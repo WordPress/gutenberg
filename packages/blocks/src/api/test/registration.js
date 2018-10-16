@@ -642,6 +642,7 @@ describe( 'blocks', () => {
 	describe( 'unregisterBlockStyle', () => {
 		afterEach( () => {
 			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/big/unregister' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/small/unregister' );
 		} );
 
 		it( 'should remove styles', () => {
@@ -652,6 +653,23 @@ describe( 'blocks', () => {
 			} );
 
 			expect( settings.styles ).toEqual( [] );
+		} );
+
+		it( 'should keep other styles', () => {
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'small' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [
+					{ name: 'normal', label: 'Normal style' },
+					{ name: 'small', label: 'Small style' },
+					{ name: 'big', label: 'Big style' },
+				],
+			} );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'normal', label: 'Normal style' },
+				{ name: 'big', label: 'Big style' },
+			] );
 		} );
 	} );
 } );
