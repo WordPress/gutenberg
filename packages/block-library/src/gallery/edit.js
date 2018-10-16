@@ -26,7 +26,6 @@ import {
 	InspectorControls,
 	mediaUpload,
 } from '@wordpress/editor';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -46,15 +45,8 @@ export function defaultColumnsNumber( attributes ) {
 }
 
 export const pickRelevantMediaFiles = ( image ) => {
-	let { caption } = image;
-
-	if ( typeof caption !== 'object' ) {
-		caption = create( { html: caption } );
-	}
-
 	return {
-		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
-		caption,
+		...pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] ),
 	};
 };
 
