@@ -27,10 +27,7 @@ export function MenuGroup( {
 	const labelId = `components-menu-group-label-${ instanceId }`;
 	const classNames = classnames(
 		className,
-		'components-menu-group',
-		{
-			'has-label': !! label,
-		}
+		'components-menu-group'
 	);
 
 	return (

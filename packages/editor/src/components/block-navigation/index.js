@@ -25,10 +25,7 @@ function BlockNavigationList( {
 	showNestedBlocks,
 } ) {
 	return (
-		<ul
-			aria-label={ __( 'Block Navigation' ) }
-			className="editor-block-navigation__list"
-		>
+		<ul className="editor-block-navigation__list">
 			{ map( blocks, ( block ) => {
 				const blockType = getBlockType( block.name );
 				return (
@@ -69,7 +66,7 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 	);
 
 	return (
-		<MenuGroup>
+		<MenuGroup label={ __( 'Block Navigation' ) }>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }
