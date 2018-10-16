@@ -19,10 +19,6 @@ export default function BlockIcon( { icon, showColors = false, className } ) {
 		color: icon && icon.foreground,
 	} : {};
 
-	if ( ! renderedIcon ) {
-		return null;
-	}
-
 	return (
 		<div
 			style={ style }
