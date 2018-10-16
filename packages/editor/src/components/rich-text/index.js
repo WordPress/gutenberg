@@ -76,8 +76,8 @@ export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
 
-		if ( multiline === 'p' || multiline === 'li' ) {
-			this.multilineTag = multiline;
+		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
+			this.multilineTag = multiline === true ? 'p' : multiline;
 		}
 
 		this.onInit = this.onInit.bind( this );
@@ -996,8 +996,8 @@ RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => 
 	let html = value;
 	let MultilineTag;
 
-	if ( multiline === 'p' || multiline === 'li' ) {
-		MultilineTag = multiline;
+	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
+		MultilineTag = multiline === true ? 'p' : multiline;
 	}
 
 	// Handle deprecated `children` and `node` sources.
