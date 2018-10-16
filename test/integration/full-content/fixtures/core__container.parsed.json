@@ -1,0 +1,27 @@
+[
+    {
+        "blockName": "core/container",
+        "attrs": {},
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p>Container, Paragraph One</p>\n\t"
+            },
+            {
+                "blockName": "core/paragraph",
+                "attrs": {},
+                "innerBlocks": [],
+                "innerHTML": "\n\t<p>Container, Paragraph Two</p>\n\t"
+            }
+        ],
+        "innerHTML": "\n<div class=\"wp-block-container\">\n\t\n\t\n</div>\n"
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n"
+    }
+]
