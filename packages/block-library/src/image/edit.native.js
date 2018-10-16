@@ -40,27 +40,17 @@ export default function ImageEdit( props ) {
 				resizeMethod="scale"
 				source={ { uri: url } }
 			/>
-			{ CaptionTextInput( setAttributes, caption, isSelected ) }
+			{ ( caption.length > 0 || isSelected ) && (
+				<View style={ { padding: 12, flex: 1 } }>
+					<TextInput
+						style={ { textAlign: 'center' } }
+						underlineColorAndroid="transparent"
+						value={ caption }
+						placeholder={ 'Write caption…' }
+						onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+					/>
+				</View>
+			) }
 		</View>
 	);
 }
-
-const CaptionTextInput = ( setAttributes, caption, isSelected ) => {
-	const captionString = [] + caption; // caption can be a string or an array.
-
-	if ( ! captionString.length && ! isSelected ) {
-		return null;
-	}
-
-	return (
-		<View style={ { padding: 12, flex: 1 } }>
-			<TextInput
-				style={ { textAlign: 'center' } }
-				underlineColorAndroid="transparent"
-				value={ captionString }
-				placeholder={ 'Write caption…' }
-				onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-			/>
-		</View>
-	);
-};
