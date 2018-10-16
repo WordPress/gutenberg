@@ -416,6 +416,11 @@ export function createBlockWithFallback( blockNode ) {
 	// freeform content fallback.
 	let name = originalName || freeformContentFallbackBlock;
 
+	// Convert 'core/cover-image' block in existing content to 'core/cover'.
+	if ( 'core/cover-image' === name ) {
+		name = 'core/cover';
+	}
+
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';

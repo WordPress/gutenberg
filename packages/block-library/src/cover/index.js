@@ -60,12 +60,12 @@ const blockAttributes = {
 	},
 };
 
-export const name = 'core/cover-image';
+export const name = 'core/cover';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const settings = {
-	title: __( 'Cover Image' ),
+	title: __( 'Cover' ),
 
 	description: __( 'Add a full-width image, and layer text over it — great for headers.' ),
 
@@ -81,14 +81,14 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => (
-					createBlock( 'core/cover-image', { title: content } )
+					createBlock( 'core/cover', { title: content } )
 				),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
 				transform: ( { caption, url, align, id } ) => (
-					createBlock( 'core/cover-image', {
+					createBlock( 'core/cover', {
 						title: caption,
 						url,
 						align,
@@ -183,7 +183,7 @@ export const settings = {
 										render={ ( { open } ) => (
 											<IconButton
 												className="components-toolbar__control"
-												label={ __( 'Edit image' ) }
+												label={ __( 'Edit media' ) }
 												icon="edit"
 												onClick={ open }
 											/>
@@ -195,7 +195,7 @@ export const settings = {
 					</BlockControls>
 					{ !! url && (
 						<InspectorControls>
-							<PanelBody title={ __( 'Cover Image Settings' ) }>
+							<PanelBody title={ __( 'Cover Settings' ) }>
 								<ToggleControl
 									label={ __( 'Fixed Background' ) }
 									checked={ hasParallax }
@@ -235,7 +235,7 @@ export const settings = {
 						onChange={ setTitle }
 						inlineToolbar
 					/>
-				) : __( 'Cover Image' );
+				) : __( 'Cover' );
 
 				return (
 					<Fragment>
@@ -245,7 +245,7 @@ export const settings = {
 							className={ className }
 							labels={ {
 								title: label,
-								name: __( 'an image' ),
+								name: __( 'an image or a video' ),
 							} }
 							onSelect={ onSelectImage }
 							accept="image/*"
@@ -268,7 +268,7 @@ export const settings = {
 						{ ( ! RichText.isEmpty( title ) || isSelected ) && (
 							<RichText
 								tagName="p"
-								className="wp-block-cover-image-text"
+								className="wp-block-cover-text"
 								placeholder={ __( 'Write title…' ) }
 								value={ title }
 								onChange={ setTitle }
@@ -304,13 +304,50 @@ export const settings = {
 		return (
 			<div className={ classes } style={ style }>
 				{ ! RichText.isEmpty( title ) && (
-					<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
+					<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
 				) }
 			</div>
 		);
 	},
 
 	deprecated: [ {
+		attributes: {
+			...blockAttributes,
+		},
+
+		supports: {
+			className: false,
+		},
+
+		save( { attributes } ) {
+			const { url, title, hasParallax, dimRatio, align, contentAlign, overlayColor, customOverlayColor } = attributes;
+			const overlayColorClass = getColorClassName( 'background-color', overlayColor );
+			const style = backgroundImageStyles( url );
+			if ( ! overlayColorClass ) {
+				style.backgroundColor = customOverlayColor;
+			}
+
+			const classes = classnames(
+				'wp-block-cover-image',
+				dimRatioToClass( dimRatio ),
+				overlayColorClass,
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				},
+				align ? `align${ align }` : null,
+			);
+
+			return (
+				<div className={ classes } style={ style }>
+					{ ! RichText.isEmpty( title ) && (
+						<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
+					) }
+				</div>
+			);
+		},
+	}, {
 		attributes: {
 			...blockAttributes,
 			title: {
