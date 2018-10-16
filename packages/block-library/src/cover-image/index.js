@@ -167,27 +167,31 @@ export const settings = {
 							value={ align }
 							onChange={ updateAlignment }
 						/>
-						<AlignmentToolbar
-							value={ contentAlign }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { contentAlign: nextAlign } );
-							} }
-						/>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ onSelectImage }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
+						{ !! url && (
+							<Fragment>
+								<AlignmentToolbar
+									value={ contentAlign }
+									onChange={ ( nextAlign ) => {
+										setAttributes( { contentAlign: nextAlign } );
+									} }
+								/>
+								<Toolbar>
+									<MediaUpload
+										onSelect={ onSelectImage }
+										allowedTypes={ ALLOWED_MEDIA_TYPES }
+										value={ id }
+										render={ ( { open } ) => (
+											<IconButton
+												className="components-toolbar__control"
+												label={ __( 'Edit image' ) }
+												icon="edit"
+												onClick={ open }
+											/>
+										) }
 									/>
-								) }
-							/>
-						</Toolbar>
+								</Toolbar>
+							</Fragment>
+						) }
 					</BlockControls>
 					{ !! url && (
 						<InspectorControls>

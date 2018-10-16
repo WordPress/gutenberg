@@ -18,6 +18,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Autosaves_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Themes_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-themes-controller.php';
+	}
 	if ( ! class_exists( 'WP_REST_Block_Renderer_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
 	}
@@ -30,6 +33,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Post_Search_Handler' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-post-search-handler.php';
 	}
+
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 

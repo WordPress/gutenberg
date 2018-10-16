@@ -40,7 +40,6 @@ import {
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -58,16 +57,7 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	let { caption } = image;
-
-	if ( typeof caption !== 'object' ) {
-		caption = create( { html: caption } );
-	}
-
-	return {
-		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
-		caption,
-	};
+	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
 };
 
 class ImageEdit extends Component {
@@ -130,7 +120,7 @@ class ImageEdit extends Component {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
-				caption: create(),
+				caption: undefined,
 			} );
 			return;
 		}
@@ -233,22 +223,23 @@ class ImageEdit extends Component {
 					value={ align }
 					onChange={ this.updateAlignment }
 				/>
-
-				<Toolbar>
-					<MediaUpload
-						onSelect={ this.onSelectImage }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ id }
-						render={ ( { open } ) => (
-							<IconButton
-								className="components-toolbar__control"
-								label={ __( 'Edit image' ) }
-								icon="edit"
-								onClick={ open }
-							/>
-						) }
-					/>
-				</Toolbar>
+				{ !! url && (
+					<Toolbar>
+						<MediaUpload
+							onSelect={ this.onSelectImage }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							value={ id }
+							render={ ( { open } ) => (
+								<IconButton
+									className="components-toolbar__control"
+									label={ __( 'Edit image' ) }
+									icon="edit"
+									onClick={ open }
+								/>
+							) }
+						/>
+					</Toolbar>
+				) }
 			</BlockControls>
 		);
 
