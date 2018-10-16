@@ -21,15 +21,16 @@
 }
 
 .wp-embed-responsive {
-	// Add responsiveness to common aspect ratios.
-	&.wp-embed-aspect-21-9 .wp-block-embed__wrapper,
-	&.wp-embed-aspect-18-9 .wp-block-embed__wrapper,
-	&.wp-embed-aspect-16-9 .wp-block-embed__wrapper,
-	&.wp-embed-aspect-4-3 .wp-block-embed__wrapper,
-	&.wp-embed-aspect-1-1 .wp-block-embed__wrapper,
-	&.wp-embed-aspect-9-16 .wp-block-embed__wrapper,
-	&.wp-embed-aspect-1-2 .wp-block-embed__wrapper {
-		position: relative;
+	.wp-block-embed {
+		// Add responsiveness to common aspect ratios.
+		&.wp-embed-aspect-21-9 .wp-block-embed__wrapper,
+		&.wp-embed-aspect-18-9 .wp-block-embed__wrapper,
+		&.wp-embed-aspect-16-9 .wp-block-embed__wrapper,
+		&.wp-embed-aspect-4-3 .wp-block-embed__wrapper,
+		&.wp-embed-aspect-1-1 .wp-block-embed__wrapper,
+		&.wp-embed-aspect-9-16 .wp-block-embed__wrapper,
+		&.wp-embed-aspect-1-2 .wp-block-embed__wrapper {
+			position: relative;
 
 			&::before {
 				content: "";

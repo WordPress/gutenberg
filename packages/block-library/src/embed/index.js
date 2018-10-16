@@ -410,11 +410,11 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			withSelect( ( select, ownProps ) => {
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
-				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
+				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview, getThemeSupports } = core;
 				const preview = undefined !== url && getEmbedPreview( url );
 				const previewIsFallback = undefined !== url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
-        const themeSupports = getThemeSupports();
+				const themeSupports = getThemeSupports();
 				// The external oEmbed provider does not exist. We got no type info and no html.
 				const badEmbedProvider = !! preview && undefined === preview.type && false === preview.html;
 				// Some WordPress URLs that can't be embedded will cause the API to return

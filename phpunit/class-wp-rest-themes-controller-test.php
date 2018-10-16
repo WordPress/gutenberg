@@ -209,6 +209,31 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Test when a theme does not support responsive embeds.
+	 */
+	public function test_theme_supports_responsive_embeds_false() {
+		remove_theme_support( 'responsive-embeds' );
+		$response = self::perform_active_theme_request();
+
+		$result = $response->get_data();
+		$this->assertTrue( isset( $result[0]['theme_supports'] ) );
+		$this->assertTrue( isset( $result[0]['theme_supports']['responsive-embeds'] ) );
+		$this->assertFalse( $result[0]['theme_supports']['responsive-embeds'] );
+	}
+
+	/**
+	 * Test when a theme supports responsive embeds.
+	 */
+	public function test_theme_supports_responsive_embeds_true() {
+		remove_theme_support( 'responsive-embeds' );
+		add_theme_support( 'responsive-embeds' );
+		$response = self::perform_active_theme_request();
+		$result   = $response->get_data();
+		$this->assertTrue( isset( $result[0]['theme_supports'] ) );
+		$this->assertTrue( $result[0]['theme_supports']['responsive-embeds'] );
+	}
+
+	/**
 	 * Test when a theme does not support post thumbnails.
 	 */
 	public function test_theme_supports_post_thumbnails_false() {
