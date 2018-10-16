@@ -77,8 +77,12 @@ export default class TableEdit extends Component {
 
 	/**
 	 * Creates a table based on dimensions in local state.
+	 *
+	 * @param {Object} event Form submit event.
 	 */
-	onCreateTable() {
+	onCreateTable( event ) {
+		event.preventDefault();
+
 		const { setAttributes } = this.props;
 		let { initialRowCount, initialColumnCount } = this.state;
 
