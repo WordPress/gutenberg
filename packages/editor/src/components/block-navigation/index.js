@@ -25,11 +25,11 @@ function BlockNavigationList( {
 	showNestedBlocks,
 } ) {
 	return (
-		<ul className="editor-block-navigation__list">
+		<ul className="editor-block-navigation__list" role="presentation">
 			{ map( blocks, ( block ) => {
 				const blockType = getBlockType( block.name );
 				return (
-					<li key={ block.clientId }>
+					<li key={ block.clientId } role="presentation">
 						<div role="presentation" className="editor-block-navigation__item">
 							<MenuItem
 								className={ classnames( 'editor-block-navigation__item-button', {
