@@ -114,6 +114,10 @@ module.exports = {
 				message: 'Deprecated functions must be removed before releasing this version.',
 			},
 			{
+				selector: 'JSXIdentifier[name=/^(path|svg)$/]',
+				message: 'Use cross-platform native primitive component'
+			},
+			{
 				// Builds a selector which handles CallExpression with path
 				// argument at varied position by function.
 				//
