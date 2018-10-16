@@ -17,8 +17,8 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 const PANEL_NAME = 'page-attributes';
 
-export function PageAttributes( { isOpened, onTogglePanel, postType } ) {
-	if ( ! postType ) {
+export function PageAttributes( { isEnabled, isOpened, onTogglePanel, postType } ) {
+	if ( ! isEnabled || ! postType ) {
 		return null;
 	}
 	return (
@@ -40,9 +40,10 @@ export function PageAttributes( { isOpened, onTogglePanel, postType } ) {
 
 const applyWithSelect = withSelect( ( select ) => {
 	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { isEditorPanelOpened } = select( 'core/edit-post' );
+	const { isEditorPanelEnabled, isEditorPanelOpened } = select( 'core/edit-post' );
 	const { getPostType } = select( 'core' );
 	return {
+		isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 		isOpened: isEditorPanelOpened( PANEL_NAME ),
 		postType: getPostType( getEditedPostAttribute( 'type' ) ),
 	};

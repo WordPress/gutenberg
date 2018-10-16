@@ -32,14 +32,22 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
       label="Featured Image"
       panelName="featured-image"
     />
-    <WithSelect(WithDispatch(Option))
-      label="Excerpt"
-      panelName="post-excerpt"
-    />
+    <PostExcerptCheck>
+      <WithSelect(WithDispatch(Option))
+        label="Excerpt"
+        panelName="post-excerpt"
+      />
+    </PostExcerptCheck>
     <WithSelect(WithDispatch(Option))
       label="Discussion"
       panelName="discussion-panel"
     />
+    <WithSelect(PageAttributesCheck)>
+      <WithSelect(WithDispatch(Option))
+        label="Page Attributes"
+        panelName="page-attributes"
+      />
+    </WithSelect(PageAttributesCheck)>
   </Section>
 </WithInstanceId(Modal)>
 `;
