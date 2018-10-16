@@ -67,6 +67,14 @@ The icon to render. Supported values are: Dashicons (specified as strings), func
 - Required: No
 - Default: `null`
 
+### size
+
+The size (width and height) of the icon.
+
+- Type: `Number`
+- Required: No
+- Default: `24`
+
 ### className
 
 An optional additional class name to apply to the rendered icon.
