@@ -48,8 +48,20 @@ export class RichText extends Component {
 	}
 
 	// eslint-disable-next-line no-unused-vars
-	onHTMLContentWithCursor( htmlText, cursorPosition ) {
-		// Descriptive placeholder: This logic still needs to be implemented.
+	onHTMLContentWithCursor( htmlText, start, end ) {
+		if ( ! this.props.onSplit ) {
+			// TODO: insert the \n char instead?
+			return;
+		}
+		this.splitContent( htmlText, start, end );
+	}
+
+	splitContent( htmlText, start, end ) {
+		const { onSplit } = this.props;
+		if ( ! onSplit ) {
+			return;
+		}
+		onSplit( htmlText, start, end );
 	}
 
 	onActiveFormatsChange( formats ) {
