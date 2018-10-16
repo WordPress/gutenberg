@@ -11,6 +11,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { MenuItem, MenuGroup } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,7 +25,10 @@ function BlockNavigationList( {
 	showNestedBlocks,
 } ) {
 	return (
-		<ul className="editor-block-navigation__list">
+		<ul
+			aria-label={ __( 'Block Navigation' ) }
+			className="editor-block-navigation__list"
+		>
 			{ map( blocks, ( block ) => {
 				const blockType = getBlockType( block.name );
 				return (
