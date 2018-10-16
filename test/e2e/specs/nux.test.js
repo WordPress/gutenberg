@@ -6,6 +6,7 @@ import {
 	clickOnMoreMenuItem,
 	newPost,
 	saveDraft,
+	toggleOption,
 } from '../support/utils';
 
 describe( 'New User Experience (NUX)', () => {
@@ -91,15 +92,8 @@ describe( 'New User Experience (NUX)', () => {
 		let nuxTipElements = await page.$$( '.nux-dot-tip' );
 		expect( nuxTipElements ).toHaveLength( 1 );
 
-		// Open the Options modal.
-		await clickOnMoreMenuItem( 'Options' );
-
-		// Click on the 'Enable Tips' checkbox to disable.
-		let [ enableTipsOption ] = await page.$x( '//label[contains(text(), "Enable Tips")]' );
-		await enableTipsOption.click();
-
-		// Close the Options modal.
-		await page.click( 'button[aria-label="Close dialog"]' );
+		// Toggle the 'Enable Tips' option to disable.
+		await toggleOption( 'Enable Tips' );
 
 		// Should disable tips from appearing.
 		nuxTipElements = await page.$$( '.nux-dot-tip' );
@@ -109,15 +103,8 @@ describe( 'New User Experience (NUX)', () => {
 		let areTipsEnabled = await getTipsEnabled( page );
 		expect( areTipsEnabled ).toEqual( false );
 
-		// Open the Options modal.
-		await clickOnMoreMenuItem( 'Options' );
-
-		// Click on the 'Enable Tips' checkbox to re-enable.
-		[ enableTipsOption ] = await page.$x( '//label[contains(text(), "Enable Tips")]' );
-		await enableTipsOption.click();
-
-		// Close the Options modal.
-		await page.click( 'button[aria-label="Close dialog"]' );
+		// Toggle the 'Enable Tips' option to enable.
+		await toggleOption( 'Enable Tips' );
 
 		// Tips should once again appear.
 		nuxTipElements = await page.$$( '.nux-dot-tip' );
