@@ -14,10 +14,10 @@ exports[`core/embed block edit matches snapshot 1`] = `
         aria-hidden="true"
         class="dashicon dashicons-embed-generic"
         focusable="false"
-        height="20"
+        height="24"
         role="img"
         viewBox="0 0 20 20"
-        width="20"
+        width="24"
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
