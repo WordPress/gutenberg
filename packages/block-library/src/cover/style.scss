@@ -1,0 +1,71 @@
+.wp-block-cover,
+.wp-block-cover.alignleft,
+.wp-block-cover.aligncenter,
+.wp-block-cover.alignright,
+.wp-block-cover.alignwide,
+.wp-block-cover.alignfull {
+	display: flex;
+}
+
+.wp-block-cover {
+	position: relative;
+	background-color: $black;
+	background-size: cover;
+	background-position: center center;
+	min-height: 430px;
+	width: 100%;
+	margin: 0 0 1.5em 0;
+
+	justify-content: center;
+	align-items: center;
+
+	&.has-parallax {
+		background-attachment: fixed;
+	}
+
+	&.has-background-dim::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background-color: inherit;
+		opacity: 0.5;
+		z-index: z-index(".wp-block-cover__inner-container");
+	}
+
+	@for $i from 1 through 10 {
+		&.has-background-dim.has-background-dim-#{ $i * 10 }::before {
+			opacity: $i * 0.1;
+		}
+	}
+
+	.wp-block-cover__inner-container {
+		width: calc(100% - 70px);
+		z-index: z-index(".wp-block-cover__inner-container");
+		color: $light-gray-100;
+	}
+
+	p,
+	h1,
+	h2,
+	h3,
+	h4,
+	h5,
+	h6,
+	.wp-block-subhead {
+		color: inherit;
+	}
+}
+
+.wp-block-cover__video-background {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	width: 100%;
+	height: 100%;
+	z-index: z-index(".wp-block-cover__video-background");
+	object-fit: fill;
+}

@@ -23,6 +23,7 @@ import {
 	withColors,
 	getColorClassName,
 } from '@wordpress/editor';
+import deprecated from '@wordpress/deprecated';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
@@ -74,6 +75,10 @@ export const settings = {
 	category: 'common',
 
 	attributes: blockAttributes,
+
+	supports: {
+		inserter: false,
+	},
 
 	transforms: {
 		from: [
@@ -132,6 +137,10 @@ export const settings = {
 		withNotices,
 	] )(
 		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
+			deprecated( 'The Cover Image block', {
+				alternative: 'the Cover block',
+				plugin: 'Gutenberg',
+			} );
 			const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const onSelectImage = ( media ) => {

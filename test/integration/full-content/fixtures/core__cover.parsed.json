@@ -1,0 +1,28 @@
+[
+    {
+        "blockName": "core/cover",
+        "attrs": {
+            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "dimRatio": 40
+        },
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {
+                    "align": "center",
+                    "placeholder": "Write title…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "innerHTML": "\n\t\t<p style=\"text-align:center\" class=\"has-large-font-size\">Cover!</p>\n\t\t"
+            }
+        ],
+        "innerHTML": "\n<div class=\"wp-block-cover has-background-dim has-background-dim-40\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n"
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n"
+    }
+]
