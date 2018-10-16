@@ -16,9 +16,6 @@
 	}
 
 	&__option {
-		display: flex;
-		align-items: center;
-		padding: 0.6rem 0;
 		border-top: 1px solid $light-gray-500;
 
 		&:last-child {
@@ -26,11 +23,14 @@
 		}
 
 		.components-base-control__field {
+			align-items: center;
+			display: flex;
 			margin: 0;
 		}
 
-		.components-checkbox-control__input {
-			margin-right: 10px;
+		.components-checkbox-control__label {
+			flex-grow: 1;
+			padding: 0.6rem 0 0.6rem 10px;
 		}
 	}
 }
