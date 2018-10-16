@@ -1,0 +1,5 @@
+.wp-block-container .editor-block-list__block {
+	// We need to enforce a cascade by telling nested blocks to inherit
+	// their text color from the container block.
+	color: inherit;
+}
