@@ -1,5 +1,5 @@
 #!/bin/bash
-NVM_VERSION="v0.33.8"
+NVM_VERSION=`curl -Ls -w %{url_effective} -o /dev/null https://github.com/creationix/nvm/releases/latest | rev | cut -d '/' -f 1 | rev`
 
 # Exit if any command fails
 set -e
