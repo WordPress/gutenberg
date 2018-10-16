@@ -40,7 +40,6 @@ import {
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -58,15 +57,8 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	let { caption } = image;
-
-	if ( typeof caption !== 'object' ) {
-		caption = create( { html: caption } );
-	}
-
 	return {
-		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
-		caption,
+		...pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] ),
 	};
 };
 
@@ -130,7 +122,7 @@ class ImageEdit extends Component {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
-				caption: create(),
+				caption: '',
 			} );
 			return;
 		}
