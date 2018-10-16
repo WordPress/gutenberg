@@ -7,22 +7,28 @@ import { Dashicon, SVG } from '../';
 function RawIcon( { icon = null, size = 24, className } ) {
 	if ( 'string' === typeof icon ) {
 		return <Dashicon icon={ icon } size={ size } className={ className } />;
-	} else if ( 'function' === typeof icon ) {
+	}
+
+	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
 			return createElement( icon, { className, size } );
 		}
 
 		return icon();
-	} else if ( icon && icon.type === 'svg' ) {
+	}
+
+	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
 		const appliedProps = {
-			...icon.props,
 			className,
-			width: icon.props.width || size,
-			height: icon.props.height || size,
+			width: size,
+			height: size,
+			...icon.props,
 		};
 
 		return <SVG { ...appliedProps } />;
-	} else if ( isValidElement( icon ) ) {
+	}
+
+	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
 			className,
 			size,
