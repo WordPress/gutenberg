@@ -137,6 +137,30 @@
 	transform: translate(-7px, -1px);
 }
 
+.components-color-picker__hue-pointer,
+.components-color-picker__saturation-pointer {
+	transition: box-shadow 0.1s linear;
+}
+
+.components-color-picker__saturation-pointer:focus {
+	box-shadow:
+		0 0 0 2px #fff,
+		0 0 0 4px $blue-medium-500,
+		0 0 5px 0 $blue-medium-500,
+		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
+		0 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+.components-color-picker__hue-pointer:focus {
+	border-color: $blue-medium-500;
+	box-shadow:
+		0 0 0 2px $blue-medium-500,
+		0 0 3px 0 $blue-medium-500;
+	outline: 2px solid transparent;
+	outline-offset: -2px;
+}
+
+
 /* INPUTS COMPONENT */
 .components-color-picker__inputs-wrapper {
 	margin: 0 -4px;
