@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { hasIn, includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -175,13 +170,7 @@ class LinkContainer extends Component {
 		event.preventDefault();
 	}
 
-	resetState( event ) {
-		// URLInput's autocomplete list can trigger onClickOutside on the link container's popover.
-		// Return early here if the click originated from one of the autocomplete suggestions.
-		if ( hasIn( event, [ 'target', 'classList' ] ) && includes( event.target.classList, 'editor-url-input__suggestion' ) ) {
-			return;
-		}
-
+	resetState() {
 		this.props.stopAddingLink();
 		this.setState( { editLink: false } );
 	}
