@@ -45,6 +45,10 @@ const globalShortcuts = {
 			ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 		},
 		{
+			keyCombination: [ 'Esc', 'Esc' ],
+			description: __( 'Open the block navigation menu.' ),
+		},
+		{
 			keyCombination: ctrl( '`' ),
 			description: __( 'Navigate to the next part of the editor.' ),
 			ariaLabel: shortcutAriaLabel.ctrl( '`' ),

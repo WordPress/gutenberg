@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { IconButton, Dropdown, SVG } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
+import { IconButton, Dropdown, SVG, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,12 +20,20 @@ function BlockNavigationDropdown() {
 	return	(
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<IconButton
-					icon={ menuIcon }
-					aria-expanded={ isOpen }
-					onClick={ onToggle }
-					label={ __( 'Block Navigation' ) }
-				/>
+				<Fragment>
+					{ ! isOpen && <KeyboardShortcuts
+						bindGlobal
+						shortcuts={ {
+							'esc esc': onToggle,
+						} }
+					/> }
+					<IconButton
+						icon={ menuIcon }
+						aria-expanded={ isOpen }
+						onClick={ onToggle }
+						label={ __( 'Block Navigation' ) }
+					/>
+				</Fragment>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<BlockNavigation onSelect={ onClose } />
