@@ -14,8 +14,8 @@ describe( 'OptionsModal', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should match snapshot when the modal is not active', () => {
+	it( 'should not render when the modal is not active', () => {
 		const wrapper = shallow( <OptionsModal isModalActive={ false } /> );
-		expect( wrapper ).toMatchSnapshot();
+		expect( wrapper.isEmptyRender() ).toBe( true );
 	} );
 } );

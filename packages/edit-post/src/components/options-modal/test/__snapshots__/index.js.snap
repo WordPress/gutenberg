@@ -43,5 +43,3 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   </Section>
 </WithInstanceId(Modal)>
 `;
-
-exports[`OptionsModal should match snapshot when the modal is not active 1`] = `""`;
