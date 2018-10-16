@@ -64,7 +64,12 @@ export const EnableTipsOption = compose(
 			onChange: ( isEnabled ) => ( isEnabled ? enableTips() : disableTips() ),
 		};
 	} )
-)( DeferredOption );
+)(
+	// Using DeferredOption here means enableTips() is called when the Options
+	// modal is dismissed. This stops the NUX guide from appearing above the
+	// Options modal, which looks totally weird.
+	DeferredOption
+);
 
 export const EnablePanelOption = compose(
 	withSelect( ( select, { panelName } ) => ( {
