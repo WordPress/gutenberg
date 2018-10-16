@@ -46,6 +46,7 @@ export {
 	hasChildBlocksWithInserterSupport,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
+	unregisterBlockStyle,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

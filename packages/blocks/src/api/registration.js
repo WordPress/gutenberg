@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some } from 'lodash';
+import { get, isFunction, some, remove } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -370,6 +370,25 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
 				...get( settings, [ 'styles' ], [] ),
 				styleVariation,
 			],
+		};
+	} );
+};
+
+/**
+ * Unregisters a block style variation for the given block.
+ *
+ * @param {string} blockName          Name of block (example: “core/latest-posts”).
+ * @param {string} styleVariationName Name of class applied to the block.
+ */
+export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
+	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariationName }/unregister`, ( settings, name ) => {
+		if ( blockName !== name ) {
+			return settings;
+		}
+
+		return {
+			...settings,
+			styles: remove( get( settings, [ 'styles' ], [] ), ( style ) => styleVariationName !== style.name ),
 		};
 	} );
 };

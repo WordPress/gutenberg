@@ -29,6 +29,7 @@ import {
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
+	unregisterBlockStyle,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -635,6 +636,22 @@ describe( 'blocks', () => {
 				{ name: 'small', label: 'Small style' },
 				{ name: 'big', label: 'Big style' },
 			] );
+		} );
+	} );
+
+	describe( 'unregisterBlockStyle', () => {
+		afterEach( () => {
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/big/unregister' );
+		} );
+
+		it( 'should remove styles', () => {
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'big' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [ { name: 'big', label: 'Big style' } ],
+			} );
+
+			expect( settings.styles ).toEqual( [] );
 		} );
 	} );
 } );
