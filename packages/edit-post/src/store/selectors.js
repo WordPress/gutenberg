@@ -118,6 +118,24 @@ export function isEditorPanelEnabled( state, panelName ) {
 }
 
 /**
+ * Returns true if the given panel is enabled, or false otherwise. Panels are
+ * enabled by default.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} panel A string that identifies the panel.
+ *
+ * @return {boolean} Whether or not the panel is enabled.
+ */
+export function isEditorSidebarPanelOpened( state, panel ) {
+	deprecated( 'isEditorSidebarPanelOpened', {
+		alternative: 'isEditorPanelEnabled',
+		plugin: 'Gutenberg',
+		version: '4.3',
+	} );
+	return isEditorPanelEnabled( state, panel );
+}
+
+/**
  * Returns true if the given panel is open, or false otherwise. Panels are
  * closed by default.
  *
