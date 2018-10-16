@@ -58,6 +58,8 @@ export default compose( [
 		const blocks = map( clientIds, ( clientId ) => getBlock( clientId ) );
 
 		const isVisible = (
+			// Guard against the case where a regular block has *just* been converted to a
+			// reusable block and doesn't yet exist in the editor store.
 			every( blocks, ( block ) => !! block ) &&
 
 			// Hide 'Add to Reusable Blocks' when Reusable Blocks are disabled, i.e. when
