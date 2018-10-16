@@ -14,6 +14,7 @@ import {
 	PanelColorSettings,
 	ContrastChecker,
 	withColors,
+	getContrastingColors,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -450,6 +451,7 @@ export class TableEdit extends Component {
 								onChange: setBackgroundColor,
 								label: __( 'Background Color' ),
 								disableCustomColors: true,
+								filterColors: ( colors ) => getContrastingColors( colors, textColor ),
 							},
 						] }
 					>

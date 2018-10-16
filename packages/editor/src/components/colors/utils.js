@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase, map } from 'lodash';
+import { find, filter, kebabCase, map } from 'lodash';
 import tinycolor from 'tinycolor2';
 
 /**
@@ -71,4 +71,20 @@ export function getMostReadableColor( colors, colorValue ) {
 		colorValue,
 		map( colors, 'color' )
 	).toHexString();
+}
+
+/**
+ * Given an array of color objects and a color value, filters the array of colors to those that contrast.
+*
+* @param {Array}   colors           Array of color objects as set by the theme or by the editor defaults.
+* @param {?string} contrastingColor A string containing the color value to compare against for a contrast.
+*
+* @return {Array} Array of filtered colors
+*/
+export function getContrastingColors( colors, contrastingColor ) {
+	return filter( colors, ( colorSetting ) => tinycolor.isReadable(
+		tinycolor( colorSetting.color ),
+		tinycolor( contrastingColor ),
+		{ level: 'AA' }
+	) );
 }

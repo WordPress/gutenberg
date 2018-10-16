@@ -17,15 +17,17 @@ import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 import ColorPicker from '../color-picker';
 
-export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
+export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className, filterColors } ) {
 	function applyOrUnset( color ) {
 		return () => onChange( value === color ? undefined : color );
 	}
 	const customColorPickerLabel = __( 'Custom color picker' );
 	const classes = classnames( 'components-color-palette', className );
+	const filteredColors = filterColors ? filterColors( colors ) : colors;
+
 	return (
 		<div className={ classes }>
-			{ map( colors, ( { color, name } ) => {
+			{ map( filteredColors, ( { color, name } ) => {
 				const style = { color: color };
 				const itemClasses = classnames( 'components-color-palette__item', { 'is-active': value === color } );
 
