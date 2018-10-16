@@ -788,8 +788,7 @@ export const getBlockRootClientId = createSelector(
 );
 
 /**
- * Given a block client ID, returns the root of the hierarchy from which the block is
- * nested, return the block itself for root level blocks.
+ * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block from which to find root client ID.
