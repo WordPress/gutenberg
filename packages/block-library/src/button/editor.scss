@@ -1,3 +1,5 @@
+$blocks-button__line-height: $big-font-size + 6px;
+
 .editor-block-list__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;
@@ -14,14 +16,31 @@
 	margin-bottom: 0;
 	position: relative;
 
-	.editor-rich-text__tinymce {
+	.editor-rich-text__tinymce.mce-content-body {
 		cursor: text;
-		line-height: 1;
+		line-height: $blocks-button__line-height;
 	}
 
-	&:not(.has-text-color) .editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+	// Make placeholder text white unless custom colors or outline versions are chosen.
+	&:not(.has-text-color):not(.is-style-outline) .editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
 		color: $white;
+	}
+
+	// Increase placeholder opacity to meet contrast ratios.
+	.editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
 		opacity: 0.8;
+	}
+
+	// Don't let the placeholder text wrap in the variation preview.
+	.editor-block-preview__content & {
+		max-width: 100%;
+
+		.wp-block-button__link {
+			max-width: 100%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
 	}
 }
 
