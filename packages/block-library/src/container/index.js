@@ -6,15 +6,27 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { withFallbackStyles } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import {
 	getColorClassName,
 	withColors,
-	InspectorControls,
+	ContrastChecker,
 	InnerBlocks,
+	InspectorControls,
 	PanelColorSettings,
 } from '@wordpress/editor';
+import { Fragment } from '@wordpress/element';
+
+const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+	const { textColor, backgroundColor } = ownProps.attributes;
+
+	return {
+		fallbackBackgroundColor: backgroundColor,
+		fallbackTextColor: textColor,
+	};
+} );
 
 export const name = 'core/container';
 
@@ -40,6 +52,12 @@ export const settings = {
 		customBackgroundColor: {
 			type: 'string',
 		},
+		textColor: {
+			type: 'string',
+		},
+		customTextColor: {
+			type: 'string',
+		},
 	},
 
 	description: __( 'Group blocks into a container.' ),
@@ -49,11 +67,18 @@ export const settings = {
 		anchor: true,
 	},
 
-	edit: withColors( 'backgroundColor' )( ( props ) => {
+	edit: compose( [
+		withColors( 'backgroundColor', { textColor: 'color' } ),
+		applyFallbackStyles,
+	] )( ( props ) => {
 		const {
 			backgroundColor,
 			className,
+			fallbackBackgroundColor,
+			fallbackTextColor,
 			setBackgroundColor,
+			setTextColor,
+			textColor,
 		} = props;
 
 		return (
@@ -68,16 +93,33 @@ export const settings = {
 								onChange: setBackgroundColor,
 								label: __( 'Background Color' ),
 							},
+							{
+								value: textColor.color,
+								onChange: setTextColor,
+								label: __( 'Text Color' ),
+							},
 						] }
-					/>
+					>
+						<ContrastChecker
+							{ ...{
+								textColor: textColor.color,
+								backgroundColor: backgroundColor.color,
+								fallbackTextColor,
+								fallbackBackgroundColor,
+							} }
+						/>
+					</PanelColorSettings>
 				</InspectorControls>
 				<div
 					className={ classnames( className, {
 						'has-background': backgroundColor.color,
+						'has-text-color': textColor.color,
 						[ backgroundColor.class ]: backgroundColor.class,
+						[ textColor.class ]: textColor.class,
 					} ) }
 					style={ {
 						backgroundColor: backgroundColor.color,
+						color: textColor.color,
 					} }
 				>
 					<InnerBlocks />
@@ -90,17 +132,26 @@ export const settings = {
 		const {
 			backgroundColor,
 			customBackgroundColor,
+			customTextColor,
+			textColor,
 		} = attributes;
 
-		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-
-		const className = classnames( {
-			'has-background': backgroundColor || customBackgroundColor,
-			[ backgroundClass ]: backgroundClass,
-		} );
+		const backgroundColorClass = getColorClassName( 'background-color', backgroundColor );
+		const textColorClass = getColorClassName( 'color', textColor );
 
 		return (
-			<div className={ className }>
+			<div
+				className={ classnames( {
+					'has-background': backgroundColor || customBackgroundColor,
+					'has-text-color': textColor || customTextColor,
+					[ backgroundColorClass ]: backgroundColorClass,
+					[ textColorClass ]: textColorClass,
+				} ) }
+				style={ {
+					backgroundColor: backgroundColorClass ? undefined : customBackgroundColor,
+					color: textColorClass ? undefined : customTextColor,
+				} }
+			>
 				<InnerBlocks.Content />
 			</div>
 		);
