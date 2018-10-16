@@ -2,7 +2,11 @@
  * Internal dependencies
  */
 
-import { escapeHTML, escapeAttribute } from '@wordpress/escape-html';
+import {
+	escapeHTML,
+	escapeAttribute,
+	isValidAttributeName,
+} from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
@@ -83,6 +87,10 @@ function createElementHTML( { type, attributes, object, children } ) {
 	let attributeString = '';
 
 	for ( const key in attributes ) {
+		if ( ! isValidAttributeName( key ) ) {
+			continue;
+		}
+
 		attributeString += ` ${ key }="${ escapeAttribute( attributes[ key ] ) }"`;
 	}
 
