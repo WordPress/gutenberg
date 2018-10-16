@@ -37,7 +37,6 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 				<EnableTipsOption label={ __( 'Enable Tips' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
-				<EnablePanelOption panelName="post-status" label={ __( 'Status & Visibility' ) } />
 				<PostTaxonomies
 					taxonomyWrapper={ ( content, taxonomy ) => (
 						<EnablePanelOption

@@ -25,10 +25,6 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   <Section
     title="Document Panels"
   >
-    <WithSelect(WithDispatch(Option))
-      label="Status & Visibility"
-      panelName="post-status"
-    />
     <WithSelect(PostTaxonomies)
       taxonomyWrapper={[Function]}
     />
