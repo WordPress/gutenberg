@@ -48,6 +48,7 @@ import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
+import { isInsideRootBlock } from '../../utils/dom';
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -133,12 +134,11 @@ export class BlockListBlock extends Component {
 		}
 
 		// Find all tabbables within node.
-		const innerBlocks = this.node.querySelector( '.editor-inner-blocks' );
 		const textInputs = focus.tabbable
 			.find( this.node )
 			.filter( isTextField )
 			// Exclude inner blocks
-			.filter( ( node ) => ! ignoreInnerBlocks || ! innerBlocks || ! innerBlocks.contains( node ) );
+			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( this.node, node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
