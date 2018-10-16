@@ -1286,7 +1286,7 @@ function gutenberg_get_block_categories( $post ) {
 		array(
 			'slug'  => 'common',
 			'title' => __( 'Common Blocks', 'gutenberg' ),
-			'icon'  => null,
+			'icon'  => 'screenoptions',
 		),
 		array(
 			'slug'  => 'formatting',
