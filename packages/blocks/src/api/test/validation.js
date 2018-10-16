@@ -14,6 +14,7 @@ import {
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
 	isValidBlock,
+	isClosedByToken,
 } from '../validation';
 import {
 	registerBlockType,
@@ -317,6 +318,53 @@ describe( 'validation', () => {
 
 			expect( token ).toBeUndefined();
 			expect( tokens ).toHaveLength( 0 );
+		} );
+	} );
+
+	describe( 'isClosedByToken()', () => {
+		it( 'should return true if self-closed token is closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( true );
+		} );
+
+		it( 'should return false if open token is not closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: false },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token has a different name to the end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'span' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by a start token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'StartTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by an undefined token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				undefined,
+			);
+
+			expect( isClosed ).toBe( false );
 		} );
 	} );
 
