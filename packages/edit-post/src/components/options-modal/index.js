@@ -20,7 +20,7 @@ import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from 
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, toggleModal } ) {
+export function OptionsModal( { isModalActive, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -30,7 +30,7 @@ export function OptionsModal( { isModalActive, toggleModal } ) {
 			className="edit-post-options-modal"
 			title={ <span className="edit-post-options-modal__title">{ __( 'Options' ) }</span> }
 			closeLabel={ __( 'Close' ) }
-			onRequestClose={ toggleModal }
+			onRequestClose={ closeModal }
 		>
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption label={ __( 'Enable Pre-publish Checks' ) } />
@@ -58,10 +58,9 @@ export default compose(
 	withSelect( ( select ) => ( {
 		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
 	} ) ),
-	withDispatch( ( dispatch, { isModalActive } ) => {
-		const { openModal, closeModal } = dispatch( 'core/edit-post' );
+	withDispatch( ( dispatch ) => {
 		return {
-			toggleModal: () => ( isModalActive ? closeModal() : openModal( MODAL_NAME ) ),
+			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
 		};
 	} )
 )( OptionsModal );
