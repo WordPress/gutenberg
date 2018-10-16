@@ -20,7 +20,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks
-		await page.click( '[aria-label="Block Hierarchy"]' );
+		await page.click( '[aria-label="Block Navigation"]' );
 		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-hierarchy__item') and contains(text(), 'Columns (beta)')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
@@ -32,7 +32,7 @@ describe( 'Navigating the block hierarchy', () => {
 		page.keyboard.type( '3' );
 
 		// Navigate to the last column blosck
-		await page.click( '[aria-label="Block Hierarchy"]' );
+		await page.click( '[aria-label="Block Navigation"]' );
 		const lastColumnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-hierarchy__item') and contains(text(), 'Column')]" ) )[ 3 ];
 		await lastColumnsBlockMenuItem.click();
 

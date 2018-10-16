@@ -17,16 +17,21 @@ import { compose } from '@wordpress/compose';
  */
 import BlockIcon from '../block-icon';
 
-function BlockHierarchyList( { blocks, selectedBlockClientId, selectBlock } ) {
+function BlockNavigationList( {
+	blocks,
+	selectedBlockClientId,
+	selectBlock,
+	showNestedBlocks,
+} ) {
 	return (
-		<ul className="editor-block-hierarchy__list">
+		<ul className="editor-block-navigation__list">
 			{ map( blocks, ( block ) => {
 				const blockType = getBlockType( block.name );
 				return (
 					<li key={ block.clientId }>
-						<div role="presentation" className="editor-block-hierarchy__item">
+						<div role="presentation" className="editor-block-navigation__item">
 							<MenuItem
-								className={ classnames( 'editor-block-hierarchy__item-button', {
+								className={ classnames( 'editor-block-navigation__item-button', {
 									'is-selected': block.clientId === selectedBlockClientId,
 								} ) }
 								onClick={ () => selectBlock( block.clientId ) }
@@ -36,11 +41,12 @@ function BlockHierarchyList( { blocks, selectedBlockClientId, selectBlock } ) {
 								{ blockType.title }
 							</MenuItem>
 						</div>
-						{ !! block.innerBlocks && !! block.innerBlocks.length && (
-							<BlockHierarchyList
+						{ showNestedBlocks && !! block.innerBlocks && !! block.innerBlocks.length && (
+							<BlockNavigationList
 								blocks={ block.innerBlocks }
 								selectedBlockClientId={ selectedBlockClientId }
 								selectBlock={ selectBlock }
+								showNestedBlocks
 							/>
 						) }
 					</li>
@@ -50,17 +56,31 @@ function BlockHierarchyList( { blocks, selectedBlockClientId, selectBlock } ) {
 	);
 }
 
-function BlockHierarchy( { rootBlock, selectedBlockClientId, selectBlock } ) {
-	if ( ! rootBlock ) {
-		return null;
-	}
+function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, selectBlock } ) {
+	const hasHierarchy = (
+		rootBlock && (
+			rootBlock.clientId !== selectedBlockClientId ||
+			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 )
+		)
+	);
+
 	return (
 		<MenuGroup>
-			<BlockHierarchyList
-				blocks={ [ rootBlock ] }
-				selectedBlockClientId={ selectedBlockClientId }
-				selectBlock={ selectBlock }
-			/>
+			{ hasHierarchy && (
+				<BlockNavigationList
+					blocks={ [ rootBlock ] }
+					selectedBlockClientId={ selectedBlockClientId }
+					selectBlock={ selectBlock }
+					showNestedBlocks
+				/>
+			) }
+			{ ! hasHierarchy && (
+				<BlockNavigationList
+					blocks={ rootBlocks }
+					selectedBlockClientId={ selectedBlockClientId }
+					selectBlock={ selectBlock }
+				/>
+			) }
 		</MenuGroup>
 	);
 }
@@ -71,9 +91,11 @@ export default compose(
 			getSelectedBlockClientId,
 			getBlockHierarchyRootClientId,
 			getBlock,
+			getBlocks,
 		} = select( 'core/editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
+			rootBlocks: getBlocks(),
 			rootBlock: selectedBlockClientId ? getBlock( getBlockHierarchyRootClientId( selectedBlockClientId ) ) : null,
 			selectedBlockClientId,
 		};
@@ -86,4 +108,4 @@ export default compose(
 			},
 		};
 	} )
-)( BlockHierarchy );
+)( BlockNavigation );

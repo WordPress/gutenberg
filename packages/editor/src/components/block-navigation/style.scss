@@ -1,21 +1,21 @@
 $tree-border-width: 2px;
 $tree-item-height: 36px;
 
-.editor-block-hierarchy__list {
+.editor-block-navigation__list {
 	padding: 0;
 	margin: 0;
 }
 
-.editor-block-hierarchy__list .editor-block-hierarchy__list {
+.editor-block-navigation__list .editor-block-navigation__list {
 	margin-top: 2px;
 	border-left: $tree-border-width solid $light-gray-900;
 	margin-left: 1em;
 
-	.editor-block-hierarchy__list {
+	.editor-block-navigation__list {
 		margin-left: 1.5em;
 	}
 
-	.editor-block-hierarchy__item {
+	.editor-block-navigation__item {
 		position: relative;
 
 		&::before {
@@ -29,7 +29,7 @@ $tree-item-height: 36px;
 		}
 	}
 
-	.editor-block-hierarchy__item-button {
+	.editor-block-navigation__item-button {
 		margin-left: 0.8em;
 		width: calc(100% - 0.8em);
 	}
@@ -48,7 +48,7 @@ $tree-item-height: 36px;
 	}
 }
 
-.editor-block-hierarchy__item-button {
+.editor-block-navigation__item-button {
 	padding: 6px;
 	display: flex;
 	align-items: center;

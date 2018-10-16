@@ -13,7 +13,7 @@ import {
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 	NavigableToolbar,
-	BlockHierarchyDropdown,
+	BlockNavigationDropdown,
 } from '@wordpress/editor';
 
 /**
@@ -37,7 +37,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
 			<EditorHistoryUndo />
 			<EditorHistoryRedo />
 			<TableOfContents />
-			<BlockHierarchyDropdown />
+			<BlockNavigationDropdown />
 			{ hasFixedToolbar && isLargeViewport && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar />
