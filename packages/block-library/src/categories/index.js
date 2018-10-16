@@ -19,31 +19,13 @@ export const settings = {
 
 	category: 'widgets',
 
-	attributes: {
-		align: {
-			type: 'string',
-		},
-		displayAsDropdown: {
-			type: 'boolean',
-			default: false,
-		},
-		showHierarchy: {
-			type: 'boolean',
-			default: false,
-		},
-		showPostCounts: {
-			type: 'boolean',
-			default: false,
-		},
-	},
-
 	supports: {
 		html: false,
 	},
 
 	getEditWrapperProps( attributes ) {
 		const { align } = attributes;
-		if ( [ 'left', 'center', 'right', 'full' ].includes( align ) ) {
+		if ( undefined !== align ) {
 			return { 'data-align': align };
 		}
 	},
