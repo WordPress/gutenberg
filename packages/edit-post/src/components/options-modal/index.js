@@ -20,8 +20,8 @@ import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from 
 const MODAL_NAME = 'edit-post/options';
 
 const Section = ( { title, children } ) => (
-	<section className="edit-post-options__section">
-		<h2 className="edit-post-options__section-title">{ title }</h2>
+	<section className="edit-post-options-modal__section">
+		<h2 className="edit-post-options-modal__section-title">{ title }</h2>
 		{ children }
 	</section>
 );
@@ -33,8 +33,8 @@ export function OptionsModal( { isModalActive, toggleModal } ) {
 
 	return (
 		<Modal
-			className="edit-post-options"
-			title={ <span className="edit-post-options__title">{ __( 'Options' ) }</span> }
+			className="edit-post-options-modal"
+			title={ <span className="edit-post-options-modal__title">{ __( 'Options' ) }</span> }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>

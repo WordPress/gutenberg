@@ -9,7 +9,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 function Option( { label, isChecked, onChange } ) {
 	return (
 		<CheckboxControl
-			className="edit-post-options__option"
+			className="edit-post-options-modal__option"
 			label={ label }
 			checked={ isChecked }
 			onChange={ onChange }
