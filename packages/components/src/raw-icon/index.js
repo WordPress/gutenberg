@@ -35,7 +35,7 @@ function RawIcon( { icon = null, size = 24, className } ) {
 		} );
 	}
 
-	return icon || null;
+	return icon;
 }
 
 export default RawIcon;
