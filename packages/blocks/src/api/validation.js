@@ -398,25 +398,21 @@ function getHTMLTokens( html ) {
 }
 
 /**
- * Returns true if the next HTML tag closes the current tag, false otherwise. Note this check does not
- * affect the array of tokens
+ * Returns true if the next HTML token closes the current token.
  *
- * @param {Object} currentToken Current token to compare against.
- * @param {Array} tokens Array of remaining HTML tokens.
+ * @param {Object} currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken Next token to compare against.
  *
- * @return {boolean} Whether the next token in `tokens` closes `currentToken`, false otherwise
+ * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
  */
-function isClosedByNextToken( currentToken, tokens ) {
-	// Check if this is a self closing tag
+export function isClosedByToken( currentToken, nextToken ) {
+	// Ensure this is a self closed token
 	if ( ! currentToken.selfClosing ) {
 		return false;
 	}
 
-	// Peek at the next token without consuming
-	const [ next ] = tokens;
-
-	// Check token names and determine if the next token is the closing tag for the current token
-	if ( next && next.tagName === currentToken.tagName && next.type === 'EndTag' ) {
+	// Check token names and determine if nextToken is the closing tag for currentToken
+	if ( nextToken && nextToken.tagName === currentToken.tagName && nextToken.type === 'EndTag' ) {
 		return true;
 	}
 
@@ -465,10 +461,16 @@ export function isEquivalentHTML( actual, expected ) {
 			return false;
 		}
 
-		// Peek at the next token to see if it closes a self-closing tag.
-		if ( isClosedByNextToken( actualToken, expectedTokens ) ) {
-			// Consume the next closing token that matches the current self-closing token
+		// Peek at the next tokens (actual and expected) to see if they close
+		// a self-closing tag
+		if ( isClosedByToken( actualToken, expectedTokens[ 0 ] ) ) {
+			// Consume the next expected token that closes the current actual
+			// self-closing token
 			getNextNonWhitespaceToken( expectedTokens );
+		} else if ( isClosedByToken( expectedToken, actualTokens[ 0 ] ) ) {
+			// Consume the next actual token that closes the current expected
+			// self-closing token
+			getNextNonWhitespaceToken( actualTokens );
 		}
 	}
 
