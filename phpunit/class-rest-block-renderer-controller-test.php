@@ -13,6 +13,13 @@
 class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
+	 * The REST API route for the block renderer.
+	 *
+	 * @var string
+	 */
+	protected static $rest_api_route = '/wp/v2/block-renderer/';
+
+	/**
 	 * Test block's name.
 	 *
 	 * @var string
@@ -169,7 +176,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		$routes = rest_get_server()->get_routes();
 		foreach ( $dynamic_block_names as $dynamic_block_name ) {
-			$this->assertArrayHasKey( "/gutenberg/v1/block-renderer/(?P<name>$dynamic_block_name)", $routes );
+			$this->assertArrayHasKey( self::$rest_api_route . "(?P<name>$dynamic_block_name)", $routes );
 		}
 	}
 
@@ -181,7 +188,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_get_item_without_permissions() {
 		wp_set_current_user( 0 );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );
 		$request->set_param( 'context', 'edit' );
 
 		$response = rest_get_server()->dispatch( $request );
@@ -195,7 +202,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_get_item_with_invalid_context() {
 		wp_set_current_user( self::$user_id );
 
-		$request  = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request  = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_invalid_param', $response, 400 );
@@ -208,7 +215,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function test_get_item_invalid_block_name() {
 		wp_set_current_user( self::$user_id );
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/core/123' );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . 'core/123' );
 
 		$request->set_param( 'context', 'edit' );
 		$response = rest_get_server()->dispatch( $request );
@@ -223,7 +230,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function test_get_item_invalid_attribute() {
 		wp_set_current_user( self::$user_id );
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );
 		$request->set_param( 'context', 'edit' );
 		$request->set_param(
 			'attributes',
@@ -242,7 +249,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 */
 	public function test_get_item_unrecognized_attribute() {
 		wp_set_current_user( self::$user_id );
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );
 		$request->set_param( 'context', 'edit' );
 		$request->set_param(
 			'attributes',
@@ -268,7 +275,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 			$defaults[ $key ] = isset( $attribute['default'] ) ? $attribute['default'] : null;
 		}
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );
 		$request->set_param( 'context', 'edit' );
 		$request->set_param( 'attributes', array() );
 		$response = rest_get_server()->dispatch( $request );
@@ -301,7 +308,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		$expected_attributes['some_int']   = (int) $expected_attributes['some_int'];
 		$expected_attributes['some_array'] = array_map( 'intval', $expected_attributes['some_array'] );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );
 		$request->set_param( 'context', 'edit' );
 		$request->set_param( 'attributes', $attributes );
 		$response = rest_get_server()->dispatch( $request );
@@ -327,7 +334,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 			'layout' => 'foo',
 		);
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );
 		$request->set_param( 'context', 'edit' );
 		$request->set_param( 'attributes', $attributes );
 		$response = rest_get_server()->dispatch( $request );
@@ -341,7 +348,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		wp_set_current_user( self::$user_id );
 
 		$expected_title = 'Test Post';
-		$request        = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$context_block_name );
+		$request        = new WP_REST_Request( 'GET', self::$rest_api_route . self::$context_block_name );
 		$request->set_param( 'context', 'edit' );
 
 		// Test without post ID.
@@ -368,7 +375,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_get_item_without_permissions_invalid_post() {
 		wp_set_current_user( self::$user_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$context_block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$context_block_name );
 		$request->set_param( 'context', 'edit' );
 
 		// Test with invalid post ID.
@@ -384,7 +391,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	public function test_get_item_without_permissions_cannot_edit_post() {
 		wp_set_current_user( self::$author_id );
 
-		$request = new WP_REST_Request( 'GET', '/gutenberg/v1/block-renderer/' . self::$context_block_name );
+		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$context_block_name );
 		$request->set_param( 'context', 'edit' );
 
 		// Test with private post ID.
@@ -400,7 +407,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 	 * @covers WP_REST_Block_Renderer_Controller::get_item_schema()
 	 */
 	public function test_get_item_schema() {
-		$request  = new WP_REST_Request( 'OPTIONS', '/gutenberg/v1/block-renderer/' . self::$block_name );
+		$request  = new WP_REST_Request( 'OPTIONS', self::$rest_api_route . self::$block_name );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
