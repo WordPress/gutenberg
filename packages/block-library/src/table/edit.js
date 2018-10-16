@@ -46,7 +46,7 @@ const applyFallbackStyles = withFallbackStyles( ( node, props ) => {
 	const styles = node ? getComputedStyle( node.querySelector( 'tr' ) ) : undefined;
 	return {
 		fallbackBackgroundColor: backgroundColor || ! styles ? undefined : styles.backgroundColor,
-		fallbackTextColor: textColor || ! styles ? undefined : styles.color,
+		textColor: textColor || ! styles ? undefined : styles.color,
 	};
 } );
 
@@ -324,7 +324,7 @@ export class TableEdit extends Component {
 	 *
 	 * @return {Object} React element for the section.
 	 */
-	renderSection( { type, rows, isStriped, backgroundColor, textColor } ) {
+	renderSection( { type, rows } ) {
 		if ( ! rows.length ) {
 			return null;
 		}
@@ -334,54 +334,39 @@ export class TableEdit extends Component {
 
 		return (
 			<Tag>
-				{ rows.map( ( { cells }, rowIndex ) => {
-					const hasColors = isStriped ? rowIndex % 2 === 0 : true;
+				{ rows.map( ( { cells }, rowIndex ) => (
+					<tr key={ rowIndex }>
+						{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
+							const isSelected = selectedCell && (
+								type === selectedCell.section &&
+								rowIndex === selectedCell.rowIndex &&
+								columnIndex === selectedCell.columnIndex
+							);
 
-					const rowClasses = classnames( {
-						'has-background-color': hasColors && backgroundColor.class,
-						[ backgroundColor.class ]: hasColors ? backgroundColor.class : undefined,
-						[ textColor.class ]: textColor.class,
-					} );
+							const cell = {
+								section: type,
+								rowIndex,
+								columnIndex,
+							};
 
-					const rowStyles = {
-						backgroundColor: hasColors ? backgroundColor.color : undefined,
-						color: textColor.color,
-					};
+							const cellClasses = classnames( { 'is-selected': isSelected	} );
 
-					return (
-						<tr key={ rowIndex } className={ rowClasses } style={ rowStyles }>
-							{ cells.map( ( { content, tag: CellTag }, columnIndex ) => {
-								const isSelected = selectedCell && (
-									type === selectedCell.section &&
-									rowIndex === selectedCell.rowIndex &&
-									columnIndex === selectedCell.columnIndex
-								);
-
-								const cell = {
-									section: type,
-									rowIndex,
-									columnIndex,
-								};
-
-								const cellClasses = classnames( { 'is-selected': isSelected	} );
-
-								return (
-									<CellTag
-										key={ columnIndex }
-										className={ cellClasses }
-									>
-										<RichText
-											className="wp-block-table__cell-content"
-											value={ content }
-											onChange={ this.onChange }
-											unstableOnFocus={ this.createOnFocus( cell ) }
-										/>
-									</CellTag>
-								);
-							} ) }
-						</tr>
-					);
-				} ) }
+							return (
+								<CellTag
+									key={ columnIndex }
+									className={ cellClasses }
+								>
+									<RichText
+										className="wp-block-table__cell-content"
+										value={ content }
+										onChange={ this.onChange }
+										unstableOnFocus={ this.createOnFocus( cell ) }
+									/>
+								</CellTag>
+							);
+						} ) }
+					</tr>
+				) ) }
 			</Tag>
 		);
 	}
@@ -403,8 +388,6 @@ export class TableEdit extends Component {
 			fallbackBackgroundColor,
 			setBackgroundColor,
 			textColor,
-			fallbackTextColor,
-			setTextColor,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
@@ -435,13 +418,9 @@ export class TableEdit extends Component {
 
 		const classes = classnames( className, {
 			'has-fixed-layout': hasFixedLayout,
+			'has-background-color': backgroundColor.class,
+			[ backgroundColor.class ]: backgroundColor.class,
 		} );
-
-		const sectionProps = {
-			isStriped: !! className && className.indexOf( 'is-style-stripes' ) > -1,
-			backgroundColor: backgroundColor,
-			textColor: textColor,
-		};
 
 		return (
 			<Fragment>
@@ -470,28 +449,23 @@ export class TableEdit extends Component {
 								value: backgroundColor.color,
 								onChange: setBackgroundColor,
 								label: __( 'Background Color' ),
-							},
-							{
-								value: textColor.color,
-								onChange: setTextColor,
-								label: __( 'Text Color' ),
+								disableCustomColors: true,
 							},
 						] }
 					>
 						<ContrastChecker
 							{ ...{
-								textColor: textColor.color,
+								textColor,
 								backgroundColor: backgroundColor.color,
-								fallbackTextColor,
 								fallbackBackgroundColor,
 							} }
 						/>
 					</PanelColorSettings>
 				</InspectorControls>
 				<table className={ classes }>
-					<Section type="head" rows={ head } { ...sectionProps } />
-					<Section type="body" rows={ body } { ...sectionProps } />
-					<Section type="foot" rows={ foot } { ...sectionProps } />
+					<Section type="head" rows={ head } />
+					<Section type="body" rows={ body } />
+					<Section type="foot" rows={ foot } />
 				</table>
 			</Fragment>
 		);
@@ -499,7 +473,7 @@ export class TableEdit extends Component {
 }
 
 const ComposedTableEdit = compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
+	withColors( 'backgroundColor' ),
 	applyFallbackStyles,
 ] )( TableEdit );
 

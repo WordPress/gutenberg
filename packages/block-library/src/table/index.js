@@ -89,21 +89,6 @@ export const settings = {
 		backgroundColor: {
 			type: 'string',
 		},
-		customBackgroundColor: {
-			type: 'string',
-		},
-		borderColor: {
-			type: 'string',
-		},
-		customBorderColor: {
-			type: 'string',
-		},
-		textColor: {
-			type: 'string',
-		},
-		customTextColor: {
-			type: 'string',
-		},
 		head: getTableSectionAttributeSchema( 'head' ),
 		body: getTableSectionAttributeSchema( 'body' ),
 		foot: getTableSectionAttributeSchema( 'foot' ),
@@ -132,15 +117,11 @@ export const settings = {
 
 	save( { attributes } ) {
 		const {
-			className,
 			hasFixedLayout,
 			head,
 			body,
 			foot,
 			backgroundColor,
-			customBackgroundColor,
-			textColor,
-			customTextColor,
 		} = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 
@@ -148,13 +129,12 @@ export const settings = {
 			return null;
 		}
 
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 		const tableClasses = classnames( {
 			'has-fixed-layout': hasFixedLayout,
+			'has-background-color': backgroundClass,
+			[ backgroundClass ]: backgroundClass,
 		} );
-
-		const isStriped = !! className && className.indexOf( 'is-style-stripes' ) > -1;
-		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-		const textClass = getColorClassName( 'color', textColor );
 
 		const Section = ( { type, rows } ) => {
 			if ( ! rows.length ) {
@@ -165,32 +145,17 @@ export const settings = {
 
 			return (
 				<Tag>
-					{ rows.map( ( { cells }, rowIndex ) => {
-						const hasColors = isStriped ? rowIndex % 2 === 0 : true;
-
-						const rowClasses = classnames( {
-							'has-background-color': hasColors && backgroundClass,
-							[ backgroundClass ]: hasColors ? backgroundClass : undefined,
-							[ textClass ]: textClass,
-						} );
-
-						const rowStyles = {
-							backgroundColor: hasColors && ! backgroundClass ? customBackgroundColor : undefined,
-							color: ! textClass ? customTextColor : undefined,
-						};
-
-						return (
-							<tr key={ rowIndex } className={ rowClasses || undefined } style={ rowStyles }>
-								{ cells.map( ( { content, tag }, cellIndex ) =>
-									<RichText.Content
-										tagName={ tag }
-										value={ content }
-										key={ cellIndex }
-									/>
-								) }
-							</tr>
-						);
-					} ) }
+					{ rows.map( ( { cells }, rowIndex ) => (
+						<tr key={ rowIndex }>
+							{ cells.map( ( { content, tag }, cellIndex ) =>
+								<RichText.Content
+									tagName={ tag }
+									value={ content }
+									key={ cellIndex }
+								/>
+							) }
+						</tr>
+					) ) }
 				</Tag>
 			);
 		};

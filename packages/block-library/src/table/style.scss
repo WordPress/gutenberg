@@ -23,8 +23,19 @@
 		border-spacing: 0;
 		border-collapse: inherit;
 
-		tr:nth-child(odd):not(.has-background-color) {
+		tr:nth-child(odd) {
 			background-color: $light-gray-200;
+		}
+
+
+		&.has-background-color {
+			tr:nth-child(odd) {
+				background-color: inherit;
+			}
+
+			tr:nth-child(even) {
+				background-color: $white;
+			}
 		}
 
 		td {
