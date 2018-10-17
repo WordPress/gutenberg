@@ -4,11 +4,6 @@
 import { find, kebabCase } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { _x } from '@wordpress/i18n';
-
-/**
  * Returns the default font size slug.
  */
 export const getDefaultFontSizeSlug = 'normal';
@@ -27,7 +22,6 @@ export const getDefaultFontSizeSlug = 'normal';
 export const getFontSize = ( fontSizes, fontSizeAttribute, customFontSizeAttribute ) => {
 	if ( customFontSizeAttribute !== undefined ) {
 		return {
-			name: _x( 'Custom', 'font size name' ),
 			slug: 'custom',
 			size: customFontSizeAttribute,
 		};
