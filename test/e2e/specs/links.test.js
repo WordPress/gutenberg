@@ -273,8 +273,8 @@ describe( 'Links', () => {
 		// Publish the post
 		await page.click( '.editor-post-publish-button' );
 
-		await page.waitForSelector( '.post-publish-panel__postpublish-link-input' );
-		const postURL = await page.evaluate( () => document.querySelector( '.post-publish-panel__postpublish-link-input' ).value );
+		await page.waitForSelector( '.post-publish-panel__postpublish-post-address input' );
+		const postURL = await page.evaluate( () => document.querySelector( '.post-publish-panel__postpublish-post-address input' ).value );
 
 		// Now create a new post and try to select the post created previously
 		// from the autocomplete suggestions.
@@ -283,6 +283,9 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
 		await page.click( 'button[aria-label="Link"]' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
 		await page.waitForSelector( '.editor-url-input__suggestion' );
@@ -296,7 +299,7 @@ describe( 'Links', () => {
 		// Expect that clicking on the autocomplete suggestion doesn't dismiss the link popover.
 		// and that the url input has a value.
 		await firstSuggestion.click();
-		expect( await page.$( '.editor-format-toolbar__link-modal' ) ).not.toBeNull();
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
 
 		// Expect the url input value to have been updated with the post url
 		const inputValue = await page.evaluate( () => document.querySelector( '.editor-url-input input[aria-label="URL"]' ).value );
@@ -305,7 +308,7 @@ describe( 'Links', () => {
 		// Expect the link to apply correctly.
 		// Note - have avoided using snapshots here since the link url can't be determined ahead of time.
 		await page.click( 'button[aria-label="Apply"]' );
-		const linkHref = await page.evaluate( () => document.querySelector( '.editor-format-toolbar__link-value' ).href );
+		const linkHref = await page.evaluate( () => document.querySelector( '.editor-format-toolbar__link-container-value' ).href );
 		expect( linkHref ).toEqual( postURL );
 	} );
 } );
