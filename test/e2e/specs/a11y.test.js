@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import axeCore from 'axe-core';
+
+/**
  * Internal dependencies
  */
 import {
@@ -16,6 +21,23 @@ function isCloseButtonFocused() {
 describe( 'a11y', () => {
 	beforeEach( async () => {
 		await newPost();
+	} );
+
+	it( 'passes aXe Javascript Accessibility API checks', async () => {
+		const handle = await page.evaluateHandle( `
+			// Inject axe source code
+			${ axeCore.source }
+			// Run axe
+			axe.run()
+		` );
+
+		// Get the results from `axe.run()`.
+		const results = await handle.jsonValue();
+
+		// Destroy the handle & return axe results.
+		await handle.dispose();
+
+		expect( results.violations ).toEqual( [] );
 	} );
 
 	it( 'tabs header bar', async () => {
