@@ -198,11 +198,18 @@ export const settings = {
 		);
 	},
 
-	merge( attributes, attributesToMerge ) {
+	merge( attributes, { value, citation } ) {
+		if ( ! value || value === '<p></p>' ) {
+			return {
+				...attributes,
+				citation: attributes.citation + citation,
+			};
+		}
+
 		return {
 			...attributes,
-			value: attributes.value + attributesToMerge.value,
-			citation: attributes.citation + attributesToMerge.citation,
+			value: attributes.value + value,
+			citation: attributes.citation + citation,
 		};
 	},
 
