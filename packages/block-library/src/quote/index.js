@@ -116,6 +116,12 @@ export const settings = {
 							} )
 						);
 					}
+
+					if ( paragraphs.length === 0 ) {
+						return createBlock( 'core/paragraph', {
+							content: '',
+						} );
+					}
 					return paragraphs;
 				},
 			},
