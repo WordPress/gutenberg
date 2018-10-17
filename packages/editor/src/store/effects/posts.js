@@ -174,6 +174,7 @@ export const requestPostUpdate = async ( action, store ) => {
 export const requestPostUpdateSuccess = ( action, store ) => {
 	const { previousPost, post, isAutosave } = action;
 	const { dispatch, getState } = store;
+	const postTypeSlug = getCurrentPostType( getState() );
 
 	// TEMPORARY: If edits remain after a save completes, the user must be
 	// prompted about unsaved changes. This should be refactored as part of
@@ -201,19 +202,39 @@ export const requestPostUpdateSuccess = ( action, store ) => {
 		noticeMessage = null;
 	} else if ( isPublished && ! willPublish ) {
 		// If undoing publish status, show specific notice
-		noticeMessage = __( 'Post reverted to draft.' );
+		noticeMessage = postTypeSlug === 'page' ? __( 'Page reverted to draft.' ) : __( 'Post reverted to draft.' );
 		shouldShowLink = false;
 	} else if ( ! isPublished && willPublish ) {
 		// If publishing or scheduling a post, show the corresponding
 		// publish message
-		noticeMessage = {
-			publish: __( 'Post published!' ),
-			private: __( 'Post published privately!' ),
-			future: __( 'Post scheduled!' ),
-		}[ post.status ];
+		const noticeMessagePublished = {
+			page: {
+				publish: __( 'Page published!' ),
+				private: __( 'Page published privately!' ),
+				future: __( 'Page scheduled!' ),
+			},
+			post: {
+				publish: __( 'Post published!' ),
+				private: __( 'Post published privately!' ),
+				future: __( 'Post scheduled!' ),
+			},
+		};
+		noticeMessage = noticeMessagePublished[ postTypeSlug ][ post.status ] || noticeMessagePublished.post[ post.status ];
 	} else {
 		// Generic fallback notice
-		noticeMessage = __( 'Post updated!' );
+		const noticeMessageUpdated = {
+			page: {
+				publish: __( 'Page updated!' ),
+				private: __( 'Page updated privately!' ),
+				future: __( 'Page scheduled!' ),
+			},
+			post: {
+				publish: __( 'Post updated!' ),
+				private: __( 'Post updated privately!' ),
+				future: __( 'Post scheduled!' ),
+			},
+		};
+		noticeMessage = noticeMessageUpdated[ postTypeSlug ][ post.status ] || noticeMessageUpdated.post[ post.status ];
 	}
 
 	if ( noticeMessage ) {
@@ -221,7 +242,7 @@ export const requestPostUpdateSuccess = ( action, store ) => {
 			<p>
 				{ noticeMessage }
 				{ ' ' }
-				{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
+				{ shouldShowLink && <a href={ post.link }>{ postTypeSlug === 'page' ? __( 'View page' ) : __( 'View post' ) }</a> }
 			</p>,
 			{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 		) );
