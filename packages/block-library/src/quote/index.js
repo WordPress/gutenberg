@@ -71,6 +71,14 @@ export const settings = {
 				},
 			},
 			{
+				type: 'block',
+				blocks: [ 'core/pullquote' ],
+				transform: ( { value, citation } ) => createBlock( 'core/quote', {
+					value,
+					citation,
+				} ),
+			},
+			{
 				type: 'pattern',
 				regExp: /^>\s/,
 				transform: ( { content } ) => {
@@ -132,6 +140,17 @@ export const settings = {
 							value: toHTMLString( quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(), 'p' ),
 						} ),
 					];
+				},
+			},
+
+			{
+				type: 'block',
+				blocks: [ 'core/pullquote' ],
+				transform: ( { value, citation } ) => {
+					return createBlock( 'core/pullquote', {
+						value,
+						citation,
+					} );
 				},
 			},
 		],
