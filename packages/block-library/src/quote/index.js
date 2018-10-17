@@ -97,8 +97,8 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { value } ) =>
-					split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
+				transform: ( { value, citation } ) =>
+					split( create( { html: value + `<p>${ citation }</p>`, multilineTag: 'p' } ), '\u2028' )
 						.map( ( piece ) =>
 							createBlock( 'core/paragraph', {
 								content: toHTMLString( piece ),
