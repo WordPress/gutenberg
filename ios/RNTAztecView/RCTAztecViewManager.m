@@ -1,6 +1,7 @@
 #import "RCTAztecViewManager.h"
-#import "RNTAztecView-Swift.h"
+//#import "RNTAztecView-Swift.h"
 #import <React/RCTViewManager.h>
+#import "WordPress-Swift.h"
 
 typedef void (^ActionBlock)(RCTAztecView *aztecView);
 

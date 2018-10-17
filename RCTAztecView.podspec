@@ -3,7 +3,7 @@ require 'json'
 package = JSON.parse(File.read(File.join(__dir__, 'package.json')))
 
 Pod::Spec.new do |s|
-  s.name             = 'RNAztec'
+  s.name             = 'RNTAztecView'
   s.version          = package['version']
   s.summary          = 'Aztec editor for React Native'
   s.license          = package['license']
