@@ -97,13 +97,27 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { value, citation } ) =>
-					split( create( { html: value + `<p>${ citation }</p>`, multilineTag: 'p' } ), '\u2028' )
-						.map( ( piece ) =>
+				transform: ( { value, citation } ) => {
+					const paragraphs = [];
+					if ( value ) {
+						paragraphs.push(
+							...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
+								.map( ( piece ) =>
+									createBlock( 'core/paragraph', {
+										content: toHTMLString( piece ),
+									} )
+								)
+						);
+					}
+					if ( citation ) {
+						paragraphs.push(
 							createBlock( 'core/paragraph', {
-								content: toHTMLString( piece ),
+								content: citation,
 							} )
-						),
+						);
+					}
+					return paragraphs;
+				},
 			},
 
 			{
