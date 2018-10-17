@@ -103,6 +103,17 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'can be converted to a pullquote', async () => {
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.type( 'cite' );
+		await convertBlock( 'Pullquote' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be merged into from a paragraph', async () => {
 		await insertBlock( 'Quote' );
 		await insertBlock( 'Paragraph' );
