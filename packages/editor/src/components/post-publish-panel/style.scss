@@ -4,6 +4,7 @@
 }
 
 .editor-post-publish-panel__content {
+	min-height: calc(100% - #{ $header-height + 60px }); // account for header and footer
 	.components-spinner {
 		display: block;
 		float: none;
@@ -35,8 +36,6 @@
 
 .editor-post-publish-panel__footer {
 	padding: 16px;
-	position: absolute;
-	bottom: 0;
 }
 
 .components-button.editor-post-publish-panel__toggle.is-primary {
