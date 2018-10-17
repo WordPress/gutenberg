@@ -53,7 +53,7 @@ async function createBlockAfter() {
 jest.setTimeout( 1000000 );
 
 describe( 'Demo content post', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await newPost();
 	} );
 
