@@ -40,9 +40,15 @@ Before running the demo app, you need to download and install the project depend
 yarn install
 ```
 
-## Run
+## Pre-Setup iOS
 
-Note: the most recent and complete version of this guide is available [here](https://github.com/react-community/create-react-native-app/blob/master/react-native-scripts/template/README.md).
+Carthage is also needed for fetching the Aztec dependency and you can get it running following command:
+
+```
+yarn preios
+```
+
+## Run
 
 ```
 yarn start
