@@ -27,24 +27,23 @@ function FontSizePicker( {
 	value,
 	withSlider,
 } ) {
-	const onChangeValue = ( event ) => {
-		const newValue = event.target.value;
-
-		// If the typed value is empty, we mark that as "custom" so the user
-		// can type in a new value without it reverting to the "Normal" size.
-		if ( newValue === '' ) {
-			onChange( 'custom' );
-			return;
-		}
-
-		onChange( Number( newValue ) );
-	};
-
-	const currentFont = fontSizes.find( ( font ) => font.size === value );
+	// Try to find the current font size in the set of preset font sizes.
+	const currentFont = fontSizes.find( ( font ) => font.slug === value.slug );
 
 	// If the current font size is not one of the pre-defined sizes, we assume
 	// the custom option has been selected.
 	const isCustomFontSize = ! ( currentFont || value === undefined );
+
+	const onChangeCustomValue = ( event ) => {
+		const newValue = event.target.value;
+
+		// If the custom value is empty, use that. Otherwise, cast it to a Number.
+		onChange( newValue === '' ? '' : Number( newValue ) );
+	};
+
+	const onResetFontSize = () => {
+		onChange( undefined );
+	};
 
 	return (
 		<BaseControl label={ __( 'Font Size' ) }>
@@ -66,23 +65,23 @@ function FontSizePicker( {
 					) }
 					renderContent={ () => (
 						<NavigableMenu>
-							{ map( fontSizes, ( { name, size, slug } ) => (
+							{ map( fontSizes, ( font ) => (
 								<Button
-									key={ slug }
-									onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
-									className={ 'is-font-' + slug }
+									key={ font.slug }
+									onClick={ () => onChange( font.slug === 'normal' ? undefined : font ) }
+									className={ 'is-font-' + font.slug }
 									role="menuitem"
 								>
-									{ ( value === size || ( ! value && slug === 'normal' ) ) &&	<Dashicon icon="saved" /> }
-									<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: size } }>
-										{ name }
+									{ font.slug === value.slug && <Dashicon icon="saved" /> }
+									<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: font.size } }>
+										{ font.name }
 									</span>
 								</Button>
 							) ) }
 							{ ( ! disableCustomFontSizes || isCustomFontSize ) &&
 								<Button
 									key={ 'custom' }
-									onClick={ () => onChange( 'custom' ) }
+									onClick={ () => onChange( '' ) }
 									className={ 'is-font-custom' }
 									role="menuitem"
 								>
@@ -99,16 +98,16 @@ function FontSizePicker( {
 					<input
 						className="components-range-control__number"
 						type="number"
-						onChange={ onChangeValue }
+						onChange={ onChangeCustomValue }
 						aria-label={ __( 'Custom font size' ) }
-						value={ value || '' }
+						value={ value.size || '' }
 					/>
 				}
 				<Button
 					className="components-color-palette__clear"
 					type="button"
-					disabled={ value === undefined }
-					onClick={ () => onChange( undefined ) }
+					disabled={ value.slug === 'normal' }
+					onClick={ onResetFontSize }
 					isSmall
 					isDefault
 					aria-label={ __( 'Reset font size' ) }
@@ -120,9 +119,9 @@ function FontSizePicker( {
 				<RangeControl
 					className="components-font-size-picker__custom-input"
 					label={ __( 'Custom Size' ) }
-					value={ value || '' }
+					value={ value.size || '' }
 					initialPosition={ fallbackFontSize }
-					onChange={ onChange }
+					onChange={ onChangeCustomValue }
 					min={ 12 }
 					max={ 100 }
 					beforeIcon="editor-textcolor"

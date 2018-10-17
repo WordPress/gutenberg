@@ -4,6 +4,11 @@
 import { find, kebabCase } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
  * 	If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
  *
@@ -22,6 +27,8 @@ export const getFontSize = ( fontSizes, fontSizeAttribute, customFontSizeAttribu
 		}
 	}
 	return {
+		name: __( 'Custom' ),
+		slug: 'custom',
 		size: customFontSizeAttribute,
 	};
 };

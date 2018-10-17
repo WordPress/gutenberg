@@ -64,7 +64,8 @@ export default ( ...fontSizeNames ) => {
 
 					createSetFontSize( fontSizeAttributeName, customFontSizeAttributeName ) {
 						return ( fontSizeValue ) => {
-							const fontSizeObject = find( this.props.fontSizes, { size: fontSizeValue } );
+							const fontSizeObject = find( this.props.fontSizes, { slug: ( fontSizeValue === undefined ? 'normal' : fontSizeValue.slug ) } );
+
 							this.props.setAttributes( {
 								[ fontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? fontSizeObject.slug : undefined,
 								[ customFontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? undefined : fontSizeValue,

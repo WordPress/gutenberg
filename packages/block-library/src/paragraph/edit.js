@@ -181,7 +181,7 @@ class ParagraphBlock extends Component {
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
 						<FontSizePicker
 							fallbackFontSize={ fallbackFontSize }
-							value={ fontSize.size }
+							value={ fontSize }
 							onChange={ setFontSize }
 						/>
 						<ToggleControl
