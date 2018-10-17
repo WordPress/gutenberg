@@ -358,10 +358,11 @@ describe( 'Demo content post', () => {
 
 		const postContent = await getEditedPostContent();
 
-		// Some random asserters to ensure blocks have been inserted and the navigation went well
+		// TODO: A snapshot test should be used, but content must be normalized
+		// to account for differences in (a) upload path and (b) media IDs.
 		expect( postContent ).toMatch( `<p style="text-align:center">Thanks for testing Gutenberg!</p>` );
 		expect( postContent ).toMatch( `<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>` );
 		expect( postContent ).toMatch( `<p style="text-align:center"><em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em></p>` );
-		expect( postContent ).toMatch( new RegExp( `<figure class=\\"wp-block-embed-vimeo wp-block-embed is-type-video is-provider-vimeo wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">\\s*https://vimeo.com/22439234\\s*</div></figure>` ) );
+		expect( postContent ).toMatch( new RegExp( `<figure class=\\"wp-block-embed-vimeo wp-block-embed\\"><div class=\\"wp-block-embed__wrapper\\">\\s*https://vimeo.com/22439234\\s*</div></figure>` ) );
 	} );
 } );
