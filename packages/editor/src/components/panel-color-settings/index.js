@@ -17,7 +17,7 @@ import ColorPaletteControl from '../color-palette/control';
 import withColorContext from '../color-palette/with-color-context';
 import { getColorObjectByColorValue } from '../colors';
 
-const customColorsDisableForSetting = ( disableCustomColors, colorSetting ) => {
+const hasCustomColorsDisabledForSetting = ( disableCustomColors, colorSetting ) => {
 	if ( colorSetting.disableCustomColors !== undefined ) {
 		return colorSetting.disableCustomColors;
 	}
@@ -28,7 +28,7 @@ const hasColorsToChooseInSetting = (
 	colors = [],
 	disableCustomColors,
 	colorSetting ) => {
-	if ( ! customColorsDisableForSetting( disableCustomColors, colorSetting ) ) {
+	if ( ! hasCustomColorsDisabledForSetting( disableCustomColors, colorSetting ) ) {
 		return true;
 	}
 	return ( colorSetting.colors || colors ).length > 0;
