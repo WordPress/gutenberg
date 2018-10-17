@@ -6,7 +6,7 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ### `value: String`
 
-*Required.* HTML string to make editable. The rendered HTML should be valid, and valid with respect to the `tagName` and `multiline` property.
+*Required.* HTML string to make editable. The HTML should be valid, and valid inside the `tagName`, if provided.
 
 ### `onChange( value: String ): Function`
 
