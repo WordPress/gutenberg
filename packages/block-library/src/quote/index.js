@@ -105,6 +105,7 @@ export const settings = {
 							} )
 						),
 			},
+
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
@@ -151,7 +152,7 @@ export const settings = {
 				</BlockControls>
 				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
-						multiline="p"
+						multiline
 						value={ value }
 						onChange={
 							( nextValue ) => setAttributes( {
@@ -191,7 +192,7 @@ export const settings = {
 
 		return (
 			<blockquote style={ { textAlign: align ? align : null } }>
-				<RichText.Content multiline="p" value={ value } />
+				<RichText.Content multiline value={ value } />
 				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
@@ -234,7 +235,7 @@ export const settings = {
 						className={ style === 2 ? 'is-large' : '' }
 						style={ { textAlign: align ? align : null } }
 					>
-						<RichText.Content multiline="p" value={ value } />
+						<RichText.Content multiline value={ value } />
 						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 					</blockquote>
 				);
@@ -261,7 +262,7 @@ export const settings = {
 						className={ `blocks-quote-style-${ style }` }
 						style={ { textAlign: align ? align : null } }
 					>
-						<RichText.Content multiline="p" value={ value } />
+						<RichText.Content multiline value={ value } />
 						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 					</blockquote>
 				);
