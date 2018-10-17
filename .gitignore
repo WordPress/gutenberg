@@ -5,7 +5,6 @@
 
 # dependencies
 /node_modules
-/ios
 
 # misc
 .env.local

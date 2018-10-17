@@ -47,6 +47,9 @@ const initialHtml = `
 Hello World
 <!-- /wp:title -->
 
+<!-- wp:paragraph -->
+<p><b>Hello</b> World!</p>
+<!-- /wp:paragraph -->
 `;
 
 const initialBlocks = parse( initialHtml );
