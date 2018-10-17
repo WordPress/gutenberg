@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
 import { mount } from 'enzyme';
 
 /**
@@ -109,6 +110,119 @@ describe( 'KeyboardShortcuts', () => {
 		expect( spy ).not.toHaveBeenCalled();
 
 		// Inside scope
+		keyPress( 68, textareas.at( 0 ).getDOMNode() );
+		expect( spy ).toHaveBeenCalled();
+	} );
+
+	it( 'should continue to bubble to ancestors', () => {
+		const spy = jest.fn();
+		const attachNode = document.createElement( 'div' );
+		document.body.appendChild( attachNode );
+
+		const wrapper = mount(
+			<KeyboardShortcuts
+				shortcuts={ {
+					d: spy,
+				} }
+			>
+				<KeyboardShortcuts
+					shortcuts={ {
+						d: noop,
+					} }
+				>
+					<textarea></textarea>
+				</KeyboardShortcuts>
+			</KeyboardShortcuts>,
+			{ attachTo: attachNode }
+		);
+
+		const textareas = wrapper.find( 'textarea' );
+
+		keyPress( 68, textareas.at( 0 ).getDOMNode() );
+		expect( spy ).toHaveBeenCalled();
+	} );
+
+	it( 'should ignore events on child handled', () => {
+		const spy = jest.fn();
+		const attachNode = document.createElement( 'div' );
+		document.body.appendChild( attachNode );
+
+		const wrapper = mount(
+			<KeyboardShortcuts
+				ignoreChildHandled
+				shortcuts={ {
+					d: spy,
+				} }
+			>
+				<KeyboardShortcuts
+					shortcuts={ {
+						d: noop,
+					} }
+				>
+					<textarea></textarea>
+				</KeyboardShortcuts>
+			</KeyboardShortcuts>,
+			{ attachTo: attachNode }
+		);
+
+		const textareas = wrapper.find( 'textarea' );
+
+		keyPress( 68, textareas.at( 0 ).getDOMNode() );
+		expect( spy ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should propagate events on child handled', () => {
+		const spy = jest.fn();
+		const attachNode = document.createElement( 'div' );
+		document.body.appendChild( attachNode );
+
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		const wrapper = mount(
+			<div onKeyDown={ spy }>
+				<KeyboardShortcuts
+					ignoreChildHandled
+					shortcuts={ {
+						d: noop,
+					} }
+				>
+					<KeyboardShortcuts
+						shortcuts={ {
+							d: noop,
+						} }
+					>
+						<textarea></textarea>
+					</KeyboardShortcuts>
+				</KeyboardShortcuts>
+			</div>,
+			{ attachTo: attachNode }
+		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
+
+		const textareas = wrapper.find( 'textarea' );
+
+		keyPress( 68, textareas.at( 0 ).getDOMNode() );
+		expect( spy ).toHaveBeenCalled();
+	} );
+
+	it( 'should handle if ignoreChildHandled but not handled by child', () => {
+		const spy = jest.fn();
+		const attachNode = document.createElement( 'div' );
+		document.body.appendChild( attachNode );
+
+		const wrapper = mount(
+			<KeyboardShortcuts
+				ignoreChildHandled
+				shortcuts={ {
+					d: spy,
+				} }
+			>
+				<textarea></textarea>
+			</KeyboardShortcuts>,
+			{ attachTo: attachNode }
+		);
+
+		const textareas = wrapper.find( 'textarea' );
+
 		keyPress( 68, textareas.at( 0 ).getDOMNode() );
 		expect( spy ).toHaveBeenCalled();
 	} );

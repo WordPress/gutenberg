@@ -22,8 +22,28 @@ class KeyboardShortcuts extends Component {
 
 		this.mousetrap = new Mousetrap( keyTarget );
 		forEach( this.props.shortcuts, ( callback, key ) => {
-			const { bindGlobal, eventName } = this.props;
+			const { bindGlobal, eventName, ignoreChildHandled } = this.props;
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
+
+			if ( ignoreChildHandled ) {
+				// Override callback to consider whether event has already been
+				// handled in a descendent KeyboardShortcuts in considering to
+				// call the original handler, stored by reference via closure.
+				callback = ( ( originalCallback ) => function( event ) {
+					if ( ! event._keyboardShortcutsHandled ) {
+						return originalCallback.apply( this, arguments );
+					}
+				} )( callback );
+			}
+
+			// Assign handled flag for consideration of ancestor; importantly
+			// only after considering flag presence to stop execution.
+			callback = ( ( originalCallback ) => function( event ) {
+				const returnValue = originalCallback.apply( this, arguments );
+				event._keyboardShortcutsHandled = true;
+				return returnValue;
+			} )( callback );
+
 			this.mousetrap[ bindFn ]( key, callback, eventName );
 		} );
 	}

@@ -105,6 +105,10 @@
 
 - `IconButton` correctly respects a passed `aria-label` prop.
 
+### New Feature
+
+- Added new prop `ignoreChildHandled` to the `KeyboardShortcuts` component.
+
 ### Deprecation
 
 - `PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.

@@ -70,6 +70,12 @@ By default, a callback is invoked in response to the `keydown` event. To overrid
 - Type: `String`
 - Required: No
 
+## ignoreChildHandled
+
+Pass as `true` to avoid calling the callback handler when the shortcut has already been handled by a descendant `KeyboardShortcuts`.
+
+This behaves similarly to [`Event#stopPropagation`](https://developer.mozilla.org/en-US/docs/Web/API/Event/stopPropagation) but impacts only the behavior of `KeyboardShortcuts`, not otherwise stopping propagation of the event.
+
 ## References
 
 - [Mousetrap documentation](https://craig.is/killing/mice)
