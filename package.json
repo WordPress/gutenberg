@@ -3,13 +3,13 @@
   "version": "0.0.2",
   "license": "GPL-2.0",
   "scripts": {
-    "install-aztec-ios": "pushd ./ios && (carthage bootstrap --platform iOS --cache-builds; popd;)",
+    "install-aztec-ios": "cd ./ios && carthage bootstrap --platform iOS --cache-builds",
     "clean": "yarn clean-watchman; yarn clean-node; yarn clean-react; yarn clean-metro; yarn clean-jest;",
     "clean-jest": "rm -rf $TMPDIR/jest_*;",
     "clean-metro": "rm -rf $TMPDIR/metro-cache-*; rm -rf $TMPDIR/metro-bundler-cache-*;",
     "clean-node": "rm -rf node_modules/;",
     "clean-react": "rm -rf $TMPDIR/react-*; rm -rf $TMPDIR/react-native-packager-cache-*;",
-    "clean-watchman": "watchman watch-del-all;",
+    "clean-watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all;",
     "clean:install": "yarn clean && yarn install"
   },
   "peerDependencies": {
