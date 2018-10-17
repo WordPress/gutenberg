@@ -31,6 +31,7 @@ describe( 'PanelColorSettings', () => {
 		);
 
 		expect( wrapper ).toMatchSnapshot();
+		expect( wrapper.dive() ).toMatchSnapshot();
 	} );
 
 	it( 'should not render anything if there are no colors to choose', () => {
@@ -80,6 +81,7 @@ describe( 'PanelColorSettings', () => {
 		);
 		expect( wrapper.type() ).not.toBeNull();
 		expect( wrapper ).toMatchSnapshot();
+		expect( wrapper.dive() ).toMatchSnapshot();
 	} );
 
 	it( 'should render a color panel if at least one setting specifies some colors to choose', () => {
@@ -109,6 +111,7 @@ describe( 'PanelColorSettings', () => {
 		);
 		expect( wrapper.type() ).not.toBeNull();
 		expect( wrapper ).toMatchSnapshot();
+		expect( wrapper.dive() ).toMatchSnapshot();
 	} );
 
 	it( 'should not render anything if none of the setting panels has colors to choose', () => {
