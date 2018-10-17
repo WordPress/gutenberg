@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	ExternalLink,
 	Fill,
@@ -53,7 +53,7 @@ function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
 }
 
-const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink } ) => (
+const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 	<form
@@ -62,7 +62,11 @@ const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink } )
 		onKeyDown={ onKeyDown }
 		onSubmit={ submitLink }
 	>
-		<URLInput value={ inputValue } onChange={ onChangeInputValue } />
+		<URLInput
+			value={ inputValue }
+			onChange={ onChangeInputValue }
+			autocompleteRef={ autocompleteRef }
+		/>
 		<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 	</form>
 	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
@@ -96,6 +100,7 @@ class LinkContainer extends Component {
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
 		this.resetState = this.resetState.bind( this );
+		this.autocompleteRef = createRef();
 
 		this.state = {};
 	}
@@ -170,7 +175,15 @@ class LinkContainer extends Component {
 		event.preventDefault();
 	}
 
-	resetState() {
+	resetState( event ) {
+		// The autocomplete suggestions list renders in a separate popover (in a portal),
+		// so onClickOutside fails to detect that a click on a suggestion occured in the
+		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
+		// return early if so.
+		if ( this.autocompleteRef.current && this.autocompleteRef.current.contains( event.target ) ) {
+			return;
+		}
+
 		this.props.stopAddingLink();
 		this.setState( { editLink: false } );
 	}
@@ -208,6 +221,7 @@ class LinkContainer extends Component {
 								onChangeInputValue={ this.onChangeInputValue }
 								onKeyDown={ this.onKeyDown }
 								submitLink={ this.submitLink }
+								autocompleteRef={ this.autocompleteRef }
 							/>
 						) : (
 							<LinkViewer
