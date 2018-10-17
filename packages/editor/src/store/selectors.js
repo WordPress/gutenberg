@@ -770,17 +770,46 @@ export function getSelectedBlock( state ) {
  *
  * @return {?string} Root client ID, if exists
  */
-export function getBlockRootClientId( state, clientId ) {
-	const { blockOrder } = state.editor.present;
+export const getBlockRootClientId = createSelector(
+	( state, clientId ) => {
+		const { blockOrder } = state.editor.present;
 
-	for ( const rootClientId in blockOrder ) {
-		if ( includes( blockOrder[ rootClientId ], clientId ) ) {
-			return rootClientId;
+		for ( const rootClientId in blockOrder ) {
+			if ( includes( blockOrder[ rootClientId ], clientId ) ) {
+				return rootClientId;
+			}
 		}
-	}
 
-	return null;
-}
+		return null;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+	]
+);
+
+/**
+ * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {string} Root client ID
+ */
+export const getBlockHierarchyRootClientId = createSelector(
+	( state, clientId ) => {
+		let rootClientId = clientId;
+		let current = clientId;
+		while ( rootClientId ) {
+			current = rootClientId;
+			rootClientId = getBlockRootClientId( state, current );
+		}
+
+		return current;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+	]
+);
 
 /**
  * Returns the client ID of the block adjacent one at the given reference

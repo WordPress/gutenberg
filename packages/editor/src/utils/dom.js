@@ -50,6 +50,21 @@ export function isInSameBlock( a, b ) {
 }
 
 /**
+ * Returns true if an elements is considered part of the block and not its children.
+ *
+ * @param {HTMLElement} blockElement Block container element.
+ * @param {HTMLElement} element      Element.
+ *
+ * @return {boolean} Whether element is in the block Element but not its children.
+ */
+export function isInsideRootBlock( blockElement, element ) {
+	const innerBlocksContainer = blockElement.querySelector( '.editor-block-list__layout' );
+	return blockElement.contains( element ) && (
+		! innerBlocksContainer || ! innerBlocksContainer.contains( element )
+	);
+}
+
+/**
  * Returns true if the given HTMLElement contains inner blocks (an InnerBlocks
  * element).
  *
