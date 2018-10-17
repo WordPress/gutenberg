@@ -466,26 +466,26 @@ function gutenberg_silence_rest_errors() {
  *
  * @see https://core.trac.wordpress.org/ticket/45101
  *
- * @param array  $args      Arguments supplied to register_post_type()
- * @param string $post_type Post type key
+ * @param array  $args      Arguments supplied to register_post_type().
+ * @param string $post_type Post type key.
  * @return array Arguments supplied to register_post_type()
  */
 function gutenberg_filter_post_type_labels( $args, $post_type ) {
 	if ( is_post_type_hierarchical( $post_type ) ) {
 		$labels = array(
-			'published_item'           => __( 'Page published.' ),
-			'published_item_privately' => __( 'Page published privately.' ),
-			'reverted_item_to_draft'   => __( 'Page reverted to draft.' ),
-			'scheduled_item'           => __( 'Page scheduled.' ),
-			'updated_item'             => __( 'Page updated.' ),
+			'published_item'           => __( 'Page published.', 'gutenberg' ),
+			'published_item_privately' => __( 'Page published privately.', 'gutenberg' ),
+			'reverted_item_to_draft'   => __( 'Page reverted to draft.', 'gutenberg' ),
+			'scheduled_item'           => __( 'Page scheduled.', 'gutenberg' ),
+			'updated_item'             => __( 'Page updated.', 'gutenberg' ),
 		);
 	} else {
 		$labels = array(
-			'published_item'           => __( 'Post published.' ),
-			'published_item_privately' => __( 'Post published privately.' ),
-			'reverted_item_to_draft'   => __( 'Post reverted to draft.' ),
-			'scheduled_item'           => __( 'Post scheduled.' ),
-			'updated_item'             => __( 'Post updated.' ),
+			'published_item'           => __( 'Post published.', 'gutenberg' ),
+			'published_item_privately' => __( 'Post published privately.', 'gutenberg' ),
+			'reverted_item_to_draft'   => __( 'Post reverted to draft.', 'gutenberg' ),
+			'scheduled_item'           => __( 'Post scheduled.', 'gutenberg' ),
+			'updated_item'             => __( 'Post updated.', 'gutenberg' ),
 		);
 	}
 	$args['labels'] = array_merge( $labels, $args['labels'] );
