@@ -23,7 +23,9 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				editorMode: 'visual',
 				isGeneralSidebarDismissed: false,
-				panels: { 'post-status': true },
+				panels: {
+					'post-status': { opened: true },
+				},
 				features: { fixedToolbar: false },
 				pinnedPluginItems: {},
 			} );
@@ -51,22 +53,120 @@ describe( 'state', () => {
 			expect( state.isGeneralSidebarDismissed ).toBe( true );
 		} );
 
-		it( 'should set the sidebar panel open flag to true if unset', () => {
-			const state = preferences( deepFreeze( { panels: {} } ), {
-				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
-				panel: 'post-taxonomies',
+		it( 'should disable panels by default', () => {
+			const original = deepFreeze( {
+				panels: {},
 			} );
-
-			expect( state.panels ).toEqual( { 'post-taxonomies': true } );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_ENABLED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { enabled: false },
+			} );
 		} );
 
-		it( 'should toggle the sidebar panel open flag', () => {
-			const state = preferences( deepFreeze( { panels: { 'post-taxonomies': true } } ), {
-				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
-				panel: 'post-taxonomies',
+		it( 'should disable panels that are enabled', () => {
+			const original = deepFreeze( {
+				panels: {
+					'post-status': { enabled: true },
+				},
 			} );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_ENABLED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { enabled: false },
+			} );
+		} );
 
-			expect( state.panels ).toEqual( { 'post-taxonomies': false } );
+		it( 'should enable panels that are disabled', () => {
+			const original = deepFreeze( {
+				panels: {
+					'post-status': { enabled: false },
+				},
+			} );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_ENABLED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { enabled: true },
+			} );
+		} );
+
+		it( 'should open panels by default', () => {
+			const original = deepFreeze( {
+				panels: {},
+			} );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_OPENED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { opened: true },
+			} );
+		} );
+
+		it( 'should open panels that are closed', () => {
+			const original = deepFreeze( {
+				panels: {
+					'post-status': { opened: false },
+				},
+			} );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_OPENED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { opened: true },
+			} );
+		} );
+
+		it( 'should close panels that are opened', () => {
+			const original = deepFreeze( {
+				panels: {
+					'post-status': { opened: true },
+				},
+			} );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_OPENED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { opened: false },
+			} );
+		} );
+
+		it( 'should open panels that are legacy closed', () => {
+			const original = deepFreeze( {
+				panels: {
+					'post-status': false,
+				},
+			} );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_OPENED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { opened: true },
+			} );
+		} );
+
+		it( 'should close panels that are legacy opened', () => {
+			const original = deepFreeze( {
+				panels: {
+					'post-status': true,
+				},
+			} );
+			const state = preferences( original, {
+				type: 'TOGGLE_PANEL_OPENED',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { opened: false },
+			} );
 		} );
 
 		it( 'should return switched mode', () => {

@@ -50,11 +50,29 @@ export const preferences = combineReducers( {
 		return state;
 	},
 	panels( state = PREFERENCES_DEFAULTS.panels, action ) {
-		if ( action.type === 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL' ) {
-			return {
-				...state,
-				[ action.panel ]: ! state[ action.panel ],
-			};
+		switch ( action.type ) {
+			case 'TOGGLE_PANEL_ENABLED': {
+				const { panelName } = action;
+				return {
+					...state,
+					[ panelName ]: {
+						...state[ panelName ],
+						enabled: ! get( state, [ panelName, 'enabled' ], true ),
+					},
+				};
+			}
+
+			case 'TOGGLE_PANEL_OPENED': {
+				const { panelName } = action;
+				const isOpen = state[ panelName ] === true || get( state, [ panelName, 'opened' ], false );
+				return {
+					...state,
+					[ panelName ]: {
+						...state[ panelName ],
+						opened: ! isOpen,
+					},
+				};
+			}
 		}
 
 		return state;

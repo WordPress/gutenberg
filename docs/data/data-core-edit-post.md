@@ -89,18 +89,47 @@ Returns true if the publish sidebar is opened.
 
 Whether the publish sidebar is open.
 
-### isEditorSidebarPanelOpened
+### isEditorPanelEnabled
 
-Returns true if the editor sidebar panel is open, or false otherwise.
+Returns true if the given panel is enabled, or false otherwise. Panels are
+enabled by default.
 
 *Parameters*
 
  * state: Global application state.
- * panel: Sidebar panel name.
+ * panelName: A string that identifies the panel.
 
 *Returns*
 
-Whether the sidebar panel is open.
+Whether or not the panel is enabled.
+
+### isEditorSidebarPanelOpened
+
+Returns true if the given panel is enabled, or false otherwise. Panels are
+enabled by default.
+
+*Parameters*
+
+ * state: Global application state.
+ * panel: A string that identifies the panel.
+
+*Returns*
+
+Whether or not the panel is enabled.
+
+### isEditorPanelOpened
+
+Returns true if the given panel is open, or false otherwise. Panels are
+closed by default.
+
+*Parameters*
+
+ * state: Global application state.
+ * panelName: A string that identifies the panel.
+
+*Returns*
+
+Whether or not the panel is open.
 
 ### isModalActive
 
@@ -257,13 +286,29 @@ publish sidebar.
 
 Returns an action object used in signalling that the user toggles the publish sidebar.
 
-### toggleGeneralSidebarEditorPanel
+### toggleEditorPanelEnabled
 
-Returns an action object used in signalling that use toggled a panel in the editor.
+Returns an action object used to enable or disable a panel in the editor.
 
 *Parameters*
 
- * panel: The panel to toggle.
+ * panelName: A string that identifies the panel to enable or disable.
+
+### toggleEditorPanelOpened
+
+Returns an action object used to open or close a panel in the editor.
+
+*Parameters*
+
+ * panelName: A string that identifies the panel to open or close.
+
+### toggleGeneralSidebarEditorPanel
+
+Returns an action object used to open or close a panel in the editor.
+
+*Parameters*
+
+ * panelName: A string that identifies the panel to open or close.
 
 ### toggleFeature
 
