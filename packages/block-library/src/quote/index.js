@@ -197,7 +197,7 @@ export const settings = {
 		);
 	},
 
-	merge( attributes, { value, citation = '' } ) {
+	merge( attributes, { value, citation } ) {
 		return {
 			...attributes,
 			value: attributes.value + value,

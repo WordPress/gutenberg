@@ -102,4 +102,13 @@ describe( 'Quote', () => {
 		await convertBlock( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'can be merged into from a paragraph', async () => {
+		await insertBlock( 'Quote' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'test' );
+		await pressTimes( 'ArrowLeft', 'test'.length );
+		await page.keyboard.press( 'Backspace' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
