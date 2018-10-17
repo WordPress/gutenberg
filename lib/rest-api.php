@@ -474,19 +474,19 @@ function gutenberg_filter_post_type_labels( $args, $post_type ) {
 	$registered_labels = ( empty( $args['labels'] ) ) ? array() : $args['labels'];
 	if ( is_post_type_hierarchical( $post_type ) ) {
 		$labels = array(
-			'published_item'           => __( 'Page published.', 'gutenberg' ),
-			'published_item_privately' => __( 'Page published privately.', 'gutenberg' ),
-			'reverted_item_to_draft'   => __( 'Page reverted to draft.', 'gutenberg' ),
-			'scheduled_item'           => __( 'Page scheduled.', 'gutenberg' ),
-			'updated_item'             => __( 'Page updated.', 'gutenberg' ),
+			'item_published'           => __( 'Page published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Page published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Page reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Page scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Page updated.', 'gutenberg' ),
 		);
 	} else {
 		$labels = array(
-			'published_item'           => __( 'Post published.', 'gutenberg' ),
-			'published_item_privately' => __( 'Post published privately.', 'gutenberg' ),
-			'reverted_item_to_draft'   => __( 'Post reverted to draft.', 'gutenberg' ),
-			'scheduled_item'           => __( 'Post scheduled.', 'gutenberg' ),
-			'updated_item'             => __( 'Post updated.', 'gutenberg' ),
+			'item_published'           => __( 'Post published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Post published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Post reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Post scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Post updated.', 'gutenberg' ),
 		);
 	}
 	$args['labels'] = array_merge( $labels, $registered_labels );
