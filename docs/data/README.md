@@ -1,8 +1,11 @@
-# Data Module Reference
+# Components Package Reference
 
- - [**core**: WordPress Core Data](../../docs/data/data-core.md)
- - [**core/blocks**: Block Types Data](../../docs/data/data-core-blocks.md)
- - [**core/editor**: The Editor’s Data](../../docs/data/data-core-editor.md)
- - [**core/edit-post**: The Editor’s UI Data](../../docs/data/data-core-edit-post.md)
- - [**core/nux**: The NUX (New User Experience) Data](../../docs/data/data-core-nux.md)
- - [**core/viewport**: The Viewport Data](../../docs/data/data-core-viewport.md)
+This is a library of generic WordPress components to be used for creating common UI elements shared between screens and features of the WordPress dashboard. They are published to vpm via the `@wordpress/components` package.
+
+## UI components
+
+- [Button](../../docs/data/data-core.md)
+- [Button](https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/button/README.md)
+- [Button](../../components/src/button/README.md)
+
+## Utility components
