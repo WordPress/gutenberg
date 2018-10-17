@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { includes, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,14 +29,22 @@ function FontSizePicker( {
 } ) {
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
+
+		// If the typed value is empty, we mark that as "custom" so the user
+		// can type in a new value without it reverting to the "Normal" size.
 		if ( newValue === '' ) {
-			onChange( undefined );
+			onChange( 'custom' );
 			return;
 		}
+
 		onChange( Number( newValue ) );
 	};
 
 	const currentFont = fontSizes.find( ( font ) => font.size === value );
+
+	// If the current font size is not one of the pre-defined sizes, we assume
+	// the custom option has been selected.
+	const isCustomFontSize = ! ( includes( map( fontSizes, 'size' ), value ) || value === undefined );
 
 	return (
 		<BaseControl label={ __( 'Font Size' ) }>
@@ -71,10 +79,23 @@ function FontSizePicker( {
 									</span>
 								</Button>
 							) ) }
+							{ ( ! disableCustomFontSizes || isCustomFontSize ) &&
+								<Button
+									key={ 'custom' }
+									onClick={ () => onChange( 'custom' ) }
+									className={ 'is-font-custom' }
+									role="menuitem"
+								>
+									{ isCustomFontSize && <Dashicon icon="saved" /> }
+									<span className="components-font-size-picker__dropdown-text-size">
+										{ __( 'Custom' ) }
+									</span>
+								</Button>
+							}
 						</NavigableMenu>
 					) }
 				/>
-				{ ( ! withSlider && ! disableCustomFontSizes ) &&
+				{ ( ! withSlider && isCustomFontSize ) &&
 					<input
 						className="components-range-control__number"
 						type="number"
@@ -95,7 +116,7 @@ function FontSizePicker( {
 					{ __( 'Reset' ) }
 				</Button>
 			</div>
-			{ withSlider &&
+			{ ( withSlider && isCustomFontSize ) &&
 				<RangeControl
 					className="components-font-size-picker__custom-input"
 					label={ __( 'Custom Size' ) }
