@@ -471,6 +471,7 @@ function gutenberg_silence_rest_errors() {
  * @return array Arguments supplied to register_post_type()
  */
 function gutenberg_filter_post_type_labels( $args, $post_type ) {
+	$registered_labels = ( empty( $args['labels'] ) ) ? array() : $args['labels'];
 	if ( is_post_type_hierarchical( $post_type ) ) {
 		$labels = array(
 			'published_item'           => __( 'Page published.', 'gutenberg' ),
@@ -488,7 +489,7 @@ function gutenberg_filter_post_type_labels( $args, $post_type ) {
 			'updated_item'             => __( 'Post updated.', 'gutenberg' ),
 		);
 	}
-	$args['labels'] = array_merge( $labels, $args['labels'] );
+	$args['labels'] = array_merge( $labels, $registered_labels );
 	return $args;
 }
 add_filter( 'register_post_type_args', 'gutenberg_filter_post_type_labels', 10, 2 );
