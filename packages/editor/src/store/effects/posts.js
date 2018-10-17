@@ -153,6 +153,7 @@ export const requestPostUpdate = async ( action, store ) => {
 				id: POST_UPDATE_TRANSACTION_ID,
 			},
 			isAutosave,
+			postType,
 		} );
 	} catch ( error ) {
 		dispatch( {
@@ -171,10 +172,9 @@ export const requestPostUpdate = async ( action, store ) => {
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const requestPostUpdateSuccess = async ( action, store ) => {
-	const { previousPost, post, isAutosave } = action;
+export const requestPostUpdateSuccess = ( action, store ) => {
+	const { previousPost, post, isAutosave, postType } = action;
 	const { dispatch, getState } = store;
-	const postType = await resolveSelector( 'core', 'getPostType', getCurrentPostType( getState() ) );
 
 	// TEMPORARY: If edits remain after a save completes, the user must be
 	// prompted about unsaved changes. This should be refactored as part of
