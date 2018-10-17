@@ -213,6 +213,7 @@ function gutenberg_init( $return, $post ) {
 	 * includes/meta-boxes is typically loaded from edit-form-advanced.php.
 	 */
 	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
+	gutenberg_collect_meta_box_data();
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
