@@ -28,7 +28,7 @@ describe( 'a11y', () => {
 			// Inject axe source code
 			${ axeCore.source }
 			// Run axe
-			axe.run()
+			axe.run( '#editor' )
 		` );
 
 		// Get the results from `axe.run()`.
