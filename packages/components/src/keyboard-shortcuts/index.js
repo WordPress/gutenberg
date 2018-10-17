@@ -3,7 +3,7 @@
  */
 import Mousetrap from 'mousetrap';
 import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
-import { forEach } from 'lodash';
+import { forEach, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,7 +70,17 @@ class KeyboardShortcuts extends Component {
 			return null;
 		}
 
-		return <div ref={ this.bindKeyTarget }>{ children }</div>;
+		return (
+			<div
+				ref={ this.bindKeyTarget }
+				{ ...omit( this.props, [
+					'shortcuts',
+					'bindGlobal',
+					'eventName',
+					'ignoreChildHandled',
+				] ) }
+			/>
+		);
 	}
 }
 

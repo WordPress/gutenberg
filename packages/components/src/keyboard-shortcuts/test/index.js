@@ -226,4 +226,22 @@ describe( 'KeyboardShortcuts', () => {
 		keyPress( 68, textareas.at( 0 ).getDOMNode() );
 		expect( spy ).toHaveBeenCalled();
 	} );
+
+	it( 'should passes through props to children wrapper', () => {
+		const attachNode = document.createElement( 'div' );
+		document.body.appendChild( attachNode );
+
+		const wrapper = mount(
+			<KeyboardShortcuts
+				ignoreChildHandled
+				shortcuts={ {} }
+				className="is-ok"
+			>
+				<textarea></textarea>
+			</KeyboardShortcuts>,
+			{ attachTo: attachNode }
+		);
+
+		expect( wrapper.getDOMNode().outerHTML ).toMatchSnapshot();
+	} );
 } );

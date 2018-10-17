@@ -108,6 +108,7 @@
 ### New Feature
 
 - Added new prop `ignoreChildHandled` to the `KeyboardShortcuts` component.
+- `KeyboardShortcuts` now passes through extra props to its rendered element when wrapping children.
 
 ### Deprecation
 

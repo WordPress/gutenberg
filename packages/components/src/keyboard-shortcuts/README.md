@@ -34,7 +34,7 @@ const MyKeyboardShortcuts = withState( {
 
 ## Props
 
-The component accepts the following props:
+The component accepts the following props. Any other props are passed to the rendered wrapping element, if passed with `children`.
 
 ### children
 
