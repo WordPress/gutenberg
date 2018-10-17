@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Quote can be converted to a pullquote 1`] = `
+"<!-- wp:pullquote -->
+<figure class=\\"wp-block-pullquote\\"><blockquote><p>one</p><p>two</p><cite>cite</cite></blockquote></figure>
+<!-- /wp:pullquote -->"
+`;
+
 exports[`Quote can be converted to headings 1`] = `
 "<!-- wp:heading -->
 <h2>one</h2>
