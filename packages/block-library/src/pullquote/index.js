@@ -64,7 +64,7 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ), isDefault: true },
+		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid' ), isDefault: true },
 		{ name: BORDER_COLOR_STYLE_NAME, label: __( 'Border' ) },
 	],
 
