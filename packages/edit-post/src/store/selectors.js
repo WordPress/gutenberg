@@ -239,6 +239,10 @@ export function isMetaBoxLocationActive( state, location ) {
 	return getActiveMetaBoxLocations( state ).includes( location );
 }
 
+export function getMetaBoxTitles( state ) {
+	return state.metaBoxTitles;
+}
+
 /**
  * Returns the state of legacy meta boxes.
  *

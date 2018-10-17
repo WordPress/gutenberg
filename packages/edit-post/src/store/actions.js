@@ -220,6 +220,13 @@ export function setActiveMetaBoxLocations( locations ) {
 	};
 }
 
+export function setMetaBoxTitles( titles ) {
+	return {
+		type: 'SET_META_BOX_TITLES',
+		titles,
+	};
+}
+
 /**
  * Returns an action object used to request meta box update.
  *

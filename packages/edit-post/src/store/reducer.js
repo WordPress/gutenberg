@@ -202,6 +202,18 @@ export function activeMetaBoxLocations( state = [], action ) {
 	return state;
 }
 
+export function metaBoxTitles( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_META_BOX_TITLES':
+			return {
+				...state,
+				...action.titles,
+			};
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	preferences,
 	activeGeneralSidebar,
@@ -209,5 +221,6 @@ export default combineReducers( {
 	activeModal,
 	publishSidebarActive,
 	activeMetaBoxLocations,
+	metaBoxTitles,
 	isSavingMetaBoxes,
 } );

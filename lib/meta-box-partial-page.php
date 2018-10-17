@@ -291,6 +291,7 @@ function the_gutenberg_metaboxes() {
 	 */
 	$wp_meta_boxes             = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
 	$locations                 = array( 'side', 'normal', 'advanced' );
+	$priorities                = array( 'high', 'sorted', 'core', 'default', 'low' );
 	$active_meta_box_locations = array();
 	// Render meta boxes.
 	?>
@@ -318,6 +319,18 @@ function the_gutenberg_metaboxes() {
 	<?php endforeach; ?>
 	<?php
 
+	$meta_box_titles = array();
+	foreach ( $locations as $location ) {
+		foreach ( $priorities as $priority ) {
+			$meta_boxes = (array) $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ];
+			foreach ( $meta_boxes as $meta_box ) {
+				if ( ! empty( $meta_box['title'] ) ) {
+					$meta_box_titles[ $meta_box['id'] ] = $meta_box['title'];
+				}
+			}
+		}
+	}
+
 	/**
 	 * Sadly we probably can not add this data directly into editor settings.
 	 *
@@ -328,6 +341,7 @@ function the_gutenberg_metaboxes() {
 	 */
 	$script = 'window._wpLoadGutenbergEditor.then( function() {
 		wp.data.dispatch( \'core/edit-post\' ).setActiveMetaBoxLocations( ' . wp_json_encode( $active_meta_box_locations ) . ' );
+		wp.data.dispatch( \'core/edit-post\' ).setMetaBoxTitles( ' . wp_json_encode( $meta_box_titles ) . ' );
 	} );';
 
 	wp_add_inline_script( 'wp-edit-post', $script );

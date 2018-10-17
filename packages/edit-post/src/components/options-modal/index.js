@@ -17,6 +17,7 @@ import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck } from '@wordpres
  */
 import Section from './section';
 import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from './options';
+import MetaBoxTitles from '../meta-box-titles';
 
 const MODAL_NAME = 'edit-post/options';
 
@@ -53,6 +54,13 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 				<PageAttributesCheck>
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
+			</Section>
+			<Section title={ __( 'Advanced Panels' ) }>
+				<MetaBoxTitles
+					titleWrapper={ ( title, id ) => (
+						<EnablePanelOption label={ title } panelName={ `meta-box-${ id }` } />
+					) }
+				/>
 			</Section>
 		</Modal>
 	);
