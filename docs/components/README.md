@@ -1,6 +1,6 @@
 # Components Package Reference
 
-This is a library of generic WordPress components to be used for creating common UI elements shared between screens and features of the WordPress dashboard. They are published to vpm via the `@wordpress/components` package.
+This is a library of generic WordPress components to be used for creating common UI elements shared between screens and features of the WordPress dashboard. They are published to npm via the `@wordpress/components` package.
 
 ## UI components
 
