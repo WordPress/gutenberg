@@ -88,7 +88,6 @@ export class PostSavedState extends Component {
 			<Button
 				className="editor-post-save-draft"
 				onClick={ onSave }
-				icon="cloud-upload"
 				shortcut={ displayShortcut.primary( 's' ) }
 				isText
 			>
