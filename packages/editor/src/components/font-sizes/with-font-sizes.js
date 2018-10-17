@@ -71,11 +71,11 @@ export default ( ...fontSizeNames ) => {
 							// Ensure that "undefined" (aka a reset) or choosing the pre-defined
 							// default font size result in an undefined fontSizeObject.
 							const fontSizeObject = ( font === undefined || font.slug === getDefaultFontSizeSlug ) ?
-								null : find( this.props.fontSizes, { slug: ( font.slug ) } );
+								undefined : find( this.props.fontSizes, { slug: ( font.slug ) } );
 
 							this.props.setAttributes( {
-								[ fontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? fontSizeObject.slug : undefined,
-								[ customFontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? undefined : font,
+								[ fontSizeAttributeName ]: ( fontSizeObject && fontSizeObject.slug ) ? fontSizeObject.slug : undefined,
+								[ customFontSizeAttributeName ]: ( font && font.slug === 'custom' ) ? font.size : undefined,
 							} );
 						};
 					}

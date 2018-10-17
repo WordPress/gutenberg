@@ -31,10 +31,10 @@ function FontSizePicker( {
 	const isCustomFontSize = ( value.slug === 'custom' );
 
 	const onChangeCustomValue = ( event ) => {
-		const newValue = event.target.value;
-
 		// If the custom value is empty, use that. Otherwise, cast it to a Number.
-		onChange( newValue === '' ? '' : Number( newValue ) );
+		const newValue = ( event.target.value === '' ) ? '' : Number( event.target.value );
+
+		onChange( { slug: 'custom', size: newValue } );
 	};
 
 	const onResetFontSize = () => {
@@ -61,6 +61,19 @@ function FontSizePicker( {
 					) }
 					renderContent={ () => (
 						<NavigableMenu>
+							{ ( ! disableCustomFontSizes || isCustomFontSize ) &&
+								<Button
+									key={ 'custom' }
+									onClick={ () => onChange( { slug: 'custom', size: '' } ) }
+									className={ 'is-font-custom' }
+									role="menuitem"
+								>
+									{ isCustomFontSize && <Dashicon icon="saved" /> }
+									<span className="components-font-size-picker__dropdown-text-size">
+										{ _x( 'Custom', 'font size name' ) }
+									</span>
+								</Button>
+							}
 							{ map( fontSizes, ( font ) => (
 								<Button
 									key={ font.slug }
@@ -74,19 +87,6 @@ function FontSizePicker( {
 									</span>
 								</Button>
 							) ) }
-							{ ( ! disableCustomFontSizes || isCustomFontSize ) &&
-								<Button
-									key={ 'custom' }
-									onClick={ () => onChange( '' ) }
-									className={ 'is-font-custom' }
-									role="menuitem"
-								>
-									{ isCustomFontSize && <Dashicon icon="saved" /> }
-									<span className="components-font-size-picker__dropdown-text-size">
-										{ _x( 'Custom', 'font size name' ) }
-									</span>
-								</Button>
-							}
 						</NavigableMenu>
 					) }
 				/>
