@@ -11,7 +11,6 @@ import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
-import { create, getTextContent } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -40,20 +39,20 @@ export const settings = {
 		},
 		fileName: {
 			source: 'html',
-			selector: 'a:not([download])',
+			selector: '.wp-block-file__link',
 		},
 		// Differs to the href when the block is configured to link to the attachment page
 		textLinkHref: {
 			type: 'string',
 			source: 'attribute',
-			selector: 'a:not([download])',
+			selector: '.wp-block-file__link',
 			attribute: 'href',
 		},
 		// e.g. `_blank` when the block is configured to open in a new window
 		textLinkTarget: {
 			type: 'string',
 			source: 'attribute',
-			selector: 'a:not([download])',
+			selector: '.wp-block-file__link',
 			attribute: 'target',
 		},
 		showDownloadButton: {
@@ -62,7 +61,7 @@ export const settings = {
 		},
 		downloadButtonText: {
 			source: 'html',
-			selector: 'a[download]',
+			selector: '.wp-block-file__button',
 			default: __( 'Download' ),
 		},
 	},
@@ -208,6 +207,7 @@ export const settings = {
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={ textLinkTarget ? 'noreferrer noopener' : false }
+						className="wp-block-file__link"
 					>
 						<RichText.Content
 							value={ fileName }
@@ -218,10 +218,6 @@ export const settings = {
 					<a
 						href={ href }
 						className="wp-block-file__button"
-						// ensure download attribute is still set when fileName
-						// is undefined. Using '' here as `true` still leaves
-						// the attribute unset.
-						download={ getTextContent( create( { html: fileName } ) ) }
 					>
 						<RichText.Content
 							value={ downloadButtonText }
