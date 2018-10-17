@@ -4,7 +4,9 @@
 }
 
 .editor-post-publish-panel__content {
-	min-height: calc(100% - #{ $header-height + 60px }); // account for header and footer
+	// Ensure the post-publish panel accounts for the header and footer height.
+	min-height: calc(100% - #{ $header-height + 60px });
+
 	.components-spinner {
 		display: block;
 		float: none;
