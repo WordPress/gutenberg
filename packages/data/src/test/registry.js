@@ -41,14 +41,109 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'registerGenericStore', () => {
-		it( 'should throw if not all required config elements are present', () => {
-			const getSelectors = () => ( {} );
-			const getActions = () => ( {} );
-			const subscribe = () => ( {} );
+		let getSelectors;
+		let getActions;
+		let subscribe;
 
-			expect( () => registry.registerStore( 'grocer', {} ) ).toThrow();
-			expect( () => registry.registerStore( 'grocer', { getSelectors, getActions } ) ).toThrow();
-			expect( () => registry.registerStore( 'grocer', { getActions, subscribe } ) ).toThrow();
+		beforeEach( () => {
+			getSelectors = () => ( {} );
+			getActions = () => ( {} );
+			subscribe = () => ( {} );
+		} );
+
+		it( 'should throw if not all required config elements are present', () => {
+			expect( () => registry.registerGenericStore( 'grocer', {} ) ).toThrow();
+			expect( () => registry.registerGenericStore( 'grocer', { getSelectors, getActions } ) ).toThrow();
+			expect( () => registry.registerGenericStore( 'grocer', { getActions, subscribe } ) ).toThrow();
+		} );
+
+		describe( 'getSelectors', () => {
+			it( 'should make selectors available via registry.select', () => {
+				const items = {
+					broccoli: { price: 2, quantity: 15 },
+					lettuce: { price: 1, quantity: 12 },
+				};
+
+				function getPrice( itemName ) {
+					const item = items[ itemName ];
+					return item && item.price;
+				}
+
+				function getQuantity( itemName ) {
+					const item = items[ itemName ];
+					return item && item.quantity;
+				}
+
+				getSelectors = () => ( { getPrice, getQuantity } );
+
+				registry.registerGenericStore( 'grocer', { getSelectors, getActions, subscribe } );
+
+				expect( registry.select( 'grocer' ).getPrice ).toEqual( getPrice );
+				expect( registry.select( 'grocer' ).getQuantity ).toEqual( getQuantity );
+			} );
+		} );
+
+		describe( 'getActions', () => {
+			it( 'should make actions available via registry.dispatch', () => {
+				const dispatch = jest.fn();
+
+				function setPrice( itemName, price ) {
+					return { type: 'SET_PRICE', itemName, price };
+				}
+
+				function setQuantity( itemName, quantity ) {
+					return { type: 'SET_QUANTITY', itemName, quantity };
+				}
+
+				getActions = () => {
+					return {
+						setPrice: ( ...args ) => dispatch( setPrice( ...args ) ),
+						setQuantity: ( ...args ) => dispatch( setQuantity( ...args ) ),
+					};
+				};
+
+				registry.registerGenericStore( 'grocer', { getSelectors, getActions, subscribe } );
+
+				expect( dispatch ).not.toHaveBeenCalled();
+
+				registry.dispatch( 'grocer' ).setPrice( 'broccoli', 3 );
+				expect( dispatch ).toHaveBeenCalledTimes( 1 );
+				expect( dispatch ).toHaveBeenCalledWith(
+					{ type: 'SET_PRICE', itemName: 'broccoli', price: 3 }
+				);
+
+				registry.dispatch( 'grocer' ).setQuantity( 'lettuce', 8 );
+				expect( dispatch ).toHaveBeenCalledTimes( 2 );
+				expect( dispatch ).toHaveBeenCalledWith(
+					{ type: 'SET_QUANTITY', itemName: 'lettuce', quantity: 8 }
+				);
+			} );
+		} );
+
+		describe( 'subscribe', () => {
+			it( 'should send out updates to listeners of the registry', () => {
+				const registryListener = jest.fn();
+
+				let listener = () => {};
+				const storeChanged = () => {
+					listener();
+				};
+				subscribe = ( newListener ) => {
+					listener = newListener;
+				};
+
+				const unsubscribe = registry.subscribe( registryListener );
+				registry.registerGenericStore( 'grocer', { getSelectors, getActions, subscribe } );
+
+				expect( registryListener ).not.toHaveBeenCalled();
+				storeChanged();
+				expect( registryListener ).toHaveBeenCalledTimes( 1 );
+				storeChanged();
+				expect( registryListener ).toHaveBeenCalledTimes( 2 );
+				unsubscribe();
+				storeChanged();
+				expect( registryListener ).toHaveBeenCalledTimes( 2 );
+			} );
 		} );
 	} );
 

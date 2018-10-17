@@ -98,6 +98,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 * Maps an object of function values to proxy invocation through to the
 	 * current internal representation of the registry, which may be enhanced
 	 * by plugins.
+	 * TODO: Consider deprecating and removing this after plugins are no longer needed.
 	 *
 	 * @param {Object<string,Function>} attributes Object of function values.
 	 *
@@ -114,7 +115,28 @@ export function createRegistry( storeConfigs = {} ) {
 		} );
 	}
 
+	/**
+	 * Registers a generic store.
+	 *
+	 * @param {string} key    Store registry key.
+	 * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+	 */
+	function registerGenericStore( key, config ) {
+		if ( typeof config.getSelectors !== 'function' ) {
+			throw new TypeError( 'config.getSelectors must be a function' );
+		}
+		if ( typeof config.getActions !== 'function' ) {
+			throw new TypeError( 'config.getActions must be a function' );
+		}
+		if ( typeof config.subscribe !== 'function' ) {
+			throw new TypeError( 'config.subscribe must be a function' );
+		}
+		stores[ key ] = config;
+		config.subscribe( globalListener );
+	}
+
 	let registry = {
+		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
@@ -126,6 +148,7 @@ export function createRegistry( storeConfigs = {} ) {
 	/**
 	 * Registers a new sub-reducer to the global state and returns a Redux-like
 	 * store object.
+	 * TODO: Deprecate and remove this function in favor of registerStore
 	 *
 	 * @param {string} reducerKey Reducer key.
 	 * @param {Object} reducer    Reducer function.
@@ -140,6 +163,7 @@ export function createRegistry( storeConfigs = {} ) {
 
 	/**
 	 * Registers actions for external usage.
+	 * TODO: Deprecate and remove this function in favor of registerStore
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              selectors for.
@@ -152,6 +176,7 @@ export function createRegistry( storeConfigs = {} ) {
 
 	/**
 	 * Registers selectors for external usage.
+	 * TODO: Deprecate and remove this function in favor of registerStore
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              selectors for.
@@ -168,6 +193,7 @@ export function createRegistry( storeConfigs = {} ) {
 	 * Registers resolvers for a given reducer key. Resolvers are side effects
 	 * invoked once per argument set of a given selector call, used in ensuring
 	 * that the data needs for the selector are satisfied.
+	 * TODO: Deprecate and remove this function in favor of registerStore
 	 *
 	 * @param {string} reducerKey   Part of the state shape to register the
 	 *                              resolvers for.
@@ -197,28 +223,9 @@ export function createRegistry( storeConfigs = {} ) {
 	};
 
 	/**
-	 * Registers a generic store.
-	 *
-	 * @param {string} key    Store registry key.
-	 * @param {Object} config Configuration (getSelectors, getActions, subscribe).
-	 */
-	function registerGenericStore( key, config ) {
-		if ( typeof config.getSelectors !== 'function' ) {
-			throw new TypeError( 'config.getSelectors must be a function' );
-		}
-		if ( typeof config.getActions !== 'function' ) {
-			throw new TypeError( 'config.getActions must be a function' );
-		}
-		if ( ! config.subscribe ) {
-			throw new TypeError( 'config.subscribe must be a function' );
-		}
-		stores[ key ] = config;
-		config.subscribe( globalListener );
-	}
-
-	/**
 	 * Enhances the registry with the prescribed set of overrides. Returns the
 	 * enhanced registry to enable plugin chaining.
+	 * TODO: Consider deprecating and removing this after plugins are no longer needed.
 	 *
 	 * @param {WPDataPlugin} plugin  Plugin by which to enhance.
 	 * @param {?Object}      options Optional options to pass to plugin.
