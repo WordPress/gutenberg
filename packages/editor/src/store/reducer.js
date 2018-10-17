@@ -652,14 +652,18 @@ export function blockSelection( state = {
 				end: action.clientId,
 				initialPosition: action.initialPosition,
 			};
-		case 'INSERT_BLOCKS':
-			return {
-				...state,
-				start: action.blocks[ 0 ].clientId,
-				end: action.blocks[ 0 ].clientId,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
+		case 'INSERT_BLOCKS': {
+			if ( action.updateSelection ) {
+				return {
+					...state,
+					start: action.blocks[ 0 ].clientId,
+					end: action.blocks[ 0 ].clientId,
+					initialPosition: null,
+					isMultiSelecting: false,
+				};
+			}
+			return state;
+		}
 		case 'REMOVE_BLOCKS':
 			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
 				return state;
