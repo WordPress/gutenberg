@@ -45,7 +45,7 @@ const globalShortcuts = {
 			ariaLabel: shortcutAriaLabel.primaryShift( ',' ),
 		},
 		{
-			keyCombination: access( 'b' ),
+			keyCombination: access( 'l' ),
 			description: __( 'Open the block navigation menu.' ),
 		},
 		{

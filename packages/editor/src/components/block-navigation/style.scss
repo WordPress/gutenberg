@@ -1,7 +1,8 @@
 $tree-border-width: 2px;
 $tree-item-height: 36px;
 
-.editor-block-navigation__list {
+.editor-block-navigation__list,
+.editor-block-navigation__paragraph {
 	padding: 0;
 	margin: 0;
 }
