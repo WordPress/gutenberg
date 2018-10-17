@@ -198,6 +198,13 @@ export const settings = {
 	},
 
 	merge( attributes, { value, citation } ) {
+		if ( ! value || value === '<p></p>' ) {
+			return {
+				...attributes,
+				citation: attributes.citation + citation,
+			};
+		}
+
 		return {
 			...attributes,
 			value: attributes.value + value,
