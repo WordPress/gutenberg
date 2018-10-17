@@ -19,7 +19,7 @@ import { getColorObjectByColorValue } from '../colors';
 
 function PanelColor( { colors, title, colorValue, initialOpen, ...props } ) {
 	deprecated( 'wp.editor.PanelColor', {
-		version: '4.2',
+		version: '4.3',
 		alternative: 'wp.editor.PanelColorSettings',
 		plugin: 'Gutenberg',
 	} );

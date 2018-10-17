@@ -4,6 +4,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 
 - `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
 - `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
+- `wp.components.PanelColor` component has been removed. Please use `wp.editor.PanelColorSettings` instead.
+- `wp.editor.PanelColor` component has been removed. Please use `wp.editor.PanelColorSettings` instead.
 
 ## 4.2.0
 

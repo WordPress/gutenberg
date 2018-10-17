@@ -1,12 +1,14 @@
+## 4.2.0 (Unreleased)
+
+### Deprecation
+
+- `wp.components.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
+
 ## 4.1.0 (2018-10-10)
 
 ### New Feature
 
 - Added a new `ResizableBox` component.
-
-### Deprecation
-
-- `wp.components.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
 
 ## 4.0.0 (2018-09-30)
 

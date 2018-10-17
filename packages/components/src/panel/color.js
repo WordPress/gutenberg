@@ -12,7 +12,7 @@ import ColorIndicator from '../color-indicator';
 
 function PanelColor( { colorValue, colorName, title, ...props } ) {
 	deprecated( 'wp.editor.PanelColor', {
-		version: '4.2',
+		version: '4.3',
 		alternative: 'wp.editor.PanelColorSettings',
 		plugin: 'Gutenberg',
 	} );
