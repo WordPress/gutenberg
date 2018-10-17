@@ -41,14 +41,6 @@ This is a library of generic WordPress components to be used for creating common
 - [Toolbar](../../docs/components/toolbar/)
 - [Tooltip](../../docs/components/tooltip/)
 - [TreeSelect](../../docs/components/tree-select/)
-- [AAAA](../../docs/components/AAAA/)
-- [AAAA](../../docs/components/AAAA/)
-- [AAAA](../../docs/components/AAAA/)
-- [AAAA](../../docs/components/AAAA/)
-- [AAAA](../../docs/components/AAAA/)
-- [AAAA](../../docs/components/AAAA/)
-- [AAAA](../../docs/components/AAAA/)
-- [AAAA](../../docs/components/AAAA/)
 
 ## Utility components
 
