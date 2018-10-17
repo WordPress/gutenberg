@@ -6,7 +6,12 @@ import { find, kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
+
+/**
+ * Returns the default font size slug.
+ */
+export const getDefaultFontSizeSlug = 'normal';
 
 /**
  *  Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values.
@@ -22,13 +27,13 @@ import { __ } from '@wordpress/i18n';
 export const getFontSize = ( fontSizes, fontSizeAttribute, customFontSizeAttribute ) => {
 	if ( customFontSizeAttribute !== undefined ) {
 		return {
-			name: __( 'Custom' ),
+			name: _x( 'Custom', 'font size name' ),
 			slug: 'custom',
 			size: customFontSizeAttribute,
 		};
 	}
 
-	const fontSizeObject = find( fontSizes, { slug: ( fontSizeAttribute === undefined ? 'normal' : fontSizeAttribute ) } );
+	const fontSizeObject = find( fontSizes, { slug: ( fontSizeAttribute === undefined ? getDefaultFontSizeSlug : fontSizeAttribute ) } );
 
 	if ( fontSizeObject ) {
 		return fontSizeObject;

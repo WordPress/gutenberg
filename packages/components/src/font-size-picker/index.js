@@ -20,6 +20,7 @@ import RangeControl from '../range-control';
 import { NavigableMenu } from '../navigable-container';
 
 function FontSizePicker( {
+	defaultFontSizeSlug,
 	fallbackFontSize,
 	fontSizes = [],
 	disableCustomFontSizes = false,
@@ -27,14 +28,7 @@ function FontSizePicker( {
 	value,
 	withSlider,
 } ) {
-	// Try to find the current font size in the set of preset font sizes.
-	const currentFont = fontSizes.find( ( font ) => {
-		return ( ( value === undefined ) ? 'normal' : value.slug ) === font.slug;
-	} );
-
-	// If the current font size is not one of the pre-defined sizes, we assume
-	// the custom option has been selected.
-	const isCustomFontSize = ! ( currentFont || value === undefined );
+	const isCustomFontSize = ( value.slug === 'custom' );
 
 	const onChangeCustomValue = ( event ) => {
 		const newValue = event.target.value;
@@ -60,9 +54,9 @@ function FontSizePicker( {
 							isLarge
 							onClick={ onToggle }
 							aria-expanded={ isOpen }
-							aria-label={ __( 'Custom font size' ) }
+							aria-label={ __( 'Choose font size' ) }
 						>
-							{ ( currentFont && currentFont.name ) || ( ! value && __( 'Normal' ) ) || _x( 'Custom', 'font size name' ) }
+							{ value && value.name }
 						</Button>
 					) }
 					renderContent={ () => (
@@ -70,7 +64,7 @@ function FontSizePicker( {
 							{ map( fontSizes, ( font ) => (
 								<Button
 									key={ font.slug }
-									onClick={ () => onChange( font.slug === 'normal' ? undefined : font ) }
+									onClick={ () => onChange( font ) }
 									className={ 'is-font-' + font.slug }
 									role="menuitem"
 								>
@@ -89,7 +83,7 @@ function FontSizePicker( {
 								>
 									{ isCustomFontSize && <Dashicon icon="saved" /> }
 									<span className="components-font-size-picker__dropdown-text-size">
-										{ __( 'Custom' ) }
+										{ _x( 'Custom', 'font size name' ) }
 									</span>
 								</Button>
 							}
@@ -108,7 +102,7 @@ function FontSizePicker( {
 				<Button
 					className="components-color-palette__clear"
 					type="button"
-					disabled={ value.slug === 'normal' }
+					disabled={ value.slug === defaultFontSizeSlug }
 					onClick={ onResetFontSize }
 					isSmall
 					isDefault

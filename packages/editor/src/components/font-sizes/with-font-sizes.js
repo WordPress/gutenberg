@@ -13,7 +13,11 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getFontSize, getFontSizeClass } from './utils';
+import {
+	getDefaultFontSizeSlug,
+	getFontSize,
+	getFontSizeClass,
+} from './utils';
 
 /**
  * Higher-order component, which handles font size logic for class generation,
@@ -63,12 +67,15 @@ export default ( ...fontSizeNames ) => {
 					}
 
 					createSetFontSize( fontSizeAttributeName, customFontSizeAttributeName ) {
-						return ( fontSizeValue ) => {
-							const fontSizeObject = find( this.props.fontSizes, { slug: ( fontSizeValue === undefined ? 'normal' : fontSizeValue.slug ) } );
+						return ( font ) => {
+							// Ensure that "undefined" (aka a reset) or choosing the pre-defined
+							// default font size result in an undefined fontSizeObject.
+							const fontSizeObject = ( font === undefined || font.slug === getDefaultFontSizeSlug ) ?
+								null : find( this.props.fontSizes, { slug: ( font.slug ) } );
 
 							this.props.setAttributes( {
 								[ fontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? fontSizeObject.slug : undefined,
-								[ customFontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? undefined : fontSizeValue,
+								[ customFontSizeAttributeName ]: fontSizeObject && fontSizeObject.slug ? undefined : font,
 							} );
 						};
 					}
