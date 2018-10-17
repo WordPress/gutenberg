@@ -17,11 +17,9 @@ import {
 	getEditedPostContent,
 } from '../support/utils';
 
-async function tabUntilElementIsActive( text ) {
+async function tabUntilElementIsActive( checkActiveElement ) {
 	const isFocusedButton = async () =>
-		await page.$eval( ':focus', ( focusedElement, buttonContent ) => {
-			return focusedElement.textContent === buttonContent;
-		}, text );
+		await page.$eval( ':focus', checkActiveElement );
 
 	let isFocused = false;
 	do {
@@ -29,6 +27,11 @@ async function tabUntilElementIsActive( text ) {
 		isFocused = await isFocusedButton();
 	} while ( ! isFocused );
 }
+
+const moveMouse = async () => {
+	await page.mouse.move( 200, 300, { steps: 10 } );
+	await page.mouse.move( 250, 350, { steps: 10 } );
+};
 
 async function uploadImageInTheMediaLibrary( assetFileName ) {
 	await page.waitForSelector( '.media-modal input[type=file]' );
@@ -72,10 +75,11 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Upload the image
-		await tabUntilElementIsActive( 'Media Library' ); // We should have a way to focus the block content
+		await tabUntilElementIsActive( ( element ) => element.textContent === 'Media Library' ); // We should have a way to focus the block content
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'cover-1.jpg' );
-		await page.click( '.media-modal button.media-button-select' ); // validating the media gallery is not easy with keyboard
+		await tabUntilElementIsActive( ( element ) => element.classList.contains( 'media-button-select' ) );
+		await page.keyboard.press( 'Enter' );
 
 		// Enter the text of image
 		await page.keyboard.press( 'Tab' );
@@ -100,7 +104,7 @@ describe( 'Demo content post', () => {
 		// Create the aligned right paragraph
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '... like this one, which is right aligned.' );
-		await page.mouse.move( 200, 300, { steps: 10 } ); // This shouldn't be necessary to show the toolbar
+		await moveMouse(); // This shouldn't be necessary to show the toolbar
 		await pressWithModifier( 'Alt', 'F10' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
@@ -126,10 +130,11 @@ describe( 'Demo content post', () => {
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'ArrowDown' ); // The cover image shows up first because we uses it
 		await page.keyboard.press( 'Enter' );
-		await tabUntilElementIsActive( 'Media Library' );
+		await tabUntilElementIsActive( ( element ) => element.textContent === 'Media Library' ); // We should have a way to focus the block content
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'image-1.jpg' );
-		await page.click( '.media-modal button.media-button-select' ); // validating the media gallery is not easy with keyboard
+		await tabUntilElementIsActive( ( element ) => element.classList.contains( 'media-button-select' ) );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'If your theme supports it, you’ll see the "wide" button on the image toolbar. Give it a try.' );
 
@@ -203,13 +208,15 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/gallery' );
 		await page.keyboard.press( 'Enter' );
-		await tabUntilElementIsActive( 'Media Library' );
+		await tabUntilElementIsActive( ( element ) => element.textContent === 'Media Library' ); // We should have a way to focus the block content
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'gallery-1.jpg' );
 		await uploadImageInTheMediaLibrary( 'gallery-2.jpg' );
 		await uploadImageInTheMediaLibrary( 'gallery-3.jpg' );
-		await page.click( '.media-modal button.media-button-gallery' ); // validating the media gallery is not easy with keyboard
-		await page.click( '.media-modal button.media-button-insert' ); // validating the media gallery is not easy with keyboard
+		await tabUntilElementIsActive( ( element ) => element.classList.contains( 'media-button-gallery' ) );
+		await page.keyboard.press( 'Enter' );
+		await tabUntilElementIsActive( ( element ) => element.classList.contains( 'media-button-insert' ) );
+		await page.keyboard.press( 'Enter' );
 
 		// Set to two columns gallery (the way we enter and exit the inspector could be improved)
 		await navigateToNextRegion();
@@ -244,10 +251,11 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
-		await tabUntilElementIsActive( 'Media Library' );
+		await tabUntilElementIsActive( ( element ) => element.textContent === 'Media Library' ); // We should have a way to focus the block content
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'image-2.jpg' );
-		await page.click( '.media-modal button.media-button-select' ); // validating the media gallery is not easy with keyboard
+		await tabUntilElementIsActive( ( element ) => element.classList.contains( 'media-button-select' ) );
+		await page.keyboard.press( 'Enter' );
 		await pressWithModifier( 'Alt', 'F10' );
 		await pressTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Enter' ); // Align center instead of full (full not available in the default theme for now)
@@ -260,12 +268,14 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/gallery' );
 		await page.keyboard.press( 'Enter' );
-		await tabUntilElementIsActive( 'Media Library' );
+		await tabUntilElementIsActive( ( element ) => element.textContent === 'Media Library' ); // We should have a way to focus the block content
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'gallery-4.jpg' );
 		await uploadImageInTheMediaLibrary( 'gallery-5.jpg' );
-		await page.click( '.media-modal button.media-button-gallery' ); // validating the media gallery is not easy with keyboard
-		await page.click( '.media-modal button.media-button-insert' ); // validating the media gallery is not easy with keyboard
+		await tabUntilElementIsActive( ( element ) => element.classList.contains( 'media-button-gallery' ) );
+		await page.keyboard.press( 'Enter' );
+		await tabUntilElementIsActive( ( element ) => element.classList.contains( 'media-button-insert' ) );
+		await page.keyboard.press( 'Enter' );
 
 		await pressWithModifier( 'Alt', 'F10' );
 		await pressTimes( 'Tab', 2 );
@@ -285,7 +295,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.type( 'https://vimeo.com/22439234' );
 		await page.keyboard.press( 'Enter' );
 
-		await page.mouse.move( 200, 300, { steps: 10 } ); // This shouldn't be necessary to show the toolbar
+		await moveMouse(); // This shouldn't be necessary to show the toolbar
 		await pressWithModifier( 'Alt', 'F10' );
 		await pressTimes( 'Tab', 3 );
 		await page.keyboard.press( 'Enter' ); // Align center instead of full (full not available in the default theme for now)
@@ -317,7 +327,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Center align
-		await page.mouse.move( 200, 300, { steps: 10 } ); // This shouldn't be necessary to show the toolbar
+		await moveMouse(); // This shouldn't be necessary to show the toolbar
 		await pressWithModifier( 'Alt', 'F10' );
 		await pressTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Enter' ); // Align center instead of full (full not available in the default theme for now)
@@ -330,7 +340,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.type( 'Help build Gutenberg' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'https://github.com/WordPress/gutenberg' );
-		await page.mouse.move( 200, 300, { steps: 10 } ); // This shouldn't be necessary to show the toolbar
+		await moveMouse(); // This shouldn't be necessary to show the toolbar
 		await pressWithModifier( 'Alt', 'F10' );
 		await pressTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Enter' ); // Align center instead of full (full not available in the default theme for now)
@@ -341,7 +351,7 @@ describe( 'Demo content post', () => {
 
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Thanks for testing Gutenberg!' );
-		await page.mouse.move( 200, 300, { steps: 10 } ); // This shouldn't be necessary to show the toolbar
+		await moveMouse(); // This shouldn't be necessary to show the toolbar
 		await pressWithModifier( 'Alt', 'F10' );
 		await pressTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Enter' ); // Align center instead of full (full not available in the default theme for now)
@@ -349,7 +359,7 @@ describe( 'Demo content post', () => {
 		const postContent = await getEditedPostContent();
 
 		// Some random asserters to ensure blocks have been inserted and the navigation went well
-		expect( postContent ).toMatch( `<p>Thanks for testing Gutenberg!</p>` );
+		expect( postContent ).toMatch( `<p style="text-align:center">Thanks for testing Gutenberg!</p>` );
 		expect( postContent ).toMatch( `<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>` );
 		expect( postContent ).toMatch( `<p style="text-align:center"><em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em></p>` );
 		expect( postContent ).toMatch( new RegExp( `<figure class=\\"wp-block-embed-vimeo wp-block-embed is-type-video is-provider-vimeo wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">\\s*https://vimeo.com/22439234\\s*</div></figure>` ) );
