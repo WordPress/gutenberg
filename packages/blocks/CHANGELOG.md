@@ -1,3 +1,9 @@
+## 4.1.0 (Unreleased)
+
+### New Feature
+
+- Added a `unregisterBlockStyle()` function to remove a block style variation.
+
 ## 4.0.0 (2018-09-30)
 
 ### Breaking Changes
