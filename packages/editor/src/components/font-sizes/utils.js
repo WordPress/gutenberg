@@ -16,21 +16,23 @@ import { __ } from '@wordpress/i18n';
  * @param {?string} fontSizeAttribute       Content of the font size attribute (slug).
  * @param {?number} customFontSizeAttribute Contents of the custom font size attribute (value).
  *
- * @return {?string} If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug.
- * 					 Otherwise, an object with just the size value based on customFontSize is returned.
+ * @return {?string} If a customFontSizeAttribute is set, return an object with the custom size value.
+ * 					 Otherwise, return one of the pre-defined fonts, falling back on the size with the slug "normal".
  */
 export const getFontSize = ( fontSizes, fontSizeAttribute, customFontSizeAttribute ) => {
-	if ( fontSizeAttribute ) {
-		const fontSizeObject = find( fontSizes, { slug: fontSizeAttribute } );
-		if ( fontSizeObject ) {
-			return fontSizeObject;
-		}
+	if ( customFontSizeAttribute !== undefined ) {
+		return {
+			name: __( 'Custom' ),
+			slug: 'custom',
+			size: customFontSizeAttribute,
+		};
 	}
-	return {
-		name: __( 'Custom' ),
-		slug: 'custom',
-		size: customFontSizeAttribute,
-	};
+
+	const fontSizeObject = find( fontSizes, { slug: ( fontSizeAttribute === undefined ? 'normal' : fontSizeAttribute ) } );
+
+	if ( fontSizeObject ) {
+		return fontSizeObject;
+	}
 };
 
 /**

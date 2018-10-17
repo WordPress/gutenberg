@@ -28,7 +28,9 @@ function FontSizePicker( {
 	withSlider,
 } ) {
 	// Try to find the current font size in the set of preset font sizes.
-	const currentFont = fontSizes.find( ( font ) => font.slug === value.slug );
+	const currentFont = fontSizes.find( ( font ) => {
+		return ( ( value === undefined ) ? 'normal' : value.slug ) === font.slug;
+	} );
 
 	// If the current font size is not one of the pre-defined sizes, we assume
 	// the custom option has been selected.
