@@ -29,7 +29,7 @@ function PostSwitchToDraftButton( { isSaving, isPublished, isScheduled, onClick 
 			className="editor-post-switch-to-draft"
 			onClick={ onSwitch }
 			disabled={ isSaving }
-			isText
+			isTertiary
 		>
 			{ __( 'Switch to Draft' ) }
 		</Button>

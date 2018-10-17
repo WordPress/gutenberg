@@ -5,7 +5,7 @@ exports[`PostSavedState returns a switch to draft link if the post is published 
 exports[`PostSavedState should return Save button if edits to be saved 1`] = `
 <[object Object]
   className="editor-post-save-draft"
-  isText={true}
+  isTertiary={true}
   onClick={[MockFunction]}
   shortcut="Ctrl+S"
 >

@@ -89,7 +89,7 @@ export class PostSavedState extends Component {
 				className="editor-post-save-draft"
 				onClick={ onSave }
 				shortcut={ displayShortcut.primary( 's' ) }
-				isText
+				isTertiary
 			>
 				{ isPending ? __( 'Save as Pending' ) : __( 'Save Draft' ) }
 			</Button>
