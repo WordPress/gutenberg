@@ -15,6 +15,14 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
 >
   <WithColorContext(ColorPalette)
     className="editor-color-palette-control__color-palette"
+    colors={
+      Array [
+        Object {
+          "color": "#f00",
+          "name": "red",
+        },
+      ]
+    }
     onChange={[Function]}
     value="#f00"
   />
