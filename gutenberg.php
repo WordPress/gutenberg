@@ -71,12 +71,6 @@ function gutenberg_menu() {
 		);
 
 		$submenu['gutenberg'][] = array(
-			__( 'Feedback', 'gutenberg' ),
-			'edit_posts',
-			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
-		);
-
-		$submenu['gutenberg'][] = array(
 			__( 'Documentation', 'gutenberg' ),
 			'edit_posts',
 			'https://wordpress.org/gutenberg/handbook/',
