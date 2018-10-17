@@ -54,7 +54,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 	$class = 'wp-block-latest-posts';
 	if ( isset( $attributes['align'] ) ) {
-		$class .= ' align' . $attributes['align'];
+		$class .= " align{$attributes['align']}";
 	}
 
 	if ( isset( $attributes['postLayout'] ) && 'grid' === $attributes['postLayout'] ) {
@@ -62,7 +62,7 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['postLayout'] ) {
-		$class .= ' columns-' . $attributes['columns'];
+		$class .= " columns-{$attributes['columns']}";
 	}
 
 	if ( isset( $attributes['displayPostDate'] ) && $attributes['displayPostDate'] ) {
@@ -70,7 +70,7 @@ function render_block_core_latest_posts( $attributes ) {
 	}
 
 	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
+		$class .= " {$attributes['className']}";
 	}
 
 	$block_content = sprintf(
@@ -90,30 +90,23 @@ function register_block_core_latest_posts() {
 		'core/latest-posts',
 		array(
 			'attributes'      => array(
+				'align'           => array(
+					'type' => 'string',
+					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
+				),
 				'categories'      => array(
 					'type' => 'string',
 				),
 				'className'       => array(
 					'type' => 'string',
 				),
-				'postsToShow'     => array(
-					'type'    => 'number',
-					'default' => 5,
-				),
-				'displayPostDate' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'postLayout'      => array(
-					'type'    => 'string',
-					'default' => 'list',
-				),
 				'columns'         => array(
 					'type'    => 'number',
 					'default' => 3,
 				),
-				'align'           => array(
-					'type' => 'string',
+				'displayPostDate' => array(
+					'type'    => 'boolean',
+					'default' => false,
 				),
 				'order'           => array(
 					'type'    => 'string',
@@ -122,6 +115,14 @@ function register_block_core_latest_posts() {
 				'orderBy'         => array(
 					'type'    => 'string',
 					'default' => 'date',
+				),
+				'postLayout'      => array(
+					'type'    => 'string',
+					'default' => 'list',
+				),
+				'postsToShow'     => array(
+					'type'    => 'number',
+					'default' => 5,
 				),
 			),
 			'render_callback' => 'render_block_core_latest_posts',
