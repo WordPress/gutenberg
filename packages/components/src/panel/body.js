@@ -61,8 +61,8 @@ class PanelBody extends Component {
 									<G><Path d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z" /></G>
 								</SVG>
 							}
-							{ icon && <RawIcon icon={ icon } className="components-panel__icon" size={ 20 } /> }
 							{ title }
+							{ icon && <RawIcon icon={ icon } className="components-panel__icon" size={ 20 } /> }
 						</Button>
 					</h2>
 				) }
