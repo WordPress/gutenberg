@@ -202,19 +202,19 @@ export const requestPostUpdateSuccess = async ( action, store ) => {
 		noticeMessage = null;
 	} else if ( isPublished && ! willPublish ) {
 		// If undoing publish status, show specific notice
-		noticeMessage = postType.labels.reverted_to_draft;
+		noticeMessage = postType.labels.reverted_item_to_draft;
 		shouldShowLink = false;
 	} else if ( ! isPublished && willPublish ) {
 		// If publishing or scheduling a post, show the corresponding
 		// publish message
 		noticeMessage = {
-			publish: postType.labels.published,
-			private: postType.labels.published_privately,
-			future: postType.labels.scheduled,
+			publish: postType.labels.published_item,
+			private: postType.labels.published_item_privately,
+			future: postType.labels.scheduled_item,
 		}[ post.status ];
 	} else {
 		// Generic fallback notice
-		noticeMessage = postType.labels.updated;
+		noticeMessage = postType.labels.updated_item;
 	}
 
 	if ( noticeMessage ) {
@@ -222,7 +222,7 @@ export const requestPostUpdateSuccess = async ( action, store ) => {
 			<p>
 				{ noticeMessage }
 				{ ' ' }
-				{ shouldShowLink && <a href={ post.link }>{ postType.labels.view }</a> }
+				{ shouldShowLink && <a href={ post.link }>{ postType.labels.view_item }</a> }
 			</p>,
 			{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 		) );

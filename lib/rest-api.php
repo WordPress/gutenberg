@@ -469,21 +469,19 @@ function gutenberg_silence_rest_errors() {
 function gutenberg_filter_post_type_labels( $args, $post_type ) {
 	if ( is_post_type_hierarchical( $post_type ) ) {
 		$labels = array(
-			'published'           => __( 'Page published.' ),
-			'published_privately' => __( 'Page published privately.' ),
-			'reverted_to_draft'   => __( 'Page reverted to draft.' ),
-			'scheduled'           => __( 'Page scheduled.' ),
-			'updated'             => __( 'Page updated.' ),
-			'view'                => __( 'View page.' ),
+			'published_item'           => __( 'Page published.' ),
+			'published_item_privately' => __( 'Page published privately.' ),
+			'reverted_item_to_draft'   => __( 'Page reverted to draft.' ),
+			'scheduled_item'           => __( 'Page scheduled.' ),
+			'updated_item'             => __( 'Page updated.' ),
 		);
 	} else {
 		$labels = array(
-			'published'           => __( 'Post published.' ),
-			'published_privately' => __( 'Post published privately.' ),
-			'reverted_to_draft'   => __( 'Post reverted to draft.' ),
-			'scheduled'           => __( 'Post scheduled.' ),
-			'updated'             => __( 'Post updated.' ),
-			'view'                => __( 'View post.' ),
+			'published_item'           => __( 'Post published.' ),
+			'published_item_privately' => __( 'Post published privately.' ),
+			'reverted_item_to_draft'   => __( 'Post reverted to draft.' ),
+			'scheduled_item'           => __( 'Post scheduled.' ),
+			'updated_item'             => __( 'Post updated.' ),
 		);
 	}
 	$args['labels'] = array_merge( $labels, $args['labels'] );
