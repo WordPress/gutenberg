@@ -17,6 +17,19 @@ import {
 	getEditedPostContent,
 } from '../support/utils';
 
+async function tabUntilElementIsActive( text ) {
+	const isFocusedButton = async () =>
+		await page.$eval( ':focus', ( focusedElement, buttonContent ) => {
+			return focusedElement.textContent === buttonContent;
+		}, text );
+
+	let isFocused = false;
+	do {
+		await page.keyboard.press( 'Tab' );
+		isFocused = await isFocusedButton();
+	} while ( ! isFocused );
+}
+
 async function uploadImageInTheMediaLibrary( assetFileName ) {
 	await page.waitForSelector( '.media-modal input[type=file]' );
 	const inputElement = await page.$( '.media-modal input[type=file]' );
@@ -59,7 +72,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Upload the image
-		await pressTimes( 'Tab', 4 ); // We should have a way to focus the block content
+		await tabUntilElementIsActive( 'Media Library' ); // We should have a way to focus the block content
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'cover-1.jpg' );
 		await page.click( '.media-modal button.media-button-select' ); // validating the media gallery is not easy with keyboard
@@ -113,7 +126,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'ArrowDown' ); // The cover image shows up first because we uses it
 		await page.keyboard.press( 'Enter' );
-		await pressTimes( 'Tab', 10 ); // We should have a way to focus the block content
+		await tabUntilElementIsActive( 'Media Library' );
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'image-1.jpg' );
 		await page.click( '.media-modal button.media-button-select' ); // validating the media gallery is not easy with keyboard
@@ -190,7 +203,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/gallery' );
 		await page.keyboard.press( 'Enter' );
-		await pressTimes( 'Tab', 10 ); // We should have a way to focus the block content
+		await tabUntilElementIsActive( 'Media Library' );
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'gallery-1.jpg' );
 		await uploadImageInTheMediaLibrary( 'gallery-2.jpg' );
@@ -231,7 +244,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/image' );
 		await page.keyboard.press( 'Enter' );
-		await pressTimes( 'Tab', 10 ); // We should have a way to focus the block content
+		await tabUntilElementIsActive( 'Media Library' );
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'image-2.jpg' );
 		await page.click( '.media-modal button.media-button-select' ); // validating the media gallery is not easy with keyboard
@@ -247,7 +260,7 @@ describe( 'Demo content post', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/gallery' );
 		await page.keyboard.press( 'Enter' );
-		await pressTimes( 'Tab', 10 ); // We should have a way to focus the block content
+		await tabUntilElementIsActive( 'Media Library' );
 		await page.keyboard.press( 'Enter' );
 		await uploadImageInTheMediaLibrary( 'gallery-4.jpg' );
 		await uploadImageInTheMediaLibrary( 'gallery-5.jpg' );
