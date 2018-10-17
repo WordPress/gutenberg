@@ -14,7 +14,7 @@ import {
 	pressWithModifier,
 	META_KEY,
 	pressTimes,
-	//getEditedPostContent,
+	getEditedPostContent,
 } from '../support/utils';
 
 async function uploadImageInTheMediaLibrary( assetFileName ) {
@@ -29,21 +29,14 @@ async function uploadImageInTheMediaLibrary( assetFileName ) {
 }
 
 async function navigateToNextRegion() {
-	await page.keyboard.down( 'Alt' );
-	await page.keyboard.down( 'Shift' );
-	await page.keyboard.type( 'n' );
-	await page.keyboard.up( 'Shift' );
-	await page.keyboard.up( 'Alt' );
+	await pressWithModifier( [ 'Alt', 'Shift' ], 'n' );
 }
 
 async function createBlockAfter() {
-	await page.keyboard.down( META_KEY );
-	await page.keyboard.down( 'Alt' );
-	await page.keyboard.type( 'y' );
-	await page.keyboard.up( 'Alt' );
-	await page.keyboard.up( META_KEY );
+	await pressWithModifier( [ META_KEY, 'Alt' ], 'y' );
 }
 
+// Creating the demo post may take more time than the default test timeout.
 jest.setTimeout( 1000000 );
 
 describe( 'Demo content post', () => {
@@ -340,6 +333,12 @@ describe( 'Demo content post', () => {
 		await pressTimes( 'Tab', 2 );
 		await page.keyboard.press( 'Enter' ); // Align center instead of full (full not available in the default theme for now)
 
-		// expect( await getEditedPostContent() ).toMatchSnapshot();
+		const postContent = await getEditedPostContent();
+
+		// Some random asserters to ensure blocks have been inserted and the navigation went well
+		expect( postContent ).toMatch( `<p>Thanks for testing Gutenberg!</p>` );
+		expect( postContent ).toMatch( `<div class="wp-block-button aligncenter"><a class="wp-block-button__link" href="https://github.com/WordPress/gutenberg">Help build Gutenberg</a></div>` );
+		expect( postContent ).toMatch( `<p style="text-align:center"><em>If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="https://github.com/WordPress/gutenberg">GitHub repository</a>.</em></p>` );
+		expect( postContent ).toMatch( new RegExp( `<figure class=\\"wp-block-embed-vimeo wp-block-embed is-type-video is-provider-vimeo wp-embed-aspect-16-9 wp-has-aspect-ratio\\"><div class=\\"wp-block-embed__wrapper\\">\\s*https://vimeo.com/22439234\\s*</div></figure>` ) );
 	} );
 } );
