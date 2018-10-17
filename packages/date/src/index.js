@@ -100,6 +100,7 @@ export function getSettings() {
 		version: '4.2',
 		alternative: 'wp.date.__experimentalGetSettings',
 		plugin: 'Gutenberg',
+		hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
 	} );
 	return settings;
 }

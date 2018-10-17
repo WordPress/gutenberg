@@ -18,7 +18,7 @@ import {
 	Toolbar,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { dateI18n, format, getSettings } from '@wordpress/date';
+import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	InspectorControls,
@@ -116,7 +116,7 @@ class LatestPostsEdit extends Component {
 			},
 		];
 
-		const dateFormat = getSettings().formats.date;
+		const dateFormat = __experimentalGetSettings().formats.date;
 
 		return (
 			<Fragment>
