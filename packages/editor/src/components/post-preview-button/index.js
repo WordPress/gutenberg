@@ -13,6 +13,11 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
 import { ifCondition, compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies.
+ */
+import defaultMarkup from './default-markup';
+
 export class PostPreviewButton extends Component {
 	constructor() {
 		super( ...arguments );
@@ -88,28 +93,7 @@ export class PostPreviewButton extends Component {
 
 		this.props.autosave();
 
-		const markup = `
-			<div class="editor-post-preview-button__interstitial-message">
-				<p>Please wait&hellip;</p>
-				<p>Generating preview.</p>
-			</div>
-			<style>
-				body {
-					margin: 0;
-				}
-				.editor-post-preview-button__interstitial-message {
-					display: flex;
-					flex-direction: column;
-					align-items: center;
-					justify-content: center;
-					height: 100vh;
-					width: 100vw;
-				}
-				p {
-					text-align: center;
-					font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-				}
-			</style>`;
+		const markup = this.props.markup || defaultMarkup;
 
 		this.previewWindow.document.write( markup );
 		this.previewWindow.document.close();
