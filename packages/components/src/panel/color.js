@@ -11,7 +11,7 @@ import PanelBody from './body';
 import ColorIndicator from '../color-indicator';
 
 function PanelColor( { colorValue, colorName, title, ...props } ) {
-	deprecated( 'wp.editor.PanelColor', {
+	deprecated( 'wp.components.PanelColor', {
 		version: '4.3',
 		alternative: 'wp.editor.PanelColorSettings',
 		plugin: 'Gutenberg',
