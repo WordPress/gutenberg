@@ -11,6 +11,10 @@ import {
 	pressWithModifier,
 } from '../support/utils';
 
+async function openBlockNavigator() {
+	return pressWithModifier( ACCESS_MODIFIER_KEYS, 'o' );
+}
+
 describe( 'Navigating the block hierarchy', () => {
 	beforeEach( async () => {
 		await newPost();
@@ -55,7 +59,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks using the keyboard.
-		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'l' );
+		await openBlockNavigator();
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
@@ -69,7 +73,7 @@ describe( 'Navigating the block hierarchy', () => {
 		page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the last column in the columns block.
-		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'l' );
+		await openBlockNavigator();
 		await pressTimes( 'Tab', 4 );
 		await page.keyboard.press( 'Enter' );
 
@@ -91,7 +95,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await insertBlock( 'Image' );
 
 		// Return to first block.
-		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'l' );
+		await openBlockNavigator();
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
@@ -102,7 +106,7 @@ describe( 'Navigating the block hierarchy', () => {
 	} );
 
 	it( 'should report "No blocks created yet." when post is empty', async () => {
-		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'l' );
+		await openBlockNavigator();
 
 		const blockNavigationText = await page.$eval(
 			'.editor-block-navigation__paragraph',

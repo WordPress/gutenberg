@@ -80,7 +80,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
               "+",
               "Alt",
               "+",
-              "B",
+              "O",
             ],
           },
           Object {

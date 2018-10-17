@@ -25,7 +25,7 @@ function BlockNavigationDropdown() {
 					<KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
-							[ rawShortcut.access( 'l' ) ]: onToggle,
+							[ rawShortcut.access( 'o' ) ]: onToggle,
 						} }
 					/>
 					<IconButton
