@@ -460,3 +460,33 @@ function gutenberg_silence_rest_errors() {
 	}
 
 }
+
+/**
+ * Include additional labels for registered post types
+ *
+ * @return array Arguments supplied to register_post_type()
+ */
+function gutenberg_filter_post_type_labels( $args, $post_type ) {
+	if ( is_post_type_hierarchical( $post_type ) ) {
+		$labels = array(
+			'published'           => __( 'Page published.' ),
+			'published_privately' => __( 'Page published privately.' ),
+			'reverted_to_draft'   => __( 'Page reverted to draft.' ),
+			'scheduled'           => __( 'Page scheduled.' ),
+			'updated'             => __( 'Page updated.' ),
+			'view'                => __( 'View page.' ),
+		);
+	} else {
+		$labels = array(
+			'published'           => __( 'Post published.' ),
+			'published_privately' => __( 'Post published privately.' ),
+			'reverted_to_draft'   => __( 'Post reverted to draft.' ),
+			'scheduled'           => __( 'Post scheduled.' ),
+			'updated'             => __( 'Post updated.' ),
+			'view'                => __( 'View post.' ),
+		);
+	}
+	$args['labels'] = array_merge( $labels, $args['labels'] );
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_filter_post_type_labels', 10, 2 );
