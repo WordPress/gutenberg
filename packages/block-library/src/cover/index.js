@@ -20,8 +20,10 @@ import {
 	default as CoverEdit,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	YOUTUBE_BACKGROUND_TYPE,
 	dimRatioToClass,
 	backgroundImageStyles,
+	getYoutubeIdFromUrl,
 } from './edit';
 
 const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
@@ -194,6 +196,12 @@ export const settings = {
 			align ? `align${ align }` : null,
 		);
 
+		let youtubeIframeSrc;
+		if ( YOUTUBE_BACKGROUND_TYPE === backgroundType ) {
+			const youtubeId = getYoutubeIdFromUrl( url );
+			youtubeIframeSrc = `https://www.youtube.com/embed/${ youtubeId }?rel=0&version=3&autoplay=1&mute=1&controls=0&controls=0&showinfo=0&loop=1&modestbranding=1&playlist=${ youtubeId }`;
+		}
+
 		return (
 			<div className={ classes } style={ style }>
 				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
@@ -203,6 +211,15 @@ export const settings = {
 					loop
 					src={ url }
 				/> ) }
+				{ YOUTUBE_BACKGROUND_TYPE === backgroundType && (
+					<iframe
+						className="wp-block-cover__video-background"
+						title={ __( 'YouTube Video Background' ) }
+						src={ youtubeIframeSrc }
+						frameBorder="0"
+						allow="autoplay; encrypted-media;"
+						allowFullscreen
+					/> ) }
 				{ ! RichText.isEmpty( title ) && (
 					<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
 				) }

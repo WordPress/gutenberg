@@ -16,12 +16,19 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	MediaPlaceholder,
-	MediaUpload,
 	AlignmentToolbar,
 	PanelColorSettings,
 	RichText,
 	withColors,
 } from '@wordpress/editor';
+
+/**
+ * Module Constants
+ */
+const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+export const IMAGE_BACKGROUND_TYPE = 'image';
+export const VIDEO_BACKGROUND_TYPE = 'video';
+export const YOUTUBE_BACKGROUND_TYPE = 'youtube';
 
 export function dimRatioToClass( ratio ) {
 	return ( ratio === 0 || ratio === 50 ) ?
@@ -35,17 +42,82 @@ export function backgroundImageStyles( url ) {
 		{};
 }
 
-/**
- * Module Constants
- */
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
-export const IMAGE_BACKGROUND_TYPE = 'image';
-export const VIDEO_BACKGROUND_TYPE = 'video';
+// Todo: memoize this calls when possible
+export function getYoutubeIdFromUrl( url ) {
+	const youtubeRegularExpression = /(?:youtube(?:-nocookie)?\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/;
+	const match = url && url.match( youtubeRegularExpression );
+	return match && match[ 1 ];
+}
 
 class CoverEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSelectMedia = this.onSelectMedia.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
+
+		// edit component has its own src in the state so it can be edited
+		// without setting the actual value outside of the edit UI
+		this.state = {
+			isEditing: ! this.props.url,
+		};
+	}
+
+	onSelectURL( newUrl ) {
+		const { attributes, setAttributes } = this.props;
+		const { url } = attributes;
+
+		// Set the block's src from the edit component's state, and switch off
+		// the editing UI.
+		if ( newUrl === url ) {
+			this.setState( { isEditing: false } );
+			return;
+		}
+
+		const youtubeId = getYoutubeIdFromUrl( newUrl );
+		if ( youtubeId ) {
+			setAttributes( {
+				url: newUrl,
+				id: undefined,
+				backgroundType: YOUTUBE_BACKGROUND_TYPE,
+			} );
+			this.setState( { isEditing: false } );
+			return;
+		}
+
+		const updateAttributesAndState = ( contentType ) => {
+			if ( ! contentType ) {
+				return;
+			}
+			if ( contentType.startsWith( IMAGE_BACKGROUND_TYPE ) ) {
+				setAttributes( {
+					url: newUrl,
+					id: undefined,
+					backgroundType: IMAGE_BACKGROUND_TYPE,
+				} );
+				this.setState( { isEditing: false } );
+			}
+			if ( contentType.startsWith( VIDEO_BACKGROUND_TYPE ) ) {
+				setAttributes( {
+					url: newUrl,
+					id: undefined,
+					backgroundType: VIDEO_BACKGROUND_TYPE,
+				} );
+				this.setState( { isEditing: false } );
+			}
+		};
+
+		// Todo: Improve this code maybe remove XMLHttpRequest
+		const { XMLHttpRequest } = window;
+		const xHttp = new XMLHttpRequest();
+		xHttp.open( 'HEAD', newUrl );
+		xHttp.onreadystatechange = ( { target } ) => {
+			if ( this.readyState === this.DONE ) {
+				const contentType = target.getResponseHeader( 'Content-Type' );
+				updateAttributesAndState( contentType );
+				target.onreadystatechange = undefined;
+			}
+		};
+		xHttp.send();
 	}
 
 	onSelectMedia( media ) {
@@ -79,13 +151,15 @@ class CoverEdit extends Component {
 				id: media.id,
 				backgroundType: mediaType,
 			} );
-			return;
+		} else {
+			setAttributes( { url: media.url, id: media.id } );
 		}
-		setAttributes( { url: media.url, id: media.id } );
+		this.setState( { isEditing: false } );
 	}
 
 	render() {
 		const { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } = this.props;
+		const { isEditing } = this.state;
 		const {
 			align,
 			backgroundType,
@@ -137,19 +211,18 @@ class CoverEdit extends Component {
 								} }
 							/>
 							<Toolbar>
-								<MediaUpload
-									onSelect={ this.onSelectMedia }
-									allowedTypes={ ALLOWED_MEDIA_TYPES }
-									value={ id }
-									render={ ( { open } ) => (
-										<IconButton
-											className="components-toolbar__control"
-											label={ __( 'Edit media' ) }
-											icon="edit"
-											onClick={ open }
-										/>
-									) }
-								/>
+								<Toolbar>
+									<IconButton
+										className="components-icon-button components-toolbar__control"
+										label={ __( 'Edit media' ) }
+										onClick={ () => {
+											this.setState( {
+												isEditing: true,
+											} );
+										} }
+										icon="edit"
+									/>
+								</Toolbar>
 							</Toolbar>
 						</Fragment>
 					) }
@@ -188,7 +261,7 @@ class CoverEdit extends Component {
 			</Fragment>
 		);
 
-		if ( ! url ) {
+		if ( isEditing ) {
 			const hasTitle = ! RichText.isEmpty( title );
 			const icon = hasTitle ? undefined : 'format-image';
 			const label = hasTitle ? (
@@ -216,9 +289,20 @@ class CoverEdit extends Component {
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
+						onSelectURL={ this.onSelectURL }
+						value={ {
+							id,
+							src: url,
+						} }
 					/>
 				</Fragment>
 			);
+		}
+
+		let youtubeIframeSrc;
+		if ( YOUTUBE_BACKGROUND_TYPE === backgroundType ) {
+			const youtubeId = getYoutubeIdFromUrl( url );
+			youtubeIframeSrc = `https://www.youtube.com/embed/${ youtubeId }?rel=0&version=3&autoplay=1&mute=1&controls=0&controls=0&showinfo=0&loop=1&modestbranding=1&playlist=${ youtubeId }`;
 		}
 
 		return (
@@ -236,6 +320,16 @@ class CoverEdit extends Component {
 							muted
 							loop
 							src={ url }
+						/>
+					) }
+					{ YOUTUBE_BACKGROUND_TYPE === backgroundType && (
+						<iframe
+							className="wp-block-cover__video-background"
+							title={ __( 'YouTube Video Background' ) }
+							src={ youtubeIframeSrc }
+							frameBorder="0"
+							allow="autoplay; encrypted-media;"
+							allowFullscreen
 						/>
 					) }
 					{ ( ! RichText.isEmpty( title ) || isSelected ) && (
