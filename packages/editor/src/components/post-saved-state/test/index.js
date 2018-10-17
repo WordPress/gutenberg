@@ -63,7 +63,7 @@ describe( 'PostSavedState', () => {
 				onSave={ saveSpy } />
 		);
 
-		expect( wrapper.name() ).toBe( 'IconButton' );
+		expect( wrapper ).toMatchSnapshot();
 		wrapper.simulate( 'click' );
 		expect( saveSpy ).toHaveBeenCalled();
 	} );
