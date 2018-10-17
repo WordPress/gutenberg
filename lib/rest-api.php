@@ -464,6 +464,10 @@ function gutenberg_silence_rest_errors() {
 /**
  * Include additional labels for registered post types
  *
+ * @see https://core.trac.wordpress.org/ticket/45101
+ *
+ * @param array  $args      Arguments supplied to register_post_type()
+ * @param string $post_type Post type key
  * @return array Arguments supplied to register_post_type()
  */
 function gutenberg_filter_post_type_labels( $args, $post_type ) {
