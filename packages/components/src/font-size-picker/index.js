@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, map } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,7 @@ function FontSizePicker( {
 
 	// If the current font size is not one of the pre-defined sizes, we assume
 	// the custom option has been selected.
-	const isCustomFontSize = ! ( includes( map( fontSizes, 'size' ), value ) || value === undefined );
+	const isCustomFontSize = ! ( currentFont || value === undefined );
 
 	return (
 		<BaseControl label={ __( 'Font Size' ) }>
