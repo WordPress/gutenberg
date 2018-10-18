@@ -18,7 +18,7 @@ import Inputs from './inputs';
 import Saturation from './saturation';
 import { colorToState, simpleCheckForValidColor } from './utils';
 
-export default class extends Component {
+export default class ColorPicker extends Component {
 	constructor( { color = '0071a1' } ) {
 		super( ...arguments );
 		this.state = colorToState( color );
