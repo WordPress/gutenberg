@@ -8,6 +8,7 @@ class RCTAztecView: Aztec.TextView {
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
 
     @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
+    @objc var onHTMLContentWithCursor: RCTBubblingEventBlock? = nil
     
     private var previousContentSize: CGSize = .zero
 
@@ -75,13 +76,6 @@ class RCTAztecView: Aztec.TextView {
         super.deleteBackward()
         updatePlaceholderVisibility()
     }
-
-    func propagateContentChanges() {
-        if let onChange = onChange {
-            let text = packForRN(getHTML(), withName: "text")
-            onChange(text)
-        }
-    }
     
     // MARK: - Native-to-RN Value Packing Logic
     
@@ -137,7 +131,7 @@ class RCTAztecView: Aztec.TextView {
         placeholderLabel.isHidden = !self.text.isEmpty
     }
 
-    // MARK: Format interface
+    // MARK: - Formatting interface
 
     @objc func apply(format: String) {
         switch format {
@@ -145,6 +139,21 @@ class RCTAztecView: Aztec.TextView {
         case "italic": toggleItalic(range: selectedRange)
         case "strikethrough": toggleStrikethrough(range: selectedRange)
         default: print("Format not recognized")
+        }
+    }
+    
+    // MARK: - Cursor Positioning
+    
+    @objc func returnHTMLWithCursor() {
+        propagateHTMLContentWithCursor()
+    }
+    
+    // MARK: - Event Propagation
+    
+    func propagateContentChanges() {
+        if let onChange = onChange {
+            let text = packForRN(getHTML(), withName: "text")
+            onChange(text)
         }
     }
 
@@ -167,6 +176,18 @@ class RCTAztecView: Aztec.TextView {
             }
         })
         onActiveFormatsChange(["formats": formats])
+    }
+    
+    func propagateHTMLContentWithCursor() {
+        guard let onHTMLContentWithCursor = onHTMLContentWithCursor else {
+            return
+        }
+
+        onHTMLContentWithCursor([
+            "text": getHTML(),
+            "selectionStart": selectedRange.location,
+            "selectionEnd": selectedRange.location + selectedRange.length,
+            ])
     }
 }
 
