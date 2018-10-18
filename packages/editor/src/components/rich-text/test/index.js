@@ -1,44 +1,9 @@
 /**
- * External dependencies
- */
-import { shallow } from 'enzyme';
-
-/**
- * WordPress dependencies
- */
-import { create } from '@wordpress/rich-text';
-
-/**
  * Internal dependencies
  */
-import { RichText } from '../';
 import { diffAriaProps, pickAriaProps } from '../aria';
 
 describe( 'RichText', () => {
-	describe( 'Component', () => {
-		describe( '.getSettings', () => {
-			const value = create();
-			const settings = {
-				setting: 'hi',
-			};
-
-			test( 'should return expected settings', () => {
-				const wrapper = shallow( <RichText value={ value } /> );
-				expect( wrapper.instance().getSettings( settings ) ).toEqual( {
-					setting: 'hi',
-					forced_root_block: false,
-					custom_undo_redo_levels: 1,
-				} );
-			} );
-
-			test( 'should be overriden', () => {
-				const mock = jest.fn().mockImplementation( () => 'mocked' );
-
-				expect( shallow( <RichText value={ value } unstableGetSettings={ mock } /> ).instance().getSettings( settings ) ).toEqual( 'mocked' );
-			} );
-		} );
-	} );
-
 	describe( 'pickAriaProps()', () => {
 		it( 'should should filter all properties to only those begining with "aria-"', () => {
 			expect( pickAriaProps( {

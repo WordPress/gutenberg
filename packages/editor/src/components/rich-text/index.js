@@ -80,7 +80,6 @@ export class RichText extends Component {
 		}
 
 		this.onInit = this.onInit.bind( this );
-		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -136,31 +135,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Retrieves the settings for this block.
-	 *
-	 * Allows passing in settings which will be overwritten.
-	 *
-	 * @param {Object} settings The settings to overwrite.
-	 * @return {Object} The settings for this block.
-	 */
-	getSettings( settings ) {
-		settings = {
-			...settings,
-			forced_root_block: this.multilineTag || false,
-			// Allow TinyMCE to keep one undo level for comparing changes.
-			// Prevent it otherwise from accumulating any history.
-			custom_undo_redo_levels: 1,
-		};
-
-		const { unstableGetSettings } = this.props;
-		if ( unstableGetSettings ) {
-			settings = unstableGetSettings( settings );
-		}
-
-		return settings;
-	}
-
-	/**
 	 * Handles the onSetup event for the TinyMCE component.
 	 *
 	 * Will setup event handlers for the TinyMCE instance.
@@ -176,11 +150,6 @@ export class RichText extends Component {
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
-
-		const { unstableOnSetup } = this.props;
-		if ( unstableOnSetup ) {
-			unstableOnSetup( editor );
-		}
 	}
 
 	setFocusedElement() {
@@ -934,7 +903,6 @@ export class RichText extends Component {
 						<Fragment>
 							<TinyMCE
 								tagName={ Tagname }
-								getSettings={ this.getSettings }
 								onSetup={ this.onSetup }
 								style={ style }
 								defaultValue={ this.valueToEditableHTML( record ) }

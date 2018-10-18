@@ -175,7 +175,8 @@ export default class TinyMCE extends Component {
 	}
 
 	initialize() {
-		const settings = this.props.getSettings( {
+		const { multilineTag } = this.props;
+		const settings = {
 			theme: false,
 			inline: true,
 			toolbar: false,
@@ -189,9 +190,13 @@ export default class TinyMCE extends Component {
 			verify_html: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
-		} );
+			forced_root_block: multilineTag || false,
+			// Allow TinyMCE to keep one undo level for comparing changes.
+			// Prevent it otherwise from accumulating any history.
+			custom_undo_redo_levels: 1,
+		};
 
-		if ( this.props.multilineTag === 'li' ) {
+		if ( multilineTag === 'li' ) {
 			settings.plugins.push( 'lists' );
 			settings.lists_indent_on_tab = true;
 		}
