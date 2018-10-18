@@ -42,7 +42,10 @@ export default ( ...args ) => {
 
 	return createHigherOrderComponent(
 		compose( [
-			withSelect( ( select ) => {
+			withSelect( ( select, { colors } ) => {
+				if ( colors ) {
+					return {};
+				}
 				const settings = select( 'core/editor' ).getEditorSettings();
 				return {
 					colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
