@@ -224,36 +224,9 @@ public class ReactAztecText extends AztecText {
 
     void emitHTMLWithCursorEvent() {
         disableTextChangedListener();
-        // The code below is taken from `toHtml` method of Aztec and adapted to report the current
-        // selection if present by adding 2 cursor spans before the converting to HTML.
-        AztecParser aztecParser = new AztecParser(getPlugins());
-        SpannableStringBuilder output = new SpannableStringBuilder(getText());
-        clearMetaSpans(output);
-        final AztecCursorSpan[] spans = output.getSpans(0, output.length(), AztecCursorSpan.class);
-        for (AztecCursorSpan currentSpan : spans) {
-            output.removeSpan(currentSpan);
-        }
-
-        output.setSpan(new AztecCursorSpan(), getSelectionEnd(), getSelectionEnd(), Spanned.SPAN_MARK_MARK);
-        if (isTextSelected()) {
-            output.setSpan(new AztecCursorSpan(), getSelectionStart(), getSelectionStart(), Spanned.SPAN_MARK_MARK);
-        }
-
-        aztecParser.syncVisualNewlinesOfBlockElements(output);
-        Format.postProcessSpannedText(output, false);
-        String content = EndOfBufferMarkerAdder.removeEndOfTextMarker(aztecParser.toHtml(output, true));
-
-        int cursorPositionStart = content.indexOf("aztec_cursor");
-        if (cursorPositionStart != -1) {
-            content = content.replaceFirst("aztec_cursor", "");
-        }
-        int cursorPositionEnd = cursorPositionStart;
-
-        if (content.contains("aztec_cursor")) {
-            cursorPositionEnd = content.indexOf("aztec_cursor");
-            content = content.replaceFirst("aztec_cursor", "");
-        }
-
+        String content = toHtml(false);
+        int cursorPositionStart = getSelectionStart();
+        int cursorPositionEnd = getSelectionEnd();
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
