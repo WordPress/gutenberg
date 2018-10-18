@@ -289,9 +289,9 @@ function the_gutenberg_metaboxes() {
 	 *
 	 * @param array $wp_meta_boxes Global meta box state.
 	 */
-	$wp_meta_boxes             = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
-	$locations                 = array( 'side', 'normal', 'advanced' );
-	$priorities                = array( 'high', 'sorted', 'core', 'default', 'low' );
+	$wp_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
+	$locations     = array( 'side', 'normal', 'advanced' );
+	$priorities    = array( 'high', 'sorted', 'core', 'default', 'low' );
 	// Render meta boxes.
 	?>
 	<form class="metabox-base-form">
@@ -322,8 +322,8 @@ function the_gutenberg_metaboxes() {
 			foreach ( $meta_boxes as $meta_box ) {
 				if ( ! empty( $meta_box['title'] ) ) {
 					$meta_boxes_per_location[ $location ][] = array(
-						'id' => $meta_box[ 'id' ],
-						'title' => $meta_box['title']
+						'id'    => $meta_box['id'],
+						'title' => $meta_box['title'],
 					);
 				}
 			}

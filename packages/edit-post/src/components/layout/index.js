@@ -38,7 +38,6 @@ import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import FullscreenMode from '../fullscreen-mode';
-import MetaBoxesVisibility from '../meta-boxes-visibility';
 
 function Layout( {
 	mode,
@@ -92,7 +91,6 @@ function Layout( {
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="advanced" />
 				</div>
-				<MetaBoxesVisibility />
 			</div>
 			{ publishSidebarOpened ? (
 				<PostPublishPanel
