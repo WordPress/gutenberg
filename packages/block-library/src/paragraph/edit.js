@@ -231,7 +231,7 @@ class ParagraphBlock extends Component {
 					style={ {
 						backgroundColor: backgroundColor.color,
 						color: textColor.color,
-						fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
+						fontSize: ( fontSize.slug === 'custom' ) ? fontSize.size + 'px' : undefined,
 						textAlign: align,
 						direction,
 					} }
