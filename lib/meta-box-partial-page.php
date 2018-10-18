@@ -113,7 +113,6 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 		'revisionsdiv',
 		'postexcerpt',
 		'trackbacksdiv',
-		'postcustom',
 		'commentstatusdiv',
 		'commentsdiv',
 		'slugdiv',

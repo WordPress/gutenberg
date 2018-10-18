@@ -5,6 +5,9 @@ export const PREFERENCES_DEFAULTS = {
 		'post-status': {
 			opened: true,
 		},
+		'meta-box-postcustom': {
+			enabled: false,
+		},
 	},
 	features: {
 		fixedToolbar: false,
