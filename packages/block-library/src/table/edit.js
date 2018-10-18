@@ -474,9 +474,7 @@ export class TableEdit extends Component {
 	}
 }
 
-const ComposedTableEdit = compose( [
+export default compose( [
 	withColors( 'backgroundColor' ),
 	applyFallbackStyles,
 ] )( TableEdit );
-
-export default ComposedTableEdit;
