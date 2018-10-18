@@ -142,7 +142,8 @@ export class Hue extends Component {
 						onMouseDown={ this.handleMouseDown }
 						onTouchMove={ this.handleChange }
 						onTouchStart={ this.handleChange }>
-						<button
+						<div
+							tabIndex="0"
 							role="slider"
 							aria-valuemax="1"
 							aria-valuemin="359"
