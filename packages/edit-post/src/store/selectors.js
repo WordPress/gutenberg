@@ -260,7 +260,8 @@ export function isMetaBoxLocationVisible( state, location ) {
  * @return {boolean} Whether the meta box location is active.
  */
 export function isMetaBoxLocationActive( state, location ) {
-	return getMetaBoxesPerLocation( state, location ).length !== 0;
+	const metaBoxes = getMetaBoxesPerLocation( state, location );
+	return !! metaBoxes && metaBoxes.length !== 0;
 }
 
 /**
