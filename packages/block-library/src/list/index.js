@@ -253,7 +253,7 @@ export const settings = {
 						undefined
 				}
 				onRemove={ () => onReplace( [] ) }
-				onTagChange={ ( tag ) => setAttributes( { ordered: tag === 'ol' } ) }
+				onTagNameChange={ ( tag ) => setAttributes( { ordered: tag === 'ol' } ) }
 			/>
 		);
 	},

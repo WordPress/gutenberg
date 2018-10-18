@@ -5,18 +5,38 @@
 import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export const ListToolbar = ( { editor, onTagChange, tagName } ) => (
+function isListRootSelected( editor ) {
+	return (
+		! editor.selection ||
+		editor.selection.getNode().closest( 'ol,ul' ) === editor.getBody()
+	);
+}
+
+function isActiveListType( editor, tagName, rootTagName ) {
+	if ( document.activeElement !== editor.getBody() ) {
+		return tagName === rootTagName;
+	}
+
+	const listItem = editor.selection.getNode();
+	const list = listItem.closest( 'ol,ul' );
+
+	if ( ! list ) {
+		return;
+	}
+
+	return list.nodeName.toLowerCase() === tagName;
+}
+
+export const ListToolbar = ( { editor, onTagNameChange, tagName } ) => (
 	<Toolbar
 		controls={ [
 			{
 				icon: 'editor-ul',
 				title: __( 'Convert to unordered list' ),
-				isActive: tagName === 'ul',
-				onClick: () => {
-					if (
-						! editor.selection ||
-						editor.selection.getNode().closest( 'ol' ) === editor.getBody() ) {
-						onTagChange( 'ul' );
+				isActive: isActiveListType( editor, 'ul', tagName ),
+				onClick() {
+					if ( isListRootSelected( editor ) ) {
+						onTagNameChange( 'ul' );
 					} else {
 						editor.execCommand( 'InsertUnorderedList' );
 					}
@@ -25,13 +45,10 @@ export const ListToolbar = ( { editor, onTagChange, tagName } ) => (
 			{
 				icon: 'editor-ol',
 				title: __( 'Convert to ordered list' ),
-				isActive: tagName === 'ol',
-				onClick: () => {
-					if (
-						! editor.selection ||
-						editor.selection.getNode().closest( 'ul' ) === editor.getBody()
-					) {
-						onTagChange( 'ol' );
+				isActive: isActiveListType( editor, 'ol', tagName ),
+				onClick() {
+					if ( isListRootSelected( editor ) ) {
+						onTagNameChange( 'ol' );
 					} else {
 						editor.execCommand( 'InsertOrderedList' );
 					}
