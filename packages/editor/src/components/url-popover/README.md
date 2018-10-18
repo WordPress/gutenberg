@@ -62,7 +62,7 @@ class MyURLPopover extends Component {
 				<Button onClick={ this.openURLPopover }>Edit URL</Button>
 				{ isVisible && (
 					<URLPopover
-						onClickOutside={ this.closeURLPopover }
+						onClose={ this.closeURLPopover }
 						renderSettings={ () => (
 							<ToggleControl
 								label={ __( 'Open in New Tab' ) }
@@ -104,9 +104,10 @@ an element.
 - Required: No
 - Default: "firstElement"
 
-### onClickOutside
+### onClose
 
-Handles an event triggered when the user clicks outside of the URLPopover.
+Callback that triggers when the user indicates the popover should close (e.g. they've used the escape key or clicked
+outside of the popover.)
 
 - Type: `Function`
 - Required: No
