@@ -1,4 +1,8 @@
-## 4.1.0 (Unreleased)
+## 5.0.0 (Unreleased)
+
+### Breaking Changes
+
+- The `checkTemplateValidity` action has been removed. Validity is verified automatically upon block reset.
 
 ### Deprecations
 

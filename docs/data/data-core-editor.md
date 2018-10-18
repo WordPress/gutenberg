@@ -1545,10 +1545,6 @@ Returns an action object resetting the template validity.
 
  * isValid: template validity flag.
 
-### checkTemplateValidity
-
-Returns an action object to check the template validity.
-
 ### synchronizeTemplate
 
 Returns an action object synchronize the template with the list of blocks
