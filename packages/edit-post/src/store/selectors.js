@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { get, includes, some } from 'lodash';
+import { get, includes, some, flatten, values } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -285,13 +285,7 @@ export function getMetaBoxesPerLocation( state, location ) {
  */
 export const getAllMetaBoxes = createSelector(
 	( state ) => {
-		let allMetaBoxes = [];
-		Object.entries( state.metaBoxes.locations )
-			.forEach( ( [ , metaBoxes ] ) => {
-				allMetaBoxes = allMetaBoxes.concat( metaBoxes );
-			} );
-
-		return allMetaBoxes;
+		return flatten( values( state.metaBoxes.locations ) );
 	},
 	( state ) => [
 		state.metaBoxes.locations,
