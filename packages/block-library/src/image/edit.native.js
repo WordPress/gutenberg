@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import { View, Image } from 'react-native';
+import { View, Image, TextInput } from 'react-native';
 
 /**
  * Internal dependencies
  */
 import { MediaPlaceholder } from '@wordpress/editor';
 
-export default function ImageEdit( { attributes } ) {
-	const { url } = attributes;
+export default function ImageEdit( props ) {
+	const { attributes, isSelected, setAttributes } = props;
+	const { url, caption } = attributes;
 
 	const onUploadPress = () => {
 		// This method should present an image picker from
@@ -39,6 +40,17 @@ export default function ImageEdit( { attributes } ) {
 				resizeMethod="scale"
 				source={ { uri: url } }
 			/>
+			{ ( caption.length > 0 || isSelected ) && (
+				<View style={ { padding: 12, flex: 1 } }>
+					<TextInput
+						style={ { textAlign: 'center' } }
+						underlineColorAndroid="transparent"
+						value={ caption }
+						placeholder={ 'Write caption…' }
+						onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+					/>
+				</View>
+			) }
 		</View>
 	);
 }

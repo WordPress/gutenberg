@@ -191,6 +191,30 @@
 		padding: 0 8px 1px;
 		font-size: 11px;
 	}
+
+	// Buttons that are text-based.
+	&.is-tertiary {
+		color: theme(outlines);
+
+		.dashicon {
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+
+		// Ensure that even SVG icons that don't include the .dashicon class are colored.
+		svg {
+			fill: currentColor;
+			outline: none;
+		}
+
+		&:active:focus:enabled {
+			box-shadow: none;
+		}
+
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			color: color(theme(outlines) shade(25%));
+		}
+	}
 }
 
 @keyframes components-button__busy-animation {

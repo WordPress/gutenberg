@@ -14,6 +14,11 @@ import {
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
+import {
+	create,
+	split,
+	toHTMLString,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -56,12 +61,53 @@ export class RichText extends Component {
 		this.splitContent( htmlText, start, end );
 	}
 
+	/*
+	 * Splits the content at the location of the selection.
+	 *
+	 * Replaces the content of the editor inside this element with the contents
+	 * before the selection. Sends the elements after the selection to the `onSplit`
+	 * handler.
+	 *
+	 */
 	splitContent( htmlText, start, end ) {
 		const { onSplit } = this.props;
+
 		if ( ! onSplit ) {
 			return;
 		}
-		onSplit( htmlText, start, end );
+
+		const record = create( {
+			html: htmlText,
+			range: null,
+			multilineTag: false,
+			removeNode: null,
+			unwrapNode: null,
+			removeAttribute: null,
+			filterString: null,
+		} );
+
+		// TODO : Fix the index position in AztecNative for Android
+		let [ before, after ] = split( { start: start - 6, end: end - 6, ...record } );
+
+		// TODO : Handle here the cases when the split happens at the trailing or leading edge...
+		// See the web version for reference.
+
+		if ( before ) {
+			before = this.valueToFormat( before );
+		}
+
+		if ( after ) {
+			after = this.valueToFormat( after );
+		}
+
+		onSplit( before, after );
+	}
+
+	valueToFormat( { formats, text } ) {
+		const value = toHTMLString( { formats, text }, this.multilineTag );
+		// remove the outer p tags
+		const returningContentWithoutParaTag = value.replace( /<p>|<\/p>/gi, '' );
+		return returningContentWithoutParaTag;
 	}
 
 	onActiveFormatsChange( formats ) {

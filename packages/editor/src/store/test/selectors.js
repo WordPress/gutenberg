@@ -61,6 +61,7 @@ const {
 	getSelectedBlock,
 	getSelectedBlockClientId,
 	getBlockRootClientId,
+	getBlockHierarchyRootClientId,
 	getCurrentPostAttribute,
 	getEditedPostAttribute,
 	getAutosaveAttribute,
@@ -2098,6 +2099,51 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockRootClientId( state, 56 ) ).toBe( '123' );
+		} );
+	} );
+
+	describe( 'getBlockHierarchyRootClientId', () => {
+		it( 'should return the given block if the block has no parents', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {},
+					},
+				},
+			};
+
+			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( 56 );
+		} );
+
+		it( 'should return root ClientId relative the block ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
+						},
+					},
+				},
+			};
+
+			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( '123' );
+		} );
+
+		it( 'should return the top level root ClientId relative the block ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ '123', '23' ],
+							123: [ '456', '56' ],
+							56: [ '12' ],
+						},
+					},
+				},
+			};
+
+			expect( getBlockHierarchyRootClientId( state, '12' ) ).toBe( '123' );
 		} );
 	} );
 

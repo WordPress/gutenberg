@@ -1,4 +1,5 @@
-.wp-block-cover-image {
+.wp-block-cover-image,
+.wp-block-cover {
 	.editor-rich-text__tinymce[data-is-empty="true"]::before {
 		position: inherit;
 	}

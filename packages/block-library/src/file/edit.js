@@ -24,7 +24,6 @@ import {
 	mediaUpload,
 } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -81,7 +80,7 @@ class FileEdit extends Component {
 			this.setState( { hasError: false } );
 			this.props.setAttributes( {
 				href: media.url,
-				fileName: create( { text: media.title } ),
+				fileName: media.title,
 				textLinkHref: media.url,
 				id: media.id,
 			} );

@@ -565,6 +565,19 @@ exist.
 
 Root client ID, if exists
 
+### getBlockHierarchyRootClientId
+
+Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block from which to find root client ID.
+
+*Returns*
+
+Root client ID
+
 ### getAdjacentBlockClientId
 
 Returns the client ID of the block adjacent one at the given reference
@@ -1531,10 +1544,6 @@ Returns an action object resetting the template validity.
 *Parameters*
 
  * isValid: template validity flag.
-
-### checkTemplateValidity
-
-Returns an action object to check the template validity.
 
 ### synchronizeTemplate
 

@@ -50,6 +50,10 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			result[ key ] = schema.default;
 		}
 
+		if ( schema.source === 'html' && typeof result[ key ] !== 'string' ) {
+			result[ key ] = '';
+		}
+
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
 			// Ensure value passed is always an array, which we're expecting in
 			// the RichText component to handle the deprecated value.

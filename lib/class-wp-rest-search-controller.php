@@ -62,7 +62,7 @@ class WP_REST_Search_Controller extends WP_REST_Controller {
 	 *                               handler instance must extend the `WP_REST_Search_Handler` class.
 	 */
 	public function __construct( array $search_handlers ) {
-		$this->namespace = 'gutenberg/v1';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'search';
 
 		foreach ( $search_handlers as $search_handler ) {
