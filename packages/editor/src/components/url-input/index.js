@@ -46,7 +46,7 @@ class URLInput extends Component {
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
 			this.scrollingIntoView = true;
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef, {
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef.current, {
 				onlyScrollIfNeeded: true,
 			} );
 
