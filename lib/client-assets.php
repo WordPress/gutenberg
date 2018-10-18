@@ -97,6 +97,10 @@ if ( ! function_exists( 'wp_register_tinymce_scripts' ) ) {
  * @since 0.1.0
  */
 function gutenberg_register_scripts_and_styles() {
+	if ( wp_script_is( 'wp-polyfill', 'registered' ) ) {
+		return;
+	}
+
 	gutenberg_register_vendor_scripts();
 
 	wp_register_tinymce_scripts();
