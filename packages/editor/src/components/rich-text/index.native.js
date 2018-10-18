@@ -15,6 +15,7 @@ import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
 import {
+	isEmpty,
 	create,
 	split,
 	toHTMLString,
@@ -87,10 +88,18 @@ export class RichText extends Component {
 		} );
 
 		// TODO : Fix the index position in AztecNative for Android
-		let [ before, after ] = split( { start: start - 6, end: end - 6, ...record } );
+		let [ before, after ] = split( { start, end, ...record } );
 
-		// TODO : Handle here the cases when the split happens at the trailing or leading edge...
-		// See the web version for reference.
+		// In case split occurs at the trailing or leading edge of the field,
+		// assume that the before/after values respectively reflect the current
+		// value. This also provides an opportunity for the parent component to
+		// determine whether the before/after value has changed using a trivial
+		//  strict equality operation.
+		if ( isEmpty( after ) ) {
+			before = record;
+		} else if ( isEmpty( before ) ) {
+			after = record;
+		}
 
 		if ( before ) {
 			before = this.valueToFormat( before );
