@@ -109,12 +109,22 @@
 					padding-right: $grid-size-large;
 				}
 
-				&:first-child > .editor-block-list__block-edit {
+				&:nth-child(odd) > .editor-block-list__block-edit {
 					padding-left: 0;
 				}
 
-				&:last-child > .editor-block-list__block-edit {
+				&:nth-child(even) > .editor-block-list__block-edit {
 					padding-right: 0;
+				}
+			}
+
+			@include break-medium() {
+				&:not(:first-child) > .editor-block-list__block-edit {
+					padding-left: $grid-size-large;
+				}
+
+				&:not(:last-child) > .editor-block-list__block-edit {
+					padding-right: $grid-size-large;
 				}
 			}
 		}

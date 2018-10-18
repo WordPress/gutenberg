@@ -28,12 +28,22 @@
 		padding-left: $grid-size-large;
 		padding-right: $grid-size-large;
 
-		&:first-child {
+		&:nth-child(odd) {
 			padding-left: 0;
 		}
 
-		&:last-child {
+		&:nth-child(even) {
 			padding-right: 0;
+		}
+	}
+
+	@include break-medium() {
+		&:not(:first-child) {
+			padding-left: $grid-size-large;
+		}
+
+		&:not(:last-child) {
+			padding-right: $grid-size-large;
 		}
 	}
 }
