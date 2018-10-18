@@ -21,14 +21,14 @@ describe( 'Navigating the block hierarchy', () => {
 	} );
 
 	it( 'should navigate using the block hierarchy dropdown menu', async () => {
-		await insertBlock( 'Columns (beta)' );
+		await insertBlock( 'Columns' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
 		await page.click( '[aria-label="Block Navigation"]' );
-		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Columns (beta)')]" ) )[ 0 ];
+		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
@@ -53,7 +53,7 @@ describe( 'Navigating the block hierarchy', () => {
 	} );
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
-		await insertBlock( 'Columns (beta)' );
+		await insertBlock( 'Columns' );
 
 		// Add a paragraph in the first column.
 		await page.keyboard.type( 'First column' );
