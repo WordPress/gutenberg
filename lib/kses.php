@@ -13,11 +13,20 @@
  * @return array (Maybe) modified allowed HTML.
  */
 function gutenberg_kses_allowedtags( $tags ) {
-	$tags['a']['download']      = true;
-	$tags['img']['data-link']   = true;
-	$tags['img']['data-id']     = true;
-	$tags['div']['style']       = true;
-	$tags['div']['aria-hidden'] = true;
+	if ( isset( $tags['a'] ) ) {
+		$tags['a']['download'] = true;
+	}
+
+	if ( isset( $tags['img'] ) ) {
+		$tags['img']['data-link'] = true;
+		$tags['img']['data-id']   = true;
+	}
+
+	if ( isset( $tags['div'] ) ) {
+		$tags['div']['style']       = true;
+		$tags['div']['aria-hidden'] = true;
+	}
+
 	return $tags;
 }
 
