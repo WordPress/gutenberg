@@ -1,12 +1,13 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+import { get, includes, some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * External dependencies
- */
-import { get, includes, some } from 'lodash';
 
 /**
  * Returns the current editing mode.
@@ -222,10 +223,15 @@ export function getMetaBoxes( state ) {
  *
  * @return {string[]} Active meta box locations.
  */
-export function getActiveMetaBoxLocations( state ) {
-	return Object.keys( state.metaBoxes.locations )
-		.filter( ( location ) => isMetaBoxLocationActive( state, location ) );
-}
+export const getActiveMetaBoxLocations = createSelector(
+	( state ) => {
+		return Object.keys( state.metaBoxes.locations )
+			.filter( ( location ) => isMetaBoxLocationActive( state, location ) );
+	},
+	( state ) => [
+		state.metaBoxes.locations,
+	]
+);
 
 /**
  * Returns true if a metabox location is active and visible
@@ -263,14 +269,10 @@ export function isMetaBoxLocationActive( state, location ) {
  * @param {Object} state    Global application state.
  * @param {string} location Meta box location to test.
  *
- * @return {Array} List of meta boxes.
+ * @return {?Array} List of meta boxes.
  */
 export function getMetaBoxesPerLocation( state, location ) {
-	return get(
-		state.metaBoxes.locations,
-		[ location ],
-		[]
-	);
+	return state.metaBoxes.locations[ location ];
 }
 
 /**
@@ -280,15 +282,20 @@ export function getMetaBoxesPerLocation( state, location ) {
  *
  * @return {Array} List of meta boxes.
  */
-export function getAllMetaBoxes( state ) {
-	let allMetaBoxes = [];
-	Object.entries( state.metaBoxes.locations )
-		.forEach( ( [ , metaBoxes ] ) => {
-			allMetaBoxes = allMetaBoxes.concat( metaBoxes );
-		} );
+export const getAllMetaBoxes = createSelector(
+	( state ) => {
+		let allMetaBoxes = [];
+		Object.entries( state.metaBoxes.locations )
+			.forEach( ( [ , metaBoxes ] ) => {
+				allMetaBoxes = allMetaBoxes.concat( metaBoxes );
+			} );
 
-	return allMetaBoxes;
-}
+		return allMetaBoxes;
+	},
+	( state ) => [
+		state.metaBoxes.locations,
+	]
+);
 
 /**
  * Returns the state of legacy meta boxes.
