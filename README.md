@@ -40,13 +40,22 @@ Before running the demo app, you need to download and install the project depend
 yarn install
 ```
 
-## Pre-Setup iOS
+## Prerequisites
 
-Carthage is also needed for fetching the Aztec dependency and you can get it running following command:
+Carthage is also needed for fetching the Aztec dependency.
+
+First make sure that you have installed homebrew for MacOS. You can do it with following command:
 
 ```
-yarn preios
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 ```
+
+When above command is exectuted with success, you can use homebrew to install Carthage. This is done via the following command:
+
+```
+brew install carthage
+```
+
 
 ## Run
 
