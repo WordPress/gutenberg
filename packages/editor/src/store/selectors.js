@@ -17,7 +17,6 @@ import {
 	reduce,
 	size,
 	some,
-	isEmpty,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -31,6 +30,7 @@ import {
 	hasBlockSupport,
 	hasChildBlocksWithInserterSupport,
 	getFreeformContentHandlerName,
+	getUnregisteredTypeHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
@@ -364,6 +364,20 @@ export function isEditedPostSaveable( state ) {
 }
 
 /**
+ * Determines whether all the block available in post are known or registered block or not.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} whether all the block available in post are known block or not.
+ */
+export function hasKnownBlocks( state ) {
+	return getBlockOrder( state ).some( ( clientId ) => (
+		state.editor.present.blocksByClientId[ clientId ].name !== getFreeformContentHandlerName() &&
+		state.editor.present.blocksByClientId[ clientId ].name !== getUnregisteredTypeHandlerName()
+	) );
+}
+
+/**
  * Returns true if the edited post has content. A post has content if it has at
  * least one saveable block or otherwise has a non-empty content property
  * assigned.
@@ -378,7 +392,7 @@ export function isEditedPostEmpty( state ) {
 	// operation by comparison. Since this function can be called frequently,
 	// optimize for the fast case where saveable blocks are non-empty.
 	return (
-		! getBlocksForSerialization( state ).length &&
+		! hasKnownBlocks( state ) ||
 		! getEditedPostAttribute( state, 'content' )
 	);
 }
@@ -1458,17 +1472,6 @@ export function getBlocksForSerialization( state ) {
 	);
 
 	if ( isSingleUnmodifiedDefaultBlock ) {
-		return [];
-	}
-
-	// A single empty core/freeform block equivalent to an empty post.
-	const isSingleEmptyFreeformBlock = (
-		blocks.length === 1 &&
-		blocks[ 0 ].name === getUnknownTypeHandlerName() &&
-		( isEmpty( blocks[ 0 ].attributes ) || blocks[ 0 ].attributes.content === '' )
-	);
-
-	if ( isSingleEmptyFreeformBlock ) {
 		return [];
 	}
 
