@@ -112,7 +112,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 			$data['theme_supports']['formats'] = $formats;
 
 			$data['theme_supports']['post-thumbnails']   = false;
-			$data['theme_supports']['responsive-embeds'] = get_theme_support( 'responsive-embeds' );
+			$data['theme_supports']['responsive-embeds'] = (bool) get_theme_support( 'responsive-embeds' );
 			$post_thumbnails                             = get_theme_support( 'post-thumbnails' );
 
 			if ( $post_thumbnails ) {
