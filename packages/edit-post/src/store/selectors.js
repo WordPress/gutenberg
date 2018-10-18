@@ -257,6 +257,14 @@ export function isMetaBoxLocationActive( state, location ) {
 	return getMetaBoxesPerLocation( state, location ).length !== 0;
 }
 
+/**
+ * Returns the list of all the available meta boxes for a given location.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} location Meta box location to test.
+ *
+ * @return {Array} List of meta boxes.
+ */
 export function getMetaBoxesPerLocation( state, location ) {
 	return get(
 		state.metaBoxes.locations,
@@ -265,6 +273,13 @@ export function getMetaBoxesPerLocation( state, location ) {
 	);
 }
 
+/**
+ * Returns the list of all the available meta boxes.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} List of meta boxes.
+ */
 export function getAllMetaBoxes( state ) {
 	let allMetaBoxes = [];
 	Object.entries( state.metaBoxes.locations )
