@@ -171,7 +171,7 @@ function gutenberg_render_block( $block ) {
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
-	$blocks = parse_blocks( $content );
+	$blocks = gutenberg_parse_blocks( $content );
 	return _recurse_blocks( $blocks, $blocks );
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
