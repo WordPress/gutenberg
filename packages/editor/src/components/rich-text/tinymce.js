@@ -101,9 +101,10 @@ export default class TinyMCE extends Component {
 	constructor() {
 		super();
 		this.bindEditorNode = this.bindEditorNode.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 	}
 
-	componentDidMount() {
+	onFocus() {
 		this.initialize();
 	}
 
@@ -258,6 +259,7 @@ export default class TinyMCE extends Component {
 			dangerouslySetInnerHTML: { __html: initialHTML },
 			onPaste,
 			onInput,
+			onFocus: this.onFocus,
 		} );
 	}
 }
