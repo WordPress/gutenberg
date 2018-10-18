@@ -42,6 +42,7 @@ export default class Editor extends Component {
                 ref="_aztec"
                 style={[styles.aztec_editor, {minHeight: myMinHeight}]}
                 text = { { text: item.text } } 
+                disableGutenbergMode = { true }
                 placeholder = {'This is the placeholder text'}
                 placeholderTextColor = {'lightgray'} // See http://facebook.github.io/react-native/docs/colors                
                 onContentSizeChange= { onContentSizeChange }
