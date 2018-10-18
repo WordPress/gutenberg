@@ -133,7 +133,6 @@
 	}
 
 	// Selected style
-	&.is-selected-parent > .editor-block-list__block-edit::before,
 	&.is-selected > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
 		outline: $border-width solid $dark-opacity-light-500;

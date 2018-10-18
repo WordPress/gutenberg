@@ -48,6 +48,7 @@ import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
 import withHoverAreas from './with-hover-areas';
+import { isInsideRootBlock } from '../../utils/dom';
 
 export class BlockListBlock extends Component {
 	constructor() {
@@ -91,7 +92,7 @@ export class BlockListBlock extends Component {
 		}
 
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
-			this.focusTabbable();
+			this.focusTabbable( true );
 		}
 	}
 
@@ -118,8 +119,10 @@ export class BlockListBlock extends Component {
 
 	/**
 	 * When a block becomes selected, transition focus to an inner tabbable.
+	 *
+	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 	 */
-	focusTabbable() {
+	focusTabbable( ignoreInnerBlocks ) {
 		const { initialPosition } = this.props;
 
 		// Focus is captured by the wrapper node, so while focus transition
@@ -131,7 +134,11 @@ export class BlockListBlock extends Component {
 		}
 
 		// Find all tabbables within node.
-		const textInputs = focus.tabbable.find( this.node ).filter( isTextField );
+		const textInputs = focus.tabbable
+			.find( this.node )
+			.filter( isTextField )
+			// Exclude inner blocks
+			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( this.node, node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
@@ -370,9 +377,7 @@ export class BlockListBlock extends Component {
 			isEmptyDefaultBlock,
 			isMovable,
 			isPreviousBlockADefaultEmptyBlock,
-			hasSelectedInnerBlock,
 			isParentOfSelectedBlock,
-			hasMultiSelection,
 			isDraggable,
 		} = this.props;
 		const isHovered = this.state.isHovered && ! isMultiSelecting;
@@ -390,7 +395,6 @@ export class BlockListBlock extends Component {
 		const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 		const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
 		const shouldAppearSelected = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && isSelected && ! isTypingWithinBlock;
-		const shouldAppearSelectedParent = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && hasSelectedInnerBlock && ! isTypingWithinBlock && ! hasMultiSelection;
 		const shouldAppearHovered = ! isFocusMode && ! hasFixedToolbar && isHovered && ! isEmptyDefaultBlock;
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
@@ -410,7 +414,6 @@ export class BlockListBlock extends Component {
 			'has-warning': ! isValid || !! error || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isPartOfMultiSelection,
-			'is-selected-parent': shouldAppearSelectedParent,
 			'is-hovered': shouldAppearHovered,
 			'is-reusable': isReusableBlock( blockType ),
 			'is-dragging': dragging,
@@ -592,7 +595,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		getEditorSettings,
 		hasSelectedInnerBlock,
 		getTemplateLock,
-		hasMultiSelection,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
@@ -607,7 +609,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
 		isMultiSelecting: isMultiSelecting(),
-		hasSelectedInnerBlock: hasSelectedInnerBlock( clientId, false ),
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 		isTypingWithinBlock: ( isSelected || isParentOfSelectedBlock ) && isTyping(),
@@ -626,7 +627,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		block,
 		isSelected,
 		isParentOfSelectedBlock,
-		hasMultiSelection: hasMultiSelection(),
 	};
 } );
 

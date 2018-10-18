@@ -4,6 +4,9 @@
 }
 
 .editor-post-publish-panel__content {
+	// Ensure the post-publish panel accounts for the header and footer height.
+	min-height: calc(100% - #{ $header-height + 84px });
+
 	.components-spinner {
 		display: block;
 		float: none;
@@ -35,8 +38,6 @@
 
 .editor-post-publish-panel__footer {
 	padding: 16px;
-	position: absolute;
-	bottom: 0;
 }
 
 .components-button.editor-post-publish-panel__toggle.is-primary {

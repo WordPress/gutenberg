@@ -108,7 +108,7 @@ export const settings = {
 		return (
 			<figure className={ figureClass } style={ figureStyles }>
 				<blockquote className={ blockquoteClasses } style={ blockquoteStyle } >
-					<RichText.Content value={ value } multiline="p" />
+					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			</figure>
@@ -123,7 +123,7 @@ export const settings = {
 			const { value, citation } = attributes;
 			return (
 				<blockquote>
-					<RichText.Content value={ value } multiline="p" />
+					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			);
@@ -146,7 +146,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ value } />
+					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

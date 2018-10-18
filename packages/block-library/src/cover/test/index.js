@@ -4,7 +4,7 @@
 import { name, settings } from '../';
 import { blockEditRender } from '../../test/helpers';
 
-describe( 'core/cover-image', () => {
+describe( 'core/cover', () => {
 	test( 'block edit matches snapshot', () => {
 		const wrapper = blockEditRender( name, settings );
 

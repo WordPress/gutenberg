@@ -494,3 +494,36 @@ function gutenberg_silence_rest_errors() {
 	}
 
 }
+
+/**
+ * Include additional labels for registered post types
+ *
+ * @see https://core.trac.wordpress.org/ticket/45101
+ *
+ * @param array  $args      Arguments supplied to register_post_type().
+ * @param string $post_type Post type key.
+ * @return array Arguments supplied to register_post_type()
+ */
+function gutenberg_filter_post_type_labels( $args, $post_type ) {
+	$registered_labels = ( empty( $args['labels'] ) ) ? array() : $args['labels'];
+	if ( is_post_type_hierarchical( $post_type ) ) {
+		$labels = array(
+			'item_published'           => __( 'Page published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Page published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Page reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Page scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Page updated.', 'gutenberg' ),
+		);
+	} else {
+		$labels = array(
+			'item_published'           => __( 'Post published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Post published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Post reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Post scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Post updated.', 'gutenberg' ),
+		);
+	}
+	$args['labels'] = array_merge( $labels, $registered_labels );
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_filter_post_type_labels', 10, 2 );

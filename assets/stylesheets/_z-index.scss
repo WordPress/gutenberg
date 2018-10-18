@@ -29,6 +29,8 @@ $z-layers: (
 	".edit-post-header": 30,
 	".block-library-button__inline-link .editor-url-input__suggestions": 6, // URL suggestions for button block above sibling inserter
 	".block-library-image__resize-handlers": 1, // Resize handlers above sibling inserter
+	".wp-block-cover.has-background-dim::before": 1, // Overlay area inside block cover need to be higher than the video background.
+	".wp-block-cover__video-background": 0, // Video background inside cover block.
 
 	// Side UI active buttons
 	".editor-block-mover__control": 1,

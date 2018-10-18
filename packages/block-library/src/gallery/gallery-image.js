@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
+import { isBlobURL } from '@wordpress/blob';
 
 class GalleryImage extends Component {
 	constructor() {
@@ -105,7 +106,7 @@ class GalleryImage extends Component {
 
 		const className = classnames( {
 			'is-selected': isSelected,
-			'is-transient': url && 0 === url.indexOf( 'blob:' ),
+			'is-transient': isBlobURL( url ),
 		} );
 
 		// Disable reason: Each block can be selected by clicking on it and we should keep the same saved markup

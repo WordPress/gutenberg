@@ -2,7 +2,8 @@
  * Internal dependencies
  */
 import {
-	toggleGeneralSidebarEditorPanel,
+	toggleEditorPanelEnabled,
+	toggleEditorPanelOpened,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 	openPublishSidebar,
@@ -58,12 +59,20 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'toggleSidebarPanel', () => {
-		it( 'should return TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL action', () => {
-			const panel = 'panelName';
-			expect( toggleGeneralSidebarEditorPanel( panel ) ).toEqual( {
-				type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
-				panel,
+	describe( 'toggleEditorPanelEnabled', () => {
+		it( 'should return a TOGGLE_PANEL_ENABLED action', () => {
+			expect( toggleEditorPanelEnabled( 'post-status' ) ).toEqual( {
+				type: 'TOGGLE_PANEL_ENABLED',
+				panelName: 'post-status',
+			} );
+		} );
+	} );
+
+	describe( 'toggleEditorPanelOpened', () => {
+		it( 'should return a TOGGLE_PANEL_OPENED action', () => {
+			expect( toggleEditorPanelOpened( 'post-status' ) ).toEqual( {
+				type: 'TOGGLE_PANEL_OPENED',
+				panelName: 'post-status',
 			} );
 		} );
 	} );

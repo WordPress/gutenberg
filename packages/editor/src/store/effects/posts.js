@@ -153,6 +153,7 @@ export const requestPostUpdate = async ( action, store ) => {
 				id: POST_UPDATE_TRANSACTION_ID,
 			},
 			isAutosave,
+			postType,
 		} );
 	} catch ( error ) {
 		dispatch( {
@@ -172,7 +173,7 @@ export const requestPostUpdate = async ( action, store ) => {
  * @param {Object} store   Redux Store.
  */
 export const requestPostUpdateSuccess = ( action, store ) => {
-	const { previousPost, post, isAutosave } = action;
+	const { previousPost, post, isAutosave, postType } = action;
 	const { dispatch, getState } = store;
 
 	// TEMPORARY: If edits remain after a save completes, the user must be
@@ -201,19 +202,19 @@ export const requestPostUpdateSuccess = ( action, store ) => {
 		noticeMessage = null;
 	} else if ( isPublished && ! willPublish ) {
 		// If undoing publish status, show specific notice
-		noticeMessage = __( 'Post reverted to draft.' );
+		noticeMessage = postType.labels.item_reverted_to_draft;
 		shouldShowLink = false;
 	} else if ( ! isPublished && willPublish ) {
 		// If publishing or scheduling a post, show the corresponding
 		// publish message
 		noticeMessage = {
-			publish: __( 'Post published!' ),
-			private: __( 'Post published privately!' ),
-			future: __( 'Post scheduled!' ),
+			publish: postType.labels.item_published,
+			private: postType.labels.item_published_privately,
+			future: postType.labels.item_scheduled,
 		}[ post.status ];
 	} else {
 		// Generic fallback notice
-		noticeMessage = __( 'Post updated!' );
+		noticeMessage = postType.labels.item_updated;
 	}
 
 	if ( noticeMessage ) {
@@ -221,7 +222,7 @@ export const requestPostUpdateSuccess = ( action, store ) => {
 			<p>
 				{ noticeMessage }
 				{ ' ' }
-				{ shouldShowLink && <a href={ post.link }>{ __( 'View post' ) }</a> }
+				{ shouldShowLink && <a href={ post.link }>{ postType.labels.view_item }</a> }
 			</p>,
 			{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
 		) );

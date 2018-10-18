@@ -338,6 +338,12 @@ describe( 'searchItems', () => {
 		);
 	} );
 
+	it( 'should search items using the categories', () => {
+		expect( searchItems( items, 'LAYOUT' ) ).toEqual(
+			[ moreItem ]
+		);
+	} );
+
 	it( 'should ignore a leading slash on a search term', () => {
 		expect( searchItems( items, '/GOOGL' ) ).toEqual(
 			[ youtubeItem ]
