@@ -16,7 +16,7 @@ For a developer experience closer to the one the project maintainers current hav
 * yarn (`npm install -g yarn`)
 * [AndroidStudio](https://developer.android.com/studio/) to be able to compile the Android version of the app
 * [Xcode](https://developer.apple.com/xcode/) to be able to compile the iOS app
-* [Carthage] (https://github.com/Carthage/Carthage#installing-carthage) needed for fetching the Aztec dependency.
+* [Carthage](https://github.com/Carthage/Carthage#installing-carthage) needed for fetching the Aztec dependency.
 
 
 Note that the OS platform used by the maintainers is macOS but the tools and setup should be usable in other platforms too.
