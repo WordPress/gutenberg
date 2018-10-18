@@ -159,6 +159,7 @@ export default class TinyMCE extends Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			verify_html: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
 		} );
@@ -260,6 +261,10 @@ export default class TinyMCE extends Component {
 				multilineTag,
 				multilineWrapperTags,
 			} );
+		}
+
+		if ( initialHTML === '' ) {
+			initialHTML = '<br data-mce-bogus="1">';
 		}
 
 		return createElement( tagName, {
