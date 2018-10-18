@@ -41,6 +41,41 @@ import {
 
 const { getComputedStyle } = window;
 
+const BACKGROUND_COLORS = [
+	{
+		color: '#ffeded',
+		name: 'Subtle pale pink',
+	},
+	{
+		color: '#fff2d1',
+		name: 'Subtle pale yellow',
+	},
+	{
+		color: '#deffdb',
+		name: 'Subtle pale green',
+	},
+	{
+		color: '#daf8ef',
+		name: 'Subtle pale mint',
+	},
+	{
+		color: '#e8f7ff',
+		name: 'Subtle pale blue',
+	},
+	{
+		color: '#fff3ff',
+		name: 'Subtle pale violet',
+	},
+	{
+		color: '#f3f4f5',
+		name: 'Subtle light gray',
+	},
+	{
+		color: '#e2e2e2',
+		name: 'Light gray',
+	},
+];
+
 const applyFallbackStyles = withFallbackStyles( ( node, props ) => {
 	const { textColor, backgroundColor } = props.attributes;
 	const rowElement = node ? node.querySelector( 'tr' ) : undefined;
@@ -417,11 +452,16 @@ export class TableEdit extends Component {
 			);
 		}
 
+		const hasBackgroundColor = !! backgroundColor.color;
+
 		const classes = classnames( className, {
 			'has-fixed-layout': hasFixedLayout,
-			'has-background-color': backgroundColor.class,
-			[ backgroundColor.class ]: backgroundColor.class,
+			'has-background-color': hasBackgroundColor,
 		} );
+
+		const style = hasBackgroundColor ? {
+			backgroundColor: backgroundColor.color,
+		} : undefined;
 
 		return (
 			<Fragment>
@@ -451,6 +491,7 @@ export class TableEdit extends Component {
 								onChange: setBackgroundColor,
 								label: __( 'Background Color' ),
 								disableCustomColors: true,
+								colors: BACKGROUND_COLORS,
 							},
 						] }
 					>
@@ -463,7 +504,7 @@ export class TableEdit extends Component {
 						/>
 					</PanelColorSettings>
 				</InspectorControls>
-				<table className={ classes }>
+				<table className={ classes } style={ style }>
 					<Section type="head" rows={ head } />
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />
