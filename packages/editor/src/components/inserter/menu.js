@@ -20,7 +20,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
@@ -162,7 +162,7 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { items, rootChildBlocks } = this.props;
+		const { items, rootChildBlocks, debouncedSpeak } = this.props;
 		const filteredItems = searchItems( items, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
@@ -205,6 +205,15 @@ export class InserterMenu extends Component {
 			itemsPerCategory,
 			openPanels,
 		} );
+
+		const resultCount = Object.keys( itemsPerCategory ).reduce( ( memo, curr ) => memo + itemsPerCategory[ curr ].length, 0 );
+
+		const resultsFoundMessage = sprintf(
+			_n( '%d result found.', '%d results found.', resultCount ),
+			resultCount
+		);
+
+		debouncedSpeak( resultsFoundMessage, 'assertive' );
 	}
 
 	render() {
