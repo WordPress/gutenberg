@@ -82,7 +82,7 @@ export class PostSavedState extends Component {
 			return null;
 		}
 
-		if ( false || forceSavedMessage || ( ! isNew && ! isDirty ) ) {
+		if ( forceSavedMessage || ( ! isNew && ! isDirty ) ) {
 			return (
 				<span className="editor-post-saved-state is-saved">
 					<Dashicon icon="saved" />
