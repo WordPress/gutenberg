@@ -11,6 +11,7 @@ import createRootURLMiddleware from './middlewares/root-url';
 import createPreloadingMiddleware from './middlewares/preloading';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
+import parseLinkHeader from './utils/parse-link-header';
 
 const middlewares = [];
 
@@ -26,42 +27,102 @@ function checkCloudflareError( error ) {
 	}
 }
 
-function apiFetch( options ) {
-	const raw = ( nextOptions ) => {
-		const { url, path, body, data, parse = true, ...remainingOptions } = nextOptions;
-		const headers = remainingOptions.headers || {};
-		if ( ! headers[ 'Content-Type' ] && data ) {
-			headers[ 'Content-Type' ] = 'application/json';
+const requestContainsUnboundedQuery = ( url ) => url.indexOf( 'per_page=-1' > -1 );
+
+const rewriteUnboundedQuery = ( url ) => url.replace( 'per_page=-1', 'per_page=100' );
+
+const getNextLinkFromResponse = ( response ) => {
+	const linkHeader = response.headers && response.headers.get( 'link' );
+	if ( ! linkHeader ) {
+		return null;
+	}
+	const links = parseLinkHeader( linkHeader );
+	return links && links.next && links.next.url;
+};
+
+/**
+ * Wrapper for fetch which can handle status checks and recursive pagination.
+ *
+ * @param {Object} options Fetch options & data payload.
+ * @return {Promise} A promise resolving to the response object, JSON, or an error.
+ */
+const fetch = ( options ) => {
+	const { url, path, body, data, parse = true, ...remainingOptions } = options;
+	const headers = remainingOptions.headers || {};
+	if ( ! headers[ 'Content-Type' ] && data ) {
+		headers[ 'Content-Type' ] = 'application/json';
+	}
+
+	const responsePromise = window.fetch(
+		rewriteUnboundedQuery( url || path ),
+		{
+			...remainingOptions,
+			credentials: 'include',
+			body: body || JSON.stringify( data ),
+			headers,
+		}
+	);
+
+	const checkStatus = ( response ) => {
+		if ( response.status >= 200 && response.status < 300 ) {
+			return response;
 		}
 
-		const responsePromise = window.fetch(
-			url || path,
-			{
-				...remainingOptions,
-				credentials: 'include',
-				body: body || JSON.stringify( data ),
-				headers,
-			}
-		);
-		const checkStatus = ( response ) => {
-			if ( response.status >= 200 && response.status < 300 ) {
-				return response;
-			}
+		throw response;
+	};
 
-			throw response;
-		};
-
-		const parseResponse = ( response ) => {
-			if ( parse ) {
-				return response.json ? response.json() : Promise.reject( response );
-			}
-
+	const parseAndPaginate = async ( response ) => {
+		if ( parse === false ) {
 			return response;
-		};
+		}
+
+		if ( parse && ! response.json ) {
+			throw response;
+		}
+
+		// Parse the response.
+		const jsonResponse = await response.json();
+
+		// TODO: Trigger pagination through an options flag, not per_page=-1.
+		// (-1 may be a valid parameter value for custom endpoints.)
+		if ( ! requestContainsUnboundedQuery( url || path ) ) {
+			return jsonResponse;
+		}
+
+		// Check response headers for the existence of a next page of results.
+		const nextPage = getNextLinkFromResponse( response );
+
+		if ( ! nextPage ) {
+			// There are no further pages to request.
+			return jsonResponse;
+		}
+
+		if ( ! Array.isArray( jsonResponse ) ) {
+			// TODO: Identify a strategy for merging paginated non-array results.
+			return jsonResponse;
+		}
+
+		// Recursively fetch & merge in the next page of results.
+		return fetch( {
+			...remainingOptions,
+			url: nextPage,
+			body,
+			data,
+			parse,
+		} ).then( ( results ) => jsonResponse.concat( results ) );
+	};
+
+	return responsePromise
+		.then( checkStatus )
+		.then( parseAndPaginate );
+};
+
+function apiFetch( options ) {
+	const raw = ( nextOptions ) => {
+		const { parse = true } = nextOptions;
+		const responsePromise = fetch( nextOptions );
 
 		return responsePromise
-			.then( checkStatus )
-			.then( parseResponse )
 			.catch( ( response ) => {
 				if ( ! parse ) {
 					throw response;
@@ -105,6 +166,7 @@ function apiFetch( options ) {
 
 	const steps = [
 		raw,
+
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
 		...middlewares,
