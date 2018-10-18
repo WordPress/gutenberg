@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,7 @@ import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from 
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, closeModal } ) {
+export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -54,6 +54,13 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
+			{ metaBoxes.length !== 0 && (
+				<Section title={ __( 'Advanced Panels' ) }>
+					{ map( metaBoxes, ( { title, id } ) => (
+						<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
+					) ) }
+				</Section>
+			) }
 		</Modal>
 	);
 }
@@ -61,6 +68,7 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 export default compose(
 	withSelect( ( select ) => ( {
 		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
+		metaBoxes: select( 'core/edit-post' ).getAllMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {

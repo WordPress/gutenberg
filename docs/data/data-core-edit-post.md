@@ -195,6 +195,19 @@ Returns an array of active meta box locations.
 
 Active meta box locations.
 
+### isMetaBoxLocationVisible
+
+Returns true if a metabox location is active and visible
+
+*Parameters*
+
+ * state: Post editor state.
+ * location: Meta box location to test.
+
+*Returns*
+
+Whether the meta box location is active and visible.
+
 ### isMetaBoxLocationActive
 
 Returns true if there is an active meta box in the given location, or false
@@ -208,6 +221,31 @@ otherwise.
 *Returns*
 
 Whether the meta box location is active.
+
+### getMetaBoxesPerLocation
+
+Returns the list of all the available meta boxes for a given location.
+
+*Parameters*
+
+ * state: Global application state.
+ * location: Meta box location to test.
+
+*Returns*
+
+List of meta boxes.
+
+### getAllMetaBoxes
+
+Returns the list of all the available meta boxes.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+List of meta boxes.
 
 ### getMetaBox
 
@@ -326,30 +364,14 @@ Returns an action object used to toggle a plugin name flag.
 
  * pluginName: Plugin name.
 
-### initializeMetaBoxState
+### setAvailableMetaBoxesPerLocation
 
-Returns an action object used to check the state of meta boxes at a location.
-
-This should only be fired once to initialize meta box state. If a meta box
-area is empty, this will set the store state to indicate that React should
-not render the meta box area.
-
-Example: metaBoxes = { side: true, normal: false }.
-
-This indicates that the sidebar has a meta box but the normal area does not.
+Returns an action object used in signaling
+what Meta boxes are available in which location.
 
 *Parameters*
 
- * metaBoxes: Whether meta box locations are active.
-
-### setActiveMetaBoxLocations
-
-Returns an action object used in signaling that the active meta box
-locations have changed.
-
-*Parameters*
-
- * locations: New active meta box locations.
+ * metaBoxesPerLocation: Meta boxes per location.
 
 ### requestMetaBoxUpdates
 
