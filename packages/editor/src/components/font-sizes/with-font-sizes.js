@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, pickBy, reduce, some, upperFirst } from 'lodash';
+import { isNumber, pickBy, reduce, some, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -67,15 +67,11 @@ export default ( ...fontSizeNames ) => {
 					}
 
 					createSetFontSize( fontSizeAttributeName, customFontSizeAttributeName ) {
-						return ( font ) => {
-							// Ensure that "undefined" (aka a reset) or choosing the pre-defined
-							// default font size result in an undefined fontSizeObject.
-							const fontSizeObject = ( font === undefined || font.slug === getDefaultFontSizeSlug ) ?
-								undefined : find( this.props.fontSizes, { slug: ( font.slug ) } );
-
+						return ( value ) => {
+							// Conditionally set the slug or numeric size.
 							this.props.setAttributes( {
-								[ fontSizeAttributeName ]: ( fontSizeObject && fontSizeObject.slug ) ? fontSizeObject.slug : undefined,
-								[ customFontSizeAttributeName ]: ( font && font.slug === 'custom' ) ? font.size : undefined,
+								[ fontSizeAttributeName ]: ( value === getDefaultFontSizeSlug || isNumber( value ) ) ? undefined : value,
+								[ customFontSizeAttributeName ]: isNumber( value ) ? value : undefined,
 							} );
 						};
 					}
@@ -83,13 +79,15 @@ export default ( ...fontSizeNames ) => {
 					static getDerivedStateFromProps( { attributes, fontSizes }, previousState ) {
 						const didAttributesChange = ( customFontSizeAttributeName, fontSizeAttributeName ) => {
 							if ( previousState[ fontSizeAttributeName ] ) {
-								// if new font size is name compare with the previous slug
+								// If the new font size is a slug, compare with the previous slug.
 								if ( attributes[ fontSizeAttributeName ] ) {
-									return attributes[ fontSizeAttributeName ] !== previousState[ fontSizeAttributeName ].slug;
+									return attributes[ fontSizeAttributeName ] !== previousState[ fontSizeAttributeName ];
 								}
-								// if font size is not named, update when the font size value changes.
-								return previousState[ fontSizeAttributeName ].size !== attributes[ customFontSizeAttributeName ];
+
+								// If the font size is not named, update when the font size value changes.
+								return true;
 							}
+
 							// in this case we need to build the font size object
 							return true;
 						};

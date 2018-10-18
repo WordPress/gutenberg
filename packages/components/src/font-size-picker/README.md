@@ -11,20 +11,22 @@ import { FontSizePicker } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
 const MyFontSizePicker = withState( {
-	fontSize: 16,
+	fontSize: 'large',
 } )( ( { fontSize, setState } ) => { 
 	const fontSizes = [
-		{ shortName: 'S', size: 12 },
-		{ shortName: 'M', size: 16 }
+		{ name: 'Small', size: 12, slug: 'small', },
+		{ name: 'Medium', size: 16, slug: 'medium', },
+		{ name: 'Large', size: 20, slug: 'large', },
 	];
+
 	const fallbackFontSize = 16;
 	
 	return ( 
 		<FontSizePicker 
-			fontSizes={ fontSizes } 
-			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
+			fontSizes={ fontSizes } 
 			onChange={ fontSize => setState( { fontSize } ) } 
+			value={ fontSize }
 		/>
 	); 
 } );

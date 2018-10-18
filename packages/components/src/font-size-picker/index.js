@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { find, isNumber, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,7 +21,6 @@ import RangeControl from '../range-control';
 import { NavigableMenu } from '../navigable-container';
 
 function FontSizePicker( {
-	defaultFontSizeSlug,
 	fallbackFontSize,
 	fontSizes = [],
 	disableCustomFontSizes = false,
@@ -28,15 +28,38 @@ function FontSizePicker( {
 	value,
 	withSlider,
 } ) {
+	// Handle the old behavior where you passed a number into the FontSizePicker component
+	if ( isNumber( value ) ) {
+		deprecated( 'Using a number as the value for wp.components.FontSizePicker', {
+			version: '4.3',
+			alternative: 'a full font size object with name, slug, and size keys',
+			plugin: 'Gutenberg',
+			hint: 'You can use the wp.editor.withFontSizes HOC to manage the font size object.',
+		} );
+
+		// Try getting a font size object
+		const fontSizeObject = find( fontSizes, { size: ( value === undefined ) ? fallbackFontSize : value } );
+
+		// Prepare a custom font size object
+		const customFontSizeObject = {
+			slug: 'custom',
+			size: value,
+		};
+
+		// Update value to the correct shape
+		value = fontSizeObject || customFontSizeObject;
+	}
+
+	// Attempts to find a font size matching a value
 	const isCustomFontSize = ( value.slug === 'custom' );
 
+	// Handles changing a custom font size value.
 	const onChangeCustomValue = ( event ) => {
-		// If the custom value is empty, use that. Otherwise, cast it to a Number.
-		const newValue = ( event.target.value === '' ) ? '' : Number( event.target.value );
-
-		onChange( { slug: 'custom', size: newValue } );
+		// Allow empty values
+		onChange( ( event.target.value === '' ) ? '' : Number( event.target.value ) );
 	};
 
+	// Handles resetting to the default ("undefined") font size.
 	const onResetFontSize = () => {
 		onChange( undefined );
 	};
@@ -56,7 +79,7 @@ function FontSizePicker( {
 							aria-expanded={ isOpen }
 							aria-label={ __( 'Choose font size' ) }
 						>
-							{ value && value.name }
+							{ ( value && value.name ) || ( isCustomFontSize && _x( 'Custom', 'font size name' ) ) }
 						</Button>
 					) }
 					renderContent={ () => (
@@ -64,7 +87,7 @@ function FontSizePicker( {
 							{ ( ! disableCustomFontSizes || isCustomFontSize ) &&
 								<Button
 									key={ 'custom' }
-									onClick={ () => onChange( { slug: 'custom', size: '' } ) }
+									onClick={ () => onChange( fallbackFontSize ) }
 									className={ 'is-font-custom' }
 									role="menuitem"
 								>
@@ -77,7 +100,7 @@ function FontSizePicker( {
 							{ map( fontSizes, ( font ) => (
 								<Button
 									key={ font.slug }
-									onClick={ () => onChange( font ) }
+									onClick={ () => onChange( font.slug ) }
 									className={ 'is-font-' + font.slug }
 									role="menuitem"
 								>
@@ -102,7 +125,6 @@ function FontSizePicker( {
 				<Button
 					className="components-font-size-picker__clear"
 					type="button"
-					disabled={ value.slug === defaultFontSizeSlug }
 					onClick={ onResetFontSize }
 					isSmall
 					isDefault
