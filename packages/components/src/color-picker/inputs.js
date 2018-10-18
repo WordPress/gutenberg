@@ -36,18 +36,16 @@ class Input extends Component {
 	}
 
 	handleBlur() {
-		const { label, onChange } = this.props;
+		const { valueKey, onChange } = this.props;
 		const { value } = this.state;
-		const propName = String( label ).toLowerCase();
-		onChange( { [ propName ]: value } );
+		onChange( { [ valueKey ]: value } );
 	}
 
 	handleChange( value ) {
-		const { label, onChange } = this.props;
+		const { valueKey, onChange } = this.props;
 		// Protect against expanding a value while we're typing.
 		if ( value.length > 4 ) {
-			const propName = String( label ).toLowerCase();
-			onChange( { [ propName ]: value } );
+			onChange( { [ valueKey ]: value } );
 		}
 		this.setState( { value } );
 	}
@@ -57,9 +55,8 @@ class Input extends Component {
 			return;
 		}
 		const { value } = this.state;
-		const { label, onChange } = this.props;
-		const propName = String( label ).toLowerCase();
-		onChange( { [ propName ]: value } );
+		const { valueKey, onChange } = this.props;
+		onChange( { [ valueKey ]: value } );
 	}
 
 	render() {
@@ -162,18 +159,14 @@ export class Inputs extends Component {
 		const { disableAlpha = false } = this.props;
 		if ( this.state.view === 'hex' ) {
 			return (
-				<fieldset>
-					<legend className="screen-reader-text">
-						{ __( 'Color value in HEX' ) }
-					</legend>
-					<div className="components-color-picker__inputs-fields">
-						<Input
-							label="hex"
-							value={ this.props.hex }
-							onChange={ this.handleChange }
-						/>
-					</div>
-				</fieldset>
+				<div className="components-color-picker__inputs-fields">
+					<Input
+						label={ __( 'Color value in hexadecimal' ) }
+						valueKey="hex"
+						value={ this.props.hex }
+						onChange={ this.handleChange }
+					/>
+				</div>
 			);
 		} else if ( this.state.view === 'rgb' ) {
 			return (
@@ -184,6 +177,7 @@ export class Inputs extends Component {
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							label="r"
+							valueKey="r"
 							value={ this.props.rgb.r }
 							onChange={ this.handleChange }
 							type="number"
@@ -192,6 +186,7 @@ export class Inputs extends Component {
 						/>
 						<Input
 							label="g"
+							valueKey="g"
 							value={ this.props.rgb.g }
 							onChange={ this.handleChange }
 							type="number"
@@ -200,6 +195,7 @@ export class Inputs extends Component {
 						/>
 						<Input
 							label="b"
+							valueKey="b"
 							value={ this.props.rgb.b }
 							onChange={ this.handleChange }
 							type="number"
@@ -209,6 +205,7 @@ export class Inputs extends Component {
 						{ disableAlpha ? null : (
 							<Input
 								label="a"
+								valueKey="a"
 								value={ this.props.rgb.a }
 								onChange={ this.handleChange }
 								type="number"
@@ -229,6 +226,7 @@ export class Inputs extends Component {
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							label="h"
+							valueKey="h"
 							value={ Math.round( this.props.hsl.h ) }
 							onChange={ this.handleChange }
 							type="number"
@@ -237,6 +235,7 @@ export class Inputs extends Component {
 						/>
 						<Input
 							label="s"
+							valueKey="s"
 							value={ Math.round( this.props.hsl.s * 100 ) }
 							onChange={ this.handleChange }
 							type="number"
@@ -245,6 +244,7 @@ export class Inputs extends Component {
 						/>
 						<Input
 							label="l"
+							valueKey="l"
 							value={ Math.round( this.props.hsl.l * 100 ) }
 							onChange={ this.handleChange }
 							type="number"
@@ -254,6 +254,7 @@ export class Inputs extends Component {
 						{ disableAlpha ? null : (
 							<Input
 								label="a"
+								valueKey="a"
 								value={ this.props.hsl.a }
 								onChange={ this.handleChange }
 								type="number"
