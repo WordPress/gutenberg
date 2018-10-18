@@ -100,11 +100,6 @@
 				flex-grow: 0;
 			}
 
-			// On medium-sized viewports, allow any amount of columns.
-			@include break-medium() {
-				flex-basis: inherit;
-			}
-
 			// Add space between columns. Themes can customize this if they wish to work differently.
 			// This has to match the same padding applied in style.scss.
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
