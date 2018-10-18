@@ -69,7 +69,7 @@ export const pickRelevantMediaFiles = ( image ) => {
  *
  * @return {boolean} Is the URL a Blob URL
  */
-const isTemporaryBlobURL = ( id, url ) => ! id && isBlobURL( url );
+const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
 /**
  * Is the url for the image hosted externally. An externally hosted image has no id
@@ -80,7 +80,7 @@ const isTemporaryBlobURL = ( id, url ) => ! id && isBlobURL( url );
  *
  * @return {boolean} Is the url an externally hosted url?
  */
-const isExternalURL = ( id, url ) => url && ! id && ! isBlobURL( url );
+const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 class ImageEdit extends Component {
 	constructor() {
@@ -109,7 +109,7 @@ class ImageEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { id, url = '' } = attributes;
 
-		if ( isTemporaryBlobURL( id, url ) ) {
+		if ( isTemporaryImage( id, url ) ) {
 			const file = getBlobByURL( url );
 
 			if ( file ) {
@@ -128,7 +128,7 @@ class ImageEdit extends Component {
 		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
 		const { id, url = '' } = this.props.attributes;
 
-		if ( isTemporaryBlobURL( prevID, prevURL ) && ! isTemporaryBlobURL( id, url ) ) {
+		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
 			revokeBlobURL( url );
 		}
 
@@ -267,7 +267,7 @@ class ImageEdit extends Component {
 		const { isEditing } = this.state;
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, width, height } = attributes;
-		const isExternal = isExternalURL( id, url );
+		const isExternal = isExternalImage( id, url );
 
 		let toolbarEditButton;
 		if ( url ) {
