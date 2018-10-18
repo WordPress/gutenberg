@@ -177,6 +177,15 @@ function do_blocks( $content ) {
 }
 add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
 
+/**
+ * Helper function for do_blocks(), to recurse through the block tree.
+ *
+ * @since 4.1.0
+ * @access private
+ *
+ * @param array $blocks Array of blocks from parse_blocks()
+ * @return string
+ */
 function _recurse_blocks( $blocks, $all_blocks ) {
 	global $post;
 
@@ -198,7 +207,7 @@ function _recurse_blocks( $blocks, $all_blocks ) {
 
 			// Replace dynamic block with server-rendered output.
 			$block_content = $block_type->render( (array) $block['attrs'], $block['innerHTML'] );
-		} else if ( $block['innerBlocks'] ) {
+		} elseif ( $block['innerBlocks'] ) {
 			$block_content = _recurse_blocks( $block['innerBlocks'], $all_blocks );
 		} else {
 			$block_content = $block['innerHTML'];
@@ -231,7 +240,7 @@ function _recurse_blocks( $blocks, $all_blocks ) {
 /**
  * Remove all dynamic blocks from the given content.
  *
- * @since 5.0.0
+ * @since 4.1.0
  *
  * @param string $content Content of the current post.
  * @return string
@@ -240,6 +249,15 @@ function strip_dynamic_blocks( $content ) {
 	return _recurse_strip_dynamic_blocks( parse_blocks( $content ) );
 }
 
+/**
+ * Helper function for strip_dynamic_blocks(), to recurse through the block tree.
+ *
+ * @since 4.1.0
+ * @access private
+ *
+ * @param array $blocks Array of blocks from parse_blocks()
+ * @return string
+ */
 function _recurse_strip_dynamic_blocks( $blocks ) {
 	$clean_content  = '';
 	$dynamic_blocks = get_dynamic_block_names();
