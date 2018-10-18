@@ -231,7 +231,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_script(
 		'wp-api-fetch',
 		gutenberg_url( 'build/api-fetch/index.js' ),
-		array( 'wp-polyfill', 'wp-hooks', 'wp-i18n' ),
+		array( 'wp-polyfill', 'wp-hooks', 'wp-i18n', 'wp-url' ),
 		filemtime( gutenberg_dir_path() . 'build/api-fetch/index.js' ),
 		true
 	);

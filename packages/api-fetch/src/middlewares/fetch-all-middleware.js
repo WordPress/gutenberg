@@ -1,3 +1,11 @@
+/**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
 import apiFetch from '../';
 
 // Duplicates parsing functionality from apiFetch.
@@ -12,15 +20,24 @@ function parseResponse( response, parse = true ) {
 const capPerPageQuery = ( options ) => ( {
 	...options,
 	// Swap back to requesting the max of 100 items per page.
-	// TODO: This feels brittle. Is there a better way to manage request parameters?
-	path: options.path && `${ options.path.replace( /(\&?per_page)=-1/, '$1=100' ) }&page=1`,
-	url: options.url && `${ options.url.replace( /(\&?per_page)=-1/, '$1=100' ) }&page=1`,
+	path: options.path && addQueryArgs( options.path, {
+		per_page: 100,
+		page: 1,
+	} ),
+	url: options.url && addQueryArgs( options.url, {
+		per_page: 100,
+		page: 1,
+	} ),
 } );
 
 const setRequestedPage = ( options, page ) => ( {
 	...options,
-	path: options.path && options.path.replace( '&page=1', `&page=${ page }` ),
-	url: options.url && options.url.replace( '&page=1', `&page=${ page }` ),
+	path: options.path && addQueryArgs( options.path, {
+		page,
+	} ),
+	url: options.url && addQueryArgs( options.url, {
+		page,
+	} ),
 } );
 
 // The REST API enforces an upper limit of 100 on the per_page option. To handle
