@@ -172,6 +172,9 @@ export function initializeMetaBoxState() {
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
+	return {
+		type: 'DO_NOTHING',
+	};
 }
 
 export function setActiveMetaBoxLocations() {
@@ -179,6 +182,9 @@ export function setActiveMetaBoxLocations() {
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
+	return {
+		type: 'DO_NOTHING',
+	};
 }
 
 /**
