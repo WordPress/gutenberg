@@ -169,7 +169,7 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 						),
 						'responsive-embeds' => array(
 							'description' => __( 'Whether the theme supports responsive embedded content.', 'gutenberg' ),
-							'type'        => array( 'bool' ),
+							'type'        => 'bool',
 							'readonly'    => true,
 						),
 					),
