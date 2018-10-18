@@ -41,6 +41,13 @@ describe( 'PostAuthor', () => {
 		},
 	};
 
+	const postAuthor = [
+		{
+			id: 1,
+			name: 'admin',
+		},
+	];
+
 	describe( '#render()', () => {
 		it( 'should update author', () => {
 			const onUpdateAuthor = jest.fn();
@@ -48,7 +55,9 @@ describe( 'PostAuthor', () => {
 				<PostAuthor
 					authors={ authors }
 					user={ user }
-					onUpdateAuthor={ onUpdateAuthor } />
+					onUpdateAuthor={ onUpdateAuthor }
+					postAuthor={ postAuthor }
+				/>
 			);
 
 			wrapper.find( 'select' ).simulate( 'change', {
