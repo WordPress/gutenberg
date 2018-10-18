@@ -25,6 +25,30 @@ import MediaUpload from '../media-upload';
 import URLPopover from '../url-popover';
 import { mediaUpload } from '../../utils/';
 
+const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
+	<URLPopover onClose={ onClose }>
+		<form
+			className="editor-media-placeholder__url-input-form"
+			onSubmit={ onSubmit }
+		>
+			<input
+				className="editor-media-placeholder__url-input-field"
+				type="url"
+				aria-label={ __( 'URL' ) }
+				placeholder={ __( 'Paste or type URL' ) }
+				onChange={ onChange }
+				value={ src }
+			/>
+			<IconButton
+				className="editor-media-placeholder__url-input-submit-button"
+				icon="editor-break"
+				label={ __( 'Apply' ) }
+				type="submit"
+			/>
+		</form>
+	</URLPopover>
+);
+
 class MediaPlaceholder extends Component {
 	constructor() {
 		super( ...arguments );
@@ -129,9 +153,8 @@ class MediaPlaceholder extends Component {
 
 		const {
 			isURLInputVisible,
+			src,
 		} = this.state;
-
-		const toggleURLInput = ! isURLInputVisible ? this.openURLInput : undefined;
 
 		const allowedTypes = this.getAllowedTypes();
 
@@ -174,38 +197,22 @@ class MediaPlaceholder extends Component {
 					) }
 				/>
 				{ onSelectURL && (
-					<div
-						className="editor-media-placeholder__url-input-container"
-					>
+					<div className="editor-media-placeholder__url-input-container">
 						<Button
 							className="editor-media-placeholder__button"
-							onClick={ toggleURLInput }
+							onClick={ this.openURLInput }
 							isToggled={ isURLInputVisible }
-							isLarge>
+							isLarge
+						>
 							{ __( 'Insert from URL' ) }
 						</Button>
 						{ isURLInputVisible && (
-							<URLPopover onClose={ this.closeURLInput }>
-								<form
-									className="editor-media-placeholder__url-input-form"
-									onSubmit={ this.onSubmitSrc }
-								>
-									<input
-										className="editor-media-placeholder__url-input-field"
-										type="url"
-										aria-label={ __( 'URL' ) }
-										placeholder={ __( 'Paste or type URL' ) }
-										onChange={ this.onChangeSrc }
-										value={ this.state.src }
-									/>
-									<IconButton
-										className="editor-media-placeholder__url-input-submit-button"
-										icon="editor-break"
-										label={ __( 'Apply' ) }
-										type="submit"
-									/>
-								</form>
-							</URLPopover>
+							<InsertFromURLPopover
+								src={ src }
+								onChange={ this.onChangeSrc }
+								onSubmit={ this.onSubmitSrc }
+								onClose={ this.closeURLInput }
+							/>
 						) }
 					</div>
 				) }

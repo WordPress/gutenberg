@@ -30,7 +30,7 @@ class URLPopover extends Component {
 			children,
 			renderSettings,
 			onClose,
-			onClickOutside = onClose,
+			onClickOutside,
 			position = 'bottom center',
 			focusOnMount = 'firstElement',
 		} = this.props;

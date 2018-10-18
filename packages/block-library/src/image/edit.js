@@ -83,7 +83,7 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 class ImageEdit extends Component {
-	constructor() {
+	constructor( { attributes } ) {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
@@ -101,7 +101,7 @@ class ImageEdit extends Component {
 
 		this.state = {
 			captionFocused: false,
-			isEditing: ! this.props.attributes.url,
+			isEditing: ! attributes.url,
 		};
 	}
 
@@ -461,7 +461,7 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = ( <img src={ url } alt={ alt } onClick={ this.onImageClick } /> );
+							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
