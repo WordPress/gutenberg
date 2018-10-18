@@ -20,7 +20,7 @@ import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from 
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, closeModal, metaboxes } ) {
+export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -54,9 +54,9 @@ export function OptionsModal( { isModalActive, closeModal, metaboxes } ) {
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
-			{ metaboxes.length !== 0 && (
+			{ metaBoxes.length !== 0 && (
 				<Section title={ __( 'Advanced Panels' ) }>
-					{ map( metaboxes, ( { title, id } ) => (
+					{ map( metaBoxes, ( { title, id } ) => (
 						<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
 					) ) }
 				</Section>
@@ -68,7 +68,7 @@ export function OptionsModal( { isModalActive, closeModal, metaboxes } ) {
 export default compose(
 	withSelect( ( select ) => ( {
 		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
-		metaboxes: select( 'core/edit-post' ).getAllMetaBoxes(),
+		metaBoxes: select( 'core/edit-post' ).getAllMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {
