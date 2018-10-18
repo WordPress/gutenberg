@@ -209,7 +209,7 @@ class LinkContainer extends Component {
 						focusOnMount={ showInput ? 'firstElement' : false }
 						renderSettings={ () => (
 							<ToggleControl
-								label={ __( 'Open in New Window' ) }
+								label={ __( 'Open in New Tab' ) }
 								checked={ opensInNewWindow }
 								onChange={ this.setLinkTarget }
 							/>
