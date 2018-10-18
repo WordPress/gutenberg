@@ -6,7 +6,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * External dependencies
  */
-import { get, includes } from 'lodash';
+import { get, includes, some } from 'lodash';
 
 /**
  * Returns the current editing mode.
@@ -223,7 +223,25 @@ export function getMetaBoxes( state ) {
  * @return {string[]} Active meta box locations.
  */
 export function getActiveMetaBoxLocations( state ) {
-	return state.activeMetaBoxLocations;
+	return Object.keys( state.metaBoxes.locations )
+		.filter( ( location ) => isMetaBoxLocationActive( state, location ) );
+}
+
+/**
+ * Returns true if a metabox location is active and visible
+ *
+ * @param {Object} state    Post editor state.
+ * @param {string} location Meta box location to test.
+ *
+ * @return {boolean} Whether the meta box location is active and visible.
+ */
+export function isMetaBoxLocationVisible( state, location ) {
+	return (
+		isMetaBoxLocationActive( state, location ) &&
+		some( getMetaBoxesPerLocation( state, location ), ( { id } ) => {
+			return isEditorPanelEnabled( state, `meta-box-${ id }` );
+		} )
+	);
 }
 
 /**
@@ -236,11 +254,25 @@ export function getActiveMetaBoxLocations( state ) {
  * @return {boolean} Whether the meta box location is active.
  */
 export function isMetaBoxLocationActive( state, location ) {
-	return getActiveMetaBoxLocations( state ).includes( location );
+	return getMetaBoxesPerLocation( state, location ).length !== 0;
 }
 
-export function getMetaBoxTitles( state ) {
-	return state.metaBoxTitles;
+export function getMetaBoxesPerLocation( state, location ) {
+	return get(
+		state.metaBoxes.locations,
+		[ location ],
+		[]
+	);
+}
+
+export function getAllMetaBoxes( state ) {
+	let allMetaBoxes = [];
+	Object.entries( state.metaBoxes.locations )
+		.forEach( ( [ , metaBoxes ] ) => {
+			allMetaBoxes = allMetaBoxes.concat( metaBoxes );
+		} );
+
+	return allMetaBoxes;
 }
 
 /**
@@ -280,5 +312,5 @@ export function hasMetaBoxes( state ) {
  * @return {boolean} Whether the metaboxes are being saved.
  */
 export function isSavingMetaBoxes( state ) {
-	return state.isSavingMetaBoxes;
+	return state.metaBoxes.isSaving;
 }

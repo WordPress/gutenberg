@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,11 +17,10 @@ import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck } from '@wordpres
  */
 import Section from './section';
 import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from './options';
-import MetaBoxTitles from '../meta-box-titles';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, closeModal } ) {
+export function OptionsModal( { isModalActive, closeModal, metaboxes } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -55,13 +54,13 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
-			<Section title={ __( 'Advanced Panels' ) }>
-				<MetaBoxTitles
-					titleWrapper={ ( title, id ) => (
-						<EnablePanelOption label={ title } panelName={ `meta-box-${ id }` } />
-					) }
-				/>
-			</Section>
+			{ metaboxes.length !== 0 && (
+				<Section title={ __( 'Advanced Panels' ) }>
+					{ map( metaboxes, ( { title, id } ) => (
+						<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
+					) ) }
+				</Section>
+			) }
 		</Modal>
 	);
 }
@@ -69,6 +68,7 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 export default compose(
 	withSelect( ( select ) => ( {
 		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
+		metaboxes: select( 'core/edit-post' ).getAllMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {
