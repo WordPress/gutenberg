@@ -155,7 +155,7 @@ export class Saturation extends Component {
 					<div className="components-color-picker__saturation-white" />
 					<div className="components-color-picker__saturation-black" />
 					<button
-						aria-label={ __( 'Saturation & lightness value' ) }
+						aria-label={ __( 'Choose a shade' ) }
 						aria-describedby={ `color-picker-saturation-${ instanceId }` }
 						className="components-color-picker__saturation-pointer"
 						style={ pointerLocation }
