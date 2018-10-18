@@ -179,6 +179,20 @@ export default class TinyMCE extends Component {
 						editor.shortcuts.remove( `access+${ number }` );
 					} );
 				} );
+
+				// TinyMCE resets the element content on initialization, even
+				// when it's already identical to what exists currently. This
+				// behavior clobbers a selection which exists at the time of
+				// initialization, thus breaking writing flow navigation. The
+				// hack here neutralizes setHTML during initialization.
+				let setHTML;
+				editor.on( 'PreInit', () => {
+					setHTML = editor.dom.setHTML;
+					editor.dom.setHTML = () => {};
+				} );
+				editor.on( 'Init', () => {
+					editor.dom.setHTML = setHTML;
+				} );
 			},
 		} );
 	}
