@@ -43,7 +43,8 @@ const { getComputedStyle } = window;
 
 const applyFallbackStyles = withFallbackStyles( ( node, props ) => {
 	const { textColor, backgroundColor } = props.attributes;
-	const styles = node ? getComputedStyle( node.querySelector( 'tr' ) ) : undefined;
+	const rowElement = node ? node.querySelector( 'tr' ) : undefined;
+	const styles = rowElement ? getComputedStyle( node.querySelector( 'tr' ) ) : undefined;
 	return {
 		fallbackBackgroundColor: backgroundColor || ! styles ? undefined : styles.backgroundColor,
 		textColor: textColor || ! styles ? undefined : styles.color,
