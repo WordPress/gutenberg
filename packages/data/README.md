@@ -322,10 +322,10 @@ const mappedActions = existingActions.map( ( action ) => {
 } );
 
 const genericStore = {
-	getSelectors(): {
+	getSelectors() {
 		return mappedSelectors;
 	},
-	getActions(): {
+	getActions() {
 		return mappedActions;
 	},
 	subscribe: reduxStore.subscribe;
@@ -334,7 +334,7 @@ const genericStore = {
 registry.registerGenericStore( 'existing-app', genericStore );
 ```
 
-It is also possible to impelement a completely custom store from scratch:
+It is also possible to implement a completely custom store from scratch:
 
 _Example:_
 
@@ -357,19 +357,19 @@ function createCustomStore() {
 	};
 
 	return {
-		getSelectors(): {
+		getSelectors() {
 			return selectors;
 		},
-		getActions(): {
+		getActions() {
 			return actions;
 		},
-		subscribe( listener ): {
+		subscribe( listener ) {
 			storeChanged = listener;
 		}
 	};
 }
 
-registry.registerGenericStore( 'custom-data', customStore );
+registry.registerGenericStore( 'custom-data', createCustomStore() );
 ```
 
 
