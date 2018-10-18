@@ -246,7 +246,7 @@ function _recurse_blocks( $blocks, $all_blocks ) {
  * @return string
  */
 function strip_dynamic_blocks( $content ) {
-	return _recurse_strip_dynamic_blocks( parse_blocks( $content ) );
+	return _recurse_strip_dynamic_blocks( gutenberg_parse_blocks( $content ) );
 }
 
 /**
