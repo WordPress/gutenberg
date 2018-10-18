@@ -9,6 +9,7 @@ export { default as pure } from './pure';
 export { default as remountOnPropChange } from './remount-on-prop-change';
 export { default as withGlobalEvents } from './with-global-events';
 export { default as withInstanceId } from './with-instance-id';
+export { default as withPropsChange } from './with-props-change';
 export { default as withSafeTimeout } from './with-safe-timeout';
 export { default as withState } from './with-state';
 
