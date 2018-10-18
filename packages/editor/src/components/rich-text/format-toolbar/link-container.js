@@ -99,6 +99,7 @@ class LinkContainer extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+		this.onClickOutside = this.onClickOutside.bind( this );
 		this.resetState = this.resetState.bind( this );
 		this.autocompleteRef = createRef();
 
@@ -175,15 +176,20 @@ class LinkContainer extends Component {
 		event.preventDefault();
 	}
 
-	resetState( event ) {
+	onClickOutside( event ) {
 		// The autocomplete suggestions list renders in a separate popover (in a portal),
 		// so onClickOutside fails to detect that a click on a suggestion occured in the
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
-		// return early if so.
-		if ( this.autocompleteRef.current && this.autocompleteRef.current.contains( event.target ) ) {
+		// return to avoid the popover being closed.
+		const autocompleteElement = this.autocompleteRef.current;
+		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
 			return;
 		}
 
+		this.resetState();
+	}
+
+	resetState() {
 		this.props.stopAddingLink();
 		this.setState( { editLink: false } );
 	}
@@ -205,7 +211,7 @@ class LinkContainer extends Component {
 					key={ `${ record.start }${ record.end }` /* Used to force rerender on selection change */ }
 				>
 					<URLPopover
-						onClickOutside={ this.resetState }
+						onClickOutside={ this.onClickOutside }
 						focusOnMount={ showInput ? 'firstElement' : false }
 						renderSettings={ () => (
 							<ToggleControl
