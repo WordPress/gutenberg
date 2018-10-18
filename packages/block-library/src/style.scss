@@ -113,7 +113,12 @@
 	font-size: 13px;
 }
 
-.has-regular-font-size {
+.has-regular-font-size, // not used now, kept because of backward compatibility.
+.has-normal-font-size {
+	font-size: 16px;
+}
+
+.has-medium-font-size {
 	font-size: 20px;
 }
 
@@ -121,6 +126,7 @@
 	font-size: 36px;
 }
 
-.has-larger-font-size {
+.has-larger-font-size, // not used now, kept because of backward compatibility.
+.has-huge-font-size, {
 	font-size: 42px;
 }
