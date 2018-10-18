@@ -350,7 +350,7 @@ export class TableEdit extends Component {
 								columnIndex,
 							};
 
-							const cellClasses = classnames( { 'is-selected': isSelected	} );
+							const cellClasses = classnames( { 'is-selected': isSelected } );
 
 							return (
 								<CellTag
