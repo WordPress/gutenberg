@@ -26,8 +26,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * }
  * @return WP_Block_Type|false The registered block type on success, or false on failure.
  */
-function register_block_type( $name, $args = array() ) {
-	return WP_Block_Type_Registry::get_instance()->register( $name, $args );
+if ( ! function_exists( 'register_block_type' ) ) {
+	function register_block_type( $name, $args = array() ) {
+		return WP_Block_Type_Registry::get_instance()->register( $name, $args );
+	}
 }
 
 /**
@@ -40,8 +42,10 @@ function register_block_type( $name, $args = array() ) {
  *                                   complete WP_Block_Type instance.
  * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
  */
-function unregister_block_type( $name ) {
-	return WP_Block_Type_Registry::get_instance()->unregister( $name );
+if ( ! function_exists( 'unregister_block_type' ) ) {
+	function unregister_block_type( $name ) {
+		return WP_Block_Type_Registry::get_instance()->unregister( $name );
+	}
 }
 
 /**
@@ -52,36 +56,38 @@ function unregister_block_type( $name ) {
  * @param  string $content Post content.
  * @return array  Array of parsed block objects.
  */
-function gutenberg_parse_blocks( $content ) {
-	/*
-	 * If there are no blocks in the content, return a single block, rather
-	 * than wasting time trying to parse the string.
-	 */
-	if ( ! has_blocks( $content ) ) {
-		return array(
-			array(
-				'blockName'   => null,
-				'attrs'       => array(),
-				'innerBlocks' => array(),
-				'innerHTML'   => $content,
-			),
-		);
-	}
+if ( ! function_exists( 'gutenberg_parse_blocks' ) ) {
+	function gutenberg_parse_blocks( $content ) {
+		/*
+		 * If there are no blocks in the content, return a single block, rather
+		 * than wasting time trying to parse the string.
+		 */
+		if ( ! has_blocks( $content ) ) {
+			return array(
+				array(
+					'blockName'   => null,
+					'attrs'       => array(),
+					'innerBlocks' => array(),
+					'innerHTML'   => $content,
+				),
+			);
+		}
 
-	/**
-	 * Filter to allow plugins to replace the server-side block parser
-	 *
-	 * @since 3.8.0
-	 *
-	 * @param string $parser_class Name of block parser class
-	 */
-	$parser_class = apply_filters( 'block_parser_class', 'WP_Block_Parser' );
-	// Load default block parser for server-side parsing if the default parser class is being used.
-	if ( 'WP_Block_Parser' === $parser_class ) {
-		require_once dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
+		/**
+		 * Filter to allow plugins to replace the server-side block parser
+		 *
+		 * @since 3.8.0
+		 *
+		 * @param string $parser_class Name of block parser class
+		 */
+		$parser_class = apply_filters( 'block_parser_class', 'WP_Block_Parser' );
+		// Load default block parser for server-side parsing if the default parser class is being used.
+		if ( 'WP_Block_Parser' === $parser_class ) {
+			require_once dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
+		}
+		$parser = new $parser_class();
+		return $parser->parse( $content );
 	}
-	$parser = new $parser_class();
-	return $parser->parse( $content );
 }
 
 /**
@@ -89,17 +95,19 @@ function gutenberg_parse_blocks( $content ) {
  *
  * @return array Array of dynamic block names.
  */
-function get_dynamic_block_names() {
-	$dynamic_block_names = array();
+if ( ! function_exists( 'get_dynamic_block_names' ) ) {
+	function get_dynamic_block_names() {
+		$dynamic_block_names = array();
 
-	$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
-	foreach ( $block_types as $block_type ) {
-		if ( $block_type->is_dynamic() ) {
-			$dynamic_block_names[] = $block_type->name;
+		$block_types = WP_Block_Type_Registry::get_instance()->get_all_registered();
+		foreach ( $block_types as $block_type ) {
+			if ( $block_type->is_dynamic() ) {
+				$dynamic_block_names[] = $block_type->name;
+			}
 		}
-	}
 
-	return $dynamic_block_names;
+		return $dynamic_block_names;
+	}
 }
 
 /**
@@ -109,29 +117,31 @@ function get_dynamic_block_names() {
  *
  * @return string
  */
-function get_dynamic_blocks_regex() {
-	$dynamic_block_names   = get_dynamic_block_names();
-	$dynamic_block_pattern = (
-		'/<!--\s+wp:(' .
-		str_replace(
-			'/',
-			'\/',                 // Escape namespace, not handled by preg_quote.
+if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
+	function get_dynamic_blocks_regex() {
+		$dynamic_block_names   = get_dynamic_block_names();
+		$dynamic_block_pattern = (
+			'/<!--\s+wp:(' .
 			str_replace(
-				'core/',
-				'(?:core/)?', // Allow implicit core namespace, but don't capture.
-				implode(
-					'|',                   // Join block names into capture group alternation.
-					array_map(
-						'preg_quote',    // Escape block name for regular expression.
-						$dynamic_block_names
+				'/',
+				'\/',                 // Escape namespace, not handled by preg_quote.
+				str_replace(
+					'core/',
+					'(?:core/)?', // Allow implicit core namespace, but don't capture.
+					implode(
+						'|',                   // Join block names into capture group alternation.
+						array_map(
+							'preg_quote',    // Escape block name for regular expression.
+							$dynamic_block_names
+						)
 					)
 				)
-			)
-		) .
-		')(\s+(\{.*?\}))?\s+(\/)?-->/'
-	);
+			) .
+			')(\s+(\{.*?\}))?\s+(\/)?-->/'
+		);
 
-	return $dynamic_block_pattern;
+		return $dynamic_block_pattern;
+	}
 }
 
 /**
@@ -170,88 +180,90 @@ function gutenberg_render_block( $block ) {
  * @param  string $content Post content.
  * @return string          Updated post content.
  */
-function do_blocks( $content ) {
-	global $post;
+if ( ! function_exists( 'do_blocks' ) ) {
+	function do_blocks( $content ) {
+		global $post;
 
-	$rendered_content      = '';
-	$dynamic_block_pattern = get_dynamic_blocks_regex();
+		$rendered_content      = '';
+		$dynamic_block_pattern = get_dynamic_blocks_regex();
 
-	/*
-	 * Back up global post, to restore after render callback.
-	 * Allows callbacks to run new WP_Query instances without breaking the global post.
-	 */
-	$global_post = $post;
+		/*
+		 * Back up global post, to restore after render callback.
+		 * Allows callbacks to run new WP_Query instances without breaking the global post.
+		 */
+		$global_post = $post;
 
-	while ( preg_match( $dynamic_block_pattern, $content, $block_match, PREG_OFFSET_CAPTURE ) ) {
-		$opening_tag     = $block_match[0][0];
-		$offset          = $block_match[0][1];
-		$block_name      = $block_match[1][0];
-		$is_self_closing = isset( $block_match[4] );
+		while ( preg_match( $dynamic_block_pattern, $content, $block_match, PREG_OFFSET_CAPTURE ) ) {
+			$opening_tag     = $block_match[0][0];
+			$offset          = $block_match[0][1];
+			$block_name      = $block_match[1][0];
+			$is_self_closing = isset( $block_match[4] );
 
-		// Reset attributes JSON to prevent scope bleed from last iteration.
-		$block_attributes_json = null;
-		if ( isset( $block_match[3] ) ) {
-			$block_attributes_json = $block_match[3][0];
-		}
-
-		// Since content is a working copy since the last match, append to
-		// rendered content up to the matched offset...
-		$rendered_content .= substr( $content, 0, $offset );
-
-		// ...then update the working copy of content.
-		$content = substr( $content, $offset + strlen( $opening_tag ) );
-
-		// Make implicit core namespace explicit.
-		$is_implicit_core_namespace = ( false === strpos( $block_name, '/' ) );
-		$normalized_block_name      = $is_implicit_core_namespace ? 'core/' . $block_name : $block_name;
-
-		// Find registered block type. We can assume it exists since we use the
-		// `get_dynamic_block_names` function as a source for pattern matching.
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $normalized_block_name );
-
-		// Attempt to parse attributes JSON, if available.
-		$attributes = array();
-		if ( ! empty( $block_attributes_json ) ) {
-			$decoded_attributes = json_decode( $block_attributes_json, true );
-			if ( ! is_null( $decoded_attributes ) ) {
-				$attributes = $decoded_attributes;
-			}
-		}
-
-		$inner_content = '';
-
-		if ( ! $is_self_closing ) {
-			$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
-			if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
-				// If no closing tag is found, abort all matching, and continue
-				// to append remainder of content to rendered output.
-				break;
+			// Reset attributes JSON to prevent scope bleed from last iteration.
+			$block_attributes_json = null;
+			if ( isset( $block_match[3] ) ) {
+				$block_attributes_json = $block_match[3][0];
 			}
 
-			// Update content to omit text up to and including closing tag.
-			$end_tag    = $block_match_end[0][0];
-			$end_offset = $block_match_end[0][1];
+			// Since content is a working copy since the last match, append to
+			// rendered content up to the matched offset...
+			$rendered_content .= substr( $content, 0, $offset );
 
-			$inner_content = substr( $content, 0, $end_offset );
-			$content       = substr( $content, $end_offset + strlen( $end_tag ) );
+			// ...then update the working copy of content.
+			$content = substr( $content, $offset + strlen( $opening_tag ) );
+
+			// Make implicit core namespace explicit.
+			$is_implicit_core_namespace = ( false === strpos( $block_name, '/' ) );
+			$normalized_block_name      = $is_implicit_core_namespace ? 'core/' . $block_name : $block_name;
+
+			// Find registered block type. We can assume it exists since we use the
+			// `get_dynamic_block_names` function as a source for pattern matching.
+			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $normalized_block_name );
+
+			// Attempt to parse attributes JSON, if available.
+			$attributes = array();
+			if ( ! empty( $block_attributes_json ) ) {
+				$decoded_attributes = json_decode( $block_attributes_json, true );
+				if ( ! is_null( $decoded_attributes ) ) {
+					$attributes = $decoded_attributes;
+				}
+			}
+
+			$inner_content = '';
+
+			if ( ! $is_self_closing ) {
+				$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
+				if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
+					// If no closing tag is found, abort all matching, and continue
+					// to append remainder of content to rendered output.
+					break;
+				}
+
+				// Update content to omit text up to and including closing tag.
+				$end_tag    = $block_match_end[0][0];
+				$end_offset = $block_match_end[0][1];
+
+				$inner_content = substr( $content, 0, $end_offset );
+				$content       = substr( $content, $end_offset + strlen( $end_tag ) );
+			}
+
+			// Replace dynamic block with server-rendered output.
+			$rendered_content .= $block_type->render( $attributes, $inner_content );
+
+			// Restore global $post.
+			$post = $global_post;
 		}
 
-		// Replace dynamic block with server-rendered output.
-		$rendered_content .= $block_type->render( $attributes, $inner_content );
+		// Append remaining unmatched content.
+		$rendered_content .= $content;
 
-		// Restore global $post.
-		$post = $global_post;
+		// Strip remaining block comment demarcations.
+		$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $rendered_content );
+
+		return $rendered_content;
 	}
-
-	// Append remaining unmatched content.
-	$rendered_content .= $content;
-
-	// Strip remaining block comment demarcations.
-	$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $rendered_content );
-
-	return $rendered_content;
+	add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
 }
-add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
 
 /**
  * Remove all dynamic blocks from the given content.
@@ -261,8 +273,10 @@ add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed
  * @param string $content Content of the current post.
  * @return string
  */
-function strip_dynamic_blocks( $content ) {
-	return preg_replace( get_dynamic_blocks_regex(), '', $content );
+if ( ! function_exists( 'strip_dynamic_blocks' ) ) {
+	function strip_dynamic_blocks( $content ) {
+		return preg_replace( get_dynamic_blocks_regex(), '', $content );
+	}
 }
 
 /**
@@ -276,12 +290,14 @@ function strip_dynamic_blocks( $content ) {
  * @param string $text Excerpt.
  * @return string
  */
-function strip_dynamic_blocks_add_filter( $text ) {
-	add_filter( 'the_content', 'strip_dynamic_blocks', 6 ); // Before do_blocks().
+if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
+	function strip_dynamic_blocks_add_filter( $text ) {
+		add_filter( 'the_content', 'strip_dynamic_blocks', 6 ); // Before do_blocks().
 
-	return $text;
+		return $text;
+	}
+	add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before wp_trim_excerpt().
 }
-add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before wp_trim_excerpt().
 
 /**
  * Removes the content filter to strip dynamic blocks from excerpts.
@@ -294,9 +310,11 @@ add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before
  * @param string $text Excerpt.
  * @return string
  */
-function strip_dynamic_blocks_remove_filter( $text ) {
-	remove_filter( 'the_content', 'strip_dynamic_blocks', 8 );
+if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
+	function strip_dynamic_blocks_remove_filter( $text ) {
+		remove_filter( 'the_content', 'strip_dynamic_blocks', 8 );
 
-	return $text;
+		return $text;
+	}
+	add_filter( 'wp_trim_excerpt', 'strip_dynamic_blocks_remove_filter', 0 ); // Before all other.
 }
-add_filter( 'wp_trim_excerpt', 'strip_dynamic_blocks_remove_filter', 0 ); // Before all other.

@@ -323,15 +323,17 @@ function gutenberg_can_edit_post_type( $post_type ) {
  * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
  * @return bool Whether the post has blocks.
  */
-function has_blocks( $post = null ) {
-	if ( ! is_string( $post ) ) {
-		$wp_post = get_post( $post );
-		if ( $wp_post instanceof WP_Post ) {
-			$post = $wp_post->post_content;
+if ( ! function_exists( 'has_blocks' ) ) {
+	function has_blocks( $post = null ) {
+		if ( ! is_string( $post ) ) {
+			$wp_post = get_post( $post );
+			if ( $wp_post instanceof WP_Post ) {
+				$post = $wp_post->post_content;
+			}
 		}
-	}
 
-	return false !== strpos( (string) $post, '<!-- wp:' );
+		return false !== strpos( (string) $post, '<!-- wp:' );
+	}
 }
 
 /**
@@ -384,19 +386,21 @@ function gutenberg_content_has_blocks( $content ) {
  * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
  * @return bool Whether the post content contains the specified block.
  */
-function has_block( $block_type, $post = null ) {
-	if ( ! has_blocks( $post ) ) {
-		return false;
-	}
-
-	if ( ! is_string( $post ) ) {
-		$wp_post = get_post( $post );
-		if ( $wp_post instanceof WP_Post ) {
-			$post = $wp_post->post_content;
+if ( ! function_exists( 'has_block' ) ) {
+	function has_block( $block_type, $post = null ) {
+		if ( ! has_blocks( $post ) ) {
+			return false;
 		}
-	}
 
-	return false !== strpos( $post, '<!-- wp:' . $block_type . ' ' );
+		if ( ! is_string( $post ) ) {
+			$wp_post = get_post( $post );
+			if ( $wp_post instanceof WP_Post ) {
+				$post = $wp_post->post_content;
+			}
+		}
+
+		return false !== strpos( $post, '<!-- wp:' . $block_type . ' ' );
+	}
 }
 
 /**

@@ -25,12 +25,14 @@
  * @param int|WP_Post $post Optional. Post ID or WP_Post object. Default is global $post.
  * @return string The post title if set; "(no title)" if no title is set.
  */
-function gutenberg_draft_or_post_title( $post = 0 ) {
-	$title = get_the_title( $post );
-	if ( empty( $title ) ) {
-		$title = __( '(no title)', 'gutenberg' );
+if ( ! function_exists( 'gutenberg_draft_or_post_title' ) ) {
+	function gutenberg_draft_or_post_title( $post = 0 ) {
+		$title = get_the_title( $post );
+		if ( empty( $title ) ) {
+			$title = __( '(no title)', 'gutenberg' );
+		}
+		return esc_html( $title );
 	}
-	return esc_html( $title );
 }
 
 /**

@@ -69,22 +69,24 @@ function gutenberg_get_script_polyfill( $tests ) {
 /**
  * Registers the main TinyMCE scripts.
  */
-function register_tinymce_scripts() {
-	global $tinymce_version, $concatenate_scripts, $compress_scripts;
-	if ( ! isset( $concatenate_scripts ) ) {
-		script_concat_settings();
-	}
-	$suffix     = SCRIPT_DEBUG ? '' : '.min';
-	$compressed = $compress_scripts && $concatenate_scripts && isset( $_SERVER['HTTP_ACCEPT_ENCODING'] )
-		&& false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip' );
-	// Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in production) or
-	// tinymce.min.js (when SCRIPT_DEBUG is true).
-	$mce_suffix = false !== strpos( get_bloginfo( 'version' ), '-src' ) ? '' : '.min';
-	if ( $compressed ) {
-		wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array(), $tinymce_version );
-	} else {
-		wp_register_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
-		wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
+if ( ! function_exists( 'wp_register_tinymce_scripts' ) ) {
+	function wp_register_tinymce_scripts() {
+		global $tinymce_version, $concatenate_scripts, $compress_scripts;
+		if ( ! isset( $concatenate_scripts ) ) {
+			script_concat_settings();
+		}
+		$suffix     = SCRIPT_DEBUG ? '' : '.min';
+		$compressed = $compress_scripts && $concatenate_scripts && isset( $_SERVER['HTTP_ACCEPT_ENCODING'] )
+			&& false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip' );
+		// Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in production) or
+		// tinymce.min.js (when SCRIPT_DEBUG is true).
+		$mce_suffix = false !== strpos( get_bloginfo( 'version' ), '-src' ) ? '' : '.min';
+		if ( $compressed ) {
+			wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array(), $tinymce_version );
+		} else {
+			wp_register_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
+			wp_register_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
+		}
 	}
 }
 
@@ -97,7 +99,7 @@ function register_tinymce_scripts() {
 function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
 
-	register_tinymce_scripts();
+	wp_register_tinymce_scripts();
 
 	wp_register_script(
 		'wp-polyfill',
