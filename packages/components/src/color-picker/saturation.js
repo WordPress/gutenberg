@@ -84,13 +84,13 @@ export class Saturation extends Component {
 	saturate( amount = 0.01 ) {
 		const { hsv, onChange = noop } = this.props;
 		const intSaturation = clamp(
-			Math.round( hsv.s * 100 ) + Math.round( amount * 100 ),
+			hsv.s + Math.round( amount * 100 ),
 			0,
 			100
 		);
 		const change = {
 			h: hsv.h,
-			s: intSaturation / 100,
+			s: intSaturation,
 			v: hsv.v,
 			a: hsv.a,
 			source: 'rgb',
@@ -102,14 +102,14 @@ export class Saturation extends Component {
 	brighten( amount = 0.01 ) {
 		const { hsv, onChange = noop } = this.props;
 		const intValue = clamp(
-			Math.round( hsv.v * 100 ) + Math.round( amount * 100 ),
+			hsv.v + Math.round( amount * 100 ),
 			0,
 			100
 		);
 		const change = {
 			h: hsv.h,
 			s: hsv.s,
-			v: intValue / 100,
+			v: intValue,
 			a: hsv.a,
 			source: 'rgb',
 		};
@@ -141,8 +141,8 @@ export class Saturation extends Component {
 	render() {
 		const { hsv, hsl, instanceId } = this.props;
 		const pointerLocation = {
-			top: `${ -( hsv.v * 100 ) + 100 }%`,
-			left: `${ hsv.s * 100 }%`,
+			top: `${ -( hsv.v ) + 100 }%`,
+			left: `${ hsv.s }%`,
 		};
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */

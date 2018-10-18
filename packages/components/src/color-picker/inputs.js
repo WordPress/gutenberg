@@ -138,18 +138,10 @@ export class Inputs extends Component {
 				source: 'rgb',
 			} );
 		} else if ( data.h || data.s || data.l ) {
-			// Remove any occurances of '%'.
-			if ( typeof data.s === 'string' && data.s.includes( '%' ) ) {
-				data.s = data.s.replace( '%', '' );
-			}
-			if ( typeof data.l === 'string' && data.l.includes( '%' ) ) {
-				data.l = data.l.replace( '%', '' );
-			}
-
 			this.props.onChange( {
 				h: data.h || this.props.hsl.h,
-				s: Number( ( data.s && data.s ) || this.props.hsl.s ),
-				l: Number( ( data.l && data.l ) || this.props.hsl.l ),
+				s: data.s || this.props.hsl.s,
+				l: data.l || this.props.hsl.l,
 				source: 'hsl',
 			} );
 		}
@@ -227,7 +219,7 @@ export class Inputs extends Component {
 						<Input
 							label="h"
 							valueKey="h"
-							value={ Math.round( this.props.hsl.h ) }
+							value={ this.props.hsl.h }
 							onChange={ this.handleChange }
 							type="number"
 							min="0"
@@ -236,7 +228,7 @@ export class Inputs extends Component {
 						<Input
 							label="s"
 							valueKey="s"
-							value={ Math.round( this.props.hsl.s * 100 ) }
+							value={ this.props.hsl.s }
 							onChange={ this.handleChange }
 							type="number"
 							min="0"
@@ -245,7 +237,7 @@ export class Inputs extends Component {
 						<Input
 							label="l"
 							valueKey="l"
-							value={ Math.round( this.props.hsl.l * 100 ) }
+							value={ this.props.hsl.l }
 							onChange={ this.handleChange }
 							type="number"
 							min="0"
