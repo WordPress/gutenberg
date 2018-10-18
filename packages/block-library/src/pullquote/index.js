@@ -8,6 +8,7 @@ import { get, includes } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { createBlock } from '@wordpress/blocks';
 import {
 	getColorClassName,
 	RichText,
@@ -16,6 +17,7 @@ import {
 import {
 	select,
 } from '@wordpress/data';
+import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 
 import {
 	default as edit,
@@ -65,6 +67,56 @@ export const settings = {
 		{ name: 'default', label: __( 'Regular' ), isDefault: true },
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
 	],
+
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				isMultiBlock: true,
+				blocks: [ 'core/paragraph' ],
+				transform: ( attributes ) => {
+					return createBlock( 'core/pullquote', {
+						value: toHTMLString( join( attributes.map( ( { content } ) =>
+							create( { html: content } )
+						), '\u2028' ), 'p' ),
+					} );
+				},
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/paragraph' ],
+				transform: ( { value, citation } ) => {
+					const paragraphs = [];
+					if ( value ) {
+						paragraphs.push(
+							...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
+								.map( ( piece ) =>
+									createBlock( 'core/paragraph', {
+										content: toHTMLString( piece ),
+									} )
+								)
+						);
+					}
+					if ( citation ) {
+						paragraphs.push(
+							createBlock( 'core/paragraph', {
+								content: citation,
+							} )
+						);
+					}
+
+					if ( paragraphs.length === 0 ) {
+						return createBlock( 'core/paragraph', {
+							content: '',
+						} );
+					}
+					return paragraphs;
+				},
+			},
+		],
+	},
 
 	supports: {
 		align: [ 'left', 'right', 'wide', 'full' ],
