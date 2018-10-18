@@ -905,7 +905,7 @@ export class RichText extends Component {
 			<div className={ classes }
 				onFocus={ this.setFocusedElement }
 			>
-				{ isSelected && this.multilineTag === 'li' && (
+				{ isSelected && this.editor && this.multilineTag === 'li' && (
 					<BlockFormatControls>
 						<ListToolbar
 							editor={ this.editor }
