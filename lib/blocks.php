@@ -110,6 +110,7 @@ function get_dynamic_block_names() {
  * @return string
  */
 function get_dynamic_blocks_regex() {
+	_deprecated_function( __FUNCTION__, '4.1.0', __( "Dynamic blocks shouldn't be extracted by regex. Use parse_blocks() instead.", 'gutenberg' ) );
 	$dynamic_block_names   = get_dynamic_block_names();
 	$dynamic_block_pattern = (
 		'/<!--\s+wp:(' .
@@ -230,13 +231,30 @@ function _recurse_blocks( $blocks, $all_blocks ) {
 /**
  * Remove all dynamic blocks from the given content.
  *
- * @since 3.6.0
+ * @since 5.0.0
  *
  * @param string $content Content of the current post.
  * @return string
  */
 function strip_dynamic_blocks( $content ) {
-	return preg_replace( get_dynamic_blocks_regex(), '', $content );
+	return _recurse_strip_dynamic_blocks( parse_blocks( $content ) );
+}
+
+function _recurse_strip_dynamic_blocks( $blocks ) {
+	$clean_content  = '';
+	$dynamic_blocks = get_dynamic_block_names();
+
+	foreach ( $blocks as $block ) {
+		if ( ! in_array( $block['blockName'], $dynamic_blocks ) ) {
+			if ( $block['innerBlocks'] ) {
+				$clean_content .= _recurse_strip_dynamic_blocks( $block['innerBlocks'] );
+			} else {
+				$clean_content .= $block['innerHTML'];
+			}
+		}
+	}
+
+	return $clean_content;
 }
 
 /**
