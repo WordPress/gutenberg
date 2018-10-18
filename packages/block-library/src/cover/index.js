@@ -204,15 +204,11 @@ export const settings = {
 					}
 					mediaType = media.type;
 				}
-				if ( mediaType ) {
-					setAttributes( {
-						url: media.url,
-						id: media.id,
-						backgroundType: mediaType,
-					} );
-					return;
-				}
-				setAttributes( { url: media.url, id: media.id } );
+				setAttributes( {
+					url: media.url,
+					id: media.id,
+					backgroundType: mediaType,
+				} );
 			};
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
