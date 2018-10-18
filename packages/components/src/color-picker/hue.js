@@ -35,6 +35,7 @@ import { noop } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
+import { TAB } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -100,6 +101,13 @@ export class Hue extends Component {
 		this.unbindEventListeners();
 	}
 
+	preventKeyEvents( event ) {
+		if ( event.keyCode === TAB ) {
+			return;
+		}
+		event.preventDefault();
+	}
+
 	unbindEventListeners() {
 		window.removeEventListener( 'mousemove', this.handleChange );
 		window.removeEventListener( 'mouseup', this.handleMouseUp );
@@ -145,6 +153,7 @@ export class Hue extends Component {
 							) }
 							className="components-color-picker__hue-pointer"
 							style={ pointerLocation }
+							onKeyDown={ this.preventKeyEvents }
 						/>
 					</div>
 					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }

@@ -35,6 +35,7 @@ import { clamp, noop, throttle } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
+import { TAB } from '@wordpress/keycodes';
 import { withInstanceId } from '@wordpress/compose';
 
 /**
@@ -116,6 +117,13 @@ export class Saturation extends Component {
 		this.unbindEventListeners();
 	}
 
+	preventKeyEvents( event ) {
+		if ( event.keyCode === TAB ) {
+			return;
+		}
+		event.preventDefault();
+	}
+
 	unbindEventListeners() {
 		window.removeEventListener( 'mousemove', this.handleChange );
 		window.removeEventListener( 'mouseup', this.handleMouseUp );
@@ -159,6 +167,7 @@ export class Saturation extends Component {
 						aria-describedby={ `color-picker-saturation-${ instanceId }` }
 						className="components-color-picker__saturation-pointer"
 						style={ pointerLocation }
+						onKeyDown={ this.preventKeyEvents }
 					/>
 					<div
 						className="screen-reader-text"
