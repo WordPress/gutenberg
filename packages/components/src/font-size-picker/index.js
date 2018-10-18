@@ -100,7 +100,7 @@ function FontSizePicker( {
 					/>
 				}
 				<Button
-					className="components-color-palette__clear"
+					className="components-font-size-picker__clear"
 					type="button"
 					disabled={ value.slug === defaultFontSizeSlug }
 					onClick={ onResetFontSize }
