@@ -103,6 +103,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.isActive = this.isActive.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -403,6 +404,10 @@ export class RichText extends Component {
 		if ( unstableOnFocus ) {
 			unstableOnFocus();
 		}
+	}
+
+	onBlur() {
+		this.applyRecord( this.formatToValue( this.savedContent ) );
 	}
 
 	/**
@@ -921,6 +926,7 @@ export class RichText extends Component {
 								key={ key }
 								onPaste={ this.onPaste }
 								onInput={ this.onInput }
+								onBlur={ this.onBlur }
 								multilineTag={ this.multilineTag }
 								setRef={ this.setRef }
 							/>

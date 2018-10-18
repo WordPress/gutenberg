@@ -203,6 +203,7 @@ export default class TinyMCE extends Component {
 			isPlaceholderVisible,
 			onPaste,
 			onInput,
+			onBlur,
 			multilineTag,
 		} = this.props;
 
@@ -243,6 +244,7 @@ export default class TinyMCE extends Component {
 			dangerouslySetInnerHTML: { __html: initialHTML },
 			onPaste,
 			onInput,
+			onBlur,
 		} );
 	}
 }
