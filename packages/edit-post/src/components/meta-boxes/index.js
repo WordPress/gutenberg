@@ -19,7 +19,7 @@ function MetaBoxes( { location, isVisible, metaBoxes } ) {
 	return (
 		<Fragment>
 			{ map( metaBoxes, ( { id } ) => (
-				<MetaBoxVisibility id={ id } />
+				<MetaBoxVisibility key={ id } id={ id } />
 			) ) }
 			{ isVisible && <MetaBoxesArea location={ location } /> }
 		</Fragment>
