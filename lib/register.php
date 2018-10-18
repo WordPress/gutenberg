@@ -439,25 +439,27 @@ function gutenberg_register_post_types() {
 	register_post_type(
 		'wp_block',
 		array(
-			'labels'                => array(
+			'labels'          => array(
 				'name'          => __( 'Blocks', 'gutenberg' ),
 				'singular_name' => __( 'Block', 'gutenberg' ),
 				'search_items'  => __( 'Search Blocks', 'gutenberg' ),
 			),
-			'public'                => false,
-			'show_ui'               => true,
-			'show_in_menu'          => false,
-			'rewrite'               => false,
-			'show_in_rest'          => true,
-			'rest_base'             => 'blocks',
-			'rest_controller_class' => 'WP_REST_Blocks_Controller',
-			'capability_type'       => 'block',
-			'capabilities'          => array(
+			'public'          => false,
+			'show_ui'         => true,
+			'show_in_menu'    => false,
+			'rewrite'         => false,
+			'show_in_rest'    => true,
+			'rest_base'       => 'blocks',
+			'capability_type' => 'block',
+			'capabilities'    => array(
 				'read'         => 'read_blocks',
 				'create_posts' => 'create_blocks',
 			),
-			'map_meta_cap'          => true,
-			'supports'              => false,
+			'map_meta_cap'    => true,
+			'supports'        => array(
+				'title',
+				'editor',
+			),
 		)
 	);
 
