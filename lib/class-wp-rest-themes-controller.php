@@ -157,12 +157,12 @@ class WP_REST_Themes_Controller extends WP_REST_Controller {
 					'type'        => 'array',
 					'readonly'    => true,
 					'properties'  => array(
-						'formats'         => array(
+						'formats'           => array(
 							'description' => __( 'Post formats supported.', 'gutenberg' ),
 							'type'        => 'array',
 							'readonly'    => true,
 						),
-						'post-thumbnails' => array(
+						'post-thumbnails'   => array(
 							'description' => __( 'Whether the theme supports post thumbnails.', 'gutenberg' ),
 							'type'        => array( 'array', 'bool' ),
 							'readonly'    => true,

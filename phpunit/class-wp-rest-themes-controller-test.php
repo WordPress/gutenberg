@@ -179,9 +179,10 @@ class WP_REST_Themes_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 1, count( $properties ) );
 		$this->assertArrayHasKey( 'theme_supports', $properties );
 
-		$this->assertEquals( 2, count( $properties['theme_supports']['properties'] ) );
+		$this->assertEquals( 3, count( $properties['theme_supports']['properties'] ) );
 		$this->assertArrayHasKey( 'formats', $properties['theme_supports']['properties'] );
 		$this->assertArrayHasKey( 'post-thumbnails', $properties['theme_supports']['properties'] );
+		$this->assertArrayHasKey( 'responsive-embeds', $properties['theme_supports']['properties'] );
 	}
 
 	/**
