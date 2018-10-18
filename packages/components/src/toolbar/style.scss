@@ -1,22 +1,23 @@
 .components-toolbar {
 	margin: 0;
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 	background-color: $white;
-	display: inline-flex;
+	display: flex;
+	flex-shrink: 0;
 }
 
 div.components-toolbar {
-	&> div {
+	& > div {
 		// IE11 does not support `position: sticky`, or Flex very well, so use block.
-		display: inline-block;
-		@supports ( position: sticky ) {
-			display: inline-flex;
+		display: block;
+		@supports (position: sticky) {
+			display: flex;
 		}
 
 		margin: 0;
 	}
 
-	&> div + div {
+	& > div + div {
 		margin-left: -3px;
 
 		&.has-left-divider {
@@ -25,9 +26,9 @@ div.components-toolbar {
 			overflow: visible;
 		}
 
-		&.has-left-divider:before {
+		&.has-left-divider::before {
 			display: inline-block;
-			content: '';
+			content: "";
 			box-sizing: content-box;
 			background-color: $light-gray-500;
 			position: absolute;
@@ -52,8 +53,8 @@ div.components-toolbar {
 
 	// Unset icon button styles
 	&:active,
-	&:not( [aria-disabled="true"] ):hover,
-	&:not( [aria-disabled="true"] ):focus {
+	&:not([aria-disabled="true"]):hover,
+	&:not([aria-disabled="true"]):focus {
 		outline: none;
 		box-shadow: none;
 		background: none;
@@ -67,32 +68,34 @@ div.components-toolbar {
 
 	& > svg {
 		padding: 5px;
-		box-sizing: content-box;
-		border-radius: $button-style__radius-roundrect;
+		border-radius: $radius-round-rectangle;
+		height: 30px;
+		width: 30px;
 	}
 
 	// Subscript for numbered icon buttons, like headings
 	&[data-subscript] svg {
-		padding: 4px 8px 4px 0;
+		padding: 5px 10px 5px 0;
 	}
 
-	&[data-subscript]:after {
-		content: attr( data-subscript );
+	&[data-subscript]::after {
+		content: attr(data-subscript);
 		font-family: $default-font;
 		font-size: $default-font-size;
 		font-weight: 600;
+		line-height: 12px;
 		position: absolute;
 		right: 8px;
-		bottom: 8px;
+		bottom: 10px;
 	}
 
 	// Assign hover style to child element, not the button itself
-	&:not( :disabled ):not([aria-disabled="true"]):hover {
+	&:not(:disabled):not([aria-disabled="true"]):hover {
 		box-shadow: none;
 	}
 
-	&:not( :disabled ).is-active > svg,
-	&:not( :disabled ):hover > svg {
+	&:not(:disabled).is-active > svg,
+	&:not(:disabled):hover > svg {
 		@include formatting-button-style__hover;
 	}
 
@@ -101,7 +104,7 @@ div.components-toolbar {
 		@include formatting-button-style__active;
 	}
 
-	&:not(:disabled).is-active[data-subscript]:after {
+	&:not(:disabled).is-active[data-subscript]::after {
 		color: $white;
 	}
 

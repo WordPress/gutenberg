@@ -29,7 +29,15 @@ function RangeControl( {
 	...props
 } ) {
 	const id = `inspector-range-control-${ instanceId }`;
-	const onChangeValue = ( event ) => onChange( Number( event.target.value ) );
+	const resetValue = () => onChange();
+	const onChangeValue = ( event ) => {
+		const newValue = event.target.value;
+		if ( newValue === '' ) {
+			resetValue();
+			return;
+		}
+		onChange( Number( newValue ) );
+	};
 	const initialSliderValue = isFinite( value ) ? value : initialPosition || '';
 
 	return (
@@ -58,7 +66,7 @@ function RangeControl( {
 				{ ...props }
 			/>
 			{ allowReset &&
-				<Button onClick={ () => onChange() } disabled={ value === undefined }>
+				<Button onClick={ resetValue } disabled={ value === undefined }>
 					{ __( 'Reset' ) }
 				</Button>
 			}

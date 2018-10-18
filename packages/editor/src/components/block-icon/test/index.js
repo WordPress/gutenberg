@@ -23,20 +23,19 @@ describe( 'BlockIcon', () => {
 	it( 'renders a dashicon by slug', () => {
 		const wrapper = shallow( <BlockIcon icon="format-image" /> );
 
-		expect( wrapper.name() ).toBe( 'Dashicon' );
-		expect( wrapper.prop( 'icon' ) ).toBe( 'format-image' );
+		expect( wrapper.find( 'Dashicon' ).prop( 'icon' ) ).toBe( 'format-image' );
 	} );
 
 	it( 'renders a function', () => {
 		const wrapper = shallow( <BlockIcon icon={ () => <span /> } /> );
 
-		expect( wrapper.name() ).toBe( 'span' );
+		expect( wrapper.childAt( 0 ).name() ).toBe( 'span' );
 	} );
 
 	it( 'renders an element', () => {
 		const wrapper = shallow( <BlockIcon icon={ <span /> } /> );
 
-		expect( wrapper.name() ).toBe( 'span' );
+		expect( wrapper.childAt( 0 ).name() ).toBe( 'span' );
 	} );
 
 	it( 'renders a component', () => {
@@ -49,6 +48,6 @@ describe( 'BlockIcon', () => {
 			<BlockIcon icon={ MyComponent } />
 		);
 
-		expect( wrapper.name() ).toBe( 'MyComponent' );
+		expect( wrapper.childAt( 0 ).name() ).toBe( 'MyComponent' );
 	} );
 } );

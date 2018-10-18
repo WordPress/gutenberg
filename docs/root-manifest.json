@@ -12,6 +12,12 @@
 		"parent": null
 	},
 	{
+		"title": "The Gutenberg block grammar",
+		"slug": "grammar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/grammar.md",
+		"parent": "language"
+	},
+	{
 		"title": "Block API",
 		"slug": "block-api",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-api.md",
@@ -32,7 +38,7 @@
 	{
 		"title": "RichText API",
 		"slug": "rich-text-api",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/editor\/components\/rich-text\/README.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/packages\/editor\/src\/components\/rich-text\/README.md",
 		"parent": "block-api"
 	},
 	{
@@ -60,6 +66,12 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Extending Editor",
+		"slug": "extending-editor",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/extending-editor.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Meta Boxes",
 		"slug": "meta-box",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/meta-box.md",
@@ -76,6 +88,30 @@
 		"slug": "autocomplete",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/autocomplete.md",
 		"parent": "extensibility"
+	},
+	{
+		"title": "Design",
+		"slug": "design",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/design.md",
+		"parent": null
+	},
+	{
+		"title": "Patterns",
+		"slug": "design-patterns",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/design\/design-patterns.md",
+		"parent": "design"
+	},
+	{
+		"title": "Block Design",
+		"slug": "block-design",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/design\/block-design.md",
+		"parent": "design"
+	},
+	{
+		"title": "Resources",
+		"slug": "design-resources",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/design\/design-resources.md",
+		"parent": "design"
 	},
 	{
 		"title": "Creating Block Types",
@@ -132,12 +168,6 @@
 		"parent": "reference"
 	},
 	{
-		"title": "Design Principles",
-		"slug": "design-principles",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/design-principles.md",
-		"parent": "reference"
-	},
-	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/history.md",
@@ -165,6 +195,12 @@
 		"title": "Release Process",
 		"slug": "release",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/release.md",
+		"parent": "reference"
+	},
+	{
+		"title": "Scripts",
+		"slug": "scripts",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/scripts.md",
 		"parent": "reference"
 	},
 	{
@@ -208,11 +244,5 @@
 		"slug": "resources",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/outreach\/resources.md",
 		"parent": "outreach"
-	},
-	{
-		"title": "Packages",
-		"slug": "packages",
-		"markdown_source":  "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/packages.md",
-		"parent": null
 	}
 ]

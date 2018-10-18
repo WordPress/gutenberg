@@ -13,6 +13,7 @@ import {
 	sortBy,
 	without,
 	includes,
+	deburr,
 } from 'lodash';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -21,10 +22,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __ } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
-import {
-	withSpokenMessages,
-	PanelBody,
-} from '@wordpress/components';
+import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -48,12 +46,39 @@ const MAX_SUGGESTED_ITEMS = 9;
  * @return {Array}             Filtered item list.
  */
 export const searchItems = ( items, searchTerm ) => {
-	const normalizedSearchTerm = searchTerm.toLowerCase().trim();
-	const matchSearch = ( string ) => string.toLowerCase().indexOf( normalizedSearchTerm ) !== -1;
+	const normalizedSearchTerm = normalizeTerm( searchTerm );
+	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
 
 	return items.filter( ( item ) =>
 		matchSearch( item.title ) || some( item.keywords, matchSearch )
 	);
+};
+
+/**
+ * Converts the search term into a normalized term.
+ *
+ * @param {string} term The search term to normalize.
+ *
+ * @return {string} The normalized search term.
+ */
+export const normalizeTerm = ( term ) => {
+	// Disregard diacritics.
+	//  Input: "média"
+	term = deburr( term );
+
+	// Accommodate leading slash, matching autocomplete expectations.
+	//  Input: "/media"
+	term = term.replace( /^\//, '' );
+
+	// Lowercase.
+	//  Input: "MEDIA"
+	term = term.toLowerCase();
+
+	// Strip leading and trailing whitespace.
+	//  Input: " media "
+	term = term.trim();
+
+	return term;
 };
 
 export class InserterMenu extends Component {
@@ -212,7 +237,6 @@ export class InserterMenu extends Component {
 					role="region"
 					aria-label={ __( 'Available block types' ) }
 				>
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
 
 					<ChildBlocks
 						rootClientId={ rootClientId }
@@ -231,6 +255,9 @@ export class InserterMenu extends Component {
 							<BlockTypesList items={ suggestedItems } onSelect={ onSelect } onHover={ this.onHover } />
 						</PanelBody>
 					}
+
+					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
 						if ( ! categoryItems || ! categoryItems.length ) {
@@ -248,8 +275,10 @@ export class InserterMenu extends Component {
 							</PanelBody>
 						);
 					} ) }
+
 					{ !! reusableItems.length && (
 						<PanelBody
+							className="editor-inserter__reusable-blocks-panel"
 							title={ __( 'Reusable' ) }
 							opened={ isPanelOpen( 'reusable' ) }
 							onToggle={ this.onTogglePanel( 'reusable' ) }
@@ -257,6 +286,12 @@ export class InserterMenu extends Component {
 							ref={ this.bindPanel( 'reusable' ) }
 						>
 							<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
+							<a
+								className="editor-inserter__manage-reusable-blocks"
+								href="edit.php?post_type=wp_block"
+							>
+								{ __( 'Manage All Reusable Blocks' ) }
+							</a>
 						</PanelBody>
 					) }
 					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (

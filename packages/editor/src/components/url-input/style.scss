@@ -1,6 +1,6 @@
 // Link input
-$input-padding: 8px;
-$input-size: 230px;
+$input-padding: 9px 8px;
+$input-size: 300px;
 
 .editor-block-list__block .editor-url-input,
 .components-popover .editor-url-input,
@@ -10,17 +10,23 @@ $input-size: 230px;
 	position: relative;
 	padding: 1px;
 
-	input[type=text] {
+	input[type="text"] {
 		width: 100%;
+		@include break-small() {
+			width: $input-size;
+		}
 		padding: $input-padding;
 		border: none;
+		border-radius: 0;
+		margin-left: 0;
+		margin-right: 0;
 
 		&::-ms-clear {
 			display: none;
 		}
 	}
 
-	.spinner {
+	.components-spinner {
 		position: absolute;
 		right: 0;
 		top: $input-padding;
@@ -31,14 +37,15 @@ $input-size: 230px;
 // Suggestions
 .editor-url-input__suggestions {
 	max-height: 200px;
-	transition: all .15s ease-in-out;
+	transition: all 0.15s ease-in-out;
 	list-style: none;
 	padding: 4px 0;
+	width: $input-size + 2 * $icon-button-size;
 }
 
 // Hide suggestions on mobile until we @todo find a better way to show them
 .editor-url-input__suggestions,
-.editor-url-input .spinner {
+.editor-url-input .components-spinner {
 	display: none;
 	@include break-small() {
 		display: inherit;
@@ -63,7 +70,7 @@ $input-size: 230px;
 
 	&:focus,
 	&.is-selected {
-		background: color( theme( primary ) shade(15%) );
+		background: color(theme(primary) shade(15%));
 		color: $white;
 		outline: none;
 	}
@@ -71,7 +78,7 @@ $input-size: 230px;
 
 // Toolbar button
 .components-toolbar > .editor-url-input__button {
-	position: inherit;	// let the dialog position according to parent
+	position: inherit; // Let the dialog position according to parent.
 }
 
 .editor-url-input__button .editor-url-input__back {
@@ -79,7 +86,7 @@ $input-size: 230px;
 	overflow: visible;
 
 	&::after {
-		content: '';
+		content: "";
 		position: absolute;
 		display: block;
 		width: 1px;

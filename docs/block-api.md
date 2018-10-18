@@ -25,7 +25,7 @@ registerBlockType( 'my-plugin/book', {} );
 
 ### Block Configuration
 
-* **Type:** `{ key: value }`
+* **Type:** `Object` [ `{ key: value }` ]
 
 A block requires a few properties to be specified before it can be registered successfully. These are defined through a configuration object, which includes the following:
 
@@ -37,7 +37,7 @@ This is the display title for your block, which can be translated with our trans
 
 ```js
 // Our data object
-title: 'Book'
+title: __( 'Book' )
 ```
 
 #### Description (optional)
@@ -47,28 +47,44 @@ title: 'Book'
 This is a short description for your block, which can be translated with our translation functions. This will be shown in the block inspector.
 
 ```js
-description: 'Block showing a Book card.'
+description: __( 'Block showing a Book card.' )
 ```
 
 #### Category
 
-* **Type:** `String [ common | formatting | layout | widgets | embed ]`
+* **Type:** `String` [ common | formatting | layout | widgets | embed ]
 
-Blocks are grouped into categories to help users browse and discover them. The core provided categories are `common`, `formatting`, `layout`, `widgets`, and `embed`.
+Blocks are grouped into categories to help users browse and discover them.
+
+The core provided categories are:
+* common
+* formatting
+* layout
+* widgets
+* embed
 
 ```js
 // Assigning to the 'widgets' category
 category: 'widgets',
 ```
 
+Plugins and Themes can also register [custom block categories](../docs/extensibility/extending-blocks/#managing-block-categories).
+
 #### Icon (optional)
+
+* **Type:** `String` | `Object`
 
 An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
 
 ```js
 // Specifying a dashicon for the block
 icon: 'book-alt',
+
+// Specifying a custom svg for the block
+icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
+
+**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 Besides src the object can contain background and foreground colors, this colors will appear with the icon
@@ -86,19 +102,21 @@ icon: {
 } ,
 ```
 
-
 #### Keywords (optional)
+
+* **Type:** `Array`
 
 Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
 
 ```js
-// Make it easier to discover a block with keyword aliases
-keywords: [ __( 'read' ) ],
+// Make it easier to discover a block with keyword aliases.
+// These can be localised so your keywords work across locales.
+keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 ```
 
 #### Attributes (optional)
 
-* **Type:** `{ attr: {} }`
+* **Type:** `Object`
 
 Attributes provide the structured data needs of a block. They can exist in different forms when they are serialized, but they are declared together under a common interface.
 
@@ -112,8 +130,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
-		type: 'string',
-		source: 'children',
+		source: 'html',
 		selector: '.book-author',
 	},
 	pages: {
@@ -372,7 +389,7 @@ transforms: {
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/editor/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 
@@ -395,8 +412,21 @@ align: true,
 // Pick which alignment options to display.
 align: [ 'left', 'right', 'full' ],
 ```
+When supports align is used the block attributes definition is extended to include an align attribute with a string type.
+By default, no alignment is assigned to the block.
+The block can apply a default alignment by specifying its own align attribute with a default e.g.:
+```
+attributes: {
+	...
+	align: {
+		type: 'string',
+		default: 'right'
+	},
+	...
+}
+```
 
-- `alignWide` (default `true`): Gutenberg allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+- `alignWide` (default `true`): This property allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 // Remove the support for wide alignment.
@@ -448,3 +478,5 @@ multiple: false,
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
+
+*Some [block supports](#supports-optional) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.*

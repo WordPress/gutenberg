@@ -31,6 +31,7 @@
 	background: $dark-gray-500;
 	border: 4px solid transparent;
 	background-clip: padding-box;
+	box-sizing: border-box;
 }
 
 @mixin range-track() {
@@ -42,7 +43,7 @@
 
 .components-range-control__slider {
 	width: 100%;
-	margin-left: $item-spacing;
+	margin-left: $grid-size;
 	padding: 0;
 	-webkit-appearance: none;
 	background: transparent;
@@ -95,7 +96,7 @@
  	 * Track
  	 */
 
-	 // webkit
+	// webkit
 	&::-webkit-slider-runnable-track {
 		@include range-track();
 		margin-top: -4px;
@@ -118,7 +119,7 @@
 
 .components-range-control__number {
 	display: inline-block;
-	margin-left: $item-spacing;
+	margin-left: $grid-size;
 	font-weight: 500;
 	width: 50px;
 	padding: 3px 5px !important;

@@ -1,8 +1,21 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Toolbar } from '@wordpress/components';
+import { withViewportMatch } from '@wordpress/viewport';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import { withBlockEditContext } from '../block-edit/context';
 
 const ALIGNMENT_CONTROLS = [
 	{
@@ -22,13 +35,18 @@ const ALIGNMENT_CONTROLS = [
 	},
 ];
 
-export default function AlignmentToolbar( { value, onChange } ) {
+export function AlignmentToolbar( { isCollapsed, value, onChange } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
+	const activeAlignment = find( ALIGNMENT_CONTROLS, ( control ) => control.align === value );
+
 	return (
 		<Toolbar
+			isCollapsed={ isCollapsed }
+			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
+			label={ __( 'Change Text Alignment' ) }
 			controls={ ALIGNMENT_CONTROLS.map( ( control ) => {
 				const { align } = control;
 				const isActive = ( value === align );
@@ -42,3 +60,21 @@ export default function AlignmentToolbar( { value, onChange } ) {
 		/>
 	);
 }
+
+export default compose(
+	withBlockEditContext( ( { clientId } ) => {
+		return {
+			clientId,
+		};
+	} ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
+	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
+		const { getBlockRootClientId, getEditorSettings } = select( 'core/editor' );
+		return {
+			isCollapsed: isCollapsed || ! isLargeViewport || (
+				! getEditorSettings().hasFixedToolbar &&
+				getBlockRootClientId( clientId )
+			),
+		};
+	} ),
+)( AlignmentToolbar );

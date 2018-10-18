@@ -1,0 +1,16 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/image",
+        "isValid": true,
+        "attributes": {
+            "url": "https://cldup.com/YLYhpou2oq.jpg",
+            "alt": "",
+            "caption": "Give it a try. Press the \"really wide\" button on the image toolbar.",
+            "align": "center",
+            "linkDestination": "none"
+        },
+        "innerBlocks": [],
+        "originalContent": "<div class=\"wp-block-image\"><figure class=\"aligncenter\"><img src=\"https://cldup.com/YLYhpou2oq.jpg\" alt=\"\" /><figcaption>Give it a try. Press the &quot;really wide&quot; button on the image toolbar.</figcaption></figure></div>"
+    }
+]

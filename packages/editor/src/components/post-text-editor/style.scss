@@ -1,5 +1,5 @@
 .editor-post-text-editor {
-	border: 1px solid $light-gray-500;
+	border: $border-width solid $light-gray-500;
 	display: block;
 	margin: 0 0 2em;
 	width: 100%;
@@ -12,10 +12,10 @@
 
 	&:hover,
 	&:focus {
-		border: 1px solid $light-gray-500;
+		border: $border-width solid $light-gray-500;
 		box-shadow: none;
 		// Emulate the effect used on the post title.
-		outline: 1px solid $light-gray-500;
+		outline: $border-width solid $light-gray-500;
 		outline-offset: -2px;
 	}
 }
@@ -34,7 +34,7 @@
 		cursor: pointer;
 		font-family: $editor-html-font;
 		color: $dark-gray-500;
-		border: 1px solid transparent;
+		border: $border-width solid transparent;
 
 		&:first-child {
 			margin-left: 0;
@@ -43,7 +43,7 @@
 		&:hover,
 		&:focus {
 			outline: none;
-			border: 1px solid $dark-gray-500;
+			border: $border-width solid $dark-gray-500;
 		}
 	}
 }
@@ -58,9 +58,9 @@
 
 .editor-post-text-editor__link {
 	text-decoration: underline;
-	color: theme( primary );
+	color: theme(primary);
 }
 
 .editor-post-text-editor__del {
-	text-decoration:line-through;
+	text-decoration: line-through;
 }

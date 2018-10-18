@@ -20,7 +20,6 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 	getBlockType,
-	setUnknownTypeHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -35,7 +34,6 @@ describe( 'validation', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -443,6 +441,35 @@ describe( 'validation', () => {
 			);
 
 			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when comparing empty strings', () => {
+			const isEquivalent = isEquivalentHTML(
+				'',
+				'',
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return false if supplied malformed HTML', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></blockquote>',
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</p></blockquote>',
+			);
+
+			expect( console ).toHaveWarned();
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return false if supplied two sets of malformed HTML', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div>fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></div>',
+				'<blockquote>fsdfsdfsd<p>fdsfsdfsdd</p a></blockquote>',
+			);
+
+			expect( console ).toHaveWarned();
+			expect( isEquivalent ).toBe( false );
 		} );
 	} );
 

@@ -1,5 +1,4 @@
-FontSizePicker
-========
+# FontSizePicker
 
 FontSizePicker is a React component that renders a UI that allows users to select a font size.
 The component renders a series of buttons that allow the user to select predefined (common) font sizes and contains a range slider that enables the user to select custom font sizes (by choosing the value.
@@ -8,21 +7,27 @@ The component renders a series of buttons that allow the user to select predefin
 
 
 ```jsx
-import { Dropdown } from '@wordpress/components';
+import { FontSizePicker } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-function MyFontSizePicker() {
-	return (
-		<FontSizePicker
-			fontSizes={ [
-				{ shortName: 'S', size: 12 },
-				{ shortName: 'M', size: 16 }
-			] }
-			fallbackFontSize={ fallbackFontSize }
+const MyFontSizePicker = withState( {
+	fontSize: 16,
+} )( ( { fontSize, setState } ) => { 
+	const fontSizes = [
+		{ shortName: 'S', size: 12 },
+		{ shortName: 'M', size: 16 }
+	];
+	const fallbackFontSize = 16;
+	
+	return ( 
+		<FontSizePicker 
+			fontSizes={ fontSizes } 
 			value={ fontSize }
-			onChange={ this.setFontSize }
+			fallbackFontSize={ fallbackFontSize }
+			onChange={ fontSize => setState( { fontSize } ) } 
 		/>
-	);
-}
+	); 
+} );
 ```
 
 ## Props

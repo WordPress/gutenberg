@@ -14,6 +14,7 @@ You can also customize the toolbar to include controls specific to your block ty
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
+	Fragment = wp.element.Fragment
 	registerBlockType = wp.blocks.registerBlockType,
 	RichText = wp.editor.RichText,
 	BlockControls = wp.editor.BlockControls,
@@ -28,8 +29,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -49,30 +49,34 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			props.setAttributes( { alignment: newAlignment } );
 		}
 
-		return [
+		return (
 			el(
-				BlockControls,
-				{ key: 'controls' },
+				Fragment,
+				null,
 				el(
-					AlignmentToolbar,
+					BlockControls,
+					null,
+					el(
+						AlignmentToolbar,
+						{
+							value: alignment,
+							onChange: onChangeAlignment,
+						}
+					)
+				),
+				el(
+					RichText,
 					{
-						value: alignment,
-						onChange: onChangeAlignment
+						key: 'editable',
+						tagName: 'p',
+						className: props.className,
+						style: { textAlign: alignment },
+						onChange: onChangeContent,
+						value: content,
 					}
 				)
-			),
-			el(
-				RichText,
-				{
-					key: 'editable',
-					tagName: 'p',
-					className: props.className,
-					style: { textAlign: alignment },
-					onChange: onChangeContent,
-					value: content,
-				}
 			)
-		];
+		);
 	},
 
 	save: function( props ) {
@@ -90,6 +94,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
+const { Fragment } = wp.element;
 const {
 	RichText,
 	BlockControls,
@@ -105,8 +110,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -125,22 +129,24 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 			setAttributes( { alignment: newAlignment } );
 		}
 
-		return [
-			<BlockControls key="controls">
-				<AlignmentToolbar
-					value={ alignment }
-					onChange={ onChangeAlignment }
+		return (
+			<Fragment>
+				<BlockControls>
+					<AlignmentToolbar
+						value={ alignment }
+						onChange={ onChangeAlignment }
+					/>
+				</BlockControls>
+				<RichText
+					key="editable"
+					tagName="p"
+					className={ className }
+					style={ { textAlign: alignment } }
+					onChange={ onChangeContent }
+					value={ content }
 				/>
-			</BlockControls>,
-			<RichText
-				key="editable"
-				tagName="p"
-				className={ className }
-				style={ { textAlign: alignment } }
-				onChange={ onChangeContent }
-				value={ content }
-			/>
-		];
+			</Fragment>
+		);
 	},
 
 	save( { attributes, className } ) {
@@ -159,10 +165,16 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 ```
 {% end %}
 
-Note that `BlockControls` is only visible when the block is currently selected.
+Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
 
 ## Inspector
 
-While the toolbar area is useful for displaying controls to toggle attributes of a block, sometimes you will find that you need more screen space for form fields. The inspector region is shown in place of the post settings sidebar when a block is selected.
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/blocks/inspector.png" with="281" height="527" alt="inspector">
+
+The inspector is used to display less-often-used settings or settings that require more screen space. The inspector should be used for **block-level settings only**.
+
+If you have settings that affects only selected content inside a block (example: the "bold" setting for selected text inside a paragraph): **do not place it inside the inspector**. The inspector is displayed even when editing a block in HTML mode, so it should only contain block-level settings.
+
+The inspector region is shown in place of the post settings sidebar when a block is selected.
 
 Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the inspector region.

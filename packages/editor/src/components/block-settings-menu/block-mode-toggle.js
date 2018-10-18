@@ -7,12 +7,12 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { IconButton } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
-export function BlockModeToggle( { blockType, mode, onToggleMode, small = false, role } ) {
+export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
 		return null;
 	}
@@ -22,15 +22,14 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false,
 		__( 'Edit visually' );
 
 	return (
-		<IconButton
+		<MenuItem
 			className="editor-block-settings-menu__control"
 			onClick={ onToggleMode }
 			icon="html"
 			label={ small ? label : undefined }
-			role={ role }
 		>
 			{ ! small && label }
-		</IconButton>
+		</MenuItem>
 	);
 }
 

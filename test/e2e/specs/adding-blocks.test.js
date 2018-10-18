@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-import '../support/bootstrap';
 import {
 	newPost,
-	newDesktopBrowserPage,
 	insertBlock,
 	getEditedPostContent,
 	pressTimes,
@@ -12,7 +10,6 @@ import {
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
-		await newDesktopBrowserPage();
 		await newPost();
 	} );
 
@@ -20,18 +17,6 @@ describe( 'adding blocks', () => {
 		// Click below editor to focus last field (block appender)
 		await page.click( '.editor-writing-flow__click-redirect' );
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
-
-		// Up to return back to title. Assumes that appender results in focus
-		// to a new block.
-		// TODO: Backspace should be sufficient to return to title.
-		await page.keyboard.press( 'ArrowUp' );
-
-		// Post is empty, the newly created paragraph has been removed on focus
-		// out because default block is provisional.
-		expect( await page.$( '[data-type="core/paragraph"]' ) ).toBeNull();
-
-		// Using the placeholder
-		await page.click( '.editor-default-block-appender' );
 		await page.keyboard.type( 'Paragraph block' );
 
 		// Using the slash command
@@ -84,7 +69,8 @@ describe( 'adding blocks', () => {
 		// Using the between inserter
 		const insertionPoint = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
 		const rect = await insertionPoint.boundingBox();
-		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y + ( rect.height / 2 ) );
+		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y + ( rect.height / 2 ), { steps: 10 } );
+		await page.waitForSelector( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
 		await page.click( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
 		await page.keyboard.type( 'Second paragraph' );
 

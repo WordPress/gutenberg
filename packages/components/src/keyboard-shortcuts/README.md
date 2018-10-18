@@ -1,5 +1,4 @@
-Keyboard Shortcuts
-==================
+# Keyboard Shortcuts
 
 `<KeyboardShortcuts />` is a component which handles keyboard sequences during the lifetime of the rendering element.
 
@@ -12,30 +11,25 @@ It uses the [Mousetrap](https://craig.is/killing/mice) library to implement keyb
 Render `<KeyboardShortcuts />` with a `shortcuts` prop object:
 
 ```jsx
-class SelectAllDetection extends Component {
-	constructor() {
-		super( ...arguments );
+import { KeyboardShortcuts } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-		this.setAllSelected = this.setAllSelected.bind( this );
-
-		this.state = { isAllSelected: false };
-	}
-
-	setAllSelected() {
-		this.setState( { isAllSelected: true } );
-	}
-
-	render() {
-		return (
-			<div>
-				<KeyboardShortcuts shortcuts={ {
-					'mod+a': this.setAllSelected,
-				} } />
-				Combination pressed? { isAllSelected ? 'Yes' : 'No' }
-			</div>
-		);
-	}
-}
+const MyKeyboardShortcuts = withState( {
+	isAllSelected: false,
+} )( ( { isAllSelected, setState } ) => { 
+	const selectAll = () => {
+		setState( { isAllSelected: true } )
+	};
+	
+	return (
+		<div>
+			<KeyboardShortcuts shortcuts={ {
+				'mod+a': selectAll,
+			} } />
+			[cmd/ctrl + A] Combination pressed? { isAllSelected ? 'Yes' : 'No' }
+		</div>
+	) 
+} )
 ```
 
 ## Props

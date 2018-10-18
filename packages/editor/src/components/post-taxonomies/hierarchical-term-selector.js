@@ -2,17 +2,17 @@
  * External dependencies
  */
 import { get, unescape as unescapeString, without, find, some, invoke } from 'lodash';
-import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { TreeSelect, withSpokenMessages, Button } from '@wordpress/components';
+import { TreeSelect, withSpokenMessages, withFilters, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -24,10 +24,12 @@ import { buildTermsTree } from '../../utils/terms';
  */
 const DEFAULT_QUERY = {
 	per_page: -1,
-	orderby: 'count',
-	order: 'desc',
+	orderby: 'name',
+	order: 'asc',
 	_fields: 'id,name,parent',
 };
+
+const MIN_TERMS_COUNT_FOR_FILTER = 8;
 
 class HierarchicalTermSelector extends Component {
 	constructor() {
@@ -38,6 +40,8 @@ class HierarchicalTermSelector extends Component {
 		this.onChangeFormParent = this.onChangeFormParent.bind( this );
 		this.onAddTerm = this.onAddTerm.bind( this );
 		this.onToggleForm = this.onToggleForm.bind( this );
+		this.setFilterValue = this.setFilterValue.bind( this );
+		this.sortBySelected = this.sortBySelected.bind( this );
 		this.state = {
 			loading: true,
 			availableTermsTree: [],
@@ -46,6 +50,8 @@ class HierarchicalTermSelector extends Component {
 			formName: '',
 			formParent: '',
 			showForm: false,
+			filterValue: '',
+			filteredTermsTree: [],
 		};
 	}
 
@@ -121,7 +127,10 @@ class HierarchicalTermSelector extends Component {
 				if ( errorCode === 'term_exists' ) {
 					// search the new category created since last fetch
 					this.addRequest = apiFetch( {
-						path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( { ...DEFAULT_QUERY, parent: formParent || 0, search: formName } ) }`,
+						path: addQueryArgs(
+							`/wp/v2/${ taxonomy.rest_base }`,
+							{ ...DEFAULT_QUERY, parent: formParent || 0, search: formName }
+						),
 					} );
 					return this.addRequest
 						.then( ( searchResult ) => {
@@ -149,7 +158,7 @@ class HierarchicalTermSelector extends Component {
 					formName: '',
 					formParent: '',
 					availableTerms: newAvailableTerms,
-					availableTermsTree: buildTermsTree( newAvailableTerms ),
+					availableTermsTree: this.sortBySelected( buildTermsTree( newAvailableTerms ) ),
 				} );
 				onUpdateTerms( [ ...terms, term.id ], taxonomy.rest_base );
 			}, ( xhr ) => {
@@ -183,10 +192,12 @@ class HierarchicalTermSelector extends Component {
 		if ( ! taxonomy ) {
 			return;
 		}
-		this.fetchRequest = apiFetch( { path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( DEFAULT_QUERY ) }` } );
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, DEFAULT_QUERY ),
+		} );
 		this.fetchRequest.then(
 			( terms ) => { // resolve
-				const availableTermsTree = buildTermsTree( terms );
+				const availableTermsTree = this.sortBySelected( buildTermsTree( terms ) );
 
 				this.fetchRequest = null;
 				this.setState( {
@@ -205,6 +216,101 @@ class HierarchicalTermSelector extends Component {
 				} );
 			}
 		);
+	}
+
+	sortBySelected( termsTree ) {
+		const { terms } = this.props;
+		const treeHasSelection = ( termTree ) => {
+			if ( terms.indexOf( termTree.id ) !== -1 ) {
+				return true;
+			}
+			if ( undefined === termTree.children ) {
+				return false;
+			}
+			const anyChildIsSelected = termTree.children.map( treeHasSelection ).filter( ( child ) => child ).length > 0;
+			if ( anyChildIsSelected ) {
+				return true;
+			}
+			return false;
+		};
+		const termOrChildIsSelected = ( termA, termB ) => {
+			const termASelected = treeHasSelection( termA );
+			const termBSelected = treeHasSelection( termB );
+
+			if ( termASelected === termBSelected ) {
+				return 0;
+			}
+
+			if ( termASelected && ! termBSelected ) {
+				return -1;
+			}
+
+			if ( ! termASelected && termBSelected ) {
+				return 1;
+			}
+
+			return 0;
+		};
+		termsTree.sort( termOrChildIsSelected );
+		return termsTree;
+	}
+
+	setFilterValue( event ) {
+		const { availableTermsTree } = this.state;
+		const filterValue = event.target.value;
+		const filteredTermsTree = availableTermsTree.map( this.getFilterMatcher( filterValue ) ).filter( ( term ) => term );
+		const getResultCount = ( terms ) => {
+			let count = 0;
+			for ( let i = 0; i < terms.length; i++ ) {
+				count++;
+				if ( undefined !== terms[ i ].children ) {
+					count += getResultCount( terms[ i ].children );
+				}
+			}
+			return count;
+		};
+		this.setState(
+			{
+				filterValue,
+				filteredTermsTree,
+			}
+		);
+
+		const resultCount = getResultCount( filteredTermsTree );
+		const resultsFoundMessage = sprintf(
+			_n( '%d result found.', '%d results found.', resultCount, 'term' ),
+			resultCount
+		);
+		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
+	}
+
+	getFilterMatcher( filterValue ) {
+		const matchTermsForFilter = ( originalTerm ) => {
+			if ( '' === filterValue ) {
+				return originalTerm;
+			}
+
+			// Shallow clone, because we'll be filtering the term's children and
+			// don't want to modify the original term.
+			const term = { ...originalTerm };
+
+			// Map and filter the children, recursive so we deal with grandchildren
+			// and any deeper levels.
+			if ( term.children.length > 0 ) {
+				term.children = term.children.map( matchTermsForFilter ).filter( ( child ) => child );
+			}
+
+			// If the term's name contains the filterValue, or it has children
+			// (i.e. some child matched at some point in the tree) then return it.
+			if ( -1 !== term.name.toLowerCase().indexOf( filterValue ) || term.children.length > 0 ) {
+				return term;
+			}
+
+			// Otherwise, return false. After mapping, the list of terms will need
+			// to have false values filtered out.
+			return false;
+		};
+		return matchTermsForFilter;
 	}
 
 	renderTerms( renderedTerms ) {
@@ -239,7 +345,7 @@ class HierarchicalTermSelector extends Component {
 			return null;
 		}
 
-		const { availableTermsTree, availableTerms, formName, formParent, loading, showForm } = this.state;
+		const { availableTermsTree, availableTerms, filteredTermsTree, formName, formParent, loading, showForm, filterValue } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
 			[ 'data', 'labels', labelProperty ],
@@ -263,10 +369,48 @@ class HierarchicalTermSelector extends Component {
 		const noParentOption = `— ${ parentSelectLabel } —`;
 		const newTermSubmitLabel = newTermButtonLabel;
 		const inputId = `editor-post-taxonomies__hierarchical-terms-input-${ instanceId }`;
+		const filterInputId = `editor-post-taxonomies__hierarchical-terms-filter-${ instanceId }`;
+		const filterLabel = sprintf(
+			_x( 'Search %s', 'term' ),
+			get(
+				this.props.taxonomy,
+				[ 'name' ],
+				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
+			)
+		);
+		const groupLabel = sprintf(
+			_x( 'Available %s', 'term' ),
+			get(
+				this.props.taxonomy,
+				[ 'name' ],
+				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
+			)
+		);
+		const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
-		/* eslint-disable jsx-a11y/no-onchange */
 		return [
-			...this.renderTerms( availableTermsTree ),
+			showFilter && <label
+				key="filter-label"
+				htmlFor={ filterInputId }>
+				{ filterLabel }
+			</label>,
+			showFilter && <input
+				type="search"
+				id={ filterInputId }
+				value={ filterValue }
+				onChange={ this.setFilterValue }
+				className="editor-post-taxonomies__hierarchical-terms-filter"
+				key="term-filter-input"
+			/>,
+			<div
+				className="editor-post-taxonomies__hierarchical-terms-list"
+				key="term-list"
+				tabIndex="0"
+				role="group"
+				aria-label={ groupLabel }
+			>
+				{ this.renderTerms( '' !== filterValue ? filteredTermsTree : availableTermsTree ) }
+			</div>,
 			! loading && hasCreateAction && (
 				<Button
 					key="term-add-button"
@@ -336,4 +480,5 @@ export default compose( [
 	} ) ),
 	withSpokenMessages,
 	withInstanceId,
+	withFilters( 'editor.PostTaxonomyType' ),
 ] )( HierarchicalTermSelector );

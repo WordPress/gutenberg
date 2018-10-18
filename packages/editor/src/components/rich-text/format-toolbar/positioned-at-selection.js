@@ -53,11 +53,11 @@ class PositionedAtSelection extends Component {
 	}
 
 	render() {
-		const { className, children } = this.props;
+		const { children } = this.props;
 		const { style } = this.state;
 
 		return (
-			<div className={ className } style={ style }>
+			<div className="editor-format-toolbar__selection-position" style={ style }>
 				{ children }
 			</div>
 		);

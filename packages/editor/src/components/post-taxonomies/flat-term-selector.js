@@ -2,17 +2,17 @@
  * External dependencies
  */
 import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash';
-import { stringify } from 'querystring';
 
 /**
  * WordPress dependencies
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { FormTokenField } from '@wordpress/components';
+import { FormTokenField, withFilters } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Module constants
@@ -77,7 +77,9 @@ class FlatTermSelector extends Component {
 	fetchTerms( params = {} ) {
 		const { taxonomy } = this.props;
 		const query = { ...DEFAULT_QUERY, ...params };
-		const request = apiFetch( { path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( query ) }` } );
+		const request = apiFetch( {
+			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query ),
+		} );
 		request.then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
@@ -116,7 +118,7 @@ class FlatTermSelector extends Component {
 			if ( errorCode === 'term_exists' ) {
 				// If the terms exist, fetch it instead of creating a new one.
 				this.addRequest = apiFetch( {
-					path: `/wp/v2/${ taxonomy.rest_base }?${ stringify( { ...DEFAULT_QUERY, search: termName } ) }`,
+					path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, { ...DEFAULT_QUERY, search: termName } ),
 				} );
 				return this.addRequest.then( ( searchResult ) => {
 					return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
@@ -171,7 +173,7 @@ class FlatTermSelector extends Component {
 
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
-		const newTermPlaceholderLabel = get(
+		const newTermLabel = get(
 			taxonomy,
 			[ 'data', 'labels', 'add_new_item' ],
 			slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' )
@@ -194,7 +196,7 @@ class FlatTermSelector extends Component {
 				onInputChange={ this.searchTerms }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 				disabled={ loading }
-				placeholder={ newTermPlaceholderLabel }
+				label={ newTermLabel }
 				messages={ {
 					added: termAddedLabel,
 					removed: termRemovedLabel,
@@ -223,5 +225,6 @@ export default compose(
 				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
 			},
 		};
-	} )
+	} ),
+	withFilters( 'editor.PostTaxonomyType' ),
 )( FlatTermSelector );

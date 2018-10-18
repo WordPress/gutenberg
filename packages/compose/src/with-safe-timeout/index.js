@@ -14,11 +14,6 @@ import { Component } from '@wordpress/element';
 import createHigherOrderComponent from '../create-higher-order-component';
 
 /**
- * Browser dependencies
- */
-const { clearTimeout, setTimeout } = window;
-
-/**
  * A higher-order component used to provide and manage delayed function calls
  * that ought to be bound to a component's lifecycle.
  *

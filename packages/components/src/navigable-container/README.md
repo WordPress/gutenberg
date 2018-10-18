@@ -1,5 +1,4 @@
-NavigableContainers
-=============
+# NavigableContainers
 
 `NavigableContainer` is a React component to render a container navigable using the keyboard. Only things that are focusable can be navigated to. It will currently always be a `div`.
 
@@ -38,28 +37,7 @@ The orientation of the menu. It could be "vertical", "horizontal" or "both"
 
 ### NavigableMenu
 
-
 A NavigableMenu allows movement up and down (or left and right) the component via the arrow keys. The `tab` key is not handled. The `orientation` prop is used to determine whether the arrow keys used are vertical, horizontal or both.
-
-### Usage
-
-```jsx
-import { NavigableMenu, Button } from '@wordpress/components';
-
-function onNavigate( index, target ) {
-	// ....
-}
-
-function MyMenu() {
-	return (
-		<NavigableMenu onNavigate={ onNavigate }>
-			<Button>My Button 1</Button>
-			<Button>My Button 2</Button>
-			<Button>My Button 3</Button>
-		</NavigableMenu>
-	);
-}
-```
 
 ### TabbableContainer
 
@@ -68,20 +46,28 @@ A `TabbableContainer` will only be navigated using the `tab` key. Every intended
 ### Usage
 
 ```jsx
-import { TabbableContainer, Button } from '@wordpress/components';
+import { NavigableMenu, TabbableContainer, Button } from '@wordpress/components';
 
 function onNavigate( index, target ) {
-	// ....
+	console.log( `Navigates to ${ index }`, target );
 }
 
-function MyContainer() {
-	return (
+const MyNavigableContainer = () => (
+	<div>
+		<span>Navigable Menu:</span>
+		<NavigableMenu onNavigate={ onNavigate } orientation="horizontal">
+			<Button isDefault>Item 1</Button>
+			<Button isDefault>Item 2</Button>
+			<Button isDefault>Item 3</Button>
+		</NavigableMenu>
+		
+		<span>Tabbable Container:</span>
 		<TabbableContainer onNavigate={ onNavigate }>
-			<div tabIndex="0">Section 1</div>
-			<div tabIndex="0">Section 2</div>
-			<div tabIndex="0">Section 3</div>
-			<div tabIndex="0">Section 4</div>
+			<Button isDefault tabIndex="0">Section 1</Button>
+			<Button isDefault tabIndex="0">Section 2</Button>
+			<Button isDefault tabIndex="0">Section 3</Button>
+			<Button isDefault tabIndex="0">Section 4</Button>
 		</TabbableContainer>
-	);
-}
+	</div>
+);
 ```

@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { IconButton } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -73,19 +72,6 @@ class URLInputButton extends Component {
 				}
 			</div>
 		);
-	}
-}
-
-export class UrlInputButton extends URLInputButton {
-	constructor() {
-		super( ...arguments );
-
-		deprecated( 'wp.editor.UrlInputButton', {
-			alternative: 'wp.editor.URLInputButton',
-			plugin: 'Gutenberg',
-			version: 'v3.4',
-			hint: 'The component has been renamed.',
-		} );
 	}
 }
 

@@ -3,12 +3,12 @@
 	display: block;
 	font-size: $default-font-size;
 	background: $white;
-	padding: ( $panel-padding * 2 ) $panel-padding;
+	padding: ($panel-padding * 2) $panel-padding;
 	text-align: center;
 }
 
 .editor-block-inspector__multi-blocks {
-	border-bottom: 1px solid $light-gray-500;
+	border-bottom: $border-width solid $light-gray-500;
 }
 
 .editor-block-inspector__card {
@@ -19,7 +19,7 @@
 }
 
 .editor-block-inspector__card-icon {
-	border: 1px solid $light-gray-700;
+	border: $border-width solid $light-gray-700;
 	padding: 7px;
 	margin-right: 10px;
 	height: 36px;
@@ -39,7 +39,11 @@
 	font-size: $default-font-size;
 }
 
-.editor-block-inspector__card .editor-block-icon__colors {
+.editor-block-inspector__card .editor-block-icon {
 	margin-left: -2px;
 	margin-right: 10px;
+	padding: 0 3px;
+	width: $icon-button-size;
+	height: $icon-button-size-small;
 }
+

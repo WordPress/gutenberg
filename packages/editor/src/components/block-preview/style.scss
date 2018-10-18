@@ -10,11 +10,11 @@
 
 	.editor-block-preview__content {
 		padding: $block-padding;
-		border: 1px solid $light-gray-500;
+		border: $border-width solid $light-gray-500;
 		font-family: $editor-font;
 
 		> div {
-			transform: scale( 0.9 );
+			transform: scale(0.9);
 			transform-origin: center top;
 			font-family: $editor-font;
 		}

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get, isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import { compose, createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getColorValue, getColorClass } from './utils';
+import { getColorClassName, getColorObjectByColorValue, getColorObjectByAttributeValues, getMostReadableColor } from './utils';
 
 const DEFAULT_COLORS = [];
 
@@ -54,8 +54,16 @@ export default ( ...args ) => {
 						super( props );
 
 						this.setters = this.createSetters();
+						this.colorUtils = {
+							getMostReadableColor: this.getMostReadableColor.bind( this ),
+						};
 
 						this.state = {};
+					}
+
+					getMostReadableColor( colorValue ) {
+						const { colors } = this.props;
+						return getMostReadableColor( colors, colorValue );
 					}
 
 					createSetters() {
@@ -70,7 +78,7 @@ export default ( ...args ) => {
 
 					createSetColor( colorAttributeName, customColorAttributeName ) {
 						return ( colorValue ) => {
-							const colorObject = find( this.props.colors, { color: colorValue } );
+							const colorObject = getColorObjectByColorValue( this.props.colors, colorValue );
 							this.props.setAttributes( {
 								[ colorAttributeName ]: colorObject && colorObject.slug ? colorObject.slug : undefined,
 								[ customColorAttributeName ]: colorObject && colorObject.slug ? undefined : colorValue,
@@ -80,26 +88,25 @@ export default ( ...args ) => {
 
 					static getDerivedStateFromProps( { attributes, colors }, previousState ) {
 						return reduce( colorMap, ( newState, colorContext, colorAttributeName ) => {
-							const colorName = attributes[ colorAttributeName ];
-							const colorValue = getColorValue(
+							const colorObject = getColorObjectByAttributeValues(
 								colors,
-								colorName,
-								attributes[ `custom${ upperFirst( colorAttributeName ) }` ]
+								attributes[ colorAttributeName ],
+								attributes[ `custom${ upperFirst( colorAttributeName ) }` ],
 							);
+
 							const previousColorObject = previousState[ colorAttributeName ];
-							const previousColorValue = get( previousColorObject, [ 'value' ] );
+							const previousColor = get( previousColorObject, [ 'color' ] );
 							/**
 							* The "and previousColorObject" condition checks that a previous color object was already computed.
 							* At the start previousColorObject and colorValue are both equal to undefined
 							* bus as previousColorObject does not exist we should compute the object.
 							*/
-							if ( previousColorValue === colorValue && previousColorObject ) {
+							if ( previousColor === colorObject.color && previousColorObject ) {
 								newState[ colorAttributeName ] = previousColorObject;
 							} else {
 								newState[ colorAttributeName ] = {
-									name: colorName,
-									class: getColorClass( colorContext, colorName ),
-									value: colorValue,
+									...colorObject,
+									class: getColorClassName( colorContext, colorObject.slug ),
 								};
 							}
 							return newState;
@@ -114,6 +121,7 @@ export default ( ...args ) => {
 									colors: undefined,
 									...this.state,
 									...this.setters,
+									colorUtils: this.colorUtils,
 								} }
 							/>
 						);

@@ -21,7 +21,7 @@ function TableOfContents( { hasBlocks } ) {
 					onClick={ onToggle }
 					icon="info-outline"
 					aria-expanded={ isOpen }
-					label={ __( 'Content Structure' ) }
+					label={ __( 'Content structure' ) }
 					disabled={ ! hasBlocks }
 				/>
 			) }

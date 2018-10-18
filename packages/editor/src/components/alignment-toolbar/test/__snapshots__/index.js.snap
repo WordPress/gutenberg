@@ -27,5 +27,7 @@ exports[`AlignmentToolbar should match snapshot 1`] = `
       },
     ]
   }
+  icon="editor-alignleft"
+  label="Change Text Alignment"
 />
 `;

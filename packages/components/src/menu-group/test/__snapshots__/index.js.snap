@@ -14,9 +14,7 @@ exports[`MenuGroup should match snapshot 1`] = `
     aria-labelledby="components-menu-group-label-1"
     orientation="vertical"
   >
-    <p
-      key=".0"
-    >
+    <p>
       My item
     </p>
   </NavigableMenu>

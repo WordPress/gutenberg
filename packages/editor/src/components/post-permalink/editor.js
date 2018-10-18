@@ -49,7 +49,7 @@ class PostPermalinkEditor extends Component {
 				className="editor-post-permalink-editor"
 				onSubmit={ this.onSavePermalink }
 			>
-				<span>
+				<span className="editor-post-permalink__editor-container">
 					<span className="editor-post-permalink-editor__prefix">
 						{ prefix }
 					</span>
@@ -71,7 +71,7 @@ class PostPermalinkEditor extends Component {
 					isLarge
 					onClick={ this.onSavePermalink }
 				>
-					{ __( 'OK' ) }
+					{ __( 'Save' ) }
 				</Button>
 			</form>
 		);

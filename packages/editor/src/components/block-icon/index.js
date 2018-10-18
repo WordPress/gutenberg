@@ -6,18 +6,26 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Dashicon } from '@wordpress/components';
+import { Dashicon, SVG } from '@wordpress/components';
 import { createElement, Component } from '@wordpress/element';
 
 function renderIcon( icon ) {
 	if ( 'string' === typeof icon ) {
-		return <Dashicon icon={ icon } />;
+		return <Dashicon icon={ icon } size={ 20 } />;
 	} else if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
 			return createElement( icon );
 		}
 
 		return icon();
+	} else if ( icon && icon.type === 'svg' ) {
+		const appliedProps = {
+			...icon.props,
+			width: icon.props.width || 24,
+			height: icon.props.height || 24,
+		};
+
+		return <SVG { ...appliedProps } />;
 	}
 
 	return icon || null;
@@ -25,18 +33,25 @@ function renderIcon( icon ) {
 
 export default function BlockIcon( { icon, showColors = false, className } ) {
 	const renderedIcon = renderIcon( icon && icon.src ? icon.src : icon );
-	if ( showColors ) {
-		return (
-			<div
-				style={ {
-					backgroundColor: icon && icon.background,
-					color: icon && icon.foreground,
-				} }
-				className={ classnames( 'editor-block-icon__colors', className ) }
-			>
-				{ renderedIcon }
-			</div>
-		);
+	const style = showColors ? {
+		backgroundColor: icon && icon.background,
+		color: icon && icon.foreground,
+	} : {};
+
+	if ( ! renderedIcon ) {
+		return null;
 	}
-	return renderedIcon;
+
+	return (
+		<div
+			style={ style }
+			className={ classnames(
+				'editor-block-icon',
+				className,
+				{ 'has-colors': showColors }
+			) }
+		>
+			{ renderedIcon }
+		</div>
+	);
 }

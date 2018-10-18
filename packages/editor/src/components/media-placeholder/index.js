@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, noop } from 'lodash';
+import { every, get, noop, startsWith } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -35,6 +35,33 @@ class MediaPlaceholder extends Component {
 		this.onFilesUpload = this.onFilesUpload.bind( this );
 	}
 
+	getAllowedTypes() {
+		const { allowedTypes, type: deprecatedType } = this.props;
+		let allowedTypesToUse = allowedTypes;
+		if ( ! allowedTypes && deprecatedType ) {
+			deprecated( 'type property of wp.editor.MediaPlaceholder', {
+				version: '4.2',
+				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
+			} );
+			if ( deprecatedType === '*' ) {
+				allowedTypesToUse = undefined;
+			} else {
+				allowedTypesToUse = [ deprecatedType ];
+			}
+		}
+		return allowedTypesToUse;
+	}
+
+	onlyAllowsImages() {
+		const allowedTypes = this.getAllowedTypes();
+		if ( ! allowedTypes ) {
+			return false;
+		}
+		return every( allowedTypes, ( allowedType ) => {
+			return allowedType === 'image' || startsWith( allowedType, 'image/' );
+		} );
+	}
+
 	componentDidMount() {
 		this.setState( { src: get( this.props.value, [ 'src' ], '' ) } );
 	}
@@ -53,26 +80,8 @@ class MediaPlaceholder extends Component {
 
 	onSubmitSrc( event ) {
 		event.preventDefault();
-		if ( this.state.src ) {
-			if ( this.props.onSelectUrl ) {
-				// TODO: In removing deprecation, ensure to simplify rendering
-				// to avoid checking for `onSelectUrl`. It also allows this
-				// function to be simplified to avoid truthiness test on
-				// `onSelectURL`, since it's required for the form invoking
-				// this function to be rendered at all.
-				deprecated( 'MediaPlaceholder `onSelectUrl` prop', {
-					alternative: '`onSelectURL` prop',
-					plugin: 'Gutenberg',
-					version: 'v3.5',
-					hint: 'The prop has been renamed.',
-				} );
-
-				this.props.onSelectUrl( this.state.src );
-			}
-
-			if ( this.props.onSelectURL ) {
-				this.props.onSelectURL( this.state.src );
-			}
+		if ( this.state.src && this.props.onSelectURL ) {
+			this.props.onSelectURL( this.state.src );
 		}
 	}
 
@@ -81,10 +90,11 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, type, multiple, onError } = this.props;
+		const { onSelect, multiple, onError } = this.props;
+		const allowedTypes = this.getAllowedTypes();
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
-			allowedType: type,
+			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
@@ -93,7 +103,6 @@ class MediaPlaceholder extends Component {
 
 	render() {
 		const {
-			type,
 			accept,
 			icon,
 			className,
@@ -101,12 +110,11 @@ class MediaPlaceholder extends Component {
 			onSelect,
 			value = {},
 			onSelectURL,
-			onSelectUrl,
 			onHTMLDrop = noop,
 			multiple = false,
 			notices,
 		} = this.props;
-
+		const allowedTypes = this.getAllowedTypes();
 		return (
 			<Placeholder
 				icon={ icon }
@@ -120,7 +128,7 @@ class MediaPlaceholder extends Component {
 					onFilesDrop={ this.onFilesUpload }
 					onHTMLDrop={ onHTMLDrop }
 				/>
-				{ ( onSelectUrl || onSelectURL ) && (
+				{ onSelectURL && (
 					<form onSubmit={ this.onSubmitSrc }>
 						<input
 							type="url"
@@ -147,10 +155,10 @@ class MediaPlaceholder extends Component {
 					{ __( 'Upload' ) }
 				</FormFileUpload>
 				<MediaUpload
-					gallery={ multiple }
+					gallery={ multiple && this.onlyAllowsImages() }
 					multiple={ multiple }
 					onSelect={ onSelect }
-					type={ type }
+					allowedTypes={ allowedTypes }
 					value={ value.id }
 					render={ ( { open } ) => (
 						<Button isLarge onClick={ open }>

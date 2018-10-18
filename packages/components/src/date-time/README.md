@@ -1,5 +1,4 @@
-DateTimePicker
-=======
+# DateTimePicker
 
 DateTimePicker is a React component to render a calendar and clock for selecting a date and time. The calendar and clock components can be accessed individually using the `DatePicker` and `TimePicker` components respectively.
 
@@ -10,11 +9,14 @@ Render a DateTimePicker.
 ```jsx
 import { DateTimePicker } from '@wordpress/components';
 import { getSettings } from '@wordpress/date';
+import { withState } from '@wordpress/compose';
 
-function selectTime( date, onUpdateDate ) {
+const MyDateTimePicker = withState( {
+	date: new Date(),
+} )( ( { date, setState } ) => {
 	const settings = getSettings();
 
-	// To know if the current timezone is a 12 hour time with look for "a" in the time format.
+	// To know if the current timezone is a 12 hour time with look for an "a" in the time format.
 	// We also make sure this a is not escaped by a "/".
 	const is12HourTime = /a(?!\\)/i.test(
 		settings.formats.time
@@ -25,13 +27,13 @@ function selectTime( date, onUpdateDate ) {
 
 	return (
 		<DateTimePicker
-		    currentDate={ date }
-		    onChange={ onUpdateDate }
-		    locale={ settings.l10n.locale }
-		    is12Hour={ is12HourTime }
-		    />
+			currentDate={ date }
+			onChange={ ( date ) => setState( { date } ) }
+			locale={ settings.l10n.locale }
+			is12Hour={ is12HourTime }
+		/>
 	);
-}
+} );
 ```
 
 ## Props
@@ -62,7 +64,7 @@ The localization for the display of the date and time.
 
 ### is12Hour
 
-Whether the current timezone is a 12 hour time.
+Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY.
 
 - Type: `bool`
 - Required: No

@@ -15,25 +15,11 @@ const { basename } = require( 'path' );
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 
 // Main CSS loader for everything but blocks..
 const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
 	filename: './build/[basename]/style.css',
-} );
-
-// CSS loader for styles specific to block editing.
-const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/core-blocks/edit-blocks.css',
-} );
-
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/core-blocks/style.css',
-} );
-
-// CSS loader for default visual block styles.
-const themeBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/core-blocks/theme.css',
 } );
 
 // Configuration for the ExtractTextPlugin.
@@ -49,7 +35,7 @@ const extractConfig = {
 		{
 			loader: 'sass-loader',
 			query: {
-				includePaths: [ 'edit-post/assets/stylesheets' ],
+				includePaths: [ 'assets/stylesheets' ],
 				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
 				outputStyle: 'production' === process.env.NODE_ENV ?
 					'compressed' : 'nested',
@@ -77,9 +63,6 @@ function camelCaseDash( string ) {
 
 const entryPointNames = [
 	'components',
-	'utils',
-	'edit-post',
-	'core-blocks',
 ];
 
 const gutenbergPackages = [
@@ -88,6 +71,8 @@ const gutenbergPackages = [
 	'autop',
 	'blob',
 	'blocks',
+	'block-library',
+	'block-serialization-default-parser',
 	'block-serialization-spec-parser',
 	'compose',
 	'core-data',
@@ -96,16 +81,22 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'dom-ready',
+	'edit-post',
 	'editor',
 	'element',
+	'escape-html',
 	'hooks',
 	'html-entities',
 	'i18n',
 	'is-shallow-equal',
 	'keycodes',
+	'list-reusable-blocks',
 	'nux',
 	'plugins',
+	'redux-routine',
+	'rich-text',
 	'shortcode',
+	'token-list',
 	'url',
 	'viewport',
 	'wordcount',
@@ -130,9 +121,11 @@ const externals = {
 	};
 } );
 
-const config = {
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+const isProduction = process.env.NODE_ENV === 'production';
+const mode = isProduction ? 'production' : 'development';
 
+const config = {
+	mode,
 	entry: Object.assign(
 		entryPointNames.reduce( ( memo, path ) => {
 			const name = camelCaseDash( path );
@@ -165,6 +158,11 @@ const config = {
 		rules: [
 			{
 				test: /\.js$/,
+				use: [ 'source-map-loader' ],
+				enforce: 'pre',
+			},
+			{
+				test: /\.js$/,
 				exclude: [
 					/block-serialization-spec-parser/,
 					/is-shallow-equal/,
@@ -173,39 +171,12 @@ const config = {
 				use: 'babel-loader',
 			},
 			{
-				test: /style\.s?css$/,
-				include: [
-					/core-blocks/,
-				],
-				use: blocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /editor\.s?css$/,
-				include: [
-					/core-blocks/,
-				],
-				use: editBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /theme\.s?css$/,
-				include: [
-					/core-blocks/,
-				],
-				use: themeBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
 				test: /\.s?css$/,
-				exclude: [
-					/core-blocks/,
-				],
 				use: mainCSSExtractTextPlugin.extract( extractConfig ),
 			},
 		],
 	},
 	plugins: [
-		blocksCSSPlugin,
-		editBlocksCSSPlugin,
-		themeBlocksCSSPlugin,
 		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
@@ -238,6 +209,7 @@ const config = {
 			'api-fetch',
 			'deprecated',
 			'dom-ready',
+			'redux-routine',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
@@ -258,18 +230,22 @@ const config = {
 				},
 			} ) )
 		),
-	],
+		// GUTENBERG_BUNDLE_ANALYZER global variable enables utility that represents bundle content
+		// as convenient interactive zoomable treemap.
+		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		// GUTENBERG_LIVE_RELOAD_PORT global variable changes port on which live reload works
+		// when running watch mode.
+		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
+	].filter( Boolean ),
 	stats: {
 		children: false,
 	},
 };
 
-if ( config.mode !== 'production' ) {
-	config.devtool = process.env.SOURCEMAP || 'source-map';
-}
-
-if ( config.mode === 'development' ) {
-	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
+if ( ! isProduction ) {
+	// GUTENBERG_DEVTOOL global variable controls how source maps are generated.
+	// See: https://webpack.js.org/configuration/devtool/#devtool.
+	config.devtool = process.env.GUTENBERG_DEVTOOL || 'source-map';
 }
 
 module.exports = config;

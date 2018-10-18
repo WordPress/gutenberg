@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
-import apiRequest from '@wordpress/api-request';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -17,7 +17,6 @@ import PostAuthorCheck from './check';
  */
 import Autocomplete from 'accessible-autocomplete/react';
 
-import './accessible-autocomplete.css';
 import { findWhere, debounce } from 'underscore';
 
 export class PostAuthor extends Component {
@@ -33,19 +32,25 @@ export class PostAuthor extends Component {
 			return;
 		}
 		const payload = '?search=' + encodeURIComponent( query );
-		apiRequest( { path: '/wp/v2/users' + payload } ).done( ( results ) => {
+		apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
 			this.authors = results;
 			populateResults( results.map( ( author ) => ( author.name ) ) );
 		} );
 	}
 
-	setAuthorId( selectedName ) {
-		if ( ! selectedName ) {
+	setAuthorId( selection ) {
+		if ( ! selection ) {
 			return;
 		}
 		const { onUpdateAuthor } = this.props;
-		const author = findWhere( this.authors, { name: selectedName } );
-		onUpdateAuthor( Number( author.id ) );
+		if ( typeof selection === 'string' ) {
+			// Author name from the autocompleter.
+			const author = findWhere( this.authors, { name: selection } );
+			onUpdateAuthor( Number( author.id ) );
+		} else {
+			// Author ID from the select.
+			onUpdateAuthor( Number( selection.target.value ) );
+		}
 	}
 
 	render() {
@@ -58,11 +63,13 @@ export class PostAuthor extends Component {
 		}
 
 		if ( authors.length < 50 ) {
+			/* eslint-disable jsx-a11y/no-onchange */
 			selector =
 				<select
 					id={ selectId }
 					value={ postAuthorId }
 					className="editor-post-author__select"
+					onChange={ this.setAuthorId }
 				>
 					{ authors.map( ( author ) => (
 						<option key={ author.id } value={ author.id }>{ author.name }</option>
@@ -95,7 +102,6 @@ export class PostAuthor extends Component {
 				/>;
 		}
 
-		/* eslint-disable jsx-a11y/no-onchange */
 		return (
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>

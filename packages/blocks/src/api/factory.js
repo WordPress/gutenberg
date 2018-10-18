@@ -41,12 +41,23 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const attributes = reduce( blockType.attributes, ( result, source, key ) => {
+	const attributes = reduce( blockType.attributes, ( result, schema, key ) => {
 		const value = blockAttributes[ key ];
+
 		if ( undefined !== value ) {
 			result[ key ] = value;
-		} else if ( source.hasOwnProperty( 'default' ) ) {
-			result[ key ] = source.default;
+		} else if ( schema.hasOwnProperty( 'default' ) ) {
+			result[ key ] = schema.default;
+		}
+
+		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+			// Ensure value passed is always an array, which we're expecting in
+			// the RichText component to handle the deprecated value.
+			if ( typeof result[ key ] === 'string' ) {
+				result[ key ] = [ result[ key ] ];
+			} else if ( ! Array.isArray( result[ key ] ) ) {
+				result[ key ] = [];
+			}
 		}
 
 		return result;
@@ -58,8 +69,6 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 	// attributes, and their inner blocks.
 	return {
 		clientId,
-		// TODO: Remove from block interface in 3.5 "UID" deprecation.
-		uid: clientId,
 		name,
 		isValid: true,
 		attributes,
@@ -83,8 +92,6 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	return {
 		...block,
 		clientId,
-		// TODO: Remove from block interface in 3.5 "UID" deprecation.
-		uid: uuid(),
 		attributes: {
 			...block.attributes,
 			...mergeAttributes,

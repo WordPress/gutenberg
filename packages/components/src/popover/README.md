@@ -8,23 +8,26 @@ Popover is a React component to render a floating content modal. It is similar i
 Render a Popover within the parent to which it should anchor:
 
 ```jsx
-import { Popover } from '@wordpress/components';
+import { Button, Popover } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-function ToggleButton( { isVisible, toggleVisible } ) {
+const MyPopover = withState( {
+	isVisible: false,
+} )( ( { isVisible, setState } ) => {
+	const toggleVisible = () => {
+		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
+	};
 	return (
-		<button onClick={ toggleVisible }>
+		<Button isDefault onClick={ toggleVisible }>
 			Toggle Popover!
 			{ isVisible && (
-				<Popover
-					onClose={ toggleVisible }
-					onClick={ ( event ) => event.stopPropagation() }
-				>
+				<Popover>
 					Popover is toggled!
 				</Popover>
 			) }
-		</button>
+		</Button>
 	);
-}
+} );
 ```
 
 If a Popover is returned by your component, it will be shown. To hide the popover, simply omit it from your component's render value.
@@ -56,8 +59,6 @@ The component accepts the following props. Props not included in this set will b
 By default, the *first tabblable element* in the popover will receive focus when it mounts. This is the same as setting `focusOnMount` to `"firstElement"`. If you want to focus the container instead, you can set `focusOnMount` to `"container"`.
 
 Set this prop to `false` to disable focus changing entirely. This should only be set when an appropriately accessible substitute behavior exists.
-
-**Deprecation notice:** Before Gutenberg 3.2 this value was `Boolean` and the value `true` was equivalent to `"firstElement"`. This behaviour is deprecated and will cause a console warning message.
 
 - Type: `String` or `Boolean`
 - Required: No

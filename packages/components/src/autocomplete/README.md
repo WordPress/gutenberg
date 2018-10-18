@@ -1,5 +1,4 @@
-Autocomplete
-============
+# Autocomplete
 
 This component is used to provide autocompletion support for a child input component.
 
@@ -105,33 +104,59 @@ Whether to apply debouncing for the autocompleter. Set to true to enable debounc
 - Type: `Boolean`
 - Required: No
 
-### Examples
+## Usage
 
 The following is a contrived completer for fresh fruit.
 
 ```jsx
-const fruitCompleter = {
-	name: 'fruit',
-	// The prefix that triggers this completer
-	triggerPrefix: '~',
-	// The option data
-	options: [
-		{ visual: '🍎', name: 'Apple' },
-		{ visual: '🍊', name: 'Orange' },
-		{ visual: '🍇', name: 'Grapes' },
-	],
-	// Returns a label for an option like "🍊 Orange"
-	getOptionLabel: option => [
-		<span class="icon">{ option.visual }</span>,
-		option.name
-	],
-	// Declares that options should be matched by their name
-	getOptionKeywords: option => [ option.name ],
-	// Declares that the Grapes option is disabled
-	isOptionDisabled: option => option.name === 'Grapes',
-	// Declares completions should be inserted as abbreviations
-	getOptionCompletion: option => (
-		<abbr title={ option.name }>{ option.visual }</abbr>
-	),
+import { Autocomplete } from '@wordpress/components';
+
+const MyAutocomplete = () => {
+	const autocompleters = [
+		{
+			name: 'fruit',
+			// The prefix that triggers this completer
+			triggerPrefix: '~',
+			// The option data
+			options: [
+				{ visual: '🍎', name: 'Apple', id: 1 },
+				{ visual: '🍊', name: 'Orange', id: 2 },
+				{ visual: '🍇', name: 'Grapes', id: 3 },
+			],
+			// Returns a label for an option like "🍊 Orange"
+			getOptionLabel: option => (
+				<span>
+					<span className="icon" >{ option.visual }</span>{ option.name }
+				</span>
+			),
+			// Declares that options should be matched by their name
+			getOptionKeywords: option => [ option.name ],
+			// Declares that the Grapes option is disabled
+			isOptionDisabled: option => option.name === 'Grapes',
+			// Declares completions should be inserted as abbreviations
+			getOptionCompletion: option => (
+				<abbr title={ option.name }>{ option.visual }</abbr>
+			),
+		}
+	];
+		
+	return (
+		<div>
+			<Autocomplete completers={ autocompleters }>
+				{ ( { isExpanded, listBoxId, activeId } ) => (
+					<div
+						contentEditable
+						suppressContentEditableWarning
+						aria-autocomplete="list"
+						aria-expanded={ isExpanded }
+						aria-owns={ listBoxId }
+						aria-activedescendant={ activeId }
+					>
+					</div>
+				) }
+			</Autocomplete>
+			<p>Type ~ for triggering the autocomplete.</p>
+		</div>
+	);
 };
 ```

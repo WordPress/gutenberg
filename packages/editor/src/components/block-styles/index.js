@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get } from 'lodash';
+import { find, get, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -11,6 +11,7 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
+import TokenList from '@wordpress/token-list';
 
 /**
  * Internal dependencies
@@ -26,23 +27,19 @@ import { BlockPreviewContent } from '../block-preview';
  * @return {Object?} The active style.
  */
 export function getActiveStyle( styles, className ) {
-	let activeStyle;
-	className
-		.split( ' ' )
-		.map( ( current ) => current.trim() )
-		.filter( ( current ) => current.indexOf( 'is-style-' ) === 0 )
-		.forEach( ( current ) => {
-			if ( activeStyle ) {
-				return;
-			}
-			const potentialStyleName = current.substring( 9 );
-			activeStyle = find( styles, ( style ) => style.name === potentialStyleName );
-		} );
-	if ( ! activeStyle ) {
-		activeStyle = find( styles, ( style ) => style.isDefault );
+	for ( const style of new TokenList( className ).values() ) {
+		if ( style.indexOf( 'is-style-' ) === -1 ) {
+			continue;
+		}
+
+		const potentialStyleName = style.substring( 9 );
+		const activeStyle = find( styles, { name: potentialStyleName } );
+		if ( activeStyle ) {
+			return activeStyle;
+		}
 	}
 
-	return activeStyle;
+	return find( styles, 'isDefault' );
 }
 
 /**
@@ -55,22 +52,15 @@ export function getActiveStyle( styles, className ) {
  * @return {string} The updated className.
  */
 export function replaceActiveStyle( className, activeStyle, newStyle ) {
-	let added = false;
-	let updatedClassName = compact( className
-		.split( ' ' )
-		.map( ( current ) => {
-			const trimmed = current.trim();
-			if ( activeStyle && trimmed === 'is-style-' + activeStyle.name ) {
-				added = true;
-				return newStyle.isDefault ? null : 'is-style-' + newStyle.name;
-			}
-			return trimmed;
-		} ) ).join( ' ' );
-	if ( ! added && ! newStyle.isDefault ) {
-		updatedClassName = updatedClassName + ' is-style-' + newStyle.name;
+	const list = new TokenList( className );
+
+	if ( activeStyle ) {
+		list.remove( 'is-style-' + activeStyle.name );
 	}
 
-	return updatedClassName;
+	list.add( 'is-style-' + newStyle.name );
+
+	return list.value;
 }
 
 function BlockStyles( {
@@ -79,8 +69,8 @@ function BlockStyles( {
 	onChangeClassName,
 	name,
 	attributes,
-	onSwitch,
-	onHoverClassName,
+	onSwitch = noop,
+	onHoverClassName = noop,
 } ) {
 	if ( ! styles ) {
 		return null;

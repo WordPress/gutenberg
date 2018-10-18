@@ -1,0 +1,14 @@
+[
+    {
+        "blockName": "core/more",
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n<!--more-->\n"
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n"
+    }
+]

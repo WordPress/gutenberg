@@ -94,15 +94,54 @@ export function isHorizontalEdge( container, isReverse ) {
 		range.collapse( ! isSelectionForward( selection ) );
 	}
 
-	const { endContainer, endOffset } = range;
-	range.selectNodeContents( container );
-	range.setEnd( endContainer, endOffset );
+	let node = range.startContainer;
 
-	// Check if the caret position is at the expected start/end position based
-	// on the value of `isReverse`. If so, consider the horizontal edge to be
-	// reached.
-	const caretOffset = range.toString().length;
-	return caretOffset === ( isReverse ? 0 : container.textContent.length );
+	let extentOffset;
+	if ( isReverse ) {
+		// When in reverse, range node should be first.
+		extentOffset = 0;
+	} else if ( node.nodeValue ) {
+		// Otherwise, vary by node type. A text node has no children. Its range
+		// offset reflects its position in nodeValue.
+		//
+		// "If the startContainer is a Node of type Text, Comment, or
+		// CDATASection, then the offset is the number of characters from the
+		// start of the startContainer to the boundary point of the Range."
+		//
+		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
+		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
+		extentOffset = node.nodeValue.length;
+	} else {
+		// "For other Node types, the startOffset is the number of child nodes
+		// between the start of the startContainer and the boundary point of
+		// the Range."
+		//
+		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
+		extentOffset = node.childNodes.length;
+	}
+
+	// Offset of range should be at expected extent.
+	const position = isReverse ? 'start' : 'end';
+	const offset = range[ `${ position }Offset` ];
+	if ( offset !== extentOffset ) {
+		return false;
+	}
+
+	// If confirmed to be at extent, traverse up through DOM, verifying that
+	// the node is at first or last child for reverse or forward respectively.
+	// Continue until container is reached.
+	const order = isReverse ? 'first' : 'last';
+	while ( node !== container ) {
+		const parentNode = node.parentNode;
+		if ( parentNode[ `${ order }Child` ] !== node ) {
+			return false;
+		}
+
+		node = parentNode;
+	}
+
+	// If reached, range is assumed to be at edge.
+	return true;
 }
 
 /**
@@ -227,8 +266,9 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
+	container.focus();
+
 	if ( ! container.isContentEditable ) {
-		container.focus();
 		return;
 	}
 
@@ -236,6 +276,12 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 	// avoids the selection always being `endOffset` of 1 when placed at end,
 	// where `startContainer`, `endContainer` would always be container itself.
 	const rangeTarget = container[ isReverse ? 'lastChild' : 'firstChild' ];
+
+	// If no range target, it implies that the container is empty. Focusing is
+	// sufficient for caret to be placed correctly.
+	if ( ! rangeTarget ) {
+		return;
+	}
 
 	const selection = window.getSelection();
 	const range = document.createRange();
@@ -245,8 +291,6 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 
 	selection.removeAllRanges();
 	selection.addRange( range );
-
-	container.focus();
 }
 
 /**

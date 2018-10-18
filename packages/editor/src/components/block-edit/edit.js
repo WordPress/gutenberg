@@ -28,14 +28,7 @@ export const Edit = ( props ) => {
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
 
-	// TODO: `id` prop is to be removed in 3.5 "UID" deprecation.
-	return (
-		<Component
-			{ ...props }
-			id={ props.clientId }
-			className={ className }
-		/>
-	);
+	return <Component { ...props } className={ className } />;
 };
 
 export default withFilters( 'editor.BlockEdit' )( Edit );
