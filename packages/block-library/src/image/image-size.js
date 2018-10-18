@@ -10,8 +10,8 @@ import { withGlobalEvents } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 
 export function getEditorWidth() {
-	const node = document.querySelector( 'div.editor-block-list__block-edit' );
-	return node && node.clientWidth;
+	const node = document.querySelector( 'div.editor-block-list__block' );
+	return node && node.clientWidth - 30;
 }
 
 class ImageSize extends Component {

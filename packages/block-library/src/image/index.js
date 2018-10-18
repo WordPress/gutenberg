@@ -52,6 +52,18 @@ const blockAttributes = {
 	align: {
 		type: 'string',
 	},
+	width: {
+		type: 'number',
+	},
+	height: {
+		type: 'number',
+	},
+	fileWidth: {
+		type: 'number',
+	},
+	fileHeight: {
+		type: 'number',
+	},
 	scale: {
 		type: 'number',
 		default: 1,
@@ -209,7 +221,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, scale, srcSet, sizes } = attributes;
+		const { url, alt, caption, align, href, width, height, scale, srcSet, sizes } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -222,6 +234,8 @@ export const settings = {
 				alt={ alt }
 				srcSet={ srcSet }
 				sizes={ sizes }
+				width={ width }
+				height={ height }
 			/>
 		);
 
