@@ -35,7 +35,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,6 +46,7 @@ export class Alpha extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.container = createRef();
 		this.increase = this.increase.bind( this );
 		this.decrease = this.decrease.bind( this );
 		this.handleChange = this.handleChange.bind( this );
@@ -143,7 +144,7 @@ export class Alpha extends Component {
 				{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
 				<div
 					className="components-color-picker__alpha-bar"
-					ref={ ( container ) => ( this.container = container ) }
+					ref={ this.container }
 					onMouseDown={ this.handleMouseDown }
 					onTouchMove={ this.handleChange }
 					onTouchStart={ this.handleChange }>
