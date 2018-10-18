@@ -9,54 +9,54 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-/**
- * Registers a block type.
- *
- * @since 0.1.0
- * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
- *
- * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
- *                                   complete WP_Block_Type instance. In case a WP_Block_Type
- *                                   is provided, the $args parameter will be ignored.
- * @param array                $args {
- *     Optional. Array of block type arguments. Any arguments may be defined, however the
- *     ones described below are supported by default. Default empty array.
- *
- *     @type callable $render_callback Callback used to render blocks of this block type.
- * }
- * @return WP_Block_Type|false The registered block type on success, or false on failure.
- */
 if ( ! function_exists( 'register_block_type' ) ) {
+	/**
+	 * Registers a block type.
+	 *
+	 * @since 0.1.0
+	 * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
+	 *
+	 * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
+	 *                                   complete WP_Block_Type instance. In case a WP_Block_Type
+	 *                                   is provided, the $args parameter will be ignored.
+	 * @param array                $args {
+	 *     Optional. Array of block type arguments. Any arguments may be defined, however the
+	 *     ones described below are supported by default. Default empty array.
+	 *
+	 *     @type callable $render_callback Callback used to render blocks of this block type.
+	 * }
+	 * @return WP_Block_Type|false The registered block type on success, or false on failure.
+	 */
 	function register_block_type( $name, $args = array() ) {
 		return WP_Block_Type_Registry::get_instance()->register( $name, $args );
 	}
 }
 
-/**
- * Unregisters a block type.
- *
- * @since 0.1.0
- * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
- *
- * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
- *                                   complete WP_Block_Type instance.
- * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
- */
 if ( ! function_exists( 'unregister_block_type' ) ) {
+	/**
+	 * Unregisters a block type.
+	 *
+	 * @since 0.1.0
+	 * @since 0.6.0 Now also accepts a WP_Block_Type instance as first parameter.
+	 *
+	 * @param string|WP_Block_Type $name Block type name including namespace, or alternatively a
+	 *                                   complete WP_Block_Type instance.
+	 * @return WP_Block_Type|false The unregistered block type on success, or false on failure.
+	 */
 	function unregister_block_type( $name ) {
 		return WP_Block_Type_Registry::get_instance()->unregister( $name );
 	}
 }
 
-/**
- * Parses blocks out of a content string.
- *
- * @since 0.5.0
- *
- * @param  string $content Post content.
- * @return array  Array of parsed block objects.
- */
 if ( ! function_exists( 'gutenberg_parse_blocks' ) ) {
+	/**
+	 * Parses blocks out of a content string.
+	 *
+	 * @since 0.5.0
+	 *
+	 * @param  string $content Post content.
+	 * @return array  Array of parsed block objects.
+	 */
 	function gutenberg_parse_blocks( $content ) {
 		/*
 		 * If there are no blocks in the content, return a single block, rather
@@ -90,12 +90,12 @@ if ( ! function_exists( 'gutenberg_parse_blocks' ) ) {
 	}
 }
 
-/**
- * Returns an array of the names of all registered dynamic block types.
- *
- * @return array Array of dynamic block names.
- */
 if ( ! function_exists( 'get_dynamic_block_names' ) ) {
+	/**
+	 * Returns an array of the names of all registered dynamic block types.
+	 *
+	 * @return array Array of dynamic block names.
+	 */
 	function get_dynamic_block_names() {
 		$dynamic_block_names = array();
 
@@ -110,14 +110,14 @@ if ( ! function_exists( 'get_dynamic_block_names' ) ) {
 	}
 }
 
-/**
- * Retrieve the dynamic blocks regular expression for searching.
- *
- * @since 3.6.0
- *
- * @return string
- */
 if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
+	/**
+	 * Retrieve the dynamic blocks regular expression for searching.
+	 *
+	 * @since 3.6.0
+	 *
+	 * @return string
+	 */
 	function get_dynamic_blocks_regex() {
 		$dynamic_block_names   = get_dynamic_block_names();
 		$dynamic_block_pattern = (
@@ -171,16 +171,16 @@ function gutenberg_render_block( $block ) {
 	return '';
 }
 
-/**
- * Parses dynamic blocks out of `post_content` and re-renders them.
- *
- * @since 0.1.0
- * @global WP_Post $post The post to edit.
- *
- * @param  string $content Post content.
- * @return string          Updated post content.
- */
 if ( ! function_exists( 'do_blocks' ) ) {
+	/**
+	 * Parses dynamic blocks out of `post_content` and re-renders them.
+	 *
+	 * @since 0.1.0
+	 * @global WP_Post $post The post to edit.
+	 *
+	 * @param  string $content Post content.
+	 * @return string          Updated post content.
+	 */
 	function do_blocks( $content ) {
 		global $post;
 
@@ -265,32 +265,32 @@ if ( ! function_exists( 'do_blocks' ) ) {
 	add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
 }
 
-/**
- * Remove all dynamic blocks from the given content.
- *
- * @since 3.6.0
- *
- * @param string $content Content of the current post.
- * @return string
- */
 if ( ! function_exists( 'strip_dynamic_blocks' ) ) {
+	/**
+	 * Remove all dynamic blocks from the given content.
+	 *
+	 * @since 3.6.0
+	 *
+	 * @param string $content Content of the current post.
+	 * @return string
+	 */
 	function strip_dynamic_blocks( $content ) {
 		return preg_replace( get_dynamic_blocks_regex(), '', $content );
 	}
 }
 
-/**
- * Adds the content filter to strip dynamic blocks from excerpts.
- *
- * It's a bit hacky for now, but once this gets merged into core the function
- * can just be called in `wp_trim_excerpt()`.
- *
- * @since 3.6.0
- *
- * @param string $text Excerpt.
- * @return string
- */
 if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
+	/**
+	 * Adds the content filter to strip dynamic blocks from excerpts.
+	 *
+	 * It's a bit hacky for now, but once this gets merged into core the function
+	 * can just be called in `wp_trim_excerpt()`.
+	 *
+	 * @since 3.6.0
+	 *
+	 * @param string $text Excerpt.
+	 * @return string
+	 */
 	function strip_dynamic_blocks_add_filter( $text ) {
 		add_filter( 'the_content', 'strip_dynamic_blocks', 6 ); // Before do_blocks().
 
@@ -299,18 +299,18 @@ if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
 	add_filter( 'get_the_excerpt', 'strip_dynamic_blocks_add_filter', 9 ); // Before wp_trim_excerpt().
 }
 
-/**
- * Removes the content filter to strip dynamic blocks from excerpts.
- *
- * It's a bit hacky for now, but once this gets merged into core the function
- * can just be called in `wp_trim_excerpt()`.
- *
- * @since 3.6.0
- *
- * @param string $text Excerpt.
- * @return string
- */
 if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
+	/**
+	 * Removes the content filter to strip dynamic blocks from excerpts.
+	 *
+	 * It's a bit hacky for now, but once this gets merged into core the function
+	 * can just be called in `wp_trim_excerpt()`.
+	 *
+	 * @since 3.6.0
+	 *
+	 * @param string $text Excerpt.
+	 * @return string
+	 */
 	function strip_dynamic_blocks_remove_filter( $text ) {
 		remove_filter( 'the_content', 'strip_dynamic_blocks', 8 );
 

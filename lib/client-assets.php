@@ -66,10 +66,10 @@ function gutenberg_get_script_polyfill( $tests ) {
 	return $polyfill;
 }
 
-/**
- * Registers the main TinyMCE scripts.
- */
 if ( ! function_exists( 'register_tinymce_scripts' ) ) {
+	/**
+	 * Registers the main TinyMCE scripts.
+	 */
 	function register_tinymce_scripts() {
 		global $tinymce_version, $concatenate_scripts, $compress_scripts;
 		if ( ! isset( $concatenate_scripts ) ) {
@@ -90,11 +90,44 @@ if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 	}
 }
 
+/**
+ * Registers a script according to `wp_register_script`. Honors this request by
+ * deregistering any script by the same handler before registration.
+ *
+ * @since 4.1.0
+ *
+ * @param string           $handle    Name of the script. Should be unique.
+ * @param string           $src       Full URL of the script, or path of the script relative to the WordPress root directory.
+ * @param array            $deps      Optional. An array of registered script handles this script depends on. Default empty array.
+ * @param string|bool|null $ver       Optional. String specifying script version number, if it has one, which is added to the URL
+ *                                    as a query string for cache busting purposes. If version is set to false, a version
+ *                                    number is automatically added equal to current installed WordPress version.
+ *                                    If set to null, no version is added.
+ * @param bool             $in_footer Optional. Whether to enqueue the script before </body> instead of in the <head>.
+ *                                    Default 'false'.
+ */
 function gutenberg_override_script( $handle, $src, $deps = array(), $ver = false, $in_footer = false ) {
 	wp_deregister_script( $handle );
 	wp_register_script( $handle, $src, $deps, $ver, $in_footer );
 }
 
+/**
+ * Registers a style according to `wp_register_style`. Honors this request by
+ * deregistering any style by the same handler before registration.
+ *
+ * @since 4.1.0
+ *
+ * @param string           $handle Name of the stylesheet. Should be unique.
+ * @param string           $src    Full URL of the stylesheet, or path of the stylesheet relative to the WordPress root directory.
+ * @param array            $deps   Optional. An array of registered stylesheet handles this stylesheet depends on. Default empty array.
+ * @param string|bool|null $ver    Optional. String specifying stylesheet version number, if it has one, which is added to the URL
+ *                                 as a query string for cache busting purposes. If version is set to false, a version
+ *                                 number is automatically added equal to current installed WordPress version.
+ *                                 If set to null, no version is added.
+ * @param string           $media  Optional. The media for which this stylesheet has been defined.
+ *                                 Default 'all'. Accepts media types like 'all', 'print' and 'screen', or media queries like
+ *                                 '(orientation: portrait)' and '(max-width: 640px)'.
+ */
 function gutenberg_override_style( $handle, $src, $deps = array(), $ver = false, $media = 'all' ) {
 	wp_deregister_style( $handle );
 	wp_register_style( $handle, $src, $deps, $ver, $media );

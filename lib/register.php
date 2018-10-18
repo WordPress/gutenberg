@@ -310,20 +310,20 @@ function gutenberg_can_edit_post_type( $post_type ) {
 	return apply_filters( 'gutenberg_can_edit_post_type', $can_edit, $post_type );
 }
 
-/**
- * Determine whether a post or content string has blocks.
- *
- * This test optimizes for performance rather than strict accuracy, detecting
- * the pattern of a block but not validating its structure. For strict accuracy
- * you should use the block parser on post content.
- *
- * @since 3.6.0
- * @see gutenberg_parse_blocks()
- *
- * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
- * @return bool Whether the post has blocks.
- */
 if ( ! function_exists( 'has_blocks' ) ) {
+	/**
+	 * Determine whether a post or content string has blocks.
+	 *
+	 * This test optimizes for performance rather than strict accuracy, detecting
+	 * the pattern of a block but not validating its structure. For strict accuracy
+	 * you should use the block parser on post content.
+	 *
+	 * @since 3.6.0
+	 * @see gutenberg_parse_blocks()
+	 *
+	 * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
+	 * @return bool Whether the post has blocks.
+	 */
 	function has_blocks( $post = null ) {
 		if ( ! is_string( $post ) ) {
 			$wp_post = get_post( $post );
@@ -374,19 +374,19 @@ function gutenberg_content_has_blocks( $content ) {
 	return has_blocks( $content );
 }
 
-/**
- * Determine whether a $post or a string contains a specific block type.
- * This test optimizes for performance rather than strict accuracy, detecting
- * the block type exists but not validating its structure.
- * For strict accuracy, you should use the block parser on post content.
- *
- * @since 3.6.0
- *
- * @param string                  $block_type Full Block type to look for.
- * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
- * @return bool Whether the post content contains the specified block.
- */
 if ( ! function_exists( 'has_block' ) ) {
+	/**
+	 * Determine whether a $post or a string contains a specific block type.
+	 * This test optimizes for performance rather than strict accuracy, detecting
+	 * the block type exists but not validating its structure.
+	 * For strict accuracy, you should use the block parser on post content.
+	 *
+	 * @since 3.6.0
+	 *
+	 * @param string                  $block_type Full Block type to look for.
+	 * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
+	 * @return bool Whether the post content contains the specified block.
+	 */
 	function has_block( $block_type, $post = null ) {
 		if ( ! has_blocks( $post ) ) {
 			return false;
