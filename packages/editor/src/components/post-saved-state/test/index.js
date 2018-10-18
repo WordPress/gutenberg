@@ -60,7 +60,9 @@ describe( 'PostSavedState', () => {
 				isDirty={ true }
 				isSaving={ false }
 				isSaveable={ true }
-				onSave={ saveSpy } />
+				isLargeViewport
+				onSave={ saveSpy }
+			/>
 		);
 
 		expect( wrapper ).toMatchSnapshot();
