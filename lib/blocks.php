@@ -171,6 +171,12 @@ function gutenberg_render_block( $block ) {
  * @return string          Updated post content.
  */
 function do_blocks( $content ) {
+	$blocks = parse_blocks( $content );
+	return _recurse_blocks( $blocks, $blocks );
+}
+add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
+
+function _recurse_blocks( $blocks, $all_blocks ) {
 	global $post;
 
 	/*
@@ -180,29 +186,46 @@ function do_blocks( $content ) {
 	$global_post = $post;
 
 	$rendered_content = '';
-	$blocks           = gutenberg_parse_blocks( $content );
 	$dynamic_blocks   = get_dynamic_block_names();
 
 	foreach ( $blocks as $block ) {
-		if ( ! in_array( $block['blockName'], $dynamic_blocks ) ) {
-			$rendered_content .= $block['innerHTML'];
-			continue;
+		$block = (array) $block;
+		if ( in_array( $block['blockName'], $dynamic_blocks ) ) {
+			// Find registered block type. We can assume it exists since we use the
+			// `get_dynamic_block_names` function as a source for pattern matching.
+			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+
+			// Replace dynamic block with server-rendered output.
+			$block_content = $block_type->render( (array) $block['attrs'], $block['innerHTML'] );
+		} else if ( $block['innerBlocks'] ) {
+			$block_content = _recurse_blocks( $block['innerBlocks'], $all_blocks );
+		} else {
+			$block_content = $block['innerHTML'];
 		}
 
-		// Find registered block type. We can assume it exists since we use the
-		// `get_dynamic_block_names` function as a source for pattern matching.
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-
-		// Replace dynamic block with server-rendered output.
-		$rendered_content .= $block_type->render( (array) $block['attrs'], $block['innerHTML'] );
+		/**
+		 * Filters the content of a single block.
+		 *
+		 * During the_content, each block is parsed and added to the output individually. This filter allows
+		 * that content to be altered immediately before it's appended.
+		 *
+		 * @since 5.0.0
+		 *
+		 * @param string $block_content The block content about to be appended.
+		 * @param array  $block         The full block, including name and attributes.
+		 * @param array  $all_blocks    The array of all blocks being processed.
+		 */
+		$rendered_content .= apply_filters( 'do_block', $block_content, $block, $all_blocks );
 
 		// Restore global $post.
 		$post = $global_post;
 	}
 
+	// Strip remaining block comment demarcations.
+	$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->/m', '', $rendered_content );
+
 	return $rendered_content;
 }
-add_filter( 'the_content', 'do_blocks', 9 ); // BEFORE do_shortcode().
 
 /**
  * Remove all dynamic blocks from the given content.
