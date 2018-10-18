@@ -58,16 +58,22 @@ const blockAttributes = {
 	customOverlayColor: {
 		type: 'string',
 	},
+	backgroundType: {
+		type: 'string',
+		default: 'image',
+	},
 };
 
-export const name = 'core/cover-image';
+export const name = 'core/cover';
 
-const ALLOWED_MEDIA_TYPES = [ 'image' ];
+const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+const IMAGE_BACKGROUND_TYPE = 'image';
+const VIDEO_BACKGROUND_TYPE = 'video';
 
 export const settings = {
-	title: __( 'Cover Image' ),
+	title: __( 'Cover' ),
 
-	description: __( 'Add a full-width image, and layer text over it — great for headers.' ),
+	description: __( 'Add a full-width image or video, and layer text over it — great for headers.' ),
 
 	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z" /><path d="M0 0h24v24H0z" fill="none" /></svg>,
 
@@ -81,18 +87,31 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => (
-					createBlock( 'core/cover-image', { title: content } )
+					createBlock( 'core/cover', { title: content } )
 				),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
 				transform: ( { caption, url, align, id } ) => (
-					createBlock( 'core/cover-image', {
+					createBlock( 'core/cover', {
 						title: caption,
 						url,
 						align,
 						id,
+					} )
+				),
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/video' ],
+				transform: ( { caption, src, align, id } ) => (
+					createBlock( 'core/cover', {
+						title: caption,
+						url: src,
+						align,
+						id,
+						backgroundType: VIDEO_BACKGROUND_TYPE,
 					} )
 				),
 			},
@@ -108,12 +127,30 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
+				isMatch: ( { backgroundType, url } ) => {
+					return ! url || backgroundType === IMAGE_BACKGROUND_TYPE;
+				},
 				transform: ( { title, url, align, id } ) => (
 					createBlock( 'core/image', {
 						caption: title,
 						url,
 						align,
 						id,
+					} )
+				),
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/video' ],
+				isMatch: ( { backgroundType, url } ) => {
+					return ! url || backgroundType === VIDEO_BACKGROUND_TYPE;
+				},
+				transform: ( { title, url, align, id } ) => (
+					createBlock( 'core/video', {
+						caption: title,
+						src: url,
+						id,
+						align,
 					} )
 				),
 			},
@@ -132,21 +169,57 @@ export const settings = {
 		withNotices,
 	] )(
 		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
-			const { url, title, align, contentAlign, id, hasParallax, dimRatio } = attributes;
+			const {
+				align,
+				backgroundType,
+				contentAlign,
+				dimRatio,
+				hasParallax,
+				id,
+				title,
+				url,
+			} = attributes;
 			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
-			const onSelectImage = ( media ) => {
+			const onSelectMedia = ( media ) => {
 				if ( ! media || ! media.url ) {
 					setAttributes( { url: undefined, id: undefined } );
 					return;
 				}
-				setAttributes( { url: media.url, id: media.id } );
+				let mediaType;
+				// for media selections originated from a file upload.
+				if ( media.media_type ) {
+					if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
+						mediaType = IMAGE_BACKGROUND_TYPE;
+					} else {
+						// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
+						// Videos contain the media type of 'file' in the object returned from the rest api.
+						mediaType = VIDEO_BACKGROUND_TYPE;
+					}
+				} else { // for media selections originated from existing files in the media library.
+					if (
+						media.type !== IMAGE_BACKGROUND_TYPE &&
+						media.type !== VIDEO_BACKGROUND_TYPE
+					) {
+						return;
+					}
+					mediaType = media.type;
+				}
+				setAttributes( {
+					url: media.url,
+					id: media.id,
+					backgroundType: mediaType,
+				} );
 			};
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 			const setTitle = ( newTitle ) => setAttributes( { title: newTitle } );
 
 			const style = {
-				...backgroundImageStyles( url ),
+				...(
+					backgroundType === IMAGE_BACKGROUND_TYPE ?
+						backgroundImageStyles( url ) :
+						{}
+				),
 				backgroundColor: overlayColor.color,
 			};
 
@@ -167,36 +240,42 @@ export const settings = {
 							value={ align }
 							onChange={ updateAlignment }
 						/>
-						<AlignmentToolbar
-							value={ contentAlign }
-							onChange={ ( nextAlign ) => {
-								setAttributes( { contentAlign: nextAlign } );
-							} }
-						/>
-						<Toolbar>
-							<MediaUpload
-								onSelect={ onSelectImage }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
-								value={ id }
-								render={ ( { open } ) => (
-									<IconButton
-										className="components-toolbar__control"
-										label={ __( 'Edit image' ) }
-										icon="edit"
-										onClick={ open }
+						{ !! url && (
+							<Fragment>
+								<AlignmentToolbar
+									value={ contentAlign }
+									onChange={ ( nextAlign ) => {
+										setAttributes( { contentAlign: nextAlign } );
+									} }
+								/>
+								<Toolbar>
+									<MediaUpload
+										onSelect={ onSelectMedia }
+										allowedTypes={ ALLOWED_MEDIA_TYPES }
+										value={ id }
+										render={ ( { open } ) => (
+											<IconButton
+												className="components-toolbar__control"
+												label={ __( 'Edit media' ) }
+												icon="edit"
+												onClick={ open }
+											/>
+										) }
 									/>
-								) }
-							/>
-						</Toolbar>
+								</Toolbar>
+							</Fragment>
+						) }
 					</BlockControls>
 					{ !! url && (
 						<InspectorControls>
-							<PanelBody title={ __( 'Cover Image Settings' ) }>
-								<ToggleControl
-									label={ __( 'Fixed Background' ) }
-									checked={ hasParallax }
-									onChange={ toggleParallax }
-								/>
+							<PanelBody title={ __( 'Cover Settings' ) }>
+								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+									<ToggleControl
+										label={ __( 'Fixed Background' ) }
+										checked={ hasParallax }
+										onChange={ toggleParallax }
+									/>
+								) }
 								<PanelColorSettings
 									title={ __( 'Overlay' ) }
 									initialOpen={ true }
@@ -231,7 +310,7 @@ export const settings = {
 						onChange={ setTitle }
 						inlineToolbar
 					/>
-				) : __( 'Cover Image' );
+				) : __( 'Cover' );
 
 				return (
 					<Fragment>
@@ -241,10 +320,11 @@ export const settings = {
 							className={ className }
 							labels={ {
 								title: label,
-								name: __( 'an image' ),
+								/* translators: Fragment of the sentence: "Drag %s, upload a new one or select a file from your library." */
+								name: __( 'an image or a video' ),
 							} }
-							onSelect={ onSelectImage }
-							accept="image/*"
+							onSelect={ onSelectMedia }
+							accept="image/*,video/*"
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							notices={ noticeUI }
 							onError={ noticeOperations.createErrorNotice }
@@ -261,10 +341,19 @@ export const settings = {
 						style={ style }
 						className={ classes }
 					>
+						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+							<video
+								className="wp-block-cover__video-background"
+								autoPlay
+								muted
+								loop
+								src={ url }
+							/>
+						) }
 						{ ( ! RichText.isEmpty( title ) || isSelected ) && (
 							<RichText
 								tagName="p"
-								className="wp-block-cover-image-text"
+								className="wp-block-cover-text"
 								placeholder={ __( 'Write title…' ) }
 								value={ title }
 								onChange={ setTitle }
@@ -278,9 +367,21 @@ export const settings = {
 	),
 
 	save( { attributes, className } ) {
-		const { url, title, hasParallax, dimRatio, align, contentAlign, overlayColor, customOverlayColor } = attributes;
+		const {
+			align,
+			backgroundType,
+			contentAlign,
+			customOverlayColor,
+			dimRatio,
+			hasParallax,
+			overlayColor,
+			title,
+			url,
+		} = attributes;
 		const overlayColorClass = getColorClassName( 'background-color', overlayColor );
-		const style = backgroundImageStyles( url );
+		const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
+			backgroundImageStyles( url ) :
+			{};
 		if ( ! overlayColorClass ) {
 			style.backgroundColor = customOverlayColor;
 		}
@@ -299,14 +400,58 @@ export const settings = {
 
 		return (
 			<div className={ classes } style={ style }>
+				{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
+					className="wp-block-cover__video-background"
+					autoPlay
+					muted
+					loop
+					src={ url }
+				/> ) }
 				{ ! RichText.isEmpty( title ) && (
-					<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
+					<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
 				) }
 			</div>
 		);
 	},
 
 	deprecated: [ {
+		attributes: {
+			...blockAttributes,
+		},
+
+		supports: {
+			className: false,
+		},
+
+		save( { attributes } ) {
+			const { url, title, hasParallax, dimRatio, align, contentAlign, overlayColor, customOverlayColor } = attributes;
+			const overlayColorClass = getColorClassName( 'background-color', overlayColor );
+			const style = backgroundImageStyles( url );
+			if ( ! overlayColorClass ) {
+				style.backgroundColor = customOverlayColor;
+			}
+
+			const classes = classnames(
+				'wp-block-cover-image',
+				dimRatioToClass( dimRatio ),
+				overlayColorClass,
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				},
+				align ? `align${ align }` : null,
+			);
+
+			return (
+				<div className={ classes } style={ style }>
+					{ ! RichText.isEmpty( title ) && (
+						<RichText.Content tagName="p" className="wp-block-cover-image-text" value={ title } />
+					) }
+				</div>
+			);
+		},
+	}, {
 		attributes: {
 			...blockAttributes,
 			title: {

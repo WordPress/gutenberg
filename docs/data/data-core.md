@@ -178,13 +178,13 @@ Returns an action object used in signalling that entity records have been receiv
  * records: Records received.
  * query: Query Object.
 
-### receiveThemeSupportsFromIndex
+### receiveThemeSupports
 
 Returns an action object used in signalling that the index has been received.
 
 *Parameters*
 
- * index: Index received.
+ * themeSupports: Theme support for the current theme.
 
 ### receiveEmbedPreview
 

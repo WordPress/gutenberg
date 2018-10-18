@@ -261,19 +261,6 @@ export default {
 
 		return resetBlocks( updatedBlockList );
 	},
-	CHECK_TEMPLATE_VALIDITY( action, { getState } ) {
-		const state = getState();
-		const blocks = getBlocks( state );
-		const template = getTemplate( state );
-		const templateLock = getTemplateLock( state );
-		const isValid = (
-			! template ||
-			templateLock !== 'all' ||
-			doBlocksMatchTemplate( blocks, template )
-		);
-
-		return setTemplateValidity( isValid );
-	},
 	FETCH_REUSABLE_BLOCKS: ( action, store ) => {
 		fetchReusableBlocks( action, store );
 	},

@@ -10,26 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Set up global variables so that plugins will add meta boxes as if we were
- * using the main editor.
- *
- * @since 1.5.0
- */
-function gutenberg_trick_plugins_into_registering_meta_boxes() {
-	global $pagenow;
-
-	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && ! isset( $_REQUEST['classic-editor'] ) ) {
-		// As early as possible, but after any plugins ( ACF ) that adds meta boxes.
-		add_action( 'admin_head', 'gutenberg_collect_meta_box_data', 99 );
-	}
-}
-// As late as possible, but before any logic that adds meta boxes.
-add_action(
-	'plugins_loaded',
-	'gutenberg_trick_plugins_into_registering_meta_boxes'
-);
-
-/**
  * Collect information about meta_boxes registered for the current post.
  *
  * Redirects to classic editor if a meta box is incompatible.

@@ -10,7 +10,7 @@ import {
 	getEditorMode,
 	getPreference,
 	isEditorSidebarOpened,
-	isEditorSidebarPanelOpened,
+	isEditorPanelOpened,
 	isModalActive,
 	isFeatureActive,
 	isPluginSidebarOpened,
@@ -22,6 +22,7 @@ import {
 	getMetaBox,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
+	isEditorPanelEnabled,
 } from '../selectors';
 
 jest.mock( '@wordpress/deprecated', () => jest.fn() );
@@ -207,29 +208,99 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditorSidebarPanelOpened', () => {
-		it( 'should return false if no panels preference', () => {
+	describe( 'isEditorPanelEnabled', () => {
+		it( 'should return true by default', () => {
 			const state = {
-				preferences: {},
+				preferences: {
+					panels: {},
+				},
 			};
 
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( true );
 		} );
 
-		it( 'should return false if the panel value is not set', () => {
+		it( 'should return true when a panel has been enabled', () => {
 			const state = {
-				preferences: { panels: {} },
+				preferences: {
+					panels: {
+						'post-status': { enabled: true },
+					},
+				},
 			};
 
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( true );
 		} );
 
-		it( 'should return the panel value', () => {
+		it( 'should return false when a panel has been disabled', () => {
 			const state = {
-				preferences: { panels: { 'post-taxonomies': true } },
+				preferences: {
+					panels: {
+						'post-status': { enabled: false },
+					},
+				},
 			};
 
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( true );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isEditorPanelOpened', () => {
+		it( 'should return false by default', () => {
+			const state = {
+				preferences: {
+					panels: {},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return true when a panel has been opened', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': { opened: true },
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( true );
+		} );
+
+		it( 'should return false when a panel has been closed', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': { opened: false },
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return true when a panel has been legacy opened', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': true,
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( true );
+		} );
+
+		it( 'should return false when a panel has been legacy closed', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': false,
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
 		} );
 	} );
 

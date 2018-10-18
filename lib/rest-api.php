@@ -45,6 +45,9 @@ function gutenberg_register_rest_routes() {
 		$autosaves_controller = new WP_REST_Autosaves_Controller( $post_type->name );
 		$autosaves_controller->register_routes();
 	}
+
+	$themes_controller = new WP_REST_Themes_Controller();
+	$themes_controller->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_routes' );
 
@@ -305,40 +308,6 @@ function gutenberg_register_taxonomy_prepare_functions( $taxonomy ) {
 add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_functions' );
 
 /**
- * Ensure that the wp-json index contains the 'theme-supports' setting as
- * part of its site info elements.
- *
- * @see https://core.trac.wordpress.org/ticket/45016
- *
- * @param WP_REST_Response $response WP REST API response of the wp-json index.
- * @return WP_REST_Response Response that contains theme-supports.
- */
-function gutenberg_ensure_wp_json_has_theme_supports( $response ) {
-	$site_info = $response->get_data();
-	if ( ! array_key_exists( 'theme_supports', $site_info ) ) {
-		$site_info['theme_supports'] = array();
-	}
-	if ( ! array_key_exists( 'formats', $site_info['theme_supports'] ) ) {
-		$formats = get_theme_support( 'post-formats' );
-		$formats = is_array( $formats ) ? array_values( $formats[0] ) : array();
-		$formats = array_merge( array( 'standard' ), $formats );
-
-		$site_info['theme_supports']['formats'] = $formats;
-	}
-	if ( ! array_key_exists( 'post-thumbnails', $site_info['theme_supports'] ) ) {
-		$post_thumbnails = get_theme_support( 'post-thumbnails' );
-		if ( $post_thumbnails ) {
-			// $post_thumbnails can contain a nested array of post types.
-			// e.g. array( array( 'post', 'page' ) ).
-			$site_info['theme_supports']['post-thumbnails'] = is_array( $post_thumbnails ) ? $post_thumbnails[0] : true;
-		}
-	}
-	$response->set_data( $site_info );
-	return $response;
-}
-add_filter( 'rest_index', 'gutenberg_ensure_wp_json_has_theme_supports' );
-
-/**
  * Handle any necessary checks early.
  *
  * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
@@ -473,3 +442,54 @@ function gutenberg_filter_user_collection_parameters( $query_params ) {
 	return $query_params;
 }
 add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
+
+/**
+ * Silence PHP Warnings and Errors in JSON requests
+ *
+ * @todo This is a temporary measure until errors are properly silenced in REST API responses in core
+ *
+ * @see https://core.trac.wordpress.org/ticket/44534
+ */
+function gutenberg_silence_rest_errors() {
+
+	if ( ( isset( $_SERVER['CONTENT_TYPE'] ) && 'application/json' === $_SERVER['CONTENT_TYPE'] ) ||
+		( isset( $_SERVER['HTTP_ACCEPT'] ) && strpos( $_SERVER['HTTP_ACCEPT'], 'application/json' ) !== false ) ) {
+		// @codingStandardsIgnoreStart
+		@ini_set( 'display_errors', 0 );
+		// @codingStandardsIgnoreEnd
+	}
+
+}
+
+/**
+ * Include additional labels for registered post types
+ *
+ * @see https://core.trac.wordpress.org/ticket/45101
+ *
+ * @param array  $args      Arguments supplied to register_post_type().
+ * @param string $post_type Post type key.
+ * @return array Arguments supplied to register_post_type()
+ */
+function gutenberg_filter_post_type_labels( $args, $post_type ) {
+	$registered_labels = ( empty( $args['labels'] ) ) ? array() : $args['labels'];
+	if ( is_post_type_hierarchical( $post_type ) ) {
+		$labels = array(
+			'item_published'           => __( 'Page published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Page published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Page reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Page scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Page updated.', 'gutenberg' ),
+		);
+	} else {
+		$labels = array(
+			'item_published'           => __( 'Post published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Post published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Post reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Post scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Post updated.', 'gutenberg' ),
+		);
+	}
+	$args['labels'] = array_merge( $labels, $registered_labels );
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_filter_post_type_labels', 10, 2 );

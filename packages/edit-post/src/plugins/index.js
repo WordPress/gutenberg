@@ -11,8 +11,6 @@ import { registerPlugin } from '@wordpress/plugins';
  */
 import CopyContentMenuItem from './copy-content-menu-item';
 import KeyboardShortcutsHelpMenuItem from './keyboard-shortcuts-help-menu-item';
-import PublishSidebarToggleMenuItem from './publish-sidebar-toggle-menu-item';
-import TipsToggleMenuItem from './tips-toggle-menu-item';
 import ToolsMoreMenuGroup from '../components/header/tools-more-menu-group';
 
 registerPlugin( 'edit-post', {
@@ -28,8 +26,6 @@ registerPlugin( 'edit-post', {
 							>
 								{ __( 'Manage All Reusable Blocks' ) }
 							</MenuItem>
-							<TipsToggleMenuItem onToggle={ onClose } />
-							<PublishSidebarToggleMenuItem onToggle={ onClose } />
 							<KeyboardShortcutsHelpMenuItem onSelect={ onClose } />
 							<CopyContentMenuItem />
 						</Fragment>

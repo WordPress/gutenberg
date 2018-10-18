@@ -89,7 +89,10 @@
 	// then pause, then keep scrolling downwards, the browser doesn't try to scroll
 	// the parent element, usually invoking a "bounce" effect and then preventing you
 	// from scrolling upwards until you pause again.
-	overscroll-behavior-y: none;
+	// This is only necessary beyond the small breakpoint because that's when the scroll container changes.
+	@include break-small() {
+		overscroll-behavior-y: none;
+	}
 
 	.edit-post-visual-editor {
 		flex-grow: 1;

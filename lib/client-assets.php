@@ -450,6 +450,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-compose',
 			'wp-core-data',
 			'wp-data',
+			'wp-date',
 			'wp-editor',
 			'wp-element',
 			'wp-html-entities',
@@ -1305,6 +1306,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'/',
 		'/wp/v2/types?context=edit',
 		'/wp/v2/taxonomies?per_page=-1&context=edit',
+		'/wp/v2/themes?status=active',
 		sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
 		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
@@ -1517,22 +1519,23 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	}
 
 	$editor_settings = array(
-		'alignWide'           => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
-		'availableTemplates'  => $available_templates,
-		'allowedBlockTypes'   => $allowed_block_types,
-		'disableCustomColors' => get_theme_support( 'disable-custom-colors' ),
-		'disablePostFormats'  => ! current_theme_supports( 'post-formats' ),
-		'titlePlaceholder'    => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
-		'bodyPlaceholder'     => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
-		'isRTL'               => is_rtl(),
-		'autosaveInterval'    => 10,
-		'maxUploadFileSize'   => $max_upload_size,
-		'allowedMimeTypes'    => get_allowed_mime_types(),
-		'styles'              => $styles,
-		'postLock'            => $lock_details,
+		'alignWide'              => $align_wide || ! empty( $gutenberg_theme_support[0]['wide-images'] ), // Backcompat. Use `align-wide` outside of `gutenberg` array.
+		'availableTemplates'     => $available_templates,
+		'allowedBlockTypes'      => $allowed_block_types,
+		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
+		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
+		'disablePostFormats'     => ! current_theme_supports( 'post-formats' ),
+		'titlePlaceholder'       => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
+		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
+		'isRTL'                  => is_rtl(),
+		'autosaveInterval'       => 10,
+		'maxUploadFileSize'      => $max_upload_size,
+		'allowedMimeTypes'       => get_allowed_mime_types(),
+		'styles'                 => $styles,
+		'postLock'               => $lock_details,
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
-		'postLockUtils'       => array(
+		'postLockUtils'          => array(
 			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
 			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
 			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),

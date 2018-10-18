@@ -49,7 +49,7 @@ export const settings = {
 			selector: 'a:not([download])',
 			attribute: 'href',
 		},
-		// e.g. `_blank` when the block is configured to open in a new window
+		// e.g. `_blank` when the block is configured to open in a new tab
 		textLinkTarget: {
 			type: 'string',
 			source: 'attribute',

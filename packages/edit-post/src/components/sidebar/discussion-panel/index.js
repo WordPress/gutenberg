@@ -12,7 +12,11 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 const PANEL_NAME = 'discussion-panel';
 
-function DiscussionPanel( { isOpened, onTogglePanel } ) {
+function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
+	if ( ! isEnabled ) {
+		return null;
+	}
+
 	return (
 		<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
 			<PanelBody title={ __( 'Discussion' ) } opened={ isOpened } onToggle={ onTogglePanel }>
@@ -35,12 +39,13 @@ function DiscussionPanel( { isOpened, onTogglePanel } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			isOpened: select( 'core/edit-post' ).isEditorSidebarPanelOpened( PANEL_NAME ),
+			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled( PANEL_NAME ),
+			isOpened: select( 'core/edit-post' ).isEditorPanelOpened( PANEL_NAME ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return dispatch( 'core/edit-post' ).toggleGeneralSidebarEditorPanel( PANEL_NAME );
+			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( PANEL_NAME );
 		},
 	} ) ),
 ] )( DiscussionPanel );

@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
 
 /**
@@ -22,6 +22,7 @@ import { NavigableMenu } from '../navigable-container';
 function FontSizePicker( {
 	fallbackFontSize,
 	fontSizes = [],
+	disableCustomFontSizes = false,
 	onChange,
 	value,
 	withSlider,
@@ -52,7 +53,7 @@ function FontSizePicker( {
 							aria-expanded={ isOpen }
 							aria-label={ __( 'Custom font size' ) }
 						>
-							{ ( currentFont && currentFont.name ) || ( ! value && 'Normal' ) || 'Custom' }
+							{ ( currentFont && currentFont.name ) || ( ! value && __( 'Normal' ) ) || _x( 'Custom', 'font size name' ) }
 						</Button>
 					) }
 					renderContent={ () => (
@@ -73,7 +74,7 @@ function FontSizePicker( {
 						</NavigableMenu>
 					) }
 				/>
-				{ ! withSlider &&
+				{ ( ! withSlider && ! disableCustomFontSizes ) &&
 					<input
 						className="components-range-control__number"
 						type="number"
