@@ -34,7 +34,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,6 +46,7 @@ export class Hue extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.container = createRef();
 		this.increase = this.increase.bind( this );
 		this.decrease = this.decrease.bind( this );
 		this.handleChange = this.handleChange.bind( this );
@@ -83,7 +84,7 @@ export class Hue extends Component {
 
 	handleChange( e ) {
 		const { onChange = noop } = this.props;
-		const change = calculateHueChange( e, this.props, this.container );
+		const change = calculateHueChange( e, this.props, this.container.current );
 		if ( change ) {
 			onChange( change, e );
 		}
@@ -129,7 +130,7 @@ export class Hue extends Component {
 					{ /* eslint-disable jsx-a11y/no-static-element-interactions */ }
 					<div
 						className="components-color-picker__hue-bar"
-						ref={ ( container ) => ( this.container = container ) }
+						ref={ this.container }
 						onMouseDown={ this.handleMouseDown }
 						onTouchMove={ this.handleChange }
 						onTouchStart={ this.handleChange }>

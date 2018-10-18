@@ -86,7 +86,7 @@ export class Alpha extends Component {
 
 	handleChange( e ) {
 		const { onChange = noop } = this.props;
-		const change = calculateAlphaChange( e, this.props, this.container );
+		const change = calculateAlphaChange( e, this.props, this.container.current );
 		if ( change ) {
 			onChange( change, e );
 		}

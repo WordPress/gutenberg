@@ -34,7 +34,7 @@ import { clamp, noop, throttle } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 
 /**
@@ -51,6 +51,7 @@ export class Saturation extends Component {
 			fn( data, e );
 		}, 50 );
 
+		this.container = createRef();
 		this.saturate = this.saturate.bind( this );
 		this.brighten = this.brighten.bind( this );
 		this.handleChange = this.handleChange.bind( this );
@@ -101,7 +102,7 @@ export class Saturation extends Component {
 
 	handleChange( e ) {
 		const { onChange = noop } = this.props;
-		const change = calculateSaturationChange( e, this.props, this.container );
+		const change = calculateSaturationChange( e, this.props, this.container.current );
 		this.throttle( onChange, change, e );
 	}
 
@@ -147,7 +148,7 @@ export class Saturation extends Component {
 				<div
 					style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
 					className="components-color-picker__saturation-color"
-					ref={ ( container ) => ( this.container = container ) }
+					ref={ this.container }
 					onMouseDown={ this.handleMouseDown }
 					onTouchMove={ this.handleChange }
 					onTouchStart={ this.handleChange }>
