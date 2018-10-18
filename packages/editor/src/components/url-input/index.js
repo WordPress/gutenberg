@@ -86,7 +86,7 @@ class URLInput extends Component {
 		} );
 
 		const request = apiFetch( {
-			path: addQueryArgs( '/gutenberg/v1/search', {
+			path: addQueryArgs( '/wp/v2/search', {
 				search: value,
 				per_page: 20,
 				type: 'post',
