@@ -1,3 +1,9 @@
+## 4.1.0 (Unreleased)
+
+### Deprecations
+
+- `wp.editor.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
+
 ## 4.0.0 (2018-09-30)
 
 ### Breaking Changes
