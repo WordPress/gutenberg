@@ -70,7 +70,7 @@ class Input extends Component {
 				onChange={ ( newValue ) => this.handleChange( newValue ) }
 				onBlur={ this.handleBlur }
 				onKeyDown={ this.handleKeyDown }
-				{ ...omit( props, [ 'onChange', 'value' ] ) }
+				{ ...omit( props, [ 'onChange', 'value', 'valueKey' ] ) }
 			/>
 		);
 	}
