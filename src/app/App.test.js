@@ -2,8 +2,9 @@
 
 import renderer from 'react-test-renderer';
 
-import App, { AppProvider } from './App';
-import { initialState, setupStore } from '../store';
+import App from './App';
+import initialHtml from './initial-html';
+import { html2State, setupStore } from '../store';
 import BlockHolder from '../block-management/block-holder';
 
 describe( 'App', () => {
@@ -13,9 +14,9 @@ describe( 'App', () => {
 		expect( rendered ).toBeTruthy();
 	} );
 
-	it( 'renders without crashing with a block focused', () => {
+	it.only( 'renders without crashing with a block focused', () => {
 		// construct a state object with the first block focused
-		const state = { ...initialState };
+		const state = html2State( initialHtml );
 		const block0 = { ...state.blocks[ 0 ] };
 		block0.focused = true;
 		state.blocks[ 0 ] = block0;
@@ -24,7 +25,7 @@ describe( 'App', () => {
 		const store = setupStore( state );
 
 		// render an App using the specified Store
-		const app = renderer.create( <AppProvider store={ store } /> );
+		const app = renderer.create( <App initialData={ store } /> );
 		const rendered = app.toJSON();
 
 		// App should be rendered OK
