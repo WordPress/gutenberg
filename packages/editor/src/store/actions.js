@@ -11,7 +11,6 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -365,25 +364,6 @@ export function setTemplateValidity( isValid ) {
 	return {
 		type: 'SET_TEMPLATE_VALIDITY',
 		isValid,
-	};
-}
-
-/**
- * Returns an action object to check the template validity.
- *
- * @return {Object} Action object.
- */
-export function checkTemplateValidity() {
-	// TODO: Hello future deprecation remover. Please ensure also to remove all
-	// references to CHECK_TEMPLATE_VALIDITY, notably its effect handler.
-	deprecated( 'checkTemplateValidity action (`core/editor`)', {
-		version: '4.1',
-		plugin: 'Gutenberg',
-		hint: 'Validity is verified automatically upon block reset.',
-	} );
-
-	return {
-		type: 'CHECK_TEMPLATE_VALIDITY',
 	};
 }
 
