@@ -100,10 +100,16 @@ class MediaTextEdit extends Component {
 	}
 
 	render() {
-		const { attributes, backgroundColor, setAttributes, setBackgroundColor } = this.props;
+		const {
+			attributes,
+			className,
+			backgroundColor,
+			setAttributes,
+			setBackgroundColor,
+		} = this.props;
 		const { mediaPosition, mediaWidth } = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
-		const className = classnames( 'wp-block-media-text', {
+		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundColor.class ]: backgroundColor.class,
 		} );
@@ -142,7 +148,7 @@ class MediaTextEdit extends Component {
 						controls={ toolbarControls }
 					/>
 				</BlockControls>
-				<div className={ className } style={ style } >
+				<div className={ classNames } style={ style } >
 					{ this.renderMediaArea() }
 					<InnerBlocks
 						allowedBlocks={ ALLOWED_BLOCKS }

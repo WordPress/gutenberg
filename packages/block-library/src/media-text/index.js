@@ -29,6 +29,8 @@ export const settings = {
 
 	category: 'layout',
 
+	keywords: [ __( 'image' ), __( 'video' ), __( 'half' ) ],
+
 	attributes: {
 		align: {
 			type: 'string',
@@ -86,16 +88,8 @@ export const settings = {
 			mediaWidth,
 		} = attributes;
 		const mediaTypeRenders = {
-			image: () => {
-				return (
-					<img src={ mediaUrl } alt={ mediaAlt } />
-				);
-			},
-			video: () => {
-				return (
-					<video controls src={ mediaUrl } />
-				);
-			},
+			image: () => <img src={ mediaUrl } alt={ mediaAlt } />,
+			video: () => <video controls src={ mediaUrl } />,
 		};
 
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
