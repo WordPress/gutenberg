@@ -36,6 +36,8 @@ describe( 'Font Size Picker', () => {
 		await changeSizeButton.click();
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '23' );
 
 		// Ensure content matches snapshot.
@@ -73,6 +75,8 @@ describe( 'Font Size Picker', () => {
 		await changeSizeButton.click();
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( '23' );
 
 		// Blur the range control
