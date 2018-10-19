@@ -264,7 +264,6 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	$title = _draft_or_post_title( $post->ID );
 
 	if ( 'wp_block' === $post->post_type ) {
-		unset( $actions['edit'] );
 		unset( $actions['inline hide-if-no-js'] );
 		$actions['export'] = sprintf(
 			'<button type="button" class="wp-list-reusable-blocks__export button-link" data-id="%s" aria-label="%s">%s</button>',
