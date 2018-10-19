@@ -19,7 +19,7 @@ function parseResponse( response, parse = true ) {
 
 const capPerPageQuery = ( options ) => ( {
 	...options,
-	// Swap back to requesting the max of 100 items per page.
+	// Swap back to requesting the max number of items per page.
 	path: options.path && addQueryArgs( options.path, {
 		per_page: 100,
 		page: 1,
@@ -40,10 +40,9 @@ const setRequestedPage = ( options, page ) => ( {
 	} ),
 } );
 
-// The REST API enforces an upper limit of 100 on the per_page option. To handle
-// large collections, apiFetch consumers can pass `per_page=-1` and this middleware
-// function will recursively assemble a full response by paging over all available
-// pages of API data.
+// The REST API enforces an upper limit on the per_page option. To handle large
+// collections, apiFetch consumers can pass `per_page=-1`; this middleware will
+// then recursively assemble a full response array from all available pages.
 const fetchAllMiddleware = async ( options, next ) => {
 	try {
 		if ( options.url && options.url.indexOf( 'per_page=-1' ) < 0 ) {
@@ -56,7 +55,6 @@ const fetchAllMiddleware = async ( options, next ) => {
 			// Ensure headers are returned for page 1.
 			parse: false,
 		} );
-		const pageOneParsed = await parseResponse( pageOneResults, options.parse );
 
 		const totalPages = pageOneResults.headers && pageOneResults.headers.get( 'X-WP-TotalPages' );
 
@@ -65,19 +63,19 @@ const fetchAllMiddleware = async ( options, next ) => {
 			length: totalPages - 1,
 		} ).map( ( _, idx ) => {
 			// Specify the page to request. First additional request is index 0 but page 2, etc.
-			// Build these URLs based on pageOptions to avoid repeating the per_page adjustment.
 			return setRequestedPage( pageOptions, idx + 2 );
 		} );
+
+		// Ensure the first page is parsed as specified.
+		const pageOneParsed = await parseResponse( pageOneResults, options.parse );
 
 		return remainingPageRequests.reduce(
 			// Request each remaining page in sequence, and return a merged array.
 			async ( previousPageRequest, nextPageOptions ) => {
 				const resultsCollection = await previousPageRequest;
-				// TODO: Circular dependency
 				const nextPage = await apiFetch( nextPageOptions );
 				return resultsCollection.concat( nextPage );
 			},
-			// Ensure that the first page is parsed properly, as specified in the original options.
 			[].concat( pageOneParsed )
 		);
 	} catch ( e ) {
