@@ -75,10 +75,11 @@ export function toTree( value, multilineTag, settings ) {
 		// For list items we need to take into account nested list items.
 		if ( multilineTag === 'li' ) {
 			characterFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
-				accumulator.push( format );
-
 				if ( format.type === 'ol' || format.type === 'ul' ) {
+					accumulator.push( format );
 					accumulator.push( multilineFormat );
+				} else if ( character !== '\u2028' ) {
+					accumulator.push( format );
 				}
 
 				return accumulator;
