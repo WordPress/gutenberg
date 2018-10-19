@@ -12,6 +12,8 @@
 
 - Added `onClose` prop to `URLPopover` component.
 
+## 4.0.3 (2018-10-18)
+
 ## 4.0.0 (2018-09-30)
 
 ### Breaking Changes
