@@ -265,6 +265,14 @@ function gutenberg_add_edit_link( $actions, $post ) {
 
 	if ( 'wp_block' === $post->post_type ) {
 		unset( $actions['inline hide-if-no-js'] );
+
+		// Export uses block raw content, which is only returned from the post
+		// REST endpoint via `context=edit`, requiring edit capability.
+		$post_type = get_post_type_object( $post->post_type );
+		if ( ! current_user_can( $post_type->cap->edit_post, $post->ID ) ) {
+			return $actions;
+		}
+
 		$actions['export'] = sprintf(
 			'<button type="button" class="wp-list-reusable-blocks__export button-link" data-id="%s" aria-label="%s">%s</button>',
 			$post->ID,
