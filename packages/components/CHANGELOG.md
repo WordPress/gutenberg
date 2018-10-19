@@ -1,5 +1,9 @@
 ## 4.2.0 (Unreleased)
 
+### New Feature
+
+- Added a new `ColorPicker` component ([#10564](https://github.com/WordPress/gutenberg/pull/10564)).
+
 ### Deprecation
 
 - `wp.components.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.

@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ColorPicker should render color picker 1`] = `
+<div
+  className="components-color-picker is-alpha-disabled"
+>
+  <div
+    className="components-color-picker__saturation"
+  >
+    <WithInstanceId(Saturation)
+      hsl={
+        Object {
+          "a": 1,
+          "h": 0,
+          "l": 100,
+          "s": 0,
+        }
+      }
+      hsv={
+        Object {
+          "a": 1,
+          "h": 0,
+          "s": 0,
+          "v": 100,
+        }
+      }
+      onChange={[Function]}
+    />
+  </div>
+  <div
+    className="components-color-picker__body"
+  >
+    <div
+      className="components-color-picker__controls"
+    >
+      <div
+        className="components-color-picker__swatch"
+      >
+        <div
+          className="components-color-picker__active"
+          style={
+            Object {
+              "backgroundColor": "rgb(255, 255, 255)",
+            }
+          }
+        />
+      </div>
+      <div
+        className="components-color-picker__toggles"
+      >
+        <WithInstanceId(Hue)
+          hsl={
+            Object {
+              "a": 1,
+              "h": 0,
+              "l": 100,
+              "s": 0,
+            }
+          }
+          onChange={[Function]}
+        />
+      </div>
+    </div>
+    <Inputs
+      disableAlpha={true}
+      hex="#ffffff"
+      hsl={
+        Object {
+          "a": 1,
+          "h": 0,
+          "l": 100,
+          "s": 0,
+        }
+      }
+      onChange={[Function]}
+      rgb={
+        Object {
+          "a": 1,
+          "b": 255,
+          "g": 255,
+          "r": 255,
+        }
+      }
+    />
+  </div>
+</div>
+`;
