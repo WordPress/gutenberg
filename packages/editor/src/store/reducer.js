@@ -240,15 +240,23 @@ export const editor = flow( [
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-				return reduce( action.edits, ( result, value, key ) => {
-					// Only assign into result if not already same value
-					if ( value !== state[ key ] ) {
-						result = getMutateSafeObject( state, result );
-						result[ key ] = value;
-					}
+				const recurseEdits = ( edits, newState ) => {
+					return reduce( edits, ( result, value, key ) => {
+						// Only assign into result if not already same value
+						if ( value !== newState[ key ] ) {
+							result = getMutateSafeObject( state, result );
 
-					return result;
-				}, state );
+							if ( typeof newState[ key ] === 'object' ) {
+								result[ key ] = recurseEdits( value, newState[ key ] );
+							} else {
+								result[ key ] = value;
+							}
+						}
+						return result;
+					}, newState );
+				};
+
+				return recurseEdits( action.edits, state );
 
 			case 'RESET_BLOCKS':
 				if ( 'content' in state ) {
