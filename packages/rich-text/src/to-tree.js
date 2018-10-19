@@ -19,6 +19,7 @@ export function toTree( value, multilineTag, settings ) {
 	let lastCharacterFormats;
 	let lastCharacter;
 
+	// If we're building a multiline tree, start off with a multiline element.
 	if ( multilineTag ) {
 		append( append( tree, { type: multilineTag } ), '' );
 		lastCharacterFormats = [ multilineFormat ];
@@ -30,6 +31,8 @@ export function toTree( value, multilineTag, settings ) {
 		const character = text.charAt( i );
 		let characterFormats = formats[ i ];
 
+		// Set multiline tags in queue for building the tree.
+		// For list items we need to take into account nested list items.
 		if ( multilineTag === 'li' ) {
 			characterFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
 				accumulator.push( format );
@@ -46,6 +49,7 @@ export function toTree( value, multilineTag, settings ) {
 
 		let pointer = getLastChild( tree );
 
+		// Set selection for the start of line.
 		if ( lastCharacter === '\u2028' ) {
 			let node = pointer;
 
@@ -68,7 +72,10 @@ export function toTree( value, multilineTag, settings ) {
 					pointer &&
 					lastCharacterFormats &&
 					format === lastCharacterFormats[ formatIndex ] &&
-					( character !== '\u2028' || characterFormats.length - 1 !== formatIndex )
+					// Do not reuse the last element if the character is a
+					// line separator.
+					( character !== '\u2028' ||
+						characterFormats.length - 1 !== formatIndex )
 				) {
 					pointer = getLastChild( pointer );
 					return;
@@ -86,6 +93,7 @@ export function toTree( value, multilineTag, settings ) {
 			} );
 		}
 
+		// No need for further processing if the character is a line separator.
 		if ( character === '\u2028' ) {
 			lastCharacterFormats = characterFormats;
 			lastCharacter = character;
@@ -93,13 +101,14 @@ export function toTree( value, multilineTag, settings ) {
 		}
 
 		// If there is selection at 0, handle it before characters are inserted.
+		if ( i === 0 ) {
+			if ( onStartIndex && start === 0 ) {
+				onStartIndex( tree, pointer );
+			}
 
-		if ( onStartIndex && start === 0 && i === 0 ) {
-			onStartIndex( tree, pointer );
-		}
-
-		if ( onEndIndex && end === 0 && i === 0 ) {
-			onEndIndex( tree, pointer );
+			if ( onEndIndex && end === 0 ) {
+				onEndIndex( tree, pointer );
+			}
 		}
 
 		if ( character !== '\ufffc' ) {
