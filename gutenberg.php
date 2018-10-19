@@ -21,14 +21,16 @@ gutenberg_pre_init();
  * The main entry point for the Gutenberg editor. Renders the editor on the
  * wp-admin page for the plugin.
  *
+ * The gutenberg and gutenberg__editor classNames are left for backward compatibility.
+ *
  * @since 0.1.0
  */
 function the_gutenberg_project() {
 	global $post_type_object;
 	?>
-	<div class="gutenberg">
+	<div class="block-editor gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
-		<div id="editor" class="gutenberg__editor"></div>
+		<div id="editor" class="block-editor__container gutenberg__editor"></div>
 		<div id="metaboxes" style="display: none;">
 			<?php the_gutenberg_metaboxes(); ?>
 		</div>
@@ -476,19 +478,20 @@ function gutenberg_replace_default_add_new_button() {
 add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_button' );
 
 /**
- * Adds the gutenberg-editor-page class to the body tag on the Gutenberg page.
+ * Adds the block-editor-page class to the body tag on the Gutenberg page.
  *
  * @since 1.5.0
  *
  * @param string $classes Space separated string of classes being added to the body tag.
- * @return string The $classes string, with gutenberg-editor-page appended.
+ * @return string The $classes string, with block-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
+	// gutenberg-editor-page is left for backward compatibility.
 	if ( current_theme_supports( 'editor-styles' ) && current_theme_supports( 'dark-editor-style' ) ) {
-		return "$classes gutenberg-editor-page is-fullscreen-mode wp-embed-responsive is-dark-theme";
+		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive is-dark-theme";
 	} else {
 		// Default to is-fullscreen-mode to avoid jumps in the UI.
-		return "$classes gutenberg-editor-page is-fullscreen-mode wp-embed-responsive";
+		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive";
 	}
 }
 

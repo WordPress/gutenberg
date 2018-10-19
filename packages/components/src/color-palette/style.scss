@@ -150,6 +150,6 @@ $color-palette-circle-spacing: 14px;
 	min-width: unset;
 }
 
-.gutenberg__editor .components-popover.components-color-palette__picker.is-bottom {
-	z-index: z-index(".gutenberg__editor .components-popover.components-color-palette__picker.is-bottom");
+.block-editor__container .components-popover.components-color-palette__picker.is-bottom {
+	z-index: z-index(".block-editor__container .components-popover.components-color-palette__picker.is-bottom");
 }

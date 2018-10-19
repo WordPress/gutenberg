@@ -82,7 +82,7 @@ $z-layers: (
 	".components-popover:not(.is-mobile).is-bottom": 99990,
 
 	// Shows above edit post sidebar; Specificity needs to be higher than 3 classes.
-	".gutenberg__editor .components-popover.components-color-palette__picker.is-bottom": 100001,
+	".block-editor__container .components-popover.components-color-palette__picker.is-bottom": 100001,
 
 	".components-autocomplete__results": 1000000,
 
