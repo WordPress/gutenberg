@@ -582,6 +582,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ColorPicker",
+		"slug": "color-picker",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/color-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Dashicon",
 		"slug": "dashicon",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/dashicon/README.md",
