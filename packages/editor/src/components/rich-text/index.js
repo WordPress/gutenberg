@@ -627,8 +627,8 @@ export class RichText extends Component {
 				if ( this.props.onSplit && isEmptyLine( record ) ) {
 					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
+					// Use the current formats (used to keep list indentation).
 					const format = record.formats[ record.start - 1 ];
-
 					// Character is used to separate lines in multiline values.
 					this.onChange( insert( record, {
 						text: '\u2028',

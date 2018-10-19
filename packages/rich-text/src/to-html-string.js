@@ -38,8 +38,8 @@ export function toHTMLString( value, multilineTag ) {
 	return createChildrenHTML( tree.children );
 }
 
-function createEmpty( type ) {
-	return { type };
+function createEmpty() {
+	return {};
 }
 
 function getLastChild( { children } ) {

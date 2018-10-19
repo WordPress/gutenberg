@@ -58,13 +58,8 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-function createEmpty( type ) {
+function createEmpty() {
 	const { body } = document.implementation.createHTMLDocument( '' );
-
-	if ( type ) {
-		return body.appendChild( body.ownerDocument.createElement( type ) );
-	}
-
 	return body;
 }
 
