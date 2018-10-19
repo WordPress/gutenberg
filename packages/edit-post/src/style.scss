@@ -71,7 +71,7 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.gutenberg-editor-page {
+body.block-editor-page {
 	background: $white;
 
 	#wpcontent {
@@ -84,7 +84,7 @@ body.gutenberg-editor-page {
 
 	/* We hide legacy notices in Gutenberg, because they were not designed in a way that scaled well.
 	   Plugins can use Gutenberg notices if they need to pass on information to the user when they are editing. */
-	#wpbody-content > div:not(.gutenberg):not(#screen-meta) {
+	#wpbody-content > div:not(.block-editor):not(#screen-meta) {
 		display: none;
 	}
 
@@ -108,8 +108,8 @@ body.gutenberg-editor-page {
 	}
 }
 
-.gutenberg,
-// The modals are shown outside the .gutenberg wrapper, they need these styles
+.block-editor,
+// The modals are shown outside the .block-editor wrapper, they need these styles
 .components-modal__frame {
 	box-sizing: border-box;
 
@@ -125,7 +125,7 @@ body.gutenberg-editor-page {
 	}
 }
 
-.gutenberg__editor {
+.block-editor__container {
 	// on mobile the main content area has to scroll
 	// otherwise you can invoke the overscroll bounce on the non-scrolling container, causing (ノಠ益ಠ)ノ彡┻━┻
 	@include break-small {
