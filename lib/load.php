@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 // These files only need to be loaded if within a rest server instance
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
+	if ( ! class_exists( 'WP_REST_Blocks_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
+	}
 	if ( ! class_exists( 'WP_REST_Autosaves_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
 	}
