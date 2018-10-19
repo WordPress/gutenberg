@@ -13,6 +13,7 @@ RCT_EXPORT_VIEW_PROPERTY(onChange, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(onEnter, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(onActiveFormatsChange, RCTBubblingEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onHTMLContentWithCursor, RCTBubblingEventBlock)
 
 RCT_EXPORT_VIEW_PROPERTY(placeholder, NSString)
 RCT_EXPORT_VIEW_PROPERTY(placeholderTextColor, UIColor)
@@ -36,6 +37,13 @@ RCT_EXPORT_METHOD(applyFormat:(nonnull NSNumber *)node format:(NSString *)format
 {    
     [self executeBlock:^(RCTAztecView *aztecView) {
         [aztecView applyWithFormat:format];
+    } onNode:node];
+}
+
+RCT_EXPORT_METHOD(returnHTMLWithCursor:(nonnull NSNumber *)node)
+{
+    [self executeBlock:^(RCTAztecView *aztecView) {
+        [aztecView returnHTMLWithCursor];
     } onNode:node];
 }
 
