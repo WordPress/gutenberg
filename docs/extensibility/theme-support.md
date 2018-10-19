@@ -45,7 +45,7 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 add_theme_support( 'align-wide' );
 ```
 
-For more information about this function, see [the developer docs on `add_theme_support()`](https://developer.wordpress.org/reference/functions/add_theme_support/). 
+For more information about this function, see [the developer docs on `add_theme_support()`](https://developer.wordpress.org/reference/functions/add_theme_support/).
 
 ### Wide Alignments and Floats
 
@@ -238,7 +238,7 @@ You can style the editor like any other webpage. Here's how to change the backgr
 
 ```css
 /* Add this to your `style-editor.css` file */
-body.gutenberg-editor-page {
+body.block-editor-page {
 	background-color: #d3ebf3;
 	color: #00005d;
 }
@@ -250,19 +250,19 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 ```css
 /* Main column width */
-body.gutenberg-editor-page .editor-post-title__block,
-body.gutenberg-editor-page .editor-default-block-appender,
-body.gutenberg-editor-page .editor-block-list__block {
+body.block-editor-page .editor-post-title__block,
+body.block-editor-page .editor-default-block-appender,
+body.block-editor-page .editor-block-list__block {
 	max-width: 720px;
 }
 
 /* Width of "wide" blocks */
-body.gutenberg-editor-page .editor-block-list__block[data-align="wide"] {
+body.block-editor-page .editor-block-list__block[data-align="wide"] {
 	max-width: 1080px;
 }
 
 /* Width of "full-wide" blocks */
-body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
+body.block-editor-page .editor-block-list__block[data-align="full"] {
 	max-width: none;
 }
 ```

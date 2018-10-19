@@ -145,6 +145,11 @@ $color-palette-circle-spacing: 14px;
 	background-clip: content-box, content-box, content-box, content-box, content-box, content-box, padding-box, padding-box, padding-box, padding-box, padding-box, padding-box;
 }
 
-.gutenberg__editor .components-popover.components-color-palette__picker.is-bottom {
-	z-index: z-index(".gutenberg__editor .components-popover.components-color-palette__picker.is-bottom");
+.components-color-palette__picker:not(.is-mobile).components-popover .components-popover__content {
+	// ChromePicker has a hardcoded width, so we need to override the popover min-width.
+	min-width: unset;
+}
+
+.block-editor__container .components-popover.components-color-palette__picker.is-bottom {
+	z-index: z-index(".block-editor__container .components-popover.components-color-palette__picker.is-bottom");
 }
