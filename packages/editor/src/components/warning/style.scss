@@ -8,6 +8,11 @@
 	text-align: left;
 	padding: 20px;
 
+	// Avoid conflict with the multi-selection highlight color.
+	.has-warning.is-multi-selected & {
+		background-color: transparent;
+	}
+
 	.editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;
