@@ -5,8 +5,8 @@ import React
 @objc (RCTAztecViewManager)
 public class RCTAztecViewManager: RCTViewManager {
     
-    var attachmentDelegate: Aztec.TextViewAttachmentDelegate?
-    var imageProvider: Aztec.TextViewAttachmentImageProvider?
+    var attachmentDelegate: Aztec.TextViewAttachmentDelegate
+    var imageProvider: Aztec.TextViewAttachmentImageProvider
 
     /// Customize the initializer to set up the Aztec delegate methods.
     /// Then the example app should implement RCTBridgeDelegate
@@ -27,7 +27,7 @@ public class RCTAztecViewManager: RCTViewManager {
         
         view.isScrollEnabled = false
         view.textAttachmentDelegate = attachmentDelegate
-//        view.registerAttachmentImageProvider(imageProvider)
+        view.registerAttachmentImageProvider(imageProvider)
 
         return view
     }
