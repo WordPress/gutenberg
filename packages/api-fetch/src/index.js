@@ -29,7 +29,7 @@ function checkCloudflareError( error ) {
 
 function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
-		const { url, path, body, data, parse, ...remainingOptions } = nextOptions;
+		const { url, path, body, data, parse = true, ...remainingOptions } = nextOptions;
 		const headers = remainingOptions.headers || {};
 		if ( ! headers[ 'Content-Type' ] && data ) {
 			headers[ 'Content-Type' ] = 'application/json';
@@ -52,15 +52,17 @@ function apiFetch( options ) {
 			throw response;
 		};
 
+		const parseResponse = ( response ) => {
+			if ( parse ) {
+				return response.json ? response.json() : Promise.reject( response );
+			}
+
+			return response;
+		};
+
 		return responsePromise
 			.then( checkStatus )
-			.then( ( response ) => {
-				if ( parse ) {
-					return response.json ? response.json() : Promise.reject( response );
-				}
-
-				return response;
-			} )
+			.then( parseResponse )
 			.catch( ( response ) => {
 				if ( ! parse ) {
 					throw response;
