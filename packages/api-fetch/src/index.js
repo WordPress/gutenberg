@@ -108,7 +108,6 @@ function apiFetch( options ) {
 		raw,
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
-		fetchAllMiddleware,
 		...middlewares,
 	];
 	const next = ( nextOptions ) => {
@@ -124,5 +123,6 @@ apiFetch.use = registerMiddleware;
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
+apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 
 export default apiFetch;

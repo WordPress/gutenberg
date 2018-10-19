@@ -251,6 +251,11 @@ function gutenberg_register_scripts_and_styles() {
 		),
 		'after'
 	);
+	wp_add_inline_script(
+		'wp-api-fetch',
+		'wp.apiFetch.use( wp.apiFetch.fetchAllMiddleware );',
+		'after'
+	);
 
 	gutenberg_override_script(
 		'wp-deprecated',
