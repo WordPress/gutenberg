@@ -9,6 +9,22 @@ import { castArray, pick } from 'lodash';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+const getFeaturedImageMediaFrame = () => {
+	return wp.media.view.MediaFrame.Post.extend( {
+
+		/**
+		 * Create the default states.
+		 *
+		 * @return {void}
+		 */
+		createStates: function createStates() {
+			this.states.add( [
+				new wp.media.controller.FeaturedImage(),
+			] );
+		},
+	} );
+};
+
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
 	/**
@@ -78,6 +94,7 @@ class MediaUpload extends Component {
 		allowedTypes,
 		multiple = false,
 		gallery = false,
+		showAuthorFilters = false,
 		title = __( 'Select or Upload Media' ),
 		modalClass,
 		value,
@@ -118,6 +135,22 @@ class MediaUpload extends Component {
 			}
 
 			this.frame = wp.media( frameConfig );
+		}
+
+		if ( showAuthorFilters ) {
+			const featuredImageFrame = getFeaturedImageMediaFrame();
+			const attachments = getAttachmentsCollection( value );
+			const selection = new wp.media.model.Selection( attachments.models, {
+				props: attachments.props.toJSON(),
+			} );
+			this.frame = new featuredImageFrame( {
+				mimeType: allowedTypes,
+				state: 'featured-image',
+				multiple,
+				selection,
+				editing: ( value ) ? true : false,
+			} );
+			wp.media.frame = this.frame;
 		}
 
 		if ( modalClass ) {
