@@ -10,6 +10,7 @@ import {
 	PostPublishButton,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
 import { DotTip } from '@wordpress/nux';
 
@@ -30,6 +31,7 @@ function Header( {
 	togglePublishSidebar,
 	hasActiveMetaboxes,
 	isSaving,
+	isMobileViewport,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
@@ -49,7 +51,7 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 					<PostPreviewButton />
-					{ isPublishSidebarEnabled ? (
+					{ isPublishSidebarEnabled || isMobileViewport ? (
 						<PostPublishPanelToggle
 							isOpen={ isPublishSidebarOpened }
 							onToggle={ togglePublishSidebar }
@@ -102,4 +104,5 @@ export default compose(
 			hasBlockSelection: undefined,
 		};
 	} ),
+	withViewportMatch( { isMobileViewport: '< small' } ),
 )( Header );
