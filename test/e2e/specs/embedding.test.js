@@ -30,11 +30,19 @@ const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
-const INTERCEPT_EMBED_SUCCESS_URLS = {
+const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
+	url: 'https://twitter.com/thatbunty',
+	html: false,
+	provider_name: 'Embed Provider',
+	version: '1.0',
+};
+
+const MOCK_RESPONSES = {
 	'https://wordpress.org/gutenberg/handbook/block-api/attributes/': MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE,
 	'https://www.youtube.com/watch?v=lXMskKTw3Bc': MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
 	'https://cloudup.com/cQFlxqtY4ob': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 	'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
+	'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 };
 
 const setupEmbedRequestInterception = async () => {
@@ -46,7 +54,7 @@ const setupEmbedRequestInterception = async () => {
 		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed/1.0/proxy&url' );
 		if ( isEmbeddingUrl ) {
 			const embedUrl = decodeURIComponent( /.*url=([^&]+).*/.exec( requestUrl )[ 1 ] );
-			const mockResponse = INTERCEPT_EMBED_SUCCESS_URLS[ embedUrl ];
+			const mockResponse = MOCK_RESPONSES[ embedUrl ];
 			if ( undefined !== mockResponse ) {
 				request.respond( {
 					content: 'application/json',
@@ -76,6 +84,13 @@ const addEmbeds = async () => {
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+	await page.keyboard.press( 'Enter' );
+
+	// Provider whose oembed API has gone wrong.
+	await clickBlockAppender();
+	await page.keyboard.type( '/embed' );
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( 'https://twitter.com/thatbunty' );
 	await page.keyboard.press( 'Enter' );
 
 	// Valid provider; erroring provider API.
@@ -133,6 +148,7 @@ describe( 'Embedding content', () => {
 
 		// Each failed embed should be in the edit state.
 		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
+		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
 		await page.waitForSelector( 'input[value="https://www.reverbnation.com/collection/186-mellow-beats"]' );
 		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
 	} );
