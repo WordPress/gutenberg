@@ -6,11 +6,11 @@ import { render } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { getEmbedEdit } from '../';
+import { getEmbedEditComponent } from '../edit';
 
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
-		const EmbedEdit = getEmbedEdit( 'Embed', 'embed-generic' );
+		const EmbedEdit = getEmbedEditComponent( 'Embed', 'embed-generic' );
 		const wrapper = render( <EmbedEdit attributes={ {} } /> );
 
 		expect( wrapper ).toMatchSnapshot();
