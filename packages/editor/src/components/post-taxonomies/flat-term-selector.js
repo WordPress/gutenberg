@@ -60,7 +60,6 @@ class FlatTermSelector extends Component {
 				}
 			);
 		}
-		this.searchTerms();
 	}
 
 	componentWillUnmount() {

@@ -407,7 +407,8 @@ export class Autocomplete extends Component {
 					return;
 				}
 
-				const match = text.match( new RegExp( `${ open.triggerPrefix }(\\w*)$` ) );
+				const safeTrigger = escapeRegExp( open.triggerPrefix );
+				const match = text.match( new RegExp( `${ safeTrigger }(\\w*)$` ) );
 				const query = match && match[ 1 ];
 				const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 

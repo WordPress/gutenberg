@@ -149,9 +149,9 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta ) {
 	return $image_size;
 }
 
-function gutenberg_render_block_core_image( $block_attributes = array(), $html = '' ) {
-	// Something's wrong. Perhaps an old post?
-	if ( empty( $html ) || empty( $block_attributes ) || empty( $block_attributes['url'] ) ) {
+function render_block_core_image( $block_attributes = array(), $html = '' ) {
+	// Something's wrong. Or an old post or external image?
+	if ( empty( $html ) || empty( $block_attributes ) || empty( $block_attributes['id'] ) ) {
 		return $html;
 	}
 
@@ -271,7 +271,7 @@ function register_block_core_image() {
 				),
 				*/
 			),
-			'render_callback' => 'gutenberg_render_block_core_image',
+			'render_callback' => 'render_block_core_image',
 		)
 	);
 }

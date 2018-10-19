@@ -10,7 +10,7 @@ import {
 	getEditorMode,
 	getPreference,
 	isEditorSidebarOpened,
-	isEditorSidebarPanelOpened,
+	isEditorPanelOpened,
 	isModalActive,
 	isFeatureActive,
 	isPluginSidebarOpened,
@@ -22,6 +22,7 @@ import {
 	getMetaBox,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
+	isEditorPanelEnabled,
 } from '../selectors';
 
 jest.mock( '@wordpress/deprecated', () => jest.fn() );
@@ -207,29 +208,99 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'isEditorSidebarPanelOpened', () => {
-		it( 'should return false if no panels preference', () => {
+	describe( 'isEditorPanelEnabled', () => {
+		it( 'should return true by default', () => {
 			const state = {
-				preferences: {},
+				preferences: {
+					panels: {},
+				},
 			};
 
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( true );
 		} );
 
-		it( 'should return false if the panel value is not set', () => {
+		it( 'should return true when a panel has been enabled', () => {
 			const state = {
-				preferences: { panels: {} },
+				preferences: {
+					panels: {
+						'post-status': { enabled: true },
+					},
+				},
 			};
 
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( true );
 		} );
 
-		it( 'should return the panel value', () => {
+		it( 'should return false when a panel has been disabled', () => {
 			const state = {
-				preferences: { panels: { 'post-taxonomies': true } },
+				preferences: {
+					panels: {
+						'post-status': { enabled: false },
+					},
+				},
 			};
 
-			expect( isEditorSidebarPanelOpened( state, 'post-taxonomies' ) ).toBe( true );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isEditorPanelOpened', () => {
+		it( 'should return false by default', () => {
+			const state = {
+				preferences: {
+					panels: {},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return true when a panel has been opened', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': { opened: true },
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( true );
+		} );
+
+		it( 'should return false when a panel has been closed', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': { opened: false },
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return true when a panel has been legacy opened', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': true,
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( true );
+		} );
+
+		it( 'should return false when a panel has been legacy closed', () => {
+			const state = {
+				preferences: {
+					panels: {
+						'post-status': false,
+					},
+				},
+			};
+
+			expect( isEditorPanelOpened( state, 'post-status' ) ).toBe( false );
 		} );
 	} );
 
@@ -296,7 +367,11 @@ describe( 'selectors', () => {
 	describe( 'hasMetaBoxes', () => {
 		it( 'should return true if there are active meta boxes', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'side' ],
+				metaBoxes: {
+					locations: {
+						side: [ 'postcustom' ],
+					},
+				},
 			};
 
 			expect( hasMetaBoxes( state ) ).toBe( true );
@@ -304,7 +379,11 @@ describe( 'selectors', () => {
 
 		it( 'should return false if there are no active meta boxes', () => {
 			const state = {
-				activeMetaBoxLocations: [],
+				metaBoxes: {
+					locations: {
+						side: [],
+					},
+				},
 			};
 
 			expect( hasMetaBoxes( state ) ).toBe( false );
@@ -314,7 +393,10 @@ describe( 'selectors', () => {
 	describe( 'isSavingMetaBoxes', () => {
 		it( 'should return true if some meta boxes are saving', () => {
 			const state = {
-				isSavingMetaBoxes: true,
+				metaBoxes: {
+					isSaving: true,
+					locations: {},
+				},
 			};
 
 			expect( isSavingMetaBoxes( state ) ).toBe( true );
@@ -322,7 +404,10 @@ describe( 'selectors', () => {
 
 		it( 'should return false if no meta boxes are saving', () => {
 			const state = {
-				isSavingMetaBoxes: false,
+				metaBoxes: {
+					isSaving: false,
+					locations: {},
+				},
 			};
 
 			expect( isSavingMetaBoxes( state ) ).toBe( false );
@@ -332,7 +417,11 @@ describe( 'selectors', () => {
 	describe( 'getMetaBoxes', () => {
 		it( 'should return the state of all meta boxes', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'normal', 'side' ],
+				metaBoxes: {
+					locations: {
+						normal: [ 'postcustom' ],
+					},
+				},
 			};
 
 			const result = getMetaBoxes( state );
@@ -346,7 +435,7 @@ describe( 'selectors', () => {
 					isActive: false,
 				},
 				side: {
-					isActive: true,
+					isActive: false,
 				},
 			} );
 		} );
@@ -355,7 +444,11 @@ describe( 'selectors', () => {
 	describe( 'getMetaBox', () => {
 		it( 'should return the state of selected meta box', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'side' ],
+				metaBoxes: {
+					locations: {
+						side: [ 'postcustom' ],
+					},
+				},
 			};
 
 			const result = getMetaBox( state, 'side' );
@@ -370,7 +463,12 @@ describe( 'selectors', () => {
 	describe( 'getActiveMetaBoxLocations', () => {
 		it( 'should return the active meta boxes', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'side' ],
+				metaBoxes: {
+					locations: {
+						side: [ 'postcustom' ],
+						normal: [],
+					},
+				},
 			};
 
 			const result = getActiveMetaBoxLocations( state, 'side' );
@@ -382,7 +480,11 @@ describe( 'selectors', () => {
 	describe( 'isMetaBoxLocationActive', () => {
 		it( 'should return false if not active', () => {
 			const state = {
-				activeMetaBoxLocations: [],
+				metaBoxes: {
+					locations: {
+						side: [],
+					},
+				},
 			};
 
 			const result = isMetaBoxLocationActive( state, 'side' );
@@ -392,7 +494,11 @@ describe( 'selectors', () => {
 
 		it( 'should return true if active', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'side' ],
+				metaBoxes: {
+					locations: {
+						side: [ 'postcustom' ],
+					},
+				},
 			};
 
 			const result = isMetaBoxLocationActive( state, 'side' );

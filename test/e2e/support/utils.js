@@ -136,10 +136,23 @@ export async function newPost( { postType, enableTips = false } = {} ) {
 	}
 }
 
-export async function togglePrePublishChecks( ) {
-	await page.click( '.edit-post-more-menu' );
-	await page.waitForSelector( '.components-popover__content' );
-	await page.click( '.edit-post__pre-publish-checks' );
+/**
+ * Toggles the screen option with the given label.
+ *
+ * @param {string}   label           The label of the screen option, e.g. 'Show Tips'.
+ * @param {?boolean} shouldBeChecked If true, turns the option on. If false, off. If
+ *                                   undefined, the option will be toggled.
+ */
+export async function toggleOption( label, shouldBeChecked = undefined ) {
+	await clickOnMoreMenuItem( 'Options' );
+	const [ handle ] = await page.$x( `//label[contains(text(), "${ label }")]` );
+
+	const isChecked = await page.evaluate( ( element ) => element.control.checked, handle );
+	if ( isChecked !== shouldBeChecked ) {
+		await handle.click();
+	}
+
+	await page.click( 'button[aria-label="Close dialog"]' );
 }
 
 export async function arePrePublishChecksEnabled( ) {
@@ -147,15 +160,11 @@ export async function arePrePublishChecksEnabled( ) {
 }
 
 export async function enablePrePublishChecks( ) {
-	if ( ! await arePrePublishChecksEnabled( ) ) {
-		await togglePrePublishChecks();
-	}
+	await toggleOption( 'Enable Pre-publish Checks', true );
 }
 
 export async function disablePrePublishChecks( ) {
-	if ( await arePrePublishChecksEnabled( ) ) {
-		await togglePrePublishChecks();
-	}
+	await toggleOption( 'Enable Pre-publish Checks', false );
 }
 
 export async function setViewport( type ) {
@@ -259,6 +268,14 @@ export async function insertBlock( searchTerm, panelName = null ) {
 		await panelButton.click();
 	}
 	await page.click( `button[aria-label="${ searchTerm }"]` );
+	await waitForRichTextInitialization();
+}
+
+export async function convertBlock( name ) {
+	await page.mouse.move( 200, 300, { steps: 10 } );
+	await page.mouse.move( 250, 350, { steps: 10 } );
+	await page.click( '.editor-block-switcher__toggle' );
+	await page.click( `.editor-block-types-list__item[aria-label="${ name }"]` );
 	await waitForRichTextInitialization();
 }
 

@@ -14,7 +14,7 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
-import { parse } from '@wordpress/blocks';
+import { parse, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -28,6 +28,7 @@ class HeadingEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			insertBlocksAfter,
 		} = this.props;
 
 		const {
@@ -55,6 +56,17 @@ class HeadingEdit extends Component {
 							content: newParaBlock.attributes.content,
 						} );
 					} }
+					onSplit={
+						insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/paragraph', { content: after } ),
+								] );
+							} :
+							undefined
+					}
 					onContentSizeChange={ ( event ) => {
 						setAttributes( { aztecHeight: event.aztecHeight } );
 					} }

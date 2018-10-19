@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { reduce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -94,16 +89,47 @@ export function togglePublishSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that use toggled a panel in the editor.
+ * Returns an action object used to enable or disable a panel in the editor.
  *
- * @param {string}  panel The panel to toggle.
+ * @param {string} panelName A string that identifies the panel to enable or disable.
+ *
+ * @return {Object} Action object.
+ */
+export function toggleEditorPanelEnabled( panelName ) {
+	return {
+		type: 'TOGGLE_PANEL_ENABLED',
+		panelName,
+	};
+}
+
+/**
+ * Returns an action object used to open or close a panel in the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to open or close.
+ *
  * @return {Object} Action object.
 */
-export function toggleGeneralSidebarEditorPanel( panel ) {
+export function toggleEditorPanelOpened( panelName ) {
 	return {
-		type: 'TOGGLE_GENERAL_SIDEBAR_EDITOR_PANEL',
-		panel,
+		type: 'TOGGLE_PANEL_OPENED',
+		panelName,
 	};
+}
+
+/**
+ * Returns an action object used to open or close a panel in the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to open or close.
+ *
+ * @return {Object} Action object.
+*/
+export function toggleGeneralSidebarEditorPanel( panelName ) {
+	deprecated( 'toggleGeneralSidebarEditorPanel', {
+		alternative: 'toggleEditorPanelOpened',
+		plugin: 'Gutenberg',
+		version: '4.3.0',
+	} );
+	return toggleEditorPanelOpened( panelName );
 }
 
 /**
@@ -141,51 +167,38 @@ export function togglePinnedPluginItem( pluginName ) {
 	};
 }
 
-/**
- * Returns an action object used to check the state of meta boxes at a location.
- *
- * This should only be fired once to initialize meta box state. If a meta box
- * area is empty, this will set the store state to indicate that React should
- * not render the meta box area.
- *
- * Example: metaBoxes = { side: true, normal: false }.
- *
- * This indicates that the sidebar has a meta box but the normal area does not.
- *
- * @param {Object} metaBoxes Whether meta box locations are active.
- *
- * @return {Object} Action object.
- */
-export function initializeMetaBoxState( metaBoxes ) {
+export function initializeMetaBoxState() {
 	deprecated( 'initializeMetaBoxState action (`core/edit-post`)', {
-		alternative: 'setActiveMetaBoxLocations',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
+	return {
+		type: 'DO_NOTHING',
+	};
+}
 
-	const locations = reduce( metaBoxes, ( result, isActive, location ) => {
-		if ( isActive ) {
-			result = result.concat( location );
-		}
-
-		return result;
-	}, [] );
-
-	return setActiveMetaBoxLocations( locations );
+export function setActiveMetaBoxLocations() {
+	deprecated( 'setActiveMetaBoxLocations action (`core/edit-post`)', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+	return {
+		type: 'DO_NOTHING',
+	};
 }
 
 /**
- * Returns an action object used in signaling that the active meta box
- * locations have changed.
+ * Returns an action object used in signaling
+ * what Meta boxes are available in which location.
  *
- * @param {string[]} locations New active meta box locations.
+ * @param {Object} metaBoxesPerLocation Meta boxes per location.
  *
  * @return {Object} Action object.
  */
-export function setActiveMetaBoxLocations( locations ) {
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	return {
-		type: 'SET_ACTIVE_META_BOX_LOCATIONS',
-		locations,
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
 	};
 }
 

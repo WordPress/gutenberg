@@ -70,8 +70,12 @@ describe( 'reusable blocks effects', () => {
 			const blockPromise = Promise.resolve( [
 				{
 					id: 123,
-					title: 'My cool block',
-					content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+					title: {
+						raw: 'My cool block',
+					},
+					content: {
+						raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+					},
 				},
 			] );
 			const postTypePromise = Promise.resolve( {
@@ -97,7 +101,6 @@ describe( 'reusable blocks effects', () => {
 						reusableBlock: {
 							id: 123,
 							title: 'My cool block',
-							content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 						},
 						parsedBlock: expect.objectContaining( {
 							name: 'core/test-block',
@@ -115,8 +118,12 @@ describe( 'reusable blocks effects', () => {
 		it( 'should fetch a single reusable block', async () => {
 			const blockPromise = Promise.resolve( {
 				id: 123,
-				title: 'My cool block',
-				content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+				title: {
+					raw: 'My cool block',
+				},
+				content: {
+					raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+				},
 			} );
 			const postTypePromise = Promise.resolve( {
 				slug: 'wp_block', rest_base: 'blocks',
@@ -141,7 +148,6 @@ describe( 'reusable blocks effects', () => {
 						reusableBlock: {
 							id: 123,
 							title: 'My cool block',
-							content: '<!-- wp:test-block {"name":"Big Bird"} /-->',
 						},
 						parsedBlock: expect.objectContaining( {
 							name: 'core/test-block',

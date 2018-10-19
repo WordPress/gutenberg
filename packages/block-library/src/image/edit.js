@@ -16,7 +16,7 @@ import {
  */
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
+import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
 	Button,
 	ButtonGroup,
@@ -41,7 +41,6 @@ import {
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -59,33 +58,49 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	let { caption } = image;
-
-	if ( typeof caption !== 'object' ) {
-		caption = create( { html: caption } );
-	}
-
-	return {
-		...pick( image, [ 'alt', 'id', 'link', 'url' ] ),
-		caption,
-	};
+	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
 };
 
+/**
+ * Is the URL a temporary blob URL? A blob URL is one that is used temporarily
+ * while the image is being uploaded and will not have an id yet allocated.
+ *
+ * @param {number=} id The id of the image.
+ * @param {string=} url The url of the image.
+ *
+ * @return {boolean} Is the URL a Blob URL
+ */
+const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
+
+/**
+ * Is the url for the image hosted externally. An externally hosted image has no id
+ * and is not a blob url.
+ *
+ * @param {number=} id  The id of the image.
+ * @param {string=} url The url of the image.
+ *
+ * @return {boolean} Is the url an externally hosted url?
+ */
+const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
+
 class ImageEdit extends Component {
-	constructor() {
+	constructor( { attributes } ) {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.onImageClick = this.onImageClick.bind( this );
 		this.onSelectImage = this.onSelectImage.bind( this );
+		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.resetScale = this.resetScale.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 
 		this.state = {
 			captionFocused: false,
+			isEditing: ! attributes.url,
 		};
 	}
 
@@ -93,7 +108,7 @@ class ImageEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { id, url = '' } = attributes;
 
-		if ( ! id && url.indexOf( 'blob:' ) === 0 ) {
+		if ( isTemporaryImage( id, url ) ) {
 			const file = getBlobByURL( url );
 
 			if ( file ) {
@@ -109,10 +124,10 @@ class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { id: prevID, url: prevUrl = '' } = prevProps.attributes;
+		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
 		const { id, url = '' } = this.props.attributes;
 
-		if ( ! prevID && prevUrl.indexOf( 'blob:' ) === 0 && id && url.indexOf( 'blob:' ) === -1 ) {
+		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
 			revokeBlobURL( url );
 		}
 
@@ -129,10 +144,14 @@ class ImageEdit extends Component {
 				url: undefined,
 				alt: undefined,
 				id: undefined,
-				caption: create(),
+				caption: undefined,
 			} );
 			return;
 		}
+
+		this.setState( {
+			isEditing: false,
+		} );
 
 		const editorWidth = getEditorWidth();
 		let src = media.url;
@@ -192,6 +211,24 @@ class ImageEdit extends Component {
 		this.props.setAttributes( {
 			linkDestination: value,
 			href,
+		} );
+	}
+
+	onSelectURL( newURL ) {
+		const { url } = this.props.attributes;
+
+		if ( newURL !== url ) {
+			this.props.setAttributes( {
+				url: newURL,
+				id: undefined,
+			} );
+			this.resetWidthHeight();
+			this.resetScale();
+			this.resetSrcsetAndSizes();
+		}
+
+		this.setState( {
+			isEditing: false,
 		} );
 	}
 
@@ -447,18 +484,34 @@ class ImageEdit extends Component {
 		return showSizes;
 	}
 
+	toggleIsEditing() {
+		this.setState( {
+			isEditing: ! this.state.isEditing,
+		} );
+	}
+
 	render() {
+		const { isEditing } = this.state;
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, scale, srcSet, width, height } = attributes;
+		const isExternal = isExternalImage( id, url );
 		const sizesAttr = attributes.sizes;
 
-		const controls = (
-			<BlockControls>
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ this.updateAlignment }
-				/>
-				{ !! url && (
+		let toolbarEditButton;
+		if ( url ) {
+			if ( isExternal ) {
+				toolbarEditButton = (
+					<Toolbar>
+						<IconButton
+							className="components-icon-button components-toolbar__control"
+							label={ __( 'Edit image' ) }
+							onClick={ this.toggleIsEditing }
+							icon="edit"
+						/>
+					</Toolbar>
+				);
+			} else {
+				toolbarEditButton = (
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectImage }
@@ -474,13 +527,23 @@ class ImageEdit extends Component {
 							) }
 						/>
 					</Toolbar>
-				) }
+				);
+			}
+		}
+
+		const controls = (
+			<BlockControls>
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ this.updateAlignment }
+				/>
+				{ toolbarEditButton }
 			</BlockControls>
 		);
 
-		const availableSizes = this.getAvailableSizes();
+		if ( isEditing ) {
+			const src = isExternal ? url : undefined;
 
-		if ( ! url ) {
 			return (
 				<Fragment>
 					{ controls }
@@ -492,21 +555,24 @@ class ImageEdit extends Component {
 						} }
 						className={ className }
 						onSelect={ this.onSelectImage }
+						onSelectURL={ this.onSelectURL }
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ { id, src } }
 					/>
 				</Fragment>
 			);
 		}
 
 		const classes = classnames( className, {
-			'is-transient': 0 === url.indexOf( 'blob:' ),
+			'is-transient': isBlobURL( url ),
 			'is-resized': scale !== 1,
 			'is-focused': isSelected,
 		} );
 
+		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 

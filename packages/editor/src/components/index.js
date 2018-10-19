@@ -6,6 +6,7 @@ export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
+export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
 export { default as withColorContext } from './color-palette/with-color-context';

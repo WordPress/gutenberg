@@ -58,20 +58,20 @@ describe( 'Blocks raw handling', () => {
 			HTML: '&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
 			plainText: '<p>Some <strong>bold</strong> text.</p>',
 			mode: 'AUTO',
-		} ).map( getBlockContent ).join( '' );
+		} );
 
-		expect( filtered ).toBe( '<p>Some <strong>bold</strong> text.</p>' );
+		expect( filtered ).toBe( 'Some <strong>bold</strong> text.' );
 		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should parse Markdown with HTML', () => {
 		const filtered = rawHandler( {
 			HTML: '',
-			plainText: '# Some <em>heading</em>',
+			plainText: '# Some <em>heading</em>\n\nA paragraph.',
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		expect( filtered ).toBe( '<h1>Some <em>heading</em></h1>' );
+		expect( filtered ).toBe( '<h1>Some <em>heading</em></h1><p>A paragraph.</p>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -92,6 +92,28 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toBe( 'schön' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should treat single list item as inline text', () => {
+		const filtered = rawHandler( {
+			HTML: '<ul><li>Some <strong>bold</strong> text.</li></ul>',
+			plainText: 'Some <strong>bold</strong> text.\n',
+			mode: 'AUTO',
+		} );
+
+		expect( filtered ).toBe( 'Some <strong>bold</strong> text.' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should treat multiple list items as a block', () => {
+		const filtered = rawHandler( {
+			HTML: '<ul><li>One</li><li>Two</li><li>Three</li></ul>',
+			plainText: 'One\nTwo\nThree\n',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<ul><li>One</li><li>Two</li><li>Three</li></ul>' );
 		expect( console ).toHaveLogged();
 	} );
 
