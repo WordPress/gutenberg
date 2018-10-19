@@ -1299,6 +1299,18 @@ Returns whether the post is locked.
 
 Is locked.
 
+### isPostSavingLocked
+
+Returns whether post saving is locked.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is locked.
+
 ### isPostLockTakeover
 
 Returns whether the edition of the post has been taken over.
@@ -1753,3 +1765,19 @@ Returns an action object used in signalling that the user has enabled the publis
 ### disablePublishSidebar
 
 Returns an action object used in signalling that the user has disabled the publish sidebar.
+
+### lockPostSaving
+
+Returns an action object used to signal that post saving is locked.
+
+*Parameters*
+
+ * lockName: The lock name.
+
+### unlockPostSaving
+
+Returns an action object used to signal that post saving is unlocked.
+
+*Parameters*
+
+ * lockName: The lock name.
