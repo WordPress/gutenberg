@@ -2,6 +2,12 @@
  * Internal dependencies
  */
 import { common, others } from './core-embeds';
+import { DEFAULT_EMBED_BLOCK } from './constants';
+
+/**
+ * External dependencies
+ */
+import { includes } from 'lodash';
 
 export const matchesPatterns = ( url, patterns = [] ) => {
 	return patterns.some( ( pattern ) => {
@@ -15,5 +21,9 @@ export const findBlock = ( url ) => {
 			return block.name;
 		}
 	}
-	return 'core/embed';
+	return DEFAULT_EMBED_BLOCK;
+};
+
+export const isFromWordPress = ( html ) => {
+	return includes( html, 'class="wp-embedded-content" data-secret' );
 };

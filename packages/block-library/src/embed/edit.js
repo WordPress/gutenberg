@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { findBlock } from './util';
-import { HOSTS_NO_PREVIEWS, ASPECT_RATIOS } from './constants';
+import { findBlock, isFromWordPress } from './util';
+import { HOSTS_NO_PREVIEWS, ASPECT_RATIOS, DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
 /**
  * External dependencies
  */
@@ -112,7 +112,7 @@ export function getEmbedEditComponent( title, icon ) {
 
 			// WordPress blocks can work on multiple sites, and so don't have patterns,
 			// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
-			if ( 'core-embed/wordpress' !== this.props.name && 'core/embed' !== matchingBlock ) {
+			if ( WORDPRESS_EMBED_BLOCK !== this.props.name && DEFAULT_EMBED_BLOCK !== matchingBlock ) {
 				// At this point, we have discovered a more suitable block for this url, so transform it.
 				if ( this.props.name !== matchingBlock ) {
 					this.props.onReplace( createBlock( matchingBlock, { url } ) );
@@ -123,13 +123,13 @@ export function getEmbedEditComponent( title, icon ) {
 			if ( preview ) {
 				const { html } = preview;
 
-				// This indicates it's a WordPress embed, there aren't a set of URL patterns we can use to match WordPress URLs.
-				if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+				// We can't match the URL for WordPress embeds, we have to check the HTML instead.
+				if ( isFromWordPress( html ) ) {
 					// If this is not the WordPress embed block, transform it into one.
-					if ( this.props.name !== 'core-embed/wordpress' ) {
+					if ( WORDPRESS_EMBED_BLOCK !== this.props.name ) {
 						this.props.onReplace(
 							createBlock(
-								'core-embed/wordpress',
+								WORDPRESS_EMBED_BLOCK,
 								{
 									url,
 									// By now we have the preview, but when the new block first renders, it
@@ -217,7 +217,7 @@ export function getEmbedEditComponent( title, icon ) {
 			const { html, provider_name: providerName } = preview;
 			const providerNameSlug = kebabCase( toLower( '' !== providerName ? providerName : title ) );
 
-			if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
+			if ( isFromWordPress( html ) ) {
 				type = 'wp-embed';
 			}
 

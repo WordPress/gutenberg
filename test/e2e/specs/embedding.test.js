@@ -3,14 +3,14 @@
  */
 import { clickBlockAppender, newPost } from '../support/utils';
 
-const INTERCEPT_EMBED_SUCCESS_URLS = [
-	'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
-	'https://www.youtube.com/watch?v=lXMskKTw3Bc',
-	'https://cloudup.com/cQFlxqtY4ob',
-	'https://twitter.com/notnownikki',
-];
-
-const VIDEO_URL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
+const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
+	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
+	html: '<div class="wp-embedded-content" data-secret="shhhh it is a secret">WordPress embed</div>',
+	type: 'rich',
+	provider_name: 'WordPress',
+	provider_url: 'https://wordpress.org',
+	version: '1.0',
+};
 
 const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 	url: 'https://twitter.com/notnownikki',
@@ -30,24 +30,31 @@ const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
+const INTERCEPT_EMBED_SUCCESS_URLS = {
+	'https://wordpress.org/gutenberg/handbook/block-api/attributes/': MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE,
+	'https://www.youtube.com/watch?v=lXMskKTw3Bc': MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+	'https://cloudup.com/cQFlxqtY4ob': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
+	'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
+};
+
 const setupEmbedRequestInterception = async () => {
 	// Intercept successful embed requests so that scripts loaded from third parties
 	// cannot leave errors in the console and cause the test to fail.
 	await page.setRequestInterception( true );
 	page.on( 'request', async ( request ) => {
 		const requestUrl = request.url();
-		const hasEmbedSuccessUrl = INTERCEPT_EMBED_SUCCESS_URLS.some(
-			( url ) => -1 !== requestUrl.indexOf( encodeURIComponent( url ) )
-		);
-		if ( hasEmbedSuccessUrl ) {
-			// If this is the YouTube request, return the video mock response that has
-			// an iframe with set aspect ratio.
-			// Otherwise: use the generic rich response.
-			const embedResponse = -1 !== requestUrl.indexOf( encodeURIComponent( VIDEO_URL ) ) ? MOCK_EMBED_VIDEO_SUCCESS_RESPONSE : MOCK_EMBED_RICH_SUCCESS_RESPONSE;
-			request.respond( {
-				content: 'application/json',
-				body: JSON.stringify( embedResponse ),
-			} );
+		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed/1.0/proxy&url' );
+		if ( isEmbeddingUrl ) {
+			const embedUrl = decodeURIComponent( /.*url=([^&]+).*/.exec( requestUrl )[ 1 ] );
+			const mockResponse = INTERCEPT_EMBED_SUCCESS_URLS[ embedUrl ];
+			if ( undefined !== mockResponse ) {
+				request.respond( {
+					content: 'application/json',
+					body: JSON.stringify( mockResponse ),
+				} );
+			} else {
+				request.continue();
+			}
 		} else {
 			request.continue();
 		}
@@ -117,8 +124,10 @@ describe( 'Embedding content', () => {
 
 	it( 'should render embeds in the correct state', async () => {
 		// The successful embeds should be in a correctly classed figure element.
+		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 		await page.waitForSelector( 'figure.wp-block-embed-cloudup' );
+		await page.waitForSelector( 'figure.wp-block-embed-wordpress' );
 		// Video embed should also have the aspect ratio class.
 		await page.waitForSelector( 'figure.wp-block-embed-youtube.wp-embed-aspect-16-9' );
 
