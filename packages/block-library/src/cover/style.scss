@@ -1,4 +1,5 @@
-.wp-block-cover-image {
+.wp-block-cover-image,
+.wp-block-cover {
 	position: relative;
 	background-color: $black;
 	background-size: cover;
@@ -14,7 +15,8 @@
 		justify-content: flex-start;
 
 		h2,
-		.wp-block-cover-image-text {
+		.wp-block-cover-image-text,
+		.wp-block-cover-text {
 			margin-left: 0;
 			text-align: left;
 		}
@@ -24,14 +26,16 @@
 		justify-content: flex-end;
 
 		h2,
-		.wp-block-cover-image-text {
+		.wp-block-cover-image-text,
+		.wp-block-cover-text {
 			margin-right: 0;
 			text-align: right;
 		}
 	}
 
 	h2,
-	.wp-block-cover-image-text {
+	.wp-block-cover-image-text,
+	.wp-block-cover-text {
 		color: $white;
 		font-size: 2em;
 		line-height: 1.25;
@@ -62,6 +66,7 @@
 		right: 0;
 		background-color: inherit;
 		opacity: 0.5;
+		z-index: z-index(".wp-block-cover.has-background-dim::before");
 	}
 
 	@for $i from 1 through 10 {
@@ -82,4 +87,15 @@
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+}
+
+.wp-block-cover__video-background {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translateX(-50%) translateY(-50%);
+	width: 100%;
+	height: 100%;
+	z-index: z-index(".wp-block-cover__video-background");
+	object-fit: fill;
 }

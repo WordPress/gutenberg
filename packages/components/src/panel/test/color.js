@@ -13,5 +13,9 @@ describe( 'PanelColor', () => {
 		const wrapper = shallow( <PanelColor title="sample title" /> );
 
 		expect( wrapper ).toMatchSnapshot();
+
+		expect( console ).toHaveWarnedWith(
+			'wp.components.PanelColor is deprecated and will be removed from Gutenberg in 4.3. Please use wp.editor.PanelColorSettings instead.'
+		);
 	} );
 } );

@@ -6,7 +6,6 @@ import { castArray, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { parseWithAttributeSchema } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
@@ -91,7 +90,6 @@ class MediaUpload extends Component {
 		this.onSelect = this.onSelect.bind( this );
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
-		this.processMediaCaption = this.processMediaCaption.bind( this );
 
 		let allowedTypesToUse = allowedTypes;
 		if ( ! allowedTypes && deprecatedType ) {
@@ -162,9 +160,9 @@ class MediaUpload extends Component {
 		}
 
 		if ( multiple ) {
-			onSelect( selectedImages.models.map( ( model ) => this.processMediaCaption( slimImageObject( model.toJSON() ) ) ) );
+			onSelect( selectedImages.models.map( ( model ) => slimImageObject( model.toJSON() ) ) );
 		} else {
-			onSelect( this.processMediaCaption( slimImageObject( ( selectedImages.models[ 0 ].toJSON() ) ) ) );
+			onSelect( slimImageObject( ( selectedImages.models[ 0 ].toJSON() ) ) );
 		}
 	}
 
@@ -174,8 +172,8 @@ class MediaUpload extends Component {
 		const attachment = this.frame.state().get( 'selection' ).toJSON();
 		onSelect(
 			multiple ?
-				attachment.map( this.processMediaCaption ) :
-				this.processMediaCaption( attachment[ 0 ] )
+				attachment :
+				attachment[ 0 ]
 		);
 	}
 
@@ -203,14 +201,6 @@ class MediaUpload extends Component {
 
 	openModal() {
 		this.frame.open();
-	}
-
-	processMediaCaption( mediaObject ) {
-		return ! mediaObject.caption ?
-			mediaObject :
-			{ ...mediaObject, caption: parseWithAttributeSchema( mediaObject.caption, {
-				source: 'rich-text',
-			} ) };
 	}
 
 	render() {

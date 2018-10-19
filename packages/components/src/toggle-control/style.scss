@@ -1,4 +1,12 @@
 .components-toggle-control .components-base-control__field {
 	display: flex;
-	justify-content: space-between;
+	margin-bottom: $grid-size-small * 3;
+
+	.components-base-control__label {
+		order: 1;
+	}
+
+	.components-form-toggle {
+		margin-right: $grid-size-large;
+	}
 }

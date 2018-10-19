@@ -1,3 +1,17 @@
+## 5.0.0 (Unreleased)
+
+### Breaking Changes
+
+- The `checkTemplateValidity` action has been removed. Validity is verified automatically upon block reset.
+
+### Deprecations
+
+- `wp.editor.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
+
+### New Features
+
+- Added `onClose` prop to `URLPopover` component.
+
 ## 4.0.0 (2018-09-30)
 
 ### Breaking Changes

@@ -55,10 +55,12 @@ The editor also uses some popular third-party packages and scripts. Plugin devel
 
 ## Polyfill Scripts
 
-The editor also provides polyfills for certain features that may not be available in all modern browsers
+The editor also provides polyfills for certain features that may not be available in all modern browsers.
+It is recommened to use the main `wp-polyfill` script handle which takes care of loading all the below mentioned polyfills.  
 
 | Script Name | Handle | Description |
 |-------------|--------|-------------|
+| polyfill | wp-polyfill | Main script to load all the below mentioned polyfills |
 | [Fetch Polyfill](https://www.npmjs.com/package/whatwg-fetch) | wp-polyfill-fetch | Polyfill that implements a subset of the standard Fetch specification |
 | [Promise Polyfill](https://www.npmjs.com/package/promise-polyfill) | wp-polyfill-promise| Lightweight ES6 Promise polyfill for the browser and node |
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill) | wp-polyfill-formdata| Polyfill conditionally replaces the native implementation |

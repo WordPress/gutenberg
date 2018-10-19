@@ -8,11 +8,12 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, IconButton } from '@wordpress/components';
+import { Dashicon, Button, IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -42,7 +43,19 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { post, isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving, isPending } = this.props;
+		const {
+			post,
+			isNew,
+			isScheduled,
+			isPublished,
+			isDirty,
+			isSaving,
+			isSaveable,
+			onSave,
+			isAutosaving,
+			isPending,
+			isLargeViewport,
+		} = this.props;
 		const { forceSavedMessage } = this.state;
 		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
 		if ( isSaving ) {
@@ -84,15 +97,28 @@ export class PostSavedState extends Component {
 			return null;
 		}
 
+		const label = isPending ? __( 'Save as Pending' ) : __( 'Save Draft' );
+		if ( ! isLargeViewport ) {
+			return (
+				<IconButton
+					className="editor-post-save-draft"
+					label={ label }
+					onClick={ onSave }
+					shortcut={ displayShortcut.primary( 's' ) }
+					icon="cloud-upload"
+				/>
+			);
+		}
+
 		return (
-			<IconButton
+			<Button
 				className="editor-post-save-draft"
 				onClick={ onSave }
-				icon="cloud-upload"
 				shortcut={ displayShortcut.primary( 's' ) }
+				isTertiary
 			>
-				{ isPending ? __( 'Save as Pending' ) : __( 'Save Draft' ) }
-			</IconButton>
+				{ label }
+			</Button>
 		);
 	}
 }
@@ -126,4 +152,5 @@ export default compose( [
 		onSave: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	withSafeTimeout,
+	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( PostSavedState );

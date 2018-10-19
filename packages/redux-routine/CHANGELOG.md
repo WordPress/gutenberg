@@ -1,3 +1,9 @@
+## 3.0.1 (Unreleased)
+
+### Bug Fix
+
+- Account for null value in redux-routine createRuntime (introduces `isAction` and `isActionOfType` methods to assist with that).
+
 ## 3.0.0 (2018-09-30)
 
 ### Breaking change

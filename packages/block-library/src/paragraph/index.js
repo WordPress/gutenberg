@@ -65,6 +65,10 @@ const schema = {
 	customFontSize: {
 		type: 'number',
 	},
+	direction: {
+		type: 'string',
+		enum: [ 'ltr', 'rtl' ],
+	},
 };
 
 export const name = 'core/paragraph';
@@ -230,6 +234,7 @@ export const settings = {
 			customTextColor,
 			fontSize,
 			customFontSize,
+			direction,
 		} = attributes;
 
 		const textClass = getColorClassName( 'color', textColor );
@@ -258,6 +263,7 @@ export const settings = {
 				style={ styles }
 				className={ className ? className : undefined }
 				value={ content }
+				dir={ direction }
 			/>
 		);
 	},

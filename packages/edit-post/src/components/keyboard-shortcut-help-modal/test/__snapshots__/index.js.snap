@@ -74,6 +74,16 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "description": "Open the block navigation menu.",
+            "keyCombination": Array [
+              "Shift",
+              "+",
+              "Alt",
+              "+",
+              "O",
+            ],
+          },
+          Object {
             "ariaLabel": "Control + Backtick",
             "description": "Navigate to the next part of the editor.",
             "keyCombination": Array [

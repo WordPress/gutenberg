@@ -21,7 +21,7 @@ import Placeholder from '../placeholder';
 import Spinner from '../spinner';
 
 export function rendererPath( block, attributes = null, urlQueryArgs = {} ) {
-	return addQueryArgs( `/gutenberg/v1/block-renderer/${ block }`, {
+	return addQueryArgs( `/wp/v2/block-renderer/${ block }`, {
 		context: 'edit',
 		...( null !== attributes ? { attributes } : {} ),
 		...urlQueryArgs,
