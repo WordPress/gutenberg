@@ -12,16 +12,16 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
         Object {
           "a": 1,
           "h": 0,
-          "l": 0.5,
-          "s": 1,
+          "l": 50,
+          "s": 100,
         }
       }
       hsv={
         Object {
           "a": 1,
           "h": 0,
-          "s": 1,
-          "v": 1,
+          "s": 100,
+          "v": 100,
         }
       }
       onChange={[Function]}
@@ -48,13 +48,13 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
       <div
         className="components-color-picker__toggles"
       >
-        <Hue
+        <WithInstanceId(Hue)
           hsl={
             Object {
               "a": 1,
               "h": 0,
-              "l": 0.5,
-              "s": 1,
+              "l": 50,
+              "s": 100,
             }
           }
           onChange={[Function]}
@@ -68,8 +68,8 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
         Object {
           "a": 1,
           "h": 0,
-          "l": 0.5,
-          "s": 1,
+          "l": 50,
+          "s": 100,
         }
       }
       onChange={[Function]}
