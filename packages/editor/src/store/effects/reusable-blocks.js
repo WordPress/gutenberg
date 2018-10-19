@@ -185,7 +185,7 @@ export const deleteReusableBlocks = async ( action, store ) => {
 
 	try {
 		await apiFetch( {
-			path: `/wp/v2/${ postType.rest_base }/${ id }?force=true`,
+			path: `/wp/v2/${ postType.rest_base }/${ id }`,
 			method: 'DELETE',
 		} );
 		dispatch( {
