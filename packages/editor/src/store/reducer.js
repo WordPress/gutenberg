@@ -246,7 +246,7 @@ export const editor = flow( [
 						if ( value !== newState[ key ] ) {
 							result = getMutateSafeObject( state, result );
 
-							if ( typeof newState[ key ] === 'object' ) {
+							if ( typeof newState[ key ] === 'object' && ! Array.isArray( newState[ key ] ) ) {
 								result[ key ] = recurseEdits( value, newState[ key ] );
 							} else {
 								result[ key ] = value;
