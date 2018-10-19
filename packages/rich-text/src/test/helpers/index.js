@@ -6,7 +6,8 @@ const em = { type: 'em' };
 const strong = { type: 'strong' };
 const img = { type: 'img', attributes: { src: '' }, object: true };
 const a = { type: 'a', attributes: { href: '#' } };
-const list = [ { type: 'ul' }, { type: 'li' } ];
+const ul = { type: 'ul' };
+const ol = { type: 'ol' };
 
 export const spec = [
 	{
@@ -352,6 +353,25 @@ export const spec = [
 		},
 	},
 	{
+		description: 'should handle empty multiline value',
+		multilineTag: 'p',
+		html: '<p></p>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.firstChild,
+			endOffset: 0,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [],
+			text: '',
+		},
+	},
+	{
 		description: 'should handle multiline value',
 		multilineTag: 'p',
 		html: '<p>one</p><p>two</p>',
@@ -373,20 +393,77 @@ export const spec = [
 	{
 		description: 'should handle multiline list value',
 		multilineTag: 'li',
-		html: '<li>one<ul><li>two</li></ul></li><li>three</li>',
+		html: '<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
 			endOffset: 1,
-			endContainer: element,
+			endContainer: element.querySelector( 'ol > li' ).firstChild,
 		} ),
 		startPath: [ 0, 0, 0 ],
-		endPath: [ 1, 0, 0 ],
+		endPath: [ 0, 1, 1, 1, 0, 0, 1 ],
 		record: {
 			start: 0,
-			end: 7,
-			formats: [ , , , list, list, list, , , , , , , ],
-			text: 'onetwo\u2028three',
+			end: 9,
+			formats: [ , , , [ ul ], [ ul ], [ ul ], [ ul ], [ ul, ol ], [ ul, ol ], [ ul, ol ], [ ul, ol ], , , , , , , ],
+			text: 'one\u2028a\u2028b\u20281\u20282\u2028three',
+		},
+	},
+	{
+		description: 'should handle empty list value',
+		multilineTag: 'li',
+		html: '<li></li>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.firstChild,
+			endOffset: 0,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 0 ],
+		record: {
+			start: 0,
+			end: 0,
+			formats: [],
+			text: '',
+		},
+	},
+	{
+		description: 'should handle nested empty list value',
+		multilineTag: 'li',
+		html: '<li><ul><li></li></ul></li>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.querySelector( 'ul > li' ),
+			endOffset: 0,
+			endContainer: element.querySelector( 'ul > li' ),
+		} ),
+		startPath: [ 0, 0, 0, 0, 0 ],
+		endPath: [ 0, 0, 0, 0, 0 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [ [ ul ] ],
+			text: '\u2028',
+		},
+	},
+	{
+		description: 'should handle middle empty list value',
+		multilineTag: 'li',
+		html: '<li></li><li></li><li></li>',
+		createRange: ( element ) => ( {
+			startOffset: 0,
+			startContainer: element.firstChild.nextSibling,
+			endOffset: 0,
+			endContainer: element.firstChild.nextSibling,
+		} ),
+		startPath: [ 1, 0, 0 ],
+		endPath: [ 1, 0, 0 ],
+		record: {
+			start: 1,
+			end: 1,
+			formats: [ , , ],
+			text: '\u2028\u2028',
 		},
 	},
 	{

@@ -1,28 +1,5 @@
-/**
- * Internal dependencies
- */
-
-import { split } from './split';
-
 export function toTree( value, multilineTag, settings ) {
-	if ( multilineTag ) {
-		const { createEmpty, append } = settings;
-		const tree = createEmpty();
-
-		split( value, '\u2028' ).forEach( ( piece, index ) => {
-			append( tree, toTree( piece, null, {
-				...settings,
-				tag: multilineTag,
-				multilineIndex: index,
-			} ) );
-		} );
-
-		return tree;
-	}
-
 	const {
-		tag,
-		multilineIndex,
 		createEmpty,
 		append,
 		getLastChild,
@@ -33,27 +10,65 @@ export function toTree( value, multilineTag, settings ) {
 		appendText,
 		onStartIndex,
 		onEndIndex,
-		onEmpty,
 	} = settings;
 	const { formats, text, start, end } = value;
 	const formatsLength = formats.length + 1;
-	const tree = createEmpty( tag );
+	const tree = createEmpty();
+	const multilineFormat = { type: multilineTag };
 
-	append( tree, '' );
+	let lastCharacterFormats;
+	let lastCharacter;
+
+	if ( multilineTag ) {
+		append( append( tree, { type: multilineTag } ), '' );
+		lastCharacterFormats = [ multilineFormat ];
+	} else {
+		append( tree, '' );
+	}
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
-		const characterFormats = formats[ i ];
-		const lastCharacterFormats = formats[ i - 1 ];
+		let characterFormats = formats[ i ];
+
+		if ( multilineTag === 'li' ) {
+			characterFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
+				accumulator.push( format );
+
+				if ( format.type === 'ol' || format.type === 'ul' ) {
+					accumulator.push( multilineFormat );
+				}
+
+				return accumulator;
+			}, [ multilineFormat ] );
+		} else if ( multilineTag ) {
+			characterFormats = [ multilineFormat, ...( characterFormats || [] ) ];
+		}
 
 		let pointer = getLastChild( tree );
+
+		if ( lastCharacter === '\u2028' ) {
+			let node = pointer;
+
+			while ( ! isText( node ) ) {
+				node = getLastChild( node );
+			}
+
+			if ( onStartIndex && start === i ) {
+				onStartIndex( tree, node );
+			}
+
+			if ( onEndIndex && end === i ) {
+				onEndIndex( tree, node );
+			}
+		}
 
 		if ( characterFormats ) {
 			characterFormats.forEach( ( format, formatIndex ) => {
 				if (
 					pointer &&
 					lastCharacterFormats &&
-					format === lastCharacterFormats[ formatIndex ]
+					format === lastCharacterFormats[ formatIndex ] &&
+					( character !== '\u2028' || characterFormats.length - 1 !== formatIndex )
 				) {
 					pointer = getLastChild( pointer );
 					return;
@@ -71,14 +86,20 @@ export function toTree( value, multilineTag, settings ) {
 			} );
 		}
 
+		if ( character === '\u2028' ) {
+			lastCharacterFormats = characterFormats;
+			lastCharacter = character;
+			continue;
+		}
+
 		// If there is selection at 0, handle it before characters are inserted.
 
 		if ( onStartIndex && start === 0 && i === 0 ) {
-			onStartIndex( tree, pointer, multilineIndex );
+			onStartIndex( tree, pointer );
 		}
 
 		if ( onEndIndex && end === 0 && i === 0 ) {
-			onEndIndex( tree, pointer, multilineIndex );
+			onEndIndex( tree, pointer );
 		}
 
 		if ( character !== '\ufffc' ) {
@@ -94,16 +115,15 @@ export function toTree( value, multilineTag, settings ) {
 		}
 
 		if ( onStartIndex && start === i + 1 ) {
-			onStartIndex( tree, pointer, multilineIndex );
+			onStartIndex( tree, pointer );
 		}
 
 		if ( onEndIndex && end === i + 1 ) {
-			onEndIndex( tree, pointer, multilineIndex );
+			onEndIndex( tree, pointer );
 		}
-	}
 
-	if ( onEmpty && text.length === 0 ) {
-		onEmpty( tree );
+		lastCharacterFormats = characterFormats;
+		lastCharacter = character;
 	}
 
 	return tree;
