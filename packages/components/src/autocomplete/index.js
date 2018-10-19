@@ -122,7 +122,7 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 			keywords = [ ...keywords, option.label ];
 		}
 
-		const isMatch = keywords.some( ( keyword ) => search.test( keyword ) );
+		const isMatch = keywords.some( ( keyword ) => search.test( deburr( keyword ) ) );
 		if ( ! isMatch ) {
 			continue;
 		}
