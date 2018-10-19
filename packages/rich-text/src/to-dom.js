@@ -105,6 +105,12 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
+function createBogusBR( doc ) {
+	const br = doc.createElement( 'br' );
+	br.setAttribute( 'data-mce-bogus', '1' );
+	return br;
+}
+
 function pad( node ) {
 	const length = node.childNodes.length;
 
@@ -114,11 +120,13 @@ function pad( node ) {
 
 		if ( child.nodeType === TEXT_NODE ) {
 			if ( length === 1 && ! child.nodeValue ) {
-				const br = child.ownerDocument.createElement( 'br' );
-				br.setAttribute( 'data-mce-bogus', '1' );
-				node.appendChild( br );
+				node.appendChild( createBogusBR( node.ownerDocument ) );
 			}
 		} else {
+			if ( ! child.previousSibling && ( child.nodeName === 'OL' || child.nodeName === 'UL' ) ) {
+				node.insertBefore( createBogusBR( child.ownerDocument ), child );
+			}
+
 			pad( child );
 		}
 	}

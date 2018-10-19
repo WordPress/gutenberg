@@ -290,6 +290,9 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
 exports[`recordToDom should handle nested empty list value 1`] = `
 <body>
   <li>
+    <br
+      data-mce-bogus="1"
+    />
     <ul>
       <li>
         
