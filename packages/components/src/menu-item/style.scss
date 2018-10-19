@@ -33,6 +33,16 @@
 	}
 }
 
+.components-menu-item__info-wrapper {
+	display: flex;
+	flex-direction: column;
+}
+
+.components-menu-item__info {
+	margin-top: $grid-size-small;
+	font-style: italic;
+}
+
 .components-menu-item__shortcut {
 	align-self: center;
 	opacity: 0.5;

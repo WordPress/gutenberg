@@ -3,6 +3,7 @@
 ### New Feature
 
 - Added a new `ColorPicker` component ([#10564](https://github.com/WordPress/gutenberg/pull/10564)).
+- `MenuItem` now accepts an `info` prop for including an extended description.
 
 ### Bug Fix
 
