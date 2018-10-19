@@ -305,6 +305,7 @@ function createFromElement( {
 		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
 		let format;
+		let value;
 
 		if ( ! unwrapNode || ! unwrapNode( node ) ) {
 			const newFormat = toFormat( {
@@ -323,14 +324,27 @@ function createFromElement( {
 			}
 		}
 
-		const value = createFromElement( {
-			element: node,
-			range,
-			removeNode,
-			unwrapNode,
-			filterString,
-			removeAttribute,
-		} );
+		if ( node.nodeName === 'UL' || node.nodeName === 'OL' ) {
+			value = createFromMultilineElement( {
+				element: node,
+				range,
+				multilineTag: 'li',
+				removeNode,
+				unwrapNode,
+				filterString,
+				removeAttribute,
+				startSeparator: true,
+			} );
+		} else {
+			value = createFromElement( {
+				element: node,
+				range,
+				removeNode,
+				unwrapNode,
+				filterString,
+				removeAttribute,
+			} );
+		}
 
 		const text = value.text;
 		const start = accumulator.text.length;
@@ -412,6 +426,7 @@ function createFromMultilineElement( {
 	unwrapNode,
 	filterString,
 	removeAttribute,
+	startSeparator = false,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -440,7 +455,7 @@ function createFromMultilineElement( {
 		} );
 
 		// Multiline value text should be separated by a double line break.
-		if ( index !== 0 ) {
+		if ( index !== 0 || startSeparator === true ) {
 			accumulator.formats = accumulator.formats.concat( [ , ] );
 			accumulator.text += '\u2028';
 		}

@@ -110,6 +110,25 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
+function pad( node ) {
+	const length = node.childNodes.length;
+
+	// Optimise for speed.
+	for ( let index = 0; index < length; index++ ) {
+		const child = node.childNodes[ index ];
+
+		if ( child.nodeType === TEXT_NODE ) {
+			if ( length === 1 && ! child.nodeValue ) {
+				const br = child.ownerDocument.createElement( 'br' );
+				br.setAttribute( 'data-mce-bogus', '1' );
+				node.appendChild( br );
+			}
+		} else {
+			pad( child );
+		}
+	}
+}
+
 export function toDom( value, multilineTag ) {
 	let startPath = [];
 	let endPath = [];
@@ -123,26 +142,15 @@ export function toDom( value, multilineTag ) {
 		getText,
 		remove,
 		appendText,
-		onStartIndex( body, pointer, multilineIndex ) {
+		onStartIndex( body, pointer ) {
 			startPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
-
-			if ( multilineIndex !== undefined ) {
-				startPath = [ multilineIndex, ...startPath ];
-			}
 		},
-		onEndIndex( body, pointer, multilineIndex ) {
+		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
-
-			if ( multilineIndex !== undefined ) {
-				endPath = [ multilineIndex, ...endPath ];
-			}
-		},
-		onEmpty( body ) {
-			const br = body.ownerDocument.createElement( 'br' );
-			br.setAttribute( 'data-mce-bogus', '1' );
-			body.appendChild( br );
 		},
 	} );
+
+	pad( tree );
 
 	return {
 		body: tree,
