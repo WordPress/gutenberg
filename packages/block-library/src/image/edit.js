@@ -256,6 +256,7 @@ class ImageEdit extends Component {
 	}
 
 	updateScale( scale ) {
+		// The image was resized by dragging, remove custom width/height.
 		this.resetWidthHeight();
 		this.props.setAttributes( { scale } );
 	}
@@ -266,11 +267,10 @@ class ImageEdit extends Component {
 		} );
 	}
 
-	setWidth( width, imageWidth, imageHeight ) {
-		const editorWidth = getEditorWidth();
+	updateWidth( width, imageWidth, imageHeight ) {
 		width = parseInt( width, 10 );
 
-		// Reset the image width and height when the user deletes the value.
+		// Reset the image size when the user deletes the value.
 		if ( ! width ) {
 			this.resetScale();
 			this.resetWidthHeight();
@@ -278,6 +278,11 @@ class ImageEdit extends Component {
 		}
 
 		const height = round( imageHeight * ( width / imageWidth ) );
+		this.setWidthHeight( width, height );
+	}
+
+	setWidthHeight( width, height ) {
+		const editorWidth = getEditorWidth();
 		const constrainedWidth = width < editorWidth ? width : editorWidth;
 
 		// Scale the image.
@@ -290,11 +295,10 @@ class ImageEdit extends Component {
 		} );
 	}
 
-	setHeight( height, imageWidth, imageHeight ) {
-		const editorWidth = getEditorWidth();
+	updateHeight( height, imageWidth, imageHeight ) {
 		height = parseInt( height, 10 );
 
-		// Reset the image width and height when the user deletes the value.
+		// Reset the image size when the user deletes the value.
 		if ( ! height ) {
 			this.resetScale();
 			this.resetWidthHeight();
@@ -302,16 +306,7 @@ class ImageEdit extends Component {
 		}
 
 		const width = round( imageWidth * ( height / imageHeight ) );
-		const constrainedWidth = width < editorWidth ? width : editorWidth;
-
-		// Scale the image.
-		this.updateScale( constrainedWidth / editorWidth );
-
-		// Store the specific values set by the user.
-		this.props.setAttributes( {
-			width: width,
-			height: height,
-		} );
+		this.setWidthHeight( width, height );
 	}
 
 	resetWidthHeight() {
@@ -350,12 +345,9 @@ class ImageEdit extends Component {
 				sizesWidth = imageData.width;
 			}
 
-			const srcset = imageData.srcset;
-			const sizes = srcset ? this.getSizesAttr( sizesWidth ) : undefined;
-
 			this.props.setAttributes( {
-				srcSet: srcset,
-				sizes: sizes,
+				srcSet: imageData.srcset,
+				sizes: this.getSizesAttr( sizesWidth ),
 				fileWidth: imageData.width,
 				fileHeight: imageData.height,
 			} );
@@ -555,7 +547,7 @@ class ImageEdit extends Component {
 									placeholder={ imageWidth }
 									min={ 1 }
 									onChange={ ( value ) => {
-										this.setWidth( value, imageWidth, imageHeight );
+										this.updateWidth( value, imageWidth, imageHeight );
 									} }
 								/>
 								<TextControl
@@ -566,7 +558,7 @@ class ImageEdit extends Component {
 									placeholder={ imageHeight }
 									min={ 1 }
 									onChange={ ( value ) => {
-										this.setHeight( value, imageWidth, imageHeight );
+										this.updateHeight( value, imageWidth, imageHeight );
 									} }
 								/>
 							</div>

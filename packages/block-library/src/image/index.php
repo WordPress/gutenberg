@@ -81,67 +81,20 @@ function gutenberg_get_block_width() {
 }
 
 /**
- * Attempt to find the image file meta by dirname/filename.ext from the img src.
- *
- *
- */
-function _gutenberg_find_image_size_by_src( $image_meta, $image_src ) {
-
-	$found = apply_filters( 'gutenberg_find_image_size_by_src', null, $image_meta, $image_src );
-
-	if ( $found !== null ) {
-		return $found;
-	}
-
-	if ( strpos( $image_src, $image_meta['file'] ) !== false ) {
-		return array(
-			'width' => $image_meta['width'],
-			'height' => $image_meta['height'],
-		);
-	}
-
-	// Retrieve the uploads sub-directory from the full size image.
-	$dirname = _wp_get_attachment_relative_path( $image_meta['file'] );
-
-	if ( $dirname ) {
-		$dirname = trailingslashit( $dirname );
-	}
-
-	// Attempt to find the image file in $image_meta['sizes']'.
-	foreach ( $image_meta['sizes'] as $size_data ) {
-		if ( strpos( $image_src, $dirname . $size_data['file'] ) !== false ) {
-			return array(
-				'width' => $size_data['width'],
-				'height' => $size_data['height'],
-			);
-		}
-	}
-
-	return false;
-}
-
-/**
  * Calculates the image width and height based on $block_witdh and the `scale` block attribute.
  *
  * @since 4.0.0
  *
  * @param array $block_attributes The block attributes.
  * @param array $image_meta The image attachment meta data.
- * @return array|bool An array of the image width and height, in that order, or false if the actual size was not found.
+ * @return array|bool An array of the image width and height, in that order, or false if the image data is missing from $block_attributes.
  */
 function gutenberg_get_image_width_height( $block_attributes, $image_meta ) {
 	$block_witdh = gutenberg_get_block_width();
 
 	if ( empty( $block_attributes['fileWidth'] ) || empty( $block_attributes['fileHeight'] ) ) {
-		// Attempt to find the actual image width/height from $image_meta.
-		$actual_size = _gutenberg_find_image_size_by_src( $image_meta, $block_attributes['url'] );
-
-		if ( ! $actual_size ) {
-			return false;
-		}
-
-		$image_file_width = (int) $actual_size['width'];
-		$image_file_height = (int) $actual_size['height'];
+		// Image data is missing, perhaps old post?
+		return false;
 	} else {
 		$image_file_width = (int) $block_attributes['fileWidth'];
 		$image_file_height = (int) $block_attributes['fileHeight'];
@@ -175,7 +128,7 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta ) {
 		}
 
 		// Check if we have large enough image to display,
-		// or we need to reduce the width to match.
+		// or we need to reduce the width to avoid upscaling.
 		$image_width = min( (int) $image_width, $image_file_width );
 	}
 
@@ -205,7 +158,6 @@ function gutenberg_render_block_core_image( $block_attributes = array(), $html =
 	$attachment_id = (int) $block_attributes['id'];
 	$image_src = esc_url_raw( $block_attributes['url'] );
 	$image_meta = wp_get_attachment_metadata( $attachment_id );
-	$srcset = '';
 	$sizes = '';
 
 	// Something's wrong. Broken or very old image meta?
@@ -223,26 +175,41 @@ function gutenberg_render_block_core_image( $block_attributes = array(), $html =
 		$image_dimensions = gutenberg_get_image_width_height( $block_attributes, $image_meta );
 	}
 
+	if ( empty( $image_dimensions ) ) {
+		// We don't have enough data to construct new img tag.
+		// Fall back to the existing HTML.
+		return $html;
+	}
+
 	$image_attributes = array(
 		'src' => $image_src,
 		'alt' => empty( $block_attributes['alt'] ) ? '' : esc_attr( $block_attributes['alt'] ),
+		'width' => (int) $image_dimensions[0],
+		'height' => (int) $image_dimensions[1],
 	);
 
-	if ( $image_dimensions ) {
-		$image_attributes['width'] = (int) $image_dimensions[0];
-		$image_attributes['height'] = (int) $image_dimensions[1];
+	$srcset = wp_calculate_image_srcset( $image_dimensions, $image_src, $image_meta, $attachment_id );
 
-		$srcset = wp_calculate_image_srcset( $image_dimensions, $image_src, $image_meta, $attachment_id );
-
-		if ( ! empty( $srcset ) ) {
-			$sizes = wp_calculate_image_sizes( $image_dimensions, $image_src, $image_meta, $attachment_id );
-		}
-
-		if ( $srcset && $sizes ) {
-			$image_attributes['srcset'] = $srcset;
-			$image_attributes['sizes'] = $sizes;
-		}
+	if ( ! empty( $srcset ) ) {
+		$sizes = wp_calculate_image_sizes( $image_dimensions, $image_src, $image_meta, $attachment_id );
 	}
+
+	if ( $srcset && $sizes ) {
+		$image_attributes['srcset'] = $srcset;
+		$image_attributes['sizes'] = $sizes;
+	}
+
+	/**
+	 * Filters the image tag attributes when rendering the core image block.
+	 *
+	 * @since 4.0
+	 *
+	 * @param array $image_attributes The (recalculated) image attributes.
+	 *                                Note: expects sanitized/escaped HTML attribute strings for names and vlues.
+	 * @param array $block_attributes The image block attributes.
+	 * @param string $html The image block HTML coming from the editor. The img tag will be replaced.
+	 */
+	$image_attributes = apply_filters( 'render_block_core_image', $image_attributes, $block_attributes, $html );
 
 	$attr = '';
 	// Attributes are escaped above or generated.
@@ -251,8 +218,6 @@ function gutenberg_render_block_core_image( $block_attributes = array(), $html =
 	}
 
 	$image_tag = '<img' . $attr . '/ >';
-
-	// TODO: filter?
 
 	// Replace the img tag.
 	$html = preg_replace( '/<img [^>]+>/', $image_tag, $html );
@@ -297,7 +262,7 @@ function register_block_core_image() {
 					'type' => 'number',
 				),
 
-				/* These are not stored in the block attributes, but can be enabled.
+				/* These are not stored in the block attributes, but can be added.
 				'srcSet' => array(
 					'type' => 'string',
 				),
