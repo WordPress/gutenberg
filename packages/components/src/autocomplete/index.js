@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, map, debounce } from 'lodash';
+import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -382,8 +382,8 @@ export class Autocomplete extends Component {
 		}
 
 		if ( isCollapsed( record ) ) {
-			const text = getTextContent( slice( record, 0 ) );
-			const prevText = getTextContent( slice( prevRecord, 0 ) );
+			const text = deburr( getTextContent( slice( record, 0 ) ) );
+			const prevText = deburr( getTextContent( slice( prevRecord, 0 ) ) );
 
 			if ( text !== prevText ) {
 				const textAfterSelection = getTextContent( slice( record, undefined, getTextContent( record ).length ) );
