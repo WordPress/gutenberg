@@ -33,6 +33,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { withInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
@@ -114,7 +115,8 @@ export class Hue extends Component {
 	}
 
 	render() {
-		const { hsl = {} } = this.props;
+		const { hsl = {}, instanceId } = this.props;
+
 		const pointerLocation = { left: `${ ( hsl.h * 100 ) / 360 }%` };
 		const shortcuts = {
 			up: () => this.increase(),
@@ -149,13 +151,18 @@ export class Hue extends Component {
 							aria-valuemin="359"
 							aria-valuenow={ hsl.h }
 							aria-orientation="horizontal"
-							aria-label={ __(
-								'Hue value in degrees, from 0 to 359.'
-							) }
+							aria-label={ __( 'Hue value in degrees, from 0 to 359.' ) }
+							aria-describedby={ `components-color-picker__hue-description-${ instanceId }` }
 							className="components-color-picker__hue-pointer"
 							style={ pointerLocation }
 							onKeyDown={ this.preventKeyEvents }
 						/>
+						<p
+							className="components-color-picker__hue-description screen-reader-text"
+							id={ `components-color-picker__hue-description-${ instanceId }` }
+						>
+							{ __( 'Move the arrow left or right to change hue.' ) }
+						</p>
 					</div>
 					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
 				</div>
@@ -164,4 +171,4 @@ export class Hue extends Component {
 	}
 }
 
-export default Hue;
+export default withInstanceId( Hue );
