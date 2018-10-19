@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, noop } from 'lodash';
+import { every, get, noop, startsWith } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -12,26 +12,83 @@ import {
 	FormFileUpload,
 	Placeholder,
 	DropZone,
+	IconButton,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
+import URLPopover from '../url-popover';
 import { mediaUpload } from '../../utils/';
+
+const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
+	<URLPopover onClose={ onClose }>
+		<form
+			className="editor-media-placeholder__url-input-form"
+			onSubmit={ onSubmit }
+		>
+			<input
+				className="editor-media-placeholder__url-input-field"
+				type="url"
+				aria-label={ __( 'URL' ) }
+				placeholder={ __( 'Paste or type URL' ) }
+				onChange={ onChange }
+				value={ src }
+			/>
+			<IconButton
+				className="editor-media-placeholder__url-input-submit-button"
+				icon="editor-break"
+				label={ __( 'Apply' ) }
+				type="submit"
+			/>
+		</form>
+	</URLPopover>
+);
 
 class MediaPlaceholder extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			src: '',
+			isURLInputVisible: false,
 		};
 		this.onChangeSrc = this.onChangeSrc.bind( this );
 		this.onSubmitSrc = this.onSubmitSrc.bind( this );
 		this.onUpload = this.onUpload.bind( this );
 		this.onFilesUpload = this.onFilesUpload.bind( this );
+		this.openURLInput = this.openURLInput.bind( this );
+		this.closeURLInput = this.closeURLInput.bind( this );
+	}
+
+	getAllowedTypes() {
+		const { allowedTypes, type: deprecatedType } = this.props;
+		let allowedTypesToUse = allowedTypes;
+		if ( ! allowedTypes && deprecatedType ) {
+			deprecated( 'type property of wp.editor.MediaPlaceholder', {
+				version: '4.2',
+				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
+			} );
+			if ( deprecatedType === '*' ) {
+				allowedTypesToUse = undefined;
+			} else {
+				allowedTypesToUse = [ deprecatedType ];
+			}
+		}
+		return allowedTypesToUse;
+	}
+
+	onlyAllowsImages() {
+		const allowedTypes = this.getAllowedTypes();
+		if ( ! allowedTypes ) {
+			return false;
+		}
+		return every( allowedTypes, ( allowedType ) => {
+			return allowedType === 'image' || startsWith( allowedType, 'image/' );
+		} );
 	}
 
 	componentDidMount() {
@@ -45,15 +102,14 @@ class MediaPlaceholder extends Component {
 	}
 
 	onChangeSrc( event ) {
-		this.setState( {
-			src: event.target.value,
-		} );
+		this.setState( { src: event.target.value } );
 	}
 
 	onSubmitSrc( event ) {
 		event.preventDefault();
 		if ( this.state.src && this.props.onSelectURL ) {
 			this.props.onSelectURL( this.state.src );
+			this.closeURLInput();
 		}
 	}
 
@@ -62,19 +118,27 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, type, multiple, onError } = this.props;
+		const { onSelect, multiple, onError } = this.props;
+		const allowedTypes = this.getAllowedTypes();
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
-			allowedType: type,
+			allowedTypes,
 			filesList: files,
 			onFileChange: setMedia,
 			onError,
 		} );
 	}
 
+	openURLInput() {
+		this.setState( { isURLInputVisible: true } );
+	}
+
+	closeURLInput() {
+		this.setState( { isURLInputVisible: false } );
+	}
+
 	render() {
 		const {
-			type,
 			accept,
 			icon,
 			className,
@@ -86,6 +150,13 @@ class MediaPlaceholder extends Component {
 			multiple = false,
 			notices,
 		} = this.props;
+
+		const {
+			isURLInputVisible,
+			src,
+		} = this.state;
+
+		const allowedTypes = this.getAllowedTypes();
 
 		return (
 			<Placeholder
@@ -100,26 +171,9 @@ class MediaPlaceholder extends Component {
 					onFilesDrop={ this.onFilesUpload }
 					onHTMLDrop={ onHTMLDrop }
 				/>
-				{ onSelectURL && (
-					<form onSubmit={ this.onSubmitSrc }>
-						<input
-							type="url"
-							className="components-placeholder__input"
-							aria-label={ labels.title }
-							placeholder={ __( 'Enter URL here…' ) }
-							onChange={ this.onChangeSrc }
-							value={ this.state.src }
-						/>
-						<Button
-							isLarge
-							type="submit">
-							{ __( 'Use URL' ) }
-						</Button>
-					</form>
-				) }
 				<FormFileUpload
 					isLarge
-					className="editor-media-placeholder__upload-button"
+					className="editor-media-placeholder__button"
 					onChange={ this.onUpload }
 					accept={ accept }
 					multiple={ multiple }
@@ -127,17 +181,41 @@ class MediaPlaceholder extends Component {
 					{ __( 'Upload' ) }
 				</FormFileUpload>
 				<MediaUpload
-					gallery={ multiple }
+					gallery={ multiple && this.onlyAllowsImages() }
 					multiple={ multiple }
 					onSelect={ onSelect }
-					type={ type }
+					allowedTypes={ allowedTypes }
 					value={ value.id }
 					render={ ( { open } ) => (
-						<Button isLarge onClick={ open }>
+						<Button
+							isLarge
+							className="editor-media-placeholder__button"
+							onClick={ open }
+						>
 							{ __( 'Media Library' ) }
 						</Button>
 					) }
 				/>
+				{ onSelectURL && (
+					<div className="editor-media-placeholder__url-input-container">
+						<Button
+							className="editor-media-placeholder__button"
+							onClick={ this.openURLInput }
+							isToggled={ isURLInputVisible }
+							isLarge
+						>
+							{ __( 'Insert from URL' ) }
+						</Button>
+						{ isURLInputVisible && (
+							<InsertFromURLPopover
+								src={ src }
+								onChange={ this.onChangeSrc }
+								onSubmit={ this.onSubmitSrc }
+								onClose={ this.closeURLInput }
+							/>
+						) }
+					</div>
+				) }
 			</Placeholder>
 		);
 	}

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
+import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
 	ClipboardButton,
 	IconButton,
@@ -52,11 +52,10 @@ class FileEdit extends Component {
 		const { href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
-		if ( this.isBlobURL( href ) ) {
+		if ( isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
-				allowedType: '*',
 				filesList: [ file ],
 				onFileChange: ( [ media ] ) => this.onSelectFile( media ),
 				onError: ( message ) => {
@@ -86,10 +85,6 @@ class FileEdit extends Component {
 				id: media.id,
 			} );
 		}
-	}
-
-	isBlobURL( url = '' ) {
-		return url.indexOf( 'blob:' ) === 0;
 	}
 
 	confirmCopyURL() {
@@ -149,13 +144,12 @@ class FileEdit extends Component {
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
 					accept="*"
-					type="*"
 				/>
 			);
 		}
 
 		const classes = classnames( className, {
-			'is-transient': this.isBlobURL( href ),
+			'is-transient': isBlobURL( href ),
 		} );
 
 		return (
@@ -174,7 +168,6 @@ class FileEdit extends Component {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectFile }
-							type="*"
 							value={ id }
 							render={ ( { open } ) => (
 								<IconButton
@@ -192,9 +185,7 @@ class FileEdit extends Component {
 						<RichText
 							wrapperClassName={ `${ className }__textlink` }
 							tagName="div" // must be block-level or else cursor disappears
-							format="string"
 							value={ fileName }
-							multiline="false"
 							placeholder={ __( 'Write file name…' ) }
 							keepPlaceholderOnFocus
 							formattingControls={ [] } // disable controls
@@ -210,7 +201,6 @@ class FileEdit extends Component {
 									formattingControls={ [] } // disable controls
 									placeholder={ __( 'Add text…' ) }
 									keepPlaceholderOnFocus
-									multiline="false"
 									onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
 								/>
 							</div>

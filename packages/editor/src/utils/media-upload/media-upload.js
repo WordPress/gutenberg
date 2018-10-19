@@ -1,12 +1,25 @@
 /**
  * External Dependencies
  */
-import { compact, flatMap, forEach, get, has, includes, map, noop, startsWith } from 'lodash';
+import {
+	compact,
+	flatMap,
+	forEach,
+	get,
+	has,
+	includes,
+	map,
+	noop,
+	omit,
+	some,
+	startsWith,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -39,52 +52,73 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  *
  *	TODO: future enhancement to add an upload indicator.
  *
- * @param   {Object}   $0                   Parameters object passed to the function.
- * @param   {string}   $0.allowedType       The type of media that can be uploaded, or '*' to allow all.
- * @param   {?Object}  $0.additionalData    Additional data to include in the request.
- * @param   {Array}    $0.filesList         List of files.
- * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
- * @param   {Function} $0.onError           Function called when an error happens.
- * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
- * @param   {?Object} $0.allowedMimeTypes   List of allowed mime types and file extensions.
+ * @param   {Object}   $0                    Parameters object passed to the function.
+ * @param   {?Array}   $0.allowedTypes       Array with the types of media that can be uploaded, if unset all types are allowed.
+ * @param   {?Object}  $0.additionalData     Additional data to include in the request.
+ * @param   {Array}    $0.filesList          List of files.
+ * @param   {?number}  $0.maxUploadFileSize  Maximum upload size in bytes allowed for the site.
+ * @param   {Function} $0.onError            Function called when an error happens.
+ * @param   {Function} $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
+ * @param   {?Object}  $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  */
 export function mediaUpload( {
-	allowedType,
+	allowedTypes,
 	additionalData = {},
 	filesList,
 	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
-	allowedMimeTypes = null,
+	wpAllowedMimeTypes = null,
 } ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
 
 	const filesSet = [];
 	const setAndUpdateFiles = ( idx, value ) => {
+		revokeBlobURL( get( filesSet, [ idx, 'url' ] ) );
 		filesSet[ idx ] = value;
 		onFileChange( compact( filesSet ) );
 	};
 
 	// Allowed type specified by consumer
 	const isAllowedType = ( fileType ) => {
-		return ( allowedType === '*' ) || startsWith( fileType, `${ allowedType }/` );
+		if ( ! allowedTypes ) {
+			return true;
+		}
+		return some(
+			allowedTypes,
+			( allowedType ) => {
+				// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
+				if ( includes( allowedType, '/' ) ) {
+					return allowedType === fileType;
+				}
+				// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
+				return startsWith( fileType, `${ allowedType }/` );
+			}
+		);
 	};
 
 	// Allowed types for the current WP_User
-	const allowedMimeTypesForUser = getMimeTypesArray( allowedMimeTypes );
+	const allowedMimeTypesForUser = getMimeTypesArray( wpAllowedMimeTypes );
 	const isAllowedMimeTypeForUser = ( fileType ) => {
 		return includes( allowedMimeTypesForUser, fileType );
 	};
 
-	files.forEach( ( mediaFile, idx ) => {
-		if ( ! isAllowedType( mediaFile.type ) ) {
-			return;
-		}
+	// Build the error message including the filename
+	const triggerError = ( error ) => {
+		error.message = [
+			<strong key="filename">{ error.file.name }</strong>,
+			': ',
+			error.message,
+		];
 
+		onError( error );
+	};
+
+	files.forEach( ( mediaFile, idx ) => {
 		// verify if user is allowed to upload this mime type
 		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
-			onError( {
+			triggerError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
 				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
 				file: mediaFile,
@@ -92,15 +126,31 @@ export function mediaUpload( {
 			return;
 		}
 
+		// Check if the block supports this mime type
+		if ( ! isAllowedType( mediaFile.type ) ) {
+			triggerError( {
+				code: 'MIME_TYPE_NOT_SUPPORTED',
+				message: __( 'Sorry, this file type is not supported here.' ),
+				file: mediaFile,
+			} );
+			return;
+		}
+
 		// verify if file is greater than the maximum file upload size allowed for the site.
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
-			onError( {
+			triggerError( {
 				code: 'SIZE_ABOVE_LIMIT',
-				message: sprintf(
-					// translators: %s: file name
-					__( '%s exceeds the maximum upload size for this site.' ),
-					mediaFile.name
-				),
+				message: __( 'This file exceeds the maximum upload size for this site.' ),
+				file: mediaFile,
+			} );
+			return;
+		}
+
+		// Don't allow empty files to be uploaded.
+		if ( mediaFile.size <= 0 ) {
+			triggerError( {
+				code: 'EMPTY_FILE',
+				message: __( 'This file is empty.' ),
 				file: mediaFile,
 			} );
 			return;
@@ -108,16 +158,15 @@ export function mediaUpload( {
 
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
-		filesSet.push( { url: window.URL.createObjectURL( mediaFile ) } );
+		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
 
 		return createMediaFromFile( mediaFile, additionalData )
 			.then( ( savedMedia ) => {
 				const mediaObject = {
+					...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
 					alt: savedMedia.alt_text,
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
-					id: savedMedia.id,
-					link: savedMedia.link,
 					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
 					mediaDetails: {},

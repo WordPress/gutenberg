@@ -116,7 +116,7 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 	 */
 	function test_link_unfiltered_html() {
 		$post_id   = $this->factory->post->create();
-		$check_key = 'https://api.w.org/action-unfiltered_html';
+		$check_key = 'https://api.w.org/action-unfiltered-html';
 		// admins can in a single site, but can't in a multisite.
 		wp_set_current_user( $this->administrator );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/posts/' . $post_id );
@@ -295,47 +295,6 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertTrue( isset( $links[ $assign_tags ] ) );
 		$this->assertTrue( isset( $links[ $create_categories ] ) );
 		$this->assertTrue( isset( $links[ $assign_categories ] ) );
-	}
-
-	/**
-	 * Should include relevant data in the 'theme_supports' key of index.
-	 */
-	function test_theme_supports_index() {
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertTrue( isset( $result['theme_supports']['formats'] ) );
-		$this->assertTrue( in_array( 'standard', $result['theme_supports']['formats'] ) );
-	}
-
-	public function test_theme_supports_post_thumbnails_false() {
-		remove_theme_support( 'post-thumbnails' );
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertFalse( isset( $result['theme_supports']['post-thumbnails'] ) );
-	}
-
-	public function test_theme_supports_post_thumbnails_true() {
-		remove_theme_support( 'post-thumbnails' );
-		add_theme_support( 'post-thumbnails' );
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertEquals( true, $result['theme_supports']['post-thumbnails'] );
-	}
-
-	public function test_theme_supports_post_thumbnails_array() {
-		remove_theme_support( 'post-thumbnails' );
-		add_theme_support( 'post-thumbnails', array( 'post' ) );
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertEquals( array( 'post' ), $result['theme_supports']['post-thumbnails'] );
 	}
 
 	public function test_get_taxonomies_context_edit() {

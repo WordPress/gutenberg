@@ -11,13 +11,12 @@ import { DateTimePicker } from '@wordpress/components';
 import { getSettings } from '@wordpress/date';
 import { withState } from '@wordpress/compose';
 
-
 const MyDateTimePicker = withState( {
 	date: new Date(),
 } )( ( { date, setState } ) => {
 	const settings = getSettings();
 
-	// To know if the current timezone is a 12 hour time with look for "a" in the time format.
+	// To know if the current timezone is a 12 hour time with look for an "a" in the time format.
 	// We also make sure this a is not escaped by a "/".
 	const is12HourTime = /a(?!\\)/i.test(
 		settings.formats.time
@@ -28,11 +27,11 @@ const MyDateTimePicker = withState( {
 
 	return (
 		<DateTimePicker
-		    currentDate={ date }
-		    onChange={ ( date ) => setState( { date } ) }
-		    locale={ settings.l10n.locale }
-		    is12Hour={ is12HourTime }
-		    />
+			currentDate={ date }
+			onChange={ ( date ) => setState( { date } ) }
+			locale={ settings.l10n.locale }
+			is12Hour={ is12HourTime }
+		/>
 	);
 } );
 ```
@@ -65,7 +64,7 @@ The localization for the display of the date and time.
 
 ### is12Hour
 
-Whether the current timezone is a 12 hour time.
+Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY.
 
 - Type: `bool`
 - Required: No

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, every, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -48,23 +48,42 @@ export function ReusableBlockConvertButton( {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { getBlock, getReusableBlock } = select( 'core/editor' );
-		const { getFallbackBlockName } = select( 'core/blocks' );
+	withSelect( ( select, { clientIds } ) => {
+		const { getBlock, canInsertBlockType, getReusableBlock } = select( 'core/editor' );
+		const {
+			getFreeformFallbackBlockName,
+			getUnregisteredFallbackBlockName,
+		} = select( 'core/blocks' );
 
-		const block = getBlock( clientId );
-		if ( ! block ) {
-			return { isVisible: false };
-		}
+		const blocks = map( clientIds, ( clientId ) => getBlock( clientId ) );
 
-		return {
+		const isVisible = (
+			// Guard against the case where a regular block has *just* been converted to a
+			// reusable block and doesn't yet exist in the editor store.
+			every( blocks, ( block ) => !! block ) &&
+
+			// Hide 'Add to Reusable Blocks' when Reusable Blocks are disabled, i.e. when
+			// core/block is not in the allowed_block_types filter.
+			canInsertBlockType( 'core/block' ) &&
+
 			// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
 			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
-			isVisible: block.name !== getFallbackBlockName(),
-			isStaticBlock: ! isReusableBlock( block ) || ! getReusableBlock( block.attributes.ref ),
+			( blocks.length !== 1 || (
+				blocks[ 0 ].name !== getFreeformFallbackBlockName() &&
+				blocks[ 0 ].name !== getUnregisteredFallbackBlockName()
+			) )
+		);
+
+		return {
+			isVisible,
+			isStaticBlock: isVisible && (
+				blocks.length !== 1 ||
+				! isReusableBlock( blocks[ 0 ] ) ||
+				! getReusableBlock( blocks[ 0 ].attributes.ref )
+			),
 		};
 	} ),
-	withDispatch( ( dispatch, { clientId, onToggle = noop } ) => {
+	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {
 		const {
 			convertBlockToReusable,
 			convertBlockToStatic,
@@ -72,11 +91,14 @@ export default compose( [
 
 		return {
 			onConvertToStatic() {
-				convertBlockToStatic( clientId );
+				if ( clientIds.length !== 1 ) {
+					return;
+				}
+				convertBlockToStatic( clientIds[ 0 ] );
 				onToggle();
 			},
 			onConvertToReusable() {
-				convertBlockToReusable( clientId );
+				convertBlockToReusable( clientIds );
 				onToggle();
 			},
 		};

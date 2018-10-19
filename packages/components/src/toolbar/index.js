@@ -8,6 +8,7 @@ import { flatMap } from 'lodash';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
+import DropdownMenu from '../dropdown-menu';
 import ToolbarContainer from './toolbar-container';
 import ToolbarButtonContainer from './toolbar-button-container';
 
@@ -41,7 +42,7 @@ import ToolbarButtonContainer from './toolbar-button-container';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( { controls = [], children, className } ) {
+function Toolbar( { controls = [], children, className, isCollapsed, icon, label } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -53,6 +54,17 @@ function Toolbar( { controls = [], children, className } ) {
 	let controlSets = controls;
 	if ( ! Array.isArray( controlSets[ 0 ] ) ) {
 		controlSets = [ controlSets ];
+	}
+
+	if ( isCollapsed ) {
+		return (
+			<DropdownMenu
+				icon={ icon }
+				label={ label }
+				controls={ controlSets }
+				className={ classnames( 'components-toolbar', className ) }
+			/>
+		);
 	}
 
 	return (
@@ -72,11 +84,12 @@ function Toolbar( { controls = [], children, className } ) {
 								event.stopPropagation();
 								control.onClick();
 							} }
-							className={ classnames( 'components-toolbar__control', {
+							className={ classnames( 'components-toolbar__control', control.className, {
 								'is-active': control.isActive,
 							} ) }
 							aria-pressed={ control.isActive }
 							disabled={ control.isDisabled }
+							{ ...control.extraProps }
 						/>
 						{ control.children }
 					</ToolbarButtonContainer>

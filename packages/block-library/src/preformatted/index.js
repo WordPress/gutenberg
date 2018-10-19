@@ -18,8 +18,7 @@ export const settings = {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			source: 'html',
 			selector: 'pre',
 		},
 	},
@@ -28,9 +27,11 @@ export const settings = {
 		from: [
 			{
 				type: 'block',
-				blocks: [ 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/preformatted', attributes ),
+				blocks: [ 'core/code', 'core/paragraph' ],
+				transform: ( { content } ) =>
+					createBlock( 'core/preformatted', {
+						content,
+					} ),
 			},
 			{
 				type: 'raw',
@@ -58,7 +59,7 @@ export const settings = {
 		],
 	},
 
-	edit( { attributes, setAttributes, className } ) {
+	edit( { attributes, mergeBlocks, setAttributes, className } ) {
 		const { content } = attributes;
 
 		return (
@@ -72,6 +73,7 @@ export const settings = {
 				} }
 				placeholder={ __( 'Write preformatted text…' ) }
 				wrapperClassName={ className }
+				onMerge={ mergeBlocks }
 			/>
 		);
 	},
@@ -80,5 +82,11 @@ export const settings = {
 		const { content } = attributes;
 
 		return <RichText.Content tagName="pre" value={ content } />;
+	},
+
+	merge( attributes, attributesToMerge ) {
+		return {
+			content: attributes.content + attributesToMerge.content,
+		};
 	},
 };

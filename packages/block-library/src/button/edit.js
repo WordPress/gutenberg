@@ -28,7 +28,7 @@ import {
 
 const { getComputedStyle } = window;
 
-const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const { textColor, backgroundColor } = ownProps;
 	const backgroundColorValue = backgroundColor && backgroundColor.color;
 	const textColorValue = textColor && textColor.color;
@@ -76,7 +76,7 @@ class ButtonEdit extends Component {
 
 		return (
 			<Fragment>
-				<span className={ className } title={ title } ref={ this.bindRef }>
+				<div className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
 						placeholder={ __( 'Add text…' ) }
 						value={ text }
@@ -123,7 +123,7 @@ class ButtonEdit extends Component {
 							/>
 						</PanelColorSettings>
 					</InspectorControls>
-				</span>
+				</div>
 				{ isSelected && (
 					<form
 						className="block-library-button__inline-link"
@@ -143,5 +143,5 @@ class ButtonEdit extends Component {
 
 export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
-	FallbackStyles,
+	applyFallbackStyles,
 ] )( ButtonEdit );

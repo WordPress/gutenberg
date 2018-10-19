@@ -15,6 +15,11 @@
 import { get, mapValues, includes, capitalize } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { isAppleOS } from './platform';
@@ -71,18 +76,18 @@ export const rawShortcut = mapValues( modifiers, ( modifier ) => {
  */
 export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
-		const isMac = _isApple();
+		const isApple = _isApple();
 		const replacementKeyMap = {
-			[ ALT ]: isMac ? 'Option' : 'Alt',
-			[ CTRL ]: 'Ctrl',
+			[ ALT ]: isApple ? '⌥' : 'Alt',
+			[ CTRL ]: isApple ? '^' : 'Ctrl',
 			[ COMMAND ]: '⌘',
-			[ SHIFT ]: 'Shift',
+			[ SHIFT ]: isApple ? '⇧' : 'Shift',
 		};
 
 		const modifierKeys = modifier( _isApple ).reduce( ( accumulator, key ) => {
 			const replacementKey = get( replacementKeyMap, key, key );
-			// When the mac's clover symbol is used, do not display a + afterwards
-			if ( replacementKey === '⌘' ) {
+			// If on the Mac, adhere to platform convention and don't show plus between keys.
+			if ( isApple ) {
 				return [ ...accumulator, replacementKey ];
 			}
 
@@ -100,8 +105,34 @@ export const displayShortcutList = mapValues( modifiers, ( modifier ) => {
  *
  * @type {Object} Keyed map of functions to display shortcuts.
  */
-export const displayShortcut = mapValues( displayShortcutList, ( sequence ) => {
-	return ( character, _isApple = isAppleOS ) => sequence( character, _isApple ).join( '' );
+export const displayShortcut = mapValues( displayShortcutList, ( shortcutList ) => {
+	return ( character, _isApple = isAppleOS ) => shortcutList( character, _isApple ).join( '' );
+} );
+
+/**
+ * An object that contains functions to return an aria label for a keyboard shortcut.
+ * E.g. shortcutAriaLabel.primary( '.' ) will return 'Command + Period' on Mac.
+ */
+export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
+	return ( character, _isApple = isAppleOS ) => {
+		const isApple = _isApple();
+		const replacementKeyMap = {
+			[ SHIFT ]: 'Shift',
+			[ COMMAND ]: isApple ? 'Command' : 'Control',
+			[ CTRL ]: 'Control',
+			[ ALT ]: isApple ? 'Option' : 'Alt',
+			/* translators: comma as in the character ',' */
+			',': __( 'Comma' ),
+			/* translators: period as in the character '.' */
+			'.': __( 'Period' ),
+			/* translators: backtick as in the character '`' */
+			'`': __( 'Backtick' ),
+		};
+
+		return [ ...modifier( _isApple ), character ]
+			.map( ( key ) => capitalize( get( replacementKeyMap, key, key ) ) )
+			.join( isApple ? ' ' : ' + ' );
+	};
 } );
 
 /**

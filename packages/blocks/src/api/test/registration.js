@@ -16,6 +16,10 @@ import {
 	unregisterBlockType,
 	setUnknownTypeHandlerName,
 	getUnknownTypeHandlerName,
+	setFreeformContentHandlerName,
+	getFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
+	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
 	getBlockType,
@@ -39,7 +43,8 @@ describe( 'blocks', () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
-		setUnknownTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
 		unstable__bootstrapServerSideBlockDefinitions( {} );
 	} );
@@ -87,7 +92,7 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 				save: noop,
 				category: 'common',
@@ -172,7 +177,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 				attributes: {
 					ok: {
@@ -305,7 +310,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 		} );
@@ -345,7 +350,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 					},
 				},
 			] );
@@ -357,7 +362,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
@@ -366,15 +371,52 @@ describe( 'blocks', () => {
 
 	describe( 'setUnknownTypeHandlerName()', () => {
 		it( 'assigns unknown type handler', () => {
-			setUnknownTypeHandlerName( 'core/test-block' );
+			try {
+				setUnknownTypeHandlerName( 'core/test-block' );
 
-			expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
+				expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
+				expect( console ).toHaveWarned();
+			} finally {
+				// Restore undefined handler here rather than in `afterEach` because:
+				// - This call generates a deprecation warning.
+				// - Deprecation warnings become test errors unless we assert `toHaveWarned`.
+				// - This is too broad of an assertion to apply for all tests in the suite.
+				setUnknownTypeHandlerName( undefined );
+			}
 		} );
 	} );
 
 	describe( 'getUnknownTypeHandlerName()', () => {
 		it( 'defaults to undefined', () => {
 			expect( getUnknownTypeHandlerName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setFreeformContentHandlerName()', () => {
+		it( 'assigns unknown type handler', () => {
+			setFreeformContentHandlerName( 'core/test-block' );
+
+			expect( getFreeformContentHandlerName() ).toBe( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getFreeformContentHandlerName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getFreeformContentHandlerName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setUnregisteredTypeHandlerName()', () => {
+		it( 'assigns unknown type handler', () => {
+			setUnregisteredTypeHandlerName( 'core/test-block' );
+
+			expect( getUnregisteredTypeHandlerName() ).toBe( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getUnregisteredTypeHandlerName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getUnregisteredTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
@@ -401,7 +443,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 		} );
@@ -416,7 +458,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 				},
 			} );
 		} );
@@ -438,7 +480,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 					},
 				},
 				{
@@ -448,7 +490,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
 					},
 				},
 			] );

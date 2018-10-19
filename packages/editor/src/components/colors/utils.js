@@ -1,12 +1,8 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
-
-/**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
+import { find, kebabCase, map } from 'lodash';
+import tinycolor from 'tinycolor2';
 
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults,
@@ -47,24 +43,6 @@ export const getColorObjectByColorValue = ( colors, colorValue ) => {
 };
 
 /**
-* Provided an array of named colors and a color value returns the color name.
-*
-* @param {Array}   colors      Array of color objects containing the "name" and "color" value as properties.
-* @param {?string} colorValue  A string containing the color value.
-*
-* @return {?string} If colorValue is defined and matches a color part of the colors array, it returns the color name for that color.
-*/
-export const getColorName = ( colors, colorValue ) => {
-	deprecated( 'getColorName function', {
-		version: '3.9',
-		alternative: '`getColorObjectByColorValue` function',
-		plugin: 'Gutenberg',
-	} );
-	const colorObj = getColorObjectByColorValue( colors, colorValue );
-	return colorObj ? colorObj.name : undefined;
-};
-
-/**
  * Returns a class based on the context a color is being used and its slug.
  *
  * @param {string} colorContextName Context/place where color is being used e.g: background, text etc...
@@ -80,11 +58,17 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
 }
 
-export function getColorClass( colorContextName, colorSlug ) {
-	deprecated( 'getColorClass function', {
-		version: '3.9',
-		alternative: '`getColorClassName` function',
-		plugin: 'Gutenberg',
-	} );
-	return getColorClassName( colorContextName, colorSlug );
+/**
+* Given an array of color objects and a color value returns the color value of the most readable color in the array.
+*
+* @param {Array}   colors     Array of color objects as set by the theme or by the editor defaults.
+* @param {?string} colorValue A string containing the color value.
+*
+* @return {string} String with the color value of the most readable color.
+*/
+export function getMostReadableColor( colors, colorValue ) {
+	return tinycolor.mostReadable(
+		colorValue,
+		map( colors, 'color' )
+	).toHexString();
 }

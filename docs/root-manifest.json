@@ -12,6 +12,12 @@
 		"parent": null
 	},
 	{
+		"title": "The Gutenberg block grammar",
+		"slug": "grammar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/grammar.md",
+		"parent": "language"
+	},
+	{
 		"title": "Block API",
 		"slug": "block-api",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/block-api.md",
@@ -32,7 +38,7 @@
 	{
 		"title": "RichText API",
 		"slug": "rich-text-api",
-		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/editor\/components\/rich-text\/README.md",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/packages\/editor\/src\/components\/rich-text\/README.md",
 		"parent": "block-api"
 	},
 	{
@@ -189,6 +195,12 @@
 		"title": "Release Process",
 		"slug": "release",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/release.md",
+		"parent": "reference"
+	},
+	{
+		"title": "Scripts",
+		"slug": "scripts",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/scripts.md",
 		"parent": "reference"
 	},
 	{

@@ -7,8 +7,10 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
+import { Dropdown, IconButton, MenuGroup, MenuItem } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-function Warning( { className, actions, children } ) {
+function Warning( { className, actions, children, secondaryActions } ) {
 	return (
 		<div className={ classnames( className, 'editor-warning' ) }>
 			<div className="editor-warning__contents">
@@ -24,6 +26,30 @@ function Warning( { className, actions, children } ) {
 					</div>
 				) }
 			</div>
+
+			{ secondaryActions && (
+				<Dropdown
+					className="editor-warning__secondary"
+					position="bottom left"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<IconButton
+							icon="ellipsis"
+							label={ __( 'More options' ) }
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+						/>
+					) }
+					renderContent={ () => (
+						<MenuGroup label={ __( 'More options' ) }>
+							{ secondaryActions.map( ( item, pos ) =>
+								<MenuItem onClick={ item.onClick } key={ pos }>
+									{ item.title }
+								</MenuItem>
+							) }
+						</MenuGroup>
+					) }
+				/>
+			) }
 		</div>
 	);
 }

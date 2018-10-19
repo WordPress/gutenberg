@@ -10,26 +10,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Set up global variables so that plugins will add meta boxes as if we were
- * using the main editor.
- *
- * @since 1.5.0
- */
-function gutenberg_trick_plugins_into_registering_meta_boxes() {
-	global $pagenow;
-
-	if ( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) && ! isset( $_REQUEST['classic-editor'] ) ) {
-		// As early as possible, but after any plugins ( ACF ) that adds meta boxes.
-		add_action( 'admin_head', 'gutenberg_collect_meta_box_data', 99 );
-	}
-}
-// As late as possible, but before any logic that adds meta boxes.
-add_action(
-	'plugins_loaded',
-	'gutenberg_trick_plugins_into_registering_meta_boxes'
-);
-
-/**
  * Collect information about meta_boxes registered for the current post.
  *
  * Redirects to classic editor if a meta box is incompatible.
@@ -215,8 +195,6 @@ function gutenberg_collect_meta_box_data() {
 	 * @param array $wp_meta_boxes Global meta box state.
 	 */
 	$_meta_boxes_copy = apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );
-
-	$meta_box_data = array();
 
 	// Redirect to classic editor if a meta box is incompatible.
 	foreach ( $locations as $location ) {
@@ -462,10 +440,13 @@ function gutenberg_register_post_types() {
 		'wp_block',
 		array(
 			'labels'                => array(
-				'name'          => 'Blocks',
-				'singular_name' => 'Block',
+				'name'          => __( 'Blocks', 'gutenberg' ),
+				'singular_name' => __( 'Block', 'gutenberg' ),
+				'search_items'  => __( 'Search Blocks', 'gutenberg' ),
 			),
 			'public'                => false,
+			'show_ui'               => true,
+			'show_in_menu'          => false,
 			'rewrite'               => false,
 			'show_in_rest'          => true,
 			'rest_base'             => 'blocks',
@@ -476,6 +457,7 @@ function gutenberg_register_post_types() {
 				'create_posts' => 'create_blocks',
 			),
 			'map_meta_cap'          => true,
+			'supports'              => false,
 		)
 	);
 

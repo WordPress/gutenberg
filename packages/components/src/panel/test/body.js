@@ -24,7 +24,7 @@ describe( 'PanelBody', () => {
 			expect( panelBody.hasClass( 'is-opened' ) ).toBe( true );
 			expect( panelBody.state( 'opened' ) ).toBe( true );
 			expect( button.prop( 'onClick' ) ).toBe( panelBody.instance().toggle );
-			expect( button.childAt( 0 ).name() ).toBe( 'svg' );
+			expect( button.childAt( 0 ).name() ).toBe( 'SVG' );
 			expect( button.childAt( 1 ).text() ).toBe( 'Some Text' );
 		} );
 

@@ -1580,7 +1580,26 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				insertUsage: {},
+				isPublishSidebarEnabled: true,
 			} );
+		} );
+
+		it( 'should disable the publish sidebar', () => {
+			const original = deepFreeze( preferences( undefined, { } ) );
+			const state = preferences( original, {
+				type: 'DISABLE_PUBLISH_SIDEBAR',
+			} );
+
+			expect( state.isPublishSidebarEnabled ).toBe( false );
+		} );
+
+		it( 'should enable the publish sidebar', () => {
+			const original = deepFreeze( preferences( { isPublishSidebarEnabled: false }, { } ) );
+			const state = preferences( original, {
+				type: 'ENABLE_PUBLISH_SIDEBAR',
+			} );
+
+			expect( state.isPublishSidebarEnabled ).toBe( true );
 		} );
 
 		it( 'should record recently used blocks', () => {

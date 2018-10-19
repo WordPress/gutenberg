@@ -1,7 +1,6 @@
 // Components
 export * from './primitives';
 // eslint-disable-next-line camelcase
-export { default as APIProvider, unstable__setApiSettings } from './higher-order/with-api-data/provider';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';
@@ -44,6 +43,7 @@ export { default as Popover } from './popover';
 export { default as QueryControls } from './query-controls';
 export { default as RadioControl } from './radio-control';
 export { default as RangeControl } from './range-control';
+export { default as ResizableBox } from './resizable-box';
 export { default as ResponsiveWrapper } from './responsive-wrapper';
 export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
@@ -60,8 +60,6 @@ export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot
 
 // Higher-Order Components
 export { default as navigateRegions } from './higher-order/navigate-regions';
-export { default as withAPIData } from './higher-order/with-api-data';
-export { default as withContext } from './higher-order/with-context';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';

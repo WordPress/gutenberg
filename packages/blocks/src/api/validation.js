@@ -398,6 +398,28 @@ function getHTMLTokens( html ) {
 }
 
 /**
+ * Returns true if the next HTML token closes the current token.
+ *
+ * @param {Object} currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken Next token to compare against.
+ *
+ * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
+ */
+export function isClosedByToken( currentToken, nextToken ) {
+	// Ensure this is a self closed token
+	if ( ! currentToken.selfClosing ) {
+		return false;
+	}
+
+	// Check token names and determine if nextToken is the closing tag for currentToken
+	if ( nextToken && nextToken.tagName === currentToken.tagName && nextToken.type === 'EndTag' ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Returns true if the given HTML strings are effectively equivalent, or
  * false otherwise. Invalid HTML is not considered equivalent, even if the
  * strings directly match.
@@ -437,6 +459,18 @@ export function isEquivalentHTML( actual, expected ) {
 		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
 		if ( isEqualTokens && ! isEqualTokens( actualToken, expectedToken ) ) {
 			return false;
+		}
+
+		// Peek at the next tokens (actual and expected) to see if they close
+		// a self-closing tag
+		if ( isClosedByToken( actualToken, expectedTokens[ 0 ] ) ) {
+			// Consume the next expected token that closes the current actual
+			// self-closing token
+			getNextNonWhitespaceToken( expectedTokens );
+		} else if ( isClosedByToken( expectedToken, actualTokens[ 0 ] ) ) {
+			// Consume the next actual token that closes the current expected
+			// self-closing token
+			getNextNonWhitespaceToken( actualTokens );
 		}
 	}
 

@@ -9,7 +9,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
@@ -23,12 +23,12 @@ import { addQueryArgs } from '@wordpress/url';
 const stopEventPropagation = ( event ) => event.stopPropagation();
 
 class URLInput extends Component {
-	constructor() {
+	constructor( { autocompleteRef } ) {
 		super( ...arguments );
 
 		this.onChange = this.onChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.bindListNode = this.bindListNode.bind( this );
+		this.autocompleteRef = autocompleteRef || createRef();
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
 
 		this.suggestionNodes = [];
@@ -46,7 +46,7 @@ class URLInput extends Component {
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
 			this.scrollingIntoView = true;
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef.current, {
 				onlyScrollIfNeeded: true,
 			} );
 
@@ -58,10 +58,6 @@ class URLInput extends Component {
 
 	componentWillUnmount() {
 		delete this.suggestionsRequest;
-	}
-
-	bindListNode( ref ) {
-		this.listNode = ref;
 	}
 
 	bindSuggestionNode( index ) {
@@ -90,7 +86,7 @@ class URLInput extends Component {
 		} );
 
 		const request = apiFetch( {
-			path: addQueryArgs( '/gutenberg/v1/search', {
+			path: addQueryArgs( '/wp/v2/search', {
 				search: value,
 				per_page: 20,
 				type: 'post',
@@ -196,7 +192,7 @@ class URLInput extends Component {
 						value={ value }
 						onChange={ this.onChange }
 						onInput={ stopEventPropagation }
-						placeholder={ __( 'Paste URL or type' ) }
+						placeholder={ __( 'Paste URL or type to search' ) }
 						onKeyDown={ this.onKeyDown }
 						role="combobox"
 						aria-expanded={ showSuggestions }
@@ -213,7 +209,7 @@ class URLInput extends Component {
 						<div
 							className="editor-url-input__suggestions"
 							id={ `editor-url-input-suggestions-${ instanceId }` }
-							ref={ this.bindListNode }
+							ref={ this.autocompleteRef }
 							role="listbox"
 						>
 							{ posts.map( ( post, index ) => (

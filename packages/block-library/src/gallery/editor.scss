@@ -1,24 +1,19 @@
-.wp-block-gallery.components-placeholder {
-	margin: 0;
-}
-
-// Allow gallery items to go edge to edge.
-.gutenberg .wp-block-gallery:not(.components-placeholder) {
-	margin-left: -8px;
-	margin-right: -8px;
-}
-
-// Don't use negative margins when full-wide.
-.gutenberg [data-align="full"] .wp-block-gallery:not(.components-placeholder) {
-	margin-left: auto;
-	margin-right: auto;
+// Override the default list style type _only in the editor_
+// to avoid :not() selector specificity issues.
+// See https://github.com/WordPress/gutenberg/pull/10358
+ul.wp-block-gallery li {
+	list-style-type: none;
 }
 
 .blocks-gallery-item {
 
+	// Hide the focus outline that otherwise briefly appears when selecting a block.
+	figure:not(.is-selected):focus {
+		outline: none;
+	}
+
 	.is-selected {
 		outline: 4px solid theme(primary);
-		outline-offset: -4px;
 	}
 
 	&.is-transient img {
@@ -27,6 +22,7 @@
 
 	.editor-rich-text {
 		position: absolute;
+		bottom: 0;
 		width: 100%;
 		max-height: 100%;
 		overflow-y: auto;
@@ -38,9 +34,12 @@
 	}
 
 	.is-selected .editor-rich-text {
-		width: calc(100% - 8px);
-		left: 4px;
-		margin-top: -4px;
+		// IE calculates this incorrectly, so leave it to modern browsers.
+		@supports (position: sticky) {
+			right: 0;
+			left: 0;
+			margin-top: -4px;
+		}
 
 		// Override negative margins so this toolbar isn't hidden by overflow. Overflow is needed for long captions.
 		.editor-rich-text__inline-toolbar {
@@ -92,8 +91,8 @@
 .block-library-gallery-item__inline-menu {
 	padding: 2px;
 	position: absolute;
-	top: 0;
-	right: 0;
+	top: -2px;
+	right: -2px;
 	background-color: theme(primary);
 	display: inline-flex;
 	z-index: z-index(".block-library-gallery-item__inline-menu");
@@ -116,17 +115,4 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-}
-
-// IE11 doesn't support object-fit or flex very well, so we inline-block.
-@media all and (-ms-high-contrast: none) {
-	*::-ms-backdrop,
-	.blocks-gallery-item {
-		display: inline-block;
-	}
-
-	*::-ms-backdrop,
-	.blocks-gallery-item img {
-		width: 100%;
-	}
 }

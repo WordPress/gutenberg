@@ -15,11 +15,12 @@ describe( 'Warning', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should has valid class', () => {
+	it( 'should have valid class', () => {
 		const wrapper = shallow( <Warning /> );
 
 		expect( wrapper.hasClass( 'editor-warning' ) ).toBe( true );
 		expect( wrapper.find( '.editor-warning__actions' ) ).toHaveLength( 0 );
+		expect( wrapper.find( '.editor-warning__hidden' ) ).toHaveLength( 0 );
 	} );
 
 	it( 'should show child error message element', () => {
@@ -31,5 +32,13 @@ describe( 'Warning', () => {
 		expect( actions ).toHaveLength( 1 );
 		expect( action.hasClass( 'editor-warning__action' ) ).toBe( true );
 		expect( action.childAt( 0 ).type() ).toBe( 'button' );
+	} );
+
+	it( 'should show hidden actions', () => {
+		const wrapper = shallow( <Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>Message</Warning> );
+
+		const actions = wrapper.find( '.editor-warning__secondary' );
+
+		expect( actions ).toHaveLength( 1 );
 	} );
 } );

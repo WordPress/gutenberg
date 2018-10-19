@@ -6,7 +6,12 @@ import { every } from 'lodash';
 /**
  * Internal dependencies
  */
-import { isURL, addQueryArgs, prependHTTP } from '../';
+import {
+	isURL,
+	addQueryArgs,
+	prependHTTP,
+	safeDecodeURI,
+} from '../';
 
 describe( 'isURL', () => {
 	it( 'returns true when given things that look like a URL', () => {
@@ -60,7 +65,7 @@ describe( 'addQueryArgs', () => {
 		const url = 'https://andalouses.example/beach?time[]=10&time[]=11';
 		const args = { beach: [ 'sand', 'rock' ] };
 
-		expect( decodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
+		expect( safeDecodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
 	} );
 } );
 
@@ -117,5 +122,20 @@ describe( 'prependHTTP', () => {
 		const url = 'mailto:foo@wordpress.org';
 
 		expect( prependHTTP( url ) ).toBe( url );
+	} );
+} );
+
+describe( 'safeDecodeURI', () => {
+	it( 'should decode URI if formed well', () => {
+		const encoded = 'https://mozilla.org/?x=%D1%88%D0%B5%D0%BB%D0%BB%D1%8B';
+		const decoded = 'https://mozilla.org/?x=шеллы';
+
+		expect( safeDecodeURI( encoded ) ).toBe( decoded );
+	} );
+
+	it( 'should return URI if malformed', () => {
+		const malformed = '%1';
+
+		expect( safeDecodeURI( malformed ) ).toBe( malformed );
 	} );
 } );

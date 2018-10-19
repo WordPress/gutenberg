@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -63,7 +68,7 @@ export default compose(
 		const tags = tagsTaxonomy && select( 'core/editor' ).getEditedPostAttribute( tagsTaxonomy.rest_base );
 		return {
 			areTagsFetched: tagsTaxonomy !== undefined,
-			isPostTypeSupported: tagsTaxonomy && tagsTaxonomy.types.some( ( type ) => type === postType ),
+			isPostTypeSupported: tagsTaxonomy && some( tagsTaxonomy.types, ( type ) => type === postType ),
 			hasTags: tags && tags.length,
 		};
 	} ),

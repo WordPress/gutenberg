@@ -12,22 +12,26 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import { createRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
+import actions, {
+	updateEditorSettings,
 	setupEditorState,
 	mergeBlocks,
 	replaceBlocks,
+	resetBlocks,
 	selectBlock,
 	createErrorNotice,
 	setTemplateValidity,
 	editPost,
 } from '../actions';
-import effects from '../effects';
+import effects, { validateBlocksToTemplate } from '../effects';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
+import applyMiddlewares from '../middlewares';
 
 describe( 'effects', () => {
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
@@ -234,6 +238,14 @@ describe( 'effects', () => {
 			...defaultPost,
 			status: 'publish',
 		} );
+		const getPostType = () => ( {
+			labels: {
+				view_item: 'View post',
+				item_published: 'Post published.',
+				item_reverted_to_draft: 'Post reverted to draft.',
+				item_updated: 'Post updated.',
+			},
+		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
@@ -241,17 +253,18 @@ describe( 'effects', () => {
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p>Post published!{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post published.{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
-					spokenMessage: 'Post published!',
+					spokenMessage: 'Post published.',
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
@@ -263,8 +276,9 @@ describe( 'effects', () => {
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
@@ -289,17 +303,18 @@ describe( 'effects', () => {
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p>Post updated!{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post updated.{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
-					spokenMessage: 'Post updated!',
+					spokenMessage: 'Post updated.',
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
@@ -441,12 +456,14 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post, settings: {} }, { getState } );
 
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
 				setupEditorState( post, [], {} ),
 			] );
 		} );
@@ -468,14 +485,16 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post }, { getState } );
 
-			expect( result[ 1 ].blocks ).toHaveLength( 1 );
+			expect( result[ 0 ].blocks ).toHaveLength( 1 );
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, result[ 1 ].blocks, {} ),
+				setupEditorState( post, result[ 0 ].blocks, {} ),
 			] );
 		} );
 
@@ -495,14 +514,88 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post }, { getState } );
 
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
 				setupEditorState( post, [], { title: 'A History of Pork' } ),
 			] );
+		} );
+	} );
+
+	describe( 'validateBlocksToTemplate', () => {
+		let store;
+		beforeEach( () => {
+			store = createRegistry().registerStore( 'test', {
+				actions,
+				selectors,
+				reducer,
+			} );
+			applyMiddlewares( store );
+
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+		} );
+
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should return undefined if no template assigned', () => {
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return undefined if invalid but unlocked', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/foo', {} ],
+				],
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return undefined if locked and valid', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/test-block' ],
+				],
+				templateLock: 'all',
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return validity set action if invalid on default state', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/foo' ],
+				],
+				templateLock: 'all',
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toEqual( setTemplateValidity( false ) );
 		} );
 	} );
 } );

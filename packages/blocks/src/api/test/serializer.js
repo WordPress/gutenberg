@@ -18,7 +18,8 @@ import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
+	setFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../';
 
@@ -29,7 +30,8 @@ describe( 'block serializer', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -196,10 +198,10 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		it( 'serializes the fallback block without comment delimiters', () => {
-			registerBlockType( 'core/unknown-block', {
+		it( 'serializes the freeform content fallback block without comment delimiters', () => {
+			registerBlockType( 'core/freeform-block', {
 				category: 'common',
-				title: 'unknown block',
+				title: 'freeform block',
 				attributes: {
 					fruit: {
 						type: 'string',
@@ -207,8 +209,26 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setUnknownTypeHandlerName( 'core/unknown-block' );
-			const block = createBlock( 'core/unknown-block', { fruit: 'Bananas' } );
+			setFreeformContentHandlerName( 'core/freeform-block' );
+			const block = createBlock( 'core/freeform-block', { fruit: 'Bananas' } );
+
+			const content = serializeBlock( block );
+
+			expect( content ).toBe( 'Bananas' );
+		} );
+		it( 'serializes the unregistered fallback block without comment delimiters', () => {
+			registerBlockType( 'core/unregistered-block', {
+				category: 'common',
+				title: 'unregistered block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
+			const block = createBlock( 'core/unregistered-block', { fruit: 'Bananas' } );
 
 			const content = serializeBlock( block );
 

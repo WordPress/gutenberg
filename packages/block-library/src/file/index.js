@@ -10,6 +10,8 @@ import { __ } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+import { RichText } from '@wordpress/editor';
+import { create, getTextContent } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -37,8 +39,7 @@ export const settings = {
 			type: 'string',
 		},
 		fileName: {
-			type: 'string',
-			source: 'text',
+			source: 'html',
 			selector: 'a:not([download])',
 		},
 		// Differs to the href when the block is configured to link to the attachment page
@@ -48,7 +49,7 @@ export const settings = {
 			selector: 'a:not([download])',
 			attribute: 'href',
 		},
-		// e.g. `_blank` when the block is configured to open in a new window
+		// e.g. `_blank` when the block is configured to open in a new tab
 		textLinkTarget: {
 			type: 'string',
 			source: 'attribute',
@@ -60,8 +61,7 @@ export const settings = {
 			default: true,
 		},
 		downloadButtonText: {
-			type: 'string',
-			source: 'text',
+			source: 'html',
 			selector: 'a[download]',
 			default: __( 'Download' ),
 		},
@@ -97,7 +97,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.src,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption,
 						textLinkHref: attributes.src,
 						id: attributes.id,
 					} );
@@ -109,7 +109,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.src,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption,
 						textLinkHref: attributes.src,
 						id: attributes.id,
 					} );
@@ -121,7 +121,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/file', {
 						href: attributes.url,
-						fileName: attributes.caption && attributes.caption.join(),
+						fileName: attributes.caption,
 						textLinkHref: attributes.url,
 						id: attributes.id,
 					} );
@@ -143,7 +143,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/audio', {
 						src: attributes.href,
-						caption: [ attributes.fileName ],
+						caption: attributes.fileName,
 						id: attributes.id,
 					} );
 				},
@@ -162,7 +162,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/video', {
 						src: attributes.href,
-						caption: [ attributes.fileName ],
+						caption: attributes.fileName,
 						id: attributes.id,
 					} );
 				},
@@ -181,7 +181,7 @@ export const settings = {
 				transform: ( attributes ) => {
 					return createBlock( 'core/image', {
 						url: attributes.href,
-						caption: [ attributes.fileName ],
+						caption: attributes.fileName,
 						id: attributes.id,
 					} );
 				},
@@ -203,13 +203,15 @@ export const settings = {
 
 		return ( href &&
 			<div>
-				{ fileName &&
+				{ ! RichText.isEmpty( fileName ) &&
 					<a
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={ textLinkTarget ? 'noreferrer noopener' : false }
 					>
-						{ fileName }
+						<RichText.Content
+							value={ fileName }
+						/>
 					</a>
 				}
 				{ showDownloadButton &&
@@ -219,9 +221,11 @@ export const settings = {
 						// ensure download attribute is still set when fileName
 						// is undefined. Using '' here as `true` still leaves
 						// the attribute unset.
-						download={ fileName || '' }
+						download={ getTextContent( create( { html: fileName } ) ) }
 					>
-						{ downloadButtonText }
+						<RichText.Content
+							value={ downloadButtonText }
+						/>
 					</a>
 				}
 			</div>

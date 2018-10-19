@@ -19,7 +19,9 @@ import {
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
-import { getBlobByURL } from '@wordpress/blob';
+import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+
+const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 class AudioEdit extends Component {
 	constructor() {
@@ -38,7 +40,7 @@ class AudioEdit extends Component {
 		const { attributes, noticeOperations, setAttributes } = this.props;
 		const { id, src = '' } = attributes;
 
-		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
+		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 
 			if ( file ) {
@@ -52,7 +54,7 @@ class AudioEdit extends Component {
 						this.setState( { editing: true } );
 						noticeOperations.createErrorNotice( e );
 					},
-					allowedType: 'audio',
+					allowedTypes: ALLOWED_MEDIA_TYPES,
 				} );
 			}
 		}
@@ -109,7 +111,7 @@ class AudioEdit extends Component {
 					onSelect={ onSelectAudio }
 					onSelectURL={ this.onSelectURL }
 					accept="audio/*"
-					type="audio"
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ this.props.attributes }
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
@@ -163,7 +165,7 @@ class AudioEdit extends Component {
 					<Disabled>
 						<audio controls="controls" src={ src } />
 					</Disabled>
-					{ ( ( caption && caption.length ) || !! isSelected ) && (
+					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
 							placeholder={ __( 'Write caption…' ) }

@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 
 export const PREFERENCES_DEFAULTS = {
 	insertUsage: {},
+	isPublishSidebarEnabled: true,
 };
 
 /**
@@ -16,6 +17,7 @@ export const PREFERENCES_DEFAULTS = {
  *  maxWidth          number         Max width to constraint resizing
  *  blockTypes        boolean|Array  Allowed block types
  *  hasFixedToolbar   boolean        Whether or not the editor toolbar is fixed
+ *  focusMode         boolean        Whether the focus mode is enabled or not
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -79,27 +81,28 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	fontSizes: [
 		{
 			name: __( 'Small' ),
-			shortName: __( 'S' ),
-			size: 14,
+			size: 13,
 			slug: 'small',
 		},
 		{
-			name: __( 'Regular' ),
-			shortName: __( 'M' ),
+			name: __( 'Normal' ),
 			size: 16,
-			slug: 'regular',
+			slug: 'normal',
+		},
+		{
+			name: __( 'Medium' ),
+			size: 20,
+			slug: 'medium',
 		},
 		{
 			name: __( 'Large' ),
-			shortName: __( 'L' ),
 			size: 36,
 			slug: 'large',
 		},
 		{
-			name: __( 'Larger' ),
-			shortName: __( 'XL' ),
+			name: __( 'Huge' ),
 			size: 48,
-			slug: 'larger',
+			slug: 'huge',
 		},
 	],
 

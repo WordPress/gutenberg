@@ -60,14 +60,28 @@ function gutenberg_parse_blocks( $content ) {
 	if ( ! has_blocks( $content ) ) {
 		return array(
 			array(
-				'attrs'     => array(),
-				'innerHTML' => $content,
+				'blockName'   => null,
+				'attrs'       => array(),
+				'innerBlocks' => array(),
+				'innerHTML'   => $content,
 			),
 		);
 	}
 
-	$parser = new Gutenberg_PEG_Parser;
-	return $parser->parse( _gutenberg_utf8_split( $content ) );
+	/**
+	 * Filter to allow plugins to replace the server-side block parser
+	 *
+	 * @since 3.8.0
+	 *
+	 * @param string $parser_class Name of block parser class
+	 */
+	$parser_class = apply_filters( 'block_parser_class', 'WP_Block_Parser' );
+	// Load default block parser for server-side parsing if the default parser class is being used.
+	if ( 'WP_Block_Parser' === $parser_class ) {
+		require_once dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
+	}
+	$parser = new $parser_class();
+	return $parser->parse( $content );
 }
 
 /**

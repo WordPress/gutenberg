@@ -2,54 +2,6 @@
 
 ## Selectors
 
-### getTerms
-
-Returns all the available terms for the given taxonomy.
-
-*Parameters*
-
- * state: Data state.
- * taxonomy: Taxonomy name.
-
-### getCategories
-
-Returns all the available categories.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Categories list.
-
-### isRequestingTerms
-
-Returns true if a request is in progress for terms data of a given taxonomy,
-or false otherwise.
-
-*Parameters*
-
- * state: Data state.
- * taxonomy: Taxonomy name.
-
-*Returns*
-
-Whether a request is in progress for taxonomy's terms.
-
-### isRequestingCategories
-
-Returns true if a request is in progress for categories data, or false
-otherwise.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Whether a request is in progress for categories.
-
 ### isRequestingEmbedPreview
 
 Returns true if a request is in progress for embed preview data, or false
@@ -59,10 +11,6 @@ otherwise.
 
  * state: Data state.
  * url: URL the preview would be for.
-
-*Returns*
-
-Whether a request is in progress for an embed preview.
 
 ### getAuthors
 
@@ -75,6 +23,19 @@ Returns all available authors.
 *Returns*
 
 Authors list.
+
+### getUserQueryResults
+
+Returns all the users returned by a query ID.
+
+*Parameters*
+
+ * state: Data state.
+ * queryID: Query ID.
+
+*Returns*
+
+Users list.
 
 ### getEntitiesByKind
 
@@ -177,16 +138,6 @@ Is the preview for the URL an oEmbed link fallback.
 
 ## Actions
 
-### receiveTerms
-
-Returns an action object used in signalling that terms have been received
-for a given taxonomy.
-
-*Parameters*
-
- * taxonomy: Taxonomy name.
- * terms: Terms received.
-
 ### receiveUserQuery
 
 Returns an action object used in signalling that authors have been received.
@@ -215,13 +166,13 @@ Returns an action object used in signalling that entity records have been receiv
  * records: Records received.
  * query: Query Object.
 
-### receiveThemeSupportsFromIndex
+### receiveThemeSupports
 
 Returns an action object used in signalling that the index has been received.
 
 *Parameters*
 
- * index: Index received.
+ * themeSupports: Theme support for the current theme.
 
 ### receiveEmbedPreview
 

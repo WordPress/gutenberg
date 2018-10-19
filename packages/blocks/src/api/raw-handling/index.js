@@ -2,19 +2,19 @@
  * External dependencies
  */
 import { flatMap, filter, compact } from 'lodash';
-// Also polyfills Element#matches.
-import 'element-closest';
 
 /**
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
+import { getBlockContent } from '../serializer';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import isInlineContent from './is-inline-content';
 import phrasingContentReducer from './phrasing-content-reducer';
+import headRemover from './head-remover';
 import msListConverter from './ms-list-converter';
 import listReducer from './list-reducer';
 import imageCorrector from './image-corrector';
@@ -141,7 +141,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	const phrasingContentSchema = getPhrasingContentSchema();
 	const blockContentSchema = getBlockContentSchema( rawTransformations );
 
-	return compact( flatMap( pieces, ( piece ) => {
+	const blocks = compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
 		if ( typeof piece !== 'string' ) {
 			return piece;
@@ -149,6 +149,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 
 		const filters = [
 			msListConverter,
+			headRemover,
 			listReducer,
 			imageCorrector,
 			phrasingContentReducer,
@@ -207,4 +208,20 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 			);
 		} );
 	} ) );
+
+	// If we're allowed to return inline content and there is only one block
+	// and the original plain text content does not have any line breaks, then
+	// treat it as inline paste.
+	if ( mode === 'AUTO' && blocks.length === 1 ) {
+		const trimmedPlainText = plainText.trim();
+
+		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {
+			return removeInvalidHTML(
+				getBlockContent( blocks[ 0 ] ),
+				phrasingContentSchema
+			);
+		}
+	}
+
+	return blocks;
 }
