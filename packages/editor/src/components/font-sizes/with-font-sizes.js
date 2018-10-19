@@ -71,7 +71,7 @@ export default ( ...fontSizeNames ) => {
 							// Conditionally set the slug or numeric size.
 							this.props.setAttributes( {
 								[ fontSizeAttributeName ]: ( value === getDefaultFontSizeSlug || isNumber( value ) ) ? undefined : value,
-								[ customFontSizeAttributeName ]: isNumber( value ) ? value : undefined,
+								[ customFontSizeAttributeName ]: ( isNumber( value ) || value === '' ) ? value : undefined,
 							} );
 						};
 					}
@@ -100,15 +100,18 @@ export default ( ...fontSizeNames ) => {
 							pickBy( fontSizeAttributeNames, didAttributesChange ),
 							( newStateAccumulator, customFontSizeAttributeName, fontSizeAttributeName ) => {
 								const fontSizeAttributeValue = attributes[ fontSizeAttributeName ];
+
 								const fontSizeObject = getFontSize(
 									fontSizes,
 									fontSizeAttributeValue,
 									attributes[ customFontSizeAttributeName ]
 								);
+
 								newStateAccumulator[ fontSizeAttributeName ] = {
 									...fontSizeObject,
 									class: getFontSizeClass( fontSizeAttributeValue ),
 								};
+
 								return newStateAccumulator;
 							},
 							{}
