@@ -461,7 +461,10 @@ function gutenberg_register_post_types() {
 				'create_posts' => 'create_blocks',
 			),
 			'map_meta_cap'          => true,
-			'supports'              => false,
+			'supports'              => array(
+				'title',
+				'editor',
+			),
 		)
 	);
 
