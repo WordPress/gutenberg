@@ -4,6 +4,3 @@
 [submodule "react-native-aztec"]
 	path = react-native-aztec
 	url = ../react-native-aztec.git
-[submodule "WordPress-iOS"]
-	path = WordPress-iOS
-	url = git@github.com:wordpress-mobile/WordPress-iOS.git
