@@ -60,16 +60,18 @@ export function getEmbedEditComponent( title, icon ) {
 		componentDidUpdate( prevProps ) {
 			const hasPreview = undefined !== this.props.preview;
 			const hadPreview = undefined !== prevProps.preview;
-			// We had a preview, and the URL was edited, and the new URL already has a preview fetched.
 			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
 			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
 
 			if ( ( switchedURL || ( hasPreview && ! hadPreview ) ) && this.maybeSwitchBlock() ) {
+				// Dont do anything if we are going to switch to a different block,
+				// and we've just changed the URL, or we've just received a preview.
 				return;
 			}
 
 			if ( ( hasPreview && ! hadPreview ) || switchedPreview ) {
 				if ( this.props.cannotEmbed ) {
+					// Can't embed this URL, and we've just received or switched the preview.
 					this.setState( { editingURL: true } );
 					return;
 				}
@@ -95,8 +97,8 @@ export function getEmbedEditComponent( title, icon ) {
 		}
 
 		/***
-		 * Maybe switches to a different embed block type, based on the URL
-		 * and the HTML in the preview.
+		 * Switches to a different embed block type, based on the URL
+		 * and the HTML in the preview, if the preview or URL match a different block.
 		 *
 		 * @return {boolean} Whether the block was switched.
 		 */
