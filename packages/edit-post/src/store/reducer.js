@@ -185,22 +185,26 @@ export function isSavingMetaBoxes( state = false, action ) {
 }
 
 /**
- * Reducer returning an array of active meta box locations after the given
- * action.
+ * Reducer keeping track of the meta boxes per location.
  *
- * @param {boolean} state  Previous state.
- * @param {Object}  action Action Object.
+ * @param {boolean}  state   Previous state.
+ * @param {Object}   action  Action Object.
  *
- * @return {string[]} Updated state.
+ * @return {Object} Updated state.
  */
-export function activeMetaBoxLocations( state = [], action ) {
+export function metaBoxLocations( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_ACTIVE_META_BOX_LOCATIONS':
-			return action.locations;
+		case 'SET_META_BOXES_PER_LOCATIONS':
+			return action.metaBoxesPerLocation;
 	}
 
 	return state;
 }
+
+const metaBoxes = combineReducers( {
+	isSaving: isSavingMetaBoxes,
+	locations: metaBoxLocations,
+} );
 
 export default combineReducers( {
 	preferences,
@@ -208,6 +212,5 @@ export default combineReducers( {
 	panel,
 	activeModal,
 	publishSidebarActive,
-	activeMetaBoxLocations,
-	isSavingMetaBoxes,
+	metaBoxes,
 } );
