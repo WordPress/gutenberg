@@ -80,6 +80,12 @@ exports[`List should create paragraph on split at end and merge back with conten
 <!-- /wp:list -->"
 `;
 
+exports[`List should split indented list item 1`] = `
+"<!-- wp:list -->
+<ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should split into two with paragraph and merge lists 1`] = `
 "<!-- wp:list -->
 <ul><li>one</li><li></li><li>two</li></ul>
