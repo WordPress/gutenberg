@@ -29,7 +29,8 @@ const TableOfContentsItem = ( {
 			}
 		) }
 	>
-		<button
+		<a
+			href={ '#' + level }
 			className="document-outline__button"
 			onClick={ onClick }
 		>
@@ -50,7 +51,7 @@ const TableOfContentsItem = ( {
 				{ children }
 			</span>
 			<span className="screen-reader-text">{ __( '(Click to focus this heading)' ) }</span>
-		</button>
+		</a>
 	</li>
 );
 
