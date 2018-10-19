@@ -164,7 +164,11 @@ export class BlockListBlock extends Component {
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
 			if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
-				result[ type.attributes[ key ].meta ] = value;
+				const metaKey = type.attributes[ key ].meta;
+				result = {
+					previous: { [ metaKey ]: this.props.meta[ metaKey ] },
+					edits: { [ metaKey ]: value },
+				};
 			}
 
 			return result;
@@ -172,8 +176,8 @@ export class BlockListBlock extends Component {
 
 		if ( size( metaAttributes ) ) {
 			this.props.onMetaChange( {
-				...this.props.meta,
-				...metaAttributes,
+				...metaAttributes.previous,
+				...metaAttributes.edits,
 			} );
 		}
 	}
