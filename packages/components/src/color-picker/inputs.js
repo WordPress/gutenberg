@@ -6,6 +6,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { DOWN, ENTER, UP } from '@wordpress/keycodes';
@@ -97,13 +98,21 @@ export class Inputs extends Component {
 	toggleViews() {
 		if ( this.state.view === 'hex' ) {
 			this.setState( { view: 'rgb' } );
+
+			speak( __( 'RGB mode active' ) );
 		} else if ( this.state.view === 'rgb' ) {
 			this.setState( { view: 'hsl' } );
+
+			speak( __( 'Hue/saturation/lightness mode active' ) );
 		} else if ( this.state.view === 'hsl' ) {
 			if ( this.props.hsl.a === 1 ) {
 				this.setState( { view: 'hex' } );
+
+				speak( __( 'Hex color mode active' ) );
 			} else {
 				this.setState( { view: 'rgb' } );
+
+				speak( __( 'RGB mode active' ) );
 			}
 		}
 	}
