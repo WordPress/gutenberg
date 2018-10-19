@@ -11,12 +11,8 @@ import apiFetch from '../';
 // Apply query arguments to both URL and Path, whichever is present.
 const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 	...options,
-	...( url ? {
-		url: addQueryArgs( url || path, queryArgs ),
-	} : {} ),
-	...( path ? {
-		path: addQueryArgs( path || path, queryArgs ),
-	} : {} ),
+	url: url && addQueryArgs( url, queryArgs ),
+	path: path && addQueryArgs( path, queryArgs ),
 } );
 
 // Duplicates parsing functionality from apiFetch.
