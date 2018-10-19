@@ -923,7 +923,7 @@ export function postLock( state = { isLocked: false }, action ) {
  *
  * @return {PostLockState} Updated state.
  */
-export function postSavingLock( state = [], action ) {
+export function postSavingLock( state = {}, action ) {
 	const { lockName } = action;
 	switch ( action.type ) {
 		case 'LOCK_POST_SAVING':
