@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
+import {
+	Toolbar,
+	withSpokenMessages,
+} from '@wordpress/components';
 import { rawShortcut } from '@wordpress/keycodes';
 import { Component } from '@wordpress/element';
 import {
@@ -48,6 +51,7 @@ class FormatToolbar extends Component {
 
 	removeLink() {
 		this.removeFormat( 'a' );
+		this.props.speak( __( 'Link removed.' ), 'assertive' );
 	}
 
 	addLink() {
@@ -155,4 +159,4 @@ class FormatToolbar extends Component {
 	}
 }
 
-export default FormatToolbar;
+export default withSpokenMessages( FormatToolbar );
