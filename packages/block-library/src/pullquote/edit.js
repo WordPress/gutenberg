@@ -33,9 +33,11 @@ class PullQuoteEdit extends Component {
 	}
 
 	pullQuoteMainColorSetter( colorValue ) {
-		const { colorUtils, textColor, setTextColor, setMainColor } = this.props;
+		const { colorUtils, textColor, setTextColor, setMainColor, className } = this.props;
+		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+
 		setMainColor( colorValue );
-		if ( ! textColor.color || this.wasTextColorAutomaticallyComputed ) {
+		if ( ( isSolidColorStyle && ! textColor.color ) || this.wasTextColorAutomaticallyComputed ) {
 			this.wasTextColorAutomaticallyComputed = true;
 			setTextColor( colorUtils.getMostReadableColor( colorValue ) );
 		}
