@@ -104,6 +104,7 @@ function apiFetch( options ) {
 
 	const steps = [
 		raw,
+		fetchAllMiddleware,
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
 		...middlewares,
