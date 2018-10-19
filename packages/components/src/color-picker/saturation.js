@@ -150,7 +150,7 @@ export class Saturation extends Component {
 			home: () => this.saturate( -1 ),
 		};
 
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions */
 		return (
 			<KeyboardShortcuts shortcuts={ shortcuts }>
 				<div
@@ -159,7 +159,9 @@ export class Saturation extends Component {
 					ref={ this.container }
 					onMouseDown={ this.handleMouseDown }
 					onTouchMove={ this.handleChange }
-					onTouchStart={ this.handleChange }>
+					onTouchStart={ this.handleChange }
+					role="application"
+				>
 					<div className="components-color-picker__saturation-white" />
 					<div className="components-color-picker__saturation-black" />
 					<button
@@ -179,7 +181,7 @@ export class Saturation extends Component {
 				</div>
 			</KeyboardShortcuts>
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
+		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/no-noninteractive-element-interactions */
 	}
 }
 
