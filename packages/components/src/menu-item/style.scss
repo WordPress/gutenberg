@@ -24,13 +24,6 @@
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
 	}
-
-	// Don't wrap text until viewport is beyond the mobile breakpoint.
-	@include break-mobile() {
-		.components-popover:not(.is-mobile) & {
-			white-space: nowrap;
-		}
-	}
 }
 
 .components-menu-item__info-wrapper {
