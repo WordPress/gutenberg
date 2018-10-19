@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * WordPress dependencies
  */
@@ -8,79 +9,95 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import apiFetch from '../';
 
+// Apply query arguments to both URL and Path, whichever is present.
+const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
+	...options,
+	...( url ? {
+		url: addQueryArgs( url || path, queryArgs ),
+	} : {} ),
+	...( path ? {
+		path: addQueryArgs( path || path, queryArgs ),
+	} : {} ),
+} );
+
 // Duplicates parsing functionality from apiFetch.
-function parseResponse( response, parse = true ) {
-	if ( parse ) {
-		return response.json ? response.json() : Promise.reject( response );
+const parseResponse = ( response ) => response.json ?
+	response.json() :
+	Promise.reject( response );
+
+const parseLinkHeader = ( linkHeader ) => {
+	if ( ! linkHeader ) {
+		return {};
 	}
+	const match = linkHeader.match( /<([^>]+)>; rel="next"/ );
+	return match ? {
+		next: match[ 1 ],
+	} : {};
+};
 
-	return response;
-}
+const getNextPageUrl = ( response ) => {
+	const { next } = parseLinkHeader( response.headers.get( 'link' ) );
+	return next;
+};
 
-const capPerPageQuery = ( options ) => ( {
-	...options,
-	// Swap back to requesting the max number of items per page.
-	path: options.path && addQueryArgs( options.path, {
-		per_page: 100,
-		page: 1,
-	} ),
-	url: options.url && addQueryArgs( options.url, {
-		per_page: 100,
-		page: 1,
-	} ),
-} );
-
-const setRequestedPage = ( options, page ) => ( {
-	...options,
-	path: options.path && addQueryArgs( options.path, {
-		page,
-	} ),
-	url: options.url && addQueryArgs( options.url, {
-		page,
-	} ),
-} );
+const requestContainsUnboundedQuery = ( options ) => {
+	const pathIsUnbounded = options.path && options.path.indexOf( 'per_page=-1' > -1 );
+	const urlIsUnbounded = options.url && options.url.indexOf( 'per_page=-1' > -1 );
+	return pathIsUnbounded || urlIsUnbounded;
+};
 
 // The REST API enforces an upper limit on the per_page option. To handle large
 // collections, apiFetch consumers can pass `per_page=-1`; this middleware will
 // then recursively assemble a full response array from all available pages.
 const fetchAllMiddleware = async ( options, next ) => {
-	try {
-		if ( options.url && options.url.indexOf( 'per_page=-1' ) < 0 ) {
-			return next( options );
-		}
+	if ( options.parse === false ) {
+		// If a consumer has opted out of parsing, do not apply middleware.
+		return next( options );
+	}
+	if ( ! requestContainsUnboundedQuery( options ) ) {
+		// If neither url nor path is requesting all items, do not apply middleware.
+		return next( options );
+	}
 
-		const pageOptions = capPerPageQuery( options );
-		const pageOneResults = await next( {
-			...pageOptions,
-			// Ensure headers are returned for page 1.
+	// Retrieve requested page of results.
+	const response = await next( {
+		...modifyQuery( options, {
+			per_page: 100,
+		} ),
+		// Ensure headers are returned for page 1.
+		parse: false,
+	} );
+
+	const results = await parseResponse( response );
+
+	if ( ! Array.isArray( results ) ) {
+		// We have no reliable way of merging non-array results.
+		return results;
+	}
+
+	let nextPage = getNextPageUrl( response );
+
+	if ( ! nextPage ) {
+		// There are no further pages to request.
+		return results;
+	}
+
+	// Iteratively fetch all remaining pages until no "next" header is found.
+	let mergedResults = [].concat( results );
+	while ( nextPage ) {
+		const nextResponse = await apiFetch( {
+			...options,
+			// Ensure the URL for the next page is used instead of any provided path.
+			path: undefined,
+			url: nextPage,
+			// Ensure we still get headers so we can identify the next page.
 			parse: false,
 		} );
-
-		const totalPages = pageOneResults.headers && pageOneResults.headers.get( 'X-WP-TotalPages' );
-
-		// Build an array of options objects for each remaining page.
-		const remainingPageRequests = Array.from( {
-			length: totalPages - 1,
-		} ).map( ( _, idx ) => {
-			// Specify the page to request. First additional request is index 0 but page 2, etc.
-			return setRequestedPage( pageOptions, idx + 2 );
-		} );
-
-		// Ensure the first page is parsed as specified.
-		const pageOneParsed = await parseResponse( pageOneResults, options.parse );
-
-		return remainingPageRequests.reduce(
-			// Request each remaining page in sequence, and return a merged array.
-			async ( previousPageRequest, nextPageOptions ) => {
-				const resultsCollection = await previousPageRequest;
-				const nextPage = await apiFetch( nextPageOptions );
-				return resultsCollection.concat( nextPage );
-			},
-			[].concat( pageOneParsed )
-		);
-	} catch ( e ) {
-		return Promise.reject( e );
+		const nextResults = await parseResponse( nextResponse );
+		mergedResults = mergedResults.concat( nextResults );
+		nextPage = getNextPageUrl( nextResponse );
 	}
+	return mergedResults;
 };
 
 export default fetchAllMiddleware;

@@ -27,14 +27,6 @@ function checkCloudflareError( error ) {
 	}
 }
 
-function parseResponse( response, parse = true ) {
-	if ( parse ) {
-		return response.json ? response.json() : Promise.reject( response );
-	}
-
-	return response;
-}
-
 function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
 		const { url, path, body, data, parse, ...remainingOptions } = nextOptions;
@@ -62,7 +54,13 @@ function apiFetch( options ) {
 
 		return responsePromise
 			.then( checkStatus )
-			.then( ( response ) => parseResponse( response, parse ) )
+			.then( ( response ) => {
+				if ( parse ) {
+					return response.json ? response.json() : Promise.reject( response );
+				}
+
+				return response;
+			} )
 			.catch( ( response ) => {
 				if ( ! parse ) {
 					throw response;
