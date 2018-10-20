@@ -5,7 +5,6 @@ $input-size: 300px;
 .editor-block-list__block .editor-url-input,
 .components-popover .editor-url-input,
 .editor-url-input {
-	width: 100%;
 	flex-grow: 1;
 	position: relative;
 	padding: 1px;
@@ -38,9 +37,9 @@ $input-size: 300px;
 .editor-url-input__suggestions {
 	max-height: 200px;
 	transition: all 0.15s ease-in-out;
-	list-style: none;
 	padding: 4px 0;
-	width: $input-size + 2 * $icon-button-size;
+	// To match the url-input width: input width + padding + 2 buttons.
+	width: $input-size + 2 + 2 * $icon-button-size;
 	overflow-y: auto;
 }
 

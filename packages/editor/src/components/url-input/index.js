@@ -22,6 +22,15 @@ import { addQueryArgs } from '@wordpress/url';
 // as being considered from the input.
 const stopEventPropagation = ( event ) => event.stopPropagation();
 
+function getAnchorRect( anchor ) {
+	/*
+	 * The default getAnchorRect() gets the parent node to calculate the popover
+	 * position. As the popover with the list of suggestions is now nested within
+	 * another popover, we need to get the gran parent node.
+	 */
+	return anchor.parentNode.parentNode.getBoundingClientRect();
+}
+
 class URLInput extends Component {
 	constructor( { autocompleteRef } ) {
 		super( ...arguments );
@@ -218,7 +227,12 @@ class URLInput extends Component {
 				</div>
 
 				{ showSuggestions && !! posts.length &&
-					<Popover position="bottom" noArrow focusOnMount={ false }>
+					<Popover
+						position="bottom center"
+						noArrow
+						focusOnMount={ false }
+						getAnchorRect={ getAnchorRect }
+					>
 						<div
 							className="editor-url-input__suggestions"
 							id={ `editor-url-input-suggestions-${ instanceId }` }
