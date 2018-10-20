@@ -1,0 +1,23 @@
+pick 847c530 fixes idea to move to media-upload.js. That was the wrong way. :)
+squash b1cc716 removes duplicate comment
+squash fe5b816 adds a destroyCollection function to trigger onClose
+squash a6e25ca removes destroyCollection and moves refresh to `onOpen`
+
+# Rebase 30395e1..a6e25ca onto 30395e1 (4 command(s))
+#
+# Commands:
+# p, pick = use commit
+# r, reword = use commit, but edit the commit message
+# e, edit = use commit, but stop for amending
+# s, squash = use commit, but meld into previous commit
+# f, fixup = like "squash", but discard this commit's log message
+# x, exec = run command (the rest of the line) using shell
+# d, drop = remove commit
+#
+# These lines can be re-ordered; they are executed from top to bottom.
+#
+# If you remove a line here THAT COMMIT WILL BE LOST.
+#
+# However, if you remove everything, the rebase will be aborted.
+#
+# Note that empty commits are commented out
