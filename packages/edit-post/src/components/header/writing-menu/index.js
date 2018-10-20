@@ -26,7 +26,7 @@ function WritingMenu( { onClose } ) {
 				info={ __( 'Focus on one block at a time' ) }
 				onToggle={ onClose } />
 			<FeatureToggle
-				eature="fullscreenMode"
+				feature="fullscreenMode"
 				label={ __( 'Fullscreen Mode' ) }
 				info={ __( 'Work without distraction' ) }
 				onToggle={ onClose } />
