@@ -125,7 +125,8 @@ class ImageEdit extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
-		const { id, url = '' } = this.props.attributes;
+		const { id, url = '', fileWidth } = this.props.attributes;
+		const imageData = this.props.image;
 
 		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
 			revokeBlobURL( url );
@@ -135,6 +136,26 @@ class ImageEdit extends Component {
 			this.setState( {
 				captionFocused: false,
 			} );
+		}
+
+		if ( url && imageData && ! fileWidth ) {
+			// Old post or just uploaded image. Attempt to update the image props.
+			const imageMeta = imageData.media_details;
+
+			if ( imageMeta ) {
+				const sizeFull = imageMeta.sizes.full;
+				const sizeLarge = imageMeta.sizes.large;
+
+				if ( url === sizeFull.source_url ) {
+					if ( sizeLarge && this.imageMatchesRatio( sizeFull.width, sizeFull.height, sizeLarge.width, sizeLarge.height ) ) {
+						// If the full size image was used, and there's a large size that matches the ratio, replace with the large size.
+						this.updateImageURL( sizeLarge.source_url, imageMeta.sizes );
+					} else {
+						// Add srcset, sizes, and image file dimensions.
+						this.updateSrcsetAndSizes( sizeFull );
+					}
+				}
+			}
 		}
 	}
 
@@ -289,7 +310,18 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { url } );
 		this.resetWidthHeight();
 		this.resetScale();
-		this.updateSrcsetAndSizes( url, availableSizes );
+		let imageData;
+		let size;
+
+		// Find the image data.
+		for ( size in availableSizes ) {
+			if ( availableSizes[ size ].source_url === url ) {
+				imageData = availableSizes[ size ];
+				break;
+			}
+		}
+
+		this.updateSrcsetAndSizes( imageData );
 	}
 
 	updateScale( scale ) {
@@ -353,18 +385,7 @@ class ImageEdit extends Component {
 		} );
 	}
 
-	updateSrcsetAndSizes( url, availableSizes ) {
-		let imageData;
-		let size;
-
-		// Find it.
-		for ( size in availableSizes ) {
-			if ( availableSizes[ size ].source_url === url ) {
-				imageData = availableSizes[ size ];
-				break;
-			}
-		}
-
+	updateSrcsetAndSizes( imageData ) {
 		if ( ! imageData ) {
 			this.resetSrcsetAndSizes();
 		} else if ( ! imageData.srcset ) {
