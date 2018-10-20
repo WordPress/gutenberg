@@ -1233,7 +1233,7 @@ function gutenberg_capture_code_editor_settings( $settings ) {
  * @param  WP_Post $post Post object.
  * @return WP_Post|boolean The post autosave. False if none found.
  */
-function get_autosave_newer_than_post_save( $post ) {
+function gutenberg_get_autosave_newer_than_post_save( $post ) {
 	// Add autosave data if it is newer and changed.
 	$autosave = wp_get_post_autosave( $post->ID );
 
@@ -1262,7 +1262,7 @@ function get_autosave_newer_than_post_save( $post ) {
  * @param  WP_Post $post Post object.
  * @return Object[] Block categories.
  */
-function get_block_categories( $post ) {
+function gutenberg_get_block_categories( $post ) {
 	$default_categories = array(
 		array(
 			'slug'  => 'common',
@@ -1381,7 +1381,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( $post ) ) ),
 		'after'
 	);
 
@@ -1587,7 +1587,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		),
 	);
 
-	$post_autosave = get_autosave_newer_than_post_save( $post );
+	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );
 	if ( $post_autosave ) {
 		$editor_settings['autosave'] = array(
 			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
@@ -1669,11 +1669,11 @@ JS;
  *
  * @param string $hook Screen name.
  */
-function wp_load_list_reusable_blocks( $hook ) {
+function gutenberg_load_list_reusable_blocks( $hook ) {
 	$is_reusable_blocks_list_page = 'edit.php' === $hook && isset( $_GET['post_type'] ) && 'wp_block' === $_GET['post_type'];
 	if ( $is_reusable_blocks_list_page ) {
 		wp_enqueue_script( 'wp-list-reusable-blocks' );
 		wp_enqueue_style( 'wp-list-reusable-blocks' );
 	}
 }
-add_action( 'admin_enqueue_scripts', 'wp_load_list_reusable_blocks' );
+add_action( 'admin_enqueue_scripts', 'gutenberg_load_list_reusable_blocks' );
