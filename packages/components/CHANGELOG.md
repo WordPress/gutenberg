@@ -1,4 +1,10 @@
-## 4.2.0 (Unreleased)
+## 4.2.1 (Unreleased)
+
+### Bug Fix
+
+- Fix importing `react-dates` stylesheet in production.
+
+## 4.2.0 (2018-10-19)
 
 ### New Feature
 
