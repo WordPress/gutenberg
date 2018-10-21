@@ -150,6 +150,8 @@ class URLInput extends Component {
 			return;
 		}
 
+		const post = this.state.posts[ this.state.selectedSuggestion ];
+
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
@@ -169,31 +171,34 @@ class URLInput extends Component {
 				} );
 				break;
 			}
-			case TAB:
+			case TAB: {
+				if ( this.state.selectedSuggestion !== null ) {
+					this.selectLink( post );
+					// Announce a link has been selected when tabbing away from the input field.
+					this.props.speak( __( 'Link selected' ) );
+				}
+				break;
+			}
 			case ENTER: {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
-					const post = this.state.posts[ this.state.selectedSuggestion ];
-					this.selectLink( post, event );
+					this.selectLink( post );
 				}
 				break;
 			}
 		}
 	}
 
-	selectLink( post, event ) {
+	selectLink( post ) {
 		this.props.onChange( post.url, post );
 		this.setState( {
 			selectedSuggestion: null,
 			showSuggestions: false,
 		} );
+	}
 
-		// Announce a link has been selected when tabbing away from the input field.
-		if ( event.keyCode === TAB ) {
-			this.props.speak( __( 'Link selected' ) );
-			return;
-		}
-
+	handleOnClick( post ) {
+		this.selectLink( post );
 		// Move focus to the input field when a link suggestion is clicked.
 		this.inputRef.current.focus();
 	}
@@ -249,7 +254,7 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ ( event ) => this.selectLink( post, event ) }
+									onClick={ () => this.handleOnClick( post ) }
 									aria-selected={ index === selectedSuggestion }
 								>
 									{ decodeEntities( post.title ) || __( '(no title)' ) }
