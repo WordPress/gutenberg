@@ -67,7 +67,6 @@ const getAttachmentsCollection = ( ids ) => {
 	return wp.media.query( {
 		order: 'ASC',
 		orderby: 'post__in',
-		per_page: -1,
 		post__in: ids,
 		query: true,
 		type: 'image',
