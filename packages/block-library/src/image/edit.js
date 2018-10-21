@@ -322,7 +322,6 @@ class ImageEdit extends Component {
 						icon="format-image"
 						labels={ {
 							title: __( 'Image' ),
-							name: __( 'an image' ),
 						} }
 						className={ className }
 						onSelect={ this.onSelectImage }

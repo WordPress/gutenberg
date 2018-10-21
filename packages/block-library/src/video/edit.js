@@ -134,7 +134,6 @@ class VideoEdit extends Component {
 					icon="media-video"
 					labels={ {
 						title: __( 'Video' ),
-						name: __( 'a video' ),
 					} }
 					className={ className }
 					onSelect={ onSelectVideo }

@@ -320,8 +320,6 @@ export const settings = {
 							className={ className }
 							labels={ {
 								title: label,
-								/* translators: Fragment of the sentence: "Drag %s, upload a new one or select a file from your library." */
-								name: __( 'an image or a video' ),
 							} }
 							onSelect={ onSelectMedia }
 							accept="image/*,video/*"

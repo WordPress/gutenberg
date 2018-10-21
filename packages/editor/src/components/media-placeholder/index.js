@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, get, noop, startsWith } from 'lodash';
+import { every, get, noop, startsWith, difference, isEmpty } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -14,7 +14,7 @@ import {
 	DropZone,
 	IconButton,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -158,12 +158,26 @@ class MediaPlaceholder extends Component {
 
 		const allowedTypes = this.getAllowedTypes();
 
+		let instructions = labels.instructions || '';
+		if ( ! instructions ) {
+			instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+
+			if ( isEmpty( difference( allowedTypes, [ 'video' ] ) ) ) {
+				instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+			} else if ( isEmpty( difference( allowedTypes, [ 'image' ] ) ) ) {
+				instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+			} else if ( isEmpty( difference( allowedTypes, [ 'audio' ] ) ) ) {
+				instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+			} else if ( isEmpty( difference( allowedTypes, [ 'image', 'video' ] ) ) ) {
+				instructions = __( 'Drag an image or a video, upload a new one or select a file from your library.' );
+			}
+		}
+
 		return (
 			<Placeholder
 				icon={ icon }
 				label={ labels.title }
-				// translators: %s: media name label e.g: "an audio","an image", "a video"
-				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
+				instructions={ instructions }
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ notices }
 			>
