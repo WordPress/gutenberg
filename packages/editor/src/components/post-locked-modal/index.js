@@ -159,11 +159,10 @@ class PostLockedModal extends Component {
 						<div>
 							{ userDisplayName ?
 								sprintf(
-									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+									/* translators: %s: user's display name */
 									__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' ),
 									userDisplayName
 								) :
-								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
 								__( 'Another user now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' )
 							}
 						</div>
@@ -180,11 +179,10 @@ class PostLockedModal extends Component {
 						<div>
 							{ userDisplayName ?
 								sprintf(
-									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+									/* translators: %s: user's display name */
 									__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
 									userDisplayName
 								) :
-								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
 								__( 'Another user is currently working on this post, which means you cannot make changes, unless you take over.' )
 							}
 						</div>
