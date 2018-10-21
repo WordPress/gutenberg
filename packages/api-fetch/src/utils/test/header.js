@@ -8,16 +8,12 @@ import {
 
 describe( 'parse-link-header', () => {
 	it( 'should return null for empty or undefined link strings', () => {
-		expect.hasAssertions();
-
 		expect( parseLinkHeader() ).toBeNull();
 		expect( parseLinkHeader( '' ) ).toBeNull();
 		expect( parseLinkHeader( null ) ).toBeNull();
 	} );
 
 	it( 'should return an object containing the "next" relation url', () => {
-		expect.hasAssertions();
-
 		const linkHeader = '<https://make.wordpress.org/core/wp-json/wp/v2/posts?page=2>; rel="next"';
 
 		expect( parseLinkHeader( linkHeader ) ).toEqual( {
@@ -41,8 +37,6 @@ describe( 'getNextLinkFromResponse', () => {
 	} );
 
 	it( 'should return null for an invalid response object', () => {
-		expect.hasAssertions();
-
 		expect( getNextLinkFromResponse( null ) ).toBeNull();
 		expect( getNextLinkFromResponse( {} ) ).toBeNull();
 		expect( getNextLinkFromResponse() ).toBeNull();

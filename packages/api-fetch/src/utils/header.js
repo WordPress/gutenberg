@@ -29,7 +29,10 @@ export const parseLinkHeader = ( linkHeader ) => {
  * @return {string|null} The URL of the next page, or null.
  */
 export const getNextLinkFromResponse = ( response ) => {
-	const linkHeader = response.headers && response.headers.get( 'link' );
+	if ( ! response || ! response.headers || ! response.headers.get ) {
+		return null;
+	}
+	const linkHeader = response.headers.get( 'link' );
 	if ( ! linkHeader ) {
 		return null;
 	}

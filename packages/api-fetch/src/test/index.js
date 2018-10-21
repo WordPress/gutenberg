@@ -99,6 +99,8 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should recursively request and merge multi-page collections', () => {
+		expect.hasAssertions();
+
 		window.fetch
 			.mockReturnValueOnce( Promise.resolve( {
 				status: 200,
@@ -144,6 +146,8 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should properly return any error message received during pagination', () => {
+		expect.hasAssertions();
+
 		window.fetch
 			.mockReturnValueOnce( Promise.resolve( {
 				status: 200,

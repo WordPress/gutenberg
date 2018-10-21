@@ -38,7 +38,7 @@ function checkCloudflareError( error ) {
  * @return {Promise} A promise resolving to the response object, JSON, or an error.
  */
 const customFetch = ( options ) => {
-	const { url, path, body, data, parse = true, ...remainingOptions } = options;
+	const { url, path, body, data, allPages = false, parse = true, ...remainingOptions } = options;
 	const headers = remainingOptions.headers || {};
 	if ( ! headers[ 'Content-Type' ] && data ) {
 		headers[ 'Content-Type' ] = 'application/json';
@@ -75,7 +75,7 @@ const customFetch = ( options ) => {
 		const jsonResponse = await response.json();
 
 		// If no pagination is requested, return the response directly.
-		if ( ! requestContainsUnboundedQuery( url || path ) ) {
+		if ( ! allPages && ! requestContainsUnboundedQuery( url || path ) ) {
 			return jsonResponse;
 		}
 
@@ -99,6 +99,8 @@ const customFetch = ( options ) => {
 			body,
 			data,
 			parse,
+			// Flag request to continue paging in the absence of per_page=-1
+			allPages: true,
 		} ).then( ( results ) => jsonResponse.concat( results ) );
 	};
 
