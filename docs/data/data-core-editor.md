@@ -36,6 +36,18 @@ the post has been saved.
 
 Whether the post is new.
 
+### hasChangedContent
+
+Returns true if content includes unsaved changes, or false otherwise.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether content includes unsaved changes.
+
 ### isEditedPostDirty
 
 Returns true if there are unsaved values for the current edit session, or

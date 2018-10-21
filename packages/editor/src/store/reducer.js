@@ -236,13 +236,6 @@ export const editor = flow( [
 		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
-
-	// Track whether changes exist, resetting at each post save. Relies on
-	// editor initialization firing post reset as an effect.
-	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
-	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
@@ -287,7 +280,16 @@ export const editor = flow( [
 		return state;
 	},
 
-	blocks: combineReducers( {
+	blocks: flow( [
+		combineReducers,
+
+		// Track whether changes exist, resetting at each post save. Relies on
+		// editor initialization firing post reset as an effect.
+		withChangeDetection( {
+			resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+			ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		} ),
+	] )( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
 				case 'RESET_BLOCKS':
