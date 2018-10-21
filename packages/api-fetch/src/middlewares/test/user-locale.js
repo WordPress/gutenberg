@@ -34,6 +34,36 @@ describe( 'User locale middleware', () => {
 		userLocaleMiddleware( requestOptions, callback );
 	} );
 
+	it( 'does not modify existing single _locale parameter in path', () => {
+		expect.hasAssertions();
+
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts?_locale=foo',
+		};
+
+		const callback = ( options ) => {
+			expect( options.path ).toBe( '/wp/v2/posts?_locale=foo' );
+		};
+
+		userLocaleMiddleware( requestOptions, callback );
+	} );
+
+	it( 'does not modify existing _locale parameter in path', () => {
+		expect.hasAssertions();
+
+		const requestOptions = {
+			method: 'GET',
+			path: '/wp/v2/posts?foo=bar&_locale=foo',
+		};
+
+		const callback = ( options ) => {
+			expect( options.path ).toBe( '/wp/v2/posts?foo=bar&_locale=foo' );
+		};
+
+		userLocaleMiddleware( requestOptions, callback );
+	} );
+
 	it( 'should append the _locale parameter to the url', () => {
 		expect.hasAssertions();
 
@@ -59,6 +89,36 @@ describe( 'User locale middleware', () => {
 
 		const callback = ( options ) => {
 			expect( options.url ).toBe( 'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=user' );
+		};
+
+		userLocaleMiddleware( requestOptions, callback );
+	} );
+
+	it( 'does not modify existing single _locale parameter in url', () => {
+		expect.hasAssertions();
+
+		const requestOptions = {
+			method: 'GET',
+			url: 'http://wp.org/wp-json/wp/v2/posts?_locale=foo',
+		};
+
+		const callback = ( options ) => {
+			expect( options.url ).toBe( 'http://wp.org/wp-json/wp/v2/posts?_locale=foo' );
+		};
+
+		userLocaleMiddleware( requestOptions, callback );
+	} );
+
+	it( 'does not modify existing _locale parameter in url', () => {
+		expect.hasAssertions();
+
+		const requestOptions = {
+			method: 'GET',
+			url: 'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=foo',
+		};
+
+		const callback = ( options ) => {
+			expect( options.url ).toBe( 'http://wp.org/wp-json/wp/v2/posts?foo=bar&_locale=foo' );
 		};
 
 		userLocaleMiddleware( requestOptions, callback );
