@@ -36,8 +36,8 @@ const getNextPageUrl = ( response ) => {
 };
 
 const requestContainsUnboundedQuery = ( options ) => {
-	const pathIsUnbounded = options.path && options.path.indexOf( 'per_page=-1' > -1 );
-	const urlIsUnbounded = options.url && options.url.indexOf( 'per_page=-1' > -1 );
+	const pathIsUnbounded = options.path && options.path.indexOf( 'per_page=-1' ) !== -1;
+	const urlIsUnbounded = options.url && options.url.indexOf( 'per_page=-1' ) !== -1;
 	return pathIsUnbounded || urlIsUnbounded;
 };
 
