@@ -2,6 +2,7 @@
  * External dependencies
  */
 import jQuery from 'jquery';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -118,7 +119,7 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils } = this.props;
+		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}
@@ -134,6 +135,7 @@ class PostLockedModal extends Component {
 			_wpnonce: postLockUtils.nonce,
 		} );
 		const allPosts = getWPAdminURL( 'edit.php' );
+		const allPostsLabel = get( postType, [ 'labels', 'all_items' ] );
 		return (
 			<Modal
 				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
@@ -165,7 +167,7 @@ class PostLockedModal extends Component {
 						</div>
 						<p>
 							<a href={ allPosts }>
-								{ __( 'View all posts' ) }
+								{ allPostsLabel }
 							</a>
 						</p>
 					</div>
@@ -186,7 +188,7 @@ class PostLockedModal extends Component {
 
 						<div className="editor-post-locked-modal__buttons">
 							<Button isDefault isLarge href={ allPosts }>
-								{ __( 'All Posts' ) }
+								{ allPostsLabel }
 							</Button>
 							<PostPreviewButton />
 							<Button isPrimary isLarge href={ unlockUrl }>
@@ -209,7 +211,9 @@ export default compose(
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -217,6 +221,7 @@ export default compose(
 			postId: getCurrentPostId(),
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
+			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
