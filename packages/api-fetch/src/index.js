@@ -11,7 +11,11 @@ import createRootURLMiddleware from './middlewares/root-url';
 import createPreloadingMiddleware from './middlewares/preloading';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
-import parseLinkHeader from './utils/parse-link-header';
+import { getNextLinkFromResponse } from './utils/header';
+import {
+	requestContainsUnboundedQuery,
+	rewriteUnboundedQuery,
+} from './utils/url';
 
 const middlewares = [];
 
@@ -27,26 +31,13 @@ function checkCloudflareError( error ) {
 	}
 }
 
-const requestContainsUnboundedQuery = ( url ) => url.indexOf( 'per_page=-1' > -1 );
-
-const rewriteUnboundedQuery = ( url ) => url.replace( 'per_page=-1', 'per_page=100' );
-
-const getNextLinkFromResponse = ( response ) => {
-	const linkHeader = response.headers && response.headers.get( 'link' );
-	if ( ! linkHeader ) {
-		return null;
-	}
-	const links = parseLinkHeader( linkHeader );
-	return links && links.next && links.next.url;
-};
-
 /**
  * Wrapper for fetch which can handle status checks and recursive pagination.
  *
  * @param {Object} options Fetch options & data payload.
  * @return {Promise} A promise resolving to the response object, JSON, or an error.
  */
-const fetch = ( options ) => {
+const customFetch = ( options ) => {
 	const { url, path, body, data, parse = true, ...remainingOptions } = options;
 	const headers = remainingOptions.headers || {};
 	if ( ! headers[ 'Content-Type' ] && data ) {
@@ -83,8 +74,7 @@ const fetch = ( options ) => {
 		// Parse the response.
 		const jsonResponse = await response.json();
 
-		// TODO: Trigger pagination through an options flag, not per_page=-1.
-		// (-1 may be a valid parameter value for custom endpoints.)
+		// If no pagination is requested, return the response directly.
 		if ( ! requestContainsUnboundedQuery( url || path ) ) {
 			return jsonResponse;
 		}
@@ -103,7 +93,7 @@ const fetch = ( options ) => {
 		}
 
 		// Recursively fetch & merge in the next page of results.
-		return fetch( {
+		return customFetch( {
 			...remainingOptions,
 			url: nextPage,
 			body,
@@ -120,7 +110,7 @@ const fetch = ( options ) => {
 function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
 		const { parse = true } = nextOptions;
-		const responsePromise = fetch( nextOptions );
+		const responsePromise = customFetch( nextOptions );
 
 		return responsePromise
 			.catch( ( response ) => {
@@ -166,7 +156,6 @@ function apiFetch( options ) {
 
 	const steps = [
 		raw,
-
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
 		...middlewares,
