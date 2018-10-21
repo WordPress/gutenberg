@@ -10,7 +10,7 @@ describe( 'apiFetch', () => {
 		window.fetch = originalFetch;
 	} );
 
-	it( 'should call the API propertly', () => {
+	it( 'should call the API properly', () => {
 		window.fetch.mockReturnValue( Promise.resolve( {
 			status: 200,
 			json() {
@@ -94,6 +94,87 @@ describe( 'apiFetch', () => {
 		return apiFetch( { path: '/random', parse: false } ).catch( ( response ) => {
 			expect( response ).toEqual( {
 				status: 400,
+			} );
+		} );
+	} );
+
+	it( 'should recursively request and merge multi-page collections', () => {
+		window.fetch
+			.mockReturnValueOnce( Promise.resolve( {
+				status: 200,
+				json() {
+					return Promise.resolve( [ 'post6', 'post5' ] );
+				},
+				headers: {
+					get() {
+						return '</wp-json/wp/v2/posts?page=2>; rel="next"';
+					},
+				},
+			} ) )
+			.mockReturnValueOnce( Promise.resolve( {
+				status: 200,
+				json() {
+					return Promise.resolve( [ 'post4', 'post3' ] );
+				},
+				headers: {
+					get() {
+						return '</wp-json/wp/v2/posts?page=3>; rel="next"';
+					},
+				},
+			} ) )
+			.mockReturnValueOnce( Promise.resolve( {
+				status: 200,
+				json() {
+					return Promise.resolve( [ 'post2', 'post1' ] );
+				},
+			} ) );
+
+		return apiFetch( {
+			path: '/wp-json/wp/v2/posts?per_page=-1',
+		} ).then( ( response ) => {
+			expect( response ).toEqual( [
+				'post6',
+				'post5',
+				'post4',
+				'post3',
+				'post2',
+				'post1',
+			] );
+		} );
+	} );
+
+	it( 'should properly return any error message received during pagination', () => {
+		window.fetch
+			.mockReturnValueOnce( Promise.resolve( {
+				status: 200,
+				json() {
+					return Promise.resolve( [ 'post6', 'post5' ] );
+				},
+				headers: {
+					get() {
+						return '</wp-json/wp/v2/posts?page=2>; rel="next"';
+					},
+				},
+			} ) )
+			.mockReturnValueOnce( Promise.resolve( {
+				status: 400,
+				json() {
+					return Promise.resolve( {
+						code: 'bad_request',
+						message: 'Bad Request',
+					} );
+				},
+				clone() {
+					return null;
+				},
+			} ) );
+
+		return apiFetch( {
+			path: '/wp-json/wp/v2/posts?per_page=-1',
+		} ).catch( ( body ) => {
+			expect( body ).toEqual( {
+				code: 'bad_request',
+				message: 'Bad Request',
 			} );
 		} );
 	} );
