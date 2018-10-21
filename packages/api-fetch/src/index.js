@@ -110,13 +110,15 @@ function apiFetch( options ) {
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
 		...middlewares,
-	];
-	const next = ( nextOptions ) => {
-		const nextMiddleware = steps.pop();
+	].reverse();
+
+	const runMiddleware = ( index ) => ( nextOptions ) => {
+		const nextMiddleware = steps[ index ];
+		const next = runMiddleware( index + 1 );
 		return nextMiddleware( nextOptions, next );
 	};
 
-	return next( options );
+	return runMiddleware( 0 )( options );
 }
 
 apiFetch.use = registerMiddleware;
