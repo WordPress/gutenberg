@@ -416,7 +416,7 @@ When supports align is used the block attributes definition is extended to inclu
 By default, no alignment is assigned to the block.
 The block can apply a default alignment by specifying its own align attribute with a default e.g.:
 ```
-attributes: {
+supports: {
 	...
 	align: {
 		type: 'string',
