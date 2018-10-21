@@ -142,7 +142,7 @@ class MediaPlaceholder extends Component {
 			accept,
 			icon,
 			className,
-			labels,
+			labels = {},
 			onSelect,
 			value = {},
 			onSelectURL,
@@ -159,24 +159,44 @@ class MediaPlaceholder extends Component {
 		const allowedTypes = this.getAllowedTypes();
 
 		let instructions = labels.instructions || '';
-		if ( ! instructions ) {
-			instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+		let title = labels.title || '';
+		if ( ! instructions || ! title ) {
+			const isVideo = isEmpty( difference( allowedTypes, [ 'video' ] ) );
+			const isImage = isEmpty( difference( allowedTypes, [ 'image' ] ) );
+			const isAudio = isEmpty( difference( allowedTypes, [ 'audio' ] ) );
+			const isImageAndAudio = isEmpty( difference( allowedTypes, [ 'image', 'video' ] ) );
 
-			if ( isEmpty( difference( allowedTypes, [ 'video' ] ) ) ) {
-				instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
-			} else if ( isEmpty( difference( allowedTypes, [ 'image' ] ) ) ) {
-				instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
-			} else if ( isEmpty( difference( allowedTypes, [ 'audio' ] ) ) ) {
-				instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
-			} else if ( isEmpty( difference( allowedTypes, [ 'image', 'video' ] ) ) ) {
-				instructions = __( 'Drag an image or a video, upload a new one or select a file from your library.' );
+			if ( ! instructions ) {
+				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+
+				if ( isVideo ) {
+					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+				} else if ( isImage ) {
+					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+				} else if ( isAudio ) {
+					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+				} else if ( isImageAndAudio ) {
+					instructions = __( 'Drag an image or a video, upload a new one or select a file from your library.' );
+				}
+			}
+
+			if ( ! title ) {
+				title = __( 'Media' );
+
+				if ( isVideo ) {
+					title = __( 'Video' );
+				} else if ( isImage ) {
+					title = __( 'Image' );
+				} else if ( isAudio ) {
+					title = __( 'Audio' );
+				}
 			}
 		}
 
 		return (
 			<Placeholder
 				icon={ icon }
-				label={ labels.title }
+				label={ title }
 				instructions={ instructions }
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ notices }
