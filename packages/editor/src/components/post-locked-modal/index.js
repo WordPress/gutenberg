@@ -160,10 +160,10 @@ class PostLockedModal extends Component {
 							{ userDisplayName ?
 								sprintf(
 									/* translators: %s: user's display name */
-									__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved.' ),
+									__( '%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' ),
 									userDisplayName
 								) :
-								__( 'Another user now has editing control of this post. Don\'t worry, your changes up to this moment have been saved.' )
+								__( 'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' )
 							}
 						</div>
 
