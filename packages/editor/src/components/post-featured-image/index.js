@@ -52,7 +52,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
-							<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Click to edit or update the image' ) }>
+							<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Edit or update the image' ) }>
 								{ media &&
 									<ResponsiveWrapper
 										naturalWidth={ mediaWidth }
