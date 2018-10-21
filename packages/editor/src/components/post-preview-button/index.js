@@ -90,8 +90,8 @@ export class PostPreviewButton extends Component {
 
 		const markup = `
 			<div class="editor-post-preview-button__interstitial-message">
-				<p>Please wait&hellip;</p>
-				<p>Generating preview.</p>
+				<p>${ __( 'Please wait&hellip;' ) }</p>
+				<p>${ __( 'Generating preview.' ) }</p>
 			</div>
 			<style>
 				body {
