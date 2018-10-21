@@ -325,7 +325,7 @@ function gutenberg_handle_early_callback_checks( $response, $handler, $request )
 		}
 		if ( $request['per_page'] < 0 ) {
 			if ( ! $can_unbounded_query ) {
-				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
+				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed to make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
 			}
 		}
 	}
