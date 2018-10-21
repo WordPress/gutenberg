@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
-import { map, find, get, filter } from 'lodash';
+import { find, get, filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
+import { deprecated } from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -49,25 +49,25 @@ export function isRequestingEmbedPreview( state, url ) {
  * @return {Array} Authors list.
  */
 export function getAuthors( state ) {
-	return getUserQueryResults( state, 'authors' );
+	return getEntityRecords( state, 'root', 'user', {
+		who: 'authors',
+		per_page: -1,
+	} );
 }
 
 /**
  * Returns all the users returned by a query ID.
  *
- * @param {Object} state   Data state.
- * @param {string} queryID Query ID.
- *
  * @return {Array} Users list.
  */
-export const getUserQueryResults = createSelector(
-	( state, queryID ) => {
-		const queryResults = state.users.queries[ queryID ];
+export const getUserQueryResults = function() {
+	deprecated( 'getUserQueryResults selector (`core`)', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
 
-		return map( queryResults, ( id ) => state.users.byId[ id ] );
-	},
-	( state, queryID ) => [ state.users.queries[ queryID ], state.users.byId ]
-);
+	return [];
+};
 
 /**
  * Returns whether the entities for the give kind are loaded.

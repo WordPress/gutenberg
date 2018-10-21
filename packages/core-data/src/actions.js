@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { castArray } from 'lodash';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -11,19 +11,13 @@ import {
 	receiveQueriedItems,
 } from './queried-data';
 
-/**
- * Returns an action object used in signalling that authors have been received.
- *
- * @param {string}       queryID Query ID.
- * @param {Array|Object} users   Users received.
- *
- * @return {Object} Action object.
- */
-export function receiveUserQuery( queryID, users ) {
+export function receiveUserQuery() {
+	deprecated( 'receiveUserQuery action (`core`)', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
 	return {
-		type: 'RECEIVE_USER_QUERY',
-		users: castArray( users ),
-		queryID,
+		type: 'DO_NOTHING',
 	};
 }
 

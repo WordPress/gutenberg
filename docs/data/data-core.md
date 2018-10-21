@@ -24,19 +24,6 @@ Returns all available authors.
 
 Authors list.
 
-### getUserQueryResults
-
-Returns all the users returned by a query ID.
-
-*Parameters*
-
- * state: Data state.
- * queryID: Query ID.
-
-*Returns*
-
-Users list.
-
 ### getEntitiesByKind
 
 Returns whether the entities for the give kind are loaded.
@@ -137,15 +124,6 @@ get back from the oEmbed preview API.
 Is the preview for the URL an oEmbed link fallback.
 
 ## Actions
-
-### receiveUserQuery
-
-Returns an action object used in signalling that authors have been received.
-
-*Parameters*
-
- * queryID: Query ID.
- * users: Users received.
 
 ### addEntities
 

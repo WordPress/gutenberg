@@ -40,6 +40,10 @@ const controls = {
 	SELECT( { selectorName, args } ) {
 		return selectData( 'core' )[ selectorName ]( ...args );
 	},
+
+	RESOLVE_PROMISE( { promise } ) {
+		return promise;
+	},
 };
 
 export default controls;

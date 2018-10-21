@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -40,7 +45,7 @@ export class PostAuthor extends Component {
 					onChange={ this.setAuthorId }
 					className="editor-post-author__select"
 				>
-					{ authors.map( ( author ) => (
+					{ map( authors, ( author ) => (
 						<option key={ author.id } value={ author.id }>{ author.name }</option>
 					) ) }
 				</select>

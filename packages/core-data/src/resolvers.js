@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,20 +12,22 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import {
-	receiveUserQuery,
 	receiveEntityRecords,
 	receiveThemeSupports,
 	receiveEmbedPreview,
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch } from './controls';
+import { getNextLinkFromResponse } from './utils/pagination';
 
 /**
  * Requests authors from the REST API.
  */
 export function* getAuthors() {
-	const users = yield apiFetch( { path: '/wp/v2/users/?who=authors&per_page=-1' } );
-	yield receiveUserQuery( 'authors', users );
+	yield getEntityRecords( 'root', 'user', {
+		who: 'authors',
+		per_page: -1,
+	} );
 }
 
 /**
@@ -58,12 +60,31 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	if ( ! entity ) {
 		return;
 	}
-	const path = addQueryArgs( entity.baseURL, {
-		...query,
-		context: 'edit',
-	} );
-	const records = yield apiFetch( { path } );
-	yield receiveEntityRecords( kind, name, Object.values( records ), query );
+	let records;
+	if ( query.per_page !== -1 ) {
+		const path = addQueryArgs( entity.baseURL, {
+			...query,
+			context: 'edit',
+		} );
+		records = Object.values( yield apiFetch( { path } ) );
+	} else {
+		let nextPath = addQueryArgs( entity.baseURL, {
+			...omit( query, 'per_page' ),
+			context: 'edit',
+			per_page: 100,
+		} );
+		records = [];
+		do {
+			const response = yield apiFetch( {
+				path: nextPath,
+				parse: false,
+			} );
+			const newRecords = yield { type: 'RESOLVE_PROMISE', promise: response.json() };
+			records = records.concat( Object.values( newRecords ) );
+			nextPath = getNextLinkFromResponse( response );
+		} while ( nextPath );
+	}
+	yield receiveEntityRecords( kind, name, records, query );
 }
 
 /**

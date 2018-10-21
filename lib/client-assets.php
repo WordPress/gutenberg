@@ -321,7 +321,14 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_script(
 		'wp-core-data',
 		gutenberg_url( 'build/core-data/index.js' ),
-		array( 'wp-data', 'wp-api-fetch', 'wp-polyfill', 'wp-url', 'lodash' ),
+		array(
+			'wp-data',
+			'wp-deprecated',
+			'wp-api-fetch',
+			'wp-polyfill',
+			'wp-url',
+			'lodash'
+		),
 		filemtime( gutenberg_dir_path() . 'build/core-data/index.js' ),
 		true
 	);

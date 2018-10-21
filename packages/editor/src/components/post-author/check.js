@@ -15,7 +15,7 @@ import { withSelect } from '@wordpress/data';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 export function PostAuthorCheck( { hasAssignAuthorAction, authors, children } ) {
-	if ( ! hasAssignAuthorAction || authors.length < 2 ) {
+	if ( ! hasAssignAuthorAction || ! authors || authors.length < 2 ) {
 		return null;
 	}
 
