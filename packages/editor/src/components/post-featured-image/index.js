@@ -52,13 +52,13 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
-							<Button className="editor-post-featured-image__preview" onClick={ open }>
+							<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Click to edit or update the image' ) }>
 								{ media &&
 									<ResponsiveWrapper
 										naturalWidth={ mediaWidth }
 										naturalHeight={ mediaHeight }
 									>
-										<img src={ mediaSourceUrl } alt={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL } />
+										<img src={ mediaSourceUrl } alt="" />
 									</ResponsiveWrapper>
 								}
 								{ ! media && <Spinner /> }
