@@ -134,7 +134,9 @@ class PostLockedModal extends Component {
 			action: 'edit',
 			_wpnonce: postLockUtils.nonce,
 		} );
-		const allPosts = getWPAdminURL( 'edit.php' );
+		const allPostsUrl = getWPAdminURL( 'edit.php', {
+			post_type: get( postType, [ 'slug' ] ),
+		} );
 		const allPostsLabel = get( postType, [ 'labels', 'all_items' ] );
 		return (
 			<Modal
@@ -166,7 +168,7 @@ class PostLockedModal extends Component {
 							}
 						</div>
 						<p>
-							<a href={ allPosts }>
+							<a href={ allPostsUrl }>
 								{ allPostsLabel }
 							</a>
 						</p>
@@ -187,7 +189,7 @@ class PostLockedModal extends Component {
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isDefault isLarge href={ allPosts }>
+							<Button isDefault isLarge href={ allPostsUrl }>
 								{ allPostsLabel }
 							</Button>
 							<PostPreviewButton />
