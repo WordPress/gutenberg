@@ -17,22 +17,35 @@ describe( 'Fetch All Middleware', async () => {
 
 	it( 'should paginate the request', async () => {
 		expect.hasAssertions();
-		const originalOptions = { path: '/posts?per_page=-1' };
+		const originalOptions = { url: '/posts?per_page=-1' };
+		let counter = 1;
 		const next = ( options ) => {
-			expect( options.path ).toBe( '/posts?per_page=100' );
-			return Promise.resolve( {
+			if ( counter === 1 ) {
+				expect( options.url ).toBe( '/posts?per_page=100' );
+			} else {
+				expect( options.url ).toBe( '/posts?per_page=100&page=2' );
+			}
+			const response = Promise.resolve( {
 				status: 200,
 				headers: {
 					get() {
-						return '';
+						return options.url === '/posts?per_page=100' ?
+							'</posts?per_page=100&page=2>; rel="next"' :
+							'';
 					},
 				},
 				json() {
-					return Promise.resolve( { message: 'ok' } );
+					return Promise.resolve( [ 'item' ] );
 				},
 			} );
+
+			counter++;
+
+			return response;
 		};
 
-		await fetchAllMiddleware( originalOptions, next );
+		const result = await fetchAllMiddleware( originalOptions, next );
+
+		expect( result ).toEqual( [ 'item', 'item' ] );
 	} );
 } );
