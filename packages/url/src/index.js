@@ -35,6 +35,51 @@ export function addQueryArgs( url, args ) {
 }
 
 /**
+ * Returns a single query argument of the url
+ *
+ * @param  {string} url URL
+ * @param  {string} arg Query arg name
+ *
+ * @return {Array|string} Query arg value.
+ */
+export function getQueryArg( url, arg ) {
+	const queryStringIndex = url.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+
+	return query[ arg ];
+}
+
+/**
+ * Determines whether the URL contains a given query arg.
+ *
+ * @param  {string}    url URL
+ * @param  {...string} arg Query arg name
+ *
+ * @return {boolean} Whether or not the URL contains the query aeg.
+ */
+export function hasQueryArg( url, arg ) {
+	return typeof getQueryArg( url, arg ) !== 'undefined';
+}
+
+/**
+ * Removes arguments from the query string of the url
+ *
+ * @param  {string} url  URL
+ * @param  {string} args Query Args
+ *
+ * @return {string} Updated URL
+ */
+export function removeQueryArgs( url, ...args ) {
+	const queryStringIndex = url.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
+
+	args.forEach( ( arg ) => delete query[ arg ] );
+
+	return baseUrl + '?' + stringify( query );
+}
+
+/**
  * Prepends "http://" to a url, if it looks like something that is meant to be a TLD.
  *
  * @param  {string} url The URL to test
