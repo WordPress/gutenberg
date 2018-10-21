@@ -1348,24 +1348,19 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							byClientId: {},
-							order: {},
+							isDirty: false,
 						},
-						edits: {
-							content: 'foo',
-						},
+						edits: {},
 					},
 				},
 				initialEdits: {},
 				currentPost: {
 					title: 'foo',
-					content: 'foo',
 					excerpt: 'foo',
 				},
 				saving: {},
 				autosave: {
 					title: 'foo',
-					content: 'foo',
 					excerpt: 'foo',
 				},
 			};
@@ -1373,26 +1368,46 @@ describe( 'selectors', () => {
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if title, excerpt, or content have changed', () => {
-			for ( const variantField of [ 'title', 'excerpt', 'content' ] ) {
-				for ( const constantField of without( [ 'title', 'excerpt', 'content' ], variantField ) ) {
+		it( 'should return true if content has changes', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							isDirty: true,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'foo',
+					excerpt: 'foo',
+				},
+				saving: {},
+				autosave: {
+					title: 'foo',
+					excerpt: 'foo',
+				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if title or excerpt have changed', () => {
+			for ( const variantField of [ 'title', 'excerpt' ] ) {
+				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
 					const state = {
 						editor: {
 							present: {
 								blocks: {
-									byClientId: {},
-									order: {},
+									isDirty: false,
 								},
-								edits: {
-									content: 'foo',
-								},
+								edits: {},
 							},
 						},
 						initialEdits: {},
 						currentPost: {
 							title: 'foo',
 							content: 'foo',
-							excerpt: 'foo',
 						},
 						saving: {},
 						autosave: {

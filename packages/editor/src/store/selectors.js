@@ -487,9 +487,17 @@ export function isEditedPostAutosaveable( state ) {
 		return true;
 	}
 
+	// To avoid an expensive content serialization, use the content dirtiness
+	// flag in place of content field comparison against the known autosave.
+	// This is not strictly accurate, and relies on a tolerance toward autosave
+	// request failures for unnecessary saves.
+	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
 	// If the title, excerpt or content has changed, the post is autosaveable.
 	const autosave = getAutosave( state );
-	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
+	return [ 'title', 'excerpt' ].some( ( field ) => (
 		autosave[ field ] !== getEditedPostAttribute( state, field )
 	) );
 }
