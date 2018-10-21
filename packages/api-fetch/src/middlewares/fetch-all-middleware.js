@@ -3,11 +3,6 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 
-/**
- * Internal dependencies
- */
-import apiFetch from '../';
-
 // Apply query arguments to both URL and Path, whichever is present.
 const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 	...options,
@@ -80,7 +75,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 	// Iteratively fetch all remaining pages until no "next" header is found.
 	let mergedResults = [].concat( results );
 	while ( nextPage ) {
-		const nextResponse = await apiFetch( {
+		const nextResponse = await next( {
 			...options,
 			// Ensure the URL for the next page is used instead of any provided path.
 			path: undefined,
