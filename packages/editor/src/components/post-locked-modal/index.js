@@ -167,11 +167,12 @@ class PostLockedModal extends Component {
 								__( 'Another user now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' )
 							}
 						</div>
-						<p>
-							<a href={ allPostsUrl }>
+
+						<div className="editor-post-locked-modal__buttons">
+							<Button isPrimary isLarge href={ allPostsUrl }>
 								{ allPostsLabel }
-							</a>
-						</p>
+							</Button>
+						</div>
 					</div>
 				) }
 				{ ! isTakeover && (
