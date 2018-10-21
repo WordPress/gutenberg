@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, escape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -90,8 +90,8 @@ export class PostPreviewButton extends Component {
 
 		const markup = `
 			<div class="editor-post-preview-button__interstitial-message">
-				<p>${ __( 'Please wait&hellip;' ) }</p>
-				<p>${ __( 'Generating preview.' ) }</p>
+				<p>${ escape( __( 'Please wait&hellip;' ) ) }</p>
+				<p>${ escape( __( 'Generating preview.' ) ) }</p>
 			</div>
 			<style>
 				body {
