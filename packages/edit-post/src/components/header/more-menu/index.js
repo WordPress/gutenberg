@@ -14,6 +14,9 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
+const ariaClosed = _x( 'Show additional settings', 'button to expand options' );
+const ariaOpen = _x( 'Hide additional settings', 'button to expand options' );
+
 const MoreMenu = () => (
 	<Dropdown
 		className="edit-post-more-menu"
@@ -22,7 +25,7 @@ const MoreMenu = () => (
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
 				icon="ellipsis"
-				label={ _x( 'More', 'button to expand options' ) }
+				label={ isOpen ? ariaOpen : ariaClosed }
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 			/>
