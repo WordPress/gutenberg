@@ -71,6 +71,7 @@ class GalleryImage extends Component {
 		const { isSelected, image, url } = this.props;
 		if ( image && ! url ) {
 			this.props.setAttributes( {
+				id: image.id,
 				url: image.source_url,
 				alt: image.alt_text,
 			} );

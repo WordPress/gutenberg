@@ -58,17 +58,31 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 			( schema ) => schema.shortcode( match.shortcode.attrs, match ),
 		);
 
+		const blockType = getBlockType( transformation.blockName );
+
 		const block = createBlock(
 			transformation.blockName,
-			getBlockAttributes(
-				{
-					...getBlockType( transformation.blockName ),
-					attributes: transformation.attributes,
-				},
-				match.shortcode.content,
-				attributes,
-			)
+			{
+				...getBlockAttributes(
+					{
+						...blockType,
+						attributes: transformation.attributes,
+					},
+					match.shortcode.content,
+					attributes,
+				),
+				...silentAttributes,
+			}
 		);
+
+		const silentAttributes = pickBy( attributes, ( value, key ) =>
+			! blockType.attributes.hasOwnProperty( key )
+		);
+
+		block.attributes = {
+			...block.attributes,
+			...silentAttributes,
+		};
 
 		return [
 			beforeHTML,

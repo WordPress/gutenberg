@@ -160,7 +160,7 @@ class GalleryEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, imageIds = [], columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -192,7 +192,7 @@ class GalleryEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( images.length === 0 ) {
+		if ( images.length === 0 && imageIds.length === 0 ) {
 			return (
 				<Fragment>
 					{ controls }
@@ -244,6 +244,30 @@ class GalleryEdit extends Component {
 				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 					{ dropZone }
 					{ images.map( ( img, index ) => {
+						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
+						const ariaLabel = __( sprintf( 'image %1$d of %2$d in gallery', ( index + 1 ), images.length ) );
+
+						return (
+							<li className="blocks-gallery-item" key={ img.id || img.url }>
+								<GalleryImage
+									url={ img.url }
+									alt={ img.alt }
+									id={ img.id }
+									isSelected={ isSelected && this.state.selectedImage === index }
+									onRemove={ this.onRemoveImage( index ) }
+									onSelect={ this.onSelectImage( index ) }
+									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+									caption={ img.caption }
+									aria-label={ ariaLabel }
+								/>
+							</li>
+						);
+					} ) }
+					{ imageIds.map( ( img, index ) => {
+						if ( images[ index ].id ) {
+							return null;
+						}
+
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
 						const ariaLabel = __( sprintf( 'image %1$d of %2$d in gallery', ( index + 1 ), images.length ) );
 

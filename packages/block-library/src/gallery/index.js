@@ -105,6 +105,16 @@ export const settings = {
 								return [];
 							}
 
+							return ids.split( ',' ).map( () => ( {} ) );
+						},
+					},
+					imageIds: {
+						type: 'array',
+						shortcode: ( { named: { ids } } ) => {
+							if ( ! ids ) {
+								return [];
+							}
+
 							return ids.split( ',' ).map( ( id ) => ( {
 								id: parseInt( id, 10 ),
 							} ) );
