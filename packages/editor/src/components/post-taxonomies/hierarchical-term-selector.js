@@ -205,7 +205,7 @@ class HierarchicalTermSelector extends Component {
 
 		const resultCount = getResultCount( filteredTermsTree );
 		const resultsFoundMessage = sprintf(
-			_n( '%d result found.', '%d results found.', resultCount, 'term' ),
+			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);
 		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
@@ -321,7 +321,7 @@ class HierarchicalTermSelector extends Component {
 				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
 			)
 		);
-		const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
+		const showFilter = availableTerms && ( availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER );
 
 		return [
 			showFilter && <label
