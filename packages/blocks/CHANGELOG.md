@@ -1,3 +1,13 @@
+## 5.1.0 (Unreleased)
+
+### New feature
+
+- `isBlockContentValid` function has been added ([#10891](https://github.com/WordPress/gutenberg/pull/10891)).
+
+### Deprecation
+
+- `isValidBlock` function has been deprecated ([#10891](https://github.com/WordPress/gutenberg/pull/10891)). Use `isBlockContentValid` instead.
+
 ## 5.0.0 (2018-10-29)
 
 ### Breaking Changes
