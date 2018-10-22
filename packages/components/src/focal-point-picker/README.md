@@ -12,7 +12,7 @@ const MyFocalPointPicker = withState( {
 		x: 0.5,
 		y: 0.5
 	},
-} )( ( { dimensions={ dimensions }, setState } ) => { 
+} )( ( { focalPoint, setState } ) => { 
 	const url = '/path/to/image';
 	const dimensions = {
 		width: 400,
