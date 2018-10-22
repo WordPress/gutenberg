@@ -23,6 +23,7 @@ class Shortcut extends Component {
 
 	onUse() {
 		this.props.onUse();
+		return false;
 	}
 
 	render() {
