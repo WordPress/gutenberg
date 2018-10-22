@@ -6,14 +6,16 @@ import { Fragment } from '@wordpress/element';
 import { ToolbarButton } from '@wordpress/components';
 import { toggleFormat } from '@wordpress/rich-text';
 
+const name = 'core/strikethrough';
+
 export const strikethrough = {
-	name: 'core/strikethrough',
+	name,
 	title: __( 'Strikethrough' ),
 	match: {
 		tagName: 'del',
 	},
 	edit( { isActive, value, onChange, FillToolbarSlot, Shortcut } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: 'core/strikethrough' } ) );
+		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
 
 		return (
 			<Fragment>

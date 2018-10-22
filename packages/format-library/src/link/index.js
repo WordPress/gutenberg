@@ -17,8 +17,10 @@ import { isURL } from '@wordpress/url';
  */
 import InlineLinkUI from './inline';
 
+const name = 'core/link';
+
 export const link = {
-	name: 'core/link',
+	name,
 	title: __( 'Link' ),
 	match: {
 		tagName: 'a',
@@ -43,7 +45,7 @@ export const link = {
 			const text = getTextContent( slice( value ) );
 
 			if ( text && isURL( text ) ) {
-				onChange( applyFormat( value, { type: 'core/link', attributes: { url: text } } ) );
+				onChange( applyFormat( value, { type: name, attributes: { url: text } } ) );
 			} else {
 				this.setState( { addingLink: true } );
 			}
@@ -55,7 +57,7 @@ export const link = {
 
 		render() {
 			const { isActive, activeAttributes, value, onChange, FillToolbarSlot, Shortcut } = this.props;
-			const onRemoveFormat = () => onChange( removeFormat( value, 'core/link' ) );
+			const onRemoveFormat = () => onChange( removeFormat( value, name ) );
 
 			return (
 				<Fragment>

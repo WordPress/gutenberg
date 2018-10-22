@@ -12,7 +12,7 @@ import { select, dispatch } from '@wordpress/data';
  *                     unregistered; otherwise `undefined`.
  */
 export function deregisterBlockType( name ) {
-	const oldFormat = select( 'core/formats' ).getBlockType( name );
+	const oldFormat = select( 'core/rich-text' ).getBlockType( name );
 
 	if ( ! oldFormat ) {
 		window.console.error(
@@ -21,7 +21,7 @@ export function deregisterBlockType( name ) {
 		return;
 	}
 
-	dispatch( 'core/formats' ).removeBlockTypes( name );
+	dispatch( 'core/rich-text' ).removeBlockTypes( name );
 
 	return oldFormat;
 }

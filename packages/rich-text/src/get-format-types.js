@@ -9,5 +9,5 @@ import { select } from '@wordpress/data';
  * @return {Array} Format settings.
  */
 export function getFormatTypes() {
-	return select( 'core/formats' ).getFormatTypes();
+	return select( 'core/rich-text' ).getFormatTypes();
 }

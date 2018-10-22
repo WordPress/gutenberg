@@ -1,73 +1,13 @@
 /**
  * External dependencies
  */
-import { isFunction, isString } from 'lodash';
-import { default as tinycolor, mostReadable } from 'tinycolor2';
+import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
-import { Component, isValidElement } from '@wordpress/element';
-
-/**
- * Array of icon colors containing a color to be used if the icon color
- * was not explicitly set but the icon background color was.
- *
- * @type {Object}
- */
-const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
-
-/**
- * Function that checks if the parameter is a valid icon.
- *
- * @param {*} icon  Parameter to be checked.
- *
- * @return {boolean} True if the parameter is a valid icon and false otherwise.
- */
-
-export function isValidIcon( icon ) {
-	return !! icon && (
-		isString( icon ) ||
-		isValidElement( icon ) ||
-		isFunction( icon ) ||
-		icon instanceof Component
-	);
-}
-
-/**
- * Function that receives an icon as set by the formats during the registration
- * and returns a new icon object that is normalized so we can rely on just on possible icon structure
- * in the codebase.
- *
- * @param {(Object|string|WPElement)} icon  Slug of the Dashicon to be shown
- *                                          as the icon for the format in the
- *                                          inserter, or element or an object describing the icon.
- *
- * @return {Object} Object describing the icon.
- */
-export function normalizeIconObject( icon ) {
-	if ( ! icon ) {
-		return { src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg> };
-	}
-	if ( isValidIcon( icon ) ) {
-		return { src: icon };
-	}
-
-	if ( icon.background ) {
-		const tinyBgColor = tinycolor( icon.background );
-		if ( ! icon.foreground ) {
-			const foreground = mostReadable(
-				tinyBgColor,
-				ICON_COLORS,
-				{ includeFallbackColors: true, level: 'AA', size: 'large' }
-			).toHexString();
-			icon.foreground = foreground;
-		}
-		icon.shadowColor = tinyBgColor.setAlpha( 0.3 ).toRgbString();
-	}
-	return icon;
-}
+import { isValidIcon, normalizeIconObject } from '@wordpress/element';
 
 /**
  * Registers a new format provided a unique name and an object defining its
@@ -93,7 +33,7 @@ export function registerFormatType( settings ) {
 		return;
 	}
 
-	if ( select( 'core/formats' ).getFormatType( settings.name ) ) {
+	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
 		window.console.error(
 			'Format "' + settings.name + '" is already registered.'
 		);
@@ -131,7 +71,7 @@ export function registerFormatType( settings ) {
 		return;
 	}
 
-	dispatch( 'core/formats' ).addFormatTypes( settings );
+	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
 	return settings;
 }

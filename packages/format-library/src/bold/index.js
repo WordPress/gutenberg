@@ -6,14 +6,16 @@ import { Fragment } from '@wordpress/element';
 import { ToolbarButton } from '@wordpress/components';
 import { toggleFormat } from '@wordpress/rich-text';
 
+export const name = 'core/bold';
+
 export const bold = {
-	name: 'core/bold',
+	name,
 	title: __( 'Bold' ),
 	match: {
 		tagName: 'strong',
 	},
 	edit( { isActive, value, onChange, FillToolbarSlot, Shortcut } ) {
-		const onToggle = () => onChange( toggleFormat( value, { type: 'core/bold' } ) );
+		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
 
 		return (
 			<Fragment>

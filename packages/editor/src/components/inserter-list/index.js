@@ -8,7 +8,7 @@ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
  */
 import InserterListItem from '../inserter-list-item';
 
-function InserterList( { items, onSelect, onHover, children } ) {
+function BlockTypesList( { items, onSelect, onHover, children } ) {
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
@@ -42,4 +42,4 @@ function InserterList( { items, onSelect, onHover, children } ) {
 	);
 }
 
-export default InserterList;
+export default BlockTypesList;

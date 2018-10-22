@@ -179,7 +179,7 @@ describe( 'BlockSwitcher', () => {
 			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
 				const onCloseStub = jest.fn();
 				const content = shallow( <div>{ getDropdown().props().renderContent( { onClose: onCloseStub } ) }</div> );
-				const blockList = content.find( 'InserterList' );
+				const blockList = content.find( 'BlockTypesList' );
 				expect( blockList.prop( 'items' ) ).toHaveLength( 1 );
 			} );
 		} );

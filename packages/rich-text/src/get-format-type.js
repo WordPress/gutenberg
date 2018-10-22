@@ -11,5 +11,5 @@ import { select } from '@wordpress/data';
  * @return {?Object} Format type.
  */
 export function getFormatType( name ) {
-	return select( 'core/formats' ).getFormatType( name );
+	return select( 'core/rich-text' ).getFormatType( name );
 }

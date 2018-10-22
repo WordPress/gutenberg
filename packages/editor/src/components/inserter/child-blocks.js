@@ -7,7 +7,7 @@ import { ifCondition, compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import InserterList from '../inserter-list';
+import BlockTypesList from '../inserter-list';
 import BlockIcon from '../block-icon';
 
 function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
@@ -19,7 +19,7 @@ function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {
 					{ rootBlockTitle && <h2>{ rootBlockTitle }</h2> }
 				</div>
 			) }
-			<InserterList items={ items } { ...props } />
+			<BlockTypesList items={ items } { ...props } />
 		</div>
 	);
 }

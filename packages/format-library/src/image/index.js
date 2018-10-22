@@ -9,8 +9,10 @@ import { InserterListItem, MediaUpload } from '@wordpress/editor';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
+const name = 'core/image';
+
 export const image = {
-	name: 'core/image',
+	name,
 	title: __( 'Image' ),
 	object: true,
 	match: {
@@ -57,7 +59,7 @@ export const image = {
 						onSelect={ ( { id, url, alt, width } ) => {
 							this.closeModal();
 							onChange( insertObject( value, {
-								type: 'core/image',
+								type: name,
 								attributes: {
 									className: `wp-image-${ id }`,
 									style: `width: ${ Math.min( width, 150 ) }px;`,
