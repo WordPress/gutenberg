@@ -320,6 +320,7 @@ export const settings = {
 							className={ className }
 							labels={ {
 								title: label,
+								instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
 							} }
 							onSelect={ onSelectMedia }
 							accept="image/*,video/*"
