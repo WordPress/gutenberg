@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 
@@ -14,8 +14,8 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
-const ariaClosed = _x( 'Show additional settings', 'button to expand options' );
-const ariaOpen = _x( 'Hide additional settings', 'button to expand options' );
+const ariaClosed = __( 'Show additional settings' );
+const ariaOpen = __( 'Hide additional settings' );
 
 const MoreMenu = () => (
 	<Dropdown
