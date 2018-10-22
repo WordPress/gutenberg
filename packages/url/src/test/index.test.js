@@ -124,6 +124,12 @@ describe( 'removeQueryArgs', () => {
 
 		expect( removeQueryArgs( url, 'foo', 'bar' ) ).toEqual( 'https://andalouses.example/beach?baz=foo' );
 	} );
+
+	it( 'should remove array query arg', () => {
+		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz&bar=foobar';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual( 'https://andalouses.example/beach?bar=foobar' );
+	} );
 } );
 
 describe( 'prependHTTP', () => {
