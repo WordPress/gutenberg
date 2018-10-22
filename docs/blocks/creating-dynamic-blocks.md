@@ -23,9 +23,11 @@ registerBlockType( 'my-plugin/latest-post', {
 			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
 		};
 	} )( function( props ) {
+		
 		if ( ! props.posts ) {
 			return "Loading...";
 		}
+
 		if ( props.posts.length === 0 ) {
 			return "No posts";
 		}
@@ -62,12 +64,15 @@ registerBlockType( 'my-plugin/latest-post', {
 			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
 		};
 	} )( ( { posts, className } ) => {
+
 		if ( ! posts ) {
 			return "Loading...";
 		}
+
 		if ( posts && posts.length === 0 ) {
 			return "No posts";
 		}
+
 		let post = posts[ 0 ];
 
 		return <a className={ className } href={ post.link }>
