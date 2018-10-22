@@ -84,6 +84,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			alignment = props.attributes.alignment;
 
 		return el( RichText.Content, {
+			tagName: 'p',
 			className: props.className,
 			style: { textAlign: alignment },
 			value: content

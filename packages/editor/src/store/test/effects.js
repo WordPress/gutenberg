@@ -238,6 +238,14 @@ describe( 'effects', () => {
 			...defaultPost,
 			status: 'publish',
 		} );
+		const getPostType = () => ( {
+			labels: {
+				view_item: 'View post',
+				item_published: 'Post published.',
+				item_reverted_to_draft: 'Post reverted to draft.',
+				item_updated: 'Post updated.',
+			},
+		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
 			const dispatch = jest.fn();
@@ -245,17 +253,18 @@ describe( 'effects', () => {
 
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p>Post published!{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post published.{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
-					spokenMessage: 'Post published!',
+					spokenMessage: 'Post published.',
 				},
 				type: 'CREATE_NOTICE',
 			} ) );
@@ -267,8 +276,9 @@ describe( 'effects', () => {
 
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
@@ -293,17 +303,18 @@ describe( 'effects', () => {
 
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType }, store );
 
 			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
 				notice: {
-					content: <p>Post updated!{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
+					content: <p>Post updated.{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
 					id: 'SAVE_POST_NOTICE_ID',
 					isDismissible: true,
 					status: 'success',
-					spokenMessage: 'Post updated!',
+					spokenMessage: 'Post updated.',
 				},
 				type: 'CREATE_NOTICE',
 			} ) );

@@ -8,6 +8,7 @@ import { omit } from 'lodash';
  */
 import { PanelColor as PanelColorComponent } from '@wordpress/components';
 import { ifCondition, compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -17,6 +18,12 @@ import withColorContext from '../color-palette/with-color-context';
 import { getColorObjectByColorValue } from '../colors';
 
 function PanelColor( { colors, title, colorValue, initialOpen, ...props } ) {
+	deprecated( 'wp.editor.PanelColor', {
+		version: '4.3',
+		alternative: 'wp.editor.PanelColorSettings',
+		plugin: 'Gutenberg',
+	} );
+
 	const colorObject = getColorObjectByColorValue( colors, colorValue );
 	const colorName = colorObject && colorObject.name;
 	return (

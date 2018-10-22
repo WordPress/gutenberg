@@ -49,6 +49,29 @@ const isTabbableTextField = overEvery( [
 	focus.tabbable.isTabbableIndex,
 ] );
 
+/**
+ * Returns true if the element should consider edge navigation upon a keyboard
+ * event of the given directional key code, or false otherwise.
+ *
+ * @param {Element} element     HTML element to test.
+ * @param {number}  keyCode     KeyboardEvent keyCode to test.
+ * @param {boolean} hasModifier Whether a modifier is pressed.
+ *
+ * @return {boolean} Whether element should consider edge navigation.
+ */
+export function isNavigationCandidate( element, keyCode, hasModifier ) {
+	const isVertical = ( keyCode === UP || keyCode === DOWN );
+
+	// Currently, all elements support unmodified vertical navigation.
+	if ( isVertical && ! hasModifier ) {
+		return true;
+	}
+
+	// Native inputs should not navigate horizontally.
+	const { tagName } = element;
+	return tagName !== 'INPUT' && tagName !== 'TEXTAREA';
+}
+
 class WritingFlow extends Component {
 	constructor() {
 		super( ...arguments );
@@ -209,6 +232,7 @@ class WritingFlow extends Component {
 		const isVertical = isUp || isDown;
 		const isNav = isHorizontal || isVertical;
 		const isShift = event.shiftKey;
+		const hasModifier = isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 
 		// This logic inside this condition needs to be checked before
@@ -240,6 +264,12 @@ class WritingFlow extends Component {
 		// Abort if navigation has already been handled (e.g. TinyMCE inline
 		// boundaries).
 		if ( event.nativeEvent.defaultPrevented ) {
+			return;
+		}
+
+		// Abort if our current target is not a candidate for navigation (e.g.
+		// preserve native input behaviors).
+		if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
 			return;
 		}
 

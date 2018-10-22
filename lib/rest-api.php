@@ -290,158 +290,10 @@ function gutenberg_register_post_prepare_functions( $post_type ) {
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_permalink_template_to_posts', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_block_format_to_post_content', 10, 3 );
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_target_schema_to_links', 10, 3 );
-	add_filter( "rest_{$post_type}_collection_params", 'gutenberg_filter_post_collection_parameters', 10, 2 );
-	add_filter( "rest_{$post_type}_query", 'gutenberg_filter_post_query_arguments', 10, 2 );
 	return $post_type;
 }
 add_filter( 'registered_post_type', 'gutenberg_register_post_prepare_functions' );
 
-/**
- * Whenever a taxonomy is registered, ensure we're hooked into its WP REST API response.
- *
- * @param string $taxonomy The newly registered taxonomy.
- */
-function gutenberg_register_taxonomy_prepare_functions( $taxonomy ) {
-	add_filter( "rest_{$taxonomy}_collection_params", 'gutenberg_filter_term_collection_parameters', 10, 2 );
-	add_filter( "rest_{$taxonomy}_query", 'gutenberg_filter_term_query_arguments', 10, 2 );
-}
-add_filter( 'registered_taxonomy', 'gutenberg_register_taxonomy_prepare_functions' );
-
-/**
- * Handle any necessary checks early.
- *
- * @param WP_HTTP_Response $response Result to send to the client. Usually a WP_REST_Response.
- * @param WP_REST_Server   $handler  ResponseHandler instance (usually WP_REST_Server).
- * @param WP_REST_Request  $request  Request used to generate the response.
- */
-function gutenberg_handle_early_callback_checks( $response, $handler, $request ) {
-	if ( 0 === strpos( $request->get_route(), '/wp/v2/' ) ) {
-		$can_unbounded_query = false;
-		$types               = get_post_types( array( 'show_in_rest' => true ), 'objects' );
-		foreach ( $types as $type ) {
-			if ( current_user_can( $type->cap->edit_posts ) ) {
-				$can_unbounded_query = true;
-			}
-		}
-		if ( $request['per_page'] < 0 ) {
-			if ( ! $can_unbounded_query ) {
-				return new WP_Error( 'rest_forbidden_per_page', __( 'Sorry, you are not allowed make unbounded queries.', 'gutenberg' ), array( 'status' => rest_authorization_required_code() ) );
-			}
-		}
-	}
-	return $response;
-}
-add_filter( 'rest_request_before_callbacks', 'gutenberg_handle_early_callback_checks', 10, 3 );
-
-/**
- * Include additional query parameters on the posts query endpoint.
- *
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array        $query_params JSON Schema-formatted collection parameters.
- * @param WP_Post_Type $post_type    Post type object being accessed.
- * @return array
- */
-function gutenberg_filter_post_collection_parameters( $query_params, $post_type ) {
-	if (
-		isset( $query_params['per_page'] ) &&
-		( $post_type->hierarchical || 'wp_block' === $post_type->name )
-	) {
-		// Change from '1' to '-1', which means unlimited.
-		$query_params['per_page']['minimum'] = -1;
-		// Default sanitize callback is 'absint', which won't work in our case.
-		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
-	}
-	return $query_params;
-}
-
-/**
- * Filter post collection query parameters to include specific behavior.
- *
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array           $prepared_args Array of arguments for WP_Query.
- * @param WP_REST_Request $request       The current request.
- * @return array
- */
-function gutenberg_filter_post_query_arguments( $prepared_args, $request ) {
-	if (
-		is_post_type_hierarchical( $prepared_args['post_type'] ) ||
-		'wp_block' === $prepared_args['post_type']
-	) {
-		// Avoid triggering 'rest_post_invalid_page_number' error
-		// which will need to be addressed in https://core.trac.wordpress.org/ticket/43998.
-		if ( -1 === $prepared_args['posts_per_page'] ) {
-			$prepared_args['posts_per_page'] = 100000;
-		}
-	}
-	return $prepared_args;
-}
-
-/**
- * Include additional query parameters on the terms query endpoint.
- *
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array  $query_params JSON Schema-formatted collection parameters.
- * @param object $taxonomy     Taxonomy being accessed.
- * @return array
- */
-function gutenberg_filter_term_collection_parameters( $query_params, $taxonomy ) {
-	if ( $taxonomy->show_in_rest
-		&& ( false === $taxonomy->rest_controller_class
-			|| 'WP_REST_Terms_Controller' === $taxonomy->rest_controller_class )
-		&& isset( $query_params['per_page'] ) ) {
-		// Change from '1' to '-1', which means unlimited.
-		$query_params['per_page']['minimum'] = -1;
-		// Default sanitize callback is 'absint', which won't work in our case.
-		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
-	}
-	return $query_params;
-}
-
-/**
- * Filter term collection query parameters to include specific behavior.
- *
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array           $prepared_args Array of arguments for WP_Term_Query.
- * @param WP_REST_Request $request       The current request.
- * @return array
- */
-function gutenberg_filter_term_query_arguments( $prepared_args, $request ) {
-	// Can't check the actual taxonomy here because it's not
-	// passed through in $prepared_args (or the filter generally).
-	if ( 0 === strpos( $request->get_route(), '/wp/v2/' ) ) {
-		if ( -1 === $prepared_args['number'] ) {
-			// This should be unset( $prepared_args['number'] )
-			// but WP_REST_Terms Controller needs to be updated to support
-			// unbounded queries.
-			// Will be addressed in https://core.trac.wordpress.org/ticket/43998.
-			$prepared_args['number'] = 100000;
-		}
-	}
-	return $prepared_args;
-}
-
-/**
- * Include additional query parameters on the user query endpoint.
- *
- * @see https://core.trac.wordpress.org/ticket/43998
- *
- * @param array $query_params JSON Schema-formatted collection parameters.
- * @return array
- */
-function gutenberg_filter_user_collection_parameters( $query_params ) {
-	if ( isset( $query_params['per_page'] ) ) {
-		// Change from '1' to '-1', which means unlimited.
-		$query_params['per_page']['minimum'] = -1;
-		// Default sanitize callback is 'absint', which won't work in our case.
-		$query_params['per_page']['sanitize_callback'] = 'rest_sanitize_request_arg';
-	}
-	return $query_params;
-}
-add_filter( 'rest_user_collection_params', 'gutenberg_filter_user_collection_parameters' );
 
 /**
  * Silence PHP Warnings and Errors in JSON requests
@@ -460,3 +312,36 @@ function gutenberg_silence_rest_errors() {
 	}
 
 }
+
+/**
+ * Include additional labels for registered post types
+ *
+ * @see https://core.trac.wordpress.org/ticket/45101
+ *
+ * @param array  $args      Arguments supplied to register_post_type().
+ * @param string $post_type Post type key.
+ * @return array Arguments supplied to register_post_type()
+ */
+function gutenberg_filter_post_type_labels( $args, $post_type ) {
+	$registered_labels = ( empty( $args['labels'] ) ) ? array() : $args['labels'];
+	if ( is_post_type_hierarchical( $post_type ) ) {
+		$labels = array(
+			'item_published'           => __( 'Page published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Page published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Page reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Page scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Page updated.', 'gutenberg' ),
+		);
+	} else {
+		$labels = array(
+			'item_published'           => __( 'Post published.', 'gutenberg' ),
+			'item_published_privately' => __( 'Post published privately.', 'gutenberg' ),
+			'item_reverted_to_draft'   => __( 'Post reverted to draft.', 'gutenberg' ),
+			'item_scheduled'           => __( 'Post scheduled.', 'gutenberg' ),
+			'item_updated'             => __( 'Post updated.', 'gutenberg' ),
+		);
+	}
+	$args['labels'] = array_merge( $labels, $registered_labels );
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_filter_post_type_labels', 10, 2 );

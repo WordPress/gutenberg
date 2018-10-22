@@ -41,6 +41,11 @@ describe( 'IconButton', () => {
 			expect( iconButton.find( 'Button' ).prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
+		it( 'should support explicit aria-label override', () => {
+			const iconButton = shallow( <IconButton aria-label="Custom" /> );
+			expect( iconButton.prop( 'aria-label' ) ).toBe( 'Custom' );
+		} );
+
 		it( 'should add an additional className', () => {
 			const iconButton = shallow( <IconButton className="test" /> );
 			expect( iconButton.hasClass( 'test' ) ).toBe( true );

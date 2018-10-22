@@ -8,7 +8,7 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
@@ -42,12 +42,7 @@ const getColumnsTemplate = memoize( ( columns ) => {
 export const name = 'core/columns';
 
 export const settings = {
-	title: sprintf(
-		/* translators: Block title modifier */
-		__( '%1$s (%2$s)' ),
-		__( 'Columns' ),
-		__( 'beta' )
-	),
+	title: __( 'Columns' ),
 
 	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M21 4H3L2 5v14l1 1h18l1-1V5l-1-1zM8 18H4V6h4v12zm6 0h-4V6h4v12zm6 0h-4V6h4v12z" /></g></svg>,
 

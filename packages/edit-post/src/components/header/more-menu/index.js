@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { IconButton, Dropdown } from '@wordpress/components';
+import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 
 /**
@@ -11,6 +11,7 @@ import { Fragment } from '@wordpress/element';
 import ModeSwitcher from '../mode-switcher';
 import PluginMoreMenuGroup from '../plugins-more-menu-group';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
+import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
 const MoreMenu = () => (
@@ -32,6 +33,9 @@ const MoreMenu = () => (
 				<ModeSwitcher onSelect={ onClose } />
 				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
+				<MenuGroup>
+					<OptionsMenuItem onSelect={ onClose } />
+				</MenuGroup>
 			</Fragment>
 		) }
 	/>
