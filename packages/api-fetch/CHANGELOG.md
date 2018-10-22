@@ -1,4 +1,4 @@
-## 2.1.0 (2018-10-21)
+## 2.1.0 (2018-10-22)
 
 - Support `per_page=-1` paginated requests.
 
