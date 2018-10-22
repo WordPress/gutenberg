@@ -1,3 +1,13 @@
+## 6.0.0 (unreleased)
+
+### Breaking Changes
+
+- The `labels.name` property has been removed from `MediaPlaceholder` in favor of the new `labels.instructions` prop.
+
+### New Features
+
+- In `MediaPlaceholder`, provide default values for title and instructions labels when allowed type is one of image, audio or video.
+
 ## 5.0.0 (2018-10-19)
 
 ### Breaking Changes
