@@ -1,3 +1,9 @@
+## 2.1.4 (2018-10-21)
+
+### Bug Fixes
+
+- Video Block: Set correct media types for the poster image.
+
 ## 2.1.3 (2018-10-19)
 
 ## 2.1.2 (2018-10-18)
