@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, get, noop, startsWith, difference, isEmpty } from 'lodash';
+import { every, get, noop, startsWith } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -161,9 +161,10 @@ class MediaPlaceholder extends Component {
 		let instructions = labels.instructions || '';
 		let title = labels.title || '';
 		if ( ! instructions || ! title ) {
-			const isAudio = isEmpty( difference( allowedTypes, [ 'audio' ] ) );
-			const isImage = isEmpty( difference( allowedTypes, [ 'image' ] ) );
-			const isVideo = isEmpty( difference( allowedTypes, [ 'video' ] ) );
+			const isOneType = 1 === allowedTypes.length;
+			const isAudio = isOneType && 'audio' === allowedTypes[ 0 ];
+			const isImage = isOneType && 'image' === allowedTypes[ 0 ];
+			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
 
 			if ( ! instructions ) {
 				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
