@@ -82,11 +82,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onEnter")))
                 .put(
-                        "topHTMLWithCursorRequested",
-                        MapBuilder.of(
-                                "phasedRegistrationNames",
-                                MapBuilder.of("bubbled", "onHTMLContentWithCursor")))
-                .put(
                         "topFocus",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
@@ -186,9 +181,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             view.setOnEnterListener(new ReactAztecText.OnEnterListener() {
                 @Override
                 public boolean onEnterKey() {
-                    ReactContext reactContext = (ReactContext) view.getContext();
-                    EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-                    eventDispatcher.dispatchEvent(new ReactAztecEnterEvent(view.getId()));
+                    view.onEnter();
                     return true;
                 }
             });
@@ -198,14 +191,12 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     }
 
     private static final int COMMAND_NOTIFY_APPLY_FORMAT = 1;
-    private static final int COMMAND_RETURN_HTML_WITH_CURSOR = 2;
     private static final String TAG = "ReactAztecText";
 
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
                 .put("applyFormat", COMMAND_NOTIFY_APPLY_FORMAT)
-                .put("returnHTMLWithCursor", COMMAND_RETURN_HTML_WITH_CURSOR)
                 .build();
     }
 
@@ -218,10 +209,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 final String format = args.getString(0);
                 Log.d(TAG, String.format("Apply format: %s", format));
                 parent.applyFormat(format);
-                return;
-            }
-            case COMMAND_RETURN_HTML_WITH_CURSOR: {
-                parent.emitHTMLWithCursorEvent();
                 return;
             }
             default:

@@ -8,7 +8,6 @@ class RCTAztecView: Aztec.TextView {
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
 
     @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
-    @objc var onHTMLContentWithCursor: RCTBubblingEventBlock? = nil
     
     private var previousContentSize: CGSize = .zero
 
@@ -63,8 +62,14 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Edits
     
     open override func insertText(_ text: String) {
-        guard text != "\n" else {            
-            onEnter?([:])
+        guard text != "\n" else {
+            let data: [AnyHashable: Any] = [
+                "text": getHTML(),
+                "selectionStart": selectedRange.location,
+                "selectionEnd": selectedRange.location + selectedRange.length,
+                ]
+            
+            onEnter?(data)
             return
         }
         
@@ -142,12 +147,6 @@ class RCTAztecView: Aztec.TextView {
         }
     }
     
-    // MARK: - Cursor Positioning
-    
-    @objc func returnHTMLWithCursor() {
-        propagateHTMLContentWithCursor()
-    }
-    
     // MARK: - Event Propagation
     
     func propagateContentChanges() {
@@ -176,18 +175,6 @@ class RCTAztecView: Aztec.TextView {
             }
         })
         onActiveFormatsChange(["formats": formats])
-    }
-    
-    func propagateHTMLContentWithCursor() {
-        guard let onHTMLContentWithCursor = onHTMLContentWithCursor else {
-            return
-        }
-
-        onHTMLContentWithCursor([
-            "text": getHTML(),
-            "selectionStart": selectedRange.location,
-            "selectionEnd": selectedRange.location + selectedRange.length,
-            ])
     }
 }
 
