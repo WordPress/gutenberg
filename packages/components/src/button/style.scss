@@ -14,7 +14,7 @@
 		height: 28px;
 		border-radius: 3px;
 		white-space: nowrap;
-		border-width: 1px;
+		border-width: $border-width;
 		border-style: solid;
 	}
 
@@ -195,6 +195,11 @@
 	// Buttons that are text-based.
 	&.is-tertiary {
 		color: theme(outlines);
+
+		// Matches default button in hit area.
+		padding: 0 10px;
+		line-height: 26px;
+		height: 28px;
 
 		.dashicon {
 			display: inline-block;
