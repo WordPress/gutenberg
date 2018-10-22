@@ -47,7 +47,18 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		if ( undefined !== value ) {
 			result[ key ] = value;
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
-			result[ key ] = schema.default;
+			let defaultValue = schema.default;
+
+			// If the type of the attribute's default is a reference type,
+			// make a copy so that implementors cannot easily mutate the
+			// block type's default attributes.
+			if ( Array.isArray( defaultValue ) ) {
+				defaultValue = defaultValue.slice();
+			} else if ( typeof defaultValue === 'object' ) {
+				defaultValue = Object.assign( {}, defaultValue );
+			}
+
+			result[ key ] = defaultValue;
 		}
 
 		if ( schema.source === 'html' && typeof result[ key ] !== 'string' ) {

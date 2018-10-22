@@ -134,6 +134,39 @@ describe( 'block factory', () => {
 			} );
 		} );
 
+		it( 'copies attribute defaults if their type is a reference type', () => {
+			const arrayDefault = [];
+			const objectDefault = {};
+
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+						default: arrayDefault,
+					},
+					properties: {
+						type: 'object',
+						source: 'children',
+						default: objectDefault,
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			// Mutate the array attribute and assert the original
+			// default wasn't also mutated.
+			block.attributes.content[ 0 ] = 'test';
+			expect( block.attributes.content ).not.toEqual( arrayDefault );
+
+			// Mutate the object attribute and assert the original
+			// default wasn't also mutated.
+			block.attributes.properties[ test ] = 'test';
+			expect( block.attributes.properties ).not.toEqual( objectDefault );
+		} );
+
 		it( 'should cast rich-text source attributes', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
