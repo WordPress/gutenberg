@@ -35,6 +35,7 @@ $blocks-button__line-height: $big-font-size + 6px;
 
 .wp-block-button__link:not(.has-background) {
 	background-color: $dark-gray-700;
+
 	&:hover,
 	&:focus,
 	&:active {
@@ -51,13 +52,6 @@ $blocks-button__line-height: $big-font-size + 6px;
 		&:focus,
 		&:active {
 			border-color: currentcolor;
-		}
-
-		// If a background color is set, always ignore it for the
-		// outline button style. (`!important` is necessary to
-		// override an inline "style" attribute, if one is set.)
-		&.has-background {
-			background: transparent !important;
 		}
 	}
 
