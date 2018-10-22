@@ -102,6 +102,10 @@ class GalleryImage extends Component {
 
 		let href;
 
+		if ( ! id && ! this.props.seedId ) {
+			return null;
+		}
+
 		switch ( linkTo ) {
 			case 'media':
 				href = url;
