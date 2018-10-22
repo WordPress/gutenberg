@@ -6,7 +6,7 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import BlockTypesList from '../inserter-list';
+import BlockTypesList from '../block-types-list';
 import { searchItems } from './menu';
 
 const { Fill, Slot } = createSlotFill( 'InserterResultsPortal' );

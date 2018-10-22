@@ -7,7 +7,7 @@ import { ifCondition, compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BlockTypesList from '../inserter-list';
+import BlockTypesList from '../block-types-list';
 import BlockIcon from '../block-icon';
 
 function ChildBlocks( { rootBlockIcon, rootBlockTitle, items, ...props } ) {

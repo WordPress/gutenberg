@@ -20,7 +20,7 @@ import { compose } from '@wordpress/compose';
 import BlockIcon from '../block-icon';
 import BlockStyles from '../block-styles';
 import BlockPreview from '../block-preview';
-import BlockTypesList from '../inserter-list';
+import BlockTypesList from '../block-types-list';
 
 export class BlockSwitcher extends Component {
 	constructor() {

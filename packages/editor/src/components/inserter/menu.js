@@ -31,7 +31,7 @@ import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
-import BlockTypesList from '../inserter-list';
+import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
 
 const MAX_SUGGESTED_ITEMS = 9;

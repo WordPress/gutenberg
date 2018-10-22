@@ -13,7 +13,7 @@ describe( 'formatTypes', () => {
 		expect( formatTypes( undefined, {} ) ).toEqual( {} );
 	} );
 
-	it( 'should add add a new block type', () => {
+	it( 'should add add a new format type', () => {
 		const original = deepFreeze( {
 			'core/bold': { name: 'core/bold' },
 		} );
@@ -29,7 +29,7 @@ describe( 'formatTypes', () => {
 		} );
 	} );
 
-	it( 'should remove block types', () => {
+	it( 'should remove format types', () => {
 		const original = deepFreeze( {
 			'core/bold': { name: 'core/bold' },
 			'core/code': { name: 'core/code' },

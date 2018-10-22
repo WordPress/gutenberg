@@ -1,6 +1,6 @@
-# Block library
+# Format library
 
-Block library for the WordPress editor.
+Format library for the WordPress editor.
 
 ## Installation
 
