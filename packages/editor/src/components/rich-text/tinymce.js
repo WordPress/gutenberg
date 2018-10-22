@@ -204,6 +204,7 @@ export default class TinyMCE extends Component {
 			onPaste,
 			onInput,
 			multilineTag,
+			multilineWrapperTags,
 		} = this.props;
 
 		/*
@@ -229,7 +230,7 @@ export default class TinyMCE extends Component {
 		} else if ( Array.isArray( defaultValue ) ) {
 			initialHTML = children.toHTML( defaultValue );
 		} else if ( typeof defaultValue !== 'string' ) {
-			initialHTML = toHTMLString( defaultValue, multilineTag );
+			initialHTML = toHTMLString( defaultValue, multilineTag, multilineWrapperTags );
 		}
 
 		return createElement( tagName, {

@@ -1,16 +1,27 @@
-export function toTree( value, multilineTag, settings ) {
-	const {
-		createEmpty,
-		append,
-		getLastChild,
-		getParent,
-		isText,
-		getText,
-		remove,
-		appendText,
-		onStartIndex,
-		onEndIndex,
-	} = settings;
+/**
+ * Internal dependencies
+ */
+
+import {
+	LINE_SEPARATOR,
+	OBJECT_REPLACEMENT_CHARACTER,
+} from './special-characters';
+
+export function toTree( {
+	value,
+	multilineTag,
+	multilineWrapperTags,
+	createEmpty,
+	append,
+	getLastChild,
+	getParent,
+	isText,
+	getText,
+	remove,
+	appendText,
+	onStartIndex,
+	onEndIndex,
+} ) {
 	const { formats, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
@@ -32,13 +43,12 @@ export function toTree( value, multilineTag, settings ) {
 		let characterFormats = formats[ i ];
 
 		// Set multiline tags in queue for building the tree.
-		// For list items we need to take into account nested list items.
-		if ( multilineTag === 'li' ) {
+		if ( multilineWrapperTags && multilineWrapperTags.length !== 0 ) {
 			characterFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
-				if ( format.type === 'ol' || format.type === 'ul' ) {
+				if ( multilineWrapperTags.indexOf( format.type ) !== -1 ) {
 					accumulator.push( format );
 					accumulator.push( multilineFormat );
-				} else if ( character !== '\u2028' ) {
+				} else if ( character !== LINE_SEPARATOR ) {
 					accumulator.push( format );
 				}
 
@@ -51,7 +61,7 @@ export function toTree( value, multilineTag, settings ) {
 		let pointer = getLastChild( tree );
 
 		// Set selection for the start of line.
-		if ( lastCharacter === '\u2028' ) {
+		if ( lastCharacter === LINE_SEPARATOR ) {
 			let node = pointer;
 
 			while ( ! isText( node ) ) {
@@ -75,7 +85,7 @@ export function toTree( value, multilineTag, settings ) {
 					format === lastCharacterFormats[ formatIndex ] &&
 					// Do not reuse the last element if the character is a
 					// line separator.
-					( character !== '\u2028' ||
+					( character !== LINE_SEPARATOR ||
 						characterFormats.length - 1 !== formatIndex )
 				) {
 					pointer = getLastChild( pointer );
@@ -95,7 +105,7 @@ export function toTree( value, multilineTag, settings ) {
 		}
 
 		// No need for further processing if the character is a line separator.
-		if ( character === '\u2028' ) {
+		if ( character === LINE_SEPARATOR ) {
 			lastCharacterFormats = characterFormats;
 			lastCharacter = character;
 			continue;
@@ -112,7 +122,7 @@ export function toTree( value, multilineTag, settings ) {
 			}
 		}
 
-		if ( character !== '\ufffc' ) {
+		if ( character !== OBJECT_REPLACEMENT_CHARACTER ) {
 			if ( character === '\n' ) {
 				pointer = append( getParent( pointer ), { type: 'br', object: true } );
 				// Ensure pointer is text node.

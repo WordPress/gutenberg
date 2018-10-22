@@ -393,6 +393,7 @@ export const spec = [
 	{
 		description: 'should handle multiline list value',
 		multilineTag: 'li',
+		multilineWrapperTags: [ 'ul', 'ol' ],
 		html: '<li>one<ul><li>a</li><li>b<ol><li>1</li><li>2</li></ol></li></ul></li><li>three</li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
@@ -412,6 +413,7 @@ export const spec = [
 	{
 		description: 'should handle empty list value',
 		multilineTag: 'li',
+		multilineWrapperTags: [ 'ul', 'ol' ],
 		html: '<li></li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
@@ -431,6 +433,7 @@ export const spec = [
 	{
 		description: 'should handle nested empty list value',
 		multilineTag: 'li',
+		multilineWrapperTags: [ 'ul', 'ol' ],
 		html: '<li><ul><li></li></ul></li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
@@ -450,6 +453,7 @@ export const spec = [
 	{
 		description: 'should handle middle empty list value',
 		multilineTag: 'li',
+		multilineWrapperTags: [ 'ul', 'ol' ],
 		html: '<li></li><li></li><li></li>',
 		createRange: ( element ) => ( {
 			startOffset: 0,

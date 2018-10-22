@@ -105,38 +105,43 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function createBogusBR( doc ) {
-	const br = doc.createElement( 'br' );
-	br.setAttribute( 'data-mce-bogus', '1' );
-	return br;
-}
+function padEmptyLines( {
+	element,
+	createLinePadding = ( doc ) => doc.createElement( 'br' ),
+} ) {
+	const length = element.childNodes.length;
+	const doc = element.ownerDocument;
 
-function pad( node ) {
-	const length = node.childNodes.length;
-
-	// Optimise for speed.
 	for ( let index = 0; index < length; index++ ) {
-		const child = node.childNodes[ index ];
+		const child = element.childNodes[ index ];
 
 		if ( child.nodeType === TEXT_NODE ) {
 			if ( length === 1 && ! child.nodeValue ) {
-				node.appendChild( createBogusBR( node.ownerDocument ) );
+				element.appendChild( createLinePadding( doc ) );
 			}
 		} else {
 			if ( ! child.previousSibling && ( child.nodeName === 'OL' || child.nodeName === 'UL' ) ) {
-				node.insertBefore( createBogusBR( child.ownerDocument ), child );
+				element.insertBefore( createLinePadding( doc ), child );
 			}
 
-			pad( child );
+			padEmptyLines( { element: child, createLinePadding } );
 		}
 	}
 }
 
-export function toDom( value, multilineTag ) {
+export function toDom( {
+	value,
+	multilineTag,
+	multilineWrapperTags,
+	createLinePadding,
+} ) {
 	let startPath = [];
 	let endPath = [];
 
-	const tree = toTree( value, multilineTag, {
+	const tree = toTree( {
+		value,
+		multilineTag,
+		multilineWrapperTags,
 		createEmpty,
 		append,
 		getLastChild,
@@ -153,7 +158,7 @@ export function toDom( value, multilineTag ) {
 		},
 	} );
 
-	pad( tree );
+	padEmptyLines( { element: tree, createLinePadding } );
 
 	return {
 		body: tree,
@@ -171,9 +176,20 @@ export function toDom( value, multilineTag ) {
  *                                   tree to.
  * @param {string}      multilineTag Multiline tag.
  */
-export function apply( value, current, multilineTag ) {
+export function apply( {
+	value,
+	current,
+	multilineTag,
+	multilineWrapperTags,
+	createLinePadding,
+} ) {
 	// Construct a new element tree in memory.
-	const { body, selection } = toDom( value, multilineTag );
+	const { body, selection } = toDom( {
+		value,
+		multilineTag,
+		multilineWrapperTags,
+		createLinePadding,
+	} );
 
 	applyValue( body, current );
 

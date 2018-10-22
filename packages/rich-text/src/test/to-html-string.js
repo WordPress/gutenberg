@@ -60,8 +60,11 @@ describe( 'toHTMLString', () => {
 		const HTML = '<li>one<ul><li>two</li></ul></li><li>three</li>';
 		const element = createNode( `<ul>${ HTML }</ul>` );
 		const multilineTag = 'li';
+		const multilineWrapperTags = [ 'ul', 'ol' ];
+		const value = create( { element, multilineTag, multilineWrapperTags } );
+		const result = toHTMLString( value, multilineTag, multilineWrapperTags );
 
-		expect( toHTMLString( create( { element, multilineTag } ), 'li' ) ).toEqual( HTML );
+		expect( result ).toEqual( HTML );
 	} );
 
 	it( 'should serialize neighbouring formats of same type', () => {
