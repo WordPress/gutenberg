@@ -115,9 +115,7 @@ export const settings = {
 								return [];
 							}
 
-							return ids.split( ',' ).map( ( id ) => ( {
-								id: parseInt( id, 10 ),
-							} ) );
+							return ids.split( ',' ).map( ( id ) => parseInt( id, 10 ) );
 						},
 					},
 					columns: {

@@ -67,21 +67,32 @@ class GalleryImage extends Component {
 		}
 	}
 
+	componentDidMount() {
+		// Needed in case `getMedia` returns data immediately.
+		this.receiveImageData();
+	}
+
 	componentDidUpdate( prevProps ) {
-		const { isSelected, image, url } = this.props;
+		// Needed in case `getMedia` needs to resolve.
+		this.receiveImageData();
+
+		// unselect the caption so when the user selects other image and comeback
+		// the caption is not immediately selected
+		const { isSelected } = this.props;
+		if ( this.state.captionSelected && ! isSelected && prevProps.isSelected ) {
+			this.setState( {
+				captionSelected: false,
+			} );
+		}
+	}
+
+	receiveImageData() {
+		const { image, url } = this.props;
 		if ( image && ! url ) {
 			this.props.setAttributes( {
 				id: image.id,
 				url: image.source_url,
 				alt: image.alt_text,
-			} );
-		}
-
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
-		if ( this.state.captionSelected && ! isSelected && prevProps.isSelected ) {
-			this.setState( {
-				captionSelected: false,
 			} );
 		}
 	}
@@ -158,7 +169,9 @@ class GalleryImage extends Component {
 
 export default withSelect( ( select, ownProps ) => {
 	const { getMedia } = select( 'core' );
-	const { id } = ownProps;
+	const { id: ownId, seedId } = ownProps;
+
+	const id = ownId || seedId;
 
 	return {
 		image: id ? getMedia( id ) : null,
