@@ -164,7 +164,7 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
-	if ( class_exists( 'WP_REST_Controller' ) ) {
+	if ( function_exists( 'gutenberg_silence_rest_errors' ) ) {
 		gutenberg_silence_rest_errors();
 	}
 
