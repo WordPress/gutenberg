@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { overSome, includes, first, last, pick, mapValues, drop, dropRight } from 'lodash';
-import { getBlockType } from '@wordpress/blocks';
+import { overSome, identity, includes, first, last, drop, dropRight } from 'lodash';
 
 /**
  * Default options for withHistory reducer enhancer. Refer to withHistory
@@ -16,6 +15,7 @@ const DEFAULT_OPTIONS = {
 	resetTypes: [],
 	ignoreTypes: [],
 	shouldOverwriteState: () => false,
+	serialize: identity,
 };
 
 /**
@@ -55,6 +55,7 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 	const {
 		resetTypes = [],
 		shouldOverwriteState = () => false,
+		serialize,
 	} = options;
 
 	return ( state = initialState, action ) => {
@@ -125,7 +126,7 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 			! past.length ||
 			! shouldOverwriteState( action, previousAction )
 		) {
-			nextPast = [ ...past, sanitize( present ) ];
+			nextPast = [ ...past, serialize( present ) ];
 			lastActionToSubmit = action;
 		}
 
@@ -138,19 +139,5 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 		};
 	};
 };
-
-function sanitize( state ) {
-	return {
-		...state,
-		blocksByClientId: mapValues( state.blocksByClientId, ( block ) => {
-			const blockType = getBlockType( block.name );
-			const attributeKeys = Object.keys( blockType.attributes );
-			return {
-				...block,
-				attributes: pick( block.attributes, attributeKeys ),
-			};
-		} ),
-	};
-}
 
 export default withHistory;

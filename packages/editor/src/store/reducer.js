@@ -15,12 +15,13 @@ import {
 	isEqual,
 	overSome,
 	get,
+	pick,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { isReusableBlock } from '@wordpress/blocks';
+import { getBlockType, isReusableBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -235,6 +236,17 @@ export const editor = flow( [
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
 		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
+		serialize: ( state ) => ( {
+			...state,
+			blocksByClientId: mapValues( state.blocksByClientId, ( block ) => {
+				const blockType = getBlockType( block.name );
+				const attributeKeys = Object.keys( blockType.attributes );
+				return {
+					...block,
+					attributes: pick( block.attributes, attributeKeys ),
+				};
+			} ),
+		} ),
 	} ),
 ] )( {
 	edits( state = {}, action ) {
