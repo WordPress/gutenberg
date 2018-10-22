@@ -7,7 +7,7 @@ import { isFunction } from 'lodash';
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
-import { isValidIcon, normalizeIconObject } from '@wordpress/element';
+import { isValidIcon, normalizeIconObject } from '@wordpress/blocks';
 
 /**
  * Registers a new format provided a unique name and an object defining its

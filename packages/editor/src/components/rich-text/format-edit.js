@@ -3,13 +3,26 @@
  */
 import { Component, Fragment } from '@wordpress/element';
 import { getActiveFormat, getFormatTypes } from '@wordpress/rich-text';
-import { Fill, KeyboardShortcuts } from '@wordpress/components';
+import { Fill, KeyboardShortcuts, ToolbarButton } from '@wordpress/components';
 import { rawShortcut } from '@wordpress/keycodes';
 
-function FillToolbarSlot( { name, children } ) {
+/**
+ * Internal dependencies
+ */
+import { InserterListItem } from '../inserter-list-item';
+
+function FillToolbarButton( { name, ...props } ) {
 	return (
 		<Fill name={ `RichText.ToolbarControls.${ name }` }>
-			{ children }
+			<ToolbarButton { ...props } />
+		</Fill>
+	);
+}
+
+function FillInserterListItem( props ) {
+	return (
+		<Fill name="Inserter.InlineElements">
+			<InserterListItem { ...props } />
 		</Fill>
 	);
 }
@@ -59,7 +72,8 @@ const FormatEdit = ( { onChange, value } ) => {
 						activeAttributes={ activeAttributes }
 						value={ value }
 						onChange={ onChange }
-						FillToolbarSlot={ FillToolbarSlot }
+						ToolbarButton={ FillToolbarButton }
+						InserterListItem={ FillInserterListItem }
 						Shortcut={ Shortcut }
 					/>
 				);

@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
-import { ToolbarButton } from '@wordpress/components';
 import {
 	getTextContent,
 	applyFormat,
@@ -56,7 +55,7 @@ export const link = {
 		}
 
 		render() {
-			const { isActive, activeAttributes, value, onChange, FillToolbarSlot, Shortcut } = this.props;
+			const { isActive, activeAttributes, value, onChange, ToolbarButton, Shortcut } = this.props;
 			const onRemoveFormat = () => onChange( removeFormat( value, name ) );
 
 			return (
@@ -76,20 +75,20 @@ export const link = {
 						character="k"
 						onUse={ () => this.addLink() }
 					/>
-					<FillToolbarSlot name="link">
-						{ isActive && <ToolbarButton
-							icon="editor-unlink"
-							title={ __( 'Unlink' ) }
-							onClick={ onRemoveFormat }
-							isActive={ isActive }
-						/> }
-						{ ! isActive && <ToolbarButton
-							icon="admin-links"
-							title={ __( 'Link' ) }
-							onClick={ () => this.addLink() }
-							isActive={ isActive }
-						/> }
-					</FillToolbarSlot>
+					{ isActive && <ToolbarButton
+						name="link"
+						icon="editor-unlink"
+						title={ __( 'Unlink' ) }
+						onClick={ onRemoveFormat }
+						isActive={ isActive }
+					/> }
+					{ ! isActive && <ToolbarButton
+						name="link"
+						icon="admin-links"
+						title={ __( 'Link' ) }
+						onClick={ () => this.addLink() }
+						isActive={ isActive }
+					/> }
 					<InlineLinkUI
 						addingLink={ this.state.addingLink }
 						stopAddingLink={ this.stopAddingLink }
