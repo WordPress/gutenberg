@@ -25,6 +25,15 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://
 
 // Prepends 'http://' to URLs that are probably mean to have them
 const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
+
+// Gets a single query arg from the given URL.
+const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz' ); // bar
+
+// Checks whether a URL contains a given query arg.
+const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); // true
+
+// Removes one or more query args from the given URL.
+const newUrl = removeQueryArgs( 'https://wordpress.org?foo=bar&bar=baz&baz=foobar', 'foo', 'bar' ); // https://wordpress.org?baz=foobar
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
