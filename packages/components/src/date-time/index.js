@@ -78,7 +78,7 @@ export class DateTimePicker extends Component {
 								<li>
 									<abbr aria-label={ __( 'Up and Down Arrows' ) }>↑/↓</abbr>
 									{ ' ' /* JSX removes whitespace, but a space is required for screen readers. */ }
-									{ __( 'Move backward (up) and forward (down) by one week.</li>' ) }
+									{ __( 'Move backward (up) and forward (down) by one week.' ) }
 								</li>
 								<li>
 									<abbr aria-label={ __( 'Page Up and Page Down' ) }>{ __( 'PgUp/PgDn' ) }</abbr>

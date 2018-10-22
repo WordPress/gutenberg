@@ -5,13 +5,15 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 
-function FeatureToggle( { onToggle, isActive, label } ) {
+function FeatureToggle( { onToggle, isActive, label, info } ) {
 	return (
 		<MenuItem
 			icon={ isActive && 'yes' }
 			isSelected={ isActive }
 			onClick={ onToggle }
 			role="menuitemcheckbox"
+			label={ label }
+			info={ info }
 		>
 			{ label }
 		</MenuItem>
