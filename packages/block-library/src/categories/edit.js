@@ -115,7 +115,7 @@ class CategoriesEdit extends Component {
 				<label htmlFor={ `${ className }-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Categories' ) }
 				</label>
-				<select name={ `${ className }-${ instanceId }` } className={ `${ className }__dropdown` }>
+				<select id={ `${ className }-${ instanceId }` } className={ `${ className }__dropdown` }>
 					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
 				</select>
 			</Fragment>
