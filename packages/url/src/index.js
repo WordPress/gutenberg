@@ -21,10 +21,10 @@ export function isURL( url ) {
 /**
  * Appends arguments to the query string of the url
  *
- * @param  {string} url   URL
- * @param  {Object} args  Query Args
+ * @param {string} url  URL
+ * @param {Object} args Query Args
  *
- * @return {string}       Updated URL
+ * @return {string} Updated URL
  */
 export function addQueryArgs( url, args ) {
 	const queryStringIndex = url.indexOf( '?' );
@@ -37,8 +37,8 @@ export function addQueryArgs( url, args ) {
 /**
  * Returns a single query argument of the url
  *
- * @param  {string} url URL
- * @param  {string} arg Query arg name
+ * @param {string} url URL
+ * @param {string} arg Query arg name
  *
  * @return {Array|string} Query arg value.
  */
@@ -52,20 +52,20 @@ export function getQueryArg( url, arg ) {
 /**
  * Determines whether the URL contains a given query arg.
  *
- * @param  {string}    url URL
- * @param  {...string} arg Query arg name
+ * @param {string} url URL
+ * @param {string} arg Query arg name
  *
  * @return {boolean} Whether or not the URL contains the query aeg.
  */
 export function hasQueryArg( url, arg ) {
-	return typeof getQueryArg( url, arg ) !== 'undefined';
+	return getQueryArg( url, arg ) !== undefined;
 }
 
 /**
  * Removes arguments from the query string of the url
  *
- * @param  {string} url  URL
- * @param  {string} args Query Args
+ * @param {string} url  URL
+ * @param {...string} args Query Args
  *
  * @return {string} Updated URL
  */

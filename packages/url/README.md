@@ -27,7 +27,7 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://
 const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
 
 // Gets a single query arg from the given URL.
-const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz' ); // bar
+const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // bar
 
 // Checks whether a URL contains a given query arg.
 const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); // true
