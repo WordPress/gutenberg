@@ -1,6 +1,9 @@
 # Focal Point Picker
 
-Focal Point Picker is a component which creates a UI for identifying the most visually important point on an image, which can be used to ensure that the image is cropped appropriately. The component is useful for background images which may be cropped in undesirable ways on small and irregular viewports. The selected point is returned as an object containing `x` and `y` values between 0-1, which can be converted to percentages and applied as the image container's `background-position` attribute.
+Focal Point Picker is a component which creates a UI for identifying the most important visual point of an image. This component addresses a specific problem: with large background images it is common to see undesirable crops, especially when viewing on smaller viewports such as mobile phones. This component allows the selection of the point with the most important visual information and returns it as a pair of numbers between 0 and 1. This value can be easily converted into the CSS `background-position` attribute, and will ensure that the focal point is never cropped out, regardless of viewport.
+
+Example focal point picker value: `{ x: 0.5, y: 0.1 }`
+Corresponding CSS: `background-position: 50% 10%;`
 
 ## Usage
 
@@ -18,11 +21,6 @@ const MyFocalPointPicker = withState( {
 		width: 400,
 		height: 100
 	};
-	const style = {
-		backgroundImage: `url(${ url })` ,
-		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
-	}
-	const imageContainer = <div style={ style } />;
 	return ( 
 		<FocalPointPicker 
 			url={ url }
@@ -32,6 +30,15 @@ const MyFocalPointPicker = withState( {
 		/>
 	) 
 } );
+
+/* Example function to render the CSS styles based on Focal Point Picker value */
+const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
+	const style = {
+		backgroundImage: `url(${ url })` ,
+		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
+	}
+	return <div style={ style } />;
+};
 ```
 
 ## Props
@@ -51,11 +58,11 @@ const MyFocalPointPicker = withState( {
 ### `value`
 
 - Type: `Object`
-- Required: No
+- Required: Yes
 - Description: The focal point. Should be an object containing `x` and `y` params.
 
 ### `onChange`
 
 - Type: `Function`
-- Required: No
+- Required: Yes
 - Description: Callback which is called when the focal point changes. 
