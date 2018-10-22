@@ -12,14 +12,11 @@ import {
 	registerFormatType,
 } from '@wordpress/rich-text';
 
-export const registerCoreFormats = () => {
-	[
-		bold,
-		code,
-		image,
-		italic,
-		link,
-		strikethrough,
-	].forEach( registerFormatType );
-};
-
+[
+	bold,
+	code,
+	image,
+	italic,
+	link,
+	strikethrough,
+].forEach( registerFormatType );

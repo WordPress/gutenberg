@@ -6,7 +6,6 @@ import '@wordpress/editor';
 import '@wordpress/nux';
 import '@wordpress/viewport';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { registerCoreFormats } from '@wordpress/format-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -60,7 +59,6 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
 
 	registerCoreBlocks();
-	registerCoreFormats();
 
 	dispatch( 'core/nux' ).triggerGuide( [
 		'core/editor.inserter',
