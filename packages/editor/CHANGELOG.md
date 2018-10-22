@@ -1,5 +1,7 @@
 ## 5.0.1 (2018-10-22)
 
+- Add animated logo to preview interstitial screen.
+
 ## 5.0.0 (2018-10-19)
 
 ### Breaking Changes
