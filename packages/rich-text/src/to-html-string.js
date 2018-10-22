@@ -18,13 +18,18 @@ import { toTree } from './to-tree';
  * Create an HTML string from a Rich Text value. If a `multilineTag` is
  * provided, text separated by two new lines will be wrapped in it.
  *
- * @param {Object} value        Rich text value.
- * @param {string} multilineTag Multiline tag.
+ * @param {Object} value                Rich text value.
+ * @param {string} multilineTag         Multiline tag.
+ * @param {Array}  multilineWrapperTags Tags where lines can be found if nesting
+ *                                      is possible.
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( value, multilineTag ) {
-	const tree = toTree( value, multilineTag, {
+export function toHTMLString( value, multilineTag, multilineWrapperTags ) {
+	const tree = toTree( {
+		value,
+		multilineTag,
+		multilineWrapperTags,
 		createEmpty,
 		append,
 		getLastChild,

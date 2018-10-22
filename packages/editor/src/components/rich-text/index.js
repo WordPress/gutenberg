@@ -36,6 +36,7 @@ import {
 	toHTMLString,
 	getTextContent,
 	insert,
+	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
 } from '@wordpress/rich-text';
@@ -75,6 +76,10 @@ export class RichText extends Component {
 
 		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
 			this.multilineTag = multiline === true ? 'p' : multiline;
+		}
+
+		if ( this.multilineTag === 'li' ) {
+			this.multilineWrapperTags = [ 'ul', 'ol' ];
 		}
 
 		this.onInit = this.onInit.bind( this );
@@ -240,6 +245,7 @@ export class RichText extends Component {
 			element: this.editableRef,
 			range,
 			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
 			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
@@ -248,7 +254,17 @@ export class RichText extends Component {
 	}
 
 	applyRecord( record ) {
-		apply( record, this.editableRef, this.multilineTag );
+		apply( {
+			value: record,
+			current: this.editableRef,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
+			createLinePadding( doc ) {
+				const element = doc.createElement( 'br' );
+				element.setAttribute( 'data-mce-bogus', '1' );
+				return element;
+			},
+		} );
 	}
 
 	isEmpty() {
@@ -627,13 +643,7 @@ export class RichText extends Component {
 				if ( this.props.onSplit && isEmptyLine( record ) ) {
 					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
-					// Use the current formats (used to keep list indentation).
-					const format = record.formats[ record.start - 1 ];
-					// Character is used to separate lines in multiline values.
-					this.onChange( insert( record, {
-						text: '\u2028',
-						formats: [ format ],
-					} ) );
+					this.onChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.props.onSplit ) {
 				const record = this.getRecord();
@@ -815,6 +825,7 @@ export class RichText extends Component {
 			return create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -822,6 +833,7 @@ export class RichText extends Component {
 			return create( {
 				html: value,
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -837,11 +849,19 @@ export class RichText extends Component {
 	valueToFormat( { formats, text } ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
-			return children.fromDOM( unstableToDom( { formats, text }, this.multilineTag ).body.childNodes );
+			return children.fromDOM( unstableToDom( {
+				value: { formats, text },
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
+			} ).body.childNodes );
 		}
 
 		if ( this.props.format === 'string' ) {
-			return toHTMLString( { formats, text }, this.multilineTag );
+			return toHTMLString(
+				{ formats, text },
+				this.multilineTag,
+				this.multilineWrapperTags,
+			);
 		}
 
 		return { formats, text };
@@ -914,6 +934,7 @@ export class RichText extends Component {
 								onPaste={ this.onPaste }
 								onInput={ this.onInput }
 								multilineTag={ this.multilineTag }
+								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&

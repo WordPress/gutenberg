@@ -96,18 +96,14 @@ exports[`recordToDom should create a value without formatting 1`] = `
 exports[`recordToDom should create an empty value 1`] = `
 <body>
   
-  <br
-    data-mce-bogus="1"
-  />
+  <br />
 </body>
 `;
 
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
   
-  <br
-    data-mce-bogus="1"
-  />
+  <br />
 </body>
 `;
 
@@ -147,9 +143,7 @@ exports[`recordToDom should filter text outside format with settings 1`] = `
 exports[`recordToDom should filter text with settings 1`] = `
 <body>
   
-  <br
-    data-mce-bogus="1"
-  />
+  <br />
 </body>
 `;
 
@@ -194,9 +188,7 @@ exports[`recordToDom should handle empty list value 1`] = `
 <body>
   <li>
     
-    <br
-      data-mce-bogus="1"
-    />
+    <br />
   </li>
 </body>
 `;
@@ -205,9 +197,7 @@ exports[`recordToDom should handle empty multiline value 1`] = `
 <body>
   <p>
     
-    <br
-      data-mce-bogus="1"
-    />
+    <br />
   </p>
 </body>
 `;
@@ -216,21 +206,15 @@ exports[`recordToDom should handle middle empty list value 1`] = `
 <body>
   <li>
     
-    <br
-      data-mce-bogus="1"
-    />
+    <br />
   </li>
   <li>
     
-    <br
-      data-mce-bogus="1"
-    />
+    <br />
   </li>
   <li>
     
-    <br
-      data-mce-bogus="1"
-    />
+    <br />
   </li>
 </body>
 `;
@@ -280,9 +264,7 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
   </p>
   <p>
     
-    <br
-      data-mce-bogus="1"
-    />
+    <br />
   </p>
 </body>
 `;
@@ -290,15 +272,11 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
 exports[`recordToDom should handle nested empty list value 1`] = `
 <body>
   <li>
-    <br
-      data-mce-bogus="1"
-    />
+    <br />
     <ul>
       <li>
         
-        <br
-          data-mce-bogus="1"
-        />
+        <br />
       </li>
     </ul>
     
@@ -319,9 +297,7 @@ exports[`recordToDom should handle selection before br 1`] = `
 exports[`recordToDom should ignore line breaks to format HTML 1`] = `
 <body>
   
-  <br
-    data-mce-bogus="1"
-  />
+  <br />
 </body>
 `;
 
@@ -343,9 +319,7 @@ exports[`recordToDom should preserve emoji in formatting 1`] = `
 exports[`recordToDom should remove br with settings 1`] = `
 <body>
   
-  <br
-    data-mce-bogus="1"
-  />
+  <br />
 </body>
 `;
 
@@ -358,9 +332,7 @@ exports[`recordToDom should remove with children with settings 1`] = `
 exports[`recordToDom should remove with settings 1`] = `
 <body>
   
-  <br
-    data-mce-bogus="1"
-  />
+  <br />
 </body>
 `;
 
