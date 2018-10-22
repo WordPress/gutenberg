@@ -13,7 +13,7 @@ import {
 	isEqualTokensOfType,
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
-	isValidBlock,
+	isBlockContentValid,
 	isClosedByToken,
 } from '../validation';
 import {
@@ -553,14 +553,14 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'isValidBlock()', () => {
+	describe( 'isBlockContentValid()', () => {
 		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Apples',
+			const isValid = isBlockContentValid(
 				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+				{ fruit: 'Bananas' },
+				'Apples'
 			);
 
 			expect( console ).toHaveWarned();
@@ -576,10 +576,10 @@ describe( 'validation', () => {
 				},
 			} );
 
-			const isValid = isValidBlock(
-				'Bananas',
+			const isValid = isBlockContentValid(
 				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( console ).toHaveErrored();
@@ -589,10 +589,10 @@ describe( 'validation', () => {
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Bananas',
+			const isValid = isBlockContentValid(
 				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( isValid ).toBe( true );

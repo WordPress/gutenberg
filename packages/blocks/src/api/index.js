@@ -20,7 +20,7 @@ export {
 	getSaveElement,
 	getSaveContent,
 } from './serializer';
-export { isValidBlock } from './validation';
+export { isBlockContentValid, isValidBlock } from './validation';
 export {
 	getCategories,
 	setCategories,
