@@ -59,7 +59,7 @@ describe( 'reducer', () => {
 			args: [],
 		} );
 		state = reducer( deepFreeze( state ), {
-			type: 'INVALIDATE_CACHE',
+			type: 'INVALIDATE_RESOLUTION',
 			reducerKey: 'test',
 			selectorName: 'getFoo',
 			args: [],
