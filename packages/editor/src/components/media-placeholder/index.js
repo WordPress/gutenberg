@@ -169,11 +169,11 @@ class MediaPlaceholder extends Component {
 				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
 
 				if ( isAudio ) {
-					instructions = __( 'Drag a audio, upload a new one or select a file from your library.' );
+					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
 				} else if ( isImage ) {
 					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
 				} else if ( isVideo ) {
-					instructions = __( 'Drag an video, upload a new one or select a file from your library.' );
+					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
 				}
 			}
 
