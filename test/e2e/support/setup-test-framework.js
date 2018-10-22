@@ -128,6 +128,22 @@ function observeConsoleLogging() {
 	} );
 }
 
+/**
+ * Binds to the document on page load which throws an error if a `focusout`
+ * event occurs without a related target (i.e. focus loss).
+ */
+function observeFocusLoss() {
+	page.on( 'load', () => {
+		page.evaluate( () => {
+			document.body.addEventListener( 'focusout', ( event ) => {
+				if ( ! event.relatedTarget ) {
+					throw new Error( 'Unexpected focus loss' );
+				}
+			} );
+		} );
+	} );
+}
+
 // Before every test suite run, delete all content created by the test. This
 // ensures other posts/comments/etc. aren't dirtying tests and tests don't
 // depend on each other's side-effects.
@@ -139,6 +155,7 @@ beforeEach( async () => {
 	capturePageEventsForTearDown();
 	enablePageDialogAccept();
 	observeConsoleLogging();
+	observeFocusLoss();
 
 	await setupBrowser();
 } );
