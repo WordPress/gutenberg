@@ -74,7 +74,6 @@ function Header( {
 						<PostPublishPanelToggle
 							isOpen={ isPublishSidebarOpened }
 							onToggle={ togglePublishSidebar }
-							forceIsDirty={ hasActiveMetaboxes }
 							forceIsSaving={ isSaving }
 						/>
 					) }
