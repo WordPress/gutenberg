@@ -41,7 +41,7 @@ function Header( {
 	isScheduled,
 	isBeingScheduled,
 	isPending,
-	isMobileViewport,
+	isSmallViewport,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
@@ -49,7 +49,7 @@ function Header( {
 		! isPublishSidebarEnabled ||
 		isPublished ||
 		( isScheduled && isBeingScheduled ) ||
-		( isPending && ! hasPublishAction && ! isMobileViewport )
+		( isPending && ! hasPublishAction && ! isSmallViewport )
 	);
 	return (
 		<div
@@ -124,5 +124,5 @@ export default compose(
 			hasBlockSelection: undefined,
 		};
 	} ),
-	withViewportMatch( { isMobileViewport: '< medium' } ),
+	withViewportMatch( { isSmallViewport: '< medium' } ),
 )( Header );
