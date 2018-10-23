@@ -203,7 +203,7 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
-    void emitHTMLWithCursorEvent() {
+    public void onEnter() {
         disableTextChangedListener();
         String content = toHtml(false);
         int cursorPositionStart = getSelectionStart();
@@ -212,7 +212,7 @@ public class ReactAztecText extends AztecText {
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecHtmlWithCursorEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
         );
     }
 

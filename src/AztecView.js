@@ -61,7 +61,7 @@ class AztecView extends React.Component {
     }
 
     const { onEnter } = this.props;
-    onEnter();
+    onEnter(event);
   }
 
   _onHTMLContentWithCursor = (event) => {
