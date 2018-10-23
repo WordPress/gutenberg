@@ -1,8 +1,10 @@
-## 5.0.1 (2018-10-22)
+## 5.0.2 (Unreleased)
 
 ### Polish
 
 - Add animated logo to preview interstitial screen.
+
+## 5.0.1 (2018-10-22)
 
 ## 5.0.0 (2018-10-19)
 
