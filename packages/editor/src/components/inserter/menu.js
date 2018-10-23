@@ -162,7 +162,7 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { items, rootChildBlocks, debouncedSpeak } = this.props;
+		const { debouncedSpeak, items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
