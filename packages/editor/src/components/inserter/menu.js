@@ -206,7 +206,9 @@ export class InserterMenu extends Component {
 			openPanels,
 		} );
 
-		const resultCount = Object.keys( itemsPerCategory ).reduce( ( memo, curr ) => memo + itemsPerCategory[ curr ].length, 0 );
+		const resultCount = Object.keys( itemsPerCategory ).reduce( ( accumulator, currentCategorySlug ) => {
+			return accumulator + itemsPerCategory[ currentCategorySlug ].length;
+		}, 0 );
 
 		const resultsFoundMessage = sprintf(
 			_n( '%d result found.', '%d results found.', resultCount ),
