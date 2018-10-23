@@ -80,6 +80,11 @@ body.block-editor-page {
 
 	#wpbody-content {
 		padding-bottom: 0;
+
+		// Hide any element output on this screen that isn't the editor.
+		> *:not(#screen-meta):not(.block-editor):not(.clear) {
+			display: none;
+		}
 	}
 
 	/* We hide legacy notices in Gutenberg, because they were not designed in a way that scaled well.
