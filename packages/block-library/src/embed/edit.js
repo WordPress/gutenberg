@@ -90,7 +90,7 @@ export function getEmbedEditComponent( title, icon ) {
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
 
-			if ( iframe && iframe.height && iframe.width ) {
+			if ( ! isFromWordPress( html ) && iframe && iframe.height && iframe.width ) {
 				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
 				// Given the actual aspect ratio, find the widest ratio to support it.
 				for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
