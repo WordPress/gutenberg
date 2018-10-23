@@ -33,6 +33,7 @@ function BlockNavigationDropdown() {
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 						label={ __( 'Block Navigation' ) }
+						className="editor-block-navigation"
 					/>
 				</Fragment>
 			) }
