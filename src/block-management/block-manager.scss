@@ -6,11 +6,19 @@
 	flex: 1;
 	justify-content: flex-start;
 	background-color: #fff;
-	padding-top: 30;
+	padding-top: 10;
 }
 
 .list {
 	flex: 1;
+}
+
+.topButtons {
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 .switch {

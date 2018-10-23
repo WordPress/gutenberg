@@ -174,6 +174,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		GBPostManager.savePost(html);
 	}
 
+	onPressClose = () => {
+		GBPostManager.close();
+	}
+
 	serializeBlocksToHtml() {
 		return this.props.blocks
 			.map( this.serializeBlock )
@@ -239,11 +243,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		return (
 			<View style={ styles.container }>
-				<View style={ styles.switch }>
+				<View style={ styles.topButtons }>
 					<Button
 						onPress={ this.onPressDone }
 						title="Done"
 					/>
+					<Button
+						onPress={ this.onPressClose }
+						title="Close"
+					/>
+				</View>
+				<View style={ styles.switch }>
 					<Switch
 						activeText={ 'On' }
 						inActiveText={ 'Off' }
