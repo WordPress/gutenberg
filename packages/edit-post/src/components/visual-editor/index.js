@@ -22,7 +22,7 @@ import PluginBlockSettingsMenuGroup from '../block-settings-menu/plugin-block-se
 
 function VisualEditor() {
 	return (
-		<BlockSelectionClearer className="edit-post-visual-editor">
+		<BlockSelectionClearer className="edit-post-visual-editor editor-styles-wrapper">
 			<EditorGlobalKeyboardShortcuts />
 			<CopyHandler />
 			<MultiSelectScrollIntoView />

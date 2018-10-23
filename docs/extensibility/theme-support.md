@@ -194,7 +194,7 @@ This flag will make sure users are only able to choose colors from the `editor-c
 Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style). This support is opt-in because these styles are applied differently from the classic editor.
 
  - In the classic editor, the stylesheet is applied as is in the iframe of the post content editor.
- - Since Gutenberg doesn't make use of iFrames, this is not possible. Instead Gutenberg wrap all the provided styles with `.editor-block-list__block` to avoid leaking styles outside the editor's content area.
+ - Since Gutenberg doesn't make use of iFrames, this is not possible. Instead Gutenberg wrap all the provided styles with `.editor-styles-wrapper` to avoid leaking styles outside the editor's content area.
 
 This technique should allow the editor styles to work properly in both editors in most cases.
 
