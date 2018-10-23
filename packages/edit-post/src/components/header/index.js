@@ -31,10 +31,16 @@ function Header( {
 	hasActiveMetaboxes,
 	isSaving,
 	isPublished,
+	isScheduled,
+	isBeingScheduled,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
-	const shouldShowButton = ( ! isPublishSidebarEnabled || isPublished );
+	const shouldShowButton = (
+		! isPublishSidebarEnabled ||
+		isPublished ||
+		( isScheduled && isBeingScheduled )
+	);
 	return (
 		<div
 			role="region"
@@ -94,6 +100,8 @@ export default compose(
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
+		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
+		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
 	} ) ),
 	withDispatch( ( dispatch, { hasBlockSelection } ) => {
 		const { openGeneralSidebar, closeGeneralSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
