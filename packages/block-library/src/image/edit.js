@@ -13,7 +13,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
@@ -57,7 +57,17 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
+	let { alt } = image;
+	const { filename } = image;
+
+	if ( ! alt ) {
+		alt = sprintf( __( 'This image has an empty alt attribute; its file name is "%s"' ), filename );
+	}
+
+	return {
+		...pick( image, [ 'id', 'link', 'url', 'caption' ] ),
+		alt,
+	};
 };
 
 /**
