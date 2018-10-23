@@ -124,5 +124,5 @@ export default compose(
 			hasBlockSelection: undefined,
 		};
 	} ),
-	withViewportMatch( { isMobileViewport: '< small' } ),
+	withViewportMatch( { isMobileViewport: '< medium' } ),
 )( Header );
