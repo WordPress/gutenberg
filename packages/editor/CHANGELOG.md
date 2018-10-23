@@ -1,4 +1,10 @@
-## 5.0.0 (Unreleased)
+## 5.0.1 (2018-10-22)
+
+### Polish
+
+- Add animated logo to preview interstitial screen.
+
+## 5.0.0 (2018-10-19)
 
 ### Breaking Changes
 
@@ -7,6 +13,12 @@
 ### Deprecations
 
 - `wp.editor.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
+
+### New Features
+
+- Added `onClose` prop to `URLPopover` component.
+
+## 4.0.3 (2018-10-18)
 
 ## 4.0.0 (2018-09-30)
 
@@ -44,7 +56,7 @@
 - `isFetchingSharedBlock` selector has been removed. Use `isFetchingReusableBlock` instead.
 - `getSharedBlocks` selector has been removed. Use `getReusableBlocks` instead.
 - `editorMediaUpload` has been removed. Use `mediaUpload` instead.
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 - `wp.editor.DocumentTitle` component has been removed.
 - `getDocumentTitle` selector (`core/editor`) has been removed.
 
