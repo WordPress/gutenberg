@@ -49,15 +49,15 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 					<PostPreviewButton />
-					{ isPublishSidebarEnabled ? (
-						<PostPublishPanelToggle
-							isOpen={ isPublishSidebarOpened }
-							onToggle={ togglePublishSidebar }
+					{ ! isPublishSidebarEnabled ? (
+						<PostPublishButton
 							forceIsDirty={ hasActiveMetaboxes }
 							forceIsSaving={ isSaving }
 						/>
 					) : (
-						<PostPublishButton
+						<PostPublishPanelToggle
+							isOpen={ isPublishSidebarOpened }
+							onToggle={ togglePublishSidebar }
 							forceIsDirty={ hasActiveMetaboxes }
 							forceIsSaving={ isSaving }
 						/>
