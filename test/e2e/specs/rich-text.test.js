@@ -5,14 +5,18 @@ import {
 	newPost,
 	getEditedPostContent,
 	insertBlock,
+	clickBlockAppender,
+	pressWithModifier,
+	META_KEY,
+	ACCESS_MODIFIER_KEYS,
 } from '../support/utils';
 
-describe( 'adding blocks', () => {
+describe( 'RichText', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );
 
-	it( 'Should handle change in tag name gracefully', async () => {
+	it( 'should handle change in tag name gracefully', async () => {
 		// Regression test: The heading block changes the tag name of its
 		// RichText element. Historically this has been prone to breakage,
 		// specifically in destroying / reinitializing the TinyMCE instance.
@@ -20,6 +24,24 @@ describe( 'adding blocks', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await insertBlock( 'Heading' );
 		await page.click( '[aria-label="Heading 3"]' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should apply formatting with access shortcut', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'test' );
+		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'd' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should apply formatting with primary shortcut', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'test' );
+		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( META_KEY, 'b' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
