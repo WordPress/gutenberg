@@ -55,6 +55,20 @@ export const getPhotoHtml = ( photo ) => {
 	return renderToString( photoPreview );
 };
 
+/***
+ * Creates a more suitable embed block based on the passed in props
+ * and attributes generated from an embed block's preview.
+ *
+ * We require `attributesFromPreview` to be generated from the latest attributes
+ * and preview, and because of the way the react lifecycle operates, we can't
+ * guarantee that the attributes contained in the block's props are the latest
+ * versions, so we require that these are generated separately.
+ * See `getAttributesFromPreview` in the generated embed edit component.
+ *
+ * @param {Object} props The block's props.
+ * @param {Object} attributesFromPreview Attributes generated from the block's most up to date preview.
+ * @return {Object|undefined} A more suitable embed block if one exists.
+ */
 export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 	const { preview, name } = props;
 	const { url } = props.attributes;
