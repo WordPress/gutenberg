@@ -51,8 +51,7 @@ figure.block-library-media-text__media-container {
 	display: none;
 }
 
-.editor-block-list__block.is-selected,
-.editor-block-list__block.is-focused {
+.wp-block-media-text.is-selected {
 	.editor-media-container__resizer .components-resizable-box__handle {
 		display: block;
 	}

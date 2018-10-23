@@ -46,20 +46,10 @@ export class RichText extends Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
-		this.onHTMLContentWithCursor = this.onHTMLContentWithCursor.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
 		};
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	onHTMLContentWithCursor( htmlText, start, end ) {
-		if ( ! this.props.onSplit ) {
-			// TODO: insert the \n char instead?
-			return;
-		}
-		this.splitContent( htmlText, start, end );
 	}
 
 	/*
@@ -109,14 +99,19 @@ export class RichText extends Component {
 			after = this.valueToFormat( after );
 		}
 
+		// The onSplit event can cause a content update event for this block.  Such event should
+		// definitely be processed by our native components, since they have no knowledge of
+		// how the split works.  Setting lastEventCount to undefined forces the native component to
+		// always update when provided with new content.
+		this.lastEventCount = undefined;
+
 		onSplit( before, after );
 	}
 
 	valueToFormat( { formats, text } ) {
 		const value = toHTMLString( { formats, text }, this.multilineTag );
-		// remove the outer p tags
-		const returningContentWithoutParaTag = value.replace( /<p>|<\/p>/gi, '' );
-		return returningContentWithoutParaTag;
+		// remove the outer root tags
+		return this.removeRootTagsProduceByAztec( value );
 	}
 
 	onActiveFormatsChange( formats ) {
@@ -133,6 +128,18 @@ export class RichText extends Component {
 			selectedNodeId: this.state.selectedNodeId + 1,
 		} );
 	}
+
+	/*
+	 * Cleans up any root tags produced by aztec.
+	 * TODO: This should be removed on a later version when aztec doesn't return the top tag of the text being edited
+	 */
+
+	removeRootTagsProduceByAztec( html ) {
+		const openingTagRegexp = RegExp( '^<' + this.props.tagName + '>', 'gim' );
+		const closingTagRegexp = RegExp( '</' + this.props.tagName + '>$', 'gim' );
+		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
+	}
+
 	/**
 	 * Handles any case where the content of the AztecRN instance has changed.
 	 */
@@ -143,11 +150,7 @@ export class RichText extends Component {
 			clearTimeout( this.currentTimer );
 		}
 		this.lastEventCount = event.nativeEvent.eventCount;
-		// The following method just cleans up any root tags produced by aztec and replaces them with a br tag
-		// This should be removed on a later version when aztec doesn't return the top tag of the text being edited
-		const openingTagRegexp = RegExp( '^<' + this.props.tagName + '>', 'gim' );
-		const closingTagRegexp = RegExp( '</' + this.props.tagName + '>$', 'gim' );
-		const contentWithoutRootTag = event.nativeEvent.text.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
+		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
 		this.lastContent = contentWithoutRootTag;
 		// Set a time to call the onChange prop if nothing changes in the next second
 		this.currentTimer = setTimeout( function() {
@@ -170,8 +173,14 @@ export class RichText extends Component {
 		);
 	}
 
-	onEnter() {
-		this._editor.requestHTMLWithCursor();
+	// eslint-disable-next-line no-unused-vars
+	onEnter( event ) {
+		if ( ! this.props.onSplit ) {
+			// TODO: insert the \n char instead?
+			return;
+		}
+
+		this.splitContent( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -262,7 +271,6 @@ export class RichText extends Component {
 					onEnter={ this.onEnter }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
-					onHTMLContentWithCursor={ this.onHTMLContentWithCursor }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }

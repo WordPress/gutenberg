@@ -25,6 +25,7 @@ import {
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
+const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 class VideoEdit extends Component {
 	constructor() {
@@ -36,6 +37,7 @@ class VideoEdit extends Component {
 		};
 
 		this.videoPlayer = createRef();
+		this.posterImageButton = createRef();
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
@@ -96,6 +98,9 @@ class VideoEdit extends Component {
 	onRemovePoster() {
 		const { setAttributes } = this.props;
 		setAttributes( { poster: '' } );
+
+		// Move focus back to the Media Upload button.
+		this.posterImageButton.current.focus();
 	}
 
 	render() {
@@ -196,9 +201,13 @@ class VideoEdit extends Component {
 							<MediaUpload
 								title={ __( 'Select Poster Image' ) }
 								onSelect={ this.onSelectPoster }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
 								render={ ( { open } ) => (
-									<Button isDefault onClick={ open }>
+									<Button
+										isDefault
+										onClick={ open }
+										ref={ this.posterImageButton }
+									>
 										{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
 									</Button>
 								) }

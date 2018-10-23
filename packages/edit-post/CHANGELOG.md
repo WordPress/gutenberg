@@ -1,6 +1,12 @@
-## 1.0.4 (Unreleased)
+## 1.0.5 (Unreleased)
 
-## Bug Fixes
+### Bug Fixes
+
+- Hide pinned plugins and block traversal tool from header on mobile.
+
+## 1.0.4 (2018-10-22)
+
+### Bug Fixes
 
 - Fix fullscreen mode toggle.
 
