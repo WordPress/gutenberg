@@ -108,6 +108,21 @@ export class PostPreviewButton extends Component {
 					height: 100vh;
 					width: 100vw;
 				}
+				@-webkit-keyframes paint {
+					0% {
+						stroke-dashoffset: 0;
+					}
+				}
+				@-moz-keyframes paint {
+					0% {
+						stroke-dashoffset: 0;
+					}
+				}
+				@-o-keyframes paint {
+					0% {
+						stroke-dashoffset: 0;
+					}
+				}
 				@keyframes paint {
 					0% {
 						stroke-dashoffset: 0;
@@ -119,17 +134,14 @@ export class PostPreviewButton extends Component {
 					stroke: #555d66;
 					stroke-width: 0.75;
 				}
-				.editor-post-preview-button__interstitial-message svg .outer {
-					stroke-dasharray: 280;
-					stroke-dashoffset: 280;
-					animation: paint 1.5s ease infinite;
-					animation-direction: alternate;
-				}
+				.editor-post-preview-button__interstitial-message svg .outer,
 				.editor-post-preview-button__interstitial-message svg .inner {
 					stroke-dasharray: 280;
 					stroke-dashoffset: 280;
-					animation: paint 1.5s ease infinite;
-					animation-direction: alternate;
+					-webkit-animation: paint 1.5s ease infinite alternate;
+					-moz-animation: paint 1.5s ease infinite alternate;
+					-o-animation: paint 1.5s ease infinite alternate;
+					animation: paint 1.5s ease infinite alternate;
 				}
 				p {
 					text-align: center;
