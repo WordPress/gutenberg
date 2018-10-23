@@ -1356,6 +1356,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	wp_enqueue_script( 'wp-edit-post' );
 	wp_enqueue_script( 'wp-format-library' );
+	wp_enqueue_style( 'wp-format-library' );
 
 	global $post;
 
