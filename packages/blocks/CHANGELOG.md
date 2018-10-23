@@ -1,3 +1,11 @@
+## 5.0.0 (Unreleased)
+
+### Breaking Changes
+
+- Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
+- `setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
+- `getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
+
 ## 4.0.4 (2018-10-19)
 
 ## 4.0.3 (2018-10-18)

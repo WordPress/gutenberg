@@ -3,6 +3,8 @@
 ### Breaking Changes
 
 - The `labels.name` property has been removed from `MediaPlaceholder` in favor of the new `labels.instructions` prop.
+- The `UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
+- `mediaDetails` in object passed to `onFileChange` callback of `mediaUpload`. Please use `media_details` property instead.
 
 ### New Features
 

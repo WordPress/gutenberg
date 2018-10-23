@@ -1,4 +1,13 @@
-## 1.0.5 (Unreleased)
+## 2.0.0 (Unreleased)
+
+### Breaking Changes
+
+- `setActiveMetaBoxLocations` action (`core/edit-post`) has been removed.
+- `initializeMetaBoxState` action (`core/edit-post`) has been removed.
+- `initializeEditor` no longer returns an object. Use the `setActiveMetaBoxLocations` action (`core/edit-post`) in place of the existing object's `initializeMetaBoxes` function.
+- `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
+- `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
+- `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
 
 ### Bug Fixes
 
