@@ -17,6 +17,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DotTip } from '@wordpress/nux';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -40,6 +41,7 @@ function Header( {
 	isScheduled,
 	isBeingScheduled,
 	isPending,
+	isMobileViewport,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
@@ -47,7 +49,7 @@ function Header( {
 		! isPublishSidebarEnabled ||
 		isPublished ||
 		( isScheduled && isBeingScheduled ) ||
-		( isPending && ! hasPublishAction )
+		( isPending && ! hasPublishAction && ! isMobileViewport )
 	);
 	return (
 		<div
@@ -122,4 +124,5 @@ export default compose(
 			hasBlockSelection: undefined,
 		};
 	} ),
+	withViewportMatch( { isMobileViewport: '< small' } ),
 )( Header );
