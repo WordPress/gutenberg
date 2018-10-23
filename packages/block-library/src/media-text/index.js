@@ -70,6 +70,10 @@ export const settings = {
 			type: 'number',
 			default: 50,
 		},
+		isStackedOnMobile: {
+			type: 'boolean',
+			default: false,
+		},
 	},
 
 	supports: {
@@ -82,6 +86,7 @@ export const settings = {
 		const {
 			backgroundColor,
 			customBackgroundColor,
+			isStackedOnMobile,
 			mediaAlt,
 			mediaPosition,
 			mediaType,
@@ -97,6 +102,7 @@ export const settings = {
 		const className = classnames( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
+			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
 
 		let gridTemplateColumns;
