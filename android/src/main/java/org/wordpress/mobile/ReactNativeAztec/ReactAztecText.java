@@ -19,17 +19,8 @@ import org.wordpress.aztec.AztecParser;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 import org.wordpress.aztec.ITextFormat;
-import org.wordpress.aztec.glideloader.GlideImageLoader;
-import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
-import org.wordpress.aztec.plugins.CssUnderlinePlugin;
 import org.wordpress.aztec.plugins.IAztecPlugin;
 import org.wordpress.aztec.plugins.IToolbarButton;
-import org.wordpress.aztec.plugins.shortcodes.AudioShortcodePlugin;
-import org.wordpress.aztec.plugins.shortcodes.CaptionShortcodePlugin;
-import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
-import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
-import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
-import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
 import org.wordpress.aztec.source.Format;
 import org.wordpress.aztec.spans.AztecCursorSpan;
 import org.wordpress.aztec.watchers.EndOfBufferMarkerAdder;
@@ -58,16 +49,6 @@ public class ReactAztecText extends AztecText {
         super(reactContext);
         this.setFocusableInTouchMode(true);
         this.setFocusable(true);
-
-        addPlugin(new WordPressCommentsPlugin(this));
-        addPlugin(new MoreToolbarButton(this));
-        addPlugin(new CaptionShortcodePlugin(this));
-        addPlugin(new VideoShortcodePlugin());
-        addPlugin(new AudioShortcodePlugin());
-        addPlugin(new HiddenGutenbergPlugin(this));
-        addPlugin(new CssUnderlinePlugin());
-        this.setImageGetter(new GlideImageLoader(reactContext));
-        this.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(reactContext));
     }
 
     @Override
@@ -76,7 +57,7 @@ public class ReactAztecText extends AztecText {
         onContentSizeChange();
     }
 
-    private void addPlugin(IAztecPlugin plugin) {
+    void addPlugin(IAztecPlugin plugin) {
         super.getPlugins().add(plugin);
         if (plugin instanceof IToolbarButton && getToolbar() != null ) {
             getToolbar().addButton((IToolbarButton)plugin);
@@ -224,36 +205,9 @@ public class ReactAztecText extends AztecText {
 
     void emitHTMLWithCursorEvent() {
         disableTextChangedListener();
-        // The code below is taken from `toHtml` method of Aztec and adapted to report the current
-        // selection if present by adding 2 cursor spans before the converting to HTML.
-        AztecParser aztecParser = new AztecParser(getPlugins());
-        SpannableStringBuilder output = new SpannableStringBuilder(getText());
-        clearMetaSpans(output);
-        final AztecCursorSpan[] spans = output.getSpans(0, output.length(), AztecCursorSpan.class);
-        for (AztecCursorSpan currentSpan : spans) {
-            output.removeSpan(currentSpan);
-        }
-
-        output.setSpan(new AztecCursorSpan(), getSelectionEnd(), getSelectionEnd(), Spanned.SPAN_MARK_MARK);
-        if (isTextSelected()) {
-            output.setSpan(new AztecCursorSpan(), getSelectionStart(), getSelectionStart(), Spanned.SPAN_MARK_MARK);
-        }
-
-        aztecParser.syncVisualNewlinesOfBlockElements(output);
-        Format.postProcessSpannedText(output, false);
-        String content = EndOfBufferMarkerAdder.removeEndOfTextMarker(aztecParser.toHtml(output, true));
-
-        int cursorPositionStart = content.indexOf("aztec_cursor");
-        if (cursorPositionStart != -1) {
-            content = content.replaceFirst("aztec_cursor", "");
-        }
-        int cursorPositionEnd = cursorPositionStart;
-
-        if (content.contains("aztec_cursor")) {
-            cursorPositionEnd = content.indexOf("aztec_cursor");
-            content = content.replaceFirst("aztec_cursor", "");
-        }
-
+        String content = toHtml(false);
+        int cursorPositionStart = getSelectionStart();
+        int cursorPositionEnd = getSelectionEnd();
         enableTextChangedListener();
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();

@@ -27,6 +27,16 @@ import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.glideloader.GlideImageLoader;
+import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
+import org.wordpress.aztec.plugins.CssUnderlinePlugin;
+import org.wordpress.aztec.plugins.shortcodes.AudioShortcodePlugin;
+import org.wordpress.aztec.plugins.shortcodes.CaptionShortcodePlugin;
+import org.wordpress.aztec.plugins.shortcodes.VideoShortcodePlugin;
+import org.wordpress.aztec.plugins.wpcomments.HiddenGutenbergPlugin;
+import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
+import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
+
 import java.util.Map;
 
 public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
@@ -42,7 +52,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
         aztecText.setCalypsoMode(false);
-
         return aztecText;
     }
 
@@ -155,6 +164,36 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @ReactProp(name = "minImagesWidth")
     public void setMinImagesWidth(ReactAztecText view, int minWidth) {
         view.setMinImagesWidth(minWidth);
+    }
+
+    /*
+     * This property/method is used to disable the Gutenberg compatibility mode on AztecRN.
+     *
+     * Aztec comes along with some nice plugins that are able to show preview of Pictures/Videos/shortcodes,
+     * and WP specific features, in the visual editor.
+     *
+     * We don't need those improvements in Gutenberg mobile, so this RN wrapper around Aztec
+     * that's only used in GB-mobile at the moment, does have them OFF by default.
+     *
+     * An external 3rd party RN-app can use AztecRN wrapper and set the `disableGutenbergMode` to false to have a fully
+     * working visual editor. See the demo app, where `disableGutenbergMode` is already OFF.
+     */
+    @ReactProp(name = "disableGutenbergMode", defaultBoolean = false)
+    public void disableGBMode(final ReactAztecText view, boolean disable) {
+        if (disable) {
+            view.addPlugin(new WordPressCommentsPlugin(view));
+            view.addPlugin(new MoreToolbarButton(view));
+            view.addPlugin(new CaptionShortcodePlugin(view));
+            view.addPlugin(new VideoShortcodePlugin());
+            view.addPlugin(new AudioShortcodePlugin());
+            view.addPlugin(new HiddenGutenbergPlugin(view));
+            view.addPlugin(new CssUnderlinePlugin());
+            view.setImageGetter(new GlideImageLoader(view.getContext()));
+            view.setVideoThumbnailGetter(new GlideVideoThumbnailLoader(view.getContext()));
+            // we need to restart the editor now
+            String content = view.toHtml(false);
+            view.fromHtml(content, false);
+        }
     }
 
     @ReactProp(name = "onContentSizeChange", defaultBoolean = false)
