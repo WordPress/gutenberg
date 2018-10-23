@@ -348,7 +348,7 @@ class HierarchicalTermSelector extends Component {
 		const { availableTermsTree, availableTerms, filteredTermsTree, formName, formParent, loading, showForm, filterValue } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
-			[ 'data', 'labels', labelProperty ],
+			[ 'labels', labelProperty ],
 			slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory
 		);
 		const newTermButtonLabel = labelWithFallback(
