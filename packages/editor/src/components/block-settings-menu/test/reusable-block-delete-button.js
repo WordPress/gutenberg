@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import ShallowRenderer from 'react-test-renderer/shallow';
 import { noop } from 'lodash';
 
 /**
@@ -10,8 +10,14 @@ import { noop } from 'lodash';
 import { ReusableBlockDeleteButton } from '../reusable-block-delete-button';
 
 describe( 'ReusableBlockDeleteButton', () => {
+	function getShallowRenderOutput( element ) {
+		const renderer = new ShallowRenderer();
+		renderer.render( element );
+		return renderer.getRenderOutput();
+	}
+
 	it( 'matches the snapshot', () => {
-		const wrapper = shallow(
+		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
 				role="menuitem"
 				reusableBlock={ { id: 123 } }
@@ -24,14 +30,14 @@ describe( 'ReusableBlockDeleteButton', () => {
 
 	it( 'should allow deleting a reusable block', () => {
 		const onDelete = jest.fn();
-		const wrapper = shallow(
+		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
 				reusableBlock={ { id: 123 } }
 				onDelete={ onDelete }
 			/>
 		);
 
-		wrapper.find( 'MenuItem' ).simulate( 'click' );
+		wrapper.props.onClick();
 		expect( onDelete ).toHaveBeenCalledWith( 123 );
 	} );
 } );

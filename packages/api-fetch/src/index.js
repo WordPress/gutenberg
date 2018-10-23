@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
 import createPreloadingMiddleware from './middlewares/preloading';
+import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 
@@ -105,16 +106,19 @@ function apiFetch( options ) {
 
 	const steps = [
 		raw,
+		fetchAllMiddleware,
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
 		...middlewares,
-	];
-	const next = ( nextOptions ) => {
-		const nextMiddleware = steps.pop();
+	].reverse();
+
+	const runMiddleware = ( index ) => ( nextOptions ) => {
+		const nextMiddleware = steps[ index ];
+		const next = runMiddleware( index + 1 );
 		return nextMiddleware( nextOptions, next );
 	};
 
-	return next( options );
+	return runMiddleware( 0 )( options );
 }
 
 apiFetch.use = registerMiddleware;
@@ -122,5 +126,6 @@ apiFetch.use = registerMiddleware;
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;
+apiFetch.fetchAllMiddleware = fetchAllMiddleware;
 
 export default apiFetch;

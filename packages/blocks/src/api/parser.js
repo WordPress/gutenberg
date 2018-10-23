@@ -410,11 +410,16 @@ export function createBlockWithFallback( blockNode ) {
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
-	const originalUndelimitedContent = innerHTML = innerHTML.trim();
+	innerHTML = innerHTML.trim();
 
 	// Use type from block content if available. Otherwise, default to the
 	// freeform content fallback.
 	let name = originalName || freeformContentFallbackBlock;
+
+	// Convert 'core/cover-image' block in existing content to 'core/cover'.
+	if ( 'core/cover-image' === name ) {
+		name = 'core/cover';
+	}
 
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
@@ -432,6 +437,9 @@ export function createBlockWithFallback( blockNode ) {
 	let blockType = getBlockType( name );
 
 	if ( ! blockType ) {
+		// Preserve undelimited content for use by the unregistered type handler.
+		const originalUndelimitedContent = innerHTML;
+
 		// If detected as a block which is not registered, preserve comment
 		// delimiters in content of unregistered type handler.
 		if ( name ) {

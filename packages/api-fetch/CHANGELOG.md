@@ -1,3 +1,7 @@
+## 2.1.0 (2018-10-22)
+
+- Support `per_page=-1` paginated requests.
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change

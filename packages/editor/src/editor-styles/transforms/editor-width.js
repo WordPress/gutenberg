@@ -7,9 +7,9 @@ export const getEditorWidthRules = ( width ) => {
 	return {
 		type: 'rule',
 		selectors: [
-			'body.gutenberg-editor-page .editor-post-title__block',
-			'body.gutenberg-editor-page .editor-default-block-appender',
-			'body.gutenberg-editor-page .editor-block-list__block',
+			'body.block-editor-page .editor-post-title__block',
+			'body.block-editor-page .editor-default-block-appender',
+			'body.block-editor-page .editor-block-list__block',
 		],
 		declarations: [
 			{

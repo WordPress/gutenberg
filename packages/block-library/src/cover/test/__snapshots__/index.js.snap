@@ -1,8 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`core/cover-image block edit matches snapshot 1`] = `
+exports[`core/cover block edit matches snapshot 1`] = `
 <div
-  class="components-placeholder editor-media-placeholder wp-block-cover-image"
+  class="components-placeholder editor-media-placeholder wp-block-cover"
 >
   <div
     class="components-placeholder__label"
@@ -21,12 +21,12 @@ exports[`core/cover-image block edit matches snapshot 1`] = `
         d="M2.25 1h15.5c.69 0 1.25.56 1.25 1.25v15.5c0 .69-.56 1.25-1.25 1.25H2.25C1.56 19 1 18.44 1 17.75V2.25C1 1.56 1.56 1 2.25 1zM17 17V3H3v14h14zM10 6c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm3 5s0-6 3-6v10c0 .55-.45 1-1 1H5c-.55 0-1-.45-1-1V8c2 0 3 4 3 4s1-3 3-3 3 2 3 2z"
       />
     </svg>
-    Cover Image
+    Cover
   </div>
   <div
     class="components-placeholder__instructions"
   >
-    Drag an image, upload a new one or select a file from your library.
+    Drag an image or a video, upload a new one or select a file from your library.
   </div>
   <div
     class="components-placeholder__fieldset"
@@ -62,7 +62,7 @@ exports[`core/cover-image block edit matches snapshot 1`] = `
       class="components-form-file-upload"
     >
       <button
-        class="components-button components-icon-button editor-media-placeholder__upload-button is-button is-default is-large"
+        class="components-button components-icon-button editor-media-placeholder__button is-button is-default is-large"
         type="button"
       >
         <svg
@@ -82,7 +82,7 @@ exports[`core/cover-image block edit matches snapshot 1`] = `
         Upload
       </button>
       <input
-        accept="image/*"
+        accept="image/*,video/*"
         style="display:none"
         type="file"
       />
