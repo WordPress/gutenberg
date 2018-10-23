@@ -103,7 +103,7 @@ export const settings = {
 	category: 'common',
 
 	keywords: [
-		'img',
+		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
 		__( 'photo' ),
 	],
 
