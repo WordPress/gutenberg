@@ -3,11 +3,11 @@
  */
 import classnames from 'classnames';
 import { omit, pick } from 'lodash';
-import { SVG, Path } from '@wordpress/components';
 
 /**
  * WordPress dependencies
  */
+import { G, Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
@@ -65,7 +65,7 @@ export const settings = {
 
 	description: __( 'Want visitors to click to subscribe, buy, or read more? Get their attention with a button.' ),
 
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><g><Path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z" /></g></SVG>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z" /></G></SVG>,
 
 	category: 'layout',
 
