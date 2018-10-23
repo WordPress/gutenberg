@@ -127,6 +127,12 @@ export default class ClassicEdit extends Component {
 			},
 		} );
 
+		editor.on( 'init', function() {
+			if ( editor.settings.toolbar1 && editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1 ) {
+				editor.dom.addClass( ref, 'has-advanced-toolbar' );
+			}
+		} );
+
 		editor.addButton( 'wp_add_media', {
 			tooltip: __( 'Insert Media' ),
 			icon: 'dashicon dashicons-admin-media',
