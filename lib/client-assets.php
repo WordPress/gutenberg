@@ -773,7 +773,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_style(
 		'wp-block-library',
 		gutenberg_url( 'build/block-library/style.css' ),
-		current_theme_supports( 'wp-block-styles' ) ? array( 'wp-block-library-theme' ) : array(),
+		array(),
 		filemtime( gutenberg_dir_path() . 'build/block-library/style.css' )
 	);
 	wp_style_add_data( 'wp-block-library', 'rtl', 'replace' );
@@ -1100,6 +1100,9 @@ function gutenberg_common_scripts_and_styles() {
 
 	// Enqueue basic styles built out of Gutenberg through `npm build`.
 	wp_enqueue_style( 'wp-block-library' );
+	if ( current_theme_supports( 'wp-block-styles' ) ) {
+		wp_enqueue_style( 'wp-block-library-theme' );
+	}
 
 	/*
 	 * Enqueue block styles built through plugins.  This lives in a separate
