@@ -40,7 +40,7 @@
 		background: theme(primary);
 
 		&:hover {
-			background: theme(primary) shade(15%);
+			background: color(theme(primary) shade(15%));
 		}
 	}
 
