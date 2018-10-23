@@ -30,9 +30,11 @@ function Header( {
 	togglePublishSidebar,
 	hasActiveMetaboxes,
 	isSaving,
+	isPublished,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
+	const shouldShowButton = ( ! isPublishSidebarEnabled || isPublished );
 	return (
 		<div
 			role="region"
@@ -49,7 +51,7 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 					<PostPreviewButton />
-					{ ! isPublishSidebarEnabled ? (
+					{ shouldShowButton ? (
 						<PostPublishButton
 							forceIsDirty={ hasActiveMetaboxes }
 							forceIsSaving={ isSaving }
@@ -91,6 +93,7 @@ export default compose(
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
+		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
 	} ) ),
 	withDispatch( ( dispatch, { hasBlockSelection } ) => {
 		const { openGeneralSidebar, closeGeneralSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
