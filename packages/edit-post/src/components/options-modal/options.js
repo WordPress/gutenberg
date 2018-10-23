@@ -5,6 +5,7 @@ import { CheckboxControl } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { ifViewportMatches } from '@wordpress/viewport';
 
 function Option( { label, isChecked, onChange } ) {
 	return (
@@ -51,7 +52,8 @@ export const EnablePublishSidebarOption = compose(
 		return {
 			onChange: ( isEnabled ) => ( isEnabled ? enablePublishSidebar() : disablePublishSidebar() ),
 		};
-	} )
+	} ),
+	ifViewportMatches( 'medium' ),
 )( Option );
 
 export const EnableTipsOption = compose(
