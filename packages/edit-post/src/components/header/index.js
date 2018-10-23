@@ -1,4 +1,9 @@
 /**
+ * External Dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -29,17 +34,20 @@ function Header( {
 	isPublishSidebarEnabled,
 	togglePublishSidebar,
 	hasActiveMetaboxes,
+	hasPublishAction,
 	isSaving,
 	isPublished,
 	isScheduled,
 	isBeingScheduled,
+	isPending,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
 	const shouldShowButton = (
 		! isPublishSidebarEnabled ||
 		isPublished ||
-		( isScheduled && isBeingScheduled )
+		( isScheduled && isBeingScheduled ) ||
+		( isPending && ! hasPublishAction )
 	);
 	return (
 		<div
@@ -99,9 +107,11 @@ export default compose(
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
+		hasPublishAction: get( select( 'core/editor' ).getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
 		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
 		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
+		isPending: select( 'core/editor' ).isCurrentPostPending(),
 	} ) ),
 	withDispatch( ( dispatch, { hasBlockSelection } ) => {
 		const { openGeneralSidebar, closeGeneralSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
