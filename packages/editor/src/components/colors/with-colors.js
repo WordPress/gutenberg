@@ -18,21 +18,24 @@ import { getColorClassName, getColorObjectByColorValue, getColorObjectByAttribut
 const DEFAULT_COLORS = [];
 
 /**
- * Higher-order component, which handles color logic for class generation
+ * A Higher-order component builder, which handles color logic for class generation
  * color value, retrieval and color attribute setting.
  *
- * @param {...(object|string)} args The arguments can be strings or objects. If the argument is an object,
- *                                  it should contain the color attribute name as key and the color context as value.
- *                                  If the argument is a string the value should be the color attribute name,
- *                                  the color context is computed by applying a kebab case transform to the value.
- *                                  Color context represents the context/place where the color is going to be used.
- *                                  The class name of the color is generated using 'has' followed by the color name
- *                                  and ending with the color context all in kebab case e.g: has-green-background-color.
+ * @param {?Array}             colorsArray The array of color objects (name, slug, color, etc... ), if not passed,
+ *                                         the array is queried from the editor state to retrieve the colors array set by the theme,
+ *                                         if the colors array was not set by the theme the default colors are used.
+ * @param {...(object|string)} args        The arguments can be strings or objects. If the argument is an object,
+ *                                         it should contain the color attribute name as key and the color context as value.
+ *                                         If the argument is a string the value should be the color attribute name,
+ *                                         the color context is computed by applying a kebab case transform to the value.
+ *                                         Color context represents the context/place where the color is going to be used.
+ *                                         The class name of the color is generated using 'has' followed by the color name
+ *                                         and ending with the color context all in kebab case e.g: has-green-background-color.
  *
  *
  * @return {Function} Higher-order component.
  */
-export default ( ...args ) => {
+export const createCustomColorsHOC = ( colorsArray ) => ( ...args ) => {
 	const colorMap = reduce( args, ( colorObject, arg ) => {
 		return {
 			...colorObject,
@@ -43,6 +46,11 @@ export default ( ...args ) => {
 	return createHigherOrderComponent(
 		compose( [
 			withSelect( ( select ) => {
+				if ( colorsArray ) {
+					return {
+						colors: colorsArray,
+					};
+				}
 				const settings = select( 'core/editor' ).getEditorSettings();
 				return {
 					colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
@@ -132,3 +140,5 @@ export default ( ...args ) => {
 		'withColors'
 	);
 };
+
+export default createCustomColorsHOC();
