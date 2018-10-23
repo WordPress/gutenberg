@@ -34,6 +34,7 @@ import {
 	INITIAL_EDITS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
+import { getMutateSafeObject, merge, diff } from './object';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -99,23 +100,6 @@ function getFlattenedBlocks( blocks ) {
 	}
 
 	return flattenedBlocks;
-}
-
-/**
- * Returns an object against which it is safe to perform mutating operations,
- * given the original object and its current working copy.
- *
- * @param {Object} original Original object.
- * @param {Object} working  Working object.
- *
- * @return {Object} Mutation-safe object.
- */
-function getMutateSafeObject( original, working ) {
-	if ( original === working ) {
-		return { ...original };
-	}
-
-	return working;
 }
 
 /**
@@ -240,23 +224,7 @@ export const editor = flow( [
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-				const recurseEdits = ( edits, newState ) => {
-					return reduce( edits, ( result, value, key ) => {
-						// Only assign into result if not already same value
-						if ( value !== newState[ key ] ) {
-							result = getMutateSafeObject( state, result );
-
-							if ( typeof newState[ key ] === 'object' && ! Array.isArray( newState[ key ] ) ) {
-								result[ key ] = recurseEdits( value, newState[ key ] );
-							} else {
-								result[ key ] = value;
-							}
-						}
-						return result;
-					}, newState );
-				};
-
-				return recurseEdits( action.edits, state );
+				return merge( state, action.edits );
 
 			case 'RESET_BLOCKS':
 				if ( 'content' in state ) {
@@ -267,19 +235,14 @@ export const editor = flow( [
 
 			case 'UPDATE_POST':
 			case 'RESET_POST':
-				const getCanonicalValue = action.type === 'UPDATE_POST' ?
-					( key ) => action.edits[ key ] :
-					( key ) => getPostRawValue( action.post[ key ] );
+				let updates;
+				if ( action.type === 'UPDATE_POST' ) {
+					updates = action.edits;
+				} else {
+					updates = mapValues( action.post, getPostRawValue );
+				}
 
-				return reduce( state, ( result, value, key ) => {
-					if ( value !== getCanonicalValue( key ) ) {
-						return result;
-					}
-
-					result = getMutateSafeObject( state, result );
-					delete result[ key ];
-					return result;
-				}, state );
+				return diff( updates, state );
 		}
 
 		return state;

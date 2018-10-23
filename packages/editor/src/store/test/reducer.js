@@ -1040,6 +1040,119 @@ describe( 'state', () => {
 				} );
 			} );
 
+			it( 'should merge object values', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						meta: {
+							a: 1,
+						},
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'EDIT_POST',
+					edits: {
+						meta: {
+							b: 2,
+						},
+					},
+				} );
+
+				expect( state.present.edits ).toEqual( {
+					meta: {
+						a: 1,
+						b: 2,
+					},
+				} );
+			} );
+
+			it( 'return state by reference on unchanging update', () => {
+				const original = editor( undefined, {} );
+
+				const state = editor( original, {
+					type: 'UPDATE_POST',
+					edits: {},
+				} );
+
+				expect( state.present.edits ).toBe( original.present.edits );
+			} );
+
+			it( 'unset updated post values which match', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						title: 'modified title',
+						meta: {
+							a: 1,
+							b: 2,
+						},
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'UPDATE_POST',
+					edits: {
+						title: 'modified title',
+						meta: {
+							a: 1,
+						},
+					},
+				} );
+
+				expect( state.present.edits ).toEqual( {
+					meta: {
+						b: 2,
+					},
+				} );
+			} );
+
+			it( 'unset reset post values which match by canonical value', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						title: 'modified title',
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'RESET_POST',
+					post: {
+						title: {
+							raw: 'modified title',
+						},
+					},
+				} );
+
+				expect( state.present.edits ).toEqual( {} );
+			} );
+
+			it( 'unset top-level key of empty object value', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						title: 'modified title',
+						meta: {
+							a: 1,
+							b: 2,
+						},
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'UPDATE_POST',
+					edits: {
+						title: 'modified title',
+						meta: {
+							a: 1,
+							b: 2,
+						},
+					},
+				} );
+
+				expect( state.present.edits ).toEqual( {} );
+			} );
+
 			it( 'should omit content when resetting', () => {
 				// Use case: When editing in Text mode, we defer to content on
 				// the property, but we reset blocks by parse when switching
