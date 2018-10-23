@@ -104,6 +104,7 @@ class MediaTextEdit extends Component {
 			attributes,
 			className,
 			backgroundColor,
+			isSelected,
 			setAttributes,
 			setBackgroundColor,
 		} = this.props;
@@ -111,6 +112,7 @@ class MediaTextEdit extends Component {
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
+			'is-selected': isSelected,
 			[ backgroundColor.class ]: backgroundColor.class,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
