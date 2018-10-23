@@ -54,6 +54,13 @@ export function registerFormatType( settings ) {
 		return;
 	}
 
+	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
+		window.console.error(
+			'The format "' + settings.name + '" can have a maximum of 3 keywords.'
+		);
+		return;
+	}
+
 	if ( typeof settings.title !== 'string' ) {
 		window.console.error(
 			'Format titles must be strings.'

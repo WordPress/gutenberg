@@ -72,7 +72,7 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
-						className={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
+						containerClassName={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
 						{ ...control }
 					/>
 				) )

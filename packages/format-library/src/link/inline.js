@@ -11,14 +11,14 @@ import {
 	withSpokenMessages,
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { prependHTTP, safeDecodeURI } from '@wordpress/url';
+import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
 	insert,
 	isCollapsed,
 	applyFormat,
 } from '@wordpress/rich-text';
-import { URLInput, filterURLForDisplay, URLPopover } from '@wordpress/editor';
+import { URLInput, URLPopover } from '@wordpress/editor';
 
 /**
  * Internal dependencies

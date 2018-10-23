@@ -13,6 +13,7 @@ const name = 'core/image';
 export const image = {
 	name,
 	title: __( 'Image' ),
+	keywords: [ __( 'photo' ), __( 'media' ) ],
 	object: true,
 	match: {
 		tagName: 'img',

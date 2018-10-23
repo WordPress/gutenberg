@@ -9,7 +9,14 @@ import { rawShortcut } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { InserterListItem } from '../inserter-list-item';
+import InserterListItem from '../inserter-list-item';
+import { normalizeTerm } from '../inserter/menu';
+
+function isResult( { title, keywords = [] }, filterValue ) {
+	const normalizedSearchTerm = normalizeTerm( filterValue );
+	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
+	return matchSearch( title ) || keywords.some( matchSearch );
+}
 
 function FillToolbarButton( { name, ...props } ) {
 	return (
@@ -22,7 +29,13 @@ function FillToolbarButton( { name, ...props } ) {
 function FillInserterListItem( props ) {
 	return (
 		<Fill name="Inserter.InlineElements">
-			<InserterListItem { ...props } />
+			{ ( { filterValue } ) => {
+				if ( filterValue && ! isResult( props, filterValue ) ) {
+					return null;
+				}
+
+				return <InserterListItem { ...props } />;
+			} }
 		</Fill>
 	);
 }
@@ -56,7 +69,7 @@ class Shortcut extends Component {
 const FormatEdit = ( { onChange, value } ) => {
 	return (
 		<Fragment>
-			{ getFormatTypes().map( ( { name, edit: Edit }, i ) => {
+			{ getFormatTypes().map( ( { name, edit: Edit, keywords }, i ) => {
 				if ( ! Edit ) {
 					return null;
 				}
@@ -73,7 +86,12 @@ const FormatEdit = ( { onChange, value } ) => {
 						value={ value }
 						onChange={ onChange }
 						ToolbarButton={ FillToolbarButton }
-						InserterListItem={ FillInserterListItem }
+						InserterListItem={ ( props ) =>
+							<FillInserterListItem
+								keywords={ keywords }
+								{ ...props }
+							/>
+						}
 						Shortcut={ Shortcut }
 					/>
 				);
