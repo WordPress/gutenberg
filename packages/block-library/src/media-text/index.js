@@ -29,7 +29,7 @@ export const settings = {
 
 	category: 'layout',
 
-	keywords: [ __( 'image' ), __( 'video' ), __( 'half' ) ],
+	keywords: [ __( 'image' ), __( 'video' ) ],
 
 	attributes: {
 		align: {
