@@ -293,7 +293,6 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-compose',
-			'wp-deprecated',
 			'wp-element',
 			'wp-is-shallow-equal',
 			'wp-polyfill',
@@ -455,7 +454,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-blob',
 			'wp-block-serialization-default-parser',
 			'wp-data',
-			'wp-deprecated',
 			'wp-dom',
 			'wp-element',
 			'wp-hooks',
