@@ -36,6 +36,7 @@ import {
 	getBlocks,
 	getBlocksByClientId,
 } from '../selectors';
+import { getPostRawValue } from '../reducer';
 
 /**
  * Module Constants
@@ -61,26 +62,25 @@ export const fetchReusableBlocks = async ( action, store ) => {
 
 	let result;
 	if ( id ) {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` } );
 	} else {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1&context=edit` } );
 	}
 
 	try {
 		const reusableBlockOrBlocks = await result;
 		dispatch( receiveReusableBlocksAction( map(
 			castArray( reusableBlockOrBlocks ),
-			( reusableBlock ) => {
-				const parsedBlocks = parse( reusableBlock.content );
-				if ( parsedBlocks.length === 1 ) {
-					return {
-						reusableBlock,
-						parsedBlock: parsedBlocks[ 0 ],
-					};
-				}
+			( post ) => {
+				const parsedBlocks = parse( post.content.raw );
 				return {
-					reusableBlock,
-					parsedBlock: createBlock( 'core/template', {}, parsedBlocks ),
+					reusableBlock: {
+						id: post.id,
+						title: getPostRawValue( post.title ),
+					},
+					parsedBlock: parsedBlocks.length === 1 ?
+						parsedBlocks[ 0 ] :
+						createBlock( 'core/template', {}, parsedBlocks ),
 				};
 			}
 		) ) );
@@ -119,7 +119,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 	const reusableBlock = getBlock( state, clientId );
 	const content = serialize( reusableBlock.name === 'core/template' ? reusableBlock.innerBlocks : reusableBlock );
 
-	const data = isTemporary ? { title, content } : { id, title, content };
+	const data = isTemporary ? { title, content, status: 'publish' } : { id, title, content, status: 'publish' };
 	const path = isTemporary ? `/wp/v2/${ postType.rest_base }` : `/wp/v2/${ postType.rest_base }/${ id }`;
 	const method = isTemporary ? 'POST' : 'PUT';
 
@@ -184,7 +184,10 @@ export const deleteReusableBlocks = async ( action, store ) => {
 	] ) );
 
 	try {
-		await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }`, method: 'DELETE' } );
+		await apiFetch( {
+			path: `/wp/v2/${ postType.rest_base }/${ id }`,
+			method: 'DELETE',
+		} );
 		dispatch( {
 			type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
 			id,

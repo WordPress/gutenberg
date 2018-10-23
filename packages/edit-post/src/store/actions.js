@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { reduce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -172,51 +167,38 @@ export function togglePinnedPluginItem( pluginName ) {
 	};
 }
 
-/**
- * Returns an action object used to check the state of meta boxes at a location.
- *
- * This should only be fired once to initialize meta box state. If a meta box
- * area is empty, this will set the store state to indicate that React should
- * not render the meta box area.
- *
- * Example: metaBoxes = { side: true, normal: false }.
- *
- * This indicates that the sidebar has a meta box but the normal area does not.
- *
- * @param {Object} metaBoxes Whether meta box locations are active.
- *
- * @return {Object} Action object.
- */
-export function initializeMetaBoxState( metaBoxes ) {
+export function initializeMetaBoxState() {
 	deprecated( 'initializeMetaBoxState action (`core/edit-post`)', {
-		alternative: 'setActiveMetaBoxLocations',
 		plugin: 'Gutenberg',
 		version: '4.2',
 	} );
+	return {
+		type: 'DO_NOTHING',
+	};
+}
 
-	const locations = reduce( metaBoxes, ( result, isActive, location ) => {
-		if ( isActive ) {
-			result = result.concat( location );
-		}
-
-		return result;
-	}, [] );
-
-	return setActiveMetaBoxLocations( locations );
+export function setActiveMetaBoxLocations() {
+	deprecated( 'setActiveMetaBoxLocations action (`core/edit-post`)', {
+		plugin: 'Gutenberg',
+		version: '4.2',
+	} );
+	return {
+		type: 'DO_NOTHING',
+	};
 }
 
 /**
- * Returns an action object used in signaling that the active meta box
- * locations have changed.
+ * Returns an action object used in signaling
+ * what Meta boxes are available in which location.
  *
- * @param {string[]} locations New active meta box locations.
+ * @param {Object} metaBoxesPerLocation Meta boxes per location.
  *
  * @return {Object} Action object.
  */
-export function setActiveMetaBoxLocations( locations ) {
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	return {
-		type: 'SET_ACTIVE_META_BOX_LOCATIONS',
-		locations,
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
 	};
 }
 

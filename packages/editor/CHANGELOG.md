@@ -1,4 +1,6 @@
-## 5.0.0 (Unreleased)
+## 5.0.1 (2018-10-22)
+
+## 5.0.0 (2018-10-19)
 
 ### Breaking Changes
 
@@ -7,6 +9,12 @@
 ### Deprecations
 
 - `wp.editor.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
+
+### New Features
+
+- Added `onClose` prop to `URLPopover` component.
+
+## 4.0.3 (2018-10-18)
 
 ## 4.0.0 (2018-09-30)
 

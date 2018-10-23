@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 4.0.0
+ * Version: 4.1.0-rc.2
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -21,14 +21,16 @@ gutenberg_pre_init();
  * The main entry point for the Gutenberg editor. Renders the editor on the
  * wp-admin page for the plugin.
  *
+ * The gutenberg and gutenberg__editor classNames are left for backward compatibility.
+ *
  * @since 0.1.0
  */
 function the_gutenberg_project() {
 	global $post_type_object;
 	?>
-	<div class="gutenberg">
+	<div class="block-editor gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
-		<div id="editor" class="gutenberg__editor"></div>
+		<div id="editor" class="block-editor__container gutenberg__editor"></div>
 		<div id="metaboxes" style="display: none;">
 			<?php the_gutenberg_metaboxes(); ?>
 		</div>
@@ -264,8 +266,15 @@ function gutenberg_add_edit_link( $actions, $post ) {
 	$title = _draft_or_post_title( $post->ID );
 
 	if ( 'wp_block' === $post->post_type ) {
-		unset( $actions['edit'] );
 		unset( $actions['inline hide-if-no-js'] );
+
+		// Export uses block raw content, which is only returned from the post
+		// REST endpoint via `context=edit`, requiring edit capability.
+		$post_type = get_post_type_object( $post->post_type );
+		if ( ! current_user_can( $post_type->cap->edit_post, $post->ID ) ) {
+			return $actions;
+		}
+
 		$actions['export'] = sprintf(
 			'<button type="button" class="wp-list-reusable-blocks__export button-link" data-id="%s" aria-label="%s">%s</button>',
 			$post->ID,
@@ -476,19 +485,20 @@ function gutenberg_replace_default_add_new_button() {
 add_action( 'admin_print_scripts-edit.php', 'gutenberg_replace_default_add_new_button' );
 
 /**
- * Adds the gutenberg-editor-page class to the body tag on the Gutenberg page.
+ * Adds the block-editor-page class to the body tag on the Gutenberg page.
  *
  * @since 1.5.0
  *
  * @param string $classes Space separated string of classes being added to the body tag.
- * @return string The $classes string, with gutenberg-editor-page appended.
+ * @return string The $classes string, with block-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
+	// gutenberg-editor-page is left for backward compatibility.
 	if ( current_theme_supports( 'editor-styles' ) && current_theme_supports( 'dark-editor-style' ) ) {
-		return "$classes gutenberg-editor-page is-fullscreen-mode is-dark-theme";
+		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive is-dark-theme";
 	} else {
 		// Default to is-fullscreen-mode to avoid jumps in the UI.
-		return "$classes gutenberg-editor-page is-fullscreen-mode";
+		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive";
 	}
 }
 
@@ -508,3 +518,21 @@ function gutenberg_kses_allowedtags( $tags ) {
 }
 
 add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );
+
+/**
+ * Adds the wp-embed-responsive class to the body tag if the theme has opted in to
+ * Gutenberg responsive embeds.
+ *
+ * @since 4.1.0
+ *
+ * @param Array $classes Array of classes being added to the body tag.
+ * @return Array The $classes array, with wp-embed-responsive appended.
+ */
+function gutenberg_add_responsive_body_class( $classes ) {
+	if ( current_theme_supports( 'responsive-embeds' ) ) {
+		$classes[] = 'wp-embed-responsive';
+	}
+	return $classes;
+}
+
+add_filter( 'body_class', 'gutenberg_add_responsive_body_class' );

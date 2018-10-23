@@ -307,8 +307,7 @@ export async function pressWithModifier( modifiers, key ) {
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
 	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
-	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
-	await itemButton.click( 'button' );
+	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
 }
 
 /**

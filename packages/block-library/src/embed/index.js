@@ -59,10 +59,10 @@ export function getEmbedEdit( title, icon ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
-
 			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 			this.setUrl = this.setUrl.bind( this );
 			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
+			this.getAttributesFromPreview = this.getAttributesFromPreview.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
 			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
@@ -91,7 +91,7 @@ export function getEmbedEdit( title, icon ) {
 			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
 			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
 
-			if ( switchedURL && this.maybeSwitchBlock() ) {
+			if ( ( switchedURL || ( hasPreview && ! hadPreview ) ) && this.maybeSwitchBlock() ) {
 				return;
 			}
 
@@ -154,7 +154,24 @@ export function getEmbedEdit( title, icon ) {
 				if ( includes( html, 'class="wp-embedded-content" data-secret' ) ) {
 					// If this is not the WordPress embed block, transform it into one.
 					if ( this.props.name !== 'core-embed/wordpress' ) {
-						this.props.onReplace( createBlock( 'core-embed/wordpress', { url } ) );
+						this.props.onReplace(
+							createBlock(
+								'core-embed/wordpress',
+								{
+									url,
+									// By now we have the preview, but when the new block first renders, it
+									// won't have had all the attributes set, and so won't get the correct
+									// type and it won't render correctly. So, we work out the attributes
+									// here so that the initial render works when we switch to the WordPress
+									// block. This only affects the WordPress block because it can't be
+									// rendered in the usual Sandbox (it has a sandbox of its own) and it
+									// relies on the preview to set the correct render type.
+									...this.getAttributesFromPreview(
+										this.props.preview, this.props.attributes.allowResponsive
+									),
+								}
+							)
+						);
 						return true;
 					}
 				}
@@ -189,6 +206,8 @@ export function getEmbedEdit( title, icon ) {
 					}
 				}
 			}
+
+			return this.props.attributes.className;
 		}
 
 		/**
@@ -210,11 +229,14 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		/***
-		 * Sets block attributes based on the preview data.
+		 * Gets block attributes based on the preview and responsive state.
+		 *
+		 * @param {string} preview The preview data.
+		 * @param {boolean} allowResponsive Apply responsive classes to fixed size content.
+		 * @return {Object} Attributes and values.
 		 */
-		setAttributesFromPreview() {
-			const { setAttributes, preview } = this.props;
-
+		getAttributesFromPreview( preview, allowResponsive = true ) {
+			const attributes = {};
 			// Some plugins only return HTML with no type info, so default this to 'rich'.
 			let { type = 'rich' } = preview;
 			// If we got a provider name from the API, use it for the slug, otherwise we use the title,
@@ -227,10 +249,25 @@ export function getEmbedEdit( title, icon ) {
 			}
 
 			if ( html || 'photo' === type ) {
-				setAttributes( { type, providerNameSlug } );
+				attributes.type = type;
+				attributes.providerNameSlug = providerNameSlug;
 			}
 
-			this.setAspectRatioClassNames( html );
+			attributes.className = classnames(
+				this.props.attributes.className,
+				this.getAspectRatioClassNames( html, allowResponsive )
+			);
+
+			return attributes;
+		}
+
+		/***
+		 * Sets block attributes based on the preview data.
+		 */
+		setAttributesFromPreview() {
+			const { setAttributes, preview } = this.props;
+			const { allowResponsive } = this.props.attributes;
+			setAttributes( this.getAttributesFromPreview( preview, allowResponsive ) );
 		}
 
 		switchBackToURLInput() {
@@ -257,7 +294,7 @@ export function getEmbedEdit( title, icon ) {
 		render() {
 			const { url, editingURL } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
-			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed } = this.props;
+			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, supportsResponsive } = this.props;
 			const controls = (
 				<Fragment>
 					<BlockControls>
@@ -272,16 +309,18 @@ export function getEmbedEdit( title, icon ) {
 							) }
 						</Toolbar>
 					</BlockControls>
-					<InspectorControls>
-						<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
-							<ToggleControl
-								label={ __( 'Automatically scale content' ) }
-								checked={ allowResponsive }
-								help={ this.getResponsiveHelp }
-								onChange={ this.toggleResponsive }
-							/>
-						</PanelBody>
-					</InspectorControls>
+					{ supportsResponsive && (
+						<InspectorControls>
+							<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
+								<ToggleControl
+									label={ __( 'Automatically scale content' ) }
+									checked={ allowResponsive }
+									help={ this.getResponsiveHelp }
+									onChange={ this.toggleResponsive }
+								/>
+							</PanelBody>
+						</InspectorControls>
+					) }
 				</Fragment>
 			);
 
@@ -408,10 +447,11 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 			withSelect( ( select, ownProps ) => {
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
-				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview } = core;
+				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview, getThemeSupports } = core;
 				const preview = undefined !== url && getEmbedPreview( url );
 				const previewIsFallback = undefined !== url && isPreviewEmbedFallback( url );
 				const fetching = undefined !== url && isRequestingEmbedPreview( url );
+				const themeSupports = getThemeSupports();
 				// The external oEmbed provider does not exist. We got no type info and no html.
 				const badEmbedProvider = !! preview && undefined === preview.type && false === preview.html;
 				// Some WordPress URLs that can't be embedded will cause the API to return
@@ -423,6 +463,7 @@ function getEmbedBlockSettings( { title, description, icon, category = 'embed', 
 				return {
 					preview: validPreview ? preview : undefined,
 					fetching,
+					supportsResponsive: themeSupports[ 'responsive-embeds' ],
 					cannotEmbed,
 				};
 			} )
