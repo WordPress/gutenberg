@@ -109,6 +109,12 @@ export class RichText extends Component {
 			after = this.valueToFormat( after );
 		}
 
+		// The onSplit event can cause a content update event for this block.  Such event should
+		// definitely be processed by our native components, since they have no knowledge of
+		// how the split works.  Setting lastEventCount to undefined forces the native component to
+		// always update when provided with new content.
+		this.lastEventCount = undefined;
+
 		onSplit( before, after );
 	}
 
