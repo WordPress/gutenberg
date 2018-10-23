@@ -13,7 +13,6 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Path, SVG } from '../primitives';
 
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
@@ -899,7 +898,7 @@ export default class Dashicon extends Component {
 		const iconClass = [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
 
 		return (
-			<SVG
+			<svg
 				aria-hidden
 				role="img"
 				focusable="false"
@@ -909,8 +908,8 @@ export default class Dashicon extends Component {
 				height={ size }
 				viewBox="0 0 20 20"
 			>
-				<Path d={ path } />
-			</SVG>
+				<path d={ path } />
+			</svg>
 		);
 	}
 }
