@@ -8,6 +8,7 @@ import { DEFAULT_EMBED_BLOCK } from './constants';
  * External dependencies
  */
 import { includes } from 'lodash';
+import { renderToString } from '@wordpress/element';
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -40,4 +41,11 @@ export const findBlock = ( url ) => {
 
 export const isFromWordPress = ( html ) => {
 	return includes( html, 'class="wp-embedded-content" data-secret' );
+};
+
+export const getPhotoHtml = ( photo ) => {
+	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
+	// acually the full size photo.
+	const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
+	return renderToString( photoPreview );
 };

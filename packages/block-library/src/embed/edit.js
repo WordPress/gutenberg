@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import { findBlock, isFromWordPress } from './util';
-import { HOSTS_NO_PREVIEWS, ASPECT_RATIOS, DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
+import { ASPECT_RATIOS, DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
+import { EmbedLoading, EmbedControls, EmbedPreview, EmbedEditUrl } from './components';
+
 /**
  * External dependencies
  */
-import { parse } from 'url';
-import { includes, kebabCase, toLower } from 'lodash';
+import { kebabCase, toLower } from 'lodash';
 import classnames from 'classnames/dedupe';
 
 /**
@@ -15,18 +16,7 @@ import classnames from 'classnames/dedupe';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, renderToString, Fragment } from '@wordpress/element';
-import {
-	Button,
-	Placeholder,
-	Spinner,
-	SandBox,
-	IconButton,
-	Toolbar,
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
-import { RichText, BlockControls, BlockIcon, InspectorControls } from '@wordpress/editor';
 
 export function getEmbedEditComponent( title, icon ) {
 	return class extends Component {
@@ -270,41 +260,10 @@ export function getEmbedEditComponent( title, icon ) {
 			const { url, editingURL } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
 			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, supportsResponsive } = this.props;
-			const controls = (
-				<Fragment>
-					<BlockControls>
-						<Toolbar>
-							{ preview && ! cannotEmbed && (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit URL' ) }
-									icon="edit"
-									onClick={ this.switchBackToURLInput }
-								/>
-							) }
-						</Toolbar>
-					</BlockControls>
-					{ supportsResponsive && (
-						<InspectorControls>
-							<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
-								<ToggleControl
-									label={ __( 'Automatically scale content' ) }
-									checked={ allowResponsive }
-									help={ this.getResponsiveHelp }
-									onChange={ this.toggleResponsive }
-								/>
-							</PanelBody>
-						</InspectorControls>
-					) }
-				</Fragment>
-			);
 
 			if ( fetching ) {
 				return (
-					<div className="wp-block-embed is-loading">
-						<Spinner />
-						<p>{ __( 'Embedding…' ) }</p>
-					</div>
+					<EmbedLoading />
 				);
 			}
 
@@ -314,68 +273,39 @@ export function getEmbedEditComponent( title, icon ) {
 			// No preview, or we can't embed the current URL, or we've clicked the edit button.
 			if ( ! preview || cannotEmbed || editingURL ) {
 				return (
-					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
-						<form onSubmit={ this.setUrl }>
-							<input
-								type="url"
-								value={ url || '' }
-								className="components-placeholder__input"
-								aria-label={ label }
-								placeholder={ __( 'Enter URL to embed here…' ) }
-								onChange={ ( event ) => this.setState( { url: event.target.value } ) } />
-							<Button
-								isLarge
-								type="submit">
-								{ __( 'Embed' ) }
-							</Button>
-							{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
-						</form>
-					</Placeholder>
+					<EmbedEditUrl
+						icon={ icon }
+						label={ label }
+						onSubmit={ this.setUrl }
+						value={ url }
+						cannotEmbed={ cannotEmbed }
+						onChange={ ( event ) => this.setState( { url: event.target.value } ) }
+					/>
 				);
 			}
 
-			const html = 'photo' === type ? this.getPhotoHtml( preview ) : preview.html;
-			const { scripts } = preview;
-			const parsedUrl = parse( url );
-			const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
-			// translators: %s: host providing embed content e.g: www.youtube.com
-			const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
-			const sandboxClassnames = classnames( type, className );
-			const embedWrapper = 'wp-embed' === type ? (
-				<div
-					className="wp-block-embed__wrapper"
-					dangerouslySetInnerHTML={ { __html: html } }
-				/>
-			) : (
-				<div className="wp-block-embed__wrapper">
-					<SandBox
-						html={ html }
-						scripts={ scripts }
-						title={ iframeTitle }
-						type={ sandboxClassnames }
-					/>
-				</div>
-			);
-
 			return (
-				<figure className={ classnames( className, 'wp-block-embed', { 'is-type-video': 'video' === type } ) }>
-					{ controls }
-					{ ( cannotPreview ) ? (
-						<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
-							<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-							<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
-						</Placeholder>
-					) : embedWrapper }
-					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-						<RichText
-							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
-							value={ caption }
-							onChange={ ( value ) => setAttributes( { caption: value } ) }
-							inlineToolbar
-						/>
-					) }
-				</figure>
+				<Fragment>
+					<EmbedControls
+						showEditButton={ preview && ! cannotEmbed }
+						supportsResponsive={ supportsResponsive }
+						allowResponsive={ allowResponsive }
+						getResponsiveHelp={ this.getResponsiveHelp }
+						toggleResponsive={ this.toggleResponsive }
+						switchBackToURLInput={ this.switchBackToURLInput }
+					/>
+					<EmbedPreview
+						preview={ preview }
+						className={ className }
+						url={ url }
+						type={ type }
+						caption={ caption }
+						onCaptionChange={ ( value ) => setAttributes( { caption: value } ) }
+						isSelected={ isSelected }
+						icon={ icon }
+						label={ label }
+					/>
+				</Fragment>
 			);
 		}
 	};
