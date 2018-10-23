@@ -46,7 +46,7 @@ function Header( {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
 	const shouldShowButton = (
-		! isPublishSidebarEnabled ||
+		( ! isPublishSidebarEnabled && ! isSmallViewport ) ||
 		isPublished ||
 		( isScheduled && isBeingScheduled ) ||
 		( isPending && ! hasPublishAction && ! isSmallViewport )
