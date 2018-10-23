@@ -1,22 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { addQueryArgs } from '@wordpress/url';
+import { addQueryArgs, hasQueryArg } from '@wordpress/url';
 
 function userLocaleMiddleware( options, next ) {
-	if (
-		typeof options.url === 'string' &&
-		-1 === options.url.indexOf( '?_locale=' ) &&
-		-1 === options.url.indexOf( '&_locale=' )
-	) {
+	if ( typeof options.url === 'string' && ! hasQueryArg( options.url, '_locale' ) ) {
 		options.url = addQueryArgs( options.url, { _locale: 'user' } );
 	}
 
-	if (
-		typeof options.path === 'string' &&
-		-1 === options.path.indexOf( '?_locale=' ) &&
-		-1 === options.path.indexOf( '&_locale=' )
-	) {
+	if ( typeof options.path === 'string' && ! hasQueryArg( options.path, '_locale' ) ) {
 		options.path = addQueryArgs( options.path, { _locale: 'user' } );
 	}
 
