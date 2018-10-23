@@ -102,7 +102,10 @@ export const settings = {
 
 	category: 'common',
 
-	keywords: [ __( 'photo' ) ],
+	keywords: [
+		'img',
+		__( 'photo' ),
+	],
 
 	attributes: blockAttributes,
 
