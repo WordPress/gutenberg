@@ -110,12 +110,13 @@ class CategoriesEdit extends Component {
 		const { showHierarchy, instanceId, className } = this.props;
 		const parentId = showHierarchy ? 0 : null;
 		const categories = this.getCategories( parentId );
+		const selectId = `${ className }-${ instanceId }`;
 		return (
 			<Fragment>
-				<label htmlFor={ `${ className }-${ instanceId }` } className="screen-reader-text">
+				<label htmlFor={ selectId } className="screen-reader-text">
 					{ __( 'Categories' ) }
 				</label>
-				<select id={ `${ className }-${ instanceId }` } className={ `${ className }__dropdown` }>
+				<select id={ selectId } className={ `${ className }__dropdown` }>
 					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
 				</select>
 			</Fragment>
