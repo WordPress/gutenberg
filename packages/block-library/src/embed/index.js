@@ -275,7 +275,7 @@ export function getEmbedEdit( title, icon ) {
 		}
 
 		getResponsiveHelp( checked ) {
-			return checked ? __( 'Videos and other content is sized to avoid letterboxing.' ) : __( 'Videos and other embeds are not resized and may be letterboxed.' );
+			return checked ? __( 'This embed will preserve its aspect ratio when the browser is resized.' ) : __( 'This embed may not preserve its aspect ratio when the browser is resized.' );
 		}
 
 		toggleResponsive() {
@@ -313,7 +313,7 @@ export function getEmbedEdit( title, icon ) {
 						<InspectorControls>
 							<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
 								<ToggleControl
-									label={ __( 'Automatically scale content' ) }
+									label={ __( 'Resize for smaller devices' ) }
 									checked={ allowResponsive }
 									help={ this.getResponsiveHelp }
 									onChange={ this.toggleResponsive }
