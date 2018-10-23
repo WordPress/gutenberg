@@ -14,6 +14,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { SVG } from '../primitives';
+import { Path } from 'react-native-svg';
 
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
@@ -900,7 +901,7 @@ export default class Dashicon extends Component {
 				height={ size }
 				viewBox="0 0 20 20"
 			>
-				<path d={ path } />
+				<Path d={ path } />
 			</SVG>
 		);
 	}

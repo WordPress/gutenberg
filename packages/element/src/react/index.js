@@ -6,7 +6,6 @@ import {
 	cloneElement,
 	Component,
 	createContext,
-	createElement,
 	createRef,
 	forwardRef,
 	Fragment,
@@ -14,6 +13,11 @@ import {
 	StrictMode,
 } from 'react';
 import { isString } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import createElement from './create-element';
 
 export { Children };
 
@@ -47,7 +51,7 @@ export { createContext };
  *
  * @param {?(string|Function)} type     Tag name or element creator
  * @param {Object}             props    Element properties, either attribute
- *                                       set to apply to DOM node or values to
+ *                                       set to apply to node or values to
  *                                       pass through to element creator
  * @param {...WPElement}       children Descendant elements
  *
