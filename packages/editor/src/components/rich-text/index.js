@@ -23,7 +23,6 @@ import {
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
-import { Slot } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -914,8 +913,7 @@ export class RichText extends Component {
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 								</Tagname>
 							}
-							{ isSelected && <Slot name="RichText.Siblings" /> }
-							{ isSelected && this.editor && <FormatEdit editor={ this.editor } value={ record } onChange={ this.onChange } /> }
+							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
 						</Fragment>
 					) }
 				</Autocomplete>

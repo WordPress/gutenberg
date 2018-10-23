@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
 	ExternalLink,
-	Fill,
 	IconButton,
 	ToggleControl,
 	withSpokenMessages,
@@ -204,38 +203,36 @@ class InlineLinkUI extends Component {
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
-			<Fill name="RichText.Siblings">
-				<PositionedAtSelection
-					key={ `${ value.start }${ value.end }` /* Used to force rerender on selection change */ }
+			<PositionedAtSelection
+				key={ `${ value.start }${ value.end }` /* Used to force rerender on selection change */ }
+			>
+				<URLPopover
+					onClickOutside={ this.onClickOutside }
+					focusOnMount={ showInput ? 'firstElement' : false }
+					renderSettings={ () => (
+						<ToggleControl
+							label={ __( 'Open in New Tab' ) }
+							checked={ opensInNewWindow }
+							onChange={ this.setLinkTarget }
+						/>
+					) }
 				>
-					<URLPopover
-						onClickOutside={ this.onClickOutside }
-						focusOnMount={ showInput ? 'firstElement' : false }
-						renderSettings={ () => (
-							<ToggleControl
-								label={ __( 'Open in New Tab' ) }
-								checked={ opensInNewWindow }
-								onChange={ this.setLinkTarget }
-							/>
-						) }
-					>
-						{ showInput ? (
-							<LinkEditor
-								value={ inputValue }
-								onChangeInputValue={ this.onChangeInputValue }
-								onKeyDown={ this.onKeyDown }
-								submitLink={ this.submitLink }
-								autocompleteRef={ this.autocompleteRef }
-							/>
-						) : (
-							<LinkViewer
-								url={ url }
-								editLink={ this.editLink }
-							/>
-						) }
-					</URLPopover>
-				</PositionedAtSelection>
-			</Fill>
+					{ showInput ? (
+						<LinkEditor
+							value={ inputValue }
+							onChangeInputValue={ this.onChangeInputValue }
+							onKeyDown={ this.onKeyDown }
+							submitLink={ this.submitLink }
+							autocompleteRef={ this.autocompleteRef }
+						/>
+					) : (
+						<LinkViewer
+							url={ url }
+							editLink={ this.editLink }
+						/>
+					) }
+				</URLPopover>
+			</PositionedAtSelection>
 		);
 	}
 }
