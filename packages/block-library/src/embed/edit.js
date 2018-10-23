@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { findBlock, isFromWordPress } from './util';
-import { ASPECT_RATIOS, DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
+import { isFromWordPress, createUpgradedEmbedBlock } from './util';
+import { ASPECT_RATIOS } from './constants';
 import { EmbedLoading, EmbedControls, EmbedPreview, EmbedEditUrl } from './components';
 
 /**
@@ -15,8 +15,7 @@ import classnames from 'classnames/dedupe';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, renderToString, Fragment } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { Component, Fragment } from '@wordpress/element';
 
 export function getEmbedEditComponent( title, icon ) {
 	return class extends Component {
@@ -24,10 +23,8 @@ export function getEmbedEditComponent( title, icon ) {
 			super( ...arguments );
 			this.switchBackToURLInput = this.switchBackToURLInput.bind( this );
 			this.setUrl = this.setUrl.bind( this );
-			this.maybeSwitchBlock = this.maybeSwitchBlock.bind( this );
 			this.getAttributesFromPreview = this.getAttributesFromPreview.bind( this );
 			this.setAttributesFromPreview = this.setAttributesFromPreview.bind( this );
-			this.setAspectRatioClassNames = this.setAspectRatioClassNames.bind( this );
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
 			this.handleIncomingPreview = this.handleIncomingPreview.bind( this );
@@ -43,8 +40,15 @@ export function getEmbedEditComponent( title, icon ) {
 		}
 
 		handleIncomingPreview() {
+			const { allowResponsive } = this.props.attributes;
 			this.setAttributesFromPreview();
-			this.maybeSwitchBlock();
+			const upgradedBlock = createUpgradedEmbedBlock(
+				this.props,
+				this.getAttributesFromPreview( this.props.preview, allowResponsive )
+			);
+			if ( upgradedBlock ) {
+				this.props.onReplace( upgradedBlock );
+			}
 		}
 
 		componentDidUpdate( prevProps ) {
@@ -53,13 +57,7 @@ export function getEmbedEditComponent( title, icon ) {
 			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
 			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
 
-			if ( ( switchedURL || ( hasPreview && ! hadPreview ) ) && this.maybeSwitchBlock() ) {
-				// Dont do anything if we are going to switch to a different block,
-				// and we've just changed the URL, or we've just received a preview.
-				return;
-			}
-
-			if ( ( hasPreview && ! hadPreview ) || switchedPreview ) {
+			if ( ( hasPreview && ! hadPreview ) || switchedPreview || switchedURL ) {
 				if ( this.props.cannotEmbed ) {
 					// Can't embed this URL, and we've just received or switched the preview.
 					this.setState( { editingURL: true } );
@@ -67,13 +65,6 @@ export function getEmbedEditComponent( title, icon ) {
 				}
 				this.handleIncomingPreview();
 			}
-		}
-
-		getPhotoHtml( photo ) {
-			// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-			// acually the full size photo.
-			const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
-			return renderToString( photoPreview );
 		}
 
 		setUrl( event ) {
@@ -84,65 +75,6 @@ export function getEmbedEditComponent( title, icon ) {
 			const { setAttributes } = this.props;
 			this.setState( { editingURL: false } );
 			setAttributes( { url } );
-		}
-
-		/***
-		 * Switches to a different embed block type, based on the URL
-		 * and the HTML in the preview, if the preview or URL match a different block.
-		 *
-		 * @return {boolean} Whether the block was switched.
-		 */
-		maybeSwitchBlock() {
-			const { preview } = this.props;
-			const { url } = this.props.attributes;
-
-			if ( ! url ) {
-				return false;
-			}
-
-			const matchingBlock = findBlock( url );
-
-			// WordPress blocks can work on multiple sites, and so don't have patterns,
-			// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
-			if ( WORDPRESS_EMBED_BLOCK !== this.props.name && DEFAULT_EMBED_BLOCK !== matchingBlock ) {
-				// At this point, we have discovered a more suitable block for this url, so transform it.
-				if ( this.props.name !== matchingBlock ) {
-					this.props.onReplace( createBlock( matchingBlock, { url } ) );
-					return true;
-				}
-			}
-
-			if ( preview ) {
-				const { html } = preview;
-
-				// We can't match the URL for WordPress embeds, we have to check the HTML instead.
-				if ( isFromWordPress( html ) ) {
-					// If this is not the WordPress embed block, transform it into one.
-					if ( WORDPRESS_EMBED_BLOCK !== this.props.name ) {
-						this.props.onReplace(
-							createBlock(
-								WORDPRESS_EMBED_BLOCK,
-								{
-									url,
-									// By now we have the preview, but when the new block first renders, it
-									// won't have had all the attributes set, and so won't get the correct
-									// type and it won't render correctly. So, we work out the attributes
-									// here so that the initial render works when we switch to the WordPress
-									// block. This only affects the WordPress block because it can't be
-									// rendered in the usual Sandbox (it has a sandbox of its own) and it
-									// relies on the preview to set the correct render type.
-									...this.getAttributesFromPreview(
-										this.props.preview, this.props.attributes.allowResponsive
-									),
-								}
-							)
-						);
-						return true;
-					}
-				}
-			}
-
-			return false;
 		}
 
 		/**
@@ -173,24 +105,6 @@ export function getEmbedEditComponent( title, icon ) {
 			}
 
 			return this.props.attributes.className;
-		}
-
-		/**
-		 * Sets the aspect ratio related class names returned by `getAspectRatioClassNames`
-		 * if `allowResponsive` is truthy.
-		 *
-		 * @param {string} html The preview HTML.
-		 */
-		setAspectRatioClassNames( html ) {
-			const { allowResponsive } = this.props.attributes;
-			if ( ! allowResponsive ) {
-				return;
-			}
-			const className = classnames(
-				this.props.attributes.className,
-				this.getAspectRatioClassNames( html )
-			);
-			this.props.setAttributes( { className } );
 		}
 
 		/***

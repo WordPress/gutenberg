@@ -2,13 +2,18 @@
  * Internal dependencies
  */
 import { common, others } from './core-embeds';
-import { DEFAULT_EMBED_BLOCK } from './constants';
+import { DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
 
 /**
  * External dependencies
  */
 import { includes } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
 import { renderToString } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -48,4 +53,49 @@ export const getPhotoHtml = ( photo ) => {
 	// acually the full size photo.
 	const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
 	return renderToString( photoPreview );
+};
+
+export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
+	const { preview, name } = props;
+	const { url } = props.attributes;
+
+	if ( ! url ) {
+		return;
+	}
+
+	const matchingBlock = findBlock( url );
+
+	// WordPress blocks can work on multiple sites, and so don't have patterns,
+	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
+	if ( WORDPRESS_EMBED_BLOCK !== name && DEFAULT_EMBED_BLOCK !== matchingBlock ) {
+		// At this point, we have discovered a more suitable block for this url, so transform it.
+		if ( name !== matchingBlock ) {
+			return createBlock( matchingBlock, { url } );
+		}
+	}
+
+	if ( preview ) {
+		const { html } = preview;
+
+		// We can't match the URL for WordPress embeds, we have to check the HTML instead.
+		if ( isFromWordPress( html ) ) {
+			// If this is not the WordPress embed block, transform it into one.
+			if ( WORDPRESS_EMBED_BLOCK !== name ) {
+				return createBlock(
+					WORDPRESS_EMBED_BLOCK,
+					{
+						url,
+						// By now we have the preview, but when the new block first renders, it
+						// won't have had all the attributes set, and so won't get the correct
+						// type and it won't render correctly. So, we pass through the current attributes
+						// here so that the initial render works when we switch to the WordPress
+						// block. This only affects the WordPress block because it can't be
+						// rendered in the usual Sandbox (it has a sandbox of its own) and it
+						// relies on the preview to set the correct render type.
+						...attributesFromPreview,
+					}
+				);
+			}
+		}
+	}
 };
