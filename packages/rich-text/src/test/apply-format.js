@@ -8,6 +8,7 @@ import deepFreeze from 'deep-freeze';
  */
 
 import { applyFormat } from '../apply-format';
+import { ZERO_WIDTH_NO_BREAK_SPACE } from '../special-characters';
 import { getSparseArrayLength } from './helpers';
 
 describe( 'applyFormat', () => {
@@ -52,7 +53,7 @@ describe( 'applyFormat', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 	} );
 
-	it( 'should not apply format on non existing format if selection is collapsed', () => {
+	it( 'should apply format in placeholder if selection is collapsed', () => {
 		const record = {
 			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
 			text: 'one two three',
@@ -60,16 +61,16 @@ describe( 'applyFormat', () => {
 			end: 0,
 		};
 		const expected = {
-			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
-			text: 'one two three',
-			start: 0,
-			end: 0,
+			formats: [ [ a2 ], , , , , [ a ], [ a ], [ a ], , , , , , , ],
+			text: `${ ZERO_WIDTH_NO_BREAK_SPACE }one two three`,
+			start: 1,
+			end: 1,
 		};
 		const result = applyFormat( deepFreeze( record ), a2 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 	} );
 
 	it( 'should apply format on existing format if selection is collapsed', () => {
