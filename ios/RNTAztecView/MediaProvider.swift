@@ -2,14 +2,12 @@ import Aztec
 import Foundation
 
 class MediaProvider: Aztec.TextViewAttachmentDelegate {
+
+    var post: Post?
     
     func textView(_ textView: TextView, attachment: NSTextAttachment, imageAt url: URL, onSuccess success: @escaping (UIImage) -> Void, onFailure failure: @escaping () -> Void) {
-    
-        DispatchQueue.main.async {
-            let image = UIImage(named: "aztec")!
-            
-            success(image)
-        }
+
+        downloadImage(from: url, success: success, onFailure: failure)
     }
     
     func textView(_ textView: TextView, urlFor imageAttachment: ImageAttachment) -> URL? {
@@ -17,7 +15,7 @@ class MediaProvider: Aztec.TextViewAttachmentDelegate {
     }
     
     func textView(_ textView: TextView, placeholderFor attachment: NSTextAttachment) -> UIImage {
-        return UIImage(named: "aztec")!
+        return UIImage(named: "media-no-results")!
     }
     
     func textView(_ textView: TextView, deletedAttachment attachment: MediaAttachment) {
@@ -29,8 +27,52 @@ class MediaProvider: Aztec.TextViewAttachmentDelegate {
     
     func textView(_ textView: TextView, deselected attachment: NSTextAttachment, atPosition position: CGPoint) {
     }
-    
-    
+
+
+    func downloadImage(from url: URL, success: @escaping (UIImage) -> Void, onFailure failure: @escaping () -> Void) {
+        guard let post = post else {
+            return
+        }
+
+        var requestURL = url
+        let imageMaxDimension = max(UIScreen.main.bounds.size.width, UIScreen.main.bounds.size.height)
+        //use height zero to maintain the aspect ratio when fetching
+        var size = CGSize(width: imageMaxDimension, height: 0)
+        let request: URLRequest
+        if url.isFileURL {
+            request = URLRequest(url: url)
+        } else if post.blog.isPrivate() {
+            // private wpcom image needs special handling.
+            // the size that WPImageHelper expects is pixel size
+            size.width = size.width * UIScreen.main.scale
+            requestURL = WPImageURLHelper.imageURLWithSize(size, forImageURL: requestURL)
+            request = PrivateSiteURLProtocol.requestForPrivateSite(from: requestURL)
+        } else if !post.blog.isHostedAtWPcom && post.blog.isBasicAuthCredentialStored() {
+            size.width = size.width * UIScreen.main.scale
+            requestURL = WPImageURLHelper.imageURLWithSize(size, forImageURL: requestURL)
+            request = URLRequest(url: requestURL)
+        } else {
+            // the size that PhotonImageURLHelper expects is points size
+            requestURL = PhotonImageURLHelper.photonURL(with: size, forImageURL: requestURL)
+            request = URLRequest(url: requestURL)
+        }
+
+        ImageDownloader.shared.downloadImage(for: request) { [weak self] (image, error) in
+            guard let _ = self else {
+                return
+            }
+
+            DispatchQueue.main.async {
+                guard let image = image else {
+                    DDLogError("Unable to download image for attachment with url = \(url). Details: \(String(describing: error?.localizedDescription))")
+                    failure()
+                    return
+                }
+
+                success(image)
+            }
+        }
+    }
 }
 
 extension MediaProvider: Aztec.TextViewAttachmentImageProvider {
