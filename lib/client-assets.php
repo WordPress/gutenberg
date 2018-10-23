@@ -312,7 +312,6 @@ function gutenberg_register_scripts_and_styles() {
 				'	var storageKey = "WP_DATA_USER_" + userId;',
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
-				'		.use( wp.data.plugins.asyncGenerator )',
 				'		.use( wp.data.plugins.controls );',
 				'} )()',
 			)
@@ -447,10 +446,6 @@ function gutenberg_register_scripts_and_styles() {
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
-	);
-	wp_add_inline_script(
-		'wp-components',
-		sprintf( 'wp.components.unstable__setSiteURL(%s);', json_encode( site_url() ) )
 	);
 	gutenberg_override_script(
 		'wp-blocks',
