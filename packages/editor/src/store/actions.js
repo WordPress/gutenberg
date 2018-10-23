@@ -752,21 +752,6 @@ export function updateEditorSettings( settings ) {
 	};
 }
 
-export function registerToken( name, settings ) {
-	return {
-		type: 'REGISTER_TOKEN',
-		name,
-		settings,
-	};
-}
-
-export function unregisterToken( name ) {
-	return {
-		type: 'UNREGISTER_TOKEN',
-		name,
-	};
-}
-
 /**
  * Returns an action object used in signalling that the user has enabled the publish sidebar.
  *

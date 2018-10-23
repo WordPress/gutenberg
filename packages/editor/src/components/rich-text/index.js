@@ -53,7 +53,6 @@ import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
-import TokenUI from './tokens/ui';
 
 /**
  * Browser dependencies
@@ -879,13 +878,6 @@ export class RichText extends Component {
 						<FormatToolbar controls={ formattingControls } />
 					</div>
 				) }
-				{ isSelected &&
-					<TokenUI
-						editor={ this.editor }
-						containerRef={ this.containerRef }
-					/>
-				}
-
 				<Autocomplete
 					onReplace={ this.props.onReplace }
 					completers={ autocompleters }
