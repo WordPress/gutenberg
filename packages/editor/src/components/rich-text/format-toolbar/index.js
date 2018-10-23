@@ -22,7 +22,7 @@ import LinkContainer from './link-container';
 import ToolbarContainer from './toolbar-container';
 
 class FormatToolbar extends Component {
-	constructor( { toggleFormat, editor } ) {
+	constructor( { editor } ) {
 		super( ...arguments );
 
 		this.removeLink = this.removeLink.bind( this );
@@ -41,8 +41,8 @@ class FormatToolbar extends Component {
 			editor.shortcuts.add( rawShortcut.primary( 'k' ), '', this.addLink );
 			editor.shortcuts.add( rawShortcut.access( 'a' ), '', this.addLink );
 			editor.shortcuts.add( rawShortcut.access( 's' ), '', this.removeLink );
-			editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => toggleFormat( { type: 'del' } ) );
-			editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => toggleFormat( { type: 'code' } ) );
+			editor.shortcuts.add( rawShortcut.access( 'd' ), '', () => this.toggleFormat( { type: 'del' } ) );
+			editor.shortcuts.add( rawShortcut.access( 'x' ), '', () => this.toggleFormat( { type: 'code' } ) );
 		}
 	}
 
