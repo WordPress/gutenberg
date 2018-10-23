@@ -29,8 +29,6 @@ import {
 import { createBlock } from '../factory';
 import serialize from '../serializer';
 
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
-
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
 		attributes: {
