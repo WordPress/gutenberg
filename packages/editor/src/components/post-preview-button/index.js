@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { get, escape } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 import { Button } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -88,11 +89,14 @@ export class PostPreviewButton extends Component {
 
 		this.props.autosave();
 
-		const markup = `
-			<div class="editor-post-preview-button__interstitial-message">
-				<p>${ escape( __( 'Please wait&hellip;' ) ) }</p>
-				<p>${ escape( __( 'Generating preview.' ) ) }</p>
+		let markup = renderToString(
+			<div className="editor-post-preview-button__interstitial-message">
+				<p>{ decodeEntities( __( 'Please wait&hellip;' ) ) }</p>
+				<p>{ __( 'Generating preview.' ) }</p>
 			</div>
+		);
+
+		markup += `
 			<style>
 				body {
 					margin: 0;
