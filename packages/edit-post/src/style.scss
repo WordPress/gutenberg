@@ -171,7 +171,8 @@ body.block-editor-page {
 .edit-post-sidebar,
 .editor-post-publish-panel,
 .editor-block-list__block,
-.components-popover {
+.components-popover,
+.components-modal__content {
 	.input-control, // Upstream name is `.regular-text`.
 	input[type="text"],
 	input[type="search"],

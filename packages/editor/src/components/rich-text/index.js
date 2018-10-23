@@ -5,7 +5,6 @@ import classnames from 'classnames';
 import {
 	defer,
 	find,
-	identity,
 	isNil,
 	noop,
 	isEqual,
@@ -968,7 +967,7 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withSelect( ( select ) => {
-		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
+		const { isViewportMatch } = select( 'core/viewport' );
 		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
 
 		return {

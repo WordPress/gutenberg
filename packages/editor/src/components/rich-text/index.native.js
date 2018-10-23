@@ -46,20 +46,10 @@ export class RichText extends Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
-		this.onHTMLContentWithCursor = this.onHTMLContentWithCursor.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
 		};
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	onHTMLContentWithCursor( htmlText, start, end ) {
-		if ( ! this.props.onSplit ) {
-			// TODO: insert the \n char instead?
-			return;
-		}
-		this.splitContent( htmlText, start, end );
 	}
 
 	/*
@@ -108,6 +98,12 @@ export class RichText extends Component {
 		if ( after ) {
 			after = this.valueToFormat( after );
 		}
+
+		// The onSplit event can cause a content update event for this block.  Such event should
+		// definitely be processed by our native components, since they have no knowledge of
+		// how the split works.  Setting lastEventCount to undefined forces the native component to
+		// always update when provided with new content.
+		this.lastEventCount = undefined;
 
 		onSplit( before, after );
 	}
@@ -177,8 +173,14 @@ export class RichText extends Component {
 		);
 	}
 
-	onEnter() {
-		this._editor.requestHTMLWithCursor();
+	// eslint-disable-next-line no-unused-vars
+	onEnter( event ) {
+		if ( ! this.props.onSplit ) {
+			// TODO: insert the \n char instead?
+			return;
+		}
+
+		this.splitContent( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -269,7 +271,6 @@ export class RichText extends Component {
 					onEnter={ this.onEnter }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
-					onHTMLContentWithCursor={ this.onHTMLContentWithCursor }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
