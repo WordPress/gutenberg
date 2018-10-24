@@ -1,9 +1,4 @@
 /**
- * External Dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,13 +6,10 @@ import { IconButton } from '@wordpress/components';
 import {
 	PostPreviewButton,
 	PostSavedState,
-	PostPublishPanelToggle,
-	PostPublishButton,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DotTip } from '@wordpress/nux';
-import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -26,31 +18,18 @@ import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import PinnedPlugins from './pinned-plugins';
 import shortcuts from '../../keyboard-shortcuts';
+import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 
 function Header( {
-	isEditorSidebarOpened,
-	openGeneralSidebar,
 	closeGeneralSidebar,
-	isPublishSidebarOpened,
-	isPublishSidebarEnabled,
-	togglePublishSidebar,
 	hasActiveMetaboxes,
-	hasPublishAction,
+	isEditorSidebarOpened,
+	isPublishSidebarOpened,
 	isSaving,
-	isPublished,
-	isScheduled,
-	isBeingScheduled,
-	isPending,
-	isSmallViewport,
+	openGeneralSidebar,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
-	const shouldShowButton = (
-		( ! isPublishSidebarEnabled && ! isSmallViewport ) ||
-		isPublished ||
-		( isScheduled && isBeingScheduled ) ||
-		( isPending && ! hasPublishAction && ! isSmallViewport )
-	);
 	return (
 		<div
 			role="region"
@@ -67,18 +46,10 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 					<PostPreviewButton />
-					{ shouldShowButton ? (
-						<PostPublishButton
-							forceIsDirty={ hasActiveMetaboxes }
-							forceIsSaving={ isSaving }
-						/>
-					) : (
-						<PostPublishPanelToggle
-							isOpen={ isPublishSidebarOpened }
-							onToggle={ togglePublishSidebar }
-							forceIsSaving={ isSaving }
-						/>
-					) }
+					<PostPublishButtonOrToggle
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
 					<div>
 						<IconButton
 							icon="admin-generic"
@@ -102,27 +73,18 @@ function Header( {
 
 export default compose(
 	withSelect( ( select ) => ( {
+		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isPublishSidebarEnabled: select( 'core/editor' ).isPublishSidebarEnabled(),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
-		hasPublishAction: get( select( 'core/editor' ).getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
-		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
-		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
-		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
-		isPending: select( 'core/editor' ).isCurrentPostPending(),
 	} ) ),
 	withDispatch( ( dispatch, { hasBlockSelection } ) => {
-		const { openGeneralSidebar, closeGeneralSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
+		const { openGeneralSidebar, closeGeneralSidebar } = dispatch( 'core/edit-post' );
 		const sidebarToOpen = hasBlockSelection ? 'edit-post/block' : 'edit-post/document';
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( sidebarToOpen ),
 			closeGeneralSidebar: closeGeneralSidebar,
-			togglePublishSidebar: togglePublishSidebar,
 			hasBlockSelection: undefined,
 		};
 	} ),
-	withViewportMatch( { isSmallViewport: '< medium' } ),
 )( Header );
