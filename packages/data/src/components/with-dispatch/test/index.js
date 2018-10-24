@@ -61,4 +61,59 @@ describe( 'withDispatch', () => {
 
 		expect( store.getState() ).toBe( 2 );
 	} );
+
+	it( 'calls dispatch on the correct registry if updated', () => {
+		const reducer = ( state = null ) => state;
+		const noop = () => ( { type: '__INERT__' } );
+		const firstRegistryAction = jest.fn().mockImplementation( noop );
+		const secondRegistryAction = jest.fn().mockImplementation( noop );
+
+		const firstRegistry = registry;
+		firstRegistry.registerStore( 'demo', {
+			reducer,
+			actions: {
+				noop: firstRegistryAction,
+			},
+		} );
+
+		const Component = withDispatch( ( _dispatch ) => {
+			const noopByReference = _dispatch( 'demo' ).noop;
+
+			return {
+				noop() {
+					_dispatch( 'demo' ).noop();
+					noopByReference();
+				},
+			};
+		} )( ( props ) => <button onClick={ props.noop } /> );
+
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ firstRegistry }>
+				<Component />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
+
+		testInstance.findByType( 'button' ).props.onClick();
+		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
+		expect( secondRegistryAction ).toHaveBeenCalledTimes( 0 );
+
+		const secondRegistry = createRegistry();
+		secondRegistry.registerStore( 'demo', {
+			reducer,
+			actions: {
+				noop: secondRegistryAction,
+			},
+		} );
+
+		testRenderer.update(
+			<RegistryProvider value={ secondRegistry }>
+				<Component />
+			</RegistryProvider>
+		);
+
+		testInstance.findByType( 'button' ).props.onClick();
+		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
+		expect( secondRegistryAction ).toHaveBeenCalledTimes( 2 );
+	} );
 } );
