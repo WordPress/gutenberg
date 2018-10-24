@@ -17,6 +17,8 @@ export const settings = getEmbedBlockSettings( {
 	title: __( 'Embed' ),
 	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
 	icon: embedContentIcon,
+	// Unknown embeds should not be responsive by default.
+	responsive: false,
 	transforms: {
 		from: [
 			{
