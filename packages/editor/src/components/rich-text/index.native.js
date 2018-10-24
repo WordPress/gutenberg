@@ -42,6 +42,7 @@ export class RichText extends Component {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
+		this.onBackspace = this.onBackspace.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
@@ -183,6 +184,15 @@ export class RichText extends Component {
 		this.splitContent( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
 	}
 
+	// eslint-disable-next-line no-unused-vars
+	onBackspace( event ) {
+		if ( ! this.props.onBackspace ) {
+			return;
+		}
+
+		this.onBackspace( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if ( nextProps.tagName !== this.props.tagName ) {
 			this.lastEventCount = undefined;
@@ -269,6 +279,7 @@ export class RichText extends Component {
 					text={ { text: html, eventCount: this.lastEventCount } }
 					onChange={ this.onChange }
 					onEnter={ this.onEnter }
+					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
 					color={ 'black' }
