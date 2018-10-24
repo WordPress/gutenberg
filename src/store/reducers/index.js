@@ -83,8 +83,7 @@ export const reducer = (
 				block.focused = false;
 			}
 
-			// Select or deselect pressed block
-			destBlock.focused = ! destBlockState;
+			destBlock.focused = true;
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.MOVE_UP: {
