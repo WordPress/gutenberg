@@ -20,6 +20,17 @@ describe( 'PostPublishPanel', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
+	it( 'should render the pre-publish panel is post status is scheduled but date is before now', () => {
+		const wrapper = shallow(
+			<PostPublishPanel
+				isScheduled={ true }
+				isBeingScheduled={ false }
+			/>
+		);
+
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
 	it( 'should render the post-publish panel if the post is published', () => {
 		const wrapper = shallow(
 			<PostPublishPanel
