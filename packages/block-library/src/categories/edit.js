@@ -114,7 +114,7 @@ class CategoriesEdit extends Component {
 		const { showHierarchy, instanceId, className } = this.props;
 		const parentId = showHierarchy ? 0 : null;
 		const categories = this.getCategories( parentId );
-		const selectId = `${ className }-${ instanceId }`;
+		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
 			<Fragment>
 				<label htmlFor={ selectId } className="screen-reader-text">
