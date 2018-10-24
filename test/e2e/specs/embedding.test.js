@@ -67,7 +67,7 @@ const setupEmbedRequestInterception = async () => {
 	await page.setRequestInterception( true );
 	page.on( 'request', async ( request ) => {
 		const requestUrl = request.url();
-		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed/1.0/proxy' );
+		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed%2F1.0%2Fproxy' );
 		if ( isEmbeddingUrl ) {
 			const embedUrl = decodeURIComponent( /.*url=([^&]+).*/.exec( requestUrl )[ 1 ] );
 			const mockResponse = MOCK_RESPONSES[ embedUrl ];
