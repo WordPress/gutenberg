@@ -96,24 +96,24 @@ export default compose( [
 			getInserterItems,
 			getBlockOrder,
 		} = select( 'core/editor' );
+
 		const insertionPoint = getBlockInsertionPoint();
-		const parentId = rootClientId || insertionPoint.rootClientId;
+		if ( rootClientId === undefined ) {
+			rootClientId = insertionPoint.rootClientId;
+		}
+
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			insertionPoint: {
-				rootClientId: parentId,
-				layout: rootClientId ? layout : insertionPoint.layout,
-				index: rootClientId ? getBlockOrder( rootClientId ).length : insertionPoint.index,
-			},
+			layout: rootClientId ? layout : insertionPoint.layout,
+			index: rootClientId ? getBlockOrder( rootClientId ).length : insertionPoint.index,
 			selectedBlock: getSelectedBlock(),
-			items: getInserterItems( parentId ),
-			rootClientId: parentId,
+			items: getInserterItems( rootClientId ),
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onInsertBlock: ( item ) => {
-			const { selectedBlock, insertionPoint } = ownProps;
-			const { index, rootClientId, layout } = insertionPoint;
+			const { selectedBlock, index, rootClientId, layout } = ownProps;
 			const { name, initialAttributes } = item;
 			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
 			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
