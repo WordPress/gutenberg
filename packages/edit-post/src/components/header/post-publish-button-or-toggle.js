@@ -27,14 +27,14 @@ function PostPublishButtonOrToggle( {
 	forceIsSaving,
 	togglePublishSidebar,
 } ) {
-	const shouldShowButton = (
+	const shouldUseButton = (
 		( ! isPublishSidebarEnabled && ! isSmallViewport ) ||
 		isPublished ||
 		( isScheduled && isBeingScheduled ) ||
 		( isPending && ! hasPublishAction && ! isSmallViewport )
 	);
 
-	const component = shouldShowButton ? (
+	const component = shouldUseButton ? (
 		<PostPublishButton
 			forceIsDirty={ forceIsDirty }
 			forceIsSaving={ forceIsSaving }
