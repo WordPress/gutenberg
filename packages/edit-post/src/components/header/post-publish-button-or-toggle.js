@@ -15,16 +15,16 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
 export function PostPublishButtonOrToggle( {
+	forceIsDirty,
+	forceIsSaving,
 	hasPublishAction,
 	isBeingScheduled,
+	isLessThanMediumViewport,
 	isPending,
 	isPublished,
 	isPublishSidebarEnabled,
 	isPublishSidebarOpened,
 	isScheduled,
-	isSmallViewport,
-	forceIsDirty,
-	forceIsSaving,
 	togglePublishSidebar,
 } ) {
 	const button = (
@@ -46,7 +46,7 @@ export function PostPublishButtonOrToggle( {
      *
      * - is published
      * - is scheduled to be published
-     * - is pending and can't be published (but only for viewports > small)
+     * - is pending and can't be published (but only for viewports >= medium)
      *
      * Originally we considered showing a button for pending posts
      * that couldn't be published (for ex, for a contributor role).
@@ -56,7 +56,7 @@ export function PostPublishButtonOrToggle( {
      */
 	if ( isPublished ||
         ( isScheduled && isBeingScheduled ) ||
-        ( isPending && ! hasPublishAction && ! isSmallViewport ) ) {
+        ( isPending && ! hasPublishAction && ! isLessThanMediumViewport ) ) {
 		return button;
 	}
 
@@ -66,7 +66,7 @@ export function PostPublishButtonOrToggle( {
      * - Show TOGGLE if it is small viewport.
      * - Otherwise, use publish sidebar status to decide - TOGGLE if enabled, BUTTON if not.
      */
-	if ( isSmallViewport ) {
+	if ( isLessThanMediumViewport ) {
 		return toggle;
 	}
 
@@ -89,5 +89,5 @@ export default compose(
 			togglePublishSidebar,
 		};
 	} ),
-	withViewportMatch( { isSmallViewport: '< medium' } ),
+	withViewportMatch( { isLessThanMediumViewport: '< medium' } ),
 )( PostPublishButtonOrToggle );
