@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Panel, PanelBody } from '@wordpress/components';
@@ -12,7 +7,6 @@ import { withSelect } from '@wordpress/data';
 import { BlockInspector } from '@wordpress/editor';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
 /**
  * Internal Dependencies
  */
@@ -27,9 +21,6 @@ import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 
-const SIDEBAR_NAME_BLOCK = 'edit-post/block';
-const SIDEBAR_NAME_DOCUMENT = 'edit-post/document';
-
 const SettingsSidebar = ( { sidebarName } ) => (
 	<Sidebar
 		name={ sidebarName }
@@ -37,7 +28,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 	>
 		<SettingsHeader sidebarName={ sidebarName } />
 		<Panel>
-			{ sidebarName === SIDEBAR_NAME_DOCUMENT && (
+			{ sidebarName === 'edit-post/document' && (
 				<Fragment>
 					<PostStatus />
 					<LastRevision />
@@ -49,7 +40,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 					<MetaBoxes location="side" />
 				</Fragment>
 			) }
-			{ sidebarName === SIDEBAR_NAME_BLOCK && (
+			{ sidebarName === 'edit-post/block' && (
 				<PanelBody className="edit-post-settings-sidebar__panel-block">
 					<BlockInspector />
 				</PanelBody>
@@ -60,11 +51,15 @@ const SettingsSidebar = ( { sidebarName } ) => (
 
 export default compose(
 	withSelect( ( select ) => {
+		const {
+			getActiveGeneralSidebarName,
+			isEditorSidebarOpened,
+		} = select( 'core/edit-post' );
+
 		return {
-			sidebarName: select( 'core/edit-post' ).getActiveGeneralSidebarName(),
+			isEditorSidebar: isEditorSidebarOpened(),
+			sidebarName: getActiveGeneralSidebarName(),
 		};
 	} ),
-	ifCondition( ( { sidebarName } ) => {
-		return includes( [ SIDEBAR_NAME_BLOCK, SIDEBAR_NAME_DOCUMENT ], sidebarName );
-	} )
+	ifCondition( ( { isEditorSidebarOpened } ) => isEditorSidebarOpened ),
 )( SettingsSidebar );
