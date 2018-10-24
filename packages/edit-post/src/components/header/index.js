@@ -73,6 +73,7 @@ function Header( {
 
 export default compose(
 	withSelect( ( select ) => ( {
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
