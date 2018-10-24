@@ -1,7 +1,7 @@
 import Aztec
 import Foundation
 import UIKit
-import React
+//import React
 
 class RCTAztecView: Aztec.TextView {
     @objc var onChange: RCTBubblingEventBlock? = nil
