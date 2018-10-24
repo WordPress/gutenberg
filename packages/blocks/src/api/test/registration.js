@@ -1,3 +1,5 @@
+/* eslint-disable react/forbid-elements */
+
 /**
  * External dependencies
  */
@@ -7,7 +9,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter, removeFilter } from '@wordpress/hooks';
-import { Circle, Path, SVG } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -93,7 +94,7 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+					src: 'block-default',
 				},
 				save: noop,
 				category: 'common',
@@ -178,7 +179,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+					src: 'block-default',
 				},
 				attributes: {
 					ok: {
@@ -205,10 +206,10 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: ( <SVG width="20" height="20" viewBox="0 0 20 20">
-					<Circle cx="10" cy="10" r="10"
+				icon: ( <svg width="20" height="20" viewBox="0 0 20 20">
+					<circle cx="10" cy="10" r="10"
 						fill="red" stroke="blue" strokeWidth="10" />
-				</SVG> ),
+				</svg> ),
 			};
 			registerBlockType( 'core/test-block-icon-normalize-element', blockType );
 			expect( getBlockType( 'core/test-block-icon-normalize-element' ) ).toEqual( {
@@ -217,10 +218,10 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: ( <SVG width="20" height="20" viewBox="0 0 20 20">
-						<Circle cx="10" cy="10" r="10"
+					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
+						<circle cx="10" cy="10" r="10"
 							fill="red" stroke="blue" strokeWidth="10" />
-					</SVG> ),
+					</svg> ),
 				},
 			} );
 		} );
@@ -246,10 +247,10 @@ describe( 'blocks', () => {
 
 		it( 'should normalize the icon containing a function', () => {
 			const MyTestIcon = () => {
-				return <SVG width="20" height="20" viewBox="0 0 20 20">
-					<Circle cx="10" cy="10" r="10"
+				return <svg width="20" height="20" viewBox="0 0 20 20">
+					<circle cx="10" cy="10" r="10"
 						fill="red" stroke="blue" strokeWidth="10" />
-				</SVG>;
+				</svg>;
 			};
 			const blockType = {
 				save: noop,
@@ -276,10 +277,10 @@ describe( 'blocks', () => {
 				title: 'block title',
 				icon: {
 					background: '#f00',
-					src: ( <SVG width="20" height="20" viewBox="0 0 20 20">
-						<Circle cx="10" cy="10" r="10"
+					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
+						<circle cx="10" cy="10" r="10"
 							fill="red" stroke="blue" strokeWidth="10" />
-					</SVG> ),
+					</svg> ),
 				},
 			};
 			registerBlockType( 'core/test-block-icon-normalize-background', blockType );
@@ -292,10 +293,10 @@ describe( 'blocks', () => {
 					background: '#f00',
 					foreground: '#191e23',
 					shadowColor: 'rgba(255, 0, 0, 0.3)',
-					src: ( <SVG width="20" height="20" viewBox="0 0 20 20">
-						<Circle cx="10" cy="10" r="10"
+					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
+						<circle cx="10" cy="10" r="10"
 							fill="red" stroke="blue" strokeWidth="10" />
-					</SVG> ),
+					</svg> ),
 				},
 			} );
 		} );
@@ -311,7 +312,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -351,7 +352,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+						src: 'block-default',
 					},
 				},
 			] );
@@ -363,7 +364,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+					src: 'block-default',
 				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
@@ -444,7 +445,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -459,7 +460,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -481,7 +482,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+						src: 'block-default',
 					},
 				},
 				{
@@ -491,7 +492,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></SVG>,
+						src: 'block-default',
 					},
 				},
 			] );

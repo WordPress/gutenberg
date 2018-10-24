@@ -169,7 +169,7 @@ module.exports = {
 				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
 			},
 		],
-		'react/forbid-elements': [ 1, {
+		'react/forbid-elements': [ 'error', {
 			forbid: [
 				[ 'circle', 'Circle' ],
 				[ 'g', 'G' ],
