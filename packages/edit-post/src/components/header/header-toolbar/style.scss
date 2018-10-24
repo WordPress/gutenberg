@@ -50,7 +50,7 @@
 	}
 
 	// Move toolbar into top Editor Bar.
-	@include break-large {
+	@include break-xlarge {
 		padding-left: $grid-size;
 		position: static;
 		left: auto;
@@ -64,11 +64,16 @@
 		}
 
 		.editor-block-toolbar {
-			margin: -9px 0;
+			margin: 0;
 		}
 
 		.editor-block-toolbar .components-toolbar {
-			padding: 9px;
+			padding: 0 $grid-size-small;
+		}
+
+		// Hide the right border on the ellipsis menu.
+		.editor-block-toolbar > div:last-child .components-toolbar {
+			border-right: none;
 		}
 	}
 }
