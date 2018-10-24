@@ -424,7 +424,13 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { start, end } = this.createRecord();
+		const { start, end, formats } = this.createRecord();
+
+		if ( formats[ start ] ) {
+			this.props.onEnterFormattedText();
+		} else {
+			this.props.onLeaveFormattedText();
+		}
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			this.setState( { start, end } );
@@ -962,12 +968,16 @@ const RichTextContainer = compose( [
 			createUndoLevel,
 			redo,
 			undo,
+			enterFormattedText,
+			leaveFormattedText,
 		} = dispatch( 'core/editor' );
 
 		return {
 			onCreateUndoLevel: createUndoLevel,
 			onRedo: redo,
 			onUndo: undo,
+			onEnterFormattedText: enterFormattedText,
+			onLeaveFormattedText: leaveFormattedText,
 		};
 	} ),
 	withSafeTimeout,
