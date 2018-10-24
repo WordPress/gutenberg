@@ -3,6 +3,7 @@ import Foundation
 import UIKit
 
 class RCTAztecView: Aztec.TextView {
+    @objc var onBackspace: RCTBubblingEventBlock? = nil
     @objc var onChange: RCTBubblingEventBlock? = nil
     @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
@@ -62,24 +63,45 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Edits
     
     open override func insertText(_ text: String) {
-        guard text != "\n" else {
-            let data: [AnyHashable: Any] = [
-                "text": getHTML(),
-                "selectionStart": selectedRange.location,
-                "selectionEnd": selectedRange.location + selectedRange.length,
-                ]
-            
-            onEnter?(data)
+        guard !interceptEnter(text) else {
             return
         }
-        
+
         super.insertText(text)
         updatePlaceholderVisibility()
     }
     
     open override func deleteBackward() {
+        guard !interceptBackspace() else {
+            return
+        }
+        
         super.deleteBackward()
         updatePlaceholderVisibility()
+    }
+    
+    // MARK: - Custom Edit Intercepts
+    
+    private func interceptEnter(_ text: String) -> Bool {
+        guard text == "\n",
+            let onEnter = onEnter else {
+                return false
+        }
+        
+        let caretData = packCaretDataForRN()
+        onEnter(caretData)
+        return true
+    }
+    
+    private func interceptBackspace() -> Bool {
+        guard selectedRange.location == 0,
+            let onBackspace = onBackspace else {
+                return false
+        }
+        
+        let caretData = packCaretDataForRN()
+        onBackspace(caretData)
+        return true
     }
     
     // MARK: - Native-to-RN Value Packing Logic
@@ -95,6 +117,13 @@ class RCTAztecView: Aztec.TextView {
                     "height": size.height]
         
         return [name: size]
+    }
+    
+    func packCaretDataForRN() -> [AnyHashable: Any] {
+        return ["text": getHTML(),
+                "selectionStart": selectedRange.location,
+                "selectionEnd": selectedRange.location + selectedRange.length,
+        ]
     }
 
     // MARK: - RN Properties
