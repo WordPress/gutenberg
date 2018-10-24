@@ -217,8 +217,7 @@ export const settings = {
 					<a
 						href={ href }
 						className="wp-block-file__button"
-						// Using '' here as `true` leaves the attribute unset.
-						download=""
+						download={ true }
 					>
 						<RichText.Content
 							value={ downloadButtonText }
