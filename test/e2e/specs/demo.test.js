@@ -23,7 +23,7 @@ describe( 'new editor state', () => {
 		// cannot leave errors in the console and cause the test to fail.
 		await page.setRequestInterception( true );
 		page.on( 'request', async ( request ) => {
-			if ( request.url().indexOf( 'oembed/1.0/proxy' ) !== -1 ) {
+			if ( request.url().indexOf( 'oembed%2F1.0%2Fproxy' ) !== -1 ) {
 				// Because we can't get the responses to requests and modify them on the fly,
 				// we have to make our own request, get the response, modify it, then use the
 				// modified values to respond to the request.
@@ -61,7 +61,7 @@ describe( 'new editor state', () => {
 		await visitAdmin( 'post-new.php', 'gutenberg-demo' );
 	} );
 
-	it.skip( 'content should load without making the post dirty', async () => {
+	it( 'content should load without making the post dirty', async () => {
 		const isDirty = await page.evaluate( () => {
 			const { select } = window.wp.data;
 			return select( 'core/editor' ).isEditedPostDirty();
