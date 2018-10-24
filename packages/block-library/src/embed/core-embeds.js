@@ -66,6 +66,7 @@ export const common = [
 			title: 'WordPress',
 			icon: embedWordPressIcon,
 			keywords: [ __( 'post' ), __( 'blog' ) ],
+			responsive: false,
 		},
 	},
 	{
