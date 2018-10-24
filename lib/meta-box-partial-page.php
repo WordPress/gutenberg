@@ -318,9 +318,13 @@ function the_gutenberg_metaboxes() {
 	foreach ( $locations as $location ) {
 		$meta_boxes_per_location[ $location ] = array();
 		foreach ( $priorities as $priority ) {
-			$meta_boxes = (array) $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ];
-			foreach ( $meta_boxes as $meta_box ) {
-				if ( ! empty( $meta_box['title'] ) ) {
+			if ( isset( $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ] ) ) {
+				$meta_boxes = (array) $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ];
+				foreach ( $meta_boxes as $meta_box ) {
+					if ( false == $meta_box || ! $meta_box['title'] ) {
+						continue;
+					}
+
 					$meta_boxes_per_location[ $location ][] = array(
 						'id'    => $meta_box['id'],
 						'title' => $meta_box['title'],

@@ -192,17 +192,14 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	const toggleFixedToolbar = async ( b ) => {
-		await page.click( '.edit-post-more-menu button' );
-		const button = ( await page.$x( "//button[contains(text(), 'Unified Toolbar')]" ) )[ 0 ];
-		const buttonClassNameProperty = await button.getProperty( 'className' );
-		const buttonClassName = await buttonClassNameProperty.jsonValue();
-		const isSelected = buttonClassName.indexOf( 'is-selected' ) !== -1;
-		if ( isSelected !== b ) {
-			await button.click();
-		} else {
-			await page.click( '.edit-post-more-menu button' );
-		}
+	const toggleFixedToolbar = async ( isFixed ) => {
+		await page.evaluate( ( _isFixed ) => {
+			const { select, dispatch } = wp.data;
+			const isCurrentlyFixed = select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
+			if ( isCurrentlyFixed !== _isFixed ) {
+				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+			}
+		}, isFixed );
 	};
 
 	it( 'allows Left to be pressed during creation when the toolbar is fixed to top', async () => {

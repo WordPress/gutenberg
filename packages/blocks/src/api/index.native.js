@@ -15,6 +15,8 @@ export {
 	registerBlockType,
 	setUnknownTypeHandlerName,
 	getUnknownTypeHandlerName,
+	setUnregisteredTypeHandlerName,
+	getUnregisteredTypeHandlerName,
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,

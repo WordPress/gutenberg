@@ -9,6 +9,9 @@ import { every } from 'lodash';
 import {
 	isURL,
 	addQueryArgs,
+	getQueryArg,
+	hasQueryArg,
+	removeQueryArgs,
 	prependHTTP,
 	safeDecodeURI,
 } from '../';
@@ -66,6 +69,66 @@ describe( 'addQueryArgs', () => {
 		const args = { beach: [ 'sand', 'rock' ] };
 
 		expect( safeDecodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
+	} );
+} );
+
+describe( 'getQueryArg', () => {
+	it( 'should get the value of an existing query arg', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
+
+		expect( getQueryArg( url, 'foo' ) ).toBe( 'bar' );
+	} );
+
+	it( 'should not return a value of an unknown query arg', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
+
+		expect( getQueryArg( url, 'baz' ) ).toBeUndefined();
+	} );
+
+	it( 'should get the value of an arry query arg', () => {
+		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz';
+
+		expect( getQueryArg( url, 'foo' ) ).toEqual( [ 'bar', 'baz' ] );
+	} );
+} );
+
+describe( 'hasQueryArg', () => {
+	it( 'should return true for an existing query arg', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
+
+		expect( hasQueryArg( url, 'foo' ) ).toBeTruthy();
+	} );
+
+	it( 'should return false for an unknown query arg', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
+
+		expect( hasQueryArg( url, 'baz' ) ).toBeFalsy();
+	} );
+
+	it( 'should return true for an arry query arg', () => {
+		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz';
+
+		expect( hasQueryArg( url, 'foo' ) ).toBeTruthy();
+	} );
+} );
+
+describe( 'removeQueryArgs', () => {
+	it( 'should not change URL not containing query args', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&bar=baz';
+
+		expect( removeQueryArgs( url, 'baz', 'test' ) ).toEqual( url );
+	} );
+
+	it( 'should remove existing query args', () => {
+		const url = 'https://andalouses.example/beach?foo=bar&baz=foo&bar=baz';
+
+		expect( removeQueryArgs( url, 'foo', 'bar' ) ).toEqual( 'https://andalouses.example/beach?baz=foo' );
+	} );
+
+	it( 'should remove array query arg', () => {
+		const url = 'https://andalouses.example/beach?foo[]=bar&foo[]=baz&bar=foobar';
+
+		expect( removeQueryArgs( url, 'foo' ) ).toEqual( 'https://andalouses.example/beach?bar=foobar' );
 	} );
 } );
 

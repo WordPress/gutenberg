@@ -134,6 +134,7 @@ class LatestPostsEdit extends Component {
 				<ul
 					className={ classnames( this.props.className, {
 						'is-grid': postLayout === 'grid',
+						'has-dates': displayPostDate,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>

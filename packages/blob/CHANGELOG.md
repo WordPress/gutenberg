@@ -1,8 +1,10 @@
-## 2.1.0 (Unreleased)
+## 2.1.0 (2018-10-19)
 
 ### New Features
 
 - Added a new `isBlobURL` function.
+
+## 2.0.3 (2018-10-18)
 
 ## 2.0.0 (2018-09-05)
 

@@ -1,5 +1,9 @@
 .edit-post-pinned-plugins {
-	display: flex;
+	display: none;
+
+	@include break-small() {
+		display: flex;
+	}
 
 	.components-icon-button {
 		margin-left: 4px;
