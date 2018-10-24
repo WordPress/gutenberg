@@ -29,4 +29,12 @@ describe( 'PostPublishButtonOrToggle', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle isPublished={ true } /> );
 		expect( wrapper ).toMatchSnapshot();
 	} );
+
+	it( 'should render button when the post is being scheduled', () => {
+		const wrapper = shallow( <PostPublishButtonOrToggle
+			isScheduled={ true }
+			isBeingScheduled={ true }
+		/> );
+		expect( wrapper ).toMatchSnapshot();
+	} );
 } );

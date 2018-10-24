@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`PostPublishButtonOrToggle should render button when the post is being scheduled 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
+
 exports[`PostPublishButtonOrToggle should render button when the post is published 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
 
 exports[`PostPublishButtonOrToggle should render button when the publish sidebar is not enabled and the viewport is > small 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
