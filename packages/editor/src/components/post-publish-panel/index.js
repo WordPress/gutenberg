@@ -19,7 +19,7 @@ import PostPublishButton from '../post-publish-button';
 import PostPublishPanelPrepublish from './prepublish';
 import PostPublishPanelPostpublish from './postpublish';
 
-class PostPublishPanel extends Component {
+export class PostPublishPanel extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSubmit = this.onSubmit.bind( this );
