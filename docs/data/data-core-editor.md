@@ -907,6 +907,18 @@ Returns true if the user is typing, or false otherwise.
 
 Whether user is typing.
 
+### isCaretWithinFormattedText
+
+Returns true if the caret is within formatted text, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the caret is within formatted text.
+
 ### getBlockInsertionPoint
 
 Returns the insertion point, the index at which the new inserted block would
@@ -1623,6 +1635,34 @@ Returns an action object used in signalling that the user has begun to type.
 
 Returns an action object used in signalling that the user has stopped typing.
 
+### enterFormattedText
+
+Returns an action object used in signalling that the caret has entered formatted text.
+
+### leaveFormattedText
+
+Returns an action object used in signalling that the user caret has left formatted text.
+
+### createNotice
+
+Returns an action object used to create a notice.
+
+*Parameters*
+
+ * status: The notice status.
+ * content: The notice content.
+ * options: The notice options.  Available options:
+                             `id` (string; default auto-generated)
+                             `isDismissible` (boolean; default `true`).
+
+### removeNotice
+
+Returns an action object used to remove a notice.
+
+*Parameters*
+
+ * id: The notice id.
+
 ### updatePostLock
 
 Returns an action object used to lock the editor.
@@ -1757,5 +1797,3 @@ Returns an action object signaling that a new term is added to the edited post.
 
  * slug: Taxonomy slug.
  * term: Term object.
-
-### createNotice
