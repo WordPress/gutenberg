@@ -1,5 +1,6 @@
 /**
  * External dependencies
+ * Force test to run
  */
 import fetch from 'node-fetch';
 
