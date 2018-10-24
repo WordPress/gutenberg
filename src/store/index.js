@@ -8,7 +8,6 @@ import { registerCoreBlocks } from '@wordpress/block-library';
 import {
 	parse,
 	registerBlockType,
-	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 
@@ -33,7 +32,6 @@ export type StateType = {
 
 registerCoreBlocks();
 registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
-setFreeformContentHandlerName( UnsupportedBlock.name );
 setUnregisteredTypeHandlerName( UnsupportedBlock.name );
 
 export function html2State( html: string ) {
