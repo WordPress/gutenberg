@@ -6,9 +6,9 @@ import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 /**
- * Event emitted by Aztec native view when BackSpace is detected.
+ * Event emitted by Aztec native view when Backspace is detected.
  */
-class ReactAztecBackSpaceEvent extends Event<ReactAztecBackSpaceEvent> {
+class ReactAztecBackspaceEvent extends Event<ReactAztecBackspaceEvent> {
 
   private static final String EVENT_NAME = "topTextInputBackspace";
 
@@ -16,7 +16,7 @@ class ReactAztecBackSpaceEvent extends Event<ReactAztecBackSpaceEvent> {
   private int mSelectionStart;
   private int mSelectionEnd;
 
-  public ReactAztecBackSpaceEvent(int viewId, String text, int selectionStart, int selectionEnd) {
+  public ReactAztecBackspaceEvent(int viewId, String text, int selectionStart, int selectionEnd) {
     super(viewId);
     mText = text;
     mSelectionStart = selectionStart;

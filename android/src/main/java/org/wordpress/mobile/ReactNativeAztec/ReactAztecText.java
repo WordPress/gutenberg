@@ -2,8 +2,6 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 import android.support.annotation.Nullable;
 import android.text.Editable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextWatcher;
 
 import com.facebook.react.bridge.ReactContext;
@@ -15,15 +13,11 @@ import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
-import org.wordpress.aztec.AztecParser;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 import org.wordpress.aztec.ITextFormat;
 import org.wordpress.aztec.plugins.IAztecPlugin;
 import org.wordpress.aztec.plugins.IToolbarButton;
-import org.wordpress.aztec.source.Format;
-import org.wordpress.aztec.spans.AztecCursorSpan;
-import org.wordpress.aztec.watchers.EndOfBufferMarkerAdder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -244,7 +238,7 @@ public class ReactAztecText extends AztecText {
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         // TODO: isRTL? Should be passed here?
         eventDispatcher.dispatchEvent(
-                new ReactAztecBackSpaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+                new ReactAztecBackspaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
         );
     }
 
