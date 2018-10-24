@@ -48,7 +48,7 @@ export class PostPublishPanel extends Component {
 			isPublished,
 			isPublishSidebarEnabled,
 			isScheduled,
-			isSavingPost,
+			isSaving,
 			onClose,
 			onTogglePublishSidebar,
 			PostPublishExtension,
@@ -60,7 +60,7 @@ export class PostPublishPanel extends Component {
 		return (
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
-					{ isPublishedOrScheduled ? (
+					{ isPublishedOrScheduled && ! isSaving ? (
 						<div className="editor-post-publish-panel__header-published">
 							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
 						</div>
@@ -78,17 +78,17 @@ export class PostPublishPanel extends Component {
 					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
-					{ ! isSavingPost && ! isPublishedOrScheduled && (
+					{ ! isSaving && ! isPublishedOrScheduled && (
 						<PostPublishPanelPrepublish>
 							{ PrePublishExtension && <PrePublishExtension /> }
 						</PostPublishPanelPrepublish>
 					) }
-					{ isSavingPost && <Spinner /> }
-					{ isPublishedOrScheduled && (
+					{ ! isSaving && isPublishedOrScheduled && (
 						<PostPublishPanelPostpublish>
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }
+					{ isSaving && ( <Spinner /> ) }
 				</div>
 				<div className="editor-post-publish-panel__footer">
 					<CheckboxControl
