@@ -278,3 +278,19 @@ Core blocks include default styles. The styles are enqueued for editing but are 
 ```php
 add_theme_support( 'wp-block-styles' );
 ```
+
+## Responsive embedded content
+
+The embed blocks automatically apply styles to embedded content to reflect the aspect ratio of content that is embedded in an iframe. A block styled with the aspect ratio responsive styles would look similar to this:
+
+```html
+<figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio">
+   ...
+</figure>
+```
+
+To make the content resize and keep its aspect ratio, the `<body>` element needs the `wp-embed-responsive` class. This is not set by default, and requires the theme to opt in to the `responsive-embeds` feature:
+
+```php
+add_theme_support( 'responsive-embeds' );
+```
