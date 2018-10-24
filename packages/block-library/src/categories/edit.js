@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { times, unescape } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
@@ -11,7 +16,6 @@ import {
 	BlockControls,
 	BlockAlignmentToolbar,
 } from '@wordpress/editor';
-import { times, unescape } from 'lodash';
 
 class CategoriesEdit extends Component {
 	constructor() {
