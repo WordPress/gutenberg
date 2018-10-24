@@ -51,6 +51,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @Override
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
+        aztecText.setFocusableInTouchMode(true);
+        aztecText.setFocusable(true);
         aztecText.setCalypsoMode(false);
         return aztecText;
     }
@@ -90,6 +92,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                         MapBuilder.of(
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onEnter")))
+                .put(
+                        "topTextInputBackspace",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onBackspace")))
                 .put(
                         "topFocus",
                         MapBuilder.of(
@@ -216,17 +223,12 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     @ReactProp(name = "onEnter", defaultBoolean = false)
     public void setOnEnterHandling(final ReactAztecText view, boolean onEnterHandling) {
-        if (onEnterHandling) {
-            view.setOnEnterListener(new ReactAztecText.OnEnterListener() {
-                @Override
-                public boolean onEnterKey() {
-                    view.onEnter();
-                    return true;
-                }
-            });
-        } else {
-            view.setOnEnterListener(null);
-        }
+        view.shouldHandleOnEnter = onEnterHandling;
+    }
+
+    @ReactProp(name = "onBackspace", defaultBoolean = false)
+    public void setOnBackspaceHandling(final ReactAztecText view, boolean onBackspaceHandling) {
+        view.shouldHandleOnBackspace = onBackspaceHandling;
     }
 
     private static final int COMMAND_NOTIFY_APPLY_FORMAT = 1;
