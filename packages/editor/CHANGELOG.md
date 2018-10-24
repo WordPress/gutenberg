@@ -3,6 +3,7 @@
 ### Polish
 
 - Add animated logo to preview interstitial screen.
+- Tweak the editor styles support.
 
 ## 5.0.1 (2018-10-22)
 

@@ -1,5 +1,9 @@
 ## 1.0.5 (Unreleased)
 
+### Polish
+
+- Add the editor styles support's wrapper className.
+
 ### Bug Fixes
 
 - Hide pinned plugins and block traversal tool from header on mobile.
