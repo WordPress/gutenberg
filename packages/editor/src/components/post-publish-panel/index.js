@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,25 +23,6 @@ class PostPublishPanel extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onSubmit = this.onSubmit.bind( this );
-		this.state = {
-			loading: false,
-			submitted: false,
-		};
-	}
-
-	static getDerivedStateFromProps( props, state ) {
-		if (
-			state.submitted ||
-			props.isSaving ||
-			( ! props.isPublished && ! props.isScheduled )
-		) {
-			return null;
-		}
-
-		return {
-			submitted: true,
-			loading: false,
-		};
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -56,26 +37,37 @@ class PostPublishPanel extends Component {
 		const { onClose, hasPublishAction } = this.props;
 		if ( ! hasPublishAction ) {
 			onClose();
-			return;
 		}
-		this.setState( { loading: true } );
 	}
 
 	render() {
-		const { isScheduled, isPublishSidebarEnabled, onClose, onTogglePublishSidebar, forceIsDirty, forceIsSaving, PrePublishExtension, PostPublishExtension, ...additionalProps } = this.props;
-		const { loading, submitted } = this.state;
+		const {
+			forceIsDirty,
+			forceIsSaving,
+			isBeingScheduled,
+			isPublished,
+			isPublishSidebarEnabled,
+			isScheduled,
+			isSavingPost,
+			onClose,
+			onTogglePublishSidebar,
+			PostPublishExtension,
+			PrePublishExtension,
+			...additionalProps
+		} = this.props;
+		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
+		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'postType' ] );
 		return (
-			<div className="editor-post-publish-panel" { ...additionalProps }>
+			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
-					{ ! submitted && (
+					{ isPublishedOrScheduled ? (
+						<div className="editor-post-publish-panel__header-published">
+							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
+						</div>
+					) : (
 						<div className="editor-post-publish-panel__header-publish-button">
 							<PostPublishButton focusOnMount={ true } onSubmit={ this.onSubmit } forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />
 							<span className="editor-post-publish-panel__spacer"></span>
-						</div>
-					) }
-					{ submitted && (
-						<div className="editor-post-publish-panel__header-published">
-							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
 						</div>
 					) }
 					<IconButton
@@ -86,13 +78,13 @@ class PostPublishPanel extends Component {
 					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
-					{ ! loading && ! submitted && (
+					{ ! isSavingPost && ! isPublishedOrScheduled && (
 						<PostPublishPanelPrepublish>
 							{ PrePublishExtension && <PrePublishExtension /> }
 						</PostPublishPanelPrepublish>
 					) }
-					{ loading && ! submitted && <Spinner /> }
-					{ submitted && (
+					{ isSavingPost && <Spinner /> }
+					{ isPublishedOrScheduled && (
 						<PostPublishPanelPostpublish>
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
@@ -117,18 +109,20 @@ export default compose( [
 			getCurrentPostType,
 			isCurrentPostPublished,
 			isCurrentPostScheduled,
-			isSavingPost,
+			isEditedPostBeingScheduled,
 			isEditedPostDirty,
+			isSavingPost,
 		} = select( 'core/editor' );
 		const { isPublishSidebarEnabled } = select( 'core/editor' );
 		return {
-			postType: getCurrentPostType(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
-			isPublished: isCurrentPostPublished(),
-			isScheduled: isCurrentPostScheduled(),
-			isSaving: isSavingPost(),
+			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),
+			isPublished: isCurrentPostPublished(),
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
+			isSaving: isSavingPost(),
+			isScheduled: isCurrentPostScheduled(),
+			postType: getCurrentPostType(),
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
