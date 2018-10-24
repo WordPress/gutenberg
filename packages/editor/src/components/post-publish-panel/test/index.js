@@ -31,6 +31,15 @@ describe( 'PostPublishPanel', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
+	it( 'should render the spinner if the post is being saved', () => {
+		const wrapper = shallow(
+			<PostPublishPanel
+				isSaving={ true }
+			/>
+		);
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
 	it( 'should render the post-publish panel if the post is published', () => {
 		const wrapper = shallow(
 			<PostPublishPanel

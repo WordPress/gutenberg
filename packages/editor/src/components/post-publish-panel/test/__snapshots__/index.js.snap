@@ -143,3 +143,42 @@ exports[`PostPublishPanel should render the pre-publish panel is post status is 
   </div>
 </div>
 `;
+
+exports[`PostPublishPanel should render the spinner if the post is being saved 1`] = `
+<div
+  className="editor-post-publish-panel"
+>
+  <div
+    className="editor-post-publish-panel__header"
+  >
+    <div
+      className="editor-post-publish-panel__header-publish-button"
+    >
+      <WithSelect(WithDispatch(PostPublishButton))
+        focusOnMount={true}
+        onSubmit={[Function]}
+      />
+      <span
+        className="editor-post-publish-panel__spacer"
+      />
+    </div>
+    <IconButton
+      aria-expanded={true}
+      icon="no-alt"
+      label="Close panel"
+    />
+  </div>
+  <div
+    className="editor-post-publish-panel__content"
+  >
+    <_default />
+  </div>
+  <div
+    className="editor-post-publish-panel__footer"
+  >
+    <WithInstanceId(CheckboxControl)
+      label="Always show pre-publish checks."
+    />
+  </div>
+</div>
+`;
