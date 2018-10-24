@@ -28,4 +28,14 @@ describe( 'PostPublishPanel', () => {
 		);
 		expect( wrapper ).toMatchSnapshot();
 	} );
+
+	it( 'should render the post-publish panel if the post is scheduled', () => {
+		const wrapper = shallow(
+			<PostPublishPanel
+				isScheduled={ true }
+				isBeingScheduled={ true }
+			/>
+		);
+		expect( wrapper ).toMatchSnapshot();
+	} );
 } );
