@@ -69,7 +69,6 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
 <div
   className="editor-post-publish-panel"
-  isSaving={false}
 >
   <div
     className="editor-post-publish-panel__header"
