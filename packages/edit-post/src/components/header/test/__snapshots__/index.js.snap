@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PostPublishButtonOrToggle should render button when the post is published 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;

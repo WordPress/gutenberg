@@ -14,7 +14,7 @@ import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
-function PostPublishButtonOrToggle( {
+export function PostPublishButtonOrToggle( {
 	hasPublishAction,
 	isBeingScheduled,
 	isPending,
