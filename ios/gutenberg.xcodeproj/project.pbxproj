@@ -32,6 +32,9 @@
 		2DCD954D1E0B4F2C00145EB5 /* gutenbergTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* gutenbergTests.m */; };
 		2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
+		7E96E3192181006F002206A2 /* GBPostManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E96E2F02181006F002206A2 /* GBPostManager.m */; };
+		7E96E31B218100AD002206A2 /* PostManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E96E31A218100AD002206A2 /* PostManager.swift */; };
+		7E96E31D218100FC002206A2 /* GutenbergBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E96E31C218100FC002206A2 /* GutenbergBridge.swift */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		8C666FF0C9224FB88C2C0447 /* libRNSVG-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BFAFEB337654221B2F14D03 /* libRNSVG-tvOS.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
@@ -378,15 +381,18 @@
 		3ADEFEC092CF4D00BEF1019E /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNTAztecView.a; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
+		7E96E2F02181006F002206A2 /* GBPostManager.m */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = GBPostManager.m; sourceTree = "<group>"; tabWidth = 1; };
+		7E96E31A218100AD002206A2 /* PostManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = PostManager.swift; sourceTree = "<group>"; tabWidth = 1; };
+		7E96E31C218100FC002206A2 /* GutenbergBridge.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = GutenbergBridge.swift; sourceTree = "<group>"; tabWidth = 1; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		9B18D59B9364468890D0E546 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		9BFAFEB337654221B2F14D03 /* libRNSVG-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNSVG-tvOS.a"; sourceTree = "<group>"; };
 		ADBDB91F1DFEBF0600ED6528 /* RCTBlob.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTBlob.xcodeproj; path = "../node_modules/react-native/Libraries/Blob/RCTBlob.xcodeproj"; sourceTree = "<group>"; };
 		F1289ECA2100E4320091E81D /* Aztec.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Aztec.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "gutenberg-Bridging-Header.h"; sourceTree = "<group>"; };
-		F15198382100DC3C000F6E97 /* BridgeDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = BridgeDelegate.swift; path = gutenberg/BridgeDelegate.swift; sourceTree = "<group>"; };
-		F15198392100DC3D000F6E97 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = gutenberg/AppDelegate.swift; sourceTree = "<group>"; };
-		F151983A2100DC3D000F6E97 /* MediaProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MediaProvider.swift; path = gutenberg/MediaProvider.swift; sourceTree = "<group>"; };
+		F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = "gutenberg-Bridging-Header.h"; sourceTree = "<group>"; tabWidth = 1; };
+		F15198382100DC3C000F6E97 /* BridgeDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; path = BridgeDelegate.swift; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; };
+		F15198392100DC3D000F6E97 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = gutenberg/AppDelegate.swift; sourceTree = "<group>"; tabWidth = 1; };
+		F151983A2100DC3D000F6E97 /* MediaProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = MediaProvider.swift; path = gutenberg/MediaProvider.swift; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; };
 		F619623252704B46A619C33C /* RNTAztecView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTAztecView.xcodeproj; path = "../react-native-aztec/ios/RNTAztecView.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -531,10 +537,10 @@
 		13B07FAE1A68108700A75B9A /* gutenberg */ = {
 			isa = PBXGroup;
 			children = (
+				7E96E32121810472002206A2 /* Shared */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */,
 				F15198392100DC3D000F6E97 /* AppDelegate.swift */,
-				F15198382100DC3C000F6E97 /* BridgeDelegate.swift */,
 				F151983A2100DC3D000F6E97 /* MediaProvider.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -591,6 +597,17 @@
 				3DAD3E881DF850E9000B6D8A /* libRCTLinking-tvOS.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7E96E32121810472002206A2 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				7E96E2F02181006F002206A2 /* GBPostManager.m */,
+				7E96E31A218100AD002206A2 /* PostManager.swift */,
+				F15198382100DC3C000F6E97 /* BridgeDelegate.swift */,
+				7E96E31C218100FC002206A2 /* GutenbergBridge.swift */,
+			);
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -1229,7 +1246,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7E96E3192181006F002206A2 /* GBPostManager.m in Sources */,
 				F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */,
+				7E96E31D218100FC002206A2 /* GutenbergBridge.swift in Sources */,
+				7E96E31B218100AD002206A2 /* PostManager.swift in Sources */,
 				F151983B2100DC3D000F6E97 /* BridgeDelegate.swift in Sources */,
 				F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */,
 			);

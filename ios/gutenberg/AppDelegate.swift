@@ -5,30 +5,22 @@ import UIKit
 class AppDelegate: UIResponder, UIApplicationDelegate {
     
     var window: UIWindow?
-    
-    let mediaProvider = MediaProvider()
-    
-    lazy var bridgeDelegate: BridgeDelegate = {
-        let sourceURL = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)!
-        
-        return BridgeDelegate(sourceURL: sourceURL, mediaProvider: self.mediaProvider)
-    }()
-    
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
-        let bridge = RCTBridge(delegate: bridgeDelegate, launchOptions: launchOptions)
-        let rootView = RCTRootView(bridge: bridge, moduleName: "gutenberg", initialProperties: nil)
-        
+
+        GutenbergBridge.start(with: launchOptions, mediaProvider: MediaProvider(), postManager: GBPostManager())
+        let rootView = RCTRootView(bridge: GutenbergBridge.shared.rnBridge, moduleName: "gutenberg", initialProperties: nil)
+
         rootView?.backgroundColor = .white
-        
+
         window = UIWindow(frame: UIScreen.main.bounds)
-        
+
         let rootViewController = UIViewController()
-        
+
         rootViewController.view = rootView
         window?.rootViewController = rootViewController
         window?.makeKeyAndVisible()
-        
+
         return true
     }
     
