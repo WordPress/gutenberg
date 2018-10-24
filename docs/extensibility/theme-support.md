@@ -204,25 +204,6 @@ Enabling editor styles support is done using:
 add_theme_support( 'editor-styles' );
 ```
 
-Alternatively, a theme can provide a stylesheet that will change the editor's appearance entirely. You can use this to change colors, fonts, and any other visual aspect of the editor.
-
-### Add the stylesheet
-
-The first thing to do is to create a new stylesheet file in your theme directory. We'll assume the file is named `style-editor.css`.
-
-Next, load your newly-created editor stylesheet in your theme:
-
-```php
-/**
- * Enqueue block editor style
- */
-function mytheme_block_editor_styles() {
-	wp_enqueue_style( 'mytheme-block-editor-styles', get_theme_file_uri( '/style-editor.css' ), false, '1.0', 'all' );
-}
-
-add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
-```
-
 If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
 
 ```php
@@ -238,7 +219,7 @@ You can style the editor like any other webpage. Here's how to change the backgr
 
 ```css
 /* Add this to your `style-editor.css` file */
-body.block-editor-page {
+body {
 	background-color: #d3ebf3;
 	color: #00005d;
 }
@@ -250,19 +231,17 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 ```css
 /* Main column width */
-body.block-editor-page .editor-post-title__block,
-body.block-editor-page .editor-default-block-appender,
-body.block-editor-page .editor-block-list__block {
+.wp-block {
 	max-width: 720px;
 }
 
 /* Width of "wide" blocks */
-body.block-editor-page .editor-block-list__block[data-align="wide"] {
+.wp-block[data-align="wide"] {
 	max-width: 1080px;
 }
 
 /* Width of "full-wide" blocks */
-body.block-editor-page .editor-block-list__block[data-align="full"] {
+.wp-block[data-align="full"] {
 	max-width: none;
 }
 ```
