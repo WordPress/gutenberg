@@ -37,4 +37,22 @@ describe( 'PostPublishButtonOrToggle', () => {
 		/> );
 		expect( wrapper ).toMatchSnapshot();
 	} );
+
+	it( 'should render button when the post is pending, it cannot be published, and the viewport is not small ', () => {
+		const wrapper = shallow( <PostPublishButtonOrToggle
+			isPending={ true }
+			hasPublishAction={ false }
+			isSmallViewport={ false }
+		/> );
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
+	it( 'should render toggle when the post is pending, it cannot be published, and the viewport is small ', () => {
+		const wrapper = shallow( <PostPublishButtonOrToggle
+			isPending={ true }
+			hasPublishAction={ false }
+			isSmallViewport={ true }
+		/> );
+		expect( wrapper ).toMatchSnapshot();
+	} );
 } );
