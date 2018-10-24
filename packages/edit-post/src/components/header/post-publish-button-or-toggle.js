@@ -15,9 +15,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
 export function PostPublishButtonOrToggle( {
-	hasPublishAction,
 	isBeingScheduled,
-	isPending,
 	isPublished,
 	isPublishSidebarEnabled,
 	isPublishSidebarOpened,
@@ -27,26 +25,42 @@ export function PostPublishButtonOrToggle( {
 	forceIsSaving,
 	togglePublishSidebar,
 } ) {
-	const shouldUseButton = (
-		( ! isPublishSidebarEnabled && ! isSmallViewport ) ||
-		isPublished ||
-		( isScheduled && isBeingScheduled ) ||
-		( isPending && ! hasPublishAction && ! isSmallViewport )
-	);
-
-	const component = shouldUseButton ? (
+	const button = (
 		<PostPublishButton
 			forceIsDirty={ forceIsDirty }
-			forceIsSaving={ forceIsSaving }
-		/>
-	) : (
+			forceIsSaving={ forceIsSaving } />
+	);
+	const toggle = (
 		<PostPublishPanelToggle
 			isOpen={ isPublishSidebarOpened }
 			onToggle={ togglePublishSidebar }
 			forceIsSaving={ forceIsSaving }
 		/>
 	);
-	return component;
+
+	/**
+     * We want to show a BUTTON when the post status is:
+     *
+     * - 'publish': isPublished will be true.
+     * - 'private': isPublished will be true.
+     * - 'future' and post date before now: isPublished will be true.
+     * - 'future' and post date equals or after now: isScheduled will be true.
+     */
+	if ( isPublished || ( isScheduled && isBeingScheduled ) ) {
+		return button;
+	}
+
+	/**
+     * Then, we take other things into account:
+     *
+     * - Show TOGGLE if it is small viewport.
+     * - Otherwise, use publish sidebar status to decide - TOGGLE if enabled, BUTTON if not.
+     */
+	if ( isSmallViewport ) {
+		return toggle;
+	}
+
+	return isPublishSidebarEnabled ? toggle : button;
 }
 
 export default compose(

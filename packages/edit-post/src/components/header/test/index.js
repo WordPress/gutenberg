@@ -9,22 +9,6 @@ import { shallow } from 'enzyme';
 import { PostPublishButtonOrToggle } from '../post-publish-button-or-toggle';
 
 describe( 'PostPublishButtonOrToggle should render a ', () => {
-	it( 'button when the publish sidebar is not enabled and the viewport is > small', () => {
-		const wrapper = shallow( <PostPublishButtonOrToggle
-			isPublishSidebarEnabled={ false }
-			isSmallViewport={ false }
-		/> );
-		expect( wrapper ).toMatchSnapshot();
-	} );
-
-	it( 'toggle when the publish sidebar is not enabled and the viewport is <= small', () => {
-		const wrapper = shallow( <PostPublishButtonOrToggle
-			isPublishSidebarEnabled={ false }
-			isSmallViewport={ true }
-		/> );
-		expect( wrapper ).toMatchSnapshot();
-	} );
-
 	it( 'button when the post is published', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle isPublished={ true } /> );
 		expect( wrapper ).toMatchSnapshot();
@@ -38,20 +22,31 @@ describe( 'PostPublishButtonOrToggle should render a ', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'button when the post is pending, it cannot be published, and the viewport is not small ', () => {
+	it( 'toggle when post is not published or scheduled and the viewport is small', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
-			isPending={ true }
-			hasPublishAction={ false }
-			isSmallViewport={ false }
+			isScheduled={ false }
+			isPublished={ false }
+			isSmallViewport={ true }
 		/> );
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'toggle when the post is pending, it cannot be published, and the viewport is small ', () => {
+	it( 'toggle when post is not published or scheduled, the viewport is not small, and the publish sidebar is enabled', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
-			isPending={ true }
-			hasPublishAction={ false }
-			isSmallViewport={ true }
+			isScheduled={ false }
+			isPublished={ false }
+			isSmallViewport={ false }
+			isPublishSidebarEnabled={ true }
+		/> );
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
+	it( 'button when post is not published or scheduled, the viewport is not small, and the publish sidebar is disabled', () => {
+		const wrapper = shallow( <PostPublishButtonOrToggle
+			isScheduled={ false }
+			isPublished={ false }
+			isSmallViewport={ false }
+			isPublishSidebarEnabled={ false }
 		/> );
 		expect( wrapper ).toMatchSnapshot();
 	} );

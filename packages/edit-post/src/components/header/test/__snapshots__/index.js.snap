@@ -1,13 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PostPublishButtonOrToggle should render button when the post is being scheduled 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
+exports[`PostPublishButtonOrToggle should render a  button when post is not published or scheduled, the viewport is not small, and the publish sidebar is disabled 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
 
-exports[`PostPublishButtonOrToggle should render button when the post is pending, it cannot be published, and the viewport is not small  1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
+exports[`PostPublishButtonOrToggle should render a  button when the post is published 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
 
-exports[`PostPublishButtonOrToggle should render button when the post is published 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
+exports[`PostPublishButtonOrToggle should render a  button when the post is scheduled 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
 
-exports[`PostPublishButtonOrToggle should render button when the publish sidebar is not enabled and the viewport is > small 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
+exports[`PostPublishButtonOrToggle should render a  toggle when post is not published or scheduled and the viewport is small 1`] = `<WithSelect(PostPublishPanelToggle) />`;
 
-exports[`PostPublishButtonOrToggle should render toggle when the post is pending, it cannot be published, and the viewport is small  1`] = `<WithSelect(PostPublishPanelToggle) />`;
-
-exports[`PostPublishButtonOrToggle should render toggle when the publish sidebar is not enabled and the viewport is <= small 1`] = `<WithSelect(PostPublishPanelToggle) />`;
+exports[`PostPublishButtonOrToggle should render a  toggle when post is not published or scheduled, the viewport is not small, and the publish sidebar is enabled 1`] = `<WithSelect(PostPublishPanelToggle) />`;
