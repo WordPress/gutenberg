@@ -7,7 +7,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
+import {
+	DropZone,
+	withFilters,
+} from '@wordpress/components';
 import {
 	rawHandler,
 	cloneBlock,
@@ -162,4 +165,4 @@ export default compose(
 			getClientIdsOfDescendants,
 		};
 	} )
-)( BlockDropZone );
+)( withFilters( 'editor.MediaPlaceholder' )( BlockDropZone ) );
