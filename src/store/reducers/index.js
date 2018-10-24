@@ -65,16 +65,12 @@ export const reducer = (
 
 			// Skip update if nothing has been changed. The reference will
 			// match the original block if `reduce` had no changed values.
-			if ( nextAttributes === findBlock( blocks, action.clientId ).attributes ) {
+			if ( nextAttributes === block.attributes ) {
 				return state;
 			}
 
 			// Otherwise merge attributes into state
-			const index = findBlockIndex( blocks, action.clientId );
-			blocks[ index ] = {
-				...block,
-				attributes: nextAttributes,
-			};
+			block.attributes = nextAttributes;
 
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
