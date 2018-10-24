@@ -66,18 +66,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	findDataSourceIndexForFocusedItem() {
 		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
-			const block = this.findBlockAtIndex( i );
+			const block = this.state.dataSource.get( i );
 			if ( block.focused === true ) {
 				return i;
 			}
 		}
 		return -1;
-	}
-
-	findBlockAtIndex( index: number ): Object {
-		return Platform.OS === 'ios' ?
-			this.props.blocks[ index ] :
-			this.state.dataSource.get( index );
 	}
 
 	// TODO: in the near future this will likely be changed to onShowBlockTypePicker and bound to this.props
