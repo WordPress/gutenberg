@@ -61,6 +61,7 @@ public class ReactAztecText extends AztecText {
             @Override
             public boolean onBackSpaceKey() {
                 if (shouldHandleOnBackspace) {
+                    onBackspace();
                     return true;
                 }
                 return false;
@@ -220,7 +221,7 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
-    public void onEnter() {
+    private void onEnter() {
         disableTextChangedListener();
         String content = toHtml(false);
         int cursorPositionStart = getSelectionStart();
@@ -230,6 +231,20 @@ public class ReactAztecText extends AztecText {
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
                 new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+        );
+    }
+
+    private void onBackspace() {
+        disableTextChangedListener();
+        String content = toHtml(false);
+        int cursorPositionStart = getSelectionStart();
+        int cursorPositionEnd = getSelectionEnd();
+        enableTextChangedListener();
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        // TODO: isRTL? Should be passed here?
+        eventDispatcher.dispatchEvent(
+                new ReactAztecBackSpaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
         );
     }
 
