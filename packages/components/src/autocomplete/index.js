@@ -399,7 +399,7 @@ export class Autocomplete extends Component {
 						return false;
 					}
 
-					return /^\w*$/.test( text.slice( index + triggerPrefix.length ) );
+					return /^\S*$/.test( text.slice( index + triggerPrefix.length ) );
 				} );
 
 				if ( ! open ) {
@@ -408,7 +408,7 @@ export class Autocomplete extends Component {
 				}
 
 				const safeTrigger = escapeRegExp( open.triggerPrefix );
-				const match = text.match( new RegExp( `${ safeTrigger }(\\w*)$` ) );
+				const match = text.match( new RegExp( `${ safeTrigger }(\\S*)$` ) );
 				const query = match && match[ 1 ];
 				const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 
