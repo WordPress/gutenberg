@@ -1,3 +1,4 @@
+force build
 # Gutenberg
 [![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
 [![Coverage](https://img.shields.io/codecov/c/github/WordPress/gutenberg/master.svg)](https://codecov.io/gh/WordPress/gutenberg)
