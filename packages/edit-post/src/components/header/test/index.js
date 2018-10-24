@@ -30,7 +30,7 @@ describe( 'PostPublishButtonOrToggle should render a ', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'button when the post is being scheduled', () => {
+	it( 'button when the post is scheduled', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isScheduled={ true }
 			isBeingScheduled={ true }
