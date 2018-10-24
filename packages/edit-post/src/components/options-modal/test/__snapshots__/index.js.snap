@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OptionsModal should match snapshot when the modal is active 1`] = `
+<WithInstanceId(Modal)
+  className="edit-post-options-modal"
+  closeLabel="Close"
+  title={
+    <span
+      className="edit-post-options-modal__title"
+    >
+      Options
+    </span>
+  }
+>
+  <Section
+    title="General"
+  >
+    <WithSelect(WithDispatch(Option))
+      label="Enable Pre-publish Checks"
+    />
+    <WithSelect(WithDispatch(DeferredOption))
+      label="Enable Tips"
+    />
+  </Section>
+  <Section
+    title="Document Panels"
+  >
+    <WithSelect(PostTaxonomies)
+      taxonomyWrapper={[Function]}
+    />
+    <WithSelect(WithDispatch(Option))
+      label="Featured Image"
+      panelName="featured-image"
+    />
+    <PostExcerptCheck>
+      <WithSelect(WithDispatch(Option))
+        label="Excerpt"
+        panelName="post-excerpt"
+      />
+    </PostExcerptCheck>
+    <WithSelect(WithDispatch(Option))
+      label="Discussion"
+      panelName="discussion-panel"
+    />
+    <WithSelect(PageAttributesCheck)>
+      <WithSelect(WithDispatch(Option))
+        label="Page Attributes"
+        panelName="page-attributes"
+      />
+    </WithSelect(PageAttributesCheck)>
+  </Section>
+</WithInstanceId(Modal)>
+`;

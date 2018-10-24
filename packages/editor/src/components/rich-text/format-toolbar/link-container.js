@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import {
 	ExternalLink,
 	Fill,
@@ -53,7 +53,7 @@ function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
 }
 
-const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink } ) => (
+const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 	<form
@@ -62,7 +62,11 @@ const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink } )
 		onKeyDown={ onKeyDown }
 		onSubmit={ submitLink }
 	>
-		<URLInput value={ inputValue } onChange={ onChangeInputValue } />
+		<URLInput
+			value={ inputValue }
+			onChange={ onChangeInputValue }
+			autocompleteRef={ autocompleteRef }
+		/>
 		<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
 	</form>
 	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
@@ -95,7 +99,9 @@ class LinkContainer extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.setLinkTarget = this.setLinkTarget.bind( this );
+		this.onClickOutside = this.onClickOutside.bind( this );
 		this.resetState = this.resetState.bind( this );
+		this.autocompleteRef = createRef();
 
 		this.state = {};
 	}
@@ -161,6 +167,10 @@ class LinkContainer extends Component {
 			this.props.applyFormat( format );
 		}
 
+		if ( this.state.editLink ) {
+			this.props.speak( __( 'Link edited.' ), 'assertive' );
+		}
+
 		this.resetState();
 
 		if ( ! link ) {
@@ -168,6 +178,19 @@ class LinkContainer extends Component {
 		}
 
 		event.preventDefault();
+	}
+
+	onClickOutside( event ) {
+		// The autocomplete suggestions list renders in a separate popover (in a portal),
+		// so onClickOutside fails to detect that a click on a suggestion occured in the
+		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
+		// return to avoid the popover being closed.
+		const autocompleteElement = this.autocompleteRef.current;
+		if ( autocompleteElement && autocompleteElement.contains( event.target ) ) {
+			return;
+		}
+
+		this.resetState();
 	}
 
 	resetState() {
@@ -192,11 +215,11 @@ class LinkContainer extends Component {
 					key={ `${ record.start }${ record.end }` /* Used to force rerender on selection change */ }
 				>
 					<URLPopover
-						onClickOutside={ this.resetState }
+						onClickOutside={ this.onClickOutside }
 						focusOnMount={ showInput ? 'firstElement' : false }
 						renderSettings={ () => (
 							<ToggleControl
-								label={ __( 'Open in New Window' ) }
+								label={ __( 'Open in New Tab' ) }
 								checked={ opensInNewWindow }
 								onChange={ this.setLinkTarget }
 							/>
@@ -208,6 +231,7 @@ class LinkContainer extends Component {
 								onChangeInputValue={ this.onChangeInputValue }
 								onKeyDown={ this.onKeyDown }
 								submitLink={ this.submitLink }
+								autocompleteRef={ this.autocompleteRef }
 							/>
 						) : (
 							<LinkViewer

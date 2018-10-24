@@ -18,13 +18,12 @@ function renderIcon( icon ) {
 		}
 
 		return icon();
-	} else if ( icon && icon.type === 'svg' ) {
+	} else if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
 		const appliedProps = {
 			...icon.props,
 			width: icon.props.width || 24,
 			height: icon.props.height || 24,
 		};
-
 		return <SVG { ...appliedProps } />;
 	}
 

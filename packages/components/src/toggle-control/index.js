@@ -13,7 +13,7 @@ import { withInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import FormToggle from '../form-toggle';
-import BaseControl from './../base-control';
+import BaseControl from '../base-control';
 
 class ToggleControl extends Component {
 	constructor() {
@@ -40,7 +40,6 @@ class ToggleControl extends Component {
 
 		return (
 			<BaseControl
-				label={ label }
 				id={ id }
 				help={ helpLabel }
 				className="components-toggle-control"
@@ -51,6 +50,12 @@ class ToggleControl extends Component {
 					onChange={ this.onChange }
 					aria-describedby={ describedBy }
 				/>
+				<label
+					htmlFor={ id }
+					className="components-toggle-control__label"
+				>
+					{ label }
+				</label>
 			</BaseControl>
 		);
 	}

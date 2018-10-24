@@ -8,6 +8,7 @@ import { flatMap, filter, compact } from 'lodash';
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
+import { getBlockContent } from '../serializer';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
@@ -140,7 +141,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	const phrasingContentSchema = getPhrasingContentSchema();
 	const blockContentSchema = getBlockContentSchema( rawTransformations );
 
-	return compact( flatMap( pieces, ( piece ) => {
+	const blocks = compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
 		if ( typeof piece !== 'string' ) {
 			return piece;
@@ -207,4 +208,20 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 			);
 		} );
 	} ) );
+
+	// If we're allowed to return inline content and there is only one block
+	// and the original plain text content does not have any line breaks, then
+	// treat it as inline paste.
+	if ( mode === 'AUTO' && blocks.length === 1 ) {
+		const trimmedPlainText = plainText.trim();
+
+		if ( trimmedPlainText !== '' && trimmedPlainText.indexOf( '\n' ) === -1 ) {
+			return removeInvalidHTML(
+				getBlockContent( blocks[ 0 ] ),
+				phrasingContentSchema
+			);
+		}
+	}
+
+	return blocks;
 }

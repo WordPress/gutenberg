@@ -32,6 +32,7 @@ import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import OptionsModal from '../options-modal';
 import MetaBoxes from '../meta-boxes';
 import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
@@ -81,6 +82,7 @@ function Layout( {
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
+				<OptionsModal />
 				{ mode === 'text' && <TextEditor /> }
 				{ mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
