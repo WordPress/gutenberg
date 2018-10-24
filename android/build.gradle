@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        gradlePluginVersion = '3.0.1'
+        gradlePluginVersion = '3.1.0'
         kotlinVersion = '1.2.31'
         supportLibVersion = '27.1.1'
         tagSoupVersion = '1.2.2'
@@ -14,9 +14,8 @@ buildscript {
     }
 
     repositories {
-        maven { url 'https://maven.google.com' }
-        jcenter()
         google()
+        jcenter()
     }
 
     dependencies {
@@ -29,7 +28,6 @@ allprojects {
     repositories {
         mavenLocal()
         google()
-        maven { url 'https://maven.google.com' }
         jcenter()
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
