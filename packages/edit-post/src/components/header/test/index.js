@@ -8,8 +8,8 @@ import { shallow } from 'enzyme';
  */
 import { PostPublishButtonOrToggle } from '../post-publish-button-or-toggle';
 
-describe( 'PostPublishButtonOrToggle', () => {
-	it( 'should render button when the publish sidebar is not enabled and the viewport is > small', () => {
+describe( 'PostPublishButtonOrToggle should render a ', () => {
+	it( 'button when the publish sidebar is not enabled and the viewport is > small', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isPublishSidebarEnabled={ false }
 			isSmallViewport={ false }
@@ -17,7 +17,7 @@ describe( 'PostPublishButtonOrToggle', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should render toggle when the publish sidebar is not enabled and the viewport is <= small', () => {
+	it( 'toggle when the publish sidebar is not enabled and the viewport is <= small', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isPublishSidebarEnabled={ false }
 			isSmallViewport={ true }
@@ -25,12 +25,12 @@ describe( 'PostPublishButtonOrToggle', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should render button when the post is published', () => {
+	it( 'button when the post is published', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle isPublished={ true } /> );
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should render button when the post is being scheduled', () => {
+	it( 'button when the post is being scheduled', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isScheduled={ true }
 			isBeingScheduled={ true }
@@ -38,7 +38,7 @@ describe( 'PostPublishButtonOrToggle', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should render button when the post is pending, it cannot be published, and the viewport is not small ', () => {
+	it( 'button when the post is pending, it cannot be published, and the viewport is not small ', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isPending={ true }
 			hasPublishAction={ false }
@@ -47,7 +47,7 @@ describe( 'PostPublishButtonOrToggle', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	it( 'should render toggle when the post is pending, it cannot be published, and the viewport is small ', () => {
+	it( 'toggle when the post is pending, it cannot be published, and the viewport is small ', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isPending={ true }
 			hasPublishAction={ false }
