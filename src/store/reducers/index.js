@@ -76,7 +76,6 @@ export const reducer = (
 		}
 		case ActionTypes.BLOCK.FOCUS: {
 			const destBlock = findBlock( blocks, action.clientId );
-			const destBlockState = destBlock.focused;
 
 			// Deselect all blocks
 			for ( const block of blocks ) {
