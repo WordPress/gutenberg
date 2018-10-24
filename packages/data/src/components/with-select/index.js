@@ -11,30 +11,6 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { RegistryConsumer } from '../registry-provider';
 
 /**
- * Returns a unique identifier per passed object reference. The same identifier
- * is returned so long as subsequent invocations are made with the same value
- * reference.
- *
- * @param {Object} object Value for which to return unique identifier.
- *
- * @return {string} Unique identifier.
- */
-export const getUniqueKeyByObject = ( () => {
-	const map = new WeakMap();
-	let counter = 0;
-
-	return ( object ) => {
-		let id = map.get( object );
-		if ( id === undefined ) {
-			id = ( counter++ ).toString();
-			map.set( object, id );
-		}
-
-		return id;
-	};
-} )();
-
-/**
  * Higher-order component used to inject state-derived props using registered
  * selectors.
  *
@@ -72,7 +48,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		constructor( props ) {
 			super( props );
 
-			this.subscribe();
+			this.subscribe( props.registry );
 
 			this.mergeProps = getNextMergeProps( props );
 		}
@@ -87,7 +63,19 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		}
 
 		shouldComponentUpdate( nextProps, nextState ) {
-			const hasPropsChanged = ! isShallowEqual( this.props.ownProps, nextProps.ownProps );
+			// Cycle subscription if registry changes.
+			const hasRegistryChanged = nextProps.registry !== this.props.registry;
+			if ( hasRegistryChanged ) {
+				this.unsubscribe();
+				this.subscribe( nextProps.registry );
+			}
+
+			// Treat a registry change as equivalent to `ownProps`, to reflect
+			// `mergeProps` to rendered component if and only if updated.
+			const hasPropsChanged = (
+				hasRegistryChanged ||
+				! isShallowEqual( this.props.ownProps, nextProps.ownProps )
+			);
 
 			// Only render if props have changed or merge props have been updated
 			// from the store subscriber.
@@ -95,27 +83,28 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 				return false;
 			}
 
-			// If merge props change as a result of the incoming props, they
-			// should be reflected as such in the upcoming render.
 			if ( hasPropsChanged ) {
 				const nextMergeProps = getNextMergeProps( nextProps );
 				if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
-					// Side effects are typically discouraged in lifecycle methods, but
-					// this component is heavily used and this is the most performant
-					// code we've found thus far.
-					// Prior efforts to use `getDerivedStateFromProps` have demonstrated
-					// miserable performance.
+					// If merge props change as a result of the incoming props,
+					// they should be reflected as such in the upcoming render.
+					// While side effects are discouraged in lifecycle methods,
+					// this component is used heavily, and prior efforts to use
+					// `getDerivedStateFromProps` had demonstrated miserable
+					// performance.
 					this.mergeProps = nextMergeProps;
 				}
+
+				// Regardless whether merge props are changing, fall through to
+				// incur the render since the component will need to receive
+				// the changed `ownProps`.
 			}
 
 			return true;
 		}
 
-		subscribe() {
-			const { subscribe } = this.props.registry;
-
-			this.unsubscribe = subscribe( () => {
+		subscribe( registry ) {
+			this.unsubscribe = registry.subscribe( () => {
 				if ( ! this.canRunSelection ) {
 					return;
 				}
@@ -148,7 +137,6 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		<RegistryConsumer>
 			{ ( registry ) => (
 				<ComponentWithSelect
-					key={ getUniqueKeyByObject( registry ) }
 					ownProps={ ownProps }
 					registry={ registry }
 				/>

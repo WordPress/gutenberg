@@ -11,41 +11,10 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import withSelect, { getUniqueKeyByObject } from '../';
+import withSelect from '../';
 import withDispatch from '../../with-dispatch';
 import { createRegistry } from '../../../registry';
 import RegistryProvider from '../../registry-provider';
-
-describe( 'getUniqueKeyByObject', () => {
-	it( 'returns a string', () => {
-		expect( typeof getUniqueKeyByObject( {} ) ).toBe( 'string' );
-	} );
-
-	it( 'returns the same id on repeated call with same value', () => {
-		const value = {};
-		let lastId = getUniqueKeyByObject( value );
-		let id;
-
-		id = getUniqueKeyByObject( value );
-		expect( id ).toBe( lastId );
-		lastId = id;
-
-		id = getUniqueKeyByObject( value );
-		expect( id ).toBe( lastId );
-	} );
-
-	it( 'returns the unique id on repeated call with differing value', () => {
-		let lastId = getUniqueKeyByObject( {} );
-		let id;
-
-		id = getUniqueKeyByObject( {} );
-		expect( id ).not.toBe( lastId );
-		lastId = id;
-
-		id = getUniqueKeyByObject( {} );
-		expect( id ).not.toBe( lastId );
-	} );
-} );
 
 describe( 'withSelect', () => {
 	let registry;
