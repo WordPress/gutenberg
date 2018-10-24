@@ -105,10 +105,7 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function padEmptyLines( {
-	element,
-	createLinePadding = ( doc ) => doc.createElement( 'br' ),
-} ) {
+function padEmptyLines( { element, createLinePadding } ) {
 	const length = element.childNodes.length;
 	const doc = element.ownerDocument;
 
@@ -158,7 +155,9 @@ export function toDom( {
 		},
 	} );
 
-	padEmptyLines( { element: tree, createLinePadding } );
+	if ( createLinePadding ) {
+		padEmptyLines( { element: tree, createLinePadding } );
+	}
 
 	return {
 		body: tree,
