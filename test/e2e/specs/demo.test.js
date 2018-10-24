@@ -11,7 +11,7 @@ import { visitAdmin } from '../support/utils';
 
 const MOCK_VIMEO_RESPONSE = {
 	url: 'https://vimeo.com/22439234',
-	html: '<iframe width="16" height="9"></iframe>',
+	html: '<iframe width="32" height="18"></iframe>',
 	type: 'video',
 	provider_name: 'Vimeo',
 	provider_url: 'https://vimeo.com',
