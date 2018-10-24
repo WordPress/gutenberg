@@ -97,7 +97,7 @@ export function __experimentalGetSettings() {
 // deprecations
 export function getSettings() {
 	deprecated( 'wp.date.getSettings', {
-		version: '4.2',
+		version: '4.4',
 		alternative: 'wp.date.__experimentalGetSettings',
 		plugin: 'Gutenberg',
 		hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
