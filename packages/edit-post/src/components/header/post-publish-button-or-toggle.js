@@ -15,7 +15,9 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
 export function PostPublishButtonOrToggle( {
+	hasPublishAction,
 	isBeingScheduled,
+	isPending,
 	isPublished,
 	isPublishSidebarEnabled,
 	isPublishSidebarOpened,
@@ -39,14 +41,22 @@ export function PostPublishButtonOrToggle( {
 	);
 
 	/**
-     * We want to show a BUTTON when the post status is:
+     * We want to show a BUTTON when the post status is at the _final stage_
+     * for a particular role (see https://codex.wordpress.org/Post_Status):
      *
-     * - 'publish': isPublished will be true.
-     * - 'private': isPublished will be true.
-     * - 'future' and post date before now: isPublished will be true.
-     * - 'future' and post date equals or after now: isScheduled will be true.
+     * - is published
+     * - is scheduled to be published
+     * - is pending and can't be published (but only for viewports > small)
+     *
+     * Originally we considered showing a button for pending posts
+     * that couldn't be published (for ex, for a contributor role).
+     * Some languages can have really long translations for "Submit for review",
+     * so given the lack of UI real state we decided to take into account the viewport
+     * in that particular case.
      */
-	if ( isPublished || ( isScheduled && isBeingScheduled ) ) {
+	if ( isPublished ||
+        ( isScheduled && isBeingScheduled ) ||
+        ( isPending && ! hasPublishAction && ! isSmallViewport ) ) {
 		return button;
 	}
 
