@@ -420,7 +420,12 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_script(
 		'wp-rich-text',
 		gutenberg_url( 'build/rich-text/index.js' ),
-		array( 'wp-polyfill', 'wp-escape-html', 'lodash' ),
+		array(
+			'lodash',
+			'wp-polyfill',
+			'wp-data',
+			'wp-escape-html',
+		),
 		filemtime( gutenberg_dir_path() . 'build/rich-text/index.js' ),
 		true
 	);
