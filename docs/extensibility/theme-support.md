@@ -281,7 +281,7 @@ add_theme_support( 'wp-block-styles' );
 
 ## Responsive embedded content
 
-The embed blocks automatically apply styles to embedded content to reflect the aspect ratio of content that is embedded in an iframe. A block styled with the aspect ratio responsive styles would look similar to this:
+The embed blocks automatically apply styles to embedded content to reflect the aspect ratio of content that is embedded in an iFrame. A block styled with the aspect ratio responsive styles would look like:
 
 ```html
 <figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio">
