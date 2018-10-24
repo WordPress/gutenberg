@@ -250,7 +250,7 @@ export function getEmbedEditComponent( title, icon ) {
 		}
 
 		getResponsiveHelp( checked ) {
-			return checked ? __( 'Videos and other content automatically resizes.' ) : __( 'Content is fixed size.' );
+			return checked ? __( 'This embed will preserve its aspect ratio when the browser is resized.' ) : __( 'This embed may not preserve its aspect ratio when the browser is resized.' );
 		}
 
 		toggleResponsive() {
@@ -288,7 +288,7 @@ export function getEmbedEditComponent( title, icon ) {
 						<InspectorControls>
 							<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
 								<ToggleControl
-									label={ __( 'Automatically scale content' ) }
+									label={ __( 'Resize for smaller devices' ) }
 									checked={ allowResponsive }
 									help={ this.getResponsiveHelp }
 									onChange={ this.toggleResponsive }
