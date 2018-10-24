@@ -12,7 +12,7 @@ import type { BlockType } from '../store/';
 import styles from './block-holder.scss';
 
 // Gutenberg imports
-import { getBlockType, getUnknownTypeHandlerName } from '@wordpress/blocks';
+import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 
 type PropsType = BlockType & {
 	showTitle: boolean,
@@ -81,7 +81,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 		let blockType = getBlockType( blockName );
 
 		if ( ! blockType ) {
-			const fallbackBlockName = getUnknownTypeHandlerName();
+			const fallbackBlockName = getUnregisteredTypeHandlerName();
 			blockType = getBlockType( fallbackBlockName );
 		}
 
