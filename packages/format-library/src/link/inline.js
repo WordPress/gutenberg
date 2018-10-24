@@ -163,13 +163,11 @@ class InlineLinkUI extends Component {
 			onChange( applyFormat( value, format ) );
 		}
 
-		if ( this.state.editLink ) {
-			this.props.speak( __( 'Link edited.' ), 'assertive' );
-		}
-
 		this.resetState();
 
-		if ( ! isActive ) {
+		if ( isActive ) {
+			speak( __( 'Link edited.' ), 'assertive' );
+		} else {
 			speak( __( 'Link added.' ), 'assertive' );
 		}
 	}

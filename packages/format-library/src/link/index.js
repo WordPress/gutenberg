@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
+import { withSpokenMessages } from '@wordpress/components';
 import {
 	getTextContent,
 	applyFormat,
@@ -28,12 +29,13 @@ export const link = {
 		url: 'href',
 		target: 'target',
 	},
-	edit: class LinkEdit extends Component {
+	edit: withSpokenMessages( class LinkEdit extends Component {
 		constructor() {
 			super( ...arguments );
 
 			this.addLink = this.addLink.bind( this );
 			this.stopAddingLink = this.stopAddingLink.bind( this );
+			this.onRemoveFormat = this.onRemoveFormat.bind( this );
 			this.state = {
 				addingLink: false,
 			};
@@ -54,39 +56,50 @@ export const link = {
 			this.setState( { addingLink: false } );
 		}
 
+		onRemoveFormat() {
+			const { value, onChange, speak } = this.props;
+
+			onChange( removeFormat( value, name ) );
+			speak( __( 'Link removed.' ), 'assertive' );
+		}
+
 		render() {
 			const { isActive, activeAttributes, value, onChange, ToolbarButton, Shortcut } = this.props;
-			const onRemoveFormat = () => onChange( removeFormat( value, name ) );
 
 			return (
 				<Fragment>
 					<Shortcut
 						type="access"
-						character="s"
-						onUse={ onRemoveFormat }
+						character="a"
+						onUse={ this.addLink }
 					/>
 					<Shortcut
 						type="access"
-						character="a"
-						onUse={ () => this.addLink() }
+						character="s"
+						onUse={ this.onRemoveFormat }
 					/>
 					<Shortcut
 						type="primary"
 						character="k"
-						onUse={ () => this.addLink() }
+						onUse={ this.addLink }
+					/>
+					<Shortcut
+						type="primaryShift"
+						character="k"
+						onUse={ this.onRemoveFormat }
 					/>
 					{ isActive && <ToolbarButton
 						name="link"
 						icon="editor-unlink"
 						title={ __( 'Unlink' ) }
-						onClick={ onRemoveFormat }
+						onClick={ this.onRemoveFormat }
 						isActive={ isActive }
 					/> }
 					{ ! isActive && <ToolbarButton
 						name="link"
 						icon="admin-links"
 						title={ __( 'Link' ) }
-						onClick={ () => this.addLink() }
+						onClick={ this.addLink }
 						isActive={ isActive }
 					/> }
 					<InlineLinkUI
@@ -100,5 +113,5 @@ export const link = {
 				</Fragment>
 			);
 		}
-	},
+	} ),
 };
