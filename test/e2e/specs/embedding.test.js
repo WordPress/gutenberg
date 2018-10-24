@@ -67,7 +67,7 @@ const setupEmbedRequestInterception = async () => {
 	await page.setRequestInterception( true );
 	page.on( 'request', async ( request ) => {
 		const requestUrl = request.url();
-		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed/1.0/proxy' );
+		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed%2F1.0%2Fproxy' );
 		if ( isEmbeddingUrl ) {
 			const embedUrl = decodeURIComponent( /.*url=([^&]+).*/.exec( requestUrl )[ 1 ] );
 			const mockResponse = MOCK_RESPONSES[ embedUrl ];
@@ -146,7 +146,7 @@ const setUp = async () => {
 describe( 'Embedding content', () => {
 	beforeEach( setUp );
 
-	it.skip( 'should render embeds in the correct state', async () => {
+	it( 'should render embeds in the correct state', async () => {
 		// The successful embeds should be in a correctly classed figure element.
 		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
