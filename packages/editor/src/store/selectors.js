@@ -1256,6 +1256,17 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the caret is within formatted text, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the caret is within formatted text.
+ */
+export function isCaretWithinFormattedText( state ) {
+	return state.isCaretWithinFormattedText;
+}
+
+/**
  * Returns the insertion point, the index at which the new inserted block would
  * be placed. Defaults to the last index.
  *

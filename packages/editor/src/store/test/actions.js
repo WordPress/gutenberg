@@ -5,6 +5,14 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
+	createNotice,
+	createErrorNotice,
+	createInfoNotice,
+	createSuccessNotice,
+	createWarningNotice,
+	removeNotice,
+	enterFormattedText,
+	leaveFormattedText,
 	fetchReusableBlocks,
 	saveReusableBlock,
 	deleteReusableBlock,
@@ -340,6 +348,130 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
+			} );
+		} );
+	} );
+
+	describe( 'enterFormattedText', () => {
+		it( 'should return the ENTER_FORMATTED_TEXT action', () => {
+			expect( enterFormattedText() ).toEqual( {
+				type: 'ENTER_FORMATTED_TEXT',
+			} );
+		} );
+	} );
+
+	describe( 'leaveFormattedText', () => {
+		it( 'should return the LEAVE_FORMATTED_TEXT action', () => {
+			expect( leaveFormattedText() ).toEqual( {
+				type: 'LEAVE_FORMATTED_TEXT',
+			} );
+		} );
+	} );
+
+	describe( 'createNotice', () => {
+		const status = 'status';
+		const content = <p>element</p>;
+		it( 'should return CREATE_NOTICE action when options is empty', () => {
+			const result = createNotice( status, content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status,
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
+		} );
+		it( 'should return CREATE_NOTICE action when options is desined', () => {
+			const id = 'my-id';
+			const options = {
+				id,
+				isDismissible: false,
+			};
+			const result = createNotice( status, content, options );
+			expect( result ).toEqual( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					id,
+					status,
+					content,
+					isDismissible: false,
+				},
+			} );
+		} );
+	} );
+
+	describe( 'createSuccessNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const content = <p>element</p>;
+			const result = createSuccessNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'success',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
+		} );
+	} );
+
+	describe( 'createInfoNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const content = <p>element</p>;
+			const result = createInfoNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'info',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
+		} );
+	} );
+
+	describe( 'createErrorNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const content = <p>element</p>;
+			const result = createErrorNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'error',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
+		} );
+	} );
+
+	describe( 'createWarningNotice', () => {
+		it( 'should return CREATE_NOTICE action', () => {
+			const content = <p>element</p>;
+			const result = createWarningNotice( content );
+			expect( result ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				notice: {
+					status: 'warning',
+					content,
+					isDismissible: true,
+					id: expect.any( String ),
+				},
+			} );
+		} );
+	} );
+
+	describe( 'removeNotice', () => {
+		it( 'should return REMOVE_NOTICE actions', () => {
+			const noticeId = 'id';
+			expect( removeNotice( noticeId ) ).toEqual( {
+				type: 'REMOVE_NOTICE',
+				noticeId,
 			} );
 		} );
 	} );
