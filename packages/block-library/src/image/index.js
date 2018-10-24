@@ -68,6 +68,12 @@ const blockAttributes = {
 		type: 'string',
 		default: 'none',
 	},
+	linkTarget: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'target',
+	},
 };
 
 const imageSchema = {
@@ -83,7 +89,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'href' ],
+				attributes: [ 'href', 'target' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -207,7 +213,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const { url, alt, caption, align, href, width, height, id, linkTarget } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -226,7 +232,7 @@ export const settings = {
 
 		const figure = (
 			<Fragment>
-				{ href ? <a href={ href }>{ image }</a> : image }
+				{ href ? <a href={ href } target={ linkTarget } rel={ linkTarget === '_blank' ? 'noreferrer noopener' : undefined }>{ image }</a> : image }
 				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);
