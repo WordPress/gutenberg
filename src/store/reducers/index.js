@@ -76,15 +76,13 @@ export const reducer = (
 		}
 		case ActionTypes.BLOCK.FOCUS: {
 			const destBlock = findBlock( blocks, action.clientId );
-			const destBlockState = destBlock.focused;
 
 			// Deselect all blocks
 			for ( const block of blocks ) {
 				block.focused = false;
 			}
 
-			// Select or deselect pressed block
-			destBlock.focused = ! destBlockState;
+			destBlock.focused = true;
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.MOVE_UP: {
