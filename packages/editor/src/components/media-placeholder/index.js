@@ -13,6 +13,7 @@ import {
 	Placeholder,
 	DropZone,
 	IconButton,
+	withFilters,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
@@ -221,4 +222,4 @@ class MediaPlaceholder extends Component {
 	}
 }
 
-export default MediaPlaceholder;
+export default withFilters( 'editor.MediaPlaceholder' )( MediaPlaceholder );
