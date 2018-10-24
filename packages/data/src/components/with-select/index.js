@@ -3,12 +3,36 @@
  */
 import { Component } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { remountOnPropChange, createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { RegistryConsumer } from '../registry-provider';
+
+/**
+ * Returns a unique identifier per passed object reference. The same identifier
+ * is returned so long as subsequent invocations are made with the same value
+ * reference.
+ *
+ * @param {Object} object Value for which to return unique identifier.
+ *
+ * @return {string} Unique identifier.
+ */
+export const getUniqueKeyByObject = ( () => {
+	const map = new WeakMap();
+	let counter = 0;
+
+	return ( object ) => {
+		let id = map.get( object );
+		if ( id === undefined ) {
+			id = ( counter++ ).toString();
+			map.set( object, id );
+		}
+
+		return id;
+	};
+} )();
 
 /**
  * Higher-order component used to inject state-derived props using registered
@@ -44,7 +68,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		);
 	}
 
-	const ComponentWithSelect = remountOnPropChange( 'registry' )( class extends Component {
+	class ComponentWithSelect extends Component {
 		constructor( props ) {
 			super( props );
 
@@ -118,12 +142,13 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		render() {
 			return <WrappedComponent { ...this.props.ownProps } { ...this.mergeProps } />;
 		}
-	} );
+	}
 
 	return ( ownProps ) => (
 		<RegistryConsumer>
 			{ ( registry ) => (
 				<ComponentWithSelect
+					key={ getUniqueKeyByObject( registry ) }
 					ownProps={ ownProps }
 					registry={ registry }
 				/>
