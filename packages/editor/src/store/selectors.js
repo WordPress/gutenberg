@@ -1016,13 +1016,27 @@ export function getLastMultiSelectedBlockClientId( state ) {
  * specified client ID is the first block of the multi-selection set, or false
  * otherwise.
  *
- * @param {Object} state      Editor state.
- * @param {string} clientId   Block client ID.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
- * @return {boolean} Whether block is first in mult-selection.
+ * @return {boolean} Whether block is first in multi-selection.
  */
 export function isFirstMultiSelectedBlock( state, clientId ) {
 	return getFirstMultiSelectedBlockClientId( state ) === clientId;
+}
+
+/**
+ * Returns true if a multi-selection exists, and the block corresponding to the
+ * specified client ID is the last block of the multi-selection set, or false
+ * otherwise.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Whether block is last in mult-selection.
+ */
+export function isLastMultiSelectedBlock( state, clientId ) {
+	return getLastMultiSelectedBlockClientId( state ) === clientId;
 }
 
 /**

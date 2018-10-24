@@ -613,7 +613,7 @@
 .editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index(".editor-block-list__insertion-point");
-	margin-top: -$block-padding;
+	margin-bottom: -$block-padding;
 }
 
 .editor-block-list__insertion-point-indicator {
@@ -640,7 +640,7 @@
 	justify-content: center;
 
 	// Show a clickable plus.
-	.editor-block-list__insertion-point-button {
+	.editor-inserter__toggle {
 		margin-top: -4px;
 		border-radius: 50%;
 		color: $blue-medium-focus;
@@ -663,30 +663,14 @@
 	}
 }
 
-// Don't show the sibling inserter before the selected block.
-.edit-post-layout:not(.has-fixed-toolbar) {
-	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter {
-		opacity: 0;
-		pointer-events: none;
-
-		&:hover,
-		&.is-visible {
-			opacity: 1;
-			pointer-events: auto;
-		}
-	}
-}
-
 // This is the edge-to-edge hover area that contains the plus.
 .editor-block-list__block {
 	> .editor-block-list__insertion-point {
 		position: absolute;
-		top: -$block-padding - $block-spacing / 2;
+		bottom: -$block-padding - $block-spacing / 2;
 
 		// Matches the whole empty space between two blocks.
 		height: $block-padding * 2;
-		bottom: auto;
 
 		// Go edge to edge on mobile.
 		left: 0;
