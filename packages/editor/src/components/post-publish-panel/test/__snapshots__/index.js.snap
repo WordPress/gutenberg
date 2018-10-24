@@ -1,5 +1,38 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`PostPublishPanel should render the post-publish panel if the post is published 1`] = `
+<div
+  className="editor-post-publish-panel"
+>
+  <div
+    className="editor-post-publish-panel__header"
+  >
+    <div
+      className="editor-post-publish-panel__header-published"
+    >
+      Published
+    </div>
+    <IconButton
+      aria-expanded={true}
+      icon="no-alt"
+      label="Close panel"
+    />
+  </div>
+  <div
+    className="editor-post-publish-panel__content"
+  >
+    <WithSelect(PostPublishPanelPostpublish) />
+  </div>
+  <div
+    className="editor-post-publish-panel__footer"
+  >
+    <WithInstanceId(CheckboxControl)
+      label="Always show pre-publish checks."
+    />
+  </div>
+</div>
+`;
+
 exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
 <div
   className="editor-post-publish-panel"

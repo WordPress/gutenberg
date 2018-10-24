@@ -19,4 +19,13 @@ describe( 'PostPublishPanel', () => {
 		);
 		expect( wrapper ).toMatchSnapshot();
 	} );
+
+	it( 'should render the post-publish panel if the post is published', () => {
+		const wrapper = shallow(
+			<PostPublishPanel
+				isPublished={ true }
+			/>
+		);
+		expect( wrapper ).toMatchSnapshot();
+	} );
 } );
