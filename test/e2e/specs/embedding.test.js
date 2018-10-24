@@ -146,7 +146,7 @@ const setUp = async () => {
 describe( 'Embedding content', () => {
 	beforeEach( setUp );
 
-	it.skip( 'should render embeds in the correct state', async () => {
+	it( 'should render embeds in the correct state', async () => {
 		// The successful embeds should be in a correctly classed figure element.
 		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
