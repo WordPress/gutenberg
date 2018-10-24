@@ -22,6 +22,15 @@ describe( 'PostPublishButtonOrToggle should render a ', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
+	it( 'button when the post is pending and cannot be published but the viewport is > small', () => {
+		const wrapper = shallow( <PostPublishButtonOrToggle
+			isPending={ true }
+			hasPublishAction={ false }
+			isSmallViewport={ false }
+		/> );
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
 	it( 'toggle when post is not published or scheduled and the viewport is small', () => {
 		const wrapper = shallow( <PostPublishButtonOrToggle
 			isScheduled={ false }

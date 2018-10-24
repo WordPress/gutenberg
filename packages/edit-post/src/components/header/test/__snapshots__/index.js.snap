@@ -2,6 +2,8 @@
 
 exports[`PostPublishButtonOrToggle should render a  button when post is not published or scheduled, the viewport is not small, and the publish sidebar is disabled 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
 
+exports[`PostPublishButtonOrToggle should render a  button when the post is pending and cannot be published but the viewport is > small 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
+
 exports[`PostPublishButtonOrToggle should render a  button when the post is published 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
 
 exports[`PostPublishButtonOrToggle should render a  button when the post is scheduled 1`] = `<WithSelect(WithDispatch(PostPublishButton)) />`;
