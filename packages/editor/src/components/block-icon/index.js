@@ -9,6 +9,16 @@ import classnames from 'classnames';
 import { Dashicon, SVG } from '@wordpress/components';
 import { createElement, Component } from '@wordpress/element';
 
+function isSVGIcon( icon ) {
+	if ( icon && icon.type === 'svg' ) {
+		return true;
+	} else if ( icon && icon.type.name === 'SVG' ) {
+		return true;
+	}
+
+	return false;
+}
+
 function renderIcon( icon ) {
 	if ( 'string' === typeof icon ) {
 		return <Dashicon icon={ icon } size={ 20 } />;
@@ -18,13 +28,12 @@ function renderIcon( icon ) {
 		}
 
 		return icon();
-	} else if ( icon && icon.type === 'svg' ) {
+	} else if ( isSVGIcon( icon ) ) {
 		const appliedProps = {
 			...icon.props,
 			width: icon.props.width || 24,
 			height: icon.props.height || 24,
 		};
-
 		return <SVG { ...appliedProps } />;
 	}
 
