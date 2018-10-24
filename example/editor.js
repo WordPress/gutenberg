@@ -48,6 +48,7 @@ export default class Editor extends Component {
                 onContentSizeChange= { onContentSizeChange }
                 onChange= {(event) => console.log(event.nativeEvent) }
                 onEnter= {(event) => console.log("asta") }
+                onBackspace= {(event) => console.log("Ciao") }
                 onEndEditing= {(event) => console.log(event.nativeEvent) }
                 onActiveFormatsChange = { this.onActiveFormatsChange }
                 color = {'black'}

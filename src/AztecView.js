@@ -15,6 +15,7 @@ class AztecView extends React.Component {
     onChange: PropTypes.func,
     onContentSizeChange: PropTypes.func,
     onEnter: PropTypes.func,
+    onBackspace: PropTypes.func,
     onScroll: PropTypes.func,
     onActiveFormatsChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,

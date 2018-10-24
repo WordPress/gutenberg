@@ -44,11 +44,28 @@ public class ReactAztecText extends AztecText {
     int mNativeEventCount = 0;
 
     String lastSentFormattingOptionsEventString = "";
+    boolean shouldHandleOnEnter = false;
+    boolean shouldHandleOnBackspace = false;
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
-        this.setFocusableInTouchMode(true);
-        this.setFocusable(true);
+        this.setOnKeyListener(new ReactAztecText.OnKeyListener() {
+            @Override
+            public boolean onEnterKey() {
+                if (shouldHandleOnEnter) {
+                    onEnter();
+                    return true;
+                }
+                return false;
+            }
+            @Override
+            public boolean onBackSpaceKey() {
+                if (shouldHandleOnBackspace) {
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     @Override
