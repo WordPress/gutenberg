@@ -56,7 +56,7 @@ export class PostPublishPanel extends Component {
 			...additionalProps
 		} = this.props;
 		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
-		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'postType' ] );
+		const propsForPanel = omit( additionalProps, [ 'hasPublishAction' ] );
 		return (
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
@@ -106,7 +106,6 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			getCurrentPost,
-			getCurrentPostType,
 			isCurrentPostPublished,
 			isCurrentPostScheduled,
 			isEditedPostBeingScheduled,
@@ -122,7 +121,6 @@ export default compose( [
 			isPublishSidebarEnabled: isPublishSidebarEnabled(),
 			isSaving: isSavingPost(),
 			isScheduled: isCurrentPostScheduled(),
-			postType: getCurrentPostType(),
 		};
 	} ),
 	withDispatch( ( dispatch, { isPublishSidebarEnabled } ) => {
