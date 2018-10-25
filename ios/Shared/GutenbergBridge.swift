@@ -1,9 +1,8 @@
 
-import Foundation
+import UIKit
 //import React
 
 class GutenbergBridge {
-    let rnBridge: RCTBridge
     let postManager: GBPostManager
     let mediaProvider: AztecMediaProvider
 
@@ -14,10 +13,15 @@ class GutenbergBridge {
         return bridge
     }
 
+    private let rnBridge: RCTBridge
     private static var _shared: GutenbergBridge?
 
     static func start(with launchOptions: [AnyHashable: Any]?, mediaProvider: AztecMediaProvider, postManager: GBPostManager) {
         _shared = GutenbergBridge(options: launchOptions, mediaProvider: mediaProvider, postManager: postManager)
+    }
+
+    static var rootView: UIView {
+        return RCTRootView(bridge: shared.rnBridge, moduleName: "gutenberg", initialProperties: nil)
     }
 
     private init(options launchOptions: [AnyHashable: Any]?, mediaProvider: AztecMediaProvider, postManager: GBPostManager) {

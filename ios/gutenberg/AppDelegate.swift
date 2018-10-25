@@ -9,9 +9,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
 
         GutenbergBridge.start(with: launchOptions, mediaProvider: MediaProvider(), postManager: GBPostManager())
-        let rootView = RCTRootView(bridge: GutenbergBridge.shared.rnBridge, moduleName: "gutenberg", initialProperties: nil)
+        let rootView = GutenbergBridge.rootView
 
-        rootView?.backgroundColor = .white
+        rootView.backgroundColor = .white
 
         window = UIWindow(frame: UIScreen.main.bounds)
 

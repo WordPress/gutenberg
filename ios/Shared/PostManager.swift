@@ -8,11 +8,11 @@ protocol GBPostManagerDelegate: class {
 
 @objc (GBPostManager)
 public class GBPostManager: NSObject, RCTBridgeModule {
+    weak var delegate: GBPostManagerDelegate?
+
     public static func moduleName() -> String! {
         return "GBPostManager"
     }
-
-    var delegate: GBPostManagerDelegate?
 
     public static func requiresMainQueueSetup() -> Bool {
         return false
