@@ -6,6 +6,7 @@ Array [
     "attrs": Object {},
     "blockName": "core/more",
     "innerBlocks": Array [],
+    "blockMarkers": Array [],
     "innerHTML": "<!--more-->",
   },
 ]
