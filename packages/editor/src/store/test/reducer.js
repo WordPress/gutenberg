@@ -1327,7 +1327,7 @@ describe( 'state', () => {
 
 		it( 'should set the flag to false', () => {
 			const state = isCaretWithinFormattedText( true, {
-				type: 'LEAVE_FORMATTED_TEXT',
+				type: 'EXIT_FORMATTED_TEXT',
 			} );
 
 			expect( state ).toBe( false );

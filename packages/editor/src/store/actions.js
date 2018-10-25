@@ -547,13 +547,13 @@ export function enterFormattedText() {
 }
 
 /**
- * Returns an action object used in signalling that the user caret has left formatted text.
+ * Returns an action object used in signalling that the user caret has exited formatted text.
  *
  * @return {Object} Action object.
  */
-export function leaveFormattedText() {
+export function exitFormattedText() {
 	return {
-		type: 'LEAVE_FORMATTED_TEXT',
+		type: 'EXIT_FORMATTED_TEXT',
 	};
 }
 

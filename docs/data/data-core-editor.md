@@ -1639,9 +1639,9 @@ Returns an action object used in signalling that the user has stopped typing.
 
 Returns an action object used in signalling that the caret has entered formatted text.
 
-### leaveFormattedText
+### exitFormattedText
 
-Returns an action object used in signalling that the user caret has left formatted text.
+Returns an action object used in signalling that the user caret has exited formatted text.
 
 ### createNotice
 

@@ -597,7 +597,7 @@ export function isCaretWithinFormattedText( state = false, action ) {
 		case 'ENTER_FORMATTED_TEXT':
 			return true;
 
-		case 'LEAVE_FORMATTED_TEXT':
+		case 'EXIT_FORMATTED_TEXT':
 			return false;
 	}
 

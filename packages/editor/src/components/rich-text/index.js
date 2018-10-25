@@ -429,7 +429,7 @@ export class RichText extends Component {
 		if ( formats[ start ] ) {
 			this.props.onEnterFormattedText();
 		} else {
-			this.props.onLeaveFormattedText();
+			this.props.onExitFormattedText();
 		}
 
 		if ( start !== this.state.start || end !== this.state.end ) {
@@ -969,7 +969,7 @@ const RichTextContainer = compose( [
 			redo,
 			undo,
 			enterFormattedText,
-			leaveFormattedText,
+			exitFormattedText,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -977,7 +977,7 @@ const RichTextContainer = compose( [
 			onRedo: redo,
 			onUndo: undo,
 			onEnterFormattedText: enterFormattedText,
-			onLeaveFormattedText: leaveFormattedText,
+			onExitFormattedText: exitFormattedText,
 		};
 	} ),
 	withSafeTimeout,
