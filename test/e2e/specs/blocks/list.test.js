@@ -97,6 +97,20 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'can be converted when nested to paragraphs', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		// Pointer device is needed. Shift+Tab won't focus the toolbar.
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+		await page.click( 'button[aria-label="Indent list item"]' );
+		await page.keyboard.type( 'two' );
+		await convertBlock( 'Paragraph' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be created by converting a quote', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'one' );
