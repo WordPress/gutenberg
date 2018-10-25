@@ -14,7 +14,7 @@ import {
 	DropZone,
 	IconButton,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 
@@ -142,7 +142,7 @@ class MediaPlaceholder extends Component {
 			accept,
 			icon,
 			className,
-			labels,
+			labels = {},
 			onSelect,
 			value = {},
 			onSelectURL,
@@ -158,12 +158,44 @@ class MediaPlaceholder extends Component {
 
 		const allowedTypes = this.getAllowedTypes();
 
+		let instructions = labels.instructions || '';
+		let title = labels.title || '';
+		if ( ! instructions || ! title ) {
+			const isOneType = 1 === allowedTypes.length;
+			const isAudio = isOneType && 'audio' === allowedTypes[ 0 ];
+			const isImage = isOneType && 'image' === allowedTypes[ 0 ];
+			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
+
+			if ( ! instructions ) {
+				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+
+				if ( isAudio ) {
+					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+				} else if ( isImage ) {
+					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+				} else if ( isVideo ) {
+					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+				}
+			}
+
+			if ( ! title ) {
+				title = __( 'Media' );
+
+				if ( isAudio ) {
+					title = __( 'Audio' );
+				} else if ( isImage ) {
+					title = __( 'Image' );
+				} else if ( isVideo ) {
+					title = __( 'Video' );
+				}
+			}
+		}
+
 		return (
 			<Placeholder
 				icon={ icon }
-				label={ labels.title }
-				// translators: %s: media name label e.g: "an audio","an image", "a video"
-				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
+				label={ title }
+				instructions={ instructions }
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ notices }
 			>

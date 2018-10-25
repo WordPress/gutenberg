@@ -94,14 +94,31 @@
 		background: $dark-gray-500;
 	}
 
+	// Make editor header bar buttons bigger to match IconButtons.
+	&.editor-post-save-draft,
+	&.editor-post-switch-to-draft,
 	&.editor-post-preview,
 	&.editor-post-publish-button,
 	&.editor-post-publish-panel__toggle {
 		margin: 2px;
 		height: 33px;
 		line-height: 32px;
-		padding: 0 5px 2px;
 		font-size: $default-font-size;
+	}
+
+	&.editor-post-save-draft,
+	&.editor-post-switch-to-draft {
+		padding: 0 5px;
+
+		@include break-small() {
+			padding: 0 12px;
+		}
+	}
+
+	&.editor-post-preview,
+	&.editor-post-publish-button,
+	&.editor-post-publish-panel__toggle {
+		padding: 0 5px 2px;
 
 		@include break-small() {
 			padding: 0 12px 2px;

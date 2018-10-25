@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	InnerBlocks,
@@ -25,11 +26,11 @@ export const name = 'core/media-text';
 export const settings = {
 	title: __( 'Media & Text' ),
 
-	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 17h8v-2h-8v2zM3 19h8V5H3v14zM13 9h8V7h-8v2zm0 4h8v-2h-8v2z" /></svg>,
+	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M13 17h8v-2h-8v2zM3 19h8V5H3v14zM13 9h8V7h-8v2zm0 4h8v-2h-8v2z" /></SVG>,
 
 	category: 'layout',
 
-	keywords: [ __( 'image' ), __( 'video' ), __( 'half' ) ],
+	keywords: [ __( 'image' ), __( 'video' ) ],
 
 	attributes: {
 		align: {

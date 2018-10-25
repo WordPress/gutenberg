@@ -12,6 +12,7 @@ import createPreloadingMiddleware from './middlewares/preloading';
 import fetchAllMiddleware from './middlewares/fetch-all-middleware';
 import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
+import userLocaleMiddleware from './middlewares/user-locale';
 
 const middlewares = [];
 
@@ -109,6 +110,7 @@ function apiFetch( options ) {
 		fetchAllMiddleware,
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
+		userLocaleMiddleware,
 		...middlewares,
 	].reverse();
 

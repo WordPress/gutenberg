@@ -170,6 +170,10 @@ class LinkContainer extends Component {
 			this.props.applyFormat( format );
 		}
 
+		if ( this.state.editLink ) {
+			this.props.speak( __( 'Link edited.' ), 'assertive' );
+		}
+
 		this.resetState();
 
 		if ( ! link ) {

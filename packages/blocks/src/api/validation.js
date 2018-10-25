@@ -57,6 +57,7 @@ const BOOLEAN_ATTRIBUTES = [
 	'default',
 	'defer',
 	'disabled',
+	'download',
 	'formnovalidate',
 	'hidden',
 	'ismap',

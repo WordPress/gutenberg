@@ -1,5 +1,8 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+# 4.4.0
+ - `wp.date.getSettings` has been removed. Please use `wp.date.__experimentalGetSettings` instead.
+
 # 4.3.0
 
 - `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.

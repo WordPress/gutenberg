@@ -8,6 +8,7 @@ import {
 	enablePrePublishChecks,
 	disablePrePublishChecks,
 	arePrePublishChecksEnabled,
+	setViewport,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
@@ -73,6 +74,32 @@ describe( 'Publishing', () => {
 
 				// The post-publishing panel should have been not shown.
 				expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
+			} );
+		} );
+	} );
+
+	[ 'post', 'page' ].forEach( ( postType ) => {
+		let werePrePublishChecksEnabled;
+		describe( `a ${ postType } in small viewports`, () => {
+			beforeEach( async () => {
+				await newPost( postType );
+				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
+				if ( werePrePublishChecksEnabled ) {
+					await disablePrePublishChecks();
+				}
+				await setViewport( 'small' );
+			} );
+
+			afterEach( async () => {
+				await setViewport( 'large' );
+				if ( werePrePublishChecksEnabled ) {
+					await enablePrePublishChecks();
+				}
+			} );
+
+			it( `should ignore the pre-publish checks and show the Publish... toggle instead of the Publish button`, async () => {
+				expect( await page.$( '.editor-post-publish-panel__toggle' ) ).not.toBeNull();
+				expect( await page.$( '.editor-post-publish-button' ) ).toBeNull();
 			} );
 		} );
 	} );

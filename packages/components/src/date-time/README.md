@@ -8,13 +8,13 @@ Render a DateTimePicker.
 
 ```jsx
 import { DateTimePicker } from '@wordpress/components';
-import { getSettings } from '@wordpress/date';
+import { __experimentalGetSettings } from '@wordpress/date';
 import { withState } from '@wordpress/compose';
 
 const MyDateTimePicker = withState( {
 	date: new Date(),
 } )( ( { date, setState } ) => {
-	const settings = getSettings();
+	const settings = __experimentalGetSettings();
 
 	// To know if the current timezone is a 12 hour time with look for an "a" in the time format.
 	// We also make sure this a is not escaped by a "/".
