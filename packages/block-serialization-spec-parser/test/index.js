@@ -11,4 +11,13 @@ describe( 'block-serialization-spec-parser', () => {
 
 		expect( result ).toMatchSnapshot();
 	} );
+
+	test( 'adds empty block markers when no inner blocks exist', () => {
+		[
+			'HTML soup',
+			'<!-- wp:voidBlock /-->',
+			'<!-- wp:block --><!-- /wp:block -->',
+			'<!-- wp:block -->with content<!-- /wp:block -->',
+		].forEach( ( document ) => expect( parse( document ) ).toHaveProperty( 'blockMarkers', [] ) );
+	} );
 } );
