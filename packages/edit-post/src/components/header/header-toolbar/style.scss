@@ -64,16 +64,11 @@
 		}
 
 		.editor-block-toolbar {
-			margin: 0;
+			margin: -($grid-size + $border-width) 0;
 		}
 
 		.editor-block-toolbar .components-toolbar {
-			padding: 0 $grid-size-small;
-		}
-
-		// Hide the right border on the ellipsis menu.
-		.editor-block-toolbar > div:last-child .components-toolbar {
-			border-right: none;
+			padding: ($grid-size + $border-width + $border-width) $grid-size-small ($grid-size + $border-width);
 		}
 	}
 }
