@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find } from 'lodash';
+import { find, includes, get, hasIn } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import {
 	receiveEntityRecords,
 	receiveThemeSupports,
 	receiveEmbedPreview,
+	receiveUploadPermissions,
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch } from './controls';
@@ -96,4 +97,24 @@ export function* getEmbedPreview( url ) {
 		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
 		yield receiveEmbedPreview( url, false );
 	}
+}
+
+/**
+ * Requests Upload Permissions from the REST API.
+ */
+export function* hasUploadPermissions() {
+	const response = yield apiFetch( { path: '/wp/v2/media', method: 'OPTIONS', parse: false } );
+
+	let allowHeader;
+	if ( hasIn( response, [ 'headers', 'get' ] ) ) {
+		// If the request is fetched using the fetch api, the header can be
+		// retrieved using the 'get' method.
+		allowHeader = response.headers.get( 'allow' );
+	} else {
+		// If the request was preloaded server-side and is returned by the
+		// preloading middleware, the header will be a simple property.
+		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
+	}
+
+	yield receiveUploadPermissions( includes( allowHeader, 'POST' ) );
 }
