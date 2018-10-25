@@ -12,7 +12,7 @@ export default function Button( props ) {
 			onPress={ onClick }
 			style={ { borderColor: ariaPressed ? 'black' : 'white', borderWidth: 1, borderRadius: 2 } }
 		>
-			<View style={ { flex: 1, flexDirection: 'row' } }>
+			<View style={ { height: 44, width: 44, flexDirection: 'row' } }>
 				{ children }
 				{ subscript && ( <Text style={ { fontVariant: [ 'small-caps' ], textAlignVertical: 'bottom' } }>{ subscript }</Text> ) }
 			</View>
