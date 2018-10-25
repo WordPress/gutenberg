@@ -6,7 +6,6 @@ import {
 	cloneElement,
 	Component,
 	createContext,
-	createElement,
 	createRef,
 	forwardRef,
 	Fragment,
@@ -14,7 +13,7 @@ import {
 	StrictMode,
 } from 'react';
 import { isString } from 'lodash';
-
+import createElement from './create-element';
 export { Children };
 
 /**

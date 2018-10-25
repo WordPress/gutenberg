@@ -1,3 +1,5 @@
+import * as React from './react';
+export default React;
 export * from './react';
 export * from './react-platform';
 export * from './utils';
