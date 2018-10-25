@@ -6,8 +6,13 @@ import { withSelect } from '@wordpress/data';
 
 export default withSelect(
 	( select ) => {
-		const { fontSizes } = select( 'core/editor' ).getEditorSettings();
+		const {
+			disableCustomFontSizes,
+			fontSizes,
+		} = select( 'core/editor' ).getEditorSettings();
+
 		return {
+			disableCustomFontSizes,
 			fontSizes,
 		};
 	}

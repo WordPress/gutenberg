@@ -7,10 +7,6 @@
 	overflow: auto;
 	height: auto;
 
-	.components-modal__content {
-		padding: 0;
-	}
-
 	@include break-small() {
 		max-height: 70%;
 	}
@@ -25,7 +21,7 @@
 		justify-content: space-between;
 		flex-direction: column;
 		width: 50%;
-		padding: 0 $panel-padding 0 $panel-padding;
+		padding: 0 $panel-padding 0 0;
 		min-width: 200px;
 
 		button {

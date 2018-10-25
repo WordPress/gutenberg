@@ -67,7 +67,7 @@
 	// Exit Code Editor toolbar.
 	.edit-post-text-editor__toolbar {
 		position: absolute;
-		top: 0;
+		top: $grid-size;
 		left: 0;
 		right: 0;
 		height: $block-controls-height;

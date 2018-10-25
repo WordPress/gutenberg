@@ -297,47 +297,6 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$this->assertTrue( isset( $links[ $assign_categories ] ) );
 	}
 
-	/**
-	 * Should include relevant data in the 'theme_supports' key of index.
-	 */
-	function test_theme_supports_index() {
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertTrue( isset( $result['theme_supports']['formats'] ) );
-		$this->assertTrue( in_array( 'standard', $result['theme_supports']['formats'] ) );
-	}
-
-	public function test_theme_supports_post_thumbnails_false() {
-		remove_theme_support( 'post-thumbnails' );
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertFalse( isset( $result['theme_supports']['post-thumbnails'] ) );
-	}
-
-	public function test_theme_supports_post_thumbnails_true() {
-		remove_theme_support( 'post-thumbnails' );
-		add_theme_support( 'post-thumbnails' );
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertEquals( true, $result['theme_supports']['post-thumbnails'] );
-	}
-
-	public function test_theme_supports_post_thumbnails_array() {
-		remove_theme_support( 'post-thumbnails' );
-		add_theme_support( 'post-thumbnails', array( 'post' ) );
-		$request  = new WP_REST_Request( 'GET', '/' );
-		$response = rest_do_request( $request );
-		$result   = $response->get_data();
-		$this->assertTrue( isset( $result['theme_supports'] ) );
-		$this->assertEquals( array( 'post' ), $result['theme_supports']['post-thumbnails'] );
-	}
-
 	public function test_get_taxonomies_context_edit() {
 		wp_set_current_user( $this->contributor );
 		$request = new WP_REST_Request( 'GET', '/wp/v2/taxonomies' );
@@ -422,17 +381,7 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
 		$request->set_param( 'per_page', '-1' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-	}
-
-	public function test_get_items_unbounded_per_page_unauthorized() {
-		wp_set_current_user( $this->subscriber );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/users' );
-		$request->set_param( 'per_page', '-1' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 403, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
+		$this->assertEquals( 400, $response->get_status() );
 	}
 
 	public function test_get_categories_unbounded_per_page() {
@@ -441,18 +390,7 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
 		$request->set_param( 'per_page', '-1' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-	}
-
-	public function test_get_categories_unbounded_per_page_unauthorized() {
-		wp_set_current_user( $this->subscriber );
-		$this->factory->category->create();
-		$request = new WP_REST_Request( 'GET', '/wp/v2/categories' );
-		$request->set_param( 'per_page', '-1' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 403, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
+		$this->assertEquals( 400, $response->get_status() );
 	}
 
 	public function test_get_pages_unbounded_per_page() {
@@ -461,18 +399,7 @@ class Gutenberg_REST_API_Test extends WP_Test_REST_TestCase {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
 		$request->set_param( 'per_page', '-1' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 200, $response->get_status() );
-	}
-
-	public function test_get_pages_unbounded_per_page_unauthorized() {
-		wp_set_current_user( $this->subscriber );
-		$this->factory->post->create( array( 'post_type' => 'page' ) );
-		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
-		$request->set_param( 'per_page', '-1' );
-		$response = rest_get_server()->dispatch( $request );
-		$this->assertEquals( 403, $response->get_status() );
-		$data = $response->get_data();
-		$this->assertEquals( 'rest_forbidden_per_page', $data['code'] );
+		$this->assertEquals( 400, $response->get_status() );
 	}
 
 	public function test_get_post_links_predecessor_version() {

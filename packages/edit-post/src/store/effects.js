@@ -28,12 +28,7 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { onChangeListener } from './utils';
 
 const effects = {
-	SET_ACTIVE_META_BOX_LOCATIONS( action, store ) {
-		const hasActiveMetaBoxes = action.locations.length > 0;
-		if ( ! hasActiveMetaBoxes ) {
-			return;
-		}
-
+	SET_META_BOXES_PER_LOCATIONS( action, store ) {
 		// Allow toggling metaboxes panels
 		// We need to wait for all scripts to load
 		// If the meta box loads the post script, it will already trigger this.
@@ -52,9 +47,16 @@ const effects = {
 		subscribe( () => {
 			const isSavingPost = select( 'core/editor' ).isSavingPost();
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+			const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 
 			// Save metaboxes on save completion when past save wasn't an autosave.
-			const shouldTriggerMetaboxesSave = wasSavingPost && ! wasAutosavingPost && ! isSavingPost && ! isAutosavingPost;
+			const shouldTriggerMetaboxesSave = (
+				hasActiveMetaBoxes &&
+				wasSavingPost &&
+				! wasAutosavingPost &&
+				! isSavingPost &&
+				! isAutosavingPost
+			);
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;

@@ -77,7 +77,7 @@ class PullQuoteEdit extends Component {
 					} ) }>
 					<blockquote style={ blockquoteStyle } className={ blockquoteClasses }>
 						<RichText
-							multiline="p"
+							multiline
 							value={ value }
 							onChange={
 								( nextValue ) => setAttributes( {

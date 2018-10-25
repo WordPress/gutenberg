@@ -1,0 +1,17 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/cover",
+        "isValid": true,
+        "attributes": {
+            "title": "Guten Berg!",
+            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "contentAlign": "center",
+            "hasParallax": false,
+            "dimRatio": 40,
+            "backgroundType": "image"
+        },
+        "innerBlocks": [],
+        "originalContent": "<div class=\"wp-block-cover has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-text\">Guten Berg!</p>\n</div>"
+    }
+]

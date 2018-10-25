@@ -221,8 +221,12 @@ export default class TinyMCE extends Component {
 		// us to show and focus the content before it's truly ready to edit.
 		let initialHTML = defaultValue;
 
+		// Guard for blocks passing `null` in onSplit callbacks. May be removed
+		// if onSplit is revised to not pass a `null` value.
+		if ( defaultValue === null ) {
+			initialHTML = '';
 		// Handle deprecated `children` and `node` sources.
-		if ( Array.isArray( defaultValue ) ) {
+		} else if ( Array.isArray( defaultValue ) ) {
 			initialHTML = children.toHTML( defaultValue );
 		} else if ( typeof defaultValue !== 'string' ) {
 			initialHTML = toHTMLString( defaultValue, multilineTag );

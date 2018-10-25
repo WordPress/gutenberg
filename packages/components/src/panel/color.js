@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -10,6 +11,12 @@ import PanelBody from './body';
 import ColorIndicator from '../color-indicator';
 
 function PanelColor( { colorValue, colorName, title, ...props } ) {
+	deprecated( 'wp.components.PanelColor', {
+		version: '4.3',
+		alternative: 'wp.editor.PanelColorSettings',
+		plugin: 'Gutenberg',
+	} );
+
 	// translators: %s: The name of the color e.g: "vivid red" or color hex code if name is not available e.g: "#f00".
 	const currentColorLabel = sprintf( __( '(current color: %s)' ), colorName || colorValue );
 	return (

@@ -1,3 +1,6 @@
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
@@ -26,8 +29,9 @@ class URLPopover extends Component {
 		const {
 			children,
 			renderSettings,
-			position,
+			onClose,
 			onClickOutside,
+			position = 'bottom center',
 			focusOnMount = 'firstElement',
 		} = this.props;
 
@@ -41,7 +45,8 @@ class URLPopover extends Component {
 			<Popover
 				className="editor-url-popover"
 				focusOnMount={ focusOnMount }
-				position={ position || 'bottom center' }
+				position={ position }
+				onClose={ onClose }
 				onClickOutside={ onClickOutside }
 			>
 				<div className="editor-url-popover__row">

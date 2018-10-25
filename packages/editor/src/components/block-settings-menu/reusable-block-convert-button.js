@@ -49,7 +49,7 @@ export function ReusableBlockConvertButton( {
 
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlock, getReusableBlock } = select( 'core/editor' );
+		const { getBlock, canInsertBlockType, getReusableBlock } = select( 'core/editor' );
 		const {
 			getFreeformFallbackBlockName,
 			getUnregisteredFallbackBlockName,
@@ -57,10 +57,17 @@ export default compose( [
 
 		const blocks = map( clientIds, ( clientId ) => getBlock( clientId ) );
 
-		// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
-		// confusing UX, because of its similarity to the 'Convert to Blocks' button.
 		const isVisible = (
+			// Guard against the case where a regular block has *just* been converted to a
+			// reusable block and doesn't yet exist in the editor store.
 			every( blocks, ( block ) => !! block ) &&
+
+			// Hide 'Add to Reusable Blocks' when Reusable Blocks are disabled, i.e. when
+			// core/block is not in the allowed_block_types filter.
+			canInsertBlockType( 'core/block' ) &&
+
+			// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
+			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
 			( blocks.length !== 1 || (
 				blocks[ 0 ].name !== getFreeformFallbackBlockName() &&
 				blocks[ 0 ].name !== getUnregisteredFallbackBlockName()
@@ -68,12 +75,12 @@ export default compose( [
 		);
 
 		return {
+			isVisible,
 			isStaticBlock: isVisible && (
 				blocks.length !== 1 ||
 				! isReusableBlock( blocks[ 0 ] ) ||
 				! getReusableBlock( blocks[ 0 ].attributes.ref )
 			),
-			isVisible,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {

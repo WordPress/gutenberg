@@ -6,8 +6,6 @@ import { IconButton } from '@wordpress/components';
 import {
 	PostPreviewButton,
 	PostSavedState,
-	PostPublishPanelToggle,
-	PostPublishButton,
 } from '@wordpress/editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -20,16 +18,15 @@ import MoreMenu from './more-menu';
 import HeaderToolbar from './header-toolbar';
 import PinnedPlugins from './pinned-plugins';
 import shortcuts from '../../keyboard-shortcuts';
+import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 
 function Header( {
-	isEditorSidebarOpened,
-	openGeneralSidebar,
 	closeGeneralSidebar,
-	isPublishSidebarOpened,
-	isPublishSidebarEnabled,
-	togglePublishSidebar,
 	hasActiveMetaboxes,
+	isEditorSidebarOpened,
+	isPublishSidebarOpened,
 	isSaving,
+	openGeneralSidebar,
 } ) {
 	const toggleGeneralSidebar = isEditorSidebarOpened ? closeGeneralSidebar : openGeneralSidebar;
 
@@ -49,19 +46,10 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 					<PostPreviewButton />
-					{ isPublishSidebarEnabled ? (
-						<PostPublishPanelToggle
-							isOpen={ isPublishSidebarOpened }
-							onToggle={ togglePublishSidebar }
-							forceIsDirty={ hasActiveMetaboxes }
-							forceIsSaving={ isSaving }
-						/>
-					) : (
-						<PostPublishButton
-							forceIsDirty={ hasActiveMetaboxes }
-							forceIsSaving={ isSaving }
-						/>
-					) }
+					<PostPublishButtonOrToggle
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
 					<div>
 						<IconButton
 							icon="admin-generic"
@@ -85,20 +73,18 @@ function Header( {
 
 export default compose(
 	withSelect( ( select ) => ( {
+		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isPublishSidebarEnabled: select( 'core/editor' ).isPublishSidebarEnabled(),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 	} ) ),
 	withDispatch( ( dispatch, { hasBlockSelection } ) => {
-		const { openGeneralSidebar, closeGeneralSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );
+		const { openGeneralSidebar, closeGeneralSidebar } = dispatch( 'core/edit-post' );
 		const sidebarToOpen = hasBlockSelection ? 'edit-post/block' : 'edit-post/document';
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( sidebarToOpen ),
 			closeGeneralSidebar: closeGeneralSidebar,
-			togglePublishSidebar: togglePublishSidebar,
 			hasBlockSelection: undefined,
 		};
 	} ),

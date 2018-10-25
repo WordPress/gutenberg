@@ -14,6 +14,7 @@ import {
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
 	isValidBlock,
+	isClosedByToken,
 } from '../validation';
 import {
 	registerBlockType,
@@ -318,6 +319,53 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'isClosedByToken()', () => {
+		it( 'should return true if self-closed token is closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( true );
+		} );
+
+		it( 'should return false if open token is not closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: false },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token has a different name to the end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'span' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by a start token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'StartTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by an undefined token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				undefined,
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEquivalentHTML()', () => {
 		it( 'should return false for effectively inequivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
@@ -470,6 +518,38 @@ describe( 'validation', () => {
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return true when comparing self-closing and normal tags', () => {
+			let isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none" />',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+
+			isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none" />'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when comparing self-closing and normal tags, ignoring trailing space', () => {
+			let isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"/>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+
+			isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"/>'
+			);
+
+			expect( isEquivalent ).toBe( true );
 		} );
 	} );
 

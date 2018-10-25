@@ -45,7 +45,7 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 add_theme_support( 'align-wide' );
 ```
 
-For more information about this function, see [the developer docs on `add_theme_support()`](https://developer.wordpress.org/reference/functions/add_theme_support/). 
+For more information about this function, see [the developer docs on `add_theme_support()`](https://developer.wordpress.org/reference/functions/add_theme_support/).
 
 ### Wide Alignments and Floats
 
@@ -167,10 +167,22 @@ As an example for the regular font size, a theme may provide the following class
 }
 ```
 
+### Disabling custom font sizes
+
+Themes can disable the ability to set custom font sizes with the following code:
+
+```php
+add_theme_support('disable-custom-font-sizes');
+```
+
+When set, users will be restricted to the default sizes provided in Gutenberg or the sizes provided via the `editor-font-sizes` theme support setting.
+
 ### Disabling custom colors in block Color Palettes
 
-By default, the color palette offered to blocks, allows the user to select a custom color different from the editor or theme default colors.
+By default, the color palette offered to blocks allows the user to select a custom color different from the editor or theme default colors.
+
 Themes can disable this feature using:
+
 ```php
 add_theme_support( 'disable-custom-colors' );
 ```
@@ -226,7 +238,7 @@ You can style the editor like any other webpage. Here's how to change the backgr
 
 ```css
 /* Add this to your `style-editor.css` file */
-body.gutenberg-editor-page {
+body.block-editor-page {
 	background-color: #d3ebf3;
 	color: #00005d;
 }
@@ -238,19 +250,19 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 ```css
 /* Main column width */
-body.gutenberg-editor-page .editor-post-title__block,
-body.gutenberg-editor-page .editor-default-block-appender,
-body.gutenberg-editor-page .editor-block-list__block {
+body.block-editor-page .editor-post-title__block,
+body.block-editor-page .editor-default-block-appender,
+body.block-editor-page .editor-block-list__block {
 	max-width: 720px;
 }
 
 /* Width of "wide" blocks */
-body.gutenberg-editor-page .editor-block-list__block[data-align="wide"] {
+body.block-editor-page .editor-block-list__block[data-align="wide"] {
 	max-width: 1080px;
 }
 
 /* Width of "full-wide" blocks */
-body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
+body.block-editor-page .editor-block-list__block[data-align="full"] {
 	max-width: none;
 }
 ```
@@ -265,4 +277,20 @@ Core blocks include default styles. The styles are enqueued for editing but are 
 
 ```php
 add_theme_support( 'wp-block-styles' );
+```
+
+## Responsive embedded content
+
+The embed blocks automatically apply styles to embedded content to reflect the aspect ratio of content that is embedded in an iFrame. A block styled with the aspect ratio responsive styles would look like:
+
+```html
+<figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio">
+   ...
+</figure>
+```
+
+To make the content resize and keep its aspect ratio, the `<body>` element needs the `wp-embed-responsive` class. This is not set by default, and requires the theme to opt in to the `responsive-embeds` feature:
+
+```php
+add_theme_support( 'responsive-embeds' );
 ```
