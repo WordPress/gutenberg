@@ -16,8 +16,9 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
 		<ul role="list" className="editor-block-types-list">
-			{ items && items.map( ( item, index ) =>
+			{ items && items.map( ( item ) =>
 				<InserterListItem
+					key={ item.id }
 					className={ getBlockMenuDefaultClassName( item.id ) }
 					icon={ item.icon }
 					hasChildBlocksWithInserterSupport={
@@ -33,7 +34,6 @@ function BlockTypesList( { items, onSelect, onHover = () => {}, children } ) {
 					onBlur={ () => onHover( null ) }
 					isDisabled={ item.isDisabled }
 					title={ item.title }
-					key={ index }
 				/>
 			) }
 			{ children }
