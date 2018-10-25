@@ -14,7 +14,7 @@ describe( 'App', () => {
 		expect( rendered ).toBeTruthy();
 	} );
 
-	it.only( 'renders without crashing with a block focused', () => {
+	it( 'renders without crashing with a block focused', () => {
 		// construct a state object with the first block focused
 		const state = html2State( initialHtml );
 		const block0 = { ...state.blocks[ 0 ] };

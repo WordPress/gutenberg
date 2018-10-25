@@ -65,30 +65,24 @@ export const reducer = (
 
 			// Skip update if nothing has been changed. The reference will
 			// match the original block if `reduce` had no changed values.
-			if ( nextAttributes === findBlock( blocks, action.clientId ).attributes ) {
+			if ( nextAttributes === block.attributes ) {
 				return state;
 			}
 
 			// Otherwise merge attributes into state
-			const index = findBlockIndex( blocks, action.clientId );
-			blocks[ index ] = {
-				...block,
-				attributes: nextAttributes,
-			};
+			block.attributes = nextAttributes;
 
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.FOCUS: {
 			const destBlock = findBlock( blocks, action.clientId );
-			const destBlockState = destBlock.focused;
 
 			// Deselect all blocks
 			for ( const block of blocks ) {
 				block.focused = false;
 			}
 
-			// Select or deselect pressed block
-			destBlock.focused = ! destBlockState;
+			destBlock.focused = true;
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.MOVE_UP: {

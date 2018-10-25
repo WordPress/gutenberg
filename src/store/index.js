@@ -5,7 +5,11 @@
 
 // Gutenberg imports
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { parse, registerBlockType, setUnknownTypeHandlerName } from '@wordpress/blocks';
+import {
+	parse,
+	registerBlockType,
+	setUnregisteredTypeHandlerName,
+} from '@wordpress/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
@@ -28,7 +32,7 @@ export type StateType = {
 
 registerCoreBlocks();
 registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
-setUnknownTypeHandlerName( UnsupportedBlock.name );
+setUnregisteredTypeHandlerName( UnsupportedBlock.name );
 
 export function html2State( html: string ) {
 	const blocksFromHtml = parse( html );
