@@ -35,6 +35,12 @@ const getDragEventType = ( { dataTransfer } ) => {
 	return 'default';
 };
 
+const isTypeSupported = ( type, typesSupported ) => {
+	return ( type === 'file' && typesSupported.onFilesDrop ) ||
+		( type === 'html' && typesSupported.onHTMLDrop ) ||
+		( type === 'default' && typesSupported.onDrop );
+};
+
 class DropZoneProvider extends Component {
 	constructor() {
 		super( ...arguments );
@@ -122,14 +128,6 @@ class DropZoneProvider extends Component {
 		} );
 	}
 
-	doesDropzoneSupportType( dropzone, type ) {
-		return (
-			( type === 'file' && dropzone.onFilesDrop ) ||
-			( type === 'html' && dropzone.onHTMLDrop ) ||
-			( type === 'default' && dropzone.onDrop )
-		);
-	}
-
 	toggleDraggingOverDocument( event, dragEventType ) {
 		// In some contexts, it may be necessary to capture and redirect the
 		// drag event (e.g. atop an `iframe`). To accommodate this, you can
@@ -142,7 +140,7 @@ class DropZoneProvider extends Component {
 		// Index of hovered dropzone.
 
 		const hoveredDropZones = filter( this.dropZones, ( dropzone ) =>
-			this.doesDropzoneSupportType( dropzone, dragEventType ) &&
+			isTypeSupported( dragEventType, dropzone ) &&
 			this.isWithinZoneBounds( dropzone.element, detail.clientX, detail.clientY )
 		);
 
@@ -191,7 +189,7 @@ class DropZoneProvider extends Component {
 			dropzone.updateState( {
 				isDraggingOverElement: isDraggingOverDropZone,
 				position: isDraggingOverDropZone ? position : null,
-				isDraggingOverDocument: this.doesDropzoneSupportType( dropzone, dragEventType ),
+				isDraggingOverDocument: isTypeSupported( dragEventType, dropzone ),
 				type: isDraggingOverDropZone ? dragEventType : null,
 			} );
 		} );
