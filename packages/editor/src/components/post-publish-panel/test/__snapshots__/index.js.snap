@@ -66,7 +66,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
 </div>
 `;
 
-exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
+exports[`PostPublishPanel should render the pre-publish panel if post status is scheduled but date is before now 1`] = `
 <div
   className="editor-post-publish-panel"
 >
@@ -105,7 +105,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
 </div>
 `;
 
-exports[`PostPublishPanel should render the pre-publish panel is post status is scheduled but date is before now 1`] = `
+exports[`PostPublishPanel should render the pre-publish panel if the post is not saving, published or scheduled 1`] = `
 <div
   className="editor-post-publish-panel"
 >
