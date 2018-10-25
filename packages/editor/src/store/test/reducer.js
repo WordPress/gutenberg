@@ -2298,7 +2298,6 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {
-				'test-lock': false,
 				'test-lock-2': true,
 			} );
 
@@ -2307,10 +2306,7 @@ describe( 'state', () => {
 				lockName: 'test-lock-2',
 			} );
 
-			expect( state ).toEqual( {
-				'test-lock': false,
-				'test-lock-2': false,
-			} );
+			expect( state ).toEqual( {} );
 		} );
 	} );
 } );

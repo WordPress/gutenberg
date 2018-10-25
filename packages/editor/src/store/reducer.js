@@ -927,11 +927,10 @@ export function postSavingLock( state = {}, action ) {
 	const { lockName } = action;
 	switch ( action.type ) {
 		case 'LOCK_POST_SAVING':
+			return { ...state, [ lockName ]: true };
+
 		case 'UNLOCK_POST_SAVING':
-			return {
-				...state,
-				[ lockName ]: action.type === 'LOCK_POST_SAVING',
-			};
+			return omit( state, lockName );
 	}
 	return state;
 }
