@@ -24,7 +24,7 @@ describe( 'Compatibility with Classic Editor', () => {
 
 		// Check the the content doesn't contain <p> tags
 		await page.waitForSelector( '.entry-content' );
-		const content = await page.$eval( '.entry-content', ( element ) => element.innerHTML );
+		const content = await page.$eval( '.entry-content', ( element ) => element.innerHTML.trim() );
 		expect( content ).toMatchSnapshot();
 	} );
 } );
