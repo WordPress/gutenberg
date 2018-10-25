@@ -85,14 +85,14 @@ describe( 'WordCounter', () => {
 			characters_including_spaces: 6,
 		},
 		{
-			message: 'Empty Tags',
+			message: 'Empty tags',
 			string: '<p></p>',
 			words: 0,
 			characters_excluding_spaces: 0,
 			characters_including_spaces: 0,
 		},
 		{
-			message: 'Empty String',
+			message: 'Empty string',
 			string: '',
 			words: 0,
 			characters_excluding_spaces: 0,
