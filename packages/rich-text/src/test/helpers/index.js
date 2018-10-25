@@ -490,6 +490,26 @@ export const spec = [
 		},
 	},
 	{
+		description: 'should handle multiline value with element selection',
+		multilineTag: 'li',
+		multilineWrapperTags: [ 'ul', 'ol' ],
+		html: '<li>one</li>',
+		createRange: ( element ) => ( {
+			startOffset: 1,
+			startContainer: element.firstChild,
+			endOffset: 1,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 0, 3 ],
+		endPath: [ 0, 0, 3 ],
+		record: {
+			start: 3,
+			end: 3,
+			formats: [ , , , ],
+			text: 'one',
+		},
+	},
+	{
 		description: 'should remove with settings',
 		settings: {
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),

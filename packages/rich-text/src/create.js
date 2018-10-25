@@ -120,7 +120,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
 	// Range indicates that the current node has selection.
-	} else if ( node === startContainer ) {
+	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
 	// Range indicates that the current node is selected.
 	} else if (
@@ -128,13 +128,22 @@ function accumulateSelection( accumulator, node, range, value ) {
 		node === startContainer.childNodes[ startOffset ]
 	) {
 		accumulator.start = currentLength;
+	// Range indicates that the selection is after the current node.
+	} else if (
+		parentNode === startContainer &&
+		node === startContainer.childNodes[ startOffset - 1 ]
+	) {
+		accumulator.start = currentLength + value.text.length;
+	// Fallback if no child inside handled the selection.
+	} else if ( node === startContainer ) {
+		accumulator.start = currentLength;
 	}
 
 	// Selection can be extracted from value.
 	if ( value.end !== undefined ) {
 		accumulator.end = currentLength + value.end;
 	// Range indicates that the current node has selection.
-	} else if ( node === endContainer ) {
+	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
 	// Range indicates that the current node is selected.
 	} else if (
@@ -148,6 +157,9 @@ function accumulateSelection( accumulator, node, range, value ) {
 		node === endContainer.childNodes[ endOffset ]
 	) {
 		accumulator.end = currentLength;
+	// Fallback if no child inside handled the selection.
+	} else if ( node === endContainer ) {
+		accumulator.end = currentLength + endOffset;
 	}
 }
 
@@ -419,7 +431,7 @@ function createFromMultilineElement( {
 			continue;
 		}
 
-		const value = createFromElement( {
+		let value = createFromElement( {
 			element: node,
 			range,
 			multilineTag,
@@ -429,6 +441,12 @@ function createFromMultilineElement( {
 			filterString,
 			removeAttribute,
 		} );
+
+		// If a line consists of one single line break (invisible), consider the
+		// line empty, wether this is the browser's doing or not.
+		if ( value.text === '\n' ) {
+			value = createEmptyValue();
+		}
 
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 || shouldPrependSeparator === true ) {
