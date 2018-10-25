@@ -321,10 +321,6 @@ class ImageEdit extends Component {
 					{ controls }
 					<MediaPlaceholder
 						icon="format-image"
-						labels={ {
-							title: __( 'Image' ),
-							name: __( 'an image' ),
-						} }
 						className={ className }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
