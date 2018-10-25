@@ -22,11 +22,13 @@ class DropZoneProvider extends Component {
 	constructor() {
 		super( ...arguments );
 
+		// Event listeners
+		this.onDragOver = this.onDragOver.bind( this );
+		this.onDrop = this.onDrop.bind( this );
+		// Utility methods
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
-		this.dragOverListener = this.dragOverListener.bind( this );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
-		this.onDrop = this.onDrop.bind( this );
 
 		this.state = {
 			isDraggingOverDocument: false,
@@ -36,7 +38,7 @@ class DropZoneProvider extends Component {
 		this.dropzones = [];
 	}
 
-	dragOverListener( event ) {
+	onDragOver( event ) {
 		this.toggleDraggingOverDocument( event, this.getDragEventType( event ) );
 		event.preventDefault();
 	}
@@ -55,7 +57,7 @@ class DropZoneProvider extends Component {
 	}
 
 	componentDidMount() {
-		window.addEventListener( 'dragover', this.dragOverListener );
+		window.addEventListener( 'dragover', this.onDragOver );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
 
@@ -65,7 +67,7 @@ class DropZoneProvider extends Component {
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'dragover', this.dragOverListener );
+		window.removeEventListener( 'dragover', this.onDragOver );
 		window.removeEventListener( 'drop', this.onDrop );
 		window.removeEventListener( 'mouseup', this.resetDragState );
 	}
