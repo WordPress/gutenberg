@@ -138,7 +138,7 @@ class FileEdit extends Component {
 					icon="media-default"
 					labels={ {
 						title: __( 'File' ),
-						name: __( 'a file' ),
+						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }

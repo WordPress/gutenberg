@@ -137,10 +137,6 @@ class VideoEdit extends Component {
 			return (
 				<MediaPlaceholder
 					icon="media-video"
-					labels={ {
-						title: __( 'Video' ),
-						name: __( 'a video' ),
-					} }
 					className={ className }
 					onSelect={ onSelectVideo }
 					onSelectURL={ this.onSelectURL }
