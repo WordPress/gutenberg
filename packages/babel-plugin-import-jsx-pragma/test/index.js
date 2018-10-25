@@ -28,8 +28,15 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 		expect( string ).toBe( original );
 	} );
 
-	it( 'does nothing if there scope variable already imported', () => {
+	it( 'does nothing if the scope variable is already imported', () => {
 		const original = 'import React from "react";\nlet foo = <bar />;';
+		const string = getTransformedCode( original );
+
+		expect( string ).toBe( original );
+	} );
+
+	it( 'does nothing if the scope variable is already defined', () => {
+		const original = 'const React = require("react");\n\nlet foo = <bar />;';
 		const string = getTransformedCode( original );
 
 		expect( string ).toBe( original );
@@ -40,6 +47,20 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 		const string = getTransformedCode( original );
 
 		expect( string ).toBe( 'import React from "react";\nlet foo = <bar />;' );
+	} );
+
+	it( 'adds import for scope variable even if library is required', () => {
+		const original = 'const OtherReact = require("react");\n\nlet foo = <bar />;';
+		const string = getTransformedCode( original );
+
+		expect( string ).toBe( 'import React from "react";\n\nconst OtherReact = require("react");\n\nlet foo = <bar />;' );
+	} );
+
+	it( 'adds import for scope variable even if variable is defined in a child scope is required', () => {
+		const original = 'let foo = <bar />;\n\nfunction x() { const React = require("react"); }';
+		const string = getTransformedCode( original );
+
+		expect( string ).toBe( 'import React from "react";\nlet foo = <bar />;\n\nfunction x() {\n  const React = require("react");\n}' );
 	} );
 
 	it( 'allows options customization', () => {

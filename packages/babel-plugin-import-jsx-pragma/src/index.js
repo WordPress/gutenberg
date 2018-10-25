@@ -46,7 +46,7 @@ export default function( babel ) {
 				state.hasJSX = true;
 			},
 			ImportDeclaration( path, state ) {
-				if ( state.hasImportedScopeVariable ) {
+				if ( state.hasImportedScopeVariable || state.hasRequiredScopeVariable ) {
 					return;
 				}
 
@@ -69,9 +69,28 @@ export default function( babel ) {
 					}
 				} );
 			},
+			VariableDeclaration( path, state ) {
+				if ( state.hasImportedScopeVariable || state.hasRequiredScopeVariable ) {
+					return;
+				}
+
+				// Only look in the global scope
+				if ( path.scope.parent !== null ) {
+					return;
+				}
+
+				const { scopeVariable } = getOptions( state );
+
+				// Test if the matching the scope variable name is defined
+				state.hasRequiredScopeVariable = path.node.declarations.some( ( declaration ) => {
+					return declaration.type === 'VariableDeclarator' &&
+						declaration.id &&
+						declaration.id.name === scopeVariable;
+				} );
+			},
 			Program: {
 				exit( path, state ) {
-					if ( ! state.hasJSX || state.hasImportedScopeVariable ) {
+					if ( ! state.hasJSX || state.hasImportedScopeVariable || state.hasRequiredScopeVariable ) {
 						return;
 					}
 
