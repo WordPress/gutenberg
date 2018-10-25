@@ -56,20 +56,6 @@ exports[`splitting and merging blocks should remove at most one paragraph in for
 <!-- /wp:paragraph -->"
 `;
 
-exports[`splitting and merging blocks should remove at most one paragraph in forward direction 2`] = `
-"<!-- wp:paragraph -->
-<p>First</p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p></p>
-<!-- /wp:paragraph -->
-
-<!-- wp:paragraph -->
-<p>Second</p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`splitting and merging blocks should remove empty paragraph block on backspace 1`] = `""`;
 
 exports[`splitting and merging blocks should split and merge paragraph blocks using Enter and Backspace 1`] = `
