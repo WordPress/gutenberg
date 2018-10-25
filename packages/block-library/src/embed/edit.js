@@ -28,7 +28,7 @@ import {
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls, BlockIcon, InspectorControls } from '@wordpress/editor';
 
-export function getEmbedEditComponent( title, icon ) {
+export function getEmbedEditComponent( title, icon, responsive = true ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -168,7 +168,8 @@ export function getEmbedEditComponent( title, icon ) {
 			previewDocument.body.innerHTML = html;
 			const iframe = previewDocument.body.querySelector( 'iframe' );
 
-			if ( iframe && iframe.height && iframe.width ) {
+			// If we have a fixed aspect iframe, and it's a responsive embed block.
+			if ( responsive && iframe && iframe.height && iframe.width ) {
 				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
 				// Given the actual aspect ratio, find the widest ratio to support it.
 				for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
@@ -250,7 +251,7 @@ export function getEmbedEditComponent( title, icon ) {
 		}
 
 		getResponsiveHelp( checked ) {
-			return checked ? __( 'Videos and other content automatically resizes.' ) : __( 'Content is fixed size.' );
+			return checked ? __( 'This embed will preserve its aspect ratio when the browser is resized.' ) : __( 'This embed may not preserve its aspect ratio when the browser is resized.' );
 		}
 
 		toggleResponsive() {
@@ -288,7 +289,7 @@ export function getEmbedEditComponent( title, icon ) {
 						<InspectorControls>
 							<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
 								<ToggleControl
-									label={ __( 'Automatically scale content' ) }
+									label={ __( 'Resize for smaller devices' ) }
 									checked={ allowResponsive }
 									help={ this.getResponsiveHelp }
 									onChange={ this.toggleResponsive }

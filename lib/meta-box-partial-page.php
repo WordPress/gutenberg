@@ -57,6 +57,7 @@ add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000 );
  *
  * @param string $location The location of the meta box, 'side', 'normal'.
  * @param int    $post_id  Post ID.
+ * @return string Modified location of the meta box.
  *
  * @hooked redirect_post_location priority 10
  */
