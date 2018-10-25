@@ -1,4 +1,4 @@
-## 2.2.0 (2018-10-24)
+## 2.2.0 (unreleased)
 
 ### Breaking Change
 
