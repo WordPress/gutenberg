@@ -15,7 +15,11 @@ import {
 	withColors,
 } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
+import {
+	PanelBody,
+	TextareaControl,
+	Toolbar,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -108,7 +112,7 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			setBackgroundColor,
 		} = this.props;
-		const { mediaPosition, mediaWidth } = attributes;
+		const { mediaAlt, mediaPosition, mediaType, mediaWidth } = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
@@ -136,9 +140,23 @@ class MediaTextEdit extends Component {
 			isActive: mediaPosition === 'right',
 			onClick: () => setAttributes( { mediaPosition: 'right' } ),
 		} ];
+		const onMediaAltChange = ( newMediaAlt ) => {
+			setAttributes( { mediaAlt: newMediaAlt } );
+		};
+		const mediaTextGeneralSettings = mediaType === 'image' && (
+			<PanelBody title={ __( 'Media & Text Settings' ) }>
+				<TextareaControl
+					label={ __( 'Alt Text (Alternative Text)' ) }
+					value={ mediaAlt }
+					onChange={ onMediaAltChange }
+					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+				/>
+			</PanelBody>
+		);
 		return (
 			<Fragment>
 				<InspectorControls>
+					{ mediaTextGeneralSettings }
 					<PanelColorSettings
 						title={ __( 'Color Settings' ) }
 						initialOpen={ false }
