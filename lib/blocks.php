@@ -9,8 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-$the_content_priority_strip_dynamic_blocks = 6; // Before do_blocks
-$the_content_priority_do_blocks = 7; // Before do_shortcodes
+$the_content_priority_strip_dynamic_blocks = 6; // Before do_blocks.
+$the_content_priority_do_blocks            = 7; // Before do_shortcodes.
 
 if ( ! function_exists( 'register_block_type' ) ) {
 	/**
