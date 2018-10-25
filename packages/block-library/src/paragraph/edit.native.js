@@ -69,6 +69,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			setAttributes,
 			style,
+			mergeBlocks,
 		} = this.props;
 
 		const {
@@ -95,6 +96,7 @@ class ParagraphEdit extends Component {
 					}
 					}
 					onSplit={ this.splitBlock }
+					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
 						setAttributes( {
 							...this.props.attributes,
