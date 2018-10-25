@@ -58,16 +58,8 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	let { alt } = image;
-	const { filename } = image;
-
-	if ( ! alt ) {
-		alt = sprintf( __( 'This image has an empty alt attribute; its file name is "%s"' ), filename );
-	}
-
 	return {
-		...pick( image, [ 'id', 'link', 'url', 'caption' ] ),
-		alt,
+		...pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] ),
 	};
 };
 
@@ -109,6 +101,7 @@ class ImageEdit extends Component {
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+		this.getFilename = this.getFilename.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -253,6 +246,16 @@ class ImageEdit extends Component {
 		return () => {
 			this.props.setAttributes( { width, height } );
 		};
+	}
+
+	getFilename( url ) {
+		if ( url ) {
+			const fileName = url.toString().match( /.*\/(.+?)\./ );
+			if ( fileName && fileName.length > 1 ) {
+				return fileName[ 1 ];
+			}
+		}
+		return '';
 	}
 
 	getAvailableSizes() {
@@ -471,12 +474,28 @@ class ImageEdit extends Component {
 								imageHeight,
 							} = sizes;
 
+							const defaultAlt = sprintf( __( 'This image has an empty alt attribute; its file name is \"%s\"' ), this.getFilename( url ) );
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							// Disable reason: Image itself is not meant to be
+							// interactive, but should direct focus to block
+							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+							const imgNoAlt = <img src={ url } alt={ defaultAlt } onClick={ this.onImageClick } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
+								if ( ! alt ) {
+									return (
+										<Fragment>
+											{ getInspectorControls( imageWidth, imageHeight ) }
+											<div style={ { width, height } }>
+												{ imgNoAlt }
+											</div>
+										</Fragment>
+
+									);
+								}
 								return (
 									<Fragment>
 										{ getInspectorControls( imageWidth, imageHeight ) }
