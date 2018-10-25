@@ -16,6 +16,16 @@ exports[`List can be converted to paragraphs 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`List can be converted when nested to paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`List can be created by converting a paragraph 1`] = `
 "<!-- wp:list -->
 <ul><li>test</li></ul>
