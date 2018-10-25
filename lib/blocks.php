@@ -312,7 +312,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_remove_filter( $text ) {
-		remove_filter( 'the_content', 'strip_dynamic_blocks', 8 );
+		remove_filter( 'the_content', 'strip_dynamic_blocks', 6 );
 
 		return $text;
 	}
