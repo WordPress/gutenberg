@@ -307,8 +307,19 @@ export async function pressWithModifier( modifiers, key ) {
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
 	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
-	const itemButton = ( await page.$x( `//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
-	await itemButton.click( 'button' );
+	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
+}
+
+/**
+ * Opens the publish panel.
+ */
+export async function openPublishPanel() {
+	await page.click( '.editor-post-publish-panel__toggle' );
+
+	// Disable reason: Wait for the animation to complete, since otherwise the
+	// click attempt may occur at the wrong point.
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitFor( 100 );
 }
 
 /**
@@ -318,13 +329,7 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
  * @return {Promise} Promise resolving when publish is complete.
  */
 export async function publishPost() {
-	// Opens the publish panel
-	await page.click( '.editor-post-publish-panel__toggle' );
-
-	// Disable reason: Wait for the animation to complete, since otherwise the
-	// click attempt may occur at the wrong point.
-	// eslint-disable-next-line no-restricted-syntax
-	await page.waitFor( 100 );
+	await openPublishPanel();
 
 	// Publish the post
 	await page.click( '.editor-post-publish-button' );

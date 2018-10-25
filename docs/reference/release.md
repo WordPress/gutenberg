@@ -47,7 +47,7 @@ Creating a release candidate involves:
 1. [Create a new release on GitHub](https://github.com/WordPress/gutenberg/releases/new).
 2. If you were releasing the `5.0.0` release candidate, label it `v5.0.0-rc.1`.
 3. The GitHub release screen should look like this:
-[![GitHub Release Screenshot](https://raw.githubusercontent.com/WordPress/gutenberg/docs/more-release-docs-tweaks/docs/reference/release-screenshot.png)](https://raw.githubusercontent.com/WordPress/gutenberg/docs/more-release-docs-tweaks/docs/reference/release-screenshot.png)
+[![GitHub Release Screenshot](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/release-screenshot.png)](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/reference/release-screenshot.png)
 4. Creative emojis related to a key feature in this release are encouraged. Emojis are fun!
 5. Publish the release.
 

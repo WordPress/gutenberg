@@ -15,7 +15,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   <Section
     title="General"
   >
-    <WithSelect(WithDispatch(Option))
+    <WithSelect(WithDispatch(IfViewportMatches(Option)))
       label="Enable Pre-publish Checks"
     />
     <WithSelect(WithDispatch(DeferredOption))

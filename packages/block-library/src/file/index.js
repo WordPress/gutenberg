@@ -11,7 +11,7 @@ import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
 import { RichText } from '@wordpress/editor';
-import { create, getTextContent } from '@wordpress/rich-text';
+import { SVG, Path } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ export const settings = {
 
 	description: __( 'Add a link to a file that visitors can download.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M9 6l2 2h9v10H4V6h5m1-2H4L2 6v12l2 2h16l2-2V8l-2-2h-8l-2-2z" /></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><Path d="M9 6l2 2h9v10H4V6h5m1-2H4L2 6v12l2 2h16l2-2V8l-2-2h-8l-2-2z" /></SVG>,
 
 	category: 'common',
 
@@ -218,10 +218,7 @@ export const settings = {
 					<a
 						href={ href }
 						className="wp-block-file__button"
-						// ensure download attribute is still set when fileName
-						// is undefined. Using '' here as `true` still leaves
-						// the attribute unset.
-						download={ getTextContent( create( { html: fileName } ) ) }
+						download={ true }
 					>
 						<RichText.Content
 							value={ downloadButtonText }
