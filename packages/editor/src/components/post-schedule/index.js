@@ -1,13 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { getSettings } from '@wordpress/date';
+import { __experimentalGetSettings } from '@wordpress/date';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
 
 export function PostSchedule( { date, onUpdateDate } ) {
-	const settings = getSettings();
+	const settings = __experimentalGetSettings();
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
 	// We also make sure this a is not escaped by a "/"
 	const is12HourTime = /a(?!\\)/i.test(
