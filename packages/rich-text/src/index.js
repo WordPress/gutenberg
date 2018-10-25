@@ -13,6 +13,8 @@ export { join } from './join';
 export { registerFormatType } from './register-format-type';
 export { removeFormat } from './remove-format';
 export { remove } from './remove';
+export { removeNextLineSeparator } from './remove-next-line-separator.js';
+export { removePreviousLineSeparator } from './remove-previous-line-separator.js';
 export { replace } from './replace';
 export { insert } from './insert';
 export { insertLineSeparator } from './insert-line-separator';

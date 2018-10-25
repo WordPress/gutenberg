@@ -37,10 +37,10 @@ import {
 	getTextContent,
 	insert,
 	insertLineSeparator,
-	remove,
+	removeNextLineSeparator,
+	removePreviousLineSeparator,
 	isEmptyLine,
 	unstableToDom,
-	LINE_SEPARATOR,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -613,22 +613,18 @@ export class RichText extends Component {
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			if ( this.multilineTag ) {
-				const isReverse = keyCode === BACKSPACE;
 				const record = this.createRecord();
-				const previousIndex = record.start - 1;
-				const nextIndex = record.end;
+				let newValue;
 
-				// The previous character is a line separator, so remove the
-				// selection including the line separator.
-				if ( isReverse && record.text[ previousIndex ] === LINE_SEPARATOR ) {
-					this.onChange( remove( record, previousIndex, record.end ) );
-					event.preventDefault();
-					// TinyMCE won't stop on `preventDefault`.
-					event.stopImmediatePropagation();
-				// The next character is a line separator, so remove the
-				// selection including the line separator.
-				} else if ( ! isReverse && record.text[ nextIndex ] === LINE_SEPARATOR ) {
-					this.onChange( remove( record, record.start, nextIndex + 1 ) );
+				if ( keyCode === BACKSPACE ) {
+					newValue = removePreviousLineSeparator( record );
+				} else {
+					newValue = removeNextLineSeparator( record );
+				}
+
+				if ( newValue ) {
+					this.onChange( newValue );
+
 					event.preventDefault();
 					// TinyMCE won't stop on `preventDefault`.
 					event.stopImmediatePropagation();
