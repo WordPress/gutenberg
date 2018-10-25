@@ -105,7 +105,7 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function padEmptyLines( { element, createLinePadding } ) {
+function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
 	const length = element.childNodes.length;
 	const doc = element.ownerDocument;
 
@@ -117,11 +117,15 @@ function padEmptyLines( { element, createLinePadding } ) {
 				element.appendChild( createLinePadding( doc ) );
 			}
 		} else {
-			if ( ! child.previousSibling && ( child.nodeName === 'OL' || child.nodeName === 'UL' ) ) {
+			if (
+				multilineWrapperTags &&
+				! child.previousSibling &&
+				multilineWrapperTags.indexOf( child.nodeName.toLowerCase() ) !== -1
+			) {
 				element.insertBefore( createLinePadding( doc ), child );
 			}
 
-			padEmptyLines( { element: child, createLinePadding } );
+			padEmptyLines( { element: child, createLinePadding, multilineWrapperTags } );
 		}
 	}
 }
@@ -156,7 +160,7 @@ export function toDom( {
 	} );
 
 	if ( createLinePadding ) {
-		padEmptyLines( { element: tree, createLinePadding } );
+		padEmptyLines( { element: tree, createLinePadding, multilineWrapperTags } );
 	}
 
 	return {
