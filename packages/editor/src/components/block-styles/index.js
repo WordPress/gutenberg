@@ -12,6 +12,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import TokenList from '@wordpress/token-list';
+import { ENTER, SPACE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -87,7 +88,6 @@ function BlockStyles( {
 		<div className="editor-block-styles">
 			{ styles.map( ( style ) => {
 				const styleClassName = replaceActiveStyle( className, activeStyle, style );
-				/* eslint-disable jsx-a11y/click-events-have-key-events */
 				return (
 					<div
 						key={ style.name }
@@ -97,6 +97,12 @@ function BlockStyles( {
 							}
 						) }
 						onClick={ () => updateClassName( style ) }
+						onKeyDown={ ( event ) => {
+							if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+								event.preventDefault();
+								updateClassName( style );
+							}
+						} }
 						onMouseEnter={ () => onHoverClassName( styleClassName ) }
 						onMouseLeave={ () => onHoverClassName( null ) }
 						role="button"
@@ -117,7 +123,6 @@ function BlockStyles( {
 						</div>
 					</div>
 				);
-				/* eslint-enable jsx-a11y/click-events-have-key-events */
 			} ) }
 		</div>
 	);
