@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, Button, KeyboardAvoidingView } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, Button, KeyboardAvoidingView, NativeModules } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -16,7 +16,6 @@ import HTMLTextInput from '../components/html-text-input';
 // Gutenberg imports
 import { createBlock, serialize } from '@wordpress/blocks';
 
-import { NativeModules } from 'react-native'
 const { GBPostManager } = NativeModules;
 
 export type BlockListType = {
@@ -171,7 +170,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	onPressDone = () => {
 		const html = this.serializeBlocksToHtml();
-		GBPostManager.savePost(html);
+		GBPostManager.savePost( html );
 	}
 
 	onPressClose = () => {
