@@ -4,7 +4,7 @@
 import { removep, autop } from '@wordpress/autop';
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Dashicon } from '@wordpress/components';
+import { Dashicon, SVG, Path } from '@wordpress/components';
 import { PlainText } from '@wordpress/editor';
 import { withInstanceId } from '@wordpress/compose';
 
@@ -15,7 +15,7 @@ export const settings = {
 
 	description: __( 'Add a shortcode -- a WordPress-specific snippet of code written between square brackets.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.5,21.4l1.9,0.5l5.2-19.3l-1.9-0.5L8.5,21.4z M3,19h4v-2H5V7h2V5H3V19z M17,5v2h2v10h-2v2h4V5H17z" /></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M8.5,21.4l1.9,0.5l5.2-19.3l-1.9-0.5L8.5,21.4z M3,19h4v-2H5V7h2V5H3V19z M17,5v2h2v10h-2v2h4V5H17z" /></SVG>,
 
 	category: 'widgets',
 
