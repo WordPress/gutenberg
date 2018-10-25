@@ -4,24 +4,24 @@
 import { select, dispatch } from '@wordpress/data';
 
 /**
- * Deregisters a format.
+ * Unregisters a format.
  *
  * @param {string} name Format name.
  *
  * @return {?WPFormat} The previous format value, if it has been successfully
  *                     unregistered; otherwise `undefined`.
  */
-export function deregisterBlockType( name ) {
-	const oldFormat = select( 'core/rich-text' ).getBlockType( name );
+export function unregisterFormatType( name ) {
+	const oldFormat = select( 'core/rich-text' ).getFormatType( name );
 
 	if ( ! oldFormat ) {
 		window.console.error(
-			'Format "' + name + '" is not registered.'
+			`Format ${ name } is not registered.`
 		);
 		return;
 	}
 
-	dispatch( 'core/rich-text' ).removeBlockTypes( name );
+	dispatch( 'core/rich-text' ).removeFormatTypes( name );
 
 	return oldFormat;
 }
