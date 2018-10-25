@@ -57,7 +57,7 @@ export default compose(
 		} = select( 'core/edit-post' );
 
 		return {
-			isEditorSidebar: isEditorSidebarOpened(),
+			isEditorSidebarOpened: isEditorSidebarOpened(),
 			sidebarName: getActiveGeneralSidebarName(),
 		};
 	} ),

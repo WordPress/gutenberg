@@ -1,13 +1,22 @@
 /**
  * Internal dependencies
  */
-import { newPost, setViewport, pressWithModifier } from '../support/utils';
+import {
+	newPost,
+	observeFocusLoss,
+	pressWithModifier,
+	setViewport,
+} from '../support/utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
 
 describe( 'Publishing', () => {
+	beforeEach( () => {
+		observeFocusLoss();
+	} );
+
 	it( 'Should have sidebar visible at the start with document sidebar active on desktop', async () => {
 		await setViewport( 'large' );
 		await newPost();
