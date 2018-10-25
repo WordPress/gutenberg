@@ -321,10 +321,6 @@ class ImageEdit extends Component {
 					{ controls }
 					<MediaPlaceholder
 						icon="format-image"
-						labels={ {
-							title: __( 'Image' ),
-							name: __( 'an image' ),
-						} }
 						className={ className }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
@@ -355,7 +351,7 @@ class ImageEdit extends Component {
 						label={ __( 'Alt Text (Alternative Text)' ) }
 						value={ alt }
 						onChange={ this.updateAlt }
-						help={ __( 'Describe the purpose of the image. Leave empty if the image is not a key part of the content.' ) }
+						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 					/>
 					{ ! isEmpty( availableSizes ) && (
 						<SelectControl
