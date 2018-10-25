@@ -9,7 +9,10 @@ import Foundation
 //
 import RNTAztecView
 
-typealias AztecMediaProvider = Aztec.TextViewAttachmentImageProvider & Aztec.TextViewAttachmentDelegate
+protocol AztecMediaProvider {
+    var attachmentImageProvider: TextViewAttachmentImageProvider { get }
+    var attachmentDelegate: TextViewAttachmentDelegate { get }
+}
 
 class BridgeDelegate: NSObject, RCTBridgeDelegate {
 
@@ -30,7 +33,7 @@ class BridgeDelegate: NSObject, RCTBridgeDelegate {
 
     func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
         return [
-            RCTAztecViewManager(attachmentDelegate: mediaProvider, imageProvider: mediaProvider),
+            RCTAztecViewManager(attachmentDelegate: mediaProvider.attachmentDelegate, imageProvider: mediaProvider.attachmentImageProvider),
             postManager
         ]
     }
