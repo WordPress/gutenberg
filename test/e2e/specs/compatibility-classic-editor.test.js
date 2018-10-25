@@ -9,10 +9,6 @@ describe( 'Compatibility with Classic Editor', () => {
 	} );
 
 	it( 'Should not apply autop when rendering blocks', async () => {
-		// Save should not be an option for new empty post.
-		expect( await page.$( '.editor-post-save-draft' ) ).toBe( null );
-
-		// Add title to enable valid non-empty post save.
 		await insertBlock( 'Custom HTML' );
 		await page.keyboard.type( '<a>' );
 		await page.keyboard.press( 'Enter' );
@@ -26,7 +22,7 @@ describe( 'Compatibility with Classic Editor', () => {
 		await viewPostLinks[ 0 ].click();
 		await page.waitForNavigation();
 
-		// Check the the dynamic block appears.
+		// Check the the content doesn't contain <p> tags
 		const content = await page.$eval( '.entry-content', ( element ) => element.innerHTML );
 		expect( content ).toMatchSnapshot();
 	} );
