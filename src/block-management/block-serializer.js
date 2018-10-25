@@ -5,7 +5,7 @@
 
 import { serialize } from '@wordpress/blocks';
 
-export function serializeBlocksToHtml( blocks: Array ): string {
+export function serializeBlocksToHtml( blocks: Array<Object> ): string {
 	return blocks
 		.map( serializeBlock )
 		.join( '' );
