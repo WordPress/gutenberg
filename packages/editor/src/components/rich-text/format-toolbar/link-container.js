@@ -33,7 +33,7 @@ function getLinkAttributesFromFormat( { attributes: { href = '', target } = {} }
 	return { href, target };
 }
 
-function createLinkFormat( { href, opensInNewWindow } ) {
+function createLinkFormat( { href, opensInNewWindow, record } ) {
 	const format = {
 		type: 'a',
 		attributes: {
@@ -41,9 +41,12 @@ function createLinkFormat( { href, opensInNewWindow } ) {
 		},
 	};
 
+	const text = record.text || '';
+
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
+		format.attributes.rel = 'external noreferrer noopener';
+		format.attributes[ 'aria-label' ] = `${ text } (opens in a new window)`;
 	}
 
 	return format;
@@ -158,7 +161,7 @@ class LinkContainer extends Component {
 		const { link, record } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
 		const href = prependHTTP( inputValue );
-		const format = createLinkFormat( { href, opensInNewWindow } );
+		const format = createLinkFormat( { href, opensInNewWindow, record } );
 
 		if ( isCollapsed( record ) && link === undefined ) {
 			const toInsert = applyFormat( create( { text: href } ), format, 0, href.length );
