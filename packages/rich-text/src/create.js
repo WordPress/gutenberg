@@ -12,7 +12,6 @@ import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { getFormatTypes } from './get-format-types';
-import './store';
 
 /**
  * Browser dependencies

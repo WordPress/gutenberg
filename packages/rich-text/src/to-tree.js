@@ -4,7 +4,6 @@
 
 import { split } from './split';
 import { getFormatType } from './get-format-type';
-import './store';
 
 function fromFormat( { type, attributes, object } ) {
 	const formatType = getFormatType( type );
