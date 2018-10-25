@@ -33,7 +33,7 @@ class DropZoneProvider extends Component {
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 
-		this.dropzones = [];
+		this.dropZones = [];
 		this.state = {
 			addDropZone: this.addDropZone,
 			removeDropZone: this.removeDropZone,
@@ -47,10 +47,10 @@ class DropZoneProvider extends Component {
 		return {
 			dropzones: {
 				add: ( { element, updateState, onDrop, onFilesDrop, onHTMLDrop } ) => {
-					this.dropzones.push( { element, updateState, onDrop, onFilesDrop, onHTMLDrop } );
+					this.dropZones.push( { element, updateState, onDrop, onFilesDrop, onHTMLDrop } );
 				},
 				remove: ( element ) => {
-					this.dropzones = filter( this.dropzones, ( dropzone ) => dropzone.element !== element );
+					this.dropZones = filter( this.dropZones, ( dropzone ) => dropzone.element !== element );
 				},
 			},
 		};
@@ -73,11 +73,11 @@ class DropZoneProvider extends Component {
 	}
 
 	addDropZone( dropZone ) {
-		this.dropzones.push( dropZone );
+		this.dropZones.push( dropZone );
 	}
 
 	removeDropZone( dropZone ) {
-		this.dropzones = filter( this.dropzones, ( dz ) => dz !== dropZone );
+		this.dropZones = filter( this.dropZones, ( dz ) => dz !== dropZone );
 	}
 
 	resetDragState() {
@@ -95,7 +95,7 @@ class DropZoneProvider extends Component {
 			position: null,
 		} );
 
-		this.dropzones.forEach( ( { updateState } ) => {
+		this.dropZones.forEach( ( { updateState } ) => {
 			updateState( {
 				isDraggingOverDocument: false,
 				isDraggingOverElement: false,
@@ -141,7 +141,7 @@ class DropZoneProvider extends Component {
 
 		// Index of hovered dropzone.
 
-		const hoveredDropZones = filter( this.dropzones, ( dropzone ) =>
+		const hoveredDropZones = filter( this.dropZones, ( dropzone ) =>
 			this.doesDropzoneSupportType( dropzone, dragEventType ) &&
 			this.isWithinZoneBounds( dropzone.element, detail.clientX, detail.clientY )
 		);
@@ -151,7 +151,7 @@ class DropZoneProvider extends Component {
 			! some( hoveredDropZones, ( subZone ) => subZone !== zone && zone.element.parentElement.contains( subZone.element ) )
 		) );
 
-		const hoveredDropZoneIndex = this.dropzones.indexOf( hoveredDropZone );
+		const hoveredDropZoneIndex = this.dropZones.indexOf( hoveredDropZone );
 
 		let position = null;
 
@@ -168,10 +168,10 @@ class DropZoneProvider extends Component {
 		let dropzonesToUpdate = [];
 
 		if ( ! this.state.isDraggingOverDocument ) {
-			dropzonesToUpdate = this.dropzones;
+			dropzonesToUpdate = this.dropZones;
 		} else if ( hoveredDropZoneIndex !== this.state.hoveredDropZone ) {
 			if ( this.state.hoveredDropZone !== -1 ) {
-				dropzonesToUpdate.push( this.dropzones[ this.state.hoveredDropZone ] );
+				dropzonesToUpdate.push( this.dropZones[ this.state.hoveredDropZone ] );
 			}
 			if ( hoveredDropZone ) {
 				dropzonesToUpdate.push( hoveredDropZone );
@@ -186,7 +186,7 @@ class DropZoneProvider extends Component {
 
 		// Notifying the dropzones
 		dropzonesToUpdate.map( ( dropzone ) => {
-			const index = this.dropzones.indexOf( dropzone );
+			const index = this.dropZones.indexOf( dropzone );
 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropzone.updateState( {
 				isDraggingOverElement: isDraggingOverDropZone,
@@ -235,7 +235,7 @@ class DropZoneProvider extends Component {
 
 		const { position, hoveredDropZone } = this.state;
 		const dragEventType = this.getDragEventType( event );
-		const dropzone = this.dropzones[ hoveredDropZone ];
+		const dropzone = this.dropZones[ hoveredDropZone ];
 		const isValidDropzone = !! dropzone && this.container.contains( event.target );
 		this.resetDragState();
 
