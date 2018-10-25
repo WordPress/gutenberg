@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-$the_content_priority_gutenberg_wpautop = 8;
+$the_content_priority_gutenberg_wpautop = 5 // Before do_blocks;
 
 /**
  * Splits a UTF-8 string into an array of UTF-8-encoded codepoints.
