@@ -182,7 +182,13 @@ Block_List
     bs:(b:Block html:$((!Block .)*) { /** <?php return array( $b, $html ); ?> **/ return [ b, html ] })*
     post:$(.*)
   { /** <?php return peg_join_blocks( $pre, $bs, $post ); ?> **/
-    return joinBlocks( pre, bs, post );
+
+    var blocks = joinBlocks( pre, bs, post );
+    blocks.forEach( function( block ) {
+        delete block.location;
+    } );
+
+    return blocks;
   }
 
 Block
@@ -208,7 +214,8 @@ Block_Void
       blockName: blockName,
       attrs: attrs || {},
       innerBlocks: [],
-      innerHTML: ''
+      innerHTML: '',
+      location: location(),
     };
   }
 
@@ -230,11 +237,27 @@ Block_Balanced
     var innerHTML = innerContent[ 0 ];
     var innerBlocks = innerContent[ 1 ];
 
+    var blockMarkers = innerBlocks.reduce( function( accum, block ) {
+        var l = block.location;
+        var length = l.end.offset - l.start.offset;
+
+        return [
+            accum[ 0 ] + length,
+            accum[ 1 ].concat( l.start.offset - accum[ 0 ] - s.location.end.offset )
+        ];
+    }, [ 0, [] ] )[ 1 ];
+
+    innerBlocks.forEach( function( block ) {
+        delete block.location;
+    } );
+
     return {
       blockName: s.blockName,
       attrs: s.attrs,
       innerBlocks: innerBlocks,
-      innerHTML: innerHTML.join( '' )
+      innerHTML: innerHTML.join( '' ),
+      blockMarkers: blockMarkers,
+      location: location(),
     };
   }
 
@@ -253,7 +276,8 @@ Block_Start
 
     return {
       blockName: blockName,
-      attrs: attrs || {}
+      attrs: attrs || {},
+      location: location(),
     };
   }
 
