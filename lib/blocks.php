@@ -9,6 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+$the_content_priority_strip_dynamic_blocks = 6; // Before do_blocks
+$the_content_priority_do_blocks = 7; // Before do_shortcodes
+
 if ( ! function_exists( 'register_block_type' ) ) {
 	/**
 	 * Registers a block type.
@@ -262,7 +265,7 @@ if ( ! function_exists( 'do_blocks' ) ) {
 
 		return $rendered_content;
 	}
-	add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
+	add_filter( 'the_content', 'do_blocks', $the_content_priority_do_blocks ); // BEFORE do_shortcode() and oembed.
 }
 
 if ( ! function_exists( 'strip_dynamic_blocks' ) ) {
@@ -292,7 +295,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_add_filter( $text ) {
-		add_filter( 'the_content', 'strip_dynamic_blocks', 6 ); // Before do_blocks().
+		add_filter( 'the_content', 'strip_dynamic_blocks', $the_content_priority_strip_dynamic_blocks );
 
 		return $text;
 	}
@@ -312,7 +315,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_remove_filter( $text ) {
-		remove_filter( 'the_content', 'strip_dynamic_blocks', 6 );
+		remove_filter( 'the_content', 'strip_dynamic_blocks', $the_content_priority_strip_dynamic_blocks );
 
 		return $text;
 	}
