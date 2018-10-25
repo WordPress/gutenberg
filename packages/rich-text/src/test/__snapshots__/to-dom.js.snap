@@ -257,6 +257,14 @@ exports[`recordToDom should handle multiline value 1`] = `
 </body>
 `;
 
+exports[`recordToDom should handle multiline value with element selection 1`] = `
+<body>
+  <li>
+    one
+  </li>
+</body>
+`;
+
 exports[`recordToDom should handle multiline value with empty 1`] = `
 <body>
   <p>
