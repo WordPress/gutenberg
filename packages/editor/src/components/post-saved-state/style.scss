@@ -16,32 +16,28 @@
 
 .editor-post-saved-state {
 	width: $icon-button-size - 8px;
+	white-space: nowrap;
+	padding: #{ $grid-size-small * 3 } $grid-size-small;
+
+	.dashicon {
+		margin-right: $grid-size;
+	}
 
 	@include break-small() {
 		width: auto;
-	}
-}
-
-.editor-post-saved-state,
-.editor-post-save-draft {
-	white-space: nowrap;
-	padding: 8px 4px;
-
-	.dashicon {
-		margin-right: 8px;
-	}
-
-	@include break-small() {
-		padding: 8px;
+		padding: $grid-size #{ $grid-size-small * 3 };
 		text-indent: inherit;
 
 		.dashicon {
-			margin-right: 4px;
+			margin-right: $grid-size-small;
 		}
 	}
 }
 
-.editor-post-save-draft {
+// This needs specificity to override inherited styles.
+.edit-post-header .edit-post-header__settings .components-button.editor-post-save-draft {
+	margin: 0;
+
 	@include break-small() {
 		.dashicon {
 			display: none;
