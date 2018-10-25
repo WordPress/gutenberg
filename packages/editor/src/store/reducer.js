@@ -924,13 +924,12 @@ export function postLock( state = { isLocked: false }, action ) {
  * @return {PostLockState} Updated state.
  */
 export function postSavingLock( state = {}, action ) {
-	const { lockName } = action;
 	switch ( action.type ) {
 		case 'LOCK_POST_SAVING':
-			return { ...state, [ lockName ]: true };
+			return { ...state, [ action.lockName ]: true };
 
 		case 'UNLOCK_POST_SAVING':
-			return omit( state, lockName );
+			return omit( state, action.lockName );
 	}
 	return state;
 }
