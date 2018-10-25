@@ -114,6 +114,24 @@ Sometimes a block could have aliases that help users discover it while searching
 keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 ```
 
+#### Styles (optional)
+
+* **Type:** `Array`
+
+Block Styles allow providing alternative styles to block. It works by adding a className to the block’s wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+
+```js
+// Register block styles.
+styles: [
+		// Mark style as default.
+		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
+		{ name: 'outline', label: __( 'Outline' ) },
+		{ name: 'squared', label: __( 'Squared' ) },
+	],
+```
+
+Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#modifying-blocks) for exisiting blocks.
+
 #### Attributes (optional)
 
 * **Type:** `Object`
