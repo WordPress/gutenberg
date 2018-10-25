@@ -12,9 +12,10 @@ import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
+import { serializeBlocksToHtml } from './block-serializer';
 
 // Gutenberg imports
-import { createBlock, serialize } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 const { GBPostManager } = NativeModules;
 
@@ -169,26 +170,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onPressDone = () => {
-		const html = this.serializeBlocksToHtml();
+		const html = serializeBlocksToHtml( this.props.blocks );
 		GBPostManager.savePost( html );
 	}
 
 	onPressClose = () => {
 		GBPostManager.close();
-	}
-
-	serializeBlocksToHtml() {
-		return this.props.blocks
-			.map( this.serializeBlock )
-			.join( '' );
-	}
-
-	serializeBlock( block: Object ) {
-		if ( block.name === 'aztec' ) {
-			return '<aztec>' + block.attributes.content + '</aztec>\n\n';
-		}
-
-		return serialize( [ block ] ) + '\n\n';
 	}
 
 	renderList() {
