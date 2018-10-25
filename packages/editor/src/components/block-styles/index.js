@@ -10,7 +10,6 @@ import classnames from 'classnames';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 
@@ -107,8 +106,7 @@ function BlockStyles( {
 						onMouseLeave={ () => onHoverClassName( null ) }
 						role="button"
 						tabIndex="0"
-						/* translators: %s: style variation name */
-						aria-label={ sprintf( __( '%s style' ), style.label || style.name ) }
+						aria-label={ style.label || style.name }
 					>
 						<div className="editor-block-styles__item-preview">
 							<BlockPreviewContent
