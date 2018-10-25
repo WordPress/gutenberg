@@ -6,8 +6,17 @@ import { isEqual, find, some, filter, noop, throttle, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component, createContext, findDOMNode } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+
+const Context = createContext( {
+	addDropZone: () => {},
+	removeDropZone: () => {},
+	isDraggingOverDocument: false,
+	isDraggingOverElement: false,
+	position: null,
+	type: null,
+} );
 
 class DropZoneProvider extends Component {
 	constructor() {
