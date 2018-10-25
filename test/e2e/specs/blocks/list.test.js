@@ -160,6 +160,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
+		// Pointer device is needed. Shift+Tab won't focus the toolbar.
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.mouse.move( 250, 350, { steps: 10 } );
 		await page.click( 'button[aria-label="Indent list item"]' );
