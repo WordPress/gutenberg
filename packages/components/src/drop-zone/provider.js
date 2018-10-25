@@ -38,11 +38,6 @@ class DropZoneProvider extends Component {
 		this.dropzones = [];
 	}
 
-	onDragOver( event ) {
-		this.toggleDraggingOverDocument( event, this.getDragEventType( event ) );
-		event.preventDefault();
-	}
-
 	getChildContext() {
 		return {
 			dropzones: {
@@ -213,6 +208,11 @@ class DropZoneProvider extends Component {
 		};
 
 		return isWithinElement( dropzone );
+	}
+
+	onDragOver( event ) {
+		this.toggleDraggingOverDocument( event, this.getDragEventType( event ) );
+		event.preventDefault();
 	}
 
 	onDrop( event ) {
