@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "4.1.0",
+	"version": "4.1.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
