@@ -41,6 +41,16 @@ const isTypeSupported = ( type, typesSupported ) => {
 		( type === 'default' && typesSupported.onDrop );
 };
 
+const isWithinElementBounds = ( element, x, y ) => {
+	const rect = element.getBoundingClientRect();
+	/// make sure the rect is a valid rect
+	if ( rect.bottom === rect.top || rect.left === rect.right ) {
+		return false;
+	}
+
+	return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+};
+
 class DropZoneProvider extends Component {
 	constructor() {
 		super( ...arguments );
@@ -54,7 +64,6 @@ class DropZoneProvider extends Component {
 		// Utility methods
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
-		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 
 		this.dropZones = [];
 		this.state = {
@@ -141,7 +150,7 @@ class DropZoneProvider extends Component {
 
 		const hoveredDropZones = filter( this.dropZones, ( dropzone ) =>
 			isTypeSupported( dragEventType, dropzone ) &&
-			this.isWithinZoneBounds( dropzone.element, detail.clientX, detail.clientY )
+			isWithinElementBounds( dropzone.element, detail.clientX, detail.clientY )
 		);
 
 		// Find the leaf dropzone not containing another dropzone
@@ -202,23 +211,6 @@ class DropZoneProvider extends Component {
 		if ( ! isShallowEqual( newState, this.state ) ) {
 			this.setState( newState );
 		}
-	}
-
-	isWithinZoneBounds( dropzone, x, y ) {
-		const isWithinElement = ( element ) => {
-			const rect = element.getBoundingClientRect();
-			/// make sure the rect is a valid rect
-			if ( rect.bottom === rect.top || rect.left === rect.right ) {
-				return false;
-			}
-
-			return (
-				x >= rect.left && x <= rect.right &&
-				y >= rect.top && y <= rect.bottom
-			);
-		};
-
-		return isWithinElement( dropzone );
 	}
 
 	onDragOver( event ) {
