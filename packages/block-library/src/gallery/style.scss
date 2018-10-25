@@ -148,4 +148,12 @@
 	&.alignright {
 		display: flex;
 	}
+
+	// If the gallery is centered, center the content inside as well.
+	[data-align="center"] &,
+	&.aligncenter {
+		.blocks-gallery-item figure {
+			justify-content: center;
+		}
+	}
 }
