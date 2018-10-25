@@ -1,19 +1,13 @@
 /**
- * External dependencies
- */
-
-import { find } from 'lodash';
-
-/**
  * Internal dependencies
  */
 
 import { split } from './split';
-import { getFormatTypes } from './get-format-types';
+import { getFormatType } from './get-format-type';
 import './store';
 
 function fromFormat( { type, attributes, object } ) {
-	const formatType = find( getFormatTypes(), ( { name } ) => type === name );
+	const formatType = getFormatType( type );
 
 	if ( ! formatType ) {
 		return { type, attributes, object };
