@@ -2003,7 +2003,7 @@ export function isPostLocked( state ) {
  * @return {boolean} Is locked.
  */
 export function isPostSavingLocked( state ) {
-	return find( state.postSavingLock, ( lock ) => lock );
+	return find( state.postSavingLock, ( lock ) => lock ) ? true : false;
 }
 
 /**
