@@ -265,6 +265,8 @@ if ( ! function_exists( 'do_blocks' ) ) {
 
 		return $rendered_content;
 	}
+
+	global $the_content_priority_do_blocks;
 	add_filter( 'the_content', 'do_blocks', $the_content_priority_do_blocks ); // BEFORE do_shortcode() and oembed.
 }
 
@@ -295,6 +297,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_add_filter( $text ) {
+		global $the_content_priority_strip_dynamic_blocks;
 		add_filter( 'the_content', 'strip_dynamic_blocks', $the_content_priority_strip_dynamic_blocks );
 
 		return $text;
@@ -315,6 +318,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_remove_filter( $text ) {
+		global $the_content_priority_strip_dynamic_blocks;
 		remove_filter( 'the_content', 'strip_dynamic_blocks', $the_content_priority_strip_dynamic_blocks );
 
 		return $text;
