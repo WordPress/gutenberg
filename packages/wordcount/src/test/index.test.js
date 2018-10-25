@@ -91,6 +91,13 @@ describe( 'WordCounter', () => {
 			characters_excluding_spaces: 0,
 			characters_including_spaces: 0,
 		},
+		{
+			message: 'Empty String',
+			string: '',
+			words: 0,
+			characters_excluding_spaces: 0,
+			characters_including_spaces: 0,
+		},
 	];
 
 	const types = [ 'words', 'characters_excluding_spaces', 'characters_including_spaces' ];
