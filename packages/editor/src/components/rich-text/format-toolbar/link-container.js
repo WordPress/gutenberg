@@ -33,6 +33,15 @@ function getLinkAttributesFromFormat( { attributes: { href = '', target } = {} }
 	return { href, target };
 }
 
+/**
+ * Generates the format object that will be applied to the link text.
+ *
+ * @param {string}  href             The href of the link.
+ * @param {boolean} opensInNewWindow Whether this link will open in a new window.
+ * @param {Object}  record           The object that contains the text being wrapped in the a tag.
+ *
+ * @return {Object} The final format object.
+ */
 function createLinkFormat( { href, opensInNewWindow, record } ) {
 	const format = {
 		type: 'a',
@@ -148,7 +157,8 @@ class LinkContainer extends Component {
 		// Apply now if URL is not being edited.
 		if ( ! isShowingInput( this.props, this.state ) ) {
 			const { href } = getLinkAttributesFromFormat( this.props.link );
-			this.props.applyFormat( createLinkFormat( { href, opensInNewWindow } ) );
+			const { record } = this.props;
+			this.props.applyFormat( createLinkFormat( { href, opensInNewWindow, record } ) );
 		}
 	}
 
