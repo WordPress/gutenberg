@@ -25,17 +25,22 @@ class DropZoneProvider extends Component {
 		// Event listeners
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDrop = this.onDrop.bind( this );
+		// Context methods so this component can receive data from consumers
+		this.addDropZone = this.addDropZone.bind( this );
+		this.removeDropZone = this.removeDropZone.bind( this );
 		// Utility methods
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
 		this.isWithinZoneBounds = this.isWithinZoneBounds.bind( this );
 
+		this.dropzones = [];
 		this.state = {
+			addDropZone: this.addDropZone,
+			removeDropZone: this.removeDropZone,
 			isDraggingOverDocument: false,
 			hoveredDropZone: -1,
 			position: null,
 		};
-		this.dropzones = [];
 	}
 
 	getChildContext() {
@@ -65,6 +70,14 @@ class DropZoneProvider extends Component {
 		window.removeEventListener( 'dragover', this.onDragOver );
 		window.removeEventListener( 'drop', this.onDrop );
 		window.removeEventListener( 'mouseup', this.resetDragState );
+	}
+
+	addDropZone( dropZone ) {
+		this.dropzones.push( dropZone );
+	}
+
+	removeDropZone( dropZone ) {
+		this.dropzones = filter( this.dropzones, ( dz ) => dz !== dropZone );
 	}
 
 	resetDragState() {
