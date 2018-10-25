@@ -6,17 +6,17 @@ import com.facebook.react.uimanager.events.Event;
 import com.facebook.react.uimanager.events.RCTEventEmitter;
 
 /**
- * Event emitted by AztecText native view when full content with cursor is requested by JS
+ * Event emitted by Aztec native view when Backspace is detected.
  */
-class ReactAztecHtmlWithCursorEvent extends Event<ReactAztecHtmlWithCursorEvent> {
+class ReactAztecBackspaceEvent extends Event<ReactAztecBackspaceEvent> {
 
-  private static final String EVENT_NAME = "topHTMLWithCursorRequested";
+  private static final String EVENT_NAME = "topTextInputBackspace";
 
   private String mText;
   private int mSelectionStart;
   private int mSelectionEnd;
 
-  public ReactAztecHtmlWithCursorEvent(int viewId, String text, int selectionStart, int selectionEnd) {
+  public ReactAztecBackspaceEvent(int viewId, String text, int selectionStart, int selectionEnd) {
     super(viewId);
     mText = text;
     mSelectionStart = selectionStart;

@@ -12,8 +12,15 @@ class ReactAztecEnterEvent extends Event<ReactAztecEnterEvent> {
 
   private static final String EVENT_NAME = "topTextInputEnter";
 
-  public ReactAztecEnterEvent(int viewId) {
+  private String mText;
+  private int mSelectionStart;
+  private int mSelectionEnd;
+
+  public ReactAztecEnterEvent(int viewId, String text, int selectionStart, int selectionEnd) {
     super(viewId);
+    mText = text;
+    mSelectionStart = selectionStart;
+    mSelectionEnd = selectionEnd;
   }
 
   @Override
@@ -34,6 +41,9 @@ class ReactAztecEnterEvent extends Event<ReactAztecEnterEvent> {
   private WritableMap serializeEventData() {
     WritableMap eventData = Arguments.createMap();
     eventData.putInt("target", getViewTag());
+    eventData.putString("text", mText);
+    eventData.putInt("selectionStart", mSelectionStart);
+    eventData.putInt("selectionEnd", mSelectionEnd);
     return eventData;
   }
 }

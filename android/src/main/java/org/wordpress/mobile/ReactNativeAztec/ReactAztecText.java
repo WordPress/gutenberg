@@ -2,8 +2,6 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 import android.support.annotation.Nullable;
 import android.text.Editable;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextWatcher;
 
 import com.facebook.react.bridge.ReactContext;
@@ -15,15 +13,11 @@ import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputLocalData;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
-import org.wordpress.aztec.AztecParser;
 import org.wordpress.aztec.AztecText;
 import org.wordpress.aztec.AztecTextFormat;
 import org.wordpress.aztec.ITextFormat;
 import org.wordpress.aztec.plugins.IAztecPlugin;
 import org.wordpress.aztec.plugins.IToolbarButton;
-import org.wordpress.aztec.source.Format;
-import org.wordpress.aztec.spans.AztecCursorSpan;
-import org.wordpress.aztec.watchers.EndOfBufferMarkerAdder;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -44,11 +38,27 @@ public class ReactAztecText extends AztecText {
     int mNativeEventCount = 0;
 
     String lastSentFormattingOptionsEventString = "";
+    boolean shouldHandleOnEnter = false;
+    boolean shouldHandleOnBackspace = false;
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
-        this.setFocusableInTouchMode(true);
-        this.setFocusable(true);
+        this.setOnKeyListener(new ReactAztecText.OnKeyListener() {
+            @Override
+            public boolean onEnterKey() {
+                if (shouldHandleOnEnter) {
+                    return onEnter();
+                }
+                return false;
+            }
+            @Override
+            public boolean onBackspaceKey() {
+                if (shouldHandleOnBackspace) {
+                    return onBackspace();
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -203,7 +213,7 @@ public class ReactAztecText extends AztecText {
         this.mIsSettingTextFromJS = mIsSettingTextFromJS;
     }
 
-    void emitHTMLWithCursorEvent() {
+    private boolean onEnter() {
         disableTextChangedListener();
         String content = toHtml(false);
         int cursorPositionStart = getSelectionStart();
@@ -212,8 +222,29 @@ public class ReactAztecText extends AztecText {
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecHtmlWithCursorEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
         );
+        return true;
+    }
+
+    private boolean onBackspace() {
+        int cursorPositionStart = getSelectionStart();
+        int cursorPositionEnd = getSelectionEnd();
+        // Make sure to report backspace at the beginning only, with no selection.
+        if (cursorPositionStart != 0 || cursorPositionEnd != 0) {
+            return false;
+        }
+
+        disableTextChangedListener();
+        String content = toHtml(false);
+        enableTextChangedListener();
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+        // TODO: isRTL? Should be passed here?
+        eventDispatcher.dispatchEvent(
+                new ReactAztecBackspaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+        );
+        return true;
     }
 
     public void applyFormat(String format) {
