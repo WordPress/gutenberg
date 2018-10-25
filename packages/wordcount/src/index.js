@@ -92,7 +92,11 @@ function matchCharacters( text, regex, settings ) {
  */
 
 export function count( text, type, userSettings ) {
-	if ( text || '' === test ) {
+	if ( '' === text ) {
+		return 0;
+	}
+
+	if ( text ) {
 		const settings = loadSettings( type, userSettings );
 		const matchRegExp = settings[ type + 'RegExp' ];
 		const results = ( 'words' === settings.type ) ?
