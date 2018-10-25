@@ -232,7 +232,7 @@ if ( ! function_exists( 'do_blocks' ) ) {
 			$inner_content = '';
 
 			if ( ! $is_self_closing ) {
-				$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
+				$end_tag_pattern = '/<!--\s+\/wp:' . preg_quote( $block_name, '/' ) . '\s+-->/';
 				if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
 					// If no closing tag is found, abort all matching, and continue
 					// to append remainder of content to rendered output.
