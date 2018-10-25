@@ -15,3 +15,4 @@ export { slice } from './slice';
 export { split } from './split';
 export { apply, toDom as unstableToDom } from './to-dom';
 export { toHTMLString } from './to-html-string';
+export { LINE_SEPARATOR } from './special-characters';
