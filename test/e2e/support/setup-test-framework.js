@@ -146,7 +146,3 @@ beforeEach( async () => {
 afterEach( async () => {
 	removePageEvents();
 } );
-
-afterAll( () => {
-	removePageEvents();
-} );
