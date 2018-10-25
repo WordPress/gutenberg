@@ -16,16 +16,24 @@ import { toTree } from './to-tree';
 
 /**
  * Create an HTML string from a Rich Text value. If a `multilineTag` is
- * provided, text separated by two new lines will be wrapped in it.
+ * provided, text separated by a line separator will be wrapped in it.
  *
- * @param {Object} value                Rich text value.
- * @param {string} multilineTag         Multiline tag.
- * @param {Array}  multilineWrapperTags Tags where lines can be found if nesting
- *                                      is possible.
+ * @param {Object} $1                      Named argements.
+ * @param {Object} $1.value                Rich text value.
+ * @param {string} $1.multilineTag         Multiline tag.
+ * @param {Array}  $1.multilineWrapperTags Tags where lines can be found if
+ *                                         nesting is possible.
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( value, multilineTag, multilineWrapperTags ) {
+export function toHTMLString( { value, multilineTag, multilineWrapperTags } ) {
+	// Check other arguments for back compact.
+	if ( value === undefined ) {
+		value = arguments[ 0 ];
+		multilineTag = arguments[ 1 ];
+		multilineWrapperTags = arguments[ 2 ];
+	}
+
 	const tree = toTree( {
 		value,
 		multilineTag,

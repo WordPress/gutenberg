@@ -876,11 +876,11 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
-			return toHTMLString(
-				{ formats, text },
-				this.multilineTag,
-				this.multilineWrapperTags,
-			);
+			return toHTMLString( {
+				value: { formats, text },
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
+			} );
 		}
 
 		return { formats, text };

@@ -240,7 +240,11 @@ export default class TinyMCE extends Component {
 		} else if ( Array.isArray( defaultValue ) ) {
 			initialHTML = children.toHTML( defaultValue );
 		} else if ( typeof defaultValue !== 'string' ) {
-			initialHTML = toHTMLString( defaultValue, multilineTag, multilineWrapperTags );
+			initialHTML = toHTMLString( {
+				value: defaultValue,
+				multilineTag,
+				multilineWrapperTags,
+			} );
 		}
 
 		return createElement( tagName, {
