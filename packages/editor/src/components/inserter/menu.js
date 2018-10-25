@@ -22,7 +22,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
-import { withSpokenMessages, PanelBody, Slot } from '@wordpress/components';
+import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
@@ -33,6 +33,7 @@ import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
+import InserterInlineElements from './inline-elements';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -268,18 +269,7 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					}
 
-					<Slot name="Inserter.InlineElements" fillProps={ { filterValue } }>
-						{ ( fills ) => ! isEmpty( fills ) && (
-							<PanelBody
-								title={ __( 'Inline Elements' ) }
-								initialOpen={ false }
-							>
-								<BlockTypesList>
-									{ fills }
-								</BlockTypesList>
-							</PanelBody>
-						) }
-					</Slot>
+					<InserterInlineElements filterValue={ filterValue } />
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];

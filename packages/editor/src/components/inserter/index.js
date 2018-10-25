@@ -13,8 +13,6 @@ import { compose } from '@wordpress/compose';
  */
 import InserterMenu from './menu';
 
-export { default as InserterResultsPortal } from './results-portal';
-
 const defaultRenderToggle = ( { onToggle, disabled, isOpen } ) => (
 	<IconButton
 		icon="insert"
