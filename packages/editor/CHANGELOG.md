@@ -4,6 +4,10 @@
 
 - Add animated logo to preview interstitial screen.
 
+### Bug Fixes
+
+- Made preview interstitial text translatable.
+
 ## 5.0.1 (2018-10-22)
 
 ## 5.0.0 (2018-10-19)
