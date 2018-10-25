@@ -18,6 +18,23 @@ const Context = createContext( {
 	type: null,
 } );
 
+const getDragEventType = ( { dataTransfer } ) => {
+	if ( dataTransfer ) {
+		// Use lodash `includes` here as in the Edge browser `types` is implemented
+		// as a DomStringList, whereas in other browsers it's an array. `includes`
+		// happily works with both types.
+		if ( includes( dataTransfer.types, 'Files' ) ) {
+			return 'file';
+		}
+
+		if ( includes( dataTransfer.types, 'text/html' ) ) {
+			return 'html';
+		}
+	}
+
+	return 'default';
+};
+
 class DropZoneProvider extends Component {
 	constructor() {
 		super( ...arguments );
@@ -103,23 +120,6 @@ class DropZoneProvider extends Component {
 				type: null,
 			} );
 		} );
-	}
-
-	getDragEventType( event ) {
-		if ( event.dataTransfer ) {
-			// Use lodash `includes` here as in the Edge browser `types` is implemented
-			// as a DomStringList, whereas in other browsers it's an array. `includes`
-			// happily works with both types.
-			if ( includes( event.dataTransfer.types, 'Files' ) ) {
-				return 'file';
-			}
-
-			if ( includes( event.dataTransfer.types, 'text/html' ) ) {
-				return 'html';
-			}
-		}
-
-		return 'default';
 	}
 
 	doesDropzoneSupportType( dropzone, type ) {
@@ -224,7 +224,7 @@ class DropZoneProvider extends Component {
 	}
 
 	onDragOver( event ) {
-		this.toggleDraggingOverDocument( event, this.getDragEventType( event ) );
+		this.toggleDraggingOverDocument( event, getDragEventType( event ) );
 		event.preventDefault();
 	}
 
@@ -234,7 +234,7 @@ class DropZoneProvider extends Component {
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
 
 		const { position, hoveredDropZone } = this.state;
-		const dragEventType = this.getDragEventType( event );
+		const dragEventType = getDragEventType( event );
 		const dropzone = this.dropZones[ hoveredDropZone ];
 		const isValidDropzone = !! dropzone && this.container.contains( event.target );
 		this.resetDragState();
