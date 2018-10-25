@@ -265,6 +265,7 @@ function createFromElement( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
+	currentWrapperTags = [],
 	removeNode,
 	unwrapNode,
 	filterString,
@@ -363,8 +364,9 @@ function createFromElement( {
 				unwrapNode,
 				filterString,
 				removeAttribute,
-				shouldPrependSeparator: true,
+				currentWrapperTags: [ ...currentWrapperTags, format ],
 			} );
+			format = undefined;
 		} else {
 			value = createFromElement( {
 				element: node,
@@ -401,6 +403,7 @@ function createFromElement( {
 			}
 		} else {
 			accumulator.text += text;
+			accumulator.formats.length += text.length;
 
 			let i = value.formats.length;
 
@@ -434,23 +437,23 @@ function createFromElement( {
  * Creates a rich text value from a DOM element and range that should be
  * multiline.
  *
- * @param {Object}    $1                        Named argements.
- * @param {?Element}  $1.element                Element to create value from.
- * @param {?Range}    $1.range                  Range to create value from.
- * @param {?string}   $1.multilineTag           Multiline tag if the structure
- *                                              is multiline.
- * @param {?Array}    $1.multilineWrapperTags   Tags where lines can be found if
- *                                              nesting is possible.
- * @param {?Function} $1.removeNode             Function to declare whether the
- *                                              given node should be removed.
- * @param {?Function} $1.unwrapNode             Function to declare whether the
- *                                              given node should be unwrapped.
- * @param {?Function} $1.filterString           Function to filter the given
- *                                              string.
- * @param {?Function} $1.removeAttribute        Wether to remove an attribute
- *                                              based on the name.
- * @param {boolean}   $1.shouldPrependSeparator Whether to prepend a line
- *                                              separator.
+ * @param {Object}    $1                      Named argements.
+ * @param {?Element}  $1.element              Element to create value from.
+ * @param {?Range}    $1.range                Range to create value from.
+ * @param {?string}   $1.multilineTag         Multiline tag if the structure is
+ *                                            multiline.
+ * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
+ *                                            nesting is possible.
+ * @param {?Function} $1.removeNode           Function to declare whether the
+ *                                            given node should be removed.
+ * @param {?Function} $1.unwrapNode           Function to declare whether the
+ *                                            given node should be unwrapped.
+ * @param {?Function} $1.filterString         Function to filter the given
+ *                                            string.
+ * @param {?Function} $1.removeAttribute      Wether to remove an attribute
+ *                                            based on the name.
+ * @param {boolean}   $1.currentWrapperTags   Whether to prepend a line
+ *                                            separator.
  *
  * @return {Object} A rich text value.
  */
@@ -463,7 +466,7 @@ function createFromMultilineElement( {
 	unwrapNode,
 	filterString,
 	removeAttribute,
-	shouldPrependSeparator = false,
+	currentWrapperTags = [],
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -486,6 +489,7 @@ function createFromMultilineElement( {
 			range,
 			multilineTag,
 			multilineWrapperTags,
+			currentWrapperTags,
 			removeNode,
 			unwrapNode,
 			filterString,
@@ -499,8 +503,9 @@ function createFromMultilineElement( {
 		}
 
 		// Multiline value text should be separated by a double line break.
-		if ( index !== 0 || shouldPrependSeparator === true ) {
-			accumulator.formats = accumulator.formats.concat( [ , ] );
+		if ( index !== 0 || currentWrapperTags.length > 0 ) {
+			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
+			accumulator.formats = accumulator.formats.concat( formats );
 			accumulator.text += LINE_SEPARATOR;
 		}
 
