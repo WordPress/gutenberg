@@ -107,7 +107,8 @@ function BlockStyles( {
 						onMouseLeave={ () => onHoverClassName( null ) }
 						role="button"
 						tabIndex="0"
-						aria-label={ sprintf( __( 'Apply style variation "%s"' ), style.label || style.name ) }
+						/* translators: %s: style variation name */
+						aria-label={ sprintf( __( '%s style' ), style.label || style.name ) }
 					>
 						<div className="editor-block-styles__item-preview">
 							<BlockPreviewContent
