@@ -2282,7 +2282,7 @@ describe( 'state', () => {
 				'test-lock': true,
 			} );
 
-			state = postSavingLock( state, {
+			state = postSavingLock( deepFreeze( state ), {
 				type: 'LOCK_POST_SAVING',
 				lockName: 'test-lock-2',
 			} );
@@ -2292,7 +2292,7 @@ describe( 'state', () => {
 				'test-lock-2': true,
 			} );
 
-			state = postSavingLock( state, {
+			state = postSavingLock( deepFreeze( state ), {
 				type: 'UNLOCK_POST_SAVING',
 				lockName: 'test-lock',
 			} );
@@ -2302,7 +2302,7 @@ describe( 'state', () => {
 				'test-lock-2': true,
 			} );
 
-			state = postSavingLock( state, {
+			state = postSavingLock( deepFreeze( state ), {
 				type: 'UNLOCK_POST_SAVING',
 				lockName: 'test-lock-2',
 			} );
