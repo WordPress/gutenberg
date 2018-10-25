@@ -27,13 +27,14 @@ export function toTree( {
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
 
+	let lastSeparatorFormats;
 	let lastCharacterFormats;
 	let lastCharacter;
 
 	// If we're building a multiline tree, start off with a multiline element.
 	if ( multilineTag ) {
 		append( append( tree, { type: multilineTag } ), '' );
-		lastCharacterFormats = [ multilineFormat ];
+		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
 	} else {
 		append( tree, '' );
 	}
@@ -43,19 +44,19 @@ export function toTree( {
 		let characterFormats = formats[ i ];
 
 		// Set multiline tags in queue for building the tree.
-		if ( multilineWrapperTags && multilineWrapperTags.length !== 0 ) {
-			characterFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
-				if ( multilineWrapperTags.indexOf( format.type ) !== -1 ) {
-					accumulator.push( format );
-					accumulator.push( multilineFormat );
-				} else if ( character !== LINE_SEPARATOR ) {
-					accumulator.push( format );
-				}
+		if ( multilineTag ) {
+			if ( character === LINE_SEPARATOR ) {
+				characterFormats = lastSeparatorFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
+					if ( character === LINE_SEPARATOR && multilineWrapperTags.indexOf( format.type ) !== -1 ) {
+						accumulator.push( format );
+						accumulator.push( multilineFormat );
+					}
 
-				return accumulator;
-			}, [ multilineFormat ] );
-		} else if ( multilineTag ) {
-			characterFormats = [ multilineFormat, ...( characterFormats || [] ) ];
+					return accumulator;
+				}, [ multilineFormat ] );
+			} else {
+				characterFormats = [ ...lastSeparatorFormats, ...( characterFormats || [] ) ];
+			}
 		}
 
 		let pointer = getLastChild( tree );

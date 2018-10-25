@@ -406,7 +406,7 @@ export const spec = [
 		record: {
 			start: 0,
 			end: 9,
-			formats: [ , , , [ ul ], [ ul ], [ ul ], [ ul ], [ ul, ol ], [ ul, ol ], [ ul, ol ], [ ul, ol ], , , , , , , ],
+			formats: [ , , , [ ul ], , [ ul ], , [ ul, ol ], , [ ul, ol ], , , , , , , , ],
 			text: 'one\u2028a\u2028b\u20281\u20282\u2028three',
 		},
 	},

@@ -287,7 +287,6 @@ exports[`recordToDom should handle nested empty list value 1`] = `
         <br />
       </li>
     </ul>
-    
   </li>
 </body>
 `;
