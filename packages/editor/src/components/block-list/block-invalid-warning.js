@@ -45,7 +45,10 @@ export class BlockInvalidWarning extends Component {
 		if ( compare ) {
 			return (
 				<Modal
-					title={ _x( 'Resolve Block', 'title for ways to fix an invalid block' ) }
+					title={
+						// translators: Dialog title to fix block content
+						__( 'Resolve Block' )
+					}
 					onRequestClose={ this.onCompareClose }
 					className="editor-block-compare"
 				>
@@ -64,7 +67,10 @@ export class BlockInvalidWarning extends Component {
 			<Warning
 				actions={ [
 					<Button key="convert" onClick={ this.onCompare } isLarge isPrimary={ ! hasHTMLBlock }>
-						{ _x( 'Resolve', 'imperative verb: show ways to fix an invalid block' ) }
+						{
+							// translators: Button to fix block content
+							_x( 'Resolve', 'imperative verb' )
+						}
 					</Button>,
 					hasHTMLBlock && (
 						<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
