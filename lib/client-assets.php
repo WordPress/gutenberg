@@ -269,7 +269,13 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_script(
 		'wp-compose',
 		gutenberg_url( 'build/compose/index.js' ),
-		array( 'lodash', 'wp-element', 'wp-is-shallow-equal', 'wp-polyfill' ),
+		array(
+			'lodash',
+			'wp-deprecated',
+			'wp-element',
+			'wp-is-shallow-equal',
+			'wp-polyfill',
+		),
 		filemtime( gutenberg_dir_path() . 'build/compose/index.js' ),
 		true
 	);
