@@ -4,7 +4,6 @@ exports[`block-serialization-spec-parser basic parsing parse() works properly 1`
 Array [
   Object {
     "attrs": Object {},
-    "blockMarkers": Array [],
     "blockName": "core/more",
     "innerBlocks": Array [],
     "innerHTML": "<!--more-->",
