@@ -5,39 +5,32 @@ import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
 	ExternalLink,
-	Fill,
 	IconButton,
 	ToggleControl,
 	withSpokenMessages,
 } from '@wordpress/components';
 import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { prependHTTP, safeDecodeURI } from '@wordpress/url';
+import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
 	insert,
 	isCollapsed,
 	applyFormat,
 } from '@wordpress/rich-text';
+import { URLInput, URLPopover } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import PositionedAtSelection from './positioned-at-selection';
-import URLInput from '../../url-input';
-import { filterURLForDisplay } from '../../../utils/url';
-import URLPopover from '../../url-popover';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
-function getLinkAttributesFromFormat( { attributes: { href = '', target } = {} } = {} ) {
-	return { href, target };
-}
-
-function createLinkFormat( { href, opensInNewWindow } ) {
+function createLinkFormat( { url, opensInNewWindow } ) {
 	const format = {
-		type: 'a',
+		type: 'core/link',
 		attributes: {
-			href,
+			url,
 		},
 	};
 
@@ -53,7 +46,7 @@ function isShowingInput( props, state ) {
 	return props.addingLink || state.editLink;
 }
 
-const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
+const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocompleteRef } ) => (
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 	<form
@@ -63,7 +56,7 @@ const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink, au
 		onSubmit={ submitLink }
 	>
 		<URLInput
-			value={ inputValue }
+			value={ value }
 			onChange={ onChangeInputValue }
 			autocompleteRef={ autocompleteRef }
 		/>
@@ -72,7 +65,7 @@ const LinkEditor = ( { inputValue, onChangeInputValue, onKeyDown, submitLink, au
 	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 );
 
-const LinkViewer = ( { href, editLink } ) => (
+const LinkViewer = ( { url, editLink } ) => (
 	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	<div
@@ -81,16 +74,16 @@ const LinkViewer = ( { href, editLink } ) => (
 	>
 		<ExternalLink
 			className="editor-format-toolbar__link-container-value"
-			href={ href }
+			href={ url }
 		>
-			{ filterURLForDisplay( safeDecodeURI( href ) ) }
+			{ filterURLForDisplay( safeDecodeURI( url ) ) }
 		</ExternalLink>
 		<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
 	</div>
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 );
 
-class LinkContainer extends Component {
+class InlineLinkUI extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -107,12 +100,12 @@ class LinkContainer extends Component {
 	}
 
 	static getDerivedStateFromProps( props, state ) {
-		const { href, target } = getLinkAttributesFromFormat( props.link );
+		const { activeAttributes: { url, target } } = props;
 		const opensInNewWindow = target === '_blank';
 
 		if ( ! isShowingInput( props, state ) ) {
-			if ( href !== state.inputValue ) {
-				return { inputValue: href };
+			if ( url !== state.inputValue ) {
+				return { inputValue: url };
 			}
 
 			if ( opensInNewWindow !== state.opensInNewWindow ) {
@@ -140,12 +133,13 @@ class LinkContainer extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
+		const { activeAttributes: { url }, value, onChange } = this.props;
+
 		this.setState( { opensInNewWindow } );
 
 		// Apply now if URL is not being edited.
 		if ( ! isShowingInput( this.props, this.state ) ) {
-			const { href } = getLinkAttributesFromFormat( this.props.link );
-			this.props.applyFormat( createLinkFormat( { href, opensInNewWindow } ) );
+			onChange( applyFormat( value, createLinkFormat( { url, opensInNewWindow } ) ) );
 		}
 	}
 
@@ -155,29 +149,27 @@ class LinkContainer extends Component {
 	}
 
 	submitLink( event ) {
-		const { link, record } = this.props;
+		const { isActive, value, onChange, speak } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
-		const href = prependHTTP( inputValue );
-		const format = createLinkFormat( { href, opensInNewWindow } );
+		const url = prependHTTP( inputValue );
+		const format = createLinkFormat( { url, opensInNewWindow } );
 
-		if ( isCollapsed( record ) && link === undefined ) {
-			const toInsert = applyFormat( create( { text: href } ), format, 0, href.length );
-			this.props.onChange( insert( record, toInsert ) );
+		event.preventDefault();
+
+		if ( isCollapsed( value ) && ! isActive ) {
+			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
+			onChange( insert( value, toInsert ) );
 		} else {
-			this.props.applyFormat( format );
-		}
-
-		if ( this.state.editLink ) {
-			this.props.speak( __( 'Link edited.' ), 'assertive' );
+			onChange( applyFormat( value, format ) );
 		}
 
 		this.resetState();
 
-		if ( ! link ) {
-			this.props.speak( __( 'Link added.' ), 'assertive' );
+		if ( isActive ) {
+			speak( __( 'Link edited.' ), 'assertive' );
+		} else {
+			speak( __( 'Link added.' ), 'assertive' );
 		}
-
-		event.preventDefault();
 	}
 
 	onClickOutside( event ) {
@@ -199,51 +191,48 @@ class LinkContainer extends Component {
 	}
 
 	render() {
-		const { link, addingLink, record } = this.props;
+		const { isActive, activeAttributes: { url }, addingLink, value } = this.props;
 
-		if ( ! link && ! addingLink ) {
+		if ( ! isActive && ! addingLink ) {
 			return null;
 		}
 
 		const { inputValue, opensInNewWindow } = this.state;
-		const { href } = getLinkAttributesFromFormat( link );
 		const showInput = isShowingInput( this.props, this.state );
 
 		return (
-			<Fill name="RichText.Siblings">
-				<PositionedAtSelection
-					key={ `${ record.start }${ record.end }` /* Used to force rerender on selection change */ }
+			<PositionedAtSelection
+				key={ `${ value.start }${ value.end }` /* Used to force rerender on selection change */ }
+			>
+				<URLPopover
+					onClickOutside={ this.onClickOutside }
+					focusOnMount={ showInput ? 'firstElement' : false }
+					renderSettings={ () => (
+						<ToggleControl
+							label={ __( 'Open in New Tab' ) }
+							checked={ opensInNewWindow }
+							onChange={ this.setLinkTarget }
+						/>
+					) }
 				>
-					<URLPopover
-						onClickOutside={ this.onClickOutside }
-						focusOnMount={ showInput ? 'firstElement' : false }
-						renderSettings={ () => (
-							<ToggleControl
-								label={ __( 'Open in New Tab' ) }
-								checked={ opensInNewWindow }
-								onChange={ this.setLinkTarget }
-							/>
-						) }
-					>
-						{ showInput ? (
-							<LinkEditor
-								inputValue={ inputValue }
-								onChangeInputValue={ this.onChangeInputValue }
-								onKeyDown={ this.onKeyDown }
-								submitLink={ this.submitLink }
-								autocompleteRef={ this.autocompleteRef }
-							/>
-						) : (
-							<LinkViewer
-								href={ href }
-								editLink={ this.editLink }
-							/>
-						) }
-					</URLPopover>
-				</PositionedAtSelection>
-			</Fill>
+					{ showInput ? (
+						<LinkEditor
+							value={ inputValue }
+							onChangeInputValue={ this.onChangeInputValue }
+							onKeyDown={ this.onKeyDown }
+							submitLink={ this.submitLink }
+							autocompleteRef={ this.autocompleteRef }
+						/>
+					) : (
+						<LinkViewer
+							url={ url }
+							editLink={ this.editLink }
+						/>
+					) }
+				</URLPopover>
+			</PositionedAtSelection>
 		);
 	}
 }
 
-export default withSpokenMessages( LinkContainer );
+export default withSpokenMessages( InlineLinkUI );
