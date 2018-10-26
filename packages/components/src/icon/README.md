@@ -1,4 +1,4 @@
-# RawIcon
+# Icon
 
 Allows you to render a raw icon without any initial styling or wrappers.
 
@@ -7,20 +7,20 @@ Allows you to render a raw icon without any initial styling or wrappers.
 #### With a Dashicon
 
 ```jsx
-import { RawIcon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 
 const MyIcon = () => (
-	<RawIcon icon="screenoptions" />
+	<Icon icon="screenoptions" />
 );
 ```
 
 #### With a function
 
 ```jsx
-import { RawIcon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 
 const MyIcon = () => (
-	<RawIcon icon={ () => <svg><path d="M5 4v3h5.5v12h3V7H19V4z" /></svg> } />
+	<Icon icon={ () => <svg><path d="M5 4v3h5.5v12h3V7H19V4z" /></svg> } />
 );
 ```
 
@@ -28,30 +28,30 @@ const MyIcon = () => (
 
 ```jsx
 import { MyIconComponent } from '../my-icon-component';
-import { RawIcon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 
 const MyIcon = () => (
-	<RawIcon icon={ MyIconComponent } />
+	<Icon icon={ MyIconComponent } />
 );
 ```
 
 #### With an SVG
 
 ```jsx
-import { RawIcon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 
 const MyIcon = () => (
-	<RawIcon icon={ <svg><path d="M5 4v3h5.5v12h3V7H19V4z" /></svg> } />
+	<Icon icon={ <svg><path d="M5 4v3h5.5v12h3V7H19V4z" /></svg> } />
 );
 ```
 
 #### Specifying a className
 
 ```jsx
-import { RawIcon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 
 const MyIcon = () => (
-	<RawIcon icon="screenoptions" className="example-class" />
+	<Icon icon="screenoptions" className="example-class" />
 );
 ```
 

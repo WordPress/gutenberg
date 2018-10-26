@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { RawIcon } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -14,10 +14,10 @@ import { RawIcon } from '@wordpress/components';
 import BlockIcon from '../';
 
 describe( 'BlockIcon', () => {
-	it( 'renders a RawIcon', () => {
+	it( 'renders a Icon', () => {
 		const wrapper = shallow( <BlockIcon icon="format-image" /> );
 
-		expect( wrapper.containsMatchingElement( <RawIcon icon="format-image" /> ) ).toBe( true );
+		expect( wrapper.containsMatchingElement( <Icon icon="format-image" /> ) ).toBe( true );
 	} );
 
 	it( 'renders a div without the has-colors classname', () => {

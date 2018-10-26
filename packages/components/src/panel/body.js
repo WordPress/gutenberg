@@ -12,7 +12,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import Button from '../button';
-import RawIcon from '../raw-icon';
+import Icon from '../icon';
 import { G, Path, SVG } from '../primitives';
 
 class PanelBody extends Component {
@@ -62,7 +62,7 @@ class PanelBody extends Component {
 								</SVG>
 							}
 							{ title }
-							{ icon && <RawIcon icon={ icon } className="components-panel__icon" size={ 20 } /> }
+							{ icon && <Icon icon={ icon } className="components-panel__icon" size={ 20 } /> }
 						</Button>
 					</h2>
 				) }

@@ -4,7 +4,7 @@
 import { cloneElement, createElement, Component, isValidElement } from '@wordpress/element';
 import { Dashicon, SVG } from '../';
 
-function RawIcon( { icon = null, size = 24, className } ) {
+function Icon( { icon = null, size = 24, className } ) {
 	if ( 'string' === typeof icon ) {
 		return <Dashicon icon={ icon } size={ size } className={ className } />;
 	}
@@ -38,4 +38,4 @@ function RawIcon( { icon = null, size = 24, className } ) {
 	return icon;
 }
 
-export default RawIcon;
+export default Icon;
