@@ -154,6 +154,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.props.focusBlockAction( newBlock.clientId ); // this not working atm
 	}
 
+	mergeBlocks( clientId: string, forward: boolean ) {
+		// find currently focused block
+		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
+	}
+
 	onChange( clientId: string, attributes: mixed ) {
 		// Update Redux store
 		this.props.onChange( clientId, attributes );
@@ -269,6 +274,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					clientId={ value.clientId }
 					insertBlocksAfter={ ( blocks ) =>
 						this.insertBlocksAfter.bind( this )( value.item.clientId, blocks )
+					}
+					mergeBlocks={ ( forward ) =>
+						this.mergeBlocks.bind( this )( value.item.clientId, forward )
 					}
 					{ ...value.item }
 				/>
