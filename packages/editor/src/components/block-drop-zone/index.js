@@ -151,7 +151,11 @@ export default compose(
 			},
 			moveBlockToPosition( srcClientId, srcRootClientId, dstIndex ) {
 				const { rootClientId: dstRootClientId, layout } = ownProps;
-				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, layout, dstIndex );
+				if ( layout === undefined ) {
+					moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, dstIndex );
+				} else {
+					moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, layout, dstIndex );
+				}
 			},
 		};
 	} ),

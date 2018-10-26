@@ -133,6 +133,14 @@ export function receiveBlocks( blocks ) {
  * @return {Object} Action object.
  */
 export function updateBlockAttributes( clientId, attributes ) {
+	if ( attributes.layout !== undefined ) {
+		deprecated( 'updateBlockAttributes with `layout` attribute', {
+			plugin: 'Gutenberg',
+			version: '2.4.0',
+			hint: 'Layout has been deprecated. The attribute should be removed.',
+		} );
+	}
+
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientId,
@@ -228,10 +236,20 @@ export function toggleSelection( isSelectionEnabled = true ) {
  * @return {Object} Action object.
  */
 export function replaceBlocks( clientIds, blocks ) {
+	blocks = castArray( blocks );
+
+	if ( blocks.some( ( block ) => block.attributes.layout !== undefined ) ) {
+		deprecated( 'replaceBlocks with block including `layout` attribute', {
+			plugin: 'Gutenberg',
+			version: '2.4.0',
+			hint: 'Layout has been deprecated. The attribute should be removed.',
+		} );
+	}
+
 	return {
 		type: 'REPLACE_BLOCKS',
 		clientIds: castArray( clientIds ),
-		blocks: castArray( blocks ),
+		blocks,
 		time: Date.now(),
 	};
 }
@@ -274,15 +292,28 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * Returns an action object signalling that an indexed block should be moved
  * to a new index.
  *
- * @param  {?string} clientId         The client ID of the block.
- * @param  {?string} fromRootClientId Root client ID source.
- * @param  {?string} toRootClientId   Root client ID destination.
- * @param  {?string} layout           Layout to move the block into.
- * @param  {number}  index            The index to move the block into.
+ * @param {?string} clientId                The client ID of the block.
+ * @param {?string} fromRootClientId        Root client ID source.
+ * @param {?string} toRootClientId          Root client ID destination.
+ * @param {?string} indexOrDeprecatedLayout The index to move the block into.
+ * @param {?number} index                   The index to move the block into.
  *
  * @return {Object} Action object.
  */
-export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId, layout, index ) {
+export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId, indexOrDeprecatedLayout, index ) {
+	let layout;
+	if ( index === undefined ) {
+		index = indexOrDeprecatedLayout;
+	} else {
+		deprecated( 'moveBlockToPosition `layout` argument', {
+			plugin: 'Gutenberg',
+			version: '2.4.0',
+			hint: 'Layout has been deprecated. The argument should be removed.',
+		} );
+
+		layout = indexOrDeprecatedLayout;
+	}
+
 	return {
 		type: 'MOVE_BLOCK_TO_POSITION',
 		fromRootClientId,
@@ -320,6 +351,14 @@ export function insertBlock( block, index, rootClientId ) {
  * @return {Object} Action object.
  */
 export function insertBlocks( blocks, index, rootClientId ) {
+	if ( blocks.some( ( block ) => block.attributes.layout !== undefined ) ) {
+		deprecated( 'insertBlocks with block including `layout` attribute', {
+			plugin: 'Gutenberg',
+			version: '2.4.0',
+			hint: 'Layout has been deprecated. The attribute should be removed.',
+		} );
+	}
+
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),

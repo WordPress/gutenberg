@@ -13,6 +13,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -104,6 +105,14 @@ class InnerBlocks extends Component {
 		const classes = classnames( 'editor-inner-blocks', {
 			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
 		} );
+
+		if ( layouts !== undefined ) {
+			deprecated( 'InnerBlocks `layouts` prop', {
+				plugin: 'Gutenberg',
+				version: '2.4.0',
+				hint: 'Layout has been deprecated. The prop should be removed.',
+			} );
+		}
 
 		return (
 			<div className={ classes }>
