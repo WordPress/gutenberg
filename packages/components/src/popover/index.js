@@ -19,7 +19,7 @@ import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
-import { Slot, Fill, SlotFillConsumer } from '../slot-fill';
+import { Slot, Fill, Consumer } from '../slot-fill';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
@@ -302,7 +302,7 @@ class Popover extends Component {
 		}
 
 		return (
-			<SlotFillConsumer>
+			<Consumer>
 				{ ( { getSlot } ) => {
 					// In case there is no slot context in which to render,
 					// default to an in-place rendering.
@@ -317,7 +317,7 @@ class Popover extends Component {
 						</span>
 					);
 				} }
-			</SlotFillConsumer>
+			</Consumer>
 		);
 	}
 }

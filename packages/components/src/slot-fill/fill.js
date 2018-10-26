@@ -11,12 +11,12 @@ import { Component, createPortal } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { SlotFillConsumer } from './provider';
+import { Consumer } from './provider';
 
 let occurrences = 0;
 
 const Fill = ( props ) => (
-	<SlotFillConsumer>
+	<Consumer>
 		{ ( { getSlot, registerFill, unregisterFill } ) => (
 			<FillComponent
 				{ ...props }
@@ -25,7 +25,7 @@ const Fill = ( props ) => (
 				unregisterFill={ unregisterFill }
 			/>
 		) }
-	</SlotFillConsumer>
+	</Consumer>
 );
 
 class FillComponent extends Component {

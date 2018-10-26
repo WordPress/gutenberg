@@ -22,10 +22,10 @@ import {
 /**
  * Internal dependencies
  */
-import { SlotFillConsumer } from './provider';
+import { Consumer } from './provider';
 
 const Slot = ( props ) => (
-	<SlotFillConsumer>
+	<Consumer>
 		{ ( { registerSlot, unregisterSlot, getFills } ) => (
 			<SlotComponent
 				{ ...props }
@@ -34,7 +34,7 @@ const Slot = ( props ) => (
 				getFills={ getFills }
 			/>
 		) }
-	</SlotFillConsumer>
+	</Consumer>
 );
 
 class SlotComponent extends Component {

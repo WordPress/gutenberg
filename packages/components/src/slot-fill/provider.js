@@ -109,4 +109,4 @@ class SlotFillProvider extends Component {
 }
 
 export default SlotFillProvider;
-export { Consumer as SlotFillConsumer };
+export { Consumer };
