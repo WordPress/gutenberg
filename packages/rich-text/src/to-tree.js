@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 
-import { split } from './split';
 import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
