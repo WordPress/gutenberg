@@ -59,6 +59,8 @@ Extending the editor UI can be accomplished with the `registerPlugin` API, allow
 
 Refer to the [Plugins](https://github.com/WordPress/gutenberg/blob/master/packages/plugins/README.md) and [Edit Post](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/README.md) section for more information.
 
+Learn also more in the [Extending editor UI](../docs/extensibility/extending-editor.md) section.
+
 ## Meta Boxes
 
 **Porting PHP meta boxes to blocks is highly encouraged!**
