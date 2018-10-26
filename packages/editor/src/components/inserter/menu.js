@@ -20,7 +20,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
@@ -33,7 +33,7 @@ import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
-import InserterResultsPortal from './results-portal';
+import InserterInlineElements from './inline-elements';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -162,7 +162,7 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { items, rootChildBlocks } = this.props;
+		const { debouncedSpeak, items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
@@ -205,6 +205,17 @@ export class InserterMenu extends Component {
 			itemsPerCategory,
 			openPanels,
 		} );
+
+		const resultCount = Object.keys( itemsPerCategory ).reduce( ( accumulator, currentCategorySlug ) => {
+			return accumulator + itemsPerCategory[ currentCategorySlug ].length;
+		}, 0 );
+
+		const resultsFoundMessage = sprintf(
+			_n( '%d result found.', '%d results found.', resultCount ),
+			resultCount
+		);
+
+		debouncedSpeak( resultsFoundMessage, 'assertive' );
 	}
 
 	render() {
@@ -258,7 +269,7 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					}
 
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+					<InserterInlineElements filterValue={ filterValue } />
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];

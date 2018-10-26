@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "4.0.3",
+	"version": "4.0.4",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,7 +26,6 @@
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",

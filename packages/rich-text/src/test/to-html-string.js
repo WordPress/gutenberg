@@ -21,6 +21,11 @@ function createNode( HTML ) {
 }
 
 describe( 'toHTMLString', () => {
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
+
 	it( 'should extract recreate HTML 1', () => {
 		const HTML = 'one <em>two 🍒</em> <a href="#"><img src=""><strong>three</strong></a><img src="">';
 		const element = createNode( `<p>${ HTML }</p>` );
