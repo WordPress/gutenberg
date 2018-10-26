@@ -31,7 +31,7 @@ class DropZoneComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.ref = createRef();
+		this.dropZoneElement = createRef();
 		this.dropZone = {
 			element: null,
 			onDrop: this.props.onDrop,
@@ -49,7 +49,7 @@ class DropZoneComponent extends Component {
 
 	componentDidMount() {
 		// Set element after the component has a node assigned in the DOM
-		this.dropZone.element = this.ref.current;
+		this.dropZone.element = this.dropZoneElement.current;
 		this.props.addDropZone( this.dropZone );
 	}
 
@@ -72,7 +72,7 @@ class DropZoneComponent extends Component {
 		} );
 
 		return (
-			<div ref={ this.ref } className={ classes }>
+			<div ref={ this.dropZoneElement } className={ classes }>
 				<div className="components-drop-zone__content">
 					{ [
 						<Dashicon
