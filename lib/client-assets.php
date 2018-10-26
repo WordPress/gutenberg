@@ -1688,7 +1688,7 @@ JS;
 	 *
 	 * @since 0.4.0
 	 *
-	 * @param WP_Post $post Post being edited.
+	 * @param WP_Post $post Post being edited (added in 4.1.1).
 	 */
 	do_action( 'enqueue_block_editor_assets', $post );
 }
