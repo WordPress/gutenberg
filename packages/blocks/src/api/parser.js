@@ -10,7 +10,6 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -262,25 +261,10 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 			break;
 	}
 
-	if ( value !== undefined ) {
-		if ( isAmbiguousStringSource( attributeSchema ) ) {
-			if ( ! isOfTypes( value, castArray( type ) ) ) {
-				deprecated( 'Attribute type coercion', {
-					plugin: 'Gutenberg',
-					version: '4.2',
-					hint: (
-						'Omit the source to preserve type via serialized ' +
-						'comment demarcation.'
-					),
-				} );
-
-				value = asType( value, type );
-			}
-		} else if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
-			// Reject the value if it is not valid of type. Reverting to the
-			// undefined value ensures the default is restored, if applicable.
-			value = undefined;
-		}
+	if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
+		// Reject the value if it is not valid of type. Reverting to the
+		// undefined value ensures the default is restored, if applicable.
+		value = undefined;
 	}
 
 	if ( value === undefined ) {

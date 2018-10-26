@@ -56,7 +56,7 @@ export class PostPublishPanel extends Component {
 			...additionalProps
 		} = this.props;
 		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
-		const propsForPanel = omit( additionalProps, [ 'hasPublishAction' ] );
+		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'isDirty' ] );
 		return (
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">

@@ -7,7 +7,6 @@ import { JSDOM } from 'jsdom';
 /**
  * Internal dependencies
  */
-
 import { create } from '../create';
 import { createElement } from '../create-element';
 import { getSparseArrayLength, spec } from './helpers';
@@ -18,6 +17,11 @@ const { document } = window;
 describe( 'create', () => {
 	const em = { type: 'em' };
 	const strong = { type: 'strong' };
+
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
 
 	spec.forEach( ( { description, multilineTag, settings, html, createRange, record } ) => {
 		it( description, () => {
