@@ -21,6 +21,7 @@ import {
 	MediaPlaceholder,
 	BlockControls,
 	RichText,
+    PlainText,
 	mediaUpload,
 } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
@@ -182,7 +183,7 @@ class FileEdit extends Component {
 				</BlockControls>
 				<div className={ classes }>
 					<div className={ `${ className }__content-wrapper` }>
-						<RichText
+						<PlainText
 							wrapperClassName={ `${ className }__textlink` }
 							tagName="div" // must be block-level or else cursor disappears
 							value={ fileName }

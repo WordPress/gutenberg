@@ -10,8 +10,9 @@ import { __, _x } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
-import { RichText } from '@wordpress/editor';
+import { RichText, PlainText } from '@wordpress/editor';
 import { SVG, Path } from '@wordpress/components';
+import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -200,33 +201,71 @@ export const settings = {
 			showDownloadButton,
 			downloadButtonText,
 		} = attributes;
-
-		return ( href &&
+        return ( href &&
 			<div>
-				{ ! RichText.isEmpty( fileName ) &&
-					<a
-						href={ textLinkHref }
-						target={ textLinkTarget }
-						rel={ textLinkTarget ? 'noreferrer noopener' : false }
-					>
-						<RichText.Content
-							value={ fileName }
-						/>
-					</a>
-				}
-				{ showDownloadButton &&
-					<a
-						href={ href }
-						className="wp-block-file__button"
-						download={ true }
-					>
-						<RichText.Content
-							value={ downloadButtonText }
-						/>
-					</a>
-				}
+                { fileName !== null &&
+				<a
+					href={ textLinkHref }
+					target={ textLinkTarget }
+					rel={ textLinkTarget ? 'noreferrer noopener' : false }
+				>
+					<RawHTML>{ fileName }</RawHTML>
+				</a>
+                }
+                { showDownloadButton &&
+				<a
+					href={ href }
+					className="wp-block-file__button"
+					download={ true }
+				>
+					<RichText.Content
+						value={ downloadButtonText }
+					/>
+				</a>
+                }
 			</div>
-		);
+        );
+    },
+
+    deprecated: [ {
+        save( { attributes } ) {
+            const {
+                href,
+                fileName,
+                textLinkHref,
+                textLinkTarget,
+                showDownloadButton,
+                downloadButtonText,
+            } = attributes;
+
+            return ( href &&
+                <div>
+                    { ! RichText.isEmpty( fileName ) &&
+                        <a
+                            href={ textLinkHref }
+                            target={ textLinkTarget }
+                            rel={ textLinkTarget ? 'noreferrer noopener' : false }
+                        >
+                            <RichText.Content
+                                value={ fileName }
+                            />
+                        </a>
+                    }
+                    { showDownloadButton &&
+                        <a
+                            href={ href }
+                            className="wp-block-file__button"
+                            download={ true }
+                        >
+                            <RichText.Content
+                                value={ downloadButtonText }
+                            />
+                        </a>
+                    }
+                </div>
+            );
+        },
 	},
+    ],
 
 };
