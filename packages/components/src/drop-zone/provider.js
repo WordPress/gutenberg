@@ -31,10 +31,10 @@ const getDragEventType = ( { dataTransfer } ) => {
 	return 'default';
 };
 
-const isTypeSupported = ( type, typesSupported ) => {
-	return ( type === 'file' && typesSupported.onFilesDrop ) ||
-		( type === 'html' && typesSupported.onHTMLDrop ) ||
-		( type === 'default' && typesSupported.onDrop );
+const isTypeSupportedByDropZone = ( type, dropZone ) => {
+	return ( type === 'file' && dropZone.onFilesDrop ) ||
+		( type === 'html' && dropZone.onHTMLDrop ) ||
+		( type === 'default' && dropZone.onDrop );
 };
 
 const isWithinElementBounds = ( element, x, y ) => {
@@ -135,7 +135,7 @@ class DropZoneProvider extends Component {
 
 		// Index of hovered dropzone.
 		const hoveredDropZones = filter( this.dropZones, ( dropZone ) =>
-			isTypeSupported( dragEventType, dropZone ) &&
+			isTypeSupportedByDropZone( dragEventType, dropZone ) &&
 			isWithinElementBounds( dropZone.element, detail.clientX, detail.clientY )
 		);
 
@@ -182,7 +182,7 @@ class DropZoneProvider extends Component {
 			const index = this.dropZones.indexOf( dropZone );
 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropZone.setState( {
-				isDraggingOverDocument: isTypeSupported( dragEventType, dropZone ),
+				isDraggingOverDocument: isTypeSupportedByDropZone( dragEventType, dropZone ),
 				isDraggingOverElement: isDraggingOverDropZone,
 				position: isDraggingOverDropZone ? position : null,
 				type: isDraggingOverDropZone ? dragEventType : null,
