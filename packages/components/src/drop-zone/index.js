@@ -17,7 +17,7 @@ import { DropZoneConsumer } from './provider';
 
 const DropZone = ( props ) => (
 	<DropZoneConsumer>
-		{ ( context ) => ( <DropZoneComponent contex={ context } { ...props } /> ) }
+		{ ( context ) => ( <DropZoneComponent context={ context } { ...props } /> ) }
 	</DropZoneConsumer>
 );
 
