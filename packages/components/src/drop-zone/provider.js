@@ -62,7 +62,7 @@ class DropZoneProvider extends Component {
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
 
 		this.dropZones = [];
-		this.context = {
+		this.dropZoneCallbacks = {
 			addDropZone: this.addDropZone,
 			removeDropZone: this.removeDropZone,
 		};
@@ -235,7 +235,7 @@ class DropZoneProvider extends Component {
 
 	render() {
 		return (
-			<Provider value={ this.context }>
+			<Provider value={ this.dropZoneCallbacks }>
 				{ this.props.children }
 			</Provider>
 		);

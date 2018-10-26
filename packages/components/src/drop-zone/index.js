@@ -17,7 +17,13 @@ import { DropZoneConsumer } from './provider';
 
 const DropZone = ( props ) => (
 	<DropZoneConsumer>
-		{ ( context ) => ( <DropZoneComponent context={ context } { ...props } /> ) }
+		{ ( { addDropZone, removeDropZone } ) => (
+			<DropZoneComponent
+				addDropZone={ addDropZone }
+				removeDropZone={ removeDropZone }
+				{ ...props }
+			/>
+		) }
 	</DropZoneConsumer>
 );
 
@@ -44,11 +50,11 @@ class DropZoneComponent extends Component {
 	componentDidMount() {
 		// Set element after the component has a node assigned in the DOM
 		this.dropZone.element = this.ref.current;
-		this.props.context.addDropZone( this.dropZone );
+		this.props.addDropZone( this.dropZone );
 	}
 
 	componentWillUnmount() {
-		this.props.context.removeDropZone( this.dropZone );
+		this.props.removeDropZone( this.dropZone );
 	}
 
 	render() {
