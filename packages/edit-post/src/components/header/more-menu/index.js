@@ -14,8 +14,8 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
-const ariaClosed = __( 'Show additional settings' );
-const ariaOpen = __( 'Hide additional settings' );
+const ariaClosed = __( 'Show more tools & options' );
+const ariaOpen = __( 'Hide more tools & options' );
 
 const MoreMenu = () => (
 	<Dropdown
