@@ -87,16 +87,12 @@ describe( 'New User Experience (NUX)', () => {
 		expect( nuxTipElements ).toHaveLength( 0 );
 	} );
 
-	it( 'should toggle tips when the "Enable tips" option is toggled', async () => {
-		// Tips should be enabled at first.
+	it( 'should enable tips when the "Enable tips" option is toggled on', async () => {
+		// Start by disabling tips.
+		await page.click( '.nux-dot-tip__disable' );
+
+		// Verify no more tips are visible on the page.
 		let nuxTipElements = await page.$$( '.nux-dot-tip' );
-		expect( nuxTipElements ).toHaveLength( 1 );
-
-		// Toggle the 'Enable Tips' option to disable.
-		await toggleOption( 'Enable Tips' );
-
-		// Should disable tips from appearing.
-		nuxTipElements = await page.$$( '.nux-dot-tip' );
 		expect( nuxTipElements ).toHaveLength( 0 );
 
 		// Tips should be disabled in localStorage as well.
