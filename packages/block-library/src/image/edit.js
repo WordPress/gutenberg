@@ -250,7 +250,7 @@ class ImageEdit extends Component {
 
 	getFilename( url ) {
 		if ( url ) {
-			const fileName = url.toString().match( /.*\/(.+?)\./ );
+			const fileName = url.toString().match( /.*\/(.+?)$/ );
 			if ( fileName && fileName.length > 1 ) {
 				return fileName[ 1 ];
 			}
@@ -474,7 +474,7 @@ class ImageEdit extends Component {
 								imageHeight,
 							} = sizes;
 
-							const defaultAlt = sprintf( __( 'This image has an empty alt attribute; its file name is \"%s\"' ), this.getFilename( url ) );
+							const defaultAlt = sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), this.getFilename( url ) );
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
@@ -541,6 +541,45 @@ class ImageEdit extends Component {
 								}
 							}
 							/* eslint-enable no-lonely-if */
+							if ( ! alt ) {
+								return (
+									<Fragment>
+										{ getInspectorControls( imageWidth, imageHeight ) }
+										<ResizableBox
+											size={
+												width && height ? {
+													width,
+													height,
+												} : undefined
+											}
+											minWidth={ minWidth }
+											maxWidth={ maxWidth }
+											minHeight={ minHeight }
+											maxHeight={ maxWidth / ratio }
+											lockAspectRatio
+											enable={ {
+												top: false,
+												right: showRightHandle,
+												bottom: true,
+												left: showLeftHandle,
+											} }
+											onResizeStart={ () => {
+												toggleSelection( false );
+											} }
+											onResizeStop={ ( event, direction, elt, delta ) => {
+												setAttributes( {
+													width: parseInt( currentWidth + delta.width, 10 ),
+													height: parseInt( currentHeight + delta.height, 10 ),
+												} );
+												toggleSelection( true );
+											} }
+										>
+											{ imgNoAlt }
+										</ResizableBox>
+									</Fragment>
+
+								);
+							}
 
 							return (
 								<Fragment>
