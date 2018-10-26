@@ -19,6 +19,9 @@ const createResolversCacheMiddleware = ( registry, reducerKey ) => () => ( next 
 			return;
 		}
 		resolversByArgs.forEach( ( value, args ) => {
+			// resolversByArgs is the map Map([ args ] => boolean) storing the cache resolution status for a given selector.
+			// If the value is false it means this resolver has finished its resolution which means we need to invalidate it,
+			// if it's true it means it's inflight and the invalidation is not necessary.
 			if ( value !== false || ! resolver.shouldInvalidate( action, ...args ) ) {
 				return;
 			}
