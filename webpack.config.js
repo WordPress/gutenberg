@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
@@ -16,33 +15,6 @@ const { basename } = require( 'path' );
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-
-// Main CSS loader for everything but blocks..
-const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './build/[basename]/style.css',
-} );
-
-// Configuration for the ExtractTextPlugin.
-const extractConfig = {
-	use: [
-		{ loader: 'raw-loader' },
-		{
-			loader: 'postcss-loader',
-			options: {
-				plugins: require( './bin/packages/post-css-config' ),
-			},
-		},
-		{
-			loader: 'sass-loader',
-			query: {
-				includePaths: [ 'assets/stylesheets' ],
-				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
-				outputStyle: 'production' === process.env.NODE_ENV ?
-					'compressed' : 'nested',
-			},
-		},
-	],
-};
 
 /**
  * Given a string, returns a new string with dash separators converedd to
@@ -61,10 +33,6 @@ function camelCaseDash( string ) {
 	);
 }
 
-const entryPointNames = [
-	'components',
-];
-
 const gutenbergPackages = [
 	'a11y',
 	'api-fetch',
@@ -74,6 +42,7 @@ const gutenbergPackages = [
 	'block-library',
 	'block-serialization-default-parser',
 	'block-serialization-spec-parser',
+	'components',
 	'compose',
 	'core-data',
 	'data',
@@ -85,6 +54,7 @@ const gutenbergPackages = [
 	'editor',
 	'element',
 	'escape-html',
+	'format-library',
 	'hooks',
 	'html-entities',
 	'i18n',
@@ -112,10 +82,7 @@ const externals = {
 	'lodash-es': 'lodash',
 };
 
-[
-	...entryPointNames,
-	...gutenbergPackages,
-].forEach( ( name ) => {
+gutenbergPackages.forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
 	};
@@ -126,18 +93,11 @@ const mode = isProduction ? 'production' : 'development';
 
 const config = {
 	mode,
-	entry: Object.assign(
-		entryPointNames.reduce( ( memo, path ) => {
-			const name = camelCaseDash( path );
-			memo[ name ] = `./${ path }`;
-			return memo;
-		}, {} ),
-		gutenbergPackages.reduce( ( memo, packageName ) => {
-			const name = camelCaseDash( packageName );
-			memo[ name ] = `./packages/${ packageName }`;
-			return memo;
-		}, {} ),
-	),
+	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
+		const name = camelCaseDash( packageName );
+		memo[ name ] = `./packages/${ packageName }`;
+		return memo;
+	}, {} ),
 	output: {
 		filename: './build/[basename]/index.js',
 		path: __dirname,
@@ -170,14 +130,9 @@ const config = {
 				],
 				use: 'babel-loader',
 			},
-			{
-				test: /\.s?css$/,
-				use: mainCSSExtractTextPlugin.extract( extractConfig ),
-			},
 		],
 	},
 	plugins: [
-		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',

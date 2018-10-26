@@ -293,7 +293,6 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-compose',
-			'wp-deprecated',
 			'wp-element',
 			'wp-is-shallow-equal',
 			'wp-polyfill',
@@ -312,7 +311,6 @@ function gutenberg_register_scripts_and_styles() {
 				'	var storageKey = "WP_DATA_USER_" + userId;',
 				'	wp.data',
 				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
-				'		.use( wp.data.plugins.asyncGenerator )',
 				'		.use( wp.data.plugins.controls );',
 				'} )()',
 			)
@@ -420,7 +418,12 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_script(
 		'wp-rich-text',
 		gutenberg_url( 'build/rich-text/index.js' ),
-		array( 'wp-polyfill', 'wp-escape-html', 'lodash' ),
+		array(
+			'lodash',
+			'wp-polyfill',
+			'wp-data',
+			'wp-escape-html',
+		),
 		filemtime( gutenberg_dir_path() . 'build/rich-text/index.js' ),
 		true
 	);
@@ -448,10 +451,6 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
 	);
-	wp_add_inline_script(
-		'wp-components',
-		sprintf( 'wp.components.unstable__setSiteURL(%s);', json_encode( site_url() ) )
-	);
 	gutenberg_override_script(
 		'wp-blocks',
 		gutenberg_url( 'build/blocks/index.js' ),
@@ -460,7 +459,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-blob',
 			'wp-block-serialization-default-parser',
 			'wp-data',
-			'wp-deprecated',
 			'wp-dom',
 			'wp-element',
 			'wp-hooks',
@@ -507,6 +505,23 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-rich-text',
 		),
 		filemtime( gutenberg_dir_path() . 'build/block-library/index.js' ),
+		true
+	);
+	gutenberg_override_script(
+		'wp-format-library',
+		gutenberg_url( 'build/format-library/index.js' ),
+		array(
+			'wp-components',
+			'wp-dom',
+			'wp-editor',
+			'wp-element',
+			'wp-i18n',
+			'wp-keycodes',
+			'wp-polyfill',
+			'wp-rich-text',
+			'wp-url',
+		),
+		filemtime( gutenberg_dir_path() . 'build/format-library/index.js' ),
 		true
 	);
 	gutenberg_override_script(
@@ -779,6 +794,14 @@ function gutenberg_register_scripts_and_styles() {
 	wp_style_add_data( 'wp-block-library', 'rtl', 'replace' );
 
 	gutenberg_override_style(
+		'wp-format-library',
+		gutenberg_url( 'build/format-library/style.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/format-library/style.css' )
+	);
+	wp_style_add_data( 'wp-format-library', 'rtl', 'replace' );
+
+	gutenberg_override_style(
 		'wp-edit-blocks',
 		gutenberg_url( 'build/block-library/editor.css' ),
 		array(
@@ -863,11 +886,7 @@ function gutenberg_preload_api_request( $memo, $path ) {
 	if ( 200 === $response->status ) {
 		$server = rest_get_server();
 		$data   = (array) $response->get_data();
-		if ( method_exists( $server, 'get_compact_response_links' ) ) {
-			$links = call_user_func( array( $server, 'get_compact_response_links' ), $response );
-		} else {
-			$links = call_user_func( array( $server, 'get_response_links' ), $response );
-		}
+		$links  = $server->get_compact_response_links( $response );
 		if ( ! empty( $links ) ) {
 			$data['_links'] = $links;
 		}
@@ -1334,6 +1353,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	add_filter( 'user_can_richedit', '__return_true' );
 
 	wp_enqueue_script( 'wp-edit-post' );
+	wp_enqueue_script( 'wp-format-library' );
+	wp_enqueue_style( 'wp-format-library' );
 
 	global $post;
 

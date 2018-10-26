@@ -47,18 +47,6 @@ Returns the name of the default block name.
 
 Default block name.
 
-### getFallbackBlockName
-
-Returns the name of the fallback block name.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Fallback block name.
-
 ### getFreeformFallbackBlockName
 
 Returns the name of the block for handling non-block content.
@@ -176,15 +164,6 @@ Returns an action object used to remove a registered block type.
 ### setDefaultBlockName
 
 Returns an action object used to set the default block name.
-
-*Parameters*
-
- * name: Block name.
-
-### setFallbackBlockName
-
-Returns an action object used to set the name of the block used as a fallback
-for non-block content.
 
 *Parameters*
 

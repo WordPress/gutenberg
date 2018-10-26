@@ -16,8 +16,6 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 import {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
-	getUnknownTypeHandlerName,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -368,29 +366,6 @@ describe( 'blocks', () => {
 				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
-		} );
-	} );
-
-	describe( 'setUnknownTypeHandlerName()', () => {
-		it( 'assigns unknown type handler', () => {
-			try {
-				setUnknownTypeHandlerName( 'core/test-block' );
-
-				expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
-				expect( console ).toHaveWarned();
-			} finally {
-				// Restore undefined handler here rather than in `afterEach` because:
-				// - This call generates a deprecation warning.
-				// - Deprecation warnings become test errors unless we assert `toHaveWarned`.
-				// - This is too broad of an assertion to apply for all tests in the suite.
-				setUnknownTypeHandlerName( undefined );
-			}
-		} );
-	} );
-
-	describe( 'getUnknownTypeHandlerName()', () => {
-		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandlerName() ).toBeNull();
 		} );
 	} );
 

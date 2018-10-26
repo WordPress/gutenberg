@@ -33,7 +33,7 @@ import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
-import InserterResultsPortal from './results-portal';
+import InserterInlineElements from './inline-elements';
 
 const MAX_SUGGESTED_ITEMS = 9;
 
@@ -269,7 +269,7 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					}
 
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+					<InserterInlineElements filterValue={ filterValue } />
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];

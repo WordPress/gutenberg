@@ -23,7 +23,6 @@ import {
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
-import { Slot } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -47,13 +46,12 @@ import { decodeEntities } from '@wordpress/html-entities';
  */
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
-import { FORMATTING_CONTROLS } from './formatting-controls';
+import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
-import TokenUI from './tokens/ui';
 
 /**
  * Browser dependencies
@@ -864,15 +862,6 @@ export class RichText extends Component {
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
 		const record = this.getRecord();
 
-		const formatToolbar = this.editor && (
-			<FormatToolbar
-				record={ record }
-				onChange={ this.onChange }
-				enabledControls={ formattingControls }
-				editor={ this.editor }
-			/>
-		);
-
 		return (
 			<div className={ classes }
 				ref={ this.containerRef }
@@ -880,21 +869,14 @@ export class RichText extends Component {
 			>
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
-						{ formatToolbar }
+						<FormatToolbar controls={ formattingControls } />
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
 					<div className="editor-rich-text__inline-toolbar">
-						{ formatToolbar }
+						<FormatToolbar controls={ formattingControls } />
 					</div>
 				) }
-				{ isSelected &&
-					<TokenUI
-						editor={ this.editor }
-						containerRef={ this.containerRef }
-					/>
-				}
-
 				<Autocomplete
 					onReplace={ this.props.onReplace }
 					completers={ autocompleters }
@@ -931,7 +913,7 @@ export class RichText extends Component {
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 								</Tagname>
 							}
-							{ isSelected && <Slot name="RichText.Siblings" /> }
+							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
 						</Fragment>
 					) }
 				</Autocomplete>
@@ -941,7 +923,7 @@ export class RichText extends Component {
 }
 
 RichText.defaultProps = {
-	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
+	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
 	format: 'string',
 	value: '',
 };

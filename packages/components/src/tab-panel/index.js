@@ -8,7 +8,6 @@ import { partial, noop, find } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -65,13 +64,6 @@ class TabPanel extends Component {
 		const selectedTab = find( tabs, { name: selected } );
 		const selectedId = instanceId + '-' + selectedTab.name;
 
-		deprecated( 'Tab Panel child function argument used as string', {
-			alternative: 'Argument is now an object, access the name property directly.',
-			version: '4.2.0',
-			plugin: 'Gutenberg',
-			hint: 'This is a global warning, shown regardless of whether the component is used.',
-		} );
-
 		return (
 			<div className={ className }>
 				<NavigableMenu
@@ -99,7 +91,7 @@ class TabPanel extends Component {
 						className="components-tab-panel__tab-content"
 						tabIndex="0"
 					>
-						{ this.props.children( Object.assign( new String( selectedTab.name ), selectedTab ) ) }
+						{ this.props.children( selectedTab ) }
 					</div>
 				) }
 			</div>

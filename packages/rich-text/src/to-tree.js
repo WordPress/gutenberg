@@ -3,6 +3,40 @@
  */
 
 import { split } from './split';
+import { getFormatType } from './get-format-type';
+
+function fromFormat( { type, attributes, object } ) {
+	const formatType = getFormatType( type );
+
+	if ( ! formatType ) {
+		return { type, attributes, object };
+	}
+
+	if ( ! attributes ) {
+		return {
+			type: formatType.match.tagName,
+			object: formatType.object,
+		};
+	}
+
+	const elementAttributes = {};
+
+	for ( const name in attributes ) {
+		const key = formatType.attributes[ name ];
+
+		if ( key ) {
+			elementAttributes[ key ] = attributes[ name ];
+		} else {
+			elementAttributes[ name ] = attributes[ name ];
+		}
+	}
+
+	return {
+		type: formatType.match.tagName,
+		object: formatType.object,
+		attributes: elementAttributes,
+	};
+}
 
 export function toTree( value, multilineTag, settings ) {
 	if ( multilineTag ) {
@@ -61,7 +95,7 @@ export function toTree( value, multilineTag, settings ) {
 
 				const { type, attributes, object } = format;
 				const parent = getParent( pointer );
-				const newNode = append( parent, { type, attributes, object } );
+				const newNode = append( parent, fromFormat( { type, attributes, object } ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );

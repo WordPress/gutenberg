@@ -111,6 +111,7 @@ const {
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
+	isPostSavingLocked,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -888,6 +889,28 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isPostSavingLocked', () => {
+		it( 'should return true if the post has postSavingLocks', () => {
+			const state = {
+				postSavingLock: [ { 1: true } ],
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostSavingLocked( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has no postSavingLocks', () => {
+			const state = {
+				postSavingLock: [],
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostSavingLocked( state ) ).toBe( false );
 		} );
 	} );
 

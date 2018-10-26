@@ -144,7 +144,7 @@ export function createRegistry( storeConfigs = {} ) {
 					}
 
 					startResolution( reducerKey, selectorName, args );
-					await registry.__experimentalFulfill( reducerKey, selectorName, ...args );
+					await fulfill( reducerKey, selectorName, ...args );
 					finishResolution( reducerKey, selectorName, args );
 				}
 
@@ -288,7 +288,6 @@ export function createRegistry( storeConfigs = {} ) {
 		select,
 		dispatch,
 		use,
-		__experimentalFulfill: fulfill,
 	};
 
 	/**
