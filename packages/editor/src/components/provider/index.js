@@ -14,7 +14,7 @@ import { withDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { traverse, wrap, urlRewrite, editorWidth } from '../../editor-styles';
+import { traverse, wrap, urlRewrite } from '../../editor-styles';
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -35,8 +35,7 @@ class EditorProvider extends Component {
 
 		map( this.props.settings.styles, ( { css, baseURL } ) => {
 			const transforms = [
-				editorWidth,
-				wrap( '.editor-block-list__block', [ '.wp-block' ] ),
+				wrap( '.editor-styles-wrapper' ),
 			];
 			if ( baseURL ) {
 				transforms.push( urlRewrite( baseURL ) );

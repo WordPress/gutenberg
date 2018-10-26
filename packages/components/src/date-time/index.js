@@ -9,7 +9,7 @@ import 'react-dates/initialize';
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -66,7 +66,7 @@ export class DateTimePicker extends Component {
 							<h4>{ __( 'Navigating with a keyboard' ) }</h4>
 							<ul>
 								<li>
-									<abbr aria-label={ __( 'Enter' ) }>↵</abbr>
+									<abbr aria-label={ _x( 'Enter', 'keyboard button' ) }>↵</abbr>
 									{ ' ' /* JSX removes whitespace, but a space is required for screen readers. */ }
 									<span>{ __( 'Select the date in focus.' ) }</span>
 								</li>

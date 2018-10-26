@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 export const PREFERENCES_DEFAULTS = {
 	insertUsage: {},
@@ -80,27 +80,27 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	fontSizes: [
 		{
-			name: __( 'Small' ),
+			name: _x( 'Small', 'font size name' ),
 			size: 13,
 			slug: 'small',
 		},
 		{
-			name: __( 'Normal' ),
+			name: _x( 'Normal', 'font size name' ),
 			size: 16,
 			slug: 'normal',
 		},
 		{
-			name: __( 'Medium' ),
+			name: _x( 'Medium', 'font size name' ),
 			size: 20,
 			slug: 'medium',
 		},
 		{
-			name: __( 'Large' ),
+			name: _x( 'Large', 'font size name' ),
 			size: 36,
 			slug: 'large',
 		},
 		{
-			name: __( 'Huge' ),
+			name: _x( 'Huge', 'font size name' ),
 			size: 48,
 			slug: 'huge',
 		},

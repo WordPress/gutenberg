@@ -169,11 +169,7 @@ export function mediaUpload( {
 					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
 					title: savedMedia.title.raw,
 					url: savedMedia.source_url,
-					mediaDetails: {},
 				};
-				if ( has( savedMedia, [ 'media_details', 'sizes' ] ) ) {
-					mediaObject.mediaDetails.sizes = get( savedMedia, [ 'media_details', 'sizes' ], {} );
-				}
 				setAndUpdateFiles( idx, mediaObject );
 			} )
 			.catch( ( error ) => {

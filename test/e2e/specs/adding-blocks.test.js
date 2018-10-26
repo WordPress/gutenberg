@@ -9,7 +9,7 @@ import {
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await newPost();
 	} );
 
@@ -80,5 +80,44 @@ describe( 'adding blocks', () => {
 		await codeEditorButton.click( 'button' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/9583
+	it( 'should not allow transfer of focus outside of the block-insertion menu once open', async () => {
+		// Enter the default block and click the inserter toggle button to the left of it.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.click( '.editor-block-list__empty-block-inserter .editor-inserter__toggle' );
+
+		// Expect the inserter search input to be the active element.
+		let activeElementClassList = await page.evaluate( () => document.activeElement.classList );
+		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__search' );
+
+		// Try using the up arrow key (vertical navigation triggers the issue described in #9583).
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Expect the inserter search input to still be the active element.
+		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
+		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__search' );
+
+		// Tab to the block search results
+		await page.keyboard.press( 'Tab' );
+
+		// Expect the search results to be the active element.
+		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
+		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__results' );
+
+		// Try using the up arrow key
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Expect the search results to still be the active element.
+		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
+		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__results' );
+
+		// Press escape to close the block inserter.
+		await page.keyboard.press( 'Escape' );
+
+		// Expect focus to have transferred back to the inserter toggle button.
+		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
+		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__toggle' );
 	} );
 } );
