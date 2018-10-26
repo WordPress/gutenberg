@@ -12,10 +12,6 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 const { Provider, Consumer } = createContext( {
 	addDropZone: () => {},
 	removeDropZone: () => {},
-	isDraggingOverDocument: false,
-	isDraggingOverElement: false,
-	position: null,
-	type: null,
 } );
 
 const getDragEventType = ( { dataTransfer } ) => {
@@ -66,12 +62,16 @@ class DropZoneProvider extends Component {
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
 
 		this.dropZones = [];
-		this.state = {
+		this.context = {
 			addDropZone: this.addDropZone,
 			removeDropZone: this.removeDropZone,
-			isDraggingOverDocument: false,
+		};
+		this.state = {
 			hoveredDropZone: -1,
+			isDraggingOverDocument: false,
+			isDraggingOverElement: false,
 			position: null,
+			type: null,
 		};
 	}
 
@@ -109,10 +109,19 @@ class DropZoneProvider extends Component {
 		}
 
 		this.setState( {
-			isDraggingOverDocument: false,
 			hoveredDropZone: -1,
+			isDraggingOverDocument: false,
+			isDraggingOverElement: false,
 			position: null,
+			type: null,
 		} );
+
+		this.dropZones.forEach( ( dropZone ) => dropZone.setState( {
+			isDraggingOverDocument: false,
+			isDraggingOverElement: false,
+			position: null,
+			type: null,
+		} ) );
 	}
 
 	toggleDraggingOverDocument( event, dragEventType ) {
@@ -150,33 +159,33 @@ class DropZoneProvider extends Component {
 		}
 
 		// Optimisation: Only update the changed dropzones
-		let dropzonesToUpdate = [];
+		let toUpdate = [];
 
 		if ( ! this.state.isDraggingOverDocument ) {
-			dropzonesToUpdate = this.dropZones;
+			toUpdate = this.dropZones;
 		} else if ( hoveredDropZoneIndex !== this.state.hoveredDropZone ) {
 			if ( this.state.hoveredDropZone !== -1 ) {
-				dropzonesToUpdate.push( this.dropZones[ this.state.hoveredDropZone ] );
+				toUpdate.push( this.dropZones[ this.state.hoveredDropZone ] );
 			}
 			if ( hoveredDropZone ) {
-				dropzonesToUpdate.push( hoveredDropZone );
+				toUpdate.push( hoveredDropZone );
 			}
 		} else if (
 			hoveredDropZone &&
 			hoveredDropZoneIndex === this.state.hoveredDropZone &&
 			! isEqual( position, this.state.position )
 		) {
-			dropzonesToUpdate.push( hoveredDropZone );
+			toUpdate.push( hoveredDropZone );
 		}
 
 		// Notifying the dropzones
-		dropzonesToUpdate.map( ( dropzone ) => {
+		toUpdate.map( ( dropzone ) => {
 			const index = this.dropZones.indexOf( dropzone );
 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
-			dropzone.updateState( {
+			dropzone.setState( {
+				isDraggingOverDocument: isTypeSupported( dragEventType, dropzone ),
 				isDraggingOverElement: isDraggingOverDropZone,
 				position: isDraggingOverDropZone ? position : null,
-				isDraggingOverDocument: isTypeSupported( dragEventType, dropzone ),
 				type: isDraggingOverDropZone ? dragEventType : null,
 			} );
 		} );
@@ -226,7 +235,7 @@ class DropZoneProvider extends Component {
 
 	render() {
 		return (
-			<Provider value={ this.state }>
+			<Provider value={ this.context }>
 				{ this.props.children }
 			</Provider>
 		);
