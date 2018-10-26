@@ -134,10 +134,9 @@ class DropZoneProvider extends Component {
 		const detail = window.CustomEvent && event instanceof window.CustomEvent ? event.detail : event;
 
 		// Index of hovered dropzone.
-
-		const hoveredDropZones = filter( this.dropZones, ( dropzone ) =>
-			isTypeSupported( dragEventType, dropzone ) &&
-			isWithinElementBounds( dropzone.element, detail.clientX, detail.clientY )
+		const hoveredDropZones = filter( this.dropZones, ( dropZone ) =>
+			isTypeSupported( dragEventType, dropZone ) &&
+			isWithinElementBounds( dropZone.element, detail.clientX, detail.clientY )
 		);
 
 		// Find the leaf dropzone not containing another dropzone
@@ -179,11 +178,11 @@ class DropZoneProvider extends Component {
 		}
 
 		// Notifying the dropzones
-		toUpdate.map( ( dropzone ) => {
-			const index = this.dropZones.indexOf( dropzone );
+		toUpdate.map( ( dropZone ) => {
+			const index = this.dropZones.indexOf( dropZone );
 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
-			dropzone.setState( {
-				isDraggingOverDocument: isTypeSupported( dragEventType, dropzone ),
+			dropZone.setState( {
+				isDraggingOverDocument: isTypeSupported( dragEventType, dropZone ),
 				isDraggingOverElement: isDraggingOverDropZone,
 				position: isDraggingOverDropZone ? position : null,
 				type: isDraggingOverDropZone ? dragEventType : null,
@@ -212,20 +211,20 @@ class DropZoneProvider extends Component {
 
 		const { position, hoveredDropZone } = this.state;
 		const dragEventType = getDragEventType( event );
-		const dropzone = this.dropZones[ hoveredDropZone ];
-		const isValidDropzone = !! dropzone && this.container.contains( event.target );
+		const dropZone = this.dropZones[ hoveredDropZone ];
+		const isValidDropzone = !! dropZone && this.container.contains( event.target );
 		this.resetDragState();
 
 		if ( isValidDropzone ) {
 			switch ( dragEventType ) {
 				case 'file':
-					dropzone.onFilesDrop( [ ...event.dataTransfer.files ], position );
+					dropZone.onFilesDrop( [ ...event.dataTransfer.files ], position );
 					break;
 				case 'html':
-					dropzone.onHTMLDrop( event.dataTransfer.getData( 'text/html' ), position );
+					dropZone.onHTMLDrop( event.dataTransfer.getData( 'text/html' ), position );
 					break;
 				case 'default':
-					dropzone.onDrop( event, position );
+					dropZone.onDrop( event, position );
 			}
 		}
 
