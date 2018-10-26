@@ -1687,8 +1687,10 @@ JS;
 	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
 	 *
 	 * @since 0.4.0
+	 *
+	 * @param WP_Post $post Post being edited.
 	 */
-	do_action( 'enqueue_block_editor_assets' );
+	do_action( 'enqueue_block_editor_assets', $post );
 }
 
 /**
