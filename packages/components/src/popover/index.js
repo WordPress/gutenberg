@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +19,7 @@ import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
-import { Slot, Fill } from '../slot-fill';
+import { Slot, Fill, SlotFillConsumer } from '../slot-fill';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
@@ -302,17 +301,24 @@ class Popover extends Component {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 
-		// In case there is no slot context in which to render, default to an
-		// in-place rendering.
-		const { getSlot } = this.context;
-		if ( getSlot && getSlot( SLOT_NAME ) ) {
-			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
-		}
+		return (
+			<SlotFillConsumer>
+				{ ( { getSlot } ) => {
+					// In case there is no slot context in which to render,
+					// default to an in-place rendering.
+					if ( getSlot && getSlot( SLOT_NAME ) ) {
+						content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+					}
 
-		return <span ref={ this.anchorNode }>
-			{ content }
-			{ isMobile && expandOnMobile && <ScrollLock /> }
-		</span>;
+					return (
+						<span ref={ this.anchorNode }>
+							{ content }
+							{ isMobile && expandOnMobile && <ScrollLock /> }
+						</span>
+					);
+				} }
+			</SlotFillConsumer>
+		);
 	}
 }
 
@@ -322,10 +328,6 @@ Popover.defaultProps = {
 };
 
 const PopoverContainer = Popover;
-
-PopoverContainer.contextTypes = {
-	getSlot: noop,
-};
 
 PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
 
