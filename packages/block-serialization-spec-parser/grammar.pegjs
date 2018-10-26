@@ -66,11 +66,11 @@ if ( ! function_exists( 'peg_array_partition' ) ) {
 
         foreach ( $array as $item ) {
             if ( is_string( $item ) ) {
-                $offset += ucs2length( $item );
+                $offset  += ucs2length( $item );
                 $truthy[] = $item;
             } else {
                 $markers[] = $offset;
-                $falsey[] = $item;
+                $falsey[]  = $item;
             }
         }
 
@@ -84,10 +84,10 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
         if ( ! empty( $pre ) ) {
             $blocks[] = array(
-                'blockName' => null,
-                'attrs' => array(),
+                'blockName'   => null,
+                'attrs'       => array(),
                 'innerBlocks' => array(),
-                'innerHTML' => $pre
+                'innerHTML'   => $pre
             );
         }
 
@@ -98,20 +98,20 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
             if ( ! empty( $html ) ) {
                 $blocks[] = array(
-                    'blockName' => null,
-                    'attrs' => array(),
+                    'blockName'   => null,
+                    'attrs'       => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $html
+                    'innerHTML'   => $html
                 );
             }
         }
 
         if ( ! empty( $post ) ) {
             $blocks[] = array(
-                'blockName' => null,
-                'attrs' => array(),
+                'blockName'   => null,
+                'attrs'       => array(),
                 'innerBlocks' => array(),
-                'innerHTML' => $post
+                'innerHTML'   => $post
             );
         }
 
