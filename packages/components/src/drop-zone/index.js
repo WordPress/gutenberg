@@ -27,7 +27,7 @@ class DropZoneComponent extends Component {
 
 		this.ref = createRef();
 		this.dropZone = {
-			element: this.ref,
+			element: null,
 			onDrop: this.props.onDrop,
 			onFilesDrop: this.props.onFilesDrop,
 			onHTMLDrop: this.props.onHTMLDrop,
@@ -35,6 +35,8 @@ class DropZoneComponent extends Component {
 	}
 
 	componentDidMount() {
+		// Set element after the component has a node assigned in the DOM
+		this.dropZone.element = this.ref.current;
 		this.props.context.addDropZone( this.dropZone );
 	}
 
