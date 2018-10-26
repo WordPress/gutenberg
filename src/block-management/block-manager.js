@@ -163,14 +163,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			( ! forward && focusedItemIndex === 0 ) ||
 			( forward && ! focusedItemIndex === this.state.dataSource.size() - 1 )
 		) {
-			return;
-		}
 
-		if ( forward ) {
-			//onMerge( block.clientId, nextBlockClientId );
-		} else {
-			//onMerge( previousBlockClientId, block.clientId );
 		}
+		// TODO: add merging code here
 	}
 
 	onChange( clientId: string, attributes: mixed ) {
