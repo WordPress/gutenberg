@@ -6,7 +6,6 @@ import {
 	isString,
 	map,
 	negate,
-	noop,
 } from 'lodash';
 
 /**
@@ -20,7 +19,25 @@ import {
 	isEmptyElement,
 } from '@wordpress/element';
 
-class Slot extends Component {
+/**
+ * Internal dependencies
+ */
+import { SlotFillConsumer } from './provider';
+
+const Slot = ( props ) => (
+	<SlotFillConsumer>
+		{ ( { registerSlot, unregisterSlot, getFills } ) => (
+			<SlotComponent
+				{ ...props }
+				registerSlot={ registerSlot }
+				unregisterSlot={ unregisterSlot }
+				getFills={ getFills }
+			/>
+		) }
+	</SlotFillConsumer>
+);
+
+class SlotComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -28,23 +45,19 @@ class Slot extends Component {
 	}
 
 	componentDidMount() {
-		const { registerSlot = noop } = this.context;
+		const { registerSlot } = this.props;
 
 		registerSlot( this.props.name, this );
 	}
 
 	componentWillUnmount() {
-		const { unregisterSlot = noop } = this.context;
+		const { unregisterSlot } = this.props;
 
 		unregisterSlot( this.props.name, this );
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { name } = this.props;
-		const {
-			unregisterSlot = noop,
-			registerSlot = noop,
-		} = this.context;
+		const { name, unregisterSlot, registerSlot } = this.props;
 
 		if ( prevProps.name !== name ) {
 			unregisterSlot( prevProps.name );
@@ -57,8 +70,7 @@ class Slot extends Component {
 	}
 
 	render() {
-		const { children, name, bubblesVirtually = false, fillProps = {} } = this.props;
-		const { getFills = noop } = this.context;
+		const { children, name, bubblesVirtually = false, fillProps = {}, getFills } = this.props;
 
 		if ( bubblesVirtually ) {
 			return <div ref={ this.bindNode } />;
@@ -90,11 +102,5 @@ class Slot extends Component {
 		);
 	}
 }
-
-Slot.contextTypes = {
-	registerSlot: noop,
-	unregisterSlot: noop,
-	getFills: noop,
-};
 
 export default Slot;
