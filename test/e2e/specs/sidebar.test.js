@@ -13,7 +13,7 @@ const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
 const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
 
 describe( 'Publishing', () => {
-	beforeEach( () => {
+	beforeAll( () => {
 		observeFocusLoss();
 	} );
 
