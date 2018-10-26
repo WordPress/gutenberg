@@ -10,7 +10,7 @@ import {
 	receiveItems,
 	receiveQueriedItems,
 } from './queried-data';
-import { getKindEntities } from './entities';
+import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { apiFetch } from './controls';
 
 /**
@@ -116,7 +116,7 @@ export function* saveEntityRecord( kind, name, record ) {
 	if ( ! entity ) {
 		return;
 	}
-	const key = entity[ key ] || 'id';
+	const key = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ key ];
 	const updatedRecord = yield apiFetch( {
 		path: `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`,

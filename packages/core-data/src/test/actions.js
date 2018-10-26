@@ -39,4 +39,22 @@ describe( 'saveEntityRecord', () => {
 		const { value: received } = fulfillment.next( post );
 		expect( received ).toEqual( receiveEntityRecords( 'postType', 'post', post, undefined, true ) );
 	} );
+
+	it( 'triggers a PUT request for an existing record with a custom key', async () => {
+		const postType = { slug: 'page', title: 'Pages' };
+		const entities = [ { name: 'postType', kind: 'root', baseURL: '/wp/v2/types', key: 'slug' } ];
+		const fulfillment = saveEntityRecord( 'root', 'postType', postType );
+		// Trigger generator
+		fulfillment.next();
+		// Provide entities and trigger apiFetch
+		const { value: apiFetchAction } = fulfillment.next( entities );
+		expect( apiFetchAction.request ).toEqual( {
+			path: '/wp/v2/types/page',
+			method: 'PUT',
+			data: postType,
+		} );
+		// Provide response and trigger action
+		const { value: received } = fulfillment.next( postType );
+		expect( received ).toEqual( receiveEntityRecords( 'root', 'postType', postType, undefined, true ) );
+	} );
 } );
