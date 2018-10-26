@@ -157,6 +157,20 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	mergeBlocks( clientId: string, forward: boolean ) {
 		// find currently focused block
 		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
+		// Do nothing when it's the first block and backspace is pressed
+		// Do nothing when it's the last block and delete is pressed
+		if (
+			( ! forward && focusedItemIndex === 0 ) ||
+			( forward && ! focusedItemIndex === this.state.dataSource.size() - 1 )
+		) {
+			return;
+		}
+
+		if ( forward ) {
+			//onMerge( block.clientId, nextBlockClientId );
+		} else {
+			//onMerge( previousBlockClientId, block.clientId );
+		}
 	}
 
 	onChange( clientId: string, attributes: mixed ) {
@@ -275,7 +289,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					insertBlocksAfter={ ( blocks ) =>
 						this.insertBlocksAfter.bind( this )( value.item.clientId, blocks )
 					}
-					mergeBlocks={ ( forward ) =>
+					mergeBlocks={ ( forward = false ) =>
 						this.mergeBlocks.bind( this )( value.item.clientId, forward )
 					}
 					{ ...value.item }
