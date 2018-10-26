@@ -1,9 +1,4 @@
 /**
- * External Dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress Dependencies
  */
 import { Button } from '@wordpress/components';
@@ -12,34 +7,19 @@ import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
 
-/**
- * Internal Dependencies
- */
-import PostPublishButton from '../post-publish-button';
-
 export function PostPublishPanelToggle( {
-	hasPublishAction,
 	isSaving,
 	isPublishable,
 	isSaveable,
 	isPublished,
 	isBeingScheduled,
-	isPending,
-	isScheduled,
 	onToggle,
 	isOpen,
-	forceIsDirty,
 	forceIsSaving,
 } ) {
 	const isButtonEnabled = (
 		! isSaving && ! forceIsSaving && isPublishable && isSaveable
 	) || isPublished;
-
-	const showToggle = ! isPublished && ! ( isScheduled && isBeingScheduled ) && ! ( isPending && ! hasPublishAction );
-
-	if ( ! showToggle ) {
-		return <PostPublishButton forceIsDirty={ forceIsDirty } forceIsSaving={ forceIsSaving } />;
-	}
 
 	return (
 		<Button
@@ -64,23 +44,15 @@ export default compose( [
 			isSavingPost,
 			isEditedPostSaveable,
 			isEditedPostPublishable,
-			isCurrentPostPending,
 			isCurrentPostPublished,
 			isEditedPostBeingScheduled,
-			isCurrentPostScheduled,
-			getCurrentPost,
-			getCurrentPostType,
 		} = select( 'core/editor' );
 		return {
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			isSaving: isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
 			isPublishable: isEditedPostPublishable(),
-			isPending: isCurrentPostPending(),
 			isPublished: isCurrentPostPublished(),
-			isScheduled: isCurrentPostScheduled(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
-			postType: getCurrentPostType(),
 		};
 	} ),
 ] )( PostPublishPanelToggle );

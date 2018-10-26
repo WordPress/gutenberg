@@ -7,7 +7,8 @@ import { isString } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { cloneElement } from '@wordpress/element';
+import { createElement, cloneElement } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -21,10 +22,44 @@ import IconButton from '../icon-button';
  *
  * @return {WPElement} More menu item.
  */
-function MenuItem( { children, className, icon, shortcut, isSelected, role = 'menuitem', ...props } ) {
+export function MenuItem( {
+	children,
+	label = children,
+	info,
+	className,
+	icon,
+	shortcut,
+	isSelected,
+	role = 'menuitem',
+	instanceId,
+	...props
+} ) {
 	className = classnames( 'components-menu-item__button', className, {
 		'has-icon': icon,
 	} );
+
+	// Avoid using label if it is passed as non-string children.
+	label = isString( label ) ? label : undefined;
+
+	if ( info ) {
+		const infoId = 'edit-post-feature-toggle__info-' + instanceId;
+
+		// Deconstructed props is scoped to the function; mutation is fine.
+		props[ 'aria-describedby' ] = infoId;
+
+		children = (
+			<span className="components-menu-item__info-wrapper">
+				{ children }
+				<span
+					id={ infoId }
+					className="components-menu-item__info">
+					{ info }
+				</span>
+			</span>
+		);
+	}
+
+	let tagName = Button;
 
 	if ( icon ) {
 		if ( ! isString( icon ) ) {
@@ -35,31 +70,22 @@ function MenuItem( { children, className, icon, shortcut, isSelected, role = 'me
 			} );
 		}
 
-		return (
-			<IconButton
-				className={ className }
-				icon={ icon }
-				aria-checked={ isSelected }
-				role={ role }
-				{ ...props }
-			>
-				{ children }
-				<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
-			</IconButton>
-		);
+		tagName = IconButton;
+		props.icon = icon;
 	}
 
-	return (
-		<Button
-			className={ className }
-			aria-checked={ isSelected }
-			role={ role }
-			{ ...props }
-		>
-			{ children }
-			<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
-		</Button>
+	return createElement(
+		tagName,
+		{
+			'aria-label': label,
+			'aria-checked': isSelected,
+			role,
+			className,
+			...props,
+		},
+		children,
+		<Shortcut className="components-menu-item__shortcut" shortcut={ shortcut } />
 	);
 }
 
-export default MenuItem;
+export default withInstanceId( MenuItem );

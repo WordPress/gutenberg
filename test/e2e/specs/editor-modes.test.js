@@ -91,18 +91,18 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( title ).toBe( 'Paragraph' );
 
 		// The Block inspector should be active
-		let blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[aria-label="Block settings"]' );
+		let blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[data-label="Block"]' );
 		expect( blockInspectorTab ).not.toBeNull();
 
 		// Switch to Code Editor
 		await switchToEditor( 'Code' );
 
 		// The Block inspector should not be active anymore
-		blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[aria-label="Block settings"]' );
+		blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[data-label="Block"]' );
 		expect( blockInspectorTab ).toBeNull();
 
 		// No block is selected
-		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block settings"]' );
+		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
 		const noBlocksElement = await page.$( '.editor-block-inspector__no-blocks' );
 		expect( noBlocksElement ).not.toBeNull();
 

@@ -46,7 +46,7 @@ class URLInput extends Component {
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
 			this.scrollingIntoView = true;
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef, {
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef.current, {
 				onlyScrollIfNeeded: true,
 			} );
 
@@ -86,7 +86,7 @@ class URLInput extends Component {
 		} );
 
 		const request = apiFetch( {
-			path: addQueryArgs( '/gutenberg/v1/search', {
+			path: addQueryArgs( '/wp/v2/search', {
 				search: value,
 				per_page: 20,
 				type: 'post',

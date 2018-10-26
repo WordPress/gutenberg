@@ -169,6 +169,21 @@ module.exports = {
 				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
 			},
 		],
+		'react/forbid-elements': [ 'error', {
+			forbid: [
+				[ 'circle', 'Circle' ],
+				[ 'g', 'G' ],
+				[ 'path', 'Path' ],
+				[ 'polygon', 'Polygon' ],
+				[ 'rect', 'Rect' ],
+				[ 'svg', 'SVG' ],
+			].map( ( [ element, componentName ] ) => {
+				return {
+					element,
+					message: `use cross-platform <${ componentName }> component instead.`,
+				};
+			} ),
+		} ],
 	},
 	overrides: [
 		{

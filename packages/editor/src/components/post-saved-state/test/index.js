@@ -60,10 +60,12 @@ describe( 'PostSavedState', () => {
 				isDirty={ true }
 				isSaving={ false }
 				isSaveable={ true }
-				onSave={ saveSpy } />
+				isLargeViewport
+				onSave={ saveSpy }
+			/>
 		);
 
-		expect( wrapper.name() ).toBe( 'IconButton' );
+		expect( wrapper ).toMatchSnapshot();
 		wrapper.simulate( 'click' );
 		expect( saveSpy ).toHaveBeenCalled();
 	} );

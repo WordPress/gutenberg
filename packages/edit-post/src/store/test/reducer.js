@@ -12,7 +12,7 @@ import {
 	activeGeneralSidebar,
 	activeModal,
 	isSavingMetaBoxes,
-	activeMetaBoxLocations,
+	metaBoxLocations,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -291,22 +291,26 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'activeMetaBoxLocations()', () => {
+	describe( 'metaBoxLocations()', () => {
 		it( 'should return default state', () => {
-			const state = activeMetaBoxLocations( undefined, {} );
+			const state = metaBoxLocations( undefined, {} );
 
-			expect( state ).toEqual( [] );
+			expect( state ).toEqual( {} );
 		} );
 
 		it( 'should set the active meta box locations', () => {
 			const action = {
-				type: 'SET_ACTIVE_META_BOX_LOCATIONS',
-				locations: [ 'normal' ],
+				type: 'SET_META_BOXES_PER_LOCATIONS',
+				metaBoxesPerLocation: {
+					normal: [ 'postcustom' ],
+				},
 			};
 
-			const state = activeMetaBoxLocations( undefined, action );
+			const state = metaBoxLocations( undefined, action );
 
-			expect( state ).toEqual( [ 'normal' ] );
+			expect( state ).toEqual( {
+				normal: [ 'postcustom' ],
+			} );
 		} );
 	} );
 } );

@@ -192,17 +192,14 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	const toggleFixedToolbar = async ( b ) => {
-		await page.click( '.edit-post-more-menu button' );
-		const button = ( await page.$x( "//button[contains(text(), 'Unified Toolbar')]" ) )[ 0 ];
-		const buttonClassNameProperty = await button.getProperty( 'className' );
-		const buttonClassName = await buttonClassNameProperty.jsonValue();
-		const isSelected = buttonClassName.indexOf( 'is-selected' ) !== -1;
-		if ( isSelected !== b ) {
-			await button.click();
-		} else {
-			await page.click( '.edit-post-more-menu button' );
-		}
+	const toggleFixedToolbar = async ( isFixed ) => {
+		await page.evaluate( ( _isFixed ) => {
+			const { select, dispatch } = wp.data;
+			const isCurrentlyFixed = select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
+			if ( isCurrentlyFixed !== _isFixed ) {
+				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+			}
+		}, isFixed );
 	};
 
 	it( 'allows Left to be pressed during creation when the toolbar is fixed to top', async () => {
@@ -257,11 +254,8 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
-	it( 'allows autocomplete suggestions to be selected with the mouse', async () => {
-		const titleText = 'Unique post title';
-
-		// First create a post that we can search for using the link autocompletion.
+	const createPostWithTitle = async ( titleText ) => {
+		await newPost();
 		await page.type( '.editor-post-title__input', titleText );
 		await page.click( '.editor-post-publish-panel__toggle' );
 
@@ -273,8 +267,16 @@ describe( 'Links', () => {
 		// Publish the post
 		await page.click( '.editor-post-publish-button' );
 
+		// Return the URL of the new post
 		await page.waitForSelector( '.post-publish-panel__postpublish-post-address input' );
-		const postURL = await page.evaluate( () => document.querySelector( '.post-publish-panel__postpublish-post-address input' ).value );
+		return page.evaluate( () => document.querySelector( '.post-publish-panel__postpublish-post-address input' ).value );
+	};
+
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
+	it( 'allows autocomplete suggestions to be selected with the mouse', async () => {
+		// First create a post that we can search for using the link autocompletion.
+		const titleText = 'Test post mouse';
+		const postURL = await createPostWithTitle( titleText );
 
 		// Now create a new post and try to select the post created previously
 		// from the autocomplete suggestions.
@@ -297,11 +299,10 @@ describe( 'Links', () => {
 		const firstSuggestion = autocompleteSuggestions[ 0 ];
 
 		// Expect that clicking on the autocomplete suggestion doesn't dismiss the link popover.
-		// and that the url input has a value.
 		await firstSuggestion.click();
 		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
 
-		// Expect the url input value to have been updated with the post url
+		// Expect the url input value to have been updated with the post url.
 		const inputValue = await page.evaluate( () => document.querySelector( '.editor-url-input input[aria-label="URL"]' ).value );
 		expect( inputValue ).toEqual( postURL );
 
@@ -310,5 +311,81 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Apply"]' );
 		const linkHref = await page.evaluate( () => document.querySelector( '.editor-format-toolbar__link-container-value' ).href );
 		expect( linkHref ).toEqual( postURL );
+	} );
+
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/10496.
+	it( 'allows autocomplete suggestions to be navigated with the keyboard', async () => {
+		const titleText = 'Test post keyboard';
+		const postURL = await createPostWithTitle( titleText );
+
+		await newPost();
+		await clickBlockAppender();
+
+		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+
+		// Press Cmd+K to insert a link
+		await pressWithModifier( META_KEY, 'K' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+
+		await page.keyboard.type( titleText );
+		await page.waitForSelector( '.editor-url-input__suggestion' );
+		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
+
+		// Expect there to be some autocomplete suggestions.
+		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+
+		// Expect the the first suggestion to be selected when pressing the down arrow.
+		await page.keyboard.press( 'ArrowDown' );
+		const isSelected = await page.evaluate( () => document.querySelector( '.editor-url-input__suggestion' ).getAttribute( 'aria-selected' ) );
+		expect( isSelected ).toBe( 'true' );
+
+		// Expect the link to apply correctly when pressing Enter.
+		// Note - have avoided using snapshots here since the link url can't be determined ahead of time.
+		await page.keyboard.press( 'Enter' );
+		const linkHref = await page.evaluate( () => document.querySelector( '.editor-format-toolbar__link-container-value' ).href );
+		expect( linkHref ).toEqual( postURL );
+	} );
+
+	it( 'allows use of escape key to dismiss the url popover', async () => {
+		const titleText = 'Test post escape';
+		await createPostWithTitle( titleText );
+
+		await newPost();
+		await clickBlockAppender();
+
+		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+
+		// Press Cmd+K to insert a link
+		await pressWithModifier( META_KEY, 'K' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+
+		// Trigger the autocomplete suggestion list and select the first suggestion.
+		await page.keyboard.type( titleText );
+		await page.waitForSelector( '.editor-url-input__suggestion' );
+		await page.keyboard.press( 'ArrowDown' );
+
+		// Expect the the escape key to dismiss the popover when the autocomplete suggestion list is open.
+		await page.keyboard.press( 'Escape' );
+		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+
+		// Press Cmd+K to insert a link
+		await pressWithModifier( META_KEY, 'K' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+
+		// Expect the the escape key to dismiss the popover normally.
+		await page.keyboard.press( 'Escape' );
+		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
 	} );
 } );

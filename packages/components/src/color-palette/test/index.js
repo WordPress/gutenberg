@@ -90,13 +90,6 @@ describe( 'ColorPalette', () => {
 			test( 'should render dropdown content', () => {
 				expect( renderedContent ).toMatchSnapshot();
 			} );
-
-			test( 'should call onToggle on click.', () => {
-				renderedContent.simulate( 'changeComplete', { hex: currentColor } );
-
-				expect( onChange ).toHaveBeenCalledTimes( 1 );
-				expect( onChange ).toHaveBeenCalledWith( currentColor );
-			} );
 		} );
 	} );
 } );
