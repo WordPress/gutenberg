@@ -409,8 +409,9 @@ export class BlockListBlock extends Component {
 		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirst ) || ! isPartOfMultiSelection;
 		const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
 
+		// The wp-block className is important for editor styles.
 		// Generate the wrapper class names handling the different states of the block.
-		const wrapperClassName = classnames( 'editor-block-list__block', {
+		const wrapperClassName = classnames( 'wp-block editor-block-list__block', {
 			'has-warning': ! isValid || !! error || isUnregisteredBlock,
 			'is-selected': shouldAppearSelected,
 			'is-multi-selected': isPartOfMultiSelection,

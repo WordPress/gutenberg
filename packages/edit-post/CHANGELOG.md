@@ -9,6 +9,10 @@
 - `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
 - `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
 
+### Polish
+
+- Add the editor styles support's wrapper className.
+
 ### Bug Fixes
 
 - Hide pinned plugins and block traversal tool from header on mobile.

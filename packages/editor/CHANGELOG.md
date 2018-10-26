@@ -15,6 +15,7 @@
 ### Polish
 
 - Add animated logo to preview interstitial screen.
+- Tweak the editor styles support.
 
 ### Bug Fixes
 

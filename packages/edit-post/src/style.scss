@@ -288,3 +288,16 @@ body.block-editor-page {
 		}
 	}
 }
+
+// These are default editor styles in case the theme doesn't provide them.
+.wp-block {
+	max-width: $content-width;
+
+	&[data-align="wide"] {
+		max-width: 1100px;
+	}
+
+	&[data-align="full"] {
+		max-width: none;
+	}
+}
