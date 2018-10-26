@@ -3,7 +3,8 @@
         "blockName": "core/nextpage",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<!--nextpage-->\n"
+        "innerHTML": "\n<!--nextpage-->\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

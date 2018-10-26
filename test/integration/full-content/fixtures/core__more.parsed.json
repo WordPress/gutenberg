@@ -3,7 +3,8 @@
         "blockName": "core/more",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<!--more-->\n"
+        "innerHTML": "\n<!--more-->\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

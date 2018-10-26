@@ -3,7 +3,8 @@
         "blockName": "core/image",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-image\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-image\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></figure>\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

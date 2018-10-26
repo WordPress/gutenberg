@@ -3,7 +3,8 @@
         "blockName": "core/heading",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<h2>The <em>Inserter</em> Tool</h2>\n"
+        "innerHTML": "\n<h2>The <em>Inserter</em> Tool</h2>\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

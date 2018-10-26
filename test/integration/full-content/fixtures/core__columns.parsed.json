@@ -13,16 +13,19 @@
                         "blockName": "core/paragraph",
                         "attrs": {},
                         "innerBlocks": [],
-                        "innerHTML": "\n\t\t<p>Column One, Paragraph One</p>\n\t\t"
+                        "innerHTML": "\n\t\t<p>Column One, Paragraph One</p>\n\t\t",
+                        "blockMarkers": []
                     },
                     {
                         "blockName": "core/paragraph",
                         "attrs": {},
                         "innerBlocks": [],
-                        "innerHTML": "\n\t\t<p>Column One, Paragraph Two</p>\n\t\t"
+                        "innerHTML": "\n\t\t<p>Column One, Paragraph Two</p>\n\t\t",
+                        "blockMarkers": []
                     }
                 ],
-                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t"
+                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t",
+                "blockMarkers": [34, 37]
             },
             {
                 "blockName": "core/column",
@@ -32,19 +35,23 @@
                         "blockName": "core/paragraph",
                         "attrs": {},
                         "innerBlocks": [],
-                        "innerHTML": "\n\t\t<p>Column Two, Paragraph One</p>\n\t\t"
+                        "innerHTML": "\n\t\t<p>Column Two, Paragraph One</p>\n\t\t",
+                        "blockMarkers": []
                     },
                     {
                         "blockName": "core/paragraph",
                         "attrs": {},
                         "innerBlocks": [],
-                        "innerHTML": "\n\t\t<p>Column Three, Paragraph One</p>\n\t\t"
+                        "innerHTML": "\n\t\t<p>Column Three, Paragraph One</p>\n\t\t",
+                        "blockMarkers": []
                     }
                 ],
-                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t"
+                "innerHTML": "\n\t<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>\n\t",
+                "blockMarkers": [34, 37]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-columns has-3-columns\">\n\t\n\t\n</div>\n"
+        "innerHTML": "\n<div class=\"wp-block-columns has-3-columns\">\n\t\n\t\n</div>\n",
+        "blockMarkers": [47, 49]
     },
     {
         "blockName": null,

@@ -7,16 +7,19 @@
                 "blockName": "core/paragraph",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n\t<p>Column One, Paragraph One</p>\n\t"
+                "innerHTML": "\n\t<p>Column One, Paragraph One</p>\n\t",
+                "blockMarkers": []
             },
             {
                 "blockName": "core/paragraph",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n\t<p>Column One, Paragraph Two</p>\n\t"
+                "innerHTML": "\n\t<p>Column One, Paragraph Two</p>\n\t",
+                "blockMarkers": []
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-column\">\n\t\n\t\n</div>\n"
+        "innerHTML": "\n<div class=\"wp-block-column\">\n\t\n\t\n</div>\n",
+        "blockMarkers": [32, 34]
     },
     {
         "blockName": null,

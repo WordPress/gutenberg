@@ -3,7 +3,8 @@
         "blockName": "core/preformatted",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<pre class=\"wp-block-preformatted\">Some <em>preformatted</em> text...<br>And more!</pre>\n"
+        "innerHTML": "\n<pre class=\"wp-block-preformatted\">Some <em>preformatted</em> text...<br>And more!</pre>\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

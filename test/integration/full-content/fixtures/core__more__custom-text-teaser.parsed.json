@@ -6,7 +6,8 @@
             "noTeaser": true
         },
         "innerBlocks": [],
-        "innerHTML": "\n<!--more Continue Reading-->\n<!--noteaser-->\n"
+        "innerHTML": "\n<!--more Continue Reading-->\n<!--noteaser-->\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

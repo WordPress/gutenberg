@@ -3,7 +3,8 @@
         "blockName": "core/paragraph",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\nUnwrapped is <em>still</em> valid.\n"
+        "innerHTML": "\nUnwrapped is <em>still</em> valid.\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

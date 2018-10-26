@@ -5,7 +5,8 @@
             "width": "center"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<div class=\"wp-block-text-columns aligncenter columns-2\">\n    <div class=\"wp-block-column\">\n        <p>One</p>\n    </div>\n    <div class=\"wp-block-column\">\n        <p>Two</p>\n    </div>\n</div>\n"
+        "innerHTML": "\n<div class=\"wp-block-text-columns aligncenter columns-2\">\n    <div class=\"wp-block-column\">\n        <p>One</p>\n    </div>\n    <div class=\"wp-block-column\">\n        <p>Two</p>\n    </div>\n</div>\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

@@ -3,7 +3,8 @@
         "blockName": "core/shortcode",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n[gallery ids=\"238,338\"]\n"
+        "innerHTML": "\n[gallery ids=\"238,338\"]\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

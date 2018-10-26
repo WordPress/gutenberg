@@ -6,7 +6,8 @@
             "displayPostDate": false
         },
         "innerBlocks": [],
-        "innerHTML": ""
+        "innerHTML": "",
+        "blockMarkers": []
     },
     {
         "blockName": null,

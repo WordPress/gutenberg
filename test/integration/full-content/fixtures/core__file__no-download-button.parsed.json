@@ -7,7 +7,8 @@
             "id": 176
         },
         "innerBlocks": [],
-        "innerHTML": "\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/?attachment_id=176\">lkjfijwef</a></div>\n"
+        "innerHTML": "\n<div class=\"wp-block-file\"><a href=\"http://localhost:8888/?attachment_id=176\">lkjfijwef</a></div>\n",
+        "blockMarkers": []
     },
     {
         "blockName": null,

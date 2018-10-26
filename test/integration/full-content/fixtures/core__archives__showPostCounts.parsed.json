@@ -6,6 +6,7 @@
             "showPostCounts": true
         },
         "innerBlocks": [],
-        "innerHTML": ""
+        "innerHTML": "",
+        "blockMarkers": []
     }
 ]
