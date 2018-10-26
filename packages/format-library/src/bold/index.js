@@ -29,6 +29,8 @@ export const bold = {
 					title={ __( 'Bold' ) }
 					onClick={ onToggle }
 					isActive={ isActive }
+					shortcutType="primary"
+					shortcutCharacter="b"
 				/>
 			</Fragment>
 		);

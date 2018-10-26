@@ -4,7 +4,7 @@
 import { Component, Fragment } from '@wordpress/element';
 import { getActiveFormat, getFormatTypes } from '@wordpress/rich-text';
 import { Fill, KeyboardShortcuts, ToolbarButton } from '@wordpress/components';
-import { rawShortcut } from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -18,10 +18,19 @@ function isResult( { title, keywords = [] }, filterValue ) {
 	return matchSearch( title ) || keywords.some( matchSearch );
 }
 
-function FillToolbarButton( { name, ...props } ) {
+function FillToolbarButton( { name, shortcutType, shortcutCharacter, ...props } ) {
+	let shortcut;
+
+	if ( shortcutType && shortcutCharacter ) {
+		shortcut = displayShortcut[ shortcutType ]( shortcutCharacter );
+	}
+
 	return (
 		<Fill name={ `RichText.ToolbarControls.${ name }` }>
-			<ToolbarButton { ...props } />
+			<ToolbarButton
+				{ ...props }
+				shortcut={ shortcut }
+			/>
 		</Fill>
 	);
 }
