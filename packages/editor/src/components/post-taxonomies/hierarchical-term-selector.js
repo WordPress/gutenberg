@@ -39,17 +39,12 @@ class HierarchicalTermSelector extends Component {
 		this.onToggleForm = this.onToggleForm.bind( this );
 		this.setFilterValue = this.setFilterValue.bind( this );
 		this.state = {
-			adding: false,
 			formName: '',
 			formParent: '',
 			showForm: false,
 			filterValue: '',
 			filteredTermsTree: [],
 		};
-	}
-
-	componentWillUnmount() {
-		this.addRequest = null;
 	}
 
 	onChange( event ) {
@@ -86,9 +81,9 @@ class HierarchicalTermSelector extends Component {
 
 	onAddTerm( event ) {
 		event.preventDefault();
-		const { onUpdateTerms, onSaveTerm, terms, slug, availableTerms, taxonomy } = this.props;
-		const { formName, formParent, adding } = this.state;
-		if ( formName === '' || adding ) {
+		const { onUpdateTerms, addTermToEditedPost, terms, availableTerms } = this.props;
+		const { formName, formParent } = this.state;
+		if ( formName === '' ) {
 			return;
 		}
 
@@ -106,45 +101,14 @@ class HierarchicalTermSelector extends Component {
 			return;
 		}
 
-		this.setState( {
-			adding: true,
-		} );
-
-		this.addRequest = onSaveTerm( {
+		addTermToEditedPost( {
 			name: formName,
 			parent: formParent ? formParent : undefined,
 		} );
-
-		this.addRequest
-			.then( ( term ) => {
-				if ( this.addRequest === null ) {
-					return;
-				}
-				const termAddedMessage = sprintf(
-					_x( '%s added', 'term' ),
-					get(
-						taxonomy,
-						[ 'data', 'labels', 'singular_name' ],
-						slug === 'category' ? __( 'Category' ) : __( 'Term' )
-					)
-				);
-				this.props.speak( termAddedMessage, 'assertive' );
-				this.addRequest = null;
-				this.setState( {
-					adding: false,
-					formName: '',
-					formParent: '',
-				} );
-				onUpdateTerms( [ ...terms, term.id ] );
-			}, () => {
-				if ( this.addRequest === null ) {
-					return;
-				}
-				this.addRequest = null;
-				this.setState( {
-					adding: false,
-				} );
-			} );
+		this.setState( {
+			formName: '',
+			formParent: '',
+		} );
 	}
 
 	sortBySelected( termsTree ) {
@@ -418,8 +382,8 @@ export default compose( [
 		onUpdateTerms( terms ) {
 			dispatch( 'core/editor' ).editPost( { [ taxonomy.rest_base ]: terms } );
 		},
-		onSaveTerm( term ) {
-			return dispatch( 'core' ).saveEntityRecord( 'taxonomy', slug, term );
+		addTermToEditedPost( term ) {
+			return dispatch( 'core/editor' ).addTermToEditedPost( slug, term );
 		},
 	} ) ),
 	withSpokenMessages,

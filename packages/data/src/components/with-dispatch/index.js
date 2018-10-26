@@ -44,7 +44,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 
 				proxyDispatch( propName, ...args ) {
 					// Original dispatcher is a pre-bound (dispatching) action creator.
-					return mapDispatchToProps( this.props.registry.dispatch, this.props.ownProps )[ propName ]( ...args );
+					mapDispatchToProps( this.props.registry.dispatch, this.props.ownProps )[ propName ]( ...args );
 				}
 
 				setProxyProps( props ) {
