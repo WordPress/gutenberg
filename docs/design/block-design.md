@@ -4,14 +4,85 @@ The following is a light guide to designing a new block with recommendations and
 
 ## Best Practices
 
-- Blocks should have a simple label for the Inserter. Keep it as short as possible.
-- Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
-- Blocks should have a instructive placeholder state when they’re first inserted. If the block includes a text input, provide placeholder text. If your block holds media, include buttons for uploading files and accessing media libraries, as well as drop-zones for drag-and-drop. 
-- When unselected, your block should preview its content as closely to the front-end output as possible.
-- When selected, your block may surface additional options like input fields or buttons to configure the block directly, if those are necessary for basic operation.
-- Every block should include a description in the “Block” tab of the Settings sidebar. The description should explain as clearly as possible what your block does. Keep it to a single sentence.
-- The “Block” tab of the Settings Sidebar can contain additional block options and configuration, but keep in mind that a user might dismiss the sidebar and never use it. Do not put critical options there.
-- Check how your block looks, feels, and works on all sorts of devices and screen sizes.
+**Blocks**
+
+Blocks should have a simple label for the Block Library. Keep it as short as possible.
+
+Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
+
+Do:
+
+![blocks-do](./blocks-do.png)
+
+Don't:
+
+![blocks-dont](./blocks-dont.png)
+
+---
+
+**Placeholders**
+
+Blocks should have a instructive placeholder state when they’re first inserted. If the block includes a text input, provide placeholder text. If your block holds media, include buttons for uploading files and accessing media libraries, as well as drop-zones for drag-and-drop. 
+
+Do:
+
+![placeholder-do](./placeholder-do.png)
+
+Don't
+
+![placeholder-dont](./placeholder-dont.png)
+
+---
+
+**Unselected & selected states**
+
+When unselected, your block should preview its content as closely to the front-end output as possible.
+
+When selected, your block may surface additional options like input fields or buttons to configure the block directly, if those are necessary for basic operation.
+
+Do:
+
+![block-controls-do](./block-controls-do.png)
+
+*In this example, the block is not functional unless the URL has been pasted in. Therefore it should not be in the sidebar.*
+
+Don't:
+
+![block-controls-dont](./block-controls-dont.png)
+
+*In this example, the block does not appear functional to a user who has dismissed the sidebar.*
+
+---
+
+**Block descriptions**
+
+Every block should include a description in the “Block” tab of the Settings sidebar. The description should explain as clearly as possible what your block does. Keep it to a single sentence.
+
+Do:
+
+![block-descriptions-do](./block-descriptions-do.png)
+
+Don't:
+
+![block-descriptions-dont](./block-descriptions-dont.png)
+
+---
+
+**Advanced block settings**
+
+The “Block” tab of the Settings Sidebar can contain additional block options and configuration, but keep in mind that a user might dismiss the sidebar and never use it. Do not put critical options there.
+
+Do:
+
+![advanced-settings-do](./advanced-settings-do.png)
+
+*In this example, the Drop Cap feature is not necessary for the basic operation of the block, and can be put in the Block tab as additional but secondary configuration.*
+
+---
+
+**Consider mobile**
+
+Check how your block looks, feels, and works on all sorts of devices and screen sizes.
 
 ## Examples
 
@@ -80,5 +151,3 @@ _Note that the Block Toolbar does not include the Block Chip in this case, since
 - Has options for post order, narrowing the list by category, changing the default number of posts to show, and showing the post date.
 
 _Latest Posts is fully functional as soon as it’s inserted, because it comes with good defaults._
-
-
