@@ -402,6 +402,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/format-library",
+		"slug": "packages-format-library",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/format-library/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/hooks/README.md",
@@ -579,6 +585,12 @@
 		"title": "ColorPalette",
 		"slug": "color-palette",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/color-palette/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "ColorPicker",
+		"slug": "color-picker",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/color-picker/README.md",
 		"parent": "components"
 	},
 	{

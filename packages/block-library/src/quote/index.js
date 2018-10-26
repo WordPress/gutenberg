@@ -15,6 +15,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import { join, split, create, toHTMLString } from '@wordpress/rich-text';
+import { G, Path, SVG } from '@wordpress/components';
 
 const blockAttributes = {
 	value: {
@@ -36,7 +37,7 @@ export const name = 'core/quote';
 export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Maybe someone else said it better -- add some quoted text.' ),
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></g></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></G></SVG>,
 	category: 'common',
 	keywords: [ __( 'blockquote' ) ],
 
@@ -66,16 +67,24 @@ export const settings = {
 				blocks: [ 'core/heading' ],
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content,
+						value: `<p>${ content }</p>`,
 					} );
 				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/pullquote' ],
+				transform: ( { value, citation } ) => createBlock( 'core/quote', {
+					value,
+					citation,
+				} ),
 			},
 			{
 				type: 'pattern',
 				regExp: /^>\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/quote', {
-						value: content,
+						value: `<p>${ content }</p>`,
 					} );
 				},
 			},
@@ -97,14 +106,35 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
-				transform: ( { value } ) =>
-					split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
-						.map( ( piece ) =>
+				transform: ( { value, citation } ) => {
+					const paragraphs = [];
+					if ( value ) {
+						paragraphs.push(
+							...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
+								.map( ( piece ) =>
+									createBlock( 'core/paragraph', {
+										content: toHTMLString( piece ),
+									} )
+								)
+						);
+					}
+					if ( citation ) {
+						paragraphs.push(
 							createBlock( 'core/paragraph', {
-								content: toHTMLString( piece ),
+								content: citation,
 							} )
-						),
+						);
+					}
+
+					if ( paragraphs.length === 0 ) {
+						return createBlock( 'core/paragraph', {
+							content: '',
+						} );
+					}
+					return paragraphs;
+				},
 			},
+
 			{
 				type: 'block',
 				blocks: [ 'core/heading' ],
@@ -133,6 +163,17 @@ export const settings = {
 					];
 				},
 			},
+
+			{
+				type: 'block',
+				blocks: [ 'core/pullquote' ],
+				transform: ( { value, citation } ) => {
+					return createBlock( 'core/pullquote', {
+						value,
+						citation,
+					} );
+				},
+			},
 		],
 	},
 
@@ -151,7 +192,7 @@ export const settings = {
 				</BlockControls>
 				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
-						multiline="p"
+						multiline
 						value={ value }
 						onChange={
 							( nextValue ) => setAttributes( {
@@ -191,17 +232,24 @@ export const settings = {
 
 		return (
 			<blockquote style={ { textAlign: align ? align : null } }>
-				<RichText.Content multiline="p" value={ value } />
+				<RichText.Content multiline value={ value } />
 				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
 		);
 	},
 
-	merge( attributes, attributesToMerge ) {
+	merge( attributes, { value, citation } ) {
+		if ( ! value || value === '<p></p>' ) {
+			return {
+				...attributes,
+				citation: attributes.citation + citation,
+			};
+		}
+
 		return {
 			...attributes,
-			value: attributes.value + attributesToMerge.value,
-			citation: attributes.citation + attributesToMerge.citation,
+			value: attributes.value + value,
+			citation: attributes.citation + citation,
 		};
 	},
 
@@ -234,7 +282,7 @@ export const settings = {
 						className={ style === 2 ? 'is-large' : '' }
 						style={ { textAlign: align ? align : null } }
 					>
-						<RichText.Content multiline="p" value={ value } />
+						<RichText.Content multiline value={ value } />
 						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 					</blockquote>
 				);
@@ -261,7 +309,7 @@ export const settings = {
 						className={ `blocks-quote-style-${ style }` }
 						style={ { textAlign: align ? align : null } }
 					>
-						<RichText.Content multiline="p" value={ value } />
+						<RichText.Content multiline value={ value } />
 						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 					</blockquote>
 				);

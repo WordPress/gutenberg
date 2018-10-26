@@ -11,7 +11,6 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
@@ -365,25 +364,6 @@ export function setTemplateValidity( isValid ) {
 	return {
 		type: 'SET_TEMPLATE_VALIDITY',
 		isValid,
-	};
-}
-
-/**
- * Returns an action object to check the template validity.
- *
- * @return {Object} Action object.
- */
-export function checkTemplateValidity() {
-	// TODO: Hello future deprecation remover. Please ensure also to remove all
-	// references to CHECK_TEMPLATE_VALIDITY, notably its effect handler.
-	deprecated( 'checkTemplateValidity action (`core/editor`)', {
-		version: '4.1',
-		plugin: 'Gutenberg',
-		hint: 'Validity is verified automatically upon block reset.',
-	} );
-
-	return {
-		type: 'CHECK_TEMPLATE_VALIDITY',
 	};
 }
 
@@ -772,21 +752,6 @@ export function updateEditorSettings( settings ) {
 	};
 }
 
-export function registerToken( name, settings ) {
-	return {
-		type: 'REGISTER_TOKEN',
-		name,
-		settings,
-	};
-}
-
-export function unregisterToken( name ) {
-	return {
-		type: 'UNREGISTER_TOKEN',
-		name,
-	};
-}
-
 /**
  * Returns an action object used in signalling that the user has enabled the publish sidebar.
  *
@@ -808,3 +773,32 @@ export function disablePublishSidebar() {
 		type: 'DISABLE_PUBLISH_SIDEBAR',
 	};
 }
+
+/**
+ * Returns an action object used to signal that post saving is locked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function lockPostSaving( lockName ) {
+	return {
+		type: 'LOCK_POST_SAVING',
+		lockName,
+	};
+}
+
+/**
+ * Returns an action object used to signal that post saving is unlocked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function unlockPostSaving( lockName ) {
+	return {
+		type: 'UNLOCK_POST_SAVING',
+		lockName,
+	};
+}
+

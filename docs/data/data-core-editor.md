@@ -565,6 +565,19 @@ exist.
 
 Root client ID, if exists
 
+### getBlockHierarchyRootClientId
+
+Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block from which to find root client ID.
+
+*Returns*
+
+Root client ID
+
 ### getAdjacentBlockClientId
 
 Returns the client ID of the block adjacent one at the given reference
@@ -1259,23 +1272,36 @@ Returns the editor settings.
 
 *Returns*
 
-The editor settings object
+The editor settings object.
 
 ### getTokenSettings
 
-Returns the editor settings.
+Returns the token settings.
 
 *Parameters*
 
  * state: Editor state.
+ * name: Token name.
 
 *Returns*
 
-The editor settings object
+Token settings object, or the named token settings object if set.
 
 ### isPostLocked
 
 Returns whether the post is locked.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is locked.
+
+### isPostSavingLocked
+
+Returns whether post saving is locked.
 
 *Parameters*
 
@@ -1531,10 +1557,6 @@ Returns an action object resetting the template validity.
 
  * isValid: template validity flag.
 
-### checkTemplateValidity
-
-Returns an action object to check the template validity.
-
 ### synchronizeTemplate
 
 Returns an action object synchronize the template with the list of blocks
@@ -1743,3 +1765,19 @@ Returns an action object used in signalling that the user has enabled the publis
 ### disablePublishSidebar
 
 Returns an action object used in signalling that the user has disabled the publish sidebar.
+
+### lockPostSaving
+
+Returns an action object used to signal that post saving is locked.
+
+*Parameters*
+
+ * lockName: The lock name.
+
+### unlockPostSaving
+
+Returns an action object used to signal that post saving is unlocked.
+
+*Parameters*
+
+ * lockName: The lock name.

@@ -61,6 +61,7 @@ const {
 	getSelectedBlock,
 	getSelectedBlockClientId,
 	getBlockRootClientId,
+	getBlockHierarchyRootClientId,
 	getCurrentPostAttribute,
 	getEditedPostAttribute,
 	getAutosaveAttribute,
@@ -110,6 +111,7 @@ const {
 	INSERTER_UTILITY_HIGH,
 	INSERTER_UTILITY_MEDIUM,
 	INSERTER_UTILITY_LOW,
+	isPostSavingLocked,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -887,6 +889,28 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostPublishable( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isPostSavingLocked', () => {
+		it( 'should return true if the post has postSavingLocks', () => {
+			const state = {
+				postSavingLock: [ { 1: true } ],
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostSavingLocked( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has no postSavingLocks', () => {
+			const state = {
+				postSavingLock: [],
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isPostSavingLocked( state ) ).toBe( false );
 		} );
 	} );
 
@@ -2098,6 +2122,51 @@ describe( 'selectors', () => {
 			};
 
 			expect( getBlockRootClientId( state, 56 ) ).toBe( '123' );
+		} );
+	} );
+
+	describe( 'getBlockHierarchyRootClientId', () => {
+		it( 'should return the given block if the block has no parents', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {},
+					},
+				},
+			};
+
+			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( 56 );
+		} );
+
+		it( 'should return root ClientId relative the block ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
+						},
+					},
+				},
+			};
+
+			expect( getBlockHierarchyRootClientId( state, 56 ) ).toBe( '123' );
+		} );
+
+		it( 'should return the top level root ClientId relative the block ClientId', () => {
+			const state = {
+				editor: {
+					present: {
+						blockOrder: {
+							'': [ '123', '23' ],
+							123: [ '456', '56' ],
+							56: [ '12' ],
+						},
+					},
+				},
+			};
+
+			expect( getBlockHierarchyRootClientId( state, '12' ) ).toBe( '123' );
 		} );
 	} );
 

@@ -14,7 +14,7 @@
 		height: 28px;
 		border-radius: 3px;
 		white-space: nowrap;
-		border-width: 1px;
+		border-width: $border-width;
 		border-style: solid;
 	}
 
@@ -190,6 +190,35 @@
 		line-height: 22px;
 		padding: 0 8px 1px;
 		font-size: 11px;
+	}
+
+	// Buttons that are text-based.
+	&.is-tertiary {
+		color: theme(outlines);
+
+		// Matches default button in hit area. See line 11.
+		padding: 0 10px;
+		line-height: 26px;
+		height: 28px;
+
+		.dashicon {
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+
+		// Ensure that even SVG icons that don't include the .dashicon class are colored.
+		svg {
+			fill: currentColor;
+			outline: none;
+		}
+
+		&:active:focus:enabled {
+			box-shadow: none;
+		}
+
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			color: color(theme(outlines) shade(25%));
+		}
 	}
 }
 

@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal Dependencies
@@ -18,6 +19,7 @@ import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockIcon from '../block-icon';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
+import BlockStyles from '../block-styles';
 
 const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 	if ( count > 1 ) {
@@ -35,30 +37,44 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
-	return [
-		<div className="editor-block-inspector__card" key="card">
-			<BlockIcon icon={ blockType.icon } showColors />
-			<div className="editor-block-inspector__card-content">
-				<div className="editor-block-inspector__card-title">{ blockType.title }</div>
-				<div className="editor-block-inspector__card-description">{ blockType.description }</div>
+	return (
+		<Fragment>
+			<div className="editor-block-inspector__card">
+				<BlockIcon icon={ blockType.icon } showColors />
+				<div className="editor-block-inspector__card-content">
+					<div className="editor-block-inspector__card-title">{ blockType.title }</div>
+					<div className="editor-block-inspector__card-description">{ blockType.description }</div>
+				</div>
 			</div>
-		</div>,
-		<div key="inspector-controls"><InspectorControls.Slot /></div>,
-		<div key="inspector-advanced-controls">
-			<InspectorAdvancedControls.Slot>
-				{ ( fills ) => ! isEmpty( fills ) && (
+			{ !! blockType.styles && (
+				<div>
 					<PanelBody
-						className="editor-block-inspector__advanced"
-						title={ __( 'Advanced' ) }
+						title={ __( 'Styles' ) }
 						initialOpen={ false }
 					>
-						{ fills }
+						<BlockStyles
+							clientId={ selectedBlock.clientId }
+						/>
 					</PanelBody>
-				) }
-			</InspectorAdvancedControls.Slot>
-		</div>,
-		<SkipToSelectedBlock key="back" />,
-	];
+				</div>
+			) }
+			<div><InspectorControls.Slot /></div>
+			<div>
+				<InspectorAdvancedControls.Slot>
+					{ ( fills ) => ! isEmpty( fills ) && (
+						<PanelBody
+							className="editor-block-inspector__advanced"
+							title={ __( 'Advanced' ) }
+							initialOpen={ false }
+						>
+							{ fills }
+						</PanelBody>
+					) }
+				</InspectorAdvancedControls.Slot>
+			</div>
+			<SkipToSelectedBlock key="back" />
+		</Fragment>
+	);
 };
 
 export default withSelect(

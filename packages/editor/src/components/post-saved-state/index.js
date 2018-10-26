@@ -2,16 +2,18 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dashicon, IconButton } from '@wordpress/components';
+import { Dashicon, Button, IconButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
+import { withViewportMatch } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -41,8 +43,21 @@ export class PostSavedState extends Component {
 	}
 
 	render() {
-		const { isNew, isScheduled, isPublished, isDirty, isSaving, isSaveable, onSave, isAutosaving } = this.props;
+		const {
+			post,
+			isNew,
+			isScheduled,
+			isPublished,
+			isDirty,
+			isSaving,
+			isSaveable,
+			onSave,
+			isAutosaving,
+			isPending,
+			isLargeViewport,
+		} = this.props;
 		const { forceSavedMessage } = this.state;
+		const hasPublishAction = get( post, [ '_links', 'wp:action-publish' ], false );
 		if ( isSaving ) {
 			// TODO: Classes generation should be common across all return
 			// paths of this function, including proper naming convention for
@@ -76,15 +91,34 @@ export class PostSavedState extends Component {
 			);
 		}
 
+		// Once the post has been submitted for review this button
+		// is not needed for the contributor role.
+		if ( ! hasPublishAction && isPending ) {
+			return null;
+		}
+
+		const label = isPending ? __( 'Save as Pending' ) : __( 'Save Draft' );
+		if ( ! isLargeViewport ) {
+			return (
+				<IconButton
+					className="editor-post-save-draft"
+					label={ label }
+					onClick={ onSave }
+					shortcut={ displayShortcut.primary( 's' ) }
+					icon="cloud-upload"
+				/>
+			);
+		}
+
 		return (
-			<IconButton
+			<Button
 				className="editor-post-save-draft"
 				onClick={ onSave }
-				icon="cloud-upload"
 				shortcut={ displayShortcut.primary( 's' ) }
+				isTertiary
 			>
-				{ __( 'Save Draft' ) }
-			</IconButton>
+				{ label }
+			</Button>
 		);
 	}
 }
@@ -100,6 +134,7 @@ export default compose( [
 			isEditedPostSaveable,
 			getCurrentPost,
 			isAutosavingPost,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		return {
 			post: getCurrentPost(),
@@ -110,10 +145,12 @@ export default compose( [
 			isSaving: forceIsSaving || isSavingPost(),
 			isSaveable: isEditedPostSaveable(),
 			isAutosaving: isAutosavingPost(),
+			isPending: 'pending' === getEditedPostAttribute( 'status' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onSave: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	withSafeTimeout,
+	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( PostSavedState );

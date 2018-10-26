@@ -770,17 +770,46 @@ export function getSelectedBlock( state ) {
  *
  * @return {?string} Root client ID, if exists
  */
-export function getBlockRootClientId( state, clientId ) {
-	const { blockOrder } = state.editor.present;
+export const getBlockRootClientId = createSelector(
+	( state, clientId ) => {
+		const { blockOrder } = state.editor.present;
 
-	for ( const rootClientId in blockOrder ) {
-		if ( includes( blockOrder[ rootClientId ], clientId ) ) {
-			return rootClientId;
+		for ( const rootClientId in blockOrder ) {
+			if ( includes( blockOrder[ rootClientId ], clientId ) ) {
+				return rootClientId;
+			}
 		}
-	}
 
-	return null;
-}
+		return null;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+	]
+);
+
+/**
+ * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {string} Root client ID
+ */
+export const getBlockHierarchyRootClientId = createSelector(
+	( state, clientId ) => {
+		let rootClientId = clientId;
+		let current = clientId;
+		while ( rootClientId ) {
+			current = rootClientId;
+			rootClientId = getBlockRootClientId( state, current );
+		}
+
+		return current;
+	},
+	( state ) => [
+		state.editor.present.blockOrder,
+	]
+);
 
 /**
  * Returns the client ID of the block adjacent one at the given reference
@@ -1928,23 +1957,24 @@ export function getBlockListSettings( state, clientId ) {
 	return state.blockListSettings[ clientId ];
 }
 
-/*
+/**
  * Returns the editor settings.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} The editor settings object
+ * @return {Object} The editor settings object.
  */
 export function getEditorSettings( state ) {
 	return state.settings;
 }
 
-/*
- * Returns the editor settings.
+/**
+ * Returns the token settings.
  *
  * @param {Object} state Editor state.
+ * @param {?string} name Token name.
  *
- * @return {Object} The editor settings object
+ * @return {Object} Token settings object, or the named token settings object if set.
  */
 export function getTokenSettings( state, name ) {
 	if ( ! name ) {
@@ -1963,6 +1993,17 @@ export function getTokenSettings( state, name ) {
  */
 export function isPostLocked( state ) {
 	return state.postLock.isLocked;
+}
+
+/**
+ * Returns whether post saving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostSavingLocked( state ) {
+	return state.postSavingLock.length > 0;
 }
 
 /**

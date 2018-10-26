@@ -1,23 +1,36 @@
-.editor-media-placeholder {
-	.components-placeholder__input {
-		margin-top: 0.5em;
-	}
+.editor-media-placeholder__url-input-container {
+	width: 100%;
 
-	.components-button.is-large {
-		margin-top: 0.5em;
-	}
-
-	.components-placeholder__fieldset {
-		max-width: 400px;
-
-		form {
-			max-width: none;
-		}
+	// Reset the margin to ensure the url popover is adjacent to the button.
+	.editor-media-placeholder__button {
+		margin-bottom: 0;
 	}
 }
 
-.editor-media-placeholder__upload-button.components-button {
-	margin-right: 5px;
+.editor-media-placeholder__url-input-form {
+	display: flex;
+
+	// Selector requires a lot of specificity to override base styles.
+	input[type="url"].editor-media-placeholder__url-input-field {
+		width: 100%;
+		@include break-small() {
+			width: 300px;
+		}
+
+		flex-grow: 1;
+		border: none;
+		border-radius: 0;
+		margin: 2px;
+
+	}
+}
+
+.editor-media-placeholder__url-input-submit-button {
+	flex-shrink: 1;
+}
+
+.editor-media-placeholder__button {
+	margin-bottom: 0.5rem;
 
 	.dashicon {
 		vertical-align: middle;
@@ -27,4 +40,8 @@
 	&:hover {
 		color: $dark-gray-800;
 	}
+}
+
+.components-form-file-upload .editor-media-placeholder__button {
+	margin-right: $grid-size-small;
 }

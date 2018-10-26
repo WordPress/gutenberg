@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	Component,
 	Fragment,
@@ -14,6 +14,7 @@ import {
 import {
 	PanelBody,
 	ToggleControl,
+	Toolbar,
 	withFallbackStyles,
 } from '@wordpress/components';
 import {
@@ -29,6 +30,7 @@ import {
 } from '@wordpress/editor';
 import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 const { getComputedStyle } = window;
 
@@ -137,6 +139,7 @@ class ParagraphBlock extends Component {
 			fallbackFontSize,
 			fontSize,
 			setFontSize,
+			isRTL,
 		} = this.props;
 
 		const {
@@ -144,6 +147,7 @@ class ParagraphBlock extends Component {
 			content,
 			dropCap,
 			placeholder,
+			direction,
 		} = attributes;
 
 		return (
@@ -155,6 +159,23 @@ class ParagraphBlock extends Component {
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
+					{ isRTL && (
+						<Toolbar
+							controls={ [
+								{
+									icon: 'editor-ltr',
+									title: _x( 'Left to right', 'editor button' ),
+									isActive: direction === 'ltr',
+									onClick() {
+										const nextDirection = direction === 'ltr' ? undefined : 'ltr';
+										setAttributes( {
+											direction: nextDirection,
+										} );
+									},
+								},
+							] }
+						/>
+					) }
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Text Settings' ) } className="blocks-font-size">
@@ -212,6 +233,7 @@ class ParagraphBlock extends Component {
 						color: textColor.color,
 						fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
 						textAlign: align,
+						direction,
 					} }
 					value={ content }
 					onChange={ ( nextContent ) => {
@@ -234,6 +256,13 @@ const ParagraphEdit = compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withFontSizes( 'fontSize' ),
 	applyFallbackStyles,
+	withSelect( ( select ) => {
+		const { getEditorSettings } = select( 'core/editor' );
+
+		return {
+			isRTL: getEditorSettings().isRTL,
+		};
+	} ),
 ] )( ParagraphBlock );
 
 export default ParagraphEdit;
