@@ -12,8 +12,7 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import { createRegistry } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
+import { dispatch as dataDispatch, createRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -25,19 +24,27 @@ import actions, {
 	replaceBlocks,
 	resetBlocks,
 	selectBlock,
-	createErrorNotice,
 	setTemplateValidity,
 	editPost,
 } from '../actions';
 import effects, { validateBlocksToTemplate } from '../effects';
+import { SAVE_POST_NOTICE_ID } from '../effects/posts';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 import applyMiddlewares from '../middlewares';
 import '../../';
 
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
-
 describe( 'effects', () => {
+	beforeAll( () => {
+		jest.spyOn( dataDispatch( 'core/notices' ), 'createErrorNotice' );
+		jest.spyOn( dataDispatch( 'core/notices' ), 'createSuccessNotice' );
+	} );
+
+	beforeEach( () => {
+		dataDispatch( 'core/notices' ).createErrorNotice.mockReset();
+		dataDispatch( 'core/notices' ).createSuccessNotice.mockReset();
+	} );
+
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
 
 	describe( '.MERGE_BLOCKS', () => {
@@ -261,8 +268,15 @@ describe( 'effects', () => {
 
 			handler( { post, previousPost, postType }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( deprecated ).toHaveBeenCalled();
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
+				'Post published.',
+				{
+					id: SAVE_POST_NOTICE_ID,
+					actions: [
+						{ label: 'View post', url: undefined },
+					],
+				}
+			);
 		} );
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
@@ -275,8 +289,13 @@ describe( 'effects', () => {
 
 			handler( { post, previousPost, postType }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( deprecated ).toHaveBeenCalled();
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
+				'Post reverted to draft.',
+				{
+					id: SAVE_POST_NOTICE_ID,
+					actions: [],
+				}
+			);
 		} );
 
 		it( 'should dispatch notices when just updating a published post again', () => {
@@ -289,8 +308,15 @@ describe( 'effects', () => {
 
 			handler( { post, previousPost, postType }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( deprecated ).toHaveBeenCalled();
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
+				'Post updated.',
+				{
+					id: SAVE_POST_NOTICE_ID,
+					actions: [
+						{ label: 'View post', url: undefined },
+					],
+				}
+			);
 		} );
 
 		it( 'should do nothing if the updated post was autosaved', () => {
@@ -302,7 +328,7 @@ describe( 'effects', () => {
 
 			handler( { post, previousPost, isAutosave: true }, store );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 0 );
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should dispatch dirtying action if edits linger after autosave', () => {
@@ -322,8 +348,6 @@ describe( 'effects', () => {
 	describe( '.REQUEST_POST_UPDATE_FAILURE', () => {
 		it( 'should dispatch a notice on failure when publishing a draft fails.', () => {
 			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
-			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
 
 			const action = {
 				post: {
@@ -341,16 +365,13 @@ describe( 'effects', () => {
 				},
 			};
 
-			handler( action, store );
+			handler( action );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Publishing failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+			expect( dataDispatch( 'core/notices' ).createErrorNotice ).toHaveBeenCalledWith( 'Publishing failed', { id: SAVE_POST_NOTICE_ID } );
 		} );
 
 		it( 'should not dispatch a notice when there were no changes for autosave to save.', () => {
 			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
-			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
 
 			const action = {
 				post: {
@@ -371,15 +392,13 @@ describe( 'effects', () => {
 				},
 			};
 
-			handler( action, store );
+			handler( action );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 0 );
+			expect( dataDispatch( 'core/notices' ).createErrorNotice ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should dispatch a notice on failure when trying to update a draft.', () => {
 			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
-			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
 
 			const action = {
 				post: {
@@ -397,10 +416,9 @@ describe( 'effects', () => {
 				},
 			};
 
-			handler( action, store );
+			handler( action );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+			expect( dataDispatch( 'core/notices' ).createErrorNotice ).toHaveBeenCalledWith( 'Updating failed', { id: SAVE_POST_NOTICE_ID } );
 		} );
 	} );
 

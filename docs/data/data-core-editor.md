@@ -1370,7 +1370,6 @@ the specified post object and editor settings.
 *Parameters*
 
  * post: Post object.
- * autosaveStatus: The Post's autosave status.
 
 ### resetPost
 

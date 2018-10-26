@@ -13,7 +13,6 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,7 +20,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	setupEditorState,
 	replaceBlocks,
-	createWarningNotice,
 	selectBlock,
 	resetBlocks,
 	setTemplateValidity,
@@ -53,7 +51,6 @@ import {
 	trashPost,
 	trashPostFailure,
 	refreshPost,
-	AUTOSAVE_POST_NOTICE_ID,
 } from './effects/posts';
 
 /**
@@ -200,7 +197,7 @@ export default {
 		) );
 	},
 	SETUP_EDITOR( action, store ) {
-		const { post, autosave } = action;
+		const { post } = action;
 		const state = store.getState();
 
 		// Parse content as blocks
@@ -219,28 +216,10 @@ export default {
 			edits.title = post.title.raw;
 		}
 
-		// Check the auto-save status
-		let autosaveAction;
-		if ( autosave ) {
-			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-			autosaveAction = createWarningNotice(
-				<p>
-					{ noticeMessage }
-					{ ' ' }
-					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
-				</p>,
-				{
-					id: AUTOSAVE_POST_NOTICE_ID,
-					spokenMessage: noticeMessage,
-				}
-			);
-		}
-
 		const setupAction = setupEditorState( post, blocks, edits );
 
 		return compact( [
 			setupAction,
-			autosaveAction,
 
 			// TODO: This is temporary, necessary only so long as editor setup
 			// is a separate action from block resetting.

@@ -17,15 +17,13 @@ import { dispatch } from '@wordpress/data';
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object}  post           Post object.
- * @param {Object}  autosaveStatus The Post's autosave status.
+ * @param {Object} post Post object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post, autosaveStatus ) {
+export function setupEditor( post ) {
 	return {
 		type: 'SETUP_EDITOR',
-		autosave: autosaveStatus,
 		post,
 	};
 }
