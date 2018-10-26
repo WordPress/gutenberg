@@ -53,7 +53,7 @@ function FontSizePicker( {
 							aria-expanded={ isOpen }
 							aria-label={ __( 'Custom font size' ) }
 						>
-							{ ( currentFont && currentFont.name ) || ( ! value && __( 'Normal' ) ) || _x( 'Custom', 'font size name' ) }
+							{ ( currentFont && currentFont.name ) || ( ! value && _x( 'Normal', 'font size name' ) ) || _x( 'Custom', 'font size name' ) }
 						</Button>
 					) }
 					renderContent={ () => (
