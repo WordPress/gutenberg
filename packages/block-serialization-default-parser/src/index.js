@@ -4,17 +4,23 @@ let output;
 let stack;
 const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?!}\s+-->)[^])+?}\s+)?(\/)?-->/g;
 
-function Block( blockName, attrs, innerBlocks, innerHTML ) {
+function Block( blockName, attrs, innerBlocks, innerHTML, blockMarkers ) {
 	return {
 		blockName,
 		attrs,
 		innerBlocks,
 		innerHTML,
+		blockMarkers,
 	};
 }
 
 function Freeform( innerHTML ) {
-	return Block( null, {}, [], innerHTML );
+	return {
+		blockName: null,
+		attrs: {},
+		innerBlocks: [],
+		innerHTML,
+	};
 }
 
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
@@ -84,14 +90,14 @@ function proceed() {
 				if ( null !== leadingHtmlStart ) {
 					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
 				}
-				output.push( Block( blockName, attrs, [], '' ) );
+				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner block
 			addInnerBlock(
-				Block( blockName, attrs, [], '' ),
+				Block( blockName, attrs, [], '', [] ),
 				startOffset,
 				tokenLength,
 			);
@@ -102,7 +108,7 @@ function proceed() {
 			// track all newly-opened blocks on the stack
 			stack.push(
 				Frame(
-					Block( blockName, attrs, [], '' ),
+					Block( blockName, attrs, [], '', [] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -230,6 +236,7 @@ function addFreeform( rawLength ) {
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
+	parent.block.blockMarkers.push( parent.block.innerHTML.length + tokenStart - parent.prevOffset );
 	parent.block.innerHTML += document.substr(
 		parent.prevOffset,
 		tokenStart - parent.prevOffset,
