@@ -94,20 +94,24 @@ export default compose( [
 			getBlockInsertionPoint,
 			getSelectedBlock,
 			getInserterItems,
-			getBlockOrder,
 		} = select( 'core/editor' );
 
-		const insertionPoint = getBlockInsertionPoint();
+		let index;
 		if ( rootClientId === undefined ) {
-			rootClientId = insertionPoint.rootClientId;
+			// Unless explicitly provided, the default insertion point provided
+			// by the store occurs immediately following the selected block.
+			// Otherwise, the default behavior for an undefined index is to
+			// append block to the end of the rootClientId context.
+			const insertionPoint = getBlockInsertionPoint();
+			( { rootClientId, layout, index } = insertionPoint );
 		}
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			layout: rootClientId ? layout : insertionPoint.layout,
-			index: rootClientId ? getBlockOrder( rootClientId ).length : insertionPoint.index,
 			selectedBlock: getSelectedBlock(),
 			items: getInserterItems( rootClientId ),
+			layout,
+			index,
 			rootClientId,
 		};
 	} ),
