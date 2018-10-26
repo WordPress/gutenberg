@@ -255,51 +255,32 @@ class Gutenberg_PEG_Parser {
     private $peg_c24;
 
     private function peg_f0($pre, $b, $html) { return array( $b, $html ); }
-    private function peg_f1($pre, $bs, $post) {
-        $blocks =  peg_join_blocks( $pre, $bs, $post );
-
-        // clear out lingering location data
-        foreach ( $blocks as $block ) {
-            unset( $block[ 'location' ] );
-        }
-
-        return $blocks;
-        }
+    private function peg_f1($pre, $bs, $post) { return peg_join_blocks( $pre, $bs, $post ); }
     private function peg_f2($blockName, $a) { return $a; }
     private function peg_f3($blockName, $attrs) {
         return array(
           'blockName'    => $blockName,
           'attrs'        => isset( $attrs ) ? $attrs : array(),
           'innerBlocks'  => array(),
-          'blockMarkers' => array(),
           'innerHTML'    => '',
-          'location'     => location(),
+          'blockMarkers' => array(),
         );
         }
     private function peg_f4($s, $children, $e) {
-        list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
-
-        $blockMarkers = array();
-        $text_length = 0;
-        foreach( $innerBlocks as $innerBlock ) {
-            $blockMarkers[] = $innerBlock[ 'location' ][ 'start' ][ 'offset' ] - $text_length - $s[ 'location' ][ 'end' ][ 'offset' ];
-            $text_length += $innerBlock[ 'location' ][ 'end' ][ 'offset' ] - $innerBlock[ 'location' ][ 'start' ][ 'offset' ];
-            unset( $innerBlock[ 'location' ] );
-        }
+        list( $innerHTML, $innerBlocks, $blockMarkers ) = peg_array_partition( $children );
 
         return array(
           'blockName'    => $s['blockName'],
           'attrs'        => $s['attrs'],
           'innerBlocks'  => $innerBlocks,
           'innerHTML'    => implode( '', $innerHTML ),
-          'location'     => location(),
+          'blockMarkers' => $blockMarkers,
         );
         }
     private function peg_f5($blockName, $attrs) {
         return array(
           'blockName' => $blockName,
           'attrs'     => isset( $attrs ) ? $attrs : array(),
-          'location'  => location(),
         );
         }
     private function peg_f6($blockName) {
@@ -1461,19 +1442,31 @@ class Gutenberg_PEG_Parser {
     // The `maybeJSON` function is not needed in PHP because its return semantics
     // are the same as `json_decode`
 
+    if ( ! function_exists( 'ucs2length' ) ) {
+        function ucs2length( $string ) {
+            return (int) strlen( iconv( 'UTF-8', 'UTF-16le', $string ) ) / 2;
+        }
+    }
+
     // array arguments are backwards because of PHP
     if ( ! function_exists( 'peg_array_partition' ) ) {
-        function peg_array_partition( $array, $predicate ) {
-            $truthy = array();
-            $falsey = array();
+        function peg_array_partition( $array ) {
+            $truthy  = array();
+            $falsey  = array();
+            $markers = array();
+            $offset  = 0;
 
             foreach ( $array as $item ) {
-                call_user_func( $predicate, $item )
-                    ? $truthy[] = $item
-                    : $falsey[] = $item;
+                if ( is_string( $item ) ) {
+                    $offset += ucs2length( $item );
+                    $truthy[] = $item;
+                } else {
+                    $markers[] = $offset;
+                    $falsey[] = $item;
+                }
             }
 
-            return array( $truthy, $falsey );
+            return array( $truthy, $falsey, $markers );
         }
     }
 

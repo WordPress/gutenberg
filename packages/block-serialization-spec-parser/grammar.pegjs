@@ -50,19 +50,31 @@
 // The `maybeJSON` function is not needed in PHP because its return semantics
 // are the same as `json_decode`
 
+if ( ! function_exists( 'ucs2length' ) ) {
+    function ucs2length( $string ) {
+        return (int) strlen( iconv( 'UTF-8', 'UTF-16le', $string ) ) / 2;
+    }
+}
+
 // array arguments are backwards because of PHP
 if ( ! function_exists( 'peg_array_partition' ) ) {
-    function peg_array_partition( $array, $predicate ) {
-        $truthy = array();
-        $falsey = array();
+    function peg_array_partition( $array ) {
+        $truthy  = array();
+        $falsey  = array();
+        $markers = array();
+        $offset  = 0;
 
         foreach ( $array as $item ) {
-            call_user_func( $predicate, $item )
-                ? $truthy[] = $item
-                : $falsey[] = $item;
+            if ( is_string( $item ) ) {
+                $offset += ucs2length( $item );
+                $truthy[] = $item;
+            } else {
+                $markers[] = $offset;
+                $falsey[] = $item;
+            }
         }
 
-        return array( $truthy, $falsey );
+        return array( $truthy, $falsey, $markers );
     }
 }
 
@@ -151,22 +163,28 @@ function maybeJSON( s ) {
     }
 }
 
-function partition( predicate, list ) {
+function partition( list ) {
     var i, l, item;
     var truthy = [];
     var falsey = [];
+    var markers = [];
+    var offset = 0;
 
     // nod to performance over a simpler reduce
     // and clone model we could have taken here
     for ( i = 0, l = list.length; i < l; i++ ) {
         item = list[ i ];
 
-        predicate( item )
-            ? truthy.push( item )
-            : falsey.push( item )
+        if ( 'string' === typeof item ) {
+            offset += item.length;
+            truthy.push( item );
+        } else {
+            markers.push( offset );
+            falsey.push( item );
+        }
     };
 
-    return [ truthy, falsey ];
+    return [ truthy, falsey, markers ];
 }
 
 }
@@ -181,24 +199,8 @@ Block_List
   = pre:$(!Block .)*
     bs:(b:Block html:$((!Block .)*) { /** <?php return array( $b, $html ); ?> **/ return [ b, html ] })*
     post:$(.*)
-  { /** <?php
-    $blocks =  peg_join_blocks( $pre, $bs, $post );
-
-    // clear out lingering location data
-    foreach ( $blocks as $block ) {
-        unset( $block[ 'location' ] );
-    }
-
-    return $blocks;
-    ?> **/
-    var blocks = joinBlocks( pre, bs, post );
-
-    // clear out lingering location data
-    blocks.forEach( function( block ) {
-        delete block.location;
-    } );
-
-    return blocks;
+  { /** <?php return peg_join_blocks( $pre, $bs, $post ); ?> **/
+    return joinBlocks( pre, bs, post );
   }
 
 Block
@@ -216,9 +218,8 @@ Block_Void
       'blockName'    => $blockName,
       'attrs'        => isset( $attrs ) ? $attrs : array(),
       'innerBlocks'  => array(),
-      'blockMarkers' => array(),
       'innerHTML'    => '',
-      'location'     => location(),
+      'blockMarkers' => array(),
     );
     ?> **/
 
@@ -226,9 +227,8 @@ Block_Void
       blockName: blockName,
       attrs: attrs || {},
       innerBlocks: [],
-      blockMarkers: [],
       innerHTML: '',
-      location: location(),
+      blockMarkers: [],
     };
   }
 
@@ -236,42 +236,21 @@ Block_Balanced
   = s:Block_Start children:(Block / $(!Block_End .))* e:Block_End
   {
     /** <?php
-    list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
-
-    $blockMarkers = array();
-    $text_length = 0;
-    foreach( $innerBlocks as $innerBlock ) {
-        $blockMarkers[] = $innerBlock[ 'location' ][ 'start' ][ 'offset' ] - $text_length - $s[ 'location' ][ 'end' ][ 'offset' ];
-        $text_length += $innerBlock[ 'location' ][ 'end' ][ 'offset' ] - $innerBlock[ 'location' ][ 'start' ][ 'offset' ];
-        unset( $innerBlock[ 'location' ] );
-    }
+    list( $innerHTML, $innerBlocks, $blockMarkers ) = peg_array_partition( $children );
 
     return array(
       'blockName'    => $s['blockName'],
       'attrs'        => $s['attrs'],
       'innerBlocks'  => $innerBlocks,
       'innerHTML'    => implode( '', $innerHTML ),
-      'location'     => location(),
+      'blockMarkers' => $blockMarkers,
     );
     ?> **/
 
-    var innerContent = partition( function( a ) { return 'string' === typeof a }, children );
+    var innerContent = partition( children );
     var innerHTML = innerContent[ 0 ];
     var innerBlocks = innerContent[ 1 ];
-
-    var blockMarkers = innerBlocks.reduce( function( accum, block ) {
-        var l = block.location;
-
-        return [
-            accum[ 0 ] + l.end.offset - l.start.offset,
-            accum[ 1 ].concat( l.start.offset - accum[ 0 ] - s.location.end.offset )
-        ];
-    }, [ 0, [] ] )[ 1 ];
-
-    // clear out lingering location data
-    innerBlocks.forEach( function( block ) {
-        delete block.location;
-    } );
+    var blockMarkers = innerContent[ 2 ];
 
     return {
       blockName: s.blockName,
@@ -279,7 +258,6 @@ Block_Balanced
       innerBlocks: innerBlocks,
       innerHTML: innerHTML.join( '' ),
       blockMarkers: blockMarkers,
-      location: location(),
     };
   }
 
@@ -293,14 +271,12 @@ Block_Start
     return array(
       'blockName' => $blockName,
       'attrs'     => isset( $attrs ) ? $attrs : array(),
-      'location'  => location(),
     );
     ?> **/
 
     return {
       blockName: blockName,
-      attrs: attrs || {},
-      location: location(),
+      attrs: attrs || {}
     };
   }
 
