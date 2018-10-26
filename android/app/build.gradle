@@ -95,7 +95,7 @@ def enableProguardInReleaseBuilds = false
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.2"
+    buildToolsVersion "28.0.2"
 
     defaultConfig {
         applicationId "com.gutenberg"
@@ -142,18 +142,18 @@ android {
 
 buildscript {
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.1.0'
     }
 }
 
 repositories {
-    jcenter()
     google()
+    jcenter()
     maven { url "https://jitpack.io" }
 }
 
