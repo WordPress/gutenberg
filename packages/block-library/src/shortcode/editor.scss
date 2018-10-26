@@ -1,6 +1,6 @@
 .wp-block-shortcode {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	padding: $block-padding;
 	background-color: $light-gray-100;
 	font-size: $default-font-size;
@@ -9,7 +9,7 @@
 	label {
 		display: flex;
 		align-items: center;
-		margin-right: $grid-size;
+		margin-bottom: $grid-size;
 		white-space: nowrap;
 		font-weight: 600;
 		flex-shrink: 0;
