@@ -124,13 +124,23 @@ Block Styles allow providing alternative styles to block. It works by adding a c
 // Register block styles.
 styles: [
 		// Mark style as default.
-		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
-		{ name: 'outline', label: __( 'Outline' ) },
-		{ name: 'squared', label: __( 'Squared' ) },
+		{ 
+			name: 'default', 
+			label: __( 'Rounded' ), 
+			isDefault: true 
+		},
+		{ 
+			name: 'outline', 
+			label: __( 'Outline' ) 
+		},
+		{ 
+			name: 'squared', 
+			label: __( 'Squared' ) 
+		},
 	],
 ```
 
-Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#modifying-blocks) for exisiting blocks.
+Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for exisiting blocks.
 
 #### Attributes (optional)
 
