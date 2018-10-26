@@ -22,4 +22,4 @@ import {
 	italic,
 	link,
 	strikethrough,
-].forEach( registerFormatType );
+].forEach( ( { name, ...settings } ) => registerFormatType( name, settings ) );
