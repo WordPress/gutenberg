@@ -23,7 +23,7 @@ export type ParseActionType = string => {
 	html: string,
 };
 
-export type BlocksActionType = string => {
+export type BlocksActionType = ( string, string ) => {
 	type: $Values<typeof ActionTypes.BLOCK>,
 	blockOneClientId: string,
 	blockTwoClientId: string,
