@@ -58,6 +58,9 @@ const blockAttributes = {
 	align: {
 		type: 'string',
 	},
+	fileName: {
+		type: 'string',
+	},
 	width: {
 		type: 'number',
 	},
