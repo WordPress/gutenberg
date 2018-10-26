@@ -35,7 +35,9 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 				url: this.props.attributes.url,
 			};
 
-			if ( this.props.preview ) {
+			console.log( '_shouldFetch?', this.props.attributes._shouldFetch );
+
+			if ( this.props.preview && this.props.attributes._shouldFetch ) {
 				this.handleIncomingPreview();
 			}
 		}
