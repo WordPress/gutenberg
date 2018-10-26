@@ -427,6 +427,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-polyfill',
+			'wp-blocks',
 			'wp-data',
 			'wp-escape-html',
 		),
