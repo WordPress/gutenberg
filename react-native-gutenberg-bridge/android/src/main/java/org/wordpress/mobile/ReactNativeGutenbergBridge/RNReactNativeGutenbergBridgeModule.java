@@ -8,19 +8,16 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule {
 
     private final ReactApplicationContext mReactContext;
-    private CountDownLatch mGetContentCountDownLatch;
+    private final GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
 
-    private String mContentHtml = "";
-
-    public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext) {
+    public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
+            GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
         super(reactContext);
         mReactContext = reactContext;
+        mGutenbergBridgeJS2Parent = gutenbergBridgeJS2Parent;
     }
 
     @Override
@@ -30,29 +27,15 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
 
     private void emitToJS(String eventName, @Nullable WritableMap data) {
-        mReactContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, data);
+        mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, data);
     }
 
-    public String getHtmlFromJS() {
-        mGetContentCountDownLatch = new CountDownLatch(1);
-
+    public void getHtmlFromJS() {
         emitToJS("requestGetHtml", null);
-
-        try {
-            mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
-        } catch (InterruptedException e) {
-//            AppLog.e(T.EDITOR, e);
-            Thread.currentThread().interrupt();
-        }
-
-        return mContentHtml;
     }
 
     @ReactMethod
     public void provideToNative_Html(String html) {
-        mContentHtml = html;
-        mGetContentCountDownLatch.countDown();
+        mGutenbergBridgeJS2Parent.responseHtml(html);
     }
 }

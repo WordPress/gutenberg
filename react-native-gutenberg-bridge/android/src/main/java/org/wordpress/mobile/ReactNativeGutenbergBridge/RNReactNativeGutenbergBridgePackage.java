@@ -10,15 +10,22 @@ import java.util.Collections;
 import java.util.List;
 
 public class RNReactNativeGutenbergBridgePackage implements ReactPackage {
+
+    private GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
     private RNReactNativeGutenbergBridgeModule mRNReactNativeGutenbergBridgeModule;
 
     public RNReactNativeGutenbergBridgeModule getRNReactNativeGutenbergBridgeModule() {
         return mRNReactNativeGutenbergBridgeModule;
     }
 
+    public RNReactNativeGutenbergBridgePackage(GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
+        mGutenbergBridgeJS2Parent = gutenbergBridgeJS2Parent;
+    }
+
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-        mRNReactNativeGutenbergBridgeModule = new RNReactNativeGutenbergBridgeModule(reactContext);
+        mRNReactNativeGutenbergBridgeModule = new RNReactNativeGutenbergBridgeModule(reactContext,
+                mGutenbergBridgeJS2Parent);
         return Arrays.<NativeModule>asList(mRNReactNativeGutenbergBridgeModule);
     }
 
