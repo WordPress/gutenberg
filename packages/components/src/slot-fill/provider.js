@@ -8,7 +8,7 @@ import { sortBy, forEach, without } from 'lodash';
  */
 import { Component, createContext } from '@wordpress/element';
 
-const { Provider } = createContext( {
+const { Provider, Consumer } = createContext( {
 	registerSlot: () => {},
 	unregisterSlot: () => {},
 	registerFill: () => {},
@@ -109,3 +109,4 @@ class SlotFillProvider extends Component {
 }
 
 export default SlotFillProvider;
+export { Consumer as SlotFillConsumer };
