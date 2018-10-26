@@ -41,7 +41,7 @@ export function finishResolution( reducerKey, selectorName, args ) {
  *
  * @param {string} reducerKey   Registered store reducer key.
  * @param {string} selectorName Name of selector for which resolver should be invalidated.
- * @param {...*}   args         Arguments to associate for uniqueness.
+ * @param {Array}  args         Arguments to associate for uniqueness.
  *
  * @return {Object} Action object.
  */
