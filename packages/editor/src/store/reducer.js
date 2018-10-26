@@ -913,6 +913,27 @@ export function postLock( state = { isLocked: false }, action ) {
 	return state;
 }
 
+/**
+ * Post saving lock.
+ *
+ * When post saving is locked, the post cannot be published or updated.
+ *
+ * @param {PostSavingLockState} state  Current state.
+ * @param {Object}              action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
+ */
+export function postSavingLock( state = {}, action ) {
+	switch ( action.type ) {
+		case 'LOCK_POST_SAVING':
+			return { ...state, [ action.lockName ]: true };
+
+		case 'UNLOCK_POST_SAVING':
+			return omit( state, action.lockName );
+	}
+	return state;
+}
+
 export const reusableBlocks = combineReducers( {
 	data( state = {}, action ) {
 		switch ( action.type ) {
@@ -1133,4 +1154,5 @@ export default optimist( combineReducers( {
 	autosave,
 	settings,
 	tokens,
+	postSavingLock,
 } ) );

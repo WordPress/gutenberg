@@ -788,3 +788,32 @@ export function disablePublishSidebar() {
 		type: 'DISABLE_PUBLISH_SIDEBAR',
 	};
 }
+
+/**
+ * Returns an action object used to signal that post saving is locked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function lockPostSaving( lockName ) {
+	return {
+		type: 'LOCK_POST_SAVING',
+		lockName,
+	};
+}
+
+/**
+ * Returns an action object used to signal that post saving is unlocked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function unlockPostSaving( lockName ) {
+	return {
+		type: 'UNLOCK_POST_SAVING',
+		lockName,
+	};
+}
+
