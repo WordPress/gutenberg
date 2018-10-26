@@ -44,7 +44,7 @@ describe( 'adding inline tokens', () => {
 		await page.click( '.media-modal button.media-button-select' );
 
 		// Check the content.
-		const regex = new RegExp( `<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt="This image has an empty alt attribute; its file name is &quot;10x10_e2e_test_image_z9T8jK.png&quot;"\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->` );
+		const regex = new RegExp( `<!-- wp:paragraph -->\\s*<p>a\\u00A0<img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->` );
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
 } );

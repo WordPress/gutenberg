@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -35,11 +35,7 @@ export const settings = {
 		);
 	},
 
-	save( { id, url, alt, width, filename } ) {
-		if ( ! alt ) {
-			alt = sprintf( __( 'This image has an empty alt attribute; its file name is "%s"' ), filename );
-		}
-
+	save( { id, url, alt, width } ) {
 		return (
 			<img
 				className={ `wp-image-${ id }` }
