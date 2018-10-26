@@ -169,6 +169,13 @@ function gutenberg_pre_init() {
 	}
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
+
+	/**
+	 * This hook is fired once the Gutenberg files are loaded.
+	 *
+	 * @since 4.1.1
+	 */
+	do_action( 'gutenberg_loaded' );
 }
 
 /**
