@@ -58,7 +58,9 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
+	return {
+		...pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] ),
+	};
 };
 
 /**
@@ -98,8 +100,8 @@ class ImageEdit extends Component {
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
-		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.getFilename = this.getFilename.bind( this );
+		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 
 		this.state = {
 			captionFocused: false,
