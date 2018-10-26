@@ -191,18 +191,17 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 ## Editor styles
 
-Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style). This support is opt-in because these styles are applied differently from the classic editor.
+Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
 
- - In the classic editor, the stylesheet is applied as is in the iframe of the post content editor.
- - Since Gutenberg doesn't make use of iFrames, this is not possible. Instead Gutenberg wrap all the provided styles with `.editor-styles-wrapper` to avoid leaking styles outside the editor's content area.
+In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. Gutenberg, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors.
 
-This technique should allow the editor styles to work properly in both editors in most cases.
-
-Enabling editor styles support is done using:
+Because it works a little differently, you need to opt-in to this by adding an extra snippet to your theme, in addition to the add_editor_style function:
 
 ```php
-add_theme_support( 'editor-styles' );
+add_theme_support('editor-styles');
 ```
+
+You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside Gutenberg.
 
 If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
 
