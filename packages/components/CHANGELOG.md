@@ -1,3 +1,9 @@
+## 5.0.0 (Unreleased)
+
+### Breaking Changes
+
+- `AccessibleSVG` component has been removed. Please use `SVG` instead.
+
 ## 4.2.1 (2018-10-22)
 
 ### Bug Fix
