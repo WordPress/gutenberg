@@ -92,26 +92,30 @@ export default compose( [
 			getBlockInsertionPoint,
 			getSelectedBlock,
 			getInserterItems,
-			getBlockOrder,
 		} = select( 'core/editor' );
-		const insertionPoint = getBlockInsertionPoint();
-		const parentId = rootClientId || insertionPoint.rootClientId;
+
+		let index;
+		if ( rootClientId === undefined ) {
+			// Unless explicitly provided, the default insertion point provided
+			// by the store occurs immediately following the selected block.
+			// Otherwise, the default behavior for an undefined index is to
+			// append block to the end of the rootClientId context.
+			const insertionPoint = getBlockInsertionPoint();
+			( { rootClientId, layout, index } = insertionPoint );
+		}
+
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			insertionPoint: {
-				rootClientId: parentId,
-				layout: rootClientId ? layout : insertionPoint.layout,
-				index: rootClientId ? getBlockOrder( rootClientId ).length : insertionPoint.index,
-			},
 			selectedBlock: getSelectedBlock(),
-			items: getInserterItems( parentId ),
-			rootClientId: parentId,
+			items: getInserterItems( rootClientId ),
+			layout,
+			index,
+			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onInsertBlock: ( item ) => {
-			const { selectedBlock, insertionPoint } = ownProps;
-			const { index, rootClientId, layout } = insertionPoint;
+			const { selectedBlock, index, rootClientId, layout } = ownProps;
 			const { name, initialAttributes } = item;
 			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
 			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
