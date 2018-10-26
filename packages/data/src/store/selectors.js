@@ -79,5 +79,5 @@ export function isResolving( state, reducerKey, selectorName, args = [] ) {
  * @return {Object} Resolvers mapped by args and selectorName.
  */
 export function getCachedResolvers( state, reducerKey ) {
-	return get( state, reducerKey, {} );
+	return state.hasOwnProperty( reducerKey ) ? state[ reducerKey ] : {};
 }

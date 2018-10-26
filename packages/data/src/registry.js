@@ -7,7 +7,6 @@ import {
 	without,
 	mapValues,
 	get,
-	pick,
 } from 'lodash';
 
 /**
@@ -119,9 +118,8 @@ export function createRegistry( storeConfigs = {} ) {
 	 */
 	function registerResolvers( reducerKey, newResolvers ) {
 		namespaces[ reducerKey ].resolvers = mapValues( newResolvers, ( resolver ) => {
-			const normalizedResolver = pick( resolver, [ 'shouldInvalidate', 'isFulfilled' ] );
-			normalizedResolver.fulfill = resolver.fulfill ? resolver.fulfill : resolver;
-			return normalizedResolver;
+			const { fulfill: resolverFulfill = resolver } = resolver;
+			return { ...resolver, fulfill: resolverFulfill };
 		} );
 
 		namespaces[ reducerKey ].selectors = mapValues( namespaces[ reducerKey ].selectors, ( selector, selectorName ) => {
