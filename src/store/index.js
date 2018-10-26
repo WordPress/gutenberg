@@ -5,10 +5,12 @@
 
 // Gutenberg imports
 import { registerCoreBlocks } from '@wordpress/block-library';
-import { parse, registerBlockType, setUnknownTypeHandlerName } from '@wordpress/blocks';
+import { parse, registerBlockType, setUnknownTypeHandlerName, serialize } from '@wordpress/blocks';
 
 import { createStore } from 'redux';
 import { reducer } from './reducers';
+
+import GutenbergBridge, { registerBridgeListener } from 'react-native-gutenberg-bridge';
 
 import * as UnsupportedBlock from '../block-types/unsupported-block/';
 
@@ -45,7 +47,16 @@ const devToolsEnhancer =
 	// ( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
 	() => {};
 
+function serializeBlocksToHtml( blocks: Array<Object> ): string {
+	return blocks.map( serialize ).join( '' );
+}
+
 export function setupStore( state: StateType = html2State( '' ) ) {
 	const store = createStore( reducer, state, devToolsEnhancer() );
+	registerBridgeListener( 'requestGetHtml', ( data ) => {
+		const html = serializeBlocksToHtml( store.getState().blocks );
+		console.log( 'editor html: ' + html );
+		GutenbergBridge.provideToNative_Html( html );
+	} );
 	return store;
 }
