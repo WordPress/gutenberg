@@ -10,6 +10,7 @@ import {
 	deleteBlockAction,
 	createBlockAction,
 	parseBlocksAction,
+	mergeBlocksAction,
 } from '../store/actions';
 import MainApp from './MainApp';
 
@@ -40,6 +41,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		},
 		parseBlocksAction: ( html ) => {
 			dispatch( parseBlocksAction( html ) );
+		},
+		mergeBlocksAction: ( blockOneClientId, blockTwoClientId ) => {
+			dispatch( mergeBlocksAction( blockOneClientId, blockTwoClientId ) );
 		},
 	};
 };

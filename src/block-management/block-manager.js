@@ -24,6 +24,7 @@ export type BlockListType = {
 	deleteBlockAction: string => mixed,
 	createBlockAction: ( string, BlockType, string ) => mixed,
 	parseBlocksAction: string => mixed,
+	mergeBlocksAction: ( string, string ) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -165,7 +166,18 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		) {
 
 		}
-		// TODO: add merging code here
+
+		let blockOneID = null;
+		let blockTwoID = null;
+		if ( forward ) {
+			blockOneID = this.state.dataSource.get( focusedItemIndex ).clientId;
+			blockTwoID = this.state.dataSource.get( focusedItemIndex + 1 ).clientId;
+		} else {
+			blockOneID = this.state.dataSource.get( focusedItemIndex - 1 ).clientId;
+			blockTwoID = this.state.dataSource.get( focusedItemIndex ).clientId;
+		}
+
+		this.props.mergeBlocksAction( blockOneID, blockTwoID );
 	}
 
 	onChange( clientId: string, attributes: mixed ) {

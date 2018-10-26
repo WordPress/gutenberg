@@ -122,6 +122,10 @@ export const reducer = (
 			const parsed = parse( action.html );
 			return { blocks: parsed, refresh: ! state.refresh, fullparse: true };
 		}
+		case ActionTypes.BLOCK.MERGE: {
+			// TODO: merge the block here
+			return state;
+		}
 		default:
 			return state;
 	}
