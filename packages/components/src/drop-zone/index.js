@@ -2,54 +2,59 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Dashicon from '../dashicon';
+import { DropZoneConsumer } from './provider';
 
-class DropZone extends Component {
+const DropZone = ( props ) => (
+	<DropZoneConsumer>
+		{ ( context ) => ( <DropZoneComponent contex={ context } { ...props } /> ) }
+	</DropZoneConsumer>
+);
+
+class DropZoneComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.setZoneNode = this.setZoneNode.bind( this );
 
-		this.state = {
-			isDraggingOverDocument: false,
-			isDraggingOverElement: false,
-			position: null,
-			type: null,
+		this.ref = createRef();
+		this.dropZone = {
+			element: this.ref,
+			onDrop: this.props.onDrop,
+			onFilesDrop: this.props.onFilesDrop,
+			onHTMLDrop: this.props.onHTMLDrop,
 		};
 	}
 
 	componentDidMount() {
-		this.context.dropzones.add( {
-			element: this.zone,
-			updateState: this.setState.bind( this ),
-			onDrop: this.props.onDrop,
-			onFilesDrop: this.props.onFilesDrop,
-			onHTMLDrop: this.props.onHTMLDrop,
-		} );
+		this.props.context.addDropZone( this.dropZone );
 	}
 
 	componentWillUnmount() {
-		this.context.dropzones.remove( this.zone );
-	}
-
-	setZoneNode( node ) {
-		this.zone = node;
+		this.props.context.removeDropZone( this.dropZone );
 	}
 
 	render() {
-		const { className, label } = this.props;
-		const { isDraggingOverDocument, isDraggingOverElement, position, type } = this.state;
+		const {
+			className,
+			label,
+			context: {
+				isDraggingOverDocument,
+				isDraggingOverElement,
+				position,
+				type,
+			},
+		} = this.props;
 		const classes = classnames( 'components-drop-zone', className, {
 			'is-active': isDraggingOverDocument || isDraggingOverElement,
 			'is-dragging-over-document': isDraggingOverDocument,
@@ -62,7 +67,7 @@ class DropZone extends Component {
 		} );
 
 		return (
-			<div ref={ this.setZoneNode } className={ classes }>
+			<div ref={ this.ref } className={ classes }>
 				<div className="components-drop-zone__content">
 					{ [
 						<Dashicon
@@ -84,9 +89,4 @@ class DropZone extends Component {
 	}
 }
 
-DropZone.contextTypes = {
-	dropzones: noop,
-};
-
 export default DropZone;
-
