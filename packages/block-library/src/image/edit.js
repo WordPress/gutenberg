@@ -58,9 +58,7 @@ const LINK_DESTINATION_CUSTOM = 'custom';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	return {
-		...pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] ),
-	};
+	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
 };
 
 /**
