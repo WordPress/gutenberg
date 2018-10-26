@@ -69,7 +69,7 @@ class Shortcut extends Component {
 const FormatEdit = ( { onChange, value } ) => {
 	return (
 		<Fragment>
-			{ getFormatTypes().map( ( { name, edit: Edit, keywords }, i ) => {
+			{ getFormatTypes().map( ( { name, edit: Edit, keywords } ) => {
 				if ( ! Edit ) {
 					return null;
 				}
@@ -80,7 +80,7 @@ const FormatEdit = ( { onChange, value } ) => {
 
 				return (
 					<Edit
-						key={ i }
+						key={ name }
 						isActive={ isActive }
 						activeAttributes={ activeAttributes }
 						value={ value }

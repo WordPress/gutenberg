@@ -8,8 +8,8 @@ const FormatToolbar = ( { controls } ) => {
 	return (
 		<div className="editor-format-toolbar">
 			<Toolbar>
-				{ controls.map( ( format, index ) =>
-					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ index } />
+				{ controls.map( ( format ) =>
+					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
 			</Toolbar>
 		</div>
