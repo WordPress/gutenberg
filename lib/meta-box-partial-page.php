@@ -113,13 +113,19 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	$core_normal_meta_boxes = array(
 		'revisionsdiv',
 		'postexcerpt',
-		'postcustom',
 		'trackbacksdiv',
 		'commentstatusdiv',
 		'commentsdiv',
 		'slugdiv',
 		'authordiv',
 	);
+
+	// Whether or not to load the 'postcustom' meta box is stored as a site option
+	// so that we're not always loading its assets.
+	$enable_custom_fields = get_option( 'enable_custom_fields', false );
+	if ( ! $enable_custom_fields ) {
+		$core_normal_meta_boxes[] = 'postcustom';
+	}
 
 	$taxonomy_callbacks_to_unset = array(
 		'post_tags_meta_box',
@@ -359,6 +365,32 @@ function the_gutenberg_metaboxes() {
 		printf( "<script type='text/javascript'>\n%s\n</script>\n", trim( $script ) );
 	}
 
+	/**
+	 * If the 'postcustom' meta box is enabled, then we need to perform some
+	 * extra initialization on it.
+	 */
+	$enable_custom_fields = get_option( 'enable_custom_fields', false );
+	if ( $enable_custom_fields ) {
+		$script = <<<JS
+			( function( $ ) {
+				if ( $('#postcustom').length ) {
+					$( '#the-list' ).wpList( {
+						addBefore: function( s ) {
+							s.data += '&post_id=' + $('#post_ID').val();
+							return s;
+						},
+						addAfter: function() {
+							$('table#list-table').show();
+						}
+					});
+				}
+			} )( jQuery );
+JS;
+
+		wp_enqueue_script( 'wp-lists' );
+		wp_add_inline_script( 'wp-lists', $script );
+	}
+
 	// Reset meta box data.
 	$wp_meta_boxes = $_original_meta_boxes;
 }
@@ -402,3 +434,21 @@ function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 	// Permalink title nonce.
 	wp_nonce_field( 'samplepermalink', 'samplepermalinknonce', false );
 }
+
+/**
+ * Admin action which toggles the 'enable_custom_fields' option, then redirects
+ * back to the editor. This allows Gutenberg to render a control that lets the
+ * user to completely enable or disable the 'postcustom' meta box.
+ *
+ * @since 5.2.0
+ */
+function gutenberg_toggle_custom_fields() {
+	check_admin_referer( 'toggle_custom_fields' );
+
+	$enable_custom_fields = get_option( 'enable_custom_fields', false );
+	update_option( 'enable_custom_fields', ! $enable_custom_fields );
+
+	wp_safe_redirect( wp_get_referer() );
+}
+
+add_action( 'admin_post_toggle_custom_fields', 'gutenberg_toggle_custom_fields' );

@@ -16,7 +16,12 @@ import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck } from '@wordpres
  * Internal dependencies
  */
 import Section from './section';
-import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from './options';
+import {
+	EnablePublishSidebarOption,
+	EnableTipsOption,
+	EnablePanelOption,
+	EnableCustomFieldsOption,
+} from './options';
 
 const MODAL_NAME = 'edit-post/options';
 
@@ -54,13 +59,21 @@ export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
-			{ metaBoxes.length !== 0 && (
-				<Section title={ __( 'Advanced Panels' ) }>
-					{ map( metaBoxes, ( { title, id } ) => (
-						<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
-					) ) }
-				</Section>
-			) }
+			<Section title={ __( 'Advanced Panels' ) }>
+				<EnableCustomFieldsOption label={ __( 'Custom Fields' ) } />
+				{ map(
+					metaBoxes,
+					( { title, id } ) =>
+						// The 'Custom Fields' meta box is a special case handled above.
+						id !== 'postcustom' && (
+							<EnablePanelOption
+								key={ id }
+								label={ title }
+								panelName={ `meta-box-${ id }` }
+							/>
+						)
+				) }
+			</Section>
 		</Modal>
 	);
 }
