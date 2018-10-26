@@ -25,8 +25,6 @@ class DropZoneComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.setZoneNode = this.setZoneNode.bind( this );
-
 		this.ref = createRef();
 		this.dropZone = {
 			element: this.ref,
