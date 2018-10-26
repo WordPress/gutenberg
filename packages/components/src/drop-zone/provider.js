@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, find, some, filter, noop, throttle, includes } from 'lodash';
+import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import { isEqual, find, some, filter, noop, throttle, includes } from 'lodash';
 import { Component, createContext, findDOMNode } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
-const Context = createContext( {
+const { Provider } = createContext( {
 	addDropZone: () => {},
 	removeDropZone: () => {},
 	isDraggingOverDocument: false,
@@ -75,19 +75,6 @@ class DropZoneProvider extends Component {
 		};
 	}
 
-	getChildContext() {
-		return {
-			dropzones: {
-				add: ( { element, updateState, onDrop, onFilesDrop, onHTMLDrop } ) => {
-					this.dropZones.push( { element, updateState, onDrop, onFilesDrop, onHTMLDrop } );
-				},
-				remove: ( element ) => {
-					this.dropZones = filter( this.dropZones, ( dropzone ) => dropzone.element !== element );
-				},
-			},
-		};
-	}
-
 	componentDidMount() {
 		window.addEventListener( 'dragover', this.onDragOver );
 		window.addEventListener( 'drop', this.onDrop );
@@ -125,15 +112,6 @@ class DropZoneProvider extends Component {
 			isDraggingOverDocument: false,
 			hoveredDropZone: -1,
 			position: null,
-		} );
-
-		this.dropZones.forEach( ( { updateState } ) => {
-			updateState( {
-				isDraggingOverDocument: false,
-				isDraggingOverElement: false,
-				position: null,
-				type: null,
-			} );
 		} );
 	}
 
@@ -247,13 +225,12 @@ class DropZoneProvider extends Component {
 	}
 
 	render() {
-		const { children } = this.props;
-		return children;
+		return (
+			<Provider value={ this.state }>
+				{ this.props.children }
+			</Provider>
+		);
 	}
 }
-
-DropZoneProvider.childContextTypes = {
-	dropzones: noop,
-};
 
 export default DropZoneProvider;
