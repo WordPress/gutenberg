@@ -12,9 +12,12 @@ describe( 'block-serialization-spec-parser', () => {
 		expect( result ).toMatchSnapshot();
 	} );
 
+	test( 'non-blocks get no block markers', () => (
+		expect( parse( 'HTML soup' )[ 0 ] ).not.toHaveProperty( 'blockMarkers' )
+	) );
+
 	test( 'adds empty block markers when no inner blocks exist', () => [
-		'HTML soup',
-		'<!-- wp:voidBlock /-->',
+		'<!-- wp:void /-->',
 		'<!-- wp:block --><!-- /wp:block -->',
 		'<!-- wp:block -->with content<!-- /wp:block -->',
 	].forEach( ( document ) => expect( parse( document )[ 0 ] ).toHaveProperty( 'blockMarkers', [] ) ) );
@@ -22,8 +25,8 @@ describe( 'block-serialization-spec-parser', () => {
 	test( 'adds block markers for inner blocks', () => [
 		[ '<!-- wp:block --><!-- wp:void /--><!-- /wp:block -->', [ 0 ] ],
 		[ '<!-- wp:block -->aa<!-- wp:void /-->bb<!-- /wp:block -->', [ 2 ] ],
-		[ '<!-- wp:block -->aa<!-- wp:inner -->bb<!-- /wp:innerBlock -->cc<!-- /wp:block -->', [ 2 ] ],
-		[ '<!-- wp:block --><!-- wp:start /-->aa<!-- wp:innerBlock -->bb<!-- /wp:innerBlock -->cc<!-- wp:end /--><!-- /wp:block -->', [ 0, 2, 4 ] ],
+		[ '<!-- wp:block -->aa<!-- wp:inner -->bb<!-- /wp:inner -->cc<!-- /wp:block -->', [ 2 ] ],
+		[ '<!-- wp:block --><!-- wp:start /-->aa<!-- wp:inner -->bb<!-- /wp:inner -->cc<!-- wp:end /--><!-- /wp:block -->', [ 0, 2, 4 ] ],
 	].forEach( ( [ document, markers ] ) => expect( parse( document )[ 0 ] ).toHaveProperty( 'blockMarkers', markers ) ) );
 
 	test( 'block markers report UCS2 length', () => [

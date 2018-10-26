@@ -255,30 +255,51 @@ class Gutenberg_PEG_Parser {
     private $peg_c24;
 
     private function peg_f0($pre, $b, $html) { return array( $b, $html ); }
-    private function peg_f1($pre, $bs, $post) { return peg_join_blocks( $pre, $bs, $post ); }
+    private function peg_f1($pre, $bs, $post) {
+        $blocks =  peg_join_blocks( $pre, $bs, $post );
+
+        // clear out lingering location data
+        foreach ( $blocks as $block ) {
+            unset( $block[ 'location' ] );
+        }
+
+        return $blocks;
+        }
     private function peg_f2($blockName, $a) { return $a; }
     private function peg_f3($blockName, $attrs) {
         return array(
-          'blockName'   => $blockName,
-          'attrs'       => isset( $attrs ) ? $attrs : array(),
-          'innerBlocks' => array(),
-          'innerHTML'   => '',
+          'blockName'    => $blockName,
+          'attrs'        => isset( $attrs ) ? $attrs : array(),
+          'innerBlocks'  => array(),
+          'blockMarkers' => array(),
+          'innerHTML'    => '',
+          'location'     => location(),
         );
         }
     private function peg_f4($s, $children, $e) {
         list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
+
+        $blockMarkers = array();
+        $text_length = 0;
+        foreach( $innerBlocks as $innerBlock ) {
+            $blockMarkers[] = $innerBlock[ 'location' ][ 'start' ][ 'offset' ] - $text_length - $s[ 'location' ][ 'end' ][ 'offset' ];
+            $text_length += $innerBlock[ 'location' ][ 'end' ][ 'offset' ] - $innerBlock[ 'location' ][ 'start' ][ 'offset' ];
+            unset( $innerBlock[ 'location' ] );
+        }
 
         return array(
           'blockName'    => $s['blockName'],
           'attrs'        => $s['attrs'],
           'innerBlocks'  => $innerBlocks,
           'innerHTML'    => implode( '', $innerHTML ),
+          'location'     => location(),
         );
         }
     private function peg_f5($blockName, $attrs) {
         return array(
           'blockName' => $blockName,
           'attrs'     => isset( $attrs ) ? $attrs : array(),
+          'location'  => location(),
         );
         }
     private function peg_f6($blockName) {

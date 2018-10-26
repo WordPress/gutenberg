@@ -150,7 +150,14 @@
         peg$c0 = peg$anyExpectation(),
         peg$c1 = function(pre, b, html) { /** <?php return array( $b, $html ); ?> **/ return [ b, html ] },
         peg$c2 = function(pre, bs, post) { /** <?php return peg_join_blocks( $pre, $bs, $post ); ?> **/
-            return joinBlocks( pre, bs, post );
+            var blocks = joinBlocks( pre, bs, post );
+
+            // clear out lingering location data
+            blocks.forEach( function( block ) {
+                delete block.location;
+            } );
+
+            return blocks;
           },
         peg$c3 = "<!--",
         peg$c4 = peg$literalExpectation("<!--", false),
@@ -165,10 +172,11 @@
         peg$c10 = function(blockName, attrs) {
             /** <?php
             return array(
-              'blockName'   => $blockName,
-              'attrs'       => isset( $attrs ) ? $attrs : array(),
-              'innerBlocks' => array(),
-              'innerHTML'   => '',
+              'blockName'    => $blockName,
+              'attrs'        => isset( $attrs ) ? $attrs : array(),
+              'innerBlocks'  => array(),
+              'blockMarkers' => array(),
+              'innerHTML'    => '',
             );
             ?> **/
 
@@ -176,7 +184,9 @@
               blockName: blockName,
               attrs: attrs || {},
               innerBlocks: [],
-              innerHTML: ''
+              blockMarkers: [],
+              innerHTML: '',
+              location: location(),
             };
           },
         peg$c11 = function(s, children, e) {
@@ -195,11 +205,27 @@
             var innerHTML = innerContent[ 0 ];
             var innerBlocks = innerContent[ 1 ];
 
+            var blockMarkers = innerBlocks.reduce( function( accum, block ) {
+                var l = block.location;
+
+                return [
+                    accum[ 0 ] + l.end.offset - l.start.offset,
+                    accum[ 1 ].concat( l.start.offset - accum[ 0 ] - s.location.end.offset )
+                ];
+            }, [ 0, [] ] )[ 1 ];
+
+            // clear out lingering location data
+            innerBlocks.forEach( function( block ) {
+                delete block.location;
+            } );
+
             return {
               blockName: s.blockName,
               attrs: s.attrs,
               innerBlocks: innerBlocks,
-              innerHTML: innerHTML.join( '' )
+              innerHTML: innerHTML.join( '' ),
+              blockMarkers: blockMarkers,
+              location: location(),
             };
           },
         peg$c12 = "-->",
@@ -214,7 +240,8 @@
 
             return {
               blockName: blockName,
-              attrs: attrs || {}
+              attrs: attrs || {},
+              location: location(),
             };
           },
         peg$c15 = "/wp:",

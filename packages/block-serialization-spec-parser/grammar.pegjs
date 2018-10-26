@@ -181,9 +181,19 @@ Block_List
   = pre:$(!Block .)*
     bs:(b:Block html:$((!Block .)*) { /** <?php return array( $b, $html ); ?> **/ return [ b, html ] })*
     post:$(.*)
-  { /** <?php return peg_join_blocks( $pre, $bs, $post ); ?> **/
+  { /** <?php
+    $blocks =  peg_join_blocks( $pre, $bs, $post );
 
+    // clear out lingering location data
+    foreach ( $blocks as $block ) {
+        unset( $block[ 'location' ] );
+    }
+
+    return $blocks;
+    ?> **/
     var blocks = joinBlocks( pre, bs, post );
+
+    // clear out lingering location data
     blocks.forEach( function( block ) {
         delete block.location;
     } );
@@ -203,10 +213,12 @@ Block_Void
   {
     /** <?php
     return array(
-      'blockName'   => $blockName,
-      'attrs'       => isset( $attrs ) ? $attrs : array(),
-      'innerBlocks' => array(),
-      'innerHTML'   => '',
+      'blockName'    => $blockName,
+      'attrs'        => isset( $attrs ) ? $attrs : array(),
+      'innerBlocks'  => array(),
+      'blockMarkers' => array(),
+      'innerHTML'    => '',
+      'location'     => location(),
     );
     ?> **/
 
@@ -214,6 +226,7 @@ Block_Void
       blockName: blockName,
       attrs: attrs || {},
       innerBlocks: [],
+      blockMarkers: [],
       innerHTML: '',
       location: location(),
     };
@@ -225,11 +238,20 @@ Block_Balanced
     /** <?php
     list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
 
+    $blockMarkers = array();
+    $text_length = 0;
+    foreach( $innerBlocks as $innerBlock ) {
+        $blockMarkers[] = $innerBlock[ 'location' ][ 'start' ][ 'offset' ] - $text_length - $s[ 'location' ][ 'end' ][ 'offset' ];
+        $text_length += $innerBlock[ 'location' ][ 'end' ][ 'offset' ] - $innerBlock[ 'location' ][ 'start' ][ 'offset' ];
+        unset( $innerBlock[ 'location' ] );
+    }
+
     return array(
       'blockName'    => $s['blockName'],
       'attrs'        => $s['attrs'],
       'innerBlocks'  => $innerBlocks,
       'innerHTML'    => implode( '', $innerHTML ),
+      'location'     => location(),
     );
     ?> **/
 
@@ -239,14 +261,14 @@ Block_Balanced
 
     var blockMarkers = innerBlocks.reduce( function( accum, block ) {
         var l = block.location;
-        var length = l.end.offset - l.start.offset;
 
         return [
-            accum[ 0 ] + length,
+            accum[ 0 ] + l.end.offset - l.start.offset,
             accum[ 1 ].concat( l.start.offset - accum[ 0 ] - s.location.end.offset )
         ];
     }, [ 0, [] ] )[ 1 ];
 
+    // clear out lingering location data
     innerBlocks.forEach( function( block ) {
         delete block.location;
     } );
@@ -271,6 +293,7 @@ Block_Start
     return array(
       'blockName' => $blockName,
       'attrs'     => isset( $attrs ) ? $attrs : array(),
+      'location'  => location(),
     );
     ?> **/
 
