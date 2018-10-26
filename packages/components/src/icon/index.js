@@ -4,14 +4,21 @@
 import { cloneElement, createElement, Component, isValidElement } from '@wordpress/element';
 import { Dashicon, SVG } from '../';
 
-function Icon( { icon = null, size = 24, className } ) {
+function Icon( { icon = null, size, className } ) {
+	let iconSize;
+
 	if ( 'string' === typeof icon ) {
-		return <Dashicon icon={ icon } size={ size } className={ className } />;
+		// Dashicons should be 20x20 by default
+		iconSize = size || 20;
+		return <Dashicon icon={ icon } size={ iconSize } className={ className } />;
 	}
+
+	// Any other icons should be 24x24 by default
+	iconSize = size || 24;
 
 	if ( 'function' === typeof icon ) {
 		if ( icon.prototype instanceof Component ) {
-			return createElement( icon, { className, size } );
+			return createElement( icon, { className, size: iconSize } );
 		}
 
 		return icon();
@@ -20,8 +27,8 @@ function Icon( { icon = null, size = 24, className } ) {
 	if ( icon && ( icon.type === 'svg' || icon.type === SVG ) ) {
 		const appliedProps = {
 			className,
-			width: size,
-			height: size,
+			width: iconSize,
+			height: iconSize,
 			...icon.props,
 		};
 
@@ -31,7 +38,7 @@ function Icon( { icon = null, size = 24, className } ) {
 	if ( isValidElement( icon ) ) {
 		return cloneElement( icon, {
 			className,
-			size,
+			size: iconSize,
 		} );
 	}
 

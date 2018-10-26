@@ -36,6 +36,12 @@ describe( 'Icon', () => {
 		expect( wrapper.find( 'Dashicon' ).prop( 'className' ) ).toBe( 'example-class' );
 	} );
 
+	it( 'renders a dashicon and with a default size of 20', () => {
+		const wrapper = shallow( <Icon icon="format-image" /> );
+
+		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
+	} );
+
 	it( 'renders a dashicon and passes the size to it', () => {
 		const wrapper = shallow( <Icon icon="format-image" size={ 32 } /> );
 
@@ -76,6 +82,13 @@ describe( 'Icon', () => {
 		const wrapper = shallow( <Icon icon={ svg } className={ className } /> );
 
 		expect( wrapper.prop( 'className' ) ).toBe( 'example-class' );
+	} );
+
+	it( 'renders an svg element with a default width and height of 24', () => {
+		const wrapper = shallow( <Icon icon={ svg } /> );
+
+		expect( wrapper.prop( 'width' ) ).toBe( 24 );
+		expect( wrapper.prop( 'height' ) ).toBe( 24 );
 	} );
 
 	it( 'renders an svg element and passes the size as its width and height', () => {

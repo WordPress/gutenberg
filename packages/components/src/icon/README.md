@@ -73,7 +73,7 @@ The size (width and height) of the icon.
 
 - Type: `Number`
 - Required: No
-- Default: `24`
+- Default: `20` when a Dashicon is rendered, `24` for all other icons.
 
 ### className
 
