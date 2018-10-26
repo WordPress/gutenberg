@@ -9,6 +9,8 @@
 ### New Features
 
 - In `MediaPlaceholder`, provide default values for title and instructions labels when allowed type is one of image, audio or video.
+- New actions `lockPostSaving` and `unlockPostSaving` were introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
+- New selector `isPostSavingLocked` was introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
 
 ### Polish
 
