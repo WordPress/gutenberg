@@ -30,7 +30,6 @@
 }
 
 .editor-media-placeholder__button {
-	margin-right: 5px;
 	margin-bottom: 0.5rem;
 
 	.dashicon {
@@ -41,4 +40,8 @@
 	&:hover {
 		color: $dark-gray-800;
 	}
+}
+
+.components-form-file-upload .editor-media-placeholder__button {
+	margin-right: $grid-size-small;
 }

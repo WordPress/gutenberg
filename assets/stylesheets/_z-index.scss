@@ -5,7 +5,6 @@
 $z-layers: (
 	".editor-block-list__block-edit::before": 0,
 	".editor-block-switcher__arrow": 1,
-	".editor-block-list__block .wp-block-more::before": -1,
 	".editor-block-list__block {core/image aligned left or right}": 20,
 	".editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 10,
@@ -82,7 +81,7 @@ $z-layers: (
 	".components-popover:not(.is-mobile).is-bottom": 99990,
 
 	// Shows above edit post sidebar; Specificity needs to be higher than 3 classes.
-	".gutenberg__editor .components-popover.components-color-palette__picker.is-bottom": 100001,
+	".block-editor__container .components-popover.components-color-palette__picker.is-bottom": 100001,
 
 	".components-autocomplete__results": 1000000,
 

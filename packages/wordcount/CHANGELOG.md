@@ -1,3 +1,9 @@
+## 2.0.1 (unreleased)
+
+### Polish
+
+- Fix: `count` returns 0 for empty strings ([#10602](https://github.com/WordPress/gutenberg/pull/10602))
+
 ## 2.0.0 (2018-09-05)
 
 ### Breaking Change

@@ -21,10 +21,10 @@ export function isURL( url ) {
 /**
  * Appends arguments to the query string of the url
  *
- * @param  {string} url   URL
- * @param  {Object} args  Query Args
+ * @param {string} url  URL
+ * @param {Object} args Query Args
  *
- * @return {string}       Updated URL
+ * @return {string} Updated URL
  */
 export function addQueryArgs( url, args ) {
 	const queryStringIndex = url.indexOf( '?' );
@@ -32,6 +32,51 @@ export function addQueryArgs( url, args ) {
 	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
 
 	return baseUrl + '?' + stringify( { ...query, ...args } );
+}
+
+/**
+ * Returns a single query argument of the url
+ *
+ * @param {string} url URL
+ * @param {string} arg Query arg name
+ *
+ * @return {Array|string} Query arg value.
+ */
+export function getQueryArg( url, arg ) {
+	const queryStringIndex = url.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+
+	return query[ arg ];
+}
+
+/**
+ * Determines whether the URL contains a given query arg.
+ *
+ * @param {string} url URL
+ * @param {string} arg Query arg name
+ *
+ * @return {boolean} Whether or not the URL contains the query aeg.
+ */
+export function hasQueryArg( url, arg ) {
+	return getQueryArg( url, arg ) !== undefined;
+}
+
+/**
+ * Removes arguments from the query string of the url
+ *
+ * @param {string} url  URL
+ * @param {...string} args Query Args
+ *
+ * @return {string} Updated URL
+ */
+export function removeQueryArgs( url, ...args ) {
+	const queryStringIndex = url.indexOf( '?' );
+	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
+	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
+
+	args.forEach( ( arg ) => delete query[ arg ] );
+
+	return baseUrl + '?' + stringify( query );
 }
 
 /**
@@ -63,4 +108,23 @@ export function safeDecodeURI( uri ) {
 	} catch ( uriError ) {
 		return uri;
 	}
+}
+
+/**
+ * Returns a URL for display.
+ *
+ * @param {string} url Original URL.
+ *
+ * @return {string} Displayed URL.
+ */
+export function filterURLForDisplay( url ) {
+	// Remove protocol and www prefixes.
+	const filteredURL = url.replace( /^(?:https?:)\/\/(?:www\.)?/, '' );
+
+	// Ends with / and only has that single slash, strip it.
+	if ( filteredURL.match( /^[^\/]+\/$/ ) ) {
+		return filteredURL.replace( '/', '' );
+	}
+
+	return filteredURL;
 }

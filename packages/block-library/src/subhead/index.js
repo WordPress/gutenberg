@@ -10,6 +10,7 @@ import {
 	BlockControls,
 	AlignmentToolbar,
 } from '@wordpress/editor';
+import { SVG, Path } from '@wordpress/components';
 
 export const name = 'core/subhead';
 
@@ -18,7 +19,7 @@ export const settings = {
 
 	description: __( 'This block is deprecated. Please use the Paragraph block instead.' ),
 
-	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.1 6l-.5 3h4.5L9.4 19h3l1.8-10h4.5l.5-3H7.1z" /></svg>,
+	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M7.1 6l-.5 3h4.5L9.4 19h3l1.8-10h4.5l.5-3H7.1z" /></SVG>,
 
 	category: 'common',
 

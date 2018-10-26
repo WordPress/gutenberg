@@ -20,12 +20,13 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import { getCategories, isReusableBlock } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -33,9 +34,11 @@ import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import BlockPreview from '../block-preview';
 import BlockTypesList from '../block-types-list';
 import ChildBlocks from './child-blocks';
-import InserterResultsPortal from './results-portal';
+import InserterInlineElements from './inline-elements';
 
 const MAX_SUGGESTED_ITEMS = 9;
+
+const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 /**
  * Filters an item list given a search term.
@@ -162,7 +165,7 @@ export class InserterMenu extends Component {
 	}
 
 	filter( filterValue = '' ) {
-		const { items, rootChildBlocks } = this.props;
+		const { debouncedSpeak, items, rootChildBlocks } = this.props;
 		const filteredItems = searchItems( items, filterValue );
 
 		const childItems = filter( filteredItems, ( { name } ) => includes( rootChildBlocks, name ) );
@@ -205,6 +208,24 @@ export class InserterMenu extends Component {
 			itemsPerCategory,
 			openPanels,
 		} );
+
+		const resultCount = Object.keys( itemsPerCategory ).reduce( ( accumulator, currentCategorySlug ) => {
+			return accumulator + itemsPerCategory[ currentCategorySlug ].length;
+		}, 0 );
+
+		const resultsFoundMessage = sprintf(
+			_n( '%d result found.', '%d results found.', resultCount ),
+			resultCount
+		);
+
+		debouncedSpeak( resultsFoundMessage, 'assertive' );
+	}
+
+	onKeyDown( event ) {
+		if ( includes( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ], event.keyCode ) ) {
+			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+			event.stopPropagation();
+		}
 	}
 
 	render() {
@@ -213,13 +234,18 @@ export class InserterMenu extends Component {
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 		const isSearching = !! filterValue;
 
-		// Disable reason: The inserter menu is a modal display, not one which
-		// is always visible, and one which already incurs this behavior of
-		// autoFocus via Popover's focusOnMount.
-
-		/* eslint-disable jsx-a11y/no-autofocus */
+		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
+		// is always visible, and one which already incurs this behavior of autoFocus via
+		// Popover's focusOnMount.
+		// Disable reason (no-static-element-interactions): Navigational key-presses within
+		// the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
+		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="editor-inserter__menu">
+			<div
+				className="editor-inserter__menu"
+				onKeyPress={ stopKeyPropagation }
+				onKeyDown={ this.onKeyDown }
+			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
@@ -249,7 +275,7 @@ export class InserterMenu extends Component {
 
 					{ !! suggestedItems.length &&
 						<PanelBody
-							title={ __( 'Most Used' ) }
+							title={ _x( 'Most Used', 'blocks' ) }
 							opened={ isPanelOpen( 'suggested' ) }
 							onToggle={ this.onTogglePanel( 'suggested' ) }
 							ref={ this.bindPanel( 'suggested' ) }
@@ -258,7 +284,7 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					}
 
-					<InserterResultsPortal.Slot fillProps={ { filterValue } } />
+					<InserterInlineElements filterValue={ filterValue } />
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
@@ -306,7 +332,7 @@ export class InserterMenu extends Component {
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus */
+		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-noninteractive-element-interactions */
 	}
 }
 

@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { SVG, Path } from '@wordpress/components';
 
 export const name = 'core/separator';
 
@@ -11,7 +12,7 @@ export const settings = {
 
 	description: __( 'Insert a horizontal line where you want to create a break between ideas.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><Path d="M19 13H5v-2h14v2z" /></SVG>,
 
 	category: 'layout',
 

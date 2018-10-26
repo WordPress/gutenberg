@@ -35,6 +35,7 @@ import {
 	template,
 	blockListSettings,
 	autosave,
+	postSavingLock,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2261,6 +2262,51 @@ describe( 'state', () => {
 				excerpt: 'The Excerpt',
 				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
+		} );
+	} );
+
+	describe( 'postSavingLock', () => {
+		it( 'returns empty object by default', () => {
+			const state = postSavingLock( undefined, {} );
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'returns correct post locks when locks added and removed', () => {
+			let state = postSavingLock( undefined, {
+				type: 'LOCK_POST_SAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+			} );
+
+			state = postSavingLock( deepFreeze( state ), {
+				type: 'LOCK_POST_SAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+				'test-lock-2': true,
+			} );
+
+			state = postSavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock-2': true,
+			} );
+
+			state = postSavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {} );
 		} );
 	} );
 } );

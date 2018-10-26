@@ -6,7 +6,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
@@ -15,6 +15,7 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import { join, split, create, toHTMLString } from '@wordpress/rich-text';
+import { G, Path, SVG } from '@wordpress/components';
 
 const blockAttributes = {
 	value: {
@@ -36,15 +37,15 @@ export const name = 'core/quote';
 export const settings = {
 	title: __( 'Quote' ),
 	description: __( 'Maybe someone else said it better -- add some quoted text.' ),
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></g></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M19 18h-6l2-4h-2V6h8v7l-2 5zm-2-2l2-3V8h-4v4h4l-2 4zm-8 2H3l2-4H3V6h8v7l-2 5zm-2-2l2-3V8H5v4h4l-2 4z" /></G></SVG>,
 	category: 'common',
 	keywords: [ __( 'blockquote' ) ],
 
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: __( 'Regular' ), isDefault: true },
-		{ name: 'large', label: __( 'Large' ) },
+		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'large', label: _x( 'Large', 'block style' ) },
 	],
 
 	transforms: {
