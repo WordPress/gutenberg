@@ -1,11 +1,13 @@
 /** @format */
 
-import { NativeModules, DeviceEventEmitter } from 'react-native';
+import { NativeModules, NativeEventEmitter } from 'react-native';
 
 const { RNReactNativeGutenbergBridge } = NativeModules;
 
-export function registerBridgeListener( eventName, listener ) {
-	DeviceEventEmitter.addListener( eventName, listener );
+const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
+
+export function subscribeParentGetHtml( callback ) {
+	return gutenbergBridgeEvents.addListener( 'requestGetHtml', callback );
 }
 
 export default RNReactNativeGutenbergBridge;

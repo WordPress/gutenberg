@@ -10,6 +10,7 @@ import {
 	deleteBlockAction,
 	createBlockAction,
 	parseBlocksAction,
+	serializeToNativeAction,
 } from '../store/actions';
 import MainApp from './MainApp';
 
@@ -40,6 +41,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		},
 		parseBlocksAction: ( html ) => {
 			dispatch( parseBlocksAction( html ) );
+		},
+		serializeToNativeAction: () => {
+			dispatch( serializeToNativeAction() );
 		},
 	};
 };

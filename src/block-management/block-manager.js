@@ -24,6 +24,7 @@ export type BlockListType = {
 	deleteBlockAction: string => mixed,
 	createBlockAction: ( string, BlockType, string ) => mixed,
 	parseBlocksAction: string => mixed,
+	serializeToNativeAction: void => void,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
