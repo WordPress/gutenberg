@@ -118,7 +118,7 @@ keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 
 * **Type:** `Array`
 
-Block Styles allow providing alternative styles to block. It works by adding a className to the block’s wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the style variation if it is selected.
 
 ```js
 // Register block styles.
