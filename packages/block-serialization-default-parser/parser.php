@@ -460,7 +460,7 @@ class WP_Block_Parser {
 			? $parent->block->blockMarkers[ count( $parent->block->blockMarkers ) - 1 ]
 			: 0;
 
-		$parent->block->innerBlocks[] = $block;
+		$parent->block->innerBlocks[] = (array) $block;
 		$parent->block->blockMarkers[] = $prev_length + self::ucs2length( $next_html );
 		$parent->block->innerHTML .= $next_html;
 		$parent->prev_offset = $last_offset ? $last_offset : $token_start + $token_length;
