@@ -53,6 +53,7 @@
     "start:debug": "node --inspect-brk node_modules/.bin/react-native start",
     "start:inside-gb:debug": "node --inspect-brk node_modules/.bin/react-native start:inside-gb",
     "android": "react-native run-android",
+    "wpandroid": "yarn android --root wpandroidlink --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
     "preios": "yarn preios:carthage",
     "preios:carthage": "cd react-native-aztec && yarn install-aztec-ios",
     "ios": "react-native run-ios",
