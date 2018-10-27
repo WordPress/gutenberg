@@ -29,6 +29,7 @@ import {
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
+	unregisterBlockStyle,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -611,6 +612,59 @@ describe( 'blocks', () => {
 				{ name: 'normal', label: 'Normal style' },
 				{ name: 'small', label: 'Small style' },
 				{ name: 'big', label: 'Big style' },
+			] );
+		} );
+	} );
+
+	describe( 'unregisterBlockStyle', () => {
+		afterEach( () => {
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/big/unregister' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/small/unregister' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/big' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/small' );
+		} );
+
+		it( 'should remove styles', () => {
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'big' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [ { name: 'big', label: 'Big style' } ],
+			} );
+
+			expect( settings.styles ).toEqual( [] );
+		} );
+
+		it( 'should keep other styles', () => {
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'small' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [
+					{ name: 'normal', label: 'Normal style' },
+					{ name: 'small', label: 'Small style' },
+					{ name: 'big', label: 'Big style' },
+				],
+			} );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'normal', label: 'Normal style' },
+				{ name: 'big', label: 'Big style' },
+			] );
+		} );
+
+		it( 'should remove a prior registerBlockStyle', () => {
+			registerBlockStyle( 'my-plugin/block-with-styles', { name: 'big', label: 'Big style' } );
+			registerBlockStyle( 'my-plugin/block-with-styles', { name: 'small', label: 'Small style' } );
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'big' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [
+					{ name: 'normal', label: 'Normal style' },
+				],
+			} );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'normal', label: 'Normal style' },
+				{ name: 'small', label: 'Small style' },
 			] );
 		} );
 	} );
