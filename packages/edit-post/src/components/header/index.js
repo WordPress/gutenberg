@@ -59,7 +59,7 @@ function Header( {
 							aria-expanded={ isEditorSidebarOpened }
 							shortcut={ shortcuts.toggleSidebar }
 						/>
-						<DotTip id="core/editor.settings">
+						<DotTip tipId="core/editor.settings">
 							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
 						</DotTip>
 					</div>

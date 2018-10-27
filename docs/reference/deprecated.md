@@ -5,6 +5,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `wp.date.getSettings` has been removed. Please use `wp.date.__experimentalGetSettings` instead.
 - `wp.compose.remountOnPropChange` has been removed.
 - The following editor store actions have been removed: `createNotice`, `removeNotice`, `createSuccessNotice`, `createInfoNotice`, `createErrorNotice`, `createWarningNotice`. Use the equivalent actions by the same name from the `@wordpress/notices` module.
+- The id prop of wp.nux.DotTip has been removed. Please use the tipId prop instead.
 
 ## 4.3.0
 

@@ -550,6 +550,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-components',
 			'wp-compose',
 			'wp-data',
+			'wp-deprecated',
 			'wp-i18n',
 			'wp-polyfill',
 			'lodash',
