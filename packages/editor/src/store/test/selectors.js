@@ -89,7 +89,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isFetchingReusableBlock,
@@ -3278,19 +3277,6 @@ describe( 'selectors', () => {
 			const content = getEditedPostContent( state );
 
 			expect( content ).toBe( '<!-- wp:default {\"modified\":true} /-->' );
-		} );
-	} );
-
-	describe( 'getNotices', () => {
-		it( 'should return the notices array', () => {
-			const state = {
-				notices: [
-					{ id: 'b', content: 'Post saved' },
-					{ id: 'a', content: 'Error saving' },
-				],
-			};
-
-			expect( getNotices( state ) ).toEqual( state.notices );
 		} );
 	} );
 

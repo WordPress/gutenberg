@@ -29,6 +29,13 @@
 	margin: 1em 0;
 }
 
+.components-notice__action.components-button {
+	&,
+	&.is-link {
+		margin-left: 4px;
+	}
+}
+
 .components-notice__dismiss {
 	position: absolute;
 	top: 0;

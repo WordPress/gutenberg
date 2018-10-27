@@ -10,8 +10,6 @@ import {
 	omit,
 	without,
 	mapValues,
-	findIndex,
-	reject,
 	omitBy,
 	keys,
 	isEqual,
@@ -861,30 +859,6 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
-export function notices( state = [], action ) {
-	switch ( action.type ) {
-		case 'CREATE_NOTICE':
-			return [
-				...reject( state, { id: action.notice.id } ),
-				action.notice,
-			];
-
-		case 'REMOVE_NOTICE':
-			const { noticeId } = action;
-			const index = findIndex( state, { id: noticeId } );
-			if ( index === -1 ) {
-				return state;
-			}
-
-			return [
-				...state.slice( 0, index ),
-				...state.slice( index + 1 ),
-			];
-	}
-
-	return state;
-}
-
 /**
  * Post Lock State.
  *
@@ -1126,7 +1100,6 @@ export default optimist( combineReducers( {
 	preferences,
 	saving,
 	postLock,
-	notices,
 	reusableBlocks,
 	template,
 	autosave,

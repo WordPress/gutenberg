@@ -48,6 +48,7 @@
 		"uuid": "^3.1.0"
 	},
 	"devDependencies": {
+		"@wordpress/token-list": "file:../token-list",
 		"enzyme": "^3.3.0",
 		"react-test-renderer": "^16.4.1"
 	},
