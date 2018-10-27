@@ -1777,3 +1777,5 @@ Returns an action object signaling that a new term is added to the edited post.
 
  * slug: Taxonomy slug.
  * term: Term object.
+
+### createNotice
