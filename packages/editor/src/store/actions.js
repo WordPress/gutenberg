@@ -558,49 +558,6 @@ export function exitFormattedText() {
 }
 
 /**
- * Returns an action object used to create a notice.
- *
- * @param {string}    status  The notice status.
- * @param {WPElement} content The notice content.
- * @param {?Object}   options The notice options.  Available options:
- *                              `id` (string; default auto-generated)
- *                              `isDismissible` (boolean; default `true`).
- *
- * @return {Object} Action object.
- */
-export function createNotice( status, content, options = {} ) {
-	const {
-		id = uuid(),
-		isDismissible = true,
-		spokenMessage,
-	} = options;
-	return {
-		type: 'CREATE_NOTICE',
-		notice: {
-			id,
-			status,
-			content,
-			isDismissible,
-			spokenMessage,
-		},
-	};
-}
-
-/**
- * Returns an action object used to remove a notice.
- *
- * @param {string} id The notice id.
- *
- * @return {Object} Action object.
- */
-export function removeNotice( id ) {
-	return {
-		type: 'REMOVE_NOTICE',
-		noticeId: id,
-	};
-}
-
-/**
  * Returns an action object used to lock the editor.
  *
  * @param {Object}  lock Details about the post lock status, user, and nonce.
