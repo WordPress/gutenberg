@@ -12,6 +12,9 @@ export { default as withInstanceId } from './with-instance-id';
 export { default as withSafeTimeout } from './with-safe-timeout';
 export { default as withState } from './with-state';
 
+export { default as useImageSize } from './use-image-size';
+export { default as useElementSize } from './use-element-size';
+
 /**
  * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
  * composition, where each successive invocation is supplied the return value of the previous.
