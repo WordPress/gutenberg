@@ -4,7 +4,7 @@
 import { Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, Icon, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { rawShortcut } from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -35,6 +35,7 @@ function BlockNavigationDropdown() {
 						onClick={ onToggle }
 						label={ __( 'Block Navigation' ) }
 						className="editor-block-navigation"
+						shortcut={ displayShortcut.access( 'o' ) }
 					/>
 				</Fragment>
 			) }
