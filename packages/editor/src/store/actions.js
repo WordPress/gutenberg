@@ -536,6 +536,28 @@ export function stopTyping() {
 }
 
 /**
+ * Returns an action object used in signalling that the caret has entered formatted text.
+ *
+ * @return {Object} Action object.
+ */
+export function enterFormattedText() {
+	return {
+		type: 'ENTER_FORMATTED_TEXT',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user caret has exited formatted text.
+ *
+ * @return {Object} Action object.
+ */
+export function exitFormattedText() {
+	return {
+		type: 'EXIT_FORMATTED_TEXT',
+	};
+}
+
+/**
  * Returns an action object used to lock the editor.
  *
  * @param {Object}  lock Details about the post lock status, user, and nonce.

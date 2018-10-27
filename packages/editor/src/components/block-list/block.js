@@ -372,6 +372,7 @@ export class BlockListBlock extends Component {
 			isPartOfMultiSelection,
 			isFirstMultiSelected,
 			isTypingWithinBlock,
+			isCaretWithinFormattedText,
 			isMultiSelecting,
 			hoverArea,
 			isEmptyDefaultBlock,
@@ -399,7 +400,7 @@ export class BlockListBlock extends Component {
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = ! isFocusMode && isHovered && ! isEmptyDefaultBlock;
-		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock ) || isFirstMultiSelected );
+		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) || isFirstMultiSelected );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -588,6 +589,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isFirstMultiSelectedBlock,
 		isMultiSelecting,
 		isTyping,
+		isCaretWithinFormattedText,
 		getBlockIndex,
 		getEditedPostAttribute,
 		getBlockMode,
@@ -613,6 +615,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 		isTypingWithinBlock: ( isSelected || isParentOfSelectedBlock ) && isTyping(),
+		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		order: getBlockIndex( clientId, rootClientId ),
 		meta: getEditedPostAttribute( 'meta' ),
 		mode: getBlockMode( clientId ),

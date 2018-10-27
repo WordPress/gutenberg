@@ -5,6 +5,8 @@ import {
 	replaceBlocks,
 	startTyping,
 	stopTyping,
+	enterFormattedText,
+	exitFormattedText,
 	fetchReusableBlocks,
 	saveReusableBlock,
 	deleteReusableBlock,
@@ -340,6 +342,22 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
+			} );
+		} );
+	} );
+
+	describe( 'enterFormattedText', () => {
+		it( 'should return the ENTER_FORMATTED_TEXT action', () => {
+			expect( enterFormattedText() ).toEqual( {
+				type: 'ENTER_FORMATTED_TEXT',
+			} );
+		} );
+	} );
+
+	describe( 'exitFormattedText', () => {
+		it( 'should return the EXIT_FORMATTED_TEXT action', () => {
+			expect( exitFormattedText() ).toEqual( {
+				type: 'EXIT_FORMATTED_TEXT',
 			} );
 		} );
 	} );

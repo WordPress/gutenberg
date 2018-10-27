@@ -25,6 +25,7 @@ import {
 	editor,
 	currentPost,
 	isTyping,
+	isCaretWithinFormattedText,
 	blockSelection,
 	preferences,
 	saving,
@@ -1309,6 +1310,24 @@ describe( 'state', () => {
 		it( 'should set the typing flag to false', () => {
 			const state = isTyping( false, {
 				type: 'STOP_TYPING',
+			} );
+
+			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'isCaretWithinFormattedText()', () => {
+		it( 'should set the flag to true', () => {
+			const state = isCaretWithinFormattedText( false, {
+				type: 'ENTER_FORMATTED_TEXT',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the flag to false', () => {
+			const state = isCaretWithinFormattedText( true, {
+				type: 'EXIT_FORMATTED_TEXT',
 			} );
 
 			expect( state ).toBe( false );

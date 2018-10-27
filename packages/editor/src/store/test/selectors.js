@@ -82,6 +82,7 @@ const {
 	isFirstMultiSelectedBlock,
 	getBlockMode,
 	isTyping,
+	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSavingPost,
@@ -2716,6 +2717,24 @@ describe( 'selectors', () => {
 			};
 
 			expect( isTyping( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isCaretWithinFormattedText', () => {
+		it( 'returns true if the isCaretWithinFormattedText state is also true', () => {
+			const state = {
+				isCaretWithinFormattedText: true,
+			};
+
+			expect( isCaretWithinFormattedText( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if the isCaretWithinFormattedText state is also false', () => {
+			const state = {
+				isCaretWithinFormattedText: false,
+			};
+
+			expect( isCaretWithinFormattedText( state ) ).toBe( false );
 		} );
 	} );
 
