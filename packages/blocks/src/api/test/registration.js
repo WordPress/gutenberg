@@ -1,3 +1,5 @@
+/* eslint-disable react/forbid-elements */
+
 /**
  * External dependencies
  */
@@ -14,8 +16,6 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 import {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
-	getUnknownTypeHandlerName,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -93,7 +93,7 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 				save: noop,
 				category: 'common',
@@ -178,7 +178,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 				attributes: {
 					ok: {
@@ -311,7 +311,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -351,7 +351,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+						src: 'block-default',
 					},
 				},
 			] );
@@ -363,33 +363,10 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
-		} );
-	} );
-
-	describe( 'setUnknownTypeHandlerName()', () => {
-		it( 'assigns unknown type handler', () => {
-			try {
-				setUnknownTypeHandlerName( 'core/test-block' );
-
-				expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
-				expect( console ).toHaveWarned();
-			} finally {
-				// Restore undefined handler here rather than in `afterEach` because:
-				// - This call generates a deprecation warning.
-				// - Deprecation warnings become test errors unless we assert `toHaveWarned`.
-				// - This is too broad of an assertion to apply for all tests in the suite.
-				setUnknownTypeHandlerName( undefined );
-			}
-		} );
-	} );
-
-	describe( 'getUnknownTypeHandlerName()', () => {
-		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
@@ -444,7 +421,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -459,7 +436,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -481,7 +458,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+						src: 'block-default',
 					},
 				},
 				{
@@ -491,7 +468,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+						src: 'block-default',
 					},
 				},
 			] );

@@ -82,6 +82,7 @@ export default compose( [
 			getEditedPostVisibility,
 			isEditedPostSaveable,
 			isEditedPostPublishable,
+			isPostSavingLocked,
 			getCurrentPost,
 			getCurrentPostType,
 		} = select( 'core/editor' );
@@ -89,7 +90,7 @@ export default compose( [
 			isSaving: forceIsSaving || isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
-			isSaveable: isEditedPostSaveable(),
+			isSaveable: isEditedPostSaveable() && ! isPostSavingLocked(),
 			isPublishable: forceIsDirty || isEditedPostPublishable(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),

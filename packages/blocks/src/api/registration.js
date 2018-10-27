@@ -10,7 +10,6 @@ import { get, isFunction, some, reject } from 'lodash';
  */
 import { applyFilters, addFilter } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -170,35 +169,6 @@ export function unregisterBlockType( name ) {
 	}
 	dispatch( 'core/blocks' ).removeBlockTypes( name );
 	return oldBlock;
-}
-
-/**
- * Assigns name of block handling unknown block types.
- *
- * @param {string} name Block name.
- */
-export function setUnknownTypeHandlerName( name ) {
-	deprecated( 'setUnknownTypeHandlerName', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-		alternative: 'setFreeformContentHandlerName and setUnregisteredTypeHandlerName',
-	} );
-	setFreeformContentHandlerName( name );
-}
-
-/**
- * Retrieves name of block handling unknown block types, or undefined if no
- * handler has been defined.
- *
- * @return {?string} Blog name.
- */
-export function getUnknownTypeHandlerName() {
-	deprecated( 'getUnknownTypeHandlerName', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-		alternative: 'getFreeformContentHandlerName and getUnregisteredTypeHandlerName',
-	} );
-	return getFreeformContentHandlerName();
 }
 
 /**

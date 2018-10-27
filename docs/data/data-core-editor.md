@@ -1061,18 +1061,6 @@ before falling back to serialization of block state.
 
 Post content.
 
-### getNotices
-
-Returns the user notices array.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-List of notices.
-
 ### canInsertBlockType
 
 Determines if the given block type is allowed to be inserted, and, if
@@ -1299,6 +1287,18 @@ Returns whether the post is locked.
 
 Is locked.
 
+### isPostSavingLocked
+
+Returns whether post saving is locked.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is locked.
+
 ### isPostLockTakeover
 
 Returns whether the edition of the post has been taken over.
@@ -1370,7 +1370,6 @@ the specified post object and editor settings.
 *Parameters*
 
  * post: Post object.
- * autosaveStatus: The Post's autosave status.
 
 ### resetPost
 
@@ -1624,26 +1623,6 @@ Returns an action object used in signalling that the user has begun to type.
 
 Returns an action object used in signalling that the user has stopped typing.
 
-### createNotice
-
-Returns an action object used to create a notice.
-
-*Parameters*
-
- * status: The notice status.
- * content: The notice content.
- * options: The notice options.  Available options:
-                             `id` (string; default auto-generated)
-                             `isDismissible` (boolean; default `true`).
-
-### removeNotice
-
-Returns an action object used to remove a notice.
-
-*Parameters*
-
- * id: The notice id.
-
 ### updatePostLock
 
 Returns an action object used to lock the editor.
@@ -1753,3 +1732,21 @@ Returns an action object used in signalling that the user has enabled the publis
 ### disablePublishSidebar
 
 Returns an action object used in signalling that the user has disabled the publish sidebar.
+
+### lockPostSaving
+
+Returns an action object used to signal that post saving is locked.
+
+*Parameters*
+
+ * lockName: The lock name.
+
+### unlockPostSaving
+
+Returns an action object used to signal that post saving is unlocked.
+
+*Parameters*
+
+ * lockName: The lock name.
+
+### createNotice

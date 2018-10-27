@@ -190,33 +190,6 @@ export function isPluginItemPinned( state, pluginName ) {
 }
 
 /**
- * Returns the state of legacy meta boxes.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} State of meta boxes.
- */
-export function getMetaBoxes( state ) {
-	deprecated( 'getMetaBox selector (`core/edit-post`)', {
-		alternative: 'getActiveMetaBoxLocations selector',
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-
-	return [
-		'normal',
-		'side',
-		'advanced',
-	].reduce( ( result, location ) => {
-		result[ location ] = {
-			isActive: isMetaBoxLocationActive( state, location ),
-		};
-
-		return result;
-	}, {} );
-}
-
-/**
  * Returns an array of active meta box locations.
  *
  * @param {Object} state Post editor state.
@@ -291,24 +264,6 @@ export const getAllMetaBoxes = createSelector(
 		state.metaBoxes.locations,
 	]
 );
-
-/**
- * Returns the state of legacy meta boxes.
- *
- * @param {Object} state    Global application state.
- * @param {string} location Location of the meta box.
- *
- * @return {Object} State of meta box at specified location.
- */
-export function getMetaBox( state, location ) {
-	deprecated( 'getMetaBox selector (`core/edit-post`)', {
-		alternative: 'isMetaBoxLocationActive selector',
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-
-	return getMetaBoxes( state )[ location ];
-}
 
 /**
  * Returns true if the post is using Meta Boxes

@@ -28,13 +28,13 @@ import {
 	blockSelection,
 	preferences,
 	saving,
-	notices,
 	blocksMode,
 	isInsertionPointVisible,
 	reusableBlocks,
 	template,
 	blockListSettings,
 	autosave,
+	postSavingLock,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -1723,91 +1723,6 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'notices()', () => {
-		it( 'should create a notice', () => {
-			const originalState = [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				originalState[ 0 ],
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			] );
-		} );
-
-		it( 'should remove a notice', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'REMOVE_NOTICE',
-				noticeId: 'a',
-			} );
-			expect( state ).toEqual( [
-				originalState[ 1 ],
-			] );
-		} );
-
-		it( 'should dedupe distinct ids', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-				{
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			] );
-		} );
-	} );
-
 	describe( 'blocksMode', () => {
 		it( 'should set mode to html if not set', () => {
 			const action = {
@@ -2261,6 +2176,51 @@ describe( 'state', () => {
 				excerpt: 'The Excerpt',
 				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
+		} );
+	} );
+
+	describe( 'postSavingLock', () => {
+		it( 'returns empty object by default', () => {
+			const state = postSavingLock( undefined, {} );
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'returns correct post locks when locks added and removed', () => {
+			let state = postSavingLock( undefined, {
+				type: 'LOCK_POST_SAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+			} );
+
+			state = postSavingLock( deepFreeze( state ), {
+				type: 'LOCK_POST_SAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock': true,
+				'test-lock-2': true,
+			} );
+
+			state = postSavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test-lock',
+			} );
+
+			expect( state ).toEqual( {
+				'test-lock-2': true,
+			} );
+
+			state = postSavingLock( deepFreeze( state ), {
+				type: 'UNLOCK_POST_SAVING',
+				lockName: 'test-lock-2',
+			} );
+
+			expect( state ).toEqual( {} );
 		} );
 	} );
 } );

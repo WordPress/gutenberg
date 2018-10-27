@@ -34,6 +34,8 @@ import {
 } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+import { select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Dependencies
@@ -1491,17 +1493,6 @@ export const getEditedPostContent = createSelector(
 );
 
 /**
- * Returns the user notices array.
- *
- * @param {Object} state Global application state.
- *
- * @return {Array} List of notices.
- */
-export function getNotices( state ) {
-	return state.notices;
-}
-
-/**
  * Determines if the given block type is allowed to be inserted, and, if
  * parentClientId is provided, whether it is allowed to be nested within the
  * given parent.
@@ -1996,6 +1987,17 @@ export function isPostLocked( state ) {
 }
 
 /**
+ * Returns whether post saving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostSavingLocked( state ) {
+	return state.postSavingLock.length > 0;
+}
+
+/**
  * Returns whether the edition of the post has been taken over.
  *
  * @param {Object} state Global application state.
@@ -2052,4 +2054,18 @@ export function isPublishSidebarEnabled( state ) {
 		return state.preferences.isPublishSidebarEnabled;
 	}
 	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
+}
+
+//
+// Deprecated
+//
+
+export function getNotices() {
+	deprecated( 'getNotices selector (`core/editor` store)', {
+		alternative: 'getNotices selector (`core/notices` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return select( 'core/notices' ).getNotices();
 }

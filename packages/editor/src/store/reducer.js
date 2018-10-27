@@ -10,8 +10,6 @@ import {
 	omit,
 	without,
 	mapValues,
-	findIndex,
-	reject,
 	omitBy,
 	keys,
 	isEqual,
@@ -861,30 +859,6 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
-export function notices( state = [], action ) {
-	switch ( action.type ) {
-		case 'CREATE_NOTICE':
-			return [
-				...reject( state, { id: action.notice.id } ),
-				action.notice,
-			];
-
-		case 'REMOVE_NOTICE':
-			const { noticeId } = action;
-			const index = findIndex( state, { id: noticeId } );
-			if ( index === -1 ) {
-				return state;
-			}
-
-			return [
-				...state.slice( 0, index ),
-				...state.slice( index + 1 ),
-			];
-	}
-
-	return state;
-}
-
 /**
  * Post Lock State.
  *
@@ -910,6 +884,27 @@ export function postLock( state = { isLocked: false }, action ) {
 			return action.lock;
 	}
 
+	return state;
+}
+
+/**
+ * Post saving lock.
+ *
+ * When post saving is locked, the post cannot be published or updated.
+ *
+ * @param {PostSavingLockState} state  Current state.
+ * @param {Object}              action Dispatched action.
+ *
+ * @return {PostLockState} Updated state.
+ */
+export function postSavingLock( state = {}, action ) {
+	switch ( action.type ) {
+		case 'LOCK_POST_SAVING':
+			return { ...state, [ action.lockName ]: true };
+
+		case 'UNLOCK_POST_SAVING':
+			return omit( state, action.lockName );
+	}
 	return state;
 }
 
@@ -1094,28 +1089,6 @@ export function autosave( state = null, action ) {
 	return state;
 }
 
-/**
- * Reducer managing the block types
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function tokens( state = {}, action ) {
-	switch ( action.type ) {
-		case 'REGISTER_TOKEN':
-			return {
-				...state,
-				[ action.name ]: action.settings,
-			};
-		case 'UNREGISTER_TOKEN':
-			return omit( state, action.name );
-	}
-
-	return state;
-}
-
 export default optimist( combineReducers( {
 	editor,
 	currentPost,
@@ -1127,10 +1100,9 @@ export default optimist( combineReducers( {
 	preferences,
 	saving,
 	postLock,
-	notices,
 	reusableBlocks,
 	template,
 	autosave,
 	settings,
-	tokens,
+	postSavingLock,
 } ) );

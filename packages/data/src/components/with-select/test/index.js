@@ -447,4 +447,59 @@ describe( 'withSelect', () => {
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
+
+	it( 'should rerun selection on registry change', () => {
+		const firstRegistry = registry;
+		firstRegistry.registerStore( 'demo', {
+			reducer: ( state = 'first' ) => state,
+			selectors: {
+				getValue: ( state ) => state,
+			},
+		} );
+
+		const mapSelectToProps = jest.fn().mockImplementation( ( _select ) => ( {
+			value: _select( 'demo' ).getValue(),
+		} ) );
+
+		const OriginalComponent = jest.fn().mockImplementation( ( props ) => (
+			<div>{ props.value }</div>
+		) );
+
+		const Component = withSelect( mapSelectToProps )( OriginalComponent );
+
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ firstRegistry }>
+				<Component />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 1 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'first',
+		} );
+
+		const secondRegistry = createRegistry();
+		secondRegistry.registerStore( 'demo', {
+			reducer: ( state = 'second' ) => state,
+			selectors: {
+				getValue: ( state ) => state,
+			},
+		} );
+
+		testRenderer.update(
+			<RegistryProvider value={ secondRegistry }>
+				<Component />
+			</RegistryProvider>
+		);
+
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
+
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'second',
+		} );
+	} );
 } );

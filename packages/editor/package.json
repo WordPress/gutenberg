@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "5.0.0",
+	"version": "5.0.1",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,6 +38,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/notices": "file:../notices",
 		"@wordpress/nux": "file:../nux",
 		"@wordpress/token-list": "file:../token-list",
 		"@wordpress/url": "file:../url",
@@ -56,8 +57,7 @@
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"tinymce": "^4.7.2",
-		"traverse": "^0.6.6",
-		"uuid": "^3.1.0"
+		"traverse": "^0.6.6"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",

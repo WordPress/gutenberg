@@ -7,7 +7,6 @@ import { castArray, mapValues } from 'lodash';
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
-import { asyncGenerator } from '../plugins';
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -273,94 +272,6 @@ describe( 'createRegistry', () => {
 
 			registry.select( 'demo' ).getValue();
 			registry.select( 'demo' ).getValue();
-
-			return promise;
-		} );
-	} );
-
-	describe( 'async generators', () => {
-		it( 'should resolve mixed type action array to dispatch', () => {
-			registry.use( asyncGenerator );
-			const reducer = ( state = 0, action ) => {
-				return action.type === 'INCREMENT' ? state + 1 : state;
-			};
-			const selectors = {
-				getCount: ( state ) => state,
-			};
-			const resolvers = {
-				getCount: () => [
-					{ type: 'INCREMENT' },
-					Promise.resolve( { type: 'INCREMENT' } ),
-				],
-			};
-			registry.registerStore( 'counter', {
-				reducer,
-				selectors,
-				resolvers,
-			} );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'counter' ).getCount() === 2,
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
-			] );
-
-			registry.select( 'counter' ).getCount();
-
-			return promise;
-		} );
-
-		it( 'should resolve generator action to dispatch', () => {
-			registry.use( asyncGenerator );
-			const reducer = ( state = 'NOTOK', action ) => {
-				return action.type === 'SET_OK' ? 'OK' : state;
-			};
-			const selectors = {
-				getValue: ( state ) => state,
-			};
-			const resolvers = {
-				* getValue() {
-					yield { type: 'SET_OK' };
-				},
-			};
-			registry.registerStore( 'demo', {
-				reducer,
-				selectors,
-				resolvers,
-			} );
-			const promise = subscribeUntil( [
-				() => registry.select( 'demo' ).getValue() === 'OK',
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
-			] );
-
-			registry.select( 'demo' ).getValue();
-
-			return promise;
-		} );
-
-		it( 'should resolve async iterator action to dispatch', () => {
-			registry.use( asyncGenerator );
-			const reducer = ( state = 0, action ) => {
-				return action.type === 'INCREMENT' ? state + 1 : state;
-			};
-			const selectors = {
-				getCount: ( state ) => state,
-			};
-			const resolvers = {
-				getCount: async function* () {
-					yield { type: 'INCREMENT' };
-					yield await Promise.resolve( { type: 'INCREMENT' } );
-				},
-			};
-			registry.registerStore( 'counter', { reducer, selectors, resolvers } );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'counter' ).getCount() === 2,
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
-			] );
-
-			registry.select( 'counter' ).getCount();
-
-			expect( console ).toHaveWarned();
 
 			return promise;
 		} );

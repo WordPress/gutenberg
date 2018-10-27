@@ -30,7 +30,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
 			<FullscreenModeClose />
 			<div>
 				<Inserter disabled={ mode !== 'visual' } position="bottom right" />
-				<DotTip id="core/editor.inserter">
+				<DotTip tipId="core/editor.inserter">
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>
 			</div>

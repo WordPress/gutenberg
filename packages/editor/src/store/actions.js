@@ -1,7 +1,6 @@
 /**
  * External Dependencies
  */
-import uuid from 'uuid/v4';
 import { partial, castArray } from 'lodash';
 
 /**
@@ -11,20 +10,20 @@ import {
 	getDefaultBlockName,
 	createBlock,
 } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
+import { dispatch } from '@wordpress/data';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object}  post           Post object.
- * @param {Object}  autosaveStatus The Post's autosave status.
+ * @param {Object} post Post object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post, autosaveStatus ) {
+export function setupEditor( post ) {
 	return {
 		type: 'SETUP_EDITOR',
-		autosave: autosaveStatus,
 		post,
 	};
 }
@@ -537,49 +536,6 @@ export function stopTyping() {
 }
 
 /**
- * Returns an action object used to create a notice.
- *
- * @param {string}    status  The notice status.
- * @param {WPElement} content The notice content.
- * @param {?Object}   options The notice options.  Available options:
- *                              `id` (string; default auto-generated)
- *                              `isDismissible` (boolean; default `true`).
- *
- * @return {Object} Action object.
- */
-export function createNotice( status, content, options = {} ) {
-	const {
-		id = uuid(),
-		isDismissible = true,
-		spokenMessage,
-	} = options;
-	return {
-		type: 'CREATE_NOTICE',
-		notice: {
-			id,
-			status,
-			content,
-			isDismissible,
-			spokenMessage,
-		},
-	};
-}
-
-/**
- * Returns an action object used to remove a notice.
- *
- * @param {string} id The notice id.
- *
- * @return {Object} Action object.
- */
-export function removeNotice( id ) {
-	return {
-		type: 'REMOVE_NOTICE',
-		noticeId: id,
-	};
-}
-
-/**
  * Returns an action object used to lock the editor.
  *
  * @param {Object}  lock Details about the post lock status, user, and nonce.
@@ -592,11 +548,6 @@ export function updatePostLock( lock ) {
 		lock,
 	};
 }
-
-export const createSuccessNotice = partial( createNotice, 'success' );
-export const createInfoNotice = partial( createNotice, 'info' );
-export const createErrorNotice = partial( createNotice, 'error' );
-export const createWarningNotice = partial( createNotice, 'warning' );
 
 /**
  * Returns an action object used to fetch a single reusable block or all
@@ -752,21 +703,6 @@ export function updateEditorSettings( settings ) {
 	};
 }
 
-export function registerToken( name, settings ) {
-	return {
-		type: 'REGISTER_TOKEN',
-		name,
-		settings,
-	};
-}
-
-export function unregisterToken( name ) {
-	return {
-		type: 'UNREGISTER_TOKEN',
-		name,
-	};
-}
-
 /**
  * Returns an action object used in signalling that the user has enabled the publish sidebar.
  *
@@ -788,3 +724,64 @@ export function disablePublishSidebar() {
 		type: 'DISABLE_PUBLISH_SIDEBAR',
 	};
 }
+
+/**
+ * Returns an action object used to signal that post saving is locked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function lockPostSaving( lockName ) {
+	return {
+		type: 'LOCK_POST_SAVING',
+		lockName,
+	};
+}
+
+/**
+ * Returns an action object used to signal that post saving is unlocked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function unlockPostSaving( lockName ) {
+	return {
+		type: 'UNLOCK_POST_SAVING',
+		lockName,
+	};
+}
+
+//
+// Deprecated
+//
+
+export function createNotice( status, content, options ) {
+	deprecated( 'createNotice action (`core/editor` store)', {
+		alternative: 'createNotice action (`core/notices` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	dispatch( 'core/notices' ).createNotice( status, content, options );
+
+	return { type: '__INERT__' };
+}
+
+export function removeNotice( id ) {
+	deprecated( 'removeNotice action (`core/editor` store)', {
+		alternative: 'removeNotice action (`core/notices` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	dispatch( 'core/notices' ).removeNotice( id );
+
+	return { type: '__INERT__' };
+}
+
+export const createSuccessNotice = partial( createNotice, 'success' );
+export const createInfoNotice = partial( createNotice, 'info' );
+export const createErrorNotice = partial( createNotice, 'error' );
+export const createWarningNotice = partial( createNotice, 'warning' );
