@@ -1306,26 +1306,32 @@ function gutenberg_get_block_categories( $post ) {
 		array(
 			'slug'  => 'common',
 			'title' => __( 'Common Blocks', 'gutenberg' ),
+			'icon'  => 'screenoptions',
 		),
 		array(
 			'slug'  => 'formatting',
 			'title' => __( 'Formatting', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'layout',
 			'title' => __( 'Layout Elements', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'widgets',
 			'title' => __( 'Widgets', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'embed',
 			'title' => __( 'Embeds', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'reusable',
 			'title' => __( 'Reusable Blocks', 'gutenberg' ),
+			'icon'  => null,
 		),
 	);
 

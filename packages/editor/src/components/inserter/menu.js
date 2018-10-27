@@ -295,6 +295,7 @@ export class InserterMenu extends Component {
 							<PanelBody
 								key={ category.slug }
 								title={ category.title }
+								icon={ category.icon }
 								opened={ isSearching || isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
 								ref={ this.bindPanel( category.slug ) }
