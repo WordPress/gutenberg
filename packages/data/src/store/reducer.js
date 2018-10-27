@@ -25,11 +25,17 @@ const isResolved = flowRight( [
 ] )( ( state = new EquivalentKeyMap(), action ) => {
 	switch ( action.type ) {
 		case 'START_RESOLUTION':
-		case 'FINISH_RESOLUTION':
+		case 'FINISH_RESOLUTION': {
 			const isStarting = action.type === 'START_RESOLUTION';
 			const nextState = new EquivalentKeyMap( state );
 			nextState.set( action.args, isStarting );
 			return nextState;
+		}
+		case 'INVALIDATE_RESOLUTION': {
+			const nextState = new EquivalentKeyMap( state );
+			nextState.delete( action.args );
+			return nextState;
+		}
 	}
 
 	return state;

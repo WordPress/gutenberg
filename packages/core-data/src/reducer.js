@@ -13,7 +13,7 @@ import { combineReducers } from '@wordpress/data';
  */
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
-import { defaultEntities } from './entities';
+import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -125,7 +125,7 @@ function entity( entityConfig ) {
 		replaceAction( ( action ) => {
 			return {
 				...action,
-				key: entityConfig.key || 'id',
+				key: entityConfig.key || DEFAULT_ENTITY_KEY,
 			};
 		} ),
 	] )( queriedDataReducer );

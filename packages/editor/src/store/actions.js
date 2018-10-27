@@ -753,6 +753,22 @@ export function unlockPostSaving( lockName ) {
 	};
 }
 
+/**
+ * Returns an action object signaling that a new term is added to the edited post.
+ *
+ * @param {string} slug  Taxonomy slug.
+ * @param {Object} term  Term object.
+ *
+ * @return {Object} Action object.
+ */
+export function addTermToEditedPost( slug, term ) {
+	return {
+		type: 'ADD_TERM_TO_EDITED_POST',
+		slug,
+		term,
+	};
+}
+
 //
 // Deprecated
 //
