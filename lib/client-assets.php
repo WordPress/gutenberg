@@ -1339,6 +1339,18 @@ function gutenberg_get_block_categories( $post ) {
 }
 
 /**
+ * Loads Gutenberg Locale Data.
+ */
+function gutenberg_load_locale_data() {
+	// Prepare Jed locale data.
+	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
+	wp_add_inline_script(
+		'wp-i18n',
+		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
+	);
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1466,12 +1478,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$initial_edits = null;
 	}
 
-	// Prepare Jed locale data.
-	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
-	wp_add_inline_script(
-		'wp-i18n',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
-	);
+	gutenberg_load_locale_data();
 
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
@@ -1719,6 +1726,7 @@ JS;
 function gutenberg_load_list_reusable_blocks( $hook ) {
 	$is_reusable_blocks_list_page = 'edit.php' === $hook && isset( $_GET['post_type'] ) && 'wp_block' === $_GET['post_type'];
 	if ( $is_reusable_blocks_list_page ) {
+		gutenberg_load_locale_data();
 		wp_enqueue_script( 'wp-list-reusable-blocks' );
 		wp_enqueue_style( 'wp-list-reusable-blocks' );
 	}
