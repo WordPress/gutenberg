@@ -1643,26 +1643,6 @@ Returns an action object used in signalling that the caret has entered formatted
 
 Returns an action object used in signalling that the user caret has exited formatted text.
 
-### createNotice
-
-Returns an action object used to create a notice.
-
-*Parameters*
-
- * status: The notice status.
- * content: The notice content.
- * options: The notice options.  Available options:
-                             `id` (string; default auto-generated)
-                             `isDismissible` (boolean; default `true`).
-
-### removeNotice
-
-Returns an action object used to remove a notice.
-
-*Parameters*
-
- * id: The notice id.
-
 ### updatePostLock
 
 Returns an action object used to lock the editor.
