@@ -450,6 +450,7 @@ function gutenberg_toggle_custom_fields() {
 	}
 
 	wp_safe_redirect( wp_get_referer() );
+	exit;
 }
 
 add_action( 'admin_post_toggle_custom_fields', 'gutenberg_toggle_custom_fields' );
