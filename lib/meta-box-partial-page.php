@@ -120,9 +120,9 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 		'authordiv',
 	);
 
-	// Whether or not to load the 'postcustom' meta box is stored as a site option
-	// so that we're not always loading its assets.
-	$enable_custom_fields = get_option( 'enable_custom_fields', false );
+	// Whether or not to load the 'postcustom' meta box is stored as a user meta
+	// field so that we're not always loading its assets.
+	$enable_custom_fields = (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true );
 	if ( ! $enable_custom_fields ) {
 		$core_normal_meta_boxes[] = 'postcustom';
 	}
@@ -369,7 +369,7 @@ function the_gutenberg_metaboxes() {
 	 * If the 'postcustom' meta box is enabled, then we need to perform some
 	 * extra initialization on it.
 	 */
-	$enable_custom_fields = get_option( 'enable_custom_fields', false );
+	$enable_custom_fields = (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true );
 	if ( $enable_custom_fields ) {
 		$script = "( function( $ ) {
 			if ( $('#postcustom').length ) {
@@ -443,8 +443,11 @@ function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 function gutenberg_toggle_custom_fields() {
 	check_admin_referer( 'toggle_custom_fields' );
 
-	$enable_custom_fields = get_option( 'enable_custom_fields', false );
-	update_option( 'enable_custom_fields', ! $enable_custom_fields );
+	$current_user_id = get_current_user_id();
+	if ( $current_user_id ) {
+		$enable_custom_fields = (bool) get_user_meta( $current_user_id, 'enable_custom_fields', true );
+		update_user_meta( $current_user_id, 'enable_custom_fields', ! $enable_custom_fields );
+	}
 
 	wp_safe_redirect( wp_get_referer() );
 }

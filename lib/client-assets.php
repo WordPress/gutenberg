@@ -1614,7 +1614,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		// Whether or not to load the 'postcustom' meta box is stored as a site option
 		// so that we're not always loading its assets.
 		'customFields'           => array(
-			'isEnabled' => get_option( 'enable_custom_fields', false ),
+			'isEnabled' => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
 			'toggleURL' => add_query_arg(
 				array(
 					'action'   => 'toggle_custom_fields',
