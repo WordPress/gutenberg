@@ -7236,9 +7236,6 @@ react-native-crypto@^2.0.1:
     pbkdf2 "3.0.8"
     public-encrypt "^4.0.0"
 
-"react-native-gutenberg-bridge@file:./react-native-gutenberg-bridge":
-  version "1.0.0"
-
 react-native-modal@^6.5.0:
   version "6.5.0"
   resolved "https://registry.yarnpkg.com/react-native-modal/-/react-native-modal-6.5.0.tgz#46220b2289a41597d344c1db17454611b426a758"
