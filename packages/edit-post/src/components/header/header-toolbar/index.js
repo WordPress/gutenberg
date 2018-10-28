@@ -22,10 +22,12 @@ import {
 import FullscreenModeClose from '../fullscreen-mode-close';
 
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
+	const toolbarAriaLabel = hasFixedToolbar ? __( 'Document and block tools' ) : __( 'Document tools' );
+
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
-			aria-label={ __( 'Editor Toolbar' ) }
+			aria-label={ toolbarAriaLabel }
 		>
 			<FullscreenModeClose />
 			<div>
