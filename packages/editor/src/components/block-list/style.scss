@@ -124,9 +124,6 @@
 			transition: outline 0.1s linear;
 			pointer-events: none;
 
-			// This fixes an issue in Safari where outlines wouldn't completely fade out.
-			will-change: transform;
-
 			// Go edge-to-edge on mobile.
 			right: -$block-padding;
 			left: -$block-padding;

@@ -25,10 +25,10 @@ import {
 	editor,
 	currentPost,
 	isTyping,
+	isCaretWithinFormattedText,
 	blockSelection,
 	preferences,
 	saving,
-	notices,
 	blocksMode,
 	isInsertionPointVisible,
 	reusableBlocks,
@@ -1316,6 +1316,24 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'isCaretWithinFormattedText()', () => {
+		it( 'should set the flag to true', () => {
+			const state = isCaretWithinFormattedText( false, {
+				type: 'ENTER_FORMATTED_TEXT',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the flag to false', () => {
+			const state = isCaretWithinFormattedText( true, {
+				type: 'EXIT_FORMATTED_TEXT',
+			} );
+
+			expect( state ).toBe( false );
+		} );
+	} );
+
 	describe( 'blockSelection()', () => {
 		it( 'should return with block clientId as selected', () => {
 			const state = blockSelection( undefined, {
@@ -1721,91 +1739,6 @@ describe( 'state', () => {
 					message: 'update failed',
 				},
 			} );
-		} );
-	} );
-
-	describe( 'notices()', () => {
-		it( 'should create a notice', () => {
-			const originalState = [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				originalState[ 0 ],
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			] );
-		} );
-
-		it( 'should remove a notice', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'REMOVE_NOTICE',
-				noticeId: 'a',
-			} );
-			expect( state ).toEqual( [
-				originalState[ 1 ],
-			] );
-		} );
-
-		it( 'should dedupe distinct ids', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-				{
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			] );
 		} );
 	} );
 

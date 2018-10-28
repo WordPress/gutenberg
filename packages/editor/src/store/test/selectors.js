@@ -82,6 +82,7 @@ const {
 	isFirstMultiSelectedBlock,
 	getBlockMode,
 	isTyping,
+	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSavingPost,
@@ -89,7 +90,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isFetchingReusableBlock,
@@ -2720,6 +2720,24 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isCaretWithinFormattedText', () => {
+		it( 'returns true if the isCaretWithinFormattedText state is also true', () => {
+			const state = {
+				isCaretWithinFormattedText: true,
+			};
+
+			expect( isCaretWithinFormattedText( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if the isCaretWithinFormattedText state is also false', () => {
+			const state = {
+				isCaretWithinFormattedText: false,
+			};
+
+			expect( isCaretWithinFormattedText( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isSelectionEnabled', () => {
 		it( 'should return true if selection is enable', () => {
 			const state = {
@@ -3278,19 +3296,6 @@ describe( 'selectors', () => {
 			const content = getEditedPostContent( state );
 
 			expect( content ).toBe( '<!-- wp:default {\"modified\":true} /-->' );
-		} );
-	} );
-
-	describe( 'getNotices', () => {
-		it( 'should return the notices array', () => {
-			const state = {
-				notices: [
-					{ id: 'b', content: 'Post saved' },
-					{ id: 'a', content: 'Error saving' },
-				],
-			};
-
-			expect( getNotices( state ) ).toEqual( state.notices );
 		} );
 	} );
 
