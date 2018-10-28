@@ -6,7 +6,7 @@ module.exports = function( api ) {
 		],
 		plugins: [
 			'react-require',
-			'@babel/plugin-transform-async-to-generator',
+			/*'@babel/plugin-transform-async-to-generator',*/ /* <--- commented out to make the wpandroid release build work */
 			'@babel/plugin-proposal-async-generator-functions',
 			'@babel/plugin-transform-runtime',
 			'react-native-classname-to-style',
