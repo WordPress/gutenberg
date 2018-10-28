@@ -371,21 +371,19 @@ function the_gutenberg_metaboxes() {
 	 */
 	$enable_custom_fields = get_option( 'enable_custom_fields', false );
 	if ( $enable_custom_fields ) {
-		$script = <<<JS
-			( function( $ ) {
-				if ( $('#postcustom').length ) {
-					$( '#the-list' ).wpList( {
-						addBefore: function( s ) {
-							s.data += '&post_id=' + $('#post_ID').val();
-							return s;
-						},
-						addAfter: function() {
-							$('table#list-table').show();
-						}
-					});
-				}
-			} )( jQuery );
-JS;
+		$script = "( function( $ ) {
+			if ( $('#postcustom').length ) {
+				$( '#the-list' ).wpList( {
+					addBefore: function( s ) {
+						s.data += '&post_id=$post->ID';
+						return s;
+					},
+					addAfter: function() {
+						$('table#list-table').show();
+					}
+				});
+			}
+		} )( jQuery );";
 
 		wp_enqueue_script( 'wp-lists' );
 		wp_add_inline_script( 'wp-lists', $script );
