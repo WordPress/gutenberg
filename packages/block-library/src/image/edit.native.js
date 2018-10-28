@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View, Image, TextInput } from 'react-native';
+import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ export default function ImageEdit( props ) {
 		// This method should present an image picker from
 		// the WordPress media library.
 		//TODO: Implement media library method.
+		RNReactNativeGutenbergBridge.onMediaLibraryPress();
 	};
 
 	if ( ! url ) {
