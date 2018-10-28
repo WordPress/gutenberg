@@ -1,3 +1,9 @@
+## 2.2.0 (unreleased)
+
+### Breaking Change
+
+- Marked getSettings as experimental 
+
 ## 2.1.0 (2018-09-26)
 
 ### New Features

@@ -1,12 +1,13 @@
 /**
+ * External dependencies
+ */
+import createSelector from 'rememo';
+import { get, includes, some, flatten, values } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-
-/**
- * External dependencies
- */
-import { get, includes } from 'lodash';
 
 /**
  * Returns the current editing mode.
@@ -189,41 +190,37 @@ export function isPluginItemPinned( state, pluginName ) {
 }
 
 /**
- * Returns the state of legacy meta boxes.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} State of meta boxes.
- */
-export function getMetaBoxes( state ) {
-	deprecated( 'getMetaBox selector (`core/edit-post`)', {
-		alternative: 'getActiveMetaBoxLocations selector',
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-
-	return [
-		'normal',
-		'side',
-		'advanced',
-	].reduce( ( result, location ) => {
-		result[ location ] = {
-			isActive: isMetaBoxLocationActive( state, location ),
-		};
-
-		return result;
-	}, {} );
-}
-
-/**
  * Returns an array of active meta box locations.
  *
  * @param {Object} state Post editor state.
  *
  * @return {string[]} Active meta box locations.
  */
-export function getActiveMetaBoxLocations( state ) {
-	return state.activeMetaBoxLocations;
+export const getActiveMetaBoxLocations = createSelector(
+	( state ) => {
+		return Object.keys( state.metaBoxes.locations )
+			.filter( ( location ) => isMetaBoxLocationActive( state, location ) );
+	},
+	( state ) => [
+		state.metaBoxes.locations,
+	]
+);
+
+/**
+ * Returns true if a metabox location is active and visible
+ *
+ * @param {Object} state    Post editor state.
+ * @param {string} location Meta box location to test.
+ *
+ * @return {boolean} Whether the meta box location is active and visible.
+ */
+export function isMetaBoxLocationVisible( state, location ) {
+	return (
+		isMetaBoxLocationActive( state, location ) &&
+		some( getMetaBoxesPerLocation( state, location ), ( { id } ) => {
+			return isEditorPanelEnabled( state, `meta-box-${ id }` );
+		} )
+	);
 }
 
 /**
@@ -236,26 +233,37 @@ export function getActiveMetaBoxLocations( state ) {
  * @return {boolean} Whether the meta box location is active.
  */
 export function isMetaBoxLocationActive( state, location ) {
-	return getActiveMetaBoxLocations( state ).includes( location );
+	const metaBoxes = getMetaBoxesPerLocation( state, location );
+	return !! metaBoxes && metaBoxes.length !== 0;
 }
 
 /**
- * Returns the state of legacy meta boxes.
+ * Returns the list of all the available meta boxes for a given location.
  *
  * @param {Object} state    Global application state.
- * @param {string} location Location of the meta box.
+ * @param {string} location Meta box location to test.
  *
- * @return {Object} State of meta box at specified location.
+ * @return {?Array} List of meta boxes.
  */
-export function getMetaBox( state, location ) {
-	deprecated( 'getMetaBox selector (`core/edit-post`)', {
-		alternative: 'isMetaBoxLocationActive selector',
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-
-	return getMetaBoxes( state )[ location ];
+export function getMetaBoxesPerLocation( state, location ) {
+	return state.metaBoxes.locations[ location ];
 }
+
+/**
+ * Returns the list of all the available meta boxes.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} List of meta boxes.
+ */
+export const getAllMetaBoxes = createSelector(
+	( state ) => {
+		return flatten( values( state.metaBoxes.locations ) );
+	},
+	( state ) => [
+		state.metaBoxes.locations,
+	]
+);
 
 /**
  * Returns true if the post is using Meta Boxes
@@ -276,5 +284,5 @@ export function hasMetaBoxes( state ) {
  * @return {boolean} Whether the metaboxes are being saved.
  */
 export function isSavingMetaBoxes( state ) {
-	return state.isSavingMetaBoxes;
+	return state.metaBoxes.isSaving;
 }

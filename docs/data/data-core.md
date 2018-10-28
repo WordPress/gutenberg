@@ -177,6 +177,7 @@ Returns an action object used in signalling that entity records have been receiv
  * name: Name of the received entity.
  * records: Records received.
  * query: Query Object.
+ * invalidateCache: Should invalidate query caches
 
 ### receiveThemeSupports
 
@@ -195,3 +196,13 @@ a given URl has been received.
 
  * url: URL to preview the embed for.
  * preview: Preview data.
+
+### saveEntityRecord
+
+Action triggered to save an entity record.
+
+*Parameters*
+
+ * kind: Kind of the received entity.
+ * name: Name of the received entity.
+ * record: Record to be saved.

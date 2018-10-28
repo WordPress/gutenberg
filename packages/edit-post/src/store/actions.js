@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { reduce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
@@ -173,50 +168,17 @@ export function togglePinnedPluginItem( pluginName ) {
 }
 
 /**
- * Returns an action object used to check the state of meta boxes at a location.
+ * Returns an action object used in signaling
+ * what Meta boxes are available in which location.
  *
- * This should only be fired once to initialize meta box state. If a meta box
- * area is empty, this will set the store state to indicate that React should
- * not render the meta box area.
- *
- * Example: metaBoxes = { side: true, normal: false }.
- *
- * This indicates that the sidebar has a meta box but the normal area does not.
- *
- * @param {Object} metaBoxes Whether meta box locations are active.
+ * @param {Object} metaBoxesPerLocation Meta boxes per location.
  *
  * @return {Object} Action object.
  */
-export function initializeMetaBoxState( metaBoxes ) {
-	deprecated( 'initializeMetaBoxState action (`core/edit-post`)', {
-		alternative: 'setActiveMetaBoxLocations',
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-
-	const locations = reduce( metaBoxes, ( result, isActive, location ) => {
-		if ( isActive ) {
-			result = result.concat( location );
-		}
-
-		return result;
-	}, [] );
-
-	return setActiveMetaBoxLocations( locations );
-}
-
-/**
- * Returns an action object used in signaling that the active meta box
- * locations have changed.
- *
- * @param {string[]} locations New active meta box locations.
- *
- * @return {Object} Action object.
- */
-export function setActiveMetaBoxLocations( locations ) {
+export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	return {
-		type: 'SET_ACTIVE_META_BOX_LOCATIONS',
-		locations,
+		type: 'SET_META_BOXES_PER_LOCATIONS',
+		metaBoxesPerLocation,
 	};
 }
 
@@ -242,22 +204,3 @@ export function metaBoxUpdatesSuccess() {
 	};
 }
 
-/**
- * Returns an action object used to set the saved meta boxes data.
- * This is used to check if the meta boxes have been touched when leaving the editor.
- *
- * @param   {Object} dataPerLocation Meta Boxes Data per location.
- *
- * @return {Object} Action object.
- */
-export function setMetaBoxSavedData( dataPerLocation ) {
-	deprecated( 'setMetaBoxSavedData action (`core/edit-post`)', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-
-	return {
-		type: 'META_BOX_SET_SAVED_DATA',
-		dataPerLocation,
-	};
-}

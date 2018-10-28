@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
+import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
 	ClipboardButton,
 	IconButton,
@@ -52,7 +52,7 @@ class FileEdit extends Component {
 		const { href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
-		if ( this.isBlobURL( href ) ) {
+		if ( isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
@@ -85,10 +85,6 @@ class FileEdit extends Component {
 				id: media.id,
 			} );
 		}
-	}
-
-	isBlobURL( url = '' ) {
-		return url.indexOf( 'blob:' ) === 0;
 	}
 
 	confirmCopyURL() {
@@ -142,7 +138,7 @@ class FileEdit extends Component {
 					icon="media-default"
 					labels={ {
 						title: __( 'File' ),
-						name: __( 'a file' ),
+						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
@@ -153,7 +149,7 @@ class FileEdit extends Component {
 		}
 
 		const classes = classnames( className, {
-			'is-transient': this.isBlobURL( href ),
+			'is-transient': isBlobURL( href ),
 		} );
 
 		return (

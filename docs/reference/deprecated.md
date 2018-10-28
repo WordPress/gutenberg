@@ -1,6 +1,13 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
-# 4.3.0
+## 4.4.0
+
+- `wp.date.getSettings` has been removed. Please use `wp.date.__experimentalGetSettings` instead.
+- `wp.compose.remountOnPropChange` has been removed.
+- The following editor store actions have been removed: `createNotice`, `removeNotice`, `createSuccessNotice`, `createInfoNotice`, `createErrorNotice`, `createWarningNotice`. Use the equivalent actions by the same name from the `@wordpress/notices` module.
+- The id prop of wp.nux.DotTip has been removed. Please use the tipId prop instead.
+
+## 4.3.0
 
 - `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
 - `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
@@ -12,7 +19,8 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - Writing resolvers as async generators has been removed. Use the controls plugin instead.
 - `wp.components.AccessibleSVG` component has been removed. Please use `wp.components.SVG` instead.
 - The `wp.editor.UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
-- `initializeMetaBoxState` action (`core/edit-post`) has been removed. Use `setActiveMetaBoxLocations` action (`core/edit-post`) instead.
+- `setActiveMetaBoxLocations` action (`core/edit-post`) has been removed.
+- `initializeMetaBoxState` action (`core/edit-post`) has been removed.
 - `wp.editPost.initializeEditor` no longer returns an object. Use the `setActiveMetaBoxLocations` action (`core/edit-post`) in place of the existing object's `initializeMetaBoxes` function.
 - `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
 - `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.

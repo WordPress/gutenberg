@@ -8,7 +8,6 @@
 	color: $dark-gray-500;
 	position: relative;
 	overflow: hidden;
-	text-indent: 4px;
 	border-radius: $radius-round-rectangle;
 
 	.dashicon {
@@ -20,6 +19,10 @@
 	svg {
 		fill: currentColor;
 		outline: none;
+
+		&:not:only-child {
+			margin-right: 4px;
+		}
 	}
 
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {

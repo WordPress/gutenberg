@@ -192,17 +192,14 @@ describe( 'Links', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	const toggleFixedToolbar = async ( b ) => {
-		await page.click( '.edit-post-more-menu button' );
-		const button = ( await page.$x( "//button[contains(text(), 'Unified Toolbar')]" ) )[ 0 ];
-		const buttonClassNameProperty = await button.getProperty( 'className' );
-		const buttonClassName = await buttonClassNameProperty.jsonValue();
-		const isSelected = buttonClassName.indexOf( 'is-selected' ) !== -1;
-		if ( isSelected !== b ) {
-			await button.click();
-		} else {
-			await page.click( '.edit-post-more-menu button' );
-		}
+	const toggleFixedToolbar = async ( isFixed ) => {
+		await page.evaluate( ( _isFixed ) => {
+			const { select, dispatch } = wp.data;
+			const isCurrentlyFixed = select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' );
+			if ( isCurrentlyFixed !== _isFixed ) {
+				dispatch( 'core/edit-post' ).toggleFeature( 'fixedToolbar' );
+			}
+		}, isFixed );
 	};
 
 	it( 'allows Left to be pressed during creation when the toolbar is fixed to top', async () => {
@@ -390,5 +387,37 @@ describe( 'Links', () => {
 		// Expect the the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+	} );
+
+	it( 'can be modified using the keyboard once a link has been set', async () => {
+		const URL = 'https://wordpress.org/gutenberg';
+
+		// Create a block with some text and format it as a link.
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( META_KEY, 'K' );
+		await waitForAutoFocus();
+		await page.keyboard.type( URL );
+		await page.keyboard.press( 'Enter' );
+
+		// Deselect the link text by moving the caret to the end of the line
+		// and the link popover should not be displayed.
+		await page.keyboard.press( 'End' );
+		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+
+		// Move the caret back into the link text and the link popover
+		// should be displayed.
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+
+		// Press Cmd+K to edit the link and the url-input should become
+		// focused with the value previously inserted.
+		await pressWithModifier( META_KEY, 'K' );
+		await waitForAutoFocus();
+		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.classList ) );
+		expect( activeElementParentClasses ).toContain( 'editor-url-input' );
+		const activeElementValue = await page.evaluate( () => document.activeElement.value );
+		expect( activeElementValue ).toBe( URL );
 	} );
 } );

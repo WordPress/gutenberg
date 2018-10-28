@@ -16,6 +16,10 @@ import {
 	cloneBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+// TODO: Ideally this would be the only dispatch in scope. This requires either
+// refactoring editor actions to yielded controls, or replacing direct dispatch
+// on the editor store with action creators (e.g. `REMOVE_REUSABLE_BLOCK`).
+import { dispatch as dataDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,8 +27,6 @@ import { __ } from '@wordpress/i18n';
 import { resolveSelector } from './utils';
 import {
 	receiveReusableBlocks as receiveReusableBlocksAction,
-	createSuccessNotice,
-	createErrorNotice,
 	removeBlocks,
 	replaceBlocks,
 	receiveBlocks,
@@ -36,6 +38,7 @@ import {
 	getBlocks,
 	getBlocksByClientId,
 } from '../selectors';
+import { getPostRawValue } from '../reducer';
 
 /**
  * Module Constants
@@ -61,26 +64,25 @@ export const fetchReusableBlocks = async ( action, store ) => {
 
 	let result;
 	if ( id ) {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` } );
 	} else {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1&context=edit` } );
 	}
 
 	try {
 		const reusableBlockOrBlocks = await result;
 		dispatch( receiveReusableBlocksAction( map(
 			castArray( reusableBlockOrBlocks ),
-			( reusableBlock ) => {
-				const parsedBlocks = parse( reusableBlock.content );
-				if ( parsedBlocks.length === 1 ) {
-					return {
-						reusableBlock,
-						parsedBlock: parsedBlocks[ 0 ],
-					};
-				}
+			( post ) => {
+				const parsedBlocks = parse( post.content.raw );
 				return {
-					reusableBlock,
-					parsedBlock: createBlock( 'core/template', {}, parsedBlocks ),
+					reusableBlock: {
+						id: post.id,
+						title: getPostRawValue( post.title ),
+					},
+					parsedBlock: parsedBlocks.length === 1 ?
+						parsedBlocks[ 0 ] :
+						createBlock( 'core/template', {}, parsedBlocks ),
 				};
 			}
 		) ) );
@@ -119,7 +121,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 	const reusableBlock = getBlock( state, clientId );
 	const content = serialize( reusableBlock.name === 'core/template' ? reusableBlock.innerBlocks : reusableBlock );
 
-	const data = isTemporary ? { title, content } : { id, title, content };
+	const data = isTemporary ? { title, content, status: 'publish' } : { id, title, content, status: 'publish' };
 	const path = isTemporary ? `/wp/v2/${ postType.rest_base }` : `/wp/v2/${ postType.rest_base }/${ id }`;
 	const method = isTemporary ? 'POST' : 'PUT';
 
@@ -131,13 +133,14 @@ export const saveReusableBlocks = async ( action, store ) => {
 			id,
 		} );
 		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
-		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
+			id: REUSABLE_BLOCK_NOTICE_ID,
+		} );
 	} catch ( error ) {
 		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-		dispatch( createErrorNotice( error.message, {
+		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
-			spokenMessage: error.message,
-		} ) );
+		} );
 	}
 };
 
@@ -184,24 +187,28 @@ export const deleteReusableBlocks = async ( action, store ) => {
 	] ) );
 
 	try {
-		await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }`, method: 'DELETE' } );
+		await apiFetch( {
+			path: `/wp/v2/${ postType.rest_base }/${ id }`,
+			method: 'DELETE',
+		} );
 		dispatch( {
 			type: 'DELETE_REUSABLE_BLOCK_SUCCESS',
 			id,
 			optimist: { type: COMMIT, id: transactionId },
 		} );
 		const message = __( 'Block deleted.' );
-		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
+			id: REUSABLE_BLOCK_NOTICE_ID,
+		} );
 	} catch ( error ) {
 		dispatch( {
 			type: 'DELETE_REUSABLE_BLOCK_FAILURE',
 			id,
 			optimist: { type: REVERT, id: transactionId },
 		} );
-		dispatch( createErrorNotice( error.message, {
+		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
-			spokenMessage: error.message,
-		} ) );
+		} );
 	}
 };
 

@@ -5,6 +5,7 @@ import { CheckboxControl } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { ifViewportMatches } from '@wordpress/viewport';
 
 function Option( { label, isChecked, onChange } ) {
 	return (
@@ -51,7 +52,10 @@ export const EnablePublishSidebarOption = compose(
 		return {
 			onChange: ( isEnabled ) => ( isEnabled ? enablePublishSidebar() : disablePublishSidebar() ),
 		};
-	} )
+	} ),
+	// In < medium viewports we override this option and always show the publish sidebar.
+	// See the edit-post's header component for the specific logic.
+	ifViewportMatches( 'medium' ),
 )( Option );
 
 export const EnableTipsOption = compose(

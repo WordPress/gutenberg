@@ -77,6 +77,15 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	yield receiveEntityRecords( kind, name, Object.values( records ), query );
 }
 
+getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
+	return (
+		action.type === 'RECEIVE_ITEMS' &&
+		action.invalidateCache &&
+		kind === action.kind &&
+		name === action.name
+	);
+};
+
 /**
  * Requests theme supports data from the index.
  */

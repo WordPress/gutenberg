@@ -1,5 +1,5 @@
 // We can't reference this package with ~ because of how Lerna handles packages. 😩
-@import "../../node_modules/react-dates/lib/css/_datepicker.css";
+@import "node_modules/react-dates/lib/css/_datepicker";
 
 .components-datetime {
 	.components-datetime__calendar-help {
@@ -40,7 +40,7 @@
 		background: theme(primary);
 
 		&:hover {
-			background: theme(primary) shade(15%);
+			background: color(theme(primary) shade(15%));
 		}
 	}
 

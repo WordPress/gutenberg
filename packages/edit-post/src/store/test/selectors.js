@@ -16,10 +16,8 @@ import {
 	isPluginSidebarOpened,
 	getActiveGeneralSidebarName,
 	isPluginItemPinned,
-	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
-	getMetaBox,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
 	isEditorPanelEnabled,
@@ -367,7 +365,11 @@ describe( 'selectors', () => {
 	describe( 'hasMetaBoxes', () => {
 		it( 'should return true if there are active meta boxes', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'side' ],
+				metaBoxes: {
+					locations: {
+						side: [ 'postcustom' ],
+					},
+				},
 			};
 
 			expect( hasMetaBoxes( state ) ).toBe( true );
@@ -375,7 +377,11 @@ describe( 'selectors', () => {
 
 		it( 'should return false if there are no active meta boxes', () => {
 			const state = {
-				activeMetaBoxLocations: [],
+				metaBoxes: {
+					locations: {
+						side: [],
+					},
+				},
 			};
 
 			expect( hasMetaBoxes( state ) ).toBe( false );
@@ -385,7 +391,10 @@ describe( 'selectors', () => {
 	describe( 'isSavingMetaBoxes', () => {
 		it( 'should return true if some meta boxes are saving', () => {
 			const state = {
-				isSavingMetaBoxes: true,
+				metaBoxes: {
+					isSaving: true,
+					locations: {},
+				},
 			};
 
 			expect( isSavingMetaBoxes( state ) ).toBe( true );
@@ -393,55 +402,25 @@ describe( 'selectors', () => {
 
 		it( 'should return false if no meta boxes are saving', () => {
 			const state = {
-				isSavingMetaBoxes: false,
+				metaBoxes: {
+					isSaving: false,
+					locations: {},
+				},
 			};
 
 			expect( isSavingMetaBoxes( state ) ).toBe( false );
 		} );
 	} );
 
-	describe( 'getMetaBoxes', () => {
-		it( 'should return the state of all meta boxes', () => {
-			const state = {
-				activeMetaBoxLocations: [ 'normal', 'side' ],
-			};
-
-			const result = getMetaBoxes( state );
-
-			expect( deprecated ).toHaveBeenCalled();
-			expect( result ).toEqual( {
-				normal: {
-					isActive: true,
-				},
-				advanced: {
-					isActive: false,
-				},
-				side: {
-					isActive: true,
-				},
-			} );
-		} );
-	} );
-
-	describe( 'getMetaBox', () => {
-		it( 'should return the state of selected meta box', () => {
-			const state = {
-				activeMetaBoxLocations: [ 'side' ],
-			};
-
-			const result = getMetaBox( state, 'side' );
-
-			expect( deprecated ).toHaveBeenCalled();
-			expect( result ).toEqual( {
-				isActive: true,
-			} );
-		} );
-	} );
-
 	describe( 'getActiveMetaBoxLocations', () => {
 		it( 'should return the active meta boxes', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'side' ],
+				metaBoxes: {
+					locations: {
+						side: [ 'postcustom' ],
+						normal: [],
+					},
+				},
 			};
 
 			const result = getActiveMetaBoxLocations( state, 'side' );
@@ -453,7 +432,11 @@ describe( 'selectors', () => {
 	describe( 'isMetaBoxLocationActive', () => {
 		it( 'should return false if not active', () => {
 			const state = {
-				activeMetaBoxLocations: [],
+				metaBoxes: {
+					locations: {
+						side: [],
+					},
+				},
 			};
 
 			const result = isMetaBoxLocationActive( state, 'side' );
@@ -463,7 +446,11 @@ describe( 'selectors', () => {
 
 		it( 'should return true if active', () => {
 			const state = {
-				activeMetaBoxLocations: [ 'side' ],
+				metaBoxes: {
+					locations: {
+						side: [ 'postcustom' ],
+					},
+				},
 			};
 
 			const result = isMetaBoxLocationActive( state, 'side' );
