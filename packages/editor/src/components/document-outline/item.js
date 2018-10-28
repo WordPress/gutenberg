@@ -17,8 +17,8 @@ const TableOfContentsItem = ( {
 	children,
 	isValid,
 	level,
-	onClick,
 	path = [],
+	target,
 } ) => (
 	<li
 		className={ classnames(
@@ -30,9 +30,8 @@ const TableOfContentsItem = ( {
 		) }
 	>
 		<a
-			href={ '#' + level }
+			href={ target ? '#block-' + target : '#post-title-1' }
 			className="document-outline__button"
-			onClick={ onClick }
 		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			{
