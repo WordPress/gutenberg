@@ -6,7 +6,7 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext, findDOMNode } from '@wordpress/element';
+import { Component, createContext, createRef } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 const { Provider, Consumer } = createContext( {
@@ -61,6 +61,7 @@ class DropZoneProvider extends Component {
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
 
+		this.container = createRef();
 		this.dropZones = [];
 		this.dropZoneCallbacks = {
 			addDropZone: this.addDropZone,
@@ -79,10 +80,6 @@ class DropZoneProvider extends Component {
 		window.addEventListener( 'dragover', this.onDragOver );
 		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
-
-		// Disable reason: Can't use a ref since this component just renders its children
-		// eslint-disable-next-line react/no-find-dom-node
-		this.container = findDOMNode( this );
 	}
 
 	componentWillUnmount() {
@@ -212,7 +209,7 @@ class DropZoneProvider extends Component {
 		const { position, hoveredDropZone } = this.state;
 		const dragEventType = getDragEventType( event );
 		const dropZone = this.dropZones[ hoveredDropZone ];
-		const isValidDropzone = !! dropZone && this.container.contains( event.target );
+		const isValidDropzone = !! dropZone && this.container.current.contains( event.target );
 		this.resetDragState();
 
 		if ( isValidDropzone ) {
@@ -234,9 +231,11 @@ class DropZoneProvider extends Component {
 
 	render() {
 		return (
-			<Provider value={ this.dropZoneCallbacks }>
-				{ this.props.children }
-			</Provider>
+			<div ref={ this.container } className="components-drop-zone__provider">
+				<Provider value={ this.dropZoneCallbacks }>
+					{ this.props.children }
+				</Provider>
+			</div>
 		);
 	}
 }
