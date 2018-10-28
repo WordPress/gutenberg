@@ -9,7 +9,6 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule {
-
     private final ReactApplicationContext mReactContext;
     private final GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
 
@@ -24,7 +23,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public String getName() {
         return "RNReactNativeGutenbergBridge";
     }
-
 
     private void emitToJS(String eventName, @Nullable WritableMap data) {
         mReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, data);

@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class RNReactNativeGutenbergBridgePackage implements ReactPackage {
-
     private GutenbergBridgeJS2Parent mGutenbergBridgeJS2Parent;
     private RNReactNativeGutenbergBridgeModule mRNReactNativeGutenbergBridgeModule;
 
