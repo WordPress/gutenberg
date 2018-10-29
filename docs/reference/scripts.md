@@ -66,4 +66,4 @@ It is recommened to use the main `wp-polyfill` script handle which takes care of
 | [Formdata Polyfill](https://www.npmjs.com/package/formdata-polyfill) | wp-polyfill-formdata| Polyfill conditionally replaces the native implementation |
 | [Node Contains Polyfill](https://polyfill.io) | wp-polyfill-node-contains |Polyfill for Node.contains |
 | [Element Closest Polyfill](https://www.npmjs.com/package/element-closest) | wp-polyfill-element-closest| Return the closest element matching a selector up the DOM tree |
-| [ECMAScript Polyfill](https://babeljs.io/docs/en/babel-polyfill) | wp-polyfill-ecmascript | Emulate a full ES2015+ environment |
+| [ECMAScript Polyfill](https://babeljs.io/docs/en/babel-polyfill) | wp-babel-polyfill | Emulate a full ES2015+ environment |
