@@ -19,13 +19,17 @@ import { G, Path, SVG } from '@wordpress/components';
 
 const blockAttributes = {
 	value: {
+		type: 'string',
 		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
+		default: '',
 	},
 	citation: {
+		type: 'string',
 		source: 'html',
 		selector: 'cite',
+		default: '',
 	},
 	align: {
 		type: 'string',
@@ -292,8 +296,10 @@ export const settings = {
 			attributes: {
 				...blockAttributes,
 				citation: {
+					type: 'string',
 					source: 'html',
 					selector: 'footer',
+					default: '',
 				},
 				style: {
 					type: 'number',

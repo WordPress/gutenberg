@@ -39,6 +39,7 @@ export const settings = {
 			type: 'string',
 		},
 		fileName: {
+			type: 'string',
 			source: 'html',
 			selector: 'a:not([download])',
 		},
@@ -61,6 +62,7 @@ export const settings = {
 			default: true,
 		},
 		downloadButtonText: {
+			type: 'string',
 			source: 'html',
 			selector: 'a[download]',
 			default: _x( 'Download', 'button label' ),
