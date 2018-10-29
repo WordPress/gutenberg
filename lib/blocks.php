@@ -154,30 +154,29 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
  * @return string String of rendered HTML.
  */
 function gutenberg_render_block( $block, $inner_blocks = [] ) {
-	$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-	$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
+	$block_name = isset( $block['blockName'] ) ? $block['blockName'] : null;
+	$block_type = $block_name ? WP_Block_Type_Registry::get_instance()->get_registered( $block_name ) : null;
+	$attributes = is_array( $block['attrs'] ) ? $block['attrs'] : array();
 
-	if ( $block_name ) {
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( null !== $block_type && $block_type->is_dynamic() ) {
-			return $block_type->render( $attributes );
+	// If there are innerBlocks, stitch their results back in.
+	if ( ! empty( $block['blockMarkers' ] ) ) {
+		$output = '';
+		$index = 0;
+		foreach( $block['blockMarkers'] as $i => $p ) {
+			$output .= substr( $block['innerHTML'], $index, $p - $index );
+			$output .= $inner_blocks[ $i ];
+			$index = $p;
 		}
+		$output .= substr( $block['innerHTML'], $index );
+
+		$block['innerHTML'] = $output;
 	}
 
-	if ( empty( $block['blockMarkers' ] ) ) {
-		return $block['innerHTML'];
+	// Handle both dynamic and static.
+	if ( null !== $block_type && $block_type->is_dynamic() ) {
+		return $block_type->render( $attributes, $block['innerHTML'] );
 	}
-
-	$output = '';
-	$index = 0;
-	foreach( $block['blockMarkers'] as $i => $p ) {
-		$output .= substr( $block['innerHTML'], $index, $p - $index );
-		$output .= $inner_blocks[ $i ];
-		$index = $p;
-	}
-	$output .= substr( $block['innerHTML'], $index );
-
-	return $output;
+	return $block['innerHTML'];
 }
 
 if ( ! class_exists( 'BlockRecursiveIteratorFilter' ) ) {
