@@ -409,10 +409,7 @@ export class RichText extends Component {
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-		// Don't apply changes if there's no transform. Content will be up to
-		// date. In the future we could always let it flow back in the live DOM
-		// if there are no performance issues.
-		this.onChange( transformed, record === transformed );
+		this.onChange( transformed );
 	}
 
 	/**
@@ -442,16 +439,11 @@ export class RichText extends Component {
 	 * updated if differences are found.
 	 *
 	 * @param {Object}  record        The record to sync and apply.
-	 * @param {boolean} _withoutApply If true, the record won't be applied to
-	 *                                the live DOM.
 	 */
-	onChange( record, _withoutApply ) {
-		if ( ! _withoutApply ) {
-			this.applyRecord( record );
-		}
-
+	onChange( record ) {
 		const { start, end } = record;
 
+		this.applyRecord( record );
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end } );
