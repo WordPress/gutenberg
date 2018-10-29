@@ -1,4 +1,4 @@
-## 2.0.7 (Unreleased)
+## 2.0.7 (2018-10-29)
 
 ### Deprecations
 
