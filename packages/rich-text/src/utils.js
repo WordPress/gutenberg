@@ -35,13 +35,13 @@ export function isValidIcon( icon ) {
 }
 
 /**
- * Function that receives an icon as set by the blocks during the registration
+ * Function that receives an icon as set by the formats during the registration
  * and returns a new icon object that is normalized so we can rely on just on possible icon structure
  * in the codebase.
  *
  * @param {(Object|string|WPElement)} icon  Slug of the Dashicon to be shown
- *                                          as the icon for the block in the
- *                                          inserter, or element or an object describing the icon.
+ *                                          as the icon for the format in the inserter, block toolbar
+ *                                          or element or an object describing the icon.
  *
  * @return {Object} Object describing the icon.
  */
