@@ -626,7 +626,8 @@ export class RichText extends Component {
 					this.onChange( newValue );
 
 					event.preventDefault();
-					// TinyMCE won't stop on `preventDefault`.
+					// It's important that we stop other handlers (e.g. ones
+					// registered by TinyMCE) from also handling this event.
 					event.stopImmediatePropagation();
 				}
 			}
@@ -638,6 +639,9 @@ export class RichText extends Component {
 		// We also split the content and call the onSplit prop if provided.
 		if ( keyCode === ENTER ) {
 			event.preventDefault();
+			// It's important that we stop other handlers (e.g. ones registered
+			// by TinyMCE) from also handling this event.
+			event.stopImmediatePropagation();
 
 			const record = this.createRecord();
 
@@ -648,10 +652,6 @@ export class RichText extends Component {
 				} );
 
 				if ( transformation ) {
-					// Calling onReplace() will destroy the editor, so it's
-					// important that we stop other handlers (e.g. ones
-					// registered by TinyMCE) from also handling this event.
-					event.stopImmediatePropagation();
 					this.props.onReplace( [
 						transformation.transform( { content: text } ),
 					] );

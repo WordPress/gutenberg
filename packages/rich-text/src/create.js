@@ -499,7 +499,18 @@ function createFromMultilineElement( {
 		// If a line consists of one single line break (invisible), consider the
 		// line empty, wether this is the browser's doing or not.
 		if ( value.text === '\n' ) {
+			const start = value.start;
+			const end = value.end;
+
 			value = createEmptyValue();
+
+			if ( start !== undefined ) {
+				value.start = 0;
+			}
+
+			if ( end !== undefined ) {
+				value.end = 0;
+			}
 		}
 
 		// Multiline value text should be separated by a double line break.
