@@ -14,6 +14,7 @@ if ( process.env.TEST_RN_PLATFORM ) {
 module.exports = {
 	verbose: true,
 	preset: 'react-native',
+	setupFiles: ["./jest/setup.js"],
 	testEnvironment: 'jsdom',
 	testPathIgnorePatterns: [
 		'/node_modules/',
