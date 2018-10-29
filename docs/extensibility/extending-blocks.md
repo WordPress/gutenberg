@@ -341,5 +341,5 @@ function my_plugin_block_categories( $categories, $post ) {
 add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
 
-An icon key/value can be specified to add an icon to block category. These can be any of [WordPress Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
 
