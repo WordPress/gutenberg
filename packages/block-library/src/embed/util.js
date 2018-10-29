@@ -123,7 +123,7 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
  * @param {boolean} allowResponsive If the responsive class names should be added, or removed.
  * @return {string} Deduped class names.
  */
-export function getClassNames( html, existingClassNames, allowResponsive = true ) {
+export function getClassNames( html, existingClassNames = '', allowResponsive = true ) {
 	const previewDocument = document.implementation.createHTMLDocument( '' );
 	previewDocument.body.innerHTML = html;
 	const iframe = previewDocument.body.querySelector( 'iframe' );
