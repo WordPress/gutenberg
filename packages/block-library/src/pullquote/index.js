@@ -80,24 +80,38 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { mainColor, customMainColor, textColor, customTextColor, value, citation, className } = attributes;
+		const {
+			mainColor,
+			customMainColor,
+			textColor,
+			customTextColor,
+			value,
+			citation,
+			className,
+		} = attributes;
+
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 
-		let figureClass, figureStyles;
+		let figureClasses, figureStyles;
+
 		// Is solid color style
 		if ( isSolidColorStyle ) {
-			figureClass = getColorClassName( 'background-color', mainColor );
-			if ( ! figureClass ) {
-				figureStyles = {
-					backgroundColor: customMainColor,
-				};
-			}
+			const backgroundClass = getColorClassName( 'background-color', mainColor );
+
+			figureClasses = classnames( {
+				'has-background': ( backgroundClass || customMainColor ),
+				[ backgroundClass ]: backgroundClass,
+			} );
+
+			figureStyles = {
+				backgroundColor: backgroundClass ? undefined : customMainColor,
+			};
 		// Is normal style and a custom color is being used ( we can set a style directly with its value)
 		} else if ( customMainColor ) {
 			figureStyles = {
 				borderColor: customMainColor,
 			};
-		// Is normal style and a named color is being used, we need to retrieve the color value to set the style,
+		// If normal style and a named color are being used, we need to retrieve the color value to set the style,
 		// as there is no expectation that themes create classes that set border colors.
 		} else if ( mainColor ) {
 			const colors = get( select( 'core/editor' ).getEditorSettings(), [ 'colors' ], [] );
@@ -108,13 +122,15 @@ export const settings = {
 		}
 
 		const blockquoteTextColorClass = getColorClassName( 'color', textColor );
-		const blockquoteClasses = textColor || customTextColor ? classnames( 'has-text-color', {
+		const blockquoteClasses = ( textColor || customTextColor ) && classnames( 'has-text-color', {
 			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-		} ) : undefined;
-		const blockquoteStyle = blockquoteTextColorClass ? undefined : { color: customTextColor };
+		} );
+
+		const blockquoteStyles = blockquoteTextColorClass ? undefined : { color: customTextColor };
+
 		return (
-			<figure className={ figureClass } style={ figureStyles }>
-				<blockquote className={ blockquoteClasses } style={ blockquoteStyle } >
+			<figure className={ figureClasses } style={ figureStyles }>
+				<blockquote className={ blockquoteClasses } style={ blockquoteStyles } >
 					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>

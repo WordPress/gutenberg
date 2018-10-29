@@ -130,13 +130,14 @@ class MediaTextEdit extends Component {
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
+			'has-background': ( backgroundColor.class || backgroundColor.color ),
 			[ backgroundColor.class ]: backgroundColor.class,
 			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
 			gridTemplateColumns: 'right' === mediaPosition ? `auto ${ widthString }` : `${ widthString } auto`,
-			backgroundColor: backgroundColor.color,
+			backgroundColor: backgroundColor.class ? undefined : backgroundColor.color,
 		};
 		const colorSettings = [ {
 			value: backgroundColor.color,

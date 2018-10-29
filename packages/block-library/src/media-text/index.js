@@ -164,6 +164,7 @@ export const settings = {
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 		const className = classnames( {
 			'has-media-on-the-right': 'right' === mediaPosition,
+			'has-background': ( backgroundClass || customBackgroundColor ),
 			[ backgroundClass ]: backgroundClass,
 			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
