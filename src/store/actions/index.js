@@ -23,10 +23,11 @@ export type ParseActionType = string => {
 	html: string,
 };
 
-export type BlocksActionType = ( string, string ) => {
+export type BlocksActionType = ( string, string, BlockType ) => {
 	type: $Values<typeof ActionTypes.BLOCK>,
 	blockOneClientId: string,
 	blockTwoClientId: string,
+	block: BlockType,
 };
 
 export function updateBlockAttributes( clientId: string, attributes: mixed ) {
@@ -69,8 +70,9 @@ export const parseBlocksAction: ParseActionType = ( html ) => ( {
 	html,
 } );
 
-export const mergeBlocksAction: BlocksActionType = ( blockOneClientId, blockTwoClientId ) => ( {
+export const mergeBlocksAction: BlocksActionType = ( blockOneClientId, blockTwoClientId, block ) => ( {
 	type: ActionTypes.BLOCK.MERGE,
 	blockOneClientId,
 	blockTwoClientId,
+	block,
 } );

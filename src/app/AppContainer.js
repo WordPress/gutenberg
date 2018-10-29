@@ -42,8 +42,8 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		parseBlocksAction: ( html ) => {
 			dispatch( parseBlocksAction( html ) );
 		},
-		mergeBlocksAction: ( blockOneClientId, blockTwoClientId ) => {
-			dispatch( mergeBlocksAction( blockOneClientId, blockTwoClientId ) );
+		mergeBlocksAction: ( blockOneClientId, blockTwoClientId, block ) => {
+			dispatch( mergeBlocksAction( blockOneClientId, blockTwoClientId, block ) );
 		},
 	};
 };

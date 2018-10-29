@@ -14,7 +14,7 @@ import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 
 // Gutenberg imports
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockType, switchToBlockType } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -24,7 +24,7 @@ export type BlockListType = {
 	deleteBlockAction: string => mixed,
 	createBlockAction: ( string, BlockType, string ) => mixed,
 	parseBlocksAction: string => mixed,
-	mergeBlocksAction: ( string, string ) => mixed,
+	mergeBlocksAction: ( string, string, BlockType ) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -164,20 +164,56 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			( ! forward && focusedItemIndex === 0 ) ||
 			( forward && ! focusedItemIndex === this.state.dataSource.size() - 1 )
 		) {
-
+			return;
 		}
 
-		let blockOneID = null;
-		let blockTwoID = null;
+		let blockA = null;
+		let blockB = null;
 		if ( forward ) {
-			blockOneID = this.state.dataSource.get( focusedItemIndex ).clientId;
-			blockTwoID = this.state.dataSource.get( focusedItemIndex + 1 ).clientId;
+			blockA = this.state.dataSource.get( focusedItemIndex );
+			blockB = this.state.dataSource.get( focusedItemIndex + 1 );
 		} else {
-			blockOneID = this.state.dataSource.get( focusedItemIndex - 1 ).clientId;
-			blockTwoID = this.state.dataSource.get( focusedItemIndex ).clientId;
+			blockA = this.state.dataSource.get( focusedItemIndex - 1 );
+			blockB = this.state.dataSource.get( focusedItemIndex );
 		}
 
-		this.props.mergeBlocksAction( blockOneID, blockTwoID );
+		const blockType = getBlockType( blockA.name );
+
+		// Only focus the previous block if it's not mergeable
+		if ( ! blockType.merge ) {
+			// TO DO: move the focus to the prev block
+			return;
+		}
+
+		// We can only merge blocks with similar types
+		// thus, we transform the block to merge first
+		const blocksWithTheSameType = blockA.name === blockB.name ?
+			[ blockB ] :
+			switchToBlockType( blockB, blockA.name );
+
+		// If the block types can not match, do nothing
+		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+			return;
+		}
+
+		// Calling the merge to update the attributes and remove the block to be merged
+		const updatedAttributes = blockType.merge(
+			blockA.attributes,
+			blocksWithTheSameType[ 0 ].attributes
+		);
+
+		const newBlock = {
+			...blockA,
+			attributes: {
+				...blockA.attributes,
+				...updatedAttributes,
+			},
+		};
+		newBlock.focused = true;
+
+		// set it into the datasource, and use the same object instance to send it to props/redux
+		this.state.dataSource.splice( this.getDataSourceIndexFromClientId( blockA.clientId ), 2, newBlock );
+		this.props.mergeBlocksAction( blockA.clientId, blockB.clientId, newBlock );
 	}
 
 	onChange( clientId: string, attributes: mixed ) {
