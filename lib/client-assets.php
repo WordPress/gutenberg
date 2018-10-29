@@ -1509,7 +1509,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	wp_add_inline_script(
 		'wp-editor',
 		sprintf(
-			'window._wpGutenbergCodeEditorSettings = %s;',
+			'window._wpCodeEditorSettings = %s;',
 			wp_json_encode( $gutenberg_captured_code_editor_settings )
 		)
 	);
