@@ -17,10 +17,7 @@
 
 <resources>
 
-    <!-- Activity themes -->
-    <style name="Theme.Base" parent="android:Theme.Material.Light">
-            <item name="android:colorPrimary">@color/colorPrimary</item>
-            <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
-    </style>
+    <color name="colorPrimary">#00BCD4</color>
+    <color name="colorPrimaryDark">#00838F</color>
 
 </resources>
