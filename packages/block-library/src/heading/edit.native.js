@@ -28,6 +28,7 @@ class HeadingEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			mergeBlocks,
 			insertBlocksAfter,
 		} = this.props;
 
@@ -56,6 +57,7 @@ class HeadingEdit extends Component {
 							content: newParaBlock.attributes.content,
 						} );
 					} }
+					onMerge={ mergeBlocks }
 					onSplit={
 						insertBlocksAfter ?
 							( before, after, ...blocks ) => {
