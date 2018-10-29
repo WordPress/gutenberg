@@ -9,7 +9,6 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -188,23 +187,12 @@ class BlockList extends Component {
 	render() {
 		const {
 			blockClientIds,
-			layout,
-			isGroupedByLayout,
 			rootClientId,
 			isDraggable,
 		} = this.props;
 
-		let defaultLayout;
-		if ( isGroupedByLayout ) {
-			defaultLayout = layout;
-		}
-
-		const classes = classnames( 'editor-block-list__layout', {
-			[ `layout-${ layout }` ]: layout,
-		} );
-
 		return (
-			<div className={ classes }>
+			<div className="editor-block-list__layout">
 				{ map( blockClientIds, ( clientId, blockIndex ) => (
 					<BlockListBlock
 						key={ 'block-' + clientId }
@@ -214,18 +202,12 @@ class BlockList extends Component {
 						onSelectionStart={ this.onSelectionStart }
 						onShiftSelection={ this.onShiftSelection }
 						rootClientId={ rootClientId }
-						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
 						isLast={ blockIndex === blockClientIds.length - 1 }
 						isDraggable={ isDraggable }
 					/>
 				) ) }
-
-				<BlockListAppender
-					rootClientId={ rootClientId }
-					layout={ layout }
-					isGroupedByLayout={ isGroupedByLayout }
-				/>
+				<BlockListAppender rootClientId={ rootClientId } />
 			</div>
 		);
 	}

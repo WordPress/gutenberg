@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, castArray, first, last } from 'lodash';
+import { get, reduce, size, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,6 @@ import {
 } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
-	cloneBlock,
 	getBlockType,
 	getSaveElement,
 	isReusableBlock,
@@ -367,7 +366,6 @@ export class BlockListBlock extends Component {
 			isLast,
 			clientId,
 			rootClientId,
-			layout,
 			isSelected,
 			isPartOfMultiSelection,
 			isFirstMultiSelected,
@@ -492,7 +490,6 @@ export class BlockListBlock extends Component {
 					<BlockInsertionPoint
 						clientId={ clientId }
 						rootClientId={ rootClientId }
-						layout={ layout }
 						canShowInserter={ canShowInBetweenInserter }
 						onInsert={ this.hideHoverEffects }
 					/>
@@ -501,7 +498,6 @@ export class BlockListBlock extends Component {
 					index={ order }
 					clientId={ clientId }
 					rootClientId={ rootClientId }
-					layout={ layout }
 				/>
 				{ shouldRenderMovers && (
 					<BlockMover
@@ -560,7 +556,6 @@ export class BlockListBlock extends Component {
 							<InserterWithShortcuts
 								clientId={ clientId }
 								rootClientId={ rootClientId }
-								layout={ layout }
 								onToggle={ this.selectOnOpen }
 							/>
 						</div>
@@ -655,8 +650,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			selectBlock( clientId, initialPosition );
 		},
 		onInsertBlocks( blocks, index ) {
-			const { rootClientId, layout } = ownProps;
-			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
+			const { rootClientId } = ownProps;
 			insertBlocks( blocks, index, rootClientId );
 		},
 		onInsertDefaultBlockAfter() {
@@ -670,10 +664,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			mergeBlocks( ...args );
 		},
 		onReplace( blocks ) {
-			const { layout } = ownProps;
-			blocks = castArray( blocks ).map( ( block ) => (
-				cloneBlock( block, { layout } )
-			) );
 			replaceBlocks( [ ownProps.clientId ], blocks );
 		},
 		onMetaChange( meta ) {

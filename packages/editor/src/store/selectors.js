@@ -1272,23 +1272,20 @@ export function isCaretWithinFormattedText( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} Insertion point object with `rootClientId`, `layout`,
- * `index`.
+ * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
 export function getBlockInsertionPoint( state ) {
-	let rootClientId, layout, index;
+	let rootClientId, index;
 
 	const { end } = state.blockSelection;
 	if ( end ) {
 		rootClientId = getBlockRootClientId( state, end ) || undefined;
-
-		layout = get( getBlock( state, end ), [ 'attributes', 'layout' ] );
 		index = getBlockIndex( state, end, rootClientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}
 
-	return { rootClientId, layout, index };
+	return { rootClientId, index };
 }
 
 /**

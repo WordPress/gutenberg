@@ -24,8 +24,8 @@ describe( 'hasInnerBlocksContext()', () => {
 			'<div class="editor-block-list__block" data-type="core/columns" tabindex="0">' +
 			'	<div class="editor-block-list__block-edit" aria-label="Block: Columns (beta)">' +
 			'		<div class="wp-block-columns has-2-columns">' +
-			'			<div class="editor-block-list__layout layout-column-1"></div>' +
-			'			<div class="editor-block-list__layout layout-column-2"></div>' +
+			'			<div class="editor-block-list__layout"></div>' +
+			'			<div class="editor-block-list__layout"></div>' +
 			'		</div>' +
 			'	</div>' +
 			'</div>'

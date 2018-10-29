@@ -277,19 +277,17 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
  * @param  {?string} clientId         The client ID of the block.
  * @param  {?string} fromRootClientId Root client ID source.
  * @param  {?string} toRootClientId   Root client ID destination.
- * @param  {?string} layout           Layout to move the block into.
  * @param  {number}  index            The index to move the block into.
  *
  * @return {Object} Action object.
  */
-export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId, layout, index ) {
+export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId, index ) {
 	return {
 		type: 'MOVE_BLOCK_TO_POSITION',
 		fromRootClientId,
 		toRootClientId,
 		clientId,
 		index,
-		layout,
 	};
 }
 
