@@ -30,7 +30,7 @@ import {
 	preferences,
 	saving,
 	blocksMode,
-	isInsertionPointVisible,
+	insertionPoint,
 	reusableBlocks,
 	template,
 	blockListSettings,
@@ -1274,27 +1274,36 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'isInsertionPointVisible', () => {
-		it( 'should default to false', () => {
-			const state = isInsertionPointVisible( undefined, {} );
+	describe( 'insertionPoint', () => {
+		it( 'should default to null', () => {
+			const state = insertionPoint( undefined, {} );
 
-			expect( state ).toBe( false );
+			expect( state ).toBe( null );
 		} );
 
-		it( 'should set insertion point visible', () => {
-			const state = isInsertionPointVisible( false, {
+		it( 'should set insertion point', () => {
+			const state = insertionPoint( null, {
 				type: 'SHOW_INSERTION_POINT',
+				rootClientId: 'clientId1',
+				index: 0,
 			} );
 
-			expect( state ).toBe( true );
+			expect( state ).toEqual( {
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
 		} );
 
 		it( 'should clear the insertion point', () => {
-			const state = isInsertionPointVisible( true, {
+			const original = deepFreeze( {
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
+			const state = insertionPoint( original, {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toBe( false );
+			expect( state ).toBe( null );
 		} );
 	} );
 

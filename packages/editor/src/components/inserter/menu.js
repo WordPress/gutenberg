@@ -130,10 +130,12 @@ export class InserterMenu extends Component {
 			hoveredItem: item,
 		} );
 
+		const { showInsertionPoint, hideInsertionPoint } = this.props;
 		if ( item ) {
-			this.props.showInsertionPoint();
+			const { rootClientId, index } = this.props;
+			showInsertionPoint( rootClientId, index );
 		} else {
-			this.props.hideInsertionPoint();
+			hideInsertionPoint();
 		}
 	}
 

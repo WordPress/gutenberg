@@ -312,7 +312,7 @@ export function insertBlock( block, index, rootClientId ) {
  *
  * @param {Object[]} blocks       Block objects to insert.
  * @param {?number}  index        Index at which block should be inserted.
- * @param {?string}  rootClientId Optional root cliente ID of block list on
+ * @param {?string}  rootClientId Optional root client ID of block list on
  *                                which to insert.
  *
  * @return {Object} Action object.
@@ -331,11 +331,17 @@ export function insertBlocks( blocks, index, rootClientId ) {
  * Returns an action object used in signalling that the insertion point should
  * be shown.
  *
+ * @param {?string} rootClientId Optional root client ID of block list on
+ *                               which to insert.
+ * @param {?number} index        Index at which block should be inserted.
+ *
  * @return {Object} Action object.
  */
-export function showInsertionPoint() {
+export function showInsertionPoint( rootClientId, index ) {
 	return {
 		type: 'SHOW_INSERTION_POINT',
+		rootClientId,
+		index,
 	};
 }
 
