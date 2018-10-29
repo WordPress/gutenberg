@@ -55,7 +55,7 @@ function createLinkFormat( { href, opensInNewWindow, record } ) {
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
 		format.attributes.rel = 'noreferrer noopener';
-		format.attributes[ 'aria-label' ] = `${ text } (opens in a new tab)`;
+		format.attributes[ 'aria-label' ] = `${ text } (${ __( 'opens in a new tab' ) })`;
 	}
 
 	return format;
