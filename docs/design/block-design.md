@@ -26,37 +26,37 @@ A block should have a straightforward, short name so users can easily find it in
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
-#### Do:
-
 ![A screenshot of the Block Library with concise block names](./blocks-do.png)
-
-#### Don't:
+**Do:**
+Use conside block names.
 
 ![A screenshot of the Block Library with long, multi-line block names](./blocks-dont.png)
+**Don't:**
+Avoid long, multi-line block names.
 
 ### Block Description
 
 Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly. Keep it to a single sentence.
 
-#### Do:
-
 ![A screenshot of a short block description](./block-descriptions-do.png)
-
-#### Don't:
+**Do:**
+Use a short, simple, block description.
 
 ![A screenshot of a long block description that includes branding](./block-descriptions-dont.png)
+**Don't:**
+Avoid long descriptions and branding.
 
 ### Placeholders
 
 If your block requires a user to configure some options before you can display it, you should provide an instructive placeholder state.
 
-#### Do:
-
 ![A screenshot of the Gallery block's placeholder](./placeholder-do.png)
-
-#### Don't
+**Do:**
+Provide an instructive placeholder state.
 
 ![An example Gallery block placeholder but with intense, distracting colors and no instructions](./placeholder-dont.png)
+**Don't:**
+Avoid branding and relying on the title along to convey instructions.
 
 ### Selected and Unselected States
 
@@ -64,27 +64,21 @@ When unselected, your block should preview its content as closely to the front-e
 
 When selected, your block may surface additional options like input fields or buttons to configure the block directly, especially when they are necessary for basic operation.
 
-#### Do:
-
 ![A Google Maps block with inline, always-accessible controls required for the block to function](./block-controls-do.png)
-
-*In this example, the block is not functional unless the URL has supplied, it's an essential control that should be rendered inside the block edit view.*
-
-#### Don't:
+**Do:**
+For controls that are essential the the operation of the block, provide them directly in inside the block edit view.
 
 ![A Google Maps block with essential controls moved to the sidebar where they can be contextually hidden](./block-controls-dont.png)
-
-*In this example, the block's essential options do not appear functional to a user who has dismissed the sidebar.*
+**Don't:**
+Do not put controls that are essential to the block in the sidebar, or the block will appear non-functional to mobile users, or desktop users who have dismissed the sidebar.
 
 ### Advanced Block Settings
 
 The “Block” tab of the Settings Sidebar can contain additional block options and configuration. Keep in mind that a user can dismiss the sidebar and never use it. You should not put critical options in the Sidebar.
 
-#### Do:
-
 ![A screenshot of the paragraph block's advanced settings in the sidebar](./advanced-settings-do.png)
-
-*In this example, the Drop Cap feature is not necessary for the basic operation of the block, and can be put in the Block tab as optional configuration.*
+**Do:**
+Because the Drop Cap feature is not necessary for the basic operation of the block, you can put it ub the Block tab as optional configuration.
 
 ### Consider mobile
 
