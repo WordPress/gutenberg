@@ -86,7 +86,7 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId, layout } ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
@@ -101,23 +101,22 @@ export default compose( [
 			// Otherwise, the default behavior for an undefined index is to
 			// append block to the end of the rootClientId context.
 			const insertionPoint = getBlockInsertionPoint();
-			( { rootClientId, layout, index } = insertionPoint );
+			( { rootClientId, index } = insertionPoint );
 		}
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			selectedBlock: getSelectedBlock(),
 			items: getInserterItems( rootClientId ),
-			layout,
 			index,
 			rootClientId,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onInsertBlock: ( item ) => {
-			const { selectedBlock, index, rootClientId, layout } = ownProps;
+			const { selectedBlock, index, rootClientId } = ownProps;
 			const { name, initialAttributes } = item;
-			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
+			const insertedBlock = createBlock( name, initialAttributes );
 			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.clientId, insertedBlock );
 			}

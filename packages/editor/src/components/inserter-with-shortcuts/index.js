@@ -56,11 +56,11 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { clientId, rootClientId, layout } = ownProps;
+		const { clientId, rootClientId } = ownProps;
 
 		return {
 			onInsert( { name, initialAttributes } ) {
-				const block = createBlock( name, { ...initialAttributes, layout } );
+				const block = createBlock( name, initialAttributes );
 				if ( clientId ) {
 					dispatch( 'core/editor' ).replaceBlocks( clientId, block );
 				} else {
