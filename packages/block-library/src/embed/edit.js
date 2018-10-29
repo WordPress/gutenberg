@@ -1,15 +1,13 @@
 /**
  * Internal dependencies
  */
-import { isFromWordPress, createUpgradedEmbedBlock } from './util';
-import { ASPECT_RATIOS } from './constants';
+import { isFromWordPress, createUpgradedEmbedBlock, getClassNames } from './util';
 import { EmbedLoading, EmbedControls, EmbedPreview, EmbedEditUrl } from './components';
 
 /**
  * External dependencies
  */
 import { kebabCase, toLower } from 'lodash';
-import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -77,37 +75,6 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			setAttributes( { url } );
 		}
 
-		/**
-		 * Gets the appropriate CSS class names to enforce an aspect ratio when the embed is resized
-		 * if the HTML has an iframe with width and height set.
-		 *
-		 * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
-		 * @param {boolean} allowResponsive If the classes should be added, or removed.
-		 * @return {Object} Object with classnames set for use with `classnames`.
-		 */
-		getAspectRatioClassNames( html, allowResponsive = true ) {
-			const previewDocument = document.implementation.createHTMLDocument( '' );
-			previewDocument.body.innerHTML = html;
-			const iframe = previewDocument.body.querySelector( 'iframe' );
-
-			// If we have a fixed aspect iframe, and it's a responsive embed block.
-			if ( responsive && iframe && iframe.height && iframe.width ) {
-				const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
-				// Given the actual aspect ratio, find the widest ratio to support it.
-				for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
-					const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
-					if ( aspectRatio >= potentialRatio.ratio ) {
-						return {
-							[ potentialRatio.className ]: allowResponsive,
-							'wp-has-aspect-ratio': allowResponsive,
-						};
-					}
-				}
-			}
-
-			return this.props.attributes.className;
-		}
-
 		/***
 		 * Gets block attributes based on the preview and responsive state.
 		 *
@@ -133,10 +100,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 				attributes.providerNameSlug = providerNameSlug;
 			}
 
-			attributes.className = classnames(
-				this.props.attributes.className,
-				this.getAspectRatioClassNames( html, allowResponsive )
-			);
+			attributes.className = getClassNames( html, this.props.attributes.className, responsive && allowResponsive );
 
 			return attributes;
 		}
@@ -161,12 +125,11 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		toggleResponsive() {
 			const { allowResponsive, className } = this.props.attributes;
 			const { html } = this.props.preview;
-			const responsiveClassNames = this.getAspectRatioClassNames( html, ! allowResponsive );
 
 			this.props.setAttributes(
 				{
 					allowResponsive: ! allowResponsive,
-					className: classnames( className, responsiveClassNames ),
+					className: getClassNames( html, className, responsive && ! allowResponsive ),
 				}
 			);
 		}

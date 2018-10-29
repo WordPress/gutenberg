@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import { common, others } from './core-embeds';
-import { DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK } from './constants';
+import { DEFAULT_EMBED_BLOCK, WORDPRESS_EMBED_BLOCK, ASPECT_RATIOS } from './constants';
 
 /**
  * External dependencies
  */
 import { includes } from 'lodash';
+import classnames from 'classnames/dedupe';
 
 /**
  * WordPress dependencies
@@ -113,3 +114,37 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 		}
 	}
 };
+
+/**
+ * Returns class names with any relevant responsive aspect ratio names.
+ *
+ * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
+ * @param {string} existingClassNames Any existing class names.
+ * @param {boolean} allowResponsive If the responsive class names should be added, or removed.
+ * @return {string} Deduped class names.
+ */
+export function getClassNames( html, existingClassNames, allowResponsive = true ) {
+	const previewDocument = document.implementation.createHTMLDocument( '' );
+	previewDocument.body.innerHTML = html;
+	const iframe = previewDocument.body.querySelector( 'iframe' );
+
+	// If we have a fixed aspect iframe, and it's a responsive embed block.
+	if ( iframe && iframe.height && iframe.width ) {
+		const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+		// Given the actual aspect ratio, find the widest ratio to support it.
+		for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
+			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
+			if ( aspectRatio >= potentialRatio.ratio ) {
+				return classnames(
+					existingClassNames,
+					{
+						[ potentialRatio.className ]: allowResponsive,
+						'wp-has-aspect-ratio': allowResponsive,
+					}
+				);
+			}
+		}
+	}
+
+	return existingClassNames;
+}
