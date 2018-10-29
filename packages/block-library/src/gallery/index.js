@@ -17,12 +17,12 @@ import { G, Path, SVG } from '@wordpress/components';
  */
 import { default as edit, defaultColumnsNumber, pickRelevantMediaFiles } from './edit';
 
+// Attributes are to be saved as JSON in the block boundary for easier
+// server-side access.
 const blockAttributes = {
 	images: {
 		type: 'array',
 		default: [],
-		source: 'query',
-		selector: 'ul.wp-block-gallery .blocks-gallery-item',
 		query: {
 			url: {
 				source: 'attribute',
@@ -61,6 +61,17 @@ const blockAttributes = {
 	linkTo: {
 		type: 'string',
 		default: 'none',
+	},
+};
+
+// Identical schema, but wherein `images` are not saved in the block boundary,
+// and instead are sourced in the block's inner HTML.
+const deprecatedBlockAttributes = {
+	...blockAttributes,
+	images: {
+		...blockAttributes.images,
+		source: 'query',
+		selector: 'ul.wp-block-gallery .blocks-gallery-item',
 	},
 };
 
@@ -199,7 +210,42 @@ export const settings = {
 
 	deprecated: [
 		{
-			attributes: blockAttributes,
+			attributes: deprecatedBlockAttributes,
+			save( { attributes } ) {
+				const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+				return (
+					<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+						{ images.map( ( image ) => {
+							let href;
+
+							switch ( linkTo ) {
+								case 'media':
+									href = image.url;
+									break;
+								case 'attachment':
+									href = image.link;
+									break;
+							}
+
+							const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ image.id ? `wp-image-${ image.id }` : null } />;
+
+							return (
+								<li key={ image.id || image.url } className="blocks-gallery-item">
+									<figure>
+										{ href ? <a href={ href }>{ img }</a> : img }
+										{ image.caption && image.caption.length > 0 && (
+											<RichText.Content tagName="figcaption" value={ image.caption } />
+										) }
+									</figure>
+								</li>
+							);
+						} ) }
+					</ul>
+				);
+			},
+		},
+		{
+			attributes: deprecatedBlockAttributes,
 			save( { attributes } ) {
 				const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
 				return (
@@ -235,9 +281,9 @@ export const settings = {
 		},
 		{
 			attributes: {
-				...blockAttributes,
+				...deprecatedBlockAttributes,
 				images: {
-					...blockAttributes.images,
+					...deprecatedBlockAttributes.images,
 					selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
 				},
 				align: {
