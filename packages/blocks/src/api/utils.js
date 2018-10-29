@@ -64,7 +64,8 @@ export function isValidIcon( icon ) {
 		isString( icon ) ||
 		isValidElement( icon ) ||
 		isFunction( icon ) ||
-		icon instanceof Component
+		icon instanceof Component ||
+		isValidIcon( icon.src )
 	);
 }
 

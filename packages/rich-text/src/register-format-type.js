@@ -1,13 +1,31 @@
 /**
  * External dependencies
  */
-import { isFunction } from 'lodash';
+import { isFunction, isString } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
-import { isValidIcon, normalizeIconObject } from '@wordpress/blocks';
+import { Component, isValidElement } from '@wordpress/element';
+
+/**
+ * Function that checks if the parameter is a valid icon.
+ *
+ * @param {*} icon  Parameter to be checked.
+ *
+ * @return {boolean} True if the parameter is a valid icon and false otherwise.
+ */
+
+export function isValidIcon( icon ) {
+	return !! icon && (
+		isString( icon ) ||
+		isValidElement( icon ) ||
+		isFunction( icon ) ||
+		icon instanceof Component ||
+		isValidIcon( icon.src )
+	);
+}
 
 /**
  * Registers a new format provided a unique name and an object defining its
@@ -22,6 +40,7 @@ import { isValidIcon, normalizeIconObject } from '@wordpress/blocks';
 export function registerFormatType( name, settings ) {
 	settings = {
 		name,
+		icon: 'block-default',
 		...settings,
 	};
 
@@ -74,9 +93,7 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-	settings.icon = normalizeIconObject( settings.icon );
-
-	if ( ! isValidIcon( settings.icon.src ) ) {
+	if ( ! isValidIcon( settings.icon ) ) {
 		window.console.error(
 			'The icon passed is invalid. ' +
 			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/format-api/#icon-optional'

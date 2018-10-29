@@ -3490,9 +3490,7 @@ describe( 'selectors', () => {
 				name: 'core/test-block-a',
 				initialAttributes: {},
 				title: 'Test Block A',
-				icon: {
-					src: 'test',
-				},
+				icon: 'test',
 				category: 'formatting',
 				keywords: [ 'testing' ],
 				isDisabled: false,
@@ -3506,9 +3504,7 @@ describe( 'selectors', () => {
 				name: 'core/block',
 				initialAttributes: { ref: 1 },
 				title: 'Reusable Block 1',
-				icon: {
-					src: 'test',
-				},
+				icon: 'test',
 				category: 'reusable',
 				keywords: [],
 				isDisabled: false,

@@ -14,7 +14,7 @@ import { select, dispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { isValidIcon, normalizeIconObject } from './utils';
+import { isValidIcon } from './utils';
 
 /**
  * Defined behavior of a block type.
@@ -66,6 +66,7 @@ export function unstable__bootstrapServerSideBlockDefinitions( definitions ) { /
 export function registerBlockType( name, settings ) {
 	settings = {
 		name,
+		icon: 'block-default',
 		...get( serverSideBlockDefinitions, name ),
 		...settings,
 	};
@@ -137,8 +138,7 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	settings.icon = normalizeIconObject( settings.icon );
-	if ( ! isValidIcon( settings.icon.src ) ) {
+	if ( ! isValidIcon( settings.icon ) ) {
 		console.error(
 			'The icon passed is invalid. ' +
 			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/block-api/#icon-optional'

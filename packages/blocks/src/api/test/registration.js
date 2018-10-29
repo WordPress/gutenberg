@@ -92,9 +92,7 @@ describe( 'blocks', () => {
 			expect( console ).not.toHaveErrored();
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
-				icon: {
-					src: 'block-default',
-				},
+				icon: 'block-default',
 				save: noop,
 				category: 'common',
 				title: 'block title',
@@ -177,9 +175,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: 'block-default',
-				},
+				icon: 'block-default',
 				attributes: {
 					ok: {
 						type: 'boolean',
@@ -216,12 +212,12 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
+				icon: (
+					<svg width="20" height="20" viewBox="0 0 20 20">
 						<circle cx="10" cy="10" r="10"
 							fill="red" stroke="blue" strokeWidth="10" />
-					</svg> ),
-				},
+					</svg>
+				),
 			} );
 		} );
 
@@ -238,9 +234,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: 'foo',
-				},
+				icon: 'foo',
 			} );
 		} );
 
@@ -263,9 +257,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: MyTestIcon,
-				},
+				icon: MyTestIcon,
 			} );
 		} );
 
@@ -282,16 +274,14 @@ describe( 'blocks', () => {
 					</svg> ),
 				},
 			};
-			registerBlockType( 'core/test-block-icon-normalize-background', blockType );
-			expect( getBlockType( 'core/test-block-icon-normalize-background' ) ).toEqual( {
-				name: 'core/test-block-icon-normalize-background',
+			registerBlockType( 'core/test-block-icon-svg-with-background', blockType );
+			expect( getBlockType( 'core/test-block-icon-svg-with-background' ) ).toEqual( {
+				name: 'core/test-block-icon-svg-with-background',
 				save: noop,
 				category: 'common',
 				title: 'block title',
 				icon: {
 					background: '#f00',
-					foreground: '#191e23',
-					shadowColor: 'rgba(255, 0, 0, 0.3)',
 					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
 						<circle cx="10" cy="10" r="10"
 							fill="red" stroke="blue" strokeWidth="10" />
@@ -310,9 +300,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: 'block-default',
-				},
+				icon: 'block-default',
 			} );
 		} );
 
@@ -350,9 +338,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'common',
 					title: 'block title',
-					icon: {
-						src: 'block-default',
-					},
+					icon: 'block-default',
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -362,9 +348,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: 'block-default',
-				},
+				icon: 'block-default',
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -420,9 +404,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: 'block-default',
-				},
+				icon: 'block-default',
 			} );
 		} );
 
@@ -435,9 +417,7 @@ describe( 'blocks', () => {
 				save: noop,
 				category: 'common',
 				title: 'block title',
-				icon: {
-					src: 'block-default',
-				},
+				icon: 'block-default',
 			} );
 		} );
 	} );
@@ -457,9 +437,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'common',
 					title: 'block title',
-					icon: {
-						src: 'block-default',
-					},
+					icon: 'block-default',
 				},
 				{
 					name: 'core/test-block-with-settings',
@@ -467,9 +445,7 @@ describe( 'blocks', () => {
 					save: noop,
 					category: 'common',
 					title: 'block title',
-					icon: {
-						src: 'block-default',
-					},
+					icon: 'block-default',
 				},
 			] );
 		} );

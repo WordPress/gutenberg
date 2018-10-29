@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Circle, Icon, SVG } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -44,6 +44,23 @@ describe( 'BlockIcon', () => {
 		expect( wrapper.find( 'div' ).prop( 'style' ) ).toEqual( {
 			backgroundColor: 'white',
 			color: 'black',
+		} );
+	} );
+
+	it( 'adds background and foreground styles when an icon with background and a custom svg', () => {
+		const icon = {
+			background: '#f00',
+			src: (
+				<SVG width="20" height="20" viewBox="0 0 20 20">
+					<Circle cx="10" cy="10" r="10" fill="red" stroke="blue" strokeWidth="10" />
+				</SVG>
+			),
+		};
+		const wrapper = shallow( <BlockIcon icon={ icon } showColors /> );
+
+		expect( wrapper.find( 'div' ).prop( 'style' ) ).toEqual( {
+			backgroundColor: '#f00',
+			color: '#191e23',
 		} );
 	} );
 } );

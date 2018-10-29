@@ -39,7 +39,7 @@ function InserterWithShortcuts( { items, isLocked, onInsert } ) {
 					// translators: %s: block title/name to be added
 					label={ sprintf( __( 'Add %s' ), item.title ) }
 					icon={ (
-						<BlockIcon icon={ item.icon && item.icon.src } />
+						<BlockIcon icon={ item.icon } />
 					) }
 				/>
 			) ) }
