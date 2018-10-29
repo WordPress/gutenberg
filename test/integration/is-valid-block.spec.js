@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { isBlockContentValid } from '@wordpress/blocks';
+import { isValidBlockContent } from '@wordpress/blocks';
 import { createElement } from '@wordpress/element';
 
-describe( 'isBlockContentValid', () => {
+describe( 'isValidBlockContent', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
 		require( '../../packages/editor/src/hooks' );
 	} );
 
 	it( 'should use the namespace in the classname for non-core blocks', () => {
-		const valid = isBlockContentValid(
+		const valid = isValidBlockContent(
 			{
 				save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 				name: 'myplugin/fruit',
@@ -24,7 +24,7 @@ describe( 'isBlockContentValid', () => {
 	} );
 
 	it( 'should include additional classes in block attributes', () => {
-		const valid = isBlockContentValid(
+		const valid = isValidBlockContent(
 			{
 				save: ( { attributes } ) => createElement( 'div', {
 					className: 'fruit',
@@ -42,7 +42,7 @@ describe( 'isBlockContentValid', () => {
 	} );
 
 	it( 'should not add a className if falsy', () => {
-		const valid = isBlockContentValid(
+		const valid = isValidBlockContent(
 			{
 				save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 				name: 'myplugin/fruit',

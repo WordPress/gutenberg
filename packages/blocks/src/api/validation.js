@@ -493,11 +493,12 @@ export function isEquivalentHTML( actual, expected ) {
 export function isValidBlock( innerHTML, blockType, attributes ) {
 	deprecated( 'isValidBlock', {
 		plugin: 'Gutenberg',
-		version: '4.3',
-		alternative: 'isBlockContentValid',
+		version: '4.4',
+		alternative: 'isValidBlockContent',
+		hint: 'The order of params has changed.',
 	} );
 
-	return isBlockContentValid( blockType, attributes, innerHTML );
+	return isValidBlockContent( blockType, attributes, innerHTML );
 }
 
 /**
@@ -513,7 +514,7 @@ export function isValidBlock( innerHTML, blockType, attributes ) {
  *
  * @return {boolean} Whether block is valid.
  */
-export function isBlockContentValid( blockType, attributes, innerHTML ) {
+export function isValidBlockContent( blockType, attributes, innerHTML ) {
 	let saveContent;
 	try {
 		saveContent = getSaveContent( blockType, attributes );

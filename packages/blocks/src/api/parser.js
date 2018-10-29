@@ -20,7 +20,7 @@ import {
 	getUnregisteredTypeHandlerName,
 } from './registration';
 import { createBlock } from './factory';
-import { isBlockContentValid } from './validation';
+import { isValidBlockContent } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 
@@ -340,7 +340,7 @@ export function getMigratedBlock( block ) {
 		);
 
 		// Ignore the deprecation if it produces a block which is not valid.
-		const isValid = isBlockContentValid(
+		const isValid = isValidBlockContent(
 			deprecatedBlockType,
 			migratedAttributes,
 			originalContent
@@ -459,7 +459,7 @@ export function createBlockWithFallback( blockNode ) {
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
 	if ( ! isFallbackBlock ) {
-		block.isValid = isBlockContentValid( blockType, block.attributes, innerHTML );
+		block.isValid = isValidBlockContent( blockType, block.attributes, innerHTML );
 	}
 
 	// Preserve original content for future use in case the block is parsed as
