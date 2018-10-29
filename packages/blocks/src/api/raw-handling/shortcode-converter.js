@@ -60,6 +60,10 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 
 		const blockType = getBlockType( transformation.blockName );
 
+		const silentAttributes = pickBy( attributes, ( value, key ) =>
+			! blockType.attributes.hasOwnProperty( key )
+		);
+
 		const block = createBlock(
 			transformation.blockName,
 			{
@@ -73,10 +77,6 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 				),
 				...silentAttributes,
 			}
-		);
-
-		const silentAttributes = pickBy( attributes, ( value, key ) =>
-			! blockType.attributes.hasOwnProperty( key )
 		);
 
 		block.attributes = {
