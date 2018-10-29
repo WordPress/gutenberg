@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, castArray, first, last } from 'lodash';
+import { get, reduce, size, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,6 @@ import {
 } from '@wordpress/dom';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
-	cloneBlock,
 	getBlockType,
 	getSaveElement,
 	isReusableBlock,
@@ -367,11 +366,11 @@ export class BlockListBlock extends Component {
 			isLast,
 			clientId,
 			rootClientId,
-			layout,
 			isSelected,
 			isPartOfMultiSelection,
 			isFirstMultiSelected,
 			isTypingWithinBlock,
+			isCaretWithinFormattedText,
 			isMultiSelecting,
 			hoverArea,
 			isEmptyDefaultBlock,
@@ -399,7 +398,7 @@ export class BlockListBlock extends Component {
 		// We render block movers and block settings to keep them tabbale even if hidden
 		const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 		const shouldShowBreadcrumb = ! isFocusMode && isHovered && ! isEmptyDefaultBlock;
-		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ! isTypingWithinBlock ) || isFirstMultiSelected );
+		const shouldShowContextualToolbar = ! hasFixedToolbar && ! showSideInserter && ( ( isSelected && ( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) || isFirstMultiSelected );
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
@@ -491,7 +490,6 @@ export class BlockListBlock extends Component {
 					<BlockInsertionPoint
 						clientId={ clientId }
 						rootClientId={ rootClientId }
-						layout={ layout }
 						canShowInserter={ canShowInBetweenInserter }
 						onInsert={ this.hideHoverEffects }
 					/>
@@ -500,7 +498,6 @@ export class BlockListBlock extends Component {
 					index={ order }
 					clientId={ clientId }
 					rootClientId={ rootClientId }
-					layout={ layout }
 				/>
 				{ shouldRenderMovers && (
 					<BlockMover
@@ -559,7 +556,6 @@ export class BlockListBlock extends Component {
 							<InserterWithShortcuts
 								clientId={ clientId }
 								rootClientId={ rootClientId }
-								layout={ layout }
 								onToggle={ this.selectOnOpen }
 							/>
 						</div>
@@ -588,6 +584,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isFirstMultiSelectedBlock,
 		isMultiSelecting,
 		isTyping,
+		isCaretWithinFormattedText,
 		getBlockIndex,
 		getEditedPostAttribute,
 		getBlockMode,
@@ -613,6 +610,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 		isTypingWithinBlock: ( isSelected || isParentOfSelectedBlock ) && isTyping(),
+		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		order: getBlockIndex( clientId, rootClientId ),
 		meta: getEditedPostAttribute( 'meta' ),
 		mode: getBlockMode( clientId ),
@@ -652,8 +650,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			selectBlock( clientId, initialPosition );
 		},
 		onInsertBlocks( blocks, index ) {
-			const { rootClientId, layout } = ownProps;
-			blocks = blocks.map( ( block ) => cloneBlock( block, { layout } ) );
+			const { rootClientId } = ownProps;
 			insertBlocks( blocks, index, rootClientId );
 		},
 		onInsertDefaultBlockAfter() {
@@ -667,10 +664,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 			mergeBlocks( ...args );
 		},
 		onReplace( blocks ) {
-			const { layout } = ownProps;
-			blocks = castArray( blocks ).map( ( block ) => (
-				cloneBlock( block, { layout } )
-			) );
 			replaceBlocks( [ ownProps.clientId ], blocks );
 		},
 		onMetaChange( meta ) {

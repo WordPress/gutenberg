@@ -10,6 +10,7 @@ import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,10 +22,27 @@ class EditorProvider extends Component {
 		super( ...arguments );
 
 		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( ! props.recovery ) {
-			this.props.updateEditorSettings( props.settings );
-			this.props.updatePostLock( props.settings.postLock );
-			this.props.setupEditor( props.post, props.settings.autosave );
+		if ( props.recovery ) {
+			return;
+		}
+
+		props.updateEditorSettings( props.settings );
+		props.updatePostLock( props.settings.postLock );
+		props.setupEditor( props.post );
+
+		if ( props.settings.autosave ) {
+			props.createWarningNotice(
+				__( 'There is an autosave of this post that is more recent than the version below.' ),
+				{
+					id: 'autosave-exists',
+					actions: [
+						{
+							label: __( 'View the autosave' ),
+							url: props.settings.autosave.editLink,
+						},
+					],
+				}
+			);
 		}
 	}
 
@@ -92,9 +110,12 @@ export default withDispatch( ( dispatch ) => {
 		updateEditorSettings,
 		updatePostLock,
 	} = dispatch( 'core/editor' );
+	const { createWarningNotice } = dispatch( 'core/notices' );
+
 	return {
 		setupEditor,
 		updateEditorSettings,
 		updatePostLock,
+		createWarningNotice,
 	};
 } )( EditorProvider );

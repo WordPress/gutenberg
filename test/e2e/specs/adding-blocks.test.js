@@ -75,7 +75,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Switch to Text Mode to check HTML Output
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
+		await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 		const codeEditorButton = ( await page.$x( "//button[contains(text(), 'Code Editor')]" ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 

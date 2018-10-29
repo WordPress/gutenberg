@@ -82,6 +82,7 @@ const {
 	isFirstMultiSelectedBlock,
 	getBlockMode,
 	isTyping,
+	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
 	isSavingPost,
@@ -89,7 +90,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	getNotices,
 	getReusableBlock,
 	isSavingReusableBlock,
 	isFetchingReusableBlock,
@@ -2720,6 +2720,24 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isCaretWithinFormattedText', () => {
+		it( 'returns true if the isCaretWithinFormattedText state is also true', () => {
+			const state = {
+				isCaretWithinFormattedText: true,
+			};
+
+			expect( isCaretWithinFormattedText( state ) ).toBe( true );
+		} );
+
+		it( 'returns false if the isCaretWithinFormattedText state is also false', () => {
+			const state = {
+				isCaretWithinFormattedText: false,
+			};
+
+			expect( isCaretWithinFormattedText( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isSelectionEnabled', () => {
 		it( 'should return true if selection is enable', () => {
 			const state = {
@@ -2768,7 +2786,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				layout: undefined,
 				index: 1,
 			} );
 		} );
@@ -2800,37 +2817,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
-				layout: undefined,
-				index: 1,
-			} );
-		} );
-
-		it( 'should return an object for the selected block with layout', () => {
-			const state = {
-				currentPost: {},
-				preferences: { mode: 'visual' },
-				blockSelection: {
-					start: 'clientId1',
-					end: 'clientId1',
-				},
-				editor: {
-					present: {
-						blocksByClientId: {
-							clientId1: { clientId: 'clientId1', attributes: { layout: 'wide' } },
-						},
-						blockOrder: {
-							'': [ 'clientId1' ],
-							clientId1: [],
-						},
-						edits: {},
-					},
-				},
-				isInsertionPointVisible: false,
-			};
-
-			expect( getBlockInsertionPoint( state ) ).toEqual( {
-				rootClientId: undefined,
-				layout: 'wide',
 				index: 1,
 			} );
 		} );
@@ -2862,7 +2848,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				layout: undefined,
 				index: 2,
 			} );
 		} );
@@ -2894,7 +2879,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				layout: undefined,
 				index: 2,
 			} );
 		} );
@@ -3278,19 +3262,6 @@ describe( 'selectors', () => {
 			const content = getEditedPostContent( state );
 
 			expect( content ).toBe( '<!-- wp:default {\"modified\":true} /-->' );
-		} );
-	} );
-
-	describe( 'getNotices', () => {
-		it( 'should return the notices array', () => {
-			const state = {
-				notices: [
-					{ id: 'b', content: 'Post saved' },
-					{ id: 'a', content: 'Error saving' },
-				],
-			};
-
-			expect( getNotices( state ) ).toEqual( state.notices );
 		} );
 	} );
 

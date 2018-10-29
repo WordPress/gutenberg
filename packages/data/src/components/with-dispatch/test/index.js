@@ -33,7 +33,10 @@ describe( 'withDispatch', () => {
 			const { count } = ownProps;
 
 			return {
-				increment: () => _dispatch( 'counter' ).increment( count ),
+				increment: () => {
+					const actionReturnedFromDispatch = _dispatch( 'counter' ).increment( count );
+					expect( actionReturnedFromDispatch ).toBe( undefined );
+				},
 			};
 		} )( ( props ) => <button onClick={ props.increment } /> );
 

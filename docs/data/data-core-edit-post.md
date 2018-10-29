@@ -275,7 +275,7 @@ Returns an action object signalling that the user closed the sidebar.
 
 ### openModal
 
-Returns an action object used in signalling that the user opened an editor sidebar.
+Returns an action object used in signalling that the user opened a modal.
 
 *Parameters*
 
@@ -283,7 +283,7 @@ Returns an action object used in signalling that the user opened an editor sideb
 
 ### closeModal
 
-Returns an action object signalling that the user closed the sidebar.
+Returns an action object signalling that the user closed a modal.
 
 ### openPublishSidebar
 

@@ -12,7 +12,6 @@ import {
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import '@wordpress/core-data'; // Needed to load the core store
 
 /**
  * Internal dependencies
@@ -37,6 +36,7 @@ import {
 	fetchReusableBlocks as fetchReusableBlocksAction,
 } from '../../actions';
 import reducer from '../../reducer';
+import '../../..'; // Ensure store dependencies are imported via root.
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 

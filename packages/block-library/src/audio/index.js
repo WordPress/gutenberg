@@ -31,6 +31,7 @@ export const settings = {
 			attribute: 'src',
 		},
 		caption: {
+			type: 'string',
 			source: 'html',
 			selector: 'figcaption',
 		},
