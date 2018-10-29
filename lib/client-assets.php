@@ -1393,6 +1393,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$post_type_object = get_post_type_object( $post_type );
 	$rest_base        = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
 
+	$preload_paths = array(
+		'/',
+		'/wp/v2/types?context=edit',
+		'/wp/v2/taxonomies?per_page=-1&context=edit',
+		'/wp/v2/themes?status=active',
+		sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
+		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
+		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
+	);
+
 	/**
 	 * Preload common data by specifying an array of REST API paths that will be preloaded.
 	 *
@@ -1401,19 +1411,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 * @param array $preload_paths Array of paths to preload
 	 * @param object $post         The post resource data.
 	 */
-	$preload_paths = apply_filters(
-		'block_editor_preload_paths',
-		array(
-			'/',
-			'/wp/v2/types?context=edit',
-			'/wp/v2/taxonomies?per_page=-1&context=edit',
-			'/wp/v2/themes?status=active',
-			sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
-			sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
-			sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
-		),
-		$post
-	);
+	$preload_paths = apply_filters( 'block_editor_preload_paths', $preload_paths, $post );
 
 	// Ensure the global $post remains the same after
 	// API data is preloaded. Because API preloading
