@@ -117,7 +117,7 @@ class CategoriesEdit extends Component {
 		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
 			<Fragment>
-				<label htmlFor={ selectId } className="screen-reader-text">
+				<label htmlFor={ selectId }>
 					{ __( 'Categories' ) }
 				</label>
 				<select id={ selectId } className={ `${ className }__dropdown` }>

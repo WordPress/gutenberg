@@ -31,7 +31,8 @@ function render_block_core_categories( $attributes ) {
 		$wrapper_markup           = '<div class="%1$s">%2$s</div>';
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
-
+		$title                    = __( 'Categories', 'gutenberg' );
+		
 		if ( ! is_admin() ) {
 			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
 		}
@@ -50,6 +51,8 @@ function render_block_core_categories( $attributes ) {
 	if ( isset( $attributes['className'] ) ) {
 		$class .= " {$attributes['className']}";
 	}
+
+	$items_markup = '<label for="' . $id . '">' . $title . '</label>' . $items_markup;
 
 	$block_content = sprintf(
 		$wrapper_markup,
