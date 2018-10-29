@@ -31,26 +31,16 @@ export const name = 'core/image';
 const blockAttributes = {
 	url: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'src',
 	},
 	alt: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'alt',
 		default: '',
 	},
 	caption: {
-		source: 'html',
-		selector: 'figcaption',
+		type: 'string',
 	},
 	href: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'figure > a',
-		attribute: 'href',
 	},
 	id: {
 		type: 'number',
@@ -70,6 +60,37 @@ const blockAttributes = {
 	},
 	linkTarget: {
 		type: 'string',
+	},
+};
+
+const deprecatedBlockAttributes = {
+	...blockAttributes,
+	url: {
+		...blockAttributes.url,
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'src',
+	},
+	alt: {
+		...blockAttributes.alt,
+		source: 'attribute',
+		selector: 'img',
+		attribute: 'alt',
+	},
+	caption: {
+		...blockAttributes.caption,
+		type: undefined,
+		source: 'html',
+		selector: 'figcaption',
+	},
+	href: {
+		...blockAttributes.href,
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'href',
+	},
+	linkTarget: {
+		...blockAttributes.linkTarget,
 		source: 'attribute',
 		selector: 'figure > a',
 		attribute: 'target',
@@ -98,6 +119,48 @@ const schema = {
 		},
 	},
 };
+
+function save( { attributes } ) {
+	const { url, alt, caption, align, href, width, height, id, linkTarget } = attributes;
+
+	const classes = classnames( {
+		[ `align${ align }` ]: align,
+		'is-resized': width || height,
+	} );
+
+	const image = (
+		<img
+			src={ url }
+			alt={ alt }
+			className={ id ? `wp-image-${ id }` : null }
+			width={ width }
+			height={ height }
+		/>
+	);
+
+	const figure = (
+		<Fragment>
+			{ href ? <a href={ href } target={ linkTarget } rel={ linkTarget === '_blank' ? 'noreferrer noopener' : undefined }>{ image }</a> : image }
+			{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
+		</Fragment>
+	);
+
+	if ( 'left' === align || 'right' === align || 'center' === align ) {
+		return (
+			<div>
+				<figure className={ classes }>
+					{ figure }
+				</figure>
+			</div>
+		);
+	}
+
+	return (
+		<figure className={ classes }>
+			{ figure }
+		</figure>
+	);
+}
 
 export const settings = {
 	title: __( 'Image' ),
@@ -212,51 +275,15 @@ export const settings = {
 
 	edit,
 
-	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id, linkTarget } = attributes;
-
-		const classes = classnames( {
-			[ `align${ align }` ]: align,
-			'is-resized': width || height,
-		} );
-
-		const image = (
-			<img
-				src={ url }
-				alt={ alt }
-				className={ id ? `wp-image-${ id }` : null }
-				width={ width }
-				height={ height }
-			/>
-		);
-
-		const figure = (
-			<Fragment>
-				{ href ? <a href={ href } target={ linkTarget } rel={ linkTarget === '_blank' ? 'noreferrer noopener' : undefined }>{ image }</a> : image }
-				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
-			</Fragment>
-		);
-
-		if ( 'left' === align || 'right' === align || 'center' === align ) {
-			return (
-				<div>
-					<figure className={ classes }>
-						{ figure }
-					</figure>
-				</div>
-			);
-		}
-
-		return (
-			<figure className={ classes }>
-				{ figure }
-			</figure>
-		);
-	},
+	save,
 
 	deprecated: [
 		{
-			attributes: blockAttributes,
+			attributes: deprecatedBlockAttributes,
+			save,
+		},
+		{
+			attributes: deprecatedBlockAttributes,
 			save( { attributes } ) {
 				const { url, alt, caption, align, href, width, height, id } = attributes;
 
@@ -284,7 +311,7 @@ export const settings = {
 			},
 		},
 		{
-			attributes: blockAttributes,
+			attributes: deprecatedBlockAttributes,
 			save( { attributes } ) {
 				const { url, alt, caption, align, href, width, height, id } = attributes;
 
@@ -307,7 +334,7 @@ export const settings = {
 			},
 		},
 		{
-			attributes: blockAttributes,
+			attributes: deprecatedBlockAttributes,
 			save( { attributes } ) {
 				const { url, alt, caption, align, href, width, height } = attributes;
 				const extraImageProps = width || height ? { width, height } : {};
