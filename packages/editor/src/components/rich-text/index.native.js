@@ -20,11 +20,36 @@ import {
 	split,
 	toHTMLString,
 } from '@wordpress/rich-text';
+import { BACKSPACE } from '@wordpress/keycodes';
+import { children } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { FORMATTING_CONTROLS } from './formatting-controls';
+
+const FORMATTING_CONTROLS = [
+	{
+		icon: 'editor-bold',
+		title: __( 'Bold' ),
+		format: 'bold',
+	},
+	{
+		icon: 'editor-italic',
+		title: __( 'Italic' ),
+		format: 'italic',
+	},
+	{
+		icon: 'admin-links',
+		title: __( 'Link' ),
+		format: 'link',
+	},
+	{
+		icon: 'editor-strikethrough',
+		title: __( 'Strikethrough' ),
+		format: 'strikethrough',
+	},
+];
 
 const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
@@ -47,6 +72,8 @@ export class RichText extends Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
+		this.isEmpty = this.isEmpty.bind( this );
+		this.valueToFormat = this.valueToFormat.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
@@ -186,11 +213,56 @@ export class RichText extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	onBackspace( event ) {
-		if ( ! this.props.onBackspace ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
 			return;
 		}
 
-		this.onBackspace( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
+		const isReverse = keyCode === BACKSPACE;
+
+		const empty = this.isEmpty();
+
+		if ( onMerge ) {
+			onMerge( ! isReverse );
+		}
+
+		// Only handle remove on Backspace. This serves dual-purpose of being
+		// an intentional user interaction distinguishing between Backspace and
+		// Delete to remove the empty field, but also to avoid merge & remove
+		// causing destruction of two fields (merge, then removed merged).
+		if ( onRemove && empty && isReverse ) {
+			onRemove( ! isReverse );
+		}
+	}
+
+	isEmpty() {
+		return isEmpty( this.formatToValue( this.props.value ) );
+	}
+
+	formatToValue( value ) {
+		// Handle deprecated `children` and `node` sources.
+		if ( Array.isArray( value ) ) {
+			return create( {
+				html: children.toHTML( value ),
+				multilineTag: this.multilineTag,
+			} );
+		}
+
+		if ( this.props.format === 'string' ) {
+			return create( {
+				html: value,
+				multilineTag: this.multilineTag,
+			} );
+		}
+
+		// Guard for blocks passing `null` in onSplit callbacks. May be removed
+		// if onSplit is revised to not pass a `null` value.
+		if ( value === null ) {
+			return create();
+		}
+
+		return value;
 	}
 
 	shouldComponentUpdate( nextProps ) {

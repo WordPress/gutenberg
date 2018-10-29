@@ -13,7 +13,7 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component, renderToString, Fragment } from '@wordpress/element';
 import {
 	Button,
@@ -327,7 +327,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 							<Button
 								isLarge
 								type="submit">
-								{ __( 'Embed' ) }
+								{ _x( 'Embed', 'button label' ) }
 							</Button>
 							{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 						</form>

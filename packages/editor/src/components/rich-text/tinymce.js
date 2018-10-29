@@ -168,6 +168,16 @@ export default class TinyMCE extends Component {
 			setup: ( editor ) => {
 				this.editor = editor;
 				this.props.onSetup( editor );
+
+				editor.on( 'init', () => {
+					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
+					[ 'b', 'i', 'u' ].forEach( ( character ) => {
+						editor.shortcuts.remove( `meta+${ character }` );
+					} );
+					[ 1, 2, 3, 4, 5, 6, 7, 8, 9 ].forEach( ( number ) => {
+						editor.shortcuts.remove( `access+${ number }` );
+					} );
+				} );
 			},
 		} );
 	}

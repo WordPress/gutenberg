@@ -43,6 +43,7 @@ const blockAttributes = {
 		default: '',
 	},
 	caption: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	},

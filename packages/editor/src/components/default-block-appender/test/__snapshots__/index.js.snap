@@ -2,7 +2,7 @@
 
 exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
-  className="editor-default-block-appender"
+  className="wp-block editor-default-block-appender"
   data-root-client-id=""
 >
   <WithDispatch(WithSelect(BlockDropZone)) />
@@ -31,7 +31,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
-  className="editor-default-block-appender"
+  className="wp-block editor-default-block-appender"
   data-root-client-id=""
 >
   <WithDispatch(WithSelect(BlockDropZone)) />
@@ -53,7 +53,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
 
 exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 <div
-  className="editor-default-block-appender"
+  className="wp-block editor-default-block-appender"
   data-root-client-id=""
 >
   <WithDispatch(WithSelect(BlockDropZone)) />

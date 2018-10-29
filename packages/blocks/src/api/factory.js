@@ -29,29 +29,25 @@ import { getBlockType, getBlockTypes } from './registration';
 /**
  * Returns a block object given its type and attributes.
  *
- * @param {string} name            Block name.
- * @param {Object} blockAttributes Block attributes.
- * @param {?Array} innerBlocks     Nested blocks.
+ * @param {string} name        Block name.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
  * @return {Object} Block object.
  */
-export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
+export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const attributes = reduce( blockType.attributes, ( result, schema, key ) => {
-		const value = blockAttributes[ key ];
+	const sanitizedAttributes = reduce( blockType.attributes, ( result, schema, key ) => {
+		const value = attributes[ key ];
 
 		if ( undefined !== value ) {
 			result[ key ] = value;
 		} else if ( schema.hasOwnProperty( 'default' ) ) {
 			result[ key ] = schema.default;
-		}
-
-		if ( schema.source === 'html' && typeof result[ key ] !== 'string' ) {
-			result[ key ] = '';
 		}
 
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
@@ -75,7 +71,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		clientId,
 		name,
 		isValid: true,
-		attributes,
+		attributes: sanitizedAttributes,
 		innerBlocks,
 	};
 }
@@ -84,7 +80,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
  * Given a block object, returns a copy of the block object, optionally merging
  * new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block              Block object.
+ * @param {Object} block              Block instance.
  * @param {Object} mergeAttributes    Block attributes.
  * @param {?Array} newInnerBlocks     Nested blocks.
  *
@@ -112,7 +108,6 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  * @param {Object} transform The transform object to validate.
  * @param {string} direction Is this a 'from' or 'to' transform.
  * @param {Array} blocks The blocks to transform from.
- * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {boolean} Is the transform possible?
  */
@@ -157,7 +152,6 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
  * 'from' transforms on other blocks.
  *
  * @param {Array}  blocks  The blocks to transform from.
- * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {Array} Block types that the blocks can be transformed into.
  */
@@ -189,7 +183,6 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
  * the source block's own 'to' transforms.
  *
  * @param {Array} blocks The blocks to transform from.
- * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {Array} Block types that the source can be transformed into.
  */

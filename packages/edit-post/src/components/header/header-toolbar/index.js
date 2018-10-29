@@ -22,15 +22,17 @@ import {
 import FullscreenModeClose from '../fullscreen-mode-close';
 
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
+	const toolbarAriaLabel = hasFixedToolbar ? __( 'Document and block tools' ) : __( 'Document tools' );
+
 	return (
 		<NavigableToolbar
 			className="edit-post-header-toolbar"
-			aria-label={ __( 'Editor Toolbar' ) }
+			aria-label={ toolbarAriaLabel }
 		>
 			<FullscreenModeClose />
 			<div>
 				<Inserter disabled={ mode !== 'visual' } position="bottom right" />
-				<DotTip id="core/editor.inserter">
+				<DotTip tipId="core/editor.inserter">
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>
 			</div>

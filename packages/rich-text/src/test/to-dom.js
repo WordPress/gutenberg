@@ -16,6 +16,11 @@ const { window } = new JSDOM();
 const { document } = window;
 
 describe( 'recordToDom', () => {
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
+
 	spec.forEach( ( { description, multilineTag, record, startPath, endPath } ) => {
 		it( description, () => {
 			const { body, selection } = toDom( record, multilineTag );

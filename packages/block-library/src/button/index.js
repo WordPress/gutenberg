@@ -8,7 +8,7 @@ import { omit, pick } from 'lodash';
  * WordPress dependencies
  */
 import { G, Path, SVG } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
 	getColorClassName,
@@ -33,6 +33,7 @@ const blockAttributes = {
 		attribute: 'title',
 	},
 	text: {
+		type: 'string',
 		source: 'html',
 		selector: 'a',
 	},
@@ -77,9 +78,9 @@ export const settings = {
 	},
 
 	styles: [
-		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
+		{ name: 'default', label: _x( 'Rounded', 'block style' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
-		{ name: 'squared', label: __( 'Squared' ) },
+		{ name: 'squared', label: _x( 'Squared', 'block style' ) },
 	],
 
 	edit,

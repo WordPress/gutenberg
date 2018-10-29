@@ -193,7 +193,7 @@ export async function waitForPageDimensions( width, height ) {
 }
 
 export async function switchToEditor( mode ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	const [ button ] = await page.$x( `//button[contains(text(), '${ mode } Editor')]` );
 	await button.click( 'button' );
 }
@@ -306,7 +306,7 @@ export async function pressWithModifier( modifiers, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
 }
 
@@ -457,5 +457,21 @@ export async function getAllBlocks() {
 	return await page.evaluate( () => {
 		const { select } = window.wp.data;
 		return select( 'core/editor' ).getBlocks();
+	} );
+}
+
+/**
+ * Binds to the document on page load which throws an error if a `focusout`
+ * event occurs without a related target (i.e. focus loss).
+ */
+export function observeFocusLoss() {
+	page.on( 'load', () => {
+		page.evaluate( () => {
+			document.body.addEventListener( 'focusout', ( event ) => {
+				if ( ! event.relatedTarget ) {
+					throw new Error( 'Unexpected focus loss' );
+				}
+			} );
+		} );
 	} );
 }

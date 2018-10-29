@@ -1,16 +1,21 @@
-## 6.0.0 (unreleased)
+## 6.0.0 (2018-10-29)
 
 ### Breaking Changes
 
 - The `labels.name` property has been removed from `MediaPlaceholder` in favor of the new `labels.instructions` prop.
+- The `UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
+- `mediaDetails` in object passed to `onFileChange` callback of `mediaUpload`. Please use `media_details` property instead.
 
 ### New Features
 
 - In `MediaPlaceholder`, provide default values for title and instructions labels when allowed type is one of image, audio or video.
+- New actions `lockPostSaving` and `unlockPostSaving` were introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
+- New selector `isPostSavingLocked` was introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
 
 ### Polish
 
 - Add animated logo to preview interstitial screen.
+- Tweak the editor styles support.
 
 ### Bug Fixes
 

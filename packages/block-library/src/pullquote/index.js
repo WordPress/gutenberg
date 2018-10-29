@@ -7,7 +7,7 @@ import { get, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	getColorClassName,
 	RichText,
@@ -26,13 +26,16 @@ import {
 
 const blockAttributes = {
 	value: {
+		type: 'string',
 		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
+		type: 'string',
 		source: 'html',
 		selector: 'cite',
+		default: '',
 	},
 	mainColor: {
 		type: 'string',
@@ -63,7 +66,7 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: __( 'Regular' ), isDefault: true },
+		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
 	],
 
@@ -133,6 +136,7 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			citation: {
+				type: 'string',
 				source: 'html',
 				selector: 'footer',
 			},

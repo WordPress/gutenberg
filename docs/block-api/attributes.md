@@ -19,6 +19,7 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 ```js
 {
 	url: {
+		type: 'string',
 		source: 'attribute',
 		selector: 'img',
 		attribute: 'src',
@@ -34,6 +35,7 @@ Use `text` to extract the inner text from markup.
 ```js
 {
 	content: {
+		type: 'string',
 		source: 'text',
 		selector: 'figcaption',
 	}
@@ -48,6 +50,7 @@ Use `html` to extract the inner HTML from markup.
 ```js
 {
 	content: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	}
@@ -60,6 +63,7 @@ Use the `multiline` property to extract the inner HTML of matching tag names for
 ```js
 {
 	content: {
+		type: 'string',
 		source: 'html',
 		multiline: 'p',
 		selector: 'blockquote',
@@ -77,11 +81,20 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 ```js
 {
 	images: {
+		type: 'array',
 		source: 'query'
 		selector: 'img',
 		query: {
-			url: { source: 'attribute', attribute: 'src' },
-			alt: { source: 'attribute', attribute: 'alt' },
+			url: {
+				type: 'string',
+				source: 'attribute',
+				attribute: 'src',
+			},
+			alt: {
+				type: 'string',
+				source: 'attribute',
+				attribute: 'alt',
+			},
 		}
 	}
 }

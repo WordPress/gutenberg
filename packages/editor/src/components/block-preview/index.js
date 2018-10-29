@@ -34,7 +34,7 @@ function BlockPreview( props ) {
 export function BlockPreviewContent( { name, attributes } ) {
 	const block = createBlock( name, attributes );
 	return (
-		<Disabled className="editor-block-preview__content" aria-hidden>
+		<Disabled className="editor-block-preview__content editor-styles-wrapper" aria-hidden>
 			<BlockEdit
 				name={ name }
 				focus={ false }
