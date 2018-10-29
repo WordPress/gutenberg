@@ -20,7 +20,7 @@ Blocks should have an identifying icon, ideally using a single color. Try to avo
 
 ### Block Description
 
-Every block should include a description in the “Block” tab of the Settings sidebar. The description should explain as clearly as possible what your block does. Keep it to a single sentence.
+Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly. Keep it to a single sentence.
 
 #### Do:
 
@@ -32,7 +32,7 @@ Every block should include a description in the “Block” tab of the Settings 
 
 ### Placeholders
 
-Blocks should have a instructive placeholder state. If your block requires a user to configure some options before they can display it (for example: uploading a photo for the Gallery block), you should instruct the user on what steps are needed to configure the block.
+If your block requires a user to configure some options before you can display it, you should provide an instructive placeholder state.
 
 #### Do:
 
