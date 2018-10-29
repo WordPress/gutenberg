@@ -187,7 +187,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// TODO: there is a problem with block transformation
 		// let's stop here until we fix the problems with block transformation routine
-		if  ( blockA.name !== blockB.name) {
+		if ( blockA.name !== blockB.name ) {
 			return;
 		}
 
