@@ -22,9 +22,11 @@
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
 		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.10",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"tinycolor2": "^1.4.1"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",

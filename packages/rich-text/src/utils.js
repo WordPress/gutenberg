@@ -1,20 +1,13 @@
 /**
  * External dependencies
  */
-import { every, has, keys, isEqual, isFunction, isString } from 'lodash';
+import { has, isFunction, isString } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
 import { Component, isValidElement } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { getDefaultBlockName } from './registration';
-import { createBlock } from './factory';
 
 /**
  * Array of icon colors containing a color to be used if the icon color
@@ -23,33 +16,6 @@ import { createBlock } from './factory';
  * @type {Object}
  */
 const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
-
-/**
- * Determines whether the block is a default block
- * and its attributes are equal to the default attributes
- * which means the block is unmodified.
- *
- * @param  {WPBlock} block Block Object
- *
- * @return {boolean}       Whether the block is an unmodified default block
- */
-export function isUnmodifiedDefaultBlock( block ) {
-	const defaultBlockName = getDefaultBlockName();
-	if ( block.name !== defaultBlockName ) {
-		return false;
-	}
-
-	const newDefaultBlock = createBlock( defaultBlockName );
-
-	const attributeKeys = applyFilters( 'blocks.isUnmodifiedDefaultBlock.attributes', [
-		...keys( newDefaultBlock.attributes ),
-		...keys( block.attributes ),
-	] );
-
-	return every( attributeKeys, ( key ) =>
-		isEqual( newDefaultBlock.attributes[ key ], block.attributes[ key ] )
-	);
-}
 
 /**
  * Function that checks if the parameter is a valid icon.
