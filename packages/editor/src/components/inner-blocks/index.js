@@ -93,7 +93,6 @@ class InnerBlocks extends Component {
 	render() {
 		const {
 			clientId,
-			layouts,
 			allowedBlocks,
 			templateLock,
 			template,
@@ -109,7 +108,7 @@ class InnerBlocks extends Component {
 			<div className={ classes }>
 				<BlockList
 					rootClientId={ clientId }
-					{ ...{ layouts, allowedBlocks, templateLock, template } }
+					{ ...{ allowedBlocks, templateLock, template } }
 				/>
 			</div>
 		);

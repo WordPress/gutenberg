@@ -282,7 +282,6 @@ export const convertBlockToReusable = ( action, store ) => {
 		action.clientIds,
 		createBlock( 'core/block', {
 			ref: reusableBlock.id,
-			layout: parsedBlock.attributes.layout,
 		} )
 	) );
 

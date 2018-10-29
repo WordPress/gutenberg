@@ -324,23 +324,6 @@ export const editor = flow( [
 					},
 				};
 
-			case 'MOVE_BLOCK_TO_POSITION':
-				// Avoid creating a new instance if the layout didn't change.
-				if ( state[ action.clientId ].attributes.layout === action.layout ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ action.clientId ]: {
-						...state[ action.clientId ],
-						attributes: {
-							...state[ action.clientId ].attributes,
-							layout: action.layout,
-						},
-					},
-				};
-
 			case 'UPDATE_BLOCK':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.clientId ] ) {
