@@ -9,11 +9,6 @@ import { isFunction } from 'lodash';
 import { select, dispatch } from '@wordpress/data';
 
 /**
- * Internal dependencies
- */
-import { isValidIcon, normalizeIconObject } from './utils';
-
-/**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
@@ -74,16 +69,6 @@ export function registerFormatType( name, settings ) {
 	if ( typeof settings.title !== 'string' ) {
 		window.console.error(
 			'Format titles must be strings.'
-		);
-		return;
-	}
-
-	settings.icon = normalizeIconObject( settings.icon );
-
-	if ( ! isValidIcon( settings.icon.src ) ) {
-		window.console.error(
-			'The icon passed is invalid. ' +
-			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/format-api/#icon-optional'
 		);
 		return;
 	}
