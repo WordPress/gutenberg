@@ -1,3 +1,9 @@
+## 2.0.7 (2018-10-29)
+
+### Deprecations
+
+- The id prop of DotTip has been deprecated. Please use the tipId prop instead.
+
 ## 2.0.6 (2018-10-22)
 
 ## 2.0.5 (2018-10-19)

@@ -171,18 +171,6 @@ When the value is not set it defaults to true.
 
 Whether the plugin item is pinned.
 
-### getMetaBoxes
-
-Returns the state of legacy meta boxes.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-State of meta boxes.
-
 ### getActiveMetaBoxLocations
 
 Returns an array of active meta box locations.
@@ -246,19 +234,6 @@ Returns the list of all the available meta boxes.
 *Returns*
 
 List of meta boxes.
-
-### getMetaBox
-
-Returns the state of legacy meta boxes.
-
-*Parameters*
-
- * state: Global application state.
- * location: Location of the meta box.
-
-*Returns*
-
-State of meta box at specified location.
 
 ### hasMetaBoxes
 
@@ -380,12 +355,3 @@ Returns an action object used to request meta box update.
 ### metaBoxUpdatesSuccess
 
 Returns an action object used signal a successful meta box update.
-
-### setMetaBoxSavedData
-
-Returns an action object used to set the saved meta boxes data.
-This is used to check if the meta boxes have been touched when leaving the editor.
-
-*Parameters*
-
- * dataPerLocation: Meta Boxes Data per location.

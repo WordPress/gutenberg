@@ -5,11 +5,6 @@ import { attr } from 'hpq';
 import deepFreeze from 'deep-freeze';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import {
@@ -33,8 +28,6 @@ import {
 } from '../registration';
 import { createBlock } from '../factory';
 import serialize from '../serializer';
-
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -297,10 +290,7 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'getBlockAttributes()', () => {
-		it( 'should parse as coerced value (deprecated)', () => {
-			// TODO: When removing this deprecation, ensure to complement with
-			// enhancement to the intended rejection of a numeric type on an
-			// ambiguous string source.
+		it( 'should reject the value with a wrong type', () => {
 			const blockType = {
 				attributes: {
 					number: {
@@ -315,9 +305,8 @@ describe( 'block parser', () => {
 			const innerHTML = '<div data-number="10">Ribs</div>';
 
 			expect( getBlockAttributes( blockType, innerHTML, {} ) ).toEqual( {
-				number: 10,
+				number: undefined,
 			} );
-			expect( deprecated ).toHaveBeenCalled();
 		} );
 
 		it( 'should merge attributes with the parsed and default attributes', () => {

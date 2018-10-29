@@ -28,8 +28,6 @@ export {
 export {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
-	getUnknownTypeHandlerName,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -46,6 +44,7 @@ export {
 	hasChildBlocksWithInserterSupport,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
+	unregisterBlockStyle,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

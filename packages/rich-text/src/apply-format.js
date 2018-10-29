@@ -2,13 +2,15 @@
  * External dependencies
  */
 
-import { find } from 'lodash';
+import { find, reject } from 'lodash';
 
 /**
  * Internal dependencies
  */
 
 import { normaliseFormats } from './normalise-formats';
+import { insert } from './insert';
+import { ZERO_WIDTH_NO_BREAK_SPACE } from './special-characters';
 
 /**
  * Apply a format object to a Rich Text value from the given `startIndex` to the
@@ -30,21 +32,34 @@ export function applyFormat(
 ) {
 	const newFormats = formats.slice( 0 );
 
-	// If the selection is collapsed, expand start and end to the edges of the
-	// format.
+	// The selection is collpased.
 	if ( startIndex === endIndex ) {
 		const startFormat = find( newFormats[ startIndex ], { type: format.type } );
 
-		while ( find( newFormats[ startIndex ], startFormat ) ) {
-			applyFormats( newFormats, startIndex, format );
-			startIndex--;
-		}
+		// If the caret is at a format of the same type, expand start and end to
+		// the edges of the format. This is useful to apply new attributes.
+		if ( startFormat ) {
+			while ( find( newFormats[ startIndex ], startFormat ) ) {
+				applyFormats( newFormats, startIndex, format );
+				startIndex--;
+			}
 
-		endIndex++;
-
-		while ( find( newFormats[ endIndex ], startFormat ) ) {
-			applyFormats( newFormats, endIndex, format );
 			endIndex++;
+
+			while ( find( newFormats[ endIndex ], startFormat ) ) {
+				applyFormats( newFormats, endIndex, format );
+				endIndex++;
+			}
+		// Otherwise, insert a placeholder with the format so new input appears
+		// with the format applied.
+		} else {
+			const previousFormat = newFormats[ startIndex - 1 ] || [];
+			const hasType = find( previousFormat, { type: format.type } );
+
+			return insert( { formats, text, start, end }, {
+				formats: hasType ? [ reject( previousFormat, { type: format.type } ) ] : [ [ ...previousFormat, format ] ],
+				text: ZERO_WIDTH_NO_BREAK_SPACE,
+			} );
 		}
 	} else {
 		for ( let index = startIndex; index < endIndex; index++ ) {

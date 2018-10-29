@@ -8,15 +8,13 @@ import '@wordpress/viewport';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import './hooks';
 import './plugins';
-import store from './store';
-import { initializeMetaBoxState } from './store/actions';
+import './store';
 import Editor from './editor';
 
 /**
@@ -51,8 +49,6 @@ export function reinitializeEditor( postType, postId, target, settings, override
  * @param {Object}  postId        ID of the post to edit.
  * @param {?Object} settings      Editor settings object.
  * @param {Object}  overridePost  Post properties to override.
- *
- * @return {Object} Editor interface.
  */
 export function initializeEditor( id, postType, postId, settings, overridePost ) {
 	const target = document.getElementById( id );
@@ -71,18 +67,6 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } />,
 		target
 	);
-
-	return {
-		initializeMetaBoxes( metaBoxes ) {
-			deprecated( 'editor.initializeMetaBoxes', {
-				alternative: 'setActiveMetaBoxLocations action (`core/edit-post`)',
-				plugin: 'Gutenberg',
-				version: '4.2',
-			} );
-
-			store.dispatch( initializeMetaBoxState( metaBoxes ) );
-		},
-	};
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';

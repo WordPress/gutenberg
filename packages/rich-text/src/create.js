@@ -1,10 +1,17 @@
 /**
+ * External dependencies
+ */
+
+import { find } from 'lodash';
+
+/**
  * Internal dependencies
  */
 
 import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
+import { getFormatTypes } from './get-format-types';
 
 /**
  * Browser dependencies
@@ -14,6 +21,47 @@ const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 function createEmptyValue() {
 	return { formats: [], text: '' };
+}
+
+function simpleFindKey( object, value ) {
+	for ( const key in object ) {
+		if ( object[ key ] === value ) {
+			return key;
+		}
+	}
+}
+
+function toFormat( { type, attributes } ) {
+	const formatType = find( getFormatTypes(), ( { match } ) =>
+		type === match.tagName
+	);
+
+	if ( ! formatType ) {
+		return attributes ? { type, attributes } : { type };
+	}
+
+	if ( ! attributes ) {
+		return { type: formatType.name };
+	}
+
+	const registeredAttributes = {};
+	const unregisteredAttributes = {};
+
+	for ( const name in attributes ) {
+		const key = simpleFindKey( formatType.attributes, name );
+
+		if ( key ) {
+			registeredAttributes[ key ] = attributes[ name ];
+		} else {
+			unregisteredAttributes[ name ] = attributes[ name ];
+		}
+	}
+
+	return {
+		type: formatType.name,
+		attributes: registeredAttributes,
+		unregisteredAttributes,
+	};
 }
 
 /**
@@ -259,12 +307,13 @@ function createFromElement( {
 		let format;
 
 		if ( ! unwrapNode || ! unwrapNode( node ) ) {
-			const type = node.nodeName.toLowerCase();
-			const attributes = getAttributes( {
-				element: node,
-				removeAttribute,
+			const newFormat = toFormat( {
+				type: node.nodeName.toLowerCase(),
+				attributes: getAttributes( {
+					element: node,
+					removeAttribute,
+				} ),
 			} );
-			const newFormat = attributes ? { type, attributes } : { type };
 
 			// Reuse the last format if it's equal.
 			if ( isFormatEqual( newFormat, lastFormat ) ) {

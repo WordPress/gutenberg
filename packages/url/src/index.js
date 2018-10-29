@@ -109,3 +109,22 @@ export function safeDecodeURI( uri ) {
 		return uri;
 	}
 }
+
+/**
+ * Returns a URL for display.
+ *
+ * @param {string} url Original URL.
+ *
+ * @return {string} Displayed URL.
+ */
+export function filterURLForDisplay( url ) {
+	// Remove protocol and www prefixes.
+	const filteredURL = url.replace( /^(?:https?:)\/\/(?:www\.)?/, '' );
+
+	// Ends with / and only has that single slash, strip it.
+	if ( filteredURL.match( /^[^\/]+\/$/ ) ) {
+		return filteredURL.replace( '/', '' );
+	}
+
+	return filteredURL;
+}

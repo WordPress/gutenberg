@@ -311,19 +311,25 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
 }
 
 /**
- * Publishes the post, resolving once the request is complete (once a notice
- * is displayed).
- *
- * @return {Promise} Promise resolving when publish is complete.
+ * Opens the publish panel.
  */
-export async function publishPost() {
-	// Opens the publish panel
+export async function openPublishPanel() {
 	await page.click( '.editor-post-publish-panel__toggle' );
 
 	// Disable reason: Wait for the animation to complete, since otherwise the
 	// click attempt may occur at the wrong point.
 	// eslint-disable-next-line no-restricted-syntax
 	await page.waitFor( 100 );
+}
+
+/**
+ * Publishes the post, resolving once the request is complete (once a notice
+ * is displayed).
+ *
+ * @return {Promise} Promise resolving when publish is complete.
+ */
+export async function publishPost() {
+	await openPublishPanel();
 
 	// Publish the post
 	await page.click( '.editor-post-publish-button' );
@@ -451,5 +457,21 @@ export async function getAllBlocks() {
 	return await page.evaluate( () => {
 		const { select } = window.wp.data;
 		return select( 'core/editor' ).getBlocks();
+	} );
+}
+
+/**
+ * Binds to the document on page load which throws an error if a `focusout`
+ * event occurs without a related target (i.e. focus loss).
+ */
+export function observeFocusLoss() {
+	page.on( 'load', () => {
+		page.evaluate( () => {
+			document.body.addEventListener( 'focusout', ( event ) => {
+				if ( ! event.relatedTarget ) {
+					throw new Error( 'Unexpected focus loss' );
+				}
+			} );
+		} );
 	} );
 }

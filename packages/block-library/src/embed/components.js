@@ -14,7 +14,7 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import {
 	Button,
@@ -103,7 +103,7 @@ export const EmbedControls = ( props ) => {
 				<InspectorControls>
 					<PanelBody title={ __( 'Media Settings' ) } className="blocks-responsive">
 						<ToggleControl
-							label={ __( 'Automatically scale content' ) }
+							label={ __( 'Resize for smaller devices' ) }
 							checked={ allowResponsive }
 							help={ getResponsiveHelp }
 							onChange={ toggleResponsive }
@@ -130,7 +130,7 @@ export const EmbedEditUrl = ( props ) => {
 				<Button
 					isLarge
 					type="submit">
-					{ __( 'Embed' ) }
+					{ _x( 'Embed', 'button label' ) }
 				</Button>
 				{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
 			</form>

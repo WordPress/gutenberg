@@ -37,12 +37,28 @@ const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
 	version: '1.0',
 };
 
+const MOCK_CANT_EMBED_RESPONSE = {
+	provider_name: 'Embed Handler',
+	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
+};
+
+const MOCK_BAD_WORDPRESS_RESPONSE = {
+	code: 'oembed_invalid_url',
+	message: 'Not Found',
+	data: {
+		status: 404,
+	},
+	html: false,
+};
+
 const MOCK_RESPONSES = {
+	'https://wordpress.org/gutenberg/handbook/': MOCK_BAD_WORDPRESS_RESPONSE,
 	'https://wordpress.org/gutenberg/handbook/block-api/attributes/': MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE,
 	'https://www.youtube.com/watch?v=lXMskKTw3Bc': MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
 	'https://cloudup.com/cQFlxqtY4ob': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 	'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 	'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
+	'https://twitter.com/wooyaygutenberg123454312': MOCK_CANT_EMBED_RESPONSE,
 };
 
 const setupEmbedRequestInterception = async () => {
@@ -51,7 +67,7 @@ const setupEmbedRequestInterception = async () => {
 	await page.setRequestInterception( true );
 	page.on( 'request', async ( request ) => {
 		const requestUrl = request.url();
-		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed/1.0/proxy&url' );
+		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed%2F1.0%2Fproxy' );
 		if ( isEmbeddingUrl ) {
 			const embedUrl = decodeURIComponent( /.*url=([^&]+).*/.exec( requestUrl )[ 1 ] );
 			const mockResponse = MOCK_RESPONSES[ embedUrl ];
@@ -86,25 +102,18 @@ const addEmbeds = async () => {
 	await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 	await page.keyboard.press( 'Enter' );
 
+	// WordPress invalid content.
+	await clickBlockAppender();
+	await page.keyboard.type( '/embed' );
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
+	await page.keyboard.press( 'Enter' );
+
 	// Provider whose oembed API has gone wrong.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://twitter.com/thatbunty' );
-	await page.keyboard.press( 'Enter' );
-
-	// Valid provider; erroring provider API.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://www.reverbnation.com/collection/186-mellow-beats' );
-	await page.keyboard.press( 'Enter' );
-
-	// WordPress content that can't be embedded.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
 	await page.keyboard.press( 'Enter' );
 
 	// WordPress content that can be embedded.
@@ -149,7 +158,6 @@ describe( 'Embedding content', () => {
 		// Each failed embed should be in the edit state.
 		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
 		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
-		await page.waitForSelector( 'input[value="https://www.reverbnation.com/collection/186-mellow-beats"]' );
 		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
 	} );
 } );

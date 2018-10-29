@@ -14,9 +14,8 @@ import {
 	DropZone,
 	IconButton,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -64,25 +63,8 @@ class MediaPlaceholder extends Component {
 		this.closeURLInput = this.closeURLInput.bind( this );
 	}
 
-	getAllowedTypes() {
-		const { allowedTypes, type: deprecatedType } = this.props;
-		let allowedTypesToUse = allowedTypes;
-		if ( ! allowedTypes && deprecatedType ) {
-			deprecated( 'type property of wp.editor.MediaPlaceholder', {
-				version: '4.2',
-				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
-			} );
-			if ( deprecatedType === '*' ) {
-				allowedTypesToUse = undefined;
-			} else {
-				allowedTypesToUse = [ deprecatedType ];
-			}
-		}
-		return allowedTypesToUse;
-	}
-
 	onlyAllowsImages() {
-		const allowedTypes = this.getAllowedTypes();
+		const { allowedTypes } = this.props;
 		if ( ! allowedTypes ) {
 			return false;
 		}
@@ -118,8 +100,7 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, multiple, onError } = this.props;
-		const allowedTypes = this.getAllowedTypes();
+		const { onSelect, multiple, onError, allowedTypes } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
 			allowedTypes,
@@ -142,13 +123,14 @@ class MediaPlaceholder extends Component {
 			accept,
 			icon,
 			className,
-			labels,
+			labels = {},
 			onSelect,
 			value = {},
 			onSelectURL,
 			onHTMLDrop = noop,
 			multiple = false,
 			notices,
+			allowedTypes,
 		} = this.props;
 
 		const {
@@ -156,14 +138,44 @@ class MediaPlaceholder extends Component {
 			src,
 		} = this.state;
 
-		const allowedTypes = this.getAllowedTypes();
+		let instructions = labels.instructions || '';
+		let title = labels.title || '';
+		if ( ! instructions || ! title ) {
+			const isOneType = 1 === allowedTypes.length;
+			const isAudio = isOneType && 'audio' === allowedTypes[ 0 ];
+			const isImage = isOneType && 'image' === allowedTypes[ 0 ];
+			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
+
+			if ( ! instructions ) {
+				instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+
+				if ( isAudio ) {
+					instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+				} else if ( isImage ) {
+					instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+				} else if ( isVideo ) {
+					instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+				}
+			}
+
+			if ( ! title ) {
+				title = __( 'Media' );
+
+				if ( isAudio ) {
+					title = __( 'Audio' );
+				} else if ( isImage ) {
+					title = __( 'Image' );
+				} else if ( isVideo ) {
+					title = __( 'Video' );
+				}
+			}
+		}
 
 		return (
 			<Placeholder
 				icon={ icon }
-				label={ labels.title }
-				// translators: %s: media name label e.g: "an audio","an image", "a video"
-				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
+				label={ title }
+				instructions={ instructions }
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ notices }
 			>

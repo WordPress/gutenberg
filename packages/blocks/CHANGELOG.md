@@ -1,3 +1,15 @@
+## 5.0.0 (2018-10-29)
+
+### Breaking Changes
+
+- Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
+- `setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
+- `getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
+
+### New Feature
+
+- Added a `unregisterBlockStyle()` function to remove a block style variation.
+
 ## 4.0.4 (2018-10-19)
 
 ## 4.0.3 (2018-10-18)

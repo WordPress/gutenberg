@@ -9,7 +9,7 @@ import 'react-dates/initialize';
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -59,26 +59,26 @@ export class DateTimePicker extends Component {
 						<div className="components-datetime__calendar-help">
 							<h4>{ __( 'Click to Select' ) }</h4>
 							<ul>
-								<li>{ __( 'Click the right and left arrows to select other months in the past or the future.' ) }</li>
+								<li>{ __( 'Click the right or left arrows to select other months in the past or the future.' ) }</li>
 								<li>{ __( 'Click the desired day to select it.' ) }</li>
 							</ul>
 
 							<h4>{ __( 'Navigating with a keyboard' ) }</h4>
 							<ul>
 								<li>
-									<abbr aria-label={ __( 'Enter' ) }>↵</abbr>
+									<abbr aria-label={ _x( 'Enter', 'keyboard button' ) }>↵</abbr>
 									{ ' ' /* JSX removes whitespace, but a space is required for screen readers. */ }
 									<span>{ __( 'Select the date in focus.' ) }</span>
 								</li>
 								<li>
 									<abbr aria-label={ __( 'Left and Right Arrows' ) }>←/→</abbr>
 									{ ' ' /* JSX removes whitespace, but a space is required for screen readers. */ }
-									{ __( 'Move backward (left) and forward (right) by one day.' ) }
+									{ __( 'Move backward (left) or forward (right) by one day.' ) }
 								</li>
 								<li>
 									<abbr aria-label={ __( 'Up and Down Arrows' ) }>↑/↓</abbr>
 									{ ' ' /* JSX removes whitespace, but a space is required for screen readers. */ }
-									{ __( 'Move backward (up) and forward (down) by one week.' ) }
+									{ __( 'Move backward (up) or forward (down) by one week.' ) }
 								</li>
 								<li>
 									<abbr aria-label={ __( 'Page Up and Page Down' ) }>{ __( 'PgUp/PgDn' ) }</abbr>
