@@ -165,4 +165,4 @@ export default compose(
 			getClientIdsOfDescendants,
 		};
 	} )
-)( withFilters( 'editor.MediaPlaceholder' )( BlockDropZone ) );
+)( withFilters( 'editor.BlockDropZone' )( BlockDropZone ) );
