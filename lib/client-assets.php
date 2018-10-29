@@ -269,7 +269,13 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_script(
 		'wp-compose',
 		gutenberg_url( 'build/compose/index.js' ),
-		array( 'lodash', 'wp-element', 'wp-is-shallow-equal', 'wp-polyfill' ),
+		array(
+			'lodash',
+			'wp-deprecated',
+			'wp-element',
+			'wp-is-shallow-equal',
+			'wp-polyfill',
+		),
 		filemtime( gutenberg_dir_path() . 'build/compose/index.js' ),
 		true
 	);
@@ -445,8 +451,8 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-is-shallow-equal',
 			'wp-keycodes',
 			'wp-polyfill',
-			'wp-url',
 			'wp-rich-text',
+			'wp-url',
 		),
 		filemtime( gutenberg_dir_path() . 'build/components/index.js' ),
 		true
@@ -469,6 +475,18 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 		),
 		filemtime( gutenberg_dir_path() . 'build/blocks/index.js' ),
+		true
+	);
+	gutenberg_override_script(
+		'wp-notices',
+		gutenberg_url( 'build/notices/index.js' ),
+		array(
+			'lodash',
+			'wp-a11y',
+			'wp-data',
+			'wp-polyfill-ecmascript',
+		),
+		filemtime( gutenberg_dir_path() . 'build/notices/index.js' ),
 		true
 	);
 	gutenberg_override_script(
@@ -532,6 +550,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-components',
 			'wp-compose',
 			'wp-data',
+			'wp-deprecated',
 			'wp-i18n',
 			'wp-polyfill',
 			'lodash',
@@ -674,6 +693,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-i18n',
 			'wp-is-shallow-equal',
 			'wp-keycodes',
+			'wp-notices',
 			'wp-nux',
 			'wp-polyfill',
 			'wp-tinymce',
@@ -1286,26 +1306,32 @@ function gutenberg_get_block_categories( $post ) {
 		array(
 			'slug'  => 'common',
 			'title' => __( 'Common Blocks', 'gutenberg' ),
+			'icon'  => 'screenoptions',
 		),
 		array(
 			'slug'  => 'formatting',
 			'title' => __( 'Formatting', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'layout',
 			'title' => __( 'Layout Elements', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'widgets',
 			'title' => __( 'Widgets', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'embed',
 			'title' => __( 'Embeds', 'gutenberg' ),
+			'icon'  => null,
 		),
 		array(
 			'slug'  => 'reusable',
 			'title' => __( 'Reusable Blocks', 'gutenberg' ),
+			'icon'  => null,
 		),
 	);
 

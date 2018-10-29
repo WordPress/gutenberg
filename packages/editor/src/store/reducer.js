@@ -10,8 +10,6 @@ import {
 	omit,
 	without,
 	mapValues,
-	findIndex,
-	reject,
 	omitBy,
 	keys,
 	isEqual,
@@ -587,6 +585,26 @@ export function isTyping( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the caret is within formatted text.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isCaretWithinFormattedText( state = false, action ) {
+	switch ( action.type ) {
+		case 'ENTER_FORMATTED_TEXT':
+			return true;
+
+		case 'EXIT_FORMATTED_TEXT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the block selection's state.
  *
  * @param {Object} state  Current state.
@@ -861,30 +879,6 @@ export function saving( state = {}, action ) {
 	return state;
 }
 
-export function notices( state = [], action ) {
-	switch ( action.type ) {
-		case 'CREATE_NOTICE':
-			return [
-				...reject( state, { id: action.notice.id } ),
-				action.notice,
-			];
-
-		case 'REMOVE_NOTICE':
-			const { noticeId } = action;
-			const index = findIndex( state, { id: noticeId } );
-			if ( index === -1 ) {
-				return state;
-			}
-
-			return [
-				...state.slice( 0, index ),
-				...state.slice( index + 1 ),
-			];
-	}
-
-	return state;
-}
-
 /**
  * Post Lock State.
  *
@@ -1119,6 +1113,7 @@ export default optimist( combineReducers( {
 	editor,
 	currentPost,
 	isTyping,
+	isCaretWithinFormattedText,
 	blockSelection,
 	blocksMode,
 	blockListSettings,
@@ -1126,7 +1121,6 @@ export default optimist( combineReducers( {
 	preferences,
 	saving,
 	postLock,
-	notices,
 	reusableBlocks,
 	template,
 	autosave,

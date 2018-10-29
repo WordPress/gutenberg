@@ -334,7 +334,7 @@ class WritingFlow extends Component {
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
-					className="editor-writing-flow__click-redirect"
+					className="wp-block editor-writing-flow__click-redirect"
 				/>
 			</div>
 		);

@@ -275,6 +275,37 @@ describe( 'createRegistry', () => {
 
 			return promise;
 		} );
+
+		it( 'should invalidate the resolver\'s resolution cache', async () => {
+			registry.registerStore( 'demo', {
+				reducer: ( state = 'NOTOK', action ) => {
+					return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
+				},
+				selectors: {
+					getValue: ( state ) => state,
+				},
+				resolvers: {
+					getValue: {
+						fulfill: () => Promise.resolve( { type: 'SET_OK' } ),
+						shouldInvalidate: ( action ) => action.type === 'INVALIDATE',
+					},
+				},
+				actions: {
+					invalidate: () => ( { type: 'INVALIDATE' } ),
+				},
+			} );
+
+			let promise = subscribeUntil( () => registry.select( 'demo' ).getValue() === 'OK' );
+			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK
+			await promise;
+
+			// Invalidate the cache
+			registry.dispatch( 'demo' ).invalidate();
+
+			promise = subscribeUntil( () => registry.select( 'demo' ).getValue() === 'NOTOK' );
+			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK
+			await promise;
+		} );
 	} );
 
 	describe( 'select', () => {

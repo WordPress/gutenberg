@@ -907,6 +907,18 @@ Returns true if the user is typing, or false otherwise.
 
 Whether user is typing.
 
+### isCaretWithinFormattedText
+
+Returns true if the caret is within formatted text, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the caret is within formatted text.
+
 ### getBlockInsertionPoint
 
 Returns the insertion point, the index at which the new inserted block would
@@ -1060,18 +1072,6 @@ before falling back to serialization of block state.
 *Returns*
 
 Post content.
-
-### getNotices
-
-Returns the user notices array.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-List of notices.
 
 ### canInsertBlockType
 
@@ -1382,7 +1382,6 @@ the specified post object and editor settings.
 *Parameters*
 
  * post: Post object.
- * autosaveStatus: The Post's autosave status.
 
 ### resetPost
 
@@ -1636,25 +1635,13 @@ Returns an action object used in signalling that the user has begun to type.
 
 Returns an action object used in signalling that the user has stopped typing.
 
-### createNotice
+### enterFormattedText
 
-Returns an action object used to create a notice.
+Returns an action object used in signalling that the caret has entered formatted text.
 
-*Parameters*
+### exitFormattedText
 
- * status: The notice status.
- * content: The notice content.
- * options: The notice options.  Available options:
-                             `id` (string; default auto-generated)
-                             `isDismissible` (boolean; default `true`).
-
-### removeNotice
-
-Returns an action object used to remove a notice.
-
-*Parameters*
-
- * id: The notice id.
+Returns an action object used in signalling that the user caret has exited formatted text.
 
 ### updatePostLock
 
@@ -1781,3 +1768,14 @@ Returns an action object used to signal that post saving is unlocked.
 *Parameters*
 
  * lockName: The lock name.
+
+### addTermToEditedPost
+
+Returns an action object signaling that a new term is added to the edited post.
+
+*Parameters*
+
+ * slug: Taxonomy slug.
+ * term: Term object.
+
+### createNotice

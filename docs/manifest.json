@@ -462,6 +462,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/notices",
+		"slug": "packages-notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/notices/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/npm-package-json-lint-config",
 		"slug": "packages-npm-package-json-lint-config",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/npm-package-json-lint-config/README.md",
@@ -732,6 +738,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Icon",
+		"slug": "icon",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/icon/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "KeyboardShortcuts",
 		"slug": "keyboard-shortcuts",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/keyboard-shortcuts/README.md",
@@ -933,6 +945,12 @@
 		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-edit-post.md",
+		"parent": "data"
+	},
+	{
+		"title": "Notices Data",
+		"slug": "data-core-notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-notices.md",
 		"parent": "data"
 	},
 	{

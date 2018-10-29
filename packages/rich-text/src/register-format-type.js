@@ -13,12 +13,18 @@ import { isValidIcon, normalizeIconObject } from '@wordpress/blocks';
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
+ * @param {string} name     Format name.
  * @param {Object} settings Format settings.
  *
  * @return {?WPFormat} The format, if it has been successfully registered;
  *                     otherwise `undefined`.
  */
-export function registerFormatType( settings ) {
+export function registerFormatType( name, settings ) {
+	settings = {
+		name,
+		...settings,
+	};
+
 	if ( typeof settings.name !== 'string' ) {
 		window.console.error(
 			'Format names must be strings.'

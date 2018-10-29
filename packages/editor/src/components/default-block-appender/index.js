@@ -47,8 +47,10 @@ export function DefaultBlockAppender( {
 	//
 	// See: https://gist.github.com/cvrebert/68659d0333a578d75372
 
+	// The wp-block className is important for editor styles.
+
 	return (
-		<div data-root-client-id={ rootClientId || '' } className="editor-default-block-appender">
+		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
 			<BlockDropZone rootClientId={ rootClientId } layout={ layout } />
 			<input
 				role="button"

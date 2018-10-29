@@ -23,6 +23,16 @@ The example above registers a block style variation named `fancy-quote` to the `
 
 By adding `isDefault: true`, you can make registered style variation to be active by default when a block is inserted.
 
+To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
+
+_Example:_
+
+```js
+wp.blocks.unregisterBlockStyle( 'core/quote', 'fancy-quote' );
+```
+
+The above removes the variation named `fancy-quote` from the `core/quote` block.
+
 ### Filters
 
 Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
