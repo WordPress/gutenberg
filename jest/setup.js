@@ -1,7 +1,7 @@
-jest.mock('../react-native-gutenberg-bridge', () => {
+jest.mock( '../react-native-gutenberg-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
 		removeEventListener: jest.fn(),
-		subscribeParentGetHtml: jest.fn()
-	}
-})
+		subscribeParentGetHtml: jest.fn(),
+	};
+} );
