@@ -24,8 +24,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.10",
-		"rememo": "^3.0.0",
-		"tinycolor2": "^1.4.1"
+		"rememo": "^3.0.0"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",
