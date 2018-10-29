@@ -237,7 +237,11 @@ export const convertBlockToStatic = ( action, store ) => {
 	if ( referencedBlock.name === 'core/template' ) {
 		newBlocks = referencedBlock.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) );
 	} else {
-		newBlocks = [ createBlock( referencedBlock.name, referencedBlock.attributes ) ];
+		newBlocks = [ createBlock(
+			referencedBlock.name,
+			referencedBlock.attributes,
+			referencedBlock.innerBlocks
+		) ];
 	}
 	store.dispatch( replaceBlocks( oldBlock.clientId, newBlocks ) );
 };
