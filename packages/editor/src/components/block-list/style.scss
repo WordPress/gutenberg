@@ -232,6 +232,11 @@
 		left: -$block-padding;
 	}
 
+	// Avoid conflict with the multi-selection highlight color.
+	&.has-warning.is-multi-selected .editor-block-list__block-edit::after {
+		background-color: transparent;
+	}
+
 	&.has-warning.is-selected .editor-block-list__block-edit::after {
 		bottom: ( $block-toolbar-height - $block-padding - $border-width );
 

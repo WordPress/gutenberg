@@ -167,26 +167,6 @@ export function togglePinnedPluginItem( pluginName ) {
 	};
 }
 
-export function initializeMetaBoxState() {
-	deprecated( 'initializeMetaBoxState action (`core/edit-post`)', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-	return {
-		type: 'DO_NOTHING',
-	};
-}
-
-export function setActiveMetaBoxLocations() {
-	deprecated( 'setActiveMetaBoxLocations action (`core/edit-post`)', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-	return {
-		type: 'DO_NOTHING',
-	};
-}
-
 /**
  * Returns an action object used in signaling
  * what Meta boxes are available in which location.
@@ -224,22 +204,3 @@ export function metaBoxUpdatesSuccess() {
 	};
 }
 
-/**
- * Returns an action object used to set the saved meta boxes data.
- * This is used to check if the meta boxes have been touched when leaving the editor.
- *
- * @param   {Object} dataPerLocation Meta Boxes Data per location.
- *
- * @return {Object} Action object.
- */
-export function setMetaBoxSavedData( dataPerLocation ) {
-	deprecated( 'setMetaBoxSavedData action (`core/edit-post`)', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-	} );
-
-	return {
-		type: 'META_BOX_SET_SAVED_DATA',
-		dataPerLocation,
-	};
-}

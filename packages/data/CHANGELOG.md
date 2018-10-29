@@ -1,3 +1,9 @@
+## 3.0.0 (2018-10-29)
+
+### Breaking Changes
+
+- Writing resolvers as async generators has been removed. Use the controls plugin instead.
+
 ## 2.1.4 (2018-10-19)
 
 ## 2.1.3 (2018-10-18)

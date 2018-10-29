@@ -1,3 +1,9 @@
+## 2.1.0 (2018-10-29)
+
+### Deprecation
+
+- `remountOnPropChange` has been deprecated.
+
 ## 2.0.5 (2018-10-19)
 
 ## 2.0.4 (2018-10-18)
