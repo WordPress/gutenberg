@@ -15,7 +15,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, RawHTML } from '@wordpress/element';
 import {
 	isHorizontalEdge,
 	getRectangleFromRange,
@@ -104,7 +104,6 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
 		this.savedContent = value;
-		this.containerRef = createRef();
 		this.patterns = getPatterns( {
 			onReplace,
 			multilineTag: this.multilineTag,
@@ -870,7 +869,6 @@ export class RichText extends Component {
 
 		return (
 			<div className={ classes }
-				ref={ this.containerRef }
 				onFocus={ this.setFocusedElement }
 			>
 				{ isSelected && ! inlineToolbar && (
