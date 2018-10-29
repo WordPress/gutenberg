@@ -1611,18 +1611,9 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 		),
 
-		// Whether or not to load the 'postcustom' meta box is stored as a site option
-		// so that we're not always loading its assets.
-		'customFields'           => array(
-			'isEnabled' => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
-			'toggleURL' => add_query_arg(
-				array(
-					'action'   => 'toggle_custom_fields',
-					'_wpnonce' => wp_create_nonce( 'toggle_custom_fields' ),
-				),
-				admin_url( 'admin-post.php' )
-			),
-		),
+		// Whether or not to load the 'postcustom' meta box is stored as a user meta
+		// field so that we're not always loading its assets.
+		'enableCustomFields'     => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
 	);
 
 	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );

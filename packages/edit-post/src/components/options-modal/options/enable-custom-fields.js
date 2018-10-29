@@ -10,7 +10,7 @@ import { withSelect } from '@wordpress/data';
 import BaseOption from './base';
 
 class EnableCustomFieldsOption extends Component {
-	constructor( { settings: { isEnabled } } ) {
+	constructor( { isEnabled } ) {
 		super( ...arguments );
 
 		this.toggleCustomFields = this.toggleCustomFields.bind( this );
@@ -19,14 +19,13 @@ class EnableCustomFieldsOption extends Component {
 	}
 
 	toggleCustomFields() {
-		const { toggleURL, isEnabled } = this.props.settings;
-
-		// Redirect to an admin action that toggles the setting and reloads the editor
-		// with the meta box assets included on the page.
-		window.location.href = toggleURL;
+		// Submit a hidden form which triggers the toggle_custom_fields admin action.
+		// This action will toggle the setting and reload the editor with the meta box
+		// assets included on the page.
+		document.getElementById( 'toggle-custom-fields-form' ).submit();
 
 		// Make it look like something happened while the page reloads.
-		this.setState( { isEnabled: ! isEnabled } );
+		this.setState( { isEnabled: ! this.props.isEnabled } );
 	}
 
 	render() {
@@ -44,5 +43,5 @@ class EnableCustomFieldsOption extends Component {
 }
 
 export default withSelect( ( select ) => ( {
-	settings: select( 'core/editor' ).getEditorSettings().customFields,
+	isEnabled: select( 'core/editor' ).getEditorSettings().enableCustomFields,
 } ) )( EnableCustomFieldsOption );

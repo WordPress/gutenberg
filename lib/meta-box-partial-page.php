@@ -304,6 +304,10 @@ function the_gutenberg_metaboxes() {
 	<form class="metabox-base-form">
 	<?php gutenberg_meta_box_post_form_hidden_fields( $post ); ?>
 	</form>
+	<form id="toggle-custom-fields-form" method="post" action="<?php echo esc_attr( admin_url( 'admin-post.php' ) ); ?>">
+		<?php wp_nonce_field( 'toggle_custom_fields' ); ?>
+		<input type="hidden" name="action" value="toggle_custom_fields" />
+	</form>
 	<?php foreach ( $locations as $location ) : ?>
 		<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
 			<div id="poststuff" class="sidebar-open">
