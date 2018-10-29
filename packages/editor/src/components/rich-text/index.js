@@ -49,7 +49,6 @@ import BlockFormatControls from '../block-format-controls';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
 import TinyMCE from './tinymce';
-import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 
@@ -858,7 +857,6 @@ export class RichText extends Component {
 		} = this.props;
 
 		const MultilineTag = this.multilineTag;
-		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
 		// changes, we unmount and destroy the previous TinyMCE element, then
@@ -903,7 +901,6 @@ export class RichText extends Component {
 								aria-expanded={ isExpanded }
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
-								{ ...ariaProps }
 								className={ className }
 								key={ key }
 								onPaste={ this.onPaste }
