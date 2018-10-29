@@ -99,15 +99,14 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId } ) => {
+	withSelect( ( select, { rootClientId, index } ) => {
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
 			getInserterItems,
 		} = select( 'core/editor' );
 
-		let index;
-		if ( rootClientId === undefined ) {
+		if ( rootClientId === undefined && index === undefined ) {
 			// Unless explicitly provided, the default insertion point provided
 			// by the store occurs immediately following the selected block.
 			// Otherwise, the default behavior for an undefined index is to

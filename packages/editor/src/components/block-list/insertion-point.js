@@ -26,7 +26,12 @@ class BlockInsertionPoint extends Component {
 		this.onFocusInserter = this.onFocusInserter.bind( this );
 	}
 
-	onFocusInserter() {
+	onFocusInserter( event ) {
+		// Stop propagation of the focus event to avoid selecting the current
+		// block while inserting a new block, as it is not relevant to sibling
+		// insertion and conflicts with contextual toolbar placement.
+		event.stopPropagation();
+
 		this.setState( {
 			isInserterFocused: true,
 		} );
@@ -40,11 +45,18 @@ class BlockInsertionPoint extends Component {
 
 	render() {
 		const { isInserterFocused } = this.state;
-		const { showInsertionPoint, canShowInserter } = this.props;
+		const {
+			showInsertionPoint,
+			canShowInserter,
+			rootClientId,
+			insertIndex,
+		} = this.props;
 
 		return (
 			<div className="editor-block-list__insertion-point">
-				{ showInsertionPoint && <div className="editor-block-list__insertion-point-indicator" /> }
+				{ showInsertionPoint && (
+					<div className="editor-block-list__insertion-point-indicator" />
+				) }
 				{ canShowInserter && (
 					<div
 						onFocus={ this.onFocusInserter }
@@ -55,7 +67,10 @@ class BlockInsertionPoint extends Component {
 							} )
 						}
 					>
-						<Inserter />
+						<Inserter
+							rootClientId={ rootClientId }
+							index={ insertIndex }
+						/>
 					</div>
 				) }
 			</div>
@@ -70,7 +85,7 @@ export default withSelect( ( select, { clientId, rootClientId } ) => {
 		isBlockInsertionPointVisible,
 	} = select( 'core/editor' );
 	const blockIndex = getBlockIndex( clientId, rootClientId );
-	const insertIndex = blockIndex + 1;
+	const insertIndex = blockIndex;
 	const insertionPoint = getBlockInsertionPoint();
 	const block = getBlock( clientId );
 	const showInsertionPoint = (
@@ -80,5 +95,5 @@ export default withSelect( ( select, { clientId, rootClientId } ) => {
 		! isUnmodifiedDefaultBlock( block )
 	);
 
-	return { showInsertionPoint };
+	return { showInsertionPoint, insertIndex };
 } )( BlockInsertionPoint );

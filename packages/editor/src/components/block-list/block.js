@@ -379,13 +379,13 @@ export class BlockListBlock extends Component {
 			isSelected,
 			isPartOfMultiSelection,
 			isFirstMultiSelected,
-			isLastMultiSelected,
 			isTypingWithinBlock,
 			isCaretWithinFormattedText,
 			isMultiSelecting,
 			hoverArea,
 			isEmptyDefaultBlock,
 			isMovable,
+			isPreviousBlockADefaultEmptyBlock,
 			isParentOfSelectedBlock,
 			isDraggable,
 		} = this.props;
@@ -414,8 +414,8 @@ export class BlockListBlock extends Component {
 
 		// Insertion point can only be made visible if the block is at the
 		// the extent of a multi-selection, or not in a multi-selection.
-		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isLastMultiSelected ) || ! isPartOfMultiSelection;
-		const canShowInBetweenInserter = ! isEmptyDefaultBlock;
+		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirstMultiSelected ) || ! isPartOfMultiSelection;
+		const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
 
 		// The wp-block className is important for editor styles.
 		// Generate the wrapper class names handling the different states of the block.
@@ -495,6 +495,13 @@ export class BlockListBlock extends Component {
 				] }
 				{ ...wrapperProps }
 			>
+				{ shouldShowInsertionPoint && (
+					<BlockInsertionPoint
+						clientId={ clientId }
+						rootClientId={ rootClientId }
+						canShowInserter={ canShowInBetweenInserter }
+					/>
+				) }
 				<BlockDropZone
 					index={ order }
 					clientId={ clientId }
@@ -568,13 +575,6 @@ export class BlockListBlock extends Component {
 						</div>
 					</Fragment>
 				) }
-				{ shouldShowInsertionPoint && (
-					<BlockInsertionPoint
-						clientId={ clientId }
-						rootClientId={ rootClientId }
-						canShowInserter={ canShowInBetweenInserter }
-					/>
-				) }
 			</IgnoreNestedEvents>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
@@ -590,7 +590,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isAncestorMultiSelected,
 		isBlockMultiSelected,
 		isFirstMultiSelectedBlock,
-		isLastMultiSelectedBlock,
 		isMultiSelecting,
 		isTyping,
 		isCaretWithinFormattedText,
@@ -607,6 +606,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
 	const block = getBlock( clientId );
 	const previousBlockClientId = getPreviousBlockClientId( clientId );
+	const previousBlock = getBlock( previousBlockClientId );
 	const templateLock = getTemplateLock( rootClientId );
 	const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 
@@ -614,7 +614,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		nextBlockClientId: getNextBlockClientId( clientId ),
 		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
-		isLastMultiSelected: isLastMultiSelectedBlock( clientId ),
 		isMultiSelecting: isMultiSelecting(),
 		// We only care about this prop when the block is selected
 		// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
@@ -626,6 +625,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
+		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
 		isMovable: 'all' !== templateLock,
 		isLocked: !! templateLock,
 		isFocusMode: focusMode && isLargeViewport,
