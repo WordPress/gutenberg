@@ -121,7 +121,7 @@ describe( 'New User Experience (NUX)', () => {
 		await clickAllTips( page );
 
 		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
+		await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="false"]' );
 
 		expect( showTipsButton ).toHaveLength( 1 );
@@ -136,7 +136,7 @@ describe( 'New User Experience (NUX)', () => {
 		await clickOnMoreMenuItem( 'Show Tips' );
 
 		// Open the "More" menu to check the "Show Tips" element.
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
+		await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 		const showTipsButton = await page.$x( '//button[contains(text(), "Show Tips")][@aria-pressed="true"]' );
 
 		expect( showTipsButton ).toHaveLength( 1 );
