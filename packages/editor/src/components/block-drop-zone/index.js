@@ -164,5 +164,6 @@ export default compose(
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,
 		};
-	} )
-)( withFilters( 'editor.BlockDropZone' )( BlockDropZone ) );
+	} ),
+	withFilters( 'editor.BlockDropZone' )
+)( BlockDropZone );
