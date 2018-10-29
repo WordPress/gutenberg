@@ -6,7 +6,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
 import {
@@ -19,13 +19,17 @@ import { G, Path, SVG } from '@wordpress/components';
 
 const blockAttributes = {
 	value: {
+		type: 'string',
 		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
+		default: '',
 	},
 	citation: {
+		type: 'string',
 		source: 'html',
 		selector: 'cite',
+		default: '',
 	},
 	align: {
 		type: 'string',
@@ -44,8 +48,8 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: __( 'Regular' ), isDefault: true },
-		{ name: 'large', label: __( 'Large' ) },
+		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'large', label: _x( 'Large', 'block style' ) },
 	],
 
 	transforms: {
@@ -292,8 +296,10 @@ export const settings = {
 			attributes: {
 				...blockAttributes,
 				citation: {
+					type: 'string',
 					source: 'html',
 					selector: 'footer',
+					default: '',
 				},
 				style: {
 					type: 'number',

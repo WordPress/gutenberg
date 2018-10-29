@@ -21,6 +21,7 @@ const embedAttributes = {
 		type: 'string',
 	},
 	caption: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	},

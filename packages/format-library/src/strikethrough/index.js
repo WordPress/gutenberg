@@ -29,6 +29,8 @@ export const strikethrough = {
 					title={ __( 'Strikethrough' ) }
 					onClick={ onToggle }
 					isActive={ isActive }
+					shortcutType="access"
+					shortcutCharacter="d"
 				/>
 			</Fragment>
 		);

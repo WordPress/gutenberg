@@ -33,6 +33,7 @@ const supports = {
 
 const schema = {
 	content: {
+		type: 'string',
 		source: 'html',
 		selector: 'p',
 		default: '',
@@ -197,6 +198,7 @@ export const settings = {
 				content: {
 					type: 'string',
 					source: 'html',
+					default: '',
 				},
 			},
 			save( { attributes } ) {

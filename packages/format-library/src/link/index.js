@@ -94,6 +94,8 @@ export const link = {
 						title={ __( 'Unlink' ) }
 						onClick={ this.onRemoveFormat }
 						isActive={ isActive }
+						shortcutType="primaryShift"
+						shortcutCharacter="k"
 					/> }
 					{ ! isActive && <ToolbarButton
 						name="link"
@@ -101,6 +103,8 @@ export const link = {
 						title={ __( 'Link' ) }
 						onClick={ this.addLink }
 						isActive={ isActive }
+						shortcutType="primary"
+						shortcutCharacter="k"
 					/> }
 					<InlineLinkUI
 						addingLink={ this.state.addingLink }

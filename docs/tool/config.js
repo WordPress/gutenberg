@@ -30,6 +30,11 @@ module.exports = {
 			selectors: [ path.resolve( root, 'packages/edit-post/src/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/edit-post/src/store/actions.js' ) ],
 		},
+		'core/notices': {
+			title: 'Notices Data',
+			selectors: [ path.resolve( root, 'packages/notices/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/notices/src/store/actions.js' ) ],
+		},
 		'core/nux': {
 			title: 'The NUX (New User Experience) Data',
 			selectors: [ path.resolve( root, 'packages/nux/src/store/selectors.js' ) ],

@@ -29,7 +29,7 @@ export function closeGeneralSidebar() {
 }
 
 /**
- * Returns an action object used in signalling that the user opened an editor sidebar.
+ * Returns an action object used in signalling that the user opened a modal.
  *
  * @param {string} name A string that uniquely identifies the modal.
  *
@@ -43,7 +43,7 @@ export function openModal( name ) {
 }
 
 /**
- * Returns an action object signalling that the user closed the sidebar.
+ * Returns an action object signalling that the user closed a modal.
  *
  * @return {Object} Action object.
  */

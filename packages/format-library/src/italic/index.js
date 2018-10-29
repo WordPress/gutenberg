@@ -29,6 +29,8 @@ export const italic = {
 					title={ __( 'Italic' ) }
 					onClick={ onToggle }
 					isActive={ isActive }
+					shortcutType="primary"
+					shortcutCharacter="i"
 				/>
 			</Fragment>
 		);

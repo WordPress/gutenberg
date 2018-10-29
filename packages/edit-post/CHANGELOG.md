@@ -1,4 +1,4 @@
-## 2.0.0 (Unreleased)
+## 2.0.0 (2018-10-29)
 
 ### Breaking Changes
 
@@ -8,6 +8,10 @@
 - `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
 - `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
 - `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
+
+### Polish
+
+- Add the editor styles support's wrapper className.
 
 ### Bug Fixes
 

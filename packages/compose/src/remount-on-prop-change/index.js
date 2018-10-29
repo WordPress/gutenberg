@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -16,8 +17,13 @@ import createHigherOrderComponent from '../create-higher-order-component';
  *
  * @return {Function} Higher-order component.
  */
-const remountOnPropChange = ( propName ) => createHigherOrderComponent(
-	( WrappedComponent ) => class extends Component {
+const remountOnPropChange = ( propName ) => createHigherOrderComponent( ( WrappedComponent ) => {
+	deprecated( 'remountOnPropChange', {
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return class extends Component {
 		constructor( props ) {
 			super( ...arguments );
 			this.state = {
@@ -40,8 +46,7 @@ const remountOnPropChange = ( propName ) => createHigherOrderComponent(
 		render() {
 			return <WrappedComponent key={ this.state.propChangeId } { ...this.props } />;
 		}
-	},
-	'remountOnPropChange'
-);
+	};
+}, 'remountOnPropChange' );
 
 export default remountOnPropChange;

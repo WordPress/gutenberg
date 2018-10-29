@@ -11,6 +11,7 @@ const FormatToolbar = ( { controls } ) => {
 				{ controls.map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
+				<Slot name="RichText.ToolbarControls" />
 			</Toolbar>
 		</div>
 	);

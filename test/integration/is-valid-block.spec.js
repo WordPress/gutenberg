@@ -1,31 +1,30 @@
 /**
  * External dependencies
  */
-import { isValidBlock } from '@wordpress/blocks';
+import { isValidBlockContent } from '@wordpress/blocks';
 import { createElement } from '@wordpress/element';
 
-describe( 'isValidBlock', () => {
+describe( 'isValidBlockContent', () => {
 	beforeAll( () => {
 		// Load all hooks that modify blocks
 		require( '../../packages/editor/src/hooks' );
 	} );
 
 	it( 'should use the namespace in the classname for non-core blocks', () => {
-		const valid = isValidBlock(
-			'<div class="wp-block-myplugin-fruit">Bananas</div>',
+		const valid = isValidBlockContent(
 			{
 				save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 				name: 'myplugin/fruit',
 			},
-			{ fruit: 'Bananas' }
+			{ fruit: 'Bananas' },
+			'<div class="wp-block-myplugin-fruit">Bananas</div>'
 		);
 
 		expect( valid ).toBe( true );
 	} );
 
 	it( 'should include additional classes in block attributes', () => {
-		const valid = isValidBlock(
-			'<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>',
+		const valid = isValidBlockContent(
 			{
 				save: ( { attributes } ) => createElement( 'div', {
 					className: 'fruit',
@@ -35,15 +34,15 @@ describe( 'isValidBlock', () => {
 			{
 				fruit: 'Bananas',
 				className: 'fresh',
-			}
+			},
+			'<div class="wp-block-myplugin-fruit fruit fresh">Bananas</div>'
 		);
 
 		expect( valid ).toBe( true );
 	} );
 
 	it( 'should not add a className if falsy', () => {
-		const valid = isValidBlock(
-			'<div>Bananas</div>',
+		const valid = isValidBlockContent(
 			{
 				save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 				name: 'myplugin/fruit',
@@ -51,7 +50,8 @@ describe( 'isValidBlock', () => {
 					className: false,
 				},
 			},
-			{ fruit: 'Bananas' }
+			{ fruit: 'Bananas' },
+			'<div>Bananas</div>'
 		);
 
 		expect( valid ).toBe( true );

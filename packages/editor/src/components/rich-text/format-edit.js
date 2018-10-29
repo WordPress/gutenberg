@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
+import { normalizeIconObject } from '@wordpress/blocks';
 import { Component, Fragment } from '@wordpress/element';
 import { getActiveFormat, getFormatTypes } from '@wordpress/rich-text';
 import { Fill, KeyboardShortcuts, ToolbarButton } from '@wordpress/components';
-import { rawShortcut } from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -18,10 +19,24 @@ function isResult( { title, keywords = [] }, filterValue ) {
 	return matchSearch( title ) || keywords.some( matchSearch );
 }
 
-function FillToolbarButton( { name, ...props } ) {
+function FillToolbarButton( { name, shortcutType, shortcutCharacter, ...props } ) {
+	let shortcut;
+	let fillName = 'RichText.ToolbarControls';
+
+	if ( name ) {
+		fillName += `.${ name }`;
+	}
+
+	if ( shortcutType && shortcutCharacter ) {
+		shortcut = displayShortcut[ shortcutType ]( shortcutCharacter );
+	}
+
 	return (
-		<Fill name={ `RichText.ToolbarControls.${ name }` }>
-			<ToolbarButton { ...props } />
+		<Fill name={ fillName }>
+			<ToolbarButton
+				{ ...props }
+				shortcut={ shortcut }
+			/>
 		</Fill>
 	);
 }
@@ -34,7 +49,7 @@ function FillInserterListItem( props ) {
 					return null;
 				}
 
-				return <InserterListItem { ...props } />;
+				return <InserterListItem { ...props } icon={ normalizeIconObject( props.icon ) } />;
 			} }
 		</Fill>
 	);
