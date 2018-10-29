@@ -1402,7 +1402,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	 * @param object $post         The post resource data.
 	 */
 	$preload_paths = apply_filters(
-		'editor_preload_paths',
+		'block_editor_preload_paths',
 		array(
 			'/',
 			'/wp/v2/types?context=edit',
