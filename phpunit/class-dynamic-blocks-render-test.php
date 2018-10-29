@@ -38,6 +38,15 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		return 10;
 	}
 
+
+	function render_test_inner_block( $atts, $content ) {
+		return json_encode( func_get_args() );
+	}
+
+	function render_test_outer_block( $atts, $content ) {
+		return '<pre>' . json_encode( $atts ) . $content . '</pre>';
+	}
+
 	/**
 	 * Dummy block rendering function, creating a new WP_Query instance.
 	 *
@@ -163,5 +172,48 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 
 		$this->assertSame( '10', $rendered );
 		$this->assertInternalType( 'string', $rendered );
+	}
+
+	function test_dynamic_block_with_inner_blocks() {
+		register_block_type(
+			'test/outer',
+			array(
+				'render_callback' => array(
+					$this,
+					'render_test_outer_block'
+				),
+			)
+		);
+
+		register_block_type(
+			'test/inner',
+			array(
+				'render_callback' => array(
+					$this,
+					'render_test_inner_block'
+				),
+			)
+		);
+
+		$content = <<<BLOCKS
+<!-- wp:test/outer {"thing":"value"} -->
+<!-- wp:test/inner {"firstthing":"firstvalue"} /-->
+<h1>before</h1>
+<!-- wp:test/inner {"innerthing":"innervalue"} -->
+<small>ittybittybunny</small>
+<!-- /wp:test/inner -->
+<p>after</p>
+<!-- wp:test/inner {"lastthing":"lastvalue"} /-->
+<!-- /wp:test/outer -->
+BLOCKS;
+
+		$expected = '<pre>{"thing":"value"}
+[{"firstthing":"firstvalue"},""]
+<h1>before</h1>
+[{"innerthing":"innervalue"},"\\n<small>ittybittybunny<\\/small>\\n"]
+<p>after</p>
+[{"lastthing":"lastvalue"},""]
+</pre>';
+		$this->assertEquals( $expected, do_blocks( $content ) );
 	}
 }
