@@ -6,7 +6,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `wp.compose.remountOnPropChange` has been removed.
 - The following editor store actions have been removed: `createNotice`, `removeNotice`, `createSuccessNotice`, `createInfoNotice`, `createErrorNotice`, `createWarningNotice`. Use the equivalent actions by the same name from the `@wordpress/notices` module.
 - The id prop of wp.nux.DotTip has been removed. Please use the tipId prop instead.
-- Block `layout` support has been removed, including the `InnerBlocks` `layouts` prop. See: https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/inner-blocks/README.md#usage
 
 ## 4.3.0
 
