@@ -2,6 +2,9 @@
     {
         "blockName": "core/image",
         "attrs": {
+			"url":"https://cldup.com/uuUqE_dXzy.jpg",
+			"caption":"",
+			"href":"https://wordpress.org/",
             "linkDestination": "custom"
         },
         "innerBlocks": [],

@@ -2,6 +2,10 @@
     {
         "blockName": "core/gallery",
         "attrs": {
+			"images": [
+				{"url":"https://cldup.com/uuUqE_dXzy.jpg","alt":"title","caption":""},
+				{"url":"http://google.com/hi.png","alt":"title","caption":""}
+			],
             "columns": 1
         },
         "innerBlocks": [],

@@ -2,6 +2,8 @@
     {
         "blockName": "core/image",
         "attrs": {
+			"url":"https://cldup.com/YLYhpou2oq.jpg",
+			"caption":"Give it a try. Press the \u0022really wide\u0022 button on the image toolbar.",
             "align": "center"
         },
         "innerBlocks": [],
