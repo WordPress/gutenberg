@@ -930,8 +930,7 @@ be placed. Defaults to the last index.
 
 *Returns*
 
-Insertion point object with `rootClientId`, `layout`,
-`index`.
+Insertion point object with `rootClientId`, `index`.
 
 ### isBlockInsertionPointVisible
 
@@ -1512,7 +1511,6 @@ to a new index.
  * clientId: The client ID of the block.
  * fromRootClientId: Root client ID source.
  * toRootClientId: Root client ID destination.
- * layout: Layout to move the block into.
  * index: The index to move the block into.
 
 ### insertBlock

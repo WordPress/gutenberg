@@ -2,8 +2,11 @@
  * Internal dependencies
  */
 
-import { split } from './split';
 import { getFormatType } from './get-format-type';
+import {
+	LINE_SEPARATOR,
+	OBJECT_REPLACEMENT_CHARACTER,
+} from './special-characters';
 
 function fromFormat( { type, attributes, object } ) {
 	const formatType = getFormatType( type );
@@ -38,56 +41,87 @@ function fromFormat( { type, attributes, object } ) {
 	};
 }
 
-export function toTree( value, multilineTag, settings ) {
-	if ( multilineTag ) {
-		const { createEmpty, append } = settings;
-		const tree = createEmpty();
-
-		split( value, '\u2028' ).forEach( ( piece, index ) => {
-			append( tree, toTree( piece, null, {
-				...settings,
-				tag: multilineTag,
-				multilineIndex: index,
-			} ) );
-		} );
-
-		return tree;
-	}
-
-	const {
-		tag,
-		multilineIndex,
-		createEmpty,
-		append,
-		getLastChild,
-		getParent,
-		isText,
-		getText,
-		remove,
-		appendText,
-		onStartIndex,
-		onEndIndex,
-		onEmpty,
-	} = settings;
+export function toTree( {
+	value,
+	multilineTag,
+	multilineWrapperTags,
+	createEmpty,
+	append,
+	getLastChild,
+	getParent,
+	isText,
+	getText,
+	remove,
+	appendText,
+	onStartIndex,
+	onEndIndex,
+} ) {
 	const { formats, text, start, end } = value;
 	const formatsLength = formats.length + 1;
-	const tree = createEmpty( tag );
+	const tree = createEmpty();
+	const multilineFormat = { type: multilineTag };
 
-	append( tree, '' );
+	let lastSeparatorFormats;
+	let lastCharacterFormats;
+	let lastCharacter;
+
+	// If we're building a multiline tree, start off with a multiline element.
+	if ( multilineTag ) {
+		append( append( tree, { type: multilineTag } ), '' );
+		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
+	} else {
+		append( tree, '' );
+	}
 
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
-		const characterFormats = formats[ i ];
-		const lastCharacterFormats = formats[ i - 1 ];
+		let characterFormats = formats[ i ];
+
+		// Set multiline tags in queue for building the tree.
+		if ( multilineTag ) {
+			if ( character === LINE_SEPARATOR ) {
+				characterFormats = lastSeparatorFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
+					if ( character === LINE_SEPARATOR && multilineWrapperTags.indexOf( format.type ) !== -1 ) {
+						accumulator.push( format );
+						accumulator.push( multilineFormat );
+					}
+
+					return accumulator;
+				}, [ multilineFormat ] );
+			} else {
+				characterFormats = [ ...lastSeparatorFormats, ...( characterFormats || [] ) ];
+			}
+		}
 
 		let pointer = getLastChild( tree );
+
+		// Set selection for the start of line.
+		if ( lastCharacter === LINE_SEPARATOR ) {
+			let node = pointer;
+
+			while ( ! isText( node ) ) {
+				node = getLastChild( node );
+			}
+
+			if ( onStartIndex && start === i ) {
+				onStartIndex( tree, node );
+			}
+
+			if ( onEndIndex && end === i ) {
+				onEndIndex( tree, node );
+			}
+		}
 
 		if ( characterFormats ) {
 			characterFormats.forEach( ( format, formatIndex ) => {
 				if (
 					pointer &&
 					lastCharacterFormats &&
-					format === lastCharacterFormats[ formatIndex ]
+					format === lastCharacterFormats[ formatIndex ] &&
+					// Do not reuse the last element if the character is a
+					// line separator.
+					( character !== LINE_SEPARATOR ||
+						characterFormats.length - 1 !== formatIndex )
 				) {
 					pointer = getLastChild( pointer );
 					return;
@@ -105,17 +139,25 @@ export function toTree( value, multilineTag, settings ) {
 			} );
 		}
 
+		// No need for further processing if the character is a line separator.
+		if ( character === LINE_SEPARATOR ) {
+			lastCharacterFormats = characterFormats;
+			lastCharacter = character;
+			continue;
+		}
+
 		// If there is selection at 0, handle it before characters are inserted.
+		if ( i === 0 ) {
+			if ( onStartIndex && start === 0 ) {
+				onStartIndex( tree, pointer );
+			}
 
-		if ( onStartIndex && start === 0 && i === 0 ) {
-			onStartIndex( tree, pointer, multilineIndex );
+			if ( onEndIndex && end === 0 ) {
+				onEndIndex( tree, pointer );
+			}
 		}
 
-		if ( onEndIndex && end === 0 && i === 0 ) {
-			onEndIndex( tree, pointer, multilineIndex );
-		}
-
-		if ( character !== '\ufffc' ) {
+		if ( character !== OBJECT_REPLACEMENT_CHARACTER ) {
 			if ( character === '\n' ) {
 				pointer = append( getParent( pointer ), { type: 'br', object: true } );
 				// Ensure pointer is text node.
@@ -128,16 +170,15 @@ export function toTree( value, multilineTag, settings ) {
 		}
 
 		if ( onStartIndex && start === i + 1 ) {
-			onStartIndex( tree, pointer, multilineIndex );
+			onStartIndex( tree, pointer );
 		}
 
 		if ( onEndIndex && end === i + 1 ) {
-			onEndIndex( tree, pointer, multilineIndex );
+			onEndIndex( tree, pointer );
 		}
-	}
 
-	if ( onEmpty && text.length === 0 ) {
-		onEmpty( tree );
+		lastCharacterFormats = characterFormats;
+		lastCharacter = character;
 	}
 
 	return tree;

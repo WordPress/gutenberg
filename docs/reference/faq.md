@@ -111,6 +111,11 @@ This is the canonical list of keyboard shortcuts:
 			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>P</kbd></td>
 		</tr>
 		<tr>
+			<td>Navigate to the nearest toolbar.</td>
+			<td><kbd>Alt</kbd>+<kbd>F10</kbd></td>
+			<td><kbd>⌥</kbd><kbd>F10</kbd></td>
+		</tr>
+		<tr>
 			<td>Switch between Visual Editor and Code Editor.</td>
 			<td><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>M</kbd></td>
 			<td><kbd>⇧</kbd><kbd>⌥</kbd><kbd>⌘</kbd><kbd>M</kbd></td>

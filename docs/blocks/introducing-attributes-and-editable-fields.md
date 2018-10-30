@@ -24,6 +24,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
 
 	attributes: {
 		content: {
+			type: 'string',
 			source: 'html',
 			selector: 'p',
 		}
@@ -72,6 +73,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 
 	attributes: {
 		content: {
+			type: 'string',
 			source: 'html',
 			selector: 'p',
 		},

@@ -404,6 +404,46 @@ describe( 'reusable blocks effects', () => {
 				time: expect.any( Number ),
 			} );
 		} );
+
+		it( 'should convert a reusable block with nested blocks into a static block', () => {
+			const associatedBlock = createBlock( 'core/block', { ref: 123 } );
+			const reusableBlock = { id: 123, title: 'My cool block' };
+			const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' }, [
+				createBlock( 'core/test-block', { name: 'Oscar the Grouch' } ),
+				createBlock( 'core/test-block', { name: 'Cookie Monster' } ),
+			] );
+
+			const state = reduce( [
+				resetBlocks( [ associatedBlock ] ),
+				receiveReusableBlocksAction( [ { reusableBlock, parsedBlock } ] ),
+				receiveBlocks( [ parsedBlock ] ),
+			], reducer, undefined );
+
+			const dispatch = jest.fn();
+			const store = { getState: () => state, dispatch };
+
+			convertBlockToStatic( convertBlockToStaticAction( associatedBlock.clientId ), store );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ associatedBlock.clientId ],
+				blocks: [
+					expect.objectContaining( {
+						name: 'core/test-block',
+						attributes: { name: 'Big Bird' },
+						innerBlocks: [
+							expect.objectContaining( {
+								attributes: { name: 'Oscar the Grouch' },
+							} ),
+							expect.objectContaining( {
+								attributes: { name: 'Cookie Monster' },
+							} ),
+						],
+					} ),
+				],
+				time: expect.any( Number ),
+			} );
+		} );
 	} );
 
 	describe( 'convertBlockToReusable', () => {

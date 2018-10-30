@@ -25,7 +25,6 @@ export function DefaultBlockAppender( {
 	onAppend,
 	showPrompt,
 	placeholder,
-	layout,
 	rootClientId,
 } ) {
 	if ( isLocked || ! isVisible ) {
@@ -51,7 +50,7 @@ export function DefaultBlockAppender( {
 
 	return (
 		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
-			<BlockDropZone rootClientId={ rootClientId } layout={ layout } />
+			<BlockDropZone rootClientId={ rootClientId } />
 			<input
 				role="button"
 				aria-label={ __( 'Add block' ) }
@@ -61,7 +60,7 @@ export function DefaultBlockAppender( {
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
-			<InserterWithShortcuts rootClientId={ rootClientId } layout={ layout } />
+			<InserterWithShortcuts rootClientId={ rootClientId } />
 			<Inserter position="top right" />
 		</div>
 	);
@@ -91,14 +90,9 @@ export default compose(
 
 		return {
 			onAppend() {
-				const { layout, rootClientId } = ownProps;
+				const { rootClientId } = ownProps;
 
-				let attributes;
-				if ( layout ) {
-					attributes = { layout };
-				}
-
-				insertDefaultBlock( attributes, rootClientId );
+				insertDefaultBlock( undefined, rootClientId );
 				startTyping();
 			},
 		};

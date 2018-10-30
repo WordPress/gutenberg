@@ -20,8 +20,6 @@ import Inserter from '../inserter';
 
 function BlockListAppender( {
 	blockClientIds,
-	layout,
-	isGroupedByLayout,
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
@@ -30,15 +28,12 @@ function BlockListAppender( {
 		return null;
 	}
 
-	const defaultLayout = isGroupedByLayout ? layout : undefined;
-
 	if ( canInsertDefaultBlock ) {
 		return (
 			<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 				<DefaultBlockAppender
 					rootClientId={ rootClientId }
 					lastBlockClientId={ last( blockClientIds ) }
-					layout={ defaultLayout }
 				/>
 			</IgnoreNestedEvents>
 		);
@@ -48,7 +43,6 @@ function BlockListAppender( {
 		<div className="block-list-appender">
 			<Inserter
 				rootClientId={ rootClientId }
-				layout={ defaultLayout }
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
 					<Button
 						aria-label={ __( 'Add block' ) }
