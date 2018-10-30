@@ -426,13 +426,14 @@ export class RichText extends Component {
 
 		const { start, end, formats } = this.createRecord();
 
-		if ( formats[ start ] ) {
-			this.props.onEnterFormattedText();
-		} else {
-			this.props.onExitFormattedText();
-		}
-
 		if ( start !== this.state.start || end !== this.state.end ) {
+			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
+			if ( ! isCaretWithinFormattedText && formats[ start ] ) {
+				this.props.onEnterFormattedText();
+			} else if ( isCaretWithinFormattedText && ! formats[ start ] ) {
+				this.props.onExitFormattedText();
+			}
+
 			this.setState( { start, end } );
 		}
 	}
@@ -956,11 +957,12 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { isViewportMatch } = select( 'core/viewport' );
-		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
+		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
