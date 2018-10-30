@@ -31,6 +31,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `wp.components.CodeEditor` has been removed. Used `wp.codeEditor` directly instead.
 - `wp.blocks.setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
 - `wp.blocks.getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
+- The Reusable Blocks Data API was marked as experimental as it's subject to change in the future.
 
 ## 4.1.0
 

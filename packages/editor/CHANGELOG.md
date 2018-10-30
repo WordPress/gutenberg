@@ -1,3 +1,9 @@
+## 6.1.0 (Unreleased)
+
+### Deprecations
+
+- The Reusable Blocks Data API is marked as experimental as it's subject to change in the future ([#11230](https://github.com/WordPress/gutenberg/pull/11230)).
+
 ## 6.0.1 (2018-10-30)
 
 ### Bug Fixes
