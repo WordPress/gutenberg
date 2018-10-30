@@ -257,9 +257,6 @@ export const editor = flow( [
 
 				return state;
 
-			case 'DIRTY_ARTIFICIALLY':
-				return { ...state };
-
 			case 'UPDATE_POST':
 			case 'RESET_POST':
 				const getCanonicalValue = action.type === 'UPDATE_POST' ?
