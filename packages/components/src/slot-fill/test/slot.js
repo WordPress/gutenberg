@@ -3,6 +3,7 @@
  */
 import { mount } from 'enzyme';
 import { isEmpty } from 'lodash';
+import ReactTestRenderer from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -34,16 +35,16 @@ class Filler extends Component {
 
 describe( 'Slot', () => {
 	it( 'should render empty Fills', () => {
-		const element = mount(
+		const tree = ReactTestRenderer.create(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
 				</div>
 				<Fill name="chicken" />
 			</Provider>
-		);
+		).toJSON();
 
-		expect( element.html() ).toBe( '<div></div>' );
+		expect( tree ).toMatchSnapshot();
 	} );
 
 	it( 'should render a string Fill', () => {
