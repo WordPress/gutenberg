@@ -1,4 +1,4 @@
-# @wordpress/data
+# Data
 
 WordPress' data module serves as a hub to manage application state for both plugins and WordPress itself, providing tools to manage data within and between distinct modules. It is designed as a modular pattern for organizing and sharing data: simple enough to satisfy the needs of a small plugin, while scalable to serve the requirements of a complex single-page application.
 
@@ -12,17 +12,43 @@ Install the module
 npm install @wordpress/data --save
 ```
 
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ## Registering a Store
 
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { data, apiRequest } = wp;
-const { registerStore, dispatch } = data;
+const { data, apiFetch } = wp;
+const { registerStore } = data;
 
 const DEFAULT_STATE = {
 	prices: {},
 	discountPercent: 0,
+};
+
+const actions = {
+	setPrice( item, price ) {
+		return {
+			type: 'SET_PRICE',
+			item,
+			price,
+		};
+	},
+
+	startSale( discountPercent ) {
+		return {
+			type: 'START_SALE',
+			discountPercent,
+		};
+	},
+
+	fetchFromAPI( path ) {
+		return {
+			type: 'FETCH_FROM_API',
+			path,
+		};
+	},
 };
 
 registerStore( 'my-shop', {
@@ -47,21 +73,7 @@ registerStore( 'my-shop', {
 		return state;
 	},
 
-	actions: {
-		setPrice( item, price ) {
-			return {
-				type: 'SET_PRICE',
-				item,
-				price,
-			};
-		},
-		startSale( discountPercent ) {
-			return {
-				type: 'START_SALE',
-				discountPercent,
-			};
-		},
-	},
+	actions,
 
 	selectors: {
 		getPrice( state, item ) {
@@ -72,20 +84,21 @@ registerStore( 'my-shop', {
 		},
 	},
 
+	controls: {
+		FETCH_FROM_API( action ) {
+			return apiFetch( { path: action.path } );
+		},
+	},
+
 	resolvers: {
-		async getPrice( state, item ) {
-			const price = await apiRequest( { path: '/wp/v2/prices/' + item } );
-			dispatch( 'my-shop' ).setPrice( item, price );
+		* getPrice( state, item ) {
+			const path = '/wp/v2/prices/' + item;
+			const price = yield actions.fetchFromAPI( path );
+			return actions.setPrice( item, price );
 		},
 	},
 } );
 ```
-
-A [**reducer**](https://redux.js.org/docs/basics/Reducers.html) is a function accepting the previous `state` and `action` as arguments and returns an updated `state` value.
-
-The **`actions`** object should describe all [action creators](https://redux.js.org/glossary#action-creator) available for your store. An action creator is a function that optionally accepts arguments and returns an action object to dispatch to the registered reducer. _Dispatching actions is the primary mechanism for making changes to your state._
-
-The **`selectors`** object includes a set of functions for accessing and deriving state values. A selector is a function which accepts state and optional arguments and returns some value from state. _Calling selectors is the primary mechanism for retrieving data from your state_, and serve as a useful abstraction over the raw data which is typically more susceptible to change and less readily usable as a [normalized object](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape#designing-a-normalized-state).
 
 The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/docs/basics/Store.html) with the following methods:
 
@@ -95,6 +108,36 @@ The return value of `registerStore` is a [Redux-like store object](https://redux
    - _Redux parallel:_ [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
 - `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
    - _Redux parallel:_ [`dispatch`](https://redux.js.org/api-reference/store#dispatch(action))
+
+## Options
+
+### `reducer`
+
+A [**reducer**](https://redux.js.org/docs/basics/Reducers.html) is a function accepting the previous `state` and `action` as arguments and returns an updated `state` value.
+
+### `actions`
+
+The **`actions`** object should describe all [action creators](https://redux.js.org/glossary#action-creator) available for your store. An action creator is a function that optionally accepts arguments and returns an action object to dispatch to the registered reducer. _Dispatching actions is the primary mechanism for making changes to your state._
+
+### `selectors`
+
+The **`selectors`** object includes a set of functions for accessing and deriving state values. A selector is a function which accepts state and optional arguments and returns some value from state. _Calling selectors is the primary mechanism for retrieving data from your state_, and serve as a useful abstraction over the raw data which is typically more susceptible to change and less readily usable as a [normalized object](https://redux.js.org/recipes/structuring-reducers/normalizing-state-shape#designing-a-normalized-state).
+
+### `resolvers`
+
+A **resolver** is a side-effect for a selector. If your selector result may need to be fulfilled from an external source, you can define a resolver such that the first time the selector is called, the fulfillment behavior is effected.
+
+The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
+
+### `controls`
+
+_**Note:** Controls are an opt-in feature, enabled via `use` (the [Plugins API](https://github.com/WordPress/gutenberg/tree/master/packages/data/src/plugins))._
+
+A **control** defines the execution flow behavior associated with a specific action type. This can be particularly useful in implementing asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
+
+The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
+
+Refer to the [documentation of `@wordpress/redux-routine`](https://github.com/WordPress/gutenberg/tree/master/packages/redux-routine/) for more information.
 
 ## Data Access and Manipulation
 
@@ -247,7 +290,7 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
 
-The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/master/packages/element#compose)).
+The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/master/packages/compose)).
 
 Specific implementation differences from Redux and React Redux:
 

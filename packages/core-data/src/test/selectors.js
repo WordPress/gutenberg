@@ -6,75 +6,22 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getTerms, isRequestingCategories, getEntityRecord, getEntityRecords } from '../selectors';
-import { select } from '@wordpress/data';
-
-jest.mock( '@wordpress/data', () => ( {
-	...require.requireActual( '@wordpress/data' ),
-	select: jest.fn().mockReturnValue( {} ),
-} ) );
-
-describe( 'getTerms()', () => {
-	it( 'returns value of terms by taxonomy', () => {
-		let state = deepFreeze( {
-			terms: {},
-		} );
-		expect( getTerms( state, 'categories' ) ).toBe( undefined );
-
-		state = deepFreeze( {
-			terms: {
-				categories: [ { id: 1 } ],
-			},
-		} );
-		expect( getTerms( state, 'categories' ) ).toEqual( [ { id: 1 } ] );
-	} );
-} );
-
-describe( 'isRequestingCategories()', () => {
-	beforeAll( () => {
-		select( 'core/data' ).isResolving = jest.fn().mockReturnValue( false );
-	} );
-
-	afterAll( () => {
-		select( 'core/data' ).isResolving.mockRestore();
-	} );
-
-	function setIsResolving( isResolving ) {
-		select( 'core/data' ).isResolving.mockImplementation(
-			( reducerKey, selectorName ) => (
-				isResolving &&
-				reducerKey === 'core' &&
-				selectorName === 'getCategories'
-			)
-		);
-	}
-
-	it( 'returns false if never requested', () => {
-		const result = isRequestingCategories();
-		expect( result ).toBe( false );
-	} );
-
-	it( 'returns false if categories resolution finished', () => {
-		setIsResolving( false );
-		const result = isRequestingCategories();
-		expect( result ).toBe( false );
-	} );
-
-	it( 'returns true if categories resolution started', () => {
-		setIsResolving( true );
-		const result = isRequestingCategories();
-		expect( result ).toBe( true );
-	} );
-} );
+import {
+	getEntityRecord,
+	getEntityRecords,
+	getEmbedPreview,
+	isPreviewEmbedFallback,
+} from '../selectors';
 
 describe( 'getEntityRecord', () => {
-	it( 'should return undefined for unknown record\'s key', () => {
+	it( 'should return undefined for unknown record’s key', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
 					root: {
 						postType: {
-							byKey: {},
+							items: {},
+							queries: {},
 						},
 					},
 				},
@@ -89,9 +36,10 @@ describe( 'getEntityRecord', () => {
 				data: {
 					root: {
 						postType: {
-							byKey: {
+							items: {
 								post: { slug: 'post' },
 							},
+							queries: {},
 						},
 					},
 				},
@@ -102,19 +50,20 @@ describe( 'getEntityRecord', () => {
 } );
 
 describe( 'getEntityRecords', () => {
-	it( 'should return an empty array by default', () => {
+	it( 'should return an null by default', () => {
 		const state = deepFreeze( {
 			entities: {
 				data: {
 					root: {
 						postType: {
-							byKey: {},
+							items: {},
+							queries: {},
 						},
 					},
 				},
 			},
 		} );
-		expect( getEntityRecords( state, 'root', 'postType' ) ).toEqual( [] );
+		expect( getEntityRecords( state, 'root', 'postType' ) ).toBe( null );
 	} );
 
 	it( 'should return all the records', () => {
@@ -123,9 +72,12 @@ describe( 'getEntityRecords', () => {
 				data: {
 					root: {
 						postType: {
-							byKey: {
+							items: {
 								post: { slug: 'post' },
 								page: { slug: 'page' },
+							},
+							queries: {
+								'': [ 'post', 'page' ],
 							},
 						},
 					},
@@ -139,3 +91,29 @@ describe( 'getEntityRecords', () => {
 	} );
 } );
 
+describe( 'getEmbedPreview()', () => {
+	it( 'returns preview stored for url', () => {
+		let state = deepFreeze( {
+			embedPreviews: {},
+		} );
+		expect( getEmbedPreview( state, 'http://example.com/' ) ).toBe( undefined );
+
+		state = deepFreeze( {
+			embedPreviews: {
+				'http://example.com/': { data: 42 },
+			},
+		} );
+		expect( getEmbedPreview( state, 'http://example.com/' ) ).toEqual( { data: 42 } );
+	} );
+} );
+
+describe( 'isPreviewEmbedFallback()', () => {
+	it( 'returns true if the preview html is just a single link', () => {
+		const state = deepFreeze( {
+			embedPreviews: {
+				'http://example.com/': { html: '<a href="http://example.com/">http://example.com/</a>' },
+			},
+		} );
+		expect( isPreviewEmbedFallback( state, 'http://example.com/' ) ).toEqual( true );
+	} );
+} );

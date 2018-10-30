@@ -1,0 +1,14 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/embed",
+        "isValid": true,
+        "attributes": {
+            "url": "https://example.com/",
+            "caption": "Embedded content from an example URL",
+            "allowResponsive": true
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-embed\">\n    <div class=\"wp-block-embed__wrapper\">\n        https://example.com/\n    </div>\n    <figcaption>Embedded content from an example URL</figcaption>\n</figure>"
+    }
+]

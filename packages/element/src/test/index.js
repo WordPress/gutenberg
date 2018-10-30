@@ -1,20 +1,12 @@
 /**
- * External dependencies
- */
-import { shallow, mount } from 'enzyme';
-
-/**
  * Internal dependencies
  */
 import {
-	Component,
-	createElement,
-	createHigherOrderComponent,
 	concatChildren,
+	createElement,
+	RawHTML,
 	renderToString,
 	switchChildrenNodeName,
-	RawHTML,
-	pure,
 } from '../';
 
 describe( 'element', () => {
@@ -121,140 +113,6 @@ describe( 'element', () => {
 			expect( children[ 0 ].props.align ).toBe( 'left' );
 			expect( children[ 1 ].type ).toBe( 'em' );
 			expect( children[ 1 ].props.children ).toBe( 'Concombre' );
-		} );
-	} );
-
-	describe( 'createHigherOrderComponent', () => {
-		it( 'should use default name for anonymous function', () => {
-			const TestComponent = createHigherOrderComponent(
-				( OriginalComponent ) => OriginalComponent,
-				'withTest'
-			)( () => <div /> );
-
-			expect( TestComponent.displayName ).toBe( 'WithTest(Component)' );
-		} );
-
-		it( 'should use camel case starting with upper for wrapper prefix ', () => {
-			const TestComponent = createHigherOrderComponent(
-				( OriginalComponent ) => OriginalComponent,
-				'with-one-two_threeFOUR'
-			)( () => <div /> );
-
-			expect( TestComponent.displayName ).toBe( 'WithOneTwoThreeFour(Component)' );
-		} );
-
-		it( 'should use function name', () => {
-			function SomeComponent() {
-				return <div />;
-			}
-			const TestComponent = createHigherOrderComponent(
-				( OriginalComponent ) => OriginalComponent,
-				'withTest'
-			)( SomeComponent );
-
-			expect( TestComponent.displayName ).toBe( 'WithTest(SomeComponent)' );
-		} );
-
-		it( 'should use component class name', () => {
-			class SomeAnotherComponent extends Component {
-				render() {
-					return <div />;
-				}
-			}
-			const TestComponent = createHigherOrderComponent(
-				( OriginalComponent ) => OriginalComponent,
-				'withTest'
-			)( SomeAnotherComponent );
-
-			expect( TestComponent.displayName ).toBe( 'WithTest(SomeAnotherComponent)' );
-		} );
-
-		it( 'should use displayName property', () => {
-			class SomeYetAnotherComponent extends Component {
-				render() {
-					return <div />;
-				}
-			}
-			SomeYetAnotherComponent.displayName = 'CustomDisplayName';
-			const TestComponent = createHigherOrderComponent(
-				( OriginalComponent ) => OriginalComponent,
-				'withTest'
-			)( SomeYetAnotherComponent );
-
-			expect( TestComponent.displayName ).toBe( 'WithTest(CustomDisplayName)' );
-		} );
-	} );
-
-	describe( 'RawHTML', () => {
-		it( 'is dangerous', () => {
-			const html = '<p>So scary!</p>';
-			const element = shallow(
-				<RawHTML>
-					{ html }
-				</RawHTML>
-			);
-
-			expect( element.type() ).toBe( 'div' );
-			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
-			expect( element.prop( 'children' ) ).toBe( undefined );
-		} );
-
-		it( 'creates wrapper if assigned other props', () => {
-			const html = '<p>So scary!</p>';
-			const element = shallow(
-				<RawHTML className="foo">
-					{ html }
-				</RawHTML>
-			);
-
-			expect( element.type() ).toBe( 'div' );
-			expect( element.prop( 'className' ) ).toBe( 'foo' );
-			expect( element.prop( 'dangerouslySetInnerHTML' ).__html ).toBe( html );
-			expect( element.prop( 'children' ) ).toBe( undefined );
-		} );
-	} );
-
-	describe( 'pure', () => {
-		it( 'functional component should rerender only when props change', () => {
-			let i = 0;
-			const MyComp = pure( () => {
-				return <p>{ ++i }</p>;
-			} );
-			const wrapper = mount( <MyComp /> );
-			wrapper.update(); // Updating with same props doesn't rerender
-			expect( wrapper.html() ).toBe( '<p>1</p>' );
-			wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
-			expect( wrapper.html() ).toBe( '<p>2</p>' );
-			wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
-			expect( wrapper.html() ).toBe( '<p>2</p>' );
-			wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
-			expect( wrapper.html() ).toBe( '<p>3</p>' );
-		} );
-
-		it( 'class component should rerender if the props or state change', () => {
-			let i = 0;
-			const MyComp = pure( class extends Component {
-				constructor() {
-					super( ...arguments );
-					this.state = {};
-				}
-				render() {
-					return <p>{ ++i }</p>;
-				}
-			} );
-			const wrapper = mount( <MyComp /> );
-			wrapper.update(); // Updating with same props doesn't rerender
-			expect( wrapper.html() ).toBe( '<p>1</p>' );
-			wrapper.setProps( { prop: 'a' } ); // New prop should trigger a rerender
-			expect( wrapper.html() ).toBe( '<p>2</p>' );
-			wrapper.setProps( { prop: 'a' } ); // Keeping the same prop value should not rerender
-			expect( wrapper.html() ).toBe( '<p>2</p>' );
-			wrapper.setProps( { prop: 'b' } ); // Changing the prop value should rerender
-			expect( wrapper.html() ).toBe( '<p>3</p>' );
-			wrapper.setState( { state: 'a' } ); // New state value should trigger a rerender
-			expect( wrapper.html() ).toBe( '<p>4</p>' );
-			wrapper.setState( { state: 'a' } ); // Keeping the same state value should not trigger a rerender
-			expect( wrapper.html() ).toBe( '<p>4</p>' );
 		} );
 	} );
 } );

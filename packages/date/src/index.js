@@ -5,6 +5,13 @@ import momentLib from 'moment';
 import 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+// Changes made here will likely need to be made in `lib/client-assets.php` as
+// well because it uses the `setSettings()` function to change these settings.
 let settings = {
 	l10n: {
 		locale: 'en_US',
@@ -19,6 +26,7 @@ let settings = {
 		time: 'g: i a',
 		date: 'F j, Y',
 		datetime: 'F j, Y g: i a',
+		datetimeAbbreviated: 'M j, Y g: i a',
 	},
 	timezone: { offset: '0', string: '' },
 };
@@ -82,7 +90,18 @@ export function setSettings( dateSettings ) {
  *
  * @return {Object} Settings, including locale data.
  */
+export function __experimentalGetSettings() {
+	return settings;
+}
+
+// deprecations
 export function getSettings() {
+	deprecated( 'wp.date.getSettings', {
+		version: '4.4',
+		alternative: 'wp.date.__experimentalGetSettings',
+		plugin: 'Gutenberg',
+		hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
+	} );
 	return settings;
 }
 

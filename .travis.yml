@@ -19,6 +19,11 @@ cache:
     - $HOME/.npm
 
 before_install:
+  - |
+    git diff --name-only $TRAVIS_COMMIT_RANGE | grep -qvE '(\.md$)' || {
+      echo "Only docs were updated, stopping build process."
+      exit
+    }
   - nvm install && nvm use
   - npm install npm -g
 
@@ -29,6 +34,7 @@ branches:
 jobs:
   include:
     - stage: test
+      env: WP_VERSION=latest
       script:
         - npm install || exit 1
         - npm run ci || exit 1
@@ -59,7 +65,48 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
+      env: WP_VERSION=latest
       script:
         - npm install || exit 1
-        - npm run build || exit 1
         - ./bin/run-e2e-tests.sh || exit 1
+    - stage: test
+      language: node_js
+      node_js: 8
+      env:
+        LANE='node'
+        GUTENBERG_AS_PARENT=true
+        CHECK_CORRECTNESS='true'
+      cache:
+        yarn: true
+      script:
+        - cd ./gutenberg-mobile
+        - yarn install
+        - ./.travis/travis-checks-js.sh
+    - stage: test
+      language: node_js
+      node_js: 8
+      env:
+        LANE='node'
+        GUTENBERG_AS_PARENT=true
+        CHECK_TESTS='true'
+        TEST_RN_PLATFORM='android'
+      cache:
+        yarn: true
+      script:
+        - cd ./gutenberg-mobile
+        - yarn install
+        - ./.travis/travis-checks-js.sh
+    - stage: test
+      language: node_js
+      node_js: 8
+      env:
+        LANE='node'
+        GUTENBERG_AS_PARENT=true
+        CHECK_TESTS='true'
+        TEST_RN_PLATFORM='ios'
+      cache:
+        yarn: true
+      script:
+        - cd ./gutenberg-mobile
+        - yarn install
+        - ./.travis/travis-checks-js.sh

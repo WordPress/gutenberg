@@ -1,0 +1,43 @@
+.editor-block-list__block[data-type="core/table"] {
+	&[data-align="left"],
+	&[data-align="right"],
+	&[data-align="center"] {
+		table {
+			// Ensure the table element is not full-width when aligned.
+			width: auto;
+		}
+	}
+
+	&[data-align="center"] {
+		text-align: initial;
+
+		table {
+			margin: 0 auto;
+		}
+	}
+}
+
+
+.wp-block-table {
+	table {
+		border-collapse: collapse;
+		width: 100%;
+	}
+
+	td,
+	th {
+		padding: 0;
+		border: $border-width solid currentColor;
+	}
+
+	td.is-selected,
+	th.is-selected {
+		border-color: $blue-medium-500;
+		box-shadow: inset 0 0 0 1px $blue-medium-500;
+		border-style: double;
+	}
+
+	&__cell-content {
+		padding: 0.5em;
+	}
+}

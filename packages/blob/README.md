@@ -1,6 +1,6 @@
-# @wordpress/blob
+# Blob
 
-Blob utils for WordPress.
+Blob utilities for WordPress.
 
 ## Installation
 

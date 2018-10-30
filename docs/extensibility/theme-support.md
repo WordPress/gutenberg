@@ -1,6 +1,6 @@
 # Theme Support
 
-By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the theme provides.
+By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
 
 Some advanced block features require opt-in support in the theme itself as it's difficult for the block to provide these styles, they may require some architecting of the theme itself, in order to work well.
 
@@ -45,7 +45,37 @@ Some blocks such as the image block have the possibility to define a "wide" or "
 add_theme_support( 'align-wide' );
 ```
 
-### Block Color Palettes:
+For more information about this function, see [the developer docs on `add_theme_support()`](https://developer.wordpress.org/reference/functions/add_theme_support/).
+
+### Wide Alignments and Floats
+
+It can be difficult to create a responsive layout that accommodates wide images, a sidebar, a centered column, and floated elements that stay within that centered column.
+
+Gutenberg adds additional markup to floated images to make styling them easier.
+
+Here's the markup for an `Image` with a caption:
+
+```html
+<figure class="wp-block-image">
+	<img src="..." alt="" width="200px">
+	<figcaption>Short image caption.</figcaption>
+</figure>
+```
+
+Here's the markup for a left-floated image:
+
+```html
+<div class="wp-block-image">
+	<figure class="alignleft">
+		<img src="..." alt="" width="200px">
+		<figcaption>Short image caption.</figcaption>
+	</figure>
+</div>
+```
+
+Here's an example using the above markup to achieve a responsive layout that features a sidebar, wide images, and floated elements with bounded captions: https://codepen.io/joen/pen/zLWvrW.
+
+### Block Color Palettes
 
 Different blocks have the possibility of customizing colors. Gutenberg provides a default palette, but a theme can overwrite it and provide its own:
 
@@ -90,10 +120,69 @@ Themes are responsible for creating the classes that apply the colors in differe
 
 The class name is built appending 'has-', followed by the class name *using* kebab case and ending with the context name.
 
+### Block Font Sizes:
+
+Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. Gutenberg provides a default set of font sizes, but a theme can overwrite it and provide its own:
+
+
+```php
+add_theme_support( 'editor-font-sizes', array(
+	array(
+		'name' => __( 'small', 'themeLangDomain' ),
+		'shortName' => __( 'S', 'themeLangDomain' ),
+		'size' => 12,
+		'slug' => 'small'
+	),
+	array(
+		'name' => __( 'regular', 'themeLangDomain' ),
+		'shortName' => __( 'M', 'themeLangDomain' ),
+		'size' => 16,
+		'slug' => 'regular'
+	),
+	array(
+		'name' => __( 'large', 'themeLangDomain' ),
+		'shortName' => __( 'L', 'themeLangDomain' ),
+		'size' => 36,
+		'slug' => 'large'
+	),
+	array(
+		'name' => __( 'larger', 'themeLangDomain' ),
+		'shortName' => __( 'XL', 'themeLangDomain' ),
+		'size' => 50,
+		'slug' => 'larger'
+	)
+) );
+```
+
+The font sizes are rendered on the font size picker in the order themes provide them.
+
+Themes are responsible for creating the classes that apply the correct font size styles.
+The class name is built appending 'has-', followed by the font size name *using* kebab case and ending with `-font-size`.
+
+As an example for the regular font size, a theme may provide the following class.
+
+```css
+.has-regular-font-size {
+    font-size: 16px;
+}
+```
+
+### Disabling custom font sizes
+
+Themes can disable the ability to set custom font sizes with the following code:
+
+```php
+add_theme_support('disable-custom-font-sizes');
+```
+
+When set, users will be restricted to the default sizes provided in Gutenberg or the sizes provided via the `editor-font-sizes` theme support setting.
+
 ### Disabling custom colors in block Color Palettes
 
-By default, the color palette offered to blocks, allows the user to select a custom color different from the editor or theme default colors.
+By default, the color palette offered to blocks allows the user to select a custom color different from the editor or theme default colors.
+
 Themes can disable this feature using:
+
 ```php
 add_theme_support( 'disable-custom-colors' );
 ```
@@ -102,24 +191,26 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 ## Editor styles
 
-A theme can provide a stylesheet that will change the editor's appearance. You can use this to change colors, fonts, and any other visual aspect of the editor.
+Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
 
-### Add the stylesheet
+In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. Gutenberg, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors.
 
-The first thing to do is to create a new stylesheet file in your theme directory. We'll assume the file is named `style-editor.css`.
-
-Next, load your newly-created editor stylesheet in your theme:
+Because it works a little differently, you need to opt-in to this by adding an extra snippet to your theme, in addition to the add_editor_style function:
 
 ```php
-/**
- * Enqueue block editor style
- */
-function mytheme_block_editor_styles() {
-	wp_enqueue_style( 'mytheme-block-editor-styles', get_theme_file_uri( '/style-editor.css' ), false, '1.0', 'all' );
-}
-
-add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
+add_theme_support('editor-styles');
 ```
+
+You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside Gutenberg.
+
+If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
+
+```php
+add_theme_support( 'editor-styles' );
+add_theme_support( 'dark-editor-style' );
+```
+
+Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-editor-style` rule to work.
 
 ### Basic colors
 
@@ -127,7 +218,7 @@ You can style the editor like any other webpage. Here's how to change the backgr
 
 ```css
 /* Add this to your `style-editor.css` file */
-body.gutenberg-editor-page {
+body {
 	background-color: #d3ebf3;
 	color: #00005d;
 }
@@ -139,19 +230,17 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 ```css
 /* Main column width */
-body.gutenberg-editor-page .editor-post-title__block,
-body.gutenberg-editor-page .editor-default-block-appender,
-body.gutenberg-editor-page .editor-block-list__block {
+.wp-block {
 	max-width: 720px;
 }
 
 /* Width of "wide" blocks */
-body.gutenberg-editor-page .editor-block-list__block[data-align="wide"] {
+.wp-block[data-align="wide"] {
 	max-width: 1080px;
 }
 
 /* Width of "full-wide" blocks */
-body.gutenberg-editor-page .editor-block-list__block[data-align="full"] {
+.wp-block[data-align="full"] {
 	max-width: none;
 }
 ```
@@ -166,4 +255,20 @@ Core blocks include default styles. The styles are enqueued for editing but are 
 
 ```php
 add_theme_support( 'wp-block-styles' );
+```
+
+## Responsive embedded content
+
+The embed blocks automatically apply styles to embedded content to reflect the aspect ratio of content that is embedded in an iFrame. A block styled with the aspect ratio responsive styles would look like:
+
+```html
+<figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio">
+   ...
+</figure>
+```
+
+To make the content resize and keep its aspect ratio, the `<body>` element needs the `wp-embed-responsive` class. This is not set by default, and requires the theme to opt in to the `responsive-embeds` feature:
+
+```php
+add_theme_support( 'responsive-embeds' );
 ```

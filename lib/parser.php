@@ -259,26 +259,26 @@ class Gutenberg_PEG_Parser {
     private function peg_f2($blockName, $a) { return $a; }
     private function peg_f3($blockName, $attrs) {
         return array(
-          'blockName'  => $blockName,
-          'attrs'      => $attrs,
+          'blockName'   => $blockName,
+          'attrs'       => isset( $attrs ) ? $attrs : array(),
           'innerBlocks' => array(),
-          'innerHTML' => '',
+          'innerHTML'   => '',
         );
         }
     private function peg_f4($s, $children, $e) {
         list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
 
         return array(
-          'blockName'  => $s['blockName'],
-          'attrs'      => $s['attrs'],
+          'blockName'    => $s['blockName'],
+          'attrs'        => $s['attrs'],
           'innerBlocks'  => $innerBlocks,
-          'innerHTML'  => implode( '', $innerHTML ),
+          'innerHTML'    => implode( '', $innerHTML ),
         );
         }
     private function peg_f5($blockName, $attrs) {
         return array(
           'blockName' => $blockName,
-          'attrs'     => $attrs,
+          'attrs'     => isset( $attrs ) ? $attrs : array(),
         );
         }
     private function peg_f6($blockName) {
@@ -1461,7 +1461,12 @@ class Gutenberg_PEG_Parser {
             $blocks = array();
 
             if ( ! empty( $pre ) ) {
-                $blocks[] = array( 'attrs' => array(), 'innerHTML' => $pre );
+                $blocks[] = array(
+                    'blockName' => null,
+                    'attrs' => array(),
+                    'innerBlocks' => array(),
+                    'innerHTML' => $pre
+                );
             }
 
             foreach ( $tokens as $token ) {
@@ -1470,12 +1475,22 @@ class Gutenberg_PEG_Parser {
                 $blocks[] = $token;
 
                 if ( ! empty( $html ) ) {
-                    $blocks[] = array( 'attrs' => array(), 'innerHTML' => $html );
+                    $blocks[] = array(
+                        'blockName' => null,
+                        'attrs' => array(),
+                        'innerBlocks' => array(),
+                        'innerHTML' => $html
+                    );
                 }
             }
 
             if ( ! empty( $post ) ) {
-                $blocks[] = array( 'attrs' => array(), 'innerHTML' => $post );
+                $blocks[] = array(
+                    'blockName' => null,
+                    'attrs' => array(),
+                    'innerBlocks' => array(),
+                    'innerHTML' => $post
+                );
             }
 
             return $blocks;

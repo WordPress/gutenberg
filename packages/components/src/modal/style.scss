@@ -1,0 +1,100 @@
+// The scrim behind the modal window.
+.components-modal__screen-overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background-color: rgba($white, 0.4);
+	z-index: z-index(".components-modal__screen-overlay");
+
+	// This animates the appearance of the white background.
+	@include fade-in();
+}
+
+// The modal window element.
+.components-modal__frame {
+	// On small screens the content needs to be full width because of limited
+	// space.
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	box-sizing: border-box;
+	margin: 0;
+	border: $border-width solid $light-gray-500;
+	background: $white;
+	box-shadow: $shadow-modal;
+	overflow: auto;
+
+	// Show a centered modal on bigger screens.
+	@include break-small() {
+		top: 50%;
+		right: auto;
+		bottom: auto;
+		left: 50%;
+		min-width: $modal-min-width;
+		max-width: calc(100% - #{ $grid-size-large } - #{ $grid-size-large });
+		max-height: calc(100% - #{ $header-height } - #{ $header-height });
+		transform: translate(-50%, -50%);
+
+		// Animate the modal frame/contents appearing on the page.
+		@include modal_appear();
+	}
+}
+
+// Fix header to the top so it is always there to provide context to the modal
+// if the content needs to be scrolled (for example, on the keyboard shortcuts
+// modal screen).
+.components-modal__header {
+	box-sizing: border-box;
+	border-bottom: $border-width solid $light-gray-500;
+	padding: 0 $grid-size-large;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	background: $white;
+	align-items: center;
+	box-sizing: border-box;
+	height: $header-height;
+	position: sticky;
+	top: 0;
+	z-index: z-index(".components-modal__header");
+	margin: 0 -#{ $grid-size-large } $grid-size-large;
+
+	.components-modal__header-heading {
+		font-size: 1em;
+		font-weight: normal;
+	}
+
+	h1 {
+		line-height: 1;
+		margin: 0;
+	}
+}
+
+.components-modal__header-heading-container {
+	align-items: center;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: row;
+	justify-content: left;
+}
+
+.components-modal__header-icon-container {
+	display: inline-block;
+
+	svg {
+		max-width: $icon-button-size;
+		max-height: $icon-button-size;
+		padding: $grid-size;
+	}
+}
+
+// Modal contents.
+.components-modal__content {
+	box-sizing: border-box;
+	height: 100%;
+	padding: 0 $grid-size-large $grid-size-large;
+}

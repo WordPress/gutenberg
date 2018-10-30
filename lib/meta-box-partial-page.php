@@ -57,6 +57,7 @@ add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000 );
  *
  * @param string $location The location of the meta box, 'side', 'normal'.
  * @param int    $post_id  Post ID.
+ * @return string Modified location of the meta box.
  *
  * @hooked redirect_post_location priority 10
  */
@@ -112,8 +113,8 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 	$core_normal_meta_boxes = array(
 		'revisionsdiv',
 		'postexcerpt',
-		'trackbacksdiv',
 		'postcustom',
+		'trackbacksdiv',
 		'commentstatusdiv',
 		'commentsdiv',
 		'slugdiv',
@@ -291,7 +292,7 @@ function the_gutenberg_metaboxes() {
 	 */
 	$wp_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
 	$locations     = array( 'side', 'normal', 'advanced' );
-	$meta_box_data = array();
+	$priorities    = array( 'high', 'sorted', 'core', 'default', 'low' );
 	// Render meta boxes.
 	?>
 	<form class="metabox-base-form">
@@ -302,19 +303,37 @@ function the_gutenberg_metaboxes() {
 			<div id="poststuff" class="sidebar-open">
 				<div id="postbox-container-2" class="postbox-container">
 					<?php
-					$number_metaboxes = do_meta_boxes(
+					do_meta_boxes(
 						$current_screen,
 						$location,
 						$post
 					);
-
-					$meta_box_data[ $location ] = $number_metaboxes > 0;
 					?>
 				</div>
 			</div>
 		</form>
 	<?php endforeach; ?>
 	<?php
+
+	$meta_boxes_per_location = array();
+	foreach ( $locations as $location ) {
+		$meta_boxes_per_location[ $location ] = array();
+		foreach ( $priorities as $priority ) {
+			if ( isset( $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ] ) ) {
+				$meta_boxes = (array) $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ];
+				foreach ( $meta_boxes as $meta_box ) {
+					if ( false == $meta_box || ! $meta_box['title'] ) {
+						continue;
+					}
+
+					$meta_boxes_per_location[ $location ][] = array(
+						'id'    => $meta_box['id'],
+						'title' => $meta_box['title'],
+					);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Sadly we probably can not add this data directly into editor settings.
@@ -324,10 +343,21 @@ function the_gutenberg_metaboxes() {
 	 * editor instance. If a cleaner solution can be imagined, please change
 	 * this, and try to get this data to load directly into the editor settings.
 	 */
-	wp_add_inline_script(
-		'wp-edit-post',
-		'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );'
-	);
+	$script = 'window._wpLoadGutenbergEditor.then( function() {
+		wp.data.dispatch( \'core/edit-post\' ).setAvailableMetaBoxesPerLocation( ' . wp_json_encode( $meta_boxes_per_location ) . ' );
+	} );';
+
+	wp_add_inline_script( 'wp-edit-post', $script );
+
+	/**
+	 * When `wp-edit-post` is output in the `<head>`, the inline script needs to be manually printed. Otherwise,
+	 * metaboxes will not display because inline scripts for `wp-edit-post` will not be printed again after this point.
+	 *
+	 * @see https://github.com/WordPress/gutenberg/issues/6963
+	 */
+	if ( wp_script_is( 'wp-edit-post', 'done' ) ) {
+		printf( "<script type='text/javascript'>\n%s\n</script>\n", trim( $script ) );
+	}
 
 	// Reset meta box data.
 	$wp_meta_boxes = $_original_meta_boxes;

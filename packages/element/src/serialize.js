@@ -28,17 +28,31 @@
 /**
  * External dependencies
  */
-import { flowRight, isEmpty, castArray, omit, startsWith, kebabCase } from 'lodash';
+import {
+	isEmpty,
+	castArray,
+	omit,
+	startsWith,
+	kebabCase,
+	isPlainObject,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
+import { escapeHTML, escapeAttribute, isValidAttributeName } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
  */
-import { Fragment, RawHTML } from './';
+import {
+	createContext,
+	Fragment,
+	StrictMode,
+} from './react';
+import RawHTML from './raw-html';
+
+const { Provider, Consumer } = createContext();
 
 /**
  * Valid attribute types.
@@ -102,6 +116,7 @@ const BOOLEAN_ATTRIBUTES = new Set( [
 	'default',
 	'defer',
 	'disabled',
+	'download',
 	'formnovalidate',
 	'hidden',
 	'ismap',
@@ -225,80 +240,6 @@ const CSS_PROPERTIES_SUPPORTS_UNITLESS = new Set( [
 ] );
 
 /**
- * Returns a string with ampersands escaped. Note that this is an imperfect
- * implementation, where only ampersands which do not appear as a pattern of
- * named, decimal, or hexadecimal character references are escaped. Invalid
- * named references (i.e. ambiguous ampersand) are are still permitted.
- *
- * @link https://w3c.github.io/html/syntax.html#character-references
- * @link https://w3c.github.io/html/syntax.html#ambiguous-ampersand
- * @link https://w3c.github.io/html/syntax.html#named-character-references
- *
- * @param {string} value Original string.
- *
- * @return {string} Escaped string.
- */
-export function escapeAmpersand( value ) {
-	return value.replace( /&(?!([a-z0-9]+|#[0-9]+|#x[a-f0-9]+);)/gi, '&amp;' );
-}
-
-/**
- * Returns a string with quotation marks replaced.
- *
- * @param {string} value Original string.
- *
- * @return {string} Escaped string.
- */
-export function escapeQuotationMark( value ) {
-	return value.replace( /"/g, '&quot;' );
-}
-
-/**
- * Returns a string with less-than sign replaced.
- *
- * @param {string} value Original string.
- *
- * @return {string} Escaped string.
- */
-export function escapeLessThan( value ) {
-	return value.replace( /</g, '&lt;' );
-}
-
-/**
- * Returns an escaped attribute value.
- *
- * @link https://w3c.github.io/html/syntax.html#elements-attributes
- *
- * "[...] the text cannot contain an ambiguous ampersand [...] must not contain
- * any literal U+0022 QUOTATION MARK characters (")"
- *
- * @param {string} value Attribute value.
- *
- * @return {string} Escaped attribute value.
- */
-export const escapeAttribute = flowRight( [
-	escapeAmpersand,
-	escapeQuotationMark,
-] );
-
-/**
- * Returns an escaped HTML element value.
- *
- * @link https://w3c.github.io/html/syntax.html#writing-html-documents-elements
- *
- * "the text must not contain the character U+003C LESS-THAN SIGN (<) or an
- * ambiguous ampersand."
- *
- * @param {string} value Element value.
- *
- * @return {string} Escaped HTML element value.
- */
-export const escapeHTML = flowRight( [
-	escapeAmpersand,
-	escapeLessThan,
-] );
-
-/**
  * Returns true if the specified string is prefixed by one of an array of
  * possible prefixes.
  *
@@ -403,18 +344,19 @@ function getNormalStylePropertyValue( property, value ) {
 /**
  * Serializes a React element to string.
  *
- * @param {WPElement} element Element to serialize.
- * @param {?Object}   context Context object.
+ * @param {WPElement} element       Element to serialize.
+ * @param {?Object}   context       Context object.
+ * @param {?Object}   legacyContext Legacy context object.
  *
  * @return {string} Serialized element.
  */
-export function renderElement( element, context = {} ) {
+export function renderElement( element, context, legacyContext = {} ) {
 	if ( null === element || undefined === element || false === element ) {
 		return '';
 	}
 
 	if ( Array.isArray( element ) ) {
-		return renderChildren( element, context );
+		return renderChildren( element, context, legacyContext );
 	}
 
 	switch ( typeof element ) {
@@ -425,11 +367,12 @@ export function renderElement( element, context = {} ) {
 			return element.toString();
 	}
 
-	const { type: tagName, props } = element;
+	const { type, props } = element;
 
-	switch ( tagName ) {
+	switch ( type ) {
+		case StrictMode:
 		case Fragment:
-			return renderChildren( props.children, context );
+			return renderChildren( props.children, context, legacyContext );
 
 		case RawHTML:
 			const { children, ...wrapperProps } = props;
@@ -440,20 +383,29 @@ export function renderElement( element, context = {} ) {
 					...wrapperProps,
 					dangerouslySetInnerHTML: { __html: children },
 				},
-				context
+				context,
+				legacyContext
 			);
 	}
 
-	switch ( typeof tagName ) {
+	switch ( typeof type ) {
 		case 'string':
-			return renderNativeComponent( tagName, props, context );
+			return renderNativeComponent( type, props, context, legacyContext );
 
 		case 'function':
-			if ( tagName.prototype && typeof tagName.prototype.render === 'function' ) {
-				return renderComponent( tagName, props, context );
+			if ( type.prototype && typeof type.prototype.render === 'function' ) {
+				return renderComponent( type, props, context, legacyContext );
 			}
 
-			return renderElement( tagName( props, context ), context );
+			return renderElement( type( props, legacyContext ), context, legacyContext );
+	}
+
+	switch ( type && type.$$typeof ) {
+		case Provider.$$typeof:
+			return renderChildren( props.children, props.value, legacyContext );
+
+		case Consumer.$$typeof:
+			return renderElement( props.children( context || type._currentValue ), context, legacyContext );
 	}
 
 	return '';
@@ -462,27 +414,28 @@ export function renderElement( element, context = {} ) {
 /**
  * Serializes a native component type to string.
  *
- * @param {?string} type    Native component type to serialize, or null if
- *                          rendering as fragment of children content.
- * @param {Object}  props   Props object.
- * @param {?Object} context Context object.
+ * @param {?string} type          Native component type to serialize, or null if
+ *                                rendering as fragment of children content.
+ * @param {Object}  props         Props object.
+ * @param {?Object} context       Context object.
+ * @param {?Object} legacyContext Legacy context object.
  *
  * @return {string} Serialized element.
  */
-export function renderNativeComponent( type, props, context = {} ) {
+export function renderNativeComponent( type, props, context, legacyContext = {} ) {
 	let content = '';
 	if ( type === 'textarea' && props.hasOwnProperty( 'value' ) ) {
 		// Textarea children can be assigned as value prop. If it is, render in
 		// place of children. Ensure to omit so it is not assigned as attribute
 		// as well.
-		content = renderChildren( props.value, context );
+		content = renderChildren( props.value, context, legacyContext );
 		props = omit( props, 'value' );
 	} else if ( props.dangerouslySetInnerHTML &&
 			typeof props.dangerouslySetInnerHTML.__html === 'string' ) {
 		// Dangerous content is left unescaped.
 		content = props.dangerouslySetInnerHTML.__html;
 	} else if ( typeof props.children !== 'undefined' ) {
-		content = renderChildren( props.children, context );
+		content = renderChildren( props.children, context, legacyContext );
 	}
 
 	if ( ! type ) {
@@ -501,29 +454,21 @@ export function renderNativeComponent( type, props, context = {} ) {
 /**
  * Serializes a non-native component type to string.
  *
- * @param {Function} Component Component type to serialize.
- * @param {Object}   props     Props object.
- * @param {?Object}  context   Context object.
+ * @param {Function} Component     Component type to serialize.
+ * @param {Object}   props         Props object.
+ * @param {?Object}  context       Context object.
+ * @param {?Object}  legacyContext Legacy context object.
  *
  * @return {string} Serialized element
  */
-export function renderComponent( Component, props, context = {} ) {
-	const instance = new Component( props, context );
-
-	if ( typeof instance.componentWillMount === 'function' ) {
-		instance.componentWillMount();
-		deprecated( 'componentWillMount', {
-			version: '3.3',
-			alternative: 'the constructor',
-			plugin: 'Gutenberg',
-		} );
-	}
+export function renderComponent( Component, props, context, legacyContext = {} ) {
+	const instance = new Component( props, legacyContext );
 
 	if ( typeof instance.getChildContext === 'function' ) {
-		Object.assign( context, instance.getChildContext() );
+		Object.assign( legacyContext, instance.getChildContext() );
 	}
 
-	const html = renderElement( instance.render(), context );
+	const html = renderElement( instance.render(), context, legacyContext );
 
 	return html;
 }
@@ -531,12 +476,13 @@ export function renderComponent( Component, props, context = {} ) {
 /**
  * Serializes an array of children to string.
  *
- * @param {Array}   children Children to serialize.
- * @param {?Object} context  Context object.
+ * @param {Array}   children      Children to serialize.
+ * @param {?Object} context       Context object.
+ * @param {?Object} legacyContext Legacy context object.
  *
  * @return {string} Serialized children.
  */
-function renderChildren( children, context = {} ) {
+function renderChildren( children, context, legacyContext = {} ) {
 	let result = '';
 
 	children = castArray( children );
@@ -544,7 +490,7 @@ function renderChildren( children, context = {} ) {
 	for ( let i = 0; i < children.length; i++ ) {
 		const child = children[ i ];
 
-		result += renderElement( child, context );
+		result += renderElement( child, context, legacyContext );
 	}
 
 	return result;
@@ -562,6 +508,10 @@ export function renderAttributes( props ) {
 
 	for ( const key in props ) {
 		const attribute = getNormalAttributeName( key );
+		if ( ! isValidAttributeName( attribute ) ) {
+			continue;
+		}
+
 		let value = getNormalAttributeValue( key, props[ key ] );
 
 		// If value is not of serializeable type, skip.
@@ -618,6 +568,11 @@ export function renderAttributes( props ) {
  * @return {string} Style attribute value.
  */
 export function renderStyle( style ) {
+	// Only generate from object, e.g. tolerate string value.
+	if ( ! isPlainObject( style ) ) {
+		return style;
+	}
+
 	let result;
 
 	for ( const property in style ) {

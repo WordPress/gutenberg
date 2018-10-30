@@ -434,7 +434,9 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		);
 
 		register_rest_field(
-			'post-revision', 'my_custom_int', array(
+			'post-revision',
+			'my_custom_int',
+			array(
 				'schema'          => $schema,
 				'get_callback'    => array( $this, 'additional_field_get_callback' ),
 				'update_callback' => array( $this, 'additional_field_update_callback' ),

@@ -38,6 +38,7 @@ wp_enqueue_script(
 	plugins_url( 'plugins-api/sidebar.js', __FILE__ ),
 	array(
 		'wp-components',
+		'wp-compose',
 		'wp-data',
 		'wp-edit-post',
 		'wp-editor',

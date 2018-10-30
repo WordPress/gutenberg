@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Notice should match snapshot 1`] = `
+<div
+  className="components-notice is-success is-dismissible"
+>
+  <div
+    className="components-notice__content"
+  >
+    Example
+    <ForwardRef(Button)
+      className="components-notice__action"
+      href="https://example.com"
+      isLink={true}
+    >
+      View
+    </ForwardRef(Button)>
+  </div>
+  <IconButton
+    className="components-notice__dismiss"
+    icon="no"
+    label="Dismiss this notice"
+    onClick={[Function]}
+    tooltip={false}
+  />
+</div>
+`;

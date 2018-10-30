@@ -1,6 +1,6 @@
-# **core/editor**: The Editor's Data
+# **core/editor**: The Editor’s Data
 
-## Selectors 
+## Selectors
 
 ### hasEditorUndo
 
@@ -51,8 +51,8 @@ Whether unsaved values exist.
 
 ### isCleanNewPost
 
-Returns true if there are no unsaved values for the current edit session and if
-the currently edited post is new (and has never been saved before).
+Returns true if there are no unsaved values for the current edit session and
+if the currently edited post is new (has never been saved before).
 
 *Parameters*
 
@@ -259,7 +259,8 @@ Whether the post can be saved.
 ### isEditedPostEmpty
 
 Returns true if the edited post has content. A post has content if it has at
-least one block or otherwise has a non-empty content property assigned.
+least one saveable block or otherwise has a non-empty content property
+assigned.
 
 *Parameters*
 
@@ -320,9 +321,108 @@ unsaved status values.
 
 Whether the post has been published.
 
-### getDocumentTitle
+### isEditedPostDateFloating
 
-Gets the document title to be used.
+Returns whether the current post should be considered to have a "floating"
+date (i.e. that it would publish "Immediately" rather than at a set time).
+
+Unlike in the PHP backend, the REST API returns a full date string for posts
+where the 0000-00-00T00:00:00 placeholder is present in the database. To
+infer that a post is set to publish "Immediately" we check whether the date
+and modified date are the same.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether the edited post has a floating date value.
+
+### getBlockDependantsCacheBust
+
+Returns a new reference when the inner blocks of a given block client ID
+change. This is used exclusively as a memoized selector dependant, relying
+on this selector's shared return value and recursively those of its inner
+blocks defined as dependencies. This abuses mechanics of the selector
+memoization to return from the original selector function only when
+dependants change.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+A value whose reference will change only when inner blocks of
+            the given block client ID change.
+
+### getBlockName
+
+Returns a block's name given its client ID, or null if no block exists with
+the client ID.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Block name.
+
+### getBlock
+
+Returns a block given its client ID. This is a parsed copy of the block,
+containing its `blockName`, `clientId`, and current `attributes` state. This
+is not the block's registration settings, which must be retrieved from the
+blocks module registration store.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Parsed block object.
+
+### getBlocks
+
+Returns all block objects for the current post being edited as an array in
+the order they appear in the post.
+
+Note: It's important to memoize this selector to avoid return a new instance
+on each call
+
+*Parameters*
+
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
+
+*Returns*
+
+Post blocks.
+
+### getClientIdsOfDescendants
+
+Returns an array containing the clientIds of all descendants
+of the blocks given.
+
+*Parameters*
+
+ * state: Global application state.
+ * clientIds: Array of blocks to inspect.
+
+*Returns*
+
+ids of descendants.
+
+### getClientIdsWithDescendants
+
+Returns an array containing the clientIds of the top-level blocks
+and their descendants of any depth (for nested blocks).
 
 *Parameters*
 
@@ -330,21 +430,35 @@ Gets the document title to be used.
 
 *Returns*
 
-Document title.
+ids of top-level and descendant blocks.
 
-### getBlockName
+### getGlobalBlockCount
 
-Returns a block's name given its UID, or null if no block exists with the
-UID.
+Returns the total number of blocks, or the total number of blocks with a specific name in a post.
+The number returned includes nested blocks.
+
+*Parameters*
+
+ * state: Global application state.
+ * blockName: Optional block name, if specified only blocks of that type will be counted.
+
+*Returns*
+
+Number of blocks in the post, or number of blocks with name equal to blockName.
+
+### getBlocksByClientId
+
+Given an array of block client IDs, returns the corresponding array of block
+objects.
 
 *Parameters*
 
  * state: Editor state.
- * uid: Block unique ID.
+ * clientIds: Client IDs for which blocks are to be returned.
 
 *Returns*
 
-Block name.
+Block objects.
 
 ### getBlockCount
 
@@ -352,8 +466,8 @@ Returns the number of blocks currently present in the post.
 
 *Parameters*
 
- * state: Global application state.
- * rootUID: Optional root UID of block list.
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
@@ -371,7 +485,7 @@ A selection is singular if its start and end match.
 
 *Returns*
 
-UID of block selection start.
+Client ID of block selection start.
 
 ### getBlockSelectionEnd
 
@@ -385,7 +499,7 @@ A selection is singular if its start and end match.
 
 *Returns*
 
-UID of block selection end.
+Client ID of block selection end.
 
 ### getSelectedBlockCount
 
@@ -411,18 +525,18 @@ Returns true if there is a single selected block, or false otherwise.
 
 Whether a single block is selected.
 
-### getSelectedBlockUID
+### getSelectedBlockClientId
 
-Returns the currently selected block UID, or null if there is no selected
-block.
+Returns the currently selected block client ID, or null if there is no
+selected block.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Selected block UID.
+Selected block client ID.
 
 ### getSelectedBlock
 
@@ -436,63 +550,84 @@ Returns the currently selected block, or null if there is no selected block.
 
 Selected block.
 
-### getBlockRootUID
+### getBlockRootClientId
 
-Given a block UID, returns the root block from which the block is nested, an
-empty string for top-level blocks, or null if the block does not exist.
-
-*Parameters*
-
- * state: Global application state.
- * uid: Block from which to find root UID.
-
-*Returns*
-
-Root UID, if exists
-
-### getAdjacentBlockUid
-
-Returns the UID of the block adjacent one at the given reference startUID and modifier
-directionality. Defaults start UID to the selected block, and direction as
-next block. Returns null if there is no adjacent block.
+Given a block client ID, returns the root block from which the block is
+nested, an empty string for top-level blocks, or null if the block does not
+exist.
 
 *Parameters*
 
- * state: Global application state.
- * startUID: Optional UID of block from which to search.
- * modifier: Directionality multiplier (1 next, -1 previous).
+ * state: Editor state.
+ * clientId: Block from which to find root client ID.
 
 *Returns*
 
-Return the UID of the block, or null if none exists.
+Root client ID, if exists
 
-### getPreviousBlockUid
+### getBlockHierarchyRootClientId
 
-Returns the previous block's UID from the given reference startUID. Defaults start
-UID to the selected block. Returns null if there is no previous block.
+Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
 
 *Parameters*
 
- * state: Global application state.
- * startUID: Optional UID of block from which to search.
+ * state: Editor state.
+ * clientId: Block from which to find root client ID.
 
 *Returns*
 
-Adjacent block's UID, or null if none exists.
+Root client ID
 
-### getNextBlockUid
+### getAdjacentBlockClientId
 
-Returns the next block's UID from the given reference startUID. Defaults start UID
-to the selected block. Returns null if there is no next block.
+Returns the client ID of the block adjacent one at the given reference
+startClientId and modifier directionality. Defaults start startClientId to
+the selected block, and direction as next block. Returns null if there is no
+adjacent block.
 
 *Parameters*
 
- * state: Global application state.
- * startUID: Optional UID of block from which to search.
+ * state: Editor state.
+ * startClientId: Optional client ID of block from which to
+                               search.
+ * modifier: Directionality multiplier (1 next, -1
+                               previous).
 
 *Returns*
 
-Adjacent block's UID, or null if none exists.
+Return the client ID of the block, or null if none exists.
+
+### getPreviousBlockClientId
+
+Returns the previous block's client ID from the given reference start ID.
+Defaults start to the selected block. Returns null if there is no previous
+block.
+
+*Parameters*
+
+ * state: Editor state.
+ * startClientId: Optional client ID of block from which to
+                               search.
+
+*Returns*
+
+Adjacent block's client ID, or null if none exists.
+
+### getNextBlockClientId
+
+Returns the next block's client ID from the given reference start ID.
+Defaults start to the selected block. Returns null if there is no next
+block.
+
+*Parameters*
+
+ * state: Editor state.
+ * startClientId: Optional client ID of block from which to
+                               search.
+
+*Returns*
+
+Adjacent block's client ID, or null if none exists.
 
 ### getSelectedBlocksInitialCaretPosition
 
@@ -507,42 +642,68 @@ This position is to used to position the caret properly when the selected block 
 
 Selected block.
 
-### getFirstMultiSelectedBlockUid
+### getMultiSelectedBlockClientIds
 
-Returns the unique ID of the first block in the multi-selection set, or null
+Returns the current multi-selection set of block client IDs, or an empty
+array if there is no multi-selection.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Multi-selected block client IDs.
+
+### getMultiSelectedBlocks
+
+Returns the current multi-selection set of blocks, or an empty array if
+there is no multi-selection.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Multi-selected block objects.
+
+### getFirstMultiSelectedBlockClientId
+
+Returns the client ID of the first block in the multi-selection set, or null
 if there is no multi-selection.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-First unique block ID in the multi-selection set.
+First block client ID in the multi-selection set.
 
-### getLastMultiSelectedBlockUid
+### getLastMultiSelectedBlockClientId
 
-Returns the unique ID of the last block in the multi-selection set, or null
+Returns the client ID of the last block in the multi-selection set, or null
 if there is no multi-selection.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Last unique block ID in the multi-selection set.
+Last block client ID in the multi-selection set.
 
 ### isFirstMultiSelectedBlock
 
 Returns true if a multi-selection exists, and the block corresponding to the
-specified unique ID is the first block of the multi-selection set, or false
+specified client ID is the first block of the multi-selection set, or false
 otherwise.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -550,76 +711,88 @@ Whether block is first in mult-selection.
 
 ### isBlockMultiSelected
 
-Returns true if the unique ID occurs within the block multi-selection, or
+Returns true if the client ID occurs within the block multi-selection, or
 false otherwise.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
 Whether block is in multi-selection set.
 
-### getMultiSelectedBlocksStartUid
+### isAncestorMultiSelected
 
-Returns the unique ID of the block which begins the multi-selection set, or
-null if there is no multi-selection.
-
-N.b.: This is not necessarily the first uid in the selection. See
-getFirstMultiSelectedBlockUid().
+Returns true if an ancestor of the block is multi-selected, or false
+otherwise.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
-Unique ID of block beginning multi-selection.
+Whether an ancestor of the block is in multi-selection
+                  set.
 
-### getMultiSelectedBlocksEndUid
+### getMultiSelectedBlocksStartClientId
 
-Returns the unique ID of the block which ends the multi-selection set, or
+Returns the client ID of the block which begins the multi-selection set, or
 null if there is no multi-selection.
 
-N.b.: This is not necessarily the last uid in the selection. See
-getLastMultiSelectedBlockUid().
+This is not necessarily the first client ID in the selection.
 
 *Parameters*
 
- * state: Global application state.
+ * state: Editor state.
 
 *Returns*
 
-Unique ID of block ending multi-selection.
+Client ID of block beginning multi-selection.
+
+### getMultiSelectedBlocksEndClientId
+
+Returns the client ID of the block which ends the multi-selection set, or
+null if there is no multi-selection.
+
+This is not necessarily the last client ID in the selection.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Client ID of block ending multi-selection.
 
 ### getBlockOrder
 
-Returns an array containing all block unique IDs of the post being edited,
-in the order they appear in the post. Optionally accepts a root UID of the
-block list for which the order should be returned, defaulting to the top-
-level block order.
+Returns an array containing all block client IDs in the editor in the order
+they appear. Optionally accepts a root client ID of the block list for which
+the order should be returned, defaulting to the top-level block order.
 
 *Parameters*
 
- * state: Global application state.
- * rootUID: Optional root UID of block list.
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
-Ordered unique IDs of post blocks.
+Ordered client IDs of editor blocks.
 
 ### getBlockIndex
 
-Returns the index at which the block corresponding to the specified unique ID
-occurs within the post block order, or `-1` if the block does not exist.
+Returns the index at which the block corresponding to the specified client
+ID occurs within the block order, or `-1` if the block does not exist.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
- * rootUID: Optional root UID of block list.
+ * state: Editor state.
+ * clientId: Block client ID.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
@@ -627,13 +800,13 @@ Index at which block exists in order.
 
 ### isBlockSelected
 
-Returns true if the block corresponding to the specified unique ID is
+Returns true if the block corresponding to the specified client ID is
 currently selected and no multi-selection exists, or false otherwise.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -645,8 +818,9 @@ Returns true if one of the block's inner blocks is selected.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
+ * deep: Perform a deep check.
 
 *Returns*
 
@@ -654,20 +828,20 @@ Whether the block as an inner block selected
 
 ### isBlockWithinSelection
 
-Returns true if the block corresponding to the specified unique ID is
+Returns true if the block corresponding to the specified client ID is
 currently selected but isn't the last of the selected blocks. Here "last"
 refers to the block sequence in the document, _not_ the sequence of
 multi-selection, which is why `state.blockSelection.end` isn't used.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
-Whether block is selected and not the last in
-                   the selection.
+Whether block is selected and not the last in the
+                  selection.
 
 ### hasMultiSelection
 
@@ -709,12 +883,13 @@ True if multi is disable, false if not.
 
 ### getBlockMode
 
-Returns thee block's editing mode.
+Returns the block's editing mode, defaulting to "visual" if not explicitly
+assigned.
 
 *Parameters*
 
- * state: Global application state.
- * uid: Block unique ID.
+ * state: Editor state.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -732,10 +907,9 @@ Returns true if the user is typing, or false otherwise.
 
 Whether user is typing.
 
-### getBlockInsertionPoint
+### isCaretWithinFormattedText
 
-Returns the insertion point, the index at which the new inserted block would
-be placed. Defaults to the last index.
+Returns true if the caret is within formatted text, or false otherwise.
 
 *Parameters*
 
@@ -743,7 +917,20 @@ be placed. Defaults to the last index.
 
 *Returns*
 
-Insertion point object with `rootUID`, `layout`, `index`
+Whether the caret is within formatted text.
+
+### getBlockInsertionPoint
+
+Returns the insertion point, the index at which the new inserted block would
+be placed. Defaults to the last index.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Insertion point object with `rootClientId`, `index`.
 
 ### isBlockInsertionPointVisible
 
@@ -783,13 +970,13 @@ Block Template
 
 ### getTemplateLock
 
-Returns the defined block template lock
-in the context of a given root block or in the global context.
+Returns the defined block template lock. Optionally accepts a root block
+client ID as context, otherwise defaulting to the global context.
 
 *Parameters*
 
- * state: null
- * rootUID: Block UID.
+ * state: Editor state.
+ * rootClientId: Optional block root client ID.
 
 *Returns*
 
@@ -859,9 +1046,23 @@ default post format. Returns null if the format cannot be determined.
 
 Suggested post format.
 
-### getNotices
+### getBlocksForSerialization
 
-Returns the user notices array.
+Returns a set of blocks which are to be used in consideration of the post's
+generated save content.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Filtered set of blocks for save.
+
+### getEditedPostContent
+
+Returns the content of the post being edited, preferring raw string edit
+before falling back to serialization of block state.
 
 *Parameters*
 
@@ -869,38 +1070,99 @@ Returns the user notices array.
 
 *Returns*
 
-List of notices.
+Post content.
 
-### isSavingSharedBlock
+### canInsertBlockType
 
-Returns whether or not the shared block with the given ID is being saved.
+Determines if the given block type is allowed to be inserted, and, if
+parentClientId is provided, whether it is allowed to be nested within the
+given parent.
+
+*Parameters*
+
+ * state: Editor state.
+ * blockName: The name of the given block type, e.g.
+                                'core/paragraph'.
+ * parentClientId: The parent that the given block is to be
+                                nested within, or null.
+
+*Returns*
+
+Whether the given block type is allowed to be inserted.
+
+### getInserterItems
+
+Determines the items that appear in the inserter. Includes both static
+items (e.g. a regular block type) and dynamic items (e.g. a reusable block).
+
+Each item object contains what's necessary to display a button in the
+inserter and handle its selection.
+
+The 'utility' property indicates how useful we think an item will be to the
+user. There are 4 levels of utility:
+
+1. Blocks that are contextually useful (utility = 3)
+2. Blocks that have been previously inserted (utility = 2)
+3. Blocks that are in the common category (utility = 1)
+4. All other blocks (utility = 0)
+
+The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
+that combines block usage frequenty and recency.
+
+Items are returned ordered descendingly by their 'utility' and 'frecency'.
+
+*Parameters*
+
+ * state: Editor state.
+ * parentClientId: The block we are inserting into, if any.
+
+*Returns*
+
+Items that appear in inserter.
+
+### getReusableBlock
+
+Returns the reusable block with the given ID.
 
 *Parameters*
 
  * state: Global application state.
- * ref: The shared block's ID.
+ * ref: The reusable block's ID.
 
 *Returns*
 
-Whether or not the shared block is being saved.
+The reusable block, or null if none exists.
 
-### isFetchingSharedBlock
+### isSavingReusableBlock
 
-Returns true if the shared block with the given ID is being fetched, or
+Returns whether or not the reusable block with the given ID is being saved.
+
+*Parameters*
+
+ * state: Global application state.
+ * ref: The reusable block's ID.
+
+*Returns*
+
+Whether or not the reusable block is being saved.
+
+### isFetchingReusableBlock
+
+Returns true if the reusable block with the given ID is being fetched, or
 false otherwise.
 
 *Parameters*
 
  * state: Global application state.
- * ref: The shared block's ID.
+ * ref: The reusable block's ID.
 
 *Returns*
 
-Whether the shared block is being fetched.
+Whether the reusable block is being fetched.
 
-### getSharedBlocks
+### getReusableBlocks
 
-Returns an array of all shared blocks.
+Returns an array of all reusable blocks.
 
 *Parameters*
 
@@ -908,7 +1170,7 @@ Returns an array of all shared blocks.
 
 *Returns*
 
-An array of all shared blocks.
+An array of all reusable blocks.
 
 ### getStateBeforeOptimisticTransaction
 
@@ -935,18 +1197,6 @@ Returns true if the post is being published, or false otherwise.
 *Returns*
 
 Whether post is being published.
-
-### getProvisionalBlockUID
-
-Returns the provisional block UID, or null if there is no provisional block.
-
-*Parameters*
-
- * state: Editor state.
-
-*Returns*
-
-Provisional block UID, if set.
 
 ### isPermalinkEditable
 
@@ -1000,12 +1250,12 @@ Whether predicate matches for some history.
 
 ### getBlockListSettings
 
-Returns the Block List settings of a block if any.
+Returns the Block List settings of a block, if any exist.
 
 *Parameters*
 
  * state: Editor state.
- * uid: Block UID.
+ * clientId: Block client ID.
 
 *Returns*
 
@@ -1021,11 +1271,84 @@ Returns the editor settings.
 
 *Returns*
 
-The editor settings object
+The editor settings object.
 
 ### getTokenSettings
 
-Returns the editor settings.
+Returns the token settings.
+
+*Parameters*
+
+ * state: Editor state.
+ * name: Token name.
+
+*Returns*
+
+Token settings object, or the named token settings object if set.
+
+### isPostLocked
+
+Returns whether the post is locked.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is locked.
+
+### isPostSavingLocked
+
+Returns whether post saving is locked.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is locked.
+
+### isPostLockTakeover
+
+Returns whether the edition of the post has been taken over.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Is post lock takeover.
+
+### getPostLockUser
+
+Returns details about the post lock user.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+A user object.
+
+### getActivePostLock
+
+Returns the active post lock.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+The lock object.
+
+### canUserUseUnfilteredHTML
+
+Returns whether or not the user has the unfiltered_html capability.
 
 *Parameters*
 
@@ -1033,7 +1356,20 @@ Returns the editor settings.
 
 *Returns*
 
-The editor settings object
+Whether the user can or can't post unfiltered HTML.
+
+### isPublishSidebarEnabled
+
+Returns whether the pre-publish panel should be shown
+or skipped when the user clicks the "publish" button.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the pre-publish panel should be shown or not.
 
 ## Actions
 
@@ -1045,7 +1381,6 @@ the specified post object and editor settings.
 *Parameters*
 
  * post: Post object.
- * autosaveStatus: The Post's autosave status.
 
 ### resetPost
 
@@ -1107,22 +1442,35 @@ replacing.
 ### updateBlockAttributes
 
 Returns an action object used in signalling that the block attributes with
-the specified UID has been updated.
+the specified client ID has been updated.
 
 *Parameters*
 
- * uid: Block UID.
+ * clientId: Block client ID.
  * attributes: Block attributes to be merged.
 
 ### updateBlock
 
 Returns an action object used in signalling that the block with the
-specified UID has been updated.
+specified client ID has been updated.
 
 *Parameters*
 
- * uid: Block UID.
+ * clientId: Block client ID.
  * updates: Block attributes to be merged.
+
+### selectBlock
+
+Returns an action object used in signalling that the block with the
+specified client ID has been selected, optionally accepting a position
+value reflecting its selection directionality. An initialPosition of -1
+reflects a reverse selection.
+
+*Parameters*
+
+ * clientId: Block client ID.
+ * initialPosition: Optional initial position. Pass as -1 to
+                                 reflect reverse selection.
 
 ### toggleSelection
 
@@ -1140,7 +1488,7 @@ one or more replacement blocks.
 
 *Parameters*
 
- * uids: Block UID(s) to replace.
+ * clientIds: Block client ID(s) to replace.
  * blocks: Replacement block(s).
 
 ### replaceBlock
@@ -1150,7 +1498,7 @@ with one or more replacement blocks.
 
 *Parameters*
 
- * uid: Block UID(s) to replace.
+ * clientId: Block client ID to replace.
  * block: Replacement block(s).
 
 ### moveBlockToPosition
@@ -1160,10 +1508,9 @@ to a new index.
 
 *Parameters*
 
- * uid: The UID of the block.
- * fromRootUID: root UID source.
- * toRootUID: root UID destination.
- * layout: layout to move the block into.
+ * clientId: The client ID of the block.
+ * fromRootClientId: Root client ID source.
+ * toRootClientId: Root client ID destination.
  * index: The index to move the block into.
 
 ### insertBlock
@@ -1175,7 +1522,8 @@ inserted, optionally at a specific index respective a root block list.
 
  * block: Block object to insert.
  * index: Index at which block should be inserted.
- * rootUID: Optional root UID of block list to insert.
+ * rootClientId: Optional root client ID of block list on which
+                              to insert.
 
 ### insertBlocks
 
@@ -1186,7 +1534,8 @@ be inserted, optionally at a specific index respective a root block list.
 
  * blocks: Block objects to insert.
  * index: Index at which block should be inserted.
- * rootUID: Optional root UID of block list to insert.
+ * rootClientId: Optional root cliente ID of block list on
+                               which to insert.
 
 ### showInsertionPoint
 
@@ -1204,10 +1553,6 @@ Returns an action object resetting the template validity.
 *Parameters*
 
  * isValid: template validity flag.
-
-### checkTemplateValidity
-
-Returns an action object to check the template validity.
 
 ### synchronizeTemplate
 
@@ -1228,8 +1573,8 @@ Returns an action object used in signalling that two blocks should be merged
 
 *Parameters*
 
- * blockAUid: UID of the first block to merge.
- * blockBUid: UID of the second block to merge.
+ * firstBlockClientId: Client ID of the first block to merge.
+ * secondBlockClientId: Client ID of the second block to merge.
 
 ### autosave
 
@@ -1251,31 +1596,34 @@ be created.
 
 ### removeBlocks
 
-Returns an action object used in signalling that the blocks
-corresponding to the specified UID set are to be removed.
+Returns an action object used in signalling that the blocks corresponding to
+the set of specified client IDs are to be removed.
 
 *Parameters*
 
- * uids: Block UIDs.
- * selectPrevious: True if the previous block should be selected when a block is removed.
+ * clientIds: Client IDs of blocks to remove.
+ * selectPrevious: True if the previous block should be
+                                        selected when a block is removed.
 
 ### removeBlock
 
 Returns an action object used in signalling that the block with the
-specified UID is to be removed.
+specified client ID is to be removed.
 
 *Parameters*
 
- * uid: Block UID.
- * selectPrevious: True if the previous block should be selected when a block is removed.
+ * clientId: Client ID of block to remove.
+ * selectPrevious: True if the previous block should be
+                                selected when a block is removed.
 
 ### toggleBlockMode
 
-Returns an action object used to toggle the block editing mode (visual/html).
+Returns an action object used to toggle the block editing mode between
+visual and HTML modes.
 
 *Parameters*
 
- * uid: Block UID.
+ * clientId: Block client ID.
 
 ### startTyping
 
@@ -1285,89 +1633,85 @@ Returns an action object used in signalling that the user has begun to type.
 
 Returns an action object used in signalling that the user has stopped typing.
 
-### createNotice
+### enterFormattedText
 
-Returns an action object used to create a notice.
+Returns an action object used in signalling that the caret has entered formatted text.
 
-*Parameters*
+### exitFormattedText
 
- * status: The notice status.
- * content: The notice content.
- * options: The notice options.  Available options:
-                             `id` (string; default auto-generated)
-                             `isDismissible` (boolean; default `true`).
+Returns an action object used in signalling that the user caret has exited formatted text.
 
-### removeNotice
+### updatePostLock
 
-Returns an action object used to remove a notice.
+Returns an action object used to lock the editor.
 
 *Parameters*
 
- * id: The notice id.
+ * lock: Details about the post lock status, user, and nonce.
 
-### fetchSharedBlocks
+### fetchReusableBlocks
 
-Returns an action object used to fetch a single shared block or all shared
-blocks from the REST API into the store.
+Returns an action object used to fetch a single reusable block or all
+reusable blocks from the REST API into the store.
 
 *Parameters*
 
- * id: If given, only a single shared block with this ID will
+ * id: If given, only a single reusable block with this ID will
                     be fetched.
 
-### receiveSharedBlocks
+### receiveReusableBlocks
 
-Returns an action object used in signalling that shared blocks have been
+Returns an action object used in signalling that reusable blocks have been
 received. `results` is an array of objects containing:
- - `sharedBlock` - Details about how the shared block is persisted.
+ - `reusableBlock` - Details about how the reusable block is persisted.
  - `parsedBlock` - The original block.
 
 *Parameters*
 
- * results: Shared blocks received.
+ * results: Reusable blocks received.
 
-### saveSharedBlock
+### saveReusableBlock
 
-Returns an action object used to save a shared block that's in the store to
+Returns an action object used to save a reusable block that's in the store to
 the REST API.
 
 *Parameters*
 
- * id: The ID of the shared block to save.
+ * id: The ID of the reusable block to save.
 
-### deleteSharedBlock
+### deleteReusableBlock
 
-Returns an action object used to delete a shared block via the REST API.
+Returns an action object used to delete a reusable block via the REST API.
 
 *Parameters*
 
- * id: The ID of the shared block to delete.
+ * id: The ID of the reusable block to delete.
 
-### updateSharedBlockTitle
+### updateReusableBlockTitle
 
-Returns an action object used in signalling that a shared block's title is
+Returns an action object used in signalling that a reusable block's title is
 to be updated.
 
 *Parameters*
 
- * id: The ID of the shared block to update.
+ * id: The ID of the reusable block to update.
  * title: The new title.
 
 ### convertBlockToStatic
 
-Returns an action object used to convert a shared block into a static block.
+Returns an action object used to convert a reusable block into a static block.
 
 *Parameters*
 
- * uid: The ID of the block to attach.
+ * clientId: The client ID of the block to attach.
 
-### convertBlockToShared
+### convertBlockToReusable
 
-Returns an action object used to convert a static block into a shared block.
+Returns an action object used to convert a static block into a reusable block.
 
 *Parameters*
 
- * uid: The ID of the block to detach.
+ * clientIds: The client IDs of the block to detach.
 
 ### insertDefaultBlock
 
@@ -1377,7 +1721,8 @@ type should be added to the block list.
 *Parameters*
 
  * attributes: Optional attributes of the block to assign.
- * rootUID: Optional root UID of block list to append.
+ * rootClientId: Optional root client ID of block list on which
+                              to append.
  * index: Optional index where to insert the default block
 
 ### updateBlockListSettings
@@ -1386,7 +1731,8 @@ Returns an action object that changes the nested settings of a given block.
 
 *Parameters*
 
- * id: UID of the block whose nested setting.
+ * clientId: Client ID of the block whose nested setting are
+                         being received.
  * settings: Object with the new settings for the nested block.
 
 ### updateEditorSettings
@@ -1396,3 +1742,38 @@ Returns an action object used in signalling that the editor settings have been u
 *Parameters*
 
  * settings: Updated settings
+
+### enablePublishSidebar
+
+Returns an action object used in signalling that the user has enabled the publish sidebar.
+
+### disablePublishSidebar
+
+Returns an action object used in signalling that the user has disabled the publish sidebar.
+
+### lockPostSaving
+
+Returns an action object used to signal that post saving is locked.
+
+*Parameters*
+
+ * lockName: The lock name.
+
+### unlockPostSaving
+
+Returns an action object used to signal that post saving is unlocked.
+
+*Parameters*
+
+ * lockName: The lock name.
+
+### addTermToEditedPost
+
+Returns an action object signaling that a new term is added to the edited post.
+
+*Parameters*
+
+ * slug: Taxonomy slug.
+ * term: Term object.
+
+### createNotice

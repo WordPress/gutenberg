@@ -1,0 +1,67 @@
+# MenuItem
+
+MenuItem is a component which renders a button intended to be used in combination with the [DropdownMenu component](../dropdown-menu).
+
+## Usage
+
+```jsx
+import { MenuItem } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+
+const MyMenuItem = withState( {
+	isActive: true,
+} )( ( { isActive, setState } ) => (
+	<MenuItem
+		icon={ isActive ? 'yes' : 'no' }
+		isSelected={ isActive }
+		onClick={ () => setState( state => ( { isActive: ! state.isActive } ) ) }
+	>
+		Toggle
+	</MenuItem>
+) );
+```
+
+## Props
+
+MenuItem supports the following props. Any additional props are passed through to the underlying [Button](../button) or [IconButton](../icon-button) component.
+
+### `children` 
+
+- Type: `WPElement`
+- Required: No
+
+Element to render as child of button.
+
+Element
+
+### `label`
+
+- Type: `string`
+- Required: No
+
+String to use as primary button label text, applied as `aria-label`. Useful in cases where an `info` prop is passed, where `label` should be the minimal text of the button, described in further detail by `info`.
+
+Defaults to the value of `children`, if `children` is passed as a string.
+
+### `info`
+
+- Type: `string`
+- Required: No
+
+Text to use as description for button text.
+
+Refer to documentation for [`label`](#label).
+
+### `icon`
+
+- Type: `string`
+- Required: No
+
+Refer to documentation for [IconButton's `icon` prop](../icon-button/README.md#icon).
+
+### `shortcut`
+
+- Type: `string`
+- Required: No
+
+Refer to documentation for [Shortcut's `shortcut` prop](../shortcut/README.md#shortcut).

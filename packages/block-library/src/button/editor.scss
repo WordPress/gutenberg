@@ -1,0 +1,90 @@
+$blocks-button__line-height: $big-font-size + 6px;
+
+.editor-block-list__block[data-type="core/button"] {
+	&[data-align="center"] {
+		text-align: center;
+	}
+
+	&[data-align="right"] {
+		/*!rtl:ignore*/
+		text-align: right;
+	}
+}
+
+.wp-block-button {
+	display: inline-block;
+	margin-bottom: 0;
+	position: relative;
+
+	.editor-rich-text__tinymce.mce-content-body {
+		cursor: text;
+		line-height: $blocks-button__line-height;
+	}
+
+	// Make placeholder text white unless custom colors or outline versions are chosen.
+	&:not(.has-text-color):not(.is-style-outline) .editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+		color: $white;
+	}
+
+	// Increase placeholder opacity to meet contrast ratios.
+	.editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+		opacity: 0.8;
+	}
+
+	// Don't let the placeholder text wrap in the variation preview.
+	.editor-block-preview__content & {
+		max-width: 100%;
+
+		.wp-block-button__link {
+			max-width: 100%;
+			overflow: hidden;
+			white-space: nowrap;
+			text-overflow: ellipsis;
+		}
+	}
+}
+
+.block-library-button__inline-link {
+	background: $white;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+
+	// the width of input box plus two icon buttons plus a padding
+	$blocks-button__link-input-width: 300px + 2 * $icon-button-size + 8px;
+	width: $blocks-button__link-input-width;
+
+	.editor-url-input {
+		width: auto;
+	}
+
+	.editor-url-input__suggestions {
+		width: $blocks-button__link-input-width - $icon-button-size - $icon-button-size;
+		z-index: z-index(".block-library-button__inline-link .editor-url-input__suggestions");
+	}
+
+	> .dashicon {
+		width: $icon-button-size;
+	}
+
+	.dashicon {
+		color: $dark-gray-100;
+	}
+
+	.editor-url-input input[type="text"]::placeholder {
+		color: $dark-gray-100;
+	}
+
+	[data-align="center"] & {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	[data-align="right"] & {
+		margin-left: auto;
+		margin-right: 0;
+	}
+}
