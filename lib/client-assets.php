@@ -144,6 +144,7 @@ function gutenberg_register_scripts_and_styles() {
 
 	register_tinymce_scripts();
 
+	$suffix = SCRIPT_DEBUG ? '' : '.min';
 	gutenberg_override_script(
 		'wp-polyfill',
 		'https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill' . $suffix . '.js'
