@@ -61,7 +61,7 @@ const blockAttributes = {
 	},
 	linkTo: {
 		type: 'string',
-		default: 'none',
+		default: 'media',
 	},
 };
 
