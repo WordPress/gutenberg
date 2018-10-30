@@ -6,6 +6,7 @@ import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
 function fromFormat( { type, attributes, object } ) {
@@ -55,8 +56,9 @@ export function toTree( {
 	appendText,
 	onStartIndex,
 	onEndIndex,
+	isEditableTree,
 } ) {
-	const { formats, text, start, end } = value;
+	const { formats, text, start, end, formatPlaceholder } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
@@ -146,6 +148,18 @@ export function toTree( {
 			continue;
 		}
 
+		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === 0 ) {
+			const parent = getParent( pointer );
+
+			if ( formatPlaceholder.format === undefined ) {
+				pointer = getParent( parent );
+			} else {
+				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
+			}
+
+			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
+		}
+
 		// If there is selection at 0, handle it before characters are inserted.
 		if ( i === 0 ) {
 			if ( onStartIndex && start === 0 ) {
@@ -167,6 +181,18 @@ export function toTree( {
 			} else {
 				appendText( pointer, character );
 			}
+		}
+
+		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === i + 1 ) {
+			const parent = getParent( pointer );
+
+			if ( formatPlaceholder.format === undefined ) {
+				pointer = getParent( parent );
+			} else {
+				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
+			}
+
+			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
 		}
 
 		if ( onStartIndex && start === i + 1 ) {
