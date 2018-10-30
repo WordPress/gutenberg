@@ -1120,7 +1120,7 @@ Items are returned ordered descendingly by their 'utility' and 'frecency'.
 
 Items that appear in inserter.
 
-### getReusableBlock
+### __experimentalGetReusableBlock
 
 Returns the reusable block with the given ID.
 
@@ -1133,7 +1133,7 @@ Returns the reusable block with the given ID.
 
 The reusable block, or null if none exists.
 
-### isSavingReusableBlock
+### __experimentalIsSavingReusableBlock
 
 Returns whether or not the reusable block with the given ID is being saved.
 
@@ -1146,7 +1146,7 @@ Returns whether or not the reusable block with the given ID is being saved.
 
 Whether or not the reusable block is being saved.
 
-### isFetchingReusableBlock
+### __experimentalIsFetchingReusableBlock
 
 Returns true if the reusable block with the given ID is being fetched, or
 false otherwise.
@@ -1160,7 +1160,7 @@ false otherwise.
 
 Whether the reusable block is being fetched.
 
-### getReusableBlocks
+### __experimentalGetReusableBlocks
 
 Returns an array of all reusable blocks.
 
@@ -1649,7 +1649,7 @@ Returns an action object used to lock the editor.
 
  * lock: Details about the post lock status, user, and nonce.
 
-### fetchReusableBlocks
+### __experimentalFetchReusableBlocks
 
 Returns an action object used to fetch a single reusable block or all
 reusable blocks from the REST API into the store.
@@ -1659,7 +1659,7 @@ reusable blocks from the REST API into the store.
  * id: If given, only a single reusable block with this ID will
                     be fetched.
 
-### receiveReusableBlocks
+### __experimentalReceiveReusableBlocks
 
 Returns an action object used in signalling that reusable blocks have been
 received. `results` is an array of objects containing:
@@ -1670,7 +1670,7 @@ received. `results` is an array of objects containing:
 
  * results: Reusable blocks received.
 
-### saveReusableBlock
+### __experimentalSaveReusableBlock
 
 Returns an action object used to save a reusable block that's in the store to
 the REST API.
@@ -1679,7 +1679,7 @@ the REST API.
 
  * id: The ID of the reusable block to save.
 
-### deleteReusableBlock
+### __experimentalDeleteReusableBlock
 
 Returns an action object used to delete a reusable block via the REST API.
 
@@ -1687,7 +1687,7 @@ Returns an action object used to delete a reusable block via the REST API.
 
  * id: The ID of the reusable block to delete.
 
-### updateReusableBlockTitle
+### __experimentalUpdateReusableBlockTitle
 
 Returns an action object used in signalling that a reusable block's title is
 to be updated.
@@ -1697,7 +1697,7 @@ to be updated.
  * id: The ID of the reusable block to update.
  * title: The new title.
 
-### convertBlockToStatic
+### __experimentalConvertBlockToStatic
 
 Returns an action object used to convert a reusable block into a static block.
 
@@ -1705,7 +1705,7 @@ Returns an action object used to convert a reusable block into a static block.
 
  * clientId: The client ID of the block to attach.
 
-### convertBlockToReusable
+### __experimentalConvertBlockToReusable
 
 Returns an action object used to convert a static block into a reusable block.
 
@@ -1777,3 +1777,5 @@ Returns an action object signaling that a new term is added to the edited post.
  * term: Term object.
 
 ### createNotice
+
+### fetchReusableBlocks
