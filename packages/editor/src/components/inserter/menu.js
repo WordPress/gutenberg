@@ -351,7 +351,7 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
-		fetchReusableBlocks: dispatch( 'core/editor' ).fetchReusableBlocks,
+		fetchReusableBlocks: dispatch( 'core/editor' ).__experimentalFetchReusableBlocks,
 		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
 		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
 	} ) ),
