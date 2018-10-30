@@ -10,7 +10,7 @@ import {
 } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await newPost();
 	} );
 
@@ -75,6 +75,46 @@ describe( 'Multi-block selection', () => {
 		await page.click( firstBlockSelector );
 		await pressWithModifier( META_KEY, 'a' );
 		await pressWithModifier( META_KEY, 'a' );
+		await expectMultiSelected( blocks, true );
+	} );
+
+	it( 'Should select/unselect multiple blocks using Shift + Arrows', async () => {
+		const firstBlockSelector = '[data-type="core/paragraph"]';
+		const secondBlockSelector = '[data-type="core/image"]';
+		const thirdBlockSelector = '[data-type="core/quote"]';
+		const multiSelectedCssClass = 'is-multi-selected';
+
+		// Creating test blocks
+		await clickBlockAppender();
+		await page.keyboard.type( 'First Paragraph' );
+		await insertBlock( 'Image' );
+		await insertBlock( 'Quote' );
+		await page.keyboard.type( 'Quote Block' );
+
+		const blocks = [ firstBlockSelector, secondBlockSelector, thirdBlockSelector ];
+		const expectMultiSelected = async ( selectors, areMultiSelected ) => {
+			for ( const selector of selectors ) {
+				const className = await page.$eval( selector, ( element ) => element.className );
+				if ( areMultiSelected ) {
+					expect( className ).toEqual( expect.stringContaining( multiSelectedCssClass ) );
+				} else {
+					expect( className ).not.toEqual( expect.stringContaining( multiSelectedCssClass ) );
+				}
+			}
+		};
+
+		// Default: No selection
+		await expectMultiSelected( blocks, false );
+
+		// Multiselect via Shift + click
+		await page.mouse.move( 200, 300 );
+		await page.click( firstBlockSelector );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowDown' ); // Two blocks selected
+		await page.keyboard.press( 'ArrowDown' ); // Three blocks selected
+		await page.keyboard.up( 'Shift' );
+
+		// Verify selection
 		await expectMultiSelected( blocks, true );
 	} );
 } );
