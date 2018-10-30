@@ -75,6 +75,22 @@ export function toTree( {
 		append( tree, '' );
 	}
 
+	function setFormatPlaceholder( pointer, index ) {
+		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === index ) {
+			const parent = getParent( pointer );
+
+			if ( formatPlaceholder.format === undefined ) {
+				pointer = getParent( parent );
+			} else {
+				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
+			}
+
+			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
+		}
+
+		return pointer;
+	}
+
 	for ( let i = 0; i < formatsLength; i++ ) {
 		const character = text.charAt( i );
 		let characterFormats = formats[ i ];
@@ -148,17 +164,7 @@ export function toTree( {
 			continue;
 		}
 
-		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === 0 ) {
-			const parent = getParent( pointer );
-
-			if ( formatPlaceholder.format === undefined ) {
-				pointer = getParent( parent );
-			} else {
-				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
-			}
-
-			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
-		}
+		pointer = setFormatPlaceholder( pointer, 0 );
 
 		// If there is selection at 0, handle it before characters are inserted.
 		if ( i === 0 ) {
@@ -183,17 +189,7 @@ export function toTree( {
 			}
 		}
 
-		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === i + 1 ) {
-			const parent = getParent( pointer );
-
-			if ( formatPlaceholder.format === undefined ) {
-				pointer = getParent( parent );
-			} else {
-				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
-			}
-
-			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
-		}
+		pointer = setFormatPlaceholder( pointer, i + 1 );
 
 		if ( onStartIndex && start === i + 1 ) {
 			onStartIndex( tree, pointer );
