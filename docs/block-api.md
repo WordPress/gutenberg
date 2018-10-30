@@ -158,6 +158,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
+		type: 'string',
 		source: 'html',
 		selector: '.book-author',
 	},

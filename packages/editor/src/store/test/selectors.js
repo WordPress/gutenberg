@@ -2786,7 +2786,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				layout: undefined,
 				index: 1,
 			} );
 		} );
@@ -2818,37 +2817,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
-				layout: undefined,
-				index: 1,
-			} );
-		} );
-
-		it( 'should return an object for the selected block with layout', () => {
-			const state = {
-				currentPost: {},
-				preferences: { mode: 'visual' },
-				blockSelection: {
-					start: 'clientId1',
-					end: 'clientId1',
-				},
-				editor: {
-					present: {
-						blocksByClientId: {
-							clientId1: { clientId: 'clientId1', attributes: { layout: 'wide' } },
-						},
-						blockOrder: {
-							'': [ 'clientId1' ],
-							clientId1: [],
-						},
-						edits: {},
-					},
-				},
-				isInsertionPointVisible: false,
-			};
-
-			expect( getBlockInsertionPoint( state ) ).toEqual( {
-				rootClientId: undefined,
-				layout: 'wide',
 				index: 1,
 			} );
 		} );
@@ -2880,7 +2848,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				layout: undefined,
 				index: 2,
 			} );
 		} );
@@ -2912,7 +2879,6 @@ describe( 'selectors', () => {
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
-				layout: undefined,
 				index: 2,
 			} );
 		} );

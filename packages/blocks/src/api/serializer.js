@@ -134,14 +134,14 @@ export function getSaveContent( blockType, attributes, innerBlocks ) {
  * This function returns only those attributes which are needed to persist and
  * which cannot be matched from the block content.
  *
- * @param {Object<string,*>} allAttributes Attributes from in-memory block data.
  * @param {Object<string,*>} blockType     Block type.
+ * @param {Object<string,*>} attributes Attributes from in-memory block data.
  *
  * @return {Object<string,*>} Subset of attributes for comment serialization.
  */
-export function getCommentAttributes( allAttributes, blockType ) {
-	const attributes = reduce( blockType.attributes, ( result, attributeSchema, key ) => {
-		const value = allAttributes[ key ];
+export function getCommentAttributes( blockType, attributes ) {
+	return reduce( blockType.attributes, ( result, attributeSchema, key ) => {
+		const value = attributes[ key ];
 
 		// Ignore undefined values.
 		if ( undefined === value ) {
@@ -163,8 +163,6 @@ export function getCommentAttributes( allAttributes, blockType ) {
 		result[ key ] = value;
 		return result;
 	}, {} );
-
-	return attributes;
 }
 
 /**
@@ -195,7 +193,7 @@ export function serializeAttributes( attributes ) {
 /**
  * Given a block object, returns the Block's Inner HTML markup.
  *
- * @param {Object} block Block Object.
+ * @param {Object} block Block instance.
  *
  * @return {string} HTML.
  */
@@ -262,7 +260,7 @@ export function serializeBlock( block ) {
 	const blockName = block.name;
 	const blockType = getBlockType( blockName );
 	const saveContent = getBlockContent( block );
-	const saveAttributes = getCommentAttributes( block.attributes, blockType );
+	const saveAttributes = getCommentAttributes( blockType, block.attributes );
 
 	switch ( blockName ) {
 		case getFreeformContentHandlerName():
