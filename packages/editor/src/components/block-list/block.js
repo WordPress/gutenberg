@@ -320,7 +320,11 @@ export class BlockListBlock extends Component {
 	deleteOrInsertAfterWrapper( event ) {
 		const { keyCode, target } = event;
 
-		if ( target !== this.wrapperNode || this.props.isLocked ) {
+		if (
+			! this.props.isSelected ||
+			target !== this.wrapperNode ||
+			this.props.isLocked
+		) {
 			return;
 		}
 
