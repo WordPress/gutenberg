@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { combineReducers } from 'redux';
+import combineReducers from 'turbo-combine-reducers';
 
 /**
  * Internal dependencies
