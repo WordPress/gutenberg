@@ -159,6 +159,10 @@ export default class TinyMCE extends Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			// Disables TinyMCE's parsing to verify HTML. It makes
+			// initialisation a bit faster. Since we're setting raw HTML
+			// already with dangerouslySetInnerHTML, we don't need this to be
+			// verified.
 			verify_html: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
@@ -171,6 +175,18 @@ export default class TinyMCE extends Component {
 				this.editor = editor;
 				this.props.onSetup( editor );
 
+				// TinyMCE resets the element content on initialization, even
+				// when it's already identical to what exists currently. This
+				// behavior clobbers a selection which exists at the time of
+				// initialization, thus breaking writing flow navigation. The
+				// hack here neutralizes setHTML during initialization.
+				let setHTML;
+
+				editor.on( 'preinit', () => {
+					setHTML = editor.dom.setHTML;
+					editor.dom.setHTML = () => {};
+				} );
+
 				editor.on( 'init', () => {
 					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
 					[ 'b', 'i', 'u' ].forEach( ( character ) => {
@@ -179,20 +195,13 @@ export default class TinyMCE extends Component {
 					[ 1, 2, 3, 4, 5, 6, 7, 8, 9 ].forEach( ( number ) => {
 						editor.shortcuts.remove( `access+${ number }` );
 					} );
+
+					editor.dom.setHTML = setHTML;
+					tinymce.DOM.addClass( editor.getBody(), 'mce-initialised' );
 				} );
 
-				// TinyMCE resets the element content on initialization, even
-				// when it's already identical to what exists currently. This
-				// behavior clobbers a selection which exists at the time of
-				// initialization, thus breaking writing flow navigation. The
-				// hack here neutralizes setHTML during initialization.
-				let setHTML;
-				editor.on( 'PreInit', () => {
-					setHTML = editor.dom.setHTML;
-					editor.dom.setHTML = () => {};
-				} );
-				editor.on( 'Init', () => {
-					editor.dom.setHTML = setHTML;
+				editor.on( 'remove', () => {
+					tinymce.DOM.removeClass( editor.getBody(), 'mce-initialised' );
 				} );
 			},
 		} );
@@ -264,6 +273,7 @@ export default class TinyMCE extends Component {
 		}
 
 		if ( initialHTML === '' ) {
+			// Ensure the field is ready to receive focus by TinyMCE.
 			initialHTML = '<br data-mce-bogus="1">';
 		}
 

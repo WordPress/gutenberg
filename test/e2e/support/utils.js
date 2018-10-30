@@ -110,7 +110,7 @@ async function waitForRichTextInitialization() {
 	}
 
 	return page.waitForFunction( () => {
-		return !! document.activeElement.closest( '.mce-content-body' );
+		return !! document.activeElement.closest( '.mce-initialised' );
 	} );
 }
 
