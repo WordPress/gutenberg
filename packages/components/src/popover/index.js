@@ -2,12 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+import { addAction, removeAction } from '@wordpress/hooks';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
@@ -55,10 +57,12 @@ class Popover extends Component {
 			isMobile: false,
 			popoverSize: null,
 		};
+
+		this.hookNamespace = uniqueId( 'core/components/popover/toggle-events-' );
 	}
 
 	componentDidMount() {
-		this.toggleWindowEvents( true );
+		this.toggleEvents( true );
 		this.refresh();
 
 		/*
@@ -79,21 +83,28 @@ class Popover extends Component {
 	}
 
 	componentWillUnmount() {
-		this.toggleWindowEvents( false );
+		this.toggleEvents( false );
 
 		clearTimeout( this.focusTimeout );
 	}
 
-	toggleWindowEvents( isListening ) {
+	toggleEvents( isListening ) {
 		const handler = isListening ? 'addEventListener' : 'removeEventListener';
 
 		window.cancelAnimationFrame( this.rafHandle );
 		window[ handler ]( 'resize', this.throttledComputePopoverPosition );
 		window[ handler ]( 'scroll', this.throttledComputePopoverPosition, true );
+
+		const { recalculatePositionHook } = this.props;
+		if ( isListening && recalculatePositionHook ) {
+			addAction( recalculatePositionHook, this.hookNamespace, () => this.throttledComputePopoverPosition() );
+		} else {
+			removeAction( recalculatePositionHook, this.hookNamespace );
+		}
 	}
 
 	throttledComputePopoverPosition( event ) {
-		if ( event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
+		if ( event && event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
 			return;
 		}
 		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );

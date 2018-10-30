@@ -10,6 +10,7 @@ exports[`DotTip should render correctly 1`] = `
   onClick={[Function]}
   position="middle right"
   role="dialog"
+  recalculatePositionHook="fullscreenModeToggled"
 >
   <p>
     It looks like you’re writing a letter. Would you like help?
