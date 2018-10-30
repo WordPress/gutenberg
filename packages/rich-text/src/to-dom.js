@@ -114,6 +114,7 @@ function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
 
 		if ( child.nodeType === TEXT_NODE ) {
 			if ( length === 1 && ! child.nodeValue ) {
+				// Pad if the only child is an empty text node.
 				element.appendChild( createLinePadding( doc ) );
 			}
 		} else {
@@ -122,6 +123,7 @@ function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
 				! child.previousSibling &&
 				multilineWrapperTags.indexOf( child.nodeName.toLowerCase() ) !== -1
 			) {
+				// Pad the line if there is no content before a nested wrapper.
 				element.insertBefore( createLinePadding( doc ), child );
 			}
 
