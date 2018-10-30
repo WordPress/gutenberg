@@ -100,9 +100,9 @@ async function login() {
  * @return {Promise} Promise resolving once RichText is initialized, or is
  *                   determined to not be a container of the active element.
  */
-async function waitForRichTextInitialization() {
+export async function waitForRichTextInitialization() {
 	const isInRichText = await page.evaluate( () => {
-		return document.activeElement.contentEditable === 'true';
+		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
 	} );
 
 	if ( ! isInRichText ) {
@@ -110,7 +110,7 @@ async function waitForRichTextInitialization() {
 	}
 
 	return page.waitForFunction( () => {
-		return !! document.activeElement.closest( '.mce-initialised' );
+		return !! document.activeElement.closest( '.mce-content-body' );
 	} );
 }
 

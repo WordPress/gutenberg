@@ -197,11 +197,6 @@ export default class TinyMCE extends Component {
 					} );
 
 					editor.dom.setHTML = setHTML;
-					tinymce.DOM.addClass( editor.getBody(), 'mce-initialised' );
-				} );
-
-				editor.on( 'remove', () => {
-					tinymce.DOM.removeClass( editor.getBody(), 'mce-initialised' );
 				} );
 			},
 		} );
