@@ -137,7 +137,10 @@ export class RichText extends Component {
 	}
 
 	valueToFormat( { formats, text } ) {
-		const value = toHTMLString( { formats, text }, this.multilineTag );
+		const value = toHTMLString( {
+			value: { formats, text },
+			multilineTag: this.multilineTag,
+		} );
 		// remove the outer root tags
 		return this.removeRootTagsProduceByAztec( value );
 	}

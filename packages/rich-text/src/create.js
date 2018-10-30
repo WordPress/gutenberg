@@ -12,6 +12,10 @@ import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
 import { getFormatTypes } from './get-format-types';
+import {
+	LINE_SEPARATOR,
+	OBJECT_REPLACEMENT_CHARACTER,
+} from './special-characters';
 
 /**
  * Browser dependencies
@@ -72,20 +76,23 @@ function toFormat( { type, attributes } ) {
  * `multilineTag` will be separated by two newlines. The optional functions can
  * be used to filter out content.
  *
- * @param {?Object}   $1                 Optional named argements.
- * @param {?Element}  $1.element         Element to create value from.
- * @param {?string}   $1.text            Text to create value from.
- * @param {?string}   $1.html            HTML to create value from.
- * @param {?Range}    $1.range           Range to create value from.
- * @param {?string}   $1.multilineTag    Multiline tag if the structure is
- *                                       multiline.
- * @param {?Function} $1.removeNode      Function to declare whether the given
- *                                       node should be removed.
- * @param {?Function} $1.unwrapNode      Function to declare whether the given
- *                                       node should be unwrapped.
- * @param {?Function} $1.filterString    Function to filter the given string.
- * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
- *                                       the name.
+ * @param {?Object}   $1                      Optional named argements.
+ * @param {?Element}  $1.element              Element to create value from.
+ * @param {?string}   $1.text                 Text to create value from.
+ * @param {?string}   $1.html                 HTML to create value from.
+ * @param {?Range}    $1.range                Range to create value from.
+ * @param {?string}   $1.multilineTag         Multiline tag if the structure is
+ *                                            multiline.
+ * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
+ *                                            nesting is possible.
+ * @param {?Function} $1.removeNode           Function to declare whether the
+ *                                            given node should be removed.
+ * @param {?Function} $1.unwrapNode           Function to declare whether the
+ *                                            given node should be unwrapped.
+ * @param {?Function} $1.filterString         Function to filter the given
+ *                                            string.
+ * @param {?Function} $1.removeAttribute      Wether to remove an attribute
+ *                                            based on the name.
  *
  * @return {Object} A rich text value.
  */
@@ -95,6 +102,7 @@ export function create( {
 	html,
 	range,
 	multilineTag,
+	multilineWrapperTags,
 	removeNode,
 	unwrapNode,
 	filterString,
@@ -130,6 +138,7 @@ export function create( {
 		element,
 		range,
 		multilineTag,
+		multilineWrapperTags,
 		removeNode,
 		unwrapNode,
 		filterString,
@@ -159,7 +168,7 @@ function accumulateSelection( accumulator, node, range, value ) {
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
 	// Range indicates that the current node has selection.
-	} else if ( node === startContainer ) {
+	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
 	// Range indicates that the current node is selected.
 	} else if (
@@ -167,13 +176,22 @@ function accumulateSelection( accumulator, node, range, value ) {
 		node === startContainer.childNodes[ startOffset ]
 	) {
 		accumulator.start = currentLength;
+	// Range indicates that the selection is after the current node.
+	} else if (
+		parentNode === startContainer &&
+		node === startContainer.childNodes[ startOffset - 1 ]
+	) {
+		accumulator.start = currentLength + value.text.length;
+	// Fallback if no child inside handled the selection.
+	} else if ( node === startContainer ) {
+		accumulator.start = currentLength;
 	}
 
 	// Selection can be extracted from value.
 	if ( value.end !== undefined ) {
 		accumulator.end = currentLength + value.end;
 	// Range indicates that the current node has selection.
-	} else if ( node === endContainer ) {
+	} else if ( node === endContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.end = currentLength + endOffset;
 	// Range indicates that the current node is selected.
 	} else if (
@@ -187,6 +205,9 @@ function accumulateSelection( accumulator, node, range, value ) {
 		node === endContainer.childNodes[ endOffset ]
 	) {
 		accumulator.end = currentLength;
+	// Fallback if no child inside handled the selection.
+	} else if ( node === endContainer ) {
+		accumulator.end = currentLength + endOffset;
 	}
 }
 
@@ -221,22 +242,30 @@ function filterRange( node, range, filter ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}    $1                 Named argements.
- * @param {?Element}  $1.element         Element to create value from.
- * @param {?Range}    $1.range           Range to create value from.
- * @param {?Function} $1.removeNode      Function to declare whether the given
- *                                       node should be removed.
- * @param {?Function} $1.unwrapNode      Function to declare whether the given
- *                                       node should be unwrapped.
- * @param {?Function} $1.filterString    Function to filter the given string.
- * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
- *                                       the name.
+ * @param {Object}    $1                      Named argements.
+ * @param {?Element}  $1.element              Element to create value from.
+ * @param {?Range}    $1.range                Range to create value from.
+ * @param {?string}   $1.multilineTag         Multiline tag if the structure is
+ *                                            multiline.
+ * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
+ *                                            nesting is possible.
+ * @param {?Function} $1.removeNode           Function to declare whether the
+ *                                            given node should be removed.
+ * @param {?Function} $1.unwrapNode           Function to declare whether the
+ *                                            given node should be unwrapped.
+ * @param {?Function} $1.filterString         Function to filter the given
+ *                                            string.
+ * @param {?Function} $1.removeAttribute      Wether to remove an attribute
+ *                                            based on the name.
  *
  * @return {Object} A rich text value.
  */
 function createFromElement( {
 	element,
 	range,
+	multilineTag,
+	multilineWrapperTags,
+	currentWrapperTags = [],
 	removeNode,
 	unwrapNode,
 	filterString,
@@ -271,6 +300,7 @@ function createFromElement( {
 	// Optimise for speed.
 	for ( let index = 0; index < length; index++ ) {
 		const node = element.childNodes[ index ];
+		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === TEXT_NODE ) {
 			const text = filterStringComplete( node.nodeValue );
@@ -295,7 +325,7 @@ function createFromElement( {
 			continue;
 		}
 
-		if ( node.nodeName === 'BR' ) {
+		if ( type === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			accumulator.text += '\n';
 			accumulator.formats.length += 1;
@@ -305,10 +335,11 @@ function createFromElement( {
 		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
 		let format;
+		let value;
 
 		if ( ! unwrapNode || ! unwrapNode( node ) ) {
 			const newFormat = toFormat( {
-				type: node.nodeName.toLowerCase(),
+				type,
 				attributes: getAttributes( {
 					element: node,
 					removeAttribute,
@@ -323,14 +354,31 @@ function createFromElement( {
 			}
 		}
 
-		const value = createFromElement( {
-			element: node,
-			range,
-			removeNode,
-			unwrapNode,
-			filterString,
-			removeAttribute,
-		} );
+		if ( multilineWrapperTags && multilineWrapperTags.indexOf( type ) !== -1 ) {
+			value = createFromMultilineElement( {
+				element: node,
+				range,
+				multilineTag,
+				multilineWrapperTags,
+				removeNode,
+				unwrapNode,
+				filterString,
+				removeAttribute,
+				currentWrapperTags: [ ...currentWrapperTags, format ],
+			} );
+			format = undefined;
+		} else {
+			value = createFromElement( {
+				element: node,
+				range,
+				multilineTag,
+				multilineWrapperTags,
+				removeNode,
+				unwrapNode,
+				filterString,
+				removeAttribute,
+			} );
+		}
 
 		const text = value.text;
 		const start = accumulator.text.length;
@@ -346,8 +394,7 @@ function createFromElement( {
 
 		if ( format && format.attributes && text.length === 0 ) {
 			format.object = true;
-			// Object replacement character.
-			accumulator.text += '\ufffc';
+			accumulator.text += OBJECT_REPLACEMENT_CHARACTER;
 
 			if ( formats[ start ] ) {
 				formats[ start ].unshift( format );
@@ -356,6 +403,7 @@ function createFromElement( {
 			}
 		} else {
 			accumulator.text += text;
+			accumulator.formats.length += text.length;
 
 			let i = value.formats.length;
 
@@ -389,18 +437,23 @@ function createFromElement( {
  * Creates a rich text value from a DOM element and range that should be
  * multiline.
  *
- * @param {Object}    $1                 Named argements.
- * @param {?Element}  $1.element         Element to create value from.
- * @param {?Range}    $1.range           Range to create value from.
- * @param {?string}   $1.multilineTag    Multiline tag if the structure is
- *                                       multiline.
- * @param {?Function} $1.removeNode      Function to declare whether the given
- *                                       node should be removed.
- * @param {?Function} $1.unwrapNode      Function to declare whether the given
- *                                       node should be unwrapped.
- * @param {?Function} $1.filterString    Function to filter the given string.
- * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
- *                                       the name.
+ * @param {Object}    $1                      Named argements.
+ * @param {?Element}  $1.element              Element to create value from.
+ * @param {?Range}    $1.range                Range to create value from.
+ * @param {?string}   $1.multilineTag         Multiline tag if the structure is
+ *                                            multiline.
+ * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
+ *                                            nesting is possible.
+ * @param {?Function} $1.removeNode           Function to declare whether the
+ *                                            given node should be removed.
+ * @param {?Function} $1.unwrapNode           Function to declare whether the
+ *                                            given node should be unwrapped.
+ * @param {?Function} $1.filterString         Function to filter the given
+ *                                            string.
+ * @param {?Function} $1.removeAttribute      Wether to remove an attribute
+ *                                            based on the name.
+ * @param {boolean}   $1.currentWrapperTags   Whether to prepend a line
+ *                                            separator.
  *
  * @return {Object} A rich text value.
  */
@@ -408,10 +461,12 @@ function createFromMultilineElement( {
 	element,
 	range,
 	multilineTag,
+	multilineWrapperTags,
 	removeNode,
 	unwrapNode,
 	filterString,
 	removeAttribute,
+	currentWrapperTags = [],
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -429,20 +484,40 @@ function createFromMultilineElement( {
 			continue;
 		}
 
-		const value = createFromElement( {
+		let value = createFromElement( {
 			element: node,
 			range,
 			multilineTag,
+			multilineWrapperTags,
+			currentWrapperTags,
 			removeNode,
 			unwrapNode,
 			filterString,
 			removeAttribute,
 		} );
 
+		// If a line consists of one single line break (invisible), consider the
+		// line empty, wether this is the browser's doing or not.
+		if ( value.text === '\n' ) {
+			const start = value.start;
+			const end = value.end;
+
+			value = createEmptyValue();
+
+			if ( start !== undefined ) {
+				value.start = 0;
+			}
+
+			if ( end !== undefined ) {
+				value.end = 0;
+			}
+		}
+
 		// Multiline value text should be separated by a double line break.
-		if ( index !== 0 ) {
-			accumulator.formats = accumulator.formats.concat( [ , ] );
-			accumulator.text += '\u2028';
+		if ( index !== 0 || currentWrapperTags.length > 0 ) {
+			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
+			accumulator.formats = accumulator.formats.concat( formats );
+			accumulator.text += LINE_SEPARATOR;
 		}
 
 		accumulateSelection( accumulator, node, range, value );
