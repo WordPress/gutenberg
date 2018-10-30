@@ -412,10 +412,9 @@ export class BlockListBlock extends Component {
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
-		// Insertion point can only be made visible when the side inserter is
-		// not present, and either the block is at the extent of a selection or
-		// is the first block in the top-level list rendering.
-		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirst ) || ! isPartOfMultiSelection;
+		// Insertion point can only be made visible if the block is at the
+		// the extent of a multi-selection, or not in a multi-selection.
+		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirstMultiSelected ) || ! isPartOfMultiSelection;
 		const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
 
 		// The wp-block className is important for editor styles.
@@ -501,7 +500,6 @@ export class BlockListBlock extends Component {
 						clientId={ clientId }
 						rootClientId={ rootClientId }
 						canShowInserter={ canShowInBetweenInserter }
-						onInsert={ this.hideHoverEffects }
 					/>
 				) }
 				<BlockDropZone

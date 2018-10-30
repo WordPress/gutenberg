@@ -710,21 +710,23 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point visibility, a boolean value
- * reflecting whether the insertion point should be shown.
+ * Reducer returning the block insertion point visibility, either null if there
+ * is not an explicit insertion point assigned, or an object of its `index` and
+ * `rootClientId`.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function isInsertionPointVisible( state = false, action ) {
+export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return true;
+			const { rootClientId, index } = action;
+			return { rootClientId, index };
 
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return null;
 	}
 
 	return state;
@@ -1100,7 +1102,7 @@ export default optimist( combineReducers( {
 	blockSelection,
 	blocksMode,
 	blockListSettings,
-	isInsertionPointVisible,
+	insertionPoint,
 	preferences,
 	saving,
 	postLock,
