@@ -48,7 +48,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render a string Fill', () => {
-		const element = mount(
+		const tree = ReactTestRenderer.create(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
@@ -57,9 +57,9 @@ describe( 'Slot', () => {
 					content
 				</Fill>
 			</Provider>
-		);
+		).toJSON();
 
-		expect( element.html() ).toBe( '<div>content</div>' );
+		expect( tree ).toMatchSnapshot();
 	} );
 
 	it( 'should render a Fill containing an element', () => {

@@ -1,3 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Slot should render a string Fill 1`] = `
+<div>
+  content
+</div>
+`;
+
 exports[`Slot should render empty Fills 1`] = `<div />`;
