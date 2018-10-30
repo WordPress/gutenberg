@@ -56,9 +56,12 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( attributes ) => {
 					return createBlock( 'core/quote', {
-						value: toHTMLString( join( attributes.map( ( { content } ) =>
-							create( { html: content } )
-						), '\u2028' ), 'p' ),
+						value: toHTMLString( {
+							value: join( attributes.map( ( { content } ) =>
+								create( { html: content } )
+							), '\u2028' ),
+							multilineTag: 'p',
+						} ),
 					} );
 				},
 			},
@@ -113,7 +116,7 @@ export const settings = {
 							...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
 								.map( ( piece ) =>
 									createBlock( 'core/paragraph', {
-										content: toHTMLString( piece ),
+										content: toHTMLString( { value: piece } ),
 									} )
 								)
 						);
@@ -153,12 +156,15 @@ export const settings = {
 
 					return [
 						createBlock( 'core/heading', {
-							content: toHTMLString( pieces[ 0 ] ),
+							content: toHTMLString( { value: pieces[ 0 ] } ),
 						} ),
 						createBlock( 'core/quote', {
 							...attrs,
 							citation,
-							value: toHTMLString( quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(), 'p' ),
+							value: toHTMLString( {
+								value: quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(),
+								multilineTag: 'p',
+							} ),
 						} ),
 					];
 				},
