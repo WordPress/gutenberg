@@ -1074,17 +1074,13 @@ Post content.
 
 ### canInsertBlockType
 
-Determines if the given block type is allowed to be inserted, and, if
-parentClientId is provided, whether it is allowed to be nested within the
-given parent.
+Determines if the given block type is allowed to be inserted into the block list.
 
 *Parameters*
 
  * state: Editor state.
- * blockName: The name of the given block type, e.g.
-                                'core/paragraph'.
- * parentClientId: The parent that the given block is to be
-                                nested within, or null.
+ * blockName: The name of the block type, e.g.' core/paragraph'.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
@@ -1114,7 +1110,7 @@ Items are returned ordered descendingly by their 'utility' and 'frecency'.
 *Parameters*
 
  * state: Editor state.
- * parentClientId: The block we are inserting into, if any.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
