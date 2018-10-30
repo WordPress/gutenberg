@@ -9,7 +9,7 @@ It includes a `wp.hooks` filter `editor.MediaPlaceholder` that enables developer
 
 _Example:_
 
-Replace the contents of the panel:
+Replace implementation of the placeholder:
 
 ```js
 function replaceMediaPlaceholder() { 
@@ -24,7 +24,7 @@ function replaceMediaPlaceholder() {
 
 wp.hooks.addFilter( 
 	'editor.MediaPlaceholder', 
-	'my-plugin/replace-media-placeholder-component', 
+	'my-plugin/replace-media-placeholder',
 	replaceMediaPlaceholder
 );
 ```
