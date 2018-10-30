@@ -20,6 +20,14 @@ exports[`Slot should render a string Fill 1`] = `
 </div>
 `;
 
+exports[`Slot should render a string Fill with HTML wrapper when render props used 1`] = `
+<div>
+  <blockquote>
+    content
+  </blockquote>
+</div>
+`;
+
 exports[`Slot should render empty Fills 1`] = `<div />`;
 
 exports[`Slot should render empty Fills without HTML wrapper when render props used 1`] = `<div />`;

@@ -133,7 +133,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render a string Fill with HTML wrapper when render props used', () => {
-		const element = mount(
+		const tree = ReactTestRenderer.create(
 			<Provider>
 				<div>
 					<Slot name="chicken">
@@ -148,9 +148,9 @@ describe( 'Slot', () => {
 					content
 				</Fill>
 			</Provider>
-		);
+		).toJSON();
 
-		expect( element.html() ).toBe( '<div><blockquote>content</blockquote></div>' );
+		expect( tree ).toMatchSnapshot();
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
