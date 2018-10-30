@@ -20,7 +20,7 @@ describe( 'IconButton', () => {
 
 		it( 'should render a Dashicon component matching the wordpress icon', () => {
 			const iconButton = shallow( <IconButton icon="wordpress" /> );
-			expect( iconButton.find( 'Icon' ).prop( 'icon' ) ).toBe( 'wordpress' );
+			expect( iconButton.find( 'Dashicon' ).shallow().hasClass( 'dashicons-wordpress' ) ).toBe( true );
 		} );
 
 		it( 'should render child elements when passed as children', () => {
