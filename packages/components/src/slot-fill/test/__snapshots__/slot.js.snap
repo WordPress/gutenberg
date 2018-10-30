@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Slot should render a Fill containing an element 1`] = `
+<div>
+  <span />
+</div>
+`;
+
 exports[`Slot should render a string Fill 1`] = `
 <div>
   content
