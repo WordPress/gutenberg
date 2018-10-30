@@ -102,7 +102,7 @@ async function login() {
  */
 async function waitForRichTextInitialization() {
 	const isInRichText = await page.evaluate( () => {
-		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
+		return document.activeElement.contentEditable === 'true';
 	} );
 
 	if ( ! isInRichText ) {
