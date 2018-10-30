@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
 import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 import { noop } from 'lodash';
@@ -102,10 +101,11 @@ describe( 'Popover', () => {
 			expect( content ).toMatchSnapshot();
 		} );
 
-		it( 'should pass additional to portaled element', () => {
-			const wrapper = shallow( <Popover role="tooltip">Hello</Popover>, { disableLifecycleMethods: true } );
+		it( 'should pass additional props to portaled element', () => {
+			const wrapper = TestUtils.renderIntoDocument( <Popover role="tooltip">Hello</Popover> );
+			const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
 
-			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
+			expect( content ).toMatchSnapshot();
 		} );
 	} );
 } );
