@@ -95,7 +95,7 @@ describe( 'Slot', () => {
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
 		const onClose = jest.fn();
 
-		const element = mount(
+		const testInstance = ReactTestRenderer.create(
 			<Provider>
 				<Slot name="chicken" fillProps={ { onClose } } />
 				<Fill name="chicken">
@@ -106,9 +106,9 @@ describe( 'Slot', () => {
 					} }
 				</Fill>
 			</Provider>
-		);
+		).root;
 
-		element.find( 'button' ).simulate( 'click' );
+		testInstance.findByType( 'button' ).props.onClick();
 
 		expect( onClose ).toHaveBeenCalledTimes( 1 );
 	} );
