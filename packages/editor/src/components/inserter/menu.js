@@ -23,7 +23,12 @@ import scrollIntoView from 'dom-scroll-into-view';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
 import { Component, findDOMNode, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
-import { getCategories, isReusableBlock } from '@wordpress/blocks';
+import {
+	getCategories,
+	isReusableBlock,
+	createBlock,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
@@ -340,21 +345,55 @@ export class InserterMenu extends Component {
 export default compose(
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getChildBlockNames,
-		} = select( 'core/blocks' );
-		const {
+			getEditedPostAttribute,
+			getSelectedBlock,
+			getInserterItems,
 			getBlockName,
 		} = select( 'core/editor' );
+		const {
+			getChildBlockNames,
+		} = select( 'core/blocks' );
+
 		const rootBlockName = getBlockName( rootClientId );
+
 		return {
+			selectedBlock: getSelectedBlock(),
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
+			title: getEditedPostAttribute( 'title' ),
+			items: getInserterItems( rootClientId ),
+			rootClientId,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		fetchReusableBlocks: dispatch( 'core/editor' ).__experimentalFetchReusableBlocks,
-		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
-		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
-	} ) ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+			showInsertionPoint,
+			hideInsertionPoint,
+		} = dispatch( 'core/editor' );
+
+		return {
+			fetchReusableBlocks,
+			showInsertionPoint,
+			hideInsertionPoint,
+			onSelect( item ) {
+				const {
+					replaceBlocks,
+					insertBlock,
+				} = dispatch( 'core/editor' );
+				const { selectedBlock, index, rootClientId } = ownProps;
+				const { name, initialAttributes } = item;
+
+				const insertedBlock = createBlock( name, initialAttributes );
+				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+					replaceBlocks( selectedBlock.clientId, insertedBlock );
+				} else {
+					insertBlock( insertedBlock, index, rootClientId );
+				}
+
+				ownProps.onSelect();
+			},
+		};
+	} ),
 	withSpokenMessages,
 	withInstanceId,
 	withSafeTimeout
