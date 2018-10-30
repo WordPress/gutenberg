@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString, isArray } from 'lodash';
+import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
  */
 import Tooltip from '../tooltip';
 import Button from '../button';
-import Dashicon from '../dashicon';
+import Icon from '../icon';
 
 // This is intentionally a Component class, not a function component because it
 // is common to apply a ref to the button element (only supported in class)
@@ -42,7 +42,7 @@ class IconButton extends Component {
 
 		let element = (
 			<Button aria-label={ label } { ...additionalProps } className={ classes }>
-				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
+				<Icon icon={ icon } />
 				{ children }
 			</Button>
 		);
