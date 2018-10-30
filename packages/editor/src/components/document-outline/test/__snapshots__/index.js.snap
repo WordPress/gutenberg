@@ -9,8 +9,8 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       isValid={true}
       key="0"
       level="H2"
-      onClick={[Function]}
       path={Array []}
+      target="3fc15d2e-5d52-40b0-9f54-9b9562adeac0"
     >
       <Component
         format="string"
@@ -22,8 +22,8 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       isValid={true}
       key="1"
       level="H3"
-      onClick={[Function]}
       path={Array []}
+      target="6eab6ae4-a33a-4e68-a218-2832860095a2"
     >
       <Component
         format="string"
@@ -44,8 +44,8 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       isValid={false}
       key="0"
       level="H1"
-      onClick={[Function]}
       path={Array []}
+      target="34f77241-c57a-4610-a4a7-f0568d999e07"
     >
       <Component
         format="string"
@@ -65,8 +65,8 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       isValid={false}
       key="1"
       level="H1"
-      onClick={[Function]}
       path={Array []}
+      target="34f77241-c57a-4610-a4a7-f0568d999e07"
     >
       <Component
         format="string"
