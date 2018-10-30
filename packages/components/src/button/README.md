@@ -2,6 +2,8 @@
 
 Buttons express what action will occur when the user clicks or taps it. Buttons are used to trigger an action, and they can be used for any type of action, including navigation.
 
+Buttons express what action will occur when the user clicks or taps it. Buttons are used to trigger an action, and they can be used for any type of action, including navigation.
+
 The presence of a `href` prop determines whether an `anchor` element is rendered instead of a `button`.
 
 ## Usage
