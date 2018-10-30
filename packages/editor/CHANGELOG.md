@@ -1,3 +1,10 @@
+## 6.0.1 (2018-10-30)
+
+### Bug Fixes
+
+- Tweak the vanilla style sheet for consistency.
+- Fix the "Copy Post Text" button not copying the post text.
+
 ## 6.0.0 (2018-10-29)
 
 ### Breaking Changes

@@ -16,6 +16,7 @@ const {
 	// Ctrl+Alt+<key> on a mac, Shift+Alt+<key> elsewhere.
 	access,
 	ctrl,
+	alt,
 	ctrlShift,
 	shiftAlt,
 } = displayShortcutList;
@@ -65,6 +66,10 @@ const globalShortcuts = {
 		{
 			keyCombination: shiftAlt( 'p' ),
 			description: __( 'Navigate to the previous part of the editor (alternative).' ),
+		},
+		{
+			keyCombination: alt( 'F10' ),
+			description: __( 'Navigate to the nearest toolbar.' ),
 		},
 		{
 			keyCombination: secondary( 'm' ),

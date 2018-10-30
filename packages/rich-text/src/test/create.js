@@ -23,11 +23,25 @@ describe( 'create', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach( ( { description, multilineTag, settings, html, createRange, record } ) => {
+	spec.forEach( ( {
+		description,
+		multilineTag,
+		multilineWrapperTags,
+		settings,
+		html,
+		createRange,
+		record,
+	} ) => {
 		it( description, () => {
 			const element = createElement( document, html );
 			const range = createRange( element );
-			const createdRecord = create( { element, range, multilineTag, ...settings } );
+			const createdRecord = create( {
+				element,
+				range,
+				multilineTag,
+				multilineWrapperTags,
+				...settings,
+			} );
 			const formatsLength = getSparseArrayLength( record.formats );
 			const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
 

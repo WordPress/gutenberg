@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { normalizeIconObject } from '@wordpress/blocks';
 import { Component, Fragment } from '@wordpress/element';
 import { getActiveFormat, getFormatTypes } from '@wordpress/rich-text';
 import { Fill, KeyboardShortcuts, ToolbarButton } from '@wordpress/components';
@@ -48,7 +49,7 @@ function FillInserterListItem( props ) {
 					return null;
 				}
 
-				return <InserterListItem { ...props } />;
+				return <InserterListItem { ...props } icon={ normalizeIconObject( props.icon ) } />;
 			} }
 		</Fill>
 	);
