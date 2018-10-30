@@ -114,7 +114,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render empty Fills without HTML wrapper when render props used', () => {
-		const element = mount(
+		const tree = ReactTestRenderer.create(
 			<Provider>
 				<div>
 					<Slot name="chicken">
@@ -127,9 +127,9 @@ describe( 'Slot', () => {
 				</div>
 				<Fill name="chicken" />
 			</Provider>
-		);
+		).toJSON();
 
-		expect( element.html() ).toBe( '<div></div>' );
+		expect( tree ).toMatchSnapshot();
 	} );
 
 	it( 'should render a string Fill with HTML wrapper when render props used', () => {
