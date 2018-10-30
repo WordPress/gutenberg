@@ -227,6 +227,12 @@ export class RichText extends Component {
 		const empty = this.isEmpty();
 
 		if ( onMerge ) {
+			// The onMerge event can cause a content update event for this block.  Such event should
+			// definitely be processed by our native components, since they have no knowledge of
+			// how the split works.  Setting lastEventCount to undefined forces the native component to
+			// always update when provided with new content.
+			this.lastEventCount = undefined;
+
 			onMerge( ! isReverse );
 		}
 
