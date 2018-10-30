@@ -27,7 +27,7 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
  * @return {Object} A complete block content schema.
  */
 export function getBlockContentSchema( transforms ) {
-	const schemas = transforms.map( ( { blockName, schema } ) => {
+	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
 		// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
 		if ( hasBlockSupport( blockName, 'anchor' ) ) {
 			for ( const tag in schema ) {
@@ -37,18 +37,41 @@ export function getBlockContentSchema( transforms ) {
 				schema[ tag ].attributes.push( 'id' );
 			}
 		}
+
+		// If an isMatch function exists add it to each schema tag that it applies to.
+		if ( isMatch ) {
+			for ( const tag in schema ) {
+				schema[ tag ].isMatch = isMatch;
+			}
+		}
 		return schema;
 	} );
 
 	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
-		if ( key === 'children' ) {
-			if ( objValue === '*' || srcValue === '*' ) {
-				return '*';
-			}
+		switch ( key ) {
+			case 'children': {
+				if ( objValue === '*' || srcValue === '*' ) {
+					return '*';
+				}
 
-			return { ...objValue, ...srcValue };
-		} else if ( key === 'attributes' || key === 'require' ) {
-			return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+				return { ...objValue, ...srcValue };
+			}
+			case 'attributes':
+			case 'require': {
+				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+			}
+			case 'isMatch': {
+				// If one of the values being merge is undefined (matches everything),
+				// the result of the merge will be undefined.
+				if ( ! objValue || ! srcValue ) {
+					return undefined;
+				}
+				// When merging two isMatch functions, the result is a new function
+				// that returns if one of the source functions returns true.
+				return ( ...args ) => {
+					return objValue( ...args ) || srcValue( ...args );
+				};
+			}
 		}
 	} );
 }
@@ -153,8 +176,12 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 	Array.from( nodeList ).forEach( ( node ) => {
 		const tag = node.nodeName.toLowerCase();
 
-		// It's a valid child.
-		if ( schema.hasOwnProperty( tag ) ) {
+		// It's a valid child, if the tag exists in the schema without an isMatch
+		// function, or with an isMatch function that matches the node.
+		if (
+			schema.hasOwnProperty( tag ) &&
+			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
+		) {
 			if ( node.nodeType === ELEMENT_NODE ) {
 				const { attributes = [], classes = [], children, require = [] } = schema[ tag ];
 
