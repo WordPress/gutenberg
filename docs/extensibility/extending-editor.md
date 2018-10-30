@@ -8,6 +8,8 @@
 
 To modify the behavior of the editor experience, Gutenberg exposes the following Filters:
 
+#### `editor.BlockDropZone`
+
 #### `editor.BlockEdit`
 
 See [Extending Blocks](../docs/extensibility/extending-blocks.md#editorblockedit) section.
@@ -15,6 +17,8 @@ See [Extending Blocks](../docs/extensibility/extending-blocks.md#editorblockedit
 #### `editor.BlockListBlock`
 
 See [Extending Blocks](../docs/extensibility/extending-blocks.md#editorblocklistblock) section.
+
+#### `editor.MediaPlaceholder`
 
 #### `editor.MediaUpload`
 
