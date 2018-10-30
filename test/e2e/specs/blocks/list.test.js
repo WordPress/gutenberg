@@ -102,6 +102,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		// Pointer device is needed. Shift+Tab won't focus the toolbar.
+		// To do: fix so Shift+Tab works.
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.mouse.move( 250, 350, { steps: 10 } );
 		await page.click( 'button[aria-label="Indent list item"]' );
@@ -175,6 +176,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		// Pointer device is needed. Shift+Tab won't focus the toolbar.
+		// To do: fix so Shift+Tab works.
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.mouse.move( 250, 350, { steps: 10 } );
 		await page.click( 'button[aria-label="Indent list item"]' );

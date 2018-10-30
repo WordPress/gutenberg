@@ -37,10 +37,14 @@ import {
 	getTextContent,
 	insert,
 	insertLineSeparator,
-	removeNextLineSeparator,
-	removePreviousLineSeparator,
 	isEmptyLine,
 	unstableToDom,
+	getSelectionStart,
+	getSelectionEnd,
+	charAt,
+	LINE_SEPARATOR,
+	remove,
+	isCollapsed,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -515,10 +519,8 @@ export class RichText extends Component {
 		const { keyCode } = event;
 		const isReverse = keyCode === BACKSPACE;
 
-		const { isCollapsed } = getSelection();
-
 		// Only process delete if the key press occurs at uncollapsed edge.
-		if ( ! isCollapsed ) {
+		if ( ! getSelection().isCollapsed ) {
 			return;
 		}
 
@@ -613,13 +615,29 @@ export class RichText extends Component {
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			if ( this.multilineTag ) {
-				const record = this.createRecord();
+				const value = this.createRecord();
+				const start = getSelectionStart( value );
+				const end = getSelectionEnd( value );
+
 				let newValue;
 
 				if ( keyCode === BACKSPACE ) {
-					newValue = removePreviousLineSeparator( record );
-				} else {
-					newValue = removeNextLineSeparator( record );
+					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
+						newValue = remove(
+							value,
+							// Only remove the line if the selection is
+							// collapsed.
+							isCollapsed( value ) ? start - 1 : start,
+							end
+						);
+					}
+				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
+					newValue = remove(
+						value,
+						start,
+						// Only remove the line if the selection is collapsed.
+						isCollapsed( value ) ? end + 1 : end,
+					);
 				}
 
 				if ( newValue ) {

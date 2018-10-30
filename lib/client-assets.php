@@ -428,6 +428,7 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'wp-polyfill',
 			'wp-data',
+			'wp-deprecated',
 			'wp-escape-html',
 		),
 		filemtime( gutenberg_dir_path() . 'build/rich-text/index.js' ),
