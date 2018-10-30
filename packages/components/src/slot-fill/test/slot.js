@@ -78,7 +78,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render a Fill containing an array', () => {
-		const element = mount(
+		const tree = ReactTestRenderer.create(
 			<Provider>
 				<div>
 					<Slot name="chicken" />
@@ -87,9 +87,9 @@ describe( 'Slot', () => {
 					{ [ <span key="1" />, <div key="2" />, 'text' ] }
 				</Fill>
 			</Provider>
-		);
+		).toJSON();
 
-		expect( element.html() ).toBe( '<div><span></span><div></div>text</div>' );
+		expect( tree ).toMatchSnapshot();
 	} );
 
 	it( 'calls the functions passed as the Slot’s fillProps in the Fill', () => {
