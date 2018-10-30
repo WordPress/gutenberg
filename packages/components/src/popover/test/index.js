@@ -96,10 +96,10 @@ describe( 'Popover', () => {
 
 	describe( '#render()', () => {
 		it( 'should render content', () => {
-			const wrapper = shallow( <Popover>Hello</Popover>, { disableLifecycleMethods: true } );
+			const wrapper = TestUtils.renderIntoDocument( <Popover>Hello</Popover> );
+			const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
 
-			expect( wrapper.type() ).toBe( 'span' );
-			expect( wrapper.find( '.components-popover__content' ).prop( 'children' ) ).toBe( 'Hello' );
+			expect( content ).toMatchSnapshot();
 		} );
 
 		it( 'should pass additional to portaled element', () => {
