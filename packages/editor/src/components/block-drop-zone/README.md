@@ -9,7 +9,7 @@ It includes a `wp.hooks` filter `editor.BlockDropZone` that enables developers t
 
 _Example:_
 
-Replace the contents of the panel:
+Replace implementation of the drop zone:
 
 ```js
 function replaceBlockDropZone() { 
