@@ -74,6 +74,16 @@ describe( 'apiFetch', () => {
 		} );
 	} );
 
+	it( 'should return null if response has no content status code', () => {
+		window.fetch.mockReturnValue( Promise.resolve( {
+			status: 204,
+		} ) );
+
+		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			expect( body ).toEqual( null );
+		} );
+	} );
+
 	it( 'should not try to parse the response', () => {
 		window.fetch.mockReturnValue( Promise.resolve( {
 			status: 200,

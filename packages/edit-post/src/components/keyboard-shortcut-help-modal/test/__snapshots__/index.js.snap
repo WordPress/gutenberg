@@ -124,6 +124,14 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
             ],
           },
           Object {
+            "description": "Navigate to the nearest toolbar.",
+            "keyCombination": Array [
+              "Alt",
+              "+",
+              "F10",
+            ],
+          },
+          Object {
             "description": "Switch between Visual Editor and Code Editor.",
             "keyCombination": Array [
               "Ctrl",
