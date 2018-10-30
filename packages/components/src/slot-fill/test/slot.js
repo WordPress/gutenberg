@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
 import { isEmpty } from 'lodash';
 import ReactTestRenderer from 'react-test-renderer';
 
@@ -171,7 +170,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should render in expected order', () => {
-		const element = mount(
+		const testRenderer = ReactTestRenderer.create(
 			<Provider>
 				<div key="slot">
 					<Slot name="egg" />
@@ -179,35 +178,35 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		element.setProps( {
-			children: [
+		testRenderer.update(
+			<Provider>
 				<div key="slot">
 					<Slot name="egg" />
-				</div>,
-				<Filler name="egg" key="first" text="first" />,
-				<Filler name="egg" key="second" text="second" />,
-			],
-		} );
+				</div>
+				<Filler name="egg" key="first" text="first" />
+				<Filler name="egg" key="second" text="second" />
+			</Provider>
+		);
 
-		element.setProps( {
-			children: [
+		testRenderer.update(
+			<Provider>
 				<div key="slot">
 					<Slot name="egg" />
-				</div>,
-				<Filler name="egg" key="second" text="second" />,
-			],
-		} );
+				</div>
+				<Filler name="egg" key="second" text="second" />
+			</Provider>
+		);
 
-		element.setProps( {
-			children: [
+		testRenderer.update(
+			<Provider>
 				<div key="slot">
 					<Slot name="egg" />
-				</div>,
-				<Filler name="egg" key="first" text="first" />,
-				<Filler name="egg" key="second" text="second" />,
-			],
-		} );
+				</div>
+				<Filler name="egg" key="first" text="first" />
+				<Filler name="egg" key="second" text="second" />
+			</Provider>
+		);
 
-		expect( element.html() ).toBe( '<div>firstsecond</div>' );
+		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 } );
