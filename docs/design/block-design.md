@@ -28,7 +28,7 @@ Blocks should have an identifying icon, ideally using a single color. Try to avo
 
 ![A screenshot of the Block Library with concise block names](./blocks-do.png)
 **Do:**
-Use conside block names.
+Use consice block names.
 
 ![A screenshot of the Block Library with long, multi-line block names](./blocks-dont.png)
 **Don't:**
@@ -56,7 +56,7 @@ Provide an instructive placeholder state.
 
 ![An example Gallery block placeholder but with intense, distracting colors and no instructions](./placeholder-dont.png)
 **Don't:**
-Avoid branding and relying on the title along to convey instructions.
+Avoid branding and relying on the title alone to convey instructions.
 
 ### Selected and Unselected States
 
