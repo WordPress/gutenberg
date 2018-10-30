@@ -1,5 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`RichText should apply formatting when selection is collapsed 1`] = `
+"<!-- wp:paragraph -->
+<p>Some <strong>bold</strong>.</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should apply formatting with access shortcut 1`] = `
 "<!-- wp:paragraph -->
 <p><del>test</del></p>

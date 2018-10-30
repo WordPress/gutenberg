@@ -159,6 +159,7 @@ export function toDom( {
 		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
 		},
+		isEditableTree: true,
 	} );
 
 	if ( createLinePadding ) {
