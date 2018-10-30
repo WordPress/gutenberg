@@ -2,7 +2,7 @@
 
 Use radio buttons when you want users to select one option from a set, and you want to show them all the available options at once.
 
-![Selected and unselected radio buttons](./radio.png)
+![Selected and unselected radio buttons](radio.png)
 Selected and unselected radio buttons
 
 ## Table of contents
@@ -24,17 +24,17 @@ Use radio buttons when you want users to:
 
 If you have a list of available options can be collapsed, consider using a dropdown menu instead — it uses less space.
 
-![Use radio buttons when only one item can be selected from a list.](./radio-usage-do.png)
+![Use radio buttons when only one item can be selected from a list.](radio-usage-do.png)
 **Do**
 Use radio buttons when only one item can be selected from a list.
 
-![Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.](./radio-usage-dont.png)
+![Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.](radio-usage-dont.png)
 **Don’t**
 Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.
 
 ### Defaults
 
-When using radio buttons **one must be selected by default** (i.e., when the page loads, in the case of a web application).
+When using radio buttons **one should be selected by default** (i.e., when the page loads, in the case of a web application).
 
 **User control**
 
