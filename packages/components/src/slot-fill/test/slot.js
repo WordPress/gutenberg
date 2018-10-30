@@ -154,7 +154,7 @@ describe( 'Slot', () => {
 	} );
 
 	it( 'should re-render Slot when not bubbling virtually', () => {
-		const element = mount(
+		const testRenderer = ReactTestRenderer.create(
 			<Provider>
 				<div>
 					<Slot name="egg" />
@@ -163,11 +163,11 @@ describe( 'Slot', () => {
 			</Provider>
 		);
 
-		expect( element.html() ).toBe( '<div>1</div>' );
+		expect( testRenderer.toJSON() ).toMatchSnapshot();
 
-		element.find( 'button' ).simulate( 'click' );
+		testRenderer.root.findByType( 'button' ).props.onClick();
 
-		expect( element.html() ).toBe( '<div>2</div>' );
+		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 
 	it( 'should render in expected order', () => {

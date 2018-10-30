@@ -1,5 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
+Array [
+  <div>
+    1
+  </div>,
+  <button
+    onClick={[Function]}
+    type="button"
+  />,
+]
+`;
+
+exports[`Slot should re-render Slot when not bubbling virtually 2`] = `
+Array [
+  <div>
+    2
+  </div>,
+  <button
+    onClick={[Function]}
+    type="button"
+  />,
+]
+`;
+
 exports[`Slot should render a Fill containing an array 1`] = `
 <div>
   <span />
