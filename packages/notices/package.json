@@ -21,6 +21,7 @@
 		"build-module"
 	],
 	"main": "build/index.js",
+	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
 		"@wordpress/a11y": "file:../a11y",
