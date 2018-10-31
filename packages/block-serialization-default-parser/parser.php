@@ -48,11 +48,14 @@ class WP_Block_Parser_Block {
 	 */
 	public $innerHTML;
 
-	function __construct( $name, $attrs, $innerBlocks, $innerHTML ) {
+	public $innerContent;
+
+	function __construct( $name, $attrs, $innerBlocks, $innerHTML, $innerContent ) {
 		$this->blockName   = $name;
 		$this->attrs       = $attrs;
 		$this->innerBlocks = $innerBlocks;
 		$this->innerHTML   = $innerHTML;
+		$this->innerContent = $innerContent;
 	}
 }
 
@@ -252,14 +255,14 @@ class WP_Block_Parser {
 						) );
 					}
 
-					$this->output[] = (array) new WP_Block_Parser_Block( $block_name, $attrs, array(), '' );
+					$this->output[] = (array) new WP_Block_Parser_Block( $block_name, $attrs, array(), '', array() );
 					$this->offset = $start_offset + $token_length;
 					return true;
 				}
 
 				// otherwise we found an inner block
 				$this->add_inner_block(
-					new WP_Block_Parser_Block( $block_name, $attrs, array(), '' ),
+					new WP_Block_Parser_Block( $block_name, $attrs, array(), '', array() ),
 					$start_offset,
 					$token_length
 				);
@@ -269,7 +272,7 @@ class WP_Block_Parser {
 			case 'block-opener':
 				// track all newly-opened blocks on the stack
 				array_push( $this->stack, new WP_Block_Parser_Frame(
-					new WP_Block_Parser_Block( $block_name, $attrs, array(), '' ),
+					new WP_Block_Parser_Block( $block_name, $attrs, array(), '', array() ),
 					$start_offset,
 					$token_length,
 					$start_offset + $token_length,
@@ -406,7 +409,7 @@ class WP_Block_Parser {
 	 * @return WP_Block_Parser_Block freeform block object
 	 */
 	static function freeform( $innerHTML ) {
-		return new WP_Block_Parser_Block( null, array(), array(), $innerHTML );
+		return new WP_Block_Parser_Block( null, array(), array(), $innerHTML, array( $innerHTML ) );
 	}
 
 	/**
@@ -441,7 +444,9 @@ class WP_Block_Parser {
 	function add_inner_block( WP_Block_Parser_Block $block, $token_start, $token_length, $last_offset = null ) {
 		$parent = $this->stack[ count( $this->stack ) - 1 ];
 		$parent->block->innerBlocks[] = $block;
-		$parent->block->innerHTML .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
+		$html = substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
+		$parent->block->innerHTML .= $html;
+		$parent->block->innerContent[] = $html;
 		$parent->prev_offset = $last_offset ? $last_offset : $token_start + $token_length;
 	}
 
@@ -456,9 +461,12 @@ class WP_Block_Parser {
 		$stack_top   = array_pop( $this->stack );
 		$prev_offset = $stack_top->prev_offset;
 
-		$stack_top->block->innerHTML .= isset( $end_offset )
+		$html = isset( $end_offset )
 			? substr( $this->document, $prev_offset, $end_offset - $prev_offset )
 			: substr( $this->document, $prev_offset );
+
+		$stack_top->block->innerHTML .= $html;
+		$stack_top->block->innerContent[] = $html;
 
 		if ( isset( $stack_top->leading_html_start ) ) {
 			$this->output[] = (array) self::freeform( substr(

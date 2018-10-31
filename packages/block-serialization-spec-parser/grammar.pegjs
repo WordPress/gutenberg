@@ -213,7 +213,7 @@ Block_Void
   }
 
 Block_Balanced
-  = s:Block_Start children:(Block / $(!Block_End .))* e:Block_End
+  = s:Block_Start children:(Block / $((!Block !Block_End .)+))* e:Block_End
   {
     /** <?php
     list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
@@ -223,6 +223,7 @@ Block_Balanced
       'attrs'        => $s['attrs'],
       'innerBlocks'  => $innerBlocks,
       'innerHTML'    => implode( '', $innerHTML ),
+      'innerContent' => array_filter( $children, 'is_string' ),
     );
     ?> **/
 
@@ -234,7 +235,8 @@ Block_Balanced
       blockName: s.blockName,
       attrs: s.attrs,
       innerBlocks: innerBlocks,
-      innerHTML: innerHTML.join( '' )
+      innerHTML: innerHTML.join( '' ),
+      innerContent: children.filter( function( child ) { return 'string' === typeof child } )
     };
   }
 

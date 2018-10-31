@@ -4,17 +4,18 @@ let output;
 let stack;
 const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:[^}]+|}+(?=})|(?!}\s+-->)[^])+?}\s+)?(\/)?-->/g;
 
-function Block( blockName, attrs, innerBlocks, innerHTML ) {
+function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	return {
 		blockName,
 		attrs,
 		innerBlocks,
 		innerHTML,
+		innerContent,
 	};
 }
 
 function Freeform( innerHTML ) {
-	return Block( null, {}, [], innerHTML );
+	return Block( null, {}, [], innerHTML, [ innerHTML ] );
 }
 
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
@@ -230,10 +231,9 @@ function addFreeform( rawLength ) {
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
-	parent.block.innerHTML += document.substr(
-		parent.prevOffset,
-		tokenStart - parent.prevOffset,
-	);
+	const leadingHTML = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	parent.block.innerHTML += leadingHTML;
+	parent.block.innerContent.push( leadingHTML );
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
@@ -241,9 +241,13 @@ function addBlockFromStack( endOffset ) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
 	if ( endOffset ) {
-		block.innerHTML += document.substr( prevOffset, endOffset - prevOffset );
+		const html = document.substr( prevOffset, endOffset - prevOffset );
+		block.innerHTML += html;
+		block.innerContent.push( html );
 	} else {
-		block.innerHTML += document.substr( prevOffset );
+		const html = document.substr( prevOffset );
+		block.innerHTML += html;
+		block.innerContent.push( html );
 	}
 
 	if ( null !== leadingHtmlStart ) {
