@@ -18,6 +18,7 @@ describe( 'block-serialization-default-parser-php', testParser( ( document ) => 
 		{
 			input: document,
 			encoding: 'utf8',
+			timeout: 30 * 1000, // abort after 30 seconds, that's too long anyway
 		}
 	).stdout
 ) ) );
