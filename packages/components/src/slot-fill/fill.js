@@ -15,19 +15,6 @@ import { Consumer } from './provider';
 
 let occurrences = 0;
 
-const Fill = ( props ) => (
-	<Consumer>
-		{ ( { getSlot, registerFill, unregisterFill } ) => (
-			<FillComponent
-				{ ...props }
-				getSlot={ getSlot }
-				registerFill={ registerFill }
-				unregisterFill={ unregisterFill }
-			/>
-		) }
-	</Consumer>
-);
-
 class FillComponent extends Component {
 	constructor() {
 		super( ...arguments );
@@ -87,5 +74,18 @@ class FillComponent extends Component {
 		return createPortal( children, slot.node );
 	}
 }
+
+const Fill = ( props ) => (
+	<Consumer>
+		{ ( { getSlot, registerFill, unregisterFill } ) => (
+			<FillComponent
+				{ ...props }
+				getSlot={ getSlot }
+				registerFill={ registerFill }
+				unregisterFill={ unregisterFill }
+			/>
+		) }
+	</Consumer>
+);
 
 export default Fill;

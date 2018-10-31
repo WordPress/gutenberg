@@ -24,19 +24,6 @@ import {
  */
 import { Consumer } from './provider';
 
-const Slot = ( props ) => (
-	<Consumer>
-		{ ( { registerSlot, unregisterSlot, getFills } ) => (
-			<SlotComponent
-				{ ...props }
-				registerSlot={ registerSlot }
-				unregisterSlot={ unregisterSlot }
-				getFills={ getFills }
-			/>
-		) }
-	</Consumer>
-);
-
 class SlotComponent extends Component {
 	constructor() {
 		super( ...arguments );
@@ -102,5 +89,18 @@ class SlotComponent extends Component {
 		);
 	}
 }
+
+const Slot = ( props ) => (
+	<Consumer>
+		{ ( { registerSlot, unregisterSlot, getFills } ) => (
+			<SlotComponent
+				{ ...props }
+				registerSlot={ registerSlot }
+				unregisterSlot={ unregisterSlot }
+				getFills={ getFills }
+			/>
+		) }
+	</Consumer>
+);
 
 export default Slot;
