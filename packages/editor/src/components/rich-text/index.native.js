@@ -277,6 +277,7 @@ export class RichText extends Component {
 			style,
 			formattingControls,
 			value,
+			isSelected
 		} = this.props;
 
 		const toolbarControls = FORMATTING_CONTROLS
@@ -292,9 +293,11 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				<BlockFormatControls>
-					<Toolbar controls={ toolbarControls } />
-				</BlockFormatControls>
+				{ isSelected && (
+					<BlockFormatControls>
+						<Toolbar controls={ toolbarControls } />
+					</BlockFormatControls>
+				) }
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
