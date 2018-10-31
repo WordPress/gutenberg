@@ -122,6 +122,11 @@ export const reducer = (
 			const parsed = parse( action.html );
 			return { blocks: parsed, refresh: ! state.refresh, fullparse: true };
 		}
+		case ActionTypes.BLOCK.MERGE: {
+			const index = findBlockIndex( blocks, action.blockOneClientId );
+			blocks.splice( index, 2, action.block );
+			return { blocks: blocks, refresh: ! state.refresh };
+		}
 		default:
 			return state;
 	}

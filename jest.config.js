@@ -1,7 +1,7 @@
 /** @flow
  * @format */
 
-const defaultPlatform = 'android';
+const defaultPlatform = 'ios';
 const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 if ( process.env.TEST_RN_PLATFORM ) {
 	// eslint-disable-next-line no-console
