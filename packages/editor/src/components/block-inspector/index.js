@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+import { ExternalLink, PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 
@@ -37,6 +37,8 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
+	const hasSupportLink = blockType.support && blockType.support.url && blockType.support.label;
+
 	return (
 		<Fragment>
 			<div className="editor-block-inspector__card">
@@ -44,6 +46,21 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 				<div className="editor-block-inspector__card-content">
 					<div className="editor-block-inspector__card-title">{ blockType.title }</div>
 					<div className="editor-block-inspector__card-description">{ blockType.description }</div>
+					{ hasSupportLink && (
+						<div className="editor-block-inspector__card-support">
+							{
+								blockType.support.external ? (
+									<ExternalLink href={ blockType.support.url }>
+										{ blockType.support.label }
+									</ExternalLink>
+								) : (
+									<a href={ blockType.support.url }>
+										{ blockType.support.label }
+									</a>
+								)
+							}
+						</div>
+					) }
 				</div>
 			</div>
 			{ !! blockType.styles && (

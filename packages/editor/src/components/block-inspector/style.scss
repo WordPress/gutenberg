@@ -39,6 +39,11 @@
 	font-size: $default-font-size;
 }
 
+.editor-block-inspector__card-support {
+	font-size: $default-font-size;
+	margin-top: $panel-padding;
+}
+
 .editor-block-inspector__card .editor-block-icon {
 	margin-left: -2px;
 	margin-right: 10px;
@@ -46,4 +51,3 @@
 	width: $icon-button-size;
 	height: $icon-button-size-small;
 }
-
