@@ -34,7 +34,7 @@ export class ServerSideRender extends Component {
 		this.state = {
 			response: null,
 		};
-		this.fetch = debounce( this.fetch, 500 );
+		this.xfetch = debounce( this.fetch, 500 );
 	}
 
 	componentDidMount() {
