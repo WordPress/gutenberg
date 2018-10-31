@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual } from 'lodash';
+import { isEqual, debounce } from 'lodash';
 
 /**
  * WordPress dependencies.
@@ -34,6 +34,7 @@ export class ServerSideRender extends Component {
 		this.state = {
 			response: null,
 		};
+		this.fetch = debounce( this.fetch, 500 );
 	}
 
 	componentDidMount() {
