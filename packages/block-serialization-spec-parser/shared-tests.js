@@ -1,5 +1,3 @@
-import { spawnSync } from 'child_process';
-
 export const jsTester = ( parse ) => () => {
 	describe( 'basic parsing', () => {
 		test( 'parse() works properly', () => {
@@ -65,11 +63,11 @@ export const jsTester = ( parse ) => () => {
 	} );
 };
 
-const hasPHP = ( () => {
-	const process = spawnSync( 'php', [ '-r', 'echo 1;' ], { encoding: 'utf8' } );
+const hasPHP = 'test' === process.env.NODE_ENV ? ( () => {
+	const process = require( 'child_process' ).spawnSync( 'php', [ '-r', 'echo 1;' ], { encoding: 'utf8' } );
 
 	return process.status === 0 && process.stdout === '1';
-} )();
+} )() : false;
 
 // skipping if `php` isn't available to us, such as in local dev without it
 // skipping preserves snapshots while commenting out or simply
@@ -79,7 +77,7 @@ const makeTest = hasPHP ? ( ...args ) => describe( ...args ) : ( ...args ) => de
 
 export const phpTester = ( name, filename ) => makeTest(
 	name,
-	jsTester( ( doc ) => JSON.parse( spawnSync(
+	'test' === process.env.NODE_ENV ? jsTester( ( doc ) => JSON.parse( require( 'child_process' ).spawnSync(
 		'php',
 		[ '-f', filename ],
 		{
@@ -87,5 +85,5 @@ export const phpTester = ( name, filename ) => makeTest(
 			encoding: 'utf8',
 			timeout: 30 * 1000, // abort after 30 seconds, that's too long anyway
 		}
-	).stdout ) )
+	).stdout ) ) : () => {}
 );
