@@ -1,4 +1,6 @@
-export const testParser = ( parse ) => () => {
+import { spawnSync } from 'child_process';
+
+export const jsTester = ( parse ) => () => {
 	describe( 'basic parsing', () => {
 		test( 'parse() works properly', () => {
 			expect( parse( '<!-- wp:core/more --><!--more--><!-- /wp:core/more -->' ) ).toMatchSnapshot();
@@ -62,3 +64,28 @@ export const testParser = ( parse ) => () => {
 		] ) ) );
 	} );
 };
+
+const hasPHP = ( () => {
+	const process = spawnSync( 'php', [ '-r', 'echo 1;' ], { encoding: 'utf8' } );
+
+	return process.status === 0 && process.stdout === '1';
+} )();
+
+// skipping if `php` isn't available to us, such as in local dev without it
+// skipping preserves snapshots while commenting out or simply
+// not injecting the tests prompts `jest` to remove "obsolete snapshots"
+// eslint-disable-next-line jest/no-disabled-tests
+const makeTest = hasPHP ? ( ...args ) => describe( ...args ) : ( ...args ) => describe.skip( ...args );
+
+export const phpTester = ( name, filename ) => makeTest(
+	name,
+	jsTester( ( document ) => JSON.parse( spawnSync(
+		'php',
+		[ '-f', filename ],
+		{
+			input: document,
+			encoding: 'utf8',
+			timeout: 30 * 1000, // abort after 30 seconds, that's too long anyway
+		}
+	).stdout ) )
+);
