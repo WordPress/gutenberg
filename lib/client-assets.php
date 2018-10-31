@@ -976,7 +976,7 @@ function gutenberg_register_vendor_scripts() {
 		'wp-polyfill',
 		'https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill' . $suffix . '.js'
 	);
-	// Ensure backwards compatibility after renaming to wp-polyfill
+	// Ensure backwards compatibility after renaming to wp-polyfill.
 	gutenberg_override_script(
 		'wp-polyfill-ecmascript',
 		null,
