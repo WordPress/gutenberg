@@ -25,4 +25,15 @@ describe( 'HTTP v1 Middleware', () => {
 
 		httpV1Middleware( requestOptions, callback );
 	} );
+
+	it( "shouldn't touch the options for an undefined method", () => {
+		expect.hasAssertions();
+
+		const requestOptions = { path: '/wp/v2/posts' };
+		const callback = ( options ) => {
+			expect( options ).toEqual( requestOptions );
+		};
+
+		httpV1Middleware( requestOptions, callback );
+	} );
 } );
