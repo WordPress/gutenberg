@@ -181,17 +181,17 @@
           },
         peg$c11 = function(s, children, e) {
             /** <?php
-            list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
+            list( $innerHTML, $innerBlocks ) = peg_process_inner_content( $children );
 
             return array(
               'blockName'    => $s['blockName'],
               'attrs'        => $s['attrs'],
               'innerBlocks'  => $innerBlocks,
-              'innerHTML'    => implode( '', $innerHTML ),
+              'innerHTML'    => $innerHTML,
             );
             ?> **/
 
-            var innerContent = partition( function( a ) { return 'string' === typeof a }, children );
+            var innerContent = processInnerContent( children );
             var innerHTML = innerContent[ 0 ];
             var innerBlocks = innerContent[ 1 ];
 
@@ -199,7 +199,7 @@
               blockName: s.blockName,
               attrs: s.attrs,
               innerBlocks: innerBlocks,
-              innerHTML: innerHTML.join( '' )
+              innerHTML: innerHTML
             };
           },
         peg$c12 = "-->",
@@ -1478,18 +1478,21 @@
     // are the same as `json_decode`
 
     // array arguments are backwards because of PHP
-    if ( ! function_exists( 'peg_array_partition' ) ) {
-        function peg_array_partition( $array, $predicate ) {
-            $truthy = array();
-            $falsey = array();
+    if ( ! function_exists( 'peg_process_inner_content' ) ) {
+        function peg_process_inner_content( $array ) {
+            $innerHTML = '';
+            $innerBlocks = array();
 
             foreach ( $array as $item ) {
-                call_user_func( $predicate, $item )
-                    ? $truthy[] = $item
-                    : $falsey[] = $item;
+                if ( is_string( $item ) ) {
+                    $innerHTML .= $item;
+                } else {
+                    $innerHTML .= '<!-- {' . count( $innerBlocks ) . '} -->';
+                    $innerBlocks[] = $item;
+                }
             }
 
-            return array( $truthy, $falsey );
+            return array( $innerHTML, $innerBlocks );
         }
     }
 
@@ -1578,22 +1581,25 @@
         }
     }
 
-    function partition( predicate, list ) {
+    function processInnerContent( list ) {
         var i, l, item;
-        var truthy = [];
-        var falsey = [];
+        var innerHTML = '';
+        var innerBlocks = [];
 
         // nod to performance over a simpler reduce
         // and clone model we could have taken here
         for ( i = 0, l = list.length; i < l; i++ ) {
             item = list[ i ];
 
-            predicate( item )
-                ? truthy.push( item )
-                : falsey.push( item )
-        };
+            if ( 'string' === typeof item ) {
+                innerHTML += item;
+            } else {
+                innerHTML += '<!-- {' + innerBlocks.length + '} -->';
+                innerBlocks.push( item );
+            }
+        }
 
-        return [ truthy, falsey ];
+        return [ innerHTML, innerBlocks ];
     }
 
 

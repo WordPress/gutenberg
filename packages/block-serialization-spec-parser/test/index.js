@@ -1,14 +1,7 @@
 /**
  * Internal dependencies
  */
+import { testParser } from '../shared-tests';
 import { parse } from '../';
 
-describe( 'block-serialization-spec-parser', () => {
-	test( 'parse() works properly', () => {
-		const result = parse(
-			'<!-- wp:core/more --><!--more--><!-- /wp:core/more -->'
-		);
-
-		expect( result ).toMatchSnapshot();
-	} );
-} );
+describe( 'block-serialization-spec-parser', testParser( parse ) );

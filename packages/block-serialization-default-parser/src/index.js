@@ -229,11 +229,10 @@ function addFreeform( rawLength ) {
 
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
-	parent.block.innerBlocks.push( block );
-	parent.block.innerHTML += document.substr(
-		parent.prevOffset,
-		tokenStart - parent.prevOffset,
-	);
+	const parentBlock = parent.block;
+	const nextHTML = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	parentBlock.innerHTML += `${ nextHTML }<!-- {${ parentBlock.innerBlocks.length }} -->`;
+	parentBlock.innerBlocks.push( block );
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 

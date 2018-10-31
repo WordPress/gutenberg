@@ -440,8 +440,9 @@ class WP_Block_Parser {
 	 */
 	function add_inner_block( WP_Block_Parser_Block $block, $token_start, $token_length, $last_offset = null ) {
 		$parent = $this->stack[ count( $this->stack ) - 1 ];
+		$next_html = substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
+		$parent->block->innerHTML .= $next_html . '<!-- {' . count( $parent->block->innerBlocks ) . '} -->';
 		$parent->block->innerBlocks[] = $block;
-		$parent->block->innerHTML .= substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
 		$parent->prev_offset = $last_offset ? $last_offset : $token_start + $token_length;
 	}
 
