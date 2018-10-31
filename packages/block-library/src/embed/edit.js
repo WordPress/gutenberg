@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { isFromWordPress, createUpgradedEmbedBlock, getClassNames } from './util';
-import { EmbedLoading, EmbedControls, EmbedPreview, EmbedEditUrl } from './components';
+import { EmbedLoading, EmbedControls, EmbedPreview, EmbedPlaceholder } from './components';
 
 /**
  * External dependencies
@@ -125,11 +125,12 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		toggleResponsive() {
 			const { allowResponsive, className } = this.props.attributes;
 			const { html } = this.props.preview;
+			const newAllowResponsive = ! allowResponsive;
 
 			this.props.setAttributes(
 				{
-					allowResponsive: ! allowResponsive,
-					className: getClassNames( html, className, responsive && ! allowResponsive ),
+					allowResponsive: newAllowResponsive,
+					className: getClassNames( html, className, responsive && newAllowResponsive ),
 				}
 			);
 		}
@@ -137,7 +138,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		render() {
 			const { url, editingURL } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
-			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, supportsResponsive } = this.props;
+			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, themeSupportsResponsive } = this.props;
 
 			if ( fetching ) {
 				return (
@@ -151,7 +152,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			// No preview, or we can't embed the current URL, or we've clicked the edit button.
 			if ( ! preview || cannotEmbed || editingURL ) {
 				return (
-					<EmbedEditUrl
+					<EmbedPlaceholder
 						icon={ icon }
 						label={ label }
 						onSubmit={ this.setUrl }
@@ -166,7 +167,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 				<Fragment>
 					<EmbedControls
 						showEditButton={ preview && ! cannotEmbed }
-						supportsResponsive={ supportsResponsive }
+						themeSupportsResponsive={ themeSupportsResponsive }
+						blockSupportsResponsive={ responsive }
 						allowResponsive={ allowResponsive }
 						getResponsiveHelp={ this.getResponsiveHelp }
 						toggleResponsive={ this.toggleResponsive }

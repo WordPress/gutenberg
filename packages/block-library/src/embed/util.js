@@ -19,8 +19,8 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Returns true if any of the regular expressions match the URL.
  *
- * @param {string} url The URL to test.
- * @param {Array} patterns The list of regular expressions to test agains.
+ * @param {string}   url      The URL to test.
+ * @param {Array}    patterns The list of regular expressions to test agains.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
 export const matchesPatterns = ( url, patterns = [] ) => {
@@ -33,7 +33,7 @@ export const matchesPatterns = ( url, patterns = [] ) => {
  * Finds the block name that should be used for the URL, based on the
  * structure of the URL.
  *
- * @param {string} url The URL to test.
+ * @param {string}  url The URL to test.
  * @return {string} The name of the block that should be used for this URL, e.g. core-embed/twitter
  */
 export const findBlock = ( url ) => {
@@ -66,8 +66,8 @@ export const getPhotoHtml = ( photo ) => {
  * versions, so we require that these are generated separately.
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
- * @param {Object} props The block's props.
- * @param {Object} attributesFromPreview Attributes generated from the block's most up to date preview.
+ * @param {Object}            props                 The block's props.
+ * @param {Object}            attributesFromPreview Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
 export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
@@ -118,12 +118,27 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
 /**
  * Returns class names with any relevant responsive aspect ratio names.
  *
- * @param {string} html The preview HTML that possibly contains an iframe with width and height set.
- * @param {string} existingClassNames Any existing class names.
- * @param {boolean} allowResponsive If the responsive class names should be added, or removed.
+ * @param {string}  html               The preview HTML that possibly contains an iframe with width and height set.
+ * @param {string}  existingClassNames Any existing class names.
+ * @param {boolean} allowResponsive    If the responsive class names should be added, or removed.
  * @return {string} Deduped class names.
  */
 export function getClassNames( html, existingClassNames = '', allowResponsive = true ) {
+	if ( ! allowResponsive ) {
+		// Remove all of the aspect ratio related class names.
+		const aspectRatioClassNames = {
+			'wp-has-aspect-ratio': false,
+		};
+		for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
+			const aspectRatioToRemove = ASPECT_RATIOS[ ratioIndex ];
+			aspectRatioClassNames[ aspectRatioToRemove.className ] = false;
+		}
+		return classnames(
+			existingClassNames,
+			aspectRatioClassNames
+		);
+	}
+
 	const previewDocument = document.implementation.createHTMLDocument( '' );
 	previewDocument.body.innerHTML = html;
 	const iframe = previewDocument.body.querySelector( 'iframe' );
