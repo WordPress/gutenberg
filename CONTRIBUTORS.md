@@ -12,13 +12,13 @@ This list is manually curated to include valuable contributions by volunteers th
 | @iseulde | @iseulde |
 | @mtias | @mtias |
 | @nylen | @jnylen0 |
-| @EphoxJames | :mag: :tired_face: |
+| @EphoxJames |  |
 | @mkaz | @mkaz |
 | @notnownikki | @notnownikki |
 | @BE-Webdesign | @chopinbach |
-| @njpanderson | :mag: :tired_face: |
-| @mimo84 | :mag: :tired_face: |
-| @intronic | :mag: :tired_face: |
+| @njpanderson |  |
+| @mimo84 |  |
+| @intronic |  |
 | @westonruter | @westonruter |
 | @mcsf | @mcsf |
 | @dmsnell | @dmsnell |
@@ -31,7 +31,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @circlecube | @circlecube |
 | @adamsilverstein | @adamsilverstein |
 | @timmyc | @timmydcrawford |
-| @ephox-mogran | :mag: :tired_face: |
+| @ephox-mogran |  |
 | @nb | @nbachiyski |
 | @JDGrimes | @JDGrimes |
 | @Soean | @Soean |
@@ -47,15 +47,15 @@ This list is manually curated to include valuable contributions by volunteers th
 | @spocke | @spocke |
 | @androb | @androb |
 | @annaephox | @annaharrison |
-| @Afraithe | :mag: :tired_face: |
-| @georgeh | :mag: :tired_face: |
+| @Afraithe |  |
+| @georgeh |  |
 | @m | @matt |
 | @melchoyce | @melchoyce |
 | @pento | @pento |
 | @karmatosed | @karmatosed |
 | @nitrajka | @nitrajka |
-| @sirreal | :mag: :tired_face: |
-| @inhil | :mag: :tired_face: |
+| @sirreal |  |
+| @inhil |  |
 | @georgeolaru | @@babbardel |
 | @martinlugton | @martinlugton |
 | @joyously | @joyously |
@@ -73,17 +73,17 @@ This list is manually curated to include valuable contributions by volunteers th
 | @buzztone | @buzztone |
 | @mathetos | @webdevmattcrom |
 | @GaryJones | @garyj |
-| @jasonagnew | :mag: :tired_face: |
+| @jasonagnew |  |
 | @brickbones | @ieatwebsites |
 | @iamgabrielma | @gma992 |
 | @swissspidy | @swissspidy |
-| @dixitadusara | :mag: :tired_face: |
+| @dixitadusara |  |
 | @ameeker | @ameeker |
 | @StaggerLeee | @stagger-lee |
 | @jblz | @jblz |
 | @nic-bertino | @nicbertino |
 | @rahmon | @rahmohn |
-| @vladanost | :mag: :tired_face: |
+| @vladanost |  |
 | @gziolo | @gziolo |
 | @lancewillett | @lancewillett |
 | @lynneux | @lynneux |
@@ -91,10 +91,10 @@ This list is manually curated to include valuable contributions by volunteers th
 | @fuyuko | @fuyuko |
 | | @msdesign21 |
 | @thrijith | @thrijith |
-| @Cloud887 | :mag: :tired_face: |
+| @Cloud887 |  |
 | @hblackett | @hblackett |
 | @vishalkakadiya | @vishalkakadiya |
-| @c-shultz | :mag: :tired_face: |
+| @c-shultz |  |
 | @nfmohit-wpmudev | @nfmohit |
 | @noisysocks | @noisysocks |
 | @omarreiss | @omarreiss |
