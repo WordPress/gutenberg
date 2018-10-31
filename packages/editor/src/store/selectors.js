@@ -374,24 +374,30 @@ export function isEditedPostSaveable( state ) {
 export function isEditedPostEmpty( state ) {
 	const blocks = getBlocksForSerialization( state );
 
-	// While the condition of truthy content string would be sufficient for
-	// determining emptiness, testing saveable blocks length is a trivial
-	// operation by comparison. Since this function can be called frequently,
-	// optimize for the fast case where saveable blocks are non-empty.
-	if ( ! blocks.length ) {
-		return true;
+	// While the condition of truthy content string is sufficient to determine
+	// emptiness, testing saveable blocks length is a trivial operation. Since
+	// this function can be called frequently, optimize for the fast case as a
+	// condition of the mere existence of blocks. Note that the value of edited
+	// content is used in place of blocks, thus allowed to fall through.
+	if ( blocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
+		// Pierce the abstraction of the serializer in knowing that blocks are
+		// joined with with newlines such that even if every individual block
+		// produces an empty save result, the serialized content is non-empty.
+		if ( blocks.length > 1 ) {
+			return false;
+		}
+
+		// Freeform and unregistered blocks omit comment delimiters in their
+		// output. The freeform block specifically may produce an empty string
+		// to save. In the case of a single freeform block, fall through to the
+		// full serialize. Otherwise, the single block is assumed non-empty by
+		// virtue of its comment delimiters.
+		if ( blocks[ 0 ].name !== getFreeformContentHandlerName() ) {
+			return false;
+		}
 	}
 
-	const freeFormBlockName = getFreeformContentHandlerName();
-
-	if ( ! some( blocks, { name: freeFormBlockName } ) ) {
-		return false;
-	}
-
-	// Content serialization is considered an expensive operation, and should
-	// only be considered after more trivial operations of assuming presence of
-	// non-freeform blocks as implying that serializable content exists.
-	return ! getEditedPostAttribute( state, 'content' );
+	return ! getEditedPostContent( state );
 }
 
 /**
