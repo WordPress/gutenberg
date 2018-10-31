@@ -111,3 +111,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @ajitbohra | |
 | @ChrisVanPatten | |
 | @tofumatt | @lonelyvegan |
+| @LukePettway | @luke_pettway |
