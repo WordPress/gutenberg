@@ -22,7 +22,7 @@ import {
 /**
  * Internal dependencies
  */
-import { Consumer } from './provider';
+import { Consumer } from './context';
 
 class SlotComponent extends Component {
 	constructor() {

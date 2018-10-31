@@ -11,7 +11,7 @@ import { Component, createPortal } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Consumer } from './provider';
+import { Consumer } from './context';
 
 let occurrences = 0;
 

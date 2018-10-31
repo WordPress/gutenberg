@@ -3,7 +3,7 @@
  */
 import Slot from './slot';
 import Fill from './fill';
-import Provider, { Consumer } from './provider';
+import Provider, { Consumer } from './context';
 
 export { Slot };
 export { Fill };

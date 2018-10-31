@@ -9,7 +9,7 @@ import ReactTestRenderer from 'react-test-renderer';
  */
 import Slot from '../slot';
 import Fill from '../fill';
-import Provider from '../provider';
+import Provider from '../context';
 
 /**
  * WordPress Dependencies
