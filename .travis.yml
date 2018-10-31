@@ -81,6 +81,7 @@ jobs:
       script:
         - git clone https://github.com/wordpress-mobile/gutenberg-mobile.git
         - cd ./gutenberg-mobile
+        - git submodule update
         - yarn install
         - ./.travis/travis-checks-js.sh
     - stage: test
@@ -96,6 +97,7 @@ jobs:
       script:
         - git clone https://github.com/wordpress-mobile/gutenberg-mobile.git
         - cd ./gutenberg-mobile
+        - git submodule update
         - yarn install
         - ./.travis/travis-checks-js.sh
     - stage: test
@@ -111,5 +113,6 @@ jobs:
       script:
         - git clone https://github.com/wordpress-mobile/gutenberg-mobile.git
         - cd ./gutenberg-mobile
+        - git submodule update
         - yarn install
         - ./.travis/travis-checks-js.sh
