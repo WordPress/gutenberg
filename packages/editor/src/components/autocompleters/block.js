@@ -23,14 +23,14 @@ function defaultGetBlockInsertionParentClientId() {
 /**
  * Returns the inserter items for the specified parent block.
  *
- * @param {string} parentClientId Client ID of the block for which to retrieve
- *                                inserter items.
+ * @param {string} rootClientId Client ID of the block for which to retrieve
+ *                              inserter items.
  *
  * @return {Array<Editor.InserterItem>} The inserter items for the specified
  *                                      parent.
  */
-function defaultGetInserterItems( parentClientId ) {
-	return select( 'core/editor' ).getInserterItems( parentClientId );
+function defaultGetInserterItems( rootClientId ) {
+	return select( 'core/editor' ).getInserterItems( rootClientId );
 }
 
 /**

@@ -128,12 +128,12 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/editor' );
 		const { clientId } = ownProps;
-		const parentClientId = getBlockRootClientId( clientId );
+		const rootClientId = getBlockRootClientId( clientId );
 		return {
 			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
 			block: getBlock( clientId ),
 			blockListSettings: getBlockListSettings( clientId ),
-			parentLock: getTemplateLock( parentClientId ),
+			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
