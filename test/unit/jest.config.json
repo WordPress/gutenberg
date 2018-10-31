@@ -6,8 +6,7 @@
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/",
 		"<rootDir>/packages/.*/benchmark/",
-		"<rootDir>/packages/.*/test/",
-		"<rootDir>/gutenberg-mobile/"
+		"<rootDir>/packages/.*/test/"
 	],
 	"moduleNameMapper": {
 		"@wordpress\\/(block-serialization-spec-parser|is-shallow-equal)$": "packages/$1",
@@ -23,8 +22,5 @@
 		"/test/e2e",
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/"
-	],
-	"modulePathIgnorePatterns": [
-		"<rootDir>/gutenberg-mobile/"
 	]
 }
