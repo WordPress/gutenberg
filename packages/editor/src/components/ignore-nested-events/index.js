@@ -22,7 +22,7 @@ import { Component, forwardRef } from '@wordpress/element';
  *
  * @type {Component}
  */
-class IgnoreNestedEvents extends Component {
+export class IgnoreNestedEvents extends Component {
 	constructor() {
 		super( ...arguments );
 
