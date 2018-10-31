@@ -79,7 +79,7 @@ export const jsTester = ( parse ) => () => {
 			expect( parse( '<!-- wp:block --><!-- wp:void /-->After<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerContent', [ null, 'After' ] );
 		} );
 
-		test( 'HTML soup apepars before blocks', () => {
+		test( 'HTML soup appears before blocks', () => {
 			expect( parse( '<!-- wp:block -->Before<!-- wp:void /--><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerContent', [ 'Before', null ] );
 		} );
 
