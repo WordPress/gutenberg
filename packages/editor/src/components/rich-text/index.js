@@ -769,6 +769,18 @@ export class RichText extends Component {
 			this.applyRecord( record );
 			this.savedContent = value;
 		}
+
+		// If blocks are merged, but the content remains the same, e.g. merging
+		// an empty paragraph into another, then also set the selection to the
+		// end.
+		if ( isSelected && ! prevProps.isSelected && ! this.isActive() ) {
+			const record = this.formatToValue( value );
+			const prevRecord = this.formatToValue( prevProps.value );
+			const length = getTextContent( prevRecord ).length;
+			record.start = length;
+			record.end = length;
+			this.applyRecord( record );
+		}
 	}
 
 	formatToValue( value ) {
