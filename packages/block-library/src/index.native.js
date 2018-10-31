@@ -14,6 +14,7 @@ import * as more from './more';
 import * as paragraph from './paragraph';
 import * as image from './image';
 import * as nextpage from './nextpage';
+import * as quote from './quote';
 
 export const registerCoreBlocks = () => {
 	[
@@ -23,6 +24,7 @@ export const registerCoreBlocks = () => {
 		more,
 		image,
 		nextpage,
+		quote,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );
