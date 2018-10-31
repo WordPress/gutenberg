@@ -11,7 +11,14 @@ const FormatToolbar = ( { controls } ) => {
 				{ controls.map( ( format ) =>
 					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
 				) }
-				<Slot name="RichText.ToolbarControls" />
+				<Slot name="RichText.ToolbarControls">
+					{ ( fills ) =>
+						<Toolbar
+							isCollapsed
+							controls={ fills.map( ( fill ) => fill[ 0 ].props ) }
+						/>
+					}
+				</Slot>
 			</Toolbar>
 		</div>
 	);
