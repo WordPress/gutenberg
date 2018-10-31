@@ -20,7 +20,7 @@ import Dashicon from '../dashicon';
 // is common to apply a ref to the button element (only supported in class)
 class IconButton extends Component {
 	render() {
-		const { icon, children, label, className, tooltip, shortcut, ...additionalProps } = this.props;
+		const { icon, children, label, className, tooltip, shortcut, labelPosition, ...additionalProps } = this.props;
 		const classes = classnames( 'components-icon-button', className );
 		const tooltipText = tooltip || label;
 
@@ -49,7 +49,7 @@ class IconButton extends Component {
 
 		if ( showTooltip ) {
 			element = (
-				<Tooltip text={ tooltipText } shortcut={ shortcut }>
+				<Tooltip text={ tooltipText } shortcut={ shortcut } position={ labelPosition }>
 					{ element }
 				</Tooltip>
 			);
