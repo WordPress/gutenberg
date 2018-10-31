@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, isFunction } from 'lodash';
+import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +39,7 @@ class FillComponent extends Component {
 	}
 
 	componentWillUnmount() {
-		const { unregisterFill = noop } = this.props;
+		const { unregisterFill } = this.props;
 
 		unregisterFill( this.props.name, this );
 	}
