@@ -1,14 +1,24 @@
 /**
+ * External dependencies
+ */
+import path from 'path';
+import { spawnSync } from 'child_process';
+
+/**
  * Internal dependencies
  */
+import { testParser } from '../shared-tests';
 import { parse } from '../';
 
-describe( 'block-serialization-spec-parser', () => {
-	test( 'parse() works properly', () => {
-		const result = parse(
-			'<!-- wp:core/more --><!--more--><!-- /wp:core/more -->'
-		);
+describe( 'block-serialization-spec-parser', testParser( parse ) );
 
-		expect( result ).toMatchSnapshot();
-	} );
-} );
+describe( 'block-serialization-spec-parser-php', testParser( ( document ) => JSON.parse(
+	spawnSync(
+		'php',
+		[ '-f', path.join( __dirname, 'test-parser.php' ) ],
+		{
+			input: document,
+			encoding: 'utf8',
+		}
+	).stdout
+) ) );
