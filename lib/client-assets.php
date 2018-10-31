@@ -909,7 +909,7 @@ function gutenberg_preload_api_request( $memo, $path ) {
 	}
 
 	$method = 'GET';
-	if ( is_array( $path ) ) {
+	if ( is_array( $path ) && 2 === count( $path ) ) {
 		$method = end( $path );
 		$path   = reset( $path );
 
