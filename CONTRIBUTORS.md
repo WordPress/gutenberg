@@ -6,96 +6,96 @@ This list is manually curated to include valuable contributions by volunteers th
 
 | GitHub Username | WordPress.org Username|
 | --------------- | --------------------- |
-| @youknowriad | |
-| @aduth | |
-| @jasmussen | |
-| @iseulde | |
-| @mtias | |
-| @nylen | |
-| @EphoxJames | |
-| @mkaz | |
-| @notnownikki | |
-| @BE-Webdesign | |
-| @njpanderson | |
-| @mimo84 | |
-| @intronic | |
-| @westonruter | |
-| @mcsf | |
-| @dmsnell | |
-| @afercia | |
-| @paulwilde | |
-| @mitogh | |
-| @codebykat | |
+| @youknowriad | @youknowriad |
+| @aduth | @aduth |
+| @jasmussen | @joen |
+| @iseulde | @iseulde |
+| @mtias | @mtias |
+| @nylen | @jnylen0 |
+| @EphoxJames | :mag: :tired_face: |
+| @mkaz | @mkaz |
+| @notnownikki | @notnownikki |
+| @BE-Webdesign | @chopinbach |
+| @njpanderson | :mag: :tired_face: |
+| @mimo84 | :mag: :tired_face: |
+| @intronic | :mag: :tired_face: |
+| @westonruter | @westonruter |
+| @mcsf | @mcsf |
+| @dmsnell | @dmsnell |
+| @afercia | @afercia |
+| @paulwilde | @paulwilde |
+| @mitogh | @mitogh |
+| @codebykat | @codebykat |
 | @ahmadawais | @mrahmadawais |
-| @kopepasah | |
-| @circlecube | |
-| @adamsilverstein | |
-| @timmyc | |
-| @ephox-mogran | |
-| @nb | |
-| @JDGrimes | |
-| @Soean | |
-| @mapk | |
-| @sirjonathan | |
-| @j-falk | |
-| @ryelle | |
+| @kopepasah | @kopepasah |
+| @circlecube | @circlecube |
+| @adamsilverstein | @adamsilverstein |
+| @timmyc | @timmydcrawford |
+| @ephox-mogran | :mag: :tired_face: |
+| @nb | @nbachiyski |
+| @JDGrimes | @JDGrimes |
+| @Soean | @Soean |
+| @mapk | @mapk |
+| @sirjonathan | @sirjonathan |
+| @j-falk | @j-falk |
+| @ryelle | @ryelle |
 | @ntwb | @netweb |
-| @lamosty | |
-| @willybahuaud | |
-| @maurobringolf | |
+| @lamosty | @lamosty |
+| @willybahuaud | @willybahuaud |
+| @maurobringolf | @maurobringolf |
 | @aaronjorbin | @jorbin |
-| @spocke | |
-| @androb | |
-| @annaephox | |
-| @Afraithe | |
-| @georgeh | |
-| @m | |
-| @melchoyce | |
-| @pento | |
-| @karmatosed | |
-| @nitrajka | |
-| @sirreal | |
-| @inhil | |
-| @georgeolaru | |
-| @martinlugton | |
-| @joyously | |
-| @rileybrook | |
-| @azaozz | |
-| @folletto | |
-| @ianstewart | |
-| @johnpixle | |
-| @mrwweb | |
-| @diegoliv | |
-| @lukecav | |
-| @shaunandrews | |
-| @hugobaeta | |
-| @mizejewski | |
-| @buzztone | |
-| @mathetos | |
-| @GaryJones | |
-| @jasonagnew | |
-| @brickbones | |
-| @iamgabrielma | |
-| @swissspidy | |
-| @dixitadusara | |
-| @ameeker | |
-| @StaggerLeee | |
-| @jblz | |
+| @spocke | @spocke |
+| @androb | @androb |
+| @annaephox | :mag: :tired_face: |
+| @Afraithe | :mag: :tired_face: |
+| @georgeh | :mag: :tired_face: |
+| @m | @matt |
+| @melchoyce | @melchoyce |
+| @pento | @pento |
+| @karmatosed | @karmatosed |
+| @nitrajka | @nitrajka |
+| @sirreal | :mag: :tired_face: |
+| @inhil | :mag: :tired_face: |
+| @georgeolaru | @@babbardel |
+| @martinlugton | @martinlugton |
+| @joyously | @joyously |
+| @rileybrook | @rileybrook |
+| @azaozz | @azaozz |
+| @folletto | @folletto |
+| @ianstewart | @iandstewart |
+| @johnpixle | @johnpixle |
+| @mrwweb | @mrwweb |
+| @diegoliv | @diegoliv |
+| @lukecav | @lukecavanagh |
+| @shaunandrews | @shaunandrews |
+| @hugobaeta | @hugobaeta |
+| @mizejewski | @mizejewski |
+| @buzztone | @buzztone |
+| @mathetos | @webdevmattcrom |
+| @GaryJones | @garyj |
+| @jasonagnew | :mag: :tired_face: |
+| @brickbones | @ieatwebsites |
+| @iamgabrielma | @gma992 |
+| @swissspidy | @swissspidy |
+| @dixitadusara | :mag: :tired_face: |
+| @ameeker | @ameeker |
+| @StaggerLeee | :mag: :tired_face: |
+| @jblz | @jblz |
 | @nic-bertino | @nicbertino |
 | @rahmon | @rahmohn |
-| @vladanost | |
+| @vladanost | :mag: :tired_face: |
 | @gziolo | @gziolo |
-| @lancewillett
-| | @lynneux
-| | @betsela
-| | @fuyuko
-| | @msdesign21
-| @thrijith |
-| @Cloud887 |
-| @hblackett |
-| @vishalkakadiya |
-| @c-shultz |
-| @nfmohit-wpmudev |
+| @lancewillett | @lancewillett |
+| @lynneux | @lynneux |
+| @betsela | @betsela |
+| @fuyuko | @fuyuko |
+| | @msdesign21 |
+| @thrijith | @thrijith |
+| @Cloud887 | :mag: :tired_face: |
+| @hblackett | @hblackett |
+| @vishalkakadiya | @vishalkakadiya |
+| @c-shultz | :mag: :tired_face: |
+| @nfmohit-wpmudev | @nfmohit |
 | @noisysocks | @noisysocks |
 | @omarreiss | @omarreiss |
 | @hedgefield | @hedgefield |
@@ -106,9 +106,9 @@ This list is manually curated to include valuable contributions by volunteers th
 | @burhandodhy | @burhandodhy |
 | @ZebulanStanphill | @zebulan |
 | @BenjaminZekavica | @benjamin_zekavica |
-| @danielbachhuber | |
-| @jorgefilipecosta | |
-| @ajitbohra | |
-| @ChrisVanPatten | |
+| @danielbachhuber | @danielbachhuber |
+| @jorgefilipecosta | @jorgefilipecosta |
+| @ajitbohra | @ajitbohra |
+| @ChrisVanPatten | @chrisvanpatten |
 | @tofumatt | @lonelyvegan |
 | @LukePettway | @luke_pettway |
