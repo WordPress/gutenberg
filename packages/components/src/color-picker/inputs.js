@@ -174,10 +174,11 @@ export class Inputs extends Component {
 				<fieldset>
 					<legend className="screen-reader-text">
 						{ __( 'Color value in RGB' ) }
+						<abbr title={ __( 'Red Green Blue' ) }>RGB</abbr>
 					</legend>
 					<div className="components-color-picker__inputs-fields">
 						<Input
-							label="r"
+							label={ __( 'Red' ) }
 							valueKey="r"
 							value={ this.props.rgb.r }
 							onChange={ this.handleChange }
@@ -186,7 +187,7 @@ export class Inputs extends Component {
 							max="255"
 						/>
 						<Input
-							label="g"
+							label={ __( 'Green' ) }
 							valueKey="g"
 							value={ this.props.rgb.g }
 							onChange={ this.handleChange }
@@ -195,7 +196,7 @@ export class Inputs extends Component {
 							max="255"
 						/>
 						<Input
-							label="b"
+							label={ __( 'Blue' ) }
 							valueKey="b"
 							value={ this.props.rgb.b }
 							onChange={ this.handleChange }
@@ -205,7 +206,7 @@ export class Inputs extends Component {
 						/>
 						{ disableAlpha ? null : (
 							<Input
-								label="a"
+								label={ __( 'Alpha' ) }
 								valueKey="a"
 								value={ this.props.rgb.a }
 								onChange={ this.handleChange }
@@ -222,11 +223,12 @@ export class Inputs extends Component {
 			return (
 				<fieldset>
 					<legend className="screen-reader-text">
-						{ __( 'Color value in HSL' ) }
+						{ __( 'Color value in' ) }
+						<abbr title={ 'Hue Saturation Lightness' }>{ __( 'HSL' ) }</abbr>
 					</legend>
 					<div className="components-color-picker__inputs-fields">
 						<Input
-							label="h"
+							label={ __( 'Hue' ) }
 							valueKey="h"
 							value={ this.props.hsl.h }
 							onChange={ this.handleChange }
@@ -235,7 +237,7 @@ export class Inputs extends Component {
 							max="359"
 						/>
 						<Input
-							label="s"
+							label={ __( 'Saturation' ) }
 							valueKey="s"
 							value={ this.props.hsl.s }
 							onChange={ this.handleChange }
@@ -244,7 +246,7 @@ export class Inputs extends Component {
 							max="100"
 						/>
 						<Input
-							label="l"
+							label={ __( 'Lightness' ) }
 							valueKey="l"
 							value={ this.props.hsl.l }
 							onChange={ this.handleChange }
@@ -254,7 +256,7 @@ export class Inputs extends Component {
 						/>
 						{ disableAlpha ? null : (
 							<Input
-								label="a"
+								label={ __( 'Alpha' ) }
 								valueKey="a"
 								value={ this.props.hsl.a }
 								onChange={ this.handleChange }
