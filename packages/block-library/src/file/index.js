@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes, every } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -77,8 +77,8 @@ export const settings = {
 		from: [
 			{
 				type: 'files',
-				isMatch: ( files ) => {
-					return every( files, ( file ) => file.type.indexOf( 'image/' ) !== 0 && file.type.indexOf( 'audio/' ) !== 0 && file.type.indexOf( 'video/' ) !== 0 );
+				isMatch( files ) {
+					return files.length > 0;
 				},
 				// We define a lower priorty (higher number) than the default of 10. This
 				// ensures that the File block is only created as a fallback.
@@ -88,6 +88,8 @@ export const settings = {
 
 					files.map( ( file ) => {
 						const blobURL = createBlobURL( file );
+
+						// File will be uploaded in componentDidMount()
 						blocks.push( createBlock( 'core/file', {
 							href: blobURL,
 							fileName: file.name,
