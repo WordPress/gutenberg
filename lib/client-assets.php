@@ -149,7 +149,6 @@ function gutenberg_register_scripts_and_styles() {
 		'data',
 		gutenberg_get_script_polyfill(
 			array(
-				'false'               => 'wp-polyfill-ecmascript',
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
 				'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata',
