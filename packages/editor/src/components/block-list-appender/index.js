@@ -28,7 +28,7 @@ function BlockListAppender( {
 		return null;
 	}
 
-	if ( canInsertDefaultBlock ) {
+	if ( ! blockClientIds.length && canInsertDefaultBlock ) {
 		return (
 			<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
 				<DefaultBlockAppender
