@@ -38,6 +38,7 @@ const {
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
+	getReferenceByDistinctEdits,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -593,6 +594,21 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
+		} );
+	} );
+
+	describe( 'getReferenceByDistinctEdits', () => {
+		it( 'should return referentially equal values across unchanging state', () => {
+			const state = { editor: {} };
+
+			expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
+		} );
+
+		it( 'should return referentially unequal values across changing state', () => {
+			const beforeState = { editor: {} };
+			const afterState = { editor: {} };
+
+			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
 		} );
 	} );
 
