@@ -445,8 +445,13 @@ class WP_Block_Parser {
 		$parent = $this->stack[ count( $this->stack ) - 1 ];
 		$parent->block->innerBlocks[] = $block;
 		$html = substr( $this->document, $parent->prev_offset, $token_start - $parent->prev_offset );
-		$parent->block->innerHTML .= $html;
-		$parent->block->innerContent[] = $html;
+
+		if ( ! empty( $html ) ) {
+			$parent->block->innerHTML .= $html;
+			$parent->block->innerContent[] = $html;
+		}
+
+		$parent->block->innerContent[] = null;
 		$parent->prev_offset = $last_offset ? $last_offset : $token_start + $token_length;
 	}
 
@@ -465,8 +470,10 @@ class WP_Block_Parser {
 			? substr( $this->document, $prev_offset, $end_offset - $prev_offset )
 			: substr( $this->document, $prev_offset );
 
-		$stack_top->block->innerHTML .= $html;
-		$stack_top->block->innerContent[] = $html;
+		if ( ! empty( $html ) ) {
+			$stack_top->block->innerHTML .= $html;
+			$stack_top->block->innerContent[] = $html;
+		}
 
 		if ( isset( $stack_top->leading_html_start ) ) {
 			$this->output[] = (array) self::freeform( substr(

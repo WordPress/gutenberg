@@ -259,21 +259,22 @@ class Gutenberg_PEG_Parser {
     private function peg_f2($blockName, $a) { return $a; }
     private function peg_f3($blockName, $attrs) {
         return array(
-          'blockName'   => $blockName,
-          'attrs'       => isset( $attrs ) ? $attrs : array(),
-          'innerBlocks' => array(),
-          'innerHTML'   => '',
+          'blockName'    => $blockName,
+          'attrs'        => isset( $attrs ) ? $attrs : array(),
+          'innerBlocks'  => array(),
+          'innerHTML'    => '',
+          'innerContent' => array(),
         );
         }
     private function peg_f4($s, $children, $e) {
-        list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
+        list( $innerHTML, $innerBlocks, $innerContent ) = peg_process_inner_content( $children );
 
         return array(
           'blockName'    => $s['blockName'],
           'attrs'        => $s['attrs'],
           'innerBlocks'  => $innerBlocks,
-          'innerHTML'    => implode( '', $innerHTML ),
-          'innerContent' => array_filter( $children, 'is_string' ),
+          'innerHTML'    => $innerHTML,
+          'innerContent' => $innerContent,
         );
         }
     private function peg_f5($blockName, $attrs) {
@@ -1582,18 +1583,23 @@ class Gutenberg_PEG_Parser {
     // are the same as `json_decode`
 
     // array arguments are backwards because of PHP
-    if ( ! function_exists( 'peg_array_partition' ) ) {
-        function peg_array_partition( $array, $predicate ) {
-            $truthy = array();
-            $falsey = array();
+    if ( ! function_exists( 'peg_process_inner_content' ) ) {
+        function peg_process_inner_content( $array ) {
+            $html = '';
+            $blocks = array();
+            $content = array();
 
             foreach ( $array as $item ) {
-                call_user_func( $predicate, $item )
-                    ? $truthy[] = $item
-                    : $falsey[] = $item;
+                if ( is_string( $item ) ) {
+                    $html .= $item;
+                    $content[] = $item;
+                } else {
+                    $blocks[] = $item;
+                    $content[] = null;
+                }
             }
 
-            return array( $truthy, $falsey );
+            return array( $html, $blocks, $content );
         }
     }
 

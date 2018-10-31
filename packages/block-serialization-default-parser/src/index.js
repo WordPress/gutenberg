@@ -85,14 +85,14 @@ function proceed() {
 				if ( null !== leadingHtmlStart ) {
 					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
 				}
-				output.push( Block( blockName, attrs, [], '' ) );
+				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner block
 			addInnerBlock(
-				Block( blockName, attrs, [], '' ),
+				Block( blockName, attrs, [], '', [] ),
 				startOffset,
 				tokenLength,
 			);
@@ -103,7 +103,7 @@ function proceed() {
 			// track all newly-opened blocks on the stack
 			stack.push(
 				Frame(
-					Block( blockName, attrs, [], '' ),
+					Block( blockName, attrs, [], '', [] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -231,21 +231,23 @@ function addFreeform( rawLength ) {
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
-	const leadingHTML = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
-	parent.block.innerHTML += leadingHTML;
-	parent.block.innerContent.push( leadingHTML );
+	const html = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+
+	if ( html ) {
+		parent.block.innerHTML += html;
+		parent.block.innerContent.push( html );
+	}
+
+	parent.block.innerContent.push( null );
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
 function addBlockFromStack( endOffset ) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
-	if ( endOffset ) {
-		const html = document.substr( prevOffset, endOffset - prevOffset );
-		block.innerHTML += html;
-		block.innerContent.push( html );
-	} else {
-		const html = document.substr( prevOffset );
+	const html = endOffset ? document.substr( prevOffset, endOffset - prevOffset ) : document.substr( prevOffset );
+
+	if ( html ) {
 		block.innerHTML += html;
 		block.innerContent.push( html );
 	}
