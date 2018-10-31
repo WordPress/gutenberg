@@ -79,11 +79,11 @@ const makeTest = hasPHP ? ( ...args ) => describe( ...args ) : ( ...args ) => de
 
 export const phpTester = ( name, filename ) => makeTest(
 	name,
-	jsTester( ( document ) => JSON.parse( spawnSync(
+	jsTester( ( doc ) => JSON.parse( spawnSync(
 		'php',
 		[ '-f', filename ],
 		{
-			input: document,
+			input: doc,
 			encoding: 'utf8',
 			timeout: 30 * 1000, // abort after 30 seconds, that's too long anyway
 		}
