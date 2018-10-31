@@ -63,9 +63,19 @@
 
 @include editor-left(".edit-post-header");
 
-.edit-post-header__settings {
+.edit-post-header__settings,
+.edit-post-header__settings-button-wrapper {
 	display: inline-flex;
 	align-items: center;
+}
+
+.edit-post-header__settings-button-wrapper {
+	position: relative;
+}
+
+.edit-post-header__settings-button-tip {
+	left: -17px;
+	position: absolute;
 }
 
 .edit-post-header .components-button {

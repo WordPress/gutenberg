@@ -16,6 +16,7 @@ exports[`PostPreviewButton render() should render currentPostLink otherwise 1`] 
     (opens in a new tab)
   </span>
   <WithSelect(WithDispatch(DotTip))
+    className="editor-post-preview__tip"
     tipId="core/editor.preview"
   >
     Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.
@@ -39,6 +40,7 @@ exports[`PostPreviewButton render() should render previewLink if provided 1`] = 
     (opens in a new tab)
   </span>
   <WithSelect(WithDispatch(DotTip))
+    className="editor-post-preview__tip"
     tipId="core/editor.preview"
   >
     Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.

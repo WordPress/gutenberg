@@ -40,6 +40,15 @@
 	padding: 16px;
 }
 
+.editor-post-publish-panel__toggle {
+	position: relative;
+}
+
+.editor-post-publish-panel__toggle-tip {
+	left: -17px;
+	position: absolute;
+}
+
 .components-button.editor-post-publish-panel__toggle.is-primary {
 	display: inline-flex;
 	align-items: center;

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import { noop } from 'lodash';
 
 /**
  * Internal dependencies
@@ -21,19 +20,43 @@ describe( 'DotTip', () => {
 		expect( wrapper.isEmptyRender() ).toBe( true );
 	} );
 
-	it( 'should render correctly', () => {
+	it( 'should render the tip when non-collapsible', () => {
 		const wrapper = shallow(
-			<DotTip isVisible setTimeout={ noop }>
+			<DotTip isVisible>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
+	it( 'should render a button when collapsible', () => {
+		const wrapper = shallow(
+			<DotTip isCollapsible isVisible>
+				It looks like you’re writing a letter. Would you like help?
+			</DotTip>
+		);
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
+	it( 'should render the tip after being clicked when collapsible', () => {
+		const wrapper = shallow(
+			<DotTip isCollapsible isVisible>
+				It looks like you’re writing a letter. Would you like help?
+			</DotTip>
+		);
+
+		const stopPropagation = jest.fn();
+		wrapper.simulate( 'click', { stopPropagation } );
+		wrapper.update();
+
+		expect( wrapper ).toMatchSnapshot();
+		expect( stopPropagation ).toHaveBeenCalled();
+	} );
+
 	it( 'should call onDismiss when the dismiss button is clicked', () => {
 		const onDismiss = jest.fn();
 		const wrapper = shallow(
-			<DotTip isVisible onDismiss={ onDismiss } setTimeout={ noop }>
+			<DotTip isVisible onDismiss={ onDismiss }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
@@ -44,7 +67,7 @@ describe( 'DotTip', () => {
 	it( 'should call onDisable when the X button is clicked', () => {
 		const onDisable = jest.fn();
 		const wrapper = shallow(
-			<DotTip isVisible onDisable={ onDisable } setTimeout={ noop }>
+			<DotTip isVisible onDisable={ onDisable }>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
