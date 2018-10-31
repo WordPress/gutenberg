@@ -43,7 +43,8 @@
     "regenerator-runtime": "^0.12.1",
     "remote-redux-devtools": "^0.5.12",
     "rungen": "^0.3.2",
-    "sprintf-js": "^1.1.1"
+    "sprintf-js": "^1.1.1",
+    "turbo-combine-reducers": "^1.0.2"
   },
   "scripts": {
     "start": "yarn react-native start",
