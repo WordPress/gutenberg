@@ -36,6 +36,10 @@ function apiFetch( options ) {
 			headers[ 'Content-Type' ] = 'application/json';
 		}
 
+		if ( ! headers.Accept ) {
+			headers.Accept = 'application/json';
+		}
+
 		const responsePromise = window.fetch(
 			url || path,
 			{
