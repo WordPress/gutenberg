@@ -46,7 +46,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @aaronjorbin | @jorbin |
 | @spocke | @spocke |
 | @androb | @androb |
-| @annaephox | :mag: :tired_face: |
+| @annaephox | @annaharrison |
 | @Afraithe | :mag: :tired_face: |
 | @georgeh | :mag: :tired_face: |
 | @m | @matt |
