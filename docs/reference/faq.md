@@ -219,8 +219,8 @@ This is the canonical list of keyboard shortcuts:
 		</tr>
 		<tr>
 			<td>Remove a link.</td>
-			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>S</kbd></td>
-			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>S</kbd></td>
+			<td><kbd>Shift</kbd>+<kbd>Alt</kbd>+<kbd>K</kbd></td>
+			<td><kbd>⌃</kbd><kbd>⌥</kbd><kbd>K</kbd></td>
 		</tr>
 		<tr>
 			<td>Add a strikethrough to the selected text.</td>
