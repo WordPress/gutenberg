@@ -4,6 +4,7 @@ exports[`block-serialization-spec-parser-js basic parsing parse() works properly
 Array [
   Object {
     "attrs": Object {},
+    "blockMarkers": Array [],
     "blockName": "core/more",
     "innerBlocks": Array [],
     "innerHTML": "<!--more-->",
@@ -15,6 +16,7 @@ exports[`block-serialization-spec-parser-php basic parsing parse() works properl
 Array [
   Object {
     "attrs": Array [],
+    "blockMarkers": Array [],
     "blockName": "core/more",
     "innerBlocks": Array [],
     "innerHTML": "<!--more-->",

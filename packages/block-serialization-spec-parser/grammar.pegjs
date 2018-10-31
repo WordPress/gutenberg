@@ -51,18 +51,31 @@
 // are the same as `json_decode`
 
 // array arguments are backwards because of PHP
-if ( ! function_exists( 'peg_array_partition' ) ) {
-    function peg_array_partition( $array, $predicate ) {
-        $truthy = array();
-        $falsey = array();
+if ( ! function_exists( 'peg_split_inner_content' ) ) {
+    function peg_split_inner_content( $array ) {
+        $strings  = array();
+        $blocks   = array();
+        $markers  = array();
+        $offset   = 0;
+        $string   = '';
 
         foreach ( $array as $item ) {
-            call_user_func( $predicate, $item )
-                ? $truthy[] = $item
-                : $falsey[] = $item;
+            if ( is_string( $item ) ) {
+                $string .= $item;
+            } else {
+                $offset   += strlen( $string );
+                $strings[] = $string;
+                $markers[] = $offset;
+                $blocks[]  = $item;
+                $string    = '';
+            }
         }
 
-        return array( $truthy, $falsey );
+        if ( $string !== '' ) {
+            $strings[] = $string;
+        }
+
+        return array( $strings, $blocks, $markers );
     }
 }
 
@@ -72,10 +85,10 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
         if ( ! empty( $pre ) ) {
             $blocks[] = array(
-                'blockName' => null,
-                'attrs' => array(),
+                'blockName'   => null,
+                'attrs'       => array(),
                 'innerBlocks' => array(),
-                'innerHTML' => $pre
+                'innerHTML'   => $pre
             );
         }
 
@@ -86,20 +99,20 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
             if ( ! empty( $html ) ) {
                 $blocks[] = array(
-                    'blockName' => null,
-                    'attrs' => array(),
+                    'blockName'   => null,
+                    'attrs'       => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $html
+                    'innerHTML'   => $html
                 );
             }
         }
 
         if ( ! empty( $post ) ) {
             $blocks[] = array(
-                'blockName' => null,
-                'attrs' => array(),
+                'blockName'   => null,
+                'attrs'       => array(),
                 'innerBlocks' => array(),
-                'innerHTML' => $post
+                'innerHTML'   => $post
             );
         }
 
@@ -151,22 +164,86 @@ function maybeJSON( s ) {
     }
 }
 
-function partition( predicate, list ) {
+/**
+ * Returns bytes required to represent given string in UTF8
+ *
+ * Assumes input is encoded in UCS2 or UTF16 according to the ECMAScript spec
+ * @see: https://www.ecma-international.org/ecma-262/9.0/index.html#sec-ecmascript-language-types-string-type
+ *
+ * Transparently counts bytes for invalid encodings:
+ * e.g. unpaired surrogate pair characters count as three bytes
+ *
+ * @cite: https://stackoverflow.com/a/34920444
+ *
+ * @param {string} s input string
+ * @return {number} how many bytes are in the UTF8 representation of the given string
+ */
+function utf8bytes( s ) {
+    var i, l, n = 0;
+
+    for ( i = 0, l = s.length; i < l; i++ ) {
+        var lo, hi = s.charCodeAt( i );
+
+        if ( hi < 0x0080) { // [0x0000, 0x007F]
+            n += 1;
+        } else if ( hi < 0x0800 ) { // [0x0080, 0x07FF]
+            n += 2;
+        } else if ( hi < 0xD800 ) { // [0x0800, 0xD7FF]
+            n += 3;
+        } else if ( hi < 0xDC00 ) { // [0xD800, 0xDBFF]
+            lo = s.charCodeAt( ++i );
+
+            if ( i < l && lo >= 0xDC00 && lo <= 0xDFFF ) { //followed by [0xDC00, 0xDFFF]
+                n += 4;
+            } else {
+                // this is an invalid string with an unpaired surrogate.
+                // transparently pass it through for byte counts
+                // and back up to restart processing at the next character.
+                n += 3;
+                i -= 1;
+            }
+        } else if ( hi < 0xE000 ) { //[0xDC00, 0xDFFF]
+            // these are invalid encodings in the Unicode standard
+            // because they are reserved for encoding surrogate pairs.
+            // transparently pass them through here for byte counts.
+            n += 3;
+        } else { // [0xE000, 0xFFFF]
+            n += 3;
+        }
+    }
+
+    return n;
+}
+
+function splitInnerContent( list ) {
     var i, l, item;
-    var truthy = [];
-    var falsey = [];
+    var strings = [];
+    var blocks = [];
+    var markers = [];
+    var offset = 0;
+    var string = '';
 
     // nod to performance over a simpler reduce
     // and clone model we could have taken here
     for ( i = 0, l = list.length; i < l; i++ ) {
         item = list[ i ];
 
-        predicate( item )
-            ? truthy.push( item )
-            : falsey.push( item )
+        if ( 'string' === typeof item ) {
+            string += item;
+        } else {
+            offset += utf8bytes( string );
+            strings.push( string );
+            markers.push( offset );
+            blocks.push( item );
+            string = '';
+        }
     };
 
-    return [ truthy, falsey ];
+    if ( string !== '' ) {
+        strings.push( string );
+    }
+
+    return [ strings, blocks, markers ];
 }
 
 }
@@ -197,10 +274,11 @@ Block_Void
   {
     /** <?php
     return array(
-      'blockName'   => $blockName,
-      'attrs'       => isset( $attrs ) ? $attrs : array(),
-      'innerBlocks' => array(),
-      'innerHTML'   => '',
+      'blockName'    => $blockName,
+      'attrs'        => isset( $attrs ) ? $attrs : array(),
+      'innerBlocks'  => array(),
+      'innerHTML'    => '',
+      'blockMarkers' => array(),
     );
     ?> **/
 
@@ -208,7 +286,8 @@ Block_Void
       blockName: blockName,
       attrs: attrs || {},
       innerBlocks: [],
-      innerHTML: ''
+      innerHTML: '',
+      blockMarkers: [],
     };
   }
 
@@ -216,25 +295,28 @@ Block_Balanced
   = s:Block_Start children:(Block / $(!Block_End .))* e:Block_End
   {
     /** <?php
-    list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
+    list( $innerHTML, $innerBlocks, $blockMarkers ) = peg_split_inner_content( $children );
 
     return array(
       'blockName'    => $s['blockName'],
       'attrs'        => $s['attrs'],
       'innerBlocks'  => $innerBlocks,
       'innerHTML'    => implode( '', $innerHTML ),
+      'blockMarkers' => $blockMarkers,
     );
     ?> **/
 
-    var innerContent = partition( function( a ) { return 'string' === typeof a }, children );
+    var innerContent = splitInnerContent( children );
     var innerHTML = innerContent[ 0 ];
     var innerBlocks = innerContent[ 1 ];
+    var blockMarkers = innerContent[ 2 ];
 
     return {
       blockName: s.blockName,
       attrs: s.attrs,
       innerBlocks: innerBlocks,
-      innerHTML: innerHTML.join( '' )
+      innerHTML: innerHTML.join( '' ),
+      blockMarkers: blockMarkers,
     };
   }
 

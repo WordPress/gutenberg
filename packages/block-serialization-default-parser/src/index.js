@@ -4,17 +4,23 @@ let output;
 let stack;
 const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?!}\s+-->)[^])+?}\s+)?(\/)?-->/g;
 
-function Block( blockName, attrs, innerBlocks, innerHTML ) {
+function Block( blockName, attrs, innerBlocks, innerHTML, blockMarkers ) {
 	return {
 		blockName,
 		attrs,
 		innerBlocks,
 		innerHTML,
+		blockMarkers,
 	};
 }
 
 function Freeform( innerHTML ) {
-	return Block( null, {}, [], innerHTML );
+	return {
+		blockName: null,
+		attrs: {},
+		innerBlocks: [],
+		innerHTML,
+	};
 }
 
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
@@ -84,14 +90,14 @@ function proceed() {
 				if ( null !== leadingHtmlStart ) {
 					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
 				}
-				output.push( Block( blockName, attrs, [], '' ) );
+				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner block
 			addInnerBlock(
-				Block( blockName, attrs, [], '' ),
+				Block( blockName, attrs, [], '', [] ),
 				startOffset,
 				tokenLength,
 			);
@@ -102,7 +108,7 @@ function proceed() {
 			// track all newly-opened blocks on the stack
 			stack.push(
 				Frame(
-					Block( blockName, attrs, [], '' ),
+					Block( blockName, attrs, [], '', [] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -227,13 +233,68 @@ function addFreeform( rawLength ) {
 	output.push( Freeform( document.substr( offset, length ) ) );
 }
 
+/**
+ * Returns bytes required to represent given string in UTF8
+ *
+ * Assumes input is encoded in UCS2 or UTF16 according to the ECMAScript spec
+ * @see: https://www.ecma-international.org/ecma-262/9.0/index.html#sec-ecmascript-language-types-string-type
+ *
+ * Transparently counts bytes for invalid encodings:
+ * e.g. unpaired surrogate pair characters count as three bytes
+ *
+ * @cite: https://stackoverflow.com/a/34920444
+ *
+ * @param {string} s input string
+ * @return {number} how many bytes are in the UTF8 representation of the given string
+ */
+function utf8bytes( s ) {
+	let n = 0;
+
+	for ( let i = 0, l = s.length; i < l; i++ ) {
+		const hi = s.charCodeAt( i );
+
+		if ( hi < 0x0080 ) { // [0x0000, 0x007F]
+			n += 1;
+		} else if ( hi < 0x0800 ) { // [0x0080, 0x07FF]
+			n += 2;
+		} else if ( hi < 0xD800 ) { // [0x0800, 0xD7FF]
+			n += 3;
+		} else if ( hi < 0xDC00 ) { // [0xD800, 0xDBFF]
+			const lo = s.charCodeAt( ++i );
+
+			if ( i < l && lo >= 0xDC00 && lo <= 0xDFFF ) { //followed by [0xDC00, 0xDFFF]
+				n += 4;
+			} else {
+				// this is an invalid string with an unpaired surrogate.
+				// transparently pass it through for byte counts
+				// and back up to restart processing at the next character.
+				n += 3;
+				i -= 1;
+			}
+		} else if ( hi < 0xE000 ) { //[0xDC00, 0xDFFF]
+			// these are invalid encodings in the Unicode standard
+			// because they are reserved for encoding surrogate pairs.
+			// transparently pass them through here for byte counts.
+			n += 3;
+		} else { // [0xE000, 0xFFFF]
+			n += 3;
+		}
+	}
+
+	return n;
+}
+
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
-	parent.block.innerBlocks.push( block );
-	parent.block.innerHTML += document.substr(
-		parent.prevOffset,
-		tokenStart - parent.prevOffset,
-	);
+	const parentBlock = parent.block;
+	const blockMarkers = parentBlock.blockMarkers;
+
+	const nextHTML = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	const prevLength = blockMarkers.length ? blockMarkers[ blockMarkers.length - 1 ] : 0;
+
+	parentBlock.innerBlocks.push( block );
+	blockMarkers.push( prevLength + utf8bytes( nextHTML ) );
+	parentBlock.innerHTML += nextHTML;
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 

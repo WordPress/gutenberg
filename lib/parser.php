@@ -259,20 +259,22 @@ class Gutenberg_PEG_Parser {
     private function peg_f2($blockName, $a) { return $a; }
     private function peg_f3($blockName, $attrs) {
         return array(
-          'blockName'   => $blockName,
-          'attrs'       => isset( $attrs ) ? $attrs : array(),
-          'innerBlocks' => array(),
-          'innerHTML'   => '',
+          'blockName'    => $blockName,
+          'attrs'        => isset( $attrs ) ? $attrs : array(),
+          'innerBlocks'  => array(),
+          'innerHTML'    => '',
+          'blockMarkers' => array(),
         );
         }
     private function peg_f4($s, $children, $e) {
-        list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
+        list( $innerHTML, $innerBlocks, $blockMarkers ) = peg_split_inner_content( $children );
 
         return array(
           'blockName'    => $s['blockName'],
           'attrs'        => $s['attrs'],
           'innerBlocks'  => $innerBlocks,
           'innerHTML'    => implode( '', $innerHTML ),
+          'blockMarkers' => $blockMarkers,
         );
         }
     private function peg_f5($blockName, $attrs) {
@@ -1441,18 +1443,31 @@ class Gutenberg_PEG_Parser {
     // are the same as `json_decode`
 
     // array arguments are backwards because of PHP
-    if ( ! function_exists( 'peg_array_partition' ) ) {
-        function peg_array_partition( $array, $predicate ) {
-            $truthy = array();
-            $falsey = array();
+    if ( ! function_exists( 'peg_split_inner_content' ) ) {
+        function peg_split_inner_content( $array ) {
+            $strings  = array();
+            $blocks   = array();
+            $markers  = array();
+            $offset   = 0;
+            $string   = '';
 
             foreach ( $array as $item ) {
-                call_user_func( $predicate, $item )
-                    ? $truthy[] = $item
-                    : $falsey[] = $item;
+                if ( is_string( $item ) ) {
+                    $string .= $item;
+                } else {
+                    $offset   += strlen( $string );
+                    $strings[] = $string;
+                    $markers[] = $offset;
+                    $blocks[]  = $item;
+                    $string    = '';
+                }
             }
 
-            return array( $truthy, $falsey );
+            if ( $string !== '' ) {
+                $strings[] = $string;
+            }
+
+            return array( $strings, $blocks, $markers );
         }
     }
 
@@ -1462,10 +1477,10 @@ class Gutenberg_PEG_Parser {
 
             if ( ! empty( $pre ) ) {
                 $blocks[] = array(
-                    'blockName' => null,
-                    'attrs' => array(),
+                    'blockName'   => null,
+                    'attrs'       => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $pre
+                    'innerHTML'   => $pre
                 );
             }
 
@@ -1476,20 +1491,20 @@ class Gutenberg_PEG_Parser {
 
                 if ( ! empty( $html ) ) {
                     $blocks[] = array(
-                        'blockName' => null,
-                        'attrs' => array(),
+                        'blockName'   => null,
+                        'attrs'       => array(),
                         'innerBlocks' => array(),
-                        'innerHTML' => $html
+                        'innerHTML'   => $html
                     );
                 }
             }
 
             if ( ! empty( $post ) ) {
                 $blocks[] = array(
-                    'blockName' => null,
-                    'attrs' => array(),
+                    'blockName'   => null,
+                    'attrs'       => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $post
+                    'innerHTML'   => $post
                 );
             }
 

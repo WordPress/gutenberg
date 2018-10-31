@@ -4,6 +4,7 @@ exports[`block-serialization-default-parser-js basic parsing parse() works prope
 Array [
   Object {
     "attrs": Object {},
+    "blockMarkers": Array [],
     "blockName": "core/more",
     "innerBlocks": Array [],
     "innerHTML": "<!--more-->",
@@ -15,6 +16,7 @@ exports[`block-serialization-default-parser-php basic parsing parse() works prop
 Array [
   Object {
     "attrs": Object {},
+    "blockMarkers": Array [],
     "blockName": "core/more",
     "innerBlocks": Array [],
     "innerHTML": "<!--more-->",
