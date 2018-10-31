@@ -1,8 +1,14 @@
-## 5.0.0 (Unreleased)
+## 5.0.1 (2018-10-30)
 
-### Breaking Changes
+## 5.0.0 (2018-10-29)
+
+### Breaking Change
 
 - `AccessibleSVG` component has been removed. Please use `SVG` instead.
+
+### New Feature
+
+- The `Notice` component accepts an array of action objects via the `actions` prop. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
 
 ## 4.2.1 (2018-10-22)
 

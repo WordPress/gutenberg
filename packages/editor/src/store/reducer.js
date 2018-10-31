@@ -10,8 +10,6 @@ import {
 	omit,
 	without,
 	mapValues,
-	findIndex,
-	reject,
 	omitBy,
 	keys,
 	isEqual,
@@ -326,23 +324,6 @@ export const editor = flow( [
 					},
 				};
 
-			case 'MOVE_BLOCK_TO_POSITION':
-				// Avoid creating a new instance if the layout didn't change.
-				if ( state[ action.clientId ].attributes.layout === action.layout ) {
-					return state;
-				}
-
-				return {
-					...state,
-					[ action.clientId ]: {
-						...state[ action.clientId ],
-						attributes: {
-							...state[ action.clientId ].attributes,
-							layout: action.layout,
-						},
-					},
-				};
-
 			case 'UPDATE_BLOCK':
 				// Ignore updates if block isn't known
 				if ( ! state[ action.clientId ] ) {
@@ -587,6 +568,26 @@ export function isTyping( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the caret is within formatted text.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function isCaretWithinFormattedText( state = false, action ) {
+	switch ( action.type ) {
+		case 'ENTER_FORMATTED_TEXT':
+			return true;
+
+		case 'EXIT_FORMATTED_TEXT':
+			return false;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the block selection's state.
  *
  * @param {Object} state  Current state.
@@ -709,21 +710,23 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point visibility, a boolean value
- * reflecting whether the insertion point should be shown.
+ * Reducer returning the block insertion point visibility, either null if there
+ * is not an explicit insertion point assigned, or an object of its `index` and
+ * `rootClientId`.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function isInsertionPointVisible( state = false, action ) {
+export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
-			return true;
+			const { rootClientId, index } = action;
+			return { rootClientId, index };
 
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return null;
 	}
 
 	return state;
@@ -856,30 +859,6 @@ export function saving( state = {}, action ) {
 				successful: false,
 				error: action.error,
 			};
-	}
-
-	return state;
-}
-
-export function notices( state = [], action ) {
-	switch ( action.type ) {
-		case 'CREATE_NOTICE':
-			return [
-				...reject( state, { id: action.notice.id } ),
-				action.notice,
-			];
-
-		case 'REMOVE_NOTICE':
-			const { noticeId } = action;
-			const index = findIndex( state, { id: noticeId } );
-			if ( index === -1 ) {
-				return state;
-			}
-
-			return [
-				...state.slice( 0, index ),
-				...state.slice( index + 1 ),
-			];
 	}
 
 	return state;
@@ -1119,14 +1098,14 @@ export default optimist( combineReducers( {
 	editor,
 	currentPost,
 	isTyping,
+	isCaretWithinFormattedText,
 	blockSelection,
 	blocksMode,
 	blockListSettings,
-	isInsertionPointVisible,
+	insertionPoint,
 	preferences,
 	saving,
 	postLock,
-	notices,
 	reusableBlocks,
 	template,
 	autosave,

@@ -167,7 +167,7 @@ export class PostPreviewButton extends Component {
 				disabled={ ! isSaveable }
 			>
 				{ _x( 'Preview', 'imperative verb' ) }
-				<DotTip id="core/editor.preview">
+				<DotTip tipId="core/editor.preview">
 					{ __( 'Click “Preview” to load a preview of this page, so you can make sure you’re happy with your blocks.' ) }
 				</DotTip>
 			</Button>

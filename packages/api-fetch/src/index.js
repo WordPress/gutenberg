@@ -55,6 +55,10 @@ function apiFetch( options ) {
 
 		const parseResponse = ( response ) => {
 			if ( parse ) {
+				if ( response.status === 204 ) {
+					return null;
+				}
+
 				return response.json ? response.json() : Promise.reject( response );
 			}
 

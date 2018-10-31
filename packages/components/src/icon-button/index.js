@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString, isArray } from 'lodash';
+import { isArray, isString } from 'lodash';
 
 /**
  * WordPress dependencies

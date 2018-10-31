@@ -124,6 +124,11 @@
 		color: $dark-gray-800;
 	}
 
+	// Prevent i tags in buttons from picking up theme editor styles.
+	.mce-btn i {
+		font-style: normal;
+	}
+
 	// Adjust padding to not cause a jump.
 	.mce-toolbar-grp > div {
 		padding: 1px 3px;

@@ -58,13 +58,8 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-function createEmpty( type ) {
+function createEmpty() {
 	const { body } = document.implementation.createHTMLDocument( '' );
-
-	if ( type ) {
-		return body.appendChild( body.ownerDocument.createElement( type ) );
-	}
-
 	return body;
 }
 
@@ -110,11 +105,46 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-export function toDom( value, multilineTag ) {
+function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
+	const length = element.childNodes.length;
+	const doc = element.ownerDocument;
+
+	for ( let index = 0; index < length; index++ ) {
+		const child = element.childNodes[ index ];
+
+		if ( child.nodeType === TEXT_NODE ) {
+			if ( length === 1 && ! child.nodeValue ) {
+				// Pad if the only child is an empty text node.
+				element.appendChild( createLinePadding( doc ) );
+			}
+		} else {
+			if (
+				multilineWrapperTags &&
+				! child.previousSibling &&
+				multilineWrapperTags.indexOf( child.nodeName.toLowerCase() ) !== -1
+			) {
+				// Pad the line if there is no content before a nested wrapper.
+				element.insertBefore( createLinePadding( doc ), child );
+			}
+
+			padEmptyLines( { element: child, createLinePadding, multilineWrapperTags } );
+		}
+	}
+}
+
+export function toDom( {
+	value,
+	multilineTag,
+	multilineWrapperTags,
+	createLinePadding,
+} ) {
 	let startPath = [];
 	let endPath = [];
 
-	const tree = toTree( value, multilineTag, {
+	const tree = toTree( {
+		value,
+		multilineTag,
+		multilineWrapperTags,
 		createEmpty,
 		append,
 		getLastChild,
@@ -123,26 +153,18 @@ export function toDom( value, multilineTag ) {
 		getText,
 		remove,
 		appendText,
-		onStartIndex( body, pointer, multilineIndex ) {
+		onStartIndex( body, pointer ) {
 			startPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
-
-			if ( multilineIndex !== undefined ) {
-				startPath = [ multilineIndex, ...startPath ];
-			}
 		},
-		onEndIndex( body, pointer, multilineIndex ) {
+		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
-
-			if ( multilineIndex !== undefined ) {
-				endPath = [ multilineIndex, ...endPath ];
-			}
 		},
-		onEmpty( body ) {
-			const br = body.ownerDocument.createElement( 'br' );
-			br.setAttribute( 'data-mce-bogus', '1' );
-			body.appendChild( br );
-		},
+		isEditableTree: true,
 	} );
+
+	if ( createLinePadding ) {
+		padEmptyLines( { element: tree, createLinePadding, multilineWrapperTags } );
+	}
 
 	return {
 		body: tree,
@@ -160,9 +182,20 @@ export function toDom( value, multilineTag ) {
  *                                   tree to.
  * @param {string}      multilineTag Multiline tag.
  */
-export function apply( value, current, multilineTag ) {
+export function apply( {
+	value,
+	current,
+	multilineTag,
+	multilineWrapperTags,
+	createLinePadding,
+} ) {
 	// Construct a new element tree in memory.
-	const { body, selection } = toDom( value, multilineTag );
+	const { body, selection } = toDom( {
+		value,
+		multilineTag,
+		multilineWrapperTags,
+		createLinePadding,
+	} );
 
 	applyValue( body, current );
 

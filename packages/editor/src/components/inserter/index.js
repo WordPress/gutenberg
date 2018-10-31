@@ -3,10 +3,9 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
+import { compose, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,6 +29,8 @@ class Inserter extends Component {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
+		this.renderToggle = this.renderToggle.bind( this );
+		this.renderContent = this.renderContent.bind( this );
 	}
 
 	onToggle( isOpen ) {
@@ -41,20 +42,46 @@ class Inserter extends Component {
 		}
 	}
 
-	render() {
+	/**
+	 * Render callback to display Dropdown toggle element.
+	 *
+	 * @param {Function} options.onToggle Callback to invoke when toggle is
+	 *                                    pressed.
+	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
+	 *
+	 * @return {WPElement} Dropdown toggle element.
+	 */
+	renderToggle( { onToggle, isOpen } ) {
 		const {
-			items,
-			position,
-			title,
-			onInsertBlock,
-			rootClientId,
 			disabled,
 			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		if ( items.length === 0 ) {
-			return null;
-		}
+		return renderToggle( { onToggle, isOpen, disabled } );
+	}
+
+	/**
+	 * Render callback to display Dropdown content element.
+	 *
+	 * @param {Function} options.onClose Callback to invoke when dropdown is
+	 *                                   closed.
+	 *
+	 * @return {WPElement} Dropdown content element.
+	 */
+	renderContent( { onClose } ) {
+		const { rootClientId, index } = this.props;
+
+		return (
+			<InserterMenu
+				onSelect={ onClose }
+				rootClientId={ rootClientId }
+				index={ index }
+			/>
+		);
+	}
+
+	render() {
+		const { position, title } = this.props;
 
 		return (
 			<Dropdown
@@ -64,60 +91,36 @@ class Inserter extends Component {
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ title }
-				renderToggle={ ( { onToggle, isOpen } ) => renderToggle( { onToggle, isOpen, disabled } ) }
-				renderContent={ ( { onClose } ) => {
-					const onSelect = ( item ) => {
-						onInsertBlock( item );
-
-						onClose();
-					};
-
-					return (
-						<InserterMenu
-							items={ items }
-							onSelect={ onSelect }
-							rootClientId={ rootClientId }
-						/>
-					);
-				} }
+				renderToggle={ this.renderToggle }
+				renderContent={ this.renderContent }
 			/>
 		);
 	}
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId, layout } ) => {
+	withSelect( ( select, { rootClientId, index } ) => {
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
-			getSelectedBlock,
 			getInserterItems,
-			getBlockOrder,
 		} = select( 'core/editor' );
-		const insertionPoint = getBlockInsertionPoint();
-		const parentId = rootClientId || insertionPoint.rootClientId;
+
+		if ( rootClientId === undefined && index === undefined ) {
+			// Unless explicitly provided, the default insertion point provided
+			// by the store occurs immediately following the selected block.
+			// Otherwise, the default behavior for an undefined index is to
+			// append block to the end of the rootClientId context.
+			const insertionPoint = getBlockInsertionPoint();
+			( { rootClientId, index } = insertionPoint );
+		}
+
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			insertionPoint: {
-				rootClientId: parentId,
-				layout: rootClientId ? layout : insertionPoint.layout,
-				index: rootClientId ? getBlockOrder( rootClientId ).length : insertionPoint.index,
-			},
-			selectedBlock: getSelectedBlock(),
-			items: getInserterItems( parentId ),
-			rootClientId: parentId,
+			hasItems: getInserterItems( rootClientId ).length > 0,
+			rootClientId,
+			index,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => ( {
-		onInsertBlock: ( item ) => {
-			const { selectedBlock, insertionPoint } = ownProps;
-			const { index, rootClientId, layout } = insertionPoint;
-			const { name, initialAttributes } = item;
-			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
-			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.clientId, insertedBlock );
-			}
-			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootClientId );
-		},
-	} ) ),
+	ifCondition( ( { hasItems } ) => hasItems ),
 ] )( Inserter );

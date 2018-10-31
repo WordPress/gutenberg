@@ -25,12 +25,12 @@ import {
 	editor,
 	currentPost,
 	isTyping,
+	isCaretWithinFormattedText,
 	blockSelection,
 	preferences,
 	saving,
-	notices,
 	blocksMode,
-	isInsertionPointVisible,
+	insertionPoint,
 	reusableBlocks,
 	template,
 	blockListSettings,
@@ -1274,27 +1274,36 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'isInsertionPointVisible', () => {
-		it( 'should default to false', () => {
-			const state = isInsertionPointVisible( undefined, {} );
+	describe( 'insertionPoint', () => {
+		it( 'should default to null', () => {
+			const state = insertionPoint( undefined, {} );
 
-			expect( state ).toBe( false );
+			expect( state ).toBe( null );
 		} );
 
-		it( 'should set insertion point visible', () => {
-			const state = isInsertionPointVisible( false, {
+		it( 'should set insertion point', () => {
+			const state = insertionPoint( null, {
 				type: 'SHOW_INSERTION_POINT',
+				rootClientId: 'clientId1',
+				index: 0,
 			} );
 
-			expect( state ).toBe( true );
+			expect( state ).toEqual( {
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
 		} );
 
 		it( 'should clear the insertion point', () => {
-			const state = isInsertionPointVisible( true, {
+			const original = deepFreeze( {
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
+			const state = insertionPoint( original, {
 				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toBe( false );
+			expect( state ).toBe( null );
 		} );
 	} );
 
@@ -1310,6 +1319,24 @@ describe( 'state', () => {
 		it( 'should set the typing flag to false', () => {
 			const state = isTyping( false, {
 				type: 'STOP_TYPING',
+			} );
+
+			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'isCaretWithinFormattedText()', () => {
+		it( 'should set the flag to true', () => {
+			const state = isCaretWithinFormattedText( false, {
+				type: 'ENTER_FORMATTED_TEXT',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it( 'should set the flag to false', () => {
+			const state = isCaretWithinFormattedText( true, {
+				type: 'EXIT_FORMATTED_TEXT',
 			} );
 
 			expect( state ).toBe( false );
@@ -1721,91 +1748,6 @@ describe( 'state', () => {
 					message: 'update failed',
 				},
 			} );
-		} );
-	} );
-
-	describe( 'notices()', () => {
-		it( 'should create a notice', () => {
-			const originalState = [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				originalState[ 0 ],
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-			] );
-		} );
-
-		it( 'should remove a notice', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'REMOVE_NOTICE',
-				noticeId: 'a',
-			} );
-			expect( state ).toEqual( [
-				originalState[ 1 ],
-			] );
-		} );
-
-		it( 'should dedupe distinct ids', () => {
-			const originalState = [
-				{
-					id: 'a',
-					content: 'Post saved',
-					status: 'success',
-				},
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-			];
-			const state = notices( deepFreeze( originalState ), {
-				type: 'CREATE_NOTICE',
-				notice: {
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			} );
-			expect( state ).toEqual( [
-				{
-					id: 'b',
-					content: 'Error saving',
-					status: 'error',
-				},
-				{
-					id: 'a',
-					content: 'Post updated',
-					status: 'success',
-				},
-			] );
 		} );
 	} );
 

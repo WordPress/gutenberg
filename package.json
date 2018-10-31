@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "4.1.1",
+	"version": "4.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -41,6 +41,7 @@
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
 		"@wordpress/keycodes": "file:packages/keycodes",
+		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
