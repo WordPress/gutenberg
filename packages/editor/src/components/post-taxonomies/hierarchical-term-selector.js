@@ -27,6 +27,7 @@ const DEFAULT_QUERY = {
 };
 
 const MIN_TERMS_COUNT_FOR_FILTER = 8;
+const EMPTY_AVAILABLE_TERMS = [];
 
 class HierarchicalTermSelector extends Component {
 	constructor() {
@@ -285,7 +286,7 @@ class HierarchicalTermSelector extends Component {
 				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
 			)
 		);
-		const showFilter = availableTerms && ( availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER );
+		const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 		return [
 			showFilter && <label
@@ -366,7 +367,8 @@ export default compose( [
 		const { getTaxonomy, getEntityRecords } = select( 'core' );
 		const { isResolving } = select( 'core/data' );
 		const taxonomy = getTaxonomy( slug );
-		const availableTerms = getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY );
+		const availableTerms = getEntityRecords( 'taxonomy', slug, DEFAULT_QUERY ) ||
+			EMPTY_AVAILABLE_TERMS;
 		const availableTermsTree = buildTermsTree( availableTerms );
 		return {
 			hasCreateAction: taxonomy ? get( getCurrentPost(), [ '_links', 'wp:action-create-' + taxonomy.rest_base ], false ) : false,
