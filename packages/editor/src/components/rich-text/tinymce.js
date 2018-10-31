@@ -250,7 +250,7 @@ export default class TinyMCE extends Component {
 	onKeyDown( event ) {
 		const { keyCode } = event;
 
-		// Disable TinyMCE behaviour.
+		// Disables TinyMCE behaviour.
 		if ( keyCode === ENTER || keyCode === BACKSPACE || keyCode === DELETE ) {
 			event.preventDefault();
 			// For some reason this is needed to also prevent the insertion of
@@ -258,6 +258,16 @@ export default class TinyMCE extends Component {
 			return false;
 		}
 
+		// Handles a horizontal navigation key down event to handle the case
+		// where TinyMCE attempts to preventDefault when on the outside edge of
+		// an inline boundary when arrowing _away_ from the boundary, not within
+		// it. Replaces the TinyMCE event `preventDefault` behavior with a noop,
+		// such that those relying on `defaultPrevented` are not misinformed
+		// about the arrow event.
+		//
+		// If TinyMCE#4476 is resolved, this handling may be removed.
+		//
+		// @see https://github.com/tinymce/tinymce/issues/4476
 		if ( keyCode !== LEFT && keyCode !== RIGHT ) {
 			return;
 		}
