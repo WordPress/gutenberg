@@ -1016,10 +1016,10 @@ export function getLastMultiSelectedBlockClientId( state ) {
  * specified client ID is the first block of the multi-selection set, or false
  * otherwise.
  *
- * @param {Object} state      Editor state.
- * @param {string} clientId   Block client ID.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
- * @return {boolean} Whether block is first in mult-selection.
+ * @return {boolean} Whether block is first in multi-selection.
  */
 export function isFirstMultiSelectedBlock( state, clientId ) {
 	return getFirstMultiSelectedBlockClientId( state ) === clientId;
@@ -1277,7 +1277,12 @@ export function isCaretWithinFormattedText( state ) {
 export function getBlockInsertionPoint( state ) {
 	let rootClientId, index;
 
-	const { end } = state.blockSelection;
+	const { insertionPoint, blockSelection } = state;
+	if ( insertionPoint !== null ) {
+		return insertionPoint;
+	}
+
+	const { end } = blockSelection;
 	if ( end ) {
 		rootClientId = getBlockRootClientId( state, end ) || undefined;
 		index = getBlockIndex( state, end, rootClientId ) + 1;
@@ -1296,7 +1301,7 @@ export function getBlockInsertionPoint( state ) {
  * @return {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.isInsertionPointVisible;
+	return state.insertionPoint !== null;
 }
 
 /**
@@ -1501,20 +1506,16 @@ export const getEditedPostContent = createSelector(
 );
 
 /**
- * Determines if the given block type is allowed to be inserted, and, if
- * parentClientId is provided, whether it is allowed to be nested within the
- * given parent.
+ * Determines if the given block type is allowed to be inserted into the block list.
  *
- * @param {Object}  state          Editor state.
- * @param {string}  blockName      The name of the given block type, e.g.
- *                                 'core/paragraph'.
- * @param {?string} parentClientId The parent that the given block is to be
- *                                 nested within, or null.
+ * @param {Object}  state        Editor state.
+ * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
 export const canInsertBlockType = createSelector(
-	( state, blockName, parentClientId = null ) => {
+	( state, blockName, rootClientId = null ) => {
 		const checkAllowList = ( list, item, defaultResult = null ) => {
 			if ( isBoolean( list ) ) {
 				return list;
@@ -1537,17 +1538,17 @@ export const canInsertBlockType = createSelector(
 			return false;
 		}
 
-		const isLocked = !! getTemplateLock( state, parentClientId );
+		const isLocked = !! getTemplateLock( state, rootClientId );
 		if ( isLocked ) {
 			return false;
 		}
 
-		const parentBlockListSettings = getBlockListSettings( state, parentClientId );
+		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
 
 		const blockAllowedParentBlocks = blockType.parent;
-		const parentName = getBlockName( state, parentClientId );
+		const parentName = getBlockName( state, rootClientId );
 		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
 
 		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
@@ -1560,9 +1561,9 @@ export const canInsertBlockType = createSelector(
 
 		return true;
 	},
-	( state, blockName, parentClientId ) => [
-		state.blockListSettings[ parentClientId ],
-		state.editor.present.blocksByClientId[ parentClientId ],
+	( state, blockName, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.editor.present.blocksByClientId[ rootClientId ],
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	],
@@ -1602,8 +1603,8 @@ function getInsertUsage( state, id ) {
  *
  * Items are returned ordered descendingly by their 'utility' and 'frecency'.
  *
- * @param {Object}  state          Editor state.
- * @param {?string} parentClientId The block we are inserting into, if any.
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  *
@@ -1621,7 +1622,7 @@ function getInsertUsage( state, id ) {
  * @property {number}   frecency          Hueristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, parentClientId = null ) => {
+	( state, rootClientId = null ) => {
 		const calculateUtility = ( category, count, isContextual ) => {
 			if ( isContextual ) {
 				return INSERTER_UTILITY_HIGH;
@@ -1659,7 +1660,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			return canInsertBlockType( state, blockType.name, parentClientId );
+			return canInsertBlockType( state, blockType.name, rootClientId );
 		};
 
 		const buildBlockTypeInserterItem = ( blockType ) => {
@@ -1689,7 +1690,7 @@ export const getInserterItems = createSelector(
 		};
 
 		const shouldIncludeReusableBlock = ( reusableBlock ) => {
-			if ( ! canInsertBlockType( state, 'core/block', parentClientId ) ) {
+			if ( ! canInsertBlockType( state, 'core/block', rootClientId ) ) {
 				return false;
 			}
 
@@ -1703,7 +1704,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			if ( ! canInsertBlockType( state, referencedBlockType.name, parentClientId ) ) {
+			if ( ! canInsertBlockType( state, referencedBlockType.name, rootClientId ) ) {
 				return false;
 			}
 
@@ -1748,8 +1749,8 @@ export const getInserterItems = createSelector(
 			[ 'desc', 'desc' ]
 		);
 	},
-	( state, parentClientId ) => [
-		state.blockListSettings[ parentClientId ],
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
 		state.editor.present.blockOrder,
 		state.editor.present.blocksByClientId,
 		state.preferences.insertUsage,

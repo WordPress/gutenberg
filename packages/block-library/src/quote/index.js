@@ -111,7 +111,7 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( { value, citation } ) => {
 					const paragraphs = [];
-					if ( value ) {
+					if ( value && value !== '<p></p>' ) {
 						paragraphs.push(
 							...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
 								.map( ( piece ) =>
@@ -121,7 +121,7 @@ export const settings = {
 								)
 						);
 					}
-					if ( citation ) {
+					if ( citation && citation !== '<p></p>' ) {
 						paragraphs.push(
 							createBlock( 'core/paragraph', {
 								content: citation,

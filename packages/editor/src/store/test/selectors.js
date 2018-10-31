@@ -2761,6 +2761,40 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockInsertionPoint', () => {
+		it( 'should return the explicitly assigned insertion point', () => {
+			const state = {
+				currentPost: {},
+				preferences: { mode: 'visual' },
+				blockSelection: {
+					start: 'clientId2',
+					end: 'clientId2',
+				},
+				editor: {
+					present: {
+						blocksByClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
+						},
+						blockOrder: {
+							'': [ 'clientId1' ],
+							clientId1: [ 'clientId2' ],
+							clientId2: [],
+						},
+						edits: {},
+					},
+				},
+				insertionPoint: {
+					rootClientId: undefined,
+					index: 0,
+				},
+			};
+
+			expect( getBlockInsertionPoint( state ) ).toEqual( {
+				rootClientId: undefined,
+				index: 0,
+			} );
+		} );
+
 		it( 'should return an object for the selected block', () => {
 			const state = {
 				currentPost: {},
@@ -2781,7 +2815,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				isInsertionPointVisible: false,
+				insertionPoint: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2812,7 +2846,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				isInsertionPointVisible: false,
+				insertionPoint: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2843,7 +2877,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				isInsertionPointVisible: false,
+				insertionPoint: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2874,7 +2908,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
-				isInsertionPointVisible: false,
+				insertionPoint: null,
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
@@ -2885,9 +2919,20 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return the value in state', () => {
+		it( 'should return false if no assigned insertion point', () => {
 			const state = {
-				isInsertionPointVisible: true,
+				insertionPoint: null,
+			};
+
+			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if assigned insertion point', () => {
+			const state = {
+				insertionPoint: {
+					rootClientId: undefined,
+					index: 5,
+				},
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
