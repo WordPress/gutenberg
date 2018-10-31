@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`block-serialization-spec-parser basic parsing parse() works properly 1`] = `
+exports[`block-serialization-spec-parser-js basic parsing parse() works properly 1`] = `
 Array [
   Object {
     "attrs": Object {},
