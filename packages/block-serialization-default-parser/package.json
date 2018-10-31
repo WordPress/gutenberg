@@ -23,6 +23,9 @@
 	"dependencies": {
 		"@babel/runtime": "^7.0.0"
 	},
+	"devDependencies": {
+		"@wordpress/block-serialization-spec-parser": "^1.0.3"
+	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -6,7 +6,7 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { jsTester, phpTester } from '../../block-serialization-spec-parser/shared-tests';
+import { jsTester, phpTester } from '@wordpress/block-serialization-spec-parser';
 import { parse } from '../';
 
 describe( 'block-serialization-default-parser-js', jsTester( parse ) );
