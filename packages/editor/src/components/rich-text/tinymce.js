@@ -2,14 +2,14 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
+import { isEqual, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
 import { toHTMLString } from '@wordpress/rich-text';
 import { children } from '@wordpress/blocks';
 
@@ -17,6 +17,23 @@ import { children } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
+
+/**
+ * Browser dependencies
+ */
+
+const { getSelection } = window;
+const { TEXT_NODE } = window.Node;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+export const TINYMCE_ZWSP = '\uFEFF';
 
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.
@@ -102,9 +119,14 @@ export default class TinyMCE extends Component {
 		super();
 		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 	}
 
 	onFocus() {
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
+		}
+
 		this.initialize();
 	}
 
@@ -198,6 +220,8 @@ export default class TinyMCE extends Component {
 
 					editor.dom.setHTML = setHTML;
 				} );
+
+				editor.on( 'keydown', this.onKeyDown, true );
 			},
 		} );
 	}
@@ -223,6 +247,49 @@ export default class TinyMCE extends Component {
 		}
 	}
 
+	onKeyDown( event ) {
+		const { keyCode } = event;
+
+		// Disable TinyMCE behaviour.
+		if ( keyCode === ENTER || keyCode === BACKSPACE || keyCode === DELETE ) {
+			event.preventDefault();
+			// For some reason this is needed to also prevent the insertion of
+			// line breaks.
+			return false;
+		}
+
+		if ( keyCode !== LEFT && keyCode !== RIGHT ) {
+			return;
+		}
+
+		const { focusNode } = getSelection();
+		const { nodeType, nodeValue } = focusNode;
+
+		if ( nodeType !== TEXT_NODE ) {
+			return;
+		}
+
+		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
+			return;
+		}
+
+		// Consider to be moving away from inline boundary based on:
+		//
+		// 1. Within a text fragment consisting only of ZWSP.
+		// 2. If in reverse, there is no previous sibling. If forward, there is
+		//    no next sibling (i.e. end of node).
+		const isReverse = event.keyCode === LEFT;
+		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
+		if ( ! focusNode[ edgeSibling ] ) {
+			// Note: This is not reassigning on the native event, rather the
+			// "fixed" TinyMCE copy, which proxies its preventDefault to the
+			// native event. By reassigning here, we're effectively preventing
+			// the proxied call on the native event, but not otherwise mutating
+			// the original event object.
+			event.preventDefault = noop;
+		}
+	}
+
 	render() {
 		const ariaProps = pickAriaProps( this.props );
 		const {
@@ -235,6 +302,8 @@ export default class TinyMCE extends Component {
 			onInput,
 			multilineTag,
 			multilineWrapperTags,
+			onKeyDown,
+			onKeyUp,
 		} = this.props;
 
 		/*
@@ -284,6 +353,8 @@ export default class TinyMCE extends Component {
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,
+			onKeyDown,
+			onKeyUp,
 		} );
 	}
 }
