@@ -539,18 +539,22 @@ add_action( 'init', 'gutenberg_register_post_types' );
  *
  * @since 4.3.0
  *
- * @param array $messages
- * @param array $bulk_counts
+ * @param array $messages    Arrays of messages, each keyed by the corresponding post type.
+ * @param array $bulk_counts Array of item counts for each message, used to build internationalized strings.
  *
  * @return array
  */
 function gutenberg_bulk_post_updated_messages( $messages, $bulk_counts ) {
 	$messages['wp_block'] = array(
+		// translators: Number of blocks updated.
 		'updated'   => _n( '%s block updated.', '%s blocks updated.', $bulk_counts['updated'], 'gutenberg' ),
-		'locked'    => ( 1 == $bulk_counts['locked'] ) ? __( '1 block not updated, somebody is editing it.', 'gutenberg' ) :
-			_n( '%s block not updated, somebody is editing it.', '%s blocks not updated, somebody is editing them.', $bulk_counts['locked'], 'gutenberg' ),
+		// translators: Blocks not updated because they're locked.
+		'locked'    => ( 1 == $bulk_counts['locked'] ) ? __( '1 block not updated, somebody is editing it.', 'gutenberg' ) : _n( '%s block not updated, somebody is editing it.', '%s blocks not updated, somebody is editing them.', $bulk_counts['locked'], 'gutenberg' ),
+		// translators: Number of blocks deleted.
 		'deleted'   => _n( '%s block permanently deleted.', '%s blocks permanently deleted.', $bulk_counts['deleted'], 'gutenberg' ),
+		// translators: Number of blocks trashed.
 		'trashed'   => _n( '%s block moved to the Trash.', '%s blocks moved to the Trash.', $bulk_counts['trashed'], 'gutenberg' ),
+		// translators: Number of blocks untrashed.
 		'untrashed' => _n( '%s block restored from the Trash.', '%s blocks restored from the Trash.', $bulk_counts['untrashed'], 'gutenberg' ),
 	);
 
