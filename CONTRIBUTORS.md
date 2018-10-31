@@ -79,7 +79,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @swissspidy | @swissspidy |
 | @dixitadusara | :mag: :tired_face: |
 | @ameeker | @ameeker |
-| @StaggerLeee | :mag: :tired_face: |
+| @StaggerLeee | @stagger-lee |
 | @jblz | @jblz |
 | @nic-bertino | @nicbertino |
 | @rahmon | @rahmohn |
