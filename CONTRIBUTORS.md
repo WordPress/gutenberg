@@ -56,7 +56,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @nitrajka | @nitrajka |
 | @sirreal | |
 | @inhil | |
-| @georgeolaru | @@babbardel |
+| @georgeolaru | @babbardel |
 | @martinlugton | @martinlugton |
 | @joyously | @joyously |
 | @rileybrook | @rileybrook |
