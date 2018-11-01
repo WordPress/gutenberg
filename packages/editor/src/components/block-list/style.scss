@@ -232,6 +232,11 @@
 		left: -$block-padding;
 	}
 
+	// Avoid conflict with the multi-selection highlight color.
+	&.has-warning.is-multi-selected .editor-block-list__block-edit::after {
+		background-color: transparent;
+	}
+
 	&.has-warning.is-selected .editor-block-list__block-edit::after {
 		bottom: ( $block-toolbar-height - $block-padding - $border-width );
 
@@ -635,7 +640,7 @@
 	justify-content: center;
 
 	// Show a clickable plus.
-	.editor-block-list__insertion-point-button {
+	.editor-inserter__toggle {
 		margin-top: -4px;
 		border-radius: 50%;
 		color: $blue-medium-focus;
@@ -661,7 +666,7 @@
 // Don't show the sibling inserter before the selected block.
 .edit-post-layout:not(.has-fixed-toolbar) {
 	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter {
+	.is-selected > .editor-block-list__insertion-point .editor-inserter__toggle {
 		opacity: 0;
 		pointer-events: none;
 

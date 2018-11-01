@@ -52,7 +52,7 @@ describe( 'applyFormat', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
 	} );
 
-	it( 'should not apply format on non existing format if selection is collapsed', () => {
+	it( 'should apply format in placeholder if selection is collapsed', () => {
 		const record = {
 			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
 			text: 'one two three',
@@ -60,10 +60,11 @@ describe( 'applyFormat', () => {
 			end: 0,
 		};
 		const expected = {
-			formats: [ , , , , [ a ], [ a ], [ a ], , , , , , , ],
-			text: 'one two three',
-			start: 0,
-			end: 0,
+			...record,
+			formatPlaceholder: {
+				format: a2,
+				index: 0,
+			},
 		};
 		const result = applyFormat( deepFreeze( record ), a2 );
 

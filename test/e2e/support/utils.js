@@ -100,7 +100,7 @@ async function login() {
  * @return {Promise} Promise resolving once RichText is initialized, or is
  *                   determined to not be a container of the active element.
  */
-async function waitForRichTextInitialization() {
+export async function waitForRichTextInitialization() {
 	const isInRichText = await page.evaluate( () => {
 		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
 	} );
@@ -193,7 +193,7 @@ export async function waitForPageDimensions( width, height ) {
 }
 
 export async function switchToEditor( mode ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	const [ button ] = await page.$x( `//button[contains(text(), '${ mode } Editor')]` );
 	await button.click( 'button' );
 }
@@ -306,8 +306,20 @@ export async function pressWithModifier( modifiers, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
+}
+
+/**
+ * Opens the publish panel.
+ */
+export async function openPublishPanel() {
+	await page.click( '.editor-post-publish-panel__toggle' );
+
+	// Disable reason: Wait for the animation to complete, since otherwise the
+	// click attempt may occur at the wrong point.
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitFor( 100 );
 }
 
 /**
@@ -317,13 +329,7 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
  * @return {Promise} Promise resolving when publish is complete.
  */
 export async function publishPost() {
-	// Opens the publish panel
-	await page.click( '.editor-post-publish-panel__toggle' );
-
-	// Disable reason: Wait for the animation to complete, since otherwise the
-	// click attempt may occur at the wrong point.
-	// eslint-disable-next-line no-restricted-syntax
-	await page.waitFor( 100 );
+	await openPublishPanel();
 
 	// Publish the post
 	await page.click( '.editor-post-publish-button' );
@@ -451,5 +457,21 @@ export async function getAllBlocks() {
 	return await page.evaluate( () => {
 		const { select } = window.wp.data;
 		return select( 'core/editor' ).getBlocks();
+	} );
+}
+
+/**
+ * Binds to the document on page load which throws an error if a `focusout`
+ * event occurs without a related target (i.e. focus loss).
+ */
+export function observeFocusLoss() {
+	page.on( 'load', () => {
+		page.evaluate( () => {
+			document.body.addEventListener( 'focusout', ( event ) => {
+				if ( ! event.relatedTarget ) {
+					throw new Error( 'Unexpected focus loss' );
+				}
+			} );
+		} );
 	} );
 }

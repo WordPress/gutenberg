@@ -101,9 +101,10 @@ export default class TinyMCE extends Component {
 	constructor() {
 		super();
 		this.bindEditorNode = this.bindEditorNode.bind( this );
+		this.onFocus = this.onFocus.bind( this );
 	}
 
-	componentDidMount() {
+	onFocus() {
 		this.initialize();
 	}
 
@@ -158,6 +159,11 @@ export default class TinyMCE extends Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			// Disables TinyMCE's parsing to verify HTML. It makes
+			// initialisation a bit faster. Since we're setting raw HTML
+			// already with dangerouslySetInnerHTML, we don't need this to be
+			// verified.
+			verify_html: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
 		} );
@@ -168,6 +174,30 @@ export default class TinyMCE extends Component {
 			setup: ( editor ) => {
 				this.editor = editor;
 				this.props.onSetup( editor );
+
+				// TinyMCE resets the element content on initialization, even
+				// when it's already identical to what exists currently. This
+				// behavior clobbers a selection which exists at the time of
+				// initialization, thus breaking writing flow navigation. The
+				// hack here neutralizes setHTML during initialization.
+				let setHTML;
+
+				editor.on( 'preinit', () => {
+					setHTML = editor.dom.setHTML;
+					editor.dom.setHTML = () => {};
+				} );
+
+				editor.on( 'init', () => {
+					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
+					[ 'b', 'i', 'u' ].forEach( ( character ) => {
+						editor.shortcuts.remove( `meta+${ character }` );
+					} );
+					[ 1, 2, 3, 4, 5, 6, 7, 8, 9 ].forEach( ( number ) => {
+						editor.shortcuts.remove( `access+${ number }` );
+					} );
+
+					editor.dom.setHTML = setHTML;
+				} );
 			},
 		} );
 	}
@@ -204,6 +234,7 @@ export default class TinyMCE extends Component {
 			onPaste,
 			onInput,
 			multilineTag,
+			multilineWrapperTags,
 		} = this.props;
 
 		/*
@@ -229,7 +260,16 @@ export default class TinyMCE extends Component {
 		} else if ( Array.isArray( defaultValue ) ) {
 			initialHTML = children.toHTML( defaultValue );
 		} else if ( typeof defaultValue !== 'string' ) {
-			initialHTML = toHTMLString( defaultValue, multilineTag );
+			initialHTML = toHTMLString( {
+				value: defaultValue,
+				multilineTag,
+				multilineWrapperTags,
+			} );
+		}
+
+		if ( initialHTML === '' ) {
+			// Ensure the field is ready to receive focus by TinyMCE.
+			initialHTML = '<br data-mce-bogus="1">';
 		}
 
 		return createElement( tagName, {
@@ -243,6 +283,7 @@ export default class TinyMCE extends Component {
 			dangerouslySetInnerHTML: { __html: initialHTML },
 			onPaste,
 			onInput,
+			onFocus: this.onFocus,
 		} );
 	}
 }

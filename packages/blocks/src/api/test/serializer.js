@@ -79,22 +79,27 @@ describe( 'block serializer', () => {
 		} );
 
 		it( 'should only return attributes which are not matched from content', () => {
-			const attributes = getCommentAttributes( {
-				fruit: 'bananas',
-				category: 'food',
-				ripeness: 'ripe',
-			}, { attributes: {
-				fruit: {
-					type: 'string',
-					source: 'text',
+			const attributes = getCommentAttributes(
+				{
+					attributes: {
+						fruit: {
+							type: 'string',
+							source: 'text',
+						},
+						category: {
+							type: 'string',
+						},
+						ripeness: {
+							type: 'string',
+						},
+					},
 				},
-				category: {
-					type: 'string',
-				},
-				ripeness: {
-					type: 'string',
-				},
-			} } );
+				{
+					fruit: 'bananas',
+					category: 'food',
+					ripeness: 'ripe',
+				}
+			);
 
 			expect( attributes ).toEqual( {
 				category: 'food',
@@ -103,17 +108,22 @@ describe( 'block serializer', () => {
 		} );
 
 		it( 'should skip attributes whose values are undefined', () => {
-			const attributes = getCommentAttributes( {
-				fruit: 'bananas',
-				ripeness: undefined,
-			}, { attributes: {
-				fruit: {
-					type: 'string',
+			const attributes = getCommentAttributes(
+				{
+					attributes: {
+						fruit: {
+							type: 'string',
+						},
+						ripeness: {
+							type: 'string',
+						},
+					},
 				},
-				ripeness: {
-					type: 'string',
-				},
-			} } );
+				{
+					fruit: 'bananas',
+					ripeness: undefined,
+				}
+			);
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
 		} );

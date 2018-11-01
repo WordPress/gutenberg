@@ -37,6 +37,7 @@ const blockAttributes = {
 		default: '',
 	},
 	caption: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	},
@@ -89,6 +90,12 @@ const blockAttributes = {
 		selector: 'img',
 		attribute: 'sizes',
 	},
+	linkTarget: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'target',
+	},
 };
 
 // Schemas are used only when pasting...
@@ -105,7 +112,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'href' ],
+				attributes: [ 'href', 'target' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -118,13 +125,16 @@ const schema = {
 export const settings = {
 	title: __( 'Image' ),
 
-	description: __( 'They’re worth 1,000 words! Insert a single image.' ),
+	description: __( 'Insert an image to make a visual statement.' ),
 
 	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0,0h24v24H0V0z" fill="none" /><Path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" /><Path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" /></SVG>,
 
 	category: 'common',
 
-	keywords: [ __( 'photo' ) ],
+	keywords: [
+		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
+		__( 'photo' ),
+	],
 
 	attributes: blockAttributes,
 
@@ -226,8 +236,7 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, srcSet, sizes } = attributes;
-
+		const { url, alt, caption, align, href, width, height, srcSet, sizes, linkTarget } = attributes;
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
 			'is-resized': width || height,
@@ -246,7 +255,7 @@ export const settings = {
 
 		const figure = (
 			<Fragment>
-				{ href ? <a href={ href }>{ image }</a> : image }
+				{ href ? <a href={ href } target={ linkTarget } rel={ linkTarget === '_blank' ? 'noreferrer noopener' : undefined }>{ image }</a> : image }
 				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);

@@ -10,6 +10,7 @@
 
 	// Label
 	input[type="text"] {
+		position: relative;
 		font-size: $default-font-size;
 		text-transform: uppercase;
 		font-weight: 600;
@@ -38,6 +39,5 @@
 		left: 0;
 		right: 0;
 		border-top: 3px dashed $light-gray-700;
-		z-index: z-index(".editor-block-list__block .wp-block-more::before");
 	}
 }

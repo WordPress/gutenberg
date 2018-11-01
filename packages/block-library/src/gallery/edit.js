@@ -201,7 +201,7 @@ class GalleryEdit extends Component {
 						className={ className }
 						labels={ {
 							title: __( 'Gallery' ),
-							name: __( 'images' ),
+							instructions: __( 'Drag images, upload new ones or select files from your library.' ),
 						} }
 						onSelect={ this.onSelectImages }
 						accept="image/*"

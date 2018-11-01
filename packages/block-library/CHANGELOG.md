@@ -1,3 +1,20 @@
+## 2.1.7 (2018-10-30)
+
+## 2.1.6 (2018-10-30)
+
+### Bug Fixes
+
+- Classic Block: Prevent theme styles from italicising the italicise button.
+- Gallery Block: Fix the "Remove Image" button appearing blank when an image is focussed.
+
+## 2.1.5 (2018-10-29)
+
+## 2.1.4 (2018-10-22)
+
+### Bug Fixes
+
+- Video Block: Set correct media types for the poster image.
+
 ## 2.1.3 (2018-10-19)
 
 ## 2.1.2 (2018-10-18)

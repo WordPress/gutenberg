@@ -226,7 +226,7 @@ if ( ! function_exists( 'do_blocks' ) ) {
 			$inner_content = '';
 
 			if ( ! $is_self_closing ) {
-				$end_tag_pattern = '/<!--\s+\/wp:' . str_replace( '/', '\/', preg_quote( $block_name ) ) . '\s+-->/';
+				$end_tag_pattern = '/<!--\s+\/wp:' . preg_quote( $block_name, '/' ) . '\s+-->/';
 				if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
 					// If no closing tag is found, abort all matching, and continue
 					// to append remainder of content to rendered output.
@@ -256,6 +256,7 @@ if ( ! function_exists( 'do_blocks' ) ) {
 
 		return $rendered_content;
 	}
+
 	add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
 }
 
@@ -286,7 +287,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_add_filter( $text ) {
-		add_filter( 'the_content', 'strip_dynamic_blocks', 6 ); // Before do_blocks().
+		add_filter( 'the_content', 'strip_dynamic_blocks', 6 );
 
 		return $text;
 	}
@@ -306,7 +307,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_remove_filter( $text ) {
-		remove_filter( 'the_content', 'strip_dynamic_blocks', 8 );
+		remove_filter( 'the_content', 'strip_dynamic_blocks', 6 );
 
 		return $text;
 	}

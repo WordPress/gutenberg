@@ -1,3 +1,11 @@
+## 2.2.0 (2018-10-29)
+
+### Features
+
+- Added `getQueryArg`.
+- Added `hasQueryArg`.
+- Added `removeQueryArgs`.
+
 ## 2.1.0 (2018-10-16)
 
 ### Features

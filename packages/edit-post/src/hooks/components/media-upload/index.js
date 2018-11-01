@@ -8,7 +8,6 @@ import { castArray, pick } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import deprecated from '@wordpress/deprecated';
 
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
@@ -67,8 +66,8 @@ const getAttachmentsCollection = ( ids ) => {
 	return wp.media.query( {
 		order: 'ASC',
 		orderby: 'post__in',
-		per_page: -1,
 		post__in: ids,
+		per_page: 100,
 		query: true,
 		type: 'image',
 	} );
@@ -77,7 +76,6 @@ const getAttachmentsCollection = ( ids ) => {
 class MediaUpload extends Component {
 	constructor( {
 		allowedTypes,
-		type: deprecatedType,
 		multiple = false,
 		gallery = false,
 		title = __( 'Select or Upload Media' ),
@@ -91,19 +89,6 @@ class MediaUpload extends Component {
 		this.onUpdate = this.onUpdate.bind( this );
 		this.onClose = this.onClose.bind( this );
 
-		let allowedTypesToUse = allowedTypes;
-		if ( ! allowedTypes && deprecatedType ) {
-			deprecated( 'type property of wp.editor.MediaUpload', {
-				version: '4.2',
-				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
-			} );
-			if ( deprecatedType === '*' ) {
-				allowedTypesToUse = undefined;
-			} else {
-				allowedTypesToUse = [ deprecatedType ];
-			}
-		}
-
 		if ( gallery ) {
 			const currentState = value ? 'gallery-edit' : 'gallery';
 			const GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
@@ -113,7 +98,7 @@ class MediaUpload extends Component {
 				multiple,
 			} );
 			this.frame = new GalleryDetailsMediaFrame( {
-				mimeType: allowedTypesToUse,
+				mimeType: allowedTypes,
 				state: currentState,
 				multiple,
 				selection,
@@ -128,8 +113,8 @@ class MediaUpload extends Component {
 				},
 				multiple,
 			};
-			if ( !! allowedTypesToUse ) {
-				frameConfig.library = { type: allowedTypesToUse };
+			if ( !! allowedTypes ) {
+				frameConfig.library = { type: allowedTypes };
 			}
 
 			this.frame = wp.media( frameConfig );

@@ -10,7 +10,6 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -21,7 +20,7 @@ import {
 	getUnregisteredTypeHandlerName,
 } from './registration';
 import { createBlock } from './factory';
-import { isValidBlock } from './validation';
+import { isValidBlockContent } from './validation';
 import { getCommentDelimitedContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 
@@ -262,25 +261,10 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 			break;
 	}
 
-	if ( value !== undefined ) {
-		if ( isAmbiguousStringSource( attributeSchema ) ) {
-			if ( ! isOfTypes( value, castArray( type ) ) ) {
-				deprecated( 'Attribute type coercion', {
-					plugin: 'Gutenberg',
-					version: '4.2',
-					hint: (
-						'Omit the source to preserve type via serialized ' +
-						'comment demarcation.'
-					),
-				} );
-
-				value = asType( value, type );
-			}
-		} else if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
-			// Reject the value if it is not valid of type. Reverting to the
-			// undefined value ensures the default is restored, if applicable.
-			value = undefined;
-		}
+	if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
+		// Reject the value if it is not valid of type. Reverting to the
+		// undefined value ensures the default is restored, if applicable.
+		value = undefined;
 	}
 
 	if ( value === undefined ) {
@@ -299,7 +283,7 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
  *
  * @return {Object} All block attributes.
  */
-export function getBlockAttributes( blockType, innerHTML, attributes ) {
+export function getBlockAttributes( blockType, innerHTML, attributes = {} ) {
 	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
 		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
 	} );
@@ -356,10 +340,10 @@ export function getMigratedBlock( block ) {
 		);
 
 		// Ignore the deprecation if it produces a block which is not valid.
-		const isValid = isValidBlock(
-			originalContent,
+		const isValid = isValidBlockContent(
 			deprecatedBlockType,
-			migratedAttributes
+			migratedAttributes,
+			originalContent
 		);
 
 		if ( ! isValid ) {
@@ -475,7 +459,7 @@ export function createBlockWithFallback( blockNode ) {
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
 	if ( ! isFallbackBlock ) {
-		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
+		block.isValid = isValidBlockContent( blockType, block.attributes, innerHTML );
 	}
 
 	// Preserve original content for future use in case the block is parsed as

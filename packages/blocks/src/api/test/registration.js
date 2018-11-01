@@ -1,3 +1,5 @@
+/* eslint-disable react/forbid-elements */
+
 /**
  * External dependencies
  */
@@ -14,8 +16,6 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 import {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
-	getUnknownTypeHandlerName,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -29,6 +29,7 @@ import {
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
+	unregisterBlockStyle,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -92,7 +93,7 @@ describe( 'blocks', () => {
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 				save: noop,
 				category: 'common',
@@ -177,7 +178,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 				attributes: {
 					ok: {
@@ -310,7 +311,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -350,7 +351,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+						src: 'block-default',
 					},
 				},
 			] );
@@ -362,33 +363,10 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
-		} );
-	} );
-
-	describe( 'setUnknownTypeHandlerName()', () => {
-		it( 'assigns unknown type handler', () => {
-			try {
-				setUnknownTypeHandlerName( 'core/test-block' );
-
-				expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
-				expect( console ).toHaveWarned();
-			} finally {
-				// Restore undefined handler here rather than in `afterEach` because:
-				// - This call generates a deprecation warning.
-				// - Deprecation warnings become test errors unless we assert `toHaveWarned`.
-				// - This is too broad of an assertion to apply for all tests in the suite.
-				setUnknownTypeHandlerName( undefined );
-			}
-		} );
-	} );
-
-	describe( 'getUnknownTypeHandlerName()', () => {
-		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
@@ -443,7 +421,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -458,7 +436,7 @@ describe( 'blocks', () => {
 				category: 'common',
 				title: 'block title',
 				icon: {
-					src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+					src: 'block-default',
 				},
 			} );
 		} );
@@ -480,7 +458,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+						src: 'block-default',
 					},
 				},
 				{
@@ -490,7 +468,7 @@ describe( 'blocks', () => {
 					category: 'common',
 					title: 'block title',
 					icon: {
-						src: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 7h-1V5h-4v2h-4V5H6v2H5c-1.1 0-2 .9-2 2v10h18V9c0-1.1-.9-2-2-2zm0 10H5V9h14v8z" /></svg>,
+						src: 'block-default',
 					},
 				},
 			] );
@@ -634,6 +612,59 @@ describe( 'blocks', () => {
 				{ name: 'normal', label: 'Normal style' },
 				{ name: 'small', label: 'Small style' },
 				{ name: 'big', label: 'Big style' },
+			] );
+		} );
+	} );
+
+	describe( 'unregisterBlockStyle', () => {
+		afterEach( () => {
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/big/unregister' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/small/unregister' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/big' );
+			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-with-styles/small' );
+		} );
+
+		it( 'should remove styles', () => {
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'big' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [ { name: 'big', label: 'Big style' } ],
+			} );
+
+			expect( settings.styles ).toEqual( [] );
+		} );
+
+		it( 'should keep other styles', () => {
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'small' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [
+					{ name: 'normal', label: 'Normal style' },
+					{ name: 'small', label: 'Small style' },
+					{ name: 'big', label: 'Big style' },
+				],
+			} );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'normal', label: 'Normal style' },
+				{ name: 'big', label: 'Big style' },
+			] );
+		} );
+
+		it( 'should remove a prior registerBlockStyle', () => {
+			registerBlockStyle( 'my-plugin/block-with-styles', { name: 'big', label: 'Big style' } );
+			registerBlockStyle( 'my-plugin/block-with-styles', { name: 'small', label: 'Small style' } );
+			unregisterBlockStyle( 'my-plugin/block-with-styles', 'big' );
+			const settings = registerBlockType( 'my-plugin/block-with-styles', {
+				...defaultBlockSettings,
+				styles: [
+					{ name: 'normal', label: 'Normal style' },
+				],
+			} );
+
+			expect( settings.styles ).toEqual( [
+				{ name: 'normal', label: 'Normal style' },
+				{ name: 'small', label: 'Small style' },
 			] );
 		} );
 	} );

@@ -7,7 +7,6 @@ import { JSDOM } from 'jsdom';
 /**
  * Internal dependencies
  */
-
 import { create } from '../create';
 import { createElement } from '../create-element';
 import { getSparseArrayLength, spec } from './helpers';
@@ -19,11 +18,30 @@ describe( 'create', () => {
 	const em = { type: 'em' };
 	const strong = { type: 'strong' };
 
-	spec.forEach( ( { description, multilineTag, settings, html, createRange, record } ) => {
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
+
+	spec.forEach( ( {
+		description,
+		multilineTag,
+		multilineWrapperTags,
+		settings,
+		html,
+		createRange,
+		record,
+	} ) => {
 		it( description, () => {
 			const element = createElement( document, html );
 			const range = createRange( element );
-			const createdRecord = create( { element, range, multilineTag, ...settings } );
+			const createdRecord = create( {
+				element,
+				range,
+				multilineTag,
+				multilineWrapperTags,
+				...settings,
+			} );
 			const formatsLength = getSparseArrayLength( record.formats );
 			const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
 
