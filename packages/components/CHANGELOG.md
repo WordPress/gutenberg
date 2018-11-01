@@ -2,6 +2,7 @@
 
 ### Polish
 
+- Forward `ref` in the `PanelBody` component.
 - Tooltip are no longer removed when Button becomes disabled, it's left to the component rendering the Tooltip.
 
 ## 5.0.1 (2018-10-30)
