@@ -120,7 +120,7 @@ describe( 'apiFetch', () => {
 
 		return apiFetch( { path: '/random', headers } ).then( () => {
 			expect( headers ).toHaveProperty( 'Accept' );
-			expect( headers.Accept ).toBe( 'application/json' );
+			expect( headers.Accept ).toBe( 'application/json, */*;q=0.1' );
 		} );
 	} );
 

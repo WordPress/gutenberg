@@ -37,7 +37,7 @@ function apiFetch( options ) {
 		}
 
 		if ( ! headers.Accept ) {
-			headers.Accept = 'application/json';
+			headers.Accept = 'application/json, */*;q=0.1';
 		}
 
 		const responsePromise = window.fetch(
