@@ -180,6 +180,7 @@ describe( 'createRegistry', () => {
 		} );
 	} );
 
+	// TODO: Refactor this into registerStore tests after this function is removed.
 	describe( 'registerReducer', () => {
 		it( 'Should append reducers to the state', () => {
 			const reducer1 = () => 'chicken';
@@ -190,9 +191,13 @@ describe( 'createRegistry', () => {
 
 			const store2 = registry.registerReducer( 'red2', reducer2 );
 			expect( store2.getState() ).toEqual( 'ribs' );
+
+			// This uses deprecated functions and will produce a warning.
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
+	// TODO: Refactor this into registerStore tests after this function is removed.
 	describe( 'registerResolvers', () => {
 		it( 'should not do anything for selectors which do not have resolvers', () => {
 			registry.registerReducer( 'demo', ( state = 'OK' ) => state );
@@ -202,6 +207,9 @@ describe( 'createRegistry', () => {
 			registry.registerResolvers( 'demo', {} );
 
 			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
+
+			// This uses deprecated functions and will produce a warning.
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should behave as a side effect for the given selector, with arguments', () => {
@@ -516,6 +524,9 @@ describe( 'createRegistry', () => {
 			registry.dispatch( 'counter' ).increment(); // state = 1
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
+
+			// This uses deprecated functions and will produce a warning.
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -550,6 +561,9 @@ describe( 'createRegistry', () => {
 			registry.use( plugin, expectedOptions );
 
 			expect( actualOptions ).toBe( expectedOptions );
+
+			// This uses deprecated functions and will produce a warning.
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should override base method', () => {

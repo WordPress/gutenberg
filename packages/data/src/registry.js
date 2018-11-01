@@ -7,6 +7,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import createNamespace from './namespace-store.js';
@@ -17,15 +22,11 @@ import dataStore from './store';
  *
  * @typedef {WPDataRegistry}
  *
- * @property {Function} registerReducer
- * @property {Function} registerSelectors
- * @property {Function} registerResolvers
- * @property {Function} registerActions
+ * @property {Function} registerGenericStore
  * @property {Function} registerStore
  * @property {Function} subscribe
  * @property {Function} select
  * @property {Function} dispatch
- * @property {Function} use
  */
 
 /**
@@ -94,16 +95,10 @@ export function createRegistry( storeConfigs = {} ) {
 		return store && store.getActions();
 	}
 
-	/**
-	 * Maps an object of function values to proxy invocation through to the
-	 * current internal representation of the registry, which may be enhanced
-	 * by plugins.
-	 * TODO: Consider deprecating and removing this after plugins are no longer needed.
-	 *
-	 * @param {Object<string,Function>} attributes Object of function values.
-	 *
-	 * @return {Object<string,Function>} Object enhanced with plugin proxying.
-	 */
+	//
+	// Deprecated
+	// TODO: Remove this after `use()` is removed.
+	//
 	function withPlugins( attributes ) {
 		return mapValues( attributes, ( attribute, key ) => {
 			if ( typeof attribute !== 'function' ) {
@@ -145,61 +140,59 @@ export function createRegistry( storeConfigs = {} ) {
 		use,
 	};
 
-	/**
-	 * Registers a new sub-reducer to the global state and returns a Redux-like
-	 * store object.
-	 * TODO: Deprecate and remove this function in favor of registerStore
-	 *
-	 * @param {string} reducerKey Reducer key.
-	 * @param {Object} reducer    Reducer function.
-	 *
-	 * @return {Object} Store Object.
-	 */
+	//
+	// Deprecated
+	//
 	registry.registerReducer = ( reducerKey, reducer ) => {
+		deprecated( 'registry.registerReducer', {
+			alternative: 'registry.registerStore',
+			plugin: 'Gutenberg',
+			version: '3.1.0',
+		} );
+
 		const namespace = createNamespace( reducerKey, { reducer }, registry );
 		registerGenericStore( reducerKey, namespace );
 		return namespace.store;
 	};
 
-	/**
-	 * Registers actions for external usage.
-	 * TODO: Deprecate and remove this function in favor of registerStore
-	 *
-	 * @param {string} reducerKey   Part of the state shape to register the
-	 *                              selectors for.
-	 * @param {Object} actions   Actions to register.
-	 */
+	//
+	// Deprecated
+	//
 	registry.registerActions = ( reducerKey, actions ) => {
+		deprecated( 'registry.registerActions', {
+			alternative: 'registry.registerStore',
+			plugin: 'Gutenberg',
+			version: '3.1.0',
+		} );
+
 		const namespace = createNamespace( reducerKey, { actions }, registry );
 		registerGenericStore( reducerKey, namespace );
 	};
 
-	/**
-	 * Registers selectors for external usage.
-	 * TODO: Deprecate and remove this function in favor of registerStore
-	 *
-	 * @param {string} reducerKey   Part of the state shape to register the
-	 *                              selectors for.
-	 * @param {Object} selectors    Selectors to register. Keys will be used as the
-	 *                              public facing API. Selectors will get passed the
-	 *                              state as first argument.
-	 */
+	//
+	// Deprecated
+	//
 	registry.registerSelectors = ( reducerKey, selectors ) => {
+		deprecated( 'registry.registerSelectors', {
+			alternative: 'registry.registerStore',
+			plugin: 'Gutenberg',
+			version: '3.1.0',
+		} );
+
 		const namespace = createNamespace( reducerKey, { selectors }, registry );
 		registerGenericStore( reducerKey, namespace );
 	};
 
-	/**
-	 * Registers resolvers for a given reducer key. Resolvers are side effects
-	 * invoked once per argument set of a given selector call, used in ensuring
-	 * that the data needs for the selector are satisfied.
-	 * TODO: Deprecate and remove this function in favor of registerStore
-	 *
-	 * @param {string} reducerKey   Part of the state shape to register the
-	 *                              resolvers for.
-	 * @param {Object} resolvers Resolvers to register.
-	 */
+	//
+	// Deprecated
+	//
 	registry.registerResolvers = ( reducerKey, resolvers ) => {
+		deprecated( 'registry.registerResolvers', {
+			alternative: 'registry.registerStore',
+			plugin: 'Gutenberg',
+			version: '3.1.0',
+		} );
+
 		const namespace = createNamespace( reducerKey, { resolvers }, registry );
 		registerGenericStore( reducerKey, namespace );
 	};
@@ -222,17 +215,16 @@ export function createRegistry( storeConfigs = {} ) {
 		return namespace.store;
 	};
 
-	/**
-	 * Enhances the registry with the prescribed set of overrides. Returns the
-	 * enhanced registry to enable plugin chaining.
-	 * TODO: Consider deprecating and removing this after plugins are no longer needed.
-	 *
-	 * @param {WPDataPlugin} plugin  Plugin by which to enhance.
-	 * @param {?Object}      options Optional options to pass to plugin.
-	 *
-	 * @return {WPDataRegistry} Enhanced registry.
-	 */
+	//
+	// Deprecated
+	//
 	function use( plugin, options ) {
+		deprecated( 'registry.use', {
+			alternative: 'registry.registerGenericStore',
+			plugin: 'Gutenberg',
+			version: '3.1.0',
+		} );
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),

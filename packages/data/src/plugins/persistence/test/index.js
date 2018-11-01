@@ -21,6 +21,7 @@ describe( 'persistence', () => {
 
 		// Since the exposed `registerStore` is a proxying function, mimic
 		// intercept of original call by adding an initial plugin.
+		// TODO: Remove the `use` function in favor of `registerGenericStore`
 		registry = createRegistry()
 			.use( ( originalRegistry ) => {
 				originalRegisterStore = jest.spyOn( originalRegistry, 'registerStore' );
@@ -33,6 +34,9 @@ describe( 'persistence', () => {
 		const options = Object.freeze( { persist: true, reducer() {} } );
 
 		registry.registerStore( 'test', options );
+
+		// use is a deprecated function and will produce a warning.
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'override values passed to registerStore', () => {
