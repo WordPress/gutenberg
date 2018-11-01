@@ -61,6 +61,17 @@ export const jsTester = ( parse ) => () => {
 			expect.objectContaining( { innerHTML: '<p>Break me</p>' } ),
 		] ) ) );
 	} );
+
+	describe( 'attack vectors', () => {
+		test( 'really long JSON attribute sections', () => {
+			const length = 100000;
+			const as = 'a'.repeat( length );
+			let parsed;
+
+			expect( () => parsed = parse( `<!-- wp:fake {"a":"${ as }"} /-->` )[ 0 ] ).not.toThrow();
+			expect( parsed.attrs.a ).toHaveLength( length );
+		} );
+	} );
 };
 
 const hasPHP = 'test' === process.env.NODE_ENV ? ( () => {
