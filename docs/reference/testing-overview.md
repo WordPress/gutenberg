@@ -342,11 +342,6 @@ test( 'should contain mars if planets is true', () => {
 
 It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
 
-### Code Coverage
-
-Code coverage is measured for each PR using the [codecov.io](https://codecov.io/gh/WordPress/gutenberg) tool.
-[Code coverage](https://en.wikipedia.org/wiki/Code_coverage) is a way of measuring the amount of code covered by the tests in the test suite of a project.  In Gutenberg, it is currently measured for JavaScript code only.
-
 ## End to end Testing
 
 If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the e2e tests locally using this command:
@@ -378,31 +373,6 @@ npm run test-php
 Code style in PHP is enforced using [PHP_CodeSniffer](https://github.com/squizlabs/PHP_CodeSniffer). It is recommended that you install PHP_CodeSniffer and the [WordPress Coding Standards for PHP_CodeSniffer](https://github.com/WordPress-Coding-Standards/WordPress-Coding-Standards#installation) ruleset using [Composer](https://getcomposer.org/). With Composer installed, run `composer install` from the project directory to install dependencies. The above `npm run test-php` will execute both unit tests and code linting. Code linting can be verified independently by running `npm run lint-php`.
 
 To run unit tests only, without the linter, use `npm run test-unit-php` instead.
-
-## Native Mobile Testing
-
-To enable automated testing against the native mobile app currently in development, the whole of the mobile source code is pulled in as a git submodule. Its testsuite is included in the Travis tests run but it can also be used locally, during development.
-
-To test locally, along with the typical Gutenberg setup and testing instructions already mentioned earlier, make sure you check out the code of the submodule:
-```
-git submodule --init --recursive
-```
-You can then use the available script to launch the mobile testsuite in isolation:
-```
-npm run test-mobile
-```
-
-or the typical `npm run test` to run all the lint, unit and mobile tests in one go.
-
-The mobile tests pick up the compiled Gutenberg code/packages and so, don't forget to run `npm install` (while at the Gutenberg root) after you've made changes to the code.
-
-### Debugging native mobile
-
-Say you have made some changes to Gutenberg's code and turns out the mobile tests get broken. What's the path forward? Hopefully, the Jest tests output will have an error message and stacktrace that is indicative enough and helps point where the error happens and what went wrong. Oftenly, what happens is that the code being shared between the web and the mobile project is no longer compatible.
-
-For example, changing an intermediate interface can inadvertently bring the `file.js` and `file.native.js` pair out of sync. You'll then need to update the `.native.js` file to adhere to the new interface or iterate on the interface itself. Feel free to reach out to mobile devs for help if needed.
-
-In other usual cases, you might directly employ HTML elements in a `render()` function but those are not actually offered by React Native, the UI framework the native mobile is build on. Those elements are usually starting with a lower-case character like `div` or `span`. In any case that code is incompatible or doesn't make sense for mobile, what needs to be done is to wrap that code in a new component and provide a "nativized" variant of it to be loaded when on native mobile instead. To "nativize" a component just create a new `.native.js` file right alongside the web version one and in it return/run the code that is compatible with mobile. The proper variant will be picked up by the toolchain automatically.
 
 [snapshot testing]: https://facebook.github.io/jest/docs/en/snapshot-testing.html
 [update snapshots]: https://facebook.github.io/jest/docs/en/snapshot-testing.html#updating-snapshots

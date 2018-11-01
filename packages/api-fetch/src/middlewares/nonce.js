@@ -3,8 +3,9 @@
  */
 import { addAction } from '@wordpress/hooks';
 
-const createNonceMiddleware = ( nonce ) => ( options, next ) => {
+const createNonceMiddleware = ( nonce ) => {
 	let usedNonce = nonce;
+
 	/**
 	 * This is not ideal but it's fine for now.
 	 *
@@ -17,31 +18,33 @@ const createNonceMiddleware = ( nonce ) => ( options, next ) => {
 		}
 	} );
 
-	let headers = options.headers || {};
-	// If an 'X-WP-Nonce' header (or any case-insensitive variation
-	// thereof) was specified, no need to add a nonce header.
-	let addNonceHeader = true;
-	for ( const headerName in headers ) {
-		if ( headers.hasOwnProperty( headerName ) ) {
-			if ( headerName.toLowerCase() === 'x-wp-nonce' ) {
-				addNonceHeader = false;
-				break;
+	return function( options, next ) {
+		let headers = options.headers || {};
+		// If an 'X-WP-Nonce' header (or any case-insensitive variation
+		// thereof) was specified, no need to add a nonce header.
+		let addNonceHeader = true;
+		for ( const headerName in headers ) {
+			if ( headers.hasOwnProperty( headerName ) ) {
+				if ( headerName.toLowerCase() === 'x-wp-nonce' ) {
+					addNonceHeader = false;
+					break;
+				}
 			}
 		}
-	}
 
-	if ( addNonceHeader ) {
-	// Do not mutate the original headers object, if any.
-		headers = {
-			...headers,
-			'X-WP-Nonce': usedNonce,
-		};
-	}
+		if ( addNonceHeader ) {
+			// Do not mutate the original headers object, if any.
+			headers = {
+				...headers,
+				'X-WP-Nonce': usedNonce,
+			};
+		}
 
-	return next( {
-		...options,
-		headers,
-	} );
+		return next( {
+			...options,
+			headers,
+		} );
+	};
 };
 
 export default createNonceMiddleware;
