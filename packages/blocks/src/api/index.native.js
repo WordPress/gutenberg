@@ -1,5 +1,6 @@
 export {
 	createBlock,
+	switchToBlockType,
 } from './factory';
 export {
 	default as parse,
