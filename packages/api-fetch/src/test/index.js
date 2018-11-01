@@ -107,38 +107,4 @@ describe( 'apiFetch', () => {
 			} );
 		} );
 	} );
-
-	it( 'should apply an Accept: application/json header', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 200,
-			json() {
-				return Promise.resolve( { message: 'ok' } );
-			},
-		} ) );
-
-		const headers = {};
-
-		return apiFetch( { path: '/random', headers } ).then( () => {
-			expect( headers ).toHaveProperty( 'Accept' );
-			expect( headers.Accept ).toBe( 'application/json, */*;q=0.1' );
-		} );
-	} );
-
-	it( 'should not override an existing accept header', () => {
-		window.fetch.mockReturnValue( Promise.resolve( {
-			status: 200,
-			json() {
-				return Promise.resolve( { message: 'ok' } );
-			},
-		} ) );
-
-		const headers = {
-			Accept: '*/*',
-		};
-
-		return apiFetch( { path: '/random', headers } ).then( () => {
-			expect( headers ).toHaveProperty( 'Accept' );
-			expect( headers.Accept ).toBe( '*/*' );
-		} );
-	} );
 } );
