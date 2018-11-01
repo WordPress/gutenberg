@@ -48,6 +48,18 @@ class WP_Block_Parser_Block {
 	 */
 	public $innerHTML;
 
+	/**
+	 * List of string fragments and null markers where inner blocks were found
+	 *
+	 * @example array(
+	 *   'innerHTML'    => 'BeforeInnerAfter',
+	 *   'innerBlocks'  => array( block, block ),
+	 *   'innerContent' => array( 'Before', null, 'Inner', null, 'After' ),
+	 * )
+	 *
+	 * @since 4.2.0
+	 * @var array
+	 */
 	public $innerContent;
 
 	function __construct( $name, $attrs, $innerBlocks, $innerHTML, $innerContent ) {
