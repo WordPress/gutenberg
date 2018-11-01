@@ -216,15 +216,10 @@ export function createRegistry( storeConfigs = {} ) {
 	};
 
 	//
-	// Deprecated
+	// TODO:
+	// This function will be deprecated as soon as it is no longer internally referenced.
 	//
 	function use( plugin, options ) {
-		deprecated( 'registry.use', {
-			alternative: 'registry.registerGenericStore',
-			plugin: 'Gutenberg',
-			version: '4.4.0',
-		} );
-
 		registry = {
 			...registry,
 			...plugin( registry, options ),

@@ -11,7 +11,6 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `wp.data` `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
 - `wp.data` `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
 - `wp.data` `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
-- `wp.data` `registry.use` has been deprecated. Implement with `registry.registerGenericStore` instead.
 
 ## 4.3.0
 

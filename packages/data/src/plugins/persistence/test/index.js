@@ -34,9 +34,6 @@ describe( 'persistence', () => {
 		const options = Object.freeze( { persist: true, reducer() {} } );
 
 		registry.registerStore( 'test', options );
-
-		// use is a deprecated function and will produce a warning.
-		expect( console ).toHaveWarned();
 	} );
 
 	it( 'override values passed to registerStore', () => {

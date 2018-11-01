@@ -10,7 +10,6 @@
 - `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
 - `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
 - `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
-- `registry.use` has been deprecated. Implement with `registry.registerGenericStore` instead.
 
 ## 3.0.1 (2018-10-30)
 

@@ -561,9 +561,6 @@ describe( 'createRegistry', () => {
 			registry.use( plugin, expectedOptions );
 
 			expect( actualOptions ).toBe( expectedOptions );
-
-			// This uses deprecated functions and will produce a warning.
-			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should override base method', () => {
