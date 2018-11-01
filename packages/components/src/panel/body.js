@@ -15,7 +15,7 @@ import Button from '../button';
 import Icon from '../icon';
 import { G, Path, SVG } from '../primitives';
 
-class PanelBody extends Component {
+export class PanelBody extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
@@ -72,6 +72,9 @@ class PanelBody extends Component {
 	}
 }
 
-export default forwardRef( ( props, ref ) => {
+const forwardedPanelBody = ( props, ref ) => {
 	return <PanelBody { ...props } forwardedRef={ ref } />;
-} );
+};
+forwardedPanelBody.displayName = 'PanelBody';
+
+export default forwardRef( forwardedPanelBody );
