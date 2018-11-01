@@ -9,10 +9,15 @@ import { URL } from 'url';
  */
 import { times, castArray } from 'lodash';
 
+const WP_ADMIN_USER = {
+	username: 'admin',
+	password: 'password',
+};
+
 const {
 	WP_BASE_URL = 'http://localhost:8889',
-	WP_USERNAME = 'admin',
-	WP_PASSWORD = 'password',
+	WP_USERNAME = WP_ADMIN_USER.username,
+	WP_PASSWORD = WP_ADMIN_USER.password,
 } = process.env;
 
 /**
@@ -76,14 +81,42 @@ async function goToWPPath( WPPath, query ) {
 	await page.goto( getUrl( WPPath, query ) );
 }
 
-async function login() {
-	await page.type( '#user_login', WP_USERNAME );
-	await page.type( '#user_pass', WP_PASSWORD );
+async function login( username = WP_USERNAME, password = WP_PASSWORD ) {
+	await page.focus( '#user_login' );
+	await pressWithModifier( META_KEY, 'a' );
+	await page.type( '#user_login', username );
+	await page.focus( '#user_pass' );
+	await pressWithModifier( META_KEY, 'a' );
+	await page.type( '#user_pass', password );
 
 	await Promise.all( [
 		page.waitForNavigation(),
 		page.click( '#wp-submit' ),
 	] );
+}
+
+/**
+ * Switches the logged in user to the admin user, if the user
+ * running the test is not already the admin user.
+ */
+export async function switchToAdminUser() {
+	if ( WP_USERNAME === WP_ADMIN_USER.username ) {
+		return;
+	}
+	await goToWPPath( 'wp-login.php' );
+	await login( WP_ADMIN_USER.username, WP_ADMIN_USER.password );
+}
+
+/**
+ * Switches the logged in user to the user the tests are running as,
+ * if we're not already that user.
+ */
+export async function switchToTestUser() {
+	if ( WP_USERNAME === WP_ADMIN_USER.username ) {
+		return;
+	}
+	await goToWPPath( 'wp-login.php' );
+	await login();
 }
 
 export async function visitAdmin( adminPath, query ) {
