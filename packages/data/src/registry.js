@@ -147,7 +147,7 @@ export function createRegistry( storeConfigs = {} ) {
 		deprecated( 'registry.registerReducer', {
 			alternative: 'registry.registerStore',
 			plugin: 'Gutenberg',
-			version: '3.1.0',
+			version: '4.4.0',
 		} );
 
 		const namespace = createNamespace( reducerKey, { reducer }, registry );
@@ -162,7 +162,7 @@ export function createRegistry( storeConfigs = {} ) {
 		deprecated( 'registry.registerActions', {
 			alternative: 'registry.registerStore',
 			plugin: 'Gutenberg',
-			version: '3.1.0',
+			version: '4.4.0',
 		} );
 
 		const namespace = createNamespace( reducerKey, { actions }, registry );
@@ -176,7 +176,7 @@ export function createRegistry( storeConfigs = {} ) {
 		deprecated( 'registry.registerSelectors', {
 			alternative: 'registry.registerStore',
 			plugin: 'Gutenberg',
-			version: '3.1.0',
+			version: '4.4.0',
 		} );
 
 		const namespace = createNamespace( reducerKey, { selectors }, registry );
@@ -190,7 +190,7 @@ export function createRegistry( storeConfigs = {} ) {
 		deprecated( 'registry.registerResolvers', {
 			alternative: 'registry.registerStore',
 			plugin: 'Gutenberg',
-			version: '3.1.0',
+			version: '4.4.0',
 		} );
 
 		const namespace = createNamespace( reducerKey, { resolvers }, registry );
@@ -222,7 +222,7 @@ export function createRegistry( storeConfigs = {} ) {
 		deprecated( 'registry.use', {
 			alternative: 'registry.registerGenericStore',
 			plugin: 'Gutenberg',
-			version: '3.1.0',
+			version: '4.4.0',
 		} );
 
 		registry = {
