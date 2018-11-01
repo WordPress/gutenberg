@@ -8,7 +8,6 @@ import {
 	pressTimes,
 	pressWithModifier,
 	META_KEY,
-	waitForRichTextInitialization,
 } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
@@ -133,9 +132,7 @@ describe( 'splitting and merging blocks', () => {
 		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
-		await waitForRichTextInitialization();
 		await page.keyboard.press( 'Enter' );
-		await waitForRichTextInitialization();
 
 		await page.keyboard.press( 'Backspace' );
 
@@ -175,11 +172,8 @@ describe( 'splitting and merging blocks', () => {
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'First' );
 		await page.keyboard.press( 'Enter' );
-		await waitForRichTextInitialization();
 		await page.keyboard.press( 'Enter' );
-		await waitForRichTextInitialization();
 		await page.keyboard.press( 'Enter' );
-		await waitForRichTextInitialization();
 		await page.keyboard.type( 'Second' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
