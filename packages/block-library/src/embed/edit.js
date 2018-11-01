@@ -2,7 +2,10 @@
  * Internal dependencies
  */
 import { isFromWordPress, createUpgradedEmbedBlock, getClassNames } from './util';
-import { EmbedLoading, EmbedControls, EmbedPreview, EmbedPlaceholder } from './components';
+import EmbedControls from './embed-controls';
+import EmbedLoading from './embed-loading';
+import EmbedPlaceholder from './embed-placeholder';
+import EmbedPreview from './embed-preview';
 
 /**
  * External dependencies
@@ -58,7 +61,6 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			if ( ( hasPreview && ! hadPreview ) || switchedPreview || switchedURL ) {
 				if ( this.props.cannotEmbed ) {
 					// Can't embed this URL, and we've just received or switched the preview.
-					this.setState( { editingURL: true } );
 					return;
 				}
 				this.handleIncomingPreview();
