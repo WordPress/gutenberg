@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -38,12 +38,12 @@ class PanelBody extends Component {
 	}
 
 	render() {
-		const { title, children, opened, className, icon } = this.props;
+		const { title, children, opened, className, icon, forwardedRef } = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
 		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } ref={ forwardedRef }>
 				{ !! title && (
 					<h2 className="components-panel__body-title">
 						<Button
@@ -72,4 +72,6 @@ class PanelBody extends Component {
 	}
 }
 
-export default PanelBody;
+export default forwardRef( ( props, ref ) => {
+	return <PanelBody { ...props } forwardedRef={ ref } />;
+} );
