@@ -334,7 +334,7 @@ export class RichText extends Component {
 			tagName,
 			style,
 			formattingControls,
-			value
+			value,
 		} = this.props;
 
 		const toolbarControls = FORMATTING_CONTROLS
@@ -351,7 +351,7 @@ export class RichText extends Component {
 		return (
 			<View>
 				<BlockFormatControls>
-						<Toolbar controls={ toolbarControls } />
+					<Toolbar controls={ toolbarControls } />
 				</BlockFormatControls>
 				<RCTAztecView
 					ref={ ( ref ) => {

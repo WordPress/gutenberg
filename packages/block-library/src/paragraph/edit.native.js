@@ -68,7 +68,6 @@ class ParagraphEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
-			style,
 			mergeBlocks,
 		} = this.props;
 
