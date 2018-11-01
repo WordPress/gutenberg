@@ -227,7 +227,8 @@ export class RichText extends Component {
 	}
 
 	createRecord() {
-		const range = getSelection().getRangeAt( 0 );
+		const selection = getSelection();
+		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
 		return create( {
 			element: this.editableRef,
