@@ -96,6 +96,7 @@
     "react-native-modal": "^6.5.0",
     "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#8a4058672821f8e28c063ca5c8671bae67ae8254",
     "react-native-svg": "^6.5.2",
+    "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "rememo": "^3.0.0",
