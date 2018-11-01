@@ -17,7 +17,7 @@ export const name = 'core/spacer';
 export const settings = {
 	title: __( 'Spacer' ),
 
-	description: __( 'Add an element with empty space and custom height.' ),
+	description: __( 'Add white space between blocks and customize its height.' ),
 
 	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><G><Path d="M13 4v2h3.59L6 16.59V13H4v7h7v-2H7.41L18 7.41V11h2V4h-7" /></G></SVG>,
 

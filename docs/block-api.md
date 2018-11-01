@@ -140,7 +140,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for exisiting blocks.
+Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for existing blocks.
 
 #### Attributes (optional)
 
@@ -158,6 +158,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
+		type: 'string',
 		source: 'html',
 		selector: '.book-author',
 	},
@@ -489,7 +490,7 @@ className: false,
 html: false,
 ```
 
-- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programatically, set `inserter` to `false`.
+- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 // Hide this block from the inserter.

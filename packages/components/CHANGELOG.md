@@ -1,3 +1,11 @@
+## 5.0.2 (Unreleased)
+
+### Polish
+
+- Tooltip are no longer removed when Button becomes disabled, it's left to the component rendering the Tooltip.
+
+## 5.0.1 (2018-10-30)
+
 ## 5.0.0 (2018-10-29)
 
 ### Breaking Change

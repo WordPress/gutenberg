@@ -372,14 +372,32 @@ export function isEditedPostSaveable( state ) {
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
-	// While the condition of truthy content string would be sufficient for
-	// determining emptiness, testing saveable blocks length is a trivial
-	// operation by comparison. Since this function can be called frequently,
-	// optimize for the fast case where saveable blocks are non-empty.
-	return (
-		! getBlocksForSerialization( state ).length &&
-		! getEditedPostAttribute( state, 'content' )
-	);
+	const blocks = getBlocksForSerialization( state );
+
+	// While the condition of truthy content string is sufficient to determine
+	// emptiness, testing saveable blocks length is a trivial operation. Since
+	// this function can be called frequently, optimize for the fast case as a
+	// condition of the mere existence of blocks. Note that the value of edited
+	// content is used in place of blocks, thus allowed to fall through.
+	if ( blocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
+		// Pierce the abstraction of the serializer in knowing that blocks are
+		// joined with with newlines such that even if every individual block
+		// produces an empty save result, the serialized content is non-empty.
+		if ( blocks.length > 1 ) {
+			return false;
+		}
+
+		// Freeform and unregistered blocks omit comment delimiters in their
+		// output. The freeform block specifically may produce an empty string
+		// to save. In the case of a single freeform block, fall through to the
+		// full serialize. Otherwise, the single block is assumed non-empty by
+		// virtue of its comment delimiters.
+		if ( blocks[ 0 ].name !== getFreeformContentHandlerName() ) {
+			return false;
+		}
+	}
+
+	return ! getEditedPostContent( state );
 }
 
 /**
@@ -502,7 +520,7 @@ export const getBlockDependantsCacheBust = createSelector(
  * @return {string} Block name.
  */
 export function getBlockName( state, clientId ) {
-	const block = state.editor.present.blocksByClientId[ clientId ];
+	const block = state.editor.present.blocks.byClientId[ clientId ];
 	return block ? block.name : null;
 }
 
@@ -519,7 +537,7 @@ export function getBlockName( state, clientId ) {
  */
 export const getBlock = createSelector(
 	( state, clientId ) => {
-		const block = state.editor.present.blocksByClientId[ clientId ];
+		const block = state.editor.present.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
 		}
@@ -552,7 +570,7 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		state.editor.present.blocksByClientId[ clientId ],
+		state.editor.present.blocks.byClientId[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
@@ -585,8 +603,7 @@ export const getBlocks = createSelector(
 		);
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks,
 	]
 );
 
@@ -618,7 +635,7 @@ export const getClientIdsWithDescendants = createSelector(
 		return [ ...topLevelIds, ...getClientIdsOfDescendants( state, topLevelIds ) ];
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 	]
 );
 
@@ -634,16 +651,16 @@ export const getClientIdsWithDescendants = createSelector(
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
 		if ( ! blockName ) {
-			return size( state.editor.present.blocksByClientId );
+			return size( state.editor.present.blocks.byClientId );
 		}
 		return reduce(
-			state.editor.present.blocksByClientId,
+			state.editor.present.blocks.byClientId,
 			( count, block ) => block.name === blockName ? count + 1 : count,
 			0
 		);
 	},
 	( state ) => [
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks.byClientId,
 	]
 );
 
@@ -662,11 +679,9 @@ export const getBlocksByClientId = createSelector(
 		( clientId ) => getBlock( state, clientId )
 	),
 	( state ) => [
-		state.editor.present.blocksByClientId,
-		state.editor.present.blockOrder,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks,
 	]
 );
 
@@ -774,10 +789,10 @@ export function getSelectedBlock( state ) {
  */
 export const getBlockRootClientId = createSelector(
 	( state, clientId ) => {
-		const { blockOrder } = state.editor.present;
+		const { order } = state.editor.present.blocks;
 
-		for ( const rootClientId in blockOrder ) {
-			if ( includes( blockOrder[ rootClientId ], clientId ) ) {
+		for ( const rootClientId in order ) {
+			if ( includes( order[ rootClientId ], clientId ) ) {
 				return rootClientId;
 			}
 		}
@@ -785,7 +800,7 @@ export const getBlockRootClientId = createSelector(
 		return null;
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 	]
 );
 
@@ -809,7 +824,7 @@ export const getBlockHierarchyRootClientId = createSelector(
 		return current;
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 	]
 );
 
@@ -854,8 +869,8 @@ export function getAdjacentBlockClientId( state, startClientId, modifier = 1 ) {
 		return null;
 	}
 
-	const { blockOrder } = state.editor.present;
-	const orderSet = blockOrder[ rootClientId ];
+	const { order } = state.editor.present.blocks;
+	const orderSet = order[ rootClientId ];
 	const index = orderSet.indexOf( startClientId );
 	const nextIndex = ( index + ( 1 * modifier ) );
 
@@ -954,7 +969,7 @@ export const getMultiSelectedBlockClientIds = createSelector(
 		return blockOrder.slice( startIndex, endIndex + 1 );
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
 	],
@@ -978,10 +993,10 @@ export const getMultiSelectedBlocks = createSelector(
 		return multiSelectedBlockClientIds.map( ( clientId ) => getBlock( state, clientId ) );
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks.byClientId,
 		state.editor.present.edits.meta,
 		state.currentPost.meta,
 	]
@@ -1016,10 +1031,10 @@ export function getLastMultiSelectedBlockClientId( state ) {
  * specified client ID is the first block of the multi-selection set, or false
  * otherwise.
  *
- * @param {Object} state      Editor state.
- * @param {string} clientId   Block client ID.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
- * @return {boolean} Whether block is first in mult-selection.
+ * @return {boolean} Whether block is first in multi-selection.
  */
 export function isFirstMultiSelectedBlock( state, clientId ) {
 	return getFirstMultiSelectedBlockClientId( state ) === clientId;
@@ -1059,7 +1074,7 @@ export const isAncestorMultiSelected = createSelector(
 		return isMultiSelected;
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
 	],
@@ -1115,7 +1130,7 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  * @return {Array} Ordered client IDs of editor blocks.
  */
 export function getBlockOrder( state, rootClientId ) {
-	return state.editor.present.blockOrder[ rootClientId || '' ] || EMPTY_ARRAY;
+	return state.editor.present.blocks.order[ rootClientId || '' ] || EMPTY_ARRAY;
 }
 
 /**
@@ -1272,23 +1287,25 @@ export function isCaretWithinFormattedText( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} Insertion point object with `rootClientId`, `layout`,
- * `index`.
+ * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
 export function getBlockInsertionPoint( state ) {
-	let rootClientId, layout, index;
+	let rootClientId, index;
 
-	const { end } = state.blockSelection;
+	const { insertionPoint, blockSelection } = state;
+	if ( insertionPoint !== null ) {
+		return insertionPoint;
+	}
+
+	const { end } = blockSelection;
 	if ( end ) {
 		rootClientId = getBlockRootClientId( state, end ) || undefined;
-
-		layout = get( getBlock( state, end ), [ 'attributes', 'layout' ] );
 		index = getBlockIndex( state, end, rootClientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}
 
-	return { rootClientId, layout, index };
+	return { rootClientId, index };
 }
 
 /**
@@ -1299,7 +1316,7 @@ export function getBlockInsertionPoint( state ) {
  * @return {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.isInsertionPointVisible;
+	return state.insertionPoint !== null;
 }
 
 /**
@@ -1498,26 +1515,21 @@ export const getEditedPostContent = createSelector(
 	},
 	( state ) => [
 		state.editor.present.edits.content,
-		state.editor.present.blocksByClientId,
-		state.editor.present.blockOrder,
+		state.editor.present.blocks,
 	],
 );
 
 /**
- * Determines if the given block type is allowed to be inserted, and, if
- * parentClientId is provided, whether it is allowed to be nested within the
- * given parent.
+ * Determines if the given block type is allowed to be inserted into the block list.
  *
- * @param {Object}  state          Editor state.
- * @param {string}  blockName      The name of the given block type, e.g.
- *                                 'core/paragraph'.
- * @param {?string} parentClientId The parent that the given block is to be
- *                                 nested within, or null.
+ * @param {Object}  state        Editor state.
+ * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
 export const canInsertBlockType = createSelector(
-	( state, blockName, parentClientId = null ) => {
+	( state, blockName, rootClientId = null ) => {
 		const checkAllowList = ( list, item, defaultResult = null ) => {
 			if ( isBoolean( list ) ) {
 				return list;
@@ -1540,17 +1552,17 @@ export const canInsertBlockType = createSelector(
 			return false;
 		}
 
-		const isLocked = !! getTemplateLock( state, parentClientId );
+		const isLocked = !! getTemplateLock( state, rootClientId );
 		if ( isLocked ) {
 			return false;
 		}
 
-		const parentBlockListSettings = getBlockListSettings( state, parentClientId );
+		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
 
 		const blockAllowedParentBlocks = blockType.parent;
-		const parentName = getBlockName( state, parentClientId );
+		const parentName = getBlockName( state, rootClientId );
 		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
 
 		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
@@ -1563,9 +1575,9 @@ export const canInsertBlockType = createSelector(
 
 		return true;
 	},
-	( state, blockName, parentClientId ) => [
-		state.blockListSettings[ parentClientId ],
-		state.editor.present.blocksByClientId[ parentClientId ],
+	( state, blockName, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.editor.present.blocks.byClientId[ rootClientId ],
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	],
@@ -1605,8 +1617,8 @@ function getInsertUsage( state, id ) {
  *
  * Items are returned ordered descendingly by their 'utility' and 'frecency'.
  *
- * @param {Object}  state          Editor state.
- * @param {?string} parentClientId The block we are inserting into, if any.
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  *
@@ -1624,7 +1636,7 @@ function getInsertUsage( state, id ) {
  * @property {number}   frecency          Hueristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, parentClientId = null ) => {
+	( state, rootClientId = null ) => {
 		const calculateUtility = ( category, count, isContextual ) => {
 			if ( isContextual ) {
 				return INSERTER_UTILITY_HIGH;
@@ -1662,7 +1674,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			return canInsertBlockType( state, blockType.name, parentClientId );
+			return canInsertBlockType( state, blockType.name, rootClientId );
 		};
 
 		const buildBlockTypeInserterItem = ( blockType ) => {
@@ -1692,7 +1704,7 @@ export const getInserterItems = createSelector(
 		};
 
 		const shouldIncludeReusableBlock = ( reusableBlock ) => {
-			if ( ! canInsertBlockType( state, 'core/block', parentClientId ) ) {
+			if ( ! canInsertBlockType( state, 'core/block', rootClientId ) ) {
 				return false;
 			}
 
@@ -1706,7 +1718,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			if ( ! canInsertBlockType( state, referencedBlockType.name, parentClientId ) ) {
+			if ( ! canInsertBlockType( state, referencedBlockType.name, rootClientId ) ) {
 				return false;
 			}
 
@@ -1741,7 +1753,7 @@ export const getInserterItems = createSelector(
 			.filter( shouldIncludeBlockType )
 			.map( buildBlockTypeInserterItem );
 
-		const reusableBlockInserterItems = getReusableBlocks( state )
+		const reusableBlockInserterItems = __experimentalGetReusableBlocks( state )
 			.filter( shouldIncludeReusableBlock )
 			.map( buildReusableBlockInserterItem );
 
@@ -1751,10 +1763,9 @@ export const getInserterItems = createSelector(
 			[ 'desc', 'desc' ]
 		);
 	},
-	( state, parentClientId ) => [
-		state.blockListSettings[ parentClientId ],
-		state.editor.present.blockOrder,
-		state.editor.present.blocksByClientId,
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.editor.present.blocks,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -1771,7 +1782,7 @@ export const getInserterItems = createSelector(
  *
  * @return {Object} The reusable block, or null if none exists.
  */
-export const getReusableBlock = createSelector(
+export const __experimentalGetReusableBlock = createSelector(
 	( state, ref ) => {
 		const block = state.reusableBlocks.data[ ref ];
 		if ( ! block ) {
@@ -1799,7 +1810,7 @@ export const getReusableBlock = createSelector(
  *
  * @return {boolean} Whether or not the reusable block is being saved.
  */
-export function isSavingReusableBlock( state, ref ) {
+export function __experimentalIsSavingReusableBlock( state, ref ) {
 	return state.reusableBlocks.isSaving[ ref ] || false;
 }
 
@@ -1812,7 +1823,7 @@ export function isSavingReusableBlock( state, ref ) {
  *
  * @return {boolean} Whether the reusable block is being fetched.
  */
-export function isFetchingReusableBlock( state, ref ) {
+export function __experimentalIsFetchingReusableBlock( state, ref ) {
 	return !! state.reusableBlocks.isFetching[ ref ];
 }
 
@@ -1823,8 +1834,11 @@ export function isFetchingReusableBlock( state, ref ) {
  *
  * @return {Array} An array of all reusable blocks.
  */
-export function getReusableBlocks( state ) {
-	return map( state.reusableBlocks.data, ( value, ref ) => getReusableBlock( state, ref ) );
+export function __experimentalGetReusableBlocks( state ) {
+	return map(
+		state.reusableBlocks.data,
+		( value, ref ) => __experimentalGetReusableBlock( state, ref )
+	);
 }
 
 /**
@@ -2079,4 +2093,45 @@ export function getNotices() {
 	} );
 
 	return select( 'core/notices' ).getNotices();
+}
+
+export function getReusableBlock( state, ref ) {
+	deprecated( "wp.data.select( 'core/editor' ).getReusableBlock( ref )", {
+		alternative: "wp.data.select( 'core' ).getEntityRecord( 'postType', 'wp_block', ref )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalGetReusableBlock( state, ref );
+}
+
+export function isSavingReusableBlock( state, ref ) {
+	deprecated( 'isSavingReusableBlock selector (`core/editor` store)', {
+		alternative: '__experimentalIsSavingReusableBlock selector (`core/edtior` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
+	} );
+
+	return __experimentalIsSavingReusableBlock( state, ref );
+}
+
+export function isFetchingReusableBlock( state, ref ) {
+	deprecated( "wp.data.select( 'core/editor' ).isFetchingReusableBlock( ref )", {
+		alternative: "wp.data.select( 'core' ).isResolving( 'getEntityRecord', 'wp_block', ref )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalIsFetchingReusableBlock( state, ref );
+}
+
+export function getReusableBlocks( state ) {
+	deprecated( "wp.data.select( 'core/editor' ).getReusableBlocks( ref )", {
+		alternative: "wp.data.select( 'core' ).getEntityRecords( 'postType', 'wp_block' )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalGetReusableBlocks( state );
 }

@@ -100,7 +100,7 @@ async function login() {
  * @return {Promise} Promise resolving once RichText is initialized, or is
  *                   determined to not be a container of the active element.
  */
-async function waitForRichTextInitialization() {
+export async function waitForRichTextInitialization() {
 	const isInRichText = await page.evaluate( () => {
 		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
 	} );
@@ -193,7 +193,7 @@ export async function waitForPageDimensions( width, height ) {
 }
 
 export async function switchToEditor( mode ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	const [ button ] = await page.$x( `//button[contains(text(), '${ mode } Editor')]` );
 	await button.click( 'button' );
 }
@@ -306,7 +306,7 @@ export async function pressWithModifier( modifiers, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
 }
 

@@ -4,11 +4,6 @@
 import classnames from 'classnames';
 
 /**
- * WordPress dependencies
- */
-import { normalizeIconObject } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
@@ -22,8 +17,6 @@ function InserterListItem( {
 	className,
 	...props
 } ) {
-	icon = normalizeIconObject( icon );
-
 	const itemIconStyle = icon ? {
 		backgroundColor: icon.background,
 		color: icon.foreground,
@@ -57,7 +50,7 @@ function InserterListItem( {
 					className="editor-block-types-list__item-icon"
 					style={ itemIconStyle }
 				>
-					<BlockIcon icon={ icon && icon.src } showColors />
+					<BlockIcon icon={ icon } showColors />
 					{ hasChildBlocksWithInserterSupport &&
 						<span
 							className="editor-block-types-list__item-icon-stack"

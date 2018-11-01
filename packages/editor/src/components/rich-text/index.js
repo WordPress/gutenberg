@@ -15,7 +15,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, RawHTML } from '@wordpress/element';
 import {
 	isHorizontalEdge,
 	getRectangleFromRange,
@@ -36,8 +36,15 @@ import {
 	toHTMLString,
 	getTextContent,
 	insert,
+	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
+	getSelectionStart,
+	getSelectionEnd,
+	charAt,
+	LINE_SEPARATOR,
+	remove,
+	isCollapsed,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -77,6 +84,10 @@ export class RichText extends Component {
 			this.multilineTag = multiline === true ? 'p' : multiline;
 		}
 
+		if ( this.multilineTag === 'li' ) {
+			this.multilineWrapperTags = [ 'ul', 'ol' ];
+		}
+
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
 		this.onSetup = this.onSetup.bind( this );
@@ -104,7 +115,6 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
 		this.savedContent = value;
-		this.containerRef = createRef();
 		this.patterns = getPatterns( {
 			onReplace,
 			multilineTag: this.multilineTag,
@@ -240,6 +250,7 @@ export class RichText extends Component {
 			element: this.editableRef,
 			range,
 			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
 			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
@@ -248,7 +259,17 @@ export class RichText extends Component {
 	}
 
 	applyRecord( record ) {
-		apply( record, this.editableRef, this.multilineTag );
+		apply( {
+			value: record,
+			current: this.editableRef,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
+			createLinePadding( doc ) {
+				const element = doc.createElement( 'br' );
+				element.setAttribute( 'data-mce-bogus', '1' );
+				return element;
+			},
+		} );
 	}
 
 	isEmpty() {
@@ -426,13 +447,14 @@ export class RichText extends Component {
 
 		const { start, end, formats } = this.createRecord();
 
-		if ( formats[ start ] ) {
-			this.props.onEnterFormattedText();
-		} else {
-			this.props.onExitFormattedText();
-		}
-
 		if ( start !== this.state.start || end !== this.state.end ) {
+			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
+			if ( ! isCaretWithinFormattedText && formats[ start ] ) {
+				this.props.onEnterFormattedText();
+			} else if ( isCaretWithinFormattedText && ! formats[ start ] ) {
+				this.props.onExitFormattedText();
+			}
+
 			this.setState( { start, end } );
 		}
 	}
@@ -497,10 +519,8 @@ export class RichText extends Component {
 		const { keyCode } = event;
 		const isReverse = keyCode === BACKSPACE;
 
-		const { isCollapsed } = getSelection();
-
 		// Only process delete if the key press occurs at uncollapsed edge.
-		if ( ! isCollapsed ) {
+		if ( ! getSelection().isCollapsed ) {
 			return;
 		}
 
@@ -588,32 +608,68 @@ export class RichText extends Component {
 	onKeyDown( event ) {
 		const { keyCode } = event;
 
-		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
-		if ( isDelete ) {
-			this.onDeleteKeyDown( event );
-		}
-
 		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
 		if ( isHorizontalNavigation ) {
 			this.onHorizontalNavigationKeyDown( event );
+		}
+
+		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			if ( this.multilineTag ) {
+				const value = this.createRecord();
+				const start = getSelectionStart( value );
+				const end = getSelectionEnd( value );
+
+				let newValue;
+
+				if ( keyCode === BACKSPACE ) {
+					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
+						newValue = remove(
+							value,
+							// Only remove the line if the selection is
+							// collapsed.
+							isCollapsed( value ) ? start - 1 : start,
+							end
+						);
+					}
+				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
+					newValue = remove(
+						value,
+						start,
+						// Only remove the line if the selection is collapsed.
+						isCollapsed( value ) ? end + 1 : end,
+					);
+				}
+
+				if ( newValue ) {
+					this.onChange( newValue );
+
+					event.preventDefault();
+					// It's important that we stop other handlers (e.g. ones
+					// registered by TinyMCE) from also handling this event.
+					event.stopImmediatePropagation();
+				}
+			}
+
+			this.onDeleteKeyDown( event );
 		}
 
 		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
 		// We also split the content and call the onSplit prop if provided.
 		if ( keyCode === ENTER ) {
 			event.preventDefault();
+			// It's important that we stop other handlers (e.g. ones registered
+			// by TinyMCE) from also handling this event.
+			event.stopImmediatePropagation();
+
+			const record = this.createRecord();
 
 			if ( this.props.onReplace ) {
-				const text = getTextContent( this.getRecord() );
+				const text = getTextContent( record );
 				const transformation = findTransform( this.enterPatterns, ( item ) => {
 					return item.regExp.test( text );
 				} );
 
 				if ( transformation ) {
-					// Calling onReplace() will destroy the editor, so it's
-					// important that we stop other handlers (e.g. ones
-					// registered by TinyMCE) from also handling this event.
-					event.stopImmediatePropagation();
 					this.props.onReplace( [
 						transformation.transform( { content: text } ),
 					] );
@@ -622,16 +678,12 @@ export class RichText extends Component {
 			}
 
 			if ( this.multilineTag ) {
-				const record = this.getRecord();
-
 				if ( this.props.onSplit && isEmptyLine( record ) ) {
 					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
-					// Character is used to separate lines in multiline values.
-					this.onChange( insert( record, '\u2028' ) );
+					this.onChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.props.onSplit ) {
-				const record = this.getRecord();
 				const text = getTextContent( record );
 				const length = text.length;
 				let toInsert = '\n';
@@ -646,7 +698,7 @@ export class RichText extends Component {
 					toInsert = '\n\n';
 				}
 
-				this.onChange( insert( this.getRecord(), toInsert ) );
+				this.onChange( insert( record, toInsert ) );
 			} else {
 				this.splitContent();
 			}
@@ -810,6 +862,7 @@ export class RichText extends Component {
 			return create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -817,6 +870,7 @@ export class RichText extends Component {
 			return create( {
 				html: value,
 				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -832,11 +886,19 @@ export class RichText extends Component {
 	valueToFormat( { formats, text } ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
-			return children.fromDOM( unstableToDom( { formats, text }, this.multilineTag ).body.childNodes );
+			return children.fromDOM( unstableToDom( {
+				value: { formats, text },
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
+			} ).body.childNodes );
 		}
 
 		if ( this.props.format === 'string' ) {
-			return toHTMLString( { formats, text }, this.multilineTag );
+			return toHTMLString( {
+				value: { formats, text },
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
+			} );
 		}
 
 		return { formats, text };
@@ -870,7 +932,6 @@ export class RichText extends Component {
 
 		return (
 			<div className={ classes }
-				ref={ this.containerRef }
 				onFocus={ this.setFocusedElement }
 			>
 				{ isSelected && ! inlineToolbar && (
@@ -909,6 +970,7 @@ export class RichText extends Component {
 								onPaste={ this.onPaste }
 								onInput={ this.onInput }
 								multilineTag={ this.multilineTag }
+								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&
@@ -956,11 +1018,12 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { isViewportMatch } = select( 'core/viewport' );
-		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
+		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

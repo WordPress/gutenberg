@@ -67,15 +67,24 @@ describe( 'adding blocks', () => {
 		await page.click( '.editor-post-title__input' );
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
+		const insertionPoint = await page.$( '[data-type="core/quote"] .editor-inserter__toggle' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y + ( rect.height / 2 ), { steps: 10 } );
-		await page.waitForSelector( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
-		await page.click( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
+		await page.waitForSelector( '[data-type="core/quote"] .editor-inserter__toggle' );
+		await page.click( '[data-type="core/quote"] .editor-inserter__toggle' );
+		// [TODO]: Search input should be focused immediately. It shouldn't be
+		// necessary to have `waitForFunction`.
+		await page.waitForFunction( () => (
+			document.activeElement &&
+			document.activeElement.classList.contains( 'editor-inserter__search' )
+		) );
+		await page.keyboard.type( 'para' );
+		await pressTimes( 'Tab', 3 );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Switch to Text Mode to check HTML Output
-		await page.click( '.edit-post-more-menu [aria-label="More"]' );
+		await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 		const codeEditorButton = ( await page.$x( "//button[contains(text(), 'Code Editor')]" ) )[ 0 ];
 		await codeEditorButton.click( 'button' );
 

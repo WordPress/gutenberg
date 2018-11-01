@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,6 +21,7 @@
 		"build-module"
 	],
 	"main": "build/index.js",
+	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
 		"@wordpress/a11y": "file:../a11y",
