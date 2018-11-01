@@ -228,7 +228,7 @@ class ImageEdit extends Component {
 		if ( value === LINK_DESTINATION_NONE ) {
 			href = undefined;
 		} else if ( value === LINK_DESTINATION_MEDIA ) {
-			href = this.props.attributes.url;
+			href = ( this.props.image && this.props.image.source_url ) || this.props.attributes.url;
 		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
 			href = this.props.image && this.props.image.link;
 		} else {

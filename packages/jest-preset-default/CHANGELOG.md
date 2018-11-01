@@ -1,3 +1,9 @@
+## 3.0.0 (Unreleased)
+
+### Breaking Change
+
+- Remove coverage support.
+
 ## 2.0.0 (2018-07-12)
 
 ### Breaking Change

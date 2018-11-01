@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { mount } from 'enzyme';
-
-/**
  * WordPress dependencies
  */
 import { SlotFillProvider } from '@wordpress/components';
+import { render } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,19 +13,21 @@ jest.mock( '../../../../../../components/src/button' );
 
 describe( 'PluginPostPublishPanel', () => {
 	test( 'renders fill properly', () => {
-		const wrapper = mount(
+		const div = document.createElement( 'div' );
+		render(
 			<SlotFillProvider>
 				<PluginPostPublishPanel
 					className="my-plugin-post-publish-panel"
 					title="My panel title"
 					initialOpen={ true }
 				>
-					My panel content
+				My panel content
 				</PluginPostPublishPanel>
 				<PluginPostPublishPanel.Slot />
-			</SlotFillProvider>
+			</SlotFillProvider>,
+			div
 		);
 
-		expect( wrapper.find( 'Slot' ).children() ).toMatchSnapshot();
+		expect( div.innerHTML ).toMatchSnapshot();
 	} );
 } );
