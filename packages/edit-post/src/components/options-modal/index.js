@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,12 +20,12 @@ import {
 	EnablePublishSidebarOption,
 	EnableTipsOption,
 	EnablePanelOption,
-	EnableCustomFieldsOption,
 } from './options';
+import MetaBoxSection from './meta-box-section';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
+export function OptionsModal( { isModalActive, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -59,21 +59,7 @@ export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
-			<Section title={ __( 'Advanced Panels' ) }>
-				<EnableCustomFieldsOption label={ __( 'Custom Fields' ) } />
-				{ map(
-					metaBoxes,
-					( { title, id } ) =>
-						// The 'Custom Fields' meta box is a special case handled above.
-						id !== 'postcustom' && (
-							<EnablePanelOption
-								key={ id }
-								label={ title }
-								panelName={ `meta-box-${ id }` }
-							/>
-						)
-				) }
-			</Section>
+			<MetaBoxSection title={ __( 'Advanced Panels' ) } />
 		</Modal>
 	);
 }
@@ -81,7 +67,6 @@ export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 export default compose(
 	withSelect( ( select ) => ( {
 		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
-		metaBoxes: select( 'core/edit-post' ).getAllMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {
