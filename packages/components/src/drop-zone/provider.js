@@ -6,7 +6,7 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext, findDOMNode } from '@wordpress/element';
+import { Component, createContext } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 const { Provider, Consumer } = createContext( {
@@ -77,17 +77,11 @@ class DropZoneProvider extends Component {
 
 	componentDidMount() {
 		window.addEventListener( 'dragover', this.onDragOver );
-		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
-
-		// Disable reason: Can't use a ref since this component just renders its children
-		// eslint-disable-next-line react/no-find-dom-node
-		this.container = findDOMNode( this );
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener( 'dragover', this.onDragOver );
-		window.removeEventListener( 'drop', this.onDrop );
 		window.removeEventListener( 'mouseup', this.resetDragState );
 	}
 
@@ -212,10 +206,9 @@ class DropZoneProvider extends Component {
 		const { position, hoveredDropZone } = this.state;
 		const dragEventType = getDragEventType( event );
 		const dropZone = this.dropZones[ hoveredDropZone ];
-		const isValidDropzone = !! dropZone && this.container.contains( event.target );
 		this.resetDragState();
 
-		if ( isValidDropzone ) {
+		if ( dropZone ) {
 			switch ( dragEventType ) {
 				case 'file':
 					dropZone.onFilesDrop( [ ...event.dataTransfer.files ], position );
@@ -234,9 +227,11 @@ class DropZoneProvider extends Component {
 
 	render() {
 		return (
-			<Provider value={ this.dropZoneCallbacks }>
-				{ this.props.children }
-			</Provider>
+			<div onDrop={ this.onDrop } className="components-drop-zone__provider">
+				<Provider value={ this.dropZoneCallbacks }>
+					{ this.props.children }
+				</Provider>
+			</div>
 		);
 	}
 }

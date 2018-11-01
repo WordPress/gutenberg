@@ -13,7 +13,6 @@ import {
 	getBlockTypes,
 	getDefaultBlockName,
 	setDefaultBlockName,
-	getFreeformContentHandlerName,
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
 import { moment } from '@wordpress/date';
@@ -159,6 +158,20 @@ describe( 'selectors', () => {
 			parent: [ 'core/test-block-b' ],
 		} );
 
+		registerBlockType( 'core/test-freeform', {
+			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
+			category: 'common',
+			title: 'Test Freeform Content Handler',
+			icon: 'test',
+			attributes: {
+				content: {
+					type: 'string',
+				},
+			},
+		} );
+
+		setFreeformContentHandlerName( 'core/test-freeform' );
+
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
 
@@ -167,6 +180,9 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-a' );
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
+		unregisterBlockType( 'core/test-freeform' );
+
+		setFreeformContentHandlerName( undefined );
 	} );
 
 	describe( 'hasEditorUndo', () => {
@@ -1003,7 +1019,8 @@ describe( 'selectors', () => {
 							byClientId: {
 								123: {
 									clientId: 123,
-									name: 'core/test-block',
+									name: 'core/test-block-a',
+									isValid: true,
 									attributes: {
 										text: '',
 									},
@@ -1017,6 +1034,65 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+				saving: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if the post has no title, excerpt and empty classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-freeform',
+									attributes: {
+										content: '',
+									},
+								},
+							},
+							order: {
+								'': [ 123 ],
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+				saving: {},
+			};
+
+			expect( isEditedPostSaveable( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if the post has a title and empty classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
+								},
+							},
+							order: {
+								'': [ 123 ],
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'sassel',
+				},
 				saving: {},
 			};
 
@@ -1202,7 +1278,8 @@ describe( 'selectors', () => {
 							byClientId: {
 								123: {
 									clientId: 123,
-									name: 'core/test-block',
+									name: 'core/test-block-a',
+									isValid: true,
 									attributes: {
 										text: '',
 									},
@@ -1219,6 +1296,38 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if blocks, but empty content edit', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-block-a',
+									isValid: true,
+									attributes: {
+										text: '',
+									},
+								},
+							},
+							order: {
+								'': [ 123 ],
+							},
+						},
+						edits: {
+							content: '',
+						},
+					},
+				},
+				currentPost: {
+					content: '',
+				},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if the post has an empty content property', () => {
@@ -1254,6 +1363,132 @@ describe( 'selectors', () => {
 					},
 				},
 				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if empty classic block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
+								},
+							},
+							order: {
+								'': [ 123 ],
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if empty content freeform block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
+								},
+							},
+							order: {
+								'': [ 123 ],
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: '',
+				},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if non-empty content freeform block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: 'Test Data',
+									},
+								},
+							},
+							order: {
+								'': [ 123 ],
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: 'Test Data',
+				},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should return false for multiple empty freeform blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								123: {
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
+								},
+								456: {
+									clientId: 456,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
+								},
+							},
+							order: {
+								'': [ 123, 456 ],
+							},
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					content: '\n\n',
+				},
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( false );
@@ -3283,11 +3518,10 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getEditedPostContent', () => {
-		let originalDefaultBlockName, originalFreeformContentHandlerName;
+		let originalDefaultBlockName;
 
 		beforeAll( () => {
 			originalDefaultBlockName = getDefaultBlockName();
-			originalFreeformContentHandlerName = getFreeformContentHandlerName();
 
 			registerBlockType( 'core/default', {
 				category: 'common',
@@ -3300,23 +3534,11 @@ describe( 'selectors', () => {
 				},
 				save: () => null,
 			} );
-			registerBlockType( 'core/unknown', {
-				category: 'common',
-				title: 'unknown',
-				attributes: {
-					html: {
-						type: 'string',
-					},
-				},
-				save: ( { attributes } ) => <RawHTML>{ attributes.html }</RawHTML>,
-			} );
 			setDefaultBlockName( 'core/default' );
-			setFreeformContentHandlerName( 'core/unknown' );
 		} );
 
 		afterAll( () => {
 			setDefaultBlockName( originalDefaultBlockName );
-			setFreeformContentHandlerName( originalFreeformContentHandlerName );
 			getBlockTypes().forEach( ( block ) => {
 				unregisterBlockType( block.name );
 			} );
@@ -3375,8 +3597,8 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'returns removep\'d serialization of blocks for single unknown', () => {
-			const unknownBlock = createBlock( getFreeformContentHandlerName(), {
-				html: '<p>foo</p>',
+			const unknownBlock = createBlock( 'core/test-freeform', {
+				content: '<p>foo</p>',
 			} );
 			const state = {
 				editor: {
@@ -3401,11 +3623,11 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'returns non-removep\'d serialization of blocks for multiple unknown', () => {
-			const firstUnknown = createBlock( getFreeformContentHandlerName(), {
-				html: '<p>foo</p>',
+			const firstUnknown = createBlock( 'core/test-freeform', {
+				content: '<p>foo</p>',
 			} );
-			const secondUnknown = createBlock( getFreeformContentHandlerName(), {
-				html: '<p>bar</p>',
+			const secondUnknown = createBlock( 'core/test-freeform', {
+				content: '<p>bar</p>',
 			} );
 			const state = {
 				editor: {
@@ -3760,6 +3982,7 @@ describe( 'selectors', () => {
 				'core/block/2',
 				'core/block/1',
 				'core/test-block-b',
+				'core/test-freeform',
 				'core/test-block-a',
 			] );
 		} );
@@ -3806,6 +4029,7 @@ describe( 'selectors', () => {
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
+				'core/test-freeform',
 				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
@@ -3815,6 +4039,7 @@ describe( 'selectors', () => {
 			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block2' );
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
+				'core/test-freeform',
 				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',

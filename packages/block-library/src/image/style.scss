@@ -41,12 +41,16 @@
 	}
 
 	.alignleft {
+		/*rtl:ignore*/
 		float: left;
+		/*rtl:ignore*/
 		margin-right: 1em;
 	}
 
 	.alignright {
+		/*rtl:ignore*/
 		float: right;
+		/*rtl:ignore*/
 		margin-left: 1em;
 	}
 
