@@ -1,3 +1,9 @@
+## 2.2.2 (Unreleased)
+
+### Double You Tee Eff, Mate?
+
+- Removed checking whether the request was blocked by Cloudflare.
+
 ## 2.2.1 (2018-10-30)
 
 ## 2.2.0 (2018-10-29)
