@@ -20,6 +20,7 @@ type PropsType = BlockType & {
 	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
 	insertBlocksAfter: ( blocks: Array<Object> ) => void,
+	mergeBlocks: ( forward: boolean ) => void,
 };
 
 type StateType = {
@@ -71,6 +72,7 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
 				}
 				insertBlocksAfter={ this.props.insertBlocksAfter }
+				mergeBlocks={ this.props.mergeBlocks }
 				isSelected={ this.props.focused }
 				style={ style }
 			/>

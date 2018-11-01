@@ -11,10 +11,12 @@ import {
 	setUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { reducer } from './reducers';
 
 import * as UnsupportedBlock from '../block-types/unsupported-block/';
+
+import gutenbergBridgeMiddleware from './gutenbergBridgeMiddleware';
 
 export type BlockType = {
 	clientId: string,
@@ -45,11 +47,11 @@ export function html2State( html: string ) {
 	return state;
 }
 
-const devToolsEnhancer =
-	// ( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
-	() => {};
+// const devToolsEnhancer =
+// 	// ( 'development' === process.env.NODE_ENV && require( 'remote-redux-devtools' ).default ) ||
+// 	() => {};
 
 export function setupStore( state: StateType = html2State( '' ) ) {
-	const store = createStore( reducer, state, devToolsEnhancer() );
+	const store = createStore( reducer, state, applyMiddleware( gutenbergBridgeMiddleware ) );
 	return store;
 }

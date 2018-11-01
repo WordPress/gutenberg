@@ -23,6 +23,17 @@ export type ParseActionType = string => {
 	html: string,
 };
 
+export type serializeToNativeActionType = void => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+};
+
+export type BlocksActionType = ( string, string, BlockType ) => {
+	type: $Values<typeof ActionTypes.BLOCK>,
+	blockOneClientId: string,
+	blockTwoClientId: string,
+	block: BlockType,
+};
+
 export function updateBlockAttributes( clientId: string, attributes: mixed ) {
 	return {
 		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
@@ -61,4 +72,15 @@ export const createBlockAction: CreateActionType = ( clientId, block, clientIdAb
 export const parseBlocksAction: ParseActionType = ( html ) => ( {
 	type: ActionTypes.BLOCK.PARSE,
 	html,
+} );
+
+export const serializeToNativeAction: serializeToNativeActionType = () => ( {
+	type: ActionTypes.BLOCK.SERIALIZE_ALL,
+} );
+
+export const mergeBlocksAction: BlocksActionType = ( blockOneClientId, blockTwoClientId, block ) => ( {
+	type: ActionTypes.BLOCK.MERGE,
+	blockOneClientId,
+	blockTwoClientId,
+	block,
 } );
