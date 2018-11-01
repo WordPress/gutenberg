@@ -20,7 +20,7 @@ export default function CodeEdit( { attributes, setAttributes } ) {
 		<View>
 			<PlainText
 				value={ attributes.content }
-				style={ { fontFamily: "monospace" } }
+				style={ { fontFamily: 'monospace' } }
 				multiline={ true }
 				underlineColorAndroid="transparent"
 				onChange={ ( content ) => setAttributes( { content } ) }
