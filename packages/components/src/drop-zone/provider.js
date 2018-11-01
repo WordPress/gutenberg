@@ -6,7 +6,7 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext, createRef } from '@wordpress/element';
+import { Component, createContext } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 const { Provider, Consumer } = createContext( {
@@ -61,7 +61,6 @@ class DropZoneProvider extends Component {
 		this.resetDragState = this.resetDragState.bind( this );
 		this.toggleDraggingOverDocument = throttle( this.toggleDraggingOverDocument.bind( this ), 200 );
 
-		this.container = createRef();
 		this.dropZones = [];
 		this.dropZoneCallbacks = {
 			addDropZone: this.addDropZone,
@@ -78,13 +77,11 @@ class DropZoneProvider extends Component {
 
 	componentDidMount() {
 		window.addEventListener( 'dragover', this.onDragOver );
-		window.addEventListener( 'drop', this.onDrop );
 		window.addEventListener( 'mouseup', this.resetDragState );
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener( 'dragover', this.onDragOver );
-		window.removeEventListener( 'drop', this.onDrop );
 		window.removeEventListener( 'mouseup', this.resetDragState );
 	}
 
@@ -209,10 +206,9 @@ class DropZoneProvider extends Component {
 		const { position, hoveredDropZone } = this.state;
 		const dragEventType = getDragEventType( event );
 		const dropZone = this.dropZones[ hoveredDropZone ];
-		const isValidDropzone = !! dropZone && this.container.current.contains( event.target );
 		this.resetDragState();
 
-		if ( isValidDropzone ) {
+		if ( dropZone ) {
 			switch ( dragEventType ) {
 				case 'file':
 					dropZone.onFilesDrop( [ ...event.dataTransfer.files ], position );
@@ -231,7 +227,7 @@ class DropZoneProvider extends Component {
 
 	render() {
 		return (
-			<div ref={ this.container } className="components-drop-zone__provider">
+			<div onDrop={ this.onDrop } className="components-drop-zone__provider">
 				<Provider value={ this.dropZoneCallbacks }>
 					{ this.props.children }
 				</Provider>
