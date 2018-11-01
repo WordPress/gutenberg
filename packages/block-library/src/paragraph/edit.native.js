@@ -83,7 +83,9 @@ class ParagraphEdit extends Component {
 					tagName="p"
 					value={ content }
 					style={ {
-						...style,
+						// We don't want to pass style here from upper leyers, because it's corrupted
+						// (when a `className` prop is passed it gets converted to `style` here)
+						// as we're using the react-native-classname-to-style plugin.
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
