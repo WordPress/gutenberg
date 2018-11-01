@@ -181,8 +181,8 @@ module.exports = {
 				};
 			} ),
 		} ],
-		// TODO: removeme, maybe? Without this eslint fails horribly on Windows :)
-		'linebreak-style': 'off',
+		// TODO: removeme, maybe? Without this linting fails horribly on Windows, many thousands of false positives :)
+		// 'linebreak-style': 'off',
 	},
 	overrides: [
 		{

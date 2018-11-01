@@ -14,5 +14,3 @@ phpcs.xml
 yarn.lock
 docker-compose.override.yml
 /wordpress
-lib/compat.php
-lib/compat.php

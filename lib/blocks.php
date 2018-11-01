@@ -110,7 +110,6 @@ if ( ! function_exists( 'get_dynamic_block_names' ) ) {
 	}
 }
 
-
 if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
 	/**
 	 * Retrieve the dynamic blocks regular expression for searching.
