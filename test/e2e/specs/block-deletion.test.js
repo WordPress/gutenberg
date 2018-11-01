@@ -7,7 +7,6 @@ import {
 	newPost,
 	pressWithModifier,
 	ACCESS_MODIFIER_KEYS,
-	waitForRichTextInitialization,
 } from '../support/utils';
 
 const addThreeParagraphsToNewPost = async () => {
@@ -17,10 +16,8 @@ const addThreeParagraphsToNewPost = async () => {
 	await clickBlockAppender();
 	await page.keyboard.type( 'First paragraph' );
 	await page.keyboard.press( 'Enter' );
-	await waitForRichTextInitialization();
 	await page.keyboard.type( 'Second paragraph' );
 	await page.keyboard.press( 'Enter' );
-	await waitForRichTextInitialization();
 };
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
@@ -99,7 +96,6 @@ describe( 'block deletion -', () => {
 			// Add a third paragraph for this test.
 			await page.keyboard.type( 'Third paragraph' );
 			await page.keyboard.press( 'Enter' );
-			await waitForRichTextInitialization();
 
 			// Press the up arrow once to select the third and fourth blocks.
 			await pressWithModifier( 'Shift', 'ArrowUp' );
