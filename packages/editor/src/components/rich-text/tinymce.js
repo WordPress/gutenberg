@@ -130,15 +130,7 @@ export default class TinyMCE extends Component {
 		this.initialize();
 	}
 
-	shouldComponentUpdate() {
-		// We must prevent rerenders because TinyMCE will modify the DOM, thus
-		// breaking React's ability to reconcile changes.
-		//
-		// See: https://github.com/facebook/react/issues/6802
-		return false;
-	}
-
-	componentWillReceiveProps( nextProps ) {
+	shouldComponentUpdate( nextProps ) {
 		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
@@ -155,6 +147,12 @@ export default class TinyMCE extends Component {
 			this.editorNode.removeAttribute( key ) );
 		updatedKeys.forEach( ( key ) =>
 			this.editorNode.setAttribute( key, nextProps[ key ] ) );
+
+		// We must prevent rerenders because TinyMCE will modify the DOM, thus
+		// breaking React's ability to reconcile changes.
+		//
+		// See: https://github.com/facebook/react/issues/6802
+		return false;
 	}
 
 	componentWillUnmount() {
