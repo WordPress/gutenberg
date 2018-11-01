@@ -45,7 +45,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ImageSize, { getEditorWidth } from './image-size';
+import ImageSize, { getBlockWidth } from './image-size';
 
 /**
  * Module constants
@@ -93,10 +93,12 @@ class ImageEdit extends Component {
 		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
-		this.resetScale = this.resetScale.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+		this.updateWidth = this.updateWidth.bind( this );
+		this.updateHeight = this.updateHeight.bind( this );
+		this.resetWidthHeight = this.resetWidthHeight.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -127,6 +129,10 @@ class ImageEdit extends Component {
 		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
 		const { id, url = '', fileWidth } = this.props.attributes;
 		const imageData = this.props.image;
+		const blockWidth = getBlockWidth();
+
+		// Store the block width inside the editor for later.
+		this.props.setAttributes( { editWidth: blockWidth } );
 
 		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
 			revokeBlobURL( url );
@@ -148,7 +154,7 @@ class ImageEdit extends Component {
 
 				if ( url === sizeFull.source_url ) {
 					if ( sizeLarge && this.imageMatchesRatio( sizeFull.width, sizeFull.height, sizeLarge.width, sizeLarge.height ) ) {
-						// If the full size image was used, and there's a large size that matches the ratio, replace with the large size.
+						// If the full size image was used, and there's a large size that matches the ratio, replace full with large size.
 						this.updateImageURL( sizeLarge.source_url, imageMeta.sizes );
 					} else {
 						// Add srcset, sizes, and image file dimensions.
@@ -174,10 +180,10 @@ class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
-		const editorWidth = getEditorWidth();
+		const blockWidth = getBlockWidth();
 		let src = media.url;
 		let img = {};
-		let sizesWidth = editorWidth;
+		let sizesWidth = blockWidth;
 		let actualWidth;
 		let actualHeight;
 
@@ -193,7 +199,7 @@ class ImageEdit extends Component {
 				actualHeight = img.actual_size.height;
 			}
 
-			if ( actualWidth < editorWidth ) {
+			if ( actualWidth < blockWidth ) {
 				// The "full" size may be narrower than 100%.
 				sizesWidth = actualWidth;
 			}
@@ -208,7 +214,6 @@ class ImageEdit extends Component {
 			url: src,
 			srcSet: img.srcset,
 			sizes: img.sizes,
-			scale: 1,
 
 			// Not used in the editor, passed to the front-end in block attributes.
 			fileWidth: actualWidth,
@@ -244,7 +249,6 @@ class ImageEdit extends Component {
 				id: undefined,
 			} );
 			this.resetWidthHeight();
-			this.resetScale();
 			this.resetSrcsetAndSizes();
 		}
 
@@ -278,38 +282,34 @@ class ImageEdit extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const scale = get( this.props.attributes, [ 'scale' ], 1 );
-		const oldAlign = get( this.props.attributes, [ 'align' ] );
+		const { align, width, fileWidth, fileHeight } = this.props.attributes;
+		const blockWidth = getBlockWidth();
+		const isFullWidth = ( ! width || ( width >= blockWidth ) ) && ( fileWidth >= blockWidth );
 
+		/* eslint-disable no-mixed-operators */
+		// Reason for disabling: buggy, throws incorrect errors... :)
 		if ( nextAlign === 'wide' || nextAlign === 'full' ) {
 			// Reset all sizing attributes.
-			this.resetScale();
 			this.resetWidthHeight();
-		} else if ( ( nextAlign === 'right' || nextAlign === 'left' ) && scale === 1 ) {
-			// When an image is floated resize it to 50% if not already resized.
-			const fileWidth = get( this.props.attributes, [ 'fileWidth' ] );
-			const editorWidth = getEditorWidth();
-			let newScale = 1;
-
-			if ( fileWidth > editorWidth ) {
-				newScale = 0.5;
-			} else if ( fileWidth > ( editorWidth / 2 ) ) {
-				newScale = ( editorWidth / 2 ) / fileWidth;
-			}
-
-			this.updateScale( newScale );
-		} else if ( ( oldAlign === 'right' || oldAlign === 'left' ) && scale === 0.5 ) {
+		} else if ( ( nextAlign === 'right' || nextAlign === 'left' ) && isFullWidth ) {
+			// When an image is floated resize it to 50% if large enough and not already resized.
+			this.updateWidth( blockWidth * 0.5, fileWidth, fileHeight );
+		} else if (
+			( align === 'right' && nextAlign !== 'left' ) ||
+			( align === 'left' && nextAlign !== 'right' ) &&
+			fileWidth >= blockWidth &&
+			width === blockWidth * 0.5
+		) {
 			// Revert the above.
-			this.resetScale();
+			this.resetWidthHeight();
 		}
+		/* eslint-enable no-mixed-operators */
 
 		this.props.setAttributes( { align: nextAlign } );
 	}
 
 	updateImageURL( url, availableSizes ) {
-		this.props.setAttributes( { url } );
 		this.resetWidthHeight();
-		this.resetScale();
 		let imageData;
 		let size;
 
@@ -322,66 +322,58 @@ class ImageEdit extends Component {
 		}
 
 		this.updateSrcsetAndSizes( imageData );
+		this.props.setAttributes( { url } );
 	}
 
-	updateScale( scale ) {
-		// The image was resized by dragging, remove custom width/height.
-		this.resetWidthHeight();
-		this.props.setAttributes( { scale } );
-	}
-
-	resetScale() {
-		this.props.setAttributes( {
-			scale: 1,
-		} );
-	}
-
-	updateWidth( width, imageWidth, imageHeight ) {
+	updateWidth( width, imageWidth, imageHeight, directInput ) {
 		width = parseInt( width, 10 );
+		imageWidth = imageWidth || this.props.attributes.imageWidth;
+		imageHeight = imageHeight || this.props.attributes.imageHeight;
 
 		// Reset the image size when the user deletes the value.
-		if ( ! width ) {
-			this.resetScale();
+		if ( ! width || ! imageWidth || ! imageHeight ) {
 			this.resetWidthHeight();
 			return;
 		}
 
 		const height = round( imageHeight * ( width / imageWidth ) );
-		this.setWidthHeight( width, height );
+		this.setWidthHeight( width, height, directInput );
 	}
 
-	setWidthHeight( width, height ) {
-		const editorWidth = getEditorWidth();
-		const constrainedWidth = width < editorWidth ? width : editorWidth;
-
-		// Scale the image.
-		this.updateScale( constrainedWidth / editorWidth );
-
-		// Store the specific values set by the user.
-		this.props.setAttributes( {
-			width: width,
-			height: height,
-		} );
-	}
-
-	updateHeight( height, imageWidth, imageHeight ) {
+	updateHeight( height, imageWidth, imageHeight, directInput ) {
 		height = parseInt( height, 10 );
+		imageWidth = imageWidth || this.props.attributes.imageWidth;
+		imageHeight = imageHeight || this.props.attributes.imageHeight;
 
 		// Reset the image size when the user deletes the value.
-		if ( ! height ) {
-			this.resetScale();
+		if ( ! height || ! imageWidth || ! imageHeight ) {
 			this.resetWidthHeight();
 			return;
 		}
 
 		const width = round( imageWidth * ( height / imageHeight ) );
-		this.setWidthHeight( width, height );
+		this.setWidthHeight( width, height, directInput );
+	}
+
+	setWidthHeight( width, height, directInput ) {
+		// Set image size and also store the values separately when set directly by the user.
+		const userWidth = directInput ? width : undefined;
+		const userHeight = directInput ? height : undefined;
+
+		this.props.setAttributes( {
+			width,
+			height,
+			userWidth,
+			userHeight,
+		} );
 	}
 
 	resetWidthHeight() {
 		this.props.setAttributes( {
 			width: undefined,
 			height: undefined,
+			userWidth: undefined,
+			userHeight: undefined,
 		} );
 	}
 
@@ -396,12 +388,8 @@ class ImageEdit extends Component {
 				fileHeight: imageData.height,
 			} );
 		} else {
-			const editorWidth = getEditorWidth();
-			let sizesWidth = editorWidth;
-
-			if ( imageData.width < editorWidth ) {
-				sizesWidth = imageData.width;
-			}
+			const blockWidth = getBlockWidth();
+			const sizesWidth = ( imageData.width < blockWidth ) ? imageData.width : blockWidth;
 
 			this.props.setAttributes( {
 				srcSet: imageData.srcset,
@@ -422,6 +410,7 @@ class ImageEdit extends Component {
 	}
 
 	getSizesAttr( width ) {
+		// For use inside the editor.
 		return '(max-width: '.concat( width, 'px) 100vw, ', width, 'px' );
 	}
 
@@ -479,9 +468,9 @@ class ImageEdit extends Component {
 			return;
 		}
 
+		let name;
 		const fullWidth = sizes.full.width;
 		const fullHeight = sizes.full.height;
-		let name;
 		const showSizes = {
 			default: sizes.large || sizes.full,
 			// Always show the thumbnail size.
@@ -514,7 +503,7 @@ class ImageEdit extends Component {
 	render() {
 		const { isEditing } = this.state;
 		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
-		const { url, alt, caption, align, id, href, linkDestination, scale, srcSet, width, height } = attributes;
+		const { url, alt, caption, align, id, href, linkDestination, srcSet, width, height, userWidth, userHeight } = attributes;
 		const isExternal = isExternalImage( id, url );
 		const sizesAttr = attributes.sizes;
 
@@ -589,7 +578,7 @@ class ImageEdit extends Component {
 
 		const classes = classnames( className, {
 			'is-transient': isBlobURL( url ),
-			'is-resized': scale !== 1,
+			'is-resized': !! width || !! height,
 			'is-focused': isSelected,
 		} );
 
@@ -630,29 +619,40 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width ? width : '' }
+									value={ userWidth ? userWidth : '' }
 									placeholder={ imageWidth }
 									min={ 1 }
 									onChange={ ( value ) => {
-										this.updateWidth( value, imageWidth, imageHeight );
+										this.updateWidth( value, imageWidth, imageHeight, true );
 									} }
 								/>
 								<TextControl
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height ? height : '' }
+									value={ userHeight ? userHeight : '' }
 									placeholder={ imageHeight }
 									min={ 1 }
 									onChange={ ( value ) => {
-										this.updateHeight( value, imageWidth, imageHeight );
+										this.updateHeight( value, imageWidth, imageHeight, true );
 									} }
 								/>
 							</div>
 							<div className="block-library-image__dimensions__row">
 								<ButtonGroup aria-label={ __( 'Image Size' ) }>
 									{ [ 25, 50, 75, 100 ].map( ( percent ) => {
-										const isCurrent = scale === percent / 100;
+										const blockWidth = getBlockWidth();
+
+										// Percentage is relative to the block width.
+										let scaledWidth = round( blockWidth * ( percent / 100 ) );
+										let isCurrent = false;
+
+										if ( scaledWidth > imageWidth ) {
+											scaledWidth = imageWidth;
+											isCurrent = percent === 100 && ( ! width || width === scaledWidth );
+										} else {
+											isCurrent = ( width === scaledWidth ) || ( ! width && percent === 100 && imageWidth > blockWidth );
+										}
 
 										return (
 											<Button
@@ -660,7 +660,7 @@ class ImageEdit extends Component {
 												isSmall
 												isPrimary={ isCurrent }
 												aria-pressed={ isCurrent }
-												onClick={ () => this.updateScale( percent / 100 ) }
+												onClick={ () => this.updateWidth( scaledWidth, imageWidth, imageHeight ) }
 											>
 												{ percent }%
 											</Button>
@@ -669,10 +669,7 @@ class ImageEdit extends Component {
 								</ButtonGroup>
 								<Button
 									isSmall
-									onClick={ () => {
-										this.resetScale();
-										this.resetWidthHeight();
-									} }
+									onClick={ this.resetWidthHeight }
 								>
 									{ __( 'Reset' ) }
 								</Button>
@@ -726,19 +723,20 @@ class ImageEdit extends Component {
 								onClick={ this.onImageClick }
 							/>;
 
+							// Floating a resized image can produce inaccurate `imageWidthWithinContainer`.
 							const ratio = imageWidth / imageHeight;
-							const editorWidth = getEditorWidth();
+							const blockWidth = getBlockWidth();
 							let constrainedWidth;
 							let constrainedHeight;
 
-							if ( ( align === 'wide' || align === 'full' ) && imageWidthWithinContainer > editorWidth ) {
-								// Do not limit the width, even if scaled up ?
+							if ( ( align === 'wide' || align === 'full' ) && imageWidthWithinContainer > blockWidth ) {
+								// Do not limit the width.
 								constrainedWidth = imageWidthWithinContainer;
 								constrainedHeight = imageHeightWithinContainer;
 							} else {
-								// Floating a resized image can produce inaccurate `imageWidthWithinContainer`.
-								constrainedWidth = imageWidth > editorWidth ? editorWidth : imageWidth;
-								constrainedHeight = round( constrainedWidth / ratio );
+								constrainedWidth = width || imageWidth;
+								constrainedWidth = constrainedWidth	> blockWidth ? blockWidth : constrainedWidth;
+								constrainedHeight = round( constrainedWidth / ratio, 2 ) || undefined;
 							}
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -746,8 +744,8 @@ class ImageEdit extends Component {
 									<Fragment>
 										{ imageWidthWithinContainer && getInspectorControls( imageWidthWithinContainer, imageHeightWithinContainer, imageWidth, imageHeight ) }
 										<div style={ {
-											width: constrainedWidth ? constrainedWidth * scale : undefined,
-											height: constrainedHeight ? constrainedHeight * scale : undefined,
+											width: constrainedWidth,
+											height: constrainedHeight,
 										} }>
 											{ img }
 										</div>
@@ -787,22 +785,14 @@ class ImageEdit extends Component {
 							}
 							/* eslint-enable no-lonely-if */
 
-							let displayWidth;
-							let displayHeight;
-
-							if ( constrainedWidth && constrainedHeight && scale ) {
-								displayWidth = constrainedWidth * scale;
-								displayHeight = constrainedHeight * scale;
-							}
-
 							return (
 								<Fragment>
 									{ getInspectorControls( imageWidthWithinContainer, imageHeightWithinContainer, imageWidth, imageHeight ) }
 									<ResizableBox
 										size={
-											( displayWidth && displayHeight ) ? {
-												width: displayWidth,
-												height: displayHeight,
+											( constrainedWidth && constrainedHeight ) ? {
+												width: constrainedWidth,
+												height: constrainedHeight,
 											} : undefined
 										}
 										minWidth={ minWidth }
@@ -820,17 +810,20 @@ class ImageEdit extends Component {
 											toggleSelection( false );
 										} }
 										onResizeStop={ ( event, direction, elt, delta ) => {
-											const currentWidth = constrainedWidth * scale;
-											const newWidth = parseInt( currentWidth + delta.width, 10 );
-											let newScale = newWidth / constrainedWidth;
+											let newWidth = parseInt( constrainedWidth + delta.width, 10 );
 
 											// Snap-to-border for the last pixel when resizing by dragging.
 											// That highlights the 100% width button.
-											if ( newScale > 0.998275 ) {
-												newScale = 1;
+											if ( Math.abs( constrainedWidth - newWidth ) < 2 ) {
+												newWidth = constrainedWidth;
 											}
 
-											this.updateScale( newScale );
+											// Don't upscale.
+											if ( newWidth > imageWidth ) {
+												newWidth = imageWidth;
+											}
+
+											this.updateWidth( newWidth, imageWidth, imageHeight );
 											toggleSelection( true );
 										} }
 									>

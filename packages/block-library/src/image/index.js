@@ -64,9 +64,14 @@ const blockAttributes = {
 	fileHeight: {
 		type: 'number',
 	},
-	scale: {
+	userWidth: {
 		type: 'number',
-		default: 1,
+	},
+	userHeight: {
+		type: 'number',
+	},
+	editWidth: {
+		type: 'number',
 	},
 	linkDestination: {
 		type: 'string',
@@ -221,11 +226,11 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, scale, srcSet, sizes } = attributes;
+		const { url, alt, caption, align, href, width, height, srcSet, sizes } = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
-			'is-resized': scale !== 1,
+			'is-resized': width || height,
 		} );
 
 		const image = (
