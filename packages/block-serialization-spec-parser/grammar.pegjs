@@ -80,7 +80,8 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
                 'blockName' => null,
                 'attrs' => array(),
                 'innerBlocks' => array(),
-                'innerHTML' => $pre
+                'innerHTML' => $pre,
+                'innerContent' => array( $pre ),
             );
         }
 
@@ -94,7 +95,8 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
                     'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $html
+                    'innerHTML' => $html,
+                    'innerContent' => array( $html ),
                 );
             }
         }
@@ -104,7 +106,8 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
                 'blockName' => null,
                 'attrs' => array(),
                 'innerBlocks' => array(),
-                'innerHTML' => $post
+                'innerHTML' => $post,
+                'innerContent' => array( $post ),
             );
         }
 
@@ -120,6 +123,7 @@ function freeform( s ) {
         attrs: {},
         innerBlocks: [],
         innerHTML: s,
+        innerContent: [ s ],
     };
 }
 

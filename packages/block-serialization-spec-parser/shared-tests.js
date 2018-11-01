@@ -64,6 +64,7 @@ export const jsTester = ( parse ) => () => {
 
 	describe( 'innerBlock placemarkers', () => {
 		test( 'innerContent exists', () => {
+			expect( parse( 'test' )[ 0 ] ).toHaveProperty( 'innerContent', [ 'test' ] );
 			expect( parse( '<!-- wp:void /-->' )[ 0 ] ).toHaveProperty( 'innerContent', [] );
 		} );
 

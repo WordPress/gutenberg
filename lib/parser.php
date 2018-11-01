@@ -1612,7 +1612,8 @@ class Gutenberg_PEG_Parser {
                     'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $pre
+                    'innerHTML' => $pre,
+                    'innerContent' => array( $pre ),
                 );
             }
 
@@ -1626,7 +1627,8 @@ class Gutenberg_PEG_Parser {
                         'blockName' => null,
                         'attrs' => array(),
                         'innerBlocks' => array(),
-                        'innerHTML' => $html
+                        'innerHTML' => $html,
+                        'innerContent' => array( $html ),
                     );
                 }
             }
@@ -1636,7 +1638,8 @@ class Gutenberg_PEG_Parser {
                     'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $post
+                    'innerHTML' => $post,
+                    'innerContent' => array( $post ),
                 );
             }
 

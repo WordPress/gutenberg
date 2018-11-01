@@ -1648,7 +1648,8 @@
                     'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $pre
+                    'innerHTML' => $pre,
+                    'innerContent' => array( $pre ),
                 );
             }
 
@@ -1662,7 +1663,8 @@
                         'blockName' => null,
                         'attrs' => array(),
                         'innerBlocks' => array(),
-                        'innerHTML' => $html
+                        'innerHTML' => $html,
+                        'innerContent' => array( $html ),
                     );
                 }
             }
@@ -1672,7 +1674,8 @@
                     'blockName' => null,
                     'attrs' => array(),
                     'innerBlocks' => array(),
-                    'innerHTML' => $post
+                    'innerHTML' => $post,
+                    'innerContent' => array( $post ),
                 );
             }
 
@@ -1688,6 +1691,7 @@
             attrs: {},
             innerBlocks: [],
             innerHTML: s,
+            innerContent: [ s ],
         };
     }
 
