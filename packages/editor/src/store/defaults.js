@@ -11,13 +11,14 @@ export const PREFERENCES_DEFAULTS = {
 /**
  * The default editor settings
  *
- *  alignWide         boolean        Enable/Disable Wide/Full Alignments
- *  colors            Array          Palette colors
- *  fontSizes         Array          Available font sizes
- *  maxWidth          number         Max width to constraint resizing
- *  blockTypes        boolean|Array  Allowed block types
- *  hasFixedToolbar   boolean        Whether or not the editor toolbar is fixed
- *  focusMode         boolean        Whether the focus mode is enabled or not
+ *  alignWide            boolean        Enable/Disable Wide/Full Alignments
+ *  colors               Array          Palette colors
+ *  fontSizes            Array          Available font sizes
+ *  availableImageSizes  Array          Available image sizes
+ *  maxWidth             number         Max width to constraint resizing
+ *  blockTypes           boolean|Array  Allowed block types
+ *  hasFixedToolbar      boolean        Whether or not the editor toolbar is fixed
+ *  focusMode            boolean        Whether the focus mode is enabled or not
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -104,6 +105,13 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 			size: 48,
 			slug: 'huge',
 		},
+	],
+
+	availableImageSizes: [
+		{ id: 'thumbnail', label: __( 'Thumbnail' ) },
+		{ id: 'medium', label: __( 'Medium' ) },
+		{ id: 'large', label: __( 'Large' ) },
+		{ id: 'full', label: __( 'Full Size' ) },
 	],
 
 	// This is current max width of the block inner area
