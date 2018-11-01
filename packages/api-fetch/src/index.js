@@ -23,10 +23,11 @@ function registerMiddleware( middleware ) {
 function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
 		const { url, path, body, data, parse = true, ...remainingOptions } = nextOptions;
-		const headers = remainingOptions.headers || {};
-		if ( ! headers[ 'Content-Type' ] && data ) {
-			headers[ 'Content-Type' ] = 'application/json';
-		}
+		const headers = {
+			Accept: 'application/json, */*;q=0.1',
+			'Content-Type': 'application/json',
+			...remainingOptions.headers,
+		};
 
 		const responsePromise = window.fetch(
 			url || path,
