@@ -814,12 +814,23 @@
 			// It behaves as relative, in other words, until it reaches an edge and then behaves as fixed.
 			// But by applying a float, we take it out of this flow. The benefit is that we don't need to compensate for margins.
 			// In turn, this allows margins on sibling elements to collapse to parent elements.
+			// RTL note: this rule does need to be auto-flipped based on direction.
+			float: left;
+		}
+	}
+
+	.editor-block-list__block[data-align="left"] & {
+		@include break-small() {
+			// RTL note: this rule should not be auto-flipped based on direction.
+			/*rtl:ignore*/
 			float: left;
 		}
 	}
 
 	.editor-block-list__block[data-align="right"] & {
 		@include break-small() {
+			// RTL note: this rule should not be auto-flipped based on direction.
+			/*rtl:ignore*/
 			float: right;
 		}
 	}
