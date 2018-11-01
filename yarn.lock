@@ -8768,6 +8768,11 @@ tunnel-agent@^0.6.0:
   dependencies:
     safe-buffer "^5.0.1"
 
+turbo-combine-reducers@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/turbo-combine-reducers/-/turbo-combine-reducers-1.0.2.tgz#aa3650b3c63daa6804d35a4042014f6d31df1e47"
+  integrity sha512-gHbdMZlA6Ym6Ur5pSH/UWrNQMIM9IqTH6SoL1DbHpqEdQ8i+cFunSmSlFykPt0eGQwZ4d/XTHOl74H0/kFBVWw==
+
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
