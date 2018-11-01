@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E45CD00218B853D00C0B2AB /* Gutenberg.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E45CCFF218B853D00C0B2AB /* Gutenberg.m */; };
 		B3E7B58A1CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */; };
 /* End PBXBuildFile section */
 
@@ -24,6 +25,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNReactNativeGutenbergBridge.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNReactNativeGutenbergBridge.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7E45CCFE218B853D00C0B2AB /* Gutenberg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Gutenberg.h; sourceTree = "<group>"; };
+		7E45CCFF218B853D00C0B2AB /* Gutenberg.m */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = Gutenberg.m; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; wrapsLines = 0; };
 		B3E7B5881CC2AC0600A0062D /* RNReactNativeGutenbergBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNReactNativeGutenbergBridge.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNReactNativeGutenbergBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -52,6 +55,8 @@
 			children = (
 				B3E7B5881CC2AC0600A0062D /* RNReactNativeGutenbergBridge.h */,
 				B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */,
+				7E45CCFE218B853D00C0B2AB /* Gutenberg.h */,
+				7E45CCFF218B853D00C0B2AB /* Gutenberg.m */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -113,6 +118,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B3E7B58A1CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m in Sources */,
+				7E45CD00218B853D00C0B2AB /* Gutenberg.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -204,7 +210,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				HEADER_SEARCH_PATHS = (
-				"$(inherited)",
+					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../React/**",
 					"$(SRCROOT)/../../react-native/React/**",
