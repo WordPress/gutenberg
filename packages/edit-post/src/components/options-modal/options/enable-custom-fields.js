@@ -10,12 +10,12 @@ import { withSelect } from '@wordpress/data';
 import BaseOption from './base';
 
 class EnableCustomFieldsOption extends Component {
-	constructor( { isEnabled } ) {
+	constructor( { isChecked } ) {
 		super( ...arguments );
 
 		this.toggleCustomFields = this.toggleCustomFields.bind( this );
 
-		this.state = { isEnabled };
+		this.state = { isChecked };
 	}
 
 	toggleCustomFields() {
@@ -25,17 +25,17 @@ class EnableCustomFieldsOption extends Component {
 		document.getElementById( 'toggle-custom-fields-form' ).submit();
 
 		// Make it look like something happened while the page reloads.
-		this.setState( { isEnabled: ! this.props.isEnabled } );
+		this.setState( { isChecked: ! this.props.isChecked } );
 	}
 
 	render() {
 		const { label } = this.props;
-		const { isEnabled } = this.state;
+		const { isChecked } = this.state;
 
 		return (
 			<BaseOption
 				label={ label }
-				isChecked={ isEnabled }
+				isChecked={ isChecked }
 				onChange={ this.toggleCustomFields }
 			/>
 		);
@@ -43,5 +43,5 @@ class EnableCustomFieldsOption extends Component {
 }
 
 export default withSelect( ( select ) => ( {
-	isEnabled: select( 'core/editor' ).getEditorSettings().enableCustomFields,
+	isChecked: select( 'core/editor' ).getEditorSettings().enableCustomFields,
 } ) )( EnableCustomFieldsOption );
