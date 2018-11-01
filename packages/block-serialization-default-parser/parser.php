@@ -206,6 +206,18 @@ class WP_Block_Parser {
 		$leading_html_start = $start_offset > $this->offset ? $this->offset : null;
 
 		switch ( $token_type ) {
+			case 'preg-failed':
+				/*
+				 * Things have gone badly, we crashed PCRE.
+				 * Log the error message, then let the no-more-tokens handler close things out as best we can.
+				 */
+				$message = sprintf(
+					'The data passed to the parser caused a PCRE error: %s',
+					array_flip( get_defined_constants( true )['pcre'])[ $block_name ]
+				);
+				_doing_it_wrong( 'WP_Block_Parser::parse', $message, '5.0.0' );
+
+				// Deliberate fall-through.
 			case 'no-more-tokens':
 				// if not in a block then flush output
 				if ( 0 === $stack_depth ) {
@@ -347,7 +359,7 @@ class WP_Block_Parser {
 		 * match back in PHP to see which one it was.
 		 */
 		$has_match = preg_match(
-			'/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:(?!}\s+-->).)+?}\s+)?(?<void>\/)?-->/s',
+			'/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{.+?}\s+)?(?<void>\/)?-->/s',
 			$this->document,
 			$matches,
 			PREG_OFFSET_CAPTURE,
@@ -357,6 +369,11 @@ class WP_Block_Parser {
 		// we have no more tokens
 		if ( 0 === $has_match ) {
 			return array( 'no-more-tokens', null, null, null, null );
+		}
+
+		// PREG failed for some reason.
+		if ( false === $has_match ) {
+			return array( 'preg-failed', preg_last_error(), null, null, null );
 		}
 
 		list( $match, $started_at ) = $matches[ 0 ];

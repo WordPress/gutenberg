@@ -102,4 +102,17 @@ class Parsing_Test extends WP_UnitTestCase {
 			"File '$parsed_json_filename' does not match expected value"
 		);
 	}
+
+	function test_default_parser_doesnt_crash_on_long_args() {
+		require_once dirname( __FILE__ ) . '/../packages/block-serialization-default-parser/parser.php';
+
+		$long_string = str_repeat( 'a', 1000000 );
+		$html        = '<!-- wp:core/this-is-a-fake-block {"foo":"' . $long_string . '"} /-->';
+
+		$parser = new WP_Block_Parser();
+		$result = $parser->parse( $html );
+
+		$this->assertArrayHasKey( 'foo', $result[0]['attrs'] );
+		$this->assertEquals( $long_string, $result[0]['attrs']['foo'] );
+	}
 }
