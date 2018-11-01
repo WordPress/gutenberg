@@ -54,6 +54,7 @@
     "start:debug": "node --inspect-brk node_modules/.bin/react-native start",
     "start:inside-gb:debug": "node --inspect-brk node_modules/.bin/react-native start:inside-gb",
     "android": "react-native run-android",
+    "wpandroid": "yarn android --root wpandroidlink --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
     "preios": "yarn preios:carthage",
     "preios:carthage": "cd react-native-aztec && yarn install-aztec-ios",
     "ios": "react-native run-ios",
@@ -72,8 +73,8 @@
     "clean:metro": "rm -rf $TMPDIR/metro-cache-*;",
     "clean:react": "rm -rf $TMPDIR/react-*",
     "clean:node": "rm -rf node_modules",
-	"clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
-	"clean:babel-cache": "rm -rf ./node_modules/.cache/babel-loader/*",
+    "clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
+    "clean:babel-cache": "rm -rf ./node_modules/.cache/babel-loader/*",
     "lint": "eslint . --ext .js",
     "lint:fix": "yarn lint --fix"
   },
@@ -94,13 +95,15 @@
     "react": "16.5.0",
     "react-native": "0.57.1",
     "react-native-modal": "^6.5.0",
-    "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#c073c0335ebe0398c85648ffeb11cbed4ee79229",
+    "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#336f7159eb6e7bad467c041b3f34667d485e7b58",
     "react-native-svg": "^6.5.2",
+    "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "rememo": "^3.0.0",
     "shallowequal": "^1.0.2",
     "simple-html-tokenizer": "^0.5.1",
-    "tinycolor2": "^1.4.1"
+    "tinycolor2": "^1.4.1",
+    "turbo-combine-reducers": "^1.0.2"
   }
 }
