@@ -671,6 +671,7 @@
 		pointer-events: none;
 
 		&:hover,
+		&:focus,
 		&.is-visible {
 			opacity: 1;
 			pointer-events: auto;

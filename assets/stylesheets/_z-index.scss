@@ -20,7 +20,7 @@ $z-layers: (
 	".edit-post-meta-boxes-area .spinner": 5,
 	".editor-block-contextual-toolbar": 21,
 	".components-popover__close": 5,
-	".editor-block-list__insertion-point": 6,
+	".editor-block-list__insertion-point": 22, // Block Toolbar has z-index of 21 which blocks the visibility of this button
 	".editor-inserter-with-shortcuts": 5,
 	".editor-warning": 5,
 	".block-library-gallery-item__inline-menu": 20,
