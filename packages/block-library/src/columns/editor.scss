@@ -69,10 +69,10 @@
 			}
 
 			@include break-small() {
-				> .editor-block-contextual-toolbar {
+				> .editor-block-list__block-edit > .editor-block-contextual-toolbar {
 					top: $block-toolbar-height - $border-width;
 					transform: translateY(-$block-toolbar-height - $border-width);
-					margin-left: -$block-padding - $block-padding - $border-width;
+					margin-left: -$grid-size-large - $border-width;
 				}
 
 				> .editor-block-list__block-edit::before {
@@ -82,8 +82,9 @@
 					left: 0;
 				}
 
-				> .editor-block-list__breadcrumb {
-					margin-right: -$block-padding - $border-width;
+				> .editor-block-list__block-edit > .editor-block-list__breadcrumb {
+					top: 0;
+					right: 0;
 				}
 			}
 
