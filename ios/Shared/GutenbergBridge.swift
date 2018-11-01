@@ -20,8 +20,8 @@ class GutenbergBridge {
         _shared = GutenbergBridge(options: launchOptions, mediaProvider: mediaProvider, postManager: postManager)
     }
 
-    static var rootView: UIView {
-        return RCTRootView(bridge: shared.rnBridge, moduleName: "gutenberg", initialProperties: nil)
+    static func rootView(with props: [AnyHashable: Any]? = nil) -> UIView {
+        return RCTRootView(bridge: shared.rnBridge, moduleName: "gutenberg", initialProperties: props)
     }
 
     private init(options launchOptions: [AnyHashable: Any]?, mediaProvider: AztecMediaProvider, postManager: GBPostManager) {
