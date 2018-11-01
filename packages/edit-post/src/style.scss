@@ -237,7 +237,7 @@ body.block-editor-page {
 	input[type="checkbox"] {
 		border-radius: $radius-round-rectangle / 2;
 
-		&::before {
+		&:checked::before {
 			margin: -4px 0 0 -5px;
 			color: $white;
 		}
@@ -246,7 +246,7 @@ body.block-editor-page {
 	input[type="radio"] {
 		border-radius: $radius-round;
 
-		&::before {
+		&:checked::before {
 			margin: 3px 0 0 3px;
 			background-color: $white;
 		}
