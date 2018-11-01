@@ -9,17 +9,10 @@
  * @package gutenberg
  */
 
-function gutenberg_high_wordpress_version_notice() {
-	echo '<div class="notice notice-warning"><p>';
-	echo __( 'WordPress 5.0 replaces the currently installed version of Gutenberg. Plugin deactivated. No action required.', 'gutenberg' );
-	echo '</p></div>';
-}
-
 // Get unmodified $wp_version.
 include ABSPATH . WPINC . '/version.php';
 if ( version_compare( $wp_version, '4.9.8', '>' ) ) {
 	require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-	add_action( 'admin_notices', 'gutenberg_high_wordpress_version_notice' );
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
 	return;
 }
