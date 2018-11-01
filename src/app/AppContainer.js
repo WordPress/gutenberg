@@ -10,6 +10,7 @@ import {
 	deleteBlockAction,
 	createBlockAction,
 	parseBlocksAction,
+	serializeToNativeAction,
 	mergeBlocksAction,
 } from '../store/actions';
 import MainApp from './MainApp';
@@ -41,6 +42,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		},
 		parseBlocksAction: ( html ) => {
 			dispatch( parseBlocksAction( html ) );
+		},
+		serializeToNativeAction: () => {
+			dispatch( serializeToNativeAction() );
 		},
 		mergeBlocksAction: ( blockOneClientId, blockTwoClientId, block ) => {
 			dispatch( mergeBlocksAction( blockOneClientId, blockTwoClientId, block ) );
