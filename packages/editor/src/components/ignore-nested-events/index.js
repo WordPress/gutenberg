@@ -100,6 +100,9 @@ export class IgnoreNestedEvents extends Component {
 	}
 }
 
-export default forwardRef( ( props, ref ) => {
+const forwardedIgnoreNestedEvents = ( props, ref ) => {
 	return <IgnoreNestedEvents { ...props } forwardedRef={ ref } />;
-} );
+};
+forwardedIgnoreNestedEvents.displayName = 'IgnoreNestedEvents';
+
+export default forwardRef( forwardedIgnoreNestedEvents );
