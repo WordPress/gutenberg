@@ -57,13 +57,17 @@ export class PostPreviewButton extends Component {
 	 * Triggers autosave if post is autosaveable.
 	 */
 	openPreviewWindow() {
-		const { isAutosaveable, previewLink, currentPostLink } = this.props;
+		const { isAutosaveable, previewLink, currentPostLink, hasMetaBoxes } = this.props;
 
 		// Open a popup, BUT: Set it to a blank page until save completes. This
 		// is necessary because popups can only be opened in response to user
 		// interaction (click), but we must still wait for the post to save.
 		if ( ! this.previewWindow || this.previewWindow.closed ) {
 			this.previewWindow = window.open( '', this.getWindowTarget() );
+		}
+
+		if ( hasMetaBoxes ) {
+			this.props.requestMetaBoxUpdates();
 		}
 
 		// Ask the browser to bring the preview tab to the front
