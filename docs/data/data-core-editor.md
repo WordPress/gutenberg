@@ -1773,15 +1773,6 @@ Returns an action object used to signal that post saving is unlocked.
 
  * lockName: The lock name.
 
-### addTermToEditedPost
-
-Returns an action object signaling that a new term is added to the edited post.
-
-*Parameters*
-
- * slug: Taxonomy slug.
- * term: Term object.
-
 ### createNotice
 
 ### fetchReusableBlocks
