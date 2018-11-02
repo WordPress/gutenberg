@@ -1,12 +1,12 @@
 
 Pod::Spec.new do |s|
   s.name         = "RNReactNativeGutenbergBridge"
-  s.version      = "1.0.0"
+  s.version      = "0.1.0"
   s.summary      = "RNReactNativeGutenbergBridge"
   s.description  = <<-DESC
-                  RNReactNativeGutenbergBridge
+                  The RNReactNativeGutenbergBridge
                    DESC
-  s.homepage     = ""
+  s.homepage     = "https://github.com/wordpress-mobile/gutenberg-mobile"
   s.license      = "MIT"
   # s.license      = { :type => "MIT", :file => "FILE_LICENSE" }
   s.author             = { "author" => "author@domain.cn" }
