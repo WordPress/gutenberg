@@ -53,6 +53,9 @@ export class ServerSideRender extends Component {
 	}
 
 	fetch( props ) {
+		if ( ! this.isStillMounted ) {
+			return;
+		}
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
