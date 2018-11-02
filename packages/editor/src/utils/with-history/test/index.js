@@ -185,14 +185,13 @@ describe( 'withHistory', () => {
 		};
 
 		const reducer = withHistory( {
-			shouldOverwriteState: ( action, previousAction ) =>
-				previousAction && action.type === previousAction.type,
+			shouldOverwriteState: ( action, previousAction ) => (
+				previousAction && action.type === previousAction.type
+			),
 			ignoreTypes: [ 'IGNORE' ],
 		} )( complexCounter );
 
-		let state;
-		state = reducer( undefined, {} );
-		state = reducer( state, { type: 'INCREMENT' } );
+		let state = reducer( reducer( undefined, {} ), { type: 'INCREMENT' } );
 
 		expect( state ).toEqual( {
 			past: [ { count: 0 } ],
