@@ -20,13 +20,11 @@ export class PostPreviewButton extends Component {
 		this.openPreviewWindow = this.openPreviewWindow.bind( this );
 	}
 
-	componentDidUpdate( prevProps ) {
-		const { previewLink } = this.props;
+	componentDidUpdate() {
+		const { previewLink, isSavingMetaBoxes, isAutosavingPost } = this.props;
 
-		// This relies on the window being responsible to unset itself when
-		// navigation occurs or a new preview window is opened, to avoid
-		// unintentional forceful redirects.
-		if ( previewLink && ! prevProps.previewLink ) {
+		// Set the preview url once metabox and autosaves are complete.
+		if ( previewLink && ! isSavingMetaBoxes && ! isAutosavingPost ) {
 			this.setPreviewWindowLink( previewLink );
 
 			// Once popup redirect is evaluated, even if already closed, delete
@@ -186,7 +184,12 @@ export default compose( [
 			isEditedPostNew,
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
+			isAutosavingPost,
 		} = select( 'core/editor' );
+		const {
+			hasMetaBoxes,
+			isSavingMetaBoxes,
+		} = select( 'core/edit-post' );
 		const {
 			getPostType,
 		} = select( 'core' );
@@ -200,9 +203,13 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
+			hasMetaBoxes: hasMetaBoxes(),
+			isSavingMetaBoxes: isSavingMetaBoxes(),
+			isAutosavingPost: isAutosavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
+		requestMetaBoxUpdates: dispatch( 'core/edit-post' ).requestMetaBoxUpdates,
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
