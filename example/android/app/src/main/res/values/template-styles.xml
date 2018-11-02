@@ -18,7 +18,10 @@
 
     <!-- Activity themes -->
 
-    <style name="Theme.Base" parent="android:Theme.Light" />
+    <style name="Theme.Base" parent="android:Theme.Material.Light">
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+    </style>
 
     <style name="Theme.Sample" parent="Theme.Base" />
 
