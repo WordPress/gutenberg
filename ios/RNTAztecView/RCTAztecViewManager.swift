@@ -1,6 +1,5 @@
 import Aztec
 import Foundation
-//import React
 
 @objc (RCTAztecViewManager)
 public class RCTAztecViewManager: RCTViewManager {

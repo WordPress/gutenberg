@@ -1,7 +1,6 @@
 import Aztec
 import Foundation
 import UIKit
-//import React
 
 class RCTAztecView: Aztec.TextView {
     @objc var onBackspace: RCTBubblingEventBlock? = nil

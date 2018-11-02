@@ -1,7 +1,12 @@
 #import "RCTAztecViewManager.h"
-#import "RNTAztecView-Swift.h"
+
 #import <React/RCTViewManager.h>
-//#import "WordPress-Swift.h"
+
+#ifndef GutenbergController
+#import "WordPress-Swift.h"
+#else
+#import "RNTAztecView-Swift.h"
+#endif
 
 typedef void (^ActionBlock)(RCTAztecView *aztecView);
 
