@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Platform, Switch, Text, View, FlatList, Button, KeyboardAvoidingView, NativeModules } from 'react-native';
+import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
@@ -12,12 +12,9 @@ import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
-import { serializeBlocksToHtml } from './block-serializer';
 
 // Gutenberg imports
 import { createBlock, getBlockType, switchToBlockType } from '@wordpress/blocks';
-
-const { GBPostManager } = NativeModules;
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -238,15 +235,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		dataSource.set( index, block );
 	}
 
-	onPressDone = () => {
-		const html = serializeBlocksToHtml( this.props.blocks );
-		GBPostManager.savePost( html );
-	}
-
-	onPressClose = () => {
-		GBPostManager.close();
-	}
-
 	renderList() {
 		let list;
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
@@ -298,16 +286,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		return (
 			<View style={ styles.container }>
-				<View style={ styles.topButtons }>
-					<Button
-						onPress={ this.onPressDone }
-						title="Done"
-					/>
-					<Button
-						onPress={ this.onPressClose }
-						title="Close"
-					/>
-				</View>
 				<View style={ styles.switch }>
 					<Switch
 						activeText={ 'On' }
