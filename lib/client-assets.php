@@ -621,7 +621,7 @@ function gutenberg_register_scripts_and_styles() {
 						'wp_more',
 						'spellchecker',
 						'wp_add_media',
-						'kitchensink',
+						'wp_adv',
 					),
 					'editor'
 				)
