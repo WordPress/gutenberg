@@ -1,69 +1,75 @@
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { createHigherOrderComponent } from '@wordpress/compose';
 
-const withHoverAreas = createHigherOrderComponent( ( WrappedComponent ) => {
-	class WithHoverAreasComponent extends Component {
-		constructor() {
-			super( ...arguments );
-			this.state = {
-				hoverArea: null,
-			};
-			this.onMouseLeave = this.onMouseLeave.bind( this );
-			this.onMouseMove = this.onMouseMove.bind( this );
-		}
+class WithHoverAreas extends Component {
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			hoverArea: null,
+		};
+		this.bindContainer = this.bindContainer.bind( this );
+		this.onMouseLeave = this.onMouseLeave.bind( this );
+		this.onMouseMove = this.onMouseMove.bind( this );
+	}
 
-		componentDidMount() {
-			// Disable reason: We use findDOMNode to avoid unnecessary extra dom Nodes
-			// eslint-disable-next-line react/no-find-dom-node
-			this.container = findDOMNode( this );
-			this.container.addEventListener( 'mousemove', this.onMouseMove );
-			this.container.addEventListener( 'mouseleave', this.onMouseLeave );
-		}
+	componentWillUnmount() {
+		this.toggleListeners( true );
+	}
 
-		componentWillUnmount() {
-			this.container.removeEventListener( 'mousemove', this.onMouseMove );
-			this.container.removeEventListener( 'mouseleave', this.onMouseLeave );
-		}
+	bindContainer( ref ) {
+		this.toggleListeners( true );
 
-		onMouseLeave() {
-			if ( this.state.hoverArea ) {
-				this.setState( { hoverArea: null } );
-			}
-		}
-
-		onMouseMove( event ) {
-			const { isRTL } = this.props;
-			const { width, left, right } = this.container.getBoundingClientRect();
-
-			let hoverArea = null;
-			if ( ( event.clientX - left ) < width / 3 ) {
-				hoverArea = isRTL ? 'right' : 'left';
-			} else if ( ( right - event.clientX ) < width / 3 ) {
-				hoverArea = isRTL ? 'left' : 'right';
-			}
-
-			if ( hoverArea !== this.state.hoverArea ) {
-				this.setState( { hoverArea } );
-			}
-		}
-
-		render() {
-			const { hoverArea } = this.state;
-			return (
-				<WrappedComponent { ...this.props } hoverArea={ hoverArea } />
-			);
+		if ( ref ) {
+			this.container = ref;
+			this.toggleListeners();
 		}
 	}
 
-	return withSelect( ( select ) => {
-		return {
-			isRTL: select( 'core/editor' ).getEditorSettings().isRTL,
-		};
-	} )( WithHoverAreasComponent );
-} );
+	toggleListeners( shouldRemoveEvents ) {
+		if ( ! this.container ) {
+			return;
+		}
+		const method = shouldRemoveEvents ? 'removeEventListener' : 'addEventListener';
+		this.container[ method ]( 'mousemove', this.onMouseMove );
+		this.container[ method ]( 'mouseleave', this.onMouseLeave );
+	}
 
-export default withHoverAreas;
+	onMouseLeave() {
+		if ( this.state.hoverArea ) {
+			this.setState( { hoverArea: null } );
+		}
+	}
+
+	onMouseMove( event ) {
+		const { isRTL } = this.props;
+		const { width, left, right } = this.container.getBoundingClientRect();
+
+		let hoverArea = null;
+		if ( ( event.clientX - left ) < width / 3 ) {
+			hoverArea = isRTL ? 'right' : 'left';
+		} else if ( ( right - event.clientX ) < width / 3 ) {
+			hoverArea = isRTL ? 'left' : 'right';
+		}
+
+		if ( hoverArea !== this.state.hoverArea ) {
+			this.setState( { hoverArea } );
+		}
+	}
+
+	render() {
+		const { hoverArea } = this.state;
+		const { children } = this.props;
+
+		return children( { hoverArea, bindContainer: this.bindContainer } );
+	}
+}
+
+export default withSelect( ( select ) => {
+	return {
+		isRTL: select( 'core/editor' ).getEditorSettings().isRTL,
+	};
+} )( WithHoverAreas );
+
