@@ -239,10 +239,15 @@ function gutenberg_show_meta_box_warning( $callback ) {
 		return;
 	}
 
-	if ( is_array( $callback ) ) {
-		$reflection = new ReflectionMethod( $callback[0], $callback[1] );
-	} else {
-		$reflection = new ReflectionFunction( $callback );
+	try {
+		if ( is_array( $callback ) ) {
+			$reflection = new ReflectionMethod( $callback[0], $callback[1] );
+		} else {
+			$reflection = new ReflectionFunction( $callback );
+		}
+	} catch ( ReflectionException $exception ) {
+		// We could not properly reflect on the callable, so we abort here.
+		return;
 	}
 
 	if ( $reflection->isInternal() ) {
