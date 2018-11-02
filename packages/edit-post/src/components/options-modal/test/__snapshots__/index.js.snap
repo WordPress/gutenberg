@@ -49,10 +49,8 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
       />
     </WithSelect(PageAttributesCheck)>
   </Section>
-  <Section
+  <WithSelect(MetaBoxesSection)
     title="Advanced Panels"
-  >
-    <WithSelect(MetaBoxOptions) />
-  </Section>
+  />
 </WithInstanceId(Modal)>
 `;

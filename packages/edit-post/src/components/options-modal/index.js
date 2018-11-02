@@ -21,7 +21,7 @@ import {
 	EnableTipsOption,
 	EnablePanelOption,
 } from './options';
-import MetaBoxSection from './meta-box-section';
+import MetaBoxesSection from './meta-boxes-section';
 
 const MODAL_NAME = 'edit-post/options';
 
@@ -59,7 +59,7 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
-			<MetaBoxSection title={ __( 'Advanced Panels' ) } />
+			<MetaBoxesSection title={ __( 'Advanced Panels' ) } />
 		</Modal>
 	);
 }
