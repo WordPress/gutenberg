@@ -1,7 +1,7 @@
 #import "RCTAztecViewManager.h"
-
 #import <React/RCTViewManager.h>
 
+// Ideally we shouldn't deppend on Swift headers at all.
 #ifndef GutenbergController
 #import "WordPress-Swift.h"
 #else
