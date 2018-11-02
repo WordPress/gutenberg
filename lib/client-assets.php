@@ -1326,6 +1326,35 @@ function gutenberg_load_locale_data() {
 }
 
 /**
+ * Retrieve The available image sizes for a post
+ *
+ * @return array
+ */
+function gutenberg_get_available_image_sizes() {
+	$sizes      = get_intermediate_image_sizes();
+	$sizes[]    = 'full';
+	$size_names = apply_filters(
+		'image_size_names_choose',
+		array(
+			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
+			'medium'    => __( 'Medium', 'gutenberg' ),
+			'large'     => __( 'Large', 'gutenberg' ),
+			'full'      => __( 'Full Size', 'gutenberg' ),
+		)
+	);
+
+	$all_sizes = array();
+	foreach ( $sizes as $size_slug ) {
+		$all_sizes[] = array(
+			'slug' => $size_slug,
+			'name' => isset( $size_names[ $size_slug ] ) ? $size_names[ $size_slug ] : $size_slug,
+		);
+	}
+
+	return $all_sizes;
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1602,6 +1631,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'maxUploadFileSize'      => $max_upload_size,
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
+		'availableImageSizes'    => gutenberg_get_available_image_sizes(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,
