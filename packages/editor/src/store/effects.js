@@ -261,9 +261,6 @@ export default {
 	REPLACE_BLOCKS: [
 		ensureDefaultBlock,
 	],
-	ADD_TERM_TO_EDITED_POST: ( action ) => {
-		addTermToEditedPost( action );
-	},
 	MULTI_SELECT: ( action, { getState } ) => {
 		const blockCount = getSelectedBlockCount( getState() );
 
