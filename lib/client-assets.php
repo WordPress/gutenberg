@@ -1602,14 +1602,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'maxUploadFileSize'      => $max_upload_size,
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
-		'postLock'               => $lock_details,
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
+		'postLock'               => $lock_details,
 		'postLockUtils'          => array(
 			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
 			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
 			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 		),
+
+		// Whether or not to load the 'postcustom' meta box is stored as a user meta
+		// field so that we're not always loading its assets.
+		'enableCustomFields'     => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
 	);
 
 	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );
