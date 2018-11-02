@@ -1,12 +1,21 @@
 /**
  * External dependencies
  */
-import { pick, sortBy, forEach, without, noop } from 'lodash';
+import { sortBy, forEach, without } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createContext } from '@wordpress/element';
+
+const { Provider, Consumer } = createContext( {
+	registerSlot: () => {},
+	unregisterSlot: () => {},
+	registerFill: () => {},
+	unregisterFill: () => {},
+	getSlot: () => {},
+	getFills: () => {},
+} );
 
 class SlotFillProvider extends Component {
 	constructor() {
@@ -21,17 +30,14 @@ class SlotFillProvider extends Component {
 
 		this.slots = {};
 		this.fills = {};
-	}
-
-	getChildContext() {
-		return pick( this, [
-			'registerSlot',
-			'registerFill',
-			'unregisterSlot',
-			'unregisterFill',
-			'getSlot',
-			'getFills',
-		] );
+		this.state = {
+			registerSlot: this.registerSlot,
+			unregisterSlot: this.unregisterSlot,
+			registerFill: this.registerFill,
+			unregisterFill: this.unregisterFill,
+			getSlot: this.getSlot,
+			getFills: this.getFills,
+		};
 	}
 
 	registerSlot( name, slot ) {
@@ -94,17 +100,13 @@ class SlotFillProvider extends Component {
 	}
 
 	render() {
-		return this.props.children;
+		return (
+			<Provider value={ this.state }>
+				{ this.props.children }
+			</Provider>
+		);
 	}
 }
 
-SlotFillProvider.childContextTypes = {
-	registerSlot: noop,
-	unregisterSlot: noop,
-	registerFill: noop,
-	unregisterFill: noop,
-	getSlot: noop,
-	getFills: noop,
-};
-
 export default SlotFillProvider;
+export { Consumer };
