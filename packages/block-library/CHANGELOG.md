@@ -1,3 +1,20 @@
+## 2.1.8 (Unreleased)
+
+### Polish
+
+- File Block: Create file blocks when dropping multiple files at once.
+
+## 2.1.7 (2018-10-30)
+
+## 2.1.6 (2018-10-30)
+
+### Bug Fixes
+
+- Classic Block: Prevent theme styles from italicising the italicise button.
+- Gallery Block: Fix the "Remove Image" button appearing blank when an image is focussed.
+
+## 2.1.5 (2018-10-29)
+
 ## 2.1.4 (2018-10-22)
 
 ### Bug Fixes

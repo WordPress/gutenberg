@@ -21,6 +21,7 @@ const embedAttributes = {
 		type: 'string',
 	},
 	caption: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	},
@@ -36,10 +37,10 @@ const embedAttributes = {
 	},
 };
 
-export function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {} } ) {
+export function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {}, responsive = true } ) {
 	// translators: %s: Name of service (e.g. VideoPress, YouTube)
 	const blockDescription = description || sprintf( __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' ), title );
-	const edit = getEmbedEditComponent( title, icon );
+	const edit = getEmbedEditComponent( title, icon, responsive );
 	return {
 		title,
 		description: blockDescription,
@@ -75,7 +76,7 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 				return {
 					preview: validPreview ? preview : undefined,
 					fetching,
-					supportsResponsive: themeSupports[ 'responsive-embeds' ],
+					themeSupportsResponsive: themeSupports[ 'responsive-embeds' ],
 					cannotEmbed,
 				};
 			} )

@@ -32,9 +32,6 @@ describe( 'apiFetch', () => {
 					message: 'Bad Request',
 				} );
 			},
-			clone() {
-				return null;
-			},
 		} ) );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
@@ -71,6 +68,16 @@ describe( 'apiFetch', () => {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
 			} );
+		} );
+	} );
+
+	it( 'should return null if response has no content status code', () => {
+		window.fetch.mockReturnValue( Promise.resolve( {
+			status: 204,
+		} ) );
+
+		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			expect( body ).toEqual( null );
 		} );
 	} );
 

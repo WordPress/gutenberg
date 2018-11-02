@@ -12,6 +12,7 @@ ul.wp-block-gallery li {
 		outline: none;
 	}
 
+	img:focus,
 	.is-selected {
 		outline: 4px solid theme(primary);
 	}
@@ -108,6 +109,10 @@ ul.wp-block-gallery li {
 
 .blocks-gallery-item__remove {
 	padding: 0;
+
+	&.components-button:focus {
+		color: inherit;
+	}
 }
 
 .blocks-gallery-item .components-spinner {

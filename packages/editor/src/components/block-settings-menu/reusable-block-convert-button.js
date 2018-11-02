@@ -49,7 +49,11 @@ export function ReusableBlockConvertButton( {
 
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
-		const { getBlock, canInsertBlockType, getReusableBlock } = select( 'core/editor' );
+		const {
+			getBlock,
+			canInsertBlockType,
+			__experimentalGetReusableBlock: getReusableBlock,
+		} = select( 'core/editor' );
 		const {
 			getFreeformFallbackBlockName,
 			getUnregisteredFallbackBlockName,
@@ -85,8 +89,8 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {
 		const {
-			convertBlockToReusable,
-			convertBlockToStatic,
+			__experimentalConvertBlockToReusable: convertBlockToReusable,
+			__experimentalConvertBlockToStatic: convertBlockToStatic,
 		} = dispatch( 'core/editor' );
 
 		return {

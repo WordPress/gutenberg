@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	InnerBlocks,
@@ -25,7 +26,9 @@ export const name = 'core/media-text';
 export const settings = {
 	title: __( 'Media & Text' ),
 
-	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 17h8v-2h-8v2zM3 19h8V5H3v14zM13 9h8V7h-8v2zm0 4h8v-2h-8v2z" /></svg>,
+	description: __( 'Set media and words side-by-side media for a richer layout.' ),
+
+	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M13 17h8v-2h-8v2zM3 19h8V5H3v14zM13 9h8V7h-8v2zm0 4h8v-2h-8v2z" /></SVG>,
 
 	category: 'layout',
 
@@ -69,6 +72,10 @@ export const settings = {
 			type: 'number',
 			default: 50,
 		},
+		isStackedOnMobile: {
+			type: 'boolean',
+			default: false,
+		},
 	},
 
 	supports: {
@@ -81,6 +88,7 @@ export const settings = {
 		const {
 			backgroundColor,
 			customBackgroundColor,
+			isStackedOnMobile,
 			mediaAlt,
 			mediaPosition,
 			mediaType,
@@ -96,6 +104,7 @@ export const settings = {
 		const className = classnames( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
+			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
 
 		let gridTemplateColumns;

@@ -9,7 +9,10 @@ import { pick, includes } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
+// TODO: Ideally this would be the only dispatch in scope. This requires either
+// refactoring editor actions to yielded controls, or replacing direct dispatch
+// on the editor store with action creators (e.g. `REQUEST_POST_UPDATE_START`).
+import { dispatch as dataDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,9 +21,6 @@ import {
 	resetAutosave,
 	resetPost,
 	updatePost,
-	removeNotice,
-	createSuccessNotice,
-	createErrorNotice,
 } from '../actions';
 import {
 	getCurrentPost,
@@ -38,8 +38,7 @@ import { resolveSelector } from './utils';
 /**
  * Module Constants
  */
-const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
-export const AUTOSAVE_POST_NOTICE_ID = 'AUTOSAVE_POST_NOTICE_ID';
+export const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 
 /**
@@ -120,8 +119,8 @@ export const requestPostUpdate = async ( action, store ) => {
 			data: toSend,
 		} );
 	} else {
-		dispatch( removeNotice( SAVE_POST_NOTICE_ID ) );
-		dispatch( removeNotice( AUTOSAVE_POST_NOTICE_ID ) );
+		dataDispatch( 'core/notices' ).removeNotice( SAVE_POST_NOTICE_ID );
+		dataDispatch( 'core/notices' ).removeNotice( 'autosave-exists' );
 
 		request = apiFetch( {
 			path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
@@ -218,14 +217,21 @@ export const requestPostUpdateSuccess = ( action, store ) => {
 	}
 
 	if ( noticeMessage ) {
-		dispatch( createSuccessNotice(
-			<p>
-				{ noticeMessage }
-				{ ' ' }
-				{ shouldShowLink && <a href={ post.link }>{ postType.labels.view_item }</a> }
-			</p>,
-			{ id: SAVE_POST_NOTICE_ID, spokenMessage: noticeMessage }
-		) );
+		const actions = [];
+		if ( shouldShowLink ) {
+			actions.push( {
+				label: postType.labels.view_item,
+				url: post.link,
+			} );
+		}
+
+		dataDispatch( 'core/notices' ).createSuccessNotice(
+			noticeMessage,
+			{
+				id: SAVE_POST_NOTICE_ID,
+				actions,
+			}
+		);
 	}
 };
 
@@ -233,9 +239,8 @@ export const requestPostUpdateSuccess = ( action, store ) => {
  * Request Post Update Failure Effect handler
  *
  * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
  */
-export const requestPostUpdateFailure = ( action, store ) => {
+export const requestPostUpdateFailure = ( action ) => {
 	const { post, edits, error } = action;
 
 	if ( error && 'rest_autosave_no_changes' === error.code ) {
@@ -243,8 +248,6 @@ export const requestPostUpdateFailure = ( action, store ) => {
 		// result in an error notice for the user.
 		return;
 	}
-
-	const { dispatch } = store;
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
@@ -259,26 +262,9 @@ export const requestPostUpdateFailure = ( action, store ) => {
 		messages[ edits.status ] :
 		__( 'Updating failed' );
 
-	const cloudflareDetailsLink = addQueryArgs(
-		'post.php',
-		{
-			post: post.id,
-			action: 'edit',
-			'classic-editor': '',
-			'cloudflare-error': '',
-		} );
-
-	const cloudflaredMessage = error && 'cloudflare_error' === error.code ?
-		<p>
-			{ noticeMessage }
-			<br />
-			{ __( 'Cloudflare is blocking REST API requests.' ) }
-			{ ' ' }
-			<a href={ cloudflareDetailsLink }>{ __( 'Learn More' ) } </a>
-		</p> :
-		noticeMessage;
-
-	dispatch( createErrorNotice( cloudflaredMessage, { id: SAVE_POST_NOTICE_ID } ) );
+	dataDispatch( 'core/notices' ).createErrorNotice( noticeMessage, {
+		id: SAVE_POST_NOTICE_ID,
+	} );
 };
 
 /**
@@ -293,7 +279,7 @@ export const trashPost = async ( action, store ) => {
 	const postTypeSlug = getCurrentPostType( getState() );
 	const postType = await resolveSelector( 'core', 'getPostType', postTypeSlug );
 
-	dispatch( removeNotice( TRASH_POST_NOTICE_ID ) );
+	dataDispatch( 'core/notices' ).removeNotice( TRASH_POST_NOTICE_ID );
 	try {
 		await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ postId }`, method: 'DELETE' } );
 		const post = getCurrentPost( getState() );
@@ -316,9 +302,11 @@ export const trashPost = async ( action, store ) => {
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const trashPostFailure = ( action, store ) => {
+export const trashPostFailure = ( action ) => {
 	const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
-	store.dispatch( createErrorNotice( message, { id: TRASH_POST_NOTICE_ID } ) );
+	dataDispatch( 'core/notices' ).createErrorNotice( message, {
+		id: TRASH_POST_NOTICE_ID,
+	} );
 };
 
 /**

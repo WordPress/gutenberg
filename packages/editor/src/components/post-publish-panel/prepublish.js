@@ -33,10 +33,10 @@ function PostPublishPanelPrepublish( {
 		prePublishBodyText = __( 'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.' );
 	} else if ( isBeingScheduled ) {
 		prePublishTitle = __( 'Are you ready to schedule?' );
-		prePublishBodyText = __( 'Your post will be published at the specified date and time.' );
+		prePublishBodyText = __( 'Your work will be published at the specified date and time.' );
 	} else {
 		prePublishTitle = __( 'Are you ready to publish?' );
-		prePublishBodyText = __( 'Double-check your settings, then use the button to publish your post.' );
+		prePublishBodyText = __( 'Double-check your settings before publishing.' );
 	}
 
 	return (

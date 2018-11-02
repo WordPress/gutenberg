@@ -95,12 +95,5 @@ fs.writeFileSync(
 	path.join( __dirname, '..', 'docs', 'grammar.md' ), `
 # The Gutenberg block grammar
 
-<style>
-	dl { display: flex; flex-wrap: wrap; font-size: 110%; }
-	dt, dd { flex: 40%; margin-bottom: 1em; }
-	dt { text-align: right; font-style: italic; font-size: 105%; }
-	dd header { font-weight: bold; }
-	pre { margin: 0; }
-</style>
 ${ flatten( grammar ) }
 ` );

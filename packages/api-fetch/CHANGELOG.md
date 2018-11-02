@@ -1,4 +1,16 @@
+## 2.2.2 (Unreleased)
+
+## 2.2.1 (2018-10-30)
+
+## 2.2.0 (2018-10-29)
+
+### New Feature
+
+- Always request data in the user's locale ([#10862](https://github.com/WordPress/gutenberg/pull/10862)).
+
 ## 2.1.0 (2018-10-22)
+
+### New Feature
 
 - Support `per_page=-1` paginated requests.
 

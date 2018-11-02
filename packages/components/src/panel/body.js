@@ -6,16 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
-import Dashicon from '../dashicon';
+import Icon from '../icon';
 import { G, Path, SVG } from '../primitives';
 
-class PanelBody extends Component {
+export class PanelBody extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.state = {
@@ -38,12 +38,12 @@ class PanelBody extends Component {
 	}
 
 	render() {
-		const { title, children, opened, className, icon } = this.props;
+		const { title, children, opened, className, icon, forwardedRef } = this.props;
 		const isOpened = opened === undefined ? this.state.opened : opened;
 		const classes = classnames( 'components-panel__body', className, { 'is-opened': isOpened } );
 
 		return (
-			<div className={ classes }>
+			<div className={ classes } ref={ forwardedRef }>
 				{ !! title && (
 					<h2 className="components-panel__body-title">
 						<Button
@@ -61,8 +61,8 @@ class PanelBody extends Component {
 									<G><Path d="M7.41,8.59L12,13.17l4.59-4.58L18,10l-6,6l-6-6L7.41,8.59z" /></G>
 								</SVG>
 							}
-							{ icon && <Dashicon icon={ icon } className="components-panel__icon" /> }
 							{ title }
+							{ icon && <Icon icon={ icon } className="components-panel__icon" size={ 20 } /> }
 						</Button>
 					</h2>
 				) }
@@ -72,4 +72,9 @@ class PanelBody extends Component {
 	}
 }
 
-export default PanelBody;
+const forwardedPanelBody = ( props, ref ) => {
+	return <PanelBody { ...props } forwardedRef={ ref } />;
+};
+forwardedPanelBody.displayName = 'PanelBody';
+
+export default forwardRef( forwardedPanelBody );

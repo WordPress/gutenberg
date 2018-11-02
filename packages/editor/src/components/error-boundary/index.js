@@ -1,20 +1,15 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, ClipboardButton } from '@wordpress/components';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { Warning } from '../';
-import { getEditedPostContent } from '../../store/selectors';
 
 class ErrorBoundary extends Component {
 	constructor() {
@@ -38,7 +33,13 @@ class ErrorBoundary extends Component {
 
 	getContent() {
 		try {
-			return getEditedPostContent( this.context.store.getState() );
+			// While `select` in a component is generally discouraged, it is
+			// used here because it (a) reduces the chance of data loss in the
+			// case of additional errors by performing a direct retrieval and
+			// (b) avoids the performance cost associated with unnecessary
+			// content serialization throughout the lifetime of a non-erroring
+			// application.
+			return select( 'core/editor' ).getEditedPostContent();
 		} catch ( error ) {}
 	}
 
@@ -68,9 +69,5 @@ class ErrorBoundary extends Component {
 		);
 	}
 }
-
-ErrorBoundary.contextTypes = {
-	store: noop,
-};
 
 export default ErrorBoundary;

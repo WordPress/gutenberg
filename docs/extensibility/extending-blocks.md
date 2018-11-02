@@ -23,6 +23,16 @@ The example above registers a block style variation named `fancy-quote` to the `
 
 By adding `isDefault: true`, you can make registered style variation to be active by default when a block is inserted.
 
+To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
+
+_Example:_
+
+```js
+wp.blocks.unregisterBlockStyle( 'core/quote', 'fancy-quote' );
+```
+
+The above removes the variation named `fancy-quote` from the `core/quote` block.
+
 ### Filters
 
 Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
@@ -323,9 +333,13 @@ function my_plugin_block_categories( $categories, $post ) {
 			array(
 				'slug' => 'my-category',
 				'title' => __( 'My category', 'my-plugin' ),
+				'icon'  => '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>',
 			),
 		)
 	);
 }
 add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
+
+You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+

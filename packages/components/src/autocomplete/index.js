@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { escapeRegExp, find, map, debounce } from 'lodash';
+import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -122,7 +122,7 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 			keywords = [ ...keywords, option.label ];
 		}
 
-		const isMatch = keywords.some( ( keyword ) => search.test( keyword ) );
+		const isMatch = keywords.some( ( keyword ) => search.test( deburr( keyword ) ) );
 		if ( ! isMatch ) {
 			continue;
 		}
@@ -382,8 +382,8 @@ export class Autocomplete extends Component {
 		}
 
 		if ( isCollapsed( record ) ) {
-			const text = getTextContent( slice( record, 0 ) );
-			const prevText = getTextContent( slice( prevRecord, 0 ) );
+			const text = deburr( getTextContent( slice( record, 0 ) ) );
+			const prevText = deburr( getTextContent( slice( prevRecord, 0 ) ) );
 
 			if ( text !== prevText ) {
 				const textAfterSelection = getTextContent( slice( record, undefined, getTextContent( record ).length ) );
@@ -399,7 +399,7 @@ export class Autocomplete extends Component {
 						return false;
 					}
 
-					return /^\w*$/.test( text.slice( index + triggerPrefix.length ) );
+					return /^\S*$/.test( text.slice( index + triggerPrefix.length ) );
 				} );
 
 				if ( ! open ) {
@@ -408,7 +408,7 @@ export class Autocomplete extends Component {
 				}
 
 				const safeTrigger = escapeRegExp( open.triggerPrefix );
-				const match = text.match( new RegExp( `${ safeTrigger }(\\w*)$` ) );
+				const match = text.match( new RegExp( `${ safeTrigger }(\\S*)$` ) );
 				const query = match && match[ 1 ];
 				const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
 

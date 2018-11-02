@@ -10,21 +10,39 @@ import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { traverse, wrap, urlRewrite, editorWidth } from '../../editor-styles';
+import { traverse, wrap, urlRewrite } from '../../editor-styles';
 
 class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
 		// Assume that we don't need to initialize in the case of an error recovery.
-		if ( ! props.recovery ) {
-			this.props.updateEditorSettings( props.settings );
-			this.props.updatePostLock( props.settings.postLock );
-			this.props.setupEditor( props.post, props.settings.autosave );
+		if ( props.recovery ) {
+			return;
+		}
+
+		props.updateEditorSettings( props.settings );
+		props.updatePostLock( props.settings.postLock );
+		props.setupEditor( props.post );
+
+		if ( props.settings.autosave ) {
+			props.createWarningNotice(
+				__( 'There is an autosave of this post that is more recent than the version below.' ),
+				{
+					id: 'autosave-exists',
+					actions: [
+						{
+							label: __( 'View the autosave' ),
+							url: props.settings.autosave.editLink,
+						},
+					],
+				}
+			);
 		}
 	}
 
@@ -35,8 +53,7 @@ class EditorProvider extends Component {
 
 		map( this.props.settings.styles, ( { css, baseURL } ) => {
 			const transforms = [
-				editorWidth,
-				wrap( '.editor-block-list__block', [ '.wp-block' ] ),
+				wrap( '.editor-styles-wrapper' ),
 			];
 			if ( baseURL ) {
 				transforms.push( urlRewrite( baseURL ) );
@@ -93,9 +110,12 @@ export default withDispatch( ( dispatch ) => {
 		updateEditorSettings,
 		updatePostLock,
 	} = dispatch( 'core/editor' );
+	const { createWarningNotice } = dispatch( 'core/notices' );
+
 	return {
 		setupEditor,
 		updateEditorSettings,
 		updatePostLock,
+		createWarningNotice,
 	};
 } )( EditorProvider );

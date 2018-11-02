@@ -86,34 +86,6 @@ async function login() {
 	] );
 }
 
-/**
- * Returns a promise which resolves once it's determined that the active DOM
- * element is not within a RichText field, or the RichText field's TinyMCE has
- * completed initialization. This is an unfortunate workaround to address an
- * issue where TinyMCE takes its time to become ready for user input.
- *
- * TODO: This is a code smell, indicating that "too fast" resulting in breakage
- * could be equally problematic for a fast human. It should be explored whether
- * all event bindings we assign to TinyMCE to handle could be handled through
- * the DOM directly instead.
- *
- * @return {Promise} Promise resolving once RichText is initialized, or is
- *                   determined to not be a container of the active element.
- */
-async function waitForRichTextInitialization() {
-	const isInRichText = await page.evaluate( () => {
-		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
-	} );
-
-	if ( ! isInRichText ) {
-		return;
-	}
-
-	return page.waitForFunction( () => {
-		return !! document.activeElement.closest( '.mce-content-body' );
-	} );
-}
-
 export async function visitAdmin( adminPath, query ) {
 	await goToWPPath( join( 'wp-admin', adminPath ), query );
 
@@ -193,7 +165,7 @@ export async function waitForPageDimensions( width, height ) {
 }
 
 export async function switchToEditor( mode ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	const [ button ] = await page.$x( `//button[contains(text(), '${ mode } Editor')]` );
 	await button.click( 'button' );
 }
@@ -238,7 +210,6 @@ export async function ensureSidebarOpened() {
  */
 export async function clickBlockAppender() {
 	await page.click( '.editor-default-block-appender__content' );
-	await waitForRichTextInitialization();
 }
 
 /**
@@ -268,7 +239,6 @@ export async function insertBlock( searchTerm, panelName = null ) {
 		await panelButton.click();
 	}
 	await page.click( `button[aria-label="${ searchTerm }"]` );
-	await waitForRichTextInitialization();
 }
 
 export async function convertBlock( name ) {
@@ -276,7 +246,6 @@ export async function convertBlock( name ) {
 	await page.mouse.move( 250, 350, { steps: 10 } );
 	await page.click( '.editor-block-switcher__toggle' );
 	await page.click( `.editor-block-types-list__item[aria-label="${ name }"]` );
-	await waitForRichTextInitialization();
 }
 
 /**
@@ -306,8 +275,20 @@ export async function pressWithModifier( modifiers, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
+}
+
+/**
+ * Opens the publish panel.
+ */
+export async function openPublishPanel() {
+	await page.click( '.editor-post-publish-panel__toggle' );
+
+	// Disable reason: Wait for the animation to complete, since otherwise the
+	// click attempt may occur at the wrong point.
+	// eslint-disable-next-line no-restricted-syntax
+	await page.waitFor( 100 );
 }
 
 /**
@@ -317,13 +298,7 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
  * @return {Promise} Promise resolving when publish is complete.
  */
 export async function publishPost() {
-	// Opens the publish panel
-	await page.click( '.editor-post-publish-panel__toggle' );
-
-	// Disable reason: Wait for the animation to complete, since otherwise the
-	// click attempt may occur at the wrong point.
-	// eslint-disable-next-line no-restricted-syntax
-	await page.waitFor( 100 );
+	await openPublishPanel();
 
 	// Publish the post
 	await page.click( '.editor-post-publish-button' );
@@ -451,5 +426,21 @@ export async function getAllBlocks() {
 	return await page.evaluate( () => {
 		const { select } = window.wp.data;
 		return select( 'core/editor' ).getBlocks();
+	} );
+}
+
+/**
+ * Binds to the document on page load which throws an error if a `focusout`
+ * event occurs without a related target (i.e. focus loss).
+ */
+export function observeFocusLoss() {
+	page.on( 'load', () => {
+		page.evaluate( () => {
+			document.body.addEventListener( 'focusout', ( event ) => {
+				if ( ! event.relatedTarget ) {
+					throw new Error( 'Unexpected focus loss' );
+				}
+			} );
+		} );
 	} );
 }

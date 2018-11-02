@@ -31,6 +31,7 @@ export const common = [
 			title: 'Twitter',
 			icon: embedTwitterIcon,
 			keywords: [ 'tweet' ],
+			description: __( 'Embed a tweet.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?twitter\.com\/.+/i ],
 	},
@@ -40,6 +41,7 @@ export const common = [
 			title: 'YouTube',
 			icon: embedYouTubeIcon,
 			keywords: [ __( 'music' ), __( 'video' ) ],
+			description: __( 'Embed a YouTube video.' ),
 		},
 		patterns: [ /^https?:\/\/((m|www)\.)?youtube\.com\/.+/i, /^https?:\/\/youtu\.be\/.+/i ],
 	},
@@ -48,6 +50,7 @@ export const common = [
 		settings: {
 			title: 'Facebook',
 			icon: embedFacebookIcon,
+			description: __( 'Embed a Facebook post.' ),
 		},
 		patterns: [ /^https?:\/\/www\.facebook.com\/.+/i ],
 	},
@@ -57,6 +60,7 @@ export const common = [
 			title: 'Instagram',
 			icon: embedInstagramIcon,
 			keywords: [ __( 'image' ) ],
+			description: __( 'Embed an Instagram post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?instagr(\.am|am\.com)\/.+/i ],
 	},
@@ -66,6 +70,8 @@ export const common = [
 			title: 'WordPress',
 			icon: embedWordPressIcon,
 			keywords: [ __( 'post' ), __( 'blog' ) ],
+			responsive: false,
+			description: __( 'Embed a WordPress post.' ),
 		},
 	},
 	{
@@ -74,6 +80,7 @@ export const common = [
 			title: 'SoundCloud',
 			icon: embedAudioIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
+			description: __( 'Embed SoundCloud content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?soundcloud\.com\/.+/i ],
 	},
@@ -83,6 +90,7 @@ export const common = [
 			title: 'Spotify',
 			icon: embedSpotifyIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
+			description: __( 'Embed Spotify content.' ),
 		},
 		patterns: [ /^https?:\/\/(open|play)\.spotify\.com\/.+/i ],
 	},
@@ -92,6 +100,7 @@ export const common = [
 			title: 'Flickr',
 			icon: embedFlickrIcon,
 			keywords: [ __( 'image' ) ],
+			description: __( 'Embed Flickr content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?flickr\.com\/.+/i, /^https?:\/\/flic\.kr\/.+/i ],
 	},
@@ -101,6 +110,7 @@ export const common = [
 			title: 'Vimeo',
 			icon: embedVimeoIcon,
 			keywords: [ __( 'video' ) ],
+			description: __( 'Embed a Vimeo video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?vimeo\.com\/.+/i ],
 	},
@@ -112,6 +122,7 @@ export const others = [
 		settings: {
 			title: 'Animoto',
 			icon: embedVideoIcon,
+			description: __( 'Embed an Animoto video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
 	},
@@ -120,6 +131,7 @@ export const others = [
 		settings: {
 			title: 'Cloudup',
 			icon: embedContentIcon,
+			description: __( 'Embed Cloudup content.' ),
 		},
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
 	},
@@ -128,6 +140,7 @@ export const others = [
 		settings: {
 			title: 'CollegeHumor',
 			icon: embedVideoIcon,
+			description: __( 'Embed CollegeHumor content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
 	},
@@ -136,6 +149,7 @@ export const others = [
 		settings: {
 			title: 'Dailymotion',
 			icon: embedVideoIcon,
+			description: __( 'Embed a Dailymotion video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
 	},
@@ -144,6 +158,7 @@ export const others = [
 		settings: {
 			title: 'Funny or Die',
 			icon: embedVideoIcon,
+			description: __( 'Embed Funny or Die content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?funnyordie\.com\/.+/i ],
 	},
@@ -152,6 +167,7 @@ export const others = [
 		settings: {
 			title: 'Hulu',
 			icon: embedVideoIcon,
+			description: __( 'Embed Hulu content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?hulu\.com\/.+/i ],
 	},
@@ -160,6 +176,7 @@ export const others = [
 		settings: {
 			title: 'Imgur',
 			icon: embedPhotoIcon,
+			description: __( 'Embed Imgur content.' ),
 		},
 		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
 	},
@@ -168,6 +185,7 @@ export const others = [
 		settings: {
 			title: 'Issuu',
 			icon: embedContentIcon,
+			description: __( 'Embed Issuu content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?issuu\.com\/.+/i ],
 	},
@@ -176,6 +194,7 @@ export const others = [
 		settings: {
 			title: 'Kickstarter',
 			icon: embedContentIcon,
+			description: __( 'Embed Kickstarter content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?kickstarter\.com\/.+/i, /^https?:\/\/kck\.st\/.+/i ],
 	},
@@ -184,6 +203,7 @@ export const others = [
 		settings: {
 			title: 'Meetup.com',
 			icon: embedContentIcon,
+			description: __( 'Embed Meetup.com content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?meetu(\.ps|p\.com)\/.+/i ],
 	},
@@ -193,6 +213,7 @@ export const others = [
 			title: 'Mixcloud',
 			icon: embedAudioIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
+			description: __( 'Embed Mixcloud content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 	},
@@ -201,6 +222,7 @@ export const others = [
 		settings: {
 			title: 'Photobucket',
 			icon: embedPhotoIcon,
+			description: __( 'Embed a Photobucket image.' ),
 		},
 		patterns: [ /^http:\/\/g?i*\.photobucket\.com\/.+/i ],
 	},
@@ -209,6 +231,7 @@ export const others = [
 		settings: {
 			title: 'Polldaddy',
 			icon: embedContentIcon,
+			description: __( 'Embed Polldaddy content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?polldaddy\.com\/.+/i ],
 	},
@@ -217,6 +240,7 @@ export const others = [
 		settings: {
 			title: 'Reddit',
 			icon: embedRedditIcon,
+			description: __( 'Embed a Reddit thread.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?reddit\.com\/.+/i ],
 	},
@@ -225,6 +249,7 @@ export const others = [
 		settings: {
 			title: 'ReverbNation',
 			icon: embedAudioIcon,
+			description: __( 'Embed ReverbNation content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
 	},
@@ -233,6 +258,7 @@ export const others = [
 		settings: {
 			title: 'Screencast',
 			icon: embedVideoIcon,
+			description: __( 'Embed Screencast content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?screencast\.com\/.+/i ],
 	},
@@ -241,6 +267,7 @@ export const others = [
 		settings: {
 			title: 'Scribd',
 			icon: embedContentIcon,
+			description: __( 'Embed Scribd content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?scribd\.com\/.+/i ],
 	},
@@ -249,6 +276,7 @@ export const others = [
 		settings: {
 			title: 'Slideshare',
 			icon: embedContentIcon,
+			description: __( 'Embed Slideshare content.' ),
 		},
 		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
 	},
@@ -257,6 +285,7 @@ export const others = [
 		settings: {
 			title: 'SmugMug',
 			icon: embedPhotoIcon,
+			description: __( 'Embed SmugMug content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
@@ -286,6 +315,7 @@ export const others = [
 					} );
 				},
 			} ],
+			description: __( 'Embed Speaker Deck content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},
@@ -294,6 +324,7 @@ export const others = [
 		settings: {
 			title: 'TED',
 			icon: embedVideoIcon,
+			description: __( 'Embed a TED video.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.|embed\.)?ted\.com\/.+/i ],
 	},
@@ -302,6 +333,7 @@ export const others = [
 		settings: {
 			title: 'Tumblr',
 			icon: embedTumbrIcon,
+			description: __( 'Embed a Tumblr post.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?tumblr\.com\/.+/i ],
 	},
@@ -311,6 +343,7 @@ export const others = [
 			title: 'VideoPress',
 			icon: embedVideoIcon,
 			keywords: [ __( 'video' ) ],
+			description: __( 'Embed a VideoPress video.' ),
 		},
 		patterns: [ /^https?:\/\/videopress\.com\/.+/i ],
 	},
@@ -319,6 +352,7 @@ export const others = [
 		settings: {
 			title: 'WordPress.tv',
 			icon: embedVideoIcon,
+			description: __( 'Embed a WordPress.tv video.' ),
 		},
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
 	},

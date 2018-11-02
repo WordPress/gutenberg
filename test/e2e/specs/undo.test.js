@@ -33,7 +33,7 @@ describe( 'undo', () => {
 		await pressWithModifier( META_KEY, 'z' ); // Undo 1st block.
 
 		// After undoing every action, there should be no more undo history.
-		await page.waitForSelector( '.editor-history__undo:disabled' );
+		await page.waitForSelector( '.editor-history__undo[aria-disabled="true"]' );
 
 		expect( await getEditedPostContent() ).toBe( '' );
 	} );

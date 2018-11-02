@@ -6,7 +6,7 @@ import { mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import IgnoreNestedEvents from '../';
+import { IgnoreNestedEvents } from '../';
 
 describe( 'IgnoreNestedEvents', () => {
 	it( 'passes props to its rendered div', () => {

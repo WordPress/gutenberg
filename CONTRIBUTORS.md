@@ -110,4 +110,6 @@ This list is manually curated to include valuable contributions by volunteers th
 | @jorgefilipecosta | |
 | @ajitbohra | |
 | @ChrisVanPatten | |
+| @mayukojpn | @mayukojpn |
 | @tofumatt | @lonelyvegan |
+| @LukePettway | @luke_pettway |
