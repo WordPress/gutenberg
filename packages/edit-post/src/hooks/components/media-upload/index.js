@@ -94,7 +94,7 @@ class MediaUpload extends Component {
 		allowedTypes,
 		multiple = false,
 		gallery = false,
-		showAuthorFilters = false,
+		unstableFeaturedImageFlow = false,
 		title = __( 'Select or Upload Media' ),
 		modalClass,
 		value,
@@ -137,7 +137,7 @@ class MediaUpload extends Component {
 			this.frame = wp.media( frameConfig );
 		}
 
-		if ( showAuthorFilters ) {
+		if ( unstableFeaturedImageFlow ) {
 			const featuredImageFrame = getFeaturedImageMediaFrame();
 			const attachments = getAttachmentsCollection( value );
 			const selection = new wp.media.model.Selection( attachments.models, {

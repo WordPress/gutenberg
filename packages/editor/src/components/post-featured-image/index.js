@@ -52,7 +52,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						<MediaUpload
 							title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
 							onSelect={ onUpdateImage }
-							showAuthorFilters
+							unstableFeaturedImageFlow
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
@@ -77,7 +77,7 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 						<MediaUpload
 							title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
 							onSelect={ onUpdateImage }
-							showAuthorFilters
+							unstableFeaturedImageFlow
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
