@@ -126,7 +126,7 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 			! past.length ||
 			! shouldOverwriteState( action, previousAction )
 		) {
-			nextPast = [ ...past, serialize( present ) ];
+			nextPast = [ ...past, serialize( present, last( past ) ) ];
 			lastActionToSubmit = action;
 		}
 

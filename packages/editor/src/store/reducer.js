@@ -15,7 +15,6 @@ import {
 	isEqual,
 	overSome,
 	get,
-	pick,
 } from 'lodash';
 
 /**
@@ -236,17 +235,61 @@ export const editor = flow( [
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
 		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
-		serialize: ( state ) => ( {
-			...state,
-			blocksByClientId: mapValues( state.blocksByClientId, ( block ) => {
-				const blockType = getBlockType( block.name );
-				const attributeKeys = Object.keys( blockType.attributes );
-				return {
-					...block,
-					attributes: pick( block.attributes, attributeKeys ),
-				};
-			} ),
-		} ),
+		serialize: ( present, past ) => {
+			// Return the same reference unless change is necessary.
+			let nextState = present;
+
+			if ( past && past.blocks && present.blocks.byClientId === past.blocks.byClientId ) {
+				return nextState;
+			}
+
+			// For each changed block in the present, check for any attribute
+			// that _isn't_ part of the block type. If such an attribute is
+			// found, delete it from the state.
+			let blockId, block, blockType, attributeName;
+			for ( blockId in present.blocks.byClientId ) {
+				block = present.blocks.byClientId[ blockId ];
+
+				// Block hasn't changed. Skip.
+				if ( past && past.blocks && block === past.blocks.byClientId[ blockId ] ) {
+					continue;
+				}
+
+				console.log( 'Checking changes in', block.name );
+
+				blockType = getBlockType( block.name );
+				for ( attributeName in block.attributes ) {
+					if ( ! blockType.attributes.hasOwnProperty( attributeName ) ) {
+						console.log( 'Found attr', attributeName );
+
+						// If this is the first match in the loop, lazily
+						// create a new state object.
+						if ( nextState === present ) {
+							nextState = {
+								...present,
+								blocks: {
+									...present.blocks,
+									byClientId: {
+										...present.blocks.byClientId,
+									},
+								},
+							};
+						}
+						// Can we assume this copy-and-delete combo to be
+						// faster than lodash#omit?
+						nextState.blocks.byClientId[ blockId ] = {
+							...nextState.blocks.byClientId[ blockId ],
+							attributes: {
+								...nextState.blocks.byClientId[ blockId ].attributes,
+							},
+						};
+						delete nextState.blocks.byClientId[ blockId ].attributes[ attributeName ];
+					}
+				}
+			}
+
+			return nextState;
+		},
 	} ),
 ] )( {
 	edits( state = {}, action ) {
