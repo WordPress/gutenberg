@@ -51,6 +51,7 @@ require dirname( __FILE__ ) . '/plugin-compat.php';
 require dirname( __FILE__ ) . '/i18n.php';
 require dirname( __FILE__ ) . '/register.php';
 
+// Register server-side code for individual blocks.
 if ( ! function_exists( 'render_block_core_archives' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/archives/index.php';
 }
