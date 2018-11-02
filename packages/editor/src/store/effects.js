@@ -6,6 +6,7 @@ import { compact, last } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import {
 	parse,
 	getBlockType,
@@ -13,6 +14,7 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -32,6 +34,7 @@ import {
 	getBlockCount,
 	getPreviousBlockClientId,
 	getSelectedBlock,
+	getSelectedBlockCount,
 	getTemplate,
 	getTemplateLock,
 	isValidTemplate,
@@ -258,4 +261,12 @@ export default {
 	REPLACE_BLOCKS: [
 		ensureDefaultBlock,
 	],
+	ADD_TERM_TO_EDITED_POST: ( action ) => {
+		addTermToEditedPost( action );
+	},
+	MULTI_SELECT: ( action, { getState } ) => {
+		const blockCount = getSelectedBlockCount( getState() );
+
+		speak( sprintf( __( '%s blocks selected.' ), blockCount ), 'assertive' );
+	},
 };
