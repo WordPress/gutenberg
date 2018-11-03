@@ -13,7 +13,7 @@ function BlockContextualToolbar() {
 	return (
 		<NavigableToolbar
 			className="editor-block-contextual-toolbar"
-			aria-label={ __( 'Block Toolbar' ) }
+			aria-label={ __( 'Block tools' ) }
 		>
 			<BlockToolbar />
 		</NavigableToolbar>
