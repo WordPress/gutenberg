@@ -64,6 +64,39 @@ describe( 'withSelect', () => {
 		} );
 	} );
 
+	it( 'passes through the component context to the registry store', () => {
+		const getSelectors = jest.fn();
+
+		const genericStore = {
+			getSelectors,
+			getActions: () => {},
+			subscribe: () => {},
+		};
+
+		registry.registerGenericStore( 'store1', genericStore );
+
+		function mapSelectToProps( select ) {
+			select( 'store1' );
+		}
+
+		const OriginalComponent = () => <div></div>;
+
+		const ComponentWithSelect = withSelect( mapSelectToProps )( OriginalComponent );
+
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<ComponentWithSelect />
+			</RegistryProvider>
+		);
+		const testInstance = testRenderer.root;
+
+		expect( getSelectors ).toHaveBeenCalledTimes( 1 );
+
+		const selectorContext = getSelectors.mock.calls[ 0 ][ 0 ];
+		const componentInstance = testInstance.children[ 0 ].instance;
+		expect( selectorContext.component ).toBe( componentInstance );
+	} );
+
 	it( 'should rerun selection on state changes', () => {
 		registry.registerStore( 'counter', {
 			reducer: ( state = 0, action ) => {

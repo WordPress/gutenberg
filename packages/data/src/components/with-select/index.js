@@ -30,20 +30,6 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 	 */
 	const DEFAULT_MERGE_PROPS = {};
 
-	/**
-	 * Given a props object, returns the next merge props by mapSelectToProps.
-	 *
-	 * @param {Object} props Props to pass as argument to mapSelectToProps.
-	 *
-	 * @return {Object} Props to merge into rendered wrapped element.
-	 */
-	function getNextMergeProps( props ) {
-		return (
-			mapSelectToProps( props.registry.select, props.ownProps ) ||
-			DEFAULT_MERGE_PROPS
-		);
-	}
-
 	class ComponentWithSelect extends Component {
 		constructor( props ) {
 			super( props );
@@ -52,7 +38,24 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 
 			this.subscribe( props.registry );
 
-			this.mergeProps = getNextMergeProps( props );
+			this.mergeProps = this.getNextMergeProps( props );
+		}
+
+		/**
+		 * Given a props object, returns the next merge props by mapSelectToProps.
+		 *
+		 * @param {Object} props Props to pass as argument to mapSelectToProps.
+		 *
+		 * @return {Object} Props to merge into rendered wrapped element.
+		 */
+		getNextMergeProps( props ) {
+			const context = { component: this };
+			const select = ( reducerKey ) => props.registry.select( reducerKey, context );
+
+			return (
+				mapSelectToProps( select, props.ownProps ) ||
+				DEFAULT_MERGE_PROPS
+			);
 		}
 
 		componentDidMount() {
@@ -94,7 +97,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			}
 
 			if ( hasPropsChanged ) {
-				const nextMergeProps = getNextMergeProps( nextProps );
+				const nextMergeProps = this.getNextMergeProps( nextProps );
 				if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
 					// If merge props change as a result of the incoming props,
 					// they should be reflected as such in the upcoming render.
@@ -119,7 +122,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 				return;
 			}
 
-			const nextMergeProps = getNextMergeProps( this.props );
+			const nextMergeProps = this.getNextMergeProps( this.props );
 			if ( isShallowEqual( this.mergeProps, nextMergeProps ) ) {
 				return;
 			}
