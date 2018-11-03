@@ -441,6 +441,22 @@ describe( 'createRegistry', () => {
 			expect( registry.select( 'reducer1' ).selector2() ).toEqual( 'result2' );
 			expect( selector2 ).toBeCalledWith( store.getState() );
 		} );
+
+		it( 'passes through optional context to getSelectors', () => {
+			const getSelectors = jest.fn();
+			const genericStore = {
+				getSelectors,
+				getActions: () => {},
+				subscribe: () => {},
+			};
+			registry.registerGenericStore( 'store1', genericStore );
+
+			const component = { displayName: 'MyComponent' };
+			registry.select( 'store1', { component } );
+
+			expect( getSelectors ).toHaveBeenCalledTimes( 1 );
+			expect( getSelectors ).toHaveBeenCalledWith( { component } );
+		} );
 	} );
 
 	describe( 'subscribe', () => {

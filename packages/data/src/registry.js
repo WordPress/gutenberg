@@ -69,12 +69,14 @@ export function createRegistry( storeConfigs = {} ) {
 	 *
 	 * @param {string} reducerKey Part of the state shape to register the
 	 *                            selectors for.
+	 * @param {Object} [context]  Optional context object for data select operation.
+	 *                            (e.g. { component: <Component Instance> } )
 	 *
 	 * @return {*} The selector's returned value.
 	 */
-	function select( reducerKey ) {
+	function select( reducerKey, context ) {
 		const store = stores[ reducerKey ];
-		return store && store.getSelectors();
+		return store && store.getSelectors( context );
 	}
 
 	/**
