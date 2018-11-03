@@ -321,7 +321,9 @@ class WP_Block_Parser {
 				 * block and add it as a new innerBlock to the parent
 				 */
 				$stack_top = array_pop( $this->stack );
-				$stack_top->block->innerHTML .= substr( $this->document, $stack_top->prev_offset, $start_offset - $stack_top->prev_offset );
+				$html = substr( $this->document, $stack_top->prev_offset, $start_offset - $stack_top->prev_offset );
+				$stack_top->block->innerHTML .= $html;
+				$stack_top->block->innerContent[] = $html;
 				$stack_top->prev_offset = $start_offset + $token_length;
 
 				$this->add_inner_block(

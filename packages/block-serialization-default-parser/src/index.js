@@ -135,10 +135,9 @@ function proceed() {
 			// otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
-			stackTop.block.innerHTML += document.substr(
-				stackTop.prevOffset,
-				startOffset - stackTop.prevOffset,
-			);
+			const html = document.substr( stackTop.prevOffset, startOffset - stackTop.prevOffset );
+			stackTop.block.innerHTML += html;
+			stackTop.block.innerContent.push( html );
 			stackTop.prevOffset = startOffset + tokenLength;
 
 			addInnerBlock(
