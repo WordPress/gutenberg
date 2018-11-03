@@ -1,3 +1,9 @@
+## 5.0.3 (unreleased)
+
+### New Features
+
+- Adjust a11y roles for MenuItem component, so that aria-checked is used properly, related change in Editor/Components/BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
+
 ## 5.0.2 (2018-11-03)
 
 ### Polish
