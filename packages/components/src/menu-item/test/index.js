@@ -86,12 +86,12 @@ describe( 'MenuItem', () => {
 			<MenuItem role="menuitemradio" isSelected={ true }><div /></MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBeTrue();
+		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
 
 		wrapper = shallow(
 			<MenuItem role="menuitemcheckbox" isSelected={ true }><div /></MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-checked' ) ).toBeTrue();
+		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
 	} );
 } );
