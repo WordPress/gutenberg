@@ -1,4 +1,4 @@
-## 3.1.0 (Unreleased)
+## 3.1.0 (2018-11-03)
 
 ### New Features
 
