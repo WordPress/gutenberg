@@ -277,7 +277,6 @@ class WP_Block_Parser {
 					new WP_Block_Parser_Block( $block_name, $attrs, array(), '', array() ),
 					$start_offset,
 					$token_length
-		$stack_top->block->innerContent[] = 'doogie';
 				);
 				$this->offset = $start_offset + $token_length;
 				return true;
