@@ -30,7 +30,7 @@ const TableOfContentsItem = ( {
 		) }
 	>
 		<a
-			href={ target ? '#block-' + target : '#post-title-1' }
+			href={ target }
 			className="document-outline__button"
 		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>

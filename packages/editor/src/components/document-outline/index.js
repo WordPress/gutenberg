@@ -70,14 +70,8 @@ export const DocumentOutline = ( { blocks = [], title, isTitleSupported } ) => {
 
 	let prevHeadingLevel = 1;
 
-	const focusTitle = () => {
-		// Not great but it's the simplest way to focus the title right now.
-		const titleNode = document.querySelector( '.editor-post-title__input' );
-		if ( titleNode ) {
-			titleNode.focus();
-		}
-	};
-
+	// Not great but it's the simplest way to locate the title right now.
+	const titleNode = document.querySelector( '.editor-post-title__input' );
 	const hasTitle = isTitleSupported && title;
 	const countByLevel = countBy( headings, 'level' );
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
@@ -89,7 +83,7 @@ export const DocumentOutline = ( { blocks = [], title, isTitleSupported } ) => {
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						onClick={ focusTitle }
+						target={ '#' + titleNode.id }
 					>
 						{ title }
 					</DocumentOutlineItem>
@@ -113,7 +107,7 @@ export const DocumentOutline = ( { blocks = [], title, isTitleSupported } ) => {
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							path={ item.path }
-							target={ item.clientId }
+							target={ '#block-' + item.clientId }
 						>
 							{ item.isEmpty ?
 								emptyHeadingContent :
