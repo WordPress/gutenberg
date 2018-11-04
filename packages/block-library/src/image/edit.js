@@ -46,6 +46,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { createUpgradedEmbedBlock } from '../embed/util';
 import ImageSize from './image-size';
 
 /**
@@ -186,6 +187,14 @@ class ImageEdit extends Component {
 		const { url } = this.props.attributes;
 
 		if ( newURL !== url ) {
+			// Check if there's an embed block that handles this URL.
+			const embedBlock = createUpgradedEmbedBlock(
+				{ attributes: { url: newURL } }
+			);
+			if ( undefined !== embedBlock ) {
+				this.props.onReplace( embedBlock );
+				return;
+			}
 			this.props.setAttributes( {
 				url: newURL,
 				id: undefined,

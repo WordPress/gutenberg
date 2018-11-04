@@ -21,6 +21,11 @@ import {
 } from '@wordpress/editor';
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 
+/**
+ * Internal dependencies
+ */
+import { createUpgradedEmbedBlock } from '../embed/util';
+
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 class AudioEdit extends Component {
@@ -73,6 +78,14 @@ class AudioEdit extends Component {
 		// Set the block's src from the edit component's state, and switch off
 		// the editing UI.
 		if ( newSrc !== src ) {
+			// Check if there's an embed block that handles this URL.
+			const embedBlock = createUpgradedEmbedBlock(
+				{ attributes: { url: newSrc } }
+			);
+			if ( undefined !== embedBlock ) {
+				this.props.onReplace( embedBlock );
+				return;
+			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
 
