@@ -13,6 +13,7 @@ function BlockContextualToolbar() {
 	return (
 		<NavigableToolbar
 			className="editor-block-contextual-toolbar"
+			/* translators: accessibility text for the block toolbar */
 			aria-label={ __( 'Block tools' ) }
 		>
 			<BlockToolbar />
