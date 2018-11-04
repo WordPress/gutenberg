@@ -7,7 +7,7 @@ import { filter, pick } from 'lodash';
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	IconButton,
 	DropZone,
@@ -254,6 +254,7 @@ class GalleryEdit extends Component {
 								onSelect={ this.onSelectImage( index ) }
 								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
 								caption={ img.caption }
+								aria-label={ __( sprintf( 'image %1$d of %2$d in gallery', ( index + 1 ), images.length ) ) }
 							/>
 						</li>
 					) ) }
