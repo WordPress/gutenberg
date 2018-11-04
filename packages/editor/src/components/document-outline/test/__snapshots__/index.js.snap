@@ -10,7 +10,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="0"
       level="H2"
       path={Array []}
-      target="#block-29532918-0ff3-42da-b8c7-455f7af120ea"
+      target="#block-7033e374-b102-4ec5-a340-623f9c433e3f"
     >
       <Component
         format="string"
@@ -23,7 +23,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="1"
       level="H3"
       path={Array []}
-      target="#block-2b9fbe24-affe-47e2-b7ec-34158e53aad8"
+      target="#block-9103c389-d5c7-4287-a7ad-e272bc61a68e"
     >
       <Component
         format="string"
@@ -45,7 +45,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       key="0"
       level="H1"
       path={Array []}
-      target="#block-a0253b47-f7d9-4707-b07a-b738d2c174c7"
+      target="#block-12df094f-a677-4ab2-882d-1821a10307e5"
     >
       <Component
         format="string"
@@ -66,7 +66,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       key="1"
       level="H1"
       path={Array []}
-      target="#block-a0253b47-f7d9-4707-b07a-b738d2c174c7"
+      target="#block-12df094f-a677-4ab2-882d-1821a10307e5"
     >
       <Component
         format="string"
