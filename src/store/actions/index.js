@@ -34,11 +34,6 @@ export type BlocksActionType = ( string, string, BlockType ) => {
 	block: BlockType,
 };
 
-export type setImageSourceActionType = string => {
-	type: $Values<typeof ActionTypes.BLOCK>,
-	url: string,
-};
-
 export function updateBlockAttributes( clientId: string, attributes: mixed ) {
 	return {
 		type: ActionTypes.BLOCK.UPDATE_ATTRIBUTES,
@@ -88,9 +83,4 @@ export const mergeBlocksAction: BlocksActionType = ( blockOneClientId, blockTwoC
 	blockOneClientId,
 	blockTwoClientId,
 	block,
-} );
-
-export const setImageSourceAction: setImageSourceActionType = ( url ) => ( {
-	type: ActionTypes.BLOCK.SET_IMAGE_SOURCE,
-	url: url,
 } );

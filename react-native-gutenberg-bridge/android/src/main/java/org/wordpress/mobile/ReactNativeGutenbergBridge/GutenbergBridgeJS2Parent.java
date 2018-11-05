@@ -2,5 +2,10 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 
 public interface GutenbergBridgeJS2Parent {
     void responseHtml(String html);
-    void onMediaLibraryPress();
+
+    interface MediaSelectedCallback {
+        void onMediaSelected(String mediaUrl);
+    }
+
+    void onMediaLibraryPress(MediaSelectedCallback mediaSelectedCallback);
 }
