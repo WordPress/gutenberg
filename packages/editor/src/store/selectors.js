@@ -54,6 +54,7 @@ export const INSERTER_UTILITY_NONE = 0;
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
+const ONE_MINUTE_IN_MS = 60 * 1000;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -323,7 +324,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && ! isInTheFuture( post.date, 1 ) );
+		( post.status === 'future' && ! isInTheFuture( new Date( Number( new Date( post.date ) ) + ONE_MINUTE_IN_MS ) ) );
 }
 
 /**
@@ -481,7 +482,11 @@ export function hasAutosave( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	return isInTheFuture( getEditedPostAttribute( state, 'date' ), 1 );
+	const date = getEditedPostAttribute( state, 'date' );
+	// Offset the date by one minute (network latency)
+	const checkedDate = new Date( Number( new Date( date ) ) + ONE_MINUTE_IN_MS );
+
+	return isInTheFuture( checkedDate );
 }
 
 /**

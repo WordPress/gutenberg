@@ -392,9 +392,16 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	return format( dateFormat, dateMoment );
 }
 
-export function isInTheFuture( dateString, minutesOffset = 0 ) {
-	const now = momentLib.tz( 'WP' ).add( minutesOffset, 'minute' );
-	const momentObject = momentLib.tz( dateString, 'WP' );
+/**
+ * Check whether a date is considered in the future according to the WordPress settings.
+ *
+ * @param {(Date|string)} dateValue  Date object or string.
+ *
+ * @return {boolean} Is in the future.
+ */
+export function isInTheFuture( dateValue ) {
+	const now = momentLib.tz( 'WP' );
+	const momentObject = momentLib.tz( dateValue, 'WP' );
 
 	return momentObject.isAfter( now );
 }

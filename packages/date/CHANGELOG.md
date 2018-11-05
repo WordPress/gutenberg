@@ -1,4 +1,4 @@
-## 2.1.1 (Unreleased)
+## 2.2.0 (Unreleased)
 
 ### Deprecations
 
