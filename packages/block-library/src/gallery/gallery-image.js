@@ -98,11 +98,11 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes, 'aria-label': ariaLabel } = this.props;
+		const { url, alt, id, seedId, linkTo, link, isSelected, caption, onRemove, setAttributes, 'aria-label': ariaLabel } = this.props;
 
 		let href;
 
-		if ( ! id && ! this.props.seedId ) {
+		if ( ! id && ! seedId ) {
 			return null;
 		}
 
@@ -175,6 +175,13 @@ export default withSelect( ( select, ownProps ) => {
 	const { getMedia } = select( 'core' );
 	const { id: ownId, seedId } = ownProps;
 
+	// Prop `id` denotes an image's ID as returned from the Media endpoint. In
+	// other words, `id` is only present when all the data needs for
+	// GalleryImage have been satisfied.
+	//
+	// In contrast, `seedId` denotes an image's ID as passed by Gallery when no
+	// other information about an image is yet known. In other words, `seedId`
+	// is a cue for GalleryImage to retrieve any media data it needs.
 	const id = ownId || seedId;
 
 	return {
