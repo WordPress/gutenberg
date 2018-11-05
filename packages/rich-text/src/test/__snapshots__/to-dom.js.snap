@@ -301,6 +301,22 @@ exports[`recordToDom should handle selection before br 1`] = `
 </body>
 `;
 
+exports[`recordToDom should ignore formats at line separator 1`] = `
+<body>
+  <p>
+    <em>
+      one
+    </em>
+  </p>
+  <p>
+    <em>
+      two
+    </em>
+    
+  </p>
+</body>
+`;
+
 exports[`recordToDom should ignore line breaks to format HTML 1`] = `
 <body>
   
