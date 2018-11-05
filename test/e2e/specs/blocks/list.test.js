@@ -9,6 +9,7 @@ import {
 	convertBlock,
 	pressWithModifier,
 	insertBlock,
+	META_KEY,
 } from '../../support/utils';
 
 describe( 'List', () => {
@@ -42,6 +43,15 @@ describe( 'List', () => {
 		// Create a block with some text that will trigger a list creation.
 		await clickBlockAppender();
 		await page.keyboard.type( '1) A list item' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'can undo asterisk transform', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1. ' );
+		await pressWithModifier( META_KEY, 'z' );
+		await page.keyboard.type( 'November' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
