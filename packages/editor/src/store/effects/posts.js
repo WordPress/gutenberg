@@ -9,7 +9,6 @@ import { pick, includes } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 // TODO: Ideally this would be the only dispatch in scope. This requires either
 // refactoring editor actions to yielded controls, or replacing direct dispatch
 // on the editor store with action creators (e.g. `REQUEST_POST_UPDATE_START`).
@@ -266,25 +265,6 @@ export const requestPostUpdateFailure = ( action ) => {
 	dataDispatch( 'core/notices' ).createErrorNotice( noticeMessage, {
 		id: SAVE_POST_NOTICE_ID,
 	} );
-
-	if ( error && 'cloudflare_error' === error.code ) {
-		dataDispatch( 'core/notices' ).createErrorNotice(
-			__( 'Cloudflare is blocking REST API requests.' ),
-			{
-				actions: [
-					{
-						label: __( 'Learn More' ),
-						url: addQueryArgs( 'post.php', {
-							post: post.id,
-							action: 'edit',
-							'classic-editor': '',
-							'cloudflare-error': '',
-						} ),
-					},
-				],
-			},
-		);
-	}
 };
 
 /**

@@ -26,14 +26,14 @@ import { dispatch as dataDispatch } from '@wordpress/data';
  */
 import { resolveSelector } from './utils';
 import {
-	receiveReusableBlocks as receiveReusableBlocksAction,
+	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
 	removeBlocks,
 	replaceBlocks,
 	receiveBlocks,
-	saveReusableBlock,
+	__experimentalSaveReusableBlock as saveReusableBlock,
 } from '../actions';
 import {
-	getReusableBlock,
+	__experimentalGetReusableBlock as getReusableBlock,
 	getBlock,
 	getBlocks,
 	getBlocksByClientId,
@@ -237,7 +237,7 @@ export const convertBlockToStatic = ( action, store ) => {
 	if ( referencedBlock.name === 'core/template' ) {
 		newBlocks = referencedBlock.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) );
 	} else {
-		newBlocks = [ createBlock( referencedBlock.name, referencedBlock.attributes ) ];
+		newBlocks = [ cloneBlock( referencedBlock ) ];
 	}
 	store.dispatch( replaceBlocks( oldBlock.clientId, newBlocks ) );
 };

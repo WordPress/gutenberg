@@ -7,7 +7,7 @@ import { get, reduce, size, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -93,27 +93,21 @@ export class BlockListBlock extends Component {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this.focusTabbable( true );
 		}
+
+		// When triggering a multi-selection,
+		// move the focus to the wrapper of the first selected block.
+		if ( this.props.isFirstMultiSelected && ! prevProps.isFirstMultiSelected ) {
+			this.wrapperNode.focus();
+		}
 	}
 
 	setBlockListRef( node ) {
-		// Disable reason: The root return element uses a component to manage
-		// event nesting, but the parent block list layout needs the raw DOM
-		// node to track multi-selection.
-		//
-		// eslint-disable-next-line react/no-find-dom-node
-		node = findDOMNode( node );
-
 		this.wrapperNode = node;
-
 		this.props.blockRef( node, this.props.clientId );
 	}
 
 	bindBlockNode( node ) {
-		// Disable reason: The block element uses a component to manage event
-		// nesting, but we rely on a raw DOM node for focusing.
-		//
-		// eslint-disable-next-line react/no-find-dom-node
-		this.node = findDOMNode( node );
+		this.node = node;
 	}
 
 	/**
@@ -314,7 +308,11 @@ export class BlockListBlock extends Component {
 	deleteOrInsertAfterWrapper( event ) {
 		const { keyCode, target } = event;
 
-		if ( target !== this.wrapperNode || this.props.isLocked ) {
+		if (
+			! this.props.isSelected ||
+			target !== this.wrapperNode ||
+			this.props.isLocked
+		) {
 			return;
 		}
 
@@ -402,10 +400,9 @@ export class BlockListBlock extends Component {
 		const shouldShowMobileToolbar = shouldAppearSelected;
 		const { error, dragging } = this.state;
 
-		// Insertion point can only be made visible when the side inserter is
-		// not present, and either the block is at the extent of a selection or
-		// is the first block in the top-level list rendering.
-		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirst ) || ! isPartOfMultiSelection;
+		// Insertion point can only be made visible if the block is at the
+		// the extent of a multi-selection, or not in a multi-selection.
+		const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirstMultiSelected ) || ! isPartOfMultiSelection;
 		const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
 
 		// The wp-block className is important for editor styles.
@@ -491,7 +488,6 @@ export class BlockListBlock extends Component {
 						clientId={ clientId }
 						rootClientId={ rootClientId }
 						canShowInserter={ canShowInBetweenInserter }
-						onInsert={ this.hideHoverEffects }
 					/>
 				) }
 				<BlockDropZone

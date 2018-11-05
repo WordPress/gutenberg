@@ -2,14 +2,14 @@
  * External dependencies
  */
 import tinymce from 'tinymce';
-import { isEqual } from 'lodash';
+import { isEqual, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
 import { toHTMLString } from '@wordpress/rich-text';
 import { children } from '@wordpress/blocks';
 
@@ -17,6 +17,23 @@ import { children } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { diffAriaProps, pickAriaProps } from './aria';
+
+/**
+ * Browser dependencies
+ */
+
+const { getSelection } = window;
+const { TEXT_NODE } = window.Node;
+
+/**
+ * Zero-width space character used by TinyMCE as a caret landing point for
+ * inline boundary nodes.
+ *
+ * @see tinymce/src/core/main/ts/text/Zwsp.ts
+ *
+ * @type {string}
+ */
+export const TINYMCE_ZWSP = '\uFEFF';
 
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.
@@ -101,21 +118,28 @@ export default class TinyMCE extends Component {
 	constructor() {
 		super();
 		this.bindEditorNode = this.bindEditorNode.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 	}
 
-	componentDidMount() {
+	onFocus() {
+		if ( this.props.onFocus ) {
+			this.props.onFocus();
+		}
+
 		this.initialize();
 	}
 
-	shouldComponentUpdate() {
-		// We must prevent rerenders because TinyMCE will modify the DOM, thus
-		// breaking React's ability to reconcile changes.
-		//
-		// See: https://github.com/facebook/react/issues/6802
-		return false;
-	}
-
-	componentWillReceiveProps( nextProps ) {
+	// We must prevent rerenders because RichText, the browser, and TinyMCE will
+	// modify the DOM. React will rerender the DOM fine, but we're losing
+	// selection and it would be more expensive to do so as it would just set
+	// the inner HTML through `dangerouslySetInnerHTML`. Instead RichText does
+	// it's own diffing and selection setting.
+	//
+	// Because we never update the component, we have to look through props and
+	// update the attributes on the wrapper nodes here. `componentDidUpdate`
+	// will never be called.
+	shouldComponentUpdate( nextProps ) {
 		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
@@ -132,6 +156,8 @@ export default class TinyMCE extends Component {
 			this.editorNode.removeAttribute( key ) );
 		updatedKeys.forEach( ( key ) =>
 			this.editorNode.setAttribute( key, nextProps[ key ] ) );
+
+		return false;
 	}
 
 	componentWillUnmount() {
@@ -158,6 +184,11 @@ export default class TinyMCE extends Component {
 			browser_spellcheck: true,
 			entity_encoding: 'raw',
 			convert_urls: false,
+			// Disables TinyMCE's parsing to verify HTML. It makes
+			// initialisation a bit faster. Since we're setting raw HTML
+			// already with dangerouslySetInnerHTML, we don't need this to be
+			// verified.
+			verify_html: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
 		} );
@@ -169,6 +200,18 @@ export default class TinyMCE extends Component {
 				this.editor = editor;
 				this.props.onSetup( editor );
 
+				// TinyMCE resets the element content on initialization, even
+				// when it's already identical to what exists currently. This
+				// behavior clobbers a selection which exists at the time of
+				// initialization, thus breaking writing flow navigation. The
+				// hack here neutralizes setHTML during initialization.
+				let setHTML;
+
+				editor.on( 'preinit', () => {
+					setHTML = editor.dom.setHTML;
+					editor.dom.setHTML = () => {};
+				} );
+
 				editor.on( 'init', () => {
 					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
 					[ 'b', 'i', 'u' ].forEach( ( character ) => {
@@ -177,7 +220,11 @@ export default class TinyMCE extends Component {
 					[ 1, 2, 3, 4, 5, 6, 7, 8, 9 ].forEach( ( number ) => {
 						editor.shortcuts.remove( `access+${ number }` );
 					} );
+
+					editor.dom.setHTML = setHTML;
 				} );
+
+				editor.on( 'keydown', this.onKeyDown, true );
 			},
 		} );
 	}
@@ -203,6 +250,59 @@ export default class TinyMCE extends Component {
 		}
 	}
 
+	onKeyDown( event ) {
+		const { keyCode } = event;
+
+		// Disables TinyMCE behaviour.
+		if ( keyCode === ENTER || keyCode === BACKSPACE || keyCode === DELETE ) {
+			event.preventDefault();
+			// For some reason this is needed to also prevent the insertion of
+			// line breaks.
+			return false;
+		}
+
+		// Handles a horizontal navigation key down event to handle the case
+		// where TinyMCE attempts to preventDefault when on the outside edge of
+		// an inline boundary when arrowing _away_ from the boundary, not within
+		// it. Replaces the TinyMCE event `preventDefault` behavior with a noop,
+		// such that those relying on `defaultPrevented` are not misinformed
+		// about the arrow event.
+		//
+		// If TinyMCE#4476 is resolved, this handling may be removed.
+		//
+		// @see https://github.com/tinymce/tinymce/issues/4476
+		if ( keyCode !== LEFT && keyCode !== RIGHT ) {
+			return;
+		}
+
+		const { focusNode } = getSelection();
+		const { nodeType, nodeValue } = focusNode;
+
+		if ( nodeType !== TEXT_NODE ) {
+			return;
+		}
+
+		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
+			return;
+		}
+
+		// Consider to be moving away from inline boundary based on:
+		//
+		// 1. Within a text fragment consisting only of ZWSP.
+		// 2. If in reverse, there is no previous sibling. If forward, there is
+		//    no next sibling (i.e. end of node).
+		const isReverse = event.keyCode === LEFT;
+		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
+		if ( ! focusNode[ edgeSibling ] ) {
+			// Note: This is not reassigning on the native event, rather the
+			// "fixed" TinyMCE copy, which proxies its preventDefault to the
+			// native event. By reassigning here, we're effectively preventing
+			// the proxied call on the native event, but not otherwise mutating
+			// the original event object.
+			event.preventDefault = noop;
+		}
+	}
+
 	render() {
 		const ariaProps = pickAriaProps( this.props );
 		const {
@@ -214,6 +314,9 @@ export default class TinyMCE extends Component {
 			onPaste,
 			onInput,
 			multilineTag,
+			multilineWrapperTags,
+			onKeyDown,
+			onKeyUp,
 		} = this.props;
 
 		/*
@@ -239,7 +342,16 @@ export default class TinyMCE extends Component {
 		} else if ( Array.isArray( defaultValue ) ) {
 			initialHTML = children.toHTML( defaultValue );
 		} else if ( typeof defaultValue !== 'string' ) {
-			initialHTML = toHTMLString( defaultValue, multilineTag );
+			initialHTML = toHTMLString( {
+				value: defaultValue,
+				multilineTag,
+				multilineWrapperTags,
+			} );
+		}
+
+		if ( initialHTML === '' ) {
+			// Ensure the field is ready to receive focus by TinyMCE.
+			initialHTML = '<br data-mce-bogus="1">';
 		}
 
 		return createElement( tagName, {
@@ -253,6 +365,9 @@ export default class TinyMCE extends Component {
 			dangerouslySetInnerHTML: { __html: initialHTML },
 			onPaste,
 			onInput,
+			onFocus: this.onFocus,
+			onKeyDown,
+			onKeyUp,
 		} );
 	}
 }

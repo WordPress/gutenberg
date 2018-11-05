@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString, isArray } from 'lodash';
+import { isArray, isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ class IconButton extends Component {
 		const tooltipText = tooltip || label;
 
 		// Should show the tooltip if...
-		const showTooltip = (
+		const showTooltip = ! additionalProps.disabled && (
 			// an explicit tooltip is passed or...
 			tooltip ||
 			// there's a shortcut or...
@@ -49,7 +49,10 @@ class IconButton extends Component {
 
 		if ( showTooltip ) {
 			element = (
-				<Tooltip text={ tooltipText } shortcut={ shortcut }>
+				<Tooltip
+					text={ tooltipText }
+					shortcut={ shortcut }
+				>
 					{ element }
 				</Tooltip>
 			);

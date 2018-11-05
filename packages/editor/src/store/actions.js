@@ -312,7 +312,7 @@ export function insertBlock( block, index, rootClientId ) {
  *
  * @param {Object[]} blocks       Block objects to insert.
  * @param {?number}  index        Index at which block should be inserted.
- * @param {?string}  rootClientId Optional root cliente ID of block list on
+ * @param {?string}  rootClientId Optional root client ID of block list on
  *                                which to insert.
  *
  * @return {Object} Action object.
@@ -331,11 +331,17 @@ export function insertBlocks( blocks, index, rootClientId ) {
  * Returns an action object used in signalling that the insertion point should
  * be shown.
  *
+ * @param {?string} rootClientId Optional root client ID of block list on
+ *                               which to insert.
+ * @param {?number} index        Index at which block should be inserted.
+ *
  * @return {Object} Action object.
  */
-export function showInsertionPoint() {
+export function showInsertionPoint( rootClientId, index ) {
 	return {
 		type: 'SHOW_INSERTION_POINT',
+		rootClientId,
+		index,
 	};
 }
 
@@ -578,7 +584,7 @@ export function updatePostLock( lock ) {
  *
  * @return {Object} Action object.
  */
-export function fetchReusableBlocks( id ) {
+export function __experimentalFetchReusableBlocks( id ) {
 	return {
 		type: 'FETCH_REUSABLE_BLOCKS',
 		id,
@@ -595,7 +601,7 @@ export function fetchReusableBlocks( id ) {
  *
  * @return {Object} Action object.
  */
-export function receiveReusableBlocks( results ) {
+export function __experimentalReceiveReusableBlocks( results ) {
 	return {
 		type: 'RECEIVE_REUSABLE_BLOCKS',
 		results,
@@ -610,7 +616,7 @@ export function receiveReusableBlocks( results ) {
  *
  * @return {Object} Action object.
  */
-export function saveReusableBlock( id ) {
+export function __experimentalSaveReusableBlock( id ) {
 	return {
 		type: 'SAVE_REUSABLE_BLOCK',
 		id,
@@ -624,7 +630,7 @@ export function saveReusableBlock( id ) {
  *
  * @return {Object} Action object.
  */
-export function deleteReusableBlock( id ) {
+export function __experimentalDeleteReusableBlock( id ) {
 	return {
 		type: 'DELETE_REUSABLE_BLOCK',
 		id,
@@ -640,7 +646,7 @@ export function deleteReusableBlock( id ) {
  *
  * @return {Object} Action object.
  */
-export function updateReusableBlockTitle( id, title ) {
+export function __experimentalUpdateReusableBlockTitle( id, title ) {
 	return {
 		type: 'UPDATE_REUSABLE_BLOCK_TITLE',
 		id,
@@ -655,7 +661,7 @@ export function updateReusableBlockTitle( id, title ) {
  *
  * @return {Object} Action object.
  */
-export function convertBlockToStatic( clientId ) {
+export function __experimentalConvertBlockToStatic( clientId ) {
 	return {
 		type: 'CONVERT_BLOCK_TO_STATIC',
 		clientId,
@@ -669,7 +675,7 @@ export function convertBlockToStatic( clientId ) {
  *
  * @return {Object} Action object.
  */
-export function convertBlockToReusable( clientIds ) {
+export function __experimentalConvertBlockToReusable( clientIds ) {
 	return {
 		type: 'CONVERT_BLOCK_TO_REUSABLE',
 		clientIds: castArray( clientIds ),
@@ -773,22 +779,6 @@ export function unlockPostSaving( lockName ) {
 	};
 }
 
-/**
- * Returns an action object signaling that a new term is added to the edited post.
- *
- * @param {string} slug  Taxonomy slug.
- * @param {Object} term  Term object.
- *
- * @return {Object} Action object.
- */
-export function addTermToEditedPost( slug, term ) {
-	return {
-		type: 'ADD_TERM_TO_EDITED_POST',
-		slug,
-		term,
-	};
-}
-
 //
 // Deprecated
 //
@@ -821,3 +811,80 @@ export const createSuccessNotice = partial( createNotice, 'success' );
 export const createInfoNotice = partial( createNotice, 'info' );
 export const createErrorNotice = partial( createNotice, 'error' );
 export const createWarningNotice = partial( createNotice, 'warning' );
+
+//
+// Deprecated
+//
+
+export function fetchReusableBlocks( id ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).fetchReusableBlocks( id )", {
+		alternative: "wp.data.select( 'core' ).getEntityRecords( 'postType', 'wp_block' )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalFetchReusableBlocks( id );
+}
+
+export function receiveReusableBlocks( results ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).receiveReusableBlocks( results )", {
+		alternative: "wp.data.select( 'core' ).getEntityRecords( 'postType', 'wp_block' )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalReceiveReusableBlocks( results );
+}
+
+export function saveReusableBlock( id ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).saveReusableBlock( id )", {
+		alternative: "wp.data.dispatch( 'core' ).saveEntityRecord( 'postType', 'wp_block', reusableBlock )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalSaveReusableBlock( id );
+}
+
+export function deleteReusableBlock( id ) {
+	deprecated( 'deleteReusableBlock action (`core/editor` store)', {
+		alternative: '__experimentalDeleteReusableBlock action (`core/edtior` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
+	} );
+
+	return __experimentalDeleteReusableBlock( id );
+}
+
+export function updateReusableBlockTitle( id, title ) {
+	deprecated( "wp.data.dispatch( 'core/editor' ).updateReusableBlockTitle( id, title )", {
+		alternative: "wp.data.dispatch( 'core' ).saveEntityRecord( 'postType', 'wp_block', reusableBlock )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalUpdateReusableBlockTitle( id, title );
+}
+
+export function convertBlockToStatic( id ) {
+	deprecated( 'convertBlockToStatic action (`core/editor` store)', {
+		alternative: '__experimentalConvertBlockToStatic action (`core/edtior` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
+	} );
+
+	return __experimentalConvertBlockToStatic( id );
+}
+
+export function convertBlockToReusable( id ) {
+	deprecated( 'convertBlockToReusable action (`core/editor` store)', {
+		alternative: '__experimentalConvertBlockToReusable action (`core/edtior` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
+	} );
+
+	return __experimentalConvertBlockToReusable( id );
+}

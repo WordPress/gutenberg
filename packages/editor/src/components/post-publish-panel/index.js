@@ -8,7 +8,12 @@ import { get, omit } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner, CheckboxControl } from '@wordpress/components';
+import {
+	IconButton,
+	Spinner,
+	CheckboxControl,
+	withConstrainedTabbing,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -135,4 +140,5 @@ export default compose( [
 			},
 		};
 	} ),
+	withConstrainedTabbing,
 ] )( PostPublishPanel );

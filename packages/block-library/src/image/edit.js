@@ -8,6 +8,7 @@ import {
 	map,
 	pick,
 	startCase,
+	keyBy,
 } from 'lodash';
 
 /**
@@ -169,7 +170,7 @@ class ImageEdit extends Component {
 		if ( value === LINK_DESTINATION_NONE ) {
 			href = undefined;
 		} else if ( value === LINK_DESTINATION_MEDIA ) {
-			href = this.props.attributes.url;
+			href = ( this.props.image && this.props.image.source_url ) || this.props.attributes.url;
 		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
 			href = this.props.image && this.props.image.link;
 		} else {
@@ -256,7 +257,7 @@ class ImageEdit extends Component {
 		return '';
 	}
 
-	getAvailableSizes() {
+	getImageSizes() {
 		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
 	}
 
@@ -277,9 +278,22 @@ class ImageEdit extends Component {
 
 	render() {
 		const { isEditing } = this.state;
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
+		const {
+			attributes,
+			setAttributes,
+			isLargeViewport,
+			isSelected,
+			className,
+			maxWidth,
+			noticeOperations,
+			noticeUI,
+			toggleSelection,
+			isRTL,
+			availableImageSizes,
+		} = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, width, height, linkTarget } = attributes;
 		const isExternal = isExternalImage( id, url );
+		const availableImageSizesBySlug = keyBy( availableImageSizes, 'slug' );
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -351,7 +365,7 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const availableSizes = this.getAvailableSizes();
+		const imageSizes = this.getImageSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
@@ -364,13 +378,13 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 					/>
-					{ ! isEmpty( availableSizes ) && (
+					{ ! isEmpty( imageSizes ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
-							options={ map( availableSizes, ( size, name ) => ( {
+							options={ map( imageSizes, ( size, slug ) => ( {
 								value: size.source_url,
-								label: startCase( name ),
+								label: availableImageSizesBySlug[ slug ] ? availableImageSizesBySlug[ slug ].name : startCase( slug ),
 							} ) ) }
 							onChange={ this.updateImageURL }
 						/>
@@ -600,12 +614,13 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL } = getEditorSettings();
+		const { maxWidth, isRTL, availableImageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
+			availableImageSizes,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

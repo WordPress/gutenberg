@@ -58,7 +58,11 @@ exports[`Quote can be converted to paragraphs and renders a paragraph for the ci
 <!-- /wp:paragraph -->"
 `;
 
-exports[`Quote can be converted to paragraphs and renders a void paragraph if both the cite and quote are void 1`] = `""`;
+exports[`Quote can be converted to paragraphs and renders a void paragraph if both the cite and quote are void 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
 
 exports[`Quote can be converted to paragraphs and renders one paragraph block per <p> within quote 1`] = `
 "<!-- wp:paragraph -->
