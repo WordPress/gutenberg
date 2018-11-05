@@ -1,8 +1,15 @@
 #import "Gutenberg.h"
-#import <React/RCTBundleURLProvider.h>
-#import <React/RCTRootView.h>
+#import "RNReactNativeGutenbergBridge.h"
 
-@interface GutenbergBridgeDelegate: NSObject<RCTBridgeDelegate>
+#import <React/RCTBridge.h>
+#import <React/RCTBridgeModule.h>
+#import <React/RCTRootView.h>
+#import <React/RCTBundleURLProvider.h>
+
+@interface Gutenberg ()<RCTBridgeDelegate, GutenbergBridgeDelegate>
+@property (nonatomic, strong, readonly) RCTBridge *bridge;
+@property (nonatomic, strong) RNReactNativeGutenbergBridge* gutenbergBridgeModule;
+@property (nonatomic, strong) UIView* gutenbergRootView;
 @end
 
 @implementation Gutenberg
@@ -21,19 +28,47 @@
 {
     self = [super init];
     if (self) {
-        _bridge = [[RCTBridge alloc] initWithDelegate:[GutenbergBridgeDelegate new] launchOptions:nil];
+        _bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:nil];
     }
     return self;
 }
 
 - (UIView *)rootViewWithInitialProps:(NSDictionary<NSString *, id> *)props
 {
-    return [[RCTRootView alloc] initWithBridge:_bridge moduleName:@"gutenberg" initialProperties:props];
+    if (!self.gutenbergRootView) {
+        self.gutenbergRootView = [[RCTRootView alloc] initWithBridge:_bridge moduleName:@"gutenberg" initialProperties:props];
+        self.gutenbergBridgeModule.delegate = self;
+    }
+    return self.gutenbergRootView;
 }
-@end
 
-@implementation GutenbergBridgeDelegate
-- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge {
+#pragma mark - RCTBridgeDelegate
+
+- (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
+{
     return [RCTBundleURLProvider.sharedSettings jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
 }
+
+- (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
+{
+    _gutenbergBridgeModule = [RNReactNativeGutenbergBridge new];
+    return @[_gutenbergBridgeModule];
+}
+
+#pragma mark - GutenbergBridgeDelegate
+
+- (void)didProvideHTML:(NSString *)html
+{
+    if (self.delegate) {
+        [self.delegate gutenbergView:self.gutenbergRootView didProvideHTML:html];
+    }
+}
+
+#pragma mark - Messages
+
+- (void)requestHTML
+{
+    [self.gutenbergBridgeModule sendEventWithName:RequestHTMLMessageName body:nil];
+}
+
 @end

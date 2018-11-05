@@ -1,6 +1,8 @@
 
 #import "RNReactNativeGutenbergBridge.h"
 
+NSString *const RequestHTMLMessageName = @"requestGetHtml";
+
 @implementation RNReactNativeGutenbergBridge
 
 - (dispatch_queue_t)methodQueue
@@ -11,14 +13,16 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"requestGetHtml"];
+    return @[RequestHTMLMessageName];
 }
 
 //provideToNative_Html
 
 RCT_EXPORT_METHOD(provideToNative_Html:(NSString *)html)
 {
-    NSLog(@"provideToNative_Html called on IOS with:\n%@", html);
+    if (self.delegate) {
+        [self.delegate didProvideHTML:html];
+    }
 }
 
 @end
