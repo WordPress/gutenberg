@@ -84,14 +84,14 @@ class PullQuoteEdit extends Component {
 									value: nextValue,
 								} )
 							}
-							/* translators: the text of the quotation */
+							/* translators: placeholder text used for the quote */
 							placeholder={ __( 'Write quote…' ) }
 							wrapperClassName="block-library-pullquote__content"
 						/>
 						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 							<RichText
 								value={ citation }
-								/* translators: the individual or entity quoted */
+								/* translators: placeholder text used for the citation */
 								placeholder={ __( 'Write citation…' ) }
 								onChange={
 									( nextCitation ) => setAttributes( {
