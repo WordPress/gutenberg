@@ -11,7 +11,12 @@ import { regexp, next } from '@wordpress/shortcode';
 /**
  * Internal dependencies
  */
-import { createBlock, getBlockTransforms, findTransform } from '../factory';
+import {
+	createBlock,
+	getBlockTransforms,
+	getSilentAttributes,
+	findTransform,
+} from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser';
 
@@ -60,9 +65,10 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 
 		const blockType = getBlockType( transformation.blockName );
 
-		const silentAttributes = pickBy( attributes, ( value, key ) =>
-			! blockType.attributes.hasOwnProperty( key )
-		);
+		// Silent attributes are not a part of the block type.
+		//
+		// @see getSilentAttributes for context
+		const silentAttributes = getSilentAttributes( attributes );
 
 		const block = createBlock(
 			transformation.blockName,
