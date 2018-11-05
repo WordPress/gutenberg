@@ -15,6 +15,10 @@ p {
 		font-size: 48px;
 	}
 
+	&.has-drop-cap {
+		overflow: hidden;
+	}
+
 	// Don't show the drop cap when editing the paragraph's content. It causes a
 	// number of bugs in combination with `contenteditable` fields. The caret
 	// cannot be set around it, caret position calculation fails in Chrome, and
