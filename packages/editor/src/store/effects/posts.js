@@ -110,7 +110,6 @@ export const requestPostUpdate = async ( action, store ) => {
 			...pick( post, [ 'title', 'content', 'excerpt' ] ),
 			...getAutosave( state ),
 			...toSend,
-			parent: post.id,
 		};
 
 		request = apiFetch( {
