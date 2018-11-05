@@ -1,16 +1,17 @@
 #import <UIKit/UIKit.h>
+#import "GutenbergBridgeDelegate.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @protocol GutenbergDelegate <NSObject>
 
-- (void)gutenbergView:(UIView *)view didProvideHTML:(NSString *)html;
+- (void)gutenbergDidProvideHTML:(NSString *)html;
 
 @end
 
 @interface Gutenberg : NSObject
 
-@property (nonatomic, weak, nullable) id<GutenbergDelegate> delegate;
+@property (nonatomic, weak, nullable) id<GutenbergBridgeDelegate> delegate;
 
 + (instancetype)sharedInstance;
 - (instancetype)init NS_UNAVAILABLE;

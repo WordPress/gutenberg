@@ -27,6 +27,7 @@
 		134814201AA4EA6300B7C361 /* libRNReactNativeGutenbergBridge.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNReactNativeGutenbergBridge.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		7E45CCFE218B853D00C0B2AB /* Gutenberg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Gutenberg.h; sourceTree = "<group>"; };
 		7E45CCFF218B853D00C0B2AB /* Gutenberg.m */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = Gutenberg.m; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; wrapsLines = 0; };
+		7EC732A121908BCC00FED2E6 /* GutenbergBridgeDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GutenbergBridgeDelegate.h; sourceTree = "<group>"; };
 		B3E7B5881CC2AC0600A0062D /* RNReactNativeGutenbergBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNReactNativeGutenbergBridge.h; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNReactNativeGutenbergBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -53,6 +54,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				7EC732A121908BCC00FED2E6 /* GutenbergBridgeDelegate.h */,
 				B3E7B5881CC2AC0600A0062D /* RNReactNativeGutenbergBridge.h */,
 				B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */,
 				7E45CCFE218B853D00C0B2AB /* Gutenberg.h */,

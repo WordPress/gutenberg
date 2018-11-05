@@ -9,6 +9,7 @@ NSString *const RequestHTMLMessageName = @"requestGetHtml";
 {
     return dispatch_get_main_queue();
 }
+
 RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
@@ -21,7 +22,7 @@ RCT_EXPORT_MODULE()
 RCT_EXPORT_METHOD(provideToNative_Html:(NSString *)html)
 {
     if (self.delegate) {
-        [self.delegate didProvideHTML:html];
+        [self.delegate gutenbergDidProvideHTML:html];
     }
 }
 

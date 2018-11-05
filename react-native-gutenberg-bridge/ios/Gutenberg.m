@@ -57,11 +57,14 @@
 
 #pragma mark - GutenbergBridgeDelegate
 
-- (void)didProvideHTML:(NSString *)html
+-(id<GutenbergBridgeDelegate>)delegate
 {
-    if (self.delegate) {
-        [self.delegate gutenbergView:self.gutenbergRootView didProvideHTML:html];
-    }
+    return self.gutenbergBridgeModule.delegate;
+}
+
+-(void)setDelegate:(id<GutenbergBridgeDelegate>)delegate
+{
+    self.gutenbergBridgeModule.delegate = delegate;
 }
 
 #pragma mark - Messages

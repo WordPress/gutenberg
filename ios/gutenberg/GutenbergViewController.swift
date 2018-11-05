@@ -23,8 +23,8 @@ class GutenbergViewController: UIViewController {
     }
 }
 
-extension GutenbergViewController: GutenbergDelegate {
-    func gutenbergView(_ view: UIView, didProvideHTML html: String) {
+extension GutenbergViewController: GutenbergBridgeDelegate {
+    func gutenbergDidProvideHTML(_ html: String) {
         print("Did receive HTML: \(html)")
     }
 }
