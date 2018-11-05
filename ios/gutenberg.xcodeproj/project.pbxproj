@@ -33,6 +33,7 @@
 		2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		7E45CC5B218B42E000C0B2AB /* libRNReactNativeGutenbergBridge.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7E45CC5A218B42C000C0B2AB /* libRNReactNativeGutenbergBridge.a */; };
+		7EC7328F21907E3F00FED2E6 /* GutenbergViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
 		8C666FF0C9224FB88C2C0447 /* libRNSVG-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9BFAFEB337654221B2F14D03 /* libRNSVG-tvOS.a */; };
 		ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ADBDB9271DFEBF0700ED6528 /* libRCTBlob.a */; };
@@ -386,6 +387,7 @@
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7E45CC55218B42C000C0B2AB /* RNReactNativeGutenbergBridge.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNReactNativeGutenbergBridge.xcodeproj; path = "../react-native-gutenberg-bridge/ios/RNReactNativeGutenbergBridge.xcodeproj"; sourceTree = "<group>"; };
+		7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = GutenbergViewController.swift; path = gutenberg/GutenbergViewController.swift; sourceTree = "<group>"; tabWidth = 1; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		9B18D59B9364468890D0E546 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		9BFAFEB337654221B2F14D03 /* libRNSVG-tvOS.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libRNSVG-tvOS.a"; sourceTree = "<group>"; };
@@ -542,6 +544,7 @@
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */,
 				F15198392100DC3D000F6E97 /* AppDelegate.swift */,
+				7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */,
 				F151983A2100DC3D000F6E97 /* MediaProvider.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -1258,6 +1261,7 @@
 			files = (
 				F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */,
 				F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */,
+				7EC7328F21907E3F00FED2E6 /* GutenbergViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
