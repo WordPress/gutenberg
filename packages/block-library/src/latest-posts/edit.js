@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isUndefined, pickBy, invoke } from 'lodash';
+import { isUndefined, pickBy } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -47,17 +47,20 @@ class LatestPostsEdit extends Component {
 	}
 
 	componentWillMount() {
+		this.isStillMounted = true;
 		this.fetchRequest = apiFetch( {
 			path: addQueryArgs( `/wp/v2/categories`, CATEGORIES_LIST_QUERY ),
 		} ).then(
 			( categoriesList ) => {
-				this.setState( { categoriesList } );
+				if ( this.isStillMounted ) {
+					this.setState( { categoriesList } );
+				}
 			}
 		);
 	}
 
 	componentWillUnmount() {
-		invoke( this.fetchRequest, [ 'abort' ] );
+		this.isStillMounted = false;
 	}
 
 	toggleDisplayPostDate() {
