@@ -1,4 +1,4 @@
-## 2.1.8 (unreleased)
+## 2.2.0 (unreleased)
 
 ### New Features
 
