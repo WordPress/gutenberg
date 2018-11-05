@@ -255,12 +255,8 @@ export const editor = flow( [
 					continue;
 				}
 
-				console.log( 'Checking changes in', block.name );
-
 				for ( attributeName in block.attributes ) {
 					if ( attributeName.indexOf( '_' ) === 0 ) {
-						console.log( 'Found attr', attributeName );
-
 						// If this is the first match in the loop, lazily
 						// create a new state object.
 						if ( nextState === present ) {
