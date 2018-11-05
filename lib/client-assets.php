@@ -1332,8 +1332,6 @@ function gutenberg_load_locale_data() {
  * @return array
  */
 function gutenberg_get_available_image_sizes() {
-	$sizes      = get_intermediate_image_sizes();
-	$sizes[]    = 'full';
 	$size_names = apply_filters(
 		'image_size_names_choose',
 		array(
@@ -1345,10 +1343,10 @@ function gutenberg_get_available_image_sizes() {
 	);
 
 	$all_sizes = array();
-	foreach ( $sizes as $size_slug ) {
+	foreach ( $size_names as $size_slug => $size_name ) {
 		$all_sizes[] = array(
 			'slug' => $size_slug,
-			'name' => isset( $size_names[ $size_slug ] ) ? $size_names[ $size_slug ] : $size_slug,
+			'name' => $size_name,
 		);
 	}
 

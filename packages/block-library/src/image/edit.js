@@ -7,8 +7,7 @@ import {
 	isEmpty,
 	map,
 	pick,
-	startCase,
-	keyBy,
+	compact,
 } from 'lodash';
 
 /**
@@ -246,10 +245,6 @@ class ImageEdit extends Component {
 		};
 	}
 
-	getImageSizes() {
-		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
-	}
-
 	getLinkDestinationOptions() {
 		return [
 			{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
@@ -279,10 +274,10 @@ class ImageEdit extends Component {
 			toggleSelection,
 			isRTL,
 			availableImageSizes,
+			image,
 		} = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, width, height, linkTarget } = attributes;
 		const isExternal = isExternalImage( id, url );
-		const availableImageSizesBySlug = keyBy( availableImageSizes, 'slug' );
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -371,9 +366,15 @@ class ImageEdit extends Component {
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
-							options={ map( imageSizes, ( size, slug ) => ( {
-								value: size.source_url,
-								label: availableImageSizesBySlug[ slug ] ? availableImageSizesBySlug[ slug ].name : startCase( slug ),
+							options={ compact( map( availableImageSizes, ( { name, slug } ) => {
+								const sizeUrl = get( image, [ 'media_details', 'sizes', slug, 'source_url' ] );
+								if ( ! sizeUrl ) {
+									return null;
+								}
+								return {
+									value: sizeUrl,
+									label: name,
+								};
 							} ) ) }
 							onChange={ this.updateImageURL }
 						/>
