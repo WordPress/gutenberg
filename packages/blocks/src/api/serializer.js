@@ -55,13 +55,14 @@ export function getBlockMenuDefaultClassName( blockName ) {
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {Object} blockType   Block type.
- * @param {Object} attributes  Block attributes.
- * @param {?Array} innerBlocks Nested blocks.
+ * @param {string|Object} blockTypeOrName   Block type or name.
+ * @param {Object}        attributes        Block attributes.
+ * @param {?Array}        innerBlocks       Nested blocks.
  *
  * @return {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
+export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
@@ -121,9 +122,7 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
  * @return {string} Save content.
  */
 export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
-	const blockType = normalizeBlockType( blockTypeOrName );
-
-	return renderToString( getSaveElement( blockType, attributes, innerBlocks ) );
+	return renderToString( getSaveElement( blockTypeOrName, attributes, innerBlocks ) );
 }
 
 /**
