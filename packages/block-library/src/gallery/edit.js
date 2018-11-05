@@ -160,7 +160,7 @@ class GalleryEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { images, imageIds = [], columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, _imageIds = [], columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -192,7 +192,7 @@ class GalleryEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( images.length === 0 && imageIds.length === 0 ) {
+		if ( images.length === 0 && _imageIds.length === 0 ) {
 			return (
 				<Fragment>
 					{ controls }
@@ -253,7 +253,7 @@ class GalleryEdit extends Component {
 									url={ img.url }
 									alt={ img.alt }
 									id={ img.id }
-									seedId={ imageIds[ index ] }
+									seedId={ _imageIds[ index ] }
 									isSelected={ isSelected && this.state.selectedImage === index }
 									onRemove={ this.onRemoveImage( index ) }
 									onSelect={ this.onSelectImage( index ) }

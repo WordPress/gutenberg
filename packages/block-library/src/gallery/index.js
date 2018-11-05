@@ -108,7 +108,7 @@ export const settings = {
 							return ids.split( ',' ).map( () => ( {} ) );
 						},
 					},
-					imageIds: {
+					_imageIds: {
 						type: 'array',
 						shortcode: ( { named: { ids } } ) => {
 							if ( ! ids ) {
