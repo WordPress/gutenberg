@@ -1,12 +1,10 @@
 #import "RCTAztecViewManager.h"
 #import <React/RCTViewManager.h>
 
-// Ideally we shouldn't deppend on Swift headers at all.
-#ifndef GutenbergController
-#import "WordPress-Swift.h"
-#else
+// USE "WordPress-Swift.h" to run on WPiOS, or "RNTAztecView-Swift.h" to run Example App.
 #import "RNTAztecView-Swift.h"
-#endif
+//#import "WordPress-Swift.h"
+
 
 typedef void (^ActionBlock)(RCTAztecView *aztecView);
 
