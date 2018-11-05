@@ -13,7 +13,7 @@ export { default as sprintf } from '@tannin/sprintf';
  */
 const DEFAULT_LOCALE_DATA = {
 	'': {
-		'Plural-Forms': 'plural=(n!=1)',
+		plural_forms: 'plural=(n!=1)',
 	},
 };
 
