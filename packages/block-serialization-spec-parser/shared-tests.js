@@ -61,6 +61,17 @@ export const jsTester = ( parse ) => () => {
 			expect.objectContaining( { innerHTML: '<p>Break me</p>' } ),
 		] ) ) );
 	} );
+
+	describe( 'attack vectors', () => {
+		test( 'really long JSON attribute sections', () => {
+			const length = 100000;
+			const as = 'a'.repeat( length );
+			let parsed;
+
+			expect( () => parsed = parse( `<!-- wp:fake {"a":"${ as }"} /-->` )[ 0 ] ).not.toThrow();
+			expect( parsed.attrs.a ).toHaveLength( length );
+		} );
+	} );
 };
 
 const hasPHP = 'test' === process.env.NODE_ENV ? ( () => {
@@ -77,13 +88,25 @@ const makeTest = hasPHP ? ( ...args ) => describe( ...args ) : ( ...args ) => de
 
 export const phpTester = ( name, filename ) => makeTest(
 	name,
-	'test' === process.env.NODE_ENV ? jsTester( ( doc ) => JSON.parse( require( 'child_process' ).spawnSync(
-		'php',
-		[ '-f', filename ],
-		{
-			input: doc,
-			encoding: 'utf8',
-			timeout: 30 * 1000, // abort after 30 seconds, that's too long anyway
+	'test' === process.env.NODE_ENV ? jsTester( ( doc ) => {
+		const process = require( 'child_process' ).spawnSync(
+			'php',
+			[ '-f', filename ],
+			{
+				input: doc,
+				encoding: 'utf8',
+				timeout: 30 * 1000, // abort after 30 seconds, that's too long anyway
+			}
+		);
+
+		if ( process.status !== 0 ) {
+			throw new Error( process.stderr || process.stdout );
 		}
-	).stdout ) ) : () => {}
+
+		try {
+			return JSON.parse( process.stdout );
+		} catch ( e ) {
+			throw new Error( 'failed to parse JSON:\n' + process.stdout );
+		}
+	} ) : () => {}
 );

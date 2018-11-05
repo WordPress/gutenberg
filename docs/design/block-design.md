@@ -27,11 +27,11 @@ A block should have a straightforward, short name so users can easily find it in
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
-![A screenshot of the Block Library with concise block names](./blocks-do.png)
+![A screenshot of the Block Library with concise block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/blocks-do.png)
 **Do:**
 Use conise block names.
 
-![A screenshot of the Block Library with long, multi-line block names](./blocks-dont.png)
+![A screenshot of the Block Library with long, multi-line block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/blocks-dont.png)
 **Don't:**
 Avoid long, multi-line block names.
 
@@ -39,11 +39,11 @@ Avoid long, multi-line block names.
 
 Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly. Keep it to a single sentence.
 
-![A screenshot of a short block description](./block-descriptions-do.png)
+![A screenshot of a short block description](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/block-descriptions-do.png)
 **Do:**
 Use a short, simple, block description.
 
-![A screenshot of a long block description that includes branding](./block-descriptions-dont.png)
+![A screenshot of a long block description that includes branding](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/block-descriptions-dont.png)
 **Don't:**
 Avoid long descriptions and branding.
 
@@ -51,11 +51,11 @@ Avoid long descriptions and branding.
 
 If your block requires a user to configure some options before you can display it, you should provide an instructive placeholder state.
 
-![A screenshot of the Gallery block's placeholder](./placeholder-do.png)
+![A screenshot of the Gallery block's placeholder](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/placeholder-do.png)
 **Do:**
 Provide an instructive placeholder state.
 
-![An example Gallery block placeholder but with intense, distracting colors and no instructions](./placeholder-dont.png)
+![An example Gallery block placeholder but with intense, distracting colors and no instructions](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/placeholder-dont.png)
 **Don't:**
 Avoid branding and relying on the title alone to convey instructions.
 
@@ -65,11 +65,11 @@ When unselected, your block should preview its content as closely to the front-e
 
 When selected, your block may surface additional options like input fields or buttons to configure the block directly, especially when they are necessary for basic operation.
 
-![A Google Maps block with inline, always-accessible controls required for the block to function](./block-controls-do.png)
+![A Google Maps block with inline, always-accessible controls required for the block to function](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/block-controls-do.png)
 **Do:**
 For controls that are essential the the operation of the block, provide them directly in inside the block edit view.
 
-![A Google Maps block with essential controls moved to the sidebar where they can be contextually hidden](./block-controls-dont.png)
+![A Google Maps block with essential controls moved to the sidebar where they can be contextually hidden](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/block-controls-dont.png)
 **Don't:**
 Do not put controls that are essential to the block in the sidebar, or the block will appear non-functional to mobile users, or desktop users who have dismissed the sidebar.
 
@@ -77,7 +77,7 @@ Do not put controls that are essential to the block in the sidebar, or the block
 
 The “Block” tab of the Settings Sidebar can contain additional block options and configuration. Keep in mind that a user can dismiss the sidebar and never use it. You should not put critical options in the Sidebar.
 
-![A screenshot of the paragraph block's advanced settings in the sidebar](./advanced-settings-do.png)
+![A screenshot of the paragraph block's advanced settings in the sidebar](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/advanced-settings-do.png)
 **Do:**
 Because the Drop Cap feature is not necessary for the basic operation of the block, you can put it ub the Block tab as optional configuration.
 

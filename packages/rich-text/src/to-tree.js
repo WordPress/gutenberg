@@ -45,7 +45,7 @@ function fromFormat( { type, attributes, object } ) {
 export function toTree( {
 	value,
 	multilineTag,
-	multilineWrapperTags,
+	multilineWrapperTags = [],
 	createEmpty,
 	append,
 	getLastChild,

@@ -13,7 +13,7 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 			icon="undo"
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
-			disabled={ ! hasUndo }
+			aria-disabled={ ! hasUndo }
 			onClick={ undo }
 			className="editor-history__undo"
 		/>
@@ -24,7 +24,14 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
 	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		undo: () => dispatch( 'core/editor' ).undo(),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		undo: () => {
+			// If there are no undo levels this is a no-op, because we don't actually
+			// disable the button.
+			// See: https://github.com/WordPress/gutenberg/issues/3486
+			if ( ownProps.hasUndo ) {
+				dispatch( 'core/editor' ).undo();
+			}
+		},
 	} ) ),
 ] )( EditorHistoryUndo );

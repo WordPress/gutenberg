@@ -1,4 +1,10 @@
-## 2.1.8 (Unreleased)
+## 2.2.0 (unreleased)
+
+### New Features
+
+- Gallery Block: Add screen reader support for order of images in gallery.
+
+## 2.1.8 (2018-11-03)
 
 ### Polish
 

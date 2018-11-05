@@ -229,7 +229,7 @@ export default compose( [
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectionStart: getMultiSelectedBlocksStartClientId(),
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
-			selectionStartClientId: getBlockSelectionStart(),
+			selectionStartClientId: isSelectionEnabled() && getBlockSelectionStart(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
 		};

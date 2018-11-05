@@ -32,6 +32,10 @@ describe( 'create', () => {
 		createRange,
 		record,
 	} ) => {
+		if ( html === undefined ) {
+			return;
+		}
+
 		it( description, () => {
 			const element = createElement( document, html );
 			const range = createRange( element );
