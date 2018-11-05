@@ -18,13 +18,13 @@ const localeData = {
 
 	'hello %s': [ 'bonjour %s' ],
 
-	'%d banana': [ 'une banane', '%d bananes' ],
+	'%d banana': [ '%d banane', '%d bananes' ],
 
-	'fruit\u0004%d apple': [ 'une pomme', '%d pommes' ],
+	'fruit\u0004%d apple': [ '%d pomme', '%d pommes' ],
 };
 const additionalLocaleData = {
 	cheeseburger: [ 'hamburger au fromage' ],
-	'%d cat': [ 'un chat', '%d chats' ],
+	'%d cat': [ '%d chat', '%d chats' ],
 };
 
 setLocaleData( localeData, 'test_domain' );
@@ -48,7 +48,7 @@ describe( 'i18n', () => {
 		} );
 
 		it( 'use the singular form', () => {
-			expect( _n( '%d banana', '%d bananas', 1, 'test_domain' ) ).toBe( 'une banane' );
+			expect( _n( '%d banana', '%d bananas', 1, 'test_domain' ) ).toBe( '%d banane' );
 		} );
 	} );
 
@@ -58,7 +58,7 @@ describe( 'i18n', () => {
 		} );
 
 		it( 'use the singular form', () => {
-			expect( _nx( '%d apple', '%d apples', 1, 'fruit', 'test_domain' ) ).toBe( 'une pomme' );
+			expect( _nx( '%d apple', '%d apples', 1, 'fruit', 'test_domain' ) ).toBe( '%d pomme' );
 		} );
 	} );
 
@@ -90,7 +90,7 @@ describe( 'i18n', () => {
 			} );
 
 			it( 'new singular form was added', () => {
-				expect( _n( '%d cat', '%d cats', 1, 'test_domain' ) ).toBe( 'un chat' );
+				expect( _n( '%d cat', '%d cats', 1, 'test_domain' ) ).toBe( '%d chat' );
 			} );
 
 			it( 'new plural form was added', () => {
