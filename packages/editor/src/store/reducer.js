@@ -20,7 +20,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { getBlockType, isReusableBlock } from '@wordpress/blocks';
+import { isReusableBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -246,7 +246,7 @@ export const editor = flow( [
 			// For each changed block in the present, check for any attribute
 			// that _isn't_ part of the block type. If such an attribute is
 			// found, delete it from the state.
-			let blockId, block, blockType, attributeName;
+			let blockId, block, attributeName;
 			for ( blockId in present.blocks.byClientId ) {
 				block = present.blocks.byClientId[ blockId ];
 
@@ -257,9 +257,8 @@ export const editor = flow( [
 
 				console.log( 'Checking changes in', block.name );
 
-				blockType = getBlockType( block.name );
 				for ( attributeName in block.attributes ) {
-					if ( ! blockType.attributes.hasOwnProperty( attributeName ) ) {
+					if ( attributeName.indexOf( '_' ) === 0 ) {
 						console.log( 'Found attr', attributeName );
 
 						// If this is the first match in the loop, lazily
