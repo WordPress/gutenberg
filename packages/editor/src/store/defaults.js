@@ -127,3 +127,10 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 };
+
+/**
+ * Default initial edits state.
+ *
+ * @type {Object}
+ */
+export const INITIAL_EDITS_DEFAULTS = {};

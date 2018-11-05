@@ -1467,26 +1467,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$demo_content = ob_get_clean();
 
 		$initial_edits = array(
-			'title'   => array(
-				'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			),
-			'content' => array(
-				'raw' => $demo_content,
-			),
+			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
+			'content' => $demo_content,
 		);
 	} elseif ( $is_new_post ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
-			'title'   => array(
-				'raw' => $post->post_title,
-			),
-			'content' => array(
-				'raw' => $post->post_content,
-			),
-			'excerpt' => array(
-				'raw' => $post->post_excerpt,
-			),
+			'title'   => $post->post_title,
+			'content' => $post->post_content,
+			'excerpt' => $post->post_excerpt,
 		);
 	} else {
 		$initial_edits = null;
