@@ -3,10 +3,6 @@
  */
 import { sprintf, __, _x, _n, _nx, setLocaleData } from '../';
 
-// Mock memoization as identity function. Inline since Jest errors on out-of-
-// scope references in a mock callback.
-jest.mock( 'memize', () => ( fn ) => fn );
-
 const localeData = {
 	'': {
 		// Domain name
@@ -34,28 +30,6 @@ const additionalLocaleData = {
 setLocaleData( localeData, 'test_domain' );
 
 describe( 'i18n', () => {
-	describe( 'error absorb', () => {
-		it( '__', () => {
-			__( 'Hello', 'domain-without-data' );
-			expect( console ).toHaveErrored();
-		} );
-
-		it( '_x', () => {
-			_x( 'feed', 'verb', 'domain-without-data' );
-			expect( console ).toHaveErrored();
-		} );
-
-		it( '_n', () => {
-			_n( '%d banana', '%d bananas', 3, 'domain-without-data' );
-			expect( console ).toHaveErrored();
-		} );
-
-		it( '_nx', () => {
-			_nx( '%d apple', '%d apples', 3, 'fruit', 'domain-without-data' );
-			expect( console ).toHaveErrored();
-		} );
-	} );
-
 	describe( '__', () => {
 		it( 'use the translation', () => {
 			expect( __( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
@@ -89,13 +63,6 @@ describe( 'i18n', () => {
 	} );
 
 	describe( 'sprintf()', () => {
-		it( 'absorbs errors', () => {
-			const result = sprintf( 'Hello %(placeholder-not-provided)s' );
-
-			expect( console ).toHaveErrored();
-			expect( result ).toBe( 'Hello %(placeholder-not-provided)s' );
-		} );
-
 		it( 'replaces placeholders', () => {
 			const result = sprintf( __( 'hello %s', 'test_domain' ), 'Riad' );
 
