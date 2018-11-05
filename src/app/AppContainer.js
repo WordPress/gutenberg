@@ -12,6 +12,7 @@ import {
 	parseBlocksAction,
 	serializeToNativeAction,
 	mergeBlocksAction,
+	setImageSourceAction,
 } from '../store/actions';
 import MainApp from './MainApp';
 
@@ -48,6 +49,9 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 		},
 		mergeBlocksAction: ( blockOneClientId, blockTwoClientId, block ) => {
 			dispatch( mergeBlocksAction( blockOneClientId, blockTwoClientId, block ) );
+		},
+		setImageSourceAction: ( url ) => {
+			dispatch( setImageSourceAction( url ) );
 		},
 	};
 };

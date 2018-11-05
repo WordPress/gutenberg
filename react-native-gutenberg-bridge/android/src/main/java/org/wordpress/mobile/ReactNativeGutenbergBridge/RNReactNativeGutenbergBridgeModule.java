@@ -6,6 +6,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule {
@@ -35,5 +36,16 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void provideToNative_Html(String html) {
         mGutenbergBridgeJS2Parent.responseHtml(html);
+    }
+
+    @ReactMethod
+    public void onMediaLibraryPress() {
+        mGutenbergBridgeJS2Parent.onMediaLibraryPress();
+    }
+
+    public void setImageSource(String url) {
+        WritableMap data = new WritableNativeMap();
+        data.putString("url", url);
+        emitToJS("setImageSource", data);
     }
 }

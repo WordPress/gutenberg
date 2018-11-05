@@ -125,6 +125,10 @@ export const reducer = (
 		case ActionTypes.BLOCK.MERGE: {
 			const index = findBlockIndex( blocks, action.blockOneClientId );
 			blocks.splice( index, 2, action.block );
+		}
+		case ActionTypes.BLOCK.SET_IMAGE_SOURCE: {
+			const focusedBlock = find( blocks, ( obj ) => obj.focused );
+			focusedBlock.attributes = { ...focusedBlock.attributes, url: action.url };
 			return { blocks: blocks, refresh: ! state.refresh };
 		}
 		default:

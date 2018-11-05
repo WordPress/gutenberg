@@ -26,6 +26,7 @@ export type BlockListType = {
 	parseBlocksAction: string => mixed,
 	serializeToNativeAction: void => void,
 	mergeBlocksAction: ( string, string, BlockType ) => mixed,
+	setImageSourceAction: string => void,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
