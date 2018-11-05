@@ -6,7 +6,7 @@ import { includes } from 'lodash';
 /**
  * @const string IS_ROOT_TAG Regex to check if the selector is a root tag selector.
  */
-const IS_ROOT_TAG = /^(body|html).*$/;
+const IS_ROOT_TAG = /^(body|html|:root).*$/;
 
 const wrap = ( namespace, ignore = [] ) => ( node ) => {
 	const updateSelector = ( selector ) => {
@@ -20,7 +20,7 @@ const wrap = ( namespace, ignore = [] ) => ( node ) => {
 		}}
 
 		// HTML and Body elements cannot be contained within our container so lets extract their styles.
-		return selector.replace( /^(body|html)/, namespace );
+		return selector.replace( /^(body|html|:root)/, namespace );
 	};
 
 	if ( node.type === 'rule' ) {
