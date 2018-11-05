@@ -79,11 +79,6 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 			}
 		);
 
-		block.attributes = {
-			...block.attributes,
-			...silentAttributes,
-		};
-
 		return [
 			beforeHTML,
 			block,
