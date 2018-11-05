@@ -28,4 +28,4 @@ export const Edit = ( props ) => {
 	);
 };
 
-export default withFilters( 'editor.BlockEdit' )( Edit );
+export default Edit;
