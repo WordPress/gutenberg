@@ -86,7 +86,7 @@ class GalleryImage extends Component {
 	}
 
 	render() {
-		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes } = this.props;
+		const { url, alt, id, linkTo, link, isSelected, caption, onRemove, setAttributes, 'aria-label': ariaLabel } = this.props;
 
 		let href;
 
@@ -102,7 +102,7 @@ class GalleryImage extends Component {
 		// Disable reason: Image itself is not meant to be
 		// interactive, but should direct image selection and unfocus caption fields
 		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } tabIndex="0" onKeyDown={ this.onImageClick } /> : <Spinner />;
+		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } tabIndex="0" onKeyDown={ this.onImageClick } aria-label={ ariaLabel } /> : <Spinner />;
 
 		const className = classnames( {
 			'is-selected': isSelected,
