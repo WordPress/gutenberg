@@ -74,89 +74,96 @@ describe( 'PostPreviewButton', () => {
 	} );
 
 	describe( 'openPreviewWindow()', () => {
-		function assertForPreview( props, expectedPreviewURL, isExpectingSave ) {
+		let windowOpen;
+		beforeEach( () => {
+			windowOpen = window.open;
+		} );
+		afterEach( () => {
+			window.open = windowOpen;
+		} );
+
+		it( 'behaves like a regular link if not autosaveable', () => {
+			const preventDefault = jest.fn();
 			const autosave = jest.fn();
 			const setLocation = jest.fn();
-			const windowOpen = window.open;
-			window.open = jest.fn( () => {
-				return {
-					set location( url ) {
-						setLocation( url );
-					},
-					document: {
-						write: jest.fn(),
-						close: jest.fn(),
-					},
-					focus: () => {},
-				};
-			} );
+			window.open = jest.fn( () => ( {
+				focus: jest.fn(),
+				set location( url ) {
+					setLocation( url );
+				},
+			} ) );
 
 			const wrapper = shallow(
 				<PostPreviewButton
 					postId={ 1 }
-					{ ...props }
 					autosave={ autosave }
 				/>
 			);
 
-			wrapper.simulate( 'click' );
+			wrapper.simulate( 'click', {
+				preventDefault,
+				target: { href: 'https://wordpress.org/?p=1' },
+			} );
 
+			expect( preventDefault ).toHaveBeenCalled();
 			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
-
-			if ( expectedPreviewURL ) {
-				expect( setLocation ).toHaveBeenCalledWith( expectedPreviewURL );
-			} else {
-				expect( setLocation ).not.toHaveBeenCalled();
-			}
-
-			window.open = windowOpen;
-
-			expect( autosave.mock.calls ).toHaveLength( isExpectingSave ? 1 : 0 );
-			if ( isExpectingSave ) {
-				expect( wrapper.instance().previewWindow.document.write ).toHaveBeenCalled();
-			}
-
-			return wrapper;
-		}
-
-		it( 'should open the currentPostLink if not autosaveable nor preview link available', () => {
-			const currentPostLink = 'https://wordpress.org/?p=1';
-			assertForPreview( {
-				isAutosaveable: false,
-				previewLink: undefined,
-				currentPostLink,
-			}, currentPostLink, false );
+			expect( wrapper.instance().previewWindow.focus ).toHaveBeenCalled();
+			expect( autosave ).not.toHaveBeenCalled();
+			expect( setLocation ).toHaveBeenCalledWith( 'https://wordpress.org/?p=1' );
 		} );
 
-		it( 'should save for autosaveable post with preview link', () => {
-			assertForPreview( {
-				isAutosaveable: true,
-				previewLink: 'https://wordpress.org/?p=1&preview=true',
-			}, null, true );
-		} );
+		it( 'autosaves the post if autosaveable', () => {
+			const preventDefault = jest.fn();
+			const autosave = jest.fn();
 
-		it( 'should save for autosaveable post without preview link', () => {
-			assertForPreview( {
-				isAutosaveable: true,
-				previewLink: undefined,
-			}, null, true );
-		} );
+			window.open = jest.fn( () => ( {
+				focus: jest.fn(),
+				document: {
+					write: jest.fn(),
+					close: jest.fn(),
+				},
+			} ) );
 
-		it( 'should not save but open a popup window if not autosaveable but preview link available', () => {
-			assertForPreview( {
-				isAutosaveable: false,
-				previewLink: 'https://wordpress.org/?p=1&preview=true',
-			}, 'https://wordpress.org/?p=1&preview=true', false );
+			const wrapper = shallow(
+				<PostPreviewButton
+					postId={ 1 }
+					autosave={ autosave }
+					isAutosaveable
+				/>
+			);
+
+			wrapper.simulate( 'click', { preventDefault } );
+
+			expect( preventDefault ).toHaveBeenCalled();
+			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
+			expect( wrapper.instance().previewWindow.focus ).toHaveBeenCalled();
+			expect( autosave ).toHaveBeenCalled();
+			expect( wrapper.instance().previewWindow.document.write.mock.calls[ 0 ][ 0 ] ).toContain( 'Generating preview…' );
+			expect( wrapper.instance().previewWindow.document.close ).toHaveBeenCalled();
 		} );
 	} );
 
 	describe( 'render()', () => {
-		it( 'should match the snapshot', () => {
+		it( 'should render previewLink if provided', () => {
 			const wrapper = shallow(
 				<PostPreviewButton
 					postId={ 1 }
 					isSaveable
-					currentPostLink="https://wordpress.org/?p=1" />
+					previewLink="https://wordpress.org/?p=1&preview=true"
+					currentPostLink="https://wordpress.org/?p=1"
+				/>
+			);
+
+			expect( wrapper ).toMatchSnapshot();
+		} );
+
+		it( 'should render currentPostLink otherwise', () => {
+			const wrapper = shallow(
+				<PostPreviewButton
+					postId={ 1 }
+					isSaveable
+					currentPostLink="https://wordpress.org/?p=1"
+				/>
 			);
 
 			expect( wrapper ).toMatchSnapshot();
@@ -166,7 +173,8 @@ describe( 'PostPreviewButton', () => {
 			const wrapper = shallow(
 				<PostPreviewButton
 					postId={ 1 }
-					currentPostLink="https://wordpress.org/?p=1" />
+					currentPostLink="https://wordpress.org/?p=1"
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );

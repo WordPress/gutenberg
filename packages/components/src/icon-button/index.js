@@ -25,7 +25,7 @@ class IconButton extends Component {
 		const tooltipText = tooltip || label;
 
 		// Should show the tooltip if...
-		const showTooltip = (
+		const showTooltip = ! additionalProps.disabled && (
 			// an explicit tooltip is passed or...
 			tooltip ||
 			// there's a shortcut or...
@@ -49,7 +49,11 @@ class IconButton extends Component {
 
 		if ( showTooltip ) {
 			element = (
-				<Tooltip text={ tooltipText } shortcut={ shortcut } position={ labelPosition }>
+				<Tooltip
+					text={ tooltipText }
+					shortcut={ shortcut }
+					position={ labelPosition }
+				>
 					{ element }
 				</Tooltip>
 			);

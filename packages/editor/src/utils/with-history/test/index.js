@@ -167,6 +167,61 @@ describe( 'withHistory', () => {
 		} );
 	} );
 
+	it( 'should overwrite present state with option.shouldOverwriteState right after ignored action', () => {
+		const complexCounter = ( state = { count: 0 }, action ) => {
+			if ( action.type === 'INCREMENT' ) {
+				return {
+					...state,
+					count: state.count + 1,
+				};
+			} else if ( action.type === 'IGNORE' ) {
+				return {
+					...state,
+					ignore: action.content,
+				};
+			}
+
+			return state;
+		};
+
+		const reducer = withHistory( {
+			shouldOverwriteState: ( action, previousAction ) => (
+				previousAction && action.type === previousAction.type
+			),
+			ignoreTypes: [ 'IGNORE' ],
+		} )( complexCounter );
+
+		let state = reducer( reducer( undefined, {} ), { type: 'INCREMENT' } );
+
+		expect( state ).toEqual( {
+			past: [ { count: 0 } ],
+			present: { count: 1 },
+			future: [],
+			lastAction: { type: 'INCREMENT' },
+			shouldCreateUndoLevel: false,
+		} );
+
+		state = reducer( state, { type: 'IGNORE', content: 'ignore' } );
+
+		expect( state ).toEqual( {
+			past: [ { count: 0 } ],
+			present: { count: 1, ignore: 'ignore' },
+			future: [],
+			lastAction: { type: 'INCREMENT' },
+			shouldCreateUndoLevel: false,
+		} );
+
+		state = reducer( state, { type: 'INCREMENT' } );
+
+		expect( state ).toEqual( {
+			past: [ { count: 0 } ],
+			present: { count: 2, ignore: 'ignore' },
+			future: [],
+			lastAction: { type: 'INCREMENT' },
+			shouldCreateUndoLevel: false,
+		} );
+	} );
+
 	it( 'should create undo level with option.shouldOverwriteState and CREATE_UNDO_LEVEL', () => {
 		const reducer = withHistory( {
 			shouldOverwriteState: ( { type } ) => type === 'INCREMENT',

@@ -13,7 +13,7 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 			icon="redo"
 			label={ __( 'Redo' ) }
 			shortcut={ displayShortcut.primaryShift( 'z' ) }
-			disabled={ ! hasRedo }
+			aria-disabled={ ! hasRedo }
 			onClick={ redo }
 			className="editor-history__redo"
 		/>
@@ -24,7 +24,14 @@ export default compose( [
 	withSelect( ( select ) => ( {
 		hasRedo: select( 'core/editor' ).hasEditorRedo(),
 	} ) ),
-	withDispatch( ( dispatch ) => ( {
-		redo: () => dispatch( 'core/editor' ).redo(),
+	withDispatch( ( dispatch, ownProps ) => ( {
+		redo: () => {
+			// If there are no redo levels this is a no-op, because we don't actually
+			// disable the button.
+			// See: https://github.com/WordPress/gutenberg/issues/3486
+			if ( ownProps.hasRedo ) {
+				dispatch( 'core/editor' ).redo();
+			}
+		},
 	} ) ),
 ] )( EditorHistoryRedo );
