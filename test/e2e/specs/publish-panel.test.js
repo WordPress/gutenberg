@@ -30,7 +30,7 @@ describe( 'PostPublishPanel', () => {
 			const focusedElementClassList = await page.$eval( ':focus', ( focusedElement ) => {
 				return Object.values( focusedElement.classList );
 			} );
-			expect( focusedElementClassList ).toBe( 'editor-post-publish-button' );
+			expect( focusedElementClassList ).toContain( 'editor-post-publish-button' );
 		} );
 
 		it( 'should retain focus within the panel', async () => {
@@ -40,7 +40,7 @@ describe( 'PostPublishPanel', () => {
 			const focusedElementClassList = await page.$eval( ':focus', ( focusedElement ) => {
 				return Object.values( focusedElement.classList );
 			} );
-			expect( focusedElementClassList ).toBe( 'components-checkbox-control__input' );
+			expect( focusedElementClassList ).toContain( 'components-checkbox-control__input' );
 		} );
 	} );
 } );
