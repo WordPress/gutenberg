@@ -13,7 +13,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
@@ -98,6 +98,7 @@ class ImageEdit extends Component {
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 
 		this.state = {
@@ -243,6 +244,16 @@ class ImageEdit extends Component {
 		return () => {
 			this.props.setAttributes( { width, height } );
 		};
+	}
+
+	getFilename( url ) {
+		if ( url ) {
+			const fileName = url.toString().match( /.*\/(.+?)$/ );
+			if ( fileName && fileName.length > 1 ) {
+				return fileName[ 1 ];
+			}
+		}
+		return '';
 	}
 
 	getAvailableSizes() {
@@ -461,12 +472,28 @@ class ImageEdit extends Component {
 								imageHeight,
 							} = sizes;
 
+							const defaultAlt = sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), this.getFilename( url ) );
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							// Disable reason: Image itself is not meant to be
+							// interactive, but should direct focus to block
+							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+							const imgNoAlt = <img src={ url } alt={ defaultAlt } onClick={ this.onImageClick } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
+								if ( ! alt ) {
+									return (
+										<Fragment>
+											{ getInspectorControls( imageWidth, imageHeight ) }
+											<div style={ { width, height } }>
+												{ imgNoAlt }
+											</div>
+										</Fragment>
+
+									);
+								}
 								return (
 									<Fragment>
 										{ getInspectorControls( imageWidth, imageHeight ) }
@@ -511,7 +538,6 @@ class ImageEdit extends Component {
 									showRightHandle = true;
 								}
 							}
-							/* eslint-enable no-lonely-if */
 
 							return (
 								<Fragment>
@@ -545,7 +571,7 @@ class ImageEdit extends Component {
 											toggleSelection( true );
 										} }
 									>
-										{ img }
+										{ alt ? img : imgNoAlt }
 									</ResizableBox>
 								</Fragment>
 							);
