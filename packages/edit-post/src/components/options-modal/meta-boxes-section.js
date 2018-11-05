@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,23 +16,19 @@ import Section from './section';
 import { EnableCustomFieldsOption, EnablePanelOption } from './options';
 
 export function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sectionProps } ) {
-	if ( ! areCustomFieldsRegistered && metaBoxes.length === 0 ) {
+	// The 'Custom Fields' meta box is a special case that we handle separately.
+	const thirdPartyMetaBoxes = filter( metaBoxes, ( { id } ) => id !== 'postcustom' );
+
+	if ( ! areCustomFieldsRegistered && thirdPartyMetaBoxes.length === 0 ) {
 		return null;
 	}
 
 	return (
 		<Section { ...sectionProps }>
-			{ areCustomFieldsRegistered && (
-				<EnableCustomFieldsOption label={ __( 'Custom Fields' ) } />
-			) }
-			{ map(
-				metaBoxes,
-				( { id, title } ) =>
-					// The 'Custom Fields' meta box is a special case handled above.
-					id !== 'postcustom' && (
-						<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
-					)
-			) }
+			{ areCustomFieldsRegistered && <EnableCustomFieldsOption label={ __( 'Custom Fields' ) } /> }
+			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
+				<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
+			) ) }
 		</Section>
 	);
 }
