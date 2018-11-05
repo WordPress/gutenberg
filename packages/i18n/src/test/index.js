@@ -70,10 +70,24 @@ describe( 'i18n', () => {
 		} );
 	} );
 
-	describe( 'setAdditionalLocale', () => {
+	describe( 'setLocaleData', () => {
 		beforeAll( () => {
 			setLocaleData( additionalLocaleData, 'test_domain' );
 		} );
+
+		it( 'supports omitted plural forms expression', () => {
+			setLocaleData( {
+				'': {
+					domain: 'test_domain2',
+					lang: 'fr',
+				},
+
+				'%d banana': [ '%d banane', '%d bananes' ],
+			}, 'test_domain2' );
+
+			expect( _n( '%d banana', '%d bananes', 2, 'test_domain2' ) ).toBe( '%d bananes' );
+		} );
+
 		describe( '__', () => {
 			it( 'existing translation still available', () => {
 				expect( __( 'hello', 'test_domain' ) ).toBe( 'bonjour' );

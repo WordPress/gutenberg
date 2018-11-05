@@ -33,12 +33,19 @@ const i18n = new Tannin( {} );
  * @param {?Object} data   Locale data configuration.
  * @param {?string} domain Domain for which configuration applies.
  */
-export function setLocaleData( data = DEFAULT_LOCALE_DATA, domain = 'default' ) {
-	i18n.data[ domain ] = Object.assign(
-		{},
-		i18n.data[ domain ],
-		data
-	);
+export function setLocaleData( data, domain = 'default' ) {
+	i18n.data[ domain ] = {
+		...DEFAULT_LOCALE_DATA,
+		...i18n.data[ domain ],
+		...data,
+	};
+
+	// Populate default domain configuration (supported locale date which omits
+	// a plural forms expression).
+	i18n.data[ domain ][ '' ] = {
+		...DEFAULT_LOCALE_DATA[ '' ],
+		...i18n.data[ domain ][ '' ],
+	};
 }
 
 /**
