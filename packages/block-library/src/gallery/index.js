@@ -52,6 +52,10 @@ const blockAttributes = {
 			},
 		},
 	},
+	ids: {
+		type: 'array',
+		default: [],
+	},
 	columns: {
 		type: 'number',
 	},
@@ -89,6 +93,7 @@ export const settings = {
 					if ( validImages.length > 0 ) {
 						return createBlock( 'core/gallery', {
 							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
+							ids: validImages.map( ( { id } ) => id ),
 						} );
 					}
 					return createBlock( 'core/gallery' );
@@ -108,6 +113,12 @@ export const settings = {
 							return ids.split( ',' ).map( ( id ) => ( {
 								id: parseInt( id, 10 ),
 							} ) );
+						},
+					},
+					ids: {
+						type: 'array',
+						shortcode: ( { named: { ids } } ) => {
+							return ids.split( ',' );
 						},
 					},
 					columns: {
