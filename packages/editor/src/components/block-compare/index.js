@@ -46,7 +46,7 @@ class BlockCompare extends Component {
 		const newBlocks = castArray( block );
 
 		// Get converted block details
-		const newContent = newBlocks.map( ( item ) => getSaveContent( getBlockType( item.name ), item.attributes, item.innerBlocks ) );
+		const newContent = newBlocks.map( ( item ) => getSaveContent( item.name, item.attributes, item.innerBlocks ) );
 		const renderedContent = newBlocks.map( ( item ) => getSaveElement( getBlockType( item.name ), item.attributes, item.innerBlocks ) );
 
 		return {
