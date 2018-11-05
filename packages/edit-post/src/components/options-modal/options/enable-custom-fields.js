@@ -9,7 +9,7 @@ import { withSelect } from '@wordpress/data';
  */
 import BaseOption from './base';
 
-class EnableCustomFieldsOption extends Component {
+export class EnableCustomFieldsOption extends Component {
 	constructor( { isChecked } ) {
 		super( ...arguments );
 

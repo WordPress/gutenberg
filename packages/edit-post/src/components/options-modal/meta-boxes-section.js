@@ -15,7 +15,7 @@ import { withSelect } from '@wordpress/data';
 import Section from './section';
 import { EnableCustomFieldsOption, EnablePanelOption } from './options';
 
-function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sectionProps } ) {
+export function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sectionProps } ) {
 	if ( ! areCustomFieldsRegistered && metaBoxes.length === 0 ) {
 		return null;
 	}
