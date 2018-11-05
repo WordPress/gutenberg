@@ -122,7 +122,9 @@ export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) 
  * @return {string} Save content.
  */
 export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
-	return renderToString( getSaveElement( blockTypeOrName, attributes, innerBlocks ) );
+	const blockType = normalizeBlockType( blockTypeOrName );
+
+	return renderToString( getSaveElement( blockType, attributes, innerBlocks ) );
 }
 
 /**
