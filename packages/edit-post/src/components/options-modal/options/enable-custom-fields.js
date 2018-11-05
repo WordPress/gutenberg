@@ -43,5 +43,5 @@ class EnableCustomFieldsOption extends Component {
 }
 
 export default withSelect( ( select ) => ( {
-	isChecked: select( 'core/editor' ).getEditorSettings().enableCustomFields,
+	isChecked: !! select( 'core/editor' ).getEditorSettings().enableCustomFields,
 } ) )( EnableCustomFieldsOption );

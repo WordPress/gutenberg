@@ -15,14 +15,14 @@ import { withSelect } from '@wordpress/data';
 import Section from './section';
 import { EnableCustomFieldsOption, EnablePanelOption } from './options';
 
-function MetaBoxesSection( { hasCustomFieldsSupport, metaBoxes, ...sectionProps } ) {
-	if ( ! hasCustomFieldsSupport && metaBoxes.length === 0 ) {
+function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sectionProps } ) {
+	if ( ! areCustomFieldsRegistered && metaBoxes.length === 0 ) {
 		return null;
 	}
 
 	return (
 		<Section { ...sectionProps }>
-			{ hasCustomFieldsSupport && (
+			{ areCustomFieldsRegistered && (
 				<EnableCustomFieldsOption label={ __( 'Custom Fields' ) } />
 			) }
 			{ map(
@@ -38,13 +38,11 @@ function MetaBoxesSection( { hasCustomFieldsSupport, metaBoxes, ...sectionProps 
 }
 
 export default withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { getPostType } = select( 'core' );
+	const { getEditorSettings } = select( 'core/editor' );
 	const { getAllMetaBoxes } = select( 'core/edit-post' );
 
-	const postType = getPostType( getEditedPostAttribute( 'type' ) );
 	return {
-		hasCustomFieldsSupport: postType.supports[ 'custom-fields' ],
+		areCustomFieldsRegistered: getEditorSettings().enableCustomFields !== undefined,
 		metaBoxes: getAllMetaBoxes(),
 	};
 } )( MetaBoxesSection );
