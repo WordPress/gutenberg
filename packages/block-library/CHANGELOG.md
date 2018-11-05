@@ -1,3 +1,15 @@
+## 2.2.0 (unreleased)
+
+### New Features
+
+- Gallery Block: Add screen reader support for order of images in gallery.
+
+## 2.1.8 (2018-11-03)
+
+### Polish
+
+- File Block: Create file blocks when dropping multiple files at once.
+
 ## 2.1.7 (2018-10-30)
 
 ## 2.1.6 (2018-10-30)

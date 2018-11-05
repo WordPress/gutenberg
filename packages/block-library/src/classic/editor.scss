@@ -88,12 +88,16 @@
 	}
 
 	.alignright {
+		/*rtl:ignore*/
 		float: right;
+		/*rtl:ignore*/
 		margin: 0.5em 0 0.5em 1em;
 	}
 
 	.alignleft {
+		/*rtl:ignore*/
 		float: left;
+		/*rtl:ignore*/
 		margin: 0.5em 1em 0.5em 0;
 	}
 

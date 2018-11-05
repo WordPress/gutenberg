@@ -139,6 +139,20 @@ been saved.
 
 Object of key value pairs comprising unsaved edits.
 
+### getReferenceByDistinctEdits
+
+Returns a new reference when edited values have changed. This is useful in
+inferring where an edit has been made between states by comparison of the
+return values using strict equality.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+A value whose reference will change only when an edit occurs.
+
 ### getCurrentPostAttribute
 
 Returns an attribute value of the saved post.
@@ -1768,15 +1782,6 @@ Returns an action object used to signal that post saving is unlocked.
 *Parameters*
 
  * lockName: The lock name.
-
-### addTermToEditedPost
-
-Returns an action object signaling that a new term is added to the edited post.
-
-*Parameters*
-
- * slug: Taxonomy slug.
- * term: Term object.
 
 ### createNotice
 
