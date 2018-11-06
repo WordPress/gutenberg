@@ -3,7 +3,7 @@
  */
 import Tannin from 'tannin';
 
-export { default as sprintf } from '@tannin/sprintf';
+export { sprintf } from 'sprintf-js';
 
 /**
  * Default locale data to use for Tannin domain when not otherwise provided.
