@@ -25,7 +25,7 @@ export default function CodeEdit( { attributes, setAttributes, style } ) {
 		<View>
 			<PlainText
 				value={ attributes.content }
-				style={ [style, styles.blockCode] }
+				style={ [ style, styles.blockCode ] }
 				multiline={ true }
 				underlineColorAndroid="transparent"
 				onChange={ ( content ) => setAttributes( { content } ) }

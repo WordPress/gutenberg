@@ -11,7 +11,10 @@ import { Component } from '@wordpress/element';
 import { parse, createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
-const minHeight = 50;
+/**
+ * Import style
+ */
+import styles from './style.scss';
 
 const name = 'core/paragraph';
 
@@ -69,6 +72,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			setAttributes,
 			mergeBlocks,
+			style,
 		} = this.props;
 
 		const {
@@ -76,15 +80,15 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
+		const minHeight = styles.blockText.minHeight;
+
 		return (
 			<View>
 				<RichText
 					tagName="p"
 					value={ content }
 					style={ {
-						// We don't want to pass style here from upper leyers, because it's corrupted
-						// (when a `className` prop is passed it gets converted to `style` here)
-						// as we're using the react-native-classname-to-style plugin.
+						...style,
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
