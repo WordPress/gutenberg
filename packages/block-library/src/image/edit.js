@@ -349,7 +349,6 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const imageSizes = this.getImageSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
@@ -362,7 +361,7 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 					/>
-					{ ! isEmpty( imageSizes ) && (
+					{ ! isEmpty( availableImageSizes ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
