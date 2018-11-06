@@ -10,9 +10,14 @@ import path from 'path';
 import {
 	getBlockContent,
 	pasteHandler,
+	rawHandler,
 	serialize,
 } from '@wordpress/blocks';
 import { registerCoreBlocks } from '@wordpress/block-library';
+
+function readFile( filePath ) {
+	return fs.existsSync( filePath ) ? fs.readFileSync( filePath, 'utf8' ).trim() : '';
+}
 
 describe( 'Blocks raw handling', () => {
 	beforeAll( () => {
@@ -117,11 +122,7 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	describe( 'serialize', () => {
-		function readFile( filePath ) {
-			return fs.existsSync( filePath ) ? fs.readFileSync( filePath, 'utf8' ).trim() : '';
-		}
-
+	describe( 'pasteHandler', () => {
 		[
 			'plain',
 			'classic',
@@ -152,6 +153,13 @@ describe( 'Blocks raw handling', () => {
 					expect( console ).toHaveLogged();
 				}
 			} );
+		} );
+	} );
+
+	describe( 'rawHandler', () => {
+		it( 'should convert HTML post to blocks with minimal content changes', () => {
+			const HTML = readFile( path.join( __dirname, 'fixtures/wordpress-convert.html' ) );
+			expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 		} );
 	} );
 } );
