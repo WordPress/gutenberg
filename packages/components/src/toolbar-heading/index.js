@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import Toolbar from '../toolbar';
+
+/**
  * External dependencies
  */
 import { range } from 'lodash';
@@ -8,9 +13,8 @@ import { range } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
 
-class HeadingToolbar extends Component {
+class ToolbarHeading extends Component {
 	createLevelControl( targetLevel, selectedLevel, onChange ) {
 		return {
 			icon: 'heading',
@@ -30,4 +34,4 @@ class HeadingToolbar extends Component {
 	}
 }
 
-export default HeadingToolbar;
+export default ToolbarHeading;
