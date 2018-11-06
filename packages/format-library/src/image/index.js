@@ -16,9 +16,8 @@ export const image = {
 	title: __( 'Image' ),
 	keywords: [ __( 'photo' ), __( 'media' ) ],
 	object: true,
-	match: {
-		tagName: 'img',
-	},
+	tagName: 'img',
+	className: null,
 	attributes: {
 		className: 'class',
 		style: 'style',

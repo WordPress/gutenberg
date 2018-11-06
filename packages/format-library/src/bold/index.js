@@ -11,9 +11,8 @@ const name = 'core/bold';
 export const bold = {
 	name,
 	title: __( 'Bold' ),
-	match: {
-		tagName: 'strong',
-	},
+	tagName: 'strong',
+	className: null,
 	edit( { isActive, value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
 
