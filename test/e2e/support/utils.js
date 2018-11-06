@@ -8,13 +8,18 @@ import { URL } from 'url';
  * External dependencies
  */
 import { times, castArray } from 'lodash';
+import fetch from 'node-fetch';
+
+/**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
 
 const {
 	WP_BASE_URL = 'http://localhost:8889',
 	WP_USERNAME = 'admin',
 	WP_PASSWORD = 'password',
 } = process.env;
-import fetch from 'node-fetch';
 
 /**
  * Platform-specific meta key.
@@ -96,8 +101,20 @@ export async function visitAdmin( adminPath, query ) {
 	}
 }
 
-export async function newPost( { postType, enableTips = false } = {} ) {
-	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
+export async function newPost( {
+	postType,
+	title,
+	content,
+	excerpt,
+	enableTips = false,
+} = {} ) {
+	const query = addQueryArgs( '', {
+		post_type: postType,
+		post_title: title,
+		content,
+		excerpt,
+	} ).slice( 1 );
+	await visitAdmin( 'post-new.php', query );
 
 	await page.evaluate( ( _enableTips ) => {
 		const action = _enableTips ? 'enableTips' : 'disableTips';

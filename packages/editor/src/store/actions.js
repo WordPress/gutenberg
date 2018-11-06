@@ -17,14 +17,16 @@ import { dispatch } from '@wordpress/data';
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post Post object.
+ * @param {Object} post  Post object.
+ * @param {Object} edits Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post ) {
+export function setupEditor( post, edits ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
+		edits,
 	};
 }
 
@@ -76,18 +78,16 @@ export function updatePost( edits ) {
 /**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object}  post            Post object.
- * @param {Array}   blocks          Array of blocks.
- * @param {Object}  edits           Initial edited attributes object.
+ * @param {Object} post   Post object.
+ * @param {Array}  blocks Array of blocks.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post, blocks, edits ) {
+export function setupEditorState( post, blocks ) {
 	return {
 		type: 'SETUP_EDITOR_STATE',
 		post,
 		blocks,
-		edits,
 	};
 }
 
@@ -381,6 +381,14 @@ export function synchronizeTemplate() {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that attributes of the post have
+ * been edited.
+ *
+ * @param {Object} edits Post attributes to edit.
+ *
+ * @return {Object} Action object.
+ */
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',

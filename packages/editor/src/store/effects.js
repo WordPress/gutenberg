@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { compact, last } from 'lodash';
+import { compact, last, has } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -200,11 +200,20 @@ export default {
 		) );
 	},
 	SETUP_EDITOR( action, store ) {
-		const { post } = action;
+		const { post, edits } = action;
 		const state = store.getState();
 
-		// Parse content as blocks
-		let blocks = parse( post.content.raw );
+		// In order to ensure maximum of a single parse during setup, edits are
+		// included as part of editor setup action. Assume edited content as
+		// canonical if provided, falling back to post.
+		let content;
+		if ( has( edits, [ 'content' ] ) ) {
+			content = edits.content;
+		} else {
+			content = post.content.raw;
+		}
+
+		let blocks = parse( content );
 
 		// Apply a template for new posts only, if exists.
 		const isNewPost = post.status === 'auto-draft';
@@ -213,13 +222,7 @@ export default {
 			blocks = synchronizeBlocksWithTemplate( blocks, template );
 		}
 
-		// Include auto draft title in edits while not flagging post as dirty
-		const edits = {};
-		if ( isNewPost ) {
-			edits.title = post.title.raw;
-		}
-
-		const setupAction = setupEditorState( post, blocks, edits );
+		const setupAction = setupEditorState( post, blocks );
 
 		return compact( [
 			setupAction,
