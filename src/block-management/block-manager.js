@@ -159,6 +159,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	mergeBlocks( clientId: string, forward: boolean ) {
 		// find currently focused block
 		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
+		if ( focusedItemIndex == -1 ) {
+			// do nothing if it's not found.
+			return;
+		}
+
 		// Do nothing when it's the first block and backspace is pressed
 		// Do nothing when it's the last block and delete is pressed
 		if (
@@ -176,6 +181,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		} else {
 			blockA = this.state.dataSource.get( focusedItemIndex - 1 );
 			blockB = this.state.dataSource.get( focusedItemIndex );
+		}
+
+		// Ignore merge if blocks aren't known
+		if ( ! blockA || ! blockB ) {
+			return;
 		}
 
 		const blockType = getBlockType( blockA.name );
@@ -223,6 +233,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// Change the data source
 		const index = this.getDataSourceIndexFromClientId( clientId );
+		if ( index == -1 ) {
+			// do nothing if it's not found.
+			return;
+		}
 		const dataSource = this.state.dataSource;
 		const block = dataSource.get( index );
 		block.attributes = attributes;
