@@ -9,7 +9,9 @@ import { JSDOM } from 'jsdom';
  */
 import { create } from '../create';
 import { createElement } from '../create-element';
-import { getSparseArrayLength, spec } from './helpers';
+import { registerFormatType } from '../register-format-type';
+import { unregisterFormatType } from '../unregister-format-type';
+import { getSparseArrayLength, spec, specWithRegistration } from './helpers';
 
 const { window } = new JSDOM();
 const { document } = window;
@@ -51,6 +53,28 @@ describe( 'create', () => {
 
 			expect( createdRecord ).toEqual( record );
 			expect( createdFormatsLength ).toEqual( formatsLength );
+		} );
+	} );
+
+	specWithRegistration.forEach( ( {
+		description,
+		formatName,
+		formatType,
+		html,
+		value,
+	} ) => {
+		it( description, () => {
+			if ( formatName ) {
+				registerFormatType( formatName, formatType );
+			}
+
+			const result = create( { html } );
+
+			if ( formatName ) {
+				unregisterFormatType( formatName );
+			}
+
+			expect( result ).toEqual( value );
 		} );
 	} );
 
