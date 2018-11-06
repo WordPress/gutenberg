@@ -130,7 +130,17 @@ describe( 'Change detection', () => {
 		await assertIsDirty( true );
 	} );
 
-	it( 'Should not prompt to confirm unsaved changes', async () => {
+	it( 'Should not prompt to confirm unsaved changes for new post', async () => {
+		await assertIsDirty( false );
+	} );
+
+	it( 'Should not prompt to confirm unsaved changes for new post with initial edits', async () => {
+		await newPost( {
+			title: 'My New Post',
+			content: 'My content',
+			excerpt: 'My excerpt',
+		} );
+
 		await assertIsDirty( false );
 	} );
 
