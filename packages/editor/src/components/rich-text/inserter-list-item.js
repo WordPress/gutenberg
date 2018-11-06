@@ -12,9 +12,9 @@ import InserterListItem from '../inserter-list-item';
 import { normalizeTerm } from '../inserter/menu';
 
 function isResult( keywords, filterValue ) {
-	const normalizedSearchTerm = normalizeTerm( filterValue );
-	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
-	return keywords.some( matchSearch );
+	return keywords.some( ( string ) =>
+		normalizeTerm( string ).indexOf( normalizeTerm( filterValue ) ) !== -1
+	);
 }
 
 export const RichTextInserterListItem = withSelect( ( select, { name } ) => ( {
