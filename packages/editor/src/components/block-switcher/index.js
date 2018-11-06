@@ -169,7 +169,8 @@ export default compose(
 		const { getBlockStyles } = select( 'core/blocks' );
 		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
 		const blocks = getBlocksByClientId( clientIds );
-		const styles = blocks && blocks.length === 1 && getBlockStyles( blocks[ 0 ].name );
+		const firstBlock = blocks && blocks.length === 1 ? blocks[ 0 ] : null;
+		const styles = firstBlock && getBlockStyles( firstBlock.name );
 		return {
 			blocks,
 			inserterItems: getInserterItems( rootClientId ),
