@@ -537,6 +537,7 @@ class ImageEdit extends Component {
 									showRightHandle = true;
 								}
 							}
+							/* eslint-enable no-lonely-if */
 
 							return (
 								<Fragment>
