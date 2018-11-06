@@ -347,7 +347,7 @@ class WP_Block_Parser {
 		 * match back in PHP to see which one it was.
 		 */
 		$has_match = preg_match(
-			'/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:[^}]+|}+(?=})|(?!}\s+-->).)+?}\s+)?(?<void>\/)?-->/s',
+			'/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+/s',
 			$this->document,
 			$matches,
 			PREG_OFFSET_CAPTURE,
@@ -361,20 +361,38 @@ class WP_Block_Parser {
 
 		list( $match, $started_at ) = $matches[ 0 ];
 
-		$length    = strlen( $match );
+		$length = strlen( $match );
+
+		// We know where the attrs start, now search until the close of the block comment.
+		$attrs_start      = $started_at + $length;
+		$closing_position = strpos( $this->document, '-->', $attrs_start );
+
+		// It looked like it might've been a token, but it wasn't.
+		if ( false === $closing_position ) {
+			return array( 'no-more-tokens', null, null, null, null );
+		}
+
 		$is_closer = isset( $matches[ 'closer' ] ) && -1 !== $matches[ 'closer' ][ 1 ];
-		$is_void   = isset( $matches[ 'void' ] ) && -1 !== $matches[ 'void' ][ 1 ];
+		$is_void   = '/' === substr( $this->document, $closing_position - 1, 1 );
 		$namespace = $matches[ 'namespace' ];
 		$namespace = ( isset( $namespace ) && -1 !== $namespace[ 1 ] ) ? $namespace[ 0 ] : 'core/';
 		$name      = $namespace . $matches[ 'name' ][ 0 ];
-		$has_attrs = isset( $matches[ 'attrs' ] ) && -1 !== $matches[ 'attrs' ][ 1 ];
+
+		// Extract the attrs from between $attrs_start and $closing_position.
+		$void_offset  = $is_void ? 1 : 0;
+		$attrs_length = $closing_position - $attrs_start - $void_offset;
+		$attrs        = trim( substr( $this->document, $attrs_start, $attrs_length ) );
+		$has_attrs    = ! empty( $attrs );
+
+		// Add the length of the attributes, the void '/', and 3 for the length of "-->".
+		$length += $attrs_length + $void_offset + 3;
 
 		/*
 		 * Fun fact! It's not trivial in PHP to create "an empty associative array" since all arrays
 		 * are associative arrays. If we use `array()` we get a JSON `[]`
 		 */
 		$attrs = $has_attrs
-			? json_decode( $matches[ 'attrs' ][ 0 ], /* as-associative */ true )
+			? json_decode( $attrs, /* as-associative */ true )
 			: json_decode( '{}', /* don't ask why, just verify in PHP */ false );
 
 		/*
