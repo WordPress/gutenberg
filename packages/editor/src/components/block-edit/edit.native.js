@@ -1,16 +1,11 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { withFilters } from '@wordpress/components';
-import { getBlockDefaultClassName, hasBlockSupport, getBlockType } from '@wordpress/blocks';
+import { getBlockType } from '@wordpress/blocks';
 
 export const Edit = ( props ) => {
-	const { attributes = {}, name } = props;
+	const { name } = props;
 	const blockType = getBlockType( name );
 
 	if ( ! blockType ) {
