@@ -11,10 +11,10 @@ import { withSelect } from '@wordpress/data';
 import InserterListItem from '../inserter-list-item';
 import { normalizeTerm } from '../inserter/menu';
 
-function isResult( { title, keywords = [] }, filterValue ) {
+function isResult( keywords, filterValue ) {
 	const normalizedSearchTerm = normalizeTerm( filterValue );
 	const matchSearch = ( string ) => normalizeTerm( string ).indexOf( normalizedSearchTerm ) !== -1;
-	return matchSearch( title ) || keywords.some( matchSearch );
+	return keywords.some( matchSearch );
 }
 
 export const RichTextInserterListItem = withSelect( ( select, { name } ) => ( {
@@ -23,7 +23,11 @@ export const RichTextInserterListItem = withSelect( ( select, { name } ) => ( {
 	return (
 		<Fill name="Inserter.InlineElements">
 			{ ( { filterValue } ) => {
-				if ( filterValue && ! isResult( props.formatType, filterValue ) ) {
+				const { keywords = [], title } = props.formatType;
+
+				keywords.push( title, props.title );
+
+				if ( filterValue && ! isResult( keywords, filterValue ) ) {
 					return null;
 				}
 
