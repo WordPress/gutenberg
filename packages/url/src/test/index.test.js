@@ -78,6 +78,13 @@ describe( 'addQueryArgs', () => {
 
 		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?sun=true' );
 	} );
+
+	it( 'should encodes spaces by RFC 3986', () => {
+		const url = 'https://andalouses.example/beach';
+		const args = { activity: 'fun in the sun' };
+
+		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?activity=fun%20in%20the%20sun' );
+	} );
 } );
 
 describe( 'getQueryArg', () => {
