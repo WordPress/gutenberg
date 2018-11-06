@@ -100,6 +100,7 @@ class ImageEdit extends Component {
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
 		this.resetWidthHeight = this.resetWidthHeight.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -164,6 +165,14 @@ class ImageEdit extends Component {
 				}
 			}
 		}
+	}
+
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.createErrorNotice( message );
+		this.setState( {
+			isEditing: true,
+		} );
 	}
 
 	onSelectImage( media ) {
@@ -521,7 +530,6 @@ class ImageEdit extends Component {
 			isSelected,
 			className,
 			maxWidth,
-			noticeOperations,
 			noticeUI,
 			toggleSelection,
 			isRTL,
@@ -586,7 +594,7 @@ class ImageEdit extends Component {
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
 						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
+						onError={ this.onUploadError }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ { id, src } }

@@ -531,6 +531,16 @@ export const spec = [
 		},
 	},
 	{
+		description: 'should ignore formats at line separator',
+		multilineTag: 'p',
+		startPath: [],
+		endPath: [],
+		record: {
+			formats: [ [ em ], [ em ], [ em ], [ em ], [ em ], [ em ], [ em ] ],
+			text: 'one\u2028two',
+		},
+	},
+	{
 		description: 'should remove br with settings',
 		settings: {
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),

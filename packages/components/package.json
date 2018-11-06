@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "5.0.1",
+	"version": "5.0.2",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -49,7 +49,7 @@
 	},
 	"devDependencies": {
 		"@wordpress/token-list": "file:../token-list",
-		"enzyme": "^3.3.0",
+		"enzyme": "^3.7.0",
 		"react-test-renderer": "^16.4.1"
 	},
 	"publishConfig": {

@@ -33,7 +33,7 @@ describe( 'scroll-lock', () => {
 	afterEach( () => {
 		testDocument = null;
 
-		if ( wrapper ) {
+		if ( wrapper && wrapper.length ) {
 			wrapper.unmount();
 			wrapper = null;
 		}
