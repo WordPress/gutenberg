@@ -71,6 +71,13 @@ describe( 'addQueryArgs', () => {
 
 		expect( safeDecodeURI( addQueryArgs( url, args ) ) ).toBe( 'https://andalouses.example/beach?time[0]=10&time[1]=11&beach[0]=sand&beach[1]=rock' );
 	} );
+
+	it( 'should disregard keys with undefined values', () => {
+		const url = 'https://andalouses.example/beach';
+		const args = { sun: 'true', sand: undefined };
+
+		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?sun=true' );
+	} );
 } );
 
 describe( 'getQueryArg', () => {
