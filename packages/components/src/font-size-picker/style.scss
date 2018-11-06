@@ -5,8 +5,11 @@
 
 	// Apply the same height as the isSmall Reset button.
 	.components-range-control__number {
-		height: 24px;
-		line-height: 22px;
+		height: 30px;
+		line-height: 28px;
+		margin: 0;
+		padding: 0 !important;
+		text-align: center;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
