@@ -20,12 +20,12 @@ import styles from './theme.scss';
 
 // Note: styling is applied directly to the (nested) PlainText component. Web-side components
 // apply it to the container 'div' but we don't have a proper proposal for cascading styling yet.
-export default function CodeEdit( { attributes, setAttributes } ) {
+export default function CodeEdit( { attributes, setAttributes, style } ) {
 	return (
 		<View>
 			<PlainText
 				value={ attributes.content }
-				style={ styles.blockCode }
+				style={ [style, styles.blockCode] }
 				multiline={ true }
 				underlineColorAndroid="transparent"
 				onChange={ ( content ) => setAttributes( { content } ) }
