@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
+import {
+	DropZone,
+	withFilters,
+} from '@wordpress/components';
 import {
 	rawHandler,
 	getBlockTransforms,
@@ -149,5 +152,6 @@ export default compose(
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,
 		};
-	} )
+	} ),
+	withFilters( 'editor.BlockDropZone' )
 )( BlockDropZone );

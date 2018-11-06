@@ -1,3 +1,23 @@
+## 6.1.1 (2018-11-03)
+
+### Polish
+
+- Remove `findDOMNode` usage from the `Inserter` component.
+- Remove `findDOMNode` usage from the `Block` component.
+
+## 6.1.0 (2018-10-30)
+
+### Deprecations
+
+- The Reusable Blocks Data API is marked as experimental as it's subject to change in the future ([#11230](https://github.com/WordPress/gutenberg/pull/11230)).
+
+## 6.0.1 (2018-10-30)
+
+### Bug Fixes
+
+- Tweak the vanilla style sheet for consistency.
+- Fix the "Copy Post Text" button not copying the post text.
+
 ## 6.0.0 (2018-10-29)
 
 ### Breaking Changes

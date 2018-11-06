@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { normalizeIconObject } from '@wordpress/blocks';
+import { withSelect } from '@wordpress/data';
 import { Component, Fragment } from '@wordpress/element';
-import { getActiveFormat, getFormatTypes } from '@wordpress/rich-text';
+import { getActiveFormat } from '@wordpress/rich-text';
 import { Fill, KeyboardShortcuts, ToolbarButton } from '@wordpress/components';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
@@ -81,10 +82,10 @@ class Shortcut extends Component {
 	}
 }
 
-const FormatEdit = ( { onChange, value } ) => {
+const FormatEdit = ( { formatTypes, onChange, value } ) => {
 	return (
 		<Fragment>
-			{ getFormatTypes().map( ( { name, edit: Edit, keywords } ) => {
+			{ formatTypes.map( ( { name, edit: Edit, keywords } ) => {
 				if ( ! Edit ) {
 					return null;
 				}
@@ -115,4 +116,12 @@ const FormatEdit = ( { onChange, value } ) => {
 	);
 };
 
-export default FormatEdit;
+export default withSelect(
+	( select ) => {
+		const { getFormatTypes } = select( 'core/rich-text' );
+
+		return {
+			formatTypes: getFormatTypes(),
+		};
+	}
+)( FormatEdit );

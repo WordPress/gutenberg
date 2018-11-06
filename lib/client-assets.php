@@ -299,6 +299,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-compose',
+			'wp-deprecated',
 			'wp-element',
 			'wp-is-shallow-equal',
 			'wp-polyfill',
@@ -428,6 +429,7 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'wp-polyfill',
 			'wp-data',
+			'wp-deprecated',
 			'wp-escape-html',
 		),
 		filemtime( gutenberg_dir_path() . 'build/rich-text/index.js' ),
@@ -1239,32 +1241,6 @@ function gutenberg_default_post_format_template( $settings, $post ) {
 add_filter( 'block_editor_settings', 'gutenberg_default_post_format_template', 10, 2 );
 
 /**
- * The code editor settings that were last captured by
- * gutenberg_capture_code_editor_settings().
- *
- * @var array|false
- */
-$gutenberg_captured_code_editor_settings = false;
-
-/**
- * When passed to the wp_code_editor_settings filter, this function captures
- * the code editor settings given to it and then prevents
- * wp_enqueue_code_editor() from enqueuing any assets.
- *
- * This is a workaround until e.g. code_editor_settings() is added to Core.
- *
- * @since 2.1.0
- *
- * @param array $settings Code editor settings.
- * @return false
- */
-function gutenberg_capture_code_editor_settings( $settings ) {
-	global $gutenberg_captured_code_editor_settings;
-	$gutenberg_captured_code_editor_settings = $settings;
-	return false;
-}
-
-/**
  * Retrieve a stored autosave that is newer than the post save.
  *
  * Deletes autosaves that are older than the post save.
@@ -1348,6 +1324,35 @@ function gutenberg_load_locale_data() {
 		'wp-i18n',
 		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
 	);
+}
+
+/**
+ * Retrieve The available image sizes for a post
+ *
+ * @return array
+ */
+function gutenberg_get_available_image_sizes() {
+	$sizes      = get_intermediate_image_sizes();
+	$sizes[]    = 'full';
+	$size_names = apply_filters(
+		'image_size_names_choose',
+		array(
+			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
+			'medium'    => __( 'Medium', 'gutenberg' ),
+			'large'     => __( 'Large', 'gutenberg' ),
+			'full'      => __( 'Full Size', 'gutenberg' ),
+		)
+	);
+
+	$all_sizes = array();
+	foreach ( $sizes as $size_slug ) {
+		$all_sizes[] = array(
+			'slug' => $size_slug,
+			'name' => isset( $size_names[ $size_slug ] ) ? $size_names[ $size_slug ] : $size_slug,
+		);
+	}
+
+	return $all_sizes;
 }
 
 /**
@@ -1508,19 +1513,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	);
 	wp_localize_script( 'wp-editor', '_wpMetaBoxUrl', $meta_box_url );
 
-	// Populate default code editor settings by short-circuiting wp_enqueue_code_editor.
-	global $gutenberg_captured_code_editor_settings;
-	add_filter( 'wp_code_editor_settings', 'gutenberg_capture_code_editor_settings' );
-	wp_enqueue_code_editor( array( 'type' => 'text/html' ) );
-	remove_filter( 'wp_code_editor_settings', 'gutenberg_capture_code_editor_settings' );
-	wp_add_inline_script(
-		'wp-editor',
-		sprintf(
-			'window._wpGutenbergCodeEditorSettings = %s;',
-			wp_json_encode( $gutenberg_captured_code_editor_settings )
-		)
-	);
-
 	// Initialize the editor.
 	$gutenberg_theme_support = get_theme_support( 'gutenberg' );
 	$align_wide              = get_theme_support( 'align-wide' );
@@ -1640,14 +1632,19 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'maxUploadFileSize'      => $max_upload_size,
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
-		'postLock'               => $lock_details,
+		'availableImageSizes'    => gutenberg_get_available_image_sizes(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
+		'postLock'               => $lock_details,
 		'postLockUtils'          => array(
 			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
 			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
 			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 		),
+
+		// Whether or not to load the 'postcustom' meta box is stored as a user meta
+		// field so that we're not always loading its assets.
+		'enableCustomFields'     => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
 	);
 
 	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );

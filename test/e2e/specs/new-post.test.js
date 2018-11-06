@@ -23,8 +23,8 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should have no history', async () => {
-		const undoButton = await page.$( '.editor-history__undo:not( :disabled )' );
-		const redoButton = await page.$( '.editor-history__redo:not( :disabled )' );
+		const undoButton = await page.$( '.editor-history__undo[aria-disabled="false"]' );
+		const redoButton = await page.$( '.editor-history__redo[aria-disabled="false"]' );
 
 		expect( undoButton ).toBeNull();
 		expect( redoButton ).toBeNull();

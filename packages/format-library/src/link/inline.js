@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import {
 	ExternalLink,
@@ -26,7 +26,16 @@ import PositionedAtSelection from './positioned-at-selection';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
-function createLinkFormat( { url, opensInNewWindow } ) {
+/**
+ * Generates the format object that will be applied to the link text.
+ *
+ * @param {string}  url              The href of the link.
+ * @param {boolean} opensInNewWindow Whether this link will open in a new window.
+ * @param {Object}  text             The text that is being hyperlinked.
+ *
+ * @return {Object} The final format object.
+ */
+function createLinkFormat( { url, opensInNewWindow, text } ) {
 	const format = {
 		type: 'core/link',
 		attributes: {
@@ -35,8 +44,12 @@ function createLinkFormat( { url, opensInNewWindow } ) {
 	};
 
 	if ( opensInNewWindow ) {
+		// translators: accessibility label for external links, where the argument is the link text
+		const label = sprintf( __( '%s (opens in a new tab)' ), text ).trim();
+
 		format.attributes.target = '_blank';
 		format.attributes.rel = 'noreferrer noopener';
+		format.attributes[ 'aria-label' ] = label;
 	}
 
 	return format;
@@ -139,7 +152,7 @@ class InlineLinkUI extends Component {
 
 		// Apply now if URL is not being edited.
 		if ( ! isShowingInput( this.props, this.state ) ) {
-			onChange( applyFormat( value, createLinkFormat( { url, opensInNewWindow } ) ) );
+			onChange( applyFormat( value, createLinkFormat( { url, opensInNewWindow, text: value.text } ) ) );
 		}
 	}
 
@@ -152,7 +165,7 @@ class InlineLinkUI extends Component {
 		const { isActive, value, onChange, speak } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
 		const url = prependHTTP( inputValue );
-		const format = createLinkFormat( { url, opensInNewWindow } );
+		const format = createLinkFormat( { url, opensInNewWindow, text: value.text } );
 
 		event.preventDefault();
 

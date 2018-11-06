@@ -10,7 +10,8 @@
             "mediaId": 17897,
             "mediaUrl": "http://localhost/wp-content/uploads/2018/09/Jul-26-2018-11-34-54.mp4",
             "mediaType": "video",
-            "mediaWidth": 50
+            "mediaWidth": 50,
+            "isStackedOnMobile": false
         },
         "innerBlocks": [
             {
