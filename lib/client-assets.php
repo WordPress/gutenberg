@@ -981,7 +981,13 @@ function gutenberg_register_vendor_scripts() {
 		null,
 		array(
 			'wp-polyfill',
+			'wp-deprecated',
 		)
+	);
+	wp_script_add_data(
+		'wp-polyfill-ecmascript',
+		'data',
+		'wp.deprecated( "wp-polyfill-ecmascript script handle", { plugin: "Gutenberg", version: "4.5" } );'
 	);
 }
 
