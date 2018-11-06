@@ -119,6 +119,12 @@ function setupWPTimezone() {
 // the attached timezone, instead of setting a default timezone on
 // the global moment object.
 export const moment = ( ...args ) => {
+	deprecated( 'wp.date.moment', {
+		version: '4.4',
+		alternative: 'the moment script as a dependency',
+		plugin: 'Gutenberg',
+	} );
+
 	return momentLib.tz( ...args, 'WP' );
 };
 
@@ -384,6 +390,20 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 	dateMoment.locale( settings.l10n.locale );
 	// Format and return.
 	return format( dateFormat, dateMoment );
+}
+
+/**
+ * Check whether a date is considered in the future according to the WordPress settings.
+ *
+ * @param {(Date|string)} dateValue  Date object or string.
+ *
+ * @return {boolean} Is in the future.
+ */
+export function isInTheFuture( dateValue ) {
+	const now = momentLib.tz( 'WP' );
+	const momentObject = momentLib.tz( dateValue, 'WP' );
+
+	return momentObject.isAfter( now );
 }
 
 setupWPTimezone();

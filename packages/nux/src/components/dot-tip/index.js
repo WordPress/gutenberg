@@ -5,6 +5,7 @@ import { compose } from '@wordpress/compose';
 import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 function getAnchorRect( anchor ) {
 	// The default getAnchorRect() excludes an element's top and bottom padding
@@ -58,19 +59,27 @@ export function DotTip( {
 }
 
 export default compose(
-	withSelect( ( select, { id } ) => {
+	withSelect( ( select, { tipId, id } ) => {
+		if ( id ) {
+			tipId = id;
+			deprecated( 'The id prop of wp.nux.DotTip', {
+				plugin: 'Gutenberg',
+				version: '4.4',
+				alternative: 'the tipId prop',
+			} );
+		}
 		const { isTipVisible, getAssociatedGuide } = select( 'core/nux' );
-		const associatedGuide = getAssociatedGuide( id );
+		const associatedGuide = getAssociatedGuide( tipId );
 		return {
-			isVisible: isTipVisible( id ),
+			isVisible: isTipVisible( tipId ),
 			hasNextTip: !! ( associatedGuide && associatedGuide.nextTipId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { id } ) => {
+	withDispatch( ( dispatch, { tipId, id } ) => {
 		const { dismissTip, disableTips } = dispatch( 'core/nux' );
 		return {
 			onDismiss() {
-				dismissTip( id );
+				dismissTip( tipId || id );
 			},
 			onDisable() {
 				disableTips();

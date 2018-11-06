@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 export const PREFERENCES_DEFAULTS = {
 	insertUsage: {},
@@ -11,13 +11,14 @@ export const PREFERENCES_DEFAULTS = {
 /**
  * The default editor settings
  *
- *  alignWide         boolean        Enable/Disable Wide/Full Alignments
- *  colors            Array          Palette colors
- *  fontSizes         Array          Available font sizes
- *  maxWidth          number         Max width to constraint resizing
- *  blockTypes        boolean|Array  Allowed block types
- *  hasFixedToolbar   boolean        Whether or not the editor toolbar is fixed
- *  focusMode         boolean        Whether the focus mode is enabled or not
+ *  alignWide            boolean        Enable/Disable Wide/Full Alignments
+ *  colors               Array          Palette colors
+ *  fontSizes            Array          Available font sizes
+ *  availableImageSizes  Array          Available image sizes
+ *  maxWidth             number         Max width to constraint resizing
+ *  blockTypes           boolean|Array  Allowed block types
+ *  hasFixedToolbar      boolean        Whether or not the editor toolbar is fixed
+ *  focusMode            boolean        Whether the focus mode is enabled or not
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -80,30 +81,37 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	fontSizes: [
 		{
-			name: __( 'Small' ),
+			name: _x( 'Small', 'font size name' ),
 			size: 13,
 			slug: 'small',
 		},
 		{
-			name: __( 'Normal' ),
+			name: _x( 'Normal', 'font size name' ),
 			size: 16,
 			slug: 'normal',
 		},
 		{
-			name: __( 'Medium' ),
+			name: _x( 'Medium', 'font size name' ),
 			size: 20,
 			slug: 'medium',
 		},
 		{
-			name: __( 'Large' ),
+			name: _x( 'Large', 'font size name' ),
 			size: 36,
 			slug: 'large',
 		},
 		{
-			name: __( 'Huge' ),
+			name: _x( 'Huge', 'font size name' ),
 			size: 48,
 			slug: 'huge',
 		},
+	],
+
+	availableImageSizes: [
+		{ slug: 'thumbnail', label: __( 'Thumbnail' ) },
+		{ slug: 'medium', label: __( 'Medium' ) },
+		{ slug: 'large', label: __( 'Large' ) },
+		{ slug: 'full', label: __( 'Full Size' ) },
 	],
 
 	// This is current max width of the block inner area
@@ -119,3 +127,10 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 };
+
+/**
+ * Default initial edits state.
+ *
+ * @type {Object}
+ */
+export const INITIAL_EDITS_DEFAULTS = {};

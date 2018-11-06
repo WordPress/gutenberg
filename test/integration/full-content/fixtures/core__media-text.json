@@ -10,7 +10,8 @@
             "mediaId": 17985,
             "mediaUrl": "http://localhost/wp-content/uploads/2018/09/1600px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg",
             "mediaType": "image",
-            "mediaWidth": 50
+            "mediaWidth": 50,
+            "isStackedOnMobile": false
         },
         "innerBlocks": [
             {

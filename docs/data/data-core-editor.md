@@ -139,6 +139,20 @@ been saved.
 
 Object of key value pairs comprising unsaved edits.
 
+### getReferenceByDistinctEdits
+
+Returns a new reference when edited values have changed. This is useful in
+inferring where an edit has been made between states by comparison of the
+return values using strict equality.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+A value whose reference will change only when an edit occurs.
+
 ### getCurrentPostAttribute
 
 Returns an attribute value of the saved post.
@@ -707,7 +721,7 @@ otherwise.
 
 *Returns*
 
-Whether block is first in mult-selection.
+Whether block is first in multi-selection.
 
 ### isBlockMultiSelected
 
@@ -907,6 +921,18 @@ Returns true if the user is typing, or false otherwise.
 
 Whether user is typing.
 
+### isCaretWithinFormattedText
+
+Returns true if the caret is within formatted text, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the caret is within formatted text.
+
 ### getBlockInsertionPoint
 
 Returns the insertion point, the index at which the new inserted block would
@@ -918,8 +944,7 @@ be placed. Defaults to the last index.
 
 *Returns*
 
-Insertion point object with `rootClientId`, `layout`,
-`index`.
+Insertion point object with `rootClientId`, `index`.
 
 ### isBlockInsertionPointVisible
 
@@ -1061,31 +1086,15 @@ before falling back to serialization of block state.
 
 Post content.
 
-### getNotices
-
-Returns the user notices array.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-List of notices.
-
 ### canInsertBlockType
 
-Determines if the given block type is allowed to be inserted, and, if
-parentClientId is provided, whether it is allowed to be nested within the
-given parent.
+Determines if the given block type is allowed to be inserted into the block list.
 
 *Parameters*
 
  * state: Editor state.
- * blockName: The name of the given block type, e.g.
-                                'core/paragraph'.
- * parentClientId: The parent that the given block is to be
-                                nested within, or null.
+ * blockName: The name of the block type, e.g.' core/paragraph'.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
@@ -1115,13 +1124,13 @@ Items are returned ordered descendingly by their 'utility' and 'frecency'.
 *Parameters*
 
  * state: Editor state.
- * parentClientId: The block we are inserting into, if any.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
 Items that appear in inserter.
 
-### getReusableBlock
+### __experimentalGetReusableBlock
 
 Returns the reusable block with the given ID.
 
@@ -1134,7 +1143,7 @@ Returns the reusable block with the given ID.
 
 The reusable block, or null if none exists.
 
-### isSavingReusableBlock
+### __experimentalIsSavingReusableBlock
 
 Returns whether or not the reusable block with the given ID is being saved.
 
@@ -1147,7 +1156,7 @@ Returns whether or not the reusable block with the given ID is being saved.
 
 Whether or not the reusable block is being saved.
 
-### isFetchingReusableBlock
+### __experimentalIsFetchingReusableBlock
 
 Returns true if the reusable block with the given ID is being fetched, or
 false otherwise.
@@ -1161,7 +1170,7 @@ false otherwise.
 
 Whether the reusable block is being fetched.
 
-### getReusableBlocks
+### __experimentalGetReusableBlocks
 
 Returns an array of all reusable blocks.
 
@@ -1382,7 +1391,7 @@ the specified post object and editor settings.
 *Parameters*
 
  * post: Post object.
- * autosaveStatus: The Post's autosave status.
+ * edits: Initial edited attributes object.
 
 ### resetPost
 
@@ -1419,7 +1428,6 @@ Returns an action object used to setup the editor state when first opening an ed
 
  * post: Post object.
  * blocks: Array of blocks.
- * edits: Initial edited attributes object.
 
 ### resetBlocks
 
@@ -1513,7 +1521,6 @@ to a new index.
  * clientId: The client ID of the block.
  * fromRootClientId: Root client ID source.
  * toRootClientId: Root client ID destination.
- * layout: Layout to move the block into.
  * index: The index to move the block into.
 
 ### insertBlock
@@ -1537,13 +1544,19 @@ be inserted, optionally at a specific index respective a root block list.
 
  * blocks: Block objects to insert.
  * index: Index at which block should be inserted.
- * rootClientId: Optional root cliente ID of block list on
+ * rootClientId: Optional root client ID of block list on
                                which to insert.
 
 ### showInsertionPoint
 
 Returns an action object used in signalling that the insertion point should
 be shown.
+
+*Parameters*
+
+ * rootClientId: Optional root client ID of block list on
+                              which to insert.
+ * index: Index at which block should be inserted.
 
 ### hideInsertionPoint
 
@@ -1560,6 +1573,15 @@ Returns an action object resetting the template validity.
 ### synchronizeTemplate
 
 Returns an action object synchronize the template with the list of blocks
+
+### editPost
+
+Returns an action object used in signalling that attributes of the post have
+been edited.
+
+*Parameters*
+
+ * edits: Post attributes to edit.
 
 ### savePost
 
@@ -1636,25 +1658,13 @@ Returns an action object used in signalling that the user has begun to type.
 
 Returns an action object used in signalling that the user has stopped typing.
 
-### createNotice
+### enterFormattedText
 
-Returns an action object used to create a notice.
+Returns an action object used in signalling that the caret has entered formatted text.
 
-*Parameters*
+### exitFormattedText
 
- * status: The notice status.
- * content: The notice content.
- * options: The notice options.  Available options:
-                             `id` (string; default auto-generated)
-                             `isDismissible` (boolean; default `true`).
-
-### removeNotice
-
-Returns an action object used to remove a notice.
-
-*Parameters*
-
- * id: The notice id.
+Returns an action object used in signalling that the user caret has exited formatted text.
 
 ### updatePostLock
 
@@ -1664,7 +1674,7 @@ Returns an action object used to lock the editor.
 
  * lock: Details about the post lock status, user, and nonce.
 
-### fetchReusableBlocks
+### __experimentalFetchReusableBlocks
 
 Returns an action object used to fetch a single reusable block or all
 reusable blocks from the REST API into the store.
@@ -1674,7 +1684,7 @@ reusable blocks from the REST API into the store.
  * id: If given, only a single reusable block with this ID will
                     be fetched.
 
-### receiveReusableBlocks
+### __experimentalReceiveReusableBlocks
 
 Returns an action object used in signalling that reusable blocks have been
 received. `results` is an array of objects containing:
@@ -1685,7 +1695,7 @@ received. `results` is an array of objects containing:
 
  * results: Reusable blocks received.
 
-### saveReusableBlock
+### __experimentalSaveReusableBlock
 
 Returns an action object used to save a reusable block that's in the store to
 the REST API.
@@ -1694,7 +1704,7 @@ the REST API.
 
  * id: The ID of the reusable block to save.
 
-### deleteReusableBlock
+### __experimentalDeleteReusableBlock
 
 Returns an action object used to delete a reusable block via the REST API.
 
@@ -1702,7 +1712,7 @@ Returns an action object used to delete a reusable block via the REST API.
 
  * id: The ID of the reusable block to delete.
 
-### updateReusableBlockTitle
+### __experimentalUpdateReusableBlockTitle
 
 Returns an action object used in signalling that a reusable block's title is
 to be updated.
@@ -1712,7 +1722,7 @@ to be updated.
  * id: The ID of the reusable block to update.
  * title: The new title.
 
-### convertBlockToStatic
+### __experimentalConvertBlockToStatic
 
 Returns an action object used to convert a reusable block into a static block.
 
@@ -1720,7 +1730,7 @@ Returns an action object used to convert a reusable block into a static block.
 
  * clientId: The client ID of the block to attach.
 
-### convertBlockToReusable
+### __experimentalConvertBlockToReusable
 
 Returns an action object used to convert a static block into a reusable block.
 
@@ -1781,3 +1791,7 @@ Returns an action object used to signal that post saving is unlocked.
 *Parameters*
 
  * lockName: The lock name.
+
+### createNotice
+
+### fetchReusableBlocks

@@ -1,16 +1,17 @@
 /**
  * External Dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
+import {
+	DropZone,
+	withFilters,
+} from '@wordpress/components';
 import {
 	rawHandler,
-	cloneBlock,
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
@@ -132,17 +133,7 @@ export default compose(
 
 		return {
 			insertBlocks( blocks, index ) {
-				const { rootClientId, layout } = ownProps;
-
-				if ( layout ) {
-					// A block's transform function may return a single
-					// transformed block or an array of blocks, so ensure
-					// to first coerce to an array before mapping to inject
-					// the layout attribute.
-					blocks = castArray( blocks ).map( ( block ) => (
-						cloneBlock( block, { layout } )
-					) );
-				}
+				const { rootClientId } = ownProps;
 
 				insertBlocks( blocks, index, rootClientId );
 			},
@@ -150,8 +141,8 @@ export default compose(
 				updateBlockAttributes( ...args );
 			},
 			moveBlockToPosition( srcClientId, srcRootClientId, dstIndex ) {
-				const { rootClientId: dstRootClientId, layout } = ownProps;
-				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, layout, dstIndex );
+				const { rootClientId: dstRootClientId } = ownProps;
+				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, dstIndex );
 			},
 		};
 	} ),
@@ -161,5 +152,6 @@ export default compose(
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,
 		};
-	} )
+	} ),
+	withFilters( 'editor.BlockDropZone' )
 )( BlockDropZone );

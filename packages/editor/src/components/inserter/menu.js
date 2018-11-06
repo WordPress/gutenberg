@@ -20,12 +20,18 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
-import { Component, findDOMNode, createRef } from '@wordpress/element';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
+import { Component, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
-import { getCategories, isReusableBlock } from '@wordpress/blocks';
+import {
+	getCategories,
+	isReusableBlock,
+	createBlock,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -36,6 +42,8 @@ import ChildBlocks from './child-blocks';
 import InserterInlineElements from './inline-elements';
 
 const MAX_SUGGESTED_ITEMS = 9;
+
+const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 /**
  * Filters an item list given a search term.
@@ -122,10 +130,12 @@ export class InserterMenu extends Component {
 			hoveredItem: item,
 		} );
 
+		const { showInsertionPoint, hideInsertionPoint } = this.props;
 		if ( item ) {
-			this.props.showInsertionPoint();
+			const { rootClientId, index } = this.props;
+			showInsertionPoint( rootClientId, index );
 		} else {
-			this.props.hideInsertionPoint();
+			hideInsertionPoint();
 		}
 	}
 
@@ -153,7 +163,7 @@ export class InserterMenu extends Component {
 				this.props.setTimeout( () => {
 					// We need a generic way to access the panel's container
 					// eslint-disable-next-line react/no-find-dom-node
-					scrollIntoView( findDOMNode( this.panels[ panel ] ), this.inserterResults.current, {
+					scrollIntoView( this.panels[ panel ], this.inserterResults.current, {
 						alignWithTop: true,
 					} );
 				} );
@@ -218,19 +228,31 @@ export class InserterMenu extends Component {
 		debouncedSpeak( resultsFoundMessage, 'assertive' );
 	}
 
+	onKeyDown( event ) {
+		if ( includes( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ], event.keyCode ) ) {
+			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
+			event.stopPropagation();
+		}
+	}
+
 	render() {
 		const { instanceId, onSelect, rootClientId } = this.props;
 		const { childItems, filterValue, hoveredItem, suggestedItems, reusableItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
 		const isSearching = !! filterValue;
 
-		// Disable reason: The inserter menu is a modal display, not one which
-		// is always visible, and one which already incurs this behavior of
-		// autoFocus via Popover's focusOnMount.
-
-		/* eslint-disable jsx-a11y/no-autofocus */
+		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
+		// is always visible, and one which already incurs this behavior of autoFocus via
+		// Popover's focusOnMount.
+		// Disable reason (no-static-element-interactions): Navigational key-presses within
+		// the menu are prevented from triggering WritingFlow and ObserveTyping interactions.
+		/* eslint-disable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 		return (
-			<div className="editor-inserter__menu">
+			<div
+				className="editor-inserter__menu"
+				onKeyPress={ stopKeyPropagation }
+				onKeyDown={ this.onKeyDown }
+			>
 				<label htmlFor={ `editor-inserter__search-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Search for a block' ) }
 				</label>
@@ -260,7 +282,7 @@ export class InserterMenu extends Component {
 
 					{ !! suggestedItems.length &&
 						<PanelBody
-							title={ __( 'Most Used' ) }
+							title={ _x( 'Most Used', 'blocks' ) }
 							opened={ isPanelOpen( 'suggested' ) }
 							onToggle={ this.onTogglePanel( 'suggested' ) }
 							ref={ this.bindPanel( 'suggested' ) }
@@ -280,6 +302,7 @@ export class InserterMenu extends Component {
 							<PanelBody
 								key={ category.slug }
 								title={ category.title }
+								icon={ category.icon }
 								opened={ isSearching || isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
 								ref={ this.bindPanel( category.slug ) }
@@ -317,28 +340,62 @@ export class InserterMenu extends Component {
 				}
 			</div>
 		);
-		/* eslint-enable jsx-a11y/no-autofocus */
+		/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-noninteractive-element-interactions */
 	}
 }
 
 export default compose(
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getChildBlockNames,
-		} = select( 'core/blocks' );
-		const {
+			getEditedPostAttribute,
+			getSelectedBlock,
+			getInserterItems,
 			getBlockName,
 		} = select( 'core/editor' );
+		const {
+			getChildBlockNames,
+		} = select( 'core/blocks' );
+
 		const rootBlockName = getBlockName( rootClientId );
+
 		return {
+			selectedBlock: getSelectedBlock(),
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
+			title: getEditedPostAttribute( 'title' ),
+			items: getInserterItems( rootClientId ),
+			rootClientId,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		fetchReusableBlocks: dispatch( 'core/editor' ).fetchReusableBlocks,
-		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
-		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
-	} ) ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+			showInsertionPoint,
+			hideInsertionPoint,
+		} = dispatch( 'core/editor' );
+
+		return {
+			fetchReusableBlocks,
+			showInsertionPoint,
+			hideInsertionPoint,
+			onSelect( item ) {
+				const {
+					replaceBlocks,
+					insertBlock,
+				} = dispatch( 'core/editor' );
+				const { selectedBlock, index, rootClientId } = ownProps;
+				const { name, initialAttributes } = item;
+
+				const insertedBlock = createBlock( name, initialAttributes );
+				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+					replaceBlocks( selectedBlock.clientId, insertedBlock );
+				} else {
+					insertBlock( insertedBlock, index, rootClientId );
+				}
+
+				ownProps.onSelect();
+			},
+		};
+	} ),
 	withSpokenMessages,
 	withInstanceId,
 	withSafeTimeout

@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { compact, last } from 'lodash';
+import { compact, last, has } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import {
 	parse,
 	getBlockType,
@@ -13,8 +14,7 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,7 +22,6 @@ import { speak } from '@wordpress/a11y';
 import {
 	setupEditorState,
 	replaceBlocks,
-	createWarningNotice,
 	selectBlock,
 	resetBlocks,
 	setTemplateValidity,
@@ -35,6 +34,7 @@ import {
 	getBlockCount,
 	getPreviousBlockClientId,
 	getSelectedBlock,
+	getSelectedBlockCount,
 	getTemplate,
 	getTemplateLock,
 	isValidTemplate,
@@ -54,7 +54,6 @@ import {
 	trashPost,
 	trashPostFailure,
 	refreshPost,
-	AUTOSAVE_POST_NOTICE_ID,
 } from './effects/posts';
 
 /**
@@ -201,11 +200,20 @@ export default {
 		) );
 	},
 	SETUP_EDITOR( action, store ) {
-		const { post, autosave } = action;
+		const { post, edits } = action;
 		const state = store.getState();
 
-		// Parse content as blocks
-		let blocks = parse( post.content.raw );
+		// In order to ensure maximum of a single parse during setup, edits are
+		// included as part of editor setup action. Assume edited content as
+		// canonical if provided, falling back to post.
+		let content;
+		if ( has( edits, [ 'content' ] ) ) {
+			content = edits.content;
+		} else {
+			content = post.content.raw;
+		}
+
+		let blocks = parse( content );
 
 		// Apply a template for new posts only, if exists.
 		const isNewPost = post.status === 'auto-draft';
@@ -214,34 +222,10 @@ export default {
 			blocks = synchronizeBlocksWithTemplate( blocks, template );
 		}
 
-		// Include auto draft title in edits while not flagging post as dirty
-		const edits = {};
-		if ( isNewPost ) {
-			edits.title = post.title.raw;
-		}
-
-		// Check the auto-save status
-		let autosaveAction;
-		if ( autosave ) {
-			const noticeMessage = __( 'There is an autosave of this post that is more recent than the version below.' );
-			autosaveAction = createWarningNotice(
-				<p>
-					{ noticeMessage }
-					{ ' ' }
-					<a href={ autosave.editLink }>{ __( 'View the autosave' ) }</a>
-				</p>,
-				{
-					id: AUTOSAVE_POST_NOTICE_ID,
-					spokenMessage: noticeMessage,
-				}
-			);
-		}
-
-		const setupAction = setupEditorState( post, blocks, edits );
+		const setupAction = setupEditorState( post, blocks );
 
 		return compact( [
 			setupAction,
-			autosaveAction,
 
 			// TODO: This is temporary, necessary only so long as editor setup
 			// is a separate action from block resetting.
@@ -273,10 +257,6 @@ export default {
 	RECEIVE_REUSABLE_BLOCKS: receiveReusableBlocks,
 	CONVERT_BLOCK_TO_STATIC: convertBlockToStatic,
 	CONVERT_BLOCK_TO_REUSABLE: convertBlockToReusable,
-	CREATE_NOTICE( { notice: { content, spokenMessage } } ) {
-		const message = spokenMessage || content;
-		speak( message, 'assertive' );
-	},
 	REMOVE_BLOCKS: [
 		selectPreviousBlock,
 		ensureDefaultBlock,
@@ -284,4 +264,9 @@ export default {
 	REPLACE_BLOCKS: [
 		ensureDefaultBlock,
 	],
+	MULTI_SELECT: ( action, { getState } ) => {
+		const blockCount = getSelectedBlockCount( getState() );
+
+		speak( sprintf( __( '%s blocks selected.' ), blockCount ), 'assertive' );
+	},
 };

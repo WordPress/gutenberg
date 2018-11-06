@@ -22,7 +22,11 @@ exports[`core/pullquote block edit matches snapshot 1`] = `
               contenteditable="true"
               data-is-placeholder-visible="true"
               role="textbox"
-            />
+            >
+              <br
+                data-mce-bogus="1"
+              />
+            </div>
             <div
               class="editor-rich-text__tinymce"
             >

@@ -1,8 +1,22 @@
-## 5.0.0 (Unreleased)
+## 5.0.2 (2018-11-03)
 
-### Breaking Changes
+### Polish
+
+- Forward `ref` in the `PanelBody` component.
+- Tooltip are no longer removed when Button becomes disabled, it's left to the component rendering the Tooltip.
+- Forward `ref` support in `TabbableContainer` and `NavigableMenu` components.
+
+## 5.0.1 (2018-10-30)
+
+## 5.0.0 (2018-10-29)
+
+### Breaking Change
 
 - `AccessibleSVG` component has been removed. Please use `SVG` instead.
+
+### New Feature
+
+- The `Notice` component accepts an array of action objects via the `actions` prop. Each member object should contain a `label` and either a `url` link string or `onClick` callback function.
 
 ## 4.2.1 (2018-10-22)
 

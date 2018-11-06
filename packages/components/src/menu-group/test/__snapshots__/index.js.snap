@@ -10,13 +10,13 @@ exports[`MenuGroup should match snapshot 1`] = `
   >
     My group
   </div>
-  <NavigableMenu
+  <ForwardRef(NavigableMenu)
     aria-labelledby="components-menu-group-label-1"
     orientation="vertical"
   >
     <p>
       My item
     </p>
-  </NavigableMenu>
+  </ForwardRef(NavigableMenu)>
 </div>
 `;

@@ -114,6 +114,34 @@ Sometimes a block could have aliases that help users discover it while searching
 keywords: [ __( 'image' ), __( 'photo' ), __( 'pics' ) ],
 ```
 
+#### Styles (optional)
+
+* **Type:** `Array`
+
+Block styles can be used to provide alternative styles to block. It works by adding a class name to the block’s wrapper. Using CSS, a theme developer can target the class name for the style variation if it is selected.
+
+```js
+// Register block styles.
+styles: [
+	// Mark style as default.
+	{ 
+		name: 'default', 
+		label: __( 'Rounded' ), 
+		isDefault: true 
+	},
+	{ 
+		name: 'outline', 
+		label: __( 'Outline' ) 
+	},
+	{ 
+		name: 'squared', 
+		label: __( 'Squared' ) 
+	},
+],
+```
+
+Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for existing blocks.
+
 #### Attributes (optional)
 
 * **Type:** `Object`
@@ -130,6 +158,7 @@ attributes: {
 		attribute: 'src',
 	},
 	author: {
+		type: 'string',
 		source: 'html',
 		selector: '.book-author',
 	},
@@ -461,7 +490,7 @@ className: false,
 html: false,
 ```
 
-- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programatically, set `inserter` to `false`.
+- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 // Hide this block from the inserter.

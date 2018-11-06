@@ -7,18 +7,23 @@ import { isFunction } from 'lodash';
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
-import { isValidIcon, normalizeIconObject } from '@wordpress/blocks';
 
 /**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
+ * @param {string} name     Format name.
  * @param {Object} settings Format settings.
  *
  * @return {?WPFormat} The format, if it has been successfully registered;
  *                     otherwise `undefined`.
  */
-export function registerFormatType( settings ) {
+export function registerFormatType( name, settings ) {
+	settings = {
+		name,
+		...settings,
+	};
+
 	if ( typeof settings.name !== 'string' ) {
 		window.console.error(
 			'Format names must be strings.'
@@ -47,6 +52,55 @@ export function registerFormatType( settings ) {
 		return;
 	}
 
+	if (
+		typeof settings.tagName !== 'string' ||
+		settings.tagName === ''
+	) {
+		window.console.error(
+			'Format tag names must be a string.'
+		);
+		return;
+	}
+
+	if (
+		( typeof settings.className !== 'string' || settings.className === '' ) &&
+		settings.className !== null
+	) {
+		window.console.error(
+			'Format class names must be a string, or null to handle bare elements.'
+		);
+		return;
+	}
+
+	if ( ! /^[_a-zA-Z]+[a-zA-Z0-9-]*$/.test( settings.className ) ) {
+		window.console.error(
+			'A class name must begin with a letter, followed by any number of hyphens, letters, or numbers.'
+		);
+		return;
+	}
+
+	if ( settings.className === null ) {
+		const formatTypeForBareElement = select( 'core/rich-text' )
+			.getFormatTypeForBareElement( settings.tagName );
+
+		if ( formatTypeForBareElement ) {
+			window.console.error(
+				`Format "${ formatTypeForBareElement.name }" is already registered to handle bare tag name "${ settings.tagName }".`
+			);
+			return;
+		}
+	} else {
+		const formatTypeForClassName = select( 'core/rich-text' )
+			.getFormatTypeForClassName( settings.className );
+
+		if ( formatTypeForClassName ) {
+			window.console.error(
+				`Format "${ formatTypeForClassName.name }" is already registered to handle class name "${ settings.className }".`
+			);
+			return;
+		}
+	}
+
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
 		window.console.error(
 			'The format "' + settings.name + '" must have a title.'
@@ -64,16 +118,6 @@ export function registerFormatType( settings ) {
 	if ( typeof settings.title !== 'string' ) {
 		window.console.error(
 			'Format titles must be strings.'
-		);
-		return;
-	}
-
-	settings.icon = normalizeIconObject( settings.icon );
-
-	if ( ! isValidIcon( settings.icon.src ) ) {
-		window.console.error(
-			'The icon passed is invalid. ' +
-			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/format-api/#icon-optional'
 		);
 		return;
 	}
