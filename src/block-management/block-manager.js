@@ -186,12 +186,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			return;
 		}
 
-		// TODO: there is a problem with block transformation
-		// let's stop here until we fix the problems with block transformation routine
-		if ( blockA.name !== blockB.name ) {
-			return;
-		}
-
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
 		const blocksWithTheSameType = blockA.name === blockB.name ?
