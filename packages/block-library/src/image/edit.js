@@ -249,7 +249,7 @@ class ImageEdit extends Component {
 
 	getFilename( url ) {
 		if ( url ) {
-			const fileName = url.match( /.*\/(.+?)(\?.*)?$/ );
+			const fileName = url.match( /.*\/(.+?)(?:\?.*)?$/ );
 			if ( fileName ) {
 				return fileName[ 1 ];
 			}
