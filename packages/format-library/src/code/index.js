@@ -10,9 +10,8 @@ const name = 'core/code';
 export const code = {
 	name,
 	title: __( 'Code' ),
-	match: {
-		tagName: 'code',
-	},
+	tagName: 'code',
+	className: null,
 	edit( { value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
 

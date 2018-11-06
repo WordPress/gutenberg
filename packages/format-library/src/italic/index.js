@@ -11,9 +11,8 @@ const name = 'core/italic';
 export const italic = {
 	name,
 	title: __( 'Italic' ),
-	match: {
-		tagName: 'em',
-	},
+	tagName: 'em',
+	className: null,
 	edit( { isActive, value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
 
