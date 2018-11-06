@@ -4,37 +4,44 @@
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
-class WithHoverAreas extends Component {
+class HoverArea extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			hoverArea: null,
 		};
-		this.bindContainer = this.bindContainer.bind( this );
 		this.onMouseLeave = this.onMouseLeave.bind( this );
 		this.onMouseMove = this.onMouseMove.bind( this );
 	}
 
 	componentWillUnmount() {
-		this.toggleListeners( true );
-	}
-
-	bindContainer( ref ) {
-		this.toggleListeners( true );
-
-		if ( ref ) {
-			this.container = ref;
-			this.toggleListeners();
+		if ( this.props.container ) {
+			this.toggleListeners( this.props.container, false );
 		}
 	}
 
-	toggleListeners( shouldRemoveEvents ) {
-		if ( ! this.container ) {
+	componentDidMount() {
+		if ( this.props.container ) {
+			this.toggleListeners( this.props.container );
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.container === this.props.container ) {
 			return;
 		}
-		const method = shouldRemoveEvents ? 'removeEventListener' : 'addEventListener';
-		this.container[ method ]( 'mousemove', this.onMouseMove );
-		this.container[ method ]( 'mouseleave', this.onMouseLeave );
+		if ( prevProps.container ) {
+			this.toggleListeners( prevProps.container, false );
+		}
+		if ( this.props.container ) {
+			this.toggleListeners( this.props.container, true );
+		}
+	}
+
+	toggleListeners( container, shouldListnerToEvents = true ) {
+		const method = shouldListnerToEvents ? 'addEventListener' : 'removeEventListener';
+		container[ method ]( 'mousemove', this.onMouseMove );
+		container[ method ]( 'mouseleave', this.onMouseLeave );
 	}
 
 	onMouseLeave() {
@@ -44,8 +51,8 @@ class WithHoverAreas extends Component {
 	}
 
 	onMouseMove( event ) {
-		const { isRTL } = this.props;
-		const { width, left, right } = this.container.getBoundingClientRect();
+		const { isRTL, container } = this.props;
+		const { width, left, right } = container.getBoundingClientRect();
 
 		let hoverArea = null;
 		if ( ( event.clientX - left ) < width / 3 ) {
@@ -63,7 +70,7 @@ class WithHoverAreas extends Component {
 		const { hoverArea } = this.state;
 		const { children } = this.props;
 
-		return children( { hoverArea, bindContainer: this.bindContainer } );
+		return children( { hoverArea } );
 	}
 }
 
@@ -71,5 +78,5 @@ export default withSelect( ( select ) => {
 	return {
 		isRTL: select( 'core/editor' ).getEditorSettings().isRTL,
 	};
-} )( WithHoverAreas );
+} )( HoverArea );
 

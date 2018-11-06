@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, reduce, size, first, last, over } from 'lodash';
+import { get, reduce, size, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,7 +46,7 @@ import BlockInsertionPoint from './insertion-point';
 import IgnoreNestedEvents from '../ignore-nested-events';
 import InserterWithShortcuts from '../inserter-with-shortcuts';
 import Inserter from '../inserter';
-import WithHoverAreas from './with-hover-areas';
+import HoverArea from './hover-area';
 import { isInsideRootBlock } from '../../utils/dom';
 
 export class BlockListBlock extends Component {
@@ -104,6 +104,11 @@ export class BlockListBlock extends Component {
 	setBlockListRef( node ) {
 		this.wrapperNode = node;
 		this.props.blockRef( node, this.props.clientId );
+
+		// We need to rerender to trigger a rerendering of HoverArea
+		// it depents on this.wrapperNode but we can't keep this.wrapperNode in state
+		// Because we need it to be immediately availeble for `focusableTabbable` to work.
+		this.forceUpdate();
 	}
 
 	bindBlockNode( node ) {
@@ -354,8 +359,8 @@ export class BlockListBlock extends Component {
 
 	render() {
 		return (
-			<WithHoverAreas>
-				{ ( { bindContainer, hoverArea } ) => {
+			<HoverArea container={ this.wrapperNode }>
+				{ ( { hoverArea } ) => {
 					const {
 						block,
 						order,
@@ -468,7 +473,7 @@ export class BlockListBlock extends Component {
 					return (
 						<IgnoreNestedEvents
 							id={ blockElementId }
-							ref={ over( this.setBlockListRef, bindContainer ) }
+							ref={ this.setBlockListRef }
 							onMouseOver={ this.maybeHover }
 							onMouseOverHandled={ this.hideHoverEffects }
 							onMouseLeave={ this.hideHoverEffects }
@@ -570,7 +575,7 @@ export class BlockListBlock extends Component {
 					);
 					/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
 				} }
-			</WithHoverAreas>
+			</HoverArea>
 		);
 	}
 }
