@@ -22,7 +22,7 @@ exports[`PanelColorSettings matches the snapshot 1`] = `
 `;
 
 exports[`PanelColorSettings matches the snapshot 2`] = `
-<[object Object]
+<ForwardRef(PanelBody)
   className="editor-panel-color-settings"
   title={
     <span
@@ -54,7 +54,7 @@ exports[`PanelColorSettings matches the snapshot 2`] = `
     onChange={[Function]}
     value="#111"
   />
-</[object Object]>
+</ForwardRef(PanelBody)>
 `;
 
 exports[`PanelColorSettings should render a color panel if at least one setting specifies some colors to choose 1`] = `
@@ -87,7 +87,7 @@ exports[`PanelColorSettings should render a color panel if at least one setting 
 `;
 
 exports[`PanelColorSettings should render a color panel if at least one setting specifies some colors to choose 2`] = `
-<[object Object]
+<ForwardRef(PanelBody)
   className="editor-panel-color-settings"
   title={
     <span
@@ -129,7 +129,7 @@ exports[`PanelColorSettings should render a color panel if at least one setting 
     onChange={[Function]}
     value="#111"
   />
-</[object Object]>
+</ForwardRef(PanelBody)>
 `;
 
 exports[`PanelColorSettings should render a color panel if at least one setting supports custom colors 1`] = `
@@ -156,7 +156,7 @@ exports[`PanelColorSettings should render a color panel if at least one setting 
 `;
 
 exports[`PanelColorSettings should render a color panel if at least one setting supports custom colors 2`] = `
-<[object Object]
+<ForwardRef(PanelBody)
   className="editor-panel-color-settings"
   title={
     <span
@@ -190,5 +190,5 @@ exports[`PanelColorSettings should render a color panel if at least one setting 
     onChange={[Function]}
     value="#111"
   />
-</[object Object]>
+</ForwardRef(PanelBody)>
 `;
