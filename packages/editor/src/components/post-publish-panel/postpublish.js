@@ -58,10 +58,25 @@ class PostPublishPanelPostpublish extends Component {
 		const { children, isScheduled, post, postType } = this.props;
 		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
+		const isViewable = get( postType, [ 'viewable' ], false );
 
-		const postPublishNonLinkHeader = isScheduled ?
+		let postPublishNonLinkHeader = isScheduled ?
 			<Fragment>{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.</Fragment> :
 			__( 'is now live.' );
+
+		if ( ! isViewable ) {
+			postPublishNonLinkHeader = isScheduled ?
+				<Fragment>{ __( 'is now scheduled. It will be published on' ) } <PostScheduleLabel />.</Fragment> :
+				__( 'is now published.' );
+
+			return (
+				<div className="post-publish-panel__postpublish">
+					<PanelBody className="post-publish-panel__postpublish-header">
+						{ post.title || __( '(no title)' ) } { postPublishNonLinkHeader }
+					</PanelBody>
+				</div>
+			);
+		}
 
 		return (
 			<div className="post-publish-panel__postpublish">
