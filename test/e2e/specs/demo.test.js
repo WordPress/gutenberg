@@ -38,4 +38,8 @@ describe( 'new editor state', () => {
 		} );
 		expect( isDirty ).toBeFalsy();
 	} );
+
+	it( 'should be immediately saveable', async () => {
+		await page.$( 'button.editor-post-save-draft' );
+	} );
 } );
