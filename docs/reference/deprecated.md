@@ -11,6 +11,7 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - `wp.data` `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
 - `wp.data` `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
 - `wp.data` `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
+- `moment` has been removed from the public API for the date module.
 
 ## 4.3.0
 

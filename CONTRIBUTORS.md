@@ -114,3 +114,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @tofumatt | @lonelyvegan |
 | @LukePettway | @luke_pettway |
 | @pratikthink | @pratikthink |
+| @amdrew | @sumobi |
