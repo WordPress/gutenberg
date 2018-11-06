@@ -183,12 +183,9 @@ export class RichText extends Component {
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
 		this.lastContent = contentWithoutRootTag;
-		// Set a time to call the onChange prop if nothing changes in the next second
-		this.currentTimer = setTimeout( function() {
-			this.props.onChange( {
-				content: this.lastContent,
-			} );
-		}.bind( this ), 1000 );
+		this.props.onChange( {
+			content: this.lastContent,
+		} );
 	}
 
 	/**
