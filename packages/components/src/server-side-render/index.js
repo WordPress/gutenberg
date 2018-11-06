@@ -34,12 +34,12 @@ export class ServerSideRender extends Component {
 		this.state = {
 			response: null,
 		};
-		this.fetch = debounce( this.fetch, 500 );
 	}
 
 	componentDidMount() {
 		this.isStillMounted = true;
 		this.fetch( this.props );
+		this.fetch = debounce( this.fetch, 500 );
 	}
 
 	componentWillUnmount() {
