@@ -1016,3 +1016,6 @@ RichTextContainer.Content.defaultProps = {
 };
 
 export default RichTextContainer;
+export { RichTextShortcut } from './shortcut';
+export { RichTextToolbarButton } from './toolbar-button';
+export { RichTextInserterListItem } from './inserter-list-item';

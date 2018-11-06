@@ -11,6 +11,7 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
+import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -64,31 +65,31 @@ export const link = {
 		}
 
 		render() {
-			const { isActive, activeAttributes, value, onChange, ToolbarButton, Shortcut } = this.props;
+			const { isActive, activeAttributes, value, onChange } = this.props;
 
 			return (
 				<Fragment>
-					<Shortcut
+					<RichTextShortcut
 						type="access"
 						character="a"
 						onUse={ this.addLink }
 					/>
-					<Shortcut
+					<RichTextShortcut
 						type="access"
 						character="s"
 						onUse={ this.onRemoveFormat }
 					/>
-					<Shortcut
+					<RichTextShortcut
 						type="primary"
 						character="k"
 						onUse={ this.addLink }
 					/>
-					<Shortcut
+					<RichTextShortcut
 						type="primaryShift"
 						character="k"
 						onUse={ this.onRemoveFormat }
 					/>
-					{ isActive && <ToolbarButton
+					{ isActive && <RichTextToolbarButton
 						name="link"
 						icon="editor-unlink"
 						title={ __( 'Unlink' ) }
@@ -97,7 +98,7 @@ export const link = {
 						shortcutType="primaryShift"
 						shortcutCharacter="k"
 					/> }
-					{ ! isActive && <ToolbarButton
+					{ ! isActive && <RichTextToolbarButton
 						name="link"
 						icon="admin-links"
 						title={ __( 'Link' ) }
