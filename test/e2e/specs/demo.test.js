@@ -12,12 +12,12 @@ const MOCK_VIMEO_RESPONSE = {
 	version: '1.0',
 };
 
-const couldNotBePreviewed = ( obj ) => {
-	return 'Embed Handler' === obj.provider_name;
+const couldNotBePreviewed = ( embedObject ) => {
+	return 'Embed Handler' === embedObject.provider_name;
 };
 
-const stripIframeFromEmbed = ( obj ) => {
-	return { ...obj, html: obj.html.replace( /src=[^\s]+/, '' ) };
+const stripIframeFromEmbed = ( embedObject ) => {
+	return { ...embedObject, html: embedObject.html.replace( /src=[^\s]+/, '' ) };
 };
 
 describe( 'new editor state', () => {

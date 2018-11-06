@@ -517,7 +517,11 @@ export function matchURL( substring ) {
 export function parameterEquals( parameterName, value ) {
 	return ( request ) => {
 		const url = request.url();
-		return value === decodeURIComponent( new RegExp( '.*' + parameterName + '=([^&]+).*' ).exec( url )[ 1 ] );
+		const match = new RegExp( `.*${ parameterName }=([^&]+).*` ).exec( url );
+		if ( ! match ) {
+			return false;
+		}
+		return value === decodeURIComponent( match[ 1 ] );
 	};
 }
 
@@ -556,11 +560,11 @@ export function mockOrTransform( mockCheck, mock, responseObjectTransform = ( ob
 				body: request.postData(),
 			}
 		);
-		const obj = await response.json();
-		if ( mockCheck( obj ) ) {
+		const responseObject = await response.json();
+		if ( mockCheck( responseObject ) ) {
 			request.respond( getJSONResponse( mock ) );
 		} else {
-			request.respond( getJSONResponse( responseObjectTransform( obj ) ) );
+			request.respond( getJSONResponse( responseObjectTransform( responseObject ) ) );
 		}
 	};
 }
