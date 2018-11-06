@@ -39,34 +39,32 @@ function Header( {
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
-			{ ! isPublishSidebarOpened && (
-				<div className="edit-post-header__settings">
-					<PostSavedState
-						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
+			<div className="edit-post-header__settings">
+				{ ! isPublishSidebarOpened && ( <PostSavedState
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/> ) }
+				<PostPreviewButton />
+				<PostPublishButtonOrToggle
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/>
+				<div>
+					<IconButton
+						icon="admin-generic"
+						label={ __( 'Settings' ) }
+						onClick={ toggleGeneralSidebar }
+						isToggled={ isEditorSidebarOpened }
+						aria-expanded={ isEditorSidebarOpened }
+						shortcut={ shortcuts.toggleSidebar }
 					/>
-					<PostPreviewButton />
-					<PostPublishButtonOrToggle
-						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
-					/>
-					<div>
-						<IconButton
-							icon="admin-generic"
-							label={ __( 'Settings' ) }
-							onClick={ toggleGeneralSidebar }
-							isToggled={ isEditorSidebarOpened }
-							aria-expanded={ isEditorSidebarOpened }
-							shortcut={ shortcuts.toggleSidebar }
-						/>
-						<DotTip tipId="core/editor.settings">
-							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
-						</DotTip>
-					</div>
-					<PinnedPlugins.Slot />
-					<MoreMenu />
+					<DotTip tipId="core/editor.settings">
+						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
+					</DotTip>
 				</div>
-			) }
+				<PinnedPlugins.Slot />
+				<MoreMenu />
+			</div>
 		</div>
 	);
 }
