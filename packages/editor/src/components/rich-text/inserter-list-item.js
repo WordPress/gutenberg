@@ -17,7 +17,7 @@ function isResult( keywords, filterValue ) {
 	);
 }
 
-export const RichTextInserterListItem = withSelect( ( select, { name } ) => ( {
+export const RichTextInserterItem = withSelect( ( select, { name } ) => ( {
 	formatType: select( 'core/rich-text' ).getFormatType( name ),
 } ) )( ( props ) => {
 	return (

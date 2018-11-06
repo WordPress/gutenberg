@@ -23,7 +23,7 @@ export {
 	default as RichText,
 	RichTextShortcut,
 	RichTextToolbarButton,
-	RichTextInserterListItem,
+	RichTextInserterItem,
 } from './rich-text';
 export { default as ServerSideRender } from './server-side-render';
 export { default as MediaPlaceholder } from './media-placeholder';
