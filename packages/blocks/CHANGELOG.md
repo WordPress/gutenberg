@@ -3,6 +3,7 @@
 ### New feature
 
 - `getBlockAttributes`, `getBlockTransforms`, `getSaveContent`, `getSaveElement` and `isValidBlockContent` methods can now take also block's name as the first param ([#11490](https://github.com/WordPress/gutenberg/pull/11490)). Passing a block's type object continues to work as before.
+- `registerBlockStyles` and `unregisterBlockStyles` can be triggered at any moment (before or after block registration).
 
 ## 5.2.0 (2018-11-09)
 
@@ -16,7 +17,7 @@
 
 ## 5.1.0 (2018-10-30)
 
-### New feature
+### New features
 
 - `isValidBlockContent` function has been added ([#10891](https://github.com/WordPress/gutenberg/pull/10891)).
 
