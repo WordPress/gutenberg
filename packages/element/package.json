@@ -24,8 +24,8 @@
 		"@babel/runtime": "^7.0.0",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.10",
-		"react": "^16.4.1",
-		"react-dom": "^16.4.1"
+		"react": "^16.6.0",
+		"react-dom": "^16.6.0"
 	},
 	"devDependencies": {
 		"enzyme": "^3.3.0"

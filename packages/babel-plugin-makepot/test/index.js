@@ -9,7 +9,7 @@ import traverse from '@babel/traverse';
  */
 import babelPlugin from '../src';
 
-describe( 'babel-plugin', () => {
+describe( 'Babel plugin makepot', () => {
 	const {
 		getNodeAsString,
 		getTranslatorComment,
@@ -46,7 +46,10 @@ describe( 'babel-plugin', () => {
 	describe( '.getTranslatorComment()', () => {
 		function getCommentFromString( string ) {
 			let comment;
-			traverse( transformSync( string, { ast: true } ).ast, {
+			traverse( transformSync( string, {
+				ast: true,
+				configFile: false,
+			} ).ast, {
 				CallExpression( path ) {
 					comment = getTranslatorComment( path );
 				},
@@ -95,7 +98,10 @@ describe( 'babel-plugin', () => {
 	describe( '.getNodeAsString()', () => {
 		function getNodeAsStringFromArgument( source ) {
 			let string;
-			traverse( transformSync( source, { ast: true } ).ast, {
+			traverse( transformSync( source, {
+				ast: true,
+				configFile: false,
+			} ).ast, {
 				CallExpression( path ) {
 					string = getNodeAsString( path.node.arguments[ 0 ] );
 				},

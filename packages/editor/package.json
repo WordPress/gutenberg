@@ -62,8 +62,8 @@
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",
 		"enzyme": "^3.3.0",
-		"react-dom": "^16.4.1",
-		"react-test-renderer": "^16.4.1"
+		"react-dom": "^16.6.0",
+		"react-test-renderer": "^16.6.0"
 	},
 	"publishConfig": {
 		"access": "public"

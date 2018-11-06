@@ -1,18 +1,7 @@
 module.exports = function( api ) {
-	api.cache( true );
+	api.cache.never();
 
 	return {
-		presets: [ '@wordpress/babel-preset-default' ],
-		plugins: [
-			[
-				'@wordpress/babel-plugin-import-jsx-pragma',
-				{
-					scopeVariable: 'createElement',
-					source: '@wordpress/element',
-					isDefault: false,
-				},
-			],
-		],
 		env: {
 			production: {
 				plugins: [
@@ -25,5 +14,37 @@ module.exports = function( api ) {
 				],
 			},
 		},
+		overrides: [
+			{
+				include: [
+					'./index.js',
+					'./node_modules/',
+					'./packages/mobile/',
+				],
+				presets: [
+					'module:metro-react-native-babel-preset',
+				],
+			},
+			{
+				exclude: [
+					'./index.js',
+					'./node_modules/',
+					'./packages/mobile/',
+				],
+				presets: [
+					'@wordpress/babel-preset-default',
+				],
+				plugins: [
+					[
+						'@wordpress/babel-plugin-import-jsx-pragma',
+						{
+							scopeVariable: 'createElement',
+							source: '@wordpress/element',
+							isDefault: false,
+						},
+					],
+				],
+			},
+		],
 	};
 };

@@ -939,11 +939,11 @@ function gutenberg_register_vendor_scripts() {
 
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@16.4.1/umd/react' . $react_suffix . '.js'
+		'https://unpkg.com/react@16.6.0/umd/react' . $react_suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
-		'https://unpkg.com/react-dom@16.4.1/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.6.0/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';

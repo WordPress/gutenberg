@@ -41,6 +41,7 @@
 		"@wordpress/i18n": "file:packages/i18n",
 		"@wordpress/is-shallow-equal": "file:packages/is-shallow-equal",
 		"@wordpress/keycodes": "file:packages/keycodes",
+		"@wordpress/mobile": "file:packages/mobile",
 		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
@@ -90,6 +91,7 @@
 		"lerna": "3.0.0-rc.0",
 		"lint-staged": "7.2.0",
 		"lodash": "4.17.10",
+		"metro-react-native-babel-preset": "0.49.0",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.9.2",
 		"path-type": "3.0.0",
@@ -97,7 +99,7 @@
 		"phpegjs": "1.0.0-beta7",
 		"postcss-color-function": "4.0.1",
 		"puppeteer": "1.6.1",
-		"react-test-renderer": "16.4.1",
+		"react-test-renderer": "16.6.0",
 		"rimraf": "2.6.2",
 		"rtlcss": "2.4.0",
 		"sass-loader": "6.0.7",
@@ -135,6 +137,9 @@
 				[
 					{
 						"access": "public"
+					},
+					{
+						"access": "private"
 					}
 				]
 			]
@@ -153,6 +158,9 @@
 		"ci": "concurrently \"npm run lint\" \"npm run test-unit:ci\" \"npm run check-local-changes\"",
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
+		"dev:start": "node node_modules/react-native/local-cli/cli.js start --reset-cache",
+		"dev:android": "node node_modules/react-native/local-cli/cli.js run-android",
+		"dev:ios": "node node_modules/react-native/local-cli/cli.js run-ios",
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node docs/tool",
 		"fixtures:clean": "rimraf \"test/integration/full-content/fixtures/*.+(json|serialized.html)\"",
@@ -167,7 +175,7 @@
 		"lint-css": "stylelint '**/*.scss'",
 		"lint-css:fix": "stylelint '**/*.scss' --fix",
 		"package-plugin": "./bin/build-plugin-zip.sh",
-		"postinstall": "npm run check-licenses && npm run build:packages",
+		"postinstall": "npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"precommit": "lint-staged",
 		"publish:check": "npm run build:packages && lerna updated",
