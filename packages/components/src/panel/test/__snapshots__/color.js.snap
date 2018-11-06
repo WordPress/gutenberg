@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`PanelColor should match snapshot when title is provided 1`] = `
-<[object Object]
+<ForwardRef(PanelBody)
   title={
     Array [
       <span

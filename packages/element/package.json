@@ -28,7 +28,7 @@
 		"react-dom": "^16.4.1"
 	},
 	"devDependencies": {
-		"enzyme": "^3.3.0"
+		"enzyme": "^3.7.0"
 	},
 	"publishConfig": {
 		"access": "public"
