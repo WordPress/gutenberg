@@ -159,7 +159,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	mergeBlocks( clientId: string, forward: boolean ) {
 		// find currently focused block
 		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
-		if ( focusedItemIndex == -1 ) {
+		if ( focusedItemIndex === -1 ) {
 			// do nothing if it's not found.
 			return;
 		}
@@ -233,7 +233,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// Change the data source
 		const index = this.getDataSourceIndexFromClientId( clientId );
-		if ( index == -1 ) {
+		if ( index === -1 ) {
 			// do nothing if it's not found.
 			return;
 		}
