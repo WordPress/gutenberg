@@ -23,7 +23,7 @@ import {
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { isURL } from '@wordpress/url';
 import {
@@ -306,7 +306,7 @@ export class RichText extends Component {
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
-			const content = rawHandler( {
+			const content = pasteHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
@@ -358,7 +358,7 @@ export class RichText extends Component {
 			mode = 'AUTO';
 		}
 
-		const content = rawHandler( {
+		const content = pasteHandler( {
 			HTML: html,
 			plainText,
 			mode,
