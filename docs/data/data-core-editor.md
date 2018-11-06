@@ -885,7 +885,7 @@ True if multi-selecting, false if not.
 
 ### isSelectionEnabled
 
-Whether is selection disable or not.
+Selector that returns if multi-selection is enabled or not.
 
 *Parameters*
 
@@ -893,7 +893,7 @@ Whether is selection disable or not.
 
 *Returns*
 
-True if multi is disable, false if not.
+True if it should be possible to multi-select blocks, false if multi-selection is disabled.
 
 ### getBlockMode
 
