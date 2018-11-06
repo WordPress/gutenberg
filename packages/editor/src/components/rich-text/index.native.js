@@ -176,10 +176,6 @@ export class RichText extends Component {
 	 */
 
 	onChange( event ) {
-		// If we had a timer set to propagate a change, let's cancel it, because the user meanwhile typed something extra
-		if ( !! this.currentTimer ) {
-			clearTimeout( this.currentTimer );
-		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
 		this.lastContent = contentWithoutRootTag;
