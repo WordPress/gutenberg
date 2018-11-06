@@ -7,7 +7,7 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder } from '@wordpress/editor';
+import { MediaPlaceholder, RichText } from '@wordpress/editor';
 
 export default function ImageEdit( props ) {
 	const { attributes, isSelected, setAttributes } = props;
@@ -41,7 +41,7 @@ export default function ImageEdit( props ) {
 				resizeMethod="scale"
 				source={ { uri: url } }
 			/>
-			{ ( caption.length > 0 || isSelected ) && (
+			{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 				<View style={ { padding: 12, flex: 1 } }>
 					<TextInput
 						style={ { textAlign: 'center' } }
