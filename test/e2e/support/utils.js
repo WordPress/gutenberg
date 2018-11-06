@@ -96,8 +96,8 @@ async function login( username = WP_USERNAME, password = WP_PASSWORD ) {
 }
 
 /**
- * Switches the logged in user to the admin user, if the user
- * running the test is not already the admin user.
+ * Switches the current user to the admin user (if the user
+ * running the test is not already the admin user).
  */
 export async function switchToAdminUser() {
 	if ( WP_USERNAME === WP_ADMIN_USER.username ) {
@@ -108,8 +108,8 @@ export async function switchToAdminUser() {
 }
 
 /**
- * Switches the logged in user to the user the tests are running as,
- * if we're not already that user.
+ * Switches the current user to whichever user we should be
+ * running the tests as (if we're not already that user).
  */
 export async function switchToTestUser() {
 	if ( WP_USERNAME === WP_ADMIN_USER.username ) {
