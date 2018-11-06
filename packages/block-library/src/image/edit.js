@@ -7,8 +7,8 @@ import {
 	isEmpty,
 	map,
 	pick,
-	startCase,
 	round,
+	keyBy,
 } from 'lodash';
 
 /**
@@ -309,15 +309,15 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { align: nextAlign } );
 	}
 
-	updateImageURL( url, availableSizes ) {
+	updateImageURL( url, displayableSizes ) {
 		this.resetWidthHeight();
 		let imageData;
 		let size;
 
 		// Find the image data.
-		for ( size in availableSizes ) {
-			if ( availableSizes[ size ].source_url === url ) {
-				imageData = availableSizes[ size ];
+		for ( size in displayableSizes ) {
+			if ( displayableSizes[ size ].source_url === url ) {
+				imageData = displayableSizes[ size ];
 				break;
 			}
 		}
@@ -462,28 +462,39 @@ class ImageEdit extends Component {
 		};
 	}
 
-	getAvailableSizes() {
+	getDisplayableSizes() {
 		const sizes = get( this.props.image, [ 'media_details', 'sizes' ], {} );
 
 		if ( ! sizes.full ) {
 			return;
 		}
 
-		let name;
+		const imageSizeLabels = keyBy( this.props.availableImageSizes, 'slug' );
 		const fullWidth = sizes.full.width;
 		const fullHeight = sizes.full.height;
-		const showSizes = {
-			default: sizes.large || sizes.full,
-			// Always show the thumbnail size.
-			thumbnail: sizes.thumbnail,
-		};
+		const defaultLabel = __( 'Default' );
+		const showSizes = {};
 
-		for ( name in sizes ) {
-			const size = sizes[ name ];
+		if ( sizes.large && imageSizeLabels.large ) {
+			showSizes[ defaultLabel ] = sizes.large;
+		} else if ( sizes.full && imageSizeLabels.full ) {
+			showSizes[ defaultLabel ] = sizes.full;
+		} else {
+			return;
+		}
+
+		// Always show the thumbnail size if "displayable".
+		if ( sizes.thumbnail && imageSizeLabels.thumbnail ) {
+			showSizes[ imageSizeLabels.thumbnail.name ] = sizes.thumbnail;
+		}
+
+		let slug;
+		for ( slug in sizes ) {
+			const size = sizes[ slug ];
 
 			// Add custom sizes that do not match the ratio (they won't be in the srcset).
-			if ( ! this.imageMatchesRatio( fullWidth, fullHeight, size.width, size.height ) ) {
-				showSizes[ name ] = size;
+			if ( ! this.imageMatchesRatio( fullWidth, fullHeight, size.width, size.height ) && imageSizeLabels[ slug ] ) {
+				showSizes[ imageSizeLabels[ slug ].name ] = size;
 			}
 		}
 
@@ -503,7 +514,18 @@ class ImageEdit extends Component {
 
 	render() {
 		const { isEditing } = this.state;
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
+		const {
+			attributes,
+			setAttributes,
+			isLargeViewport,
+			isSelected,
+			className,
+			maxWidth,
+			noticeOperations,
+			noticeUI,
+			toggleSelection,
+			isRTL,
+		} = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, srcSet, width, height, userWidth, userHeight, linkTarget } = attributes;
 		const isExternal = isExternalImage( id, url );
 		const sizesAttr = attributes.sizes;
@@ -579,7 +601,7 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const availableSizes = this.getAvailableSizes();
+		const displayableSizes = this.getDisplayableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
@@ -592,16 +614,16 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 					/>
-					{ ! isEmpty( availableSizes ) && (
+					{ ! isEmpty( displayableSizes ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
-							options={ map( availableSizes, ( size, name ) => ( {
+							options={ map( displayableSizes, ( size, name ) => ( {
 								value: size.source_url,
-								label: startCase( name ),
+								label: name,
 							} ) ) }
 							onChange={ ( src ) => {
-								this.updateImageURL( src, availableSizes );
+								this.updateImageURL( src, displayableSizes );
 							} }
 						/>
 					) }
@@ -859,12 +881,13 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL } = getEditorSettings();
+		const { maxWidth, isRTL, availableImageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
+			availableImageSizes,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

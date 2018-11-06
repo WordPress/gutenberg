@@ -182,7 +182,7 @@ module.exports = {
 			} ),
 		} ],
 		// TODO: removeme, maybe? Without this linting fails horribly on Windows, many thousands of false positives :)
-		// 'linebreak-style': 'off',
+		 'linebreak-style': 'off',
 	},
 	overrides: [
 		{

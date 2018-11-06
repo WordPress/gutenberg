@@ -3,6 +3,7 @@
 ### Polish
 
 - Remove `findDOMNode` usage from the `Inserter` component.
+- Remove `findDOMNode` usage from the `Block` component.
 
 ## 6.1.0 (2018-10-30)
 

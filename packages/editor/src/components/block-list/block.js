@@ -7,7 +7,7 @@ import { get, reduce, size, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, findDOMNode, Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
@@ -102,24 +102,12 @@ export class BlockListBlock extends Component {
 	}
 
 	setBlockListRef( node ) {
-		// Disable reason: The root return element uses a component to manage
-		// event nesting, but the parent block list layout needs the raw DOM
-		// node to track multi-selection.
-		//
-		// eslint-disable-next-line react/no-find-dom-node
-		node = findDOMNode( node );
-
 		this.wrapperNode = node;
-
 		this.props.blockRef( node, this.props.clientId );
 	}
 
 	bindBlockNode( node ) {
-		// Disable reason: The block element uses a component to manage event
-		// nesting, but we rely on a raw DOM node for focusing.
-		//
-		// eslint-disable-next-line react/no-find-dom-node
-		this.node = findDOMNode( node );
+		this.node = node;
 	}
 
 	/**
