@@ -61,7 +61,7 @@ describe( 'create', () => {
 		formatName,
 		formatType,
 		html,
-		value,
+		value: expectedValue,
 	} ) => {
 		it( description, () => {
 			if ( formatName ) {
@@ -74,7 +74,7 @@ describe( 'create', () => {
 				unregisterFormatType( formatName );
 			}
 
-			expect( result ).toEqual( value );
+			expect( result ).toEqual( expectedValue );
 		} );
 	} );
 

@@ -40,6 +40,7 @@ function toFormat( { type, attributes } ) {
 		formatType = select( 'core/rich-text' ).getFormatTypeForClassName( attributes.class );
 
 		if ( formatType ) {
+			// Preserve any additional classes.
 			attributes.class = ` ${ attributes.class } `.replace( ` ${ formatType.className } `, ' ' ).trim();
 
 			if ( ! attributes.class ) {

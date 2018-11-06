@@ -16,7 +16,7 @@ function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 		return { type, attributes, object };
 	}
 
-	const elementAttributes = unregisteredAttributes ? { ...unregisteredAttributes } : {};
+	const elementAttributes = { ...unregisteredAttributes };
 
 	for ( const name in attributes ) {
 		const key = formatType.attributes[ name ];
