@@ -15,7 +15,6 @@ import {
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
-import { moment } from '@wordpress/date';
 import { RawHTML } from '@wordpress/element';
 
 /**
@@ -37,6 +36,7 @@ const {
 	getCurrentPostRevisionsCount,
 	getCurrentPostType,
 	getPostEdits,
+	getReferenceByDistinctEdits,
 	getEditedPostVisibility,
 	isCurrentPostPending,
 	isCurrentPostPublished,
@@ -609,6 +609,21 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
+		} );
+	} );
+
+	describe( 'getReferenceByDistinctEdits', () => {
+		it( 'should return referentially equal values across unchanging state', () => {
+			const state = { editor: {} };
+
+			expect( getReferenceByDistinctEdits( state ) ).toBe( getReferenceByDistinctEdits( state ) );
+		} );
+
+		it( 'should return referentially unequal values across changing state', () => {
+			const beforeState = { editor: {} };
+			const afterState = { editor: {} };
+
+			expect( getReferenceByDistinctEdits( beforeState ) ).not.toBe( getReferenceByDistinctEdits( afterState ) );
 		} );
 	} );
 
@@ -1497,10 +1512,12 @@ describe( 'selectors', () => {
 
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
+			const time = Date.now() + ( 1000 * 3600 * 24 * 7 ); // 7 days in the future
+			const date = new Date( time );
 			const state = {
 				editor: {
 					present: {
-						edits: { date: moment().add( 7, 'days' ).format( '' ) },
+						edits: { date: date.toUTCString() },
 					},
 				},
 			};

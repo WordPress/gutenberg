@@ -32,7 +32,7 @@ import {
 	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { moment } from '@wordpress/date';
+import { isInTheFuture } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 import { select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -54,6 +54,7 @@ export const INSERTER_UTILITY_NONE = 0;
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
+const ONE_MINUTE_IN_MS = 60 * 1000;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -197,6 +198,29 @@ export function getPostEdits( state ) {
 }
 
 /**
+ * Returns a new reference when edited values have changed. This is useful in
+ * inferring where an edit has been made between states by comparison of the
+ * return values using strict equality.
+ *
+ * @example
+ *
+ * ```
+ * const hasEditOccurred = (
+ *    getReferenceByDistinctEdits( beforeState ) !==
+ *    getReferenceByDistinctEdits( afterState )
+ * );
+ * ```
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {*} A value whose reference will change only when an edit occurs.
+ */
+export const getReferenceByDistinctEdits = createSelector(
+	() => [],
+	( state ) => [ state.editor ],
+);
+
+/**
  * Returns an attribute value of the saved post.
  *
  * @param {Object} state         Global application state.
@@ -300,7 +324,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+		( post.status === 'future' && ! isInTheFuture( new Date( Number( new Date( post.date ) ) + ONE_MINUTE_IN_MS ) ) );
 }
 
 /**
@@ -458,11 +482,11 @@ export function hasAutosave( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = moment( getEditedPostAttribute( state, 'date' ) );
-	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = moment().add( 1, 'minute' );
+	const date = getEditedPostAttribute( state, 'date' );
+	// Offset the date by one minute (network latency)
+	const checkedDate = new Date( Number( new Date( date ) ) + ONE_MINUTE_IN_MS );
 
-	return date.isAfter( now );
+	return isInTheFuture( checkedDate );
 }
 
 /**

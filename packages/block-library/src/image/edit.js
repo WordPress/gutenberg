@@ -100,6 +100,7 @@ class ImageEdit extends Component {
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -139,6 +140,14 @@ class ImageEdit extends Component {
 				captionFocused: false,
 			} );
 		}
+	}
+
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.createErrorNotice( message );
+		this.setState( {
+			isEditing: true,
+		} );
 	}
 
 	onSelectImage( media ) {
@@ -274,7 +283,6 @@ class ImageEdit extends Component {
 			isSelected,
 			className,
 			maxWidth,
-			noticeOperations,
 			noticeUI,
 			toggleSelection,
 			isRTL,
@@ -339,7 +347,7 @@ class ImageEdit extends Component {
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
 						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
+						onError={ this.onUploadError }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ { id, src } }

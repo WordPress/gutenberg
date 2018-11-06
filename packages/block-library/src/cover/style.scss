@@ -55,6 +55,13 @@
 
 	&.has-parallax {
 		background-attachment: fixed;
+
+		// Mobile Safari does not support fixed background attachment properly.
+		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
+		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
+		@supports (-webkit-overflow-scrolling: touch) {
+			background-attachment: scroll;
+		}
 	}
 
 	&.has-background-dim::before {

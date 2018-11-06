@@ -1,4 +1,4 @@
-## 3.0.0 (Unreleased)
+## 3.0.0 (2018-11-03)
 
 ### Breaking Change
 
