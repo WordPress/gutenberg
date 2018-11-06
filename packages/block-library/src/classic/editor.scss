@@ -204,10 +204,6 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 	position: static;
 }
 
-.block-library-classic__toolbar.hide-advanced-toolbars .mce-toolbar-grp .mce-toolbar:not(:first-child) {
-	display: none;
-}
-
 // We don't want the ellipsis to overlap the classic toolbar, which it will due to position sticky.
 // So we move it to the right, and make room for it.
 @include break-small() {
