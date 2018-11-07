@@ -62,6 +62,7 @@ describe( 'templates', () => {
 		const STANDARD_FORMAT_VALUE = '0';
 
 		async function setPostFormat( format ) {
+			// To set the post format, we need to be the admin user.
 			await switchToAdminUser();
 			await visitAdmin( 'options-writing.php' );
 			await page.select( '#default_post_format', format );

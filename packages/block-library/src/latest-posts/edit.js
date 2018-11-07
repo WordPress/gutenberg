@@ -56,6 +56,12 @@ class LatestPostsEdit extends Component {
 					this.setState( { categoriesList } );
 				}
 			}
+		).catch(
+			() => {
+				if ( this.isStillMounted ) {
+					this.setState( { categoriesList: [] } );
+				}
+			}
 		);
 	}
 
