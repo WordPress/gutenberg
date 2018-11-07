@@ -66,15 +66,18 @@ export class PostPublishButton extends Component {
 			onSave();
 		};
 
+		const buttonProps = {
+			className: 'editor-post-publish-button',
+			disabled: isButtonDisabled,
+			isBusy: isSaving && isPublished,
+			isLarge: true,
+			isPrimary: true,
+			onClick,
+		};
 		return (
 			<Button
 				ref={ this.buttonNode }
-				className="editor-post-publish-button"
-				isPrimary
-				isLarge
-				onClick={ onClick }
-				disabled={ isButtonDisabled }
-				isBusy={ isSaving && isPublished }
+				{ ...buttonProps }
 			>
 				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
 			</Button>
