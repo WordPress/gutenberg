@@ -49,11 +49,7 @@ class IconButton extends Component {
 
 		if ( showTooltip ) {
 			element = (
-				<Tooltip
-					text={ tooltipText }
-					shortcut={ shortcut }
-					position={ labelPosition }
-				>
+				<Tooltip text={ tooltipText } shortcut={ shortcut } position={ labelPosition }>
 					{ element }
 				</Tooltip>
 			);
