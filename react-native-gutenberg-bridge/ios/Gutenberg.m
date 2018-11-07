@@ -6,7 +6,7 @@
 #import <React/RCTRootView.h>
 #import <React/RCTBundleURLProvider.h>
 
-@interface Gutenberg ()<RCTBridgeDelegate, GutenbergBridgeDelegate>
+@interface Gutenberg ()<RCTBridgeDelegate>
 @property (nonatomic, strong, readonly) RCTBridge *bridge;
 @property (nonatomic, strong) RNReactNativeGutenbergBridge* gutenbergBridgeModule;
 @property (nonatomic, strong) UIView* gutenbergRootView;
@@ -28,6 +28,7 @@
 {
     self = [super init];
     if (self) {
+        _gutenbergBridgeModule = [RNReactNativeGutenbergBridge new];
         _bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:nil];
     }
     return self;
@@ -37,7 +38,6 @@
 {
     if (!self.gutenbergRootView) {
         self.gutenbergRootView = [[RCTRootView alloc] initWithBridge:_bridge moduleName:@"gutenberg" initialProperties:props];
-        self.gutenbergBridgeModule.delegate = self;
     }
     return self.gutenbergRootView;
 }
@@ -51,7 +51,6 @@
 
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
-    _gutenbergBridgeModule = [RNReactNativeGutenbergBridge new];
     return @[_gutenbergBridgeModule];
 }
 
