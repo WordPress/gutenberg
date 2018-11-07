@@ -98,7 +98,7 @@ describe( 'templates', () => {
 		} );
 
 		it( 'should not populate new page with default block for format', async () => {
-			// This test always needs to run as the admin user.
+			// This test always needs to run as the admin user, because other roles can't create pages.
 			// It can't be skipped, because then it failed because of not testing the snapshot.
 			await switchToAdminUser();
 			await newPost( { postType: 'page' } );
