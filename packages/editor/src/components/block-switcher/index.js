@@ -58,7 +58,20 @@ export class BlockSwitcher extends Component {
 		const hasStyles = blocks.length === 1 && get( blockType, [ 'styles' ], [] ).length !== 0;
 
 		if ( ! hasStyles && ! possibleBlockTransformations.length ) {
-			return null;
+			if ( blocks.length > 1 ) {
+				return null;
+			}
+			return (
+				<Toolbar>
+					<IconButton
+						disabled
+						className="editor-block-switcher__no-switcher-icon"
+						label={ __( 'Block icon' ) }
+					>
+						<BlockIcon icon={ blockType.icon } showColors />
+					</IconButton>
+				</Toolbar>
+			);
 		}
 
 		return (
