@@ -8,6 +8,7 @@ import { select } from '@wordpress/data';
  */
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
+import { getFormatType } from '../get-format-type';
 
 describe( 'registerFormatType', () => {
 	beforeAll( () => {
@@ -36,8 +37,9 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should error without arguments', () => {
-		registerFormatType();
+		const format = registerFormatType();
 		expect( console ).toHaveErroredWith( 'Format names must be strings.' );
+		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject format types without a namespace', () => {
@@ -77,30 +79,32 @@ describe( 'registerFormatType', () => {
 	} );
 
 	it( 'should accept valid format names', () => {
-		const format = registerFormatType( 'my-plugin/fancy-format-4', validFormatSettings );
+		const format = registerFormatType( 'my-plugin/fancy-format-4', validSettings );
 		expect( console ).not.toHaveErrored();
 		expect( format ).toEqual( {
 			name: 'my-plugin/fancy-format-4',
-			...validFormatSettings
+			...validSettings,
 		} );
 	} );
 
 	it( 'should error on already registered name', () => {
 		registerFormatType( validName, validSettings );
-		registerFormatType( validName, validSettings );
+		const duplicateFormat = registerFormatType( validName, validSettings );
 		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered.' );
+		expect( duplicateFormat ).toBeUndefined();
 	} );
 
 	it( 'should error on undefined edit property', () => {
-		registerFormatType( 'plugin/test', {
+		const format = registerFormatType( 'plugin/test', {
 			...validSettings,
 			edit: undefined,
 		} );
 		expect( console ).toHaveErroredWith( 'The "edit" property must be specified and must be a valid function.' );
+		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject formats with an invalid edit function', () => {
-		registerFormatType( validName, {
+		const format = registerFormatType( validName, {
 			...validSettings,
 			edit: 'not-a-function',
 		} );
@@ -108,34 +112,54 @@ describe( 'registerFormatType', () => {
 		expect( format ).toBeUndefined();
 	} );
 
+	it( 'should reject formats without tag name', () => {
+		const settings = { ...validSettings };
+		delete settings.tagName;
+		const format = registerFormatType( validName, settings );
+		expect( console ).toHaveErroredWith( 'Format tag names must be a string.' );
+		expect( format ).toBeUndefined();
+	} );
+
 	it( 'should error on empty tagName property', () => {
-		registerFormatType( validName, {
+		const format = registerFormatType( validName, {
 			...validSettings,
 			tagName: '',
 		} );
 		expect( console ).toHaveErroredWith( 'Format tag names must be a string.' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should reject formats without class name', () => {
+		const settings = { ...validSettings };
+		delete settings.className;
+		const format = registerFormatType( validName, settings );
+		expect( console ).toHaveErroredWith( 'Format class names must be a string, or null to handle bare elements.' );
+		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should error on invalid empty className property', () => {
-		registerFormatType( validName, {
+		const format = registerFormatType( validName, {
 			...validSettings,
 			className: '',
 		} );
 		expect( console ).toHaveErroredWith( 'Format class names must be a string, or null to handle bare elements.' );
+		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should error on invalid className property', () => {
-		registerFormatType( validName, {
+		const format = registerFormatType( validName, {
 			...validSettings,
 			className: 'invalid class name',
 		} );
 		expect( console ).toHaveErroredWith( 'A class name must begin with a letter, followed by any number of hyphens, letters, or numbers.' );
+		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should error on already registered tagName', () => {
 		registerFormatType( validName, validSettings );
-		registerFormatType( 'plugin/second', validSettings );
+		const duplicateTagNameFormat = registerFormatType( 'plugin/second', validSettings );
 		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered to handle bare tag name "test".' );
+		expect( duplicateTagNameFormat ).toBeUndefined();
 	} );
 
 	it( 'should error on already registered className', () => {
@@ -143,31 +167,33 @@ describe( 'registerFormatType', () => {
 			...validSettings,
 			className: 'test',
 		} );
-		registerFormatType( 'plugin/second', {
+		const duplicateClassNameFormat = registerFormatType( 'plugin/second', {
 			...validSettings,
 			className: 'test',
 		} );
 		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered to handle class name "test".' );
+		expect( duplicateClassNameFormat ).toBeUndefined();
 	} );
 
 	it( 'should reject formats without title', () => {
 		const settings = { ...validSettings };
 		delete settings.title;
-		registerFormatType(validName, settings);
+		const format = registerFormatType( validName, settings );
 		expect( console ).toHaveErroredWith( `The format "${ validName }" must have a title.` );
 		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should error on empty title property', () => {
-		registerFormatType( validName, {
+		const format = registerFormatType( validName, {
 			...validSettings,
 			title: '',
 		} );
 		expect( console ).toHaveErroredWith( 'The format "plugin/test" must have a title.' );
+		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should reject titles which are not strings', () => {
-		registerFormatType( validName, {
+		const format = registerFormatType( validName, {
 			...validSettings,
 			title: 1337,
 		} );
@@ -181,7 +207,7 @@ describe( 'registerFormatType', () => {
 		formatType.mutated = true;
 		expect( getFormatType( validName ) ).toEqual( {
 			name: validName,
-			...validSettings
+			...validSettings,
 		} );
 	} );
 } );

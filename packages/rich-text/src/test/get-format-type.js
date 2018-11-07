@@ -12,8 +12,10 @@ import { registerFormatType } from '../register-format-type';
 import { getFormatTypes } from '../get-format-types';
 
 describe( 'getFormatType', () => {
-	// Initialize format store.
-	require( '../store' );
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
 
 	afterEach( () => {
 		getFormatTypes().forEach( ( format ) => {
@@ -27,6 +29,8 @@ describe( 'getFormatType', () => {
 			title: 'format title',
 			keywords: [ 'one', 'two', 'three' ],
 			formatTestSetting: 'settingTestValue',
+			tagName: 'test',
+			className: null,
 		};
 
 		registerFormatType( 'core/test-format-with-settings', formatType );

@@ -1,15 +1,20 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import { getFormatTypes, getFormatType } from '../selectors';
 
 describe( 'selectors', () => {
-	const defaultState = {
+	const defaultState = deepFreeze( {
 		formatTypes: {
 			'core/test-format': { name: 'core/test-format' },
 			'core/test-format-2': { name: 'core/test-format-2' },
 		},
-	};
+	} );
 
 	describe( 'getFormatTypes', () => {
 		it( 'should get format types', () => {

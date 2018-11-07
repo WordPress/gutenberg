@@ -11,8 +11,10 @@ import { unregisterFormatType } from '../unregister-format-type';
 import { registerFormatType } from '../register-format-type';
 
 describe( 'getFormatTypes', () => {
-	// Initialize format store.
-	require( '../store' );
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
 
 	afterEach( () => {
 		getFormatTypes().forEach( ( format ) => {
@@ -25,23 +27,30 @@ describe( 'getFormatTypes', () => {
 	} );
 
 	it( 'should return all registered formats', () => {
-		const formatType1 = { edit: noop, title: 'format title' };
-		const formatType2 = {
+		const testFormat = {
+			edit: noop,
+			title: 'format title',
+			tagName: 'test',
+			className: null,
+		};
+		const testFormatWithSettings = {
 			edit: noop,
 			title: 'format title 2',
 			keywords: [ 'one', 'two', 'three' ],
+			tagName: 'test 2',
+			className: null,
 			formatTestSetting: 'settingTestValue',
 		};
-		registerFormatType( 'core/test-format', formatType1 );
-		registerFormatType( 'core/test-format-with-settings', formatType2 );
+		registerFormatType( 'core/test-format', testFormat );
+		registerFormatType( 'core/test-format-with-settings', testFormatWithSettings );
 		expect( getFormatTypes() ).toEqual( [
 			{
 				name: 'core/test-format',
-				...formatType1,
+				...testFormat,
 			},
 			{
 				name: 'core/test-format-with-settings',
-				...formatType2,
+				...testFormatWithSettings,
 			},
 		] );
 	} );
