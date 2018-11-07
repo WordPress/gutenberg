@@ -395,13 +395,15 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 /**
  * Check whether a date is considered in the future according to the WordPress settings.
  *
- * @param {(Date|string)} dateValue  Date object or string.
+ * @param {(Date|string)} dateValue  Date object or string. (The timezone is ignored in date objects)
  *
  * @return {boolean} Is in the future.
  */
 export function isInTheFuture( dateValue ) {
+	const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+	const timezoneLessDate = momentLib( dateValue ).format( TIMEZONELESS_FORMAT );
 	const now = momentLib.tz( 'WP' );
-	const momentObject = momentLib.tz( dateValue, 'WP' );
+	const momentObject = momentLib.tz( timezoneLessDate, 'WP' );
 
 	return momentObject.isAfter( now );
 }
