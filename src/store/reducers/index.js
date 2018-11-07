@@ -73,7 +73,7 @@ export const reducer = (
 			// Otherwise merge attributes into state
 			block.attributes = nextAttributes;
 
-			return { blocks: blocks, initialHtmlHash: state.initialHtmlHash, refresh: ! state.refresh };
+			return { ...state, blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.FOCUS: {
 			const destBlock = findBlock( blocks, action.clientId );
@@ -84,7 +84,7 @@ export const reducer = (
 			}
 
 			destBlock.focused = true;
-			return { blocks: blocks, initialHtmlHash: state.initialHtmlHash, refresh: ! state.refresh };
+			return { ...state, blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.MOVE_UP: {
 			if ( blocks[ 0 ].clientId === action.clientId ) {
@@ -95,7 +95,7 @@ export const reducer = (
 			const tmp = blocks[ index ];
 			blocks[ index ] = blocks[ index - 1 ];
 			blocks[ index - 1 ] = tmp;
-			return { blocks: blocks, initialHtmlHash: state.initialHtmlHash, refresh: ! state.refresh };
+			return { ...state, blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.MOVE_DOWN: {
 			if ( blocks[ blocks.length - 1 ].clientId === action.clientId ) {
@@ -106,18 +106,18 @@ export const reducer = (
 			const tmp = blocks[ index ];
 			blocks[ index ] = blocks[ index + 1 ];
 			blocks[ index + 1 ] = tmp;
-			return { blocks: blocks, initialHtmlHash: state.initialHtmlHash, refresh: ! state.refresh };
+			return { ...state, blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.DELETE: {
 			const index = findBlockIndex( blocks, action.clientId );
 			blocks.splice( index, 1 );
-			return { blocks: blocks, initialHtmlHash: state.initialHtmlHash, refresh: ! state.refresh };
+			return { ...state, blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.CREATE: {
 			// TODO we need to set focused: true and search for the currently focused block and
 			// set that one to `focused: false`.
 			insertBlock( blocks, action.block, action.clientIdAbove );
-			return { blocks: blocks, initialHtmlHash: state.initialHtmlHash, refresh: ! state.refresh };
+			return { ...state, blocks: blocks, refresh: ! state.refresh };
 		}
 		case ActionTypes.BLOCK.PARSE: {
 			const newState = html2State( action.html );
@@ -128,7 +128,7 @@ export const reducer = (
 		case ActionTypes.BLOCK.MERGE: {
 			const index = findBlockIndex( blocks, action.blockOneClientId );
 			blocks.splice( index, 2, action.block );
-			return { blocks: blocks, initialHtmlHash: state.initialHtmlHash, refresh: ! state.refresh };
+			return { ...state, blocks: blocks, refresh: ! state.refresh };
 		}
 		default:
 			return state;
