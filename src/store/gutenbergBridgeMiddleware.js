@@ -3,8 +3,9 @@
  * @flow
  */
 
-// Gutenberg imports
-import { serialize } from '@wordpress/blocks';
+import md5 from 'md5';
+
+import { store2html } from './';
 
 import type { Store, Dispatch } from 'redux';
 
@@ -15,11 +16,10 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 export default ( store: Store ) => ( next: Dispatch ) => ( action: BlockActionType ) => {
 	switch ( action.type ) {
 		case ActionTypes.BLOCK.SERIALIZE_ALL: {
-			const html = store
-				.getState()
-				.blocks.map( serialize )
-				.join( '\n\n' );
-			RNReactNativeGutenbergBridge.provideToNative_Html( html );
+			const html = store2html( store );
+			const hash = md5( html );
+			const oldHash = store.getState().initialHtmlHash;
+			RNReactNativeGutenbergBridge.provideToNative_Html( html, oldHash !== hash );
 		}
 	}
 
