@@ -4,6 +4,9 @@ import Foundation
 @objc (RCTAztecViewManager)
 public class RCTAztecViewManager: RCTViewManager {
 
+// NOTE:
+// Removing temporarily images and attachment handling in favour of a simpler Bridge implementation.
+
 //    var attachmentDelegate: Aztec.TextViewAttachmentDelegate
 //    var imageProvider: Aztec.TextViewAttachmentImageProvider
 //

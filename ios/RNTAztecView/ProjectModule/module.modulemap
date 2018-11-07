@@ -1,4 +1,0 @@
-module RCTAztecViewPrivate {  
-  header "../RCTAztecViewManager.h"
-  export *
-}
