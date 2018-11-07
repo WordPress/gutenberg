@@ -251,6 +251,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const index = this.getDataSourceIndexFromClientId( clientId );
 		if ( index === -1 ) {
 			// do nothing if it's not found.
+			// Updates calls from the native side may arrive late, and the block already been deleted/merged
 			return;
 		}
 		const dataSource = this.state.dataSource;
