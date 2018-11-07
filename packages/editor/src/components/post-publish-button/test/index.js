@@ -48,7 +48,10 @@ describe( 'PostPublishButton', () => {
 
 		it( 'should be enabled otherwise', () => {
 			const wrapper = shallow(
-				<PostPublishButton hasPublishAction={ true } isPublishable isSaveable />
+				<PostPublishButton
+					isPublishable
+					isSaveable
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( false );
