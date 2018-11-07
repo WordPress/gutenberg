@@ -2,73 +2,73 @@
 
 exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
-	className="wp-block editor-default-block-appender"
-	data-root-client-id=""
+  className="wp-block editor-default-block-appender"
+  data-root-client-id=""
 >
-	<WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
-	<input
-		aria-label="Add block"
-		className="editor-default-block-appender__content"
-		onFocus={
-			[MockFunction] {
-				"calls": Array [
-					Array [],
-				],
-				"results": undefined,
-			}
-		}
-		readOnly={true}
-		role="button"
-		type="text"
-		value="Type text or press “/” to insert a block"
-	/>
-	<WithSelect(WithDispatch(InserterWithShortcuts)) />
-	<WithSelect(IfCondition(Inserter))
-		position="top right"
-	/>
+  <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
+  <input
+    aria-label="Add block"
+    className="editor-default-block-appender__content"
+    onFocus={
+      [MockFunction] {
+        "calls": Array [
+          Array [],
+        ],
+        "results": undefined,
+      }
+    }
+    readOnly={true}
+    role="button"
+    type="text"
+    value="Type text or press “/” to insert a block"
+  />
+  <WithSelect(WithDispatch(InserterWithShortcuts)) />
+  <WithSelect(IfCondition(Inserter))
+    position="top right"
+  />
 </div>
 `;
 
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
-	className="wp-block editor-default-block-appender"
-	data-root-client-id=""
+  className="wp-block editor-default-block-appender"
+  data-root-client-id=""
 >
-	<WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
-	<input
-		aria-label="Add block"
-		className="editor-default-block-appender__content"
-		onFocus={[MockFunction]}
-		readOnly={true}
-		role="button"
-		type="text"
-		value="Type text or press “/” to insert a block"
-	/>
-	<WithSelect(WithDispatch(InserterWithShortcuts)) />
-	<WithSelect(IfCondition(Inserter))
-		position="top right"
-	/>
+  <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
+  <input
+    aria-label="Add block"
+    className="editor-default-block-appender__content"
+    onFocus={[MockFunction]}
+    readOnly={true}
+    role="button"
+    type="text"
+    value="Type text or press “/” to insert a block"
+  />
+  <WithSelect(WithDispatch(InserterWithShortcuts)) />
+  <WithSelect(IfCondition(Inserter))
+    position="top right"
+  />
 </div>
 `;
 
 exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 <div
-	className="wp-block editor-default-block-appender"
-	data-root-client-id=""
+  className="wp-block editor-default-block-appender"
+  data-root-client-id=""
 >
-	<WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
-	<input
-		aria-label="Add block"
-		className="editor-default-block-appender__content"
-		onFocus={[MockFunction]}
-		readOnly={true}
-		role="button"
-		type="text"
-		value=""
-	/>
-	<WithSelect(WithDispatch(InserterWithShortcuts)) />
-	<WithSelect(IfCondition(Inserter))
-		position="top right"
-	/>
+  <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
+  <input
+    aria-label="Add block"
+    className="editor-default-block-appender__content"
+    onFocus={[MockFunction]}
+    readOnly={true}
+    role="button"
+    type="text"
+    value=""
+  />
+  <WithSelect(WithDispatch(InserterWithShortcuts)) />
+  <WithSelect(IfCondition(Inserter))
+    position="top right"
+  />
 </div>
 `;
