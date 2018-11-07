@@ -172,7 +172,7 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles any case where the content of the AztecRN instance has changed.
+	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 
 	onChange( event ) {
