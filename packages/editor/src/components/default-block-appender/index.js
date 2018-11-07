@@ -31,7 +31,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Write your story' );
+	const value = decodeEntities( placeholder ) || __( 'Type text or press “/” to select a block' );
 
 	// The appender "button" is in-fact a text field so as to support
 	// transitions by WritingFlow occurring by arrow key press. WritingFlow

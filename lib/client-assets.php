@@ -1626,7 +1626,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 		'disablePostFormats'     => ! current_theme_supports( 'post-formats' ),
 		'titlePlaceholder'       => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
-		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
+		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Type text or press “/” to select a block', 'gutenberg' ), $post ),
 		'isRTL'                  => is_rtl(),
 		'autosaveInterval'       => 10,
 		'maxUploadFileSize'      => $max_upload_size,

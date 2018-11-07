@@ -71,7 +71,7 @@ export class PostTextEditor extends Component {
 		return (
 			<Fragment>
 				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
-					{ decodedPlaceholder || __( 'Write your story' ) }
+					{ decodedPlaceholder || __( 'Type text or press “/” to select a block' ) }
 				</label>
 				<Textarea
 					autoComplete="off"
@@ -80,7 +80,7 @@ export class PostTextEditor extends Component {
 					onBlur={ this.stopEditing }
 					className="editor-post-text-editor"
 					id={ `post-content-${ instanceId }` }
-					placeholder={ decodedPlaceholder || __( 'Write your story' ) }
+					placeholder={ decodedPlaceholder || __( 'Type text or press “/” to select a block' ) }
 				/>
 			</Fragment>
 		);

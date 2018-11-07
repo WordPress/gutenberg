@@ -97,7 +97,7 @@ The most basic unit of the editor. The paragraph block is a simple input field.
 
 ### Placeholder:
 
-- Simple placeholder text that says “Add text or type / to add content.” The placeholder disappears when the block is selected.
+- Simple placeholder text that reads “Type text or press / to select a block”. The placeholder disappears when the block is selected.
 
 ### Selected state:
 

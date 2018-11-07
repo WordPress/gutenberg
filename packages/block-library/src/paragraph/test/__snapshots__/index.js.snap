@@ -14,7 +14,7 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
           <p
             aria-autocomplete="list"
             aria-expanded="false"
-            aria-label="Add text or type / to add content"
+            aria-label="Type text or use the forward slash key to insert a block"
             aria-multiline="true"
             class="wp-block-paragraph editor-rich-text__tinymce"
             contenteditable="true"
@@ -28,7 +28,7 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
           <p
             class="editor-rich-text__tinymce wp-block-paragraph"
           >
-            Add text or type / to add content
+            Type text or press “/” to select a block
           </p>
         </div>
       </div>
