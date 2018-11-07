@@ -1,0 +1,38 @@
+{
+  "name": "cgp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build:js-sync-runner": "docker build -t js-sync-runner -f runner-js-sync.Dockerfile .",
+    "build:php-sync-runner": "docker build -t php-sync-runner -f runner-php-sync.Dockerfile .",
+    "start:default-js": "docker run --rm -it -p 8001:80 -v $(pwd)/../../../packages/block-serialization-default-parser/src/index.js:/web/parser.js js-sync-runner",
+    "start:spec-js": "docker run --rm -it -p 8002:80 -v $(pwd)/../../../packages/block-serialization-spec-parser/parser.js:/web/parser.js js-sync-runner",
+    "start:default-php": "docker run --rm -it -p 8003:80 -v $(pwd)/../../../packages/block-serialization-default-parser/parser.php:/default-parser.php -v $(pwd)/parser-php-default.php:/parser.php  php-sync-runner",
+    "start:spec-php": "docker run --rm -it -p 8004:80 -v $(pwd)/../../../lib/parser.php:/post.peg.php -v $(pwd)/parser-php-spec.php:/parser.php php-sync-runner",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.26.3",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-1": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "css-loader": "^0.28.11",
+    "deep-diff": "^1.0.1",
+    "deep-object-diff": "^1.1.0",
+    "extract-text-webpack-plugin": "^3.0.2",
+    "mini-css-extract-plugin": "^0.4.1",
+    "node-sass": "^4.9.0",
+    "postcss-loader": "^2.1.5",
+    "sass-loader": "^7.0.3",
+    "webpack": "^4.14.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^3.1.2"
+  }
+}
