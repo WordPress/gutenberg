@@ -9,7 +9,7 @@ import {
 	createWarningNotice,
 	removeNotice,
 } from '../actions';
-import { DEFAULT_CONTEXT } from '../constants';
+import { DEFAULT_CONTEXT, DEFAULT_STATUS } from '../constants';
 
 describe( 'actions', () => {
 	describe( 'createNotice', () => {
@@ -83,7 +83,7 @@ describe( 'actions', () => {
 				context: DEFAULT_CONTEXT,
 				notice: {
 					id,
-					status: 'info',
+					status: DEFAULT_STATUS,
 					content,
 					isDismissible: false,
 					actions: [],
@@ -131,7 +131,7 @@ describe( 'actions', () => {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
-					status: 'info',
+					status: DEFAULT_STATUS,
 					content,
 					isDismissible: true,
 					id: expect.any( String ),

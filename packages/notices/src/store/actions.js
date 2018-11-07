@@ -6,7 +6,7 @@ import { isPlainObject, uniqueId } from 'lodash';
 /**
  * Internal dependencies
  */
-import { DEFAULT_CONTEXT } from './constants';
+import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 
 /**
  * Yields action objects used in signalling that a notice is to be created.
@@ -27,13 +27,13 @@ import { DEFAULT_CONTEXT } from './constants';
  * @param {?Array<WPNoticeAction>} options.actions       User actions to be
  *                                                       presented with notice.
  */
-export function* createNotice( statusOrNotice = 'info', content, options = {} ) {
+export function* createNotice( statusOrNotice = DEFAULT_STATUS, content, options = {} ) {
 	let status;
 
 	if ( isPlainObject( statusOrNotice ) ) {
 		// Support overloaded form `createNotice( notice: WPNotice )`.
 		options = statusOrNotice;
-		( { status = 'info', content } = options );
+		( { status = DEFAULT_STATUS, content } = options );
 	} else {
 		// Else consider the first argument the status type string.
 		status = statusOrNotice;
