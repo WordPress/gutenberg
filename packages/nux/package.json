@@ -31,7 +31,7 @@
 		"rememo": "^3.0.0"
 	},
 	"devDependencies": {
-		"enzyme": "^3.3.0"
+		"enzyme": "^3.7.0"
 	},
 	"publishConfig": {
 		"access": "public"

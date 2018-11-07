@@ -10,6 +10,9 @@ import { JSDOM } from 'jsdom';
 
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
+import { registerFormatType } from '../register-format-type';
+import { unregisterFormatType } from '../unregister-format-type';
+import { specWithRegistration } from './helpers';
 
 const { window } = new JSDOM();
 const { document } = window;
@@ -24,6 +27,28 @@ describe( 'toHTMLString', () => {
 	beforeAll( () => {
 		// Initialize the rich-text store.
 		require( '../store' );
+	} );
+
+	specWithRegistration.forEach( ( {
+		description,
+		formatName,
+		formatType,
+		html,
+		value,
+	} ) => {
+		it( description, () => {
+			if ( formatName ) {
+				registerFormatType( formatName, formatType );
+			}
+
+			const result = toHTMLString( { value } );
+
+			if ( formatName ) {
+				unregisterFormatType( formatName );
+			}
+
+			expect( result ).toEqual( html );
+		} );
 	} );
 
 	it( 'should extract recreate HTML 1', () => {
