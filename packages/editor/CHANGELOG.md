@@ -1,4 +1,4 @@
-## 6.1.2 (unreleased)
+## 6.2.0 (unreleased)
 
 ### New Features
 
