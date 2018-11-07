@@ -447,16 +447,11 @@ export class RichText extends Component {
 	 * updated if differences are found.
 	 *
 	 * @param {Object}  record        The record to sync and apply.
-	 * @param {boolean} _withoutApply If true, the record won't be applied to
-	 *                                the live DOM.
 	 */
-	onChange( record, _withoutApply ) {
-		if ( ! _withoutApply ) {
-			this.applyRecord( record );
-		}
-
+	onChange( record ) {
 		const { start, end } = record;
 
+		this.applyRecord( record );
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end } );

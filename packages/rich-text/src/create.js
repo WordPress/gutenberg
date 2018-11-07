@@ -53,6 +53,10 @@ function toFormat( { type, attributes } ) {
 		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement( type );
 	}
 
+	if ( formatType.prepareEditableTree ) {
+		return null;
+	}
+
 	if ( ! formatType ) {
 		return attributes ? { type, attributes } : { type };
 	}
@@ -359,11 +363,13 @@ function createFromElement( {
 				} ),
 			} );
 
-			// Reuse the last format if it's equal.
-			if ( isFormatEqual( newFormat, lastFormat ) ) {
-				format = lastFormat;
-			} else {
-				format = newFormat;
+			if ( newFormat ) {
+				// Reuse the last format if it's equal.
+				if ( isFormatEqual( newFormat, lastFormat ) ) {
+					format = lastFormat;
+				} else {
+					format = newFormat;
+				}
 			}
 		}
 

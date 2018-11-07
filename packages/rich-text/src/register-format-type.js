@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
@@ -41,13 +36,6 @@ export function registerFormatType( name, settings ) {
 	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
 		window.console.error(
 			'Format "' + settings.name + '" is already registered.'
-		);
-		return;
-	}
-
-	if ( ! settings || ! isFunction( settings.edit ) ) {
-		window.console.error(
-			'The "edit" property must be specified and must be a valid function.'
 		);
 		return;
 	}
