@@ -1,6 +1,6 @@
 /** @format */
 
-.toolbar {
+.inlineToolbar {
 	height: 34;
 	background-color: white;
 	flex-direction: row;
@@ -8,7 +8,7 @@
 	padding-right: 8;
 }
 
-.toolbarButton {
+.inlineToolbarButton {
 	width: 50;
 	justify-content: center;
 	align-items: center;
