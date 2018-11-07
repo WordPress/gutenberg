@@ -3,12 +3,6 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@protocol GutenbergDelegate <NSObject>
-
-- (void)gutenbergDidProvideHTML:(NSString *)html;
-
-@end
-
 @interface Gutenberg : NSObject
 
 @property (nonatomic, weak, nullable) id<GutenbergBridgeDelegate> delegate;
