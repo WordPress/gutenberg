@@ -26,7 +26,7 @@ export type BlockListType = {
 	createBlockAction: ( string, BlockType, string ) => mixed,
 	parseBlocksAction: string => mixed,
 	serializeToNativeAction: void => void,
-	mergeBlocksAction: ( string, string, BlockType ) => mixed,
+	mergeBlocksAction: ( string, string ) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
 	refresh: boolean,
@@ -38,6 +38,7 @@ type StateType = {
 	showHtml: boolean,
 	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
+	blocks: Array<BlockType>,
 	selectedBlockType: string,
 };
 

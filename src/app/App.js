@@ -5,17 +5,15 @@ import '../globals';
 
 import React from 'react';
 import { Provider } from 'react-redux';
-import { setupStore, html2State } from '../store';
+import { type BlockType, setupStore, html2State } from '../store';
 import AppContainer from './AppContainer';
 import { Store } from 'redux';
 import { withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { BlockEdit } from '@wordpress/editor';
 
 import initialHtml from './initial-html';
 
-
 type PropsType = {
+	onResetBlocks: Array<BlockType> => mixed,
 	initialData: string | Store,
 };
 type StateType = {

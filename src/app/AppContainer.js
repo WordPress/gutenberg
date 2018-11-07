@@ -2,22 +2,32 @@
  * @format */
 
 import { connect } from 'react-redux';
-import MainApp from './MainApp';
+import { isEqual } from 'lodash';
 
+import MainApp from './MainApp';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { BlockEdit } from '@wordpress/editor';
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 const mapStateToProps = ( state, ownProps ) => {
-	return {
-		blocks: ownProps.blocks.map( block => {
-			block.focused = ownProps.isBlockSelected( block.clientId );
-			return block;
-		} ),
-		refresh: ! ownProps.refresh
+	let blocks = ownProps.blocks;
+	let refresh = !! ownProps.refresh;
+
+	const newBlocks = ownProps.blocks.map( ( block ) => {
+		block.focused = ownProps.isBlockSelected( block.clientId );
+		return block;
+	} );
+
+	if ( ! isEqual( blocks, newBlocks ) ) {
+		blocks = newBlocks;
+		refresh = ! ownProps.refresh;
 	}
+
+	return {
+		blocks,
+		refresh,
+	};
 };
 
 const mapDispatchToProps = ( dispatch, ownProps ) => {
