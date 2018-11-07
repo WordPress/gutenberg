@@ -246,7 +246,7 @@ class ParagraphBlock extends Component {
 					onReplace={ this.onReplace }
 					onRemove={ () => onReplace( [] ) }
 					aria-label={ __( 'Empty block; type text or press the forward slash key to insert a block' ) }
-					placeholder={ placeholder || __( 'Type text or press “/” to insert a block' ) }
+					placeholder={ placeholder || __( 'Start writing or press “/” to insert a block' ) }
 				/>
 			</Fragment>
 		);

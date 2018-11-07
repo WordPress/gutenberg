@@ -20,7 +20,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     readOnly={true}
     role="button"
     type="text"
-    value="Type text or press “/” to insert a block"
+    value="Start writing or press “/” to insert a block"
   />
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
   <WithSelect(IfCondition(Inserter))
@@ -42,7 +42,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     readOnly={true}
     role="button"
     type="text"
-    value="Type text or press “/” to insert a block"
+    value="Start writing or press “/” to insert a block"
   />
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
   <WithSelect(IfCondition(Inserter))

@@ -31,7 +31,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Type text or press “/” to insert a block' );
+	const value = decodeEntities( placeholder ) || __( 'Start writing or press “/” to insert a block' );
 
 	// The appender "button" is in-fact a text field so as to support
 	// transitions by WritingFlow occurring by arrow key press. WritingFlow
