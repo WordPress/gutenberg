@@ -174,6 +174,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
 		if ( focusedItemIndex === -1 ) {
 			// do nothing if it's not found.
+			// Updates calls from the native side may arrive late, and the block already been deleted
 			return;
 		}
 
@@ -198,6 +199,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// Ignore merge if blocks aren't known
 		if ( ! blockA || ! blockB ) {
+			// Updates calls from the native side may arrive late, and one of the block 
+			// may not be available
 			return;
 		}
 
