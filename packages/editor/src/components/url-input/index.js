@@ -137,6 +137,32 @@ class URLInput extends Component {
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if ( ! showSuggestions || ! posts.length || loading ) {
+			// This switch statement corrects a bug in Windows Firefox
+			switch ( event.keyCode ) {
+				case UP: {
+					// If the caret is not in position 0
+					if ( 0 !== event.target.selectionStart ) {
+						event.stopPropagation();
+						event.preventDefault();
+
+						// Set the input caret to position 0
+						event.target.setSelectionRange( 0, 0 );
+					}
+					break;
+				}
+				case DOWN: {
+					// If the caret is not in the last position
+					if ( this.props.value.length !== event.target.selectionStart ) {
+						event.stopPropagation();
+						event.preventDefault();
+
+						// Set the inpit caret to the last position
+						event.target.setSelectionRange( this.props.value.length, this.props.value.length );
+					}
+					break;
+				}
+			}
+
 			return;
 		}
 
