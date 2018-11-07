@@ -36,11 +36,12 @@ describe( 'PostPublishButton', () => {
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be disabled if post is not publishable', () => {
+		it( 'should be disabled if post is not publishable and not forceIsDirty', () => {
 			const wrapper = shallow(
 				<PostPublishButton
-					isPublishable={ false }
 					isSaveable
+					isPublishable={ false }
+					forceIsDirty={ false }
 				/>
 			);
 
@@ -56,6 +57,18 @@ describe( 'PostPublishButton', () => {
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+		} );
+
+		it( 'should be enabled if post is saveable but not publishable and forceIsDirty is true', () => {
+			const wrapper = shallow(
+				<PostPublishButton
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty
+				/>
+			);
+
+			expect( wrapper.prop( 'disabled' ) ).toBe( false );
 		} );
 
 		it( 'should be enabled otherwise', () => {

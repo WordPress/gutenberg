@@ -37,9 +37,10 @@ export class PostPublishButton extends Component {
 			isSaveable,
 			hasPublishAction,
 			onSubmit = noop,
+			forceIsDirty,
 			forceIsSaving,
 		} = this.props;
-		const isButtonEnabled = isPublishable && isSaveable;
+		const isButtonEnabled = ( forceIsDirty || isPublishable ) && isSaveable;
 
 		let publishStatus;
 		if ( ! hasPublishAction ) {
@@ -75,7 +76,7 @@ export class PostPublishButton extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { forceIsSaving, forceIsDirty } ) => {
+	withSelect( ( select, { forceIsSaving } ) => {
 		const {
 			isSavingPost,
 			isEditedPostBeingScheduled,
@@ -91,7 +92,7 @@ export default compose( [
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable() && ! isPostSavingLocked(),
-			isPublishable: forceIsDirty || isEditedPostPublishable(),
+			isPublishable: isEditedPostPublishable(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
 		};
