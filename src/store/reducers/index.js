@@ -5,10 +5,10 @@
 
 import { find, findIndex, reduce } from 'lodash';
 
-import { html2State } from '../';
+import { html2State } from '../utils';
 
 import ActionTypes from '../actions/ActionTypes';
-import type { StateType } from '../types';
+import type { StateType } from '../';
 import type { BlockActionType } from '../actions';
 
 function findBlock( blocks, clientId: string ) {

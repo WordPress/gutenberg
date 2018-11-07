@@ -7,7 +7,7 @@ import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
 import Toolbar from './toolbar';
 
-import type { BlockType } from '../store/types';
+import type { BlockType } from '../store/';
 
 import styles from './block-holder.scss';
 

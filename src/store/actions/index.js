@@ -4,7 +4,7 @@
  */
 
 import ActionTypes from './ActionTypes';
-import type { BlockType } from '../types';
+import type { BlockType } from '../';
 
 export type BlockActionType = string => {
 	type: $Values<typeof ActionTypes.BLOCK>,

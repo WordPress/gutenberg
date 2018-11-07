@@ -5,7 +5,7 @@
 
 import md5 from 'md5';
 
-import { store2html } from './';
+import { store2html } from './utils';
 
 import type { Store, Dispatch } from 'redux';
 

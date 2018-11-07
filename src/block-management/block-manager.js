@@ -8,7 +8,7 @@ import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 're
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { ToolbarButton } from './constants';
-import type { BlockType } from '../store/types';
+import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
