@@ -44,7 +44,7 @@ class FlatTermSelector extends Component {
 			this.setState( { loading: false } );
 			this.initRequest = this.fetchTerms( {
 				include: this.props.terms.join( ',' ),
-				per_page: 100,
+				per_page: -1,
 			} );
 			this.initRequest.then(
 				() => {

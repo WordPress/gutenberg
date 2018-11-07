@@ -28,7 +28,7 @@ class EditorProvider extends Component {
 
 		props.updateEditorSettings( props.settings );
 		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post );
+		props.setupEditor( props.post, props.initialEdits );
 
 		if ( props.settings.autosave ) {
 			props.createWarningNotice(

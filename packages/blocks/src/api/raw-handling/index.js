@@ -66,6 +66,51 @@ function getRawTransformations() {
 }
 
 /**
+ * Converts HTML directly to blocks. Looks for a matching transform for each
+ * top-level tag. The HTML should be filtered to not have any text between
+ * top-level tags and formatted in a way that blocks can handle the HTML.
+ *
+ * @param  {Object} $1               Named parameters.
+ * @param  {string} $1.html          HTML to convert.
+ * @param  {Array}  $1.rawTransforms Transforms that can be used.
+ *
+ * @return {Array} An array of blocks.
+ */
+function htmlToBlocks( { html, rawTransforms } ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+
+	doc.body.innerHTML = html;
+
+	return Array.from( doc.body.children ).map( ( node ) => {
+		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
+
+		if ( ! rawTransform ) {
+			console.warn(
+				'A block registered a raw transformation schema for `' + node.nodeName + '` but did not match it. ' +
+				'Make sure there is a `selector` or `isMatch` property that can match the schema.\n' +
+				'Sanitized HTML: `' + node.outerHTML + '`'
+			);
+
+			return;
+		}
+
+		const { transform, blockName } = rawTransform;
+
+		if ( transform ) {
+			return transform( node );
+		}
+
+		return createBlock(
+			blockName,
+			getBlockAttributes(
+				getBlockType( blockName ),
+				node.outerHTML
+			)
+		);
+	} );
+}
+
+/**
  * Converts an HTML string to known blocks. Strips everything else.
  *
  * @param {string}  [options.HTML]                     The HTML to convert.
@@ -79,7 +124,7 @@ function getRawTransformations() {
  *
  * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
  */
-export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
+export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagName, canUserUseUnfilteredHTML = false } ) {
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/, '' );
 
@@ -137,9 +182,9 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 		return filterInlineHTML( HTML );
 	}
 
-	const rawTransformations = getRawTransformations();
+	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema();
-	const blockContentSchema = getBlockContentSchema( rawTransformations );
+	const blockContentSchema = getBlockContentSchema( rawTransforms );
 
 	const blocks = compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
@@ -176,37 +221,7 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 		// Allows us to ask for this information when we get a report.
 		console.log( 'Processed HTML piece:\n\n', piece );
 
-		const doc = document.implementation.createHTMLDocument( '' );
-
-		doc.body.innerHTML = piece;
-
-		return Array.from( doc.body.children ).map( ( node ) => {
-			const rawTransformation = findTransform( rawTransformations, ( { isMatch } ) => isMatch( node ) );
-
-			if ( ! rawTransformation ) {
-				console.warn(
-					'A block registered a raw transformation schema for `' + node.nodeName + '` but did not match it. ' +
-					'Make sure there is a `selector` or `isMatch` property that can match the schema.\n' +
-					'Sanitized HTML: `' + node.outerHTML + '`'
-				);
-
-				return;
-			}
-
-			const { transform, blockName } = rawTransformation;
-
-			if ( transform ) {
-				return transform( node );
-			}
-
-			return createBlock(
-				blockName,
-				getBlockAttributes(
-					getBlockType( blockName ),
-					node.outerHTML
-				)
-			);
-		} );
+		return htmlToBlocks( { html: piece, rawTransforms } );
 	} ) );
 
 	// If we're allowed to return inline content and there is only one block
@@ -224,4 +239,49 @@ export default function rawHandler( { HTML = '', plainText = '', mode = 'AUTO', 
 	}
 
 	return blocks;
+}
+
+/**
+ * Converts an HTML string to known blocks.
+ *
+ * @param {string} $1.HTML The HTML to convert.
+ *
+ * @return {Array} A list of blocks.
+ */
+export function rawHandler( { HTML = '' } ) {
+	// If we detect block delimiters, parse entirely as blocks.
+	if ( HTML.indexOf( '<!-- wp:' ) !== -1 ) {
+		return parseWithGrammar( HTML );
+	}
+
+	// An array of HTML strings and block objects. The blocks replace matched
+	// shortcodes.
+	const pieces = shortcodeConverter( HTML );
+	const rawTransforms = getRawTransformations();
+	const blockContentSchema = getBlockContentSchema( rawTransforms );
+
+	return compact( flatMap( pieces, ( piece ) => {
+		// Already a block from shortcode.
+		if ( typeof piece !== 'string' ) {
+			return piece;
+		}
+
+		// These filters are essential for some blocks to be able to transform
+		// from raw HTML. These filters move around some content or add
+		// additional tags, they do not remove any content.
+		const filters = [
+			// Needed to create more and nextpage blocks.
+			specialCommentConverter,
+			// Needed to create media blocks.
+			figureContentReducer,
+			// Needed to create the quote block, which cannot handle text
+			// without wrapper paragraphs.
+			blockquoteNormaliser,
+		];
+
+		piece = deepFilterHTML( piece, filters, blockContentSchema );
+		piece = normaliseBlocks( piece );
+
+		return htmlToBlocks( { html: piece, rawTransforms } );
+	} ) );
 }

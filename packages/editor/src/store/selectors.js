@@ -32,7 +32,7 @@ import {
 	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { moment } from '@wordpress/date';
+import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 import { select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -54,6 +54,7 @@ export const INSERTER_UTILITY_NONE = 0;
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
+const ONE_MINUTE_IN_MS = 60 * 1000;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -192,9 +193,18 @@ export function getCurrentPostLastRevisionId( state ) {
  *
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
-export function getPostEdits( state ) {
-	return state.editor.present.edits;
-}
+export const getPostEdits = createSelector(
+	( state ) => {
+		return {
+			...state.initialEdits,
+			...state.editor.present.edits,
+		};
+	},
+	( state ) => [
+		state.editor.present.edits,
+		state.initialEdits,
+	]
+);
 
 /**
  * Returns a new reference when edited values have changed. This is useful in
@@ -323,7 +333,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+		( post.status === 'future' && ! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) );
 }
 
 /**
@@ -481,11 +491,11 @@ export function hasAutosave( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = moment( getEditedPostAttribute( state, 'date' ) );
-	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = moment().add( 1, 'minute' );
+	const date = getEditedPostAttribute( state, 'date' );
+	// Offset the date by one minute (network latency)
+	const checkedDate = new Date( Number( getDate( date ) ) - ONE_MINUTE_IN_MS );
 
-	return date.isAfter( now );
+	return isInTheFuture( checkedDate );
 }
 
 /**
@@ -596,6 +606,7 @@ export const getBlock = createSelector(
 		state.editor.present.blocks.byClientId[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -703,6 +714,7 @@ export const getBlocksByClientId = createSelector(
 	),
 	( state ) => [
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 		state.editor.present.blocks,
 	]
@@ -1021,6 +1033,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.blockSelection.end,
 		state.editor.present.blocks.byClientId,
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -1537,8 +1550,9 @@ export const getEditedPostContent = createSelector(
 		return content;
 	},
 	( state ) => [
-		state.editor.present.edits.content,
 		state.editor.present.blocks,
+		state.editor.present.edits.content,
+		state.initialEdits.content,
 	],
 );
 
