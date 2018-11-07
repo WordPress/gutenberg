@@ -12,7 +12,11 @@ describe( 'PostPublishPanelToggle', () => {
 	describe( 'disabled', () => {
 		it( 'should be disabled if post is currently saving', () => {
 			const wrapper = shallow(
-				<PostPublishPanelToggle isSaving />
+				<PostPublishPanelToggle
+					isPublishable
+					isSaveable
+					isSaving
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
