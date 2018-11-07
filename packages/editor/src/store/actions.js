@@ -295,35 +295,36 @@ export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId,
  * Returns an action object used in signalling that a single block should be
  * inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object}  block        Block object to insert.
- * @param {?number} index        Index at which block should be inserted.
- * @param {?string} rootClientId Optional root client ID of block list on which
- *                               to insert.
+ * @param {Object}  block            Block object to insert.
+ * @param {?number} index            Index at which block should be inserted.
+ * @param {?string} rootClientId     Optional root client ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlock( block, index, rootClientId ) {
-	return insertBlocks( [ block ], index, rootClientId );
+export function insertBlock( block, index, rootClientId, updateSelection = true ) {
+	return insertBlocks( [ block ], index, rootClientId, updateSelection );
 }
 
 /**
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks       Block objects to insert.
- * @param {?number}  index        Index at which block should be inserted.
- * @param {?string}  rootClientId Optional root client ID of block list on
- *                                which to insert.
+ * @param {Object[]} blocks          Block objects to insert.
+ * @param {?number}  index           Index at which block should be inserted.
+ * @param {?string}  rootClientId    Optional root cliente ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlocks( blocks, index, rootClientId ) {
+export function insertBlocks( blocks, index, rootClientId, updateSelection = true ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
 		index,
 		rootClientId,
 		time: Date.now(),
+		updateSelection,
 	};
 }
 

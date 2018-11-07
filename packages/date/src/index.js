@@ -395,7 +395,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
 /**
  * Check whether a date is considered in the future according to the WordPress settings.
  *
- * @param {(Date|string)} dateValue  Date object or string.
+ * @param {string} dateValue Date String or Date object in the Defined WP Timezone.
  *
  * @return {boolean} Is in the future.
  */
@@ -404,6 +404,21 @@ export function isInTheFuture( dateValue ) {
 	const momentObject = momentLib.tz( dateValue, 'WP' );
 
 	return momentObject.isAfter( now );
+}
+
+/**
+ * Create and return a JavaScript Date Object from a date string in the WP timezone.
+ *
+ * @param {string?} dateString Date formatted in the WP timezone.
+ *
+ * @return {Date} Date
+ */
+export function getDate( dateString ) {
+	if ( ! dateString ) {
+		return momentLib.tz( 'WP' ).toDate();
+	}
+
+	return momentLib.tz( dateString, 'WP' ).toDate();
 }
 
 setupWPTimezone();
