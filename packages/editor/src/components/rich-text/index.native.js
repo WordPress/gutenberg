@@ -14,6 +14,7 @@ import {
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
+import { BlockFormatControls } from '@wordpress/editor';
 import {
 	isEmpty,
 	create,
@@ -342,9 +343,9 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				<View style={ { flex: 1 } }>
+				<BlockFormatControls>
 					<Toolbar controls={ toolbarControls } />
-				</View>
+				</BlockFormatControls>
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
