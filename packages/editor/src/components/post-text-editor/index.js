@@ -71,7 +71,7 @@ export class PostTextEditor extends Component {
 		return (
 			<Fragment>
 				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
-					{ decodedPlaceholder || __( 'Type text or press “/” to select a block' ) }
+					{ decodedPlaceholder || __( 'Empty block; type text or use the forward slash key to insert a block' ) }
 				</label>
 				<Textarea
 					autoComplete="off"
