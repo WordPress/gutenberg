@@ -32,7 +32,7 @@ import {
 	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { isInTheFuture } from '@wordpress/date';
+import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 import { select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -333,7 +333,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && ! isInTheFuture( new Date( Number( new Date( post.date ) ) + ONE_MINUTE_IN_MS ) ) );
+		( post.status === 'future' && ! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) );
 }
 
 /**
@@ -493,7 +493,7 @@ export function hasAutosave( state ) {
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	// Offset the date by one minute (network latency)
-	const checkedDate = new Date( Number( new Date( date ) ) + ONE_MINUTE_IN_MS );
+	const checkedDate = new Date( Number( getDate( date ) ) - ONE_MINUTE_IN_MS );
 
 	return isInTheFuture( checkedDate );
 }
