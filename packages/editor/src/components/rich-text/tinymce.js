@@ -198,7 +198,6 @@ export default class TinyMCE extends Component {
 
 		if ( multilineTag === 'li' ) {
 			settings.plugins.push( 'lists' );
-			settings.lists_indent_on_tab = true;
 		}
 
 		tinymce.init( {

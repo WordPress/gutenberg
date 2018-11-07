@@ -59,7 +59,7 @@ import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
-import { ListToolbar } from './list-toolbar';
+import { ListEdit } from './list-edit';
 
 /**
  * Browser dependencies
@@ -876,7 +876,7 @@ export class RichText extends Component {
 			>
 				{ isSelected && this.editor && this.multilineTag === 'li' && (
 					<BlockFormatControls>
-						<ListToolbar
+						<ListEdit
 							editor={ this.editor }
 							onTagNameChange={ onTagNameChange }
 							tagName={ Tagname }
