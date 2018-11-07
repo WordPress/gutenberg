@@ -804,6 +804,19 @@ export class RichText extends Component {
 		return value;
 	}
 
+	valueToEditableHTML( value ) {
+		return unstableToDom( {
+			value,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
+			createLinePadding( doc ) {
+				const element = doc.createElement( 'br' );
+				element.setAttribute( 'data-mce-bogus', '1' );
+				return element;
+			},
+		} ).body.innerHTML;
+	}
+
 	valueToFormat( { formats, text } ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
@@ -829,7 +842,6 @@ export class RichText extends Component {
 		const {
 			tagName: Tagname = 'div',
 			style,
-			value,
 			wrapperClassName,
 			className,
 			inlineToolbar = false,
@@ -878,7 +890,7 @@ export class RichText extends Component {
 								getSettings={ this.getSettings }
 								onSetup={ this.onSetup }
 								style={ style }
-								defaultValue={ value }
+								defaultValue={ this.valueToEditableHTML( record ) }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
