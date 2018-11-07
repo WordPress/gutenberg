@@ -20,7 +20,8 @@ Yields action objects used in signalling that a notice is to be created.
 
 *Parameters*
 
- * status: Notice status.
+ * statusOrNotice: Notice status, or a
+                                                      notice object.
                                                       Defaults to `info`.
  * content: Notice message.
  * options: Notice options.

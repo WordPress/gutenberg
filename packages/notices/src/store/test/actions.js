@@ -13,10 +13,11 @@ import { DEFAULT_CONTEXT } from '../constants';
 
 describe( 'actions', () => {
 	describe( 'createNotice', () => {
+		const id = 'my-id';
 		const status = 'status';
 		const content = 'my message';
 
-		it( 'should yields actions when options is empty', () => {
+		it( 'yields actions when options is empty', () => {
 			const result = createNotice( status, content );
 
 			expect( result.next().value ).toMatchObject( {
@@ -37,8 +38,7 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should yields actions when options passed', () => {
-			const id = 'my-id';
+		it( 'yields actions when options passed', () => {
 			const context = 'foo';
 			const options = {
 				id,
@@ -59,6 +59,31 @@ describe( 'actions', () => {
 				notice: {
 					id,
 					status,
+					content,
+					isDismissible: false,
+					actions: [],
+				},
+			} );
+		} );
+
+		it( 'yields actions when notice object passed', () => {
+			const result = createNotice( {
+				id,
+				content,
+				isDismissible: false,
+			} );
+
+			expect( result.next().value ).toMatchObject( {
+				type: 'SPEAK',
+				message: content,
+			} );
+
+			expect( result.next().value ).toEqual( {
+				type: 'CREATE_NOTICE',
+				context: DEFAULT_CONTEXT,
+				notice: {
+					id,
+					status: 'info',
 					content,
 					isDismissible: false,
 					actions: [],

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { uniqueId } from 'lodash';
+import { isPlainObject, uniqueId } from 'lodash';
 
 /**
  * Internal dependencies
@@ -11,7 +11,8 @@ import { DEFAULT_CONTEXT } from './constants';
 /**
  * Yields action objects used in signalling that a notice is to be created.
  *
- * @param {?string}                status                Notice status.
+ * @param {?string|WPNotice}       statusOrNotice        Notice status, or a
+ *                                                       notice object.
  *                                                       Defaults to `info`.
  * @param {string}                 content               Notice message.
  * @param {?Object}                options               Notice options.
@@ -26,7 +27,18 @@ import { DEFAULT_CONTEXT } from './constants';
  * @param {?Array<WPNoticeAction>} options.actions       User actions to be
  *                                                       presented with notice.
  */
-export function* createNotice( status = 'info', content, options = {} ) {
+export function* createNotice( statusOrNotice = 'info', content, options = {} ) {
+	let status;
+
+	if ( isPlainObject( statusOrNotice ) ) {
+		// Support overloaded form `createNotice( notice: WPNotice )`.
+		options = statusOrNotice;
+		( { status = 'info', content } = options );
+	} else {
+		// Else consider the first argument the status type string.
+		status = statusOrNotice;
+	}
+
 	const {
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
