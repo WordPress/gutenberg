@@ -43,7 +43,7 @@ describe( 'App', () => {
 					const contentComponent = blockHolderContainer.children[ 0 ];
 					const inputComponent =
 						contentComponent.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ]
-							.children[ 0 ].children[ 0 ];
+							.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
 					expect( inputComponent.type ).toBe( 'TextInput' );
 				}
 			} );

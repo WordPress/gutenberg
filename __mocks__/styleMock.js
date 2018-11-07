@@ -1,4 +1,10 @@
 /** @flow
  * @format */
 
-module.exports = {};
+module.exports = {
+
+	//Mock block paragraph style with minimum height
+	blockText: {
+		minHeight: 50,
+	},
+};

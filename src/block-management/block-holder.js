@@ -5,19 +5,19 @@
 
 import React from 'react';
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import Toolbar from './toolbar';
+import InlineToolbar from './inline-toolbar';
 
 import type { BlockType } from '../store/';
 
 import styles from './block-holder.scss';
 
 // Gutenberg imports
-import { getBlockType, getUnregisteredTypeHandlerName } from '@wordpress/blocks';
+import { BlockEdit } from '@wordpress/editor';
 
 type PropsType = BlockType & {
 	showTitle: boolean,
 	onChange: ( clientId: string, attributes: mixed ) => void,
-	onToolbarButtonPressed: ( button: number, clientId: string ) => void,
+	onInlineToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
 	insertBlocksAfter: ( blocks: Array<Object> ) => void,
 	mergeBlocks: ( forward: boolean ) => void,
@@ -40,9 +40,9 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (
-				<Toolbar
+				<InlineToolbar
 					clientId={ this.props.clientId }
-					onButtonPressed={ this.props.onToolbarButtonPressed }
+					onButtonPressed={ this.props.onInlineToolbarButtonPressed }
 				/>
 			);
 		}
@@ -52,20 +52,9 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 	}
 
 	getBlockForType() {
-		// Since unsupported blocks are handled in block-manager.js, at this point the block should definitely
-		// be supported.
-		const blockType = getBlockType( this.props.name );
-		const Block = blockType.edit;
-
-		let style;
-		if ( blockType.name === 'core/code' ) {
-			style = styles.blockCode;
-		} else if ( blockType.name === 'core/paragraph' ) {
-			style = styles.blockText;
-		}
-
 		return (
-			<Block
+			<BlockEdit
+				name={ this.props.name }
 				attributes={ { ...this.props.attributes } }
 				// pass a curried version of onChanged with just one argument
 				setAttributes={ ( attrs ) =>
@@ -74,20 +63,8 @@ export default class BlockHolder extends React.Component<PropsType, StateType> {
 				insertBlocksAfter={ this.props.insertBlocksAfter }
 				mergeBlocks={ this.props.mergeBlocks }
 				isSelected={ this.props.focused }
-				style={ style }
 			/>
 		);
-	}
-
-	getBlockType( blockName: String ) {
-		let blockType = getBlockType( blockName );
-
-		if ( ! blockType ) {
-			const fallbackBlockName = getUnregisteredTypeHandlerName();
-			blockType = getBlockType( fallbackBlockName );
-		}
-
-		return blockType;
 	}
 
 	renderBlockTitle() {

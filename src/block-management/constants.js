@@ -3,7 +3,7 @@
  * @flow
  */
 
-const ToolbarButton = {
+const InlineToolbarButton = {
 	UP: 1,
 	DOWN: 2,
 	SETTINGS: 3,
@@ -11,4 +11,4 @@ const ToolbarButton = {
 	PLUS: 5,
 };
 
-export { ToolbarButton };
+export { InlineToolbarButton };
