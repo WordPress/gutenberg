@@ -24,9 +24,15 @@
     return self;
 }
 
--(instancetype)init
+- (instancetype)init
 {
     return [self initWithProps:nil];
+}
+
+- (void)invalidate
+{
+    [self.bridge invalidate];
+    _bridge = nil;
 }
 
 #pragma mark - RCTBridgeDelegate
