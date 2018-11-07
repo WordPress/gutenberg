@@ -130,6 +130,15 @@ export default class TinyMCE extends Component {
 		this.initialize();
 	}
 
+	// We must prevent rerenders because RichText, the browser, and TinyMCE will
+	// modify the DOM. React will rerender the DOM fine, but we're losing
+	// selection and it would be more expensive to do so as it would just set
+	// the inner HTML through `dangerouslySetInnerHTML`. Instead RichText does
+	// it's own diffing and selection setting.
+	//
+	// Because we never update the component, we have to look through props and
+	// update the attributes on the wrapper nodes here. `componentDidUpdate`
+	// will never be called.
 	shouldComponentUpdate( nextProps ) {
 		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
 
@@ -148,10 +157,6 @@ export default class TinyMCE extends Component {
 		updatedKeys.forEach( ( key ) =>
 			this.editorNode.setAttribute( key, nextProps[ key ] ) );
 
-		// We must prevent rerenders because TinyMCE will modify the DOM, thus
-		// breaking React's ability to reconcile changes.
-		//
-		// See: https://github.com/facebook/react/issues/6802
 		return false;
 	}
 

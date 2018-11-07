@@ -299,6 +299,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-compose',
+			'wp-deprecated',
 			'wp-element',
 			'wp-is-shallow-equal',
 			'wp-polyfill',
@@ -1331,8 +1332,6 @@ function gutenberg_load_locale_data() {
  * @return array
  */
 function gutenberg_get_available_image_sizes() {
-	$sizes      = get_intermediate_image_sizes();
-	$sizes[]    = 'full';
 	$size_names = apply_filters(
 		'image_size_names_choose',
 		array(
@@ -1344,10 +1343,10 @@ function gutenberg_get_available_image_sizes() {
 	);
 
 	$all_sizes = array();
-	foreach ( $sizes as $size_slug ) {
+	foreach ( $size_names as $size_slug => $size_name ) {
 		$all_sizes[] = array(
 			'slug' => $size_slug,
-			'name' => isset( $size_names[ $size_slug ] ) ? $size_names[ $size_slug ] : $size_slug,
+			'name' => $size_name,
 		);
 	}
 
@@ -1466,26 +1465,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$demo_content = ob_get_clean();
 
 		$initial_edits = array(
-			'title'   => array(
-				'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			),
-			'content' => array(
-				'raw' => $demo_content,
-			),
+			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
+			'content' => $demo_content,
 		);
 	} elseif ( $is_new_post ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
-			'title'   => array(
-				'raw' => $post->post_title,
-			),
-			'content' => array(
-				'raw' => $post->post_content,
-			),
-			'excerpt' => array(
-				'raw' => $post->post_excerpt,
-			),
+			'title'   => $post->post_title,
+			'content' => $post->post_content,
+			'excerpt' => $post->post_excerpt,
 		);
 	} else {
 		$initial_edits = null;
@@ -1631,7 +1620,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'maxUploadFileSize'      => $max_upload_size,
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
-		'availableImageSizes'    => gutenberg_get_available_image_sizes(),
+		'imageSizes'             => gutenberg_get_available_image_sizes(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,

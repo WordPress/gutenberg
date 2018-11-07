@@ -33,9 +33,13 @@ class PullQuoteEdit extends Component {
 	}
 
 	pullQuoteMainColorSetter( colorValue ) {
-		const { colorUtils, textColor, setTextColor, setMainColor } = this.props;
+		const { colorUtils, textColor, setTextColor, setMainColor, className } = this.props;
+		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+		const needTextColor = ! textColor.color || this.wasTextColorAutomaticallyComputed;
+		const shouldSetTextColor = isSolidColorStyle && needTextColor && colorValue;
+
 		setMainColor( colorValue );
-		if ( ! textColor.color || this.wasTextColorAutomaticallyComputed ) {
+		if ( shouldSetTextColor ) {
 			this.wasTextColorAutomaticallyComputed = true;
 			setTextColor( colorUtils.getMostReadableColor( colorValue ) );
 		}
@@ -84,15 +88,19 @@ class PullQuoteEdit extends Component {
 									value: nextValue,
 								} )
 							}
-							/* translators: the text of the quotation */
-							placeholder={ __( 'Write quote…' ) }
+							placeholder={
+								// translators: placeholder text used for the quote
+								__( 'Write quote…' )
+							}
 							wrapperClassName="block-library-pullquote__content"
 						/>
 						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 							<RichText
 								value={ citation }
-								/* translators: the individual or entity quoted */
-								placeholder={ __( 'Write citation…' ) }
+								placeholder={
+									// translators: placeholder text used for the citation
+									__( 'Write citation…' )
+								}
 								onChange={
 									( nextCitation ) => setAttributes( {
 										citation: nextCitation,

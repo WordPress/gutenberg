@@ -1,8 +1,14 @@
+## 2.2.0 (Unreleased)
+
+### Deprecations
+
+- Remove `moment` from the public API for the date module.
+
 ## 2.1.0 (2018-10-29)
 
 ### Breaking Change
 
-- Marked getSettings as experimental 
+- Marked getSettings as experimental
 
 ## 2.0.3 (2018-09-26)
 

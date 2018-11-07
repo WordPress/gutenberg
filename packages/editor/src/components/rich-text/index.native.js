@@ -14,6 +14,7 @@ import {
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
+import { BlockFormatControls } from '@wordpress/editor';
 import {
 	isEmpty,
 	create,
@@ -172,23 +173,16 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles any case where the content of the AztecRN instance has changed.
+	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 
 	onChange( event ) {
-		// If we had a timer set to propagate a change, let's cancel it, because the user meanwhile typed something extra
-		if ( !! this.currentTimer ) {
-			clearTimeout( this.currentTimer );
-		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
 		this.lastContent = contentWithoutRootTag;
-		// Set a time to call the onChange prop if nothing changes in the next second
-		this.currentTimer = setTimeout( function() {
-			this.props.onChange( {
-				content: this.lastContent,
-			} );
-		}.bind( this ), 1000 );
+		this.props.onChange( {
+			content: this.lastContent,
+		} );
 	}
 
 	/**
@@ -349,9 +343,9 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				<View style={ { flex: 1 } }>
+				<BlockFormatControls>
 					<Toolbar controls={ toolbarControls } />
-				</View>
+				</BlockFormatControls>
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;

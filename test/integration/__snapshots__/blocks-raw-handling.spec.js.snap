@@ -1,0 +1,35 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Blocks raw handling rawHandler should convert HTML post to blocks with minimal content changes 1`] = `
+"<!-- wp:heading -->
+<h2>Howdy</h2>
+<!-- /wp:heading -->
+
+<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://w.org\\" alt=\\"\\"/></figure>
+<!-- /wp:image -->
+
+<!-- wp:paragraph -->
+<p>This is a paragraph.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Preserve <span style=\\"color:red\\">me</span>!</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading {\\"level\\":3} -->
+<h3>More tag</h3>
+<!-- /wp:heading -->
+
+<!-- wp:more -->
+<!--more-->
+<!-- /wp:more -->
+
+<!-- wp:heading {\\"level\\":3} -->
+<h3>Shortcode</h3>
+<!-- /wp:heading -->
+
+<!-- wp:gallery {\\"columns\\":3,\\"linkTo\\":\\"attachment\\"} -->
+<ul class=\\"wp-block-gallery columns-3 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img data-id=\\"1\\" class=\\"wp-image-1\\"/></figure></li></ul>
+<!-- /wp:gallery -->"
+`;

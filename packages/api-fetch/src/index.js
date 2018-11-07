@@ -14,6 +14,30 @@ import namespaceEndpointMiddleware from './middlewares/namespace-endpoint';
 import httpV1Middleware from './middlewares/http-v1';
 import userLocaleMiddleware from './middlewares/user-locale';
 
+/**
+ * Default set of header values which should be sent with every request unless
+ * explicitly provided through apiFetch options.
+ *
+ * @type {Object}
+ */
+const DEFAULT_HEADERS = {
+	// The backend uses the Accept header as a condition for considering an
+	// incoming request as a REST request.
+	//
+	// See: https://core.trac.wordpress.org/ticket/44534
+	Accept: 'application/json, */*;q=0.1',
+};
+
+/**
+ * Default set of fetch option values which should be sent with every request
+ * unless explicitly provided through apiFetch options.
+ *
+ * @type {Object}
+ */
+const DEFAULT_OPTIONS = {
+	credentials: 'include',
+};
+
 const middlewares = [];
 
 function registerMiddleware( middleware ) {
@@ -22,19 +46,24 @@ function registerMiddleware( middleware ) {
 
 function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
-		const { url, path, body, data, parse = true, ...remainingOptions } = nextOptions;
-		const headers = {
-			Accept: 'application/json, */*;q=0.1',
-			'Content-Type': 'application/json',
-			...remainingOptions.headers,
-		};
+		const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
+		let { body, headers } = nextOptions;
+
+		// Merge explicitly-provided headers with default values.
+		headers = { ...DEFAULT_HEADERS, ...headers };
+
+		// The `data` property is a shorthand for sending a JSON body.
+		if ( data ) {
+			body = JSON.stringify( data );
+			headers[ 'Content-Type' ] = 'application/json';
+		}
 
 		const responsePromise = window.fetch(
 			url || path,
 			{
+				...DEFAULT_OPTIONS,
 				...remainingOptions,
-				credentials: 'include',
-				body: body || JSON.stringify( data ),
+				body,
 				headers,
 			}
 		);

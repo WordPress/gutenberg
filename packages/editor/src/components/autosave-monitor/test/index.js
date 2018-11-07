@@ -28,6 +28,33 @@ describe( 'AutosaveMonitor', () => {
 			expect( toggleTimer ).toHaveBeenCalledWith( true );
 		} );
 
+		it( 'should restart autosave timer when edits reference changes', () => {
+			const beforeReference = [];
+			const afterReference = [];
+			wrapper.setProps( {
+				isDirty: true,
+				isAutosaveable: true,
+				editsReference: beforeReference,
+			} );
+			toggleTimer.mockClear();
+
+			wrapper.setProps( {
+				isDirty: true,
+				isAutosaveable: true,
+				editsReference: beforeReference,
+			} );
+
+			expect( toggleTimer ).not.toHaveBeenCalled();
+
+			wrapper.setProps( {
+				isDirty: true,
+				isAutosaveable: true,
+				editsReference: afterReference,
+			} );
+
+			expect( toggleTimer ).toHaveBeenCalledWith( true );
+		} );
+
 		it( 'should stop autosave timer when the autosave is up to date', () => {
 			wrapper.setProps( { isDirty: true, isAutosaveable: false } );
 

@@ -1,8 +1,22 @@
+/**
+ * Internal dependencies
+ */
 import apiFetch from '../';
+
+/**
+ * Mock return value for a successful fetch JSON return value.
+ *
+ * @return {Promise} Mock return value.
+ */
+const DEFAULT_FETCH_MOCK_RETURN = Promise.resolve( {
+	status: 200,
+	json: () => Promise.resolve( {} ),
+} );
 
 describe( 'apiFetch', () => {
 	const originalFetch = window.fetch;
-	beforeAll( () => {
+
+	beforeEach( () => {
 		window.fetch = jest.fn();
 	} );
 
@@ -10,7 +24,7 @@ describe( 'apiFetch', () => {
 		window.fetch = originalFetch;
 	} );
 
-	it( 'should call the API propertly', () => {
+	it( 'should call the API properly', () => {
 		window.fetch.mockReturnValue( Promise.resolve( {
 			status: 200,
 			json() {
@@ -20,6 +34,71 @@ describe( 'apiFetch', () => {
 
 		return apiFetch( { path: '/random' } ).then( ( body ) => {
 			expect( body ).toEqual( { message: 'ok' } );
+		} );
+	} );
+
+	it( 'should fetch with non-JSON body', () => {
+		window.fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
+
+		const body = 'FormData';
+
+		apiFetch( {
+			path: '/wp/v2/media',
+			method: 'POST',
+			body,
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/media?_locale=user', {
+			credentials: 'include',
+			headers: {
+				Accept: 'application/json, */*;q=0.1',
+			},
+			method: 'POST',
+			body,
+		} );
+	} );
+
+	it( 'should fetch with a JSON body', () => {
+		window.fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
+
+		apiFetch( {
+			path: '/wp/v2/posts',
+			method: 'POST',
+			headers: {
+				'Content-Type': 'text/plain',
+			},
+			data: {},
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
+			body: '{}',
+			credentials: 'include',
+			headers: {
+				Accept: 'application/json, */*;q=0.1',
+				'Content-Type': 'application/json',
+			},
+			method: 'POST',
+		} );
+	} );
+
+	it( 'should respect developer-provided options', () => {
+		window.fetch.mockReturnValue( DEFAULT_FETCH_MOCK_RETURN );
+
+		apiFetch( {
+			path: '/wp/v2/posts',
+			method: 'POST',
+			data: {},
+			credentials: 'omit',
+		} );
+
+		expect( window.fetch ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
+			body: '{}',
+			credentials: 'omit',
+			headers: {
+				Accept: 'application/json, */*;q=0.1',
+				'Content-Type': 'application/json',
+			},
+			method: 'POST',
 		} );
 	} );
 

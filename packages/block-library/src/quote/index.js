@@ -215,8 +215,10 @@ export const settings = {
 								onReplace( [] );
 							}
 						} }
-						/* translators: the text of the quotation */
-						placeholder={ __( 'Write quote…' ) }
+						placeholder={
+							// translators: placeholder text used for the quote
+							__( 'Write quote…' )
+						}
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
@@ -226,8 +228,10 @@ export const settings = {
 									citation: nextCitation,
 								} )
 							}
-							/* translators: the individual or entity quoted */
-							placeholder={ __( 'Write citation…' ) }
+							placeholder={
+								// translators: placeholder text used for the citation
+								__( 'Write citation…' )
+							}
 							className="wp-block-quote__citation"
 						/>
 					) }
