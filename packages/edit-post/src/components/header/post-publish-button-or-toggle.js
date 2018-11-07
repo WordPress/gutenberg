@@ -6,9 +6,9 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies.
  */
-import { PostPublishPanelToggle, PostPublishButton } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { PostPublishPanelToggle, PostPublishButton } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 
 export function PostPublishButtonOrToggle( {
