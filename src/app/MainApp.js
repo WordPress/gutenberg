@@ -5,6 +5,7 @@ import React from 'react';
 import { subscribeParentGetHtml } from 'react-native-gutenberg-bridge';
 
 import BlockManager, { type BlockListType } from '../block-management/block-manager';
+import { SlotFillProvider } from '@wordpress/components';
 
 import type { EmitterSubscription } from 'react-native';
 
@@ -27,6 +28,10 @@ export default class MainScreen extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		return <BlockManager { ...this.props } />;
+		return (
+			<SlotFillProvider>
+				<BlockManager { ...this.props } />
+			</SlotFillProvider>
+		);
 	}
 }

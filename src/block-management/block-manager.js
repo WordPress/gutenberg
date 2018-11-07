@@ -7,11 +7,12 @@ import React from 'react';
 import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
-import { ToolbarButton } from './constants';
+import { InlineToolbarButton } from './constants';
 import type { BlockType } from '../store/';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
+import BlockToolbar from './block-toolbar';
 
 // Gutenberg imports
 import { createBlock, getBlockType, switchToBlockType } from '@wordpress/blocks';
@@ -53,7 +54,19 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onBlockHolderPressed( clientId: string ) {
+		this.focusDataSourceItem( clientId );
 		this.props.focusBlockAction( clientId );
+	}
+
+	focusDataSourceItem( clientId: string ) {
+		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
+			const block = this.state.dataSource.get( i );
+			if ( block.clientId === clientId ) {
+				block.focused = true;
+			} else {
+				block.focused = false;
+			}
+		}
 	}
 
 	getDataSourceIndexFromClientId( clientId: string ) {
@@ -112,25 +125,25 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return null;
 	}
 
-	onToolbarButtonPressed( button: number, clientId: string ) {
+	onInlineToolbarButtonPressed( button: number, clientId: string ) {
 		const dataSourceBlockIndex = this.getDataSourceIndexFromClientId( clientId );
 		switch ( button ) {
-			case ToolbarButton.UP:
+			case InlineToolbarButton.UP:
 				this.state.dataSource.moveUp( dataSourceBlockIndex );
 				this.props.moveBlockUpAction( clientId );
 				break;
-			case ToolbarButton.DOWN:
+			case InlineToolbarButton.DOWN:
 				this.state.dataSource.moveDown( dataSourceBlockIndex );
 				this.props.moveBlockDownAction( clientId );
 				break;
-			case ToolbarButton.DELETE:
+			case InlineToolbarButton.DELETE:
 				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
 				this.props.deleteBlockAction( clientId );
 				break;
-			case ToolbarButton.PLUS:
+			case InlineToolbarButton.PLUS:
 				this.showBlockTypePicker( true );
 				break;
-			case ToolbarButton.SETTINGS:
+			case InlineToolbarButton.SETTINGS:
 				// TODO: implement settings
 				break;
 		}
@@ -260,6 +273,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				{ list }
+				<BlockToolbar />
 			</KeyboardAvoidingView>
 		);
 	}
@@ -324,7 +338,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			<View>
 				<BlockHolder
 					key={ value.clientId }
-					onToolbarButtonPressed={ this.onToolbarButtonPressed.bind( this ) }
+					onInlineToolbarButtonPressed={ this.onInlineToolbarButtonPressed.bind( this ) }
 					onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
 					onChange={ this.onChange.bind( this ) }
 					showTitle={ this.state.inspectBlocks }
