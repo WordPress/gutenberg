@@ -48,7 +48,10 @@ describe( 'PostPublishPanelToggle', () => {
 
 		it( 'should be disabled if post is not saveable', () => {
 			const wrapper = shallow(
-				<PostPublishPanelToggle isSaveable={ false } />
+				<PostPublishPanelToggle
+					isSaveable={ false }
+					isPublishable
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
