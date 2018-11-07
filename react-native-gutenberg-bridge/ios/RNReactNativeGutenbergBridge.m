@@ -1,4 +1,3 @@
-
 #import "RNReactNativeGutenbergBridge.h"
 
 NSString *const RequestHTMLMessageName = @"requestGetHtml";
@@ -27,4 +26,3 @@ RCT_EXPORT_METHOD(provideToNative_Html:(NSString *)html)
 }
 
 @end
-  

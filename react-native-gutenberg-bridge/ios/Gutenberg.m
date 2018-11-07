@@ -49,12 +49,12 @@
 
 #pragma mark - GutenbergBridgeDelegate
 
--(id<GutenbergBridgeDelegate>)delegate
+- (id<GutenbergBridgeDelegate>)delegate
 {
     return self.gutenbergBridgeModule.delegate;
 }
 
--(void)setDelegate:(id<GutenbergBridgeDelegate>)delegate
+- (void)setDelegate:(id<GutenbergBridgeDelegate>)delegate
 {
     self.gutenbergBridgeModule.delegate = delegate;
 }
