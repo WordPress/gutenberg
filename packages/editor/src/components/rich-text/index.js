@@ -111,6 +111,7 @@ export class RichText extends Component {
 		this.isActive = this.isActive.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
+		this.createRecordFromRange = memize( this.createRecordFromRange.bind( this ), { size: 1 } );
 
 		this.savedContent = value;
 		this.patterns = getPatterns( {
@@ -175,8 +176,10 @@ export class RichText extends Component {
 	}
 
 	createRecord() {
-		const range = getSelection().getRangeAt( 0 );
+		return this.createRecordFromRange( getSelection().getRangeAt( 0 ) );
+	}
 
+	createRecordFromRange( range ) {
 		return create( {
 			element: this.editableRef,
 			range,
