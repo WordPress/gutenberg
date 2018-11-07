@@ -6,7 +6,6 @@ import { select } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-
 import { registerFormatType } from '../register-format-type';
 import { unregisterFormatType } from '../unregister-format-type';
 
@@ -41,9 +40,49 @@ describe( 'registerFormatType', () => {
 		expect( console ).toHaveErroredWith( 'Format names must be strings.' );
 	} );
 
-	it( 'should error on invalid name', () => {
-		registerFormatType( 'test', validSettings );
+	it( 'should reject format types without a namespace', () => {
+		const format = registerFormatType( 'doing-it-wrong' );
 		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should reject format types with too many namespaces', () => {
+		const format = registerFormatType( 'doing/it/wrong' );
+		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should reject format types with invalid characters', () => {
+		const format = registerFormatType( 'still/_doing_it_wrong' );
+		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should reject format types with uppercase characters', () => {
+		const format = registerFormatType( 'Core/Bold' );
+		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should reject format types not starting with a letter', () => {
+		const format = registerFormatType( 'my-plugin/4-fancy-format' );
+		expect( console ).toHaveErroredWith( 'Format names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-format' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should reject numbers', () => {
+		const format = registerFormatType( 42 );
+		expect( console ).toHaveErroredWith( 'Format names must be strings.' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should accept valid format names', () => {
+		const format = registerFormatType( 'my-plugin/fancy-format-4', validFormatSettings );
+		expect( console ).not.toHaveErrored();
+		expect( format ).toEqual( {
+			name: 'my-plugin/fancy-format-4',
+			...validFormatSettings
+		} );
 	} );
 
 	it( 'should error on already registered name', () => {
@@ -58,6 +97,15 @@ describe( 'registerFormatType', () => {
 			edit: undefined,
 		} );
 		expect( console ).toHaveErroredWith( 'The "edit" property must be specified and must be a valid function.' );
+	} );
+
+	it( 'should reject formats with an invalid edit function', () => {
+		registerFormatType( validName, {
+			...validSettings,
+			edit: 'not-a-function',
+		} );
+		expect( console ).toHaveErroredWith( 'The "edit" property must be specified and must be a valid function.' );
+		expect( format ).toBeUndefined();
 	} );
 
 	it( 'should error on empty tagName property', () => {
@@ -102,11 +150,38 @@ describe( 'registerFormatType', () => {
 		expect( console ).toHaveErroredWith( 'Format "plugin/test" is already registered to handle class name "test".' );
 	} );
 
+	it( 'should reject formats without title', () => {
+		const settings = { ...validSettings };
+		delete settings.title;
+		registerFormatType(validName, settings);
+		expect( console ).toHaveErroredWith( `The format "${ validName }" must have a title.` );
+		expect( format ).toBeUndefined();
+	} );
+
 	it( 'should error on empty title property', () => {
 		registerFormatType( validName, {
 			...validSettings,
 			title: '',
 		} );
 		expect( console ).toHaveErroredWith( 'The format "plugin/test" must have a title.' );
+	} );
+
+	it( 'should reject titles which are not strings', () => {
+		registerFormatType( validName, {
+			...validSettings,
+			title: 1337,
+		} );
+		expect( console ).toHaveErroredWith( 'Format titles must be strings.' );
+		expect( format ).toBeUndefined();
+	} );
+
+	it( 'should store a copy of the format type', () => {
+		const formatType = { ...validSettings };
+		registerFormatType( validName, formatType );
+		formatType.mutated = true;
+		expect( getFormatType( validName ) ).toEqual( {
+			name: validName,
+			...validSettings
+		} );
 	} );
 } );
