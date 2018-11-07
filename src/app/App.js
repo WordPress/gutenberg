@@ -8,8 +8,12 @@ import { Provider } from 'react-redux';
 import { setupStore, html2State } from '../store';
 import AppContainer from './AppContainer';
 import { Store } from 'redux';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { BlockEdit } from '@wordpress/editor';
 
 import initialHtml from './initial-html';
+
 
 type PropsType = {
 	initialData: string | Store,
@@ -18,7 +22,7 @@ type StateType = {
 	store: Store,
 };
 
-export default class AppProvider extends React.Component<PropsType, StateType> {
+class AppProvider extends React.Component<PropsType, StateType> {
 	state: StateType;
 
 	constructor( props: PropsType ) {
@@ -30,6 +34,9 @@ export default class AppProvider extends React.Component<PropsType, StateType> {
 					props.initialData :
 					setupStore( html2State( props.initialData !== undefined ? props.initialData : initialHtml ) ),
 		};
+
+		// initialize gutenberg store with local store
+		props.onResetBlocks( this.state.store.getState().blocks );
 	}
 
 	render() {
@@ -40,3 +47,12 @@ export default class AppProvider extends React.Component<PropsType, StateType> {
 		);
 	}
 }
+
+export default withDispatch( ( dispatch ) => {
+	const {
+		resetBlocks,
+	} = dispatch( 'core/editor' );
+	return {
+		onResetBlocks: resetBlocks,
+	};
+} )( AppProvider );
