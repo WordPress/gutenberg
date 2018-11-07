@@ -45,7 +45,7 @@
 		"@commitlint/config-conventional": "^7.0.1",
 		"@wordpress/npm-package-json-lint-config": "^1.1.2",
 		"eslint": "^5.4.0",
-		"eslint-plugin-jest": "^21.21.0",
+		"eslint-plugin-jest": "^22.0.0",
 		"eslint-plugin-wordpress": "git://github.com/WordPress-Coding-Standards/eslint-plugin-wordpress.git#b65ae0cea1199c9714641ed3be7ea98fcb27dd6c",
 		"husky": "^1.1.2",
 		"jest": "^23.5.0",
