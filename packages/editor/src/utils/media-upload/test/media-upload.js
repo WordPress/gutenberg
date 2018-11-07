@@ -126,6 +126,33 @@ describe( 'mediaUpload', () => {
 		expect( onError ).not.toHaveBeenCalled();
 	} );
 
+	it( 'should only fail the file that caused the validation to fail and still allow others to succeed when uploading multiple files', () => {
+		const onError = jest.fn();
+		const invalidTestFile = {
+			url: 'https://cldup.com/uuUqE_dXzy.mp3',
+			type: 'image/jpeg',
+			name: 'myimage.jpg',
+		};
+		const validTestFile = {
+			url: 'https://cldup.com/uuUqE_dXzy.mp3',
+			type: 'audio/mp3',
+			name: 'mymusic.mp3',
+		};
+
+		mediaUpload( {
+			filesList: [ invalidTestFile, validTestFile ],
+			onFileChange: onFileChangeSpy,
+			allowedTypes: [ 'audio' ],
+			onError,
+		} );
+
+		expect( onError.mock.calls ).toHaveLength( 1 );
+		expect( onError.mock.calls[ 0 ][ 0 ].file ).toBe( invalidTestFile );
+
+		expect( createBlobURL.mock.calls ).toHaveLength( 1 );
+		expect( createBlobURL ).toHaveBeenCalledWith( validTestFile );
+	} );
+
 	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
 		const onError = jest.fn();
 

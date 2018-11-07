@@ -115,7 +115,9 @@ export async function mediaUpload( {
 		onError( error );
 	};
 
-	for ( const mediaFile of files ) {
+	// Using a normal for loop here since the loop contains an 'await'.
+	for ( let idx = 0; idx < files.length; ++idx ) {
+		const mediaFile = files[ idx ];
 		// verify if user is allowed to upload this mime type
 		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
 			triggerError( {
@@ -123,7 +125,7 @@ export async function mediaUpload( {
 				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
 
 		// Check if the block supports this mime type
@@ -133,7 +135,7 @@ export async function mediaUpload( {
 				message: __( 'Sorry, this file type is not supported here.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
 
 		// verify if file is greater than the maximum file upload size allowed for the site.
@@ -143,7 +145,7 @@ export async function mediaUpload( {
 				message: __( 'This file exceeds the maximum upload size for this site.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
 
 		// Don't allow empty files to be uploaded.
@@ -153,17 +155,14 @@ export async function mediaUpload( {
 				message: __( 'This file is empty.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
 
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
 		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
-	}
 
-	for ( let idx = 0; idx < files.length; ++idx ) {
-		const mediaFile = files[ idx ];
 		try {
 			const savedMedia = await createMediaFromFile( mediaFile, additionalData );
 			const mediaObject = {
