@@ -80,7 +80,7 @@ export class PostTextEditor extends Component {
 					onBlur={ this.stopEditing }
 					className="editor-post-text-editor"
 					id={ `post-content-${ instanceId }` }
-					placeholder={ decodedPlaceholder || __( 'Type text or press “/” to select a block' ) }
+					placeholder={ decodedPlaceholder || __( 'Type text or press “/” to insert a block' ) }
 				/>
 			</Fragment>
 		);
