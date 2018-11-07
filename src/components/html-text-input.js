@@ -6,7 +6,9 @@
 import React from 'react';
 import { Platform, TextInput, KeyboardAvoidingView } from 'react-native';
 import styles from './html-text-input.scss';
-import { serializeBlocksToHtml } from '../block-management/block-serializer';
+
+// Gutenberg imports
+import { serialize } from '@wordpress/blocks';
 
 type PropsType = {
 	blocks: Array<Object>,
@@ -25,7 +27,7 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 	textInput: TextInput;
 
 	componentDidMount() {
-		const html = serializeBlocksToHtml( this.props.blocks );
+		const html = this.serializeBlocksToHtml();
 		this.setState( { html } );
 		if ( this.isIOS ) {
 			this.textInput.setNativeProps( { text: html } );
@@ -39,6 +41,20 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 
 	shouldComponentUpdate() {
 		return ! this.isIOS;
+	}
+
+	serializeBlocksToHtml() {
+		return this.props.blocks
+			.map( this.serializeBlock )
+			.join( '' );
+	}
+
+	serializeBlock( block: Object ) {
+		if ( block.name === 'aztec' ) {
+			return '<aztec>' + block.attributes.content + '</aztec>\n\n';
+		}
+
+		return serialize( [ block ] ) + '\n\n';
 	}
 
 	render() {
