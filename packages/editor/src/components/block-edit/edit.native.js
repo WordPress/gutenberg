@@ -12,12 +12,11 @@ export const Edit = ( props ) => {
 		return null;
 	}
 
-	// `edit` and `save` are functions or components describing the markup
-	// with which a block is displayed. If `blockType` is valid, assign
-	// them preferentially as the render value for the block.
-	const Component = blockType.edit || blockType.save;
+	const Component = blockType.edit;
 
-	return <Component { ...props } />;
+	return (
+		<Component { ...props } />
+	);
 };
 
 export default withFilters( 'editor.BlockEdit' )( Edit );

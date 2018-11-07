@@ -62,6 +62,33 @@ export const jsTester = ( parse ) => () => {
 		] ) ) );
 	} );
 
+	describe( 'innerBlock placemarkers', () => {
+		test( 'innerContent exists', () => {
+			expect( parse( 'test' )[ 0 ] ).toHaveProperty( 'innerContent', [ 'test' ] );
+			expect( parse( '<!-- wp:void /-->' )[ 0 ] ).toHaveProperty( 'innerContent', [] );
+		} );
+
+		test( 'innerContent contains innerHTML', () => {
+			expect( parse( '<!-- wp:block -->Inner<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerContent', [ 'Inner' ] );
+		} );
+
+		test( 'block locations become null', () => {
+			expect( parse( '<!-- wp:block --><!-- wp:void /--><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerContent', [ null ] );
+		} );
+
+		test( 'HTML soup appears after blocks', () => {
+			expect( parse( '<!-- wp:block --><!-- wp:void /-->After<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerContent', [ null, 'After' ] );
+		} );
+
+		test( 'HTML soup appears before blocks', () => {
+			expect( parse( '<!-- wp:block -->Before<!-- wp:void /--><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerContent', [ 'Before', null ] );
+		} );
+
+		test( 'blocks follow each other', () => {
+			expect( parse( '<!-- wp:block --><!-- wp:void /--><!-- wp:void /--><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerContent', [ null, null ] );
+		} );
+	} );
+
 	describe( 'attack vectors', () => {
 		test( 'really long JSON attribute sections', () => {
 			const length = 100000;

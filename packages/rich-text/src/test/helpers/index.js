@@ -709,3 +709,80 @@ export const spec = [
 		},
 	},
 ];
+
+export const specWithRegistration = [
+	{
+		description: 'should create format by matching the class',
+		formatName: 'my-plugin/link',
+		formatType: {
+			title: 'Custom Link',
+			tagName: 'a',
+			className: 'custom-format',
+			edit() {},
+		},
+		html: '<a class="custom-format">a</a>',
+		value: {
+			formats: [ [ {
+				type: 'my-plugin/link',
+				attributes: {},
+				unregisteredAttributes: {},
+			} ] ],
+			text: 'a',
+		},
+	},
+	{
+		description: 'should retain class names',
+		formatName: 'my-plugin/link',
+		formatType: {
+			title: 'Custom Link',
+			tagName: 'a',
+			className: 'custom-format',
+			edit() {},
+		},
+		html: '<a class="custom-format test">a</a>',
+		value: {
+			formats: [ [ {
+				type: 'my-plugin/link',
+				attributes: {},
+				unregisteredAttributes: {
+					class: 'test',
+				},
+			} ] ],
+			text: 'a',
+		},
+	},
+	{
+		description: 'should create base format',
+		formatName: 'core/link',
+		formatType: {
+			title: 'Link',
+			tagName: 'a',
+			className: null,
+			edit() {},
+		},
+		html: '<a class="custom-format">a</a>',
+		value: {
+			formats: [ [ {
+				type: 'core/link',
+				attributes: {},
+				unregisteredAttributes: {
+					class: 'custom-format',
+				},
+			} ] ],
+			text: 'a',
+		},
+	},
+	{
+		description: 'should create fallback format',
+		html: '<a class="custom-format">a</a>',
+		value: {
+			formats: [ [ {
+				type: 'a',
+				attributes: {
+					class: 'custom-format',
+				},
+			} ] ],
+			text: 'a',
+		},
+	},
+];

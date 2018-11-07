@@ -60,12 +60,14 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			...additionalProps
 		} = this.props;
-		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
 		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'isDirty' ] );
+		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
+		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
+		const isPostPublish = isPublishedOrScheduled && ! isSaving;
 		return (
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
-					{ isPublishedOrScheduled && ! isSaving ? (
+					{ isPostPublish ? (
 						<div className="editor-post-publish-panel__header-published">
 							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
 						</div>
@@ -83,13 +85,13 @@ export class PostPublishPanel extends Component {
 					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
-					{ ! isSaving && ! isPublishedOrScheduled && (
+					{ isPrePublish && (
 						<PostPublishPanelPrepublish>
 							{ PrePublishExtension && <PrePublishExtension /> }
 						</PostPublishPanelPrepublish>
 					) }
-					{ ! isSaving && isPublishedOrScheduled && (
-						<PostPublishPanelPostpublish>
+					{ isPostPublish && (
+						<PostPublishPanelPostpublish focusOnMount={ true } >
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }

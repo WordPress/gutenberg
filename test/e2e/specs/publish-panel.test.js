@@ -5,6 +5,7 @@ import {
 	newPost,
 	openPublishPanel,
 	pressWithModifier,
+	publishPost,
 } from '../support/utils';
 
 describe( 'PostPublishPanel', () => {
@@ -23,7 +24,7 @@ describe( 'PostPublishPanel', () => {
 		}
 	} );
 
-	it( 'publish button should have focus', async () => {
+	it( 'PrePublish: publish button should have the focus', async () => {
 		await page.type( '.editor-post-title__input', 'E2E Test Post' );
 		await openPublishPanel();
 
@@ -31,6 +32,21 @@ describe( 'PostPublishPanel', () => {
 			return Object.values( focusedElement.classList );
 		} );
 		expect( focusedElementClassList ).toContain( 'editor-post-publish-button' );
+	} );
+
+	it( 'PostPublish: post link should have the focus', async () => {
+		const postTitle = 'E2E Test Post';
+		await page.type( '.editor-post-title__input', postTitle );
+		await publishPost();
+
+		const focusedElementTag = await page.$eval( ':focus', ( focusedElement ) => {
+			return focusedElement.tagName.toLowerCase();
+		} );
+		const focusedElementText = await page.$eval( ':focus', ( focusedElement ) => {
+			return focusedElement.text;
+		} );
+		expect( focusedElementTag ).toBe( 'a' );
+		expect( focusedElementText ).toBe( postTitle );
 	} );
 
 	it( 'should retain focus within the panel', async () => {

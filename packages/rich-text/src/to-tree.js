@@ -9,21 +9,14 @@ import {
 	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
-function fromFormat( { type, attributes, object } ) {
+function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	const formatType = getFormatType( type );
 
 	if ( ! formatType ) {
 		return { type, attributes, object };
 	}
 
-	if ( ! attributes ) {
-		return {
-			type: formatType.match.tagName,
-			object: formatType.object,
-		};
-	}
-
-	const elementAttributes = {};
+	const elementAttributes = { ...unregisteredAttributes };
 
 	for ( const name in attributes ) {
 		const key = formatType.attributes[ name ];
@@ -35,8 +28,16 @@ function fromFormat( { type, attributes, object } ) {
 		}
 	}
 
+	if ( formatType.className ) {
+		if ( elementAttributes.class ) {
+			elementAttributes.class = `${ formatType.className } ${ elementAttributes.class }`;
+		} else {
+			elementAttributes.class = formatType.className;
+		}
+	}
+
 	return {
-		type: formatType.match.tagName,
+		type: formatType.tagName,
 		object: formatType.object,
 		attributes: elementAttributes,
 	};
@@ -145,15 +146,14 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes, object } = format;
 				const parent = getParent( pointer );
-				const newNode = append( parent, fromFormat( { type, attributes, object } ) );
+				const newNode = append( parent, fromFormat( format ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );
 				}
 
-				pointer = append( object ? parent : newNode, '' );
+				pointer = append( format.object ? parent : newNode, '' );
 			} );
 		}
 
