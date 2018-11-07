@@ -12,10 +12,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface Gutenberg : NSObject
 
 @property (nonatomic, weak, nullable) id<GutenbergBridgeDelegate> delegate;
+@property (nonatomic, strong, readonly) UIView* rootView;
 
-+ (instancetype)sharedInstance;
-- (instancetype)init NS_UNAVAILABLE;
-- (UIView *)rootViewWithInitialProps:(NSDictionary<NSString *, id> *)props;
+- (instancetype)initWithProps:(nullable NSDictionary<NSString *, id> *)props NS_DESIGNATED_INITIALIZER;
 
 #pragma mark - Messages
 

@@ -2,15 +2,16 @@
 import UIKit
 
 class GutenbergViewController: UIViewController {
+    lazy var gutenberg = Gutenberg()
 
     override func loadView() {
-        view = Gutenberg.sharedInstance().rootView(withInitialProps: [:])
+        view = gutenberg.rootView
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         addSaveButton()
-        Gutenberg.sharedInstance().delegate = self
+        gutenberg.delegate = self
         navigationController?.navigationBar.isTranslucent = false
     }
 
@@ -19,7 +20,7 @@ class GutenbergViewController: UIViewController {
     }
 
     @objc func saveButtonPressed(sender: UIBarButtonItem) {
-        Gutenberg.sharedInstance().requestHTML()
+        gutenberg.requestHTML()
     }
 }
 

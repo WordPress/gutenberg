@@ -9,37 +9,24 @@
 @interface Gutenberg ()<RCTBridgeDelegate>
 @property (nonatomic, strong, readonly) RCTBridge *bridge;
 @property (nonatomic, strong) RNReactNativeGutenbergBridge* gutenbergBridgeModule;
-@property (nonatomic, strong) UIView* gutenbergRootView;
 @end
 
 @implementation Gutenberg
 
-+ (instancetype)sharedInstance;
-{
-    static Gutenberg *_sharedInstance = nil;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        _sharedInstance = [[self alloc] init];
-    });
-    return _sharedInstance;
-}
-
-- (instancetype)init
+- (instancetype)initWithProps:(NSDictionary<NSString *, id> *)props
 {
     self = [super init];
     if (self) {
         _gutenbergBridgeModule = [RNReactNativeGutenbergBridge new];
         _bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:nil];
+        _rootView = [[RCTRootView alloc] initWithBridge:_bridge moduleName:@"gutenberg" initialProperties:props];
     }
     return self;
 }
 
-- (UIView *)rootViewWithInitialProps:(NSDictionary<NSString *, id> *)props
+-(instancetype)init
 {
-    if (!self.gutenbergRootView) {
-        self.gutenbergRootView = [[RCTRootView alloc] initWithBridge:_bridge moduleName:@"gutenberg" initialProperties:props];
-    }
-    return self.gutenbergRootView;
+    return [self initWithProps:nil];
 }
 
 #pragma mark - RCTBridgeDelegate
@@ -51,7 +38,7 @@
 
 - (NSArray<id<RCTBridgeModule>> *)extraModulesForBridge:(RCTBridge *)bridge
 {
-    return @[_gutenbergBridgeModule];
+    return @[self.gutenbergBridgeModule];
 }
 
 #pragma mark - GutenbergBridgeDelegate
