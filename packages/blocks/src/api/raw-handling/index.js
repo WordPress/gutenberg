@@ -65,15 +65,26 @@ function getRawTransformations() {
 		} );
 }
 
-function htmlToBlocks( { html, rawTransformations } ) {
+/**
+ * Converts HTML directly to blocks. Looks for a matching transform for each
+ * top-level tag. The HTML should be filtered to not have any text between
+ * top-level tags and formatted in a way that blocks can handle the HTML.
+ *
+ * @param  {Object} $1               Named parameters.
+ * @param  {string} $1.html          HTML to convert.
+ * @param  {Array}  $1.rawTransforms Transforms that can be used.
+ *
+ * @return {Array} An array of blocks.
+ */
+function htmlToBlocks( { html, rawTransforms } ) {
 	const doc = document.implementation.createHTMLDocument( '' );
 
 	doc.body.innerHTML = html;
 
 	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransformation = findTransform( rawTransformations, ( { isMatch } ) => isMatch( node ) );
+		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
 
-		if ( ! rawTransformation ) {
+		if ( ! rawTransform ) {
 			console.warn(
 				'A block registered a raw transformation schema for `' + node.nodeName + '` but did not match it. ' +
 				'Make sure there is a `selector` or `isMatch` property that can match the schema.\n' +
@@ -83,7 +94,7 @@ function htmlToBlocks( { html, rawTransformations } ) {
 			return;
 		}
 
-		const { transform, blockName } = rawTransformation;
+		const { transform, blockName } = rawTransform;
 
 		if ( transform ) {
 			return transform( node );
@@ -171,9 +182,9 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		return filterInlineHTML( HTML );
 	}
 
-	const rawTransformations = getRawTransformations();
+	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema();
-	const blockContentSchema = getBlockContentSchema( rawTransformations );
+	const blockContentSchema = getBlockContentSchema( rawTransforms );
 
 	const blocks = compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
@@ -210,7 +221,7 @@ export function pasteHandler( { HTML = '', plainText = '', mode = 'AUTO', tagNam
 		// Allows us to ask for this information when we get a report.
 		console.log( 'Processed HTML piece:\n\n', piece );
 
-		return htmlToBlocks( { html: piece, rawTransformations } );
+		return htmlToBlocks( { html: piece, rawTransforms } );
 	} ) );
 
 	// If we're allowed to return inline content and there is only one block
@@ -246,8 +257,8 @@ export function rawHandler( { HTML = '' } ) {
 	// An array of HTML strings and block objects. The blocks replace matched
 	// shortcodes.
 	const pieces = shortcodeConverter( HTML );
-	const rawTransformations = getRawTransformations();
-	const blockContentSchema = getBlockContentSchema( rawTransformations );
+	const rawTransforms = getRawTransformations();
+	const blockContentSchema = getBlockContentSchema( rawTransforms );
 
 	return compact( flatMap( pieces, ( piece ) => {
 		// Already a block from shortcode.
@@ -255,15 +266,22 @@ export function rawHandler( { HTML = '' } ) {
 			return piece;
 		}
 
+		// These filters are essential for some blocks to be able to transform
+		// from raw HTML. These filters move around some content or add
+		// additional tags, they do not remove any content.
 		const filters = [
+			// Needed to create more and nextpage blocks.
 			specialCommentConverter,
+			// Needed to create media blocks.
 			figureContentReducer,
+			// Needed to create the quote block, which cannot handle text
+			// without wrapper paragraphs.
 			blockquoteNormaliser,
 		];
 
 		piece = deepFilterHTML( piece, filters, blockContentSchema );
 		piece = normaliseBlocks( piece );
 
-		return htmlToBlocks( { html: piece, rawTransformations } );
+		return htmlToBlocks( { html: piece, rawTransforms } );
 	} ) );
 }
