@@ -34,9 +34,13 @@ describe( 'PostPublishPanelToggle', () => {
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be disabled if post is not publishable', () => {
+		it( 'should be disabled if post is not publishable and not forceIsDirty', () => {
 			const wrapper = shallow(
-				<PostPublishPanelToggle isPublishable={ false } />
+				<PostPublishPanelToggle
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty={ false }
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
@@ -56,6 +60,18 @@ describe( 'PostPublishPanelToggle', () => {
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+		} );
+
+		it( 'should be enabled if post is saveable but not publishable and forceIsDirty is true', () => {
+			const wrapper = shallow(
+				<PostPublishPanelToggle
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty={ true }
+				/>
+			);
+
+			expect( wrapper.prop( 'disabled' ) ).toBe( false );
 		} );
 
 		it( 'should be enabled otherwise', () => {
