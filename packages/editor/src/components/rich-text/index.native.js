@@ -269,18 +269,18 @@ export class RichText extends Component {
 		}
 		// The check below allows us to avoid updating the content right after an `onChange` call.
 		// The first time the component is drawn `lastContent` and `lastEventCount ` are both undefined
-		if ( this.lastEventCount && 
+		if ( this.lastEventCount &&
 			nextProps.value &&
 			this.lastContent &&
-			nextProps.value === this.lastContent) {
+			nextProps.value === this.lastContent ) {
 			return false;
 		}
 
-		// If the component is changed React side (merging/splitting/custom text actions) we need to make sure 
+		// If the component is changed React side (merging/splitting/custom text actions) we need to make sure
 		// the native is updated as well
 		if ( nextProps.value &&
 			this.lastContent &&
-			nextProps.value !== this.lastContent) {
+			nextProps.value !== this.lastContent ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
