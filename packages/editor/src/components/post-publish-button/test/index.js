@@ -24,6 +24,18 @@ describe( 'PostPublishButton', () => {
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
+		it( 'should be disabled if forceIsSaving is true', () => {
+			const wrapper = shallow(
+				<PostPublishButton
+					isPublishable
+					isSaveable
+					forceIsSaving
+				/>
+			);
+
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+		} );
+
 		it( 'should be disabled if post is not publishable', () => {
 			const wrapper = shallow(
 				<PostPublishButton
