@@ -26,7 +26,7 @@ const DEFAULT_NOTICES = [];
  *                                      user. Defaults to `true`.
  * @property {WPNoticeAction[]} actions User actions to present with notice.
  *
- * @typedef {Notice}
+ * @typedef {WPNotice}
  */
 
 /**
@@ -48,7 +48,7 @@ const DEFAULT_NOTICES = [];
  * @param {Object}  state   Notices state.
  * @param {?string} context Optional grouping context.
  *
- * @return {Notice[]} Array of notices.
+ * @return {WPNotice[]} Array of notices.
  */
 export function getNotices( state, context = DEFAULT_CONTEXT ) {
 	return state[ context ] || DEFAULT_NOTICES;
