@@ -199,7 +199,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// Ignore merge if blocks aren't known
 		if ( ! blockA || ! blockB ) {
-			// Updates calls from the native side may arrive late, and one of the block 
+			// Updates calls from the native side may arrive late, and one of the block
 			// may not be available
 			return;
 		}
