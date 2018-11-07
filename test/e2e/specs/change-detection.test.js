@@ -91,11 +91,11 @@ describe( 'Change detection', () => {
 	it( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async () => {
 		await page.type( '.editor-post-title__input', 'Hello World' );
 
-		// Toggle post as sticky (not persisted for autosave).
+		// Toggle post as needing review (not persisted for autosave).
 		await ensureSidebarOpened();
 
-		const postStickyToggleButton = ( await page.$x( "//label[contains(text(), 'Stick to the Front Page')]" ) )[ 0 ];
-		await postStickyToggleButton.click( 'button' );
+		const postPendingReviewButton = ( await page.$x( "//label[contains(text(), 'Pending Review')]" ) )[ 0 ];
+		await postPendingReviewButton.click( 'button' );
 
 		// Force autosave to occur immediately.
 		await Promise.all( [
