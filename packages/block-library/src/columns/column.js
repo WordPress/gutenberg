@@ -20,6 +20,7 @@ export const settings = {
 
 	supports: {
 		inserter: false,
+		reusable: false,
 	},
 
 	edit() {
