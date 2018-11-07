@@ -1630,7 +1630,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'maxUploadFileSize'      => $max_upload_size,
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
-		'availableImageSizes'    => gutenberg_get_available_image_sizes(),
+		'imageSizes'             => gutenberg_get_available_image_sizes(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,

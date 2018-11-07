@@ -260,6 +260,20 @@ class ImageEdit extends Component {
 		} );
 	}
 
+	getImageSizeOptions() {
+		const { imageSizes, image } = this.props;
+		return compact( map( imageSizes, ( { name, slug } ) => {
+			const sizeUrl = get( image, [ 'media_details', 'sizes', slug, 'source_url' ] );
+			if ( ! sizeUrl ) {
+				return null;
+			}
+			return {
+				value: sizeUrl,
+				label: name,
+			};
+		} ) );
+	}
+
 	render() {
 		const { isEditing } = this.state;
 		const {
@@ -273,11 +287,10 @@ class ImageEdit extends Component {
 			noticeUI,
 			toggleSelection,
 			isRTL,
-			availableImageSizes,
-			image,
 		} = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, width, height, linkTarget } = attributes;
 		const isExternal = isExternalImage( id, url );
+		const imageSizeOptions = this.getImageSizeOptions();
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -361,20 +374,11 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 					/>
-					{ ! isEmpty( availableImageSizes ) && (
+					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
-							options={ compact( map( availableImageSizes, ( { name, slug } ) => {
-								const sizeUrl = get( image, [ 'media_details', 'sizes', slug, 'source_url' ] );
-								if ( ! sizeUrl ) {
-									return null;
-								}
-								return {
-									value: sizeUrl,
-									label: name,
-								};
-							} ) ) }
+							options={ imageSizeOptions }
 							onChange={ this.updateImageURL }
 						/>
 					) }
@@ -588,13 +592,13 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, availableImageSizes } = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
-			availableImageSizes,
+			imageSizes,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
