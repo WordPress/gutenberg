@@ -61,7 +61,7 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  * @param   {Function} $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
  * @param   {?Object}  $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  */
-export function mediaUpload( {
+export async function mediaUpload( {
 	allowedTypes,
 	additionalData = {},
 	filesList,
@@ -115,7 +115,7 @@ export function mediaUpload( {
 		onError( error );
 	};
 
-	files.forEach( ( mediaFile, idx ) => {
+	for ( const mediaFile of files ) {
 		// verify if user is allowed to upload this mime type
 		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
 			triggerError( {
@@ -160,38 +160,40 @@ export function mediaUpload( {
 		// with final file from media gallery when upload is `done` below
 		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
+	}
 
-		return createMediaFromFile( mediaFile, additionalData )
-			.then( ( savedMedia ) => {
-				const mediaObject = {
-					...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
-					alt: savedMedia.alt_text,
-					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
-					title: savedMedia.title.raw,
-					url: savedMedia.source_url,
-				};
-				setAndUpdateFiles( idx, mediaObject );
-			} )
-			.catch( ( error ) => {
-				// Reset to empty on failure.
-				setAndUpdateFiles( idx, null );
-				let message;
-				if ( has( error, [ 'message' ] ) ) {
-					message = get( error, [ 'message' ] );
-				} else {
-					message = sprintf(
-						// translators: %s: file name
-						__( 'Error while uploading file %s to the media library.' ),
-						mediaFile.name
-					);
-				}
-				onError( {
-					code: 'GENERAL',
-					message,
-					file: mediaFile,
-				} );
+	for ( let idx = 0; idx < files.length; ++idx ) {
+		const mediaFile = files[ idx ];
+		try {
+			const savedMedia = await createMediaFromFile( mediaFile, additionalData );
+			const mediaObject = {
+				...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
+				alt: savedMedia.alt_text,
+				caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
+				title: savedMedia.title.raw,
+				url: savedMedia.source_url,
+			};
+			setAndUpdateFiles( idx, mediaObject );
+		} catch ( error ) {
+			// Reset to empty on failure.
+			setAndUpdateFiles( idx, null );
+			let message;
+			if ( has( error, [ 'message' ] ) ) {
+				message = get( error, [ 'message' ] );
+			} else {
+				message = sprintf(
+					// translators: %s: file name
+					__( 'Error while uploading file %s to the media library.' ),
+					mediaFile.name
+				);
+			}
+			onError( {
+				code: 'GENERAL',
+				message,
+				file: mediaFile,
 			} );
-	} );
+		}
+	}
 }
 
 /**

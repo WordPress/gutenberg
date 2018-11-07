@@ -1,7 +1,19 @@
 /**
+ * WordPress dependencies
+ */
+import { createBlobURL } from '@wordpress/blob';
+
+/**
  * Internal dependencies
  */
 import { mediaUpload, getMimeTypesArray } from '../media-upload';
+
+// Image uploading fails in a test environment because
+// window.URL.createObjectURL is missing. We can check success by seeing if
+// mediaUpload() attempts to create a blob URL for the image.
+jest.mock( '@wordpress/blob', () => ( {
+	createBlobURL: jest.fn(),
+} ) );
 
 const invalidMediaObj = {
 	url: 'https://cldup.com/uuUqE_dXzy.jpg',
@@ -18,12 +30,10 @@ const validMediaObj = {
 
 describe( 'mediaUpload', () => {
 	const onFileChangeSpy = jest.fn();
-	const createObjectURL = jest.fn();
-	window.URL.createObjectURL = createObjectURL;
 
 	beforeEach( () => {
 		onFileChangeSpy.mockReset();
-		createObjectURL.mockReset();
+		createBlobURL.mockReset();
 	} );
 
 	it( 'should do nothing on no files', () => {
@@ -51,26 +61,18 @@ describe( 'mediaUpload', () => {
 			type: 'image/jpeg',
 			name: 'myImage.jpeg',
 		};
-		expect( () => {
-			mediaUpload( {
-				filesList: [ testFile ],
-				onFileChange: onFileChangeSpy,
-				allowedTypes: [ 'image/gif' ],
-				onError,
-			} );
-		} ).not.toThrow();
-		expect( createObjectURL ).not.toHaveBeenCalled();
+		mediaUpload( {
+			filesList: [ testFile ],
+			onFileChange: onFileChangeSpy,
+			allowedTypes: [ 'image/gif' ],
+			onError,
+		} );
+		expect( createBlobURL ).not.toHaveBeenCalled();
 		expect( onError ).toHaveBeenCalled();
 		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
-
-		createObjectURL.mockReset();
 	} );
 
 	it( 'should work as expected if allowedTypes contains a complete mime type string and the validation has success', () => {
-		// When the upload has success we get errors because we don't have available on the test environment
-		// all the functions required by mediaUpload.
-		// We know that when a validation success the function tries to create a temporary url for the file
-		// so we use that function to test the validation success.
 		const onError = jest.fn();
 		const testFile = {
 			url: 'https://cldup.com/uuUqE_dXzy.mp3',
@@ -78,15 +80,13 @@ describe( 'mediaUpload', () => {
 			name: 'myImage.jpeg',
 		};
 
-		expect( () => {
-			mediaUpload( {
-				filesList: [ testFile ],
-				onFileChange: onFileChangeSpy,
-				allowedTypes: [ 'image/jpeg' ],
-				onError,
-			} );
-		} ).toThrow();
-		expect( createObjectURL ).not.toHaveBeenCalled();
+		mediaUpload( {
+			filesList: [ testFile ],
+			onFileChange: onFileChangeSpy,
+			allowedTypes: [ 'image/jpeg' ],
+			onError,
+		} );
+		expect( createBlobURL ).toHaveBeenCalled();
 		expect( onError ).not.toHaveBeenCalled();
 	} );
 
@@ -97,26 +97,18 @@ describe( 'mediaUpload', () => {
 			type: 'audio/mp3',
 			name: 'mymusic.mp3',
 		};
-		expect( () => {
-			mediaUpload( {
-				filesList: [ testFile ],
-				onFileChange: onFileChangeSpy,
-				allowedTypes: [ 'video', 'image' ],
-				onError,
-			} );
-		} ).not.toThrow();
-		expect( createObjectURL ).not.toHaveBeenCalled();
+		mediaUpload( {
+			filesList: [ testFile ],
+			onFileChange: onFileChangeSpy,
+			allowedTypes: [ 'video', 'image' ],
+			onError,
+		} );
+		expect( createBlobURL ).not.toHaveBeenCalled();
 		expect( onError ).toHaveBeenCalled();
 		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
-
-		createObjectURL.mockReset();
 	} );
 
 	it( 'should work as expected if allowedTypes contains multiple types and the validation has success', () => {
-		// When the upload has success we get errors because we don't have available on the test environment
-		// all the functions required by mediaUpload.
-		// We know that when a validation success the function tries to create a temporary url for the file
-		// so we use that function to test the validation success.
 		const onError = jest.fn();
 		const testFile = {
 			url: 'https://cldup.com/uuUqE_dXzy.mp3',
@@ -124,15 +116,13 @@ describe( 'mediaUpload', () => {
 			name: 'mymusic.mp3',
 		};
 
-		expect( () => {
-			mediaUpload( {
-				filesList: [ testFile ],
-				onFileChange: onFileChangeSpy,
-				allowedTypes: [ 'image', 'audio' ],
-				onError,
-			} );
-		} ).toThrow();
-		expect( createObjectURL ).not.toHaveBeenCalled();
+		mediaUpload( {
+			filesList: [ testFile ],
+			onFileChange: onFileChangeSpy,
+			allowedTypes: [ 'image', 'audio' ],
+			onError,
+		} );
+		expect( createBlobURL ).toHaveBeenCalled();
 		expect( onError ).not.toHaveBeenCalled();
 	} );
 
