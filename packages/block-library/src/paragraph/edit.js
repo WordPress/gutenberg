@@ -245,7 +245,7 @@ class ParagraphBlock extends Component {
 					onMerge={ mergeBlocks }
 					onReplace={ this.onReplace }
 					onRemove={ () => onReplace( [] ) }
-					aria-label={ __( 'Empty block; type text or use the forward slash key to insert a block' ) }
+					aria-label={ __( 'Empty block; type text or press the forward slash key to insert a block' ) }
 					placeholder={ placeholder || __( 'Type text or press “/” to insert a block' ) }
 				/>
 			</Fragment>
