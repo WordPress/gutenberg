@@ -172,7 +172,7 @@ class InlineLinkUI extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		const { activeAttributes: { url }, value, onChange } = this.props;
+		const { activeAttributes: { url = '' }, value, onChange } = this.props;
 
 		this.setState( { opensInNewWindow } );
 
