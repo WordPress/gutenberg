@@ -75,7 +75,7 @@ describe( 'MenuItem', () => {
 
 	it( 'should avoid using aria-checked if only menuitem is set as aria-role', () => {
 		const wrapper = shallow(
-			<MenuItem role="menuitem"><div /></MenuItem>
+			<MenuItem role="menuitem" isSelected={ true }><div /></MenuItem>
 		);
 
 		expect( wrapper.prop( 'aria-checked' ) ).toBeUndefined();
