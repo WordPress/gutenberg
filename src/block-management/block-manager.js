@@ -48,7 +48,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
-			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
+			blocks: [],
+			dataSource: null,
 			showHtml: false,
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
@@ -125,12 +126,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
-		if ( props.fullparse === true ) {
+		if ( state.blocks !== props.blocks ) {
 			return {
 				...state,
+				blocks: props.blocks,
 				dataSource: new DataSource( props.blocks, ( item: BlockType ) => item.clientId ),
 			};
 		}
+
 		// no state change necessary
 		return null;
 	}
@@ -230,24 +233,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			return;
 		}
 
-		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = blockType.merge(
-			blockA.attributes,
-			blocksWithTheSameType[ 0 ].attributes
-		);
-
-		const newBlock = {
-			...blockA,
-			attributes: {
-				...blockA.attributes,
-				...updatedAttributes,
-			},
-		};
-		newBlock.focused = true;
-
-		// set it into the datasource, and use the same object instance to send it to props/redux
-		this.state.dataSource.splice( this.getDataSourceIndexFromClientId( blockA.clientId ), 2, newBlock );
-		this.props.mergeBlocksAction( blockA.clientId, blockB.clientId, newBlock );
+		this.props.mergeBlocksAction( blockA.clientId, blockB.clientId );
 	}
 
 	onChange( clientId: string, attributes: mixed ) {
@@ -291,8 +277,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			list = (
 				<FlatList
 					style={ styles.list }
-					data={ this.props.blocks }
-					extraData={ this.props.refresh, this.state.inspectBlocks }
+					data={ this.state.blocks }
+					extraData={ { refresh: this.props.refresh, inspectBlocks: this.state.inspectBlocks } }
 					keyExtractor={ ( item ) => item.clientId }
 					renderItem={ this.renderItem.bind( this ) }
 				/>

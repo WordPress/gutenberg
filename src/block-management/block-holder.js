@@ -23,20 +23,7 @@ type PropsType = BlockType & {
 	mergeBlocks: ( forward: boolean ) => void,
 };
 
-type StateType = {
-	selected: boolean,
-	focused: boolean,
-};
-
-export default class BlockHolder extends React.Component<PropsType, StateType> {
-	constructor( props: PropsType ) {
-		super( props );
-		this.state = {
-			selected: false,
-			focused: false,
-		};
-	}
-
+export default class BlockHolder extends React.Component<PropsType> {
 	renderToolbarIfBlockFocused() {
 		if ( this.props.focused ) {
 			return (

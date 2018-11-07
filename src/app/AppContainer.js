@@ -2,17 +2,6 @@
  * @format */
 
 import { connect } from 'react-redux';
-import {
-	updateBlockAttributes,
-	focusBlockAction,
-	moveBlockUpAction,
-	moveBlockDownAction,
-	deleteBlockAction,
-	createBlockAction,
-	parseBlocksAction,
-	serializeToNativeAction,
-	mergeBlocksAction,
-} from '../store/actions';
 import MainApp from './MainApp';
 
 import { parse, serialize } from '@wordpress/blocks';
@@ -21,49 +10,46 @@ import { compose } from '@wordpress/compose';
 import { BlockEdit } from '@wordpress/editor';
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
-const mapStateToProps = ( state ) => ( {
-	...state,
-} );
+const mapStateToProps = ( state, ownProps ) => {
+	return {
+		blocks: ownProps.blocks.map( block => {
+			block.focused = ownProps.isBlockSelected( block.clientId );
+			return block;
+		} ),
+		refresh: ! ownProps.refresh
+	}
+};
 
 const mapDispatchToProps = ( dispatch, ownProps ) => {
 	return {
 		...ownProps,
 		onChange: ( clientId, attributes ) => {
-			dispatch( updateBlockAttributes( clientId, attributes ) );
 			ownProps.onAttributesUpdate( clientId, attributes );
 		},
 		focusBlockAction: ( clientId ) => {
-			dispatch( focusBlockAction( clientId ) );
 			ownProps.onSelect( clientId );
 		},
 		moveBlockUpAction: ( clientId ) => {
-			dispatch( moveBlockUpAction( clientId ) );
 			ownProps.onMoveUp( clientId );
 		},
 		moveBlockDownAction: ( clientId ) => {
-			dispatch( moveBlockDownAction( clientId ) );
 			ownProps.onMoveDown( clientId );
 		},
 		deleteBlockAction: ( clientId ) => {
-			dispatch( deleteBlockAction( clientId ) );
 			ownProps.onRemove( clientId );
 		},
-		createBlockAction: ( clientId, block, clientIdAbove ) => {
-			dispatch( createBlockAction( clientId, block, clientIdAbove ) );
+		createBlockAction: ( clientId, block ) => {
 			ownProps.onInsertBlock( block, ownProps.selectedBlockIndex + 1 );
 		},
 		parseBlocksAction: ( html ) => {
-			dispatch( parseBlocksAction( html ) );
 			const parsed = parse( html );
 			ownProps.onResetBlocks( parsed );
 		},
 		serializeToNativeAction: () => {
-			dispatch( serializeToNativeAction() );
 			const html = serialize( ownProps.blocks );
 			RNReactNativeGutenbergBridge.provideToNative_Html( html );
 		},
-		mergeBlocksAction: ( blockOneClientId, blockTwoClientId, block ) => {
-			dispatch( mergeBlocksAction( blockOneClientId, blockTwoClientId, block ) );
+		mergeBlocksAction: ( blockOneClientId, blockTwoClientId ) => {
 			ownProps.onMerge( blockOneClientId, blockTwoClientId );
 		},
 	};
@@ -77,11 +63,13 @@ export default compose( [
 			getBlockIndex,
 			getBlocks,
 			getSelectedBlockClientId,
+			isBlockSelected,
 		} = select( 'core/editor' );
 		const { rootClientId } = ownProps;
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
+			isBlockSelected,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId, rootClientId ),
 			blocks: getBlocks(),
 		};
@@ -106,7 +94,7 @@ export default compose( [
 			onRemove: removeBlock,
 			onResetBlocks: resetBlocks,
 			onSelect: selectBlock,
-			onAttributesUpdate: updateBlockAttributes
+			onAttributesUpdate: updateBlockAttributes,
 		};
 	} ),
 ] )( AppContainer );

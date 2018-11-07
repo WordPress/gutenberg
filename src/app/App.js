@@ -8,7 +8,7 @@ import { Provider } from 'react-redux';
 import { setupStore, html2State } from '../store';
 import AppContainer from './AppContainer';
 import { Store } from 'redux';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { BlockEdit } from '@wordpress/editor';
 
