@@ -650,7 +650,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	if ( isset( $tinymce_settings['style_formats'] ) && is_string( $tinymce_settings['style_formats'] ) ) {
 		// Decode the options as we used to recommende json_encoding the TinyMCE settings.
-		$tinymce_settings['style_formats'] = json_decode( $tinymce_settings['style_formats'] );
+		$tinymce_settings['style_formats'] = wp_json_decode( $tinymce_settings['style_formats'] );
 	}
 	wp_localize_script(
 		'wp-block-library',
@@ -1329,7 +1329,7 @@ function gutenberg_load_locale_data() {
 	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
 	wp_add_inline_script(
 		'wp-i18n',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
+		'wp.i18n.setLocaleData( ' . wp_json_encode( $locale_data ) . ' );'
 	);
 }
 
@@ -1492,7 +1492,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . json_encode( gutenberg_prepare_blocks_for_js() ) . ');'
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( gutenberg_prepare_blocks_for_js() ) . ');'
 	);
 
 	// Get admin url for handling meta boxes.

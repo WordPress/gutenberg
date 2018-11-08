@@ -20,7 +20,7 @@ if (!function_exists("Gutenberg_PEG_ord_unicode")) {
         if (strlen($character) === 1) {
             return ord($character);
         }
-        $json = json_encode($character);
+        $json = wp_json_encode($character);
         $utf16_1 = hexdec(substr($json, 3, 4));
         if (substr($json, 7, 2) === "\u") {
             $utf16_2 = hexdec(substr($json, 9, 4));
@@ -212,7 +212,7 @@ class Gutenberg_PEG_Parser {
               . $expectedDescs[count($expected) - 1]
           : $expectedDescs[0];
 
-        $foundDesc = $found ? json_encode($found) : "end of input";
+        $foundDesc = $found ? wp_json_encode($found) : "end of input";
 
         $message = "Expected " . $expectedDesc . " but " . $foundDesc . " found.";
       }
@@ -289,7 +289,7 @@ class Gutenberg_PEG_Parser {
         );
         }
     private function peg_f7($type) { return "core/$type"; }
-    private function peg_f8($attrs) { return json_decode( $attrs, true ); }
+    private function peg_f8($attrs) { return wp_json_decode( $attrs, true ); }
 
     private function peg_parseBlock_List() {
 

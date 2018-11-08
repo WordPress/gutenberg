@@ -391,8 +391,8 @@ class WP_Block_Parser {
 		 * are associative arrays. If we use `array()` we get a JSON `[]`
 		 */
 		$attrs = $has_attrs
-			? json_decode( $matches[ 'attrs' ][ 0 ], /* as-associative */ true )
-			: json_decode( '{}', /* don't ask why, just verify in PHP */ false );
+			? wp_json_decode( $matches[ 'attrs' ][ 0 ], /* as-associative */ true )
+			: wp_json_decode( '{}', /* don't ask why, just verify in PHP */ false );
 
 		/*
 		 * This state isn't allowed

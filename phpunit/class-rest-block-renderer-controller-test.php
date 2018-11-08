@@ -282,7 +282,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 
-		$this->assertEquals( $defaults, json_decode( $data['rendered'], true ) );
+		$this->assertEquals( $defaults, wp_json_decode( $data['rendered'], true ) );
 		$this->assertEquals(
 			json_decode( $block_type->render( $defaults ) ),
 			json_decode( $data['rendered'] )
@@ -315,7 +315,7 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		$this->assertEquals( 200, $response->get_status() );
 		$data = $response->get_data();
 
-		$this->assertEquals( $expected_attributes, json_decode( $data['rendered'], true ) );
+		$this->assertEquals( $expected_attributes, wp_json_decode( $data['rendered'], true ) );
 		$this->assertEquals(
 			json_decode( $block_type->render( $attributes ), true ),
 			json_decode( $data['rendered'], true )

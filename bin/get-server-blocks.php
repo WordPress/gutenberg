@@ -36,4 +36,4 @@ foreach ( glob( dirname( dirname( __FILE__ ) ) . '/packages/block-library/src/*/
 
 do_action( 'init' );
 
-echo json_encode( gutenberg_prepare_blocks_for_js() );
+echo wp_json_encode( gutenberg_prepare_blocks_for_js() );

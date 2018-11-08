@@ -311,7 +311,7 @@ Block_Attributes
   "JSON-encoded attributes embedded in a block's opening comment"
   = attrs:$("{" (!("}" __ """/"? "-->") .)* "}")
   {
-    /** <?php return json_decode( $attrs, true ); ?> **/
+    /** <?php return wp_json_decode( $attrs, true ); ?> **/
     return maybeJSON( attrs );
   }
 

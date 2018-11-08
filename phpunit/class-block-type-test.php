@@ -86,7 +86,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 			)
 		);
 		$output     = $block_type->render( $attributes );
-		$this->assertEquals( $attributes, json_decode( $output, true ) );
+		$this->assertEquals( $attributes, wp_json_decode( $output, true ) );
 	}
 
 	function test_render_with_content() {
@@ -106,7 +106,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 			)
 		);
 		$output     = $block_type->render( $attributes, $content );
-		$this->assertEquals( $expected, json_decode( $output, true ) );
+		$this->assertEquals( $expected, wp_json_decode( $output, true ) );
 	}
 
 	function test_render_for_static_block() {
@@ -247,12 +247,12 @@ class Block_Type_Test extends WP_UnitTestCase {
 	}
 
 	function render_dummy_block( $attributes ) {
-		return json_encode( $attributes );
+		return wp_json_encode( $attributes );
 	}
 
 	function render_dummy_block_with_content( $attributes, $content ) {
 		$attributes['_content'] = $content;
 
-		return json_encode( $attributes );
+		return wp_json_encode( $attributes );
 	}
 }

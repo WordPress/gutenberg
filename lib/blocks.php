@@ -223,7 +223,7 @@ if ( ! function_exists( 'do_blocks' ) ) {
 			// Attempt to parse attributes JSON, if available.
 			$attributes = array();
 			if ( ! empty( $block_attributes_json ) ) {
-				$decoded_attributes = json_decode( $block_attributes_json, true );
+				$decoded_attributes = wp_json_decode( $block_attributes_json, true );
 				if ( ! is_null( $decoded_attributes ) ) {
 					$attributes = $decoded_attributes;
 				}

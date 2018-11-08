@@ -63,7 +63,7 @@ class Parsing_Test extends WP_UnitTestCase {
 		}
 
 		$html            = self::strip_r( file_get_contents( $html_path ) );
-		$expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
+		$expected_parsed = wp_json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
 
 		$parser = new Gutenberg_PEG_Parser;
 		$result = $parser->parse( _gutenberg_utf8_split( $html ) );
@@ -91,10 +91,10 @@ class Parsing_Test extends WP_UnitTestCase {
 		}
 
 		$html            = self::strip_r( file_get_contents( $html_path ) );
-		$expected_parsed = json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
+		$expected_parsed = wp_json_decode( self::strip_r( file_get_contents( $parsed_json_path ) ), true );
 
 		$parser = new WP_Block_Parser();
-		$result = json_decode( json_encode( $parser->parse( $html ) ), true );
+		$result = wp_json_decode( wp_json_encode( $parser->parse( $html ) ), true );
 
 		$this->assertEquals(
 			$expected_parsed,

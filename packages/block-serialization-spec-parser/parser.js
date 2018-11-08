@@ -252,7 +252,7 @@
         peg$c29 = peg$literalExpectation("}", false),
         peg$c30 = "",
         peg$c31 = function(attrs) {
-            /** <?php return json_decode( $attrs, true ); ?> **/
+            /** <?php return wp_json_decode( $attrs, true ); ?> **/
             return maybeJSON( attrs );
           },
         peg$c32 = /^[ \t\r\n]/,
