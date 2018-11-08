@@ -18,9 +18,11 @@ export function PostPublishPanelToggle( {
 	forceIsSaving,
 	forceIsDirty,
 } ) {
-	const isButtonDisabled = isPublished ||
+	const isButtonDisabled =
+		isPublished ||
+		isSaving ||
+		forceIsSaving ||
 		! isSaveable ||
-		isSaving || forceIsSaving ||
 		( ! isPublishable && ! forceIsDirty );
 
 	return (
