@@ -41,7 +41,6 @@ export function DotTip( {
 			role="dialog"
 			aria-label={ __( 'Gutenberg tips' ) }
 			onClick={ onClick }
-			recalculatePositionHook="fullscreenModeToggled"
 		>
 			<p>{ children }</p>
 			<p>

@@ -122,13 +122,6 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Type: `Boolean`
  - Required: No
  - Default: `false`
- 
-### recalculatePositionHook
-
-Name of the hook to listen when the popover's position needs to be recalculated. 
- 
- - Type: `String`
- - Required: No
 
 ## Methods
 

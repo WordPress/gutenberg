@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { Component, createRef } from '@wordpress/element';
 
 /**
@@ -18,7 +19,6 @@ class Dropdown extends Component {
 		this.refresh = this.refresh.bind( this );
 
 		this.containerRef = createRef();
-		this.popoverRef = createRef();
 
 		this.state = {
 			isOpen: false,
@@ -45,11 +45,14 @@ class Dropdown extends Component {
 	 * When contents change height due to user interaction,
 	 * `refresh` can be called to re-render Popover with correct
 	 * attributes which allow scroll, if need be.
+	 * @deprecated
 	 */
 	refresh() {
-		if ( this.popoverRef.current ) {
-			this.popoverRef.current.refresh();
-		}
+		deprecated( 'Dropdown.refresh()', {
+			plugin: 'Gutenberg',
+			version: '4.5',
+			hint: 'Popover is now automatically re-rendered without needing to execute "refresh"',
+		} );
 	}
 
 	toggle() {
@@ -96,7 +99,6 @@ class Dropdown extends Component {
 				{ isOpen && (
 					<Popover
 						className={ contentClassName }
-						ref={ this.popoverRef }
 						position={ position }
 						onClose={ this.close }
 						onClickOutside={ this.closeIfClickOutside }
