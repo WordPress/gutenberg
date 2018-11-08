@@ -989,7 +989,7 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withSafeTimeout,
-	withFilters( 'RichText' ),
+	withFilters( 'experimentalRichText' ),
 ] )( RichText );
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {

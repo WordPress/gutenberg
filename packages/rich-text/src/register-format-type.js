@@ -113,9 +113,12 @@ export function registerFormatType( name, settings ) {
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
-	if ( settings.createPrepareEditableTree && settings.getPropsForEditableTreePreparation ) {
-		addFilter( 'RichText', name, ( OriginalComponent ) => {
-			return withSelect( settings.getPropsForEditableTreePreparation )( ( props ) => (
+	if (
+		settings.__experimentalCreatePrepareEditableTree &&
+		settings.__experimentalGetPropsForEditableTreePreparation
+	) {
+		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
+			return withSelect( settings.__experimentalGetPropsForEditableTreePreparation )( ( props ) => (
 				<OriginalComponent
 					{ ...props }
 					propsToCheck={ [
@@ -124,7 +127,7 @@ export function registerFormatType( name, settings ) {
 					] }
 					prepareEditableTree={ [
 						...( props.prepareEditableTree || [] ),
-						settings.createPrepareEditableTree( props ),
+						settings.__experimentalCreatePrepareEditableTree( props ),
 					] }
 				/>
 			) );

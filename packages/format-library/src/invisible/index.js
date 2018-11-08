@@ -10,12 +10,12 @@ export const invisible = {
 	title: 'invisible',
 	tagName: 'mark',
 	className: 'invisible',
-	getPropsForEditableTreePreparation( select ) {
+	__experimentalGetPropsForEditableTreePreparation( select ) {
 		return {
 			isEnabled: select( 'core/edit-post' ).getActiveGeneralSidebarName() === 'edit-post/block',
 		};
 	},
-	createPrepareEditableTree( props ) {
+	__experimentalCreatePrepareEditableTree( props ) {
 		return ( formats, text ) => {
 			if ( ! props.isEnabled ) {
 				return formats;
