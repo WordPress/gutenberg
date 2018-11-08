@@ -535,6 +535,8 @@ export class RichText extends Component {
 			onRemove( ! isReverse );
 		}
 
+		event.preventDefault();
+
 		return true;
 	}
 
