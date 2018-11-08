@@ -42,9 +42,12 @@ export class PostPublishButton extends Component {
 			forceIsDirty,
 			forceIsSaving,
 		} = this.props;
-		const isButtonEnabled = ( ! isSaving && ! forceIsSaving ) &&
-			( forceIsDirty || isPublishable ) &&
-			( isSaveable && ! isPostSavingLocked );
+		const isButtonDisabled =
+			isSaving ||
+			forceIsSaving ||
+			! isSaveable ||
+			isPostSavingLocked ||
+			( ! isPublishable && ! forceIsDirty );
 
 		let publishStatus;
 		if ( ! hasPublishAction ) {
@@ -70,7 +73,7 @@ export class PostPublishButton extends Component {
 				isPrimary
 				isLarge
 				onClick={ onClick }
-				disabled={ ! isButtonEnabled }
+				disabled={ isButtonDisabled }
 				isBusy={ isSaving && isPublished }
 			>
 				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
