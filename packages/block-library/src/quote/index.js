@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { omit } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -200,7 +201,7 @@ export const settings = {
 						} }
 					/>
 				</BlockControls>
-				<blockquote className={ className } style={ { textAlign: align } }>
+				<blockquote className={ align }>
 					<RichText
 						multiline
 						value={ value }
