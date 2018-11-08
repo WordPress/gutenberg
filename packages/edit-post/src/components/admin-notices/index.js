@@ -34,21 +34,19 @@ function getAdminNotices() {
 }
 
 /**
- * Given an admin notice Element, returns the upgraded content string. Prefers
- * text found within its first child paragraph node, but falls back to the text
- * content of the entire notice element.
+ * Given an admin notice Element, returns the element from which content should
+ * be sourced.
  *
  * @param {Element} element Admin notice element.
  *
- * @return {string} Upgraded notice content.
+ * @return {Element} Upgraded notice HTML.
  */
-function getNoticeContentFromElement( element ) {
-	let node = element;
-	if ( node.firstElementChild && node.firstElementChild.nodeName === 'P' ) {
-		node = node.firstElementChild;
+function getNoticeContentSourceFromElement( element ) {
+	if ( element.firstElementChild && element.firstElementChild.nodeName === 'P' ) {
+		return element.firstElementChild;
 	}
 
-	return node.textContent.trim();
+	return element;
 }
 
 /**
@@ -77,10 +75,12 @@ function getNoticeStatusFromClassList( element ) {
  */
 function getNoticeFromElement( element ) {
 	const status = getNoticeStatusFromClassList( element );
-	const content = getNoticeContentFromElement( element );
+	const contentSource = getNoticeContentSourceFromElement( element );
+	const __unstableHTML = contentSource.innerHTML.trim();
+	const content = contentSource.textContent.trim();
 	const isDismissible = element.classList.contains( 'is-dismissible' );
 
-	return { status, content, isDismissible };
+	return { status, content, __unstableHTML, isDismissible };
 }
 
 export class AdminNotices extends Component {

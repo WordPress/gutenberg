@@ -16,7 +16,7 @@ describe( 'AdminNotices', () => {
 		document.body.innerHTML = `
 			<div class="notice notice-success is-dismissible">
 				<p>
-					My notice text
+					My <strong>notice</strong> text
 				</p>
 				<button type="button" class="notice-dismiss">
 					<span class="screen-reader-text">Dismiss this notice.</span>
@@ -34,6 +34,7 @@ describe( 'AdminNotices', () => {
 			status: 'success',
 			isDismissible: true,
 			content: 'My notice text',
+			__unstableHTML: 'My <strong>notice</strong> text',
 		} );
 		expect( document.body.childElementCount ).toBe( 0 );
 	} );
