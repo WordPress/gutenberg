@@ -33,6 +33,7 @@ const blockAttributes = {
 	},
 	align: {
 		type: 'string',
+		default: 'is-left',
 	},
 };
 
