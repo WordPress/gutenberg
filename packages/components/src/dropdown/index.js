@@ -11,12 +11,15 @@ import Popover from '../popover';
 class Dropdown extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
-		this.bindContainer = this.bindContainer.bind( this );
 		this.closeIfClickOutside = this.closeIfClickOutside.bind( this );
 		this.refresh = this.refresh.bind( this );
+
+		this.containerRef = createRef();
 		this.popoverRef = createRef();
+
 		this.state = {
 			isOpen: false,
 		};
@@ -36,10 +39,6 @@ class Dropdown extends Component {
 		if ( prevState.isOpen !== isOpen && onToggle ) {
 			onToggle( isOpen );
 		}
-	}
-
-	bindContainer( ref ) {
-		this.container = ref;
 	}
 
 	/**
@@ -68,6 +67,7 @@ class Dropdown extends Component {
 	 * @param {MouseEvent} event Click event triggering `onClickOutside`.
 	 */
 	closeIfClickOutside( event ) {
+		if ( ! this.containerRef.current.contains( event.target ) ) {
 			this.close();
 		}
 	}
@@ -91,7 +91,7 @@ class Dropdown extends Component {
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 
 		return (
-			<div className={ className } ref={ this.bindContainer }>
+			<div className={ className } ref={ this.containerRef }>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
