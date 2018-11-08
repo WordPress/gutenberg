@@ -296,7 +296,7 @@
 		// Position toolbar better on mobile.
 		.editor-block-contextual-toolbar {
 			width: auto;
-			border-bottom: 1px solid $light-gray-500;
+			border-bottom: $border-width solid $light-gray-500;
 			bottom: auto;
 		}
 	}
@@ -543,14 +543,14 @@
 	.editor-block-list__block-mobile-toolbar {
 		display: flex;
 		flex-direction: row;
+
 		// Make room for the height of the block toolbar above.
-		margin-top: $grid-size + $block-toolbar-height - $block-padding;
+		transform: translateY($block-padding + $border-width);
+		margin-top: $block-toolbar-height;
 		margin-right: -$block-padding;
 		margin-left: -$block-padding;
 		border-top: $border-width solid $light-gray-500;
 		height: $block-toolbar-height;
-
-		transform: translateY(#{ $block-padding + $border-width });
 
 		@include break-small() {
 			display: none;
@@ -745,7 +745,7 @@
 
 		// Position toolbar below the block on mobile.
 		position: absolute;
-		bottom: $block-toolbar-height - $block-padding - 1px;
+		bottom: $block-toolbar-height - $block-padding;
 		left: -$block-padding;
 		right: -$block-padding;
 
@@ -769,7 +769,7 @@
 	&[data-align="left"] .editor-block-contextual-toolbar,
 	&[data-align="right"] .editor-block-contextual-toolbar {
 		margin-bottom: $border-width;
-		margin-top: -$block-toolbar-height - $border-width;
+		margin-top: -$block-toolbar-height;
 	}
 
 	// Make block toolbar full width on mobile.
@@ -829,13 +829,6 @@
 				// Compensate for translate, so the sticky sticks to the top.
 				top: $block-toolbar-height + $block-padding;
 			}
-
-			// This is an important one. Because the toolbar is sticky, it's part of the flow.
-			// It behaves as relative, in other words, until it reaches an edge and then behaves as fixed.
-			// But by applying a float, we take it out of this flow. The benefit is that we don't need to compensate for margins.
-			// In turn, this allows margins on sibling elements to collapse to parent elements.
-			// RTL note: this rule does need to be auto-flipped based on direction.
-			float: left;
 		}
 	}
 
@@ -871,19 +864,6 @@
 		// This prevents floats from messing up the position.
 		position: absolute;
 		left: 0;
-	}
-}
-
-// This rule ensures that any blocks that are not a Paragraph, that follows any aligned block, clears them.
-// This is necessary to ensure the selected block outlines and toolbar are correctly positioned.
-.editor-block-list__block[data-align] + .editor-block-list__block:not([data-align="right"]):not([data-type="core/paragraph"]) {
-	clear: both;
-}
-
-// This rule ensures that Paragraphs, which do not clear preceeding floats, have a correctly aligned contextual toolbar.
-.editor-block-list__block[data-align] + .editor-block-list__block[data-type="core/paragraph"] {
-	.editor-block-contextual-toolbar {
-		float: none;
 	}
 }
 
