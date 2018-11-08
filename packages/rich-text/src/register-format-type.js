@@ -118,16 +118,14 @@ export function registerFormatType( name, settings ) {
 		settings.__experimentalGetPropsForEditableTreePreparation
 	) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			return withSelect( settings.__experimentalGetPropsForEditableTreePreparation )( ( props ) => (
+			return withSelect( ( sel ) => ( {
+				[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation( sel ),
+			} ) )( ( props ) => (
 				<OriginalComponent
 					{ ...props }
-					propsToCheck={ [
-						...( props.propsToCheck || [] ),
-						'isEnabled',
-					] }
 					prepareEditableTree={ [
 						...( props.prepareEditableTree || [] ),
-						settings.__experimentalCreatePrepareEditableTree( props ),
+						settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ] ),
 					] }
 				/>
 			) );

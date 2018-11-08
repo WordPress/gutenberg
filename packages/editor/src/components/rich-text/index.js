@@ -737,7 +737,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected, propsToCheck = [] } = this.props;
+		const { tagName, value, isSelected } = this.props;
 
 		if (
 			tagName === prevProps.tagName &&
@@ -779,7 +779,18 @@ export class RichText extends Component {
 			this.applyRecord( record );
 		}
 
-		if ( propsToCheck.some( ( name ) => this.props[ name ] !== prevProps[ name ] ) ) {
+		// If any format props update, reapply value.
+		const shouldReapply = Object.keys( this.props ).some( ( name ) => {
+			if ( name.indexOf( 'format_' ) !== 0 ) {
+				return false;
+			}
+
+			return Object.keys( this.props[ name ] ).some( ( subName ) => {
+				return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
+			} );
+		} );
+
+		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
 			this.applyRecord( record );
 		}
