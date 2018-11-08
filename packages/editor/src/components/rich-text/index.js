@@ -42,6 +42,8 @@ import {
 	getSelectionEnd,
 	remove,
 	isCollapsed,
+	LINE_SEPARATOR,
+	charAt,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 
@@ -545,31 +547,40 @@ export class RichText extends Component {
 		const { keyCode } = event;
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			event.preventDefault();
-
 			if ( this.onDeleteKeyDown( event ) ) {
 				return;
 			}
 
-			const value = this.createRecord();
-			const start = getSelectionStart( value );
-			const end = getSelectionEnd( value );
+			if ( this.multilineTag ) {
+				const value = this.createRecord();
+				const start = getSelectionStart( value );
+				const end = getSelectionEnd( value );
 
-			if ( keyCode === BACKSPACE ) {
-				this.onChange( remove(
-					value,
-					// Only remove the line if the selection is
-					// collapsed.
-					isCollapsed( value ) ? start - 1 : start,
-					end
-				) );
-			} else {
-				this.onChange( remove(
-					value,
-					start,
-					// Only remove the line if the selection is collapsed.
-					isCollapsed( value ) ? end + 1 : end,
-				) );
+				let newValue;
+
+				if ( keyCode === BACKSPACE ) {
+					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
+						newValue = remove(
+							value,
+							// Only remove the line if the selection is
+							// collapsed.
+							isCollapsed( value ) ? start - 1 : start,
+							end
+						);
+					}
+				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
+					newValue = remove(
+						value,
+						start,
+						// Only remove the line if the selection is collapsed.
+						isCollapsed( value ) ? end + 1 : end,
+					);
+				}
+
+				if ( newValue ) {
+					this.onChange( newValue );
+					event.preventDefault();
+				}
 			}
 		} else if ( keyCode === ENTER ) {
 			event.preventDefault();

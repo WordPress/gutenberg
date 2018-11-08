@@ -254,7 +254,7 @@ export default class TinyMCE extends Component {
 		const { keyCode } = event;
 
 		// Disables TinyMCE behaviour.
-		if ( keyCode === ENTER || keyCode === BACKSPACE || keyCode === DELETE ) {
+		if ( keyCode === ENTER ) {
 			event.preventDefault();
 			// For some reason this is needed to also prevent the insertion of
 			// line breaks.
