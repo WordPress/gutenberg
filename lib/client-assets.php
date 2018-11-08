@@ -144,13 +144,6 @@ function gutenberg_register_scripts_and_styles() {
 
 	register_tinymce_scripts();
 
-	gutenberg_override_script(
-		'wp-polyfill',
-		null,
-		array(
-			'wp-polyfill-ecmascript',
-		)
-	);
 	wp_script_add_data(
 		'wp-polyfill',
 		'data',
@@ -486,7 +479,7 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'wp-a11y',
 			'wp-data',
-			'wp-polyfill-ecmascript',
+			'wp-polyfill',
 		),
 		filemtime( gutenberg_dir_path() . 'build/notices/index.js' ),
 		true
@@ -752,7 +745,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-compose',
 			'wp-element',
 			'wp-i18n',
-			'wp-polyfill-ecmascript',
+			'wp-polyfill',
 		),
 		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/index.js' ),
 		true
@@ -980,8 +973,22 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/element-closest@2.0.2/element-closest.js'
 	);
 	gutenberg_register_vendor_script(
-		'wp-polyfill-ecmascript',
+		'wp-polyfill',
 		'https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill' . $suffix . '.js'
+	);
+	// Ensure backwards compatibility after renaming to wp-polyfill.
+	gutenberg_override_script(
+		'wp-polyfill-ecmascript',
+		null,
+		array(
+			'wp-polyfill',
+			'wp-deprecated',
+		)
+	);
+	wp_script_add_data(
+		'wp-polyfill-ecmascript',
+		'data',
+		'wp.deprecated( "wp-polyfill-ecmascript script handle", { plugin: "Gutenberg", version: "4.5" } );'
 	);
 }
 
