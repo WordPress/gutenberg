@@ -248,11 +248,16 @@ export const settings = {
 		);
 	},
 
-	save( { attributes } ) {
+	save( { attributes, className } ) {
 		const { align, value, citation } = attributes;
 
+		const classes = classnames(
+			className,
+			align,
+		);
+
 		return (
-			<blockquote style={ { textAlign: align ? align : null } }>
+			<blockquote className={ classes }>
 				<RichText.Content multiline value={ value } />
 				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 			</blockquote>
