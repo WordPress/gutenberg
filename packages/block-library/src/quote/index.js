@@ -191,6 +191,12 @@ export const settings = {
 
 	edit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 		const { align, value, citation } = attributes;
+
+		const classes = classnames(
+			className,
+			align,
+		);
+
 		return (
 			<Fragment>
 				<BlockControls>
