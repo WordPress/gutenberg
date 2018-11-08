@@ -28,14 +28,17 @@ export function PostPublishButtonOrToggle( {
 		<PostPublishButton
 			forceIsDirty={ forceIsDirty }
 			forceIsSaving={ forceIsSaving }
+			isOpen={ isPublishSidebarOpened }
+			isToggle={ false }
+			onToggle={ togglePublishSidebar }
 		/>
 	);
 	const toggle = (
 		<PostPublishPanelToggle
+			forceIsDirty={ forceIsDirty }
+			forceIsSaving={ forceIsSaving }
 			isOpen={ isPublishSidebarOpened }
 			onToggle={ togglePublishSidebar }
-			forceIsSaving={ forceIsSaving }
-			forceIsDirty={ forceIsDirty }
 		/>
 	);
 

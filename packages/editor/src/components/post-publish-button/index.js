@@ -28,25 +28,35 @@ export class PostPublishButton extends Component {
 
 	render() {
 		const {
-			isSaving,
-			onStatusChange,
-			onSave,
-			isBeingScheduled,
-			visibility,
-			isPublishable,
-			isSaveable,
-			isPostSavingLocked,
-			isPublished,
-			hasPublishAction,
-			onSubmit = noop,
 			forceIsDirty,
 			forceIsSaving,
+			hasPublishAction,
+			isBeingScheduled,
+			isOpen,
+			isPostSavingLocked,
+			isPublishable,
+			isPublished,
+			isSaveable,
+			isSaving,
+			isToggle,
+			onSave,
+			onStatusChange,
+			onSubmit = noop,
+			onToggle,
+			visibility,
 		} = this.props;
 		const isButtonDisabled =
 			isSaving ||
 			forceIsSaving ||
 			! isSaveable ||
 			isPostSavingLocked ||
+			( ! isPublishable && ! forceIsDirty );
+
+		const isToggleDisabled =
+			isPublished ||
+			isSaving ||
+			forceIsSaving ||
+			! isSaveable ||
 			( ! isPublishable && ! forceIsDirty );
 
 		let publishStatus;
@@ -74,10 +84,21 @@ export class PostPublishButton extends Component {
 			isPrimary: true,
 			onClick,
 		};
+
+		const toggleProps = {
+			'aria-expanded': isOpen,
+			className: 'editor-post-publish-panel__toggle',
+			disabled: isToggleDisabled,
+			isBusy: isSaving && isPublished,
+			isPrimary: true,
+			onClick: onToggle,
+		};
+
+		const componentProps = isToggle ? toggleProps : buttonProps;
 		return (
 			<Button
 				ref={ this.buttonNode }
-				{ ...buttonProps }
+				{ ...componentProps }
 			>
 				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
 			</Button>
