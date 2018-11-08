@@ -37,7 +37,28 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should yields actions when options passed', () => {
+		it( 'normalizes content to string', () => {
+			const result = createNotice( status, <strong>Hello</strong> );
+
+			expect( result.next().value ).toMatchObject( {
+				type: 'SPEAK',
+				message: expect.any( String ),
+			} );
+
+			expect( result.next().value ).toMatchObject( {
+				type: 'CREATE_NOTICE',
+				context: DEFAULT_CONTEXT,
+				notice: {
+					status,
+					content: expect.any( String ),
+					isDismissible: true,
+					id: expect.any( String ),
+					actions: [],
+				},
+			} );
+		} );
+
+		it( 'yields actions when options passed', () => {
 			const id = 'my-id';
 			const context = 'foo';
 			const options = {

@@ -34,6 +34,11 @@ export function* createNotice( status = 'info', content, options = {} ) {
 		actions = [],
 	} = options;
 
+	// The supported value shape of content is currently limited to plain text
+	// strings. To avoid setting expectation that e.g. a WPElement could be
+	// supported, cast to a string.
+	content = String( content );
+
 	yield { type: 'SPEAK', message: content };
 
 	yield {
