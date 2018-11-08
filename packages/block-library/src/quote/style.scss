@@ -10,7 +10,9 @@
 
 		cite,
 		footer {
-			font-size: 18px;
-		}
-	}
-}
+			font-size: 1em;
+		} // cite, footer
+
+	} // &.is-style-large, &.is-large
+
+} // .wp-block-quote
