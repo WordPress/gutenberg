@@ -25,4 +25,13 @@ RCT_EXPORT_METHOD(provideToNative_Html:(NSString *)html)
     }
 }
 
+RCT_EXPORT_METHOD(onMediaLibraryPress:(RCTResponseSenderBlock)callback)
+{
+    if (self.delegate) {
+        [self.delegate gutenbergDidRequestMediaPickerWithCallback:^(NSString * _Nullable url) {
+            callback(url ? @[url] : @[[NSNull null]]);
+        }];
+    }
+}
+
 @end
