@@ -28,6 +28,6 @@ export default compose( [
 		hasRedo: select( 'core/editor' ).hasEditorRedo(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		redo: () => dispatch( 'core/editor' ).redo(),
+		redo: dispatch( 'core/editor' ).redo,
 	} ) ),
 ] )( EditorHistoryRedo );

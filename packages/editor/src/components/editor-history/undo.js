@@ -28,6 +28,6 @@ export default compose( [
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		undo: () => dispatch( 'core/editor' ).undo(),
+		undo: dispatch( 'core/editor' ).undo,
 	} ) ),
 ] )( EditorHistoryUndo );
