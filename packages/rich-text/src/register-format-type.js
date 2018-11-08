@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { select, dispatch } from '@wordpress/data';
+import { select, dispatch, withSelect } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Registers a new format provided a unique name and an object defining its
@@ -111,6 +112,24 @@ export function registerFormatType( name, settings ) {
 	}
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
+
+	if ( settings.createPrepareEditableTree && settings.getPropsForEditableTreePreparation ) {
+		addFilter( 'RichText', name, ( OriginalComponent ) => {
+			return withSelect( settings.getPropsForEditableTreePreparation )( ( props ) => (
+				<OriginalComponent
+					{ ...props }
+					propsToCheck={ [
+						...( props.propsToCheck || [] ),
+						'isEnabled',
+					] }
+					prepareEditableTree={ [
+						...( props.prepareEditableTree || [] ),
+						settings.createPrepareEditableTree( props ),
+					] }
+				/>
+			) );
+		} );
+	}
 
 	return settings;
 }
