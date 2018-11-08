@@ -7,7 +7,6 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { decodeEntities } from '@wordpress/html-entities';
 import { Component, Fragment } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -65,13 +64,12 @@ export class PostTextEditor extends Component {
 
 	render() {
 		const { value } = this.state;
-		const { placeholder, instanceId } = this.props;
-		const decodedPlaceholder = decodeEntities( placeholder );
+		const { instanceId } = this.props;
 
 		return (
 			<Fragment>
 				<label htmlFor={ `post-content-${ instanceId }` } className="screen-reader-text">
-					{ decodedPlaceholder || __( 'Write your story' ) }
+					{ __( 'Type text or HTML' ) }
 				</label>
 				<Textarea
 					autoComplete="off"
@@ -80,7 +78,7 @@ export class PostTextEditor extends Component {
 					onBlur={ this.stopEditing }
 					className="editor-post-text-editor"
 					id={ `post-content-${ instanceId }` }
-					placeholder={ decodedPlaceholder || __( 'Write your story' ) }
+					placeholder={ __( 'Start writing with text or HTML' ) }
 				/>
 			</Fragment>
 		);
@@ -89,11 +87,9 @@ export class PostTextEditor extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditedPostContent, getEditorSettings } = select( 'core/editor' );
-		const { bodyPlaceholder } = getEditorSettings();
+		const { getEditedPostContent } = select( 'core/editor' );
 		return {
 			value: getEditedPostContent(),
-			placeholder: bodyPlaceholder,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
