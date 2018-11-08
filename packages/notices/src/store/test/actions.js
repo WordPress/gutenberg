@@ -70,6 +70,7 @@ describe( 'actions', () => {
 			const result = createNotice( {
 				id,
 				content,
+				__unstableHTML: 'my <strong>message</strong>',
 				isDismissible: false,
 			} );
 
@@ -85,6 +86,7 @@ describe( 'actions', () => {
 					id,
 					status: DEFAULT_STATUS,
 					content,
+					__unstableHTML: 'my <strong>message</strong>',
 					isDismissible: false,
 					actions: [],
 				},

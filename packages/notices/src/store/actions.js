@@ -28,12 +28,12 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                       presented with notice.
  */
 export function* createNotice( statusOrNotice = DEFAULT_STATUS, content, options = {} ) {
-	let status;
+	let status, __unstableHTML;
 
 	if ( isPlainObject( statusOrNotice ) ) {
 		// Support overloaded form `createNotice( notice: WPNotice )`.
 		options = statusOrNotice;
-		( { status = DEFAULT_STATUS, content } = options );
+		( { status = DEFAULT_STATUS, content, __unstableHTML } = options );
 	} else {
 		// Else consider the first argument the status type string.
 		status = statusOrNotice;
@@ -55,6 +55,7 @@ export function* createNotice( statusOrNotice = DEFAULT_STATUS, content, options
 			id,
 			status,
 			content,
+			__unstableHTML,
 			isDismissible,
 			actions,
 		},
