@@ -3,5 +3,45 @@
 
 	&__citation {
 		font-size: $default-font-size;
-	}
-}
+	} // &__citation
+
+	&.is-left {
+		border-left: 4px solid $black;
+		padding-left: 1em;
+	} // &.is-left
+
+	&.is-right {
+		border-right: 4px solid $black;
+		padding-right: 1em;
+		text-align: right;
+	} // &.is-right
+
+	&.is-center {
+		margin: 3em inherit;
+		padding-left: 2em;
+		padding-right: 2em;
+		text-align: center;
+
+		&::before {
+			background-color: $black;
+			content: "";
+			display: block;
+			height: 4px;
+			margin-left: calc(50% - 10%);
+			margin-bottom: 2em;
+			width: 20%;
+		} // &::before
+
+		&::after {
+			background-color: $black;
+			content: "";
+			display: block;
+			height: 4px;
+			margin-left: calc(50% - 10%);
+			margin-top: 2em;
+			width: 20%;
+		} // &::after
+
+	} // .is-center
+
+} // .wp-block-quote
