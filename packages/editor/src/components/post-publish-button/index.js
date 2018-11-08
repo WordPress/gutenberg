@@ -10,6 +10,7 @@ import { Button } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -94,13 +95,17 @@ export class PostPublishButton extends Component {
 			onClick: onToggle,
 		};
 
+		const toggleChildren = isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' );
+		const buttonChildren = <PublishButtonLabel forceIsSaving={ forceIsSaving } />;
+
 		const componentProps = isToggle ? toggleProps : buttonProps;
+		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<Button
 				ref={ this.buttonNode }
 				{ ...componentProps }
 			>
-				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
+				{ componentChildren }
 			</Button>
 		);
 	}
