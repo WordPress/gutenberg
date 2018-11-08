@@ -27,25 +27,27 @@ export function PostPublishButtonOrToggle( {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
 	let component;
+
 	/**
-	 * We want to show a BUTTON when the post status is at the _final stage_
+	 * Conditions to show a BUTTON (publish directly) or a TOGGLE (open publish sidebar):
+	 *
+	 * 1) We want to show a BUTTON when the post status is at the _final stage_
 	 * for a particular role (see https://codex.wordpress.org/Post_Status):
 	 *
 	 * - is published
 	 * - is scheduled to be published
-	 * - is pending and can't be published (but only for viewports >= medium)
+	 * - is pending and can't be published (but only for viewports >= medium).
+	 * 	 Originally, we considered showing a button for pending posts that couldn't be published
+	 * 	 (for ex, for a contributor role). Some languages can have really long translations
+	 * 	 for "Submit for review", so given the lack of UI real state available
+	 * 	 we decided to take into account the viewport in that particular case.
 	 *
-	 * Originally we considered showing a button for pending posts
-	 * that couldn't be published (for ex, for a contributor role).
-	 * Some languages can have really long translations for "Submit for review",
-	 * so given the lack of UI real state we decided to take into account the viewport
-	 * in that particular case.
-	 */
-	/**
-	 * Then, we take other things into account:
+	 * 2) Then, in small viewports, we'll show a TOGGLE.
 	 *
-	 * - Show TOGGLE if it is small viewport.
-	 * - Otherwise, use publish sidebar status to decide - TOGGLE if enabled, BUTTON if not.
+	 * 3) Finally, we'll use the publish sidebar status to decide:
+	 *
+	 * - if it is enabled, we show a TOGGLE
+	 * - if it is disabled, we show a BUTTON
 	 */
 	if (
 		isPublished ||
