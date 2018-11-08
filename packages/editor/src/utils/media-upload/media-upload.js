@@ -115,9 +115,9 @@ export async function mediaUpload( {
 		onError( error );
 	};
 
-	// Using a normal for loop here since the loop contains an 'await'.
-	for ( let idx = 0; idx < files.length; ++idx ) {
-		const mediaFile = files[ idx ];
+	const validFiles = [];
+
+	for ( const mediaFile of files ) {
 		// verify if user is allowed to upload this mime type
 		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
 			triggerError( {
@@ -158,11 +158,16 @@ export async function mediaUpload( {
 			continue;
 		}
 
+		validFiles.push( mediaFile );
+
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
 		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
+	}
 
+	for ( let idx = 0; idx < validFiles.length; ++idx ) {
+		const mediaFile = validFiles[ idx ];
 		try {
 			const savedMedia = await createMediaFromFile( mediaFile, additionalData );
 			const mediaObject = {
