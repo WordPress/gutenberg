@@ -10,11 +10,11 @@ export default function Button( props ) {
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
 			onPress={ onClick }
-			style={ { borderColor: ariaPressed ? 'black' : 'white', borderWidth: 1, borderRadius: 2 } }
+			style={ { flex: 1, borderColor: ariaPressed ? 'black' : 'white', borderWidth: 1, borderRadius: 5 } }
 		>
-			<View style={ { height: 44, width: 44, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' } }>
+			<View style={ { flex: 1, aspectRatio: 1, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' } }>
 				{ children }
-				{ subscript && ( <Text style={ { fontVariant: [ 'small-caps' ] } }>{ subscript }</Text> ) }
+				{ subscript && ( <Text style={ { fontVariant: [ 'small-caps' ], color: '#3d596d' } }>{ subscript }</Text> ) }
 			</View>
 		</TouchableOpacity>
 	);

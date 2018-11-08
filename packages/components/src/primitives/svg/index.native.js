@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { omit } from 'lodash';
-import { Svg } from 'react-native-svg';
+import { Svg, Path as SvgPath } from 'react-native-svg';
 
 /**
  * Internal dependencies
@@ -12,7 +12,6 @@ import styles from '../../dashicon/style.scss';
 export {
 	Circle,
 	G,
-	Path,
 	Polygon,
 	Rect,
 } from 'react-native-svg';
@@ -42,3 +41,14 @@ export const SVG = ( props ) => {
 		/>
 	);
 };
+
+export const Path = ( props ) => {
+
+	return (
+		<SvgPath
+			fill="#3d596d"
+			{ ...props }
+		/>
+	);
+};
+
