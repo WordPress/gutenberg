@@ -179,7 +179,10 @@ describe( 'PostPublishButton', () => {
 
 	it( 'should have save modifier class', () => {
 		const wrapper = shallow(
-			<PostPublishButton hasPublishAction={ true } isSaving />
+			<PostPublishButton
+				isSaving
+				isPublished
+			/>
 		);
 
 		expect( wrapper.find( 'Button' ).prop( 'isBusy' ) ).toBe( true );

@@ -36,6 +36,7 @@ export class PostPublishButton extends Component {
 			isPublishable,
 			isSaveable,
 			isPostSavingLocked,
+			isPublished,
 			hasPublishAction,
 			onSubmit = noop,
 			forceIsDirty,
@@ -70,7 +71,7 @@ export class PostPublishButton extends Component {
 				isLarge
 				onClick={ onClick }
 				disabled={ ! isButtonEnabled }
-				isBusy={ isSaving }
+				isBusy={ isSaving && isPublished }
 			>
 				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
 			</Button>
@@ -84,6 +85,7 @@ export default compose( [
 			isSavingPost,
 			isEditedPostBeingScheduled,
 			getEditedPostVisibility,
+			isCurrentPostPublished,
 			isEditedPostSaveable,
 			isEditedPostPublishable,
 			isPostSavingLocked,
@@ -97,6 +99,7 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
+			isPublished: isCurrentPostPublished(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
 		};
