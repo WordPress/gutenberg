@@ -494,8 +494,6 @@ export class RichText extends Component {
 	 * @link https://en.wikipedia.org/wiki/Caret_navigation
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
-	 *
-	 * @return {?boolean} True if the event was handled.
 	 */
 	onDeleteKeyDown( event ) {
 		const { onMerge, onRemove } = this.props;
@@ -536,8 +534,6 @@ export class RichText extends Component {
 		}
 
 		event.preventDefault();
-
-		return true;
 	}
 
 	/**
@@ -549,15 +545,18 @@ export class RichText extends Component {
 		const { keyCode } = event;
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			if ( this.onDeleteKeyDown( event ) ) {
+			const value = this.createRecord();
+			const start = getSelectionStart( value );
+			const end = getSelectionEnd( value );
+
+			// Always handle uncollapsed selections ourselves.
+			if ( ! isCollapsed( value ) ) {
+				this.onChange( remove( value ) );
+				event.preventDefault();
 				return;
 			}
 
 			if ( this.multilineTag ) {
-				const value = this.createRecord();
-				const start = getSelectionStart( value );
-				const end = getSelectionEnd( value );
-
 				let newValue;
 
 				if ( keyCode === BACKSPACE ) {
@@ -584,6 +583,8 @@ export class RichText extends Component {
 					event.preventDefault();
 				}
 			}
+
+			this.onDeleteKeyDown( event );
 		} else if ( keyCode === ENTER ) {
 			event.preventDefault();
 
