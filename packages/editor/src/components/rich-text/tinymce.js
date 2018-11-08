@@ -194,6 +194,7 @@ export default class TinyMCE extends Component {
 			// Allow TinyMCE to keep one undo level for comparing changes.
 			// Prevent it otherwise from accumulating any history.
 			custom_undo_redo_levels: 1,
+			lists_indent_on_tab: false,
 		};
 
 		if ( multilineTag === 'li' ) {
