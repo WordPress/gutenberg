@@ -114,7 +114,9 @@ class ButtonEdit extends Component {
 						>
 							<ContrastChecker
 								{ ...{
-									isLargeText: true,
+									// Text is considered large if font size is greater or equal to 18pt or 24px,
+									// currently that's not the case for button.
+									isLargeText: false,
 									textColor: textColor.color,
 									backgroundColor: backgroundColor.color,
 									fallbackBackgroundColor,
