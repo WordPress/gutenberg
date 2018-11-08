@@ -207,7 +207,7 @@ export const settings = {
 						} }
 					/>
 				</BlockControls>
-				<blockquote className={ align }>
+				<blockquote className={ classes }>
 					<RichText
 						multiline
 						value={ value }
