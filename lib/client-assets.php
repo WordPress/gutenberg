@@ -134,6 +134,27 @@ function gutenberg_override_style( $handle, $src, $deps = array(), $ver = false,
 }
 
 /**
+ * Registers all the WordPress packages scripts that are in the standardized
+ * `build/` location.
+ *
+ * @since 4.3.0
+ */
+function gutenberg_register_packages_scripts() {
+	$packages_dependencies = array();
+
+	foreach ( $packages_dependencies as $package => $dependencies ) {
+		$path = "build/$package/index.js";
+		gutenberg_override_script(
+			'wp-' . $package,
+			gutenberg_url( $path ),
+			$dependencies,
+			filemtime( gutenberg_dir_path() . $path ),
+			true
+		);
+	}
+}
+
+/**
  * Registers common scripts and styles to be used as dependencies of the editor
  * and plugins.
  *
