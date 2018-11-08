@@ -1,8 +1,13 @@
-## 5.1.0 (unreleased)
+## 5.1.0 (Unreleased)
 
-### New Features
+### New Feature
 
 - Adjust a11y roles for MenuItem component, so that aria-checked is used properly, related change in Editor/Components/BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
+- `Popover` components are now automatically refreshed every 0.5s in order to recalculate their size or position.
+
+### Deprecation
+
+- `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
 
 ## 5.0.2 (2018-11-03)
 
