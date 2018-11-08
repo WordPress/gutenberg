@@ -964,7 +964,7 @@ describe( 'selectors', () => {
 	describe( 'isPostSavingLocked', () => {
 		it( 'should return true if the post has postSavingLocks', () => {
 			const state = {
-				postSavingLock: [ { 1: true } ],
+				postSavingLock: { example: true },
 				currentPost: {},
 				saving: {},
 			};
@@ -974,7 +974,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the post has no postSavingLocks', () => {
 			const state = {
-				postSavingLock: [],
+				postSavingLock: {},
 				currentPost: {},
 				saving: {},
 			};
