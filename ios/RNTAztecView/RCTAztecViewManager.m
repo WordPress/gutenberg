@@ -1,6 +1,10 @@
 #import "RCTAztecViewManager.h"
-#import "RNTAztecView-Swift.h"
 #import <React/RCTViewManager.h>
+
+// USE "WordPress-Swift.h" to run on WPiOS, or "RNTAztecView-Swift.h" to run Example App.
+#import "RNTAztecView-Swift.h"
+//#import "WordPress-Swift.h"
+
 
 typedef void (^ActionBlock)(RCTAztecView *aztecView);
 
