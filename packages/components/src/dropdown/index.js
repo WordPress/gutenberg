@@ -11,13 +11,12 @@ import Popover from '../popover';
 class Dropdown extends Component {
 	constructor() {
 		super( ...arguments );
-
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
+		this.clickOutside = this.clickOutside.bind( this );
+		this.bindContainer = this.bindContainer.bind( this );
 		this.refresh = this.refresh.bind( this );
-
 		this.popoverRef = createRef();
-
 		this.state = {
 			isOpen: false,
 		};
@@ -39,6 +38,10 @@ class Dropdown extends Component {
 		}
 	}
 
+	bindContainer( ref ) {
+		this.container = ref;
+	}
+
 	/**
 	 * When contents change height due to user interaction,
 	 * `refresh` can be called to re-render Popover with correct
@@ -54,6 +57,12 @@ class Dropdown extends Component {
 		this.setState( ( state ) => ( {
 			isOpen: ! state.isOpen,
 		} ) );
+	}
+
+	clickOutside( event ) {
+		if ( ! this.container.contains( event.target ) ) {
+			this.close();
+		}
 	}
 
 	close() {
@@ -75,7 +84,7 @@ class Dropdown extends Component {
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 
 		return (
-			<div className={ className }>
+			<div className={ className } ref={ this.bindContainer }>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
@@ -83,6 +92,7 @@ class Dropdown extends Component {
 						ref={ this.popoverRef }
 						position={ position }
 						onClose={ this.close }
+						onClickOutside={ this.clickOutside }
 						expandOnMobile={ expandOnMobile }
 						headerTitle={ headerTitle }
 					>
