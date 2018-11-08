@@ -2056,7 +2056,7 @@ export function isPostLocked( state ) {
  * @return {boolean} Is locked.
  */
 export function isPostSavingLocked( state ) {
-	return state.postSavingLock.length > 0;
+	return Object.keys( state.postSavingLock ).length > 0;
 }
 
 /**
