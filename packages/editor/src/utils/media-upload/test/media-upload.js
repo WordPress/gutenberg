@@ -2,184 +2,169 @@
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import { mediaUpload, getMimeTypesArray } from '../media-upload';
 
-// Image uploading fails in a test environment because
-// window.URL.createObjectURL is missing. We can check success by seeing if
-// mediaUpload() attempts to create a blob URL for the image.
 jest.mock( '@wordpress/blob', () => ( {
 	createBlobURL: jest.fn(),
+	revokeBlobURL: jest.fn(),
 } ) );
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
-const invalidMediaObj = {
-	url: 'https://cldup.com/uuUqE_dXzy.jpg',
-	type: 'text/xml',
-	name: 'test.xml',
-};
-
-const validMediaObj = {
-	url: 'https://cldup.com/uuUqE_dXzy.jpg',
-	type: 'image/jpeg',
-	size: 1024,
-	name: 'test.jpeg',
-};
+const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', { type: 'text/xml' } );
+const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', { type: 'image/jpeg' } );
 
 describe( 'mediaUpload', () => {
-	const onFileChangeSpy = jest.fn();
-
-	beforeEach( () => {
-		onFileChangeSpy.mockReset();
-		createBlobURL.mockReset();
-	} );
-
-	it( 'should do nothing on no files', () => {
-		mediaUpload( { filesList: [], onFileChange: onFileChangeSpy, allowedType: 'image' } );
-		expect( onFileChangeSpy ).not.toHaveBeenCalled();
-	} );
-
-	it( 'should do nothing on invalid image type', () => {
+	it( 'should do nothing on no files', async () => {
 		const onError = jest.fn();
-		mediaUpload( {
-			filesList: [ invalidMediaObj ],
-			onFileChange: onFileChangeSpy,
-			allowedTypes: [ 'image' ],
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			filesList: [],
 			onError,
+			onFileChange,
 		} );
-		expect( onFileChangeSpy ).not.toHaveBeenCalled();
-		expect( onError ).toHaveBeenCalled();
-		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
+
+		expect( onError ).not.toHaveBeenCalled();
+		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should error if allowedTypes contains a complete mime type string and the validation fails', () => {
+	it( 'should error if allowedTypes contains a partial mime type and the validation fails', async () => {
 		const onError = jest.fn();
-		const testFile = {
-			url: 'https://cldup.com/uuUqE_dXzy.mp3',
-			type: 'image/jpeg',
-			name: 'myImage.jpeg',
-		};
-		mediaUpload( {
-			filesList: [ testFile ],
-			onFileChange: onFileChangeSpy,
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: [ xmlFile ],
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should error if allowedTypes contains a complete mime type and the validation fails', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
 			allowedTypes: [ 'image/gif' ],
+			filesList: [ imageFile ],
 			onError,
+			onFileChange,
 		} );
-		expect( createBlobURL ).not.toHaveBeenCalled();
-		expect( onError ).toHaveBeenCalled();
-		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should work as expected if allowedTypes contains a complete mime type string and the validation has success', () => {
-		const onError = jest.fn();
-		const testFile = {
-			url: 'https://cldup.com/uuUqE_dXzy.mp3',
-			type: 'image/jpeg',
-			name: 'myImage.jpeg',
-		};
+	it( 'should work if allowedTypes contains a complete mime type and the validation succeeds', async () => {
+		createBlobURL.mockReturnValue( 'blob:fake_blob' );
+		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
 
-		mediaUpload( {
-			filesList: [ testFile ],
-			onFileChange: onFileChangeSpy,
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
 			allowedTypes: [ 'image/jpeg' ],
+			filesList: [ imageFile ],
 			onError,
+			onFileChange,
 		} );
-		expect( createBlobURL ).toHaveBeenCalled();
+
 		expect( onError ).not.toHaveBeenCalled();
+		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'should error if allowedTypes contains multiple types and the validation fails', () => {
+	it( 'should error if allowedTypes contains multiple types and the validation fails', async () => {
 		const onError = jest.fn();
-		const testFile = {
-			url: 'https://cldup.com/uuUqE_dXzy.mp3',
-			type: 'audio/mp3',
-			name: 'mymusic.mp3',
-		};
-		mediaUpload( {
-			filesList: [ testFile ],
-			onFileChange: onFileChangeSpy,
+		const onFileChange = jest.fn();
+		await mediaUpload( {
 			allowedTypes: [ 'video', 'image' ],
+			filesList: [ xmlFile ],
 			onError,
+			onFileChange,
 		} );
-		expect( createBlobURL ).not.toHaveBeenCalled();
-		expect( onError ).toHaveBeenCalled();
-		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_SUPPORTED' );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should work as expected if allowedTypes contains multiple types and the validation has success', () => {
-		const onError = jest.fn();
-		const testFile = {
-			url: 'https://cldup.com/uuUqE_dXzy.mp3',
-			type: 'audio/mp3',
-			name: 'mymusic.mp3',
-		};
+	it( 'should work if allowedTypes contains multiple types and the validation succeeds', async () => {
+		createBlobURL.mockReturnValue( 'blob:fake_blob' );
+		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
 
-		mediaUpload( {
-			filesList: [ testFile ],
-			onFileChange: onFileChangeSpy,
-			allowedTypes: [ 'image', 'audio' ],
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'video', 'image' ],
+			filesList: [ imageFile ],
 			onError,
+			onFileChange,
 		} );
-		expect( createBlobURL ).toHaveBeenCalled();
+
 		expect( onError ).not.toHaveBeenCalled();
+		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'should only fail the file that caused the validation to fail and still allow others to succeed when uploading multiple files', () => {
+	it( 'should only fail the invalid file and still allow others to succeed when uploading multiple files', async () => {
+		createBlobURL.mockReturnValue( 'blob:fake_blob' );
+		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
+
 		const onError = jest.fn();
-		const invalidTestFile = {
-			url: 'https://cldup.com/uuUqE_dXzy.mp3',
-			type: 'image/jpeg',
-			name: 'myimage.jpg',
-		};
-		const validTestFile = {
-			url: 'https://cldup.com/uuUqE_dXzy.mp3',
-			type: 'audio/mp3',
-			name: 'mymusic.mp3',
-		};
-
-		mediaUpload( {
-			filesList: [ invalidTestFile, validTestFile ],
-			onFileChange: onFileChangeSpy,
-			allowedTypes: [ 'audio' ],
-			onError,
-		} );
-
-		expect( onError.mock.calls ).toHaveLength( 1 );
-		expect( onError.mock.calls[ 0 ][ 0 ].file ).toBe( invalidTestFile );
-
-		expect( createBlobURL.mock.calls ).toHaveLength( 1 );
-		expect( createBlobURL ).toHaveBeenCalledWith( validTestFile );
-	} );
-
-	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
-		const onError = jest.fn();
-
-		mediaUpload( {
+		const onFileChange = jest.fn();
+		await mediaUpload( {
 			allowedTypes: [ 'image' ],
-			filesList: [ validMediaObj ],
-			onFileChange: onFileChangeSpy,
-			maxUploadFileSize: 512,
+			filesList: [ imageFile, xmlFile ],
 			onError,
+			onFileChange,
 		} );
-		expect( onError ).toHaveBeenCalled();
-		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'SIZE_ABOVE_LIMIT' );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+			file: xmlFile,
+		} ) );
+		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
 	} );
 
-	it( 'should call error handler with the correct error object if file type is not allowed for user', () => {
+	it( 'should error if the file size is greater than the maximum', async () => {
 		const onError = jest.fn();
-		const wpAllowedMimeTypes = { aac: 'audio/aac' };
-
-		mediaUpload( {
+		const onFileChange = jest.fn();
+		await mediaUpload( {
 			allowedTypes: [ 'image' ],
-			filesList: [ validMediaObj ],
-			onFileChange: onFileChangeSpy,
+			filesList: [ imageFile ],
+			maxUploadFileSize: 1,
 			onError,
-			wpAllowedMimeTypes,
+			onFileChange,
 		} );
-		expect( onError ).toHaveBeenCalled();
-		expect( onError.mock.calls[ 0 ][ 0 ].code ).toBe( 'MIME_TYPE_NOT_ALLOWED_FOR_USER' );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'SIZE_ABOVE_LIMIT',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should call error handler with the correct error object if file type is not allowed for user', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: [ imageFile ],
+			onError,
+			wpAllowedMimeTypes: { aac: 'audio/aac' },
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 } );
 
