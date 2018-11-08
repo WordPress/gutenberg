@@ -179,9 +179,9 @@ class InlineLinkUI extends Component {
 		this.resetState();
 
 		if ( isActive ) {
-			speak( __( 'Link edited.' ), 'assertive' );
+			speak( __( 'Link edited' ), 'assertive' );
 		} else {
-			speak( __( 'Link added.' ), 'assertive' );
+			speak( __( 'Link inserted' ), 'assertive' );
 		}
 	}
 
