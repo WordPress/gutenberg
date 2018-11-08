@@ -1,3 +1,9 @@
+## 6.2.0 (unreleased)
+
+### New Features
+
+- Adjust a11y roles for menu items, and make sure screen readers can properly use BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
+
 ## 6.1.1 (2018-11-03)
 
 ### Polish
