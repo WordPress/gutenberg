@@ -41,7 +41,8 @@ export class PostPublishButton extends Component {
 			forceIsDirty,
 			forceIsSaving,
 		} = this.props;
-		const isButtonEnabled = ( forceIsDirty || isPublishable ) &&
+		const isButtonEnabled = ( ! isSaving && ! forceIsSaving ) &&
+			( forceIsDirty || isPublishable ) &&
 			( isSaveable && ! isPostSavingLocked );
 
 		let publishStatus;
@@ -78,7 +79,7 @@ export class PostPublishButton extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { forceIsSaving } ) => {
+	withSelect( ( select ) => {
 		const {
 			isSavingPost,
 			isEditedPostBeingScheduled,
@@ -90,7 +91,7 @@ export default compose( [
 			getCurrentPostType,
 		} = select( 'core/editor' );
 		return {
-			isSaving: forceIsSaving || isSavingPost(),
+			isSaving: isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
