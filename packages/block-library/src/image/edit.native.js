@@ -23,7 +23,7 @@ export default function ImageEdit( props ) {
 		// Call onMediaLibraryPress from the Native<->RN bridge. It should trigger an image picker from
 		// the WordPress media library and call the provided callback to set the image URL.
 		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
-			if ( mediaUrl)  {
+			if ( mediaUrl ) {
 				setAttributes( { url: mediaUrl } );
 			}
 		} );
