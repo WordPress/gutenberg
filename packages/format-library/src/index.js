@@ -1,4 +1,11 @@
 /**
+ * WordPress dependencies
+ */
+import {
+	registerFormatType,
+} from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 import { bold } from './bold';
@@ -8,18 +15,21 @@ import { italic } from './italic';
 import { link } from './link';
 import { strikethrough } from './strikethrough';
 
-/**
- * WordPress dependencies
- */
-import {
-	registerFormatType,
-} from '@wordpress/rich-text';
+export function getCoreFormatTypes() {
+	return [
+		bold,
+		code,
+		image,
+		italic,
+		link,
+		strikethrough,
+	].map(
+		( { name, ...settings } ) => [ name, settings ]
+	);
+}
 
-[
-	bold,
-	code,
-	image,
-	italic,
-	link,
-	strikethrough,
-].forEach( ( { name, ...settings } ) => registerFormatType( name, settings ) );
+export function registerCoreFormatTypes() {
+	getCoreFormatTypes().forEach(
+		( params ) => registerFormatType( ...params )
+	);
+}

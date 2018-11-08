@@ -544,6 +544,11 @@ function gutenberg_register_scripts_and_styles() {
 		filemtime( gutenberg_dir_path() . 'build/format-library/index.js' ),
 		true
 	);
+	wp_add_inline_script(
+		'wp-format-library',
+		'wp.formatLibrary.registerCoreFormatTypes();',
+		'after'
+	);
 	gutenberg_override_script(
 		'wp-nux',
 		gutenberg_url( 'build/nux/index.js' ),
