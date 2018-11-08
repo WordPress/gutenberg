@@ -12,7 +12,7 @@ const OBJECT_REPLACEMENT_CHARACTER = '\ufffc';
  * removed. Indices are retrieved from the selection if none are provided.
  *
  * @param {Object} value          Value to modify.
- * @param {string} formatToInsert Format to insert as object.
+ * @param {Object} formatToInsert Format to insert as object.
  * @param {number} startIndex     Start index.
  * @param {number} endIndex       End index.
  *
