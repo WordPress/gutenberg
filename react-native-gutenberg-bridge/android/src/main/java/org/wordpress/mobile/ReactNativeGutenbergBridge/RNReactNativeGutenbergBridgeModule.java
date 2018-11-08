@@ -36,8 +36,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void provideToNative_Html(String html) {
-        mGutenbergBridgeJS2Parent.responseHtml(html);
+    public void provideToNative_Html(String html, boolean changed) {
+        mGutenbergBridgeJS2Parent.responseHtml(html, changed);
     }
 
     @ReactMethod
