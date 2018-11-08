@@ -38,12 +38,12 @@ export const ListEdit = ( { editor, onTagNameChange, tagName } ) => (
 	<Fragment>
 		<RichTextShortcut
 			type="primary"
-			character="]"
+			character="["
 			onUse={ () => editor.execCommand( 'Outdent' ) }
 		/>
 		<RichTextShortcut
 			type="primary"
-			character="["
+			character="]"
 			onUse={ () => editor.execCommand( 'Indent' ) }
 		/>
 		<RichTextShortcut
