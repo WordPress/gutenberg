@@ -225,3 +225,12 @@ Returns an action object used to set block categories.
 *Parameters*
 
  * categories: Block categories.
+
+### setCategoryIcon
+
+Returns an action object used to the icon of a category.
+
+*Parameters*
+
+ * slug: Block category slug.
+ * icon: Block category icon.

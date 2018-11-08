@@ -120,3 +120,19 @@ export function setCategories( categories ) {
 		categories,
 	};
 }
+
+/**
+ * Returns an action object used to the icon of a category.
+ *
+ * @param {string}       slug Block category slug.
+ * @param {string|Array} icon Block category icon.
+ *
+ * @return {Object} Action object.
+ */
+export function setCategoryIcon( slug, icon ) {
+	return {
+		type: 'SET_CATEGORY_ICON',
+		slug,
+		icon,
+	};
+}

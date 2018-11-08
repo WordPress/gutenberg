@@ -20,3 +20,13 @@ export function getCategories() {
 export function setCategories( categories ) {
 	dispatch( 'core/blocks' ).setCategories( categories );
 }
+
+/**
+ * Sets the category icon.
+ *
+ * @param {string}       slug Block category slug.
+ * @param {string|Array} icon Block category icon.
+ */
+export function setCategoryIcon( slug, icon ) {
+	dispatch( 'core/blocks' ).setCategoryIcon( slug, icon );
+}

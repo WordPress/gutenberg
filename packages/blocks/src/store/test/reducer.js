@@ -226,4 +226,43 @@ describe( 'categories', () => {
 			{ slug: 'wings', title: 'Wings' },
 		] );
 	} );
+
+	it( 'should add the category icon', () => {
+		const original = deepFreeze( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+		} ] );
+
+		const state = categories( original, {
+			type: 'SET_CATEGORY_ICON',
+			slug: 'chicken',
+			icon: 'new-icon',
+		} );
+
+		expect( state ).toEqual( [ {
+			slug: 'wings',
+			title: 'Wings',
+			icon: 'new-icon',
+		} ] );
+	} );
+
+	it( 'should update the category icon', () => {
+		const original = deepFreeze( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+			icon: 'old-icon',
+		} ] );
+
+		const state = categories( original, {
+			type: 'SET_CATEGORY_ICON',
+			slug: 'chicken',
+			icon: 'new-icon',
+		} );
+
+		expect( state ).toEqual( [ {
+			slug: 'wings',
+			title: 'Wings',
+			icon: 'new-icon',
+		} ] );
+	} );
 } );
