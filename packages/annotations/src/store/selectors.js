@@ -8,7 +8,7 @@ import createSelector from 'rememo';
  *
  * @return {Array} The annotations applicable to this block.
  */
-export const getAnnotationsForBlock = createSelector(
+export const __experimentalGetAnnotationsForBlock = createSelector(
 	( state, blockClientId ) => {
 		return state.all.filter( ( annotation ) => {
 			return annotation.selector === 'block' && annotation.blockClientId === blockClientId;
@@ -31,7 +31,7 @@ export const getAnnotationsForBlock = createSelector(
  * @param {string} richTextIdentifier Unique identifier that identifies the given RichText.
  * @return {Array} All the annotations relevant for the `RichText`.
  */
-export const getAnnotationsForRichText = createSelector(
+export const __experimentalGetAnnotationsForRichText = createSelector(
 	( state, blockClientId, richTextIdentifier ) => {
 		return state.all.filter( ( annotation ) => {
 			return annotation.selector === 'range' &&
@@ -57,6 +57,6 @@ export const getAnnotationsForRichText = createSelector(
  * @param {Object} state Editor state.
  * @return {Array} All annotations currently applied.
  */
-export function getAnnotations( state ) {
+export function __experimentalGetAnnotations( state ) {
 	return state.all;
 }

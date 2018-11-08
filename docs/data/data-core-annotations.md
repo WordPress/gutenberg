@@ -2,7 +2,7 @@
 
 ## Selectors
 
-### getAnnotationsForBlock
+### __experimentalGetAnnotationsForBlock
 
 Returns the annotations for a specific client ID.
 
@@ -11,7 +11,7 @@ Returns the annotations for a specific client ID.
  * state: Editor state.
  * clientId: The ID of the block to get the annotations for.
 
-### getAnnotationsForRichText
+### __experimentalGetAnnotationsForRichText
 
 Returns the annotations that apply to the given RichText instance.
 
@@ -29,7 +29,7 @@ block needs to implement annotations itself.
 
 All the annotations relevant for the `RichText`.
 
-### getAnnotations
+### __experimentalGetAnnotations
 
 Returns all annotations in the editor state.
 
@@ -43,7 +43,7 @@ All annotations currently applied.
 
 ## Actions
 
-### addAnnotation
+### __experimentalAddAnnotation
 
 Adds an annotation to a block.
 
@@ -67,7 +67,7 @@ The `range` property is only relevant if the selector is 'range'.
  * string: [id=uuid()]        The ID the annotation should have.
                                    Generates a UUID by default.
 
-### removeAnnotation
+### __experimentalRemoveAnnotation
 
 Removes an annotation with a specific ID.
 
@@ -75,7 +75,7 @@ Removes an annotation with a specific ID.
 
  * annotationId: The annotation to remove.
 
-### removeAnnotationsBySource
+### __experimentalRemoveAnnotationsBySource
 
 Removes all annotations of a specific source.
 

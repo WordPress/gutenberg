@@ -23,7 +23,7 @@ import uuid from 'uuid/v4';
  *
  * @return {Object} Action object.
  */
-export function addAnnotation( { blockClientId, richTextIdentifier = null, range = null, selector = 'range', source = 'default', id = uuid() } ) {
+export function __experimentalAddAnnotation( { blockClientId, richTextIdentifier = null, range = null, selector = 'range', source = 'default', id = uuid() } ) {
 	const action = {
 		type: 'ANNOTATION_ADD',
 		id,
@@ -47,7 +47,7 @@ export function addAnnotation( { blockClientId, richTextIdentifier = null, range
  *
  * @return {Object} Action object.
  */
-export function removeAnnotation( annotationId ) {
+export function __experimentalRemoveAnnotation( annotationId ) {
 	return {
 		type: 'ANNOTATION_REMOVE',
 		annotationId,
@@ -61,7 +61,7 @@ export function removeAnnotation( annotationId ) {
  *
  * @return {Object} Action object.
  */
-export function removeAnnotationsBySource( source ) {
+export function __experimentalRemoveAnnotationsBySource( source ) {
 	return {
 		type: 'ANNOTATION_REMOVE_SOURCE',
 		source,

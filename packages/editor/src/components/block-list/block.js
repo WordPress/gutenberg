@@ -607,7 +607,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		getTemplateLock,
 	} = select( 'core/editor' );
 	const {
-		getAnnotationsForBlock,
+		__experimentalGetAnnotationsForBlock,
 	} = select( 'core/annotations' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
@@ -641,7 +641,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		block,
 		isSelected,
 		isParentOfSelectedBlock,
-		annotations: getAnnotationsForBlock( clientId ),
+		annotations: __experimentalGetAnnotationsForBlock( clientId ),
 	};
 } );
 
