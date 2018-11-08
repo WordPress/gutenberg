@@ -53,12 +53,12 @@ function toFormat( { type, attributes } ) {
 		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement( type );
 	}
 
-	if ( formatType.__experimentalCreatePrepareEditableTree ) {
-		return null;
-	}
-
 	if ( ! formatType ) {
 		return attributes ? { type, attributes } : { type };
+	}
+
+	if ( formatType.__experimentalCreatePrepareEditableTree ) {
+		return null;
 	}
 
 	if ( ! attributes ) {
