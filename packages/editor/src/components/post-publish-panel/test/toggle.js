@@ -66,7 +66,7 @@ describe( 'PostPublishPanelToggle', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( false );
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be enabled if post is saveable but not publishable and forceIsDirty is true', () => {
