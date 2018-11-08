@@ -18,16 +18,16 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 		sprintf( _n( '%d Block', '%d Blocks', blockCount ), blockCount );
 
 	const [ documentAriaLabel, documentActiveClass ] = sidebarName === 'edit-post/document' ?
-		// translators: ARIA label for the Document Settings sidebar tab, selected.
-		[ __( 'Document settings (selected)' ), 'is-active' ] :
-		// translators: ARIA label for the Document Settings sidebar tab, not selected.
-		[ __( 'Document settings' ), '' ];
+		// translators: ARIA label for the Document sidebar tab, selected.
+		[ __( 'Document (selected)' ), 'is-active' ] :
+		// translators: ARIA label for the Document sidebar tab, not selected.
+		[ __( 'Document' ), '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
-		// translators: ARIA label for the Block Settings sidebar tab, selected.
-		[ __( 'Block settings (selected)' ), 'is-active' ] :
-		// translators: ARIA label for the Block Settings sidebar tab, not selected.
-		[ __( 'Block settings' ), '' ];
+		// translators: ARIA label for the Block sidebar tab, selected.
+		[ __( 'Block (selected)' ), 'is-active' ] :
+		// translators: ARIA label for the Block sidebar tab, not selected.
+		[ __( 'Block' ), '' ];
 
 	return (
 		<SidebarHeader

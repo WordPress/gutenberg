@@ -33,7 +33,7 @@ describe( 'preferences', () => {
 		expect( await getActiveSidebarTabText() ).toBe( 'Document' );
 
 		// Change to "Block" tab.
-		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block settings"]' );
+		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block"]' );
 		expect( await getActiveSidebarTabText() ).toBe( 'Block' );
 
 		// Regression test: Reload resets to document tab.
