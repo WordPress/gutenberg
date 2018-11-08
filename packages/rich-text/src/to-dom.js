@@ -3,7 +3,6 @@
  */
 
 import { toTree } from './to-tree';
-import { getFormatTypes } from './get-format-types';
 
 /**
  * Browser dependencies
@@ -133,13 +132,9 @@ function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
 	}
 }
 
-function prepareFormats( value ) {
-	return getFormatTypes().reduce( ( accumlator, { prepareEditableTree } ) => {
-		if ( prepareEditableTree ) {
-			return prepareEditableTree( accumlator, value.text );
-		}
-
-		return accumlator;
+function prepareFormats( prepareEditableTree = [], value ) {
+	return prepareEditableTree.reduce( ( accumlator, fn ) => {
+		return fn( accumlator, value.text );
 	}, value.formats );
 }
 
@@ -148,6 +143,7 @@ export function toDom( {
 	multilineTag,
 	multilineWrapperTags,
 	createLinePadding,
+	prepareEditableTree,
 } ) {
 	let startPath = [];
 	let endPath = [];
@@ -155,7 +151,7 @@ export function toDom( {
 	const tree = toTree( {
 		value: {
 			...value,
-			formats: prepareFormats( value ),
+			formats: prepareFormats( prepareEditableTree, value ),
 		},
 		multilineTag,
 		multilineWrapperTags,
@@ -202,6 +198,7 @@ export function apply( {
 	multilineTag,
 	multilineWrapperTags,
 	createLinePadding,
+	prepareEditableTree,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
@@ -209,6 +206,7 @@ export function apply( {
 		multilineTag,
 		multilineWrapperTags,
 		createLinePadding,
+		prepareEditableTree,
 	} );
 
 	applyValue( body, current );

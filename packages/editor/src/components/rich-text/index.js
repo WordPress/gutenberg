@@ -44,6 +44,7 @@ import {
 	isCollapsed,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
+import { withFilters } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -238,6 +239,7 @@ export class RichText extends Component {
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
+			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
 
@@ -252,6 +254,7 @@ export class RichText extends Component {
 				element.setAttribute( 'data-mce-bogus', '1' );
 				return element;
 			},
+			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
 
@@ -734,7 +737,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected } = this.props;
+		const { tagName, value, isSelected, propsToCheck = [] } = this.props;
 
 		if (
 			tagName === prevProps.tagName &&
@@ -773,6 +776,11 @@ export class RichText extends Component {
 			const length = getTextContent( prevRecord ).length;
 			record.start = length;
 			record.end = length;
+			this.applyRecord( record );
+		}
+
+		if ( propsToCheck.some( ( name ) => this.props[ name ] !== prevProps[ name ] ) ) {
+			const record = this.formatToValue( value );
 			this.applyRecord( record );
 		}
 	}
@@ -814,6 +822,7 @@ export class RichText extends Component {
 				element.setAttribute( 'data-mce-bogus', '1' );
 				return element;
 			},
+			prepareEditableTree: this.props.prepareEditableTree,
 		} ).body.innerHTML;
 	}
 
@@ -980,6 +989,7 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withSafeTimeout,
+	withFilters( 'RichText' ),
 ] )( RichText );
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
