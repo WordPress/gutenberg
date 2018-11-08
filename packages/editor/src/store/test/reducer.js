@@ -1078,35 +1078,6 @@ describe( 'state', () => {
 				expect( state.present.edits ).toBe( original.present.edits );
 			} );
 
-			it( 'unset updated post values which match', () => {
-				const original = editor( undefined, {
-					type: 'EDIT_POST',
-					edits: {
-						title: 'modified title',
-						meta: {
-							a: 1,
-							b: 2,
-						},
-					},
-				} );
-
-				const state = editor( original, {
-					type: 'UPDATE_POST',
-					edits: {
-						title: 'modified title',
-						meta: {
-							a: 1,
-						},
-					},
-				} );
-
-				expect( state.present.edits ).toEqual( {
-					meta: {
-						b: 2,
-					},
-				} );
-			} );
-
 			it( 'unset reset post values which match by canonical value', () => {
 				const original = editor( undefined, {
 					type: 'EDIT_POST',
@@ -1127,7 +1098,7 @@ describe( 'state', () => {
 				expect( state.present.edits ).toEqual( {} );
 			} );
 
-			it( 'unset top-level key of empty object value', () => {
+			it( 'unset reset post values by deep match', () => {
 				const original = editor( undefined, {
 					type: 'EDIT_POST',
 					edits: {

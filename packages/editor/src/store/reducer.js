@@ -34,7 +34,16 @@ import {
 	INITIAL_EDITS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
-import { getMutateSafeObject, merge, diff } from './object';
+
+/**
+ * Set of post properties for which edits should assume a merging behavior,
+ * assuming an object value.
+ *
+ * @type {Set}
+ */
+const EDIT_MERGE_PROPERTIES = new Set( [
+	'meta',
+] );
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -100,6 +109,23 @@ function getFlattenedBlocks( blocks ) {
 	}
 
 	return flattenedBlocks;
+}
+
+/**
+ * Returns an object against which it is safe to perform mutating operations,
+ * given the original object and its current working copy.
+ *
+ * @param {Object} original Original object.
+ * @param {Object} working  Working object.
+ *
+ * @return {Object} Mutation-safe object.
+ */
+function getMutateSafeObject( original, working ) {
+	if ( original === working ) {
+		return { ...original };
+	}
+
+	return working;
 }
 
 /**
@@ -224,7 +250,22 @@ export const editor = flow( [
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-				return merge( state, action.edits );
+				return reduce( action.edits, ( result, value, key ) => {
+					// Only assign into result if not already same value
+					if ( value !== state[ key ] ) {
+						result = getMutateSafeObject( state, result );
+
+						if ( EDIT_MERGE_PROPERTIES.has( key ) ) {
+							// Merge properties should assign to current value.
+							result[ key ] = { ...result[ key ], ...value };
+						} else {
+							// Otherwise override.
+							result[ key ] = value;
+						}
+					}
+
+					return result;
+				}, state );
 
 			case 'RESET_BLOCKS':
 				if ( 'content' in state ) {
@@ -235,14 +276,19 @@ export const editor = flow( [
 
 			case 'UPDATE_POST':
 			case 'RESET_POST':
-				let updates;
-				if ( action.type === 'UPDATE_POST' ) {
-					updates = action.edits;
-				} else {
-					updates = mapValues( action.post, getPostRawValue );
-				}
+				const getCanonicalValue = action.type === 'UPDATE_POST' ?
+					( key ) => action.edits[ key ] :
+					( key ) => getPostRawValue( action.post[ key ] );
 
-				return diff( updates, state );
+				return reduce( state, ( result, value, key ) => {
+					if ( ! isEqual( value, getCanonicalValue( key ) ) ) {
+						return result;
+					}
+
+					result = getMutateSafeObject( state, result );
+					delete result[ key ];
+					return result;
+				}, state );
 		}
 
 		return state;
