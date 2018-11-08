@@ -30,9 +30,11 @@ function the_gutenberg_project() {
 	?>
 	<div class="block-editor gutenberg">
 		<noscript>
-			<div class="error" style='margin-top:32px'><p><?php
+			<div class="error" style='margin-top:32px'><p>
+			<?php
 			echo __( 'The block editor requires Javascript to be enabled.', 'gutenberg' );
-			?></p></div>
+			?>
+			</p></div>
 		</noscript>
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="block-editor__container gutenberg__editor"></div>
