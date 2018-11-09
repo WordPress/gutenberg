@@ -677,7 +677,6 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'tinymce-latest-lists',
 			'wp-a11y',
-			'wp-annotations',
 			'wp-api-fetch',
 			'wp-blob',
 			'wp-blocks',
