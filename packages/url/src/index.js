@@ -119,7 +119,7 @@ export function getQueryString( url ) {
 /**
  * Checks for invalid characters within the provided query string.
  *
- * @param {string} queryString The url query string.
+ * @param {string} queryString The query string.
  *
  * @return {boolean} True if the argument contains a valid query string.
  */
