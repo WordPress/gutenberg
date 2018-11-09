@@ -246,7 +246,7 @@ describe( 'adding blocks', () => {
 		expect( blockText ).toBe( 'alpha beta gamma delta' );
 	} );
 
-	it( 'should create valid paragraph blocks when holding down Enter', async () => {
+	it( 'should create valid paragraph blocks when rapidly pressing Enter', async () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
