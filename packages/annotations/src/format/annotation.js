@@ -5,7 +5,9 @@ import { __ } from '@wordpress/i18n';
 
 const name = 'core/annotation';
 
-/* WordPress dependencies */
+/**
+ * WordPress dependencies
+ */
 import { applyFormat, removeFormat } from '@wordpress/rich-text';
 
 /**
@@ -15,7 +17,6 @@ import { applyFormat, removeFormat } from '@wordpress/rich-text';
  * @param {Array} annotations The annotation to apply.
  * @return {Object} A record with the annotations applied.
  */
-
 export function applyAnnotations( record, annotations = [] ) {
 	annotations.forEach( ( annotation ) => {
 		let { start, end } = annotation;
