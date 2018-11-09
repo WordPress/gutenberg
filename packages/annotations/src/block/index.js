@@ -1,4 +1,6 @@
-/* WordPress dependencies */
+/**
+ * WordPress dependencies
+ */
 import { addFilter } from '@wordpress/hooks';
 import { withSelect } from '@wordpress/data';
 

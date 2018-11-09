@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import createSelector from 'rememo';
 
 /**

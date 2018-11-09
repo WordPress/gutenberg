@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { annotations } from '../reducer';
 
 describe( 'annotations', () => {
