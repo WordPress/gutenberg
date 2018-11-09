@@ -167,8 +167,7 @@ function gutenberg_render_block( $block ) {
 	}
 
 	if ( $is_dynamic ) {
-		$attributes    = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
-
+		$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
 		$global_post = $post;
 		$output      = $block_type->render( $attributes, $inner_content );
 		$post        = $global_post;
