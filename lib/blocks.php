@@ -194,9 +194,8 @@ if ( ! function_exists( 'do_blocks' ) ) {
 	 * @return string          Updated post content.
 	 */
 	function do_blocks( $content ) {
-		$without_trailing_newlines = preg_replace( '/(<!--\s+\/?wp:.*?-->)\r?\n?/m', '$1', $content );
-		$blocks                    = gutenberg_parse_blocks( $without_trailing_newlines );
-		$output                    = '';
+		$blocks = gutenberg_parse_blocks( $content );
+		$output = '';
 
 		foreach ( $blocks as $block ) {
 			$output .= gutenberg_render_block( $block );
