@@ -38,7 +38,7 @@
 		"showdown": "^1.8.6",
 		"simple-html-tokenizer": "^0.4.1",
 		"tinycolor2": "^1.4.1",
-		"uuid": "^3.1.0"
+		"uuid": "^3.3.2"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1"
