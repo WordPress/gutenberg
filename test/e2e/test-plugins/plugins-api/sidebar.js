@@ -56,7 +56,7 @@
 				{
 					isPrimary: true,
 					onClick: () => {
-						dispatch( 'core/annotations' ).addAnnotation( {
+						dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
 							source: 'e2e-tests',
 							blockClientId: select( 'core/editor' ).getBlockOrder()[ 0 ],
 							richTextIdentifier: 'content',
