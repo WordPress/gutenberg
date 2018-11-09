@@ -206,6 +206,7 @@ Action triggered to save an entity record.
  * kind: Kind of the received entity.
  * name: Name of the received entity.
  * record: Record to be saved.
+
 ### receiveUploadPermissions
 
 Returns an action object used in signalling that Upload permissions have been received.
