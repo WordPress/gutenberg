@@ -420,4 +420,16 @@ describe( 'Links', () => {
 		const activeElementValue = await page.evaluate( () => document.activeElement.value );
 		expect( activeElementValue ).toBe( URL );
 	} );
+
+	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( META_KEY, 'K' );
+		await waitForAutoFocus();
+		await page.keyboard.type( 'http://#test.com' );
+		await page.keyboard.press( 'Enter' );
+		const assertiveContent = await page.evaluate( () => document.querySelector( '#a11y-speak-assertive' ).textContent );
+		expect( assertiveContent ).toBe( 'Warning: the link has been inserted but may have errors. Please test it.' );
+	} );
 } );
