@@ -63,6 +63,13 @@ describe( 'i18n', () => {
 	} );
 
 	describe( 'sprintf()', () => {
+		it( 'absorbs errors', () => {
+			const result = sprintf( 'Hello %(placeholder-not-provided)s' );
+
+			expect( console ).toHaveErrored();
+			expect( result ).toBe( 'Hello %(placeholder-not-provided)s' );
+		} );
+
 		it( 'replaces placeholders', () => {
 			const result = sprintf( __( 'hello %s', 'test_domain' ), 'Riad' );
 
