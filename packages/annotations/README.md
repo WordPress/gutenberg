@@ -1,5 +1,7 @@
 # Annotations
 
+Annotate content in the Gutenberg editor.
+
 ## Installation
 
 Install the module
