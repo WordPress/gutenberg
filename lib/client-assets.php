@@ -598,28 +598,26 @@ function gutenberg_register_scripts_and_styles() {
 			),
 			'toolbar1'         => implode(
 				',',
-				array_merge(
-					apply_filters(
-						'mce_buttons',
-						array(
-							'formatselect',
-							'bold',
-							'italic',
-							'bullist',
-							'numlist',
-							'blockquote',
-							'alignleft',
-							'aligncenter',
-							'alignright',
-							'link',
-							'unlink',
-							'wp_more',
-							'spellchecker',
-							'wp_add_media',
-						),
-						'editor'
+				apply_filters(
+					'mce_buttons',
+					array(
+						'formatselect',
+						'bold',
+						'italic',
+						'bullist',
+						'numlist',
+						'blockquote',
+						'alignleft',
+						'aligncenter',
+						'alignright',
+						'link',
+						'unlink',
+						'wp_more',
+						'spellchecker',
+						'wp_add_media',
+						'kitchensink',
 					),
-					array( 'kitchensink' )
+					'editor'
 				)
 			),
 			'toolbar2'         => implode(
