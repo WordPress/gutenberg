@@ -27,7 +27,7 @@ export function PostPublishPanelToggle( {
 		( ! isPublishable && ! forceIsDirty );
 
 	deprecated( 'PostPublishPanelToggle', {
-		version: '5.1',
+		version: '4.6',
 		alternative: 'PostPublishButton',
 		plugin: 'Gutenberg',
 	} );
