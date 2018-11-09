@@ -162,9 +162,20 @@ function gutenberg_render_block( $block ) {
 	$has_blocks = ! empty( $block['innerBlocks'] );
 
 	if ( $is_dynamic ) {
-		$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
+		$attributes    = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
+		$inner_content = '';
+
+		if ( $has_blocks ) {
+			$index  = 0;
+			foreach ( $block['innerContent'] as $chunk ) {
+				$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
+			}
+		} else {
+			$inner_content = $block['innerHTML'];
+		}
+		
 		$global_post = $post;
-		$output      = $block_type->render( $attributes, $block['innerHTML'] );
+		$output      = $block_type->render( $attributes, $inner_content );
 		$post        = $global_post;
 
 		return $output;
