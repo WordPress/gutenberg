@@ -1,4 +1,4 @@
-## 5.3.0 (Unreleased)
+## 5.3.0 (2018-11-09)
 
 ### New feature
 

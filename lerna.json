@@ -6,7 +6,6 @@
 	},
 	"ignoreChanges": [
 		"**/benchmark/*.js",
-		"**/CHANGELOG.md",
 		"**/test/**"
 	],
 	"packages": [
