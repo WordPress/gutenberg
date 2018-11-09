@@ -236,7 +236,11 @@ describe( 'adding blocks', () => {
 	it( 'should not delete trailing spaces when deleting a word with alt + backspace', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'alpha beta gamma delta' );
-		await pressWithModifier( META_KEY, 'Backspace' );
+		if ( process.platform === 'darwin' ) {
+			await pressWithModifier( 'Alt', 'Backspace' );
+		} else {
+			await pressWithModifier( META_KEY, 'Backspace' );
+		}
 		await page.keyboard.type( 'delta' );
 		const blockText = await page.evaluate( () => document.activeElement.textContent );
 		expect( blockText ).toBe( 'alpha beta gamma delta' );
