@@ -665,9 +665,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );
 		},
-		onMultiSelect( ...args ) {
-			multiSelect( ...args );
-		},
+		onMultiSelect: multiSelect,
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
 			insertBlocks( blocks, index, rootClientId );
