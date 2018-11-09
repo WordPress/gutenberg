@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, omit, mapValues, get, uniqBy, filter } from 'lodash';
+import { keyBy, omit, mapValues, get, uniqBy, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,10 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy( action.blockTypes, 'name' ),
+				...keyBy(
+					map( action.blockTypes, ( blockType ) => omit( blockType, 'styles ' ) ),
+					'name'
+				),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
