@@ -753,12 +753,6 @@ export function blockSelection( state = {
 				...state,
 				isEnabled: action.isSelectionEnabled,
 			};
-
-		case 'SET_RICH_TEXT_SELECTION':
-			return {
-				...state,
-				richText: action.selection,
-			};
 	}
 
 	return state;

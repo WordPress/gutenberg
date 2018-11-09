@@ -53,12 +53,3 @@ This doesn't provide any styling out of the box, so you have to provide some CSS
 ## Text annotation
 
 The text annotation is controlled by the `start` and `end` properties. Simple `start` and `end` properties don't work for HTML, so these properties are assumed to be offsets within the `rich-text` internal structure. For simplicity you can think about this as if all HTML would be stripped out and then you calculate the `start` and the `end` of the annotation.
-
-If you simply want to annotate the currently selected text you can use the following code:
-
-```js
-wp.data.dispatch( 'core/annotations' ).addAnnotation( {
-	source: "my-annotations-plugin",
-	...wp.data.select( 'core/editor' ).getCurrentRichTextSelection(),
-} );
-```

@@ -439,7 +439,6 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end } );
-			this.props.onSelectionChange( this.props.clientId, this.props.identifier, { start, end } );
 		}
 	}
 
@@ -996,7 +995,6 @@ const RichTextContainer = compose( [
 			undo,
 			enterFormattedText,
 			exitFormattedText,
-			setRichTextSelection,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -1005,7 +1003,6 @@ const RichTextContainer = compose( [
 			onUndo: undo,
 			onEnterFormattedText: enterFormattedText,
 			onExitFormattedText: exitFormattedText,
-			onSelectionChange: setRichTextSelection,
 		};
 	} ),
 	withSafeTimeout,
