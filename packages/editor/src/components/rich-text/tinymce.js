@@ -10,8 +10,6 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
-import { toHTMLString } from '@wordpress/rich-text';
-import { children } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -313,8 +311,6 @@ export default class TinyMCE extends Component {
 			isPlaceholderVisible,
 			onPaste,
 			onInput,
-			multilineTag,
-			multilineWrapperTags,
 			onKeyDown,
 			onKeyUp,
 		} = this.props;
@@ -332,28 +328,6 @@ export default class TinyMCE extends Component {
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
 		// us to show and focus the content before it's truly ready to edit.
-		let initialHTML = defaultValue;
-
-		// Guard for blocks passing `null` in onSplit callbacks. May be removed
-		// if onSplit is revised to not pass a `null` value.
-		if ( defaultValue === null ) {
-			initialHTML = '';
-		// Handle deprecated `children` and `node` sources.
-		} else if ( Array.isArray( defaultValue ) ) {
-			initialHTML = children.toHTML( defaultValue );
-		} else if ( typeof defaultValue !== 'string' ) {
-			initialHTML = toHTMLString( {
-				value: defaultValue,
-				multilineTag,
-				multilineWrapperTags,
-			} );
-		}
-
-		if ( initialHTML === '' ) {
-			// Ensure the field is ready to receive focus by TinyMCE.
-			initialHTML = '<br data-mce-bogus="1">';
-		}
-
 		return createElement( tagName, {
 			...ariaProps,
 			className: classnames( className, 'editor-rich-text__tinymce' ),
@@ -362,7 +336,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: initialHTML },
+			dangerouslySetInnerHTML: { __html: defaultValue },
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,

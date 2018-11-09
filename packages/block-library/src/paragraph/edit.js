@@ -219,6 +219,7 @@ class ParagraphBlock extends Component {
 					</PanelColorSettings>
 				</InspectorControls>
 				<RichText
+					identifier="content"
 					tagName="p"
 					className={ classnames( 'wp-block-paragraph', className, {
 						'has-text-color': textColor.color,
