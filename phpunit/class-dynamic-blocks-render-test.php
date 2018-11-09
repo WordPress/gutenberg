@@ -170,9 +170,14 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	function test_dynamic_block_gets_inner_html() {
-		register_block_type( 'core/dynamic', array(
-			'render_callback' => array( $this, 'render_serialize_dynamic_block' ),
-		) );
+		register_block_type(
+			'core/dynamic', array(
+				'render_callback' => array(
+					$this,
+					'render_serialize_dynamic_block'
+				),
+			)
+		);
 
 		$output = do_blocks( '<!-- wp:dynamic -->inner<!-- /wp:dynamic -->' );
 		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
@@ -181,12 +186,24 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	function test_dynamic_block_gets_rendered_inner_blocks() {
-		register_block_type( 'core/dummy', array(
-			'render_callback' => array( $this, 'render_dummy_block_numeric' ),
-		) );
-		register_block_type( 'core/dynamic', array(
-			'render_callback' => array( $this, 'render_serialize_dynamic_block' ),
-		) );
+		register_block_type(
+			'core/dummy',
+			array(
+				'render_callback' => array(
+					$this,
+					'render_dummy_block_numeric'
+				),
+			)
+		);
+		register_block_type(
+			'core/dynamic',
+			array(
+				'render_callback' => array(
+					$this,
+					'render_serialize_dynamic_block'
+				),
+			)
+		);
 
 		$output = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dummy /-->after<!-- /wp:dynamic -->' );
 		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
@@ -195,14 +212,20 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 	}
 
 	function test_dynamic_block_gets_rendered_inner_dynamic_blocks() {
-		register_block_type( 'core/dynamic', array(
-			'render_callback' => array( $this, 'render_serialize_dynamic_block' ),
-		) );
+		register_block_type(
+			'core/dynamic',
+			array(
+				'render_callback' => array(
+					$this,
+					'render_serialize_dynamic_block'
+				),
+			)
+		);
 
 		$output = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dynamic -->deep inner<!-- /wp:dynamic -->after<!-- /wp:dynamic -->' );
 		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
-		$inner = $this->render_serialize_dynamic_block( [], 'deep inner' );
+		$inner = $this->render_serialize_dynamic_block( array(), 'deep inner' );
 
 		$this->assertEquals( $content, 'before' . $inner . 'after' );
 	}
