@@ -40,7 +40,8 @@ function Header( {
 		>
 			<HeaderToolbar />
 			<div className="edit-post-header__settings">
-				{ ! isPublishSidebarOpened && ( <PostSavedState
+				{ ! isPublishSidebarOpened && (
+					<PostSavedState
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
 				/> ) }
