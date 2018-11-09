@@ -1,4 +1,4 @@
-## 6.2.0 (unreleased)
+## 6.2.0 (2018-11-09)
 
 ### New Features
 

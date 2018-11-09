@@ -1,3 +1,9 @@
+## 5.2.0 (2018-11-09)
+
+-   Paste: Google Docs: fix nested formatting, sub, sup and del.
+-   Expose @wordpress/editor to Gutenberg mobile.
+-   Separate Paste Handler.
+
 ## 5.1.2 (2018-11-03)
 
 ## 5.1.1 (2018-10-30)

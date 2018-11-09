@@ -1,3 +1,10 @@
+## 2.1.0 (2018-11-09)
+
+### Bug Fixes
+
+- "View as" link is not updated after the post is updated and the permalink is changed.
+- Hide custom fields option when the meta box is disabled.
+
 ## 2.0.3 (2018-11-03)
 
 ## 2.0.2 (2018-10-30)

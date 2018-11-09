@@ -1,3 +1,10 @@
+## 2.0.3 (2018-11-09)
+
+### Bug Fix
+
+- Fix Format Type Assignment During Parsing.
+- Fix applying formats on multiline values without wrapper tags.
+
 ## 2.0.2 (2018-11-03)
 
 ## 2.0.1 (2018-10-30)
