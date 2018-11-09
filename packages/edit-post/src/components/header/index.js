@@ -41,10 +41,16 @@ function Header( {
 			<HeaderToolbar />
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
+					// This button isn't completely hidden by the publish sidebar.
+					// We can't hide the whole toolbar when the publish sidebar is open because
+					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					// We track that DOM node to return focus to the PostPublishButtonOrToggle
+					// when the publish sidebar has been closed.
 					<PostSavedState
-					forceIsDirty={ hasActiveMetaboxes }
-					forceIsSaving={ isSaving }
-				/> ) }
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+					/>
+				) }
 				<PostPreviewButton />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
