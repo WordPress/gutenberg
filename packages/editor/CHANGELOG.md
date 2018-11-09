@@ -1,5 +1,9 @@
 ## 6.2.1 (Unreleased)
 
+### Deprecations
+
+- `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
+
 ### Polish
 
 - Reactive block styles.
