@@ -42,6 +42,8 @@ import {
 	getSelectionEnd,
 	remove,
 	isCollapsed,
+	LINE_SEPARATOR,
+	charAt,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters } from '@wordpress/components';
@@ -492,8 +494,6 @@ export class RichText extends Component {
 	 * @link https://en.wikipedia.org/wiki/Caret_navigation
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
-	 *
-	 * @return {?boolean} True if the event was handled.
 	 */
 	onDeleteKeyDown( event ) {
 		const { onMerge, onRemove } = this.props;
@@ -533,7 +533,7 @@ export class RichText extends Component {
 			onRemove( ! isReverse );
 		}
 
-		return true;
+		event.preventDefault();
 	}
 
 	/**
@@ -545,32 +545,46 @@ export class RichText extends Component {
 		const { keyCode } = event;
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			event.preventDefault();
-
-			if ( this.onDeleteKeyDown( event ) ) {
-				return;
-			}
-
 			const value = this.createRecord();
 			const start = getSelectionStart( value );
 			const end = getSelectionEnd( value );
 
-			if ( keyCode === BACKSPACE ) {
-				this.onChange( remove(
-					value,
-					// Only remove the line if the selection is
-					// collapsed.
-					isCollapsed( value ) ? start - 1 : start,
-					end
-				) );
-			} else {
-				this.onChange( remove(
-					value,
-					start,
-					// Only remove the line if the selection is collapsed.
-					isCollapsed( value ) ? end + 1 : end,
-				) );
+			// Always handle uncollapsed selections ourselves.
+			if ( ! isCollapsed( value ) ) {
+				this.onChange( remove( value ) );
+				event.preventDefault();
+				return;
 			}
+
+			if ( this.multilineTag ) {
+				let newValue;
+
+				if ( keyCode === BACKSPACE ) {
+					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
+						newValue = remove(
+							value,
+							// Only remove the line if the selection is
+							// collapsed.
+							isCollapsed( value ) ? start - 1 : start,
+							end
+						);
+					}
+				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
+					newValue = remove(
+						value,
+						start,
+						// Only remove the line if the selection is collapsed.
+						isCollapsed( value ) ? end + 1 : end,
+					);
+				}
+
+				if ( newValue ) {
+					this.onChange( newValue );
+					event.preventDefault();
+				}
+			}
+
+			this.onDeleteKeyDown( event );
 		} else if ( keyCode === ENTER ) {
 			event.preventDefault();
 
