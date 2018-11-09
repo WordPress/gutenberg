@@ -241,4 +241,21 @@ describe( 'adding blocks', () => {
 		const blockText = await page.evaluate( () => document.activeElement.textContent );
 		expect( blockText ).toBe( 'alpha beta gamma delta' );
 	} );
+
+	it( 'should create valid paragraph blocks when holding down Enter', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		// Check that none of the paragraph blocks have <br> in them.
+		const postContent = await getEditedPostContent();
+		expect( postContent.indexOf( 'br' ) ).toBe( -1 );
+	} );
 } );
