@@ -57,7 +57,6 @@ import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
-import { applyAnnotations, removeAnnotations } from './annotations';
 
 /**
  * Browser dependencies
@@ -222,7 +221,7 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value, this.props.annotations );
+		const { formats, text } = this.formatToValue( this.props.value );
 		const { start, end } = this.state;
 
 		return { formats, text, start, end };
@@ -260,7 +259,7 @@ export class RichText extends Component {
 	}
 
 	isEmpty() {
-		return isEmpty( this.formatToValue( this.props.value, this.props.annotations ) );
+		return isEmpty( this.formatToValue( this.props.value ) );
 	}
 
 	/**
@@ -741,15 +740,12 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected, annotations } = this.props;
-
-		const shouldApplyAnnotations = annotations !== prevProps.annotations;
+		const { tagName, value, isSelected } = this.props;
 
 		if (
-			( tagName === prevProps.tagName &&
+			tagName === prevProps.tagName &&
 			value !== prevProps.value &&
-			value !== this.savedContent ) ||
-			shouldApplyAnnotations
+			value !== this.savedContent
 		) {
 			// Handle deprecated `children` and `node` sources.
 			// The old way of passing a value with the `node` matcher required
@@ -761,10 +757,10 @@ export class RichText extends Component {
 				return;
 			}
 
-			const record = this.formatToValue( value, annotations );
+			const record = this.formatToValue( value );
 
 			if ( isSelected ) {
-				const prevRecord = this.formatToValue( prevProps.value, prevProps.annotations );
+				const prevRecord = this.formatToValue( prevProps.value );
 				const length = getTextContent( prevRecord ).length;
 				record.start = length;
 				record.end = length;
@@ -778,8 +774,8 @@ export class RichText extends Component {
 		// an empty paragraph into another, then also set the selection to the
 		// end.
 		if ( isSelected && ! prevProps.isSelected && ! this.isActive() ) {
-			const record = this.formatToValue( value, annotations );
-			const prevRecord = this.formatToValue( prevProps.value, prevProps.annotations );
+			const record = this.formatToValue( value );
+			const prevRecord = this.formatToValue( prevProps.value );
 			const length = getTextContent( prevRecord ).length;
 			record.start = length;
 			record.end = length;
@@ -803,12 +799,10 @@ export class RichText extends Component {
 		}
 	}
 
-	formatToValue( value, annotations = [] ) {
-		let record;
-
+	formatToValue( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			record = create( {
+			return create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -816,7 +810,7 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
-			record = create( {
+			return create( {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -826,10 +820,10 @@ export class RichText extends Component {
 		// Guard for blocks passing `null` in onSplit callbacks. May be removed
 		// if onSplit is revised to not pass a `null` value.
 		if ( value === null ) {
-			record = create();
+			return create();
 		}
 
-		return applyAnnotations( record, annotations );
+		return value;
 	}
 
 	valueToEditableHTML( value ) {
@@ -846,13 +840,11 @@ export class RichText extends Component {
 		} ).body.innerHTML;
 	}
 
-	valueToFormat( { formats, text } ) {
-		const value = removeAnnotations( { formats, text } );
-
+	valueToFormat( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
 			return children.fromDOM( unstableToDom( {
-				value: value,
+				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} ).body.childNodes );
@@ -860,7 +852,7 @@ export class RichText extends Component {
 
 		if ( this.props.format === 'string' ) {
 			return toHTMLString( {
-				value: value,
+				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} );
@@ -987,24 +979,15 @@ const RichTextContainer = compose( [
 			clientId: context.clientId,
 		};
 	} ),
-	withSelect( ( select, props ) => {
+	withSelect( ( select ) => {
 		const { isViewportMatch } = select( 'core/viewport' );
 		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
-		const { __experimentalGetAnnotationsForRichText } = select( 'core/annotations' );
 
-		const selectProps = {
+		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		};
-
-		// Allow explicit annotations to be passed in.
-		// When an identifier is passed in we can retrieve the annotations for this RichText.
-		if ( ! props.annotations && props.identifier ) {
-			selectProps.annotations = __experimentalGetAnnotationsForRichText( props.clientId, props.identifier );
-		}
-
-		return selectProps;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
