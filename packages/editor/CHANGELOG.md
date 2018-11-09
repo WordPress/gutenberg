@@ -1,3 +1,9 @@
+## 7.0.0 (Unreleased)
+
+### Breaking Changes
+
+- The `PanelColor` component has been removed.
+
 ## 6.2.1 (2018-11-09)
 
 ### Polish
