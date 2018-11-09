@@ -195,8 +195,7 @@ if ( ! function_exists( 'do_blocks' ) ) {
 	 */
 	function do_blocks( $content ) {
 		$without_trailing_newlines = preg_replace( '/(<!--\s+\/?wp:.*?-->)\r?\n?/m', '$1', $content );
-		$without_final_newline     = preg_replace( '/[\n]$/', '', $without_trailing_newlines );
-		$blocks                    = gutenberg_parse_blocks( $without_final_newline );
+		$blocks                    = gutenberg_parse_blocks( $without_trailing_newlines );
 		$output                    = '';
 
 		foreach ( $blocks as $block ) {
