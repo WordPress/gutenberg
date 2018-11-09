@@ -1,7 +1,5 @@
 # Annotations
 
-
-
 ## Installation
 
 Install the module
