@@ -6,7 +6,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   data-root-client-id=""
 >
   <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
-  <textarea
+  <TextareaAutosize
     aria-label="Add block"
     className="editor-default-block-appender__content"
     onFocus={
@@ -19,6 +19,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     }
     readOnly={true}
     role="button"
+    rows={1}
     value="Start writing or type / to choose a block"
   />
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
@@ -34,12 +35,13 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   data-root-client-id=""
 >
   <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
-  <textarea
+  <TextareaAutosize
     aria-label="Add block"
     className="editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
+    rows={1}
     value="Start writing or type / to choose a block"
   />
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
@@ -55,12 +57,13 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   data-root-client-id=""
 >
   <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
-  <textarea
+  <TextareaAutosize
     aria-label="Add block"
     className="editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
+    rows={1}
     value=""
   />
   <WithSelect(WithDispatch(InserterWithShortcuts)) />
