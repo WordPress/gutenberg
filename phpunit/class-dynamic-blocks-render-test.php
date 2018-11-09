@@ -202,11 +202,8 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		$output = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dynamic -->deep inner<!-- /wp:dynamic -->after<!-- /wp:dynamic -->' );
 		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
-		$this->assertStringStartsWith( 'before', $content );
-		$this->assertStringEndWith( 'after', $content );
+		$inner = $this->render_serialize_dynamic_block( [], 'deep inner' );
 
-		list( /* attrs */, $content ) = unserialize( base64_decode( $content ) );
-
-		$this->assertEqual( $content, 'deep inner' );
+		$this->assertEqual( $content, 'before' . $inner . 'after' );
 	}
 }
