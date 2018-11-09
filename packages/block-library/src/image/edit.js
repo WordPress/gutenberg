@@ -56,6 +56,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
+const NEW_TAB_REL = 'noreferrer noopener';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
@@ -213,22 +214,20 @@ class ImageEdit extends Component {
 	}
 
 	onSetNewTab( value ) {
-		const newTabRel = 'noreferrer noopener';
+		const { rel } = this.props.attributes;
+		const linkTarget = value ? '_blank' : undefined;
 
-		if ( value ) {
-			value = '_blank';
-			if ( ! this.props.attributes.rel ) {
-				this.props.setAttributes( { rel: newTabRel } );
-			}
-		} else {
-			if ( this.props.attributes.rel === newTabRel ) {
-				this.props.setAttributes( { rel: undefined } );
-			}
-
-			value = undefined;
+		let updatedRel = rel;
+		if ( linkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
 		}
 
-		this.props.setAttributes( { linkTarget: value } );
+		this.props.setAttributes( {
+			linkTarget,
+			rel: updatedRel,
+		} );
 	}
 
 	onFocusCaption() {
@@ -310,7 +309,20 @@ class ImageEdit extends Component {
 			isRTL,
 			availableImageSizes,
 		} = this.props;
-		const { url, alt, caption, align, id, href, rel, linkClass, linkDestination, width, height, linkTarget } = attributes;
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			id,
+			href,
+			rel,
+			linkClass,
+			linkDestination,
+			width,
+			height,
+			linkTarget,
+		} = attributes;
 		const isExternal = isExternalImage( id, url );
 		const availableImageSizesBySlug = keyBy( availableImageSizes, 'slug' );
 

@@ -240,7 +240,19 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, rel, linkClass, width, height, id, linkTarget } = attributes;
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			id,
+			linkTarget,
+		} = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -259,7 +271,16 @@ export const settings = {
 
 		const figure = (
 			<Fragment>
-				{ href ? <a className={ linkClass || null } href={ href } target={ linkTarget || null } rel={ rel || null }>{ image }</a> : image }
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ rel }
+					>
+						{ image }
+					</a>
+				) : image }
 				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);
