@@ -57,14 +57,9 @@
 		margin-right: -$block-padding;
 	}
 
-	// Adjust the spacing of the appender to match text blocks.
-	.editor-default-block-appender > .editor-default-block-appender__content {
-		margin-top: $block-padding * 2 + $block-spacing;
-	}
-
 	// Space every block, and the default appender, using margins.
 	// This allows margins to collapse, which gives a better representation of how it looks on the frontend.
-	> .editor-default-block-appender__content,
+	.editor-default-block-appender > .editor-default-block-appender__content,
 	> .editor-block-list__block > .editor-block-list__block-edit,
 	> .editor-block-list__layout > .editor-block-list__block > .editor-block-list__block-edit {
 		margin-top: $block-padding * 2 + $block-spacing;

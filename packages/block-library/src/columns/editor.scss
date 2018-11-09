@@ -25,15 +25,6 @@
 	}
 }
 
-// This block has flex container children. Flex container margins do not collapse: https://www.w3.org/TR/css-flexbox-1/#flex-containers.
-// Therefore, let's at least not add any additional margins here.
-// The goal is for the editor to look more like the front-end.
-.editor-block-list__layout .editor-block-list__block[data-type="core/columns"] > .editor-block-list__block-edit,
-.editor-block-list__layout .editor-block-list__block[data-type="core/column"] > .editor-block-list__block-edit {
-	margin-top: 0;
-	margin-bottom: 0;
-}
-
 .wp-block-columns {
 	display: block;
 
@@ -55,8 +46,13 @@
 			// The Column block is a child of the Columns block and is mostly a passthrough container.
 			// Therefore it shouldn't add additional paddings and margins, so we reset these, and compensate for margins.
 			// @todo In the future, if a passthrough feature lands, it would be good to apply these rules to such an element in a more generic way.
-			margin-top: -$block-padding;
-			margin-bottom: -$block-padding;
+			margin-top: -$block-padding - $block-padding;
+			margin-bottom: -$block-padding - $block-padding;
+
+			> .editor-block-list__block-edit {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
 
 			// On mobile, only a single column is shown, so match adjacent block paddings.
 			padding-left: 0;
@@ -129,4 +125,14 @@
 			}
 		}
 	}
+}
+
+// In absence of making the individual columns resizable, we prevent them from being clickable.
+// This makes them less fiddly. This will be revisited as the interface is refined.
+.wp-block-columns [data-type="core/column"] {
+	pointer-events: none;
+}
+
+:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit > .editor-inner-blocks {
+	pointer-events: all;
 }

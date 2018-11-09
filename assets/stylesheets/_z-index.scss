@@ -37,6 +37,9 @@ $z-layers: (
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,
 
+	// Reusable blocks UI, needs to be above sibling inserter.
+	".editor-block-list__layout .reusable-block-edit-panel": 7,
+
 	// The draggable element should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
