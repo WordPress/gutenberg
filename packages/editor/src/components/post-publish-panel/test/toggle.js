@@ -21,7 +21,7 @@ describe( 'PostPublishPanelToggle', () => {
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 			expect( console ).toHaveWarnedWith(
-				'PostPublishPanelToggle is deprecated and will be removed from Gutenberg in 4.6. Please use PostPublishButton instead.'
+				'PostPublishPanelToggle is deprecated and will be removed from Gutenberg in 4.5. Please use PostPublishButton instead.'
 			);
 		} );
 
