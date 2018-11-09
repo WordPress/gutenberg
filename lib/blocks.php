@@ -166,14 +166,14 @@ function gutenberg_render_block( $block ) {
 		$inner_content = '';
 
 		if ( $has_blocks ) {
-			$index  = 0;
+			$index = 0;
 			foreach ( $block['innerContent'] as $chunk ) {
 				$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
 			}
 		} else {
 			$inner_content = $block['innerHTML'];
 		}
-		
+
 		$global_post = $post;
 		$output      = $block_type->render( $attributes, $inner_content );
 		$post        = $global_post;
