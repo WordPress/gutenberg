@@ -177,7 +177,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		$output = do_blocks( '<!-- wp:dynamic -->inner<!-- /wp:dynamic -->' );
 		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
-		$this->assertEqual( $content, 'inner' );
+		$this->assertEqual( 'inner', $content );
 	}
 
 	function test_dynamic_block_gets_rendered_inner_blocks() {
@@ -191,7 +191,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 		$output = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dummy /-->after<!-- /wp:dynamic -->' );
 		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
-		$this->assertEqual( $content, 'before10after' );
+		$this->assertEqual( 'before10after', $content );
 	}
 
 	function test_dynamic_block_gets_rendered_inner_dynamic_blocks() {
