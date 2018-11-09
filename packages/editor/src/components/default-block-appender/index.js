@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import TextareaAutosize from 'react-autosize-textarea';
 
 /**
  * WordPress dependencies
@@ -51,7 +52,7 @@ export function DefaultBlockAppender( {
 	return (
 		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
 			<BlockDropZone rootClientId={ rootClientId } />
-			<textarea
+			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
