@@ -142,7 +142,7 @@ class MediaPlaceholder extends Component {
 		let instructions = labels.instructions || '';
 		let title = labels.title || '';
 		if ( ! instructions || ! title ) {
-			const isOneType = 1 === allowedTypes.length;
+			const isOneType = 1 === allowedTypes && allowedTypes.length;
 			const isAudio = isOneType && 'audio' === allowedTypes[ 0 ];
 			const isImage = isOneType && 'image' === allowedTypes[ 0 ];
 			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
