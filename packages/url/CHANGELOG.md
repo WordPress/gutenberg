@@ -1,3 +1,18 @@
+## 2.3.0 (Unreleased)
+
+### Features
+
+- Added `getProtocol`
+- Added `isValidProtocol`
+- Added `getAuthority`
+- Added `isValidAuthority`
+- Added `getPath`
+- Added `isValidPath`
+- Added `getQueryString`
+- Added `isValidQueryString`
+- Added `getFragment`
+- Added `isValidFragment`
+
 ## 2.2.0 (2018-10-29)
 
 ### Features
