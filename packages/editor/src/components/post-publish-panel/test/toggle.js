@@ -20,6 +20,9 @@ describe( 'PostPublishPanelToggle', () => {
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+			expect( console ).toHaveWarnedWith(
+				'PostPublishPanelToggle is deprecated and will be removed from Gutenberg in 5.1. Please use PostPublishButton instead.'
+			);
 		} );
 
 		it( 'should be disabled if post is currently force saving', () => {
