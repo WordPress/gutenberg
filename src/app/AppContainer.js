@@ -12,7 +12,7 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 const mapStateToProps = ( state, ownProps ) => {
 	let blocks = ownProps.blocks;
-	let refresh = !! ownProps.refresh;
+	let refresh = false;
 
 	const newBlocks = ownProps.blocks.map( ( block ) => {
 		block.focused = ownProps.isBlockSelected( block.clientId );
