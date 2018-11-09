@@ -134,6 +134,6 @@
 	pointer-events: none;
 }
 
-:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit > .editor-inner-blocks {
+:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit .editor-inner-blocks {
 	pointer-events: all;
 }
