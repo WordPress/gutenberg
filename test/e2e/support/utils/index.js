@@ -8,12 +8,11 @@ import { URL } from 'url';
  * External dependencies
  */
 import { times, castArray } from 'lodash';
-import fetch from 'node-fetch';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
-import { addQueryArgs } from '@wordpress/url';
+import { getJSONResponse } from './get-json-response';
 
 const WP_ADMIN_USER = {
 	username: 'admin',
@@ -25,6 +24,10 @@ const {
 	WP_USERNAME = WP_ADMIN_USER.username,
 	WP_PASSWORD = WP_ADMIN_USER.password,
 } = process.env;
+
+export { mockOrTransform } from './mock-or-transform';
+export { newPost } from './new-post';
+export { setUpResponseMocking } from './set-up-response-mocking';
 
 /**
  * Platform-specific meta key.
@@ -42,7 +45,8 @@ export const META_KEY = process.platform === 'darwin' ? 'Meta' : 'Control';
  *
  * @type {string}
  */
-export const ACCESS_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
+export const ACCESS_MODIFIER_KEYS =
+	process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
 
 /**
  * Regular expression matching zero-width space characters.
@@ -95,10 +99,7 @@ async function login( username = WP_USERNAME, password = WP_PASSWORD ) {
 	await pressWithModifier( META_KEY, 'a' );
 	await page.type( '#user_pass', password );
 
-	await Promise.all( [
-		page.waitForNavigation(),
-		page.click( '#wp-submit' ),
-	] );
+	await Promise.all( [ page.waitForNavigation(), page.click( '#wp-submit' ) ] );
 }
 
 /**
@@ -134,31 +135,6 @@ export async function visitAdmin( adminPath, query ) {
 	}
 }
 
-export async function newPost( {
-	postType,
-	title,
-	content,
-	excerpt,
-	enableTips = false,
-} = {} ) {
-	const query = addQueryArgs( '', {
-		post_type: postType,
-		post_title: title,
-		content,
-		excerpt,
-	} ).slice( 1 );
-	await visitAdmin( 'post-new.php', query );
-
-	await page.evaluate( ( _enableTips ) => {
-		const action = _enableTips ? 'enableTips' : 'disableTips';
-		wp.data.dispatch( 'core/nux' )[ action ]();
-	}, enableTips );
-
-	if ( enableTips ) {
-		await page.reload();
-	}
-}
-
 /**
  * Toggles the screen option with the given label.
  *
@@ -170,7 +146,10 @@ export async function toggleOption( label, shouldBeChecked = undefined ) {
 	await clickOnMoreMenuItem( 'Options' );
 	const [ handle ] = await page.$x( `//label[contains(text(), "${ label }")]` );
 
-	const isChecked = await page.evaluate( ( element ) => element.control.checked, handle );
+	const isChecked = await page.evaluate(
+		( element ) => element.control.checked,
+		handle
+	);
 	if ( isChecked !== shouldBeChecked ) {
 		await handle.click();
 	}
@@ -178,15 +157,17 @@ export async function toggleOption( label, shouldBeChecked = undefined ) {
 	await page.click( 'button[aria-label="Close dialog"]' );
 }
 
-export async function arePrePublishChecksEnabled( ) {
-	return page.evaluate( () => window.wp.data.select( 'core/editor' ).isPublishSidebarEnabled() );
+export async function arePrePublishChecksEnabled() {
+	return page.evaluate( () =>
+		window.wp.data.select( 'core/editor' ).isPublishSidebarEnabled()
+	);
 }
 
-export async function enablePrePublishChecks( ) {
+export async function enablePrePublishChecks() {
 	await toggleOption( 'Enable Pre-publish Checks', true );
 }
 
-export async function disablePrePublishChecks( ) {
+export async function disablePrePublishChecks() {
 	await toggleOption( 'Enable Pre-publish Checks', false );
 }
 
@@ -210,14 +191,20 @@ export async function setViewport( type ) {
  * @param {height} height Height of the window.
  */
 export async function waitForPageDimensions( width, height ) {
-	await page.mainFrame().waitForFunction(
-		`window.innerWidth === ${ width } && window.innerHeight === ${ height }`
-	);
+	await page
+		.mainFrame()
+		.waitForFunction(
+			`window.innerWidth === ${ width } && window.innerHeight === ${ height }`
+		);
 }
 
 export async function switchToEditor( mode ) {
-	await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
-	const [ button ] = await page.$x( `//button[contains(text(), '${ mode } Editor')]` );
+	await page.click(
+		'.edit-post-more-menu [aria-label="Show more tools & options"]'
+	);
+	const [ button ] = await page.$x(
+		`//button[contains(text(), '${ mode } Editor')]`
+	);
 	await button.click( 'button' );
 }
 
@@ -286,7 +273,9 @@ export async function searchForBlock( searchTerm ) {
 export async function insertBlock( searchTerm, panelName = null ) {
 	await searchForBlock( searchTerm );
 	if ( panelName ) {
-		const panelButton = ( await page.$x( `//button[contains(text(), '${ panelName }')]` ) )[ 0 ];
+		const panelButton = ( await page.$x(
+			`//button[contains(text(), '${ panelName }')]`
+		) )[ 0 ];
 		await panelButton.click();
 	}
 	await page.click( `button[aria-label="${ searchTerm }"]` );
@@ -326,8 +315,12 @@ export async function pressWithModifier( modifiers, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await expect( page ).toClick( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
-	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
+	await expect( page ).toClick(
+		'.edit-post-more-menu [aria-label="Show more tools & options"]'
+	);
+	await page.click(
+		`.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]`
+	);
 }
 
 /**
@@ -395,7 +388,9 @@ export async function selectBlockByClientId( clientId ) {
  * Clicks on the button in the header which opens Document Settings sidebar when it is closed.
  */
 export async function openDocumentSettingsSidebar() {
-	const openButton = await page.$( '.edit-post-header__settings button[aria-label="Settings"][aria-expanded="false"]' );
+	const openButton = await page.$(
+		'.edit-post-header__settings button[aria-label="Settings"][aria-expanded="false"]'
+	);
 
 	if ( openButton ) {
 		await page.click( openButton );
@@ -441,7 +436,8 @@ export function enablePageDialogAccept() {
  * @param {?string} modalClassName Class name for the modal to close
  */
 export async function clickOnCloseModalButton( modalClassName ) {
-	let closeButtonClassName = '.components-modal__header .components-icon-button';
+	let closeButtonClassName =
+		'.components-modal__header .components-icon-button';
 
 	if ( modalClassName ) {
 		closeButtonClassName = `${ modalClassName } ${ closeButtonClassName }`;
@@ -503,7 +499,9 @@ export function observeFocusLoss() {
  * @return {function} Function that determines if a request is for the embed API, embedding a specific URL.
  */
 export function isEmbedding( url ) {
-	return ( request ) => matchURL( 'oembed%2F1.0%2Fproxy' )( request ) && parameterEquals( 'url', url )( request );
+	return ( request ) =>
+		matchURL( 'oembed%2F1.0%2Fproxy' )( request ) &&
+		parameterEquals( 'url', url )( request );
 }
 
 /**
@@ -542,84 +540,4 @@ export function parameterEquals( parameterName, value ) {
 		}
 		return value === decodeURIComponent( match[ 1 ] );
 	};
-}
-
-/**
- * Get a JSON response for the passed in object, for use with `request.respond`.
- *
- * @param {Object} obj Object to seralise for response.
- * @return {Object} Response for use with `request.respond`.
- */
-export function getJSONResponse( obj ) {
-	return {
-		content: 'application/json',
-		body: JSON.stringify( obj ),
-	};
-}
-
-/**
- * Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the
- * deserialised JSON response for the request.
- *
- * @param {function} mockCheck function that returns true if the request should be mocked.
- * @param {Object} mock A mock object to wrap in a JSON response, if the request should be mocked.
- * @param {function|undefined} responseObjectTransform An optional function that transforms the response's object before the response is used.
- * @return {Promise} Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
- */
-export function mockOrTransform( mockCheck, mock, responseObjectTransform = ( obj ) => obj ) {
-	return async ( request ) => {
-		// Because we can't get the responses to requests and modify them on the fly,
-		// we have to make our own request and get the response, then apply the
-		// optional transform to the json encoded object.
-		const response = await fetch(
-			request.url(),
-			{
-				headers: request.headers(),
-				method: request.method(),
-				body: request.postData(),
-			}
-		);
-		const responseObject = await response.json();
-		if ( mockCheck( responseObject ) ) {
-			request.respond( getJSONResponse( mock ) );
-		} else {
-			request.respond( getJSONResponse( responseObjectTransform( responseObject ) ) );
-		}
-	};
-}
-
-/**
- * Sets up mock checks and responses. Accepts a list of mock settings with the following properties:
- *   - match: function to check if a request should be mocked.
- *   - onRequestMatch: async function to respond to the request.
- *
- * Example:
- *   const MOCK_RESPONSES = [
- *     {
- *       match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
- *       onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
- *     },
- *     {
- *       match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
- *       onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
- *     }
- *  ];
- *  setUpResponseMocking( MOCK_RESPONSES );
- *
- * If none of the mock settings match the request, the request is allowed to continue.
- *
- * @param {Array} mocks Array of mock settings.
- */
-export async function setUpResponseMocking( mocks ) {
-	await page.setRequestInterception( true );
-	page.on( 'request', async ( request ) => {
-		for ( let i = 0; i < mocks.length; i++ ) {
-			const mock = mocks[ i ];
-			if ( mock.match( request ) ) {
-				await mock.onRequestMatch( request );
-				return;
-			}
-		}
-		request.continue();
-	} );
 }
