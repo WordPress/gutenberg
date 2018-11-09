@@ -118,14 +118,23 @@ export function registerFormatType( name, settings ) {
 		settings.__experimentalGetPropsForEditableTreePreparation
 	) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			return withSelect( ( sel ) => ( {
-				[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation( sel ),
+			return withSelect( ( sel, { clientId, identifier } ) => ( {
+				[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
+					sel,
+					{
+						richTextIdentifier: identifier,
+						blockClientId: clientId,
+					}
+				),
 			} ) )( ( props ) => (
 				<OriginalComponent
 					{ ...props }
 					prepareEditableTree={ [
 						...( props.prepareEditableTree || [] ),
-						settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ] ),
+						settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], 	{
+							richTextIdentifier: props.identifier,
+							blockClientId: props.clientId,
+						} ),
 					] }
 				/>
 			) );

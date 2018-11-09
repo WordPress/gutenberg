@@ -959,12 +959,15 @@ const RichTextContainer = compose( [
 	withBlockEditContext( ( context, ownProps ) => {
 		// When explicitly set as not selected, do nothing.
 		if ( ownProps.isSelected === false ) {
-			return {};
+			return {
+				clientId: context.clientId,
+			};
 		}
 		// When explicitly set as selected, use the value stored in the context instead.
 		if ( ownProps.isSelected === true ) {
 			return {
 				isSelected: context.isSelected,
+				clientId: context.clientId,
 			};
 		}
 
@@ -972,6 +975,7 @@ const RichTextContainer = compose( [
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
+			clientId: context.clientId,
 		};
 	} ),
 	withSelect( ( select ) => {
