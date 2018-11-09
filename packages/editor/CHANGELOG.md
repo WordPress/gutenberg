@@ -10,6 +10,10 @@
 
 - In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
 
+### Deprecations
+
+- `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
+
 ### Polish
 
 - Reactive block styles.

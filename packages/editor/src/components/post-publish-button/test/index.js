@@ -11,8 +11,8 @@ import { PostPublishButton } from '../';
 jest.mock( '../../../../../components/src/button' );
 
 describe( 'PostPublishButton', () => {
-	describe( 'disabled', () => {
-		it( 'should be disabled if post is currently saving', () => {
+	describe( 'aria-disabled', () => {
+		it( 'should be true if post is currently saving', () => {
 			const wrapper = shallow(
 				<PostPublishButton
 					isPublishable
@@ -21,10 +21,10 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be disabled if forceIsSaving is true', () => {
+		it( 'should be true if forceIsSaving is true', () => {
 			const wrapper = shallow(
 				<PostPublishButton
 					isPublishable
@@ -33,10 +33,10 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be disabled if post is not publishable and not forceIsDirty', () => {
+		it( 'should be true if post is not publishable and not forceIsDirty', () => {
 			const wrapper = shallow(
 				<PostPublishButton
 					isSaveable
@@ -45,10 +45,10 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be disabled if post is not saveable', () => {
+		it( 'should be true if post is not saveable', () => {
 			const wrapper = shallow(
 				<PostPublishButton
 					isPublishable
@@ -56,10 +56,10 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be disabled if post saving is locked', () => {
+		it( 'should be true if post saving is locked', () => {
 			const wrapper = shallow(
 				<PostPublishButton
 					isPublishable
@@ -68,10 +68,10 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be enabled if post is saveable but not publishable and forceIsDirty is true', () => {
+		it( 'should be false if post is saveable but not publishable and forceIsDirty is true', () => {
 			const wrapper = shallow(
 				<PostPublishButton
 					isSaveable
@@ -80,10 +80,10 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( false );
+			expect( wrapper.prop( 'aria-disabled' ) ).toBe( false );
 		} );
 
-		it( 'should be enabled if post is publishave and saveable', () => {
+		it( 'should be false if post is publishave and saveable', () => {
 			const wrapper = shallow(
 				<PostPublishButton
 					isPublishable
@@ -91,7 +91,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'disabled' ) ).toBe( false );
+			expect( wrapper.prop( 'aria-disabled' ) ).toBe( false );
 		} );
 	} );
 
