@@ -180,8 +180,9 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$output  = do_blocks( '<!-- wp:dynamic -->inner<!-- /wp:dynamic -->' );
-		$content = unserialize( base64_decode( $output ) )[1];
+		$output = do_blocks( '<!-- wp:dynamic -->inner<!-- /wp:dynamic -->' );
+
+		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
 		$this->assertEquals( 'inner', $content );
 	}
@@ -206,8 +207,9 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$output  = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dummy /-->after<!-- /wp:dynamic -->' );
-		$content = unserialize( base64_decode( $output ) )[ 1 ];
+		$output = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dummy /-->after<!-- /wp:dynamic -->' );
+
+		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
 		$this->assertEquals( 'before10after', $content );
 	}
@@ -223,8 +225,9 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$output  = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dynamic -->deep inner<!-- /wp:dynamic -->after<!-- /wp:dynamic -->' );
-		$content = unserialize( base64_decode( $output ) )[ 1 ];
+		$output = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dynamic -->deep inner<!-- /wp:dynamic -->after<!-- /wp:dynamic -->' );
+		
+		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
 		$inner = $this->render_serialize_dynamic_block( array(), 'deep inner' );
 
