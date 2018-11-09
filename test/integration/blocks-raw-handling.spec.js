@@ -147,7 +147,7 @@ describe( 'Blocks raw handling', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><cite>ribs</cite></blockquote>' );
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><footer><cite>ribs</cite></footer></blockquote>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -157,7 +157,7 @@ describe( 'Blocks raw handling', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>ribs</p><cite>ribs</cite></blockquote>' );
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>ribs</p><footer><cite>ribs</cite></footer></blockquote>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -167,7 +167,7 @@ describe( 'Blocks raw handling', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p><cite>ribs</cite></blockquote>' );
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p><footer><cite>ribs</cite></footer></blockquote>' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -177,7 +177,7 @@ describe( 'Blocks raw handling', () => {
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
-		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p></p><cite>ribs</cite></blockquote>' );
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p></p><footer><cite>ribs</cite></footer></blockquote>' );
 		expect( console ).toHaveLogged();
 	} );
 

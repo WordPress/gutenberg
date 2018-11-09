@@ -31,7 +31,7 @@ const blockAttributes = {
 	[ ATTRIBUTE_CITATION ]: {
 		type: 'string',
 		source: 'html',
-		selector: 'cite',
+		selector: 'footer cite',
 		default: '',
 	},
 	align: {
@@ -264,6 +264,8 @@ export const settings = {
 								// translators: placeholder text used for the citation
 								__( 'Write citation…' )
 							}
+							tagName="footer"
+							// Class left for compatibility with theme editor styles targeting older version of block that did not use footer element.
 							className="wp-block-quote__citation"
 						/>
 					) }
@@ -278,7 +280,9 @@ export const settings = {
 		return (
 			<blockquote style={ { textAlign: align ? align : null } }>
 				<RichText.Content multiline value={ value } />
-				{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+				{ ! RichText.isEmpty( citation ) && (
+					<footer><RichText.Content tagName="cite" value={ citation } /></footer>
+				) }
 			</blockquote>
 		);
 	},
@@ -302,6 +306,33 @@ export const settings = {
 		{
 			attributes: {
 				...blockAttributes,
+				citation: {
+					type: 'string',
+					source: 'html',
+					selector: 'cite',
+					default: '',
+				},
+			},
+			save( { attributes } ) {
+				const { align, value, citation } = attributes;
+
+				return (
+					<blockquote style={ { textAlign: align ? align : null } }>
+						<RichText.Content multiline value={ value } />
+						{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
+					</blockquote>
+				);
+			},
+		},
+		{
+			attributes: {
+				...blockAttributes,
+				citation: {
+					type: 'string',
+					source: 'html',
+					selector: 'cite',
+					default: '',
+				},
 				style: {
 					type: 'number',
 					default: 1,

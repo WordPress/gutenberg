@@ -12,7 +12,7 @@ exports[`Quote can be converted to headings 1`] = `
 <!-- /wp:heading -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p>two</p><cite>cite</cite></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p>two</p><footer><cite>cite</cite></footer></blockquote>
 <!-- /wp:quote -->"
 `;
 
@@ -26,7 +26,7 @@ exports[`Quote can be converted to headings 2`] = `
 <!-- /wp:heading -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"><p></p><cite>cite</cite></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p></p><footer><cite>cite</cite></footer></blockquote>
 <!-- /wp:quote -->"
 `;
 

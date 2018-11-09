@@ -10,7 +10,10 @@
 			line-height: 1.6;
 		}
 
-		cite,
+		// The p + cite selector is for compatibility with older versions of the block that did not use
+		// footer. It has to be this specific in order to not target cite elements within the quoted
+		// paragraphs (or other quoted content if the block is updated to use nesting).
+		p + cite,
 		footer {
 			font-size: 18px;
 			text-align: right;
