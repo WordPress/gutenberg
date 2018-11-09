@@ -70,6 +70,7 @@ export class BlockListBlock extends Component {
 		this.onDragStart = this.onDragStart.bind( this );
 		this.onDragEnd = this.onDragEnd.bind( this );
 		this.selectOnOpen = this.selectOnOpen.bind( this );
+		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
@@ -285,7 +286,7 @@ export class BlockListBlock extends Component {
 
 		if ( event.shiftKey ) {
 			if ( ! this.props.isSelected ) {
-				this.props.onShiftSelection( this.props.clientId );
+				this.onShiftSelection();
 				event.preventDefault();
 			}
 		} else {
@@ -354,6 +355,20 @@ export class BlockListBlock extends Component {
 	selectOnOpen( open ) {
 		if ( open && ! this.props.isSelected ) {
 			this.props.onSelect();
+		}
+	}
+
+	onShiftSelection() {
+		if ( ! this.props.isSelectionEnabled ) {
+			return;
+		}
+
+		const { getBlockSelectionStart, onMultiSelect, onSelect } = this.props;
+
+		if ( getBlockSelectionStart() ) {
+			onMultiSelect( getBlockSelectionStart(), this.props.clientId );
+		} else {
+			onSelect( this.props.clientId );
 		}
 	}
 
@@ -601,6 +616,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		getEditorSettings,
 		hasSelectedInnerBlock,
 		getTemplateLock,
+		getBlockSelectionStart,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
@@ -634,6 +650,9 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		block,
 		isSelected,
 		isParentOfSelectedBlock,
+		// We only care about this value when the shift key is pressed.
+		// We call it dynamically in the event handler to avoid unnecessary re-renders.
+		getBlockSelectionStart,
 	};
 } );
 
@@ -641,6 +660,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	const {
 		updateBlockAttributes,
 		selectBlock,
+		multiSelect,
 		insertBlocks,
 		insertDefaultBlock,
 		removeBlock,
@@ -657,6 +677,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );
 		},
+		onMultiSelect: multiSelect,
 		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
 			insertBlocks( blocks, index, rootClientId );
