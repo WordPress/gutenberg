@@ -248,13 +248,8 @@ class ImageEdit extends Component {
 	}
 
 	getFilename( url ) {
-		if ( url ) {
-			const fileName = url.match( /.*\/(.+?)(?:\?.*)?$/ );
-			if ( fileName ) {
-				return fileName[ 1 ];
-			}
-		}
-		return '';
+		const fileName = url.match( /.*\/(.+?)(?:\?.*)?$/ );
+		return fileName[ 1 ];
 	}
 
 	getImageSizes() {
