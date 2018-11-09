@@ -166,7 +166,6 @@ export async function mediaUpload( {
 		onFileChange( filesSet );
 	}
 
-<<<<<<< HEAD
 	for ( let idx = 0; idx < validFiles.length; ++idx ) {
 		const mediaFile = validFiles[ idx ];
 		try {
@@ -196,37 +195,6 @@ export async function mediaUpload( {
 				code: 'GENERAL',
 				message,
 				file: mediaFile,
-=======
-		return createMediaFromFile( mediaFile, additionalData )
-			.then( ( savedMedia ) => {
-				const mediaObject = {
-					...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
-					alt: savedMedia.alt_text,
-					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
-					title: savedMedia.title.raw,
-					url: savedMedia.source_url,
-				};
-				setAndUpdateFiles( idx, mediaObject );
-			} )
-			.catch( ( error ) => {
-				// Reset to empty on failure.
-				setAndUpdateFiles( idx, null );
-				let message;
-				if ( has( error, [ 'message' ] ) ) {
-					message = get( error, [ 'message' ] );
-				} else {
-					message = sprintf(
-						// translators: %s: file name
-						__( 'Error while uploading file %s to the media library.' ),
-						mediaFile.name
-					);
-				}
-				onError( {
-					code: 'GENERAL',
-					message,
-					file: mediaFile,
-				} );
->>>>>>> 2463a82... we could actually just do this in `mediaUpload` (the function)
 			} );
 		}
 	}
