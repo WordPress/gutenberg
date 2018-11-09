@@ -3,6 +3,10 @@
  */
 import { sprintf, __, _x, _n, _nx, setLocaleData } from '../';
 
+// Mock memoization as identity function. Inline since Jest errors on out-of-
+// scope references in a mock callback.
+jest.mock( 'memize', () => ( fn ) => fn );
+
 const localeData = {
 	'': {
 		// Domain name
