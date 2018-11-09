@@ -1,5 +1,9 @@
 ## 6.2.0 (unreleased)
 
+### Polish
+
+- Remove unnecessary `locale` prop usage [#11649](https://github.com/WordPress/gutenberg/pull/11649)
+
 ### New Features
 
 - Adjust a11y roles for menu items, and make sure screen readers can properly use BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
