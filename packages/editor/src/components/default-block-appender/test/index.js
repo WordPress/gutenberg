@@ -31,7 +31,7 @@ describe( 'DefaultBlockAppender', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt /> );
 
-		wrapper.find( 'input.editor-default-block-appender__content' ).simulate( 'focus' );
+		wrapper.find( 'textarea.editor-default-block-appender__content' ).simulate( 'focus' );
 
 		expect( wrapper ).toMatchSnapshot();
 
@@ -41,7 +41,7 @@ describe( 'DefaultBlockAppender', () => {
 	it( 'should optionally show without prompt', () => {
 		const onAppend = jest.fn();
 		const wrapper = shallow( <DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt={ false } /> );
-		const input = wrapper.find( 'input.editor-default-block-appender__content' );
+		const input = wrapper.find( 'textarea.editor-default-block-appender__content' );
 
 		expect( input.prop( 'value' ) ).toEqual( '' );
 

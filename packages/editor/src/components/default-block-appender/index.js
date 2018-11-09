@@ -51,11 +51,10 @@ export function DefaultBlockAppender( {
 	return (
 		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
 			<BlockDropZone rootClientId={ rootClientId } />
-			<input
+			<textarea
 				role="button"
 				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
-				type="text"
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }

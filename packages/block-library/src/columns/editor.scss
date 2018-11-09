@@ -128,11 +128,24 @@
 }
 
 // In absence of making the individual columns resizable, we prevent them from being clickable.
-// This makes them less fiddly. This will be revisited as the interface is refined.
+// This makes them less fiddly. @todo: This should be revisited as the interface is refined.
 .wp-block-columns [data-type="core/column"] {
 	pointer-events: none;
+
+	// The empty state of a columns block has the default appenders.
+	// Since those appenders are not blocks, the parent, actual block, appears "hovered" when hovering the appenders.
+	// Because the column shouldn't be hovered as part of this temporary passhthrough, we unset the hover style.
+	&.is-hovered {
+		> .editor-block-list__block-edit::before {
+			content: none;
+		}
+
+		.editor-block-list__breadcrumb {
+			display: none;
+		}
+	}
 }
 
-:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit > .editor-inner-blocks {
+:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit .editor-inner-blocks {
 	pointer-events: all;
 }
