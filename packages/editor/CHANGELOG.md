@@ -6,6 +6,10 @@
 
 ## 6.2.1 (2018-11-09)
 
+### New Features
+
+- In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
+
 ### Polish
 
 - Reactive block styles.
