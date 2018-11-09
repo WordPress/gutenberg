@@ -66,6 +66,7 @@ export const settings = {
 		customClassName: false,
 		inserter: false,
 		html: false,
+		reusable: false,
 	},
 
 	attributes: {

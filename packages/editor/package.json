@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "6.1.1",
+	"version": "6.2.1",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -61,7 +61,7 @@
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.3.0",
+		"enzyme": "^3.7.0",
 		"react-dom": "^16.4.1",
 		"react-test-renderer": "^16.4.1"
 	},

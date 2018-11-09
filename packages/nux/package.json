@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "2.0.9",
+	"version": "2.0.11",
 	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
 		"rememo": "^3.0.0"
 	},
 	"devDependencies": {
-		"enzyme": "^3.3.0"
+		"enzyme": "^3.7.0"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -16,10 +16,14 @@ export function PostPublishPanelToggle( {
 	onToggle,
 	isOpen,
 	forceIsSaving,
+	forceIsDirty,
 } ) {
-	const isButtonEnabled = (
-		! isSaving && ! forceIsSaving && isPublishable && isSaveable
-	) || isPublished;
+	const isButtonDisabled =
+		isPublished ||
+		isSaving ||
+		forceIsSaving ||
+		! isSaveable ||
+		( ! isPublishable && ! forceIsDirty );
 
 	return (
 		<Button
@@ -27,7 +31,7 @@ export function PostPublishPanelToggle( {
 			isPrimary
 			onClick={ onToggle }
 			aria-expanded={ isOpen }
-			disabled={ ! isButtonEnabled }
+			disabled={ isButtonDisabled }
 			isBusy={ isSaving && isPublished }
 		>
 			{ isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' ) }

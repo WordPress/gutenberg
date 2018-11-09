@@ -6,6 +6,9 @@ Array [
     "attrs": Object {},
     "blockName": "core/more",
     "innerBlocks": Array [],
+    "innerContent": Array [
+      "<!--more-->",
+    ],
     "innerHTML": "<!--more-->",
   },
 ]
@@ -17,6 +20,9 @@ Array [
     "attrs": Array [],
     "blockName": "core/more",
     "innerBlocks": Array [],
+    "innerContent": Array [
+      "<!--more-->",
+    ],
     "innerHTML": "<!--more-->",
   },
 ]

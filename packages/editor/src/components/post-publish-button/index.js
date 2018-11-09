@@ -35,11 +35,19 @@ export class PostPublishButton extends Component {
 			visibility,
 			isPublishable,
 			isSaveable,
+			isPostSavingLocked,
+			isPublished,
 			hasPublishAction,
 			onSubmit = noop,
+			forceIsDirty,
 			forceIsSaving,
 		} = this.props;
-		const isButtonEnabled = isPublishable && isSaveable;
+		const isButtonDisabled =
+			isSaving ||
+			forceIsSaving ||
+			! isSaveable ||
+			isPostSavingLocked ||
+			( ! isPublishable && ! forceIsDirty );
 
 		let publishStatus;
 		if ( ! hasPublishAction ) {
@@ -65,8 +73,8 @@ export class PostPublishButton extends Component {
 				isPrimary
 				isLarge
 				onClick={ onClick }
-				disabled={ ! isButtonEnabled }
-				isBusy={ isSaving }
+				disabled={ isButtonDisabled }
+				isBusy={ isSaving && isPublished }
 			>
 				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
 			</Button>
@@ -75,11 +83,12 @@ export class PostPublishButton extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { forceIsSaving, forceIsDirty } ) => {
+	withSelect( ( select ) => {
 		const {
 			isSavingPost,
 			isEditedPostBeingScheduled,
 			getEditedPostVisibility,
+			isCurrentPostPublished,
 			isEditedPostSaveable,
 			isEditedPostPublishable,
 			isPostSavingLocked,
@@ -87,11 +96,13 @@ export default compose( [
 			getCurrentPostType,
 		} = select( 'core/editor' );
 		return {
-			isSaving: forceIsSaving || isSavingPost(),
+			isSaving: isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
-			isSaveable: isEditedPostSaveable() && ! isPostSavingLocked(),
-			isPublishable: forceIsDirty || isEditedPostPublishable(),
+			isSaveable: isEditedPostSaveable(),
+			isPostSavingLocked: isPostSavingLocked(),
+			isPublishable: isEditedPostPublishable(),
+			isPublished: isCurrentPostPublished(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
 		};

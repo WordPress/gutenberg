@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { View, Image, TextInput } from 'react-native';
+import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder } from '@wordpress/editor';
+import { MediaPlaceholder, RichText } from '@wordpress/editor';
 
 export default function ImageEdit( props ) {
 	const { attributes, isSelected, setAttributes } = props;
@@ -19,9 +20,13 @@ export default function ImageEdit( props ) {
 	};
 
 	const onMediaLibraryPress = () => {
-		// This method should present an image picker from
-		// the WordPress media library.
-		//TODO: Implement media library method.
+		// Call onMediaLibraryPress from the Native<->RN bridge. It should trigger an image picker from
+		// the WordPress media library and call the provided callback to set the image URL.
+		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
+			if ( mediaUrl ) {
+				setAttributes( { url: mediaUrl } );
+			}
+		} );
 	};
 
 	if ( ! url ) {
@@ -40,7 +45,7 @@ export default function ImageEdit( props ) {
 				resizeMethod="scale"
 				source={ { uri: url } }
 			/>
-			{ ( caption.length > 0 || isSelected ) && (
+			{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 				<View style={ { padding: 12, flex: 1 } }>
 					<TextInput
 						style={ { textAlign: 'center' } }

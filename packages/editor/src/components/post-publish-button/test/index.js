@@ -14,15 +14,35 @@ describe( 'PostPublishButton', () => {
 	describe( 'disabled', () => {
 		it( 'should be disabled if post is currently saving', () => {
 			const wrapper = shallow(
-				<PostPublishButton hasPublishAction={ true } isSaving />
+				<PostPublishButton
+					isPublishable
+					isSaveable
+					isSaving
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be disabled if post is not publishable', () => {
+		it( 'should be disabled if forceIsSaving is true', () => {
 			const wrapper = shallow(
-				<PostPublishButton hasPublishAction={ true } isPublishable={ false } />
+				<PostPublishButton
+					isPublishable
+					isSaveable
+					forceIsSaving
+				/>
+			);
+
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+		} );
+
+		it( 'should be disabled if post is not publishable and not forceIsDirty', () => {
+			const wrapper = shallow(
+				<PostPublishButton
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty={ false }
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
@@ -30,15 +50,45 @@ describe( 'PostPublishButton', () => {
 
 		it( 'should be disabled if post is not saveable', () => {
 			const wrapper = shallow(
-				<PostPublishButton hasPublishAction={ true } isSaveable={ false } />
+				<PostPublishButton
+					isPublishable
+					isSaveable={ false }
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
-		it( 'should be enabled otherwise', () => {
+		it( 'should be disabled if post saving is locked', () => {
 			const wrapper = shallow(
-				<PostPublishButton hasPublishAction={ true } isPublishable isSaveable />
+				<PostPublishButton
+					isPublishable
+					isSaveable
+					isPostSavingLocked
+				/>
+			);
+
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
+		} );
+
+		it( 'should be enabled if post is saveable but not publishable and forceIsDirty is true', () => {
+			const wrapper = shallow(
+				<PostPublishButton
+					isSaveable
+					isPublishable={ false }
+					forceIsDirty
+				/>
+			);
+
+			expect( wrapper.prop( 'disabled' ) ).toBe( false );
+		} );
+
+		it( 'should be enabled if post is publishave and saveable', () => {
+			const wrapper = shallow(
+				<PostPublishButton
+					isPublishable
+					isSaveable
+				/>
 			);
 
 			expect( wrapper.prop( 'disabled' ) ).toBe( false );
@@ -129,7 +179,10 @@ describe( 'PostPublishButton', () => {
 
 	it( 'should have save modifier class', () => {
 		const wrapper = shallow(
-			<PostPublishButton hasPublishAction={ true } isSaving />
+			<PostPublishButton
+				isSaving
+				isPublished
+			/>
 		);
 
 		expect( wrapper.find( 'Button' ).prop( 'isBusy' ) ).toBe( true );

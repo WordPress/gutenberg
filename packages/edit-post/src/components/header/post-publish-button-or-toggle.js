@@ -35,6 +35,7 @@ export function PostPublishButtonOrToggle( {
 			isOpen={ isPublishSidebarOpened }
 			onToggle={ togglePublishSidebar }
 			forceIsSaving={ forceIsSaving }
+			forceIsDirty={ forceIsDirty }
 		/>
 	);
 

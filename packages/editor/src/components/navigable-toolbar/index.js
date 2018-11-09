@@ -7,7 +7,7 @@ import { cond, matchesProperty } from 'lodash';
  * WordPress dependencies
  */
 import { NavigableMenu, KeyboardShortcuts } from '@wordpress/components';
-import { Component, findDOMNode } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 
@@ -21,24 +21,17 @@ class NavigableToolbar extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.bindNode = this.bindNode.bind( this );
 		this.focusToolbar = this.focusToolbar.bind( this );
 		this.focusSelection = this.focusSelection.bind( this );
 
 		this.switchOnKeyDown = cond( [
 			[ matchesProperty( [ 'keyCode' ], ESCAPE ), this.focusSelection ],
 		] );
-	}
-
-	bindNode( ref ) {
-		// Disable reason: Need DOM node for finding first focusable element
-		// on keyboard interaction to shift to toolbar.
-		// eslint-disable-next-line react/no-find-dom-node
-		this.toolbar = findDOMNode( ref );
+		this.toolbar = createRef();
 	}
 
 	focusToolbar() {
-		const tabbables = focus.tabbable.find( this.toolbar );
+		const tabbables = focus.tabbable.find( this.toolbar.current );
 		if ( tabbables.length ) {
 			tabbables[ 0 ].focus();
 		}
@@ -74,7 +67,7 @@ class NavigableToolbar extends Component {
 			<NavigableMenu
 				orientation="horizontal"
 				role="toolbar"
-				ref={ this.bindNode }
+				ref={ this.toolbar }
 				onKeyDown={ this.switchOnKeyDown }
 				{ ...props }
 			>
