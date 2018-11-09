@@ -22,6 +22,9 @@
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
 		"@wordpress/data": "file:../data",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/rich-text": "file:../rich-text",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
