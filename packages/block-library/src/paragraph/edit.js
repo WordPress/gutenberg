@@ -221,7 +221,6 @@ class ParagraphBlock extends Component {
 				<RichText
 					identifier="content"
 					tagName="p"
-					identifier="content"
 					className={ classnames( 'wp-block-paragraph', className, {
 						'has-text-color': textColor.color,
 						'has-background': backgroundColor.color,
