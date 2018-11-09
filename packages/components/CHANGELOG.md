@@ -1,3 +1,9 @@
+## 6.0.0 (Unreleased)
+
+### Breaking Changes
+
+- The `PanelColor` component has been removed.
+
 ## 5.1.1 (2018-11-09)
 
 ## 5.1.0 (2018-11-09)
