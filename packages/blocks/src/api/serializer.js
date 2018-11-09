@@ -18,6 +18,7 @@ import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from './registration';
+import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
 /**
@@ -54,13 +55,14 @@ export function getBlockMenuDefaultClassName( blockName ) {
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
  *
- * @param {Object} blockType   Block type.
- * @param {Object} attributes  Block attributes.
- * @param {?Array} innerBlocks Nested blocks.
+ * @param {string|Object} blockTypeOrName   Block type or name.
+ * @param {Object}        attributes        Block attributes.
+ * @param {?Array}        innerBlocks       Nested blocks.
  *
  * @return {Object|string} Save element or raw HTML string.
  */
-export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
+export function getSaveElement( blockTypeOrName, attributes, innerBlocks = [] ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
 	let { save } = blockType;
 
 	// Component classes are unsupported for save since serialization must
@@ -113,13 +115,15 @@ export function getSaveElement( blockType, attributes, innerBlocks = [] ) {
  * Given a block type containing a save render implementation and attributes, returns the
  * static markup to be saved.
  *
- * @param {Object} blockType   Block type.
- * @param {Object} attributes  Block attributes.
- * @param {?Array} innerBlocks Nested blocks.
+ * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {Object}        attributes      Block attributes.
+ * @param {?Array}        innerBlocks     Nested blocks.
  *
  * @return {string} Save content.
  */
-export function getSaveContent( blockType, attributes, innerBlocks ) {
+export function getSaveContent( blockTypeOrName, attributes, innerBlocks ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
+
 	return renderToString( getSaveElement( blockType, attributes, innerBlocks ) );
 }
 
@@ -199,7 +203,6 @@ export function serializeAttributes( attributes ) {
  */
 export function getBlockContent( block ) {
 	// @todo why not getBlockInnerHtml?
-	const blockType = getBlockType( block.name );
 
 	// If block was parsed as invalid or encounters an error while generating
 	// save content, use original content instead to avoid content loss. If a
@@ -209,7 +212,7 @@ export function getBlockContent( block ) {
 	let saveContent = block.originalContent;
 	if ( block.isValid || block.innerBlocks.length ) {
 		try {
-			saveContent = getSaveContent( blockType, block.attributes, block.innerBlocks );
+			saveContent = getSaveContent( block.name, block.attributes, block.innerBlocks );
 		} catch ( error ) {}
 	}
 

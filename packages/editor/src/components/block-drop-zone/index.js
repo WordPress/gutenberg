@@ -11,7 +11,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import {
-	rawHandler,
+	pasteHandler,
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
@@ -70,7 +70,7 @@ class BlockDropZone extends Component {
 	}
 
 	onHTMLDrop( HTML, position ) {
-		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );

@@ -23,6 +23,19 @@ Returns a block type by name.
 
 Block Type.
 
+### getBlockStyles
+
+Returns block styles by block name.
+
+*Parameters*
+
+ * state: Data state.
+ * name: Block type name.
+
+*Returns*
+
+Block Styles.
+
 ### getCategories
 
 Returns all the available categories.
@@ -160,6 +173,24 @@ Returns an action object used to remove a registered block type.
 *Parameters*
 
  * names: Block name.
+
+### addBlockStyles
+
+Returns an action object used in signalling that new block styles have been added.
+
+*Parameters*
+
+ * blockName: Block name.
+ * styles: Block styles.
+
+### removeBlockStyles
+
+Returns an action object used in signalling that block styles have been removed.
+
+*Parameters*
+
+ * blockName: Block name.
+ * styleNames: Block style names.
 
 ### setDefaultBlockName
 

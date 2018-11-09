@@ -144,13 +144,6 @@ function gutenberg_register_scripts_and_styles() {
 
 	register_tinymce_scripts();
 
-	gutenberg_override_script(
-		'wp-polyfill',
-		null,
-		array(
-			'wp-polyfill-ecmascript',
-		)
-	);
 	wp_script_add_data(
 		'wp-polyfill',
 		'data',
@@ -299,6 +292,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'lodash',
 			'wp-compose',
+			'wp-deprecated',
 			'wp-element',
 			'wp-is-shallow-equal',
 			'wp-polyfill',
@@ -321,6 +315,13 @@ function gutenberg_register_scripts_and_styles() {
 				'} )()',
 			)
 		)
+	);
+	gutenberg_override_script(
+		'wp-annotations',
+		gutenberg_url( 'build/annotations/index.js' ),
+		array( 'wp-polyfill', 'wp-data', 'wp-rich-text', 'wp-hooks', 'wp-i18n' ),
+		filemtime( gutenberg_dir_path() . 'build/annotations/index.js' ),
+		true
 	);
 	gutenberg_override_script(
 		'wp-core-data',
@@ -485,7 +486,7 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'wp-a11y',
 			'wp-data',
-			'wp-polyfill-ecmascript',
+			'wp-polyfill',
 		),
 		filemtime( gutenberg_dir_path() . 'build/notices/index.js' ),
 		true
@@ -604,28 +605,26 @@ function gutenberg_register_scripts_and_styles() {
 			),
 			'toolbar1'         => implode(
 				',',
-				array_merge(
-					apply_filters(
-						'mce_buttons',
-						array(
-							'formatselect',
-							'bold',
-							'italic',
-							'bullist',
-							'numlist',
-							'blockquote',
-							'alignleft',
-							'aligncenter',
-							'alignright',
-							'link',
-							'unlink',
-							'wp_more',
-							'spellchecker',
-							'wp_add_media',
-						),
-						'editor'
+				apply_filters(
+					'mce_buttons',
+					array(
+						'formatselect',
+						'bold',
+						'italic',
+						'bullist',
+						'numlist',
+						'blockquote',
+						'alignleft',
+						'aligncenter',
+						'alignright',
+						'link',
+						'unlink',
+						'wp_more',
+						'spellchecker',
+						'wp_add_media',
+						'kitchensink',
 					),
-					array( 'kitchensink' )
+					'editor'
 				)
 			),
 			'toolbar2'         => implode(
@@ -724,7 +723,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-compose',
 			'wp-core-data',
 			'wp-data',
-			'wp-deprecated',
 			'wp-dom-ready',
 			'wp-editor',
 			'wp-element',
@@ -751,7 +749,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-compose',
 			'wp-element',
 			'wp-i18n',
-			'wp-polyfill-ecmascript',
+			'wp-polyfill',
 		),
 		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/index.js' ),
 		true
@@ -867,6 +865,24 @@ function gutenberg_register_scripts_and_styles() {
 			$live_reload_url
 		);
 	}
+
+	// Temporary backward compatibility for `wp-polyfill-ecmascript`, which has
+	// since been absorbed into `wp-polyfill`.
+	//
+	// [TODO][REMOVEME] To be removed in Gutenberg v4.5.
+	gutenberg_override_script(
+		'wp-polyfill-ecmascript',
+		null,
+		array(
+			'wp-polyfill',
+			'wp-deprecated',
+		)
+	);
+	wp_script_add_data(
+		'wp-polyfill-ecmascript',
+		'data',
+		'wp.deprecated( "wp-polyfill-ecmascript script handle", { plugin: "Gutenberg", version: "4.5" } );'
+	);
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -979,7 +995,7 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/element-closest@2.0.2/element-closest.js'
 	);
 	gutenberg_register_vendor_script(
-		'wp-polyfill-ecmascript',
+		'wp-polyfill',
 		'https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill' . $suffix . '.js'
 	);
 }
@@ -1326,6 +1342,33 @@ function gutenberg_load_locale_data() {
 }
 
 /**
+ * Retrieve The available image sizes for a post
+ *
+ * @return array
+ */
+function gutenberg_get_available_image_sizes() {
+	$size_names = apply_filters(
+		'image_size_names_choose',
+		array(
+			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
+			'medium'    => __( 'Medium', 'gutenberg' ),
+			'large'     => __( 'Large', 'gutenberg' ),
+			'full'      => __( 'Full Size', 'gutenberg' ),
+		)
+	);
+
+	$all_sizes = array();
+	foreach ( $size_names as $size_slug => $size_name ) {
+		$all_sizes[] = array(
+			'slug' => $size_slug,
+			'name' => $size_name,
+		);
+	}
+
+	return $all_sizes;
+}
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1437,26 +1480,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$demo_content = ob_get_clean();
 
 		$initial_edits = array(
-			'title'   => array(
-				'raw' => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			),
-			'content' => array(
-				'raw' => $demo_content,
-			),
+			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
+			'content' => $demo_content,
 		);
 	} elseif ( $is_new_post ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
-			'title'   => array(
-				'raw' => $post->post_title,
-			),
-			'content' => array(
-				'raw' => $post->post_content,
-			),
-			'excerpt' => array(
-				'raw' => $post->post_excerpt,
-			),
+			'title'   => $post->post_title,
+			'content' => $post->post_content,
+			'excerpt' => $post->post_excerpt,
 		);
 	} else {
 		$initial_edits = null;
@@ -1596,20 +1629,25 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 		'disablePostFormats'     => ! current_theme_supports( 'post-formats' ),
 		'titlePlaceholder'       => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
-		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
+		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Start writing or type / to choose a block', 'gutenberg' ), $post ),
 		'isRTL'                  => is_rtl(),
 		'autosaveInterval'       => 10,
 		'maxUploadFileSize'      => $max_upload_size,
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
-		'postLock'               => $lock_details,
+		'imageSizes'             => gutenberg_get_available_image_sizes(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
+		'postLock'               => $lock_details,
 		'postLockUtils'          => array(
 			'nonce'       => wp_create_nonce( 'lock-post_' . $post->ID ),
 			'unlockNonce' => wp_create_nonce( 'update-post_' . $post->ID ),
 			'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 		),
+
+		// Whether or not to load the 'postcustom' meta box is stored as a user meta
+		// field so that we're not always loading its assets.
+		'enableCustomFields'     => (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true ),
 	);
 
 	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );

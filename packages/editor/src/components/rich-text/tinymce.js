@@ -10,8 +10,6 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
-import { toHTMLString } from '@wordpress/rich-text';
-import { children } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -130,15 +128,16 @@ export default class TinyMCE extends Component {
 		this.initialize();
 	}
 
-	shouldComponentUpdate() {
-		// We must prevent rerenders because TinyMCE will modify the DOM, thus
-		// breaking React's ability to reconcile changes.
-		//
-		// See: https://github.com/facebook/react/issues/6802
-		return false;
-	}
-
-	componentWillReceiveProps( nextProps ) {
+	// We must prevent rerenders because RichText, the browser, and TinyMCE will
+	// modify the DOM. React will rerender the DOM fine, but we're losing
+	// selection and it would be more expensive to do so as it would just set
+	// the inner HTML through `dangerouslySetInnerHTML`. Instead RichText does
+	// it's own diffing and selection setting.
+	//
+	// Because we never update the component, we have to look through props and
+	// update the attributes on the wrapper nodes here. `componentDidUpdate`
+	// will never be called.
+	shouldComponentUpdate( nextProps ) {
 		this.configureIsPlaceholderVisible( nextProps.isPlaceholderVisible );
 
 		if ( ! isEqual( this.props.style, nextProps.style ) ) {
@@ -155,6 +154,8 @@ export default class TinyMCE extends Component {
 			this.editorNode.removeAttribute( key ) );
 		updatedKeys.forEach( ( key ) =>
 			this.editorNode.setAttribute( key, nextProps[ key ] ) );
+
+		return false;
 	}
 
 	componentWillUnmount() {
@@ -249,9 +250,11 @@ export default class TinyMCE extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode } = event;
+		const { startContainer, startOffset, endContainer, endOffset } = getSelection().getRangeAt( 0 );
+		const isCollapsed = startContainer === endContainer && startOffset === endOffset;
 
 		// Disables TinyMCE behaviour.
-		if ( keyCode === ENTER || keyCode === BACKSPACE || keyCode === DELETE ) {
+		if ( keyCode === ENTER || ( ! isCollapsed && ( keyCode === DELETE || keyCode === BACKSPACE ) ) ) {
 			event.preventDefault();
 			// For some reason this is needed to also prevent the insertion of
 			// line breaks.
@@ -310,8 +313,6 @@ export default class TinyMCE extends Component {
 			isPlaceholderVisible,
 			onPaste,
 			onInput,
-			multilineTag,
-			multilineWrapperTags,
 			onKeyDown,
 			onKeyUp,
 		} = this.props;
@@ -329,28 +330,6 @@ export default class TinyMCE extends Component {
 		// If a default value is provided, render it into the DOM even before
 		// TinyMCE finishes initializing. This avoids a short delay by allowing
 		// us to show and focus the content before it's truly ready to edit.
-		let initialHTML = defaultValue;
-
-		// Guard for blocks passing `null` in onSplit callbacks. May be removed
-		// if onSplit is revised to not pass a `null` value.
-		if ( defaultValue === null ) {
-			initialHTML = '';
-		// Handle deprecated `children` and `node` sources.
-		} else if ( Array.isArray( defaultValue ) ) {
-			initialHTML = children.toHTML( defaultValue );
-		} else if ( typeof defaultValue !== 'string' ) {
-			initialHTML = toHTMLString( {
-				value: defaultValue,
-				multilineTag,
-				multilineWrapperTags,
-			} );
-		}
-
-		if ( initialHTML === '' ) {
-			// Ensure the field is ready to receive focus by TinyMCE.
-			initialHTML = '<br data-mce-bogus="1">';
-		}
-
 		return createElement( tagName, {
 			...ariaProps,
 			className: classnames( className, 'editor-rich-text__tinymce' ),
@@ -359,7 +338,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: initialHTML },
+			dangerouslySetInnerHTML: { __html: defaultValue },
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,

@@ -1,3 +1,20 @@
+## 3.1.2 (2018-11-09)
+
+## 3.1.1 (2018-11-09)
+
+## 3.1.0 (2018-11-03)
+
+### New Features
+
+- `registry.registerGenericStore` has been added to support integration with existing data systems.
+
+### Deprecations
+
+- `registry.registerReducer` has been deprecated. Use `registry.registerStore` instead.
+- `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
+- `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
+- `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
+
 ## 3.0.1 (2018-10-30)
 
 ### Internal

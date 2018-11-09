@@ -15,6 +15,11 @@ module.exports = {
 			selectors: [ path.resolve( root, 'packages/core-data/src/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/core-data/src/actions.js' ) ],
 		},
+		'core/annotations': {
+			title: 'Annotations',
+			selectors: [ path.resolve( root, 'packages/annotations/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/annotations/src/store/actions.js' ) ],
+		},
 		'core/blocks': {
 			title: 'Block Types Data',
 			selectors: [ path.resolve( root, 'packages/blocks/src/store/selectors.js' ) ],

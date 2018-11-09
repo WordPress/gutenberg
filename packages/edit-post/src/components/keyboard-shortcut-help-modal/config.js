@@ -142,7 +142,7 @@ const textFormattingShortcuts = {
 			description: __( 'Convert the selected text into a link.' ),
 		},
 		{
-			keyCombination: access( 's' ),
+			keyCombination: primaryShift( 'k' ),
 			description: __( 'Remove a link.' ),
 		},
 		{

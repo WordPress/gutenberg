@@ -1,4 +1,36 @@
-## 6.1.1 (Unreleased)
+## 7.0.0 (Unreleased)
+
+### Breaking Changes
+
+- The `PanelColor` component has been removed.
+
+## 6.2.1 (2018-11-09)
+
+### New Features
+
+- In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
+
+### Deprecations
+
+- `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
+
+### Polish
+
+- Reactive block styles.
+
+## 6.2.0 (2018-11-09)
+
+### New Features
+
+- Adjust a11y roles for menu items, and make sure screen readers can properly use BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
+
+## 6.1.1 (2018-11-03)
+
+### Polish
+
+- Remove `findDOMNode` usage from the `Inserter` component.
+- Remove `findDOMNode` usage from the `Block` component.
+- Remove `findDOMNode` usage from the `NavigableToolbar` component.
 
 ## 6.1.0 (2018-10-30)
 
