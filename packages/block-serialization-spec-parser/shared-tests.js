@@ -8,6 +8,19 @@ export const jsTester = ( parse ) => () => {
 			expect( parse( '<!-- wp:first /--><!-- wp:second /-->' ) ).toEqual( expect.any( Array ) );
 		} );
 
+		test( 'parses blocks of various types', () => {
+			expect( parse( '<!-- wp:void /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {"value":true} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {"a":{}} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void { "value" : true } /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {\n\t"value" : true\n} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:block --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {"value":true} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {} -->inner<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+		} );
+
 		test( 'blockName is namespaced string (except freeform)', () => {
 			expect( parse( 'freeform has null name' )[ 0 ] ).toHaveProperty( 'blockName', null );
 			expect( parse( '<!-- wp:more /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/more' );
@@ -18,6 +31,7 @@ export const jsTester = ( parse ) => () => {
 		test( 'JSON attributes are key/value object', () => {
 			expect( parse( 'freeform has empty attrs' )[ 0 ] ).toHaveProperty( 'attrs', {} );
 			expect( parse( '<!-- wp:void /-->' )[ 0 ] ).toHaveProperty( 'attrs', {} );
+			expect( parse( '<!-- wp:void {} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
 			expect( parse( '<!-- wp:void {} /-->' )[ 0 ] ).toHaveProperty( 'attrs', {} );
 			expect( parse( '<!-- wp:void {"key": "value"} /-->' )[ 0 ] ).toHaveProperty( 'attrs', { key: 'value' } );
 			expect( parse( '<!-- wp:block --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'attrs', {} );
