@@ -35,6 +35,7 @@ function camelCaseDash( string ) {
 
 const gutenbergPackages = [
 	'a11y',
+	'annotations',
 	'api-fetch',
 	'autop',
 	'blob',

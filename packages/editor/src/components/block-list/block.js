@@ -398,6 +398,7 @@ export class BlockListBlock extends Component {
 						isPreviousBlockADefaultEmptyBlock,
 						isParentOfSelectedBlock,
 						isDraggable,
+						className,
 					} = this.props;
 					const isHovered = this.state.isHovered && ! isMultiSelecting;
 					const { name: blockName, isValid } = block;
@@ -439,7 +440,7 @@ export class BlockListBlock extends Component {
 						'is-typing': isTypingWithinBlock,
 						'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 						'is-focus-mode': isFocusMode,
-					} );
+					}, className );
 
 					const { onReplace } = this.props;
 

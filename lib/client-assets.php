@@ -317,6 +317,13 @@ function gutenberg_register_scripts_and_styles() {
 		)
 	);
 	gutenberg_override_script(
+		'wp-annotations',
+		gutenberg_url( 'build/annotations/index.js' ),
+		array( 'wp-polyfill', 'wp-data', 'wp-rich-text', 'wp-hooks', 'wp-i18n' ),
+		filemtime( gutenberg_dir_path() . 'build/annotations/index.js' ),
+		true
+	);
+	gutenberg_override_script(
 		'wp-core-data',
 		gutenberg_url( 'build/core-data/index.js' ),
 		array( 'wp-data', 'wp-api-fetch', 'wp-polyfill', 'wp-url', 'lodash' ),

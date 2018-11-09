@@ -853,11 +853,11 @@ export class RichText extends Component {
 		} ).body.innerHTML;
 	}
 
-	valueToFormat( { formats, text } ) {
+	valueToFormat( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
 			return children.fromDOM( unstableToDom( {
-				value: { formats, text },
+				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} ).body.childNodes );
@@ -865,13 +865,13 @@ export class RichText extends Component {
 
 		if ( this.props.format === 'string' ) {
 			return toHTMLString( {
-				value: { formats, text },
+				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
-		return { formats, text };
+		return value;
 	}
 
 	render() {
