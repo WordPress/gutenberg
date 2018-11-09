@@ -32,7 +32,7 @@ function the_gutenberg_project() {
 		<noscript>
 			<div class="error" style='margin-top:32px'><p>
 			<?php
-			echo __( 'The block editor requires Javascript to be enabled.', 'gutenberg' );
+			_e( 'The block editor requires Javascript to be enabled.', 'gutenberg' );
 			?>
 			</p></div>
 		</noscript>
@@ -130,7 +130,7 @@ function is_gutenberg_page() {
  */
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
-	echo __( 'Gutenberg requires WordPress 4.9.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
+	_e( 'Gutenberg requires WordPress 4.9.8 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
@@ -143,7 +143,7 @@ function gutenberg_wordpress_version_notice() {
  */
 function gutenberg_build_files_notice() {
 	echo '<div class="error"><p>';
-	echo __( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
+	_e( 'Gutenberg development mode requires files to be built. Run <code>npm install</code> to install dependencies, <code>npm run build</code> to build the files or <code>npm run dev</code> to build the files and watch for changes. Read the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">contributing</a> file for more information.', 'gutenberg' );
 	echo '</p></div>';
 }
 
