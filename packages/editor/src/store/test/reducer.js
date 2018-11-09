@@ -1427,11 +1427,6 @@ describe( 'state', () => {
 				initialPosition: -1,
 				isMultiSelecting: false,
 				isEnabled: true,
-				richText: {
-					blockClientId: null,
-					identifier: null,
-					range: { start: null, end: null },
-				},
 			} );
 		} );
 
