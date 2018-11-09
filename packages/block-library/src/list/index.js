@@ -12,7 +12,6 @@ import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
-	getBlockType,
 } from '@wordpress/blocks';
 import {
 	BlockControls,
@@ -108,7 +107,7 @@ export const settings = {
 				transform( node ) {
 					return createBlock( 'core/list', {
 						...getBlockAttributes(
-							getBlockType( 'core/list' ),
+							'core/list',
 							node.outerHTML
 						),
 						ordered: node.nodeName === 'OL',

@@ -1,3 +1,9 @@
+## 5.3.0 (Unreleased)
+
+### New feature
+
+- `getBlockAttributes`, `getBlockTransforms`, `getSaveContent`, `getSaveElement` and `isValidBlockContent` methods can now take also block's name as the first param ([#11490](https://github.com/WordPress/gutenberg/pull/11490)). Passing a block's type object continues to work as before.
+
 ## 5.2.0 (2018-11-09)
 
 -   Paste: Google Docs: fix nested formatting, sub, sup and del.
