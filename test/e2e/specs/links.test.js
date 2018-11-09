@@ -430,6 +430,6 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'http://#test.com' );
 		await page.keyboard.press( 'Enter' );
 		const assertiveContent = await page.evaluate( () => document.querySelector( '#a11y-speak-assertive' ).textContent );
-		expect( assertiveContent ).toBe( 'Warning: the link has been inserted but may have errors. Please test it.' );
+		expect( assertiveContent.trim() ).toBe( 'Warning: the link has been inserted but may have errors. Please test it.' );
 	} );
 } );
