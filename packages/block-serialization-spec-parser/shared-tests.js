@@ -19,6 +19,7 @@ export const jsTester = ( parse ) => () => {
 			expect( parse( '<!-- wp:block {} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
 			expect( parse( '<!-- wp:block {"value":true} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
 			expect( parse( '<!-- wp:block {} -->inner<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {"value":{"a" : "true"}} -->inner<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
 		} );
 
 		test( 'blockName is namespaced string (except freeform)', () => {
