@@ -319,7 +319,7 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_override_script(
 		'wp-annotations',
 		gutenberg_url( 'build/annotations/index.js' ),
-		array( 'wp-polyfill', 'wp-data' ),
+		array( 'wp-polyfill', 'wp-data', 'wp-rich-text', 'wp-hooks' ),
 		filemtime( gutenberg_dir_path() . 'build/annotations/index.js' ),
 		true
 	);

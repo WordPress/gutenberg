@@ -383,7 +383,7 @@ export class BlockListBlock extends Component {
 						isPreviousBlockADefaultEmptyBlock,
 						isParentOfSelectedBlock,
 						isDraggable,
-						annotations,
+						className,
 					} = this.props;
 					const isHovered = this.state.isHovered && ! isMultiSelecting;
 					const { name: blockName, isValid } = block;
@@ -413,10 +413,6 @@ export class BlockListBlock extends Component {
 					const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirstMultiSelected ) || ! isPartOfMultiSelection;
 					const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
 
-					const annotationsClassNames = annotations.map( ( annotation ) => {
-						return 'is-annotated-by-' + annotation.source;
-					} );
-
 					// The wp-block className is important for editor styles.
 					// Generate the wrapper class names handling the different states of the block.
 					const wrapperClassName = classnames( 'wp-block editor-block-list__block', {
@@ -429,7 +425,7 @@ export class BlockListBlock extends Component {
 						'is-typing': isTypingWithinBlock,
 						'is-focused': isFocusMode && ( isSelected || isParentOfSelectedBlock ),
 						'is-focus-mode': isFocusMode,
-					}, annotationsClassNames );
+					}, className );
 
 					const { onReplace } = this.props;
 
@@ -606,9 +602,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		hasSelectedInnerBlock,
 		getTemplateLock,
 	} = select( 'core/editor' );
-	const {
-		__experimentalGetAnnotationsForBlock,
-	} = select( 'core/annotations' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
 	const block = getBlock( clientId );
@@ -641,7 +634,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		block,
 		isSelected,
 		isParentOfSelectedBlock,
-		annotations: __experimentalGetAnnotationsForBlock( clientId ),
 	};
 } );
 
