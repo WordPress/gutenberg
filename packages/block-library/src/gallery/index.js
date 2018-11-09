@@ -153,11 +153,13 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
-				transform: ( { images } ) => {
+				transform: ( { images, align } ) => {
 					if ( images.length > 0 ) {
-						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
+						return images.map( ( { id, url, alt, caption } ) => {
+							return createBlock( 'core/image', { id, url, alt, caption, align } );
+						} );
 					}
-					return createBlock( 'core/image' );
+					return createBlock( 'core/image', { align } );
 				},
 			},
 		],
