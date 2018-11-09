@@ -30,7 +30,7 @@ class Do_Blocks_Test extends WP_UnitTestCase {
 		add_shortcode( 'someshortcode', array( $this, 'handle_shortcode' ) );
 
 		$classic_content = "Foo\n\n[someshortcode]\n\nBar\n\n[/someshortcode]\n\nBaz";
-		$block_content   = "<!-- wp:core/paragraph -->\n<p>Foo</p>\n<!-- /wp:core/paragraph -->\n\n<!-- wp:core/shortcode -->[someshortcode]\n\nBar\n\n[/someshortcode]<!-- /wp:core/shortcode -->\n\n<!-- wp:core/paragraph -->\n<p>Baz</p>\n<!-- /wp:core/paragraph -->";
+		$block_content   = "<!-- wp:core/paragraph --><p>Foo</p>\n<!-- /wp:core/paragraph -->\n\n<!-- wp:core/shortcode -->[someshortcode]\n\nBar\n\n[/someshortcode]<!-- /wp:core/shortcode -->\n\n<!-- wp:core/paragraph -->\n<p>Baz</p>\n<!-- /wp:core/paragraph -->";
 
 		$classic_filtered_content = apply_filters( 'the_content', $classic_content );
 		$block_filtered_content   = apply_filters( 'the_content', $block_content );
