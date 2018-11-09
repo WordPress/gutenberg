@@ -4,14 +4,18 @@ import Foundation
 @objc (RCTAztecViewManager)
 public class RCTAztecViewManager: RCTViewManager {
 
-// NOTE:
-// Removing temporarily images and attachment handling in favour of a simpler Bridge implementation.
-
     public var attachmentDelegate: Aztec.TextViewAttachmentDelegate?
     public var imageProvider: Aztec.TextViewAttachmentImageProvider?
 
     public override static func requiresMainQueueSetup() -> Bool {
         return true
+    }
+
+    @objc
+    func applyFormat(_ node: NSNumber, format: String) {
+        executeBlock({ (aztecView) in
+            aztecView.apply(format: format)
+        }, onNode: node)
     }
 
     @objc
@@ -29,5 +33,15 @@ public class RCTAztecViewManager: RCTViewManager {
         }
 
         return view
+    }
+
+    func executeBlock(_ block: @escaping (RCTAztecView) -> Void, onNode node: NSNumber) {
+        self.bridge.uiManager.addUIBlock { (manager, viewRegistry) in
+            let view = viewRegistry?[node]
+            guard let aztecView = view as? RCTAztecView else {
+                return
+            }
+            block(aztecView)
+        }
     }
 }

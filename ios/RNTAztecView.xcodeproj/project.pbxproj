@@ -55,7 +55,6 @@
 		F13BF49E20ECF5440047D3F9 /* RCTAztecView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTAztecView-Bridging-Header.h"; sourceTree = "<group>"; };
 		F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCTAztecViewManager.swift; sourceTree = "<group>"; };
 		F145CFC62087D16A006C159A /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		F1663A8720F4D9B500DC4C03 /* RCTAztecViewManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCTAztecViewManager.h; sourceTree = "<group>"; };
 		F166A37420EE6DD7008E7C9F /* Aztec.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = Aztec.xcodeproj; path = "Carthage/Checkouts/AztecEditor-iOS/Aztec.xcodeproj"; sourceTree = SOURCE_ROOT; };
 		F1A879CF20EE90C000FABD31 /* RCTAztecView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RCTAztecView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -94,7 +93,6 @@
 			isa = PBXGroup;
 			children = (
 				F13BF49E20ECF5440047D3F9 /* RCTAztecView-Bridging-Header.h */,
-				F1663A8720F4D9B500DC4C03 /* RCTAztecViewManager.h */,
 				F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */,
 				F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */,
 				F1A879CF20EE90C000FABD31 /* RCTAztecView.swift */,
