@@ -515,45 +515,46 @@ export class BlockListBlock extends Component {
 									onDragEnd={ this.onDragEnd }
 								/>
 							) }
-							{ shouldShowBreadcrumb && (
-								<BlockBreadcrumb
-									clientId={ clientId }
-									isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
-								/>
-							) }
-							{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
 							{ isFirstMultiSelected && (
 								<BlockMultiControls rootClientId={ rootClientId } />
 							) }
-							<IgnoreNestedEvents
-								ref={ this.bindBlockNode }
-								onDragStart={ this.preventDrag }
-								onMouseDown={ this.onPointerDown }
-								className="editor-block-list__block-edit"
-								data-block={ clientId }
-							>
-								<BlockCrashBoundary onError={ this.onBlockError }>
-									{ isValid && blockEdit }
-									{ isValid && mode === 'html' && (
-										<BlockHtml clientId={ clientId } />
-									) }
-									{ ! isValid && [
-										<BlockInvalidWarning
-											key="invalid-warning"
-											block={ block }
-										/>,
-										<div key="invalid-preview">
-											{ getSaveElement( blockType, block.attributes ) }
-										</div>,
-									] }
-								</BlockCrashBoundary>
-								{ shouldShowMobileToolbar && (
-									<BlockMobileToolbar
+							<div className="editor-block-list__block-edit">
+								{ shouldShowBreadcrumb && (
+									<BlockBreadcrumb
 										clientId={ clientId }
+										isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 									/>
 								) }
-								{ !! error && <BlockCrashWarning /> }
-							</IgnoreNestedEvents>
+								{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
+								<IgnoreNestedEvents
+									ref={ this.bindBlockNode }
+									onDragStart={ this.preventDrag }
+									onMouseDown={ this.onPointerDown }
+									data-block={ clientId }
+								>
+									<BlockCrashBoundary onError={ this.onBlockError }>
+										{ isValid && blockEdit }
+										{ isValid && mode === 'html' && (
+											<BlockHtml clientId={ clientId } />
+										) }
+										{ ! isValid && [
+											<BlockInvalidWarning
+												key="invalid-warning"
+												block={ block }
+											/>,
+											<div key="invalid-preview">
+												{ getSaveElement( blockType, block.attributes ) }
+											</div>,
+										] }
+									</BlockCrashBoundary>
+									{ shouldShowMobileToolbar && (
+										<BlockMobileToolbar
+											clientId={ clientId }
+										/>
+									) }
+									{ !! error && <BlockCrashWarning /> }
+								</IgnoreNestedEvents>
+							</div>
 							{ showEmptyBlockSideInserter && (
 								<Fragment>
 									<div className="editor-block-list__side-inserter">
