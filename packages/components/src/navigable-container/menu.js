@@ -42,13 +42,29 @@ export function NavigableMenu( {
 		}
 	};
 
+	const isAriaOrientationAllowed = [
+		'scrollbar',
+		'select',
+		'separator',
+		'slider',
+		'tablist',
+		'toolbar',
+		'combobox',
+		'listbox',
+		'menu',
+		'menubar',
+		'radiogroup',
+		'tree',
+		'treegrid',
+	].includes( role );
+
 	return (
 		<NavigableContainer
 			ref={ ref }
 			stopNavigationEvents
 			onlyBrowserTabstops={ false }
 			role={ role }
-			aria-orientation={ orientation }
+			aria-orientation={ isAriaOrientationAllowed ? orientation : null }
 			eventToOffset={ eventToOffset }
 			{ ...rest }
 		/>
