@@ -7,6 +7,7 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	blockStyles,
 	blockTypes,
 	categories,
 	defaultBlockName,
@@ -20,7 +21,7 @@ describe( 'blockTypes', () => {
 		expect( blockTypes( undefined, {} ) ).toEqual( {} );
 	} );
 
-	it( 'should add add a new block type', () => {
+	it( 'should add a new block type', () => {
 		const original = deepFreeze( {
 			'core/paragraph': { name: 'core/paragraph' },
 		} );
@@ -49,6 +50,87 @@ describe( 'blockTypes', () => {
 
 		expect( state ).toEqual( {
 			'core/paragraph': { name: 'core/paragraph' },
+		} );
+	} );
+} );
+
+describe( 'blockStyles', () => {
+	it( 'should return an empty object as default state', () => {
+		expect( blockStyles( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'should add a new block styles', () => {
+		const original = deepFreeze( {} );
+
+		let state = blockStyles( original, {
+			type: 'ADD_BLOCK_STYLES',
+			blockName: 'core/image',
+			styles: [ { name: 'fancy' } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'fancy' },
+			],
+		} );
+
+		state = blockStyles( state, {
+			type: 'ADD_BLOCK_STYLES',
+			blockName: 'core/image',
+			styles: [ { name: 'lightbox' } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'fancy' },
+				{ name: 'lightbox' },
+			],
+		} );
+	} );
+
+	it( 'should add block styles when adding a block', () => {
+		const original = deepFreeze( {
+			'core/image': [
+				{ name: 'fancy' },
+			],
+		} );
+
+		const state = blockStyles( original, {
+			type: 'ADD_BLOCK_TYPES',
+			blockTypes: [ {
+				name: 'core/image',
+				styles: [
+					{ name: 'original' },
+				],
+			} ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'original' },
+				{ name: 'fancy' },
+			],
+		} );
+	} );
+
+	it( 'should remove block styles', () => {
+		const original = deepFreeze( {
+			'core/image': [
+				{ name: 'fancy' },
+				{ name: 'lightbox' },
+			],
+		} );
+
+		const state = blockStyles( original, {
+			type: 'REMOVE_BLOCK_STYLES',
+			blockName: 'core/image',
+			styleNames: [ 'fancy' ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'lightbox' },
+			],
 		} );
 	} );
 } );

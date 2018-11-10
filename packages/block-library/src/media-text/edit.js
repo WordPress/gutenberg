@@ -15,8 +15,12 @@ import {
 	withColors,
 } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
-import { Toolbar } from '@wordpress/components';
-
+import {
+	PanelBody,
+	TextareaControl,
+	ToggleControl,
+	Toolbar,
+} from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -108,12 +112,19 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			setBackgroundColor,
 		} = this.props;
-		const { mediaPosition, mediaWidth } = attributes;
+		const {
+			isStackedOnMobile,
+			mediaAlt,
+			mediaPosition,
+			mediaType,
+			mediaWidth,
+		} = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
 			[ backgroundColor.class ]: backgroundColor.class,
+			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
@@ -136,9 +147,30 @@ class MediaTextEdit extends Component {
 			isActive: mediaPosition === 'right',
 			onClick: () => setAttributes( { mediaPosition: 'right' } ),
 		} ];
+		const onMediaAltChange = ( newMediaAlt ) => {
+			setAttributes( { mediaAlt: newMediaAlt } );
+		};
+		const mediaTextGeneralSettings = (
+			<PanelBody title={ __( 'Media & Text Settings' ) }>
+				<ToggleControl
+					label={ __( 'Stack on mobile' ) }
+					checked={ isStackedOnMobile }
+					onChange={ () => setAttributes( {
+						isStackedOnMobile: ! isStackedOnMobile,
+					} ) }
+				/>
+				{ mediaType === 'image' && ( <TextareaControl
+					label={ __( 'Alt Text (Alternative Text)' ) }
+					value={ mediaAlt }
+					onChange={ onMediaAltChange }
+					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+				/> ) }
+			</PanelBody>
+		);
 		return (
 			<Fragment>
 				<InspectorControls>
+					{ mediaTextGeneralSettings }
 					<PanelColorSettings
 						title={ __( 'Color Settings' ) }
 						initialOpen={ false }

@@ -1,5 +1,6 @@
 export {
 	createBlock,
+	switchToBlockType,
 } from './factory';
 export {
 	default as parse,
@@ -13,13 +14,12 @@ export {
 } from './serializer';
 export {
 	registerBlockType,
-	setUnknownTypeHandlerName,
-	getUnknownTypeHandlerName,
 	setUnregisteredTypeHandlerName,
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	isReusableBlock,
 } from './registration';
 export { getPhrasingContentSchema } from './raw-handling';
 export { default as children } from './children';

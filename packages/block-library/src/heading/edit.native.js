@@ -13,7 +13,7 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/editor';
+import { RichText, BlockControls } from '@wordpress/editor';
 import { parse, createBlock } from '@wordpress/blocks';
 
 /**
@@ -28,6 +28,7 @@ class HeadingEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			mergeBlocks,
 			insertBlocksAfter,
 		} = this.props;
 
@@ -41,7 +42,9 @@ class HeadingEdit extends Component {
 
 		return (
 			<View>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<BlockControls>
+					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				</BlockControls>
 				<RichText
 					tagName={ tagName }
 					value={ content }
@@ -56,6 +59,7 @@ class HeadingEdit extends Component {
 							content: newParaBlock.attributes.content,
 						} );
 					} }
+					onMerge={ mergeBlocks }
 					onSplit={
 						insertBlocksAfter ?
 							( before, after, ...blocks ) => {

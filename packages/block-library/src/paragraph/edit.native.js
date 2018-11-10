@@ -11,7 +11,10 @@ import { Component } from '@wordpress/element';
 import { parse, createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
-const minHeight = 50;
+/**
+ * Import style
+ */
+import styles from './style.scss';
 
 const name = 'core/paragraph';
 
@@ -68,6 +71,7 @@ class ParagraphEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			mergeBlocks,
 			style,
 		} = this.props;
 
@@ -75,6 +79,8 @@ class ParagraphEdit extends Component {
 			placeholder,
 			content,
 		} = attributes;
+
+		const minHeight = styles.blockText.minHeight;
 
 		return (
 			<View>
@@ -95,6 +101,7 @@ class ParagraphEdit extends Component {
 					}
 					}
 					onSplit={ this.splitBlock }
+					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
 						setAttributes( {
 							...this.props.attributes,

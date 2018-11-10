@@ -9,7 +9,6 @@ import {
 	sortBy,
 	throttle,
 } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -30,7 +29,6 @@ class BlockList extends Component {
 
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
-		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
@@ -171,40 +169,15 @@ class BlockList extends Component {
 		}
 	}
 
-	onShiftSelection( clientId ) {
-		if ( ! this.props.isSelectionEnabled ) {
-			return;
-		}
-
-		const { selectionStartClientId, onMultiSelect, onSelect } = this.props;
-
-		if ( selectionStartClientId ) {
-			onMultiSelect( selectionStartClientId, clientId );
-		} else {
-			onSelect( clientId );
-		}
-	}
-
 	render() {
 		const {
 			blockClientIds,
-			layout,
-			isGroupedByLayout,
 			rootClientId,
 			isDraggable,
 		} = this.props;
 
-		let defaultLayout;
-		if ( isGroupedByLayout ) {
-			defaultLayout = layout;
-		}
-
-		const classes = classnames( 'editor-block-list__layout', {
-			[ `layout-${ layout }` ]: layout,
-		} );
-
 		return (
-			<div className={ classes }>
+			<div className="editor-block-list__layout">
 				{ map( blockClientIds, ( clientId, blockIndex ) => (
 					<BlockListBlock
 						key={ 'block-' + clientId }
@@ -212,20 +185,13 @@ class BlockList extends Component {
 						clientId={ clientId }
 						blockRef={ this.setBlockRef }
 						onSelectionStart={ this.onSelectionStart }
-						onShiftSelection={ this.onShiftSelection }
 						rootClientId={ rootClientId }
-						layout={ defaultLayout }
 						isFirst={ blockIndex === 0 }
 						isLast={ blockIndex === blockClientIds.length - 1 }
 						isDraggable={ isDraggable }
 					/>
 				) ) }
-
-				<BlockListAppender
-					rootClientId={ rootClientId }
-					layout={ layout }
-					isGroupedByLayout={ isGroupedByLayout }
-				/>
+				<BlockListAppender rootClientId={ rootClientId } />
 			</div>
 		);
 	}
@@ -239,7 +205,6 @@ export default compose( [
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
 			getMultiSelectedBlocksEndClientId,
-			getBlockSelectionStart,
 		} = select( 'core/editor' );
 		const { rootClientId } = ownProps;
 
@@ -247,7 +212,6 @@ export default compose( [
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectionStart: getMultiSelectedBlocksStartClientId(),
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
-			selectionStartClientId: getBlockSelectionStart(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
 		};
@@ -257,14 +221,12 @@ export default compose( [
 			startMultiSelect,
 			stopMultiSelect,
 			multiSelect,
-			selectBlock,
 		} = dispatch( 'core/editor' );
 
 		return {
 			onStartMultiSelect: startMultiSelect,
 			onStopMultiSelect: stopMultiSelect,
 			onMultiSelect: multiSelect,
-			onSelect: selectBlock,
 		};
 	} ),
 ] )( BlockList );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, keys, isEqual, isFunction, isString } from 'lodash';
+import { every, has, keys, isEqual, isFunction, isString } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
@@ -13,7 +13,7 @@ import { Component, isValidElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getDefaultBlockName } from './registration';
+import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
 
 /**
@@ -81,23 +81,43 @@ export function isValidIcon( icon ) {
  */
 export function normalizeIconObject( icon ) {
 	if ( ! icon ) {
-		return { src: 'block-default' };
+		icon = 'block-default';
 	}
+
 	if ( isValidIcon( icon ) ) {
 		return { src: icon };
 	}
 
-	if ( icon.background ) {
+	if ( has( icon, [ 'background' ] ) ) {
 		const tinyBgColor = tinycolor( icon.background );
-		if ( ! icon.foreground ) {
-			const foreground = mostReadable(
+
+		return {
+			...icon,
+			foreground: icon.foreground ? icon.foreground : mostReadable(
 				tinyBgColor,
 				ICON_COLORS,
 				{ includeFallbackColors: true, level: 'AA', size: 'large' }
-			).toHexString();
-			icon.foreground = foreground;
-		}
-		icon.shadowColor = tinyBgColor.setAlpha( 0.3 ).toRgbString();
+			).toHexString(),
+			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
+		};
 	}
+
 	return icon;
+}
+
+/**
+ * Normalizes block type passed as param. When string is passed then
+ * it converts it to the matching block type object.
+ * It passes the original object otherwise.
+ *
+ * @param {string|Object} blockTypeOrName  Block type or name.
+ *
+ * @return {?Object} Block type.
+ */
+export function normalizeBlockType( blockTypeOrName ) {
+	if ( isString( blockTypeOrName ) ) {
+		return getBlockType( blockTypeOrName );
+	}
+
+	return blockTypeOrName;
 }

@@ -90,6 +90,12 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Annotations",
+		"slug": "annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/extensibility/annotations.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Design",
 		"slug": "design",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design.md",
@@ -258,6 +264,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/annotations",
+		"slug": "packages-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/annotations/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/api-fetch",
 		"slug": "packages-api-fetch",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/api-fetch/README.md",
@@ -402,6 +414,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/format-library",
+		"slug": "packages-format-library",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/format-library/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/hooks/README.md",
@@ -453,6 +471,12 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/notices",
+		"slug": "packages-notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/notices/README.md",
 		"parent": "packages"
 	},
 	{
@@ -726,6 +750,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Icon",
+		"slug": "icon",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/icon/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "KeyboardShortcuts",
 		"slug": "keyboard-shortcuts",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/keyboard-shortcuts/README.md",
@@ -912,6 +942,12 @@
 		"parent": "data"
 	},
 	{
+		"title": "Annotations",
+		"slug": "data-core-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-annotations.md",
+		"parent": "data"
+	},
+	{
 		"title": "Block Types Data",
 		"slug": "data-core-blocks",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-blocks.md",
@@ -927,6 +963,12 @@
 		"title": "The Editor’s UI Data",
 		"slug": "data-core-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-edit-post.md",
+		"parent": "data"
+	},
+	{
+		"title": "Notices Data",
+		"slug": "data-core-notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-notices.md",
 		"parent": "data"
 	},
 	{

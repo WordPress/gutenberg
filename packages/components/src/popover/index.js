@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +19,7 @@ import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
-import { Slot, Fill } from '../slot-fill';
+import { Slot, Fill, Consumer } from '../slot-fill';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
@@ -40,8 +39,8 @@ class Popover extends Component {
 		this.getAnchorRect = this.getAnchorRect.bind( this );
 		this.updatePopoverSize = this.updatePopoverSize.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
-		this.throttledComputePopoverPosition = this.throttledComputePopoverPosition.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
+		this.throttledRefresh = this.throttledRefresh.bind( this );
 
 		this.contentNode = createRef();
 		this.anchorNode = createRef();
@@ -59,7 +58,7 @@ class Popover extends Component {
 	}
 
 	componentDidMount() {
-		this.toggleWindowEvents( true );
+		this.toggleAutoRefresh( true );
 		this.refresh();
 
 		/*
@@ -80,24 +79,38 @@ class Popover extends Component {
 	}
 
 	componentWillUnmount() {
-		this.toggleWindowEvents( false );
-
 		clearTimeout( this.focusTimeout );
+		this.toggleAutoRefresh( false );
 	}
 
-	toggleWindowEvents( isListening ) {
-		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-
+	toggleAutoRefresh( isActive ) {
 		window.cancelAnimationFrame( this.rafHandle );
-		window[ handler ]( 'resize', this.throttledComputePopoverPosition );
-		window[ handler ]( 'scroll', this.throttledComputePopoverPosition, true );
+
+		// Refresh the popover every time the window is resized or scrolled
+		const handler = isActive ? 'addEventListener' : 'removeEventListener';
+		window[ handler ]( 'resize', this.throttledRefresh );
+		window[ handler ]( 'scroll', this.throttledRefresh, true );
+
+		/*
+		 * There are sometimes we need to reposition or resize the popover that are not
+		 * handled by the resize/scroll window events (i.e. CSS changes in the layout
+		 * that changes the position of the anchor).
+		 *
+		 * For these situations, we refresh the popover every 0.5s
+		 */
+		if ( isActive ) {
+			this.autoRefresh = setInterval( this.throttledRefresh, 500 );
+		} else {
+			clearInterval( this.autoRefresh );
+		}
 	}
 
-	throttledComputePopoverPosition( event ) {
-		if ( event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
+	throttledRefresh( event ) {
+		window.cancelAnimationFrame( this.rafHandle );
+		if ( event && event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
 			return;
 		}
-		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
+		this.rafHandle = window.requestAnimationFrame( this.refresh );
 	}
 
 	/**
@@ -162,16 +175,15 @@ class Popover extends Component {
 	}
 
 	updatePopoverSize() {
-		const rect = this.contentNode.current.getBoundingClientRect();
+		const popoverSize = {
+			width: this.contentNode.current.scrollWidth,
+			height: this.contentNode.current.scrollHeight,
+		};
 		if (
 			! this.state.popoverSize ||
-			rect.width !== this.state.popoverSize.width ||
-			rect.height !== this.state.popoverSize.height
+			popoverSize.width !== this.state.popoverSize.width ||
+			popoverSize.height !== this.state.popoverSize.height
 		) {
-			const popoverSize = {
-				height: rect.height,
-				width: rect.width,
-			};
 			this.setState( { popoverSize } );
 			return popoverSize;
 		}
@@ -302,17 +314,24 @@ class Popover extends Component {
 			content = <FocusManaged>{ content }</FocusManaged>;
 		}
 
-		// In case there is no slot context in which to render, default to an
-		// in-place rendering.
-		const { getSlot } = this.context;
-		if ( getSlot && getSlot( SLOT_NAME ) ) {
-			content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
-		}
+		return (
+			<Consumer>
+				{ ( { getSlot } ) => {
+					// In case there is no slot context in which to render,
+					// default to an in-place rendering.
+					if ( getSlot && getSlot( SLOT_NAME ) ) {
+						content = <Fill name={ SLOT_NAME }>{ content }</Fill>;
+					}
 
-		return <span ref={ this.anchorNode }>
-			{ content }
-			{ isMobile && expandOnMobile && <ScrollLock /> }
-		</span>;
+					return (
+						<span ref={ this.anchorNode }>
+							{ content }
+							{ isMobile && expandOnMobile && <ScrollLock /> }
+						</span>
+					);
+				} }
+			</Consumer>
+		);
 	}
 }
 
@@ -322,10 +341,6 @@ Popover.defaultProps = {
 };
 
 const PopoverContainer = Popover;
-
-PopoverContainer.contextTypes = {
-	getSlot: noop,
-};
 
 PopoverContainer.Slot = () => <Slot bubblesVirtually name={ SLOT_NAME } />;
 

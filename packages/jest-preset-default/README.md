@@ -24,8 +24,6 @@ npm install @wordpress/jest-preset-default --save-dev
 
 #### Brief explanations of options included
 
-* `coverageDirectory` - the directory where Jest outputs its coverage files is set to `coverage`.
-* `coveragePathIgnorePatterns` - coverage information will be skipped for all folders named `build` and `build-module`.
 * `moduleNameMapper` - all `css` and `scss` files containing CSS styles will be stubbed out.
 * `modulePaths` - the root dir of the project is used as a location to search when resolving modules.
 * `setupFiles` - runs code before each test which sets up global variables required in the testing environment.

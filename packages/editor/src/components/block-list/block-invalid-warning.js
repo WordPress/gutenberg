@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import {
@@ -45,7 +45,10 @@ export class BlockInvalidWarning extends Component {
 		if ( compare ) {
 			return (
 				<Modal
-					title={ __( 'Resolve Block' ) }
+					title={
+						// translators: Dialog title to fix block content
+						__( 'Resolve Block' )
+					}
 					onRequestClose={ this.onCompareClose }
 					className="editor-block-compare"
 				>
@@ -64,7 +67,10 @@ export class BlockInvalidWarning extends Component {
 			<Warning
 				actions={ [
 					<Button key="convert" onClick={ this.onCompare } isLarge isPrimary={ ! hasHTMLBlock }>
-						{ __( 'Resolve' ) }
+						{
+							// translators: Button to fix block content
+							_x( 'Resolve', 'imperative verb' )
+						}
 					</Button>,
 					hasHTMLBlock && (
 						<Button key="edit" onClick={ convertToHTML } isLarge isPrimary>
@@ -88,7 +94,6 @@ const blockToHTML = ( block ) => createBlock( 'core/html', {
 } );
 const blockToBlocks = ( block ) => rawHandler( {
 	HTML: block.originalContent,
-	mode: 'BLOCKS',
 } );
 
 export default withDispatch( ( dispatch, { block } ) => {

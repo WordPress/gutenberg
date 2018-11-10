@@ -14,17 +14,43 @@ import {
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
+import { BlockFormatControls } from '@wordpress/editor';
 import {
 	isEmpty,
 	create,
 	split,
 	toHTMLString,
 } from '@wordpress/rich-text';
+import { BACKSPACE } from '@wordpress/keycodes';
+import { children } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { FORMATTING_CONTROLS } from './formatting-controls';
+
+const FORMATTING_CONTROLS = [
+	{
+		icon: 'editor-bold',
+		title: __( 'Bold' ),
+		format: 'bold',
+	},
+	{
+		icon: 'editor-italic',
+		title: __( 'Italic' ),
+		format: 'italic',
+	},
+	{
+		icon: 'admin-links',
+		title: __( 'Link' ),
+		format: 'link',
+	},
+	{
+		icon: 'editor-strikethrough',
+		title: __( 'Strikethrough' ),
+		format: 'strikethrough',
+	},
+];
 
 const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
@@ -47,6 +73,8 @@ export class RichText extends Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
+		this.isEmpty = this.isEmpty.bind( this );
+		this.valueToFormat = this.valueToFormat.bind( this );
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
@@ -110,7 +138,10 @@ export class RichText extends Component {
 	}
 
 	valueToFormat( { formats, text } ) {
-		const value = toHTMLString( { formats, text }, this.multilineTag );
+		const value = toHTMLString( {
+			value: { formats, text },
+			multilineTag: this.multilineTag,
+		} );
 		// remove the outer root tags
 		return this.removeRootTagsProduceByAztec( value );
 	}
@@ -142,23 +173,16 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles any case where the content of the AztecRN instance has changed.
+	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 
 	onChange( event ) {
-		// If we had a timer set to propagate a change, let's cancel it, because the user meanwhile typed something extra
-		if ( !! this.currentTimer ) {
-			clearTimeout( this.currentTimer );
-		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
 		this.lastContent = contentWithoutRootTag;
-		// Set a time to call the onChange prop if nothing changes in the next second
-		this.currentTimer = setTimeout( function() {
-			this.props.onChange( {
-				content: this.lastContent,
-			} );
-		}.bind( this ), 1000 );
+		this.props.onChange( {
+			content: this.lastContent,
+		} );
 	}
 
 	/**
@@ -186,11 +210,56 @@ export class RichText extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	onBackspace( event ) {
-		if ( ! this.props.onBackspace ) {
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
 			return;
 		}
 
-		this.onBackspace( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
+		const isReverse = keyCode === BACKSPACE;
+
+		const empty = this.isEmpty();
+
+		if ( onMerge ) {
+			onMerge( ! isReverse );
+		}
+
+		// Only handle remove on Backspace. This serves dual-purpose of being
+		// an intentional user interaction distinguishing between Backspace and
+		// Delete to remove the empty field, but also to avoid merge & remove
+		// causing destruction of two fields (merge, then removed merged).
+		if ( onRemove && empty && isReverse ) {
+			onRemove( ! isReverse );
+		}
+	}
+
+	isEmpty() {
+		return isEmpty( this.formatToValue( this.props.value ) );
+	}
+
+	formatToValue( value ) {
+		// Handle deprecated `children` and `node` sources.
+		if ( Array.isArray( value ) ) {
+			return create( {
+				html: children.toHTML( value ),
+				multilineTag: this.multilineTag,
+			} );
+		}
+
+		if ( this.props.format === 'string' ) {
+			return create( {
+				html: value,
+				multilineTag: this.multilineTag,
+			} );
+		}
+
+		// Guard for blocks passing `null` in onSplit callbacks. May be removed
+		// if onSplit is revised to not pass a `null` value.
+		if ( value === null ) {
+			return create();
+		}
+
+		return value;
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -199,12 +268,21 @@ export class RichText extends Component {
 			this.lastContent = undefined;
 			return true;
 		}
-		// The check below allows us to avoid updating the content right after an `onChange` call
-		// first time the component is drawn with empty content `lastContent` is undefined
+		// The check below allows us to avoid updating the content right after an `onChange` call.
+		// The first time the component is drawn `lastContent` and `lastEventCount ` are both undefined
+		if ( this.lastEventCount &&
+			nextProps.value &&
+			this.lastContent &&
+			nextProps.value === this.lastContent ) {
+			return false;
+		}
+
+		// If the component is changed React side (merging/splitting/custom text actions) we need to make sure
+		// the native is updated as well
 		if ( nextProps.value &&
 			this.lastContent &&
-			this.lastEventCount ) {
-			return false;
+			nextProps.value !== this.lastContent ) {
+			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
 		return true;
@@ -268,9 +346,9 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				<View style={ { flex: 1 } }>
+				<BlockFormatControls>
 					<Toolbar controls={ toolbarControls } />
-				</View>
+				</BlockFormatControls>
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;

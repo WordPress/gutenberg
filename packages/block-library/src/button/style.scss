@@ -29,12 +29,14 @@ $blocks-button__line-height: $big-font-size + 6px;
 	}
 
 	&.alignright {
+		/*rtl:ignore*/
 		text-align: right;
 	}
 }
 
 .wp-block-button__link:not(.has-background) {
 	background-color: $dark-gray-700;
+
 	&:hover,
 	&:focus,
 	&:active {
@@ -45,64 +47,18 @@ $blocks-button__line-height: $big-font-size + 6px;
 .wp-block-button.is-style-outline {
 	.wp-block-button__link {
 		background: transparent;
-		border: 2px solid transparent;
+		border: 2px solid currentcolor;
 
-		&.has-pale-pink-background-color {
-			border-color: #f78da7;
-		}
-
-		&.has-vivid-red-background-color {
-			border-color: #cf2e2e;
-		}
-
-		&.has-luminous-vivid-orange-background-color {
-			border-color: #ff6900;
-		}
-
-		&.has-luminous-vivid-amber-background-color {
-			border-color: #fcb900;
-		}
-
-		&.has-light-green-cyan-background-color {
-			border-color: #7bdcb5;
-		}
-
-		&.has-vivid-green-cyan-background-color {
-			border-color: #00d084;
-		}
-
-		&.has-pale-cyan-blue-background-color {
-			border-color: #8ed1fc;
-		}
-
-		&.has-vivid-cyan-blue-background-color {
-			border-color: #0693e3;
-		}
-
-		&.has-very-light-gray-background-color {
-			border-color: #eee;
-		}
-
-		&.has-cyan-bluish-gray-background-color {
-			border-color: #abb8c3;
-		}
-
-		&.has-very-dark-gray-background-color {
-			border-color: #313131;
-		}
-	}
-
-	.wp-block-button__link:not(.has-background) {
-		border-color: $dark-gray-700;
 		&:hover,
 		&:focus,
 		&:active {
-			border-color: $dark-gray-700;
+			border-color: currentcolor;
 		}
 	}
 
 	.wp-block-button__link:not(.has-text-color) {
 		color: $dark-gray-700;
+
 		&:hover,
 		&:focus,
 		&:active {
@@ -113,6 +69,7 @@ $blocks-button__line-height: $big-font-size + 6px;
 
 .wp-block-button__link:not(.has-text-color) {
 	color: $white;
+
 	&:hover,
 	&:focus,
 	&:active {

@@ -16,9 +16,26 @@ const { window } = new JSDOM();
 const { document } = window;
 
 describe( 'recordToDom', () => {
-	spec.forEach( ( { description, multilineTag, record, startPath, endPath } ) => {
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
+
+	spec.forEach( ( {
+		description,
+		multilineTag,
+		multilineWrapperTags,
+		record,
+		startPath,
+		endPath,
+	} ) => {
 		it( description, () => {
-			const { body, selection } = toDom( record, multilineTag );
+			const { body, selection } = toDom( {
+				value: record,
+				multilineTag,
+				multilineWrapperTags,
+				createLinePadding: ( doc ) => doc.createElement( 'br' ),
+			} );
 			expect( body ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );
 		} );

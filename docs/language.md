@@ -22,7 +22,7 @@ Additionally, how do we even know this came from our editor? Maybe someone snuck
 
 A Gutenberg post is the proper block-aware representation of a post, a collection of semantically consistent descriptions of what each block is and what its essential data is. This representation only ever exists in memory. It is the [chase](https://en.wikipedia.org/wiki/Chase_(printing)) in the typesetter's workshop, ever-shifting as sorts are attached and repositioned.
 
-A Gutenberg post is not the artefact it produces, namely the `post_content`. The latter is the printed page, optimized for the reader, but retaining its invisible markings for later editing.
+A Gutenberg post is not the artifact it produces, namely the `post_content`. The latter is the printed page, optimized for the reader, but retaining its invisible markings for later editing.
 
 Later sections of this document will refer to _Gutenberg post_ and to _blocks_. These are to be assumed to not be the `post_content` or the invisible markings.
 

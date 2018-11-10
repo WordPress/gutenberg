@@ -388,4 +388,48 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Escape' );
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
 	} );
+
+	it( 'can be modified using the keyboard once a link has been set', async () => {
+		const URL = 'https://wordpress.org/gutenberg';
+
+		// Create a block with some text and format it as a link.
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( META_KEY, 'K' );
+		await waitForAutoFocus();
+		await page.keyboard.type( URL );
+		await page.keyboard.press( 'Enter' );
+
+		// Deselect the link text by moving the caret to the end of the line
+		// and the link popover should not be displayed.
+		await page.keyboard.press( 'End' );
+		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+
+		// Move the caret back into the link text and the link popover
+		// should be displayed.
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+
+		// Press Cmd+K to edit the link and the url-input should become
+		// focused with the value previously inserted.
+		await pressWithModifier( META_KEY, 'K' );
+		await waitForAutoFocus();
+		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.classList ) );
+		expect( activeElementParentClasses ).toContain( 'editor-url-input' );
+		const activeElementValue = await page.evaluate( () => document.activeElement.value );
+		expect( activeElementValue ).toBe( URL );
+	} );
+
+	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( META_KEY, 'K' );
+		await waitForAutoFocus();
+		await page.keyboard.type( 'http://#test.com' );
+		await page.keyboard.press( 'Enter' );
+		const assertiveContent = await page.evaluate( () => document.querySelector( '#a11y-speak-assertive' ).textContent );
+		expect( assertiveContent.trim() ).toBe( 'Warning: the link has been inserted but may have errors. Please test it.' );
+	} );
 } );

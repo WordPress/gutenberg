@@ -8,11 +8,22 @@ import { URL } from 'url';
  * External dependencies
  */
 import { times, castArray } from 'lodash';
+import fetch from 'node-fetch';
+
+/**
+ * WordPress dependencies
+ */
+import { addQueryArgs } from '@wordpress/url';
+
+const WP_ADMIN_USER = {
+	username: 'admin',
+	password: 'password',
+};
 
 const {
 	WP_BASE_URL = 'http://localhost:8889',
-	WP_USERNAME = 'admin',
-	WP_PASSWORD = 'password',
+	WP_USERNAME = WP_ADMIN_USER.username,
+	WP_PASSWORD = WP_ADMIN_USER.password,
 } = process.env;
 
 /**
@@ -76,9 +87,13 @@ async function goToWPPath( WPPath, query ) {
 	await page.goto( getUrl( WPPath, query ) );
 }
 
-async function login() {
-	await page.type( '#user_login', WP_USERNAME );
-	await page.type( '#user_pass', WP_PASSWORD );
+async function login( username = WP_USERNAME, password = WP_PASSWORD ) {
+	await page.focus( '#user_login' );
+	await pressWithModifier( META_KEY, 'a' );
+	await page.type( '#user_login', username );
+	await page.focus( '#user_pass' );
+	await pressWithModifier( META_KEY, 'a' );
+	await page.type( '#user_pass', password );
 
 	await Promise.all( [
 		page.waitForNavigation(),
@@ -87,31 +102,27 @@ async function login() {
 }
 
 /**
- * Returns a promise which resolves once it's determined that the active DOM
- * element is not within a RichText field, or the RichText field's TinyMCE has
- * completed initialization. This is an unfortunate workaround to address an
- * issue where TinyMCE takes its time to become ready for user input.
- *
- * TODO: This is a code smell, indicating that "too fast" resulting in breakage
- * could be equally problematic for a fast human. It should be explored whether
- * all event bindings we assign to TinyMCE to handle could be handled through
- * the DOM directly instead.
- *
- * @return {Promise} Promise resolving once RichText is initialized, or is
- *                   determined to not be a container of the active element.
+ * Switches the current user to the admin user (if the user
+ * running the test is not already the admin user).
  */
-async function waitForRichTextInitialization() {
-	const isInRichText = await page.evaluate( () => {
-		return !! document.activeElement.closest( '.editor-rich-text__tinymce' );
-	} );
-
-	if ( ! isInRichText ) {
+export async function switchToAdminUser() {
+	if ( WP_USERNAME === WP_ADMIN_USER.username ) {
 		return;
 	}
+	await goToWPPath( 'wp-login.php' );
+	await login( WP_ADMIN_USER.username, WP_ADMIN_USER.password );
+}
 
-	return page.waitForFunction( () => {
-		return !! document.activeElement.closest( '.mce-content-body' );
-	} );
+/**
+ * Switches the current user to whichever user we should be
+ * running the tests as (if we're not already that user).
+ */
+export async function switchToTestUser() {
+	if ( WP_USERNAME === WP_ADMIN_USER.username ) {
+		return;
+	}
+	await goToWPPath( 'wp-login.php' );
+	await login();
 }
 
 export async function visitAdmin( adminPath, query ) {
@@ -123,8 +134,20 @@ export async function visitAdmin( adminPath, query ) {
 	}
 }
 
-export async function newPost( { postType, enableTips = false } = {} ) {
-	await visitAdmin( 'post-new.php', postType ? 'post_type=' + postType : '' );
+export async function newPost( {
+	postType,
+	title,
+	content,
+	excerpt,
+	enableTips = false,
+} = {} ) {
+	const query = addQueryArgs( '', {
+		post_type: postType,
+		post_title: title,
+		content,
+		excerpt,
+	} ).slice( 1 );
+	await visitAdmin( 'post-new.php', query );
 
 	await page.evaluate( ( _enableTips ) => {
 		const action = _enableTips ? 'enableTips' : 'disableTips';
@@ -193,7 +216,7 @@ export async function waitForPageDimensions( width, height ) {
 }
 
 export async function switchToEditor( mode ) {
-	await page.click( '.edit-post-more-menu [aria-label="More"]' );
+	await page.click( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	const [ button ] = await page.$x( `//button[contains(text(), '${ mode } Editor')]` );
 	await button.click( 'button' );
 }
@@ -238,7 +261,6 @@ export async function ensureSidebarOpened() {
  */
 export async function clickBlockAppender() {
 	await page.click( '.editor-default-block-appender__content' );
-	await waitForRichTextInitialization();
 }
 
 /**
@@ -268,7 +290,6 @@ export async function insertBlock( searchTerm, panelName = null ) {
 		await panelButton.click();
 	}
 	await page.click( `button[aria-label="${ searchTerm }"]` );
-	await waitForRichTextInitialization();
 }
 
 export async function convertBlock( name ) {
@@ -276,7 +297,6 @@ export async function convertBlock( name ) {
 	await page.mouse.move( 250, 350, { steps: 10 } );
 	await page.click( '.editor-block-switcher__toggle' );
 	await page.click( `.editor-block-types-list__item[aria-label="${ name }"]` );
-	await waitForRichTextInitialization();
 }
 
 /**
@@ -306,7 +326,7 @@ export async function pressWithModifier( modifiers, key ) {
  * @param {string} buttonLabel The label to search the button for.
  */
 export async function clickOnMoreMenuItem( buttonLabel ) {
-	await expect( page ).toClick( '.edit-post-more-menu [aria-label="More"]' );
+	await expect( page ).toClick( '.edit-post-more-menu [aria-label="Show more tools & options"]' );
 	await page.click( `.edit-post-more-menu__content button[aria-label="${ buttonLabel }"]` );
 }
 
@@ -457,5 +477,149 @@ export async function getAllBlocks() {
 	return await page.evaluate( () => {
 		const { select } = window.wp.data;
 		return select( 'core/editor' ).getBlocks();
+	} );
+}
+
+/**
+ * Binds to the document on page load which throws an error if a `focusout`
+ * event occurs without a related target (i.e. focus loss).
+ */
+export function observeFocusLoss() {
+	page.on( 'load', () => {
+		page.evaluate( () => {
+			document.body.addEventListener( 'focusout', ( event ) => {
+				if ( ! event.relatedTarget ) {
+					throw new Error( 'Unexpected focus loss' );
+				}
+			} );
+		} );
+	} );
+}
+
+/**
+ * Creates a function to determine if a request is embedding a certain URL.
+ *
+ * @param {string} url The URL to check against a request.
+ * @return {function} Function that determines if a request is for the embed API, embedding a specific URL.
+ */
+export function isEmbedding( url ) {
+	return ( request ) => matchURL( 'oembed%2F1.0%2Fproxy' )( request ) && parameterEquals( 'url', url )( request );
+}
+
+/**
+ * Respond to a request with a JSON response.
+ *
+ * @param {string} mockResponse The mock object to wrap in a JSON response.
+ * @return {Promise} Promise that responds to a request with the mock JSON response.
+ */
+export function JSONResponse( mockResponse ) {
+	return async ( request ) => request.respond( getJSONResponse( mockResponse ) );
+}
+
+/**
+ * Creates a function to determine if a request is calling a URL with the substring present.
+ *
+ * @param {string} substring The substring to check for.
+ * @return {function} Function that determines if a request's URL contains substring.
+ */
+export function matchURL( substring ) {
+	return ( request ) => -1 !== request.url().indexOf( substring );
+}
+
+/**
+ * Creates a function to determine if a request has a parameter with a certain value.
+ *
+ * @param {string} parameterName The query parameter to check.
+ * @param {string} value The value to check for.
+ * @return {function} Function that determines if a request's query parameter is the specified value.
+ */
+export function parameterEquals( parameterName, value ) {
+	return ( request ) => {
+		const url = request.url();
+		const match = new RegExp( `.*${ parameterName }=([^&]+).*` ).exec( url );
+		if ( ! match ) {
+			return false;
+		}
+		return value === decodeURIComponent( match[ 1 ] );
+	};
+}
+
+/**
+ * Get a JSON response for the passed in object, for use with `request.respond`.
+ *
+ * @param {Object} obj Object to seralise for response.
+ * @return {Object} Response for use with `request.respond`.
+ */
+export function getJSONResponse( obj ) {
+	return {
+		content: 'application/json',
+		body: JSON.stringify( obj ),
+	};
+}
+
+/**
+ * Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the
+ * deserialised JSON response for the request.
+ *
+ * @param {function} mockCheck function that returns true if the request should be mocked.
+ * @param {Object} mock A mock object to wrap in a JSON response, if the request should be mocked.
+ * @param {function|undefined} responseObjectTransform An optional function that transforms the response's object before the response is used.
+ * @return {Promise} Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
+ */
+export function mockOrTransform( mockCheck, mock, responseObjectTransform = ( obj ) => obj ) {
+	return async ( request ) => {
+		// Because we can't get the responses to requests and modify them on the fly,
+		// we have to make our own request and get the response, then apply the
+		// optional transform to the json encoded object.
+		const response = await fetch(
+			request.url(),
+			{
+				headers: request.headers(),
+				method: request.method(),
+				body: request.postData(),
+			}
+		);
+		const responseObject = await response.json();
+		if ( mockCheck( responseObject ) ) {
+			request.respond( getJSONResponse( mock ) );
+		} else {
+			request.respond( getJSONResponse( responseObjectTransform( responseObject ) ) );
+		}
+	};
+}
+
+/**
+ * Sets up mock checks and responses. Accepts a list of mock settings with the following properties:
+ *   - match: function to check if a request should be mocked.
+ *   - onRequestMatch: async function to respond to the request.
+ *
+ * Example:
+ *   const MOCK_RESPONSES = [
+ *     {
+ *       match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
+ *       onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+ *     },
+ *     {
+ *       match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
+ *       onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+ *     }
+ *  ];
+ *  setUpResponseMocking( MOCK_RESPONSES );
+ *
+ * If none of the mock settings match the request, the request is allowed to continue.
+ *
+ * @param {Array} mocks Array of mock settings.
+ */
+export async function setUpResponseMocking( mocks ) {
+	await page.setRequestInterception( true );
+	page.on( 'request', async ( request ) => {
+		for ( let i = 0; i < mocks.length; i++ ) {
+			const mock = mocks[ i ];
+			if ( mock.match( request ) ) {
+				await mock.onRequestMatch( request );
+				return;
+			}
+		}
+		request.continue();
 	} );
 }

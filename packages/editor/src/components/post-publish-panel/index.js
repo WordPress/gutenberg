@@ -8,7 +8,13 @@ import { get, omit } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { IconButton, Spinner, CheckboxControl } from '@wordpress/components';
+import {
+	IconButton,
+	Spinner,
+	CheckboxControl,
+	withFocusReturn,
+	withConstrainedTabbing,
+} from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -55,12 +61,14 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			...additionalProps
 		} = this.props;
+		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'isDirty' ] );
 		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
-		const propsForPanel = omit( additionalProps, [ 'hasPublishAction' ] );
+		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
+		const isPostPublish = isPublishedOrScheduled && ! isSaving;
 		return (
 			<div className="editor-post-publish-panel" { ...propsForPanel }>
 				<div className="editor-post-publish-panel__header">
-					{ isPublishedOrScheduled && ! isSaving ? (
+					{ isPostPublish ? (
 						<div className="editor-post-publish-panel__header-published">
 							{ isScheduled ? __( 'Scheduled' ) : __( 'Published' ) }
 						</div>
@@ -78,13 +86,13 @@ export class PostPublishPanel extends Component {
 					/>
 				</div>
 				<div className="editor-post-publish-panel__content">
-					{ ! isSaving && ! isPublishedOrScheduled && (
+					{ isPrePublish && (
 						<PostPublishPanelPrepublish>
 							{ PrePublishExtension && <PrePublishExtension /> }
 						</PostPublishPanelPrepublish>
 					) }
-					{ ! isSaving && isPublishedOrScheduled && (
-						<PostPublishPanelPostpublish>
+					{ isPostPublish && (
+						<PostPublishPanelPostpublish focusOnMount={ true } >
 							{ PostPublishExtension && <PostPublishExtension /> }
 						</PostPublishPanelPostpublish>
 					) }
@@ -135,4 +143,6 @@ export default compose( [
 			},
 		};
 	} ),
+	withFocusReturn,
+	withConstrainedTabbing,
 ] )( PostPublishPanel );

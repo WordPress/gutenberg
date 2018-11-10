@@ -39,34 +39,39 @@ function Header( {
 			tabIndex="-1"
 		>
 			<HeaderToolbar />
-			{ ! isPublishSidebarOpened && (
-				<div className="edit-post-header__settings">
+			<div className="edit-post-header__settings">
+				{ ! isPublishSidebarOpened && (
+					// This button isn't completely hidden by the publish sidebar.
+					// We can't hide the whole toolbar when the publish sidebar is open because
+					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					// We track that DOM node to return focus to the PostPublishButtonOrToggle
+					// when the publish sidebar has been closed.
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
 					/>
-					<PostPreviewButton />
-					<PostPublishButtonOrToggle
-						forceIsDirty={ hasActiveMetaboxes }
-						forceIsSaving={ isSaving }
+				) }
+				<PostPreviewButton />
+				<PostPublishButtonOrToggle
+					forceIsDirty={ hasActiveMetaboxes }
+					forceIsSaving={ isSaving }
+				/>
+				<div>
+					<IconButton
+						icon="admin-generic"
+						label={ __( 'Settings' ) }
+						onClick={ toggleGeneralSidebar }
+						isToggled={ isEditorSidebarOpened }
+						aria-expanded={ isEditorSidebarOpened }
+						shortcut={ shortcuts.toggleSidebar }
 					/>
-					<div>
-						<IconButton
-							icon="admin-generic"
-							label={ __( 'Settings' ) }
-							onClick={ toggleGeneralSidebar }
-							isToggled={ isEditorSidebarOpened }
-							aria-expanded={ isEditorSidebarOpened }
-							shortcut={ shortcuts.toggleSidebar }
-						/>
-						<DotTip id="core/editor.settings">
-							{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
-						</DotTip>
-					</div>
-					<PinnedPlugins.Slot />
-					<MoreMenu />
+					<DotTip tipId="core/editor.settings">
+						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
+					</DotTip>
 				</div>
-			) }
+				<PinnedPlugins.Slot />
+				<MoreMenu />
+			</div>
 		</div>
 	);
 }

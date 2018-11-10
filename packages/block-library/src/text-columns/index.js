@@ -41,6 +41,7 @@ export const settings = {
 			selector: 'p',
 			query: {
 				children: {
+					type: 'string',
 					source: 'html',
 				},
 			},

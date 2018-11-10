@@ -147,7 +147,7 @@ class HierarchicalTermSelector extends Component {
 					_x( '%s added', 'term' ),
 					get(
 						this.props.taxonomy,
-						[ 'data', 'labels', 'singular_name' ],
+						[ 'labels', 'singular_name' ],
 						slug === 'category' ? __( 'Category' ) : __( 'Term' )
 					)
 				);
@@ -278,7 +278,7 @@ class HierarchicalTermSelector extends Component {
 
 		const resultCount = getResultCount( filteredTermsTree );
 		const resultsFoundMessage = sprintf(
-			_n( '%d result found.', '%d results found.', resultCount, 'term' ),
+			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);
 		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
@@ -348,7 +348,7 @@ class HierarchicalTermSelector extends Component {
 		const { availableTermsTree, availableTerms, filteredTermsTree, formName, formParent, loading, showForm, filterValue } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
-			[ 'data', 'labels', labelProperty ],
+			[ 'labels', labelProperty ],
 			slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory
 		);
 		const newTermButtonLabel = labelWithFallback(

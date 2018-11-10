@@ -103,20 +103,6 @@ enabled by default.
 
 Whether or not the panel is enabled.
 
-### isEditorSidebarPanelOpened
-
-Returns true if the given panel is enabled, or false otherwise. Panels are
-enabled by default.
-
-*Parameters*
-
- * state: Global application state.
- * panel: A string that identifies the panel.
-
-*Returns*
-
-Whether or not the panel is enabled.
-
 ### isEditorPanelOpened
 
 Returns true if the given panel is open, or false otherwise. Panels are
@@ -170,18 +156,6 @@ When the value is not set it defaults to true.
 *Returns*
 
 Whether the plugin item is pinned.
-
-### getMetaBoxes
-
-Returns the state of legacy meta boxes.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-State of meta boxes.
 
 ### getActiveMetaBoxLocations
 
@@ -247,19 +221,6 @@ Returns the list of all the available meta boxes.
 
 List of meta boxes.
 
-### getMetaBox
-
-Returns the state of legacy meta boxes.
-
-*Parameters*
-
- * state: Global application state.
- * location: Location of the meta box.
-
-*Returns*
-
-State of meta box at specified location.
-
 ### hasMetaBoxes
 
 Returns true if the post is using Meta Boxes
@@ -300,7 +261,7 @@ Returns an action object signalling that the user closed the sidebar.
 
 ### openModal
 
-Returns an action object used in signalling that the user opened an editor sidebar.
+Returns an action object used in signalling that the user opened a modal.
 
 *Parameters*
 
@@ -308,7 +269,7 @@ Returns an action object used in signalling that the user opened an editor sideb
 
 ### closeModal
 
-Returns an action object signalling that the user closed the sidebar.
+Returns an action object signalling that the user closed a modal.
 
 ### openPublishSidebar
 
@@ -333,14 +294,6 @@ Returns an action object used to enable or disable a panel in the editor.
  * panelName: A string that identifies the panel to enable or disable.
 
 ### toggleEditorPanelOpened
-
-Returns an action object used to open or close a panel in the editor.
-
-*Parameters*
-
- * panelName: A string that identifies the panel to open or close.
-
-### toggleGeneralSidebarEditorPanel
 
 Returns an action object used to open or close a panel in the editor.
 
@@ -380,12 +333,3 @@ Returns an action object used to request meta box update.
 ### metaBoxUpdatesSuccess
 
 Returns an action object used signal a successful meta box update.
-
-### setMetaBoxSavedData
-
-Returns an action object used to set the saved meta boxes data.
-This is used to check if the meta boxes have been touched when leaving the editor.
-
-*Parameters*
-
- * dataPerLocation: Meta Boxes Data per location.

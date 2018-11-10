@@ -29,6 +29,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	attributes: {
 		content: {
+			type: 'string',
 			source: 'html',
 			selector: 'p',
 		},
@@ -111,6 +112,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 
 	attributes: {
 		content: {
+			type: 'string',
 			source: 'html',
 			selector: 'p',
 		},
@@ -150,12 +152,11 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		);
 	},
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const { content, alignment } = attributes;
 
 		return (
 			<RichText.Content
-				className={ className }
 				style={ { textAlign: alignment } }
 				value={ content }
 				tagName="p"

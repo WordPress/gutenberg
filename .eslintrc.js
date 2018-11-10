@@ -155,10 +155,7 @@ module.exports = {
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
-				// The <DotTip> component uses the `id` prop for something that does not require an
-				// instanceId; maybe we should change its key.
-				// See: https://github.com/WordPress/gutenberg/issues/10305
-				selector: 'JSXOpeningElement[name.name!="DotTip"] JSXAttribute[name.name="id"][value.type="Literal"]',
+				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
 				message: 'Do not use string literals for IDs; use withInstanceId instead.',
 			},
 			{

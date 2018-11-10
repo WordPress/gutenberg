@@ -19,6 +19,146 @@ export function isURL( url ) {
 }
 
 /**
+ * Returns the protocol part of the URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The protocol part of the URL.
+ */
+export function getProtocol( url ) {
+	const matches = /^([^\s:]+:)/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Tests if a url protocol is valid.
+ *
+ * @param {string} protocol The url protocol.
+ *
+ * @return {boolean} True if the argument is a valid protocol (e.g. http://, tel:).
+ */
+export function isValidProtocol( protocol ) {
+	if ( ! protocol ) {
+		return false;
+	}
+	return /^[a-z\-.\+]+[0-9]*:(?:\/\/)?\/?$/i.test( protocol );
+}
+
+/**
+ * Returns the authority part of the URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The authority part of the URL.
+ */
+export function getAuthority( url ) {
+	const matches = /^[^\/\s:]+:(?:\/\/)?\/?([^\/\s#?]+)[\/#?]{0,1}\S*$/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided authority.
+ *
+ * @param {string} authority A string containing the URL authority.
+ *
+ * @return {boolean} True if the argument contains a valid authority.
+ */
+export function isValidAuthority( authority ) {
+	if ( ! authority ) {
+		return false;
+	}
+	return /^[^\s#?]+$/.test( authority );
+}
+
+/**
+ * Returns the path part of the URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The path part of the URL.
+ */
+export function getPath( url ) {
+	const matches = /^[^\/\s:]+:(?:\/\/)?[^\/\s#?]+[\/]([^\s#?]+)[#?]{0,1}\S*$/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided path.
+ *
+ * @param {string} path The URL path.
+ *
+ * @return {boolean} True if the argument contains a valid path
+ */
+export function isValidPath( path ) {
+	if ( ! path ) {
+		return false;
+	}
+	return /^[^\s#?]+$/.test( path );
+}
+
+/**
+ * Returns the query string part of the URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The query string part of the URL.
+ */
+export function getQueryString( url ) {
+	const matches = /^\S+?\?([^\s#]+)/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided query string.
+ *
+ * @param {string} queryString The query string.
+ *
+ * @return {boolean} True if the argument contains a valid query string.
+ */
+export function isValidQueryString( queryString ) {
+	if ( ! queryString ) {
+		return false;
+	}
+	return /^[^\s#?\/]+$/.test( queryString );
+}
+
+/**
+ * Returns the fragment part of the URL.
+ *
+ * @param {string} url The full URL
+ *
+ * @return {?string} The fragment part of the URL.
+ */
+export function getFragment( url ) {
+	const matches = /^\S+(#[^\s\?]*)/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided fragment.
+ *
+ * @param {string} fragment The url fragment.
+ *
+ * @return {boolean} True if the argument contains a valid fragment.
+ */
+export function isValidFragment( fragment ) {
+	if ( ! fragment ) {
+		return false;
+	}
+	return /^#[^\s#?\/]*$/.test( fragment );
+}
+
+/**
  * Appends arguments to the query string of the url
  *
  * @param {string} url  URL
@@ -108,4 +248,23 @@ export function safeDecodeURI( uri ) {
 	} catch ( uriError ) {
 		return uri;
 	}
+}
+
+/**
+ * Returns a URL for display.
+ *
+ * @param {string} url Original URL.
+ *
+ * @return {string} Displayed URL.
+ */
+export function filterURLForDisplay( url ) {
+	// Remove protocol and www prefixes.
+	const filteredURL = url.replace( /^(?:https?:)\/\/(?:www\.)?/, '' );
+
+	// Ends with / and only has that single slash, strip it.
+	if ( filteredURL.match( /^[^\/]+\/$/ ) ) {
+		return filteredURL.replace( '/', '' );
+	}
+
+	return filteredURL;
 }

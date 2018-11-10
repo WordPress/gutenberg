@@ -23,6 +23,19 @@ Returns a block type by name.
 
 Block Type.
 
+### getBlockStyles
+
+Returns block styles by block name.
+
+*Parameters*
+
+ * state: Data state.
+ * name: Block type name.
+
+*Returns*
+
+Block Styles.
+
 ### getCategories
 
 Returns all the available categories.
@@ -46,18 +59,6 @@ Returns the name of the default block name.
 *Returns*
 
 Default block name.
-
-### getFallbackBlockName
-
-Returns the name of the fallback block name.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Fallback block name.
 
 ### getFreeformFallbackBlockName
 
@@ -173,18 +174,27 @@ Returns an action object used to remove a registered block type.
 
  * names: Block name.
 
-### setDefaultBlockName
+### addBlockStyles
 
-Returns an action object used to set the default block name.
+Returns an action object used in signalling that new block styles have been added.
 
 *Parameters*
 
- * name: Block name.
+ * blockName: Block name.
+ * styles: Block styles.
 
-### setFallbackBlockName
+### removeBlockStyles
 
-Returns an action object used to set the name of the block used as a fallback
-for non-block content.
+Returns an action object used in signalling that block styles have been removed.
+
+*Parameters*
+
+ * blockName: Block name.
+ * styleNames: Block style names.
+
+### setDefaultBlockName
+
+Returns an action object used to set the default block name.
 
 *Parameters*
 

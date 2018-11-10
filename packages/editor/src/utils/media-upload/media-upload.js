@@ -61,7 +61,7 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  * @param   {Function} $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
  * @param   {?Object}  $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  */
-export function mediaUpload( {
+export async function mediaUpload( {
 	allowedTypes,
 	additionalData = {},
 	filesList,
@@ -115,7 +115,9 @@ export function mediaUpload( {
 		onError( error );
 	};
 
-	files.forEach( ( mediaFile, idx ) => {
+	const validFiles = [];
+
+	for ( const mediaFile of files ) {
 		// verify if user is allowed to upload this mime type
 		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
 			triggerError( {
@@ -123,7 +125,7 @@ export function mediaUpload( {
 				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
 
 		// Check if the block supports this mime type
@@ -133,7 +135,7 @@ export function mediaUpload( {
 				message: __( 'Sorry, this file type is not supported here.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
 
 		// verify if file is greater than the maximum file upload size allowed for the site.
@@ -143,7 +145,7 @@ export function mediaUpload( {
 				message: __( 'This file exceeds the maximum upload size for this site.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
 
 		// Don't allow empty files to be uploaded.
@@ -153,49 +155,49 @@ export function mediaUpload( {
 				message: __( 'This file is empty.' ),
 				file: mediaFile,
 			} );
-			return;
+			continue;
 		}
+
+		validFiles.push( mediaFile );
 
 		// Set temporary URL to create placeholder media file, this is replaced
 		// with final file from media gallery when upload is `done` below
 		filesSet.push( { url: createBlobURL( mediaFile ) } );
 		onFileChange( filesSet );
+	}
 
-		return createMediaFromFile( mediaFile, additionalData )
-			.then( ( savedMedia ) => {
-				const mediaObject = {
-					...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
-					alt: savedMedia.alt_text,
-					caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
-					title: savedMedia.title.raw,
-					url: savedMedia.source_url,
-					mediaDetails: {},
-				};
-				if ( has( savedMedia, [ 'media_details', 'sizes' ] ) ) {
-					mediaObject.mediaDetails.sizes = get( savedMedia, [ 'media_details', 'sizes' ], {} );
-				}
-				setAndUpdateFiles( idx, mediaObject );
-			} )
-			.catch( ( error ) => {
-				// Reset to empty on failure.
-				setAndUpdateFiles( idx, null );
-				let message;
-				if ( has( error, [ 'message' ] ) ) {
-					message = get( error, [ 'message' ] );
-				} else {
-					message = sprintf(
-						// translators: %s: file name
-						__( 'Error while uploading file %s to the media library.' ),
-						mediaFile.name
-					);
-				}
-				onError( {
-					code: 'GENERAL',
-					message,
-					file: mediaFile,
-				} );
+	for ( let idx = 0; idx < validFiles.length; ++idx ) {
+		const mediaFile = validFiles[ idx ];
+		try {
+			const savedMedia = await createMediaFromFile( mediaFile, additionalData );
+			const mediaObject = {
+				...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
+				alt: savedMedia.alt_text,
+				caption: get( savedMedia, [ 'caption', 'raw' ], '' ),
+				title: savedMedia.title.raw,
+				url: savedMedia.source_url,
+			};
+			setAndUpdateFiles( idx, mediaObject );
+		} catch ( error ) {
+			// Reset to empty on failure.
+			setAndUpdateFiles( idx, null );
+			let message;
+			if ( has( error, [ 'message' ] ) ) {
+				message = get( error, [ 'message' ] );
+			} else {
+				message = sprintf(
+					// translators: %s: file name
+					__( 'Error while uploading file %s to the media library.' ),
+					mediaFile.name
+				);
+			}
+			onError( {
+				code: 'GENERAL',
+				message,
+				file: mediaFile,
 			} );
-	} );
+		}
+	}
 }
 
 /**

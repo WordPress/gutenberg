@@ -5,9 +5,15 @@ import { tokenize } from 'simple-html-tokenizer';
 import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import { getSaveContent } from './serializer';
+import { normalizeBlockType } from './utils';
 
 /**
  * Globally matches any consecutive whitespace
@@ -485,6 +491,17 @@ export function isEquivalentHTML( actual, expected ) {
 	return true;
 }
 
+export function isValidBlock( innerHTML, blockType, attributes ) {
+	deprecated( 'isValidBlock', {
+		plugin: 'Gutenberg',
+		version: '4.4',
+		alternative: 'isValidBlockContent',
+		hint: 'The order of params has changed.',
+	} );
+
+	return isValidBlockContent( blockType, attributes, innerHTML );
+}
+
 /**
  * Returns true if the parsed block is valid given the input content. A block
  * is considered valid if, when serialized with assumed attributes, the content
@@ -492,13 +509,14 @@ export function isEquivalentHTML( actual, expected ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param {string} innerHTML  Original block content.
- * @param {string} blockType  Block type.
- * @param {Object} attributes Parsed block attributes.
+ * @param {string|Object} blockTypeOrName Block type.
+ * @param {Object}        attributes      Parsed block attributes.
+ * @param {string}        innerHTML       Original block content.
  *
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlock( innerHTML, blockType, attributes ) {
+export function isValidBlockContent( blockTypeOrName, attributes, innerHTML ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
 	let saveContent;
 	try {
 		saveContent = getSaveContent( blockType, attributes );

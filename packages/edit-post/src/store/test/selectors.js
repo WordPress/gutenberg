@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import {
@@ -16,22 +11,14 @@ import {
 	isPluginSidebarOpened,
 	getActiveGeneralSidebarName,
 	isPluginItemPinned,
-	getMetaBoxes,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
-	getMetaBox,
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
 	isEditorPanelEnabled,
 } from '../selectors';
 
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
-
 describe( 'selectors', () => {
-	beforeEach( () => {
-		deprecated.mockClear();
-	} );
-
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {
@@ -411,52 +398,6 @@ describe( 'selectors', () => {
 			};
 
 			expect( isSavingMetaBoxes( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'getMetaBoxes', () => {
-		it( 'should return the state of all meta boxes', () => {
-			const state = {
-				metaBoxes: {
-					locations: {
-						normal: [ 'postcustom' ],
-					},
-				},
-			};
-
-			const result = getMetaBoxes( state );
-
-			expect( deprecated ).toHaveBeenCalled();
-			expect( result ).toEqual( {
-				normal: {
-					isActive: true,
-				},
-				advanced: {
-					isActive: false,
-				},
-				side: {
-					isActive: false,
-				},
-			} );
-		} );
-	} );
-
-	describe( 'getMetaBox', () => {
-		it( 'should return the state of selected meta box', () => {
-			const state = {
-				metaBoxes: {
-					locations: {
-						side: [ 'postcustom' ],
-					},
-				},
-			};
-
-			const result = getMetaBox( state, 'side' );
-
-			expect( deprecated ).toHaveBeenCalled();
-			expect( result ).toEqual( {
-				isActive: true,
-			} );
 		} );
 	} );
 

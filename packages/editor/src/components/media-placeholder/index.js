@@ -13,10 +13,10 @@ import {
 	Placeholder,
 	DropZone,
 	IconButton,
+	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -64,25 +64,8 @@ class MediaPlaceholder extends Component {
 		this.closeURLInput = this.closeURLInput.bind( this );
 	}
 
-	getAllowedTypes() {
-		const { allowedTypes, type: deprecatedType } = this.props;
-		let allowedTypesToUse = allowedTypes;
-		if ( ! allowedTypes && deprecatedType ) {
-			deprecated( 'type property of wp.editor.MediaPlaceholder', {
-				version: '4.2',
-				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
-			} );
-			if ( deprecatedType === '*' ) {
-				allowedTypesToUse = undefined;
-			} else {
-				allowedTypesToUse = [ deprecatedType ];
-			}
-		}
-		return allowedTypesToUse;
-	}
-
 	onlyAllowsImages() {
-		const allowedTypes = this.getAllowedTypes();
+		const { allowedTypes } = this.props;
 		if ( ! allowedTypes ) {
 			return false;
 		}
@@ -118,8 +101,7 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, multiple, onError } = this.props;
-		const allowedTypes = this.getAllowedTypes();
+		const { onSelect, multiple, onError, allowedTypes } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
 			allowedTypes,
@@ -149,14 +131,13 @@ class MediaPlaceholder extends Component {
 			onHTMLDrop = noop,
 			multiple = false,
 			notices,
+			allowedTypes,
 		} = this.props;
 
 		const {
 			isURLInputVisible,
 			src,
 		} = this.state;
-
-		const allowedTypes = this.getAllowedTypes();
 
 		let instructions = labels.instructions || '';
 		let title = labels.title || '';
@@ -253,4 +234,4 @@ class MediaPlaceholder extends Component {
 	}
 }
 
-export default MediaPlaceholder;
+export default withFilters( 'editor.MediaPlaceholder' )( MediaPlaceholder );
