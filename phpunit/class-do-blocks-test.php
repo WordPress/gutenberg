@@ -10,6 +10,19 @@
  */
 class Do_Blocks_Test extends WP_UnitTestCase {
 	/**
+	 * Tear down.
+	 */
+	function tearDown() {
+		parent::tearDown();
+
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		if ( $registry->is_registered( 'core/dummy' ) ) {
+			$registry->unregister( 'core/dummy' );
+		}
+	}
+
+	/**
 	 * Test do_blocks removes comment demarcations.
 	 *
 	 * @covers ::do_blocks
@@ -41,7 +54,43 @@ class Do_Blocks_Test extends WP_UnitTestCase {
 		$this->assertEquals( $classic_filtered_content, $block_filtered_content );
 	}
 
+	function test_can_nest_at_least_so_deep() {
+		$minimum_depth = 99;
+
+		$content = 'deep inside';
+		for ( $i = 0; $i < $minimum_depth; $i++ ) {
+			$content = '<!-- wp:dummy -->' . $content . '<!-- /wp:dummy -->';
+		}
+
+		$this->assertEquals( 'deep inside', do_blocks( $content ) );
+	}
+
+	function test_can_nest_at_least_so_deep_with_dynamic_blocks() {
+		$minimum_depth = 99;
+
+		$content = '0';
+		for ( $i = 0; $i < $minimum_depth; $i++ ) {
+			$content = '<!-- wp:dummy -->' . $content . '<!-- /wp:dummy -->';
+		}
+
+		register_block_type(
+			'core/dummy',
+			array(
+				'render_callback' => array(
+					$this,
+					'render_dynamic_incrementer',
+				)
+			)
+		);
+
+		$this->assertEquals( $minimum_depth, (int) do_blocks( $content ) );
+	}
+
 	function handle_shortcode( $atts, $content ) {
 		return $content;
+	}
+
+	function render_dynamic_incrementer( $attrs, $content ) {
+		return (string) ( 1 + (int) $content );
 	}
 }
