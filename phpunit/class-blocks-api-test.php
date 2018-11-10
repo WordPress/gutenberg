@@ -24,14 +24,7 @@ class Blocks_API extends WP_UnitTestCase {
 <!-- /wp:spacer -->';
 
 	public $filtered_content = '
-
 <p>paragraph</p>
-
-
-
-
-
-<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 ';
 
 	/**
@@ -77,17 +70,17 @@ class Blocks_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests strip_dynamic_blocks().
+	 * Tests excerpt_remove_blocks().
 	 *
-	 * @covers ::strip_dynamic_blocks
+	 * @covers ::excerpt_remove_blocks
 	 */
-	function test_strip_dynamic_blocks() {
+	function test_excerpt_remove_blocks() {
 		// Simple dynamic block..
 		$content = '<!-- wp:core/block /-->';
-		$this->assertEmpty( strip_dynamic_blocks( $content ) );
+		$this->assertEmpty( excerpt_remove_blocks( $content ) );
 
 		// Dynamic block with options, embedded in other content.
-		$this->assertEquals( $this->filtered_content, strip_dynamic_blocks( $this->content ) );
+		$this->assertEquals( $this->filtered_content, excerpt_remove_blocks( $this->content ) );
 	}
 
 	/**

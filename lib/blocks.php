@@ -100,7 +100,6 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
 	 * Retrieve the dynamic blocks regular expression for searching.
 	 *
 	 * @since 3.6.0
-	 * @deprecated 4.4.0 Use gutenberg_parse_blocks()
 	 *
 	 * @return string
 	 */
@@ -193,22 +192,13 @@ if ( ! function_exists( 'strip_dynamic_blocks' ) ) {
 	 * Remove all dynamic blocks from the given content.
 	 *
 	 * @since 3.6.0
+	 * @deprecated 4.4.0 Use excerpt_remove_blocks()
 	 *
 	 * @param string $content Content of the current post.
 	 * @return string
 	 */
 	function strip_dynamic_blocks( $content ) {
-		$blocks              = gutenberg_parse_blocks( $content );
-		$dynamic_block_names = get_dynamic_block_names();
-		$output              = '';
-
-		foreach ( $blocks as $block ) {
-			if ( ! in_array( $block['blockName'], $dynamic_block_names, true ) ) {
-				$output .= gutenberg_render_block( $block );
-			}
-		}
-
-		return $output;
+		return preg_replace( get_dynamic_blocks_regex(), '', $content );
 	}
 }
 
@@ -225,7 +215,7 @@ if ( ! function_exists( 'strip_dynamic_blocks_add_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_add_filter( $text ) {
-		add_filter( 'the_content', 'strip_dynamic_blocks', 6 );
+		add_filter( 'the_content', 'excerpt_remove_blocks', 6 );
 
 		return $text;
 	}
@@ -245,9 +235,61 @@ if ( ! function_exists( 'strip_dynamic_blocks_remove_filter' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks_remove_filter( $text ) {
-		remove_filter( 'the_content', 'strip_dynamic_blocks', 6 );
+		remove_filter( 'the_content', 'excerpt_remove_blocks', 6 );
 
 		return $text;
 	}
 	add_filter( 'wp_trim_excerpt', 'strip_dynamic_blocks_remove_filter', 0 ); // Before all other.
+}
+
+if ( ! function_exists( 'excerpt_remove_blocks' ) ) {
+	/**
+	 * Parses blocks out of a content string, and renders those appropriate for the excerpt.
+	 *
+	 * As the excerpt should be a small string of text relevant to the full post content,
+	 * this function renders the blocks that are most likely to contain such text.
+	 *
+	 * @since 4.4.0
+	 *
+	 * @param string $content The content to parse.
+	 * @return string The parsed and filtered content.
+	 */
+	function excerpt_remove_blocks( $content ) {
+		$allowed_blocks = array(
+			'core/columns',
+			'core/freeform',
+			'core/heading',
+			'core/html',
+			'core/list',
+			'core/media-text',
+			'core/paragraph',
+			'core/preformatted',
+			'core/pullquote',
+			'core/quote',
+			'core/table',
+			'core/verse',
+		);
+		/**
+		 * Filters the list of blocks that can contribute to the excerpt.
+		 *
+		 * If a dynamic block is added to this list, it must not generate another
+		 * excerpt, as this will cause an infinite loop to occur.
+		 *
+		 * @since 4.4.0
+		 *
+		 * @param array $allowed_blocks The list of allowed blocks.
+		 */
+		$allowed_blocks = apply_filters( 'excerpt_allowed_blocks', $allowed_blocks );
+
+		$blocks = gutenberg_parse_blocks( $content );
+		$output = '';
+
+		foreach ( $blocks as $block ) {
+			if ( in_array( $block['blockName'], $allowed_blocks, true ) ) {
+				$output .= gutenberg_render_block( $block );
+			}
+		}
+
+		return $output;
+	}
 }
