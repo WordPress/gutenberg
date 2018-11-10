@@ -79,6 +79,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 
 		$registry = WP_Block_Type_Registry::get_instance();
 		$registry->unregister( 'core/dummy' );
+		$registry->unregister( 'core/dynamic' );
 	}
 
 	/**
