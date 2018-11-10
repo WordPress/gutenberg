@@ -24,15 +24,15 @@ class Blocks_API extends WP_UnitTestCase {
 <!-- /wp:spacer -->';
 
 	public $filtered_content = '
-<!-- wp:paragraph -->
+
 <p>paragraph</p>
-<!-- /wp:paragraph -->
 
 
 
-<!-- wp:spacer -->
+
+
 <div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
-<!-- /wp:spacer -->';
+';
 
 	/**
 	 * Dummy block rendering function.
