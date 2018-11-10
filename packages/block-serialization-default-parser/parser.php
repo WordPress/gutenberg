@@ -174,6 +174,14 @@ class WP_Block_Parser {
 	public $stack;
 
 	/**
+	 * Empty associative array, here due to PHP quirks
+	 *
+	 * @since 4.4.0
+	 * @var array empty associative array
+	 */
+	public $empty_attrs;
+
+	/**
 	 * Parses a document and returns a list of block structures
 	 *
 	 * When encountering an invalid parse will return a best-effort
@@ -186,10 +194,11 @@ class WP_Block_Parser {
 	 * @return WP_Block_Parser_Block[]
 	 */
 	function parse( $document ) {
-		$this->document = $document;
-		$this->offset   = 0;
-		$this->output   = array();
-		$this->stack    = array();
+		$this->document    = $document;
+		$this->offset      = 0;
+		$this->output      = array();
+		$this->stack       = array();
+		$this->empty_attrs = json_decode( '{}', true );
 
 		do {
 			// twiddle our thumbs
@@ -364,7 +373,7 @@ class WP_Block_Parser {
 		 * match back in PHP to see which one it was.
 		 */
 		$has_match = preg_match(
-			'/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:[^}]+|}+(?=})|(?!}\s+-->).)+?}\s+)?(?<void>\/)?-->/s',
+			'/<!--\s+(?<closer>\/)?wp:(?<namespace>[a-z][a-z0-9_-]*\/)?(?<name>[a-z][a-z0-9_-]*)\s+(?<attrs>{(?:[^}]+|}+(?=})|(?!}\s+-->).)*?}\s+)?(?<void>\/)?-->/s',
 			$this->document,
 			$matches,
 			PREG_OFFSET_CAPTURE,
@@ -392,7 +401,7 @@ class WP_Block_Parser {
 		 */
 		$attrs = $has_attrs
 			? json_decode( $matches[ 'attrs' ][ 0 ], /* as-associative */ true )
-			: json_decode( '{}', /* don't ask why, just verify in PHP */ false );
+			: $this->empty_attrs;
 
 		/*
 		 * This state isn't allowed
@@ -422,8 +431,8 @@ class WP_Block_Parser {
 	 * @param string $innerHTML HTML content of block
 	 * @return WP_Block_Parser_Block freeform block object
 	 */
-	static function freeform( $innerHTML ) {
-		return new WP_Block_Parser_Block( null, array(), array(), $innerHTML, array( $innerHTML ) );
+	function freeform( $innerHTML ) {
+		return new WP_Block_Parser_Block( null, $this->empty_attrs, array(), $innerHTML, array( $innerHTML ) );
 	}
 
 	/**
