@@ -79,7 +79,7 @@ class Do_Blocks_Test extends WP_UnitTestCase {
 				'render_callback' => array(
 					$this,
 					'render_dynamic_incrementer',
-				)
+				),
 			)
 		);
 
