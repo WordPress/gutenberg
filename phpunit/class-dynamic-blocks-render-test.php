@@ -175,7 +175,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			array(
 				'render_callback' => array(
 					$this,
-					'render_serialize_dynamic_block'
+					'render_serialize_dynamic_block',
 				),
 			)
 		);
@@ -193,7 +193,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			array(
 				'render_callback' => array(
 					$this,
-					'render_dummy_block_numeric'
+					'render_dummy_block_numeric',
 				),
 			)
 		);
@@ -202,7 +202,7 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			array(
 				'render_callback' => array(
 					$this,
-					'render_serialize_dynamic_block'
+					'render_serialize_dynamic_block',
 				),
 			)
 		);
@@ -220,13 +220,13 @@ class Dynamic_Blocks_Render_Test extends WP_UnitTestCase {
 			array(
 				'render_callback' => array(
 					$this,
-					'render_serialize_dynamic_block'
+					'render_serialize_dynamic_block',
 				),
 			)
 		);
 
 		$output = do_blocks( '<!-- wp:dynamic -->before<!-- wp:dynamic -->deep inner<!-- /wp:dynamic -->after<!-- /wp:dynamic -->' );
-		
+
 		list( /* attrs */, $content ) = unserialize( base64_decode( $output ) );
 
 		$inner = $this->render_serialize_dynamic_block( array(), 'deep inner' );
