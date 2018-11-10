@@ -58,21 +58,6 @@ if ( ! function_exists( 'gutenberg_parse_blocks' ) ) {
 	 * @return array  Array of parsed block objects.
 	 */
 	function gutenberg_parse_blocks( $content ) {
-		/*
-		 * If there are no blocks in the content, return a single block, rather
-		 * than wasting time trying to parse the string.
-		 */
-		if ( ! has_blocks( $content ) ) {
-			return array(
-				array(
-					'blockName'   => null,
-					'attrs'       => array(),
-					'innerBlocks' => array(),
-					'innerHTML'   => $content,
-				),
-			);
-		}
-
 		/**
 		 * Filter to allow plugins to replace the server-side block parser
 		 *
