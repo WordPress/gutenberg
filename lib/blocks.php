@@ -100,6 +100,7 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
 	 * Retrieve the dynamic blocks regular expression for searching.
 	 *
 	 * @since 3.6.0
+	 * @deprecated 4.4.0 Use gutenberg_parse_blocks()
 	 *
 	 * @return string
 	 */
