@@ -22,7 +22,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
-import { withFilters } from '@wordpress/components';
+import { KeyboardShortcuts, withFilters } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -57,6 +57,7 @@ export class BlockListBlock extends Component {
 		this.bindBlockNode = this.bindBlockNode.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.maybeHover = this.maybeHover.bind( this );
+		this.forceFocusedContextualToolbar = this.forceFocusedContextualToolbar.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
 		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
@@ -78,6 +79,7 @@ export class BlockListBlock extends Component {
 			dragging: false,
 			isHovered: false,
 		};
+		this.isForcingContextualToolbar = false;
 	}
 
 	componentDidMount() {
@@ -87,6 +89,11 @@ export class BlockListBlock extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
+		if ( this.isForcingContextualToolbar ) {
+			// The forcing of contextual toolbar should only be true during one update,
+			// after the first update normal conditions should apply.
+			this.isForcingContextualToolbar = false;
+		}
 		if ( this.props.isTypingWithinBlock || this.props.isSelected ) {
 			this.hideHoverEffects();
 		}
@@ -372,6 +379,12 @@ export class BlockListBlock extends Component {
 		}
 	}
 
+	forceFocusedContextualToolbar() {
+		this.isForcingContextualToolbar = true;
+		// trigger a re-render
+		this.setState( () => ( {} ) );
+	}
+
 	render() {
 		return (
 			<HoverArea container={ this.wrapperNode }>
@@ -541,7 +554,30 @@ export class BlockListBlock extends Component {
 										isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 									/>
 								) }
-								{ shouldShowContextualToolbar && <BlockContextualToolbar /> }
+								{ (
+									shouldShowContextualToolbar ||
+									this.isForcingContextualToolbar
+								) && (
+									<BlockContextualToolbar
+										// If the toolbar is being shown because of being forced
+										// it should focus the toolbar right after the mount.
+										focusOnMount={ this.isForcingContextualToolbar }
+									/>
+								) }
+								{ (
+									! shouldShowContextualToolbar &&
+									isSelected &&
+									! hasFixedToolbar &&
+									! isEmptyDefaultBlock
+								) && (
+									<KeyboardShortcuts
+										bindGlobal
+										eventName="keydown"
+										shortcuts={ {
+											'alt+f10': this.forceFocusedContextualToolbar,
+										} }
+									/>
+								) }
 								<IgnoreNestedEvents
 									ref={ this.bindBlockNode }
 									onDragStart={ this.preventDrag }

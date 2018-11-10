@@ -3,6 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
@@ -24,6 +25,12 @@ export function PostPublishPanelToggle( {
 		forceIsSaving ||
 		! isSaveable ||
 		( ! isPublishable && ! forceIsDirty );
+
+	deprecated( 'PostPublishPanelToggle', {
+		version: '4.5',
+		alternative: 'PostPublishButton',
+		plugin: 'Gutenberg',
+	} );
 
 	return (
 		<Button
