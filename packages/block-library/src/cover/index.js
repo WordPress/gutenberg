@@ -266,7 +266,7 @@ export const settings = {
 										render={ ( { open } ) => (
 											<IconButton
 												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
+												label={ __( 'Edit Media' ) }
 												icon="edit"
 												onClick={ open }
 											/>
