@@ -100,6 +100,7 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
 	 * Retrieve the dynamic blocks regular expression for searching.
 	 *
 	 * @since 3.6.0
+	 * @deprecated 4.4.0 Use gutenberg_parse_blocks()
 	 *
 	 * @return string
 	 */
@@ -197,7 +198,17 @@ if ( ! function_exists( 'strip_dynamic_blocks' ) ) {
 	 * @return string
 	 */
 	function strip_dynamic_blocks( $content ) {
-		return preg_replace( get_dynamic_blocks_regex(), '', $content );
+		$blocks              = gutenberg_parse_blocks( $content );
+		$dynamic_block_names = get_dynamic_block_names();
+		$output              = '';
+
+		foreach ( $blocks as $block ) {
+			if ( ! in_array( $block['blockName'], $dynamic_block_names, true ) ) {
+				$output .= gutenberg_render_block( $block );
+			}
+		}
+
+		return $output;
 	}
 }
 
