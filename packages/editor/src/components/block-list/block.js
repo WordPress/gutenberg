@@ -424,8 +424,8 @@ export class BlockListBlock extends Component {
 					// Empty paragraph blocks should always show up as unselected.
 					const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 					const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-					const shouldAppearSelected = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && isSelected && ! isTypingWithinBlock;
-					const shouldAppearHovered = ! isFocusMode && ! hasFixedToolbar && isHovered && ! isEmptyDefaultBlock;
+					const shouldAppearSelected = ! isFocusMode && ! showSideInserter && isSelected && ! isTypingWithinBlock;
+					const shouldAppearHovered = ! isFocusMode && isHovered && ! isEmptyDefaultBlock;
 					// We render block movers and block settings to keep them tabbale even if hidden
 					const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
 					const shouldShowBreadcrumb = ! isFocusMode && isHovered && ! isEmptyDefaultBlock;
