@@ -76,7 +76,7 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 
 	return (
 		<NavigableMenu
-			role="navigation"
+			role="presentation"
 			className="editor-block-navigation__container"
 		>
 			<p className="editor-block-navigation__label">{ __( 'Block Navigation' ) }</p>
