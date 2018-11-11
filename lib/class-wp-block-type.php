@@ -150,14 +150,14 @@ class WP_Block_Type {
 		}
 
 		/**
-		* Filter to allow plugins to override block attributes
+		* Filter to allow plugins to override Block attributes.
 		* 
 		* @since 3.5.0
 		* 
-		* @param array $prepared_attributes block attributes 
+		* @param array $prepared_attributes Block attributes.
+		* @param WP_Block_Type $this Block object which attributes are filtered.
 		*/
-
-		$prepared_attributes = apply_filters( 'block_attributes', $prepared_attributes );
+		$prepared_attributes = apply_filters( 'block_attributes', $prepared_attributes, $this );
 
 		return $prepared_attributes;
 	}
