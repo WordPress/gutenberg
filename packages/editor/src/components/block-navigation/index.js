@@ -37,7 +37,7 @@ function BlockNavigationList( {
 
 				return (
 					<li key={ block.clientId }>
-						<span className="editor-block-navigation__item">
+						<div className="editor-block-navigation__item">
 							<Button
 								className={ classnames( 'editor-block-navigation__item-button', {
 									'is-selected': block.clientId === selectedBlockClientId,
@@ -49,7 +49,7 @@ function BlockNavigationList( {
 								{ blockType.title }
 								{ isSelected && <span className="screen-reader-text">{ __( '(selected block)' ) }</span> }
 							</Button>
-						</span>
+						</div>
 						{ showNestedBlocks && !! block.innerBlocks && !! block.innerBlocks.length && (
 							<BlockNavigationList
 								blocks={ block.innerBlocks }
