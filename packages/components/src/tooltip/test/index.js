@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { shallow, mount } from 'enzyme';
+import TestUtils from 'react-dom/test-utils';
+import ReactDOM from 'react-dom';
 
 /**
  * Internal dependencies
@@ -49,7 +51,7 @@ describe( 'Tooltip', () => {
 			expect( button.childAt( 1 ).name() ).toBe( 'Popover' );
 			expect( popover.prop( 'focusOnMount' ) ).toBe( false );
 			expect( popover.prop( 'position' ) ).toBe( 'bottom right' );
-			expect( popover.children().text() ).toBe( 'Help text' );
+			expect( popover.children().first().text() ).toBe( 'Help text' );
 		} );
 
 		it( 'should show popover on focus', () => {
@@ -76,12 +78,8 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'should show popover on delayed mouseenter', () => {
-			const expectPopoverVisible = ( wrapper, visible ) => expect( wrapper.find( 'Popover' ) ).toHaveLength( visible ? 1 : 0 );
-
-			// Mount: Issues with using `setState` asynchronously with shallow-
-			// rendered components: https://github.com/airbnb/enzyme/issues/450
 			const originalMouseEnter = jest.fn();
-			const wrapper = mount(
+			const wrapper = TestUtils.renderIntoDocument(
 				<Tooltip text="Help text">
 					<button
 						onMouseEnter={ originalMouseEnter }
@@ -92,22 +90,20 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			wrapper.find( 'button' ).simulate( 'mouseenter', {
-				// Enzyme does not accurately emulate event targets
-				// See: https://github.com/airbnb/enzyme/issues/218
-				currentTarget: wrapper.find( 'button' ).getDOMNode(),
-				target: wrapper.find( 'button > span' ).getDOMNode(),
-			} );
+			/* eslint-disable react/no-find-dom-node */
+			const button = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+			TestUtils.Simulate.mouseEnter( ReactDOM.findDOMNode( button ) );
+			/* eslint-enable react/no-find-dom-node */
 
-			expect( originalMouseEnter ).toHaveBeenCalled();
+			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
+			expect( wrapper.state.isOver ).toBe( false );
+			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 0 );
 
-			expect( wrapper.state( 'isOver' ) ).toBe( false );
-			expectPopoverVisible( wrapper, false );
-			wrapper.instance().delayedSetIsOver.flush();
-			wrapper.update();
+			// Force delayedSetIsOver to be called
+			wrapper.delayedSetIsOver.flush();
 
-			expect( wrapper.state( 'isOver' ) ).toBe( true );
-			expectPopoverVisible( wrapper, true );
+			expect( wrapper.state.isOver ).toBe( true );
+			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 1 );
 		} );
 
 		it( 'should ignore mouseenter on disabled elements', () => {

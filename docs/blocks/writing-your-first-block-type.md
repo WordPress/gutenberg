@@ -80,7 +80,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
 ```
 {% end %}
 
-Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide your own by assigning the value of `icon` as a [WordPress Element](https://github.com/WordPress/gutenberg/tree/master/packages/element) element or component.
+Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](https://wordpress.org/gutenberg/handbook/block-api/#icon-optional).
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.
 

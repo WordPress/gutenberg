@@ -23,7 +23,12 @@ registerBlockType( 'my-plugin/latest-post', {
 			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
 		};
 	} )( function( props ) {
-		if ( props.posts && props.posts.length === 0 ) {
+		
+		if ( ! props.posts ) {
+			return "Loading...";
+		}
+
+		if ( props.posts.length === 0 ) {
 			return "No posts";
 		}
 		var className = props.className;
@@ -59,10 +64,16 @@ registerBlockType( 'my-plugin/latest-post', {
 			posts: select( 'core' ).getEntityRecords( 'postType', 'post' )
 		};
 	} )( ( { posts, className } ) => {
+
+		if ( ! posts ) {
+			return "Loading...";
+		}
+
 		if ( posts && posts.length === 0 ) {
 			return "No posts";
 		}
-		var post = posts[ 0 ];
+
+		let post = posts[ 0 ];
 
 		return <a className={ className } href={ post.link }>
 			{ post.title.rendered }
@@ -113,7 +124,9 @@ There are a few things to notice:
 
 ## Live rendering in Gutenberg editor
 
-Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/server-side-render) block which enables all the rendering to take place on the server using PHP rather than in JavaScript. Server-side render is meant as a fallback; client-side rendering in JavaScript is the preferred implementation.
+Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
+
+*Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation).*
 
 {% codetabs %}
 {% ES5 %}

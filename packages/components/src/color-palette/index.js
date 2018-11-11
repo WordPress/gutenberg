@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { ChromePicker } from 'react-color';
 import { map } from 'lodash';
 
 /**
@@ -16,6 +15,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
+import ColorPicker from '../color-picker';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
 	function applyOrUnset( color ) {
@@ -71,7 +71,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						</Tooltip>
 					) }
 					renderContent={ () => (
-						<ChromePicker
+						<ColorPicker
 							color={ value }
 							onChangeComplete={ ( color ) => onChange( color.hex ) }
 							disableAlpha
@@ -84,7 +84,6 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 				className="components-color-palette__clear"
 				type="button"
 				onClick={ () => onChange( undefined ) }
-				isButton
 				isSmall
 				isDefault
 			>

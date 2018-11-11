@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import AlignmentToolbar from '../';
+import { AlignmentToolbar } from '../';
 
 describe( 'AlignmentToolbar', () => {
 	const alignment = 'left';
@@ -40,5 +40,48 @@ describe( 'AlignmentToolbar', () => {
 		expect( inactiveControl.isActive ).toBe( false );
 		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 		expect( onChangeSpy ).toHaveBeenCalledWith( 'center' );
+	} );
+
+	test( 'should allow custom alignment controls to be specified', () => {
+		const wrapperCustomControls = shallow(
+			<AlignmentToolbar
+				value={ 'custom-right' }
+				onChange={ onChangeSpy }
+				alignmentControls={ [
+					{
+						icon: 'editor-alignleft',
+						title: 'My custom left',
+						align: 'custom-left',
+					},
+					{
+						icon: 'editor-aligncenter',
+						title: 'My custom right',
+						align: 'custom-right',
+					},
+				] }
+			/>
+		);
+		expect( wrapperCustomControls ).toMatchSnapshot();
+		const customControls = wrapperCustomControls.props().controls;
+		expect( customControls ).toHaveLength( 2 );
+
+		// should correctly call on change when right alignment is pressed (active alignment)
+		const rightControl = customControls.find(
+			( { align } ) => align === 'custom-right'
+		);
+		expect( rightControl.title ).toBe( 'My custom right' );
+		rightControl.onClick();
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( undefined );
+		onChangeSpy.mockClear();
+
+		// should correctly call on change when right alignment is pressed (inactive alignment)
+		const leftControl = customControls.find(
+			( { align } ) => align === 'custom-left'
+		);
+		expect( leftControl.title ).toBe( 'My custom left' );
+		leftControl.onClick();
+		expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
+		expect( onChangeSpy ).toHaveBeenCalledWith( 'custom-left' );
 	} );
 } );

@@ -2,10 +2,11 @@
     {
         "blockName": "core/archives",
         "attrs": {
-            "showPostCounts": false,
-            "displayAsDropdown": false
+            "displayAsDropdown": false,
+            "showPostCounts": false
         },
         "innerBlocks": [],
-        "innerHTML": ""
+        "innerHTML": "",
+        "innerContent": []
     }
 ]

@@ -16,12 +16,15 @@ import {
 	default as parsePegjs,
 	parseWithAttributeSchema,
 	toBooleanAttributeMatcher,
+	isOfType,
+	isOfTypes,
 } from '../parser';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
-	setUnknownTypeHandlerName,
+	setFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../factory';
 import serialize from '../serializer';
@@ -56,7 +59,8 @@ describe( 'block parser', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -133,6 +137,46 @@ describe( 'block parser', () => {
 
 			expect( asType( obj, 'object' ) ).toBe( obj );
 			expect( asType( {}, 'object' ) ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'isOfType()', () => {
+		it( 'gracefully handles unhandled type', () => {
+			expect( isOfType( 5, '__UNHANDLED__' ) ).toBe( true );
+		} );
+
+		it( 'returns expected result of type', () => {
+			expect( isOfType( '5', 'string' ) ).toBe( true );
+			expect( isOfType( 5, 'string' ) ).toBe( false );
+
+			expect( isOfType( 5, 'integer' ) ).toBe( true );
+			expect( isOfType( '5', 'integer' ) ).toBe( false );
+
+			expect( isOfType( 5, 'number' ) ).toBe( true );
+			expect( isOfType( '5', 'number' ) ).toBe( false );
+
+			expect( isOfType( true, 'boolean' ) ).toBe( true );
+			expect( isOfType( false, 'boolean' ) ).toBe( true );
+			expect( isOfType( '5', 'boolean' ) ).toBe( false );
+			expect( isOfType( 0, 'boolean' ) ).toBe( false );
+
+			expect( isOfType( null, 'null' ) ).toBe( true );
+			expect( isOfType( 0, 'null' ) ).toBe( false );
+
+			expect( isOfType( [], 'array' ) ).toBe( true );
+
+			expect( isOfType( {}, 'object' ) ).toBe( true );
+			expect( isOfType( null, 'object' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isOfTypes', () => {
+		it( 'returns false if value is not one of types', () => {
+			expect( isOfTypes( null, [ 'string' ] ) ).toBe( false );
+		} );
+
+		it( 'returns true if value is one of types', () => {
+			expect( isOfTypes( null, [ 'string', 'null' ] ) ).toBe( true );
 		} );
 	} );
 
@@ -246,38 +290,77 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'getBlockAttributes()', () => {
-		it( 'should merge attributes with the parsed and default attributes', () => {
+		it( 'should reject the value with a wrong type', () => {
 			const blockType = {
 				attributes: {
-					content: {
-						type: 'string',
-						source: 'text',
-						selector: 'div',
-					},
 					number: {
 						type: 'number',
 						source: 'attribute',
 						attribute: 'data-number',
 						selector: 'div',
 					},
+				},
+			};
+
+			const innerHTML = '<div data-number="10">Ribs</div>';
+
+			expect( getBlockAttributes( blockType, innerHTML, {} ) ).toEqual( {
+				number: undefined,
+			} );
+		} );
+
+		it( 'should merge attributes with the parsed and default attributes', () => {
+			const blockType = {
+				attributes: {
+					content: {
+						source: 'text',
+						selector: 'div',
+					},
 					align: {
-						type: 'string',
+						type: [ 'string', 'null' ],
 					},
 					topic: {
 						type: 'string',
 						default: 'none',
 					},
+					undefAmbiguousStringWithDefault: {
+						type: 'string',
+						source: 'attribute',
+						selector: 'div',
+						attribute: 'data-foo',
+						default: 'ok',
+					},
 				},
 			};
 
 			const innerHTML = '<div data-number="10">Ribs</div>';
-			const attrs = { align: 'left', invalid: true };
+			const attrs = { align: null, invalid: true };
 
 			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
 				content: 'Ribs',
-				number: 10,
-				align: 'left',
+				align: null,
 				topic: 'none',
+				undefAmbiguousStringWithDefault: 'ok',
+			} );
+		} );
+
+		it( 'should work when block type is passed as string', () => {
+			registerBlockType( 'core/meal', {
+				title: 'Meal',
+				category: 'widgets',
+				attributes: {
+					content: {
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: () => {},
+			} );
+
+			const innerHTML = '<div data-number="10">Ribs</div>';
+
+			expect( getBlockAttributes( 'core/meal', innerHTML ) ).toEqual( {
+				content: 'Ribs',
 			} );
 		} );
 	} );
@@ -476,27 +559,27 @@ describe( 'block parser', () => {
 			expect( block.attributes ).toEqual( {} );
 		} );
 
-		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlockType( 'core/unknown-block', unknownBlockSettings );
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+		it( 'should fall back to the unregistered type handler for unregistered blocks if present', () => {
+			registerBlockType( 'core/unregistered-block', unknownBlockSettings );
+			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
 
 			const block = createBlockWithFallback( {
 				blockName: 'core/test-block',
 				innerHTML: 'Bananas',
 				attrs: { fruit: 'Bananas' },
 			} );
-			expect( block.name ).toBe( 'core/unknown-block' );
+			expect( block.name ).toBe( 'core/unregistered-block' );
 			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
 
-		it( 'should fall back to the unknown type handler if block type not specified', () => {
-			registerBlockType( 'core/unknown-block', unknownBlockSettings );
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+		it( 'should fall back to the freeform content handler if block type not specified', () => {
+			registerBlockType( 'core/freeform-block', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform-block' );
 
 			const block = createBlockWithFallback( {
 				innerHTML: 'content',
 			} );
-			expect( block.name ).toEqual( 'core/unknown-block' );
+			expect( block.name ).toEqual( 'core/freeform-block' );
 			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
@@ -634,7 +717,8 @@ describe( 'block parser', () => {
 		it( 'should ignore blocks with a bad namespace', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
+			setUnregisteredTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
@@ -649,7 +733,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
@@ -669,7 +753,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +

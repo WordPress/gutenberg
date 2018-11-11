@@ -1,14 +1,14 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { range } from 'lodash';
+import HeadingToolbar from './heading-toolbar';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
-import { PanelBody, Toolbar } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, BlockControls, InspectorControls, AlignmentToolbar } from '@wordpress/editor';
 
@@ -23,26 +23,15 @@ export default function HeadingEdit( {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 
-	function createLevelControl( targetLevel ) {
-		return {
-			icon: 'heading',
-			// translators: %s: heading level e.g: "1", "2", "3"
-			title: sprintf( __( 'Heading %d' ), targetLevel ),
-			isActive: targetLevel === level,
-			onClick: () => setAttributes( { level: targetLevel } ),
-			subscript: String( targetLevel ),
-		};
-	}
-
 	return (
 		<Fragment>
 			<BlockControls>
-				<Toolbar controls={ range( 2, 5 ).map( createLevelControl ) } />
+				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Heading Settings' ) }>
 					<p>{ __( 'Level' ) }</p>
-					<Toolbar controls={ range( 1, 7 ).map( createLevelControl ) } />
+					<HeadingToolbar minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
 					<p>{ __( 'Text Alignment' ) }</p>
 					<AlignmentToolbar
 						value={ align }
@@ -53,6 +42,7 @@ export default function HeadingEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<RichText
+				identifier="content"
 				wrapperClassName="wp-block-heading"
 				tagName={ tagName }
 				value={ content }

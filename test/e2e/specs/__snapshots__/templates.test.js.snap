@@ -10,7 +10,7 @@ exports[`templates Using a CPT with a predefined template Should add a custom po
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
@@ -36,7 +36,7 @@ exports[`templates Using a CPT with a predefined template Should respect user ed
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
-<blockquote class=\\"wp-block-quote\\"></blockquote>
+<blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
 <!-- /wp:quote -->
 
 <!-- wp:columns -->
@@ -52,4 +52,14 @@ exports[`templates Using a CPT with a predefined template Should respect user ed
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
+`;
+
+exports[`templates With default post format assigned should not populate edited post with default block for format 1`] = `""`;
+
+exports[`templates With default post format assigned should not populate new page with default block for format 1`] = `""`;
+
+exports[`templates With default post format assigned should populate new post with default block for format 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->"
 `;

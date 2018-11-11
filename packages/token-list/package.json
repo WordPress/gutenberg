@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/token-list",
-	"version": "1.0.0",
+	"version": "1.0.2",
 	"description": "Constructable, plain JavaScript DOMTokenList implementation, supporting non-browser runtimes.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,7 +18,7 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"@babel/runtime-corejs2": "7.0.0-beta.56",
+		"@babel/runtime": "^7.0.0",
 		"lodash": "^4.17.10"
 	},
 	"publishConfig": {

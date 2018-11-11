@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://github.com/WordPress/gutenberg",
-            "text": [
-                "Help build Gutenberg"
-            ],
+            "text": "Help build Gutenberg",
             "align": "center"
         },
         "innerBlocks": [],

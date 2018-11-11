@@ -13,14 +13,14 @@ import {
 	isEqualTokensOfType,
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
-	isValidBlock,
+	isValidBlockContent,
+	isClosedByToken,
 } from '../validation';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 	getBlockType,
-	setUnknownTypeHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -35,7 +35,6 @@ describe( 'validation', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -320,6 +319,53 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'isClosedByToken()', () => {
+		it( 'should return true if self-closed token is closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( true );
+		} );
+
+		it( 'should return false if open token is not closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: false },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token has a different name to the end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'span' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by a start token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'StartTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by an undefined token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				undefined,
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEquivalentHTML()', () => {
 		it( 'should return false for effectively inequivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
@@ -473,16 +519,48 @@ describe( 'validation', () => {
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
 		} );
+
+		it( 'should return true when comparing self-closing and normal tags', () => {
+			let isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none" />',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+
+			isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none" />'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when comparing self-closing and normal tags, ignoring trailing space', () => {
+			let isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"/>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+
+			isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"/>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
 	} );
 
-	describe( 'isValidBlock()', () => {
+	describe( 'isValidBlockContent()', () => {
 		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Apples',
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Apples'
 			);
 
 			expect( console ).toHaveWarned();
@@ -498,10 +576,10 @@ describe( 'validation', () => {
 				},
 			} );
 
-			const isValid = isValidBlock(
-				'Bananas',
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( console ).toHaveErrored();
@@ -511,10 +589,22 @@ describe( 'validation', () => {
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Bananas',
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
+			);
+
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'works also when block type object is passed as object', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const isValid = isValidBlockContent(
 				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( isValid ).toBe( true );

@@ -63,7 +63,7 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Replace contents of first paragraph with "Bar".
-		await pressTimes( 'Backspace', 3 );
+		await pressTimes( 'Backspace', 4 );
 		await page.keyboard.type( 'Bar' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -75,13 +75,23 @@ describe( 'splitting and merging blocks', () => {
 		// should remove the first.
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/8388
+
+		// First paragraph
 		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+
+		// Second paragraph
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.up( 'Shift' );
 
 		// Delete the soft line break.
 		await page.keyboard.press( 'Backspace' );
+
+		// Typing at this point should occur still within the second paragraph,
+		// while before the regression fix it would have occurred in the first.
+		await page.keyboard.type( 'Still Second' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -170,5 +180,35 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Delete' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should ensure always a default block', async () => {
+		// Feature: To avoid focus loss, removal of all blocks will result in a
+		// default block insertion at the root. Pressing backspace in a new
+		// paragraph should not effectively allow removal. This is counteracted
+		// with pre-save content processing to save post consisting of only the
+		// unmodified default block as an empty string.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/9626
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.press( 'Backspace' );
+
+		// There is a default block:
+		expect( await page.$$( '.editor-block-list__block' ) ).toHaveLength( 1 );
+
+		// But the effective saved content is still empty:
+		expect( await getEditedPostContent() ).toBe( '' );
+
+		// And focus is retained:
+		const isInDefaultBlock = await page.evaluate( () => {
+			const activeBlockName = document.activeElement
+				.closest( '[data-type]' )
+				.getAttribute( 'data-type' );
+			const defaultBlockName = window.wp.blocks.getDefaultBlockName();
+
+			return activeBlockName === defaultBlockName;
+		} );
+
+		expect( isInDefaultBlock ).toBe( true );
 	} );
 } );

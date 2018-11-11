@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/api-fetch",
-	"version": "1.1.1",
+	"version": "2.2.2",
 	"description": "Utility to make WordPress REST API requests.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,10 +19,12 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime-corejs2": "7.0.0-beta.56",
+		"@babel/runtime": "^7.0.0",
 		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/i18n": "file:../i18n"
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/url": "file:../url"
 	},
 	"publishConfig": {
 		"access": "public"

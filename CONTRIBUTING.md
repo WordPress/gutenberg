@@ -30,23 +30,23 @@ To test the plugin, or to contribute to it, you can clone this repository and bu
 ### Local Environment
 
 First, you need a WordPress Environment to run the plugin on. The quickest way to get up and running is to use the provided docker setup. Install [docker](https://www.docker.com/) and [docker-compose](https://docs.docker.com/compose/) by following the most recent instructions on the docker site.
- 
+
 In the folder of your preference, clone this project and enter the working directory:
 ```bash
 git clone git@github.com:WordPress/gutenberg.git
-cd gutenberg 
+cd gutenberg
 ```
 
 Then, run a setup script to check if docker and node are configured properly and starts the local WordPress instance. You may need to run this script multiple times if prompted.
 ```
 ./bin/setup-local-env.sh
-``` 
+```
 
 **If you're developing themes, or core WordPress functionality alongside Gutenberg**, you can make the WordPress files accessible in `wordpress/` by following these instructions instead:
 
 1. If this is your first time setting up the environment, run `DOCKER_ENV=localwpdev ./bin/setup-local-env.sh` instead of `./bin/setup-local-env.sh`
 2. If you've already had the previous environment set up, you need to start fresh, and you can do that by first running `docker-compose down --rmi all`. After that you can repeat step 1.
-3. If you turn off your computer or restart Docker, you can get your local WordPress dev enviroment back by typing `docker-compose -f docker-compose.yml -f docker-compose-localdev.yml up`. If you just run `docker-compose up`, you will get the vanilla install that doesn't expose the WordPress folder.
+3. If you turn off your computer or restart Docker, you can get your local WordPress dev environment back by typing `docker-compose -f docker-compose.yml -f docker-compose-localdev.yml up`. If you just run `docker-compose up`, you will get the vanilla install that doesn't expose the WordPress folder.
 
 **If everything was successful**, you'll see the following ascii art:
 ```
@@ -112,7 +112,7 @@ Gutenberg contains both PHP and JavaScript code, and encourages testing and code
 
 ## Managing packages
 
-This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm]. 
+This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm].
 
 ### Creating new package
 
@@ -141,7 +141,7 @@ When creating a new package you need to provide at least the following:
 		"module": "build-module/index.js",
 		"react-native": "src/index",
 		"dependencies": {
-			"@babel/runtime-corejs2": "7.0.0-beta.56"
+			"@babel/runtime": "^7.0.0"
 		},
 		"publishConfig": {
 			"access": "public"
@@ -159,7 +159,7 @@ When creating a new package you need to provide at least the following:
 	- Installation details
 	- Usage example
 	- `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
-	
+
 ### Maintaining changelogs
 
 Maintaining dozens of npm packages is difficult—it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. All packages should follow the [Semantic Versioning (`semver`) specification](https://semver.org/).
@@ -244,11 +244,11 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
-To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [manifest file](https://github.com/WordPress/gutenberg/blob/master/docs/manifest.json).
+To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [root-manifest.json](https://github.com/WordPress/gutenberg/blob/master/docs/root-manifest.json).
 
 ### `@wordpress/component`
 
-If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](./packages/components/CONTRIBUTING.md). 
+If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](./packages/components/CONTRIBUTING.md).
 
 ## Reporting Security Issues
 

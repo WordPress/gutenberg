@@ -22,7 +22,6 @@
 	<arg name="extensions" value="php"/>
 
 	<file>./bin</file>
-	<file>./block-library</file>
 	<file>./packages/block-library/src</file>
 	<file>./lib</file>
 	<exclude-pattern>./lib/parser.php</exclude-pattern>

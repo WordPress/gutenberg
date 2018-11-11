@@ -48,7 +48,7 @@ describe( 'PostTaxonomies', () => {
 			/>
 		);
 
-		expect( wrapperOne.at( 0 ) ).toHaveLength( 1 );
+		expect( wrapperOne ).toHaveLength( 1 );
 
 		const wrapperTwo = shallow(
 			<PostTaxonomies postType="book"
@@ -62,7 +62,7 @@ describe( 'PostTaxonomies', () => {
 			/>
 		);
 
-		expect( wrapperTwo.at( 0 ) ).toHaveLength( 2 );
+		expect( wrapperTwo ).toHaveLength( 2 );
 	} );
 
 	it( 'should not render taxonomy components that hide their ui', () => {

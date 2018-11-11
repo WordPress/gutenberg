@@ -16,10 +16,11 @@ import {
 	getFontSizeClass,
 	RichText,
 } from '@wordpress/editor';
+import { getPhrasingContentSchema } from '@wordpress/blocks';
 import {
-	getPhrasingContentSchema,
-	children,
-} from '@wordpress/blocks';
+	Path,
+	SVG,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -32,10 +33,10 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
-		source: 'children',
+		type: 'string',
+		source: 'html',
 		selector: 'p',
-		default: [],
+		default: '',
 	},
 	align: {
 		type: 'string',
@@ -65,6 +66,10 @@ const schema = {
 	customFontSize: {
 		type: 'number',
 	},
+	direction: {
+		type: 'string',
+		enum: [ 'ltr', 'rtl' ],
+	},
 };
 
 export const name = 'core/paragraph';
@@ -72,9 +77,9 @@ export const name = 'core/paragraph';
 export const settings = {
 	title: __( 'Paragraph' ),
 
-	description: __( 'Add some basic text.' ),
+	description: __( 'Start with the building block of all narrative.' ),
 
-	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z" /></svg>,
+	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M11 5v7H9.5C7.6 12 6 10.4 6 8.5S7.6 5 9.5 5H11m8-2H9.5C6.5 3 4 5.5 4 8.5S6.5 14 9.5 14H11v7h2V5h2v16h2V5h2V3z" /></SVG>,
 
 	category: 'common',
 
@@ -193,28 +198,21 @@ export const settings = {
 				content: {
 					type: 'string',
 					source: 'html',
+					default: '',
 				},
 			},
 			save( { attributes } ) {
 				return <RawHTML>{ attributes.content }</RawHTML>;
 			},
 			migrate( attributes ) {
-				return {
-					...attributes,
-					content: [
-						<RawHTML key="html">{ attributes.content }</RawHTML>,
-					],
-				};
+				return attributes;
 			},
 		},
 	],
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 
@@ -238,6 +236,7 @@ export const settings = {
 			customTextColor,
 			fontSize,
 			customFontSize,
+			direction,
 		} = attributes;
 
 		const textClass = getColorClassName( 'color', textColor );
@@ -245,6 +244,7 @@ export const settings = {
 		const fontSizeClass = getFontSizeClass( fontSize );
 
 		const className = classnames( {
+			'has-text-color': textColor || customTextColor,
 			'has-background': backgroundColor || customBackgroundColor,
 			'has-drop-cap': dropCap,
 			[ fontSizeClass ]: fontSizeClass,
@@ -265,6 +265,7 @@ export const settings = {
 				style={ styles }
 				className={ className ? className : undefined }
 				value={ content }
+				dir={ direction }
 			/>
 		);
 	},

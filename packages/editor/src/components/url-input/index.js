@@ -9,9 +9,9 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { UP, DOWN, ENTER } from '@wordpress/keycodes';
+import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -23,12 +23,13 @@ import { addQueryArgs } from '@wordpress/url';
 const stopEventPropagation = ( event ) => event.stopPropagation();
 
 class URLInput extends Component {
-	constructor() {
+	constructor( { autocompleteRef } ) {
 		super( ...arguments );
 
 		this.onChange = this.onChange.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.bindListNode = this.bindListNode.bind( this );
+		this.autocompleteRef = autocompleteRef || createRef();
+		this.inputRef = createRef();
 		this.updateSuggestions = throttle( this.updateSuggestions.bind( this ), 200 );
 
 		this.suggestionNodes = [];
@@ -46,7 +47,7 @@ class URLInput extends Component {
 		// when already expanded
 		if ( showSuggestions && selectedSuggestion !== null && ! this.scrollingIntoView ) {
 			this.scrollingIntoView = true;
-			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.listNode, {
+			scrollIntoView( this.suggestionNodes[ selectedSuggestion ], this.autocompleteRef.current, {
 				onlyScrollIfNeeded: true,
 			} );
 
@@ -58,10 +59,6 @@ class URLInput extends Component {
 
 	componentWillUnmount() {
 		delete this.suggestionsRequest;
-	}
-
-	bindListNode( ref ) {
-		this.listNode = ref;
 	}
 
 	bindSuggestionNode( index ) {
@@ -90,7 +87,7 @@ class URLInput extends Component {
 		} );
 
 		const request = apiFetch( {
-			path: addQueryArgs( '/gutenberg/v1/search', {
+			path: addQueryArgs( '/wp/v2/search', {
 				search: value,
 				per_page: 20,
 				type: 'post',
@@ -144,6 +141,8 @@ class URLInput extends Component {
 			return;
 		}
 
+		const post = this.state.posts[ this.state.selectedSuggestion ];
+
 		switch ( event.keyCode ) {
 			case UP: {
 				event.stopPropagation();
@@ -163,12 +162,20 @@ class URLInput extends Component {
 				} );
 				break;
 			}
+			case TAB: {
+				if ( this.state.selectedSuggestion !== null ) {
+					this.selectLink( post );
+					// Announce a link has been selected when tabbing away from the input field.
+					this.props.speak( __( 'Link selected' ) );
+				}
+				break;
+			}
 			case ENTER: {
 				if ( this.state.selectedSuggestion !== null ) {
 					event.stopPropagation();
-					const post = this.state.posts[ this.state.selectedSuggestion ];
 					this.selectLink( post );
 				}
+				break;
 			}
 		}
 	}
@@ -179,6 +186,12 @@ class URLInput extends Component {
 			selectedSuggestion: null,
 			showSuggestions: false,
 		} );
+	}
+
+	handleOnClick( post ) {
+		this.selectLink( post );
+		// Move focus to the input field when a link suggestion is clicked.
+		this.inputRef.current.focus();
 	}
 
 	render() {
@@ -196,13 +209,14 @@ class URLInput extends Component {
 						value={ value }
 						onChange={ this.onChange }
 						onInput={ stopEventPropagation }
-						placeholder={ __( 'Paste URL or type' ) }
+						placeholder={ __( 'Paste URL or type to search' ) }
 						onKeyDown={ this.onKeyDown }
 						role="combobox"
 						aria-expanded={ showSuggestions }
 						aria-autocomplete="list"
 						aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
 						aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
+						ref={ this.inputRef }
 					/>
 
 					{ ( loading ) && <Spinner /> }
@@ -213,7 +227,7 @@ class URLInput extends Component {
 						<div
 							className="editor-url-input__suggestions"
 							id={ `editor-url-input-suggestions-${ instanceId }` }
-							ref={ this.bindListNode }
+							ref={ this.autocompleteRef }
 							role="listbox"
 						>
 							{ posts.map( ( post, index ) => (
@@ -226,7 +240,7 @@ class URLInput extends Component {
 									className={ classnames( 'editor-url-input__suggestion', {
 										'is-selected': index === selectedSuggestion,
 									} ) }
-									onClick={ () => this.selectLink( post ) }
+									onClick={ () => this.handleOnClick( post ) }
 									aria-selected={ index === selectedSuggestion }
 								>
 									{ decodeEntities( post.title ) || __( '(no title)' ) }

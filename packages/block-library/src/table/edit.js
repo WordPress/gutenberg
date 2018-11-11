@@ -77,8 +77,12 @@ export default class TableEdit extends Component {
 
 	/**
 	 * Creates a table based on dimensions in local state.
+	 *
+	 * @param {Object} event Form submit event.
 	 */
-	onCreateTable() {
+	onCreateTable( event ) {
+		event.preventDefault();
+
 		const { setAttributes } = this.props;
 		let { initialRowCount, initialColumnCount } = this.state;
 
@@ -332,6 +336,7 @@ export default class TableEdit extends Component {
 							return (
 								<CellTag key={ columnIndex } className={ classes }>
 									<RichText
+										className="wp-block-table__cell-content"
 										value={ content }
 										onChange={ this.onChange }
 										unstableOnFocus={ this.createOnFocus( cell ) }

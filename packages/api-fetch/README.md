@@ -10,15 +10,39 @@ Install the module
 npm install @wordpress/api-fetch --save
 ```
 
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ## Usage
 
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
+apiFetch( { path: '/wp-json/wp/v2/posts' } ).then( posts => {
 	console.log( posts );
 } );
 ```
+
+### Options
+
+`apiFetch` supports and passes through all [options of the `fetch` global](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch).
+
+Additionally, the following options are available:
+
+#### `path` (`string`)
+
+Shorthand to be used in place of `url`, appended to the REST API root URL for the current site.
+
+#### `url` (`string`)
+
+Absolute URL to the endpoint from which to fetch.
+
+#### `parse` (`boolean`, default `true`)
+
+Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the parsed JSON result. Disable this behavior by passing `parse` as `false`.
+
+#### `data` (`object`)
+
+Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
 
 ### Middlewares
 

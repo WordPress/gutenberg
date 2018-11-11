@@ -16,9 +16,20 @@
  */
 function render_block_core_archives( $attributes ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
-	$class           = "wp-block-archives align{$attributes['align']}";
+
+	$class = 'wp-block-archives';
+
+	if ( isset( $attributes['align'] ) ) {
+		$class .= " align{$attributes['align']}";
+	}
+
+	if ( isset( $attributes['className'] ) ) {
+		$class .= " {$attributes['className']}";
+	}
 
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
+
+		$class .= ' wp-block-archives-dropdown';
 
 		$dropdown_id = esc_attr( uniqid( 'wp-block-archives-' ) );
 		$title       = __( 'Archives', 'gutenberg' );
@@ -68,6 +79,8 @@ function render_block_core_archives( $attributes ) {
 		);
 	} else {
 
+		$class .= ' wp-block-archives-list';
+
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
 		$archives_args = apply_filters(
 			'widget_archives_args',
@@ -79,13 +92,25 @@ function render_block_core_archives( $attributes ) {
 
 		$archives_args['echo'] = 0;
 
-		$block_content = wp_get_archives( $archives_args );
+		$archives = wp_get_archives( $archives_args );
 
-		$block_content = sprintf(
-			'<ul class="%1$s">%2$s</ul>',
-			esc_attr( $class ),
-			$block_content
-		);
+		$classnames = esc_attr( $class );
+
+		if ( empty( $archives ) ) {
+
+			$block_content = sprintf(
+				'<div class="%1$s">%2$s</div>',
+				$classnames,
+				__( 'No archives to show.', 'gutenberg' )
+			);
+		} else {
+
+			$block_content = sprintf(
+				'<ul class="%1$s">%2$s</ul>',
+				$classnames,
+				$archives
+			);
+		}
 	}
 
 	return $block_content;
@@ -99,17 +124,19 @@ function register_block_core_archives() {
 		'core/archives',
 		array(
 			'attributes'      => array(
-				'showPostCounts'    => array(
-					'type'    => 'boolean',
-					'default' => false,
+				'align'             => array(
+					'type' => 'string',
+				),
+				'className'         => array(
+					'type' => 'string',
 				),
 				'displayAsDropdown' => array(
 					'type'    => 'boolean',
 					'default' => false,
 				),
-				'align'             => array(
-					'type'    => 'string',
-					'default' => 'none',
+				'showPostCounts'    => array(
+					'type'    => 'boolean',
+					'default' => false,
 				),
 			),
 			'render_callback' => 'render_block_core_archives',

@@ -12,6 +12,8 @@ import * as code from './code';
 import * as heading from './heading';
 import * as more from './more';
 import * as paragraph from './paragraph';
+import * as image from './image';
+import * as nextpage from './nextpage';
 
 export const registerCoreBlocks = () => {
 	[
@@ -19,6 +21,8 @@ export const registerCoreBlocks = () => {
 		heading,
 		code,
 		more,
+		image,
+		nextpage,
 	].forEach( ( { name, settings } ) => {
 		registerBlockType( name, settings );
 	} );

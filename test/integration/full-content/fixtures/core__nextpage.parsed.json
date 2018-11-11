@@ -1,12 +1,16 @@
 [
     {
         "blockName": "core/nextpage",
-        "attrs": null,
+        "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<!--nextpage-->\n"
+        "innerHTML": "\n<!--nextpage-->\n",
+        "innerContent": [ "\n<!--nextpage-->\n" ]
     },
     {
+        "blockName": null,
         "attrs": {},
-        "innerHTML": "\n"
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [ "\n" ]
     }
 ]

@@ -41,10 +41,11 @@ export const settings = {
 			selector: 'p',
 			query: {
 				children: {
-					source: 'children',
+					type: 'string',
+					source: 'html',
 				},
 			},
-			default: [ [], [] ],
+			default: [ {}, {} ],
 		},
 		columns: {
 			type: 'number',

@@ -1,66 +1,170 @@
 /**
+ * WordPress dependencies
+ */
+import { createBlobURL } from '@wordpress/blob';
+import apiFetch from '@wordpress/api-fetch';
+
+/**
  * Internal dependencies
  */
 import { mediaUpload, getMimeTypesArray } from '../media-upload';
 
-const invalidMediaObj = {
-	url: 'https://cldup.com/uuUqE_dXzy.jpg',
-	type: 'text/xml',
-};
+jest.mock( '@wordpress/blob', () => ( {
+	createBlobURL: jest.fn(),
+	revokeBlobURL: jest.fn(),
+} ) );
+jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
-const validMediaObj = {
-	url: 'https://cldup.com/uuUqE_dXzy.jpg',
-	type: 'image/jpeg',
-	size: 1024,
-	name: 'test.jpeg',
-};
+const xmlFile = new window.File( [ 'fake_file' ], 'test.xml', { type: 'text/xml' } );
+const imageFile = new window.File( [ 'fake_file' ], 'test.jpeg', { type: 'image/jpeg' } );
 
 describe( 'mediaUpload', () => {
-	const onFileChangeSpy = jest.fn();
-
-	it( 'should do nothing on no files', () => {
-		mediaUpload( { filesList: [], onFileChange: onFileChangeSpy, allowedType: 'image' } );
-		expect( onFileChangeSpy ).not.toHaveBeenCalled();
-	} );
-
-	it( 'should do nothing on invalid image type', () => {
-		mediaUpload( { filesList: [ invalidMediaObj ], onFileChange: onFileChangeSpy, allowedType: 'image' } );
-		expect( onFileChangeSpy ).not.toHaveBeenCalled();
-	} );
-
-	it( 'should call error handler with the correct error object if file size is greater than the maximum', () => {
+	it( 'should do nothing on no files', async () => {
 		const onError = jest.fn();
-
-		mediaUpload( {
-			allowedType: 'image',
-			filesList: [ validMediaObj ],
-			onFileChange: onFileChangeSpy,
-			maxUploadFileSize: 512,
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			filesList: [],
 			onError,
+			onFileChange,
 		} );
-		expect( onError ).toBeCalledWith( {
+
+		expect( onError ).not.toHaveBeenCalled();
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should error if allowedTypes contains a partial mime type and the validation fails', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: [ xmlFile ],
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should error if allowedTypes contains a complete mime type and the validation fails', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image/gif' ],
+			filesList: [ imageFile ],
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should work if allowedTypes contains a complete mime type and the validation succeeds', async () => {
+		createBlobURL.mockReturnValue( 'blob:fake_blob' );
+		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
+
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image/jpeg' ],
+			filesList: [ imageFile ],
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).not.toHaveBeenCalled();
+		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should error if allowedTypes contains multiple types and the validation fails', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'video', 'image' ],
+			filesList: [ xmlFile ],
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should work if allowedTypes contains multiple types and the validation succeeds', async () => {
+		createBlobURL.mockReturnValue( 'blob:fake_blob' );
+		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
+
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'video', 'image' ],
+			filesList: [ imageFile ],
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).not.toHaveBeenCalled();
+		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should only fail the invalid file and still allow others to succeed when uploading multiple files', async () => {
+		createBlobURL.mockReturnValue( 'blob:fake_blob' );
+		apiFetch.mockResolvedValue( { title: { raw: 'Test' } } );
+
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: [ imageFile, xmlFile ],
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
+			code: 'MIME_TYPE_NOT_SUPPORTED',
+			file: xmlFile,
+		} ) );
+		expect( onFileChange ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'should error if the file size is greater than the maximum', async () => {
+		const onError = jest.fn();
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: [ imageFile ],
+			maxUploadFileSize: 1,
+			onError,
+			onFileChange,
+		} );
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
 			code: 'SIZE_ABOVE_LIMIT',
-			file: validMediaObj,
-			message: `${ validMediaObj.name } exceeds the maximum upload size for this site.`,
-		} );
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 
-	it( 'should call error handler with the correct error object if file type is not allowed for user', () => {
+	it( 'should call error handler with the correct error object if file type is not allowed for user', async () => {
 		const onError = jest.fn();
-		const allowedMimeTypes = { aac: 'audio/aac' };
-
-		mediaUpload( {
-			allowedType: 'image',
-			filesList: [ validMediaObj ],
-			onFileChange: onFileChangeSpy,
+		const onFileChange = jest.fn();
+		await mediaUpload( {
+			allowedTypes: [ 'image' ],
+			filesList: [ imageFile ],
 			onError,
-			allowedMimeTypes,
+			wpAllowedMimeTypes: { aac: 'audio/aac' },
 		} );
-		expect( onError ).toBeCalledWith( {
+
+		expect( onError ).toHaveBeenCalledWith( expect.objectContaining( {
 			code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-			file: validMediaObj,
-			message: 'Sorry, this file type is not permitted for security reasons.',
-		} );
+		} ) );
+		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 } );
 

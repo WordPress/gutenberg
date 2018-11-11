@@ -1,0 +1,23 @@
+[
+    {
+        "blockName": "core/cover",
+        "attrs": {
+            "url": "https://cldup.com/uuUqE_dXzy.jpg",
+            "dimRatio": 40
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<div class=\"wp-block-cover has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-text\">Guten Berg!</p>\n</div>\n",
+        "innerContent": [
+            "\n<div class=\"wp-block-cover has-background-dim-40 has-background-dim\" style=\"background-image:url(https://cldup.com/uuUqE_dXzy.jpg)\">\n    <p class=\"wp-block-cover-text\">Guten Berg!</p>\n</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

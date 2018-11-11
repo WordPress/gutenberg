@@ -6,24 +6,15 @@ import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 class UnsavedChangesWarning extends Component {
-	/**
-	 * @inheritdoc
-	 */
 	constructor() {
 		super( ...arguments );
 		this.warnIfUnsavedChanges = this.warnIfUnsavedChanges.bind( this );
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	componentDidMount() {
 		window.addEventListener( 'beforeunload', this.warnIfUnsavedChanges );
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	componentWillUnmount() {
 		window.removeEventListener( 'beforeunload', this.warnIfUnsavedChanges );
 	}
@@ -31,20 +22,19 @@ class UnsavedChangesWarning extends Component {
 	/**
 	 * Warns the user if there are unsaved changes before leaving the editor.
 	 *
-	 * @param   {Event}   event Event Object.
-	 * @return {string?}       Warning message.
+	 * @param {Event} event `beforeunload` event.
+	 *
+	 * @return {?string} Warning prompt message, if unsaved changes exist.
 	 */
 	warnIfUnsavedChanges( event ) {
-		const { isDirty, forceIsDirty = () => false } = this.props;
-		if ( isDirty || forceIsDirty() ) {
+		const { isDirty } = this.props;
+
+		if ( isDirty ) {
 			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
 			return event.returnValue;
 		}
 	}
 
-	/**
-	 * @inheritdoc
-	 */
 	render() {
 		return null;
 	}

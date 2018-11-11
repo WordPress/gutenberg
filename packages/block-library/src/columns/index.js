@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
-import { times, property, omit } from 'lodash';
+import { times } from 'lodash';
 import classnames from 'classnames';
 import memoize from 'memize';
 
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+import { PanelBody, RangeControl, G, SVG, Path } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import {
@@ -39,17 +39,38 @@ const getColumnsTemplate = memoize( ( columns ) => {
 	return times( columns, () => [ 'core/column' ] );
 } );
 
+/**
+ * Given an HTML string for a deprecated columns inner block, returns the
+ * column index to which the migrated inner block should be assigned. Returns
+ * undefined if the inner block was not assigned to a column.
+ *
+ * @param {string} originalContent Deprecated Columns inner block HTML.
+ *
+ * @return {?number} Column to which inner block is to be assigned.
+ */
+function getDeprecatedLayoutColumn( originalContent ) {
+	let { doc } = getDeprecatedLayoutColumn;
+	if ( ! doc ) {
+		doc = document.implementation.createHTMLDocument( '' );
+		getDeprecatedLayoutColumn.doc = doc;
+	}
+
+	let columnMatch;
+
+	doc.body.innerHTML = originalContent;
+	for ( const classListItem of doc.body.firstChild.classList ) {
+		if ( ( columnMatch = classListItem.match( /^layout-column-(\d+)$/ ) ) ) {
+			return Number( columnMatch[ 1 ] ) - 1;
+		}
+	}
+}
+
 export const name = 'core/columns';
 
 export const settings = {
-	title: sprintf(
-		/* translators: Block title modifier */
-		__( '%1$s (%2$s)' ),
-		__( 'Columns' ),
-		__( 'beta' )
-	),
+	title: __( 'Columns' ),
 
-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M21 4H3L2 5v14l1 1h18l1-1V5l-1-1zM8 18H4V6h4v12zm6 0h-4V6h4v12zm6 0h-4V6h4v12z" /></g></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M21 4H3L2 5v14l1 1h18l1-1V5l-1-1zM8 18H4V6h4v12zm6 0h-4V6h4v12zm6 0h-4V6h4v12z" /></G></SVG>,
 
 	category: 'layout',
 
@@ -75,23 +96,30 @@ export const settings = {
 				},
 			},
 			isEligible( attributes, innerBlocks ) {
-				return innerBlocks.some( property( [ 'attributes', 'layout' ] ) );
-			},
-			migrate( attributes, innerBlocks ) {
-				function withoutLayout( block ) {
-					return {
-						...block,
-						attributes: omit( block.attributes, [ 'layout' ] ),
-					};
+				// Since isEligible is called on every valid instance of the
+				// Columns block and a deprecation is the unlikely case due to
+				// its subsequent migration, optimize for the `false` condition
+				// by performing a naive, inaccurate pass at inner blocks.
+				const isFastPassEligible = innerBlocks.some( ( innerBlock ) => (
+					/layout-column-\d+/.test( innerBlock.originalContent )
+				) );
+
+				if ( ! isFastPassEligible ) {
+					return false;
 				}
 
+				// Only if the fast pass is considered eligible is the more
+				// accurate, durable, slower condition performed.
+				return innerBlocks.some( ( innerBlock ) => (
+					getDeprecatedLayoutColumn( innerBlock.originalContent ) !== undefined
+				) );
+			},
+			migrate( attributes, innerBlocks ) {
 				const columns = innerBlocks.reduce( ( result, innerBlock ) => {
-					const { layout } = innerBlock.attributes;
+					const { originalContent } = innerBlock;
 
-					let columnIndex, columnMatch;
-					if ( layout && ( columnMatch = layout.match( /^column-(\d+)$/ ) ) ) {
-						columnIndex = Number( columnMatch[ 1 ] ) - 1;
-					} else {
+					let columnIndex = getDeprecatedLayoutColumn( originalContent );
+					if ( columnIndex === undefined ) {
 						columnIndex = 0;
 					}
 
@@ -99,7 +127,7 @@ export const settings = {
 						result[ columnIndex ] = [];
 					}
 
-					result[ columnIndex ].push( withoutLayout( innerBlock ) );
+					result[ columnIndex ].push( innerBlock );
 
 					return result;
 				}, [] );

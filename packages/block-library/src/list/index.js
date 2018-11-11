@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, compact, get, initial, last, isEmpty, omit } from 'lodash';
+import { find, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,17 +12,13 @@ import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
-	getBlockType,
 } from '@wordpress/blocks';
 import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import splitOnLineBreak from './split-on-line-break';
+import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wordpress/rich-text';
+import { G, Path, SVG } from '@wordpress/components';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -51,10 +47,11 @@ const schema = {
 		default: false,
 	},
 	values: {
-		type: 'array',
-		source: 'children',
+		type: 'string',
+		source: 'html',
 		selector: 'ol,ul',
-		default: [],
+		multiline: 'li',
+		default: '',
 	},
 };
 
@@ -62,8 +59,8 @@ export const name = 'core/list';
 
 export const settings = {
 	title: __( 'List' ),
-	description: __( 'Numbers, bullets, up to you. Add a list of items.' ),
-	icon: <svg role="img" aria-hidden="true" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M9 19h12v-2H9v2zm0-6h12v-2H9v2zm0-8v2h12V5H9zm-4-.5c-.828 0-1.5.672-1.5 1.5S4.172 7.5 5 7.5 6.5 6.828 6.5 6 5.828 4.5 5 4.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z" /></g></svg>,
+	description: __( 'Create a bulleted or numbered list.' ),
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><G><Path d="M9 19h12v-2H9v2zm0-6h12v-2H9v2zm0-8v2h12V5H9zm-4-.5c-.828 0-1.5.672-1.5 1.5S4.172 7.5 5 7.5 6.5 6.828 6.5 6 5.828 4.5 5 4.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z" /></G></SVG>,
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 
@@ -78,31 +75,25 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
-					let items = blockAttributes.map( ( { content } ) => content );
-					const hasItems = ! items.every( isEmpty );
-
-					// Look for line breaks if converting a single paragraph,
-					// then treat each line as a list item.
-					if ( hasItems && items.length === 1 ) {
-						items = splitOnLineBreak( items[ 0 ] );
-					}
-
 					return createBlock( 'core/list', {
-						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
+						values: toHTMLString( {
+							value: join( blockAttributes.map( ( { content } ) =>
+								replace( create( { html: content } ), /\n/g, LINE_SEPARATOR )
+							), LINE_SEPARATOR ),
+							multilineTag: 'li',
+						} ),
 					} );
 				},
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
-				transform: ( { value, citation } ) => {
-					const items = value.map( ( p ) => get( p, [ 'children', 'props', 'children' ] ) );
-					if ( ! isEmpty( citation ) ) {
-						items.push( citation );
-					}
-					const hasItems = ! items.every( isEmpty );
+				transform: ( { value } ) => {
 					return createBlock( 'core/list', {
-						values: hasItems ? items.map( ( content, index ) => <li key={ index }>{ content }</li> ) : [],
+						values: toHTMLString( {
+							value: create( { html: value, multilineTag: 'p' } ),
+							multilineTag: 'li',
+						} ),
 					} );
 				},
 			},
@@ -116,7 +107,7 @@ export const settings = {
 				transform( node ) {
 					return createBlock( 'core/list', {
 						...getBlockAttributes(
-							getBlockType( 'core/list' ),
+							'core/list',
 							node.outerHTML
 						),
 						ordered: node.nodeName === 'OL',
@@ -128,7 +119,7 @@ export const settings = {
 				regExp: /^[*-]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						values: [ <li key="1">{ content }</li> ],
+						values: `<li>${ content }</li>`,
 					} );
 				},
 			},
@@ -138,7 +129,7 @@ export const settings = {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						ordered: true,
-						values: [ <li key="1">{ content }</li> ],
+						values: `<li>${ content }</li>`,
 					} );
 				},
 			},
@@ -148,20 +139,30 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					compact( values.map( ( value ) => get( value, [ 'props', 'children' ], null ) ) )
-						.map( ( content ) => createBlock( 'core/paragraph', {
-							content: [ content ],
-						} ) ),
+					split( create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ), LINE_SEPARATOR )
+						.map( ( piece ) =>
+							createBlock( 'core/paragraph', {
+								content: toHTMLString( { value: piece } ),
+							} )
+						),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: compact( ( values.length === 1 ? values : initial( values ) )
-							.map( ( value ) => get( value, [ 'props', 'children' ], null ) ) )
-							.map( ( children ) => ( { children: <p>{ children }</p> } ) ),
-						citation: ( values.length === 1 ? undefined : [ get( last( values ), [ 'props', 'children' ] ) ] ),
+						value: toHTMLString( {
+							value: create( {
+								html: values,
+								multilineTag: 'li',
+								multilineWrapperTags: [ 'ul', 'ol' ],
+							} ),
+							multilineTag: 'p',
+						} ),
 					} );
 				},
 			},
@@ -203,19 +204,15 @@ export const settings = {
 	],
 
 	merge( attributes, attributesToMerge ) {
-		const valuesToMerge = attributesToMerge.values || [];
+		const { values } = attributesToMerge;
 
-		// Standard text-like block attribute.
-		if ( attributesToMerge.content ) {
-			valuesToMerge.push( attributesToMerge.content );
+		if ( ! values || values === '<li></li>' ) {
+			return attributes;
 		}
 
 		return {
 			...attributes,
-			values: [
-				...attributes.values,
-				...valuesToMerge,
-			],
+			values: attributes.values + values,
 		};
 	},
 
@@ -244,12 +241,12 @@ export const settings = {
 				} );
 			} );
 
-			// this checks for languages that do not typically have square brackets on their keyboards
+			// Check for languages that do not have square brackets on their keyboards.
 			const lang = window.navigator.browserLanguage || window.navigator.language;
-			const keyboardHasSqBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
+			const keyboardHasSquareBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
 
-			if ( keyboardHasSqBracket ) {
-				// keycode 219 = '[' and keycode 221 = ']'
+			if ( keyboardHasSquareBracket ) {
+				// `[` is keycode 219; `]` is keycode 221.
 				editor.shortcuts.add( 'meta+219', 'Decrease indent', 'Outdent' );
 				editor.shortcuts.add( 'meta+221', 'Increase indent', 'Indent' );
 			} else {
@@ -265,7 +262,7 @@ export const settings = {
 				const { setAttributes } = this.props;
 				const { internalListType } = this.state;
 				if ( internalListType ) {
-					// only change list types, don't toggle off internal lists
+					// Only change list types, don't toggle off internal lists.
 					if ( internalListType !== type && this.editor ) {
 						this.editor.execCommand( command );
 					}
@@ -336,6 +333,7 @@ export const settings = {
 						] }
 					/>
 					<RichText
+						identifier="values"
 						multiline="li"
 						tagName={ tagName }
 						unstableGetSettings={ this.getEditorSettings }
@@ -353,7 +351,7 @@ export const settings = {
 										blocks.push( createBlock( 'core/paragraph' ) );
 									}
 
-									if ( after.length ) {
+									if ( after !== '<li></li>' ) {
 										blocks.push( createBlock( 'core/list', {
 											ordered,
 											values: after,
@@ -377,7 +375,7 @@ export const settings = {
 		const tagName = ordered ? 'ol' : 'ul';
 
 		return (
-			<RichText.Content tagName={ tagName } value={ values } />
+			<RichText.Content tagName={ tagName } value={ values } multiline="li" />
 		);
 	},
 };

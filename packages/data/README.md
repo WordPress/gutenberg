@@ -12,6 +12,8 @@ Install the module
 npm install @wordpress/data --save
 ```
 
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ## Registering a Store
 
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
@@ -283,6 +285,93 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 //
 //  <SaleButton>Start Sale!</SaleButton>
 ```
+
+## Generic Stores
+
+The `@wordpress/data` module offers a more advanced and generic interface for the purposes of integrating other data systems and situations where more direct control over a data system is needed. In this case, a data store will need to be implemented outside of `@wordpress/data` and then plugged in via three functions:
+
+- `getSelectors()`: Returns an object of selector functions, pre-mapped to the store.
+- `getActions()`: Returns an object of action functions, pre-mapped to the store.
+- `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
+   - Behaves as Redux [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+   with the following differences:
+      - Doesn't have to implement an unsubscribe, since the registry never uses it.
+	  - Only has to support one listener (the registry).
+
+By implementing the above interface for your custom store, you gain the benefits of using the registry and the `withSelect` and `withDispatch` higher order components in your application code. This provides seamless integration with existing and alternative data systems.
+
+Integrating an existing redux store with its own reducers, store enhancers and middleware can be accomplished as follows:
+
+_Example:_
+
+```js
+import existingSelectors from './existing-app/selectors';
+import existingActions from './existing-app/actions';
+import createStore from './existing-app/store';
+
+const reduxStore = createStore();
+
+const mappedSelectors = existingSelectors.map( ( selector ) => {
+	return ( ...args ) => selector( reduxStore.getState(), ...args );
+} );
+
+const mappedActions = existingActions.map( ( action ) => {
+	return actions.map( ( action ) => {
+		return ( ...args ) => reduxStore.dispatch( action( ...args ) );
+	} );
+} );
+
+const genericStore = {
+	getSelectors() {
+		return mappedSelectors;
+	},
+	getActions() {
+		return mappedActions;
+	},
+	subscribe: reduxStore.subscribe;
+};
+
+registry.registerGenericStore( 'existing-app', genericStore );
+```
+
+It is also possible to implement a completely custom store from scratch:
+
+_Example:_
+
+```js
+function createCustomStore() {
+	let storeChanged = () => {};
+	const prices = { hammer: 7.50 };
+
+	const selectors = {
+		getPrice( itemName ): {
+			return prices[ itemName ];
+		},
+	};
+
+	const actions = {
+		setPrice( itemName, price ): {
+			prices[ itemName ] = price;
+			storeChanged();
+		},
+	};
+
+	return {
+		getSelectors() {
+			return selectors;
+		},
+		getActions() {
+			return actions;
+		},
+		subscribe( listener ) {
+			storeChanged = listener;
+		}
+	};
+}
+
+registry.registerGenericStore( 'custom-data', createCustomStore() );
+```
+
 
 ## Comparison with Redux
 

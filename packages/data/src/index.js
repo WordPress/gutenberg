@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { combineReducers } from 'redux';
+import combineReducers from 'turbo-combine-reducers';
 
 /**
  * Internal dependencies
@@ -13,10 +13,6 @@ export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
 export { createRegistry } from './registry';
-export {
-	restrictPersistence,
-	setPersistenceStorage,
-} from './deprecated';
 export { plugins };
 
 /**
@@ -34,10 +30,10 @@ export { combineReducers };
 export const select = defaultRegistry.select;
 export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
+export const registerGenericStore = defaultRegistry.registerGenericStore;
 export const registerStore = defaultRegistry.registerStore;
 export const registerReducer = defaultRegistry.registerReducer;
 export const registerActions = defaultRegistry.registerActions;
 export const registerSelectors = defaultRegistry.registerSelectors;
 export const registerResolvers = defaultRegistry.registerResolvers;
-export const setupPersistence = defaultRegistry.setupPersistence;
 export const use = defaultRegistry.use;

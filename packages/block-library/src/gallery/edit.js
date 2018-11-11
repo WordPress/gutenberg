@@ -7,7 +7,7 @@ import { filter, pick } from 'lodash';
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	IconButton,
 	DropZone,
@@ -38,10 +38,15 @@ const linkOptions = [
 	{ value: 'media', label: __( 'Media File' ) },
 	{ value: 'none', label: __( 'None' ) },
 ];
+const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export function defaultColumnsNumber( attributes ) {
 	return Math.min( 3, attributes.images.length );
 }
+
+export const pickRelevantMediaFiles = ( image ) => {
+	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
+};
 
 class GalleryEdit extends Component {
 	constructor() {
@@ -86,7 +91,7 @@ class GalleryEdit extends Component {
 
 	onSelectImages( images ) {
 		this.props.setAttributes( {
-			images: images.map( ( image ) => pick( image, [ 'alt', 'caption', 'id', 'link', 'url' ] ) ),
+			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
 		} );
 	}
 
@@ -131,11 +136,12 @@ class GalleryEdit extends Component {
 		const currentImages = this.props.attributes.images || [];
 		const { noticeOperations, setAttributes } = this.props;
 		mediaUpload( {
-			allowedType: 'image',
+			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList: files,
 			onFileChange: ( images ) => {
+				const imagesNormalized = images.map( ( image ) => pickRelevantMediaFiles( image ) );
 				setAttributes( {
-					images: currentImages.concat( images ),
+					images: currentImages.concat( imagesNormalized ),
 				} );
 			},
 			onError: noticeOperations.createErrorNotice,
@@ -168,7 +174,7 @@ class GalleryEdit extends Component {
 					<Toolbar>
 						<MediaUpload
 							onSelect={ this.onSelectImages }
-							type="image"
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							multiple
 							gallery
 							value={ images.map( ( img ) => img.id ) }
@@ -195,11 +201,11 @@ class GalleryEdit extends Component {
 						className={ className }
 						labels={ {
 							title: __( 'Gallery' ),
-							name: __( 'images' ),
+							instructions: __( 'Drag images, upload new ones or select files from your library.' ),
 						} }
 						onSelect={ this.onSelectImages }
 						accept="image/*"
-						type="image"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						multiple
 						notices={ noticeUI }
 						onError={ noticeOperations.createErrorNotice }
@@ -237,20 +243,26 @@ class GalleryEdit extends Component {
 				{ noticeUI }
 				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
 					{ dropZone }
-					{ images.map( ( img, index ) => (
-						<li className="blocks-gallery-item" key={ img.id || img.url }>
-							<GalleryImage
-								url={ img.url }
-								alt={ img.alt }
-								id={ img.id }
-								isSelected={ isSelected && this.state.selectedImage === index }
-								onRemove={ this.onRemoveImage( index ) }
-								onSelect={ this.onSelectImage( index ) }
-								setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
-								caption={ img.caption }
-							/>
-						</li>
-					) ) }
+					{ images.map( ( img, index ) => {
+						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
+						const ariaLabel = __( sprintf( 'image %1$d of %2$d in gallery', ( index + 1 ), images.length ) );
+
+						return (
+							<li className="blocks-gallery-item" key={ img.id || img.url }>
+								<GalleryImage
+									url={ img.url }
+									alt={ img.alt }
+									id={ img.id }
+									isSelected={ isSelected && this.state.selectedImage === index }
+									onRemove={ this.onRemoveImage( index ) }
+									onSelect={ this.onSelectImage( index ) }
+									setAttributes={ ( attrs ) => this.setImageAttributes( index, attrs ) }
+									caption={ img.caption }
+									aria-label={ ariaLabel }
+								/>
+							</li>
+						);
+					} ) }
 					{ isSelected &&
 						<li className="blocks-gallery-item has-add-item-button">
 							<FormFileUpload

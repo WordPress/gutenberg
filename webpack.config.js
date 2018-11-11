@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-const ExtractTextPlugin = require( 'extract-text-webpack-plugin' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
@@ -15,54 +14,13 @@ const { basename } = require( 'path' );
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
-
-// Main CSS loader for everything but blocks..
-const mainCSSExtractTextPlugin = new ExtractTextPlugin( {
-	filename: './build/[basename]/style.css',
-} );
-
-// CSS loader for styles specific to block editing.
-const editBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/block-library/edit-blocks.css',
-} );
-
-// CSS loader for styles specific to blocks in general.
-const blocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/block-library/style.css',
-} );
-
-// CSS loader for default visual block styles.
-const themeBlocksCSSPlugin = new ExtractTextPlugin( {
-	filename: './build/block-library/theme.css',
-} );
-
-// Configuration for the ExtractTextPlugin.
-const extractConfig = {
-	use: [
-		{ loader: 'raw-loader' },
-		{
-			loader: 'postcss-loader',
-			options: {
-				plugins: require( './bin/packages/post-css-config' ),
-			},
-		},
-		{
-			loader: 'sass-loader',
-			query: {
-				includePaths: [ 'edit-post/assets/stylesheets' ],
-				data: '@import "colors"; @import "breakpoints"; @import "variables"; @import "mixins"; @import "animations";@import "z-index";',
-				outputStyle: 'production' === process.env.NODE_ENV ?
-					'compressed' : 'nested',
-			},
-		},
-	],
-};
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 
 /**
- * Given a string, returns a new string with dash separators converedd to
- * camel-case equivalent. This is not as aggressive as `_.camelCase` in
- * converting to uppercase, where Lodash will convert letters following
- * numbers.
+ * Given a string, returns a new string with dash separators converted to
+ * camelCase equivalent. This is not as aggressive as `_.camelCase` in
+ * converting to uppercase, where Lodash will also capitalize letters
+ * following numbers.
  *
  * @param {string} string Input dash-delimited string.
  *
@@ -75,20 +33,17 @@ function camelCaseDash( string ) {
 	);
 }
 
-const entryPointNames = [
-	'components',
-	'edit-post',
-	'block-library',
-	'core-blocks',
-];
-
 const gutenbergPackages = [
 	'a11y',
+	'annotations',
 	'api-fetch',
 	'autop',
 	'blob',
 	'blocks',
+	'block-library',
+	'block-serialization-default-parser',
 	'block-serialization-spec-parser',
+	'components',
 	'compose',
 	'core-data',
 	'data',
@@ -96,16 +51,22 @@ const gutenbergPackages = [
 	'deprecated',
 	'dom',
 	'dom-ready',
+	'edit-post',
 	'editor',
 	'element',
+	'escape-html',
+	'format-library',
 	'hooks',
 	'html-entities',
 	'i18n',
 	'is-shallow-equal',
 	'keycodes',
+	'list-reusable-blocks',
+	'notices',
 	'nux',
 	'plugins',
 	'redux-routine',
+	'rich-text',
 	'shortcode',
 	'token-list',
 	'url',
@@ -123,30 +84,22 @@ const externals = {
 	'lodash-es': 'lodash',
 };
 
-[
-	...entryPointNames,
-	...gutenbergPackages,
-].forEach( ( name ) => {
+gutenbergPackages.forEach( ( name ) => {
 	externals[ `@wordpress/${ name }` ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
 	};
 } );
 
-const config = {
-	mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+const isProduction = process.env.NODE_ENV === 'production';
+const mode = isProduction ? 'production' : 'development';
 
-	entry: Object.assign(
-		entryPointNames.reduce( ( memo, path ) => {
-			const name = camelCaseDash( path );
-			memo[ name ] = `./${ path }`;
-			return memo;
-		}, {} ),
-		gutenbergPackages.reduce( ( memo, packageName ) => {
-			const name = camelCaseDash( packageName );
-			memo[ name ] = `./packages/${ packageName }`;
-			return memo;
-		}, {} ),
-	),
+const config = {
+	mode,
+	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
+		const name = camelCaseDash( packageName );
+		memo[ name ] = `./packages/${ packageName }`;
+		return memo;
+	}, {} ),
 	output: {
 		filename: './build/[basename]/index.js',
 		path: __dirname,
@@ -179,41 +132,9 @@ const config = {
 				],
 				use: 'babel-loader',
 			},
-			{
-				test: /style\.s?css$/,
-				include: [
-					/block-library/,
-				],
-				use: blocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /editor\.s?css$/,
-				include: [
-					/block-library/,
-				],
-				use: editBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /theme\.s?css$/,
-				include: [
-					/block-library/,
-				],
-				use: themeBlocksCSSPlugin.extract( extractConfig ),
-			},
-			{
-				test: /\.s?css$/,
-				exclude: [
-					/block-library/,
-				],
-				use: mainCSSExtractTextPlugin.extract( extractConfig ),
-			},
 		],
 	},
 	plugins: [
-		blocksCSSPlugin,
-		editBlocksCSSPlugin,
-		themeBlocksCSSPlugin,
-		mainCSSExtractTextPlugin,
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
@@ -266,18 +187,22 @@ const config = {
 				},
 			} ) )
 		),
-	],
+		// GUTENBERG_BUNDLE_ANALYZER global variable enables utility that represents bundle content
+		// as convenient interactive zoomable treemap.
+		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
+		// GUTENBERG_LIVE_RELOAD_PORT global variable changes port on which live reload works
+		// when running watch mode.
+		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
+	].filter( Boolean ),
 	stats: {
 		children: false,
 	},
 };
 
-if ( config.mode !== 'production' ) {
-	config.devtool = process.env.SOURCEMAP || 'source-map';
-}
-
-if ( config.mode === 'development' ) {
-	config.plugins.push( new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ) );
+if ( ! isProduction ) {
+	// GUTENBERG_DEVTOOL global variable controls how source maps are generated.
+	// See: https://webpack.js.org/configuration/devtool/#devtool.
+	config.devtool = process.env.GUTENBERG_DEVTOOL || 'source-map';
 }
 
 module.exports = config;

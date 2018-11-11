@@ -6,9 +6,9 @@ import { get } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { PanelBody, Button, ClipboardButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { PanelBody, Button, ClipboardButton, TextControl } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -24,6 +24,13 @@ class PostPublishPanelPostpublish extends Component {
 		};
 		this.onCopy = this.onCopy.bind( this );
 		this.onSelectInput = this.onSelectInput.bind( this );
+		this.postLink = createRef();
+	}
+
+	componentDidMount() {
+		if ( this.props.focusOnMount ) {
+			this.postLink.current.focus();
+		}
 	}
 
 	componentWillUnmount() {
@@ -49,28 +56,31 @@ class PostPublishPanelPostpublish extends Component {
 
 	render() {
 		const { children, isScheduled, post, postType } = this.props;
+		const postLabel = get( postType, [ 'labels', 'singular_name' ] );
 		const viewPostLabel = get( postType, [ 'labels', 'view_item' ] );
 
 		const postPublishNonLinkHeader = isScheduled ?
 			<Fragment>{ __( 'is now scheduled. It will go live on' ) } <PostScheduleLabel />.</Fragment> :
 			__( 'is now live.' );
-		const postPublishBodyText = isScheduled ?
-			__( 'The post address will be:' ) :
-			__( 'What’s next?' );
 
 		return (
 			<div className="post-publish-panel__postpublish">
 				<PanelBody className="post-publish-panel__postpublish-header">
-					<a href={ post.link }>{ post.title || __( '(no title)' ) }</a> { postPublishNonLinkHeader }
+					<a ref={ this.postLink } href={ post.link }>{ post.title || __( '(no title)' ) }</a> { postPublishNonLinkHeader }
 				</PanelBody>
 				<PanelBody>
-					<div><strong>{ postPublishBodyText }</strong></div>
-					<input
-						className="post-publish-panel__postpublish-link-input"
+					<p className="post-publish-panel__postpublish-subheader">
+						<strong>{ __( 'What’s next?' ) }</strong>
+					</p>
+					<TextControl
+						className="post-publish-panel__postpublish-post-address"
 						readOnly
+						label={ sprintf(
+							/* translators: %s: post type singular name */
+							__( '%s address' ), postLabel
+						) }
 						value={ post.link }
 						onFocus={ this.onSelectInput }
-						type="text"
 					/>
 					<div className="post-publish-panel__postpublish-buttons">
 						{ ! isScheduled && (

@@ -44,19 +44,12 @@ if [ ! -z "$changed" ]; then
 	exit 1
 fi
 
-branch="$(git rev-parse --abbrev-ref HEAD)"
-if [ "$branch" != 'master' ]; then
-	warning "WARNING: You should probably be running this script against the
-         'master' branch (current: '$branch')"
-	sleep 2
-fi
-
 # Do a dry run of the repository reset. Prompting the user for a list of all
 # files that will be removed should prevent them from losing important files!
 status "Resetting the repository to pristine condition. ✨"
 git clean -xdf --dry-run
 warning "🚨 About to delete everything above! Is this okay? 🚨"
-echo -n "[Y]es/[N]o: "
+echo -n "[y]es/[N]o: "
 read answer
 if [ "$answer" != "${answer#[Yy]}" ]; then
 	# Remove ignored files to reset repository to pristine condition. Previous
@@ -120,8 +113,8 @@ status "Creating archive... 🎁"
 zip -r gutenberg.zip \
 	gutenberg.php \
 	lib/*.php \
-	block-library/*/*.php \
 	packages/block-library/src/*/*.php \
+	packages/block-serialization-default-parser/*.php \
 	post-content.php \
 	$vendor_scripts \
 	$build_files \

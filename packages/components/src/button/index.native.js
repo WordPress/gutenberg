@@ -1,10 +1,10 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 
 export default function Button( props ) {
-	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed } = props;
+	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;
 	return (
 		<TouchableOpacity
 			accessible={ true }
@@ -12,7 +12,10 @@ export default function Button( props ) {
 			onPress={ onClick }
 			style={ { borderColor: ariaPressed ? 'black' : 'white', borderWidth: 1, borderRadius: 2 } }
 		>
-			{ children }
+			<View style={ { height: 44, width: 44, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' } }>
+				{ children }
+				{ subscript && ( <Text style={ { fontVariant: [ 'small-caps' ] } }>{ subscript }</Text> ) }
+			</View>
 		</TouchableOpacity>
 	);
 }

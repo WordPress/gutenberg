@@ -12,24 +12,38 @@ import {
 	registerBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import { dispatch as dataDispatch, createRegistry } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
+import actions, {
+	updateEditorSettings,
 	setupEditorState,
 	mergeBlocks,
 	replaceBlocks,
+	resetBlocks,
 	selectBlock,
-	createErrorNotice,
 	setTemplateValidity,
-	editPost,
 } from '../actions';
-import effects from '../effects';
+import effects, { validateBlocksToTemplate } from '../effects';
+import { SAVE_POST_NOTICE_ID } from '../effects/posts';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
+import applyMiddlewares from '../middlewares';
+import '../../';
 
 describe( 'effects', () => {
+	beforeAll( () => {
+		jest.spyOn( dataDispatch( 'core/notices' ), 'createErrorNotice' );
+		jest.spyOn( dataDispatch( 'core/notices' ), 'createSuccessNotice' );
+	} );
+
+	beforeEach( () => {
+		dataDispatch( 'core/notices' ).createErrorNotice.mockReset();
+		dataDispatch( 'core/notices' ).createSuccessNotice.mockReset();
+	} );
+
 	const defaultBlockSettings = { save: () => 'Saved', category: 'common', title: 'block title' };
 
 	describe( '.MERGE_BLOCKS', () => {
@@ -207,16 +221,6 @@ describe( 'effects', () => {
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 
-		function createGetState( hasLingeringEdits = false ) {
-			let state = reducer( undefined, {} );
-			if ( hasLingeringEdits ) {
-				state = reducer( state, editPost( { edited: true } ) );
-			}
-
-			const getState = () => state;
-			return getState;
-		}
-
 		const defaultPost = {
 			id: 1,
 			title: {
@@ -234,108 +238,80 @@ describe( 'effects', () => {
 			...defaultPost,
 			status: 'publish',
 		} );
+		const getPostType = () => ( {
+			labels: {
+				view_item: 'View post',
+				item_published: 'Post published.',
+				item_reverted_to_draft: 'Post reverted to draft.',
+				item_updated: 'Post updated.',
+			},
+		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType } );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
-				notice: {
-					content: <p>Post published!{ ' ' }<a>View post</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
-					id: 'SAVE_POST_NOTICE_ID',
-					isDismissible: true,
-					status: 'success',
-					spokenMessage: 'Post published!',
-				},
-				type: 'CREATE_NOTICE',
-			} ) );
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
+				'Post published.',
+				{
+					id: SAVE_POST_NOTICE_ID,
+					actions: [
+						{ label: 'View post', url: undefined },
+					],
+				}
+			);
 		} );
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType } );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
-				notice: {
-					content: <p>
-						Post reverted to draft.
-						{ ' ' }
-						{ false }
-					</p>,
-					id: 'SAVE_POST_NOTICE_ID',
-					isDismissible: true,
-					status: 'success',
-					spokenMessage: 'Post reverted to draft.',
-				},
-				type: 'CREATE_NOTICE',
-			} ) );
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
+				'Post reverted to draft.',
+				{
+					id: SAVE_POST_NOTICE_ID,
+					actions: [],
+				}
+			);
 		} );
 
 		it( 'should dispatch notices when just updating a published post again', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
+			const postType = getPostType();
 
-			handler( { post, previousPost }, store );
+			handler( { post, previousPost, postType } );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( expect.objectContaining( {
-				notice: {
-					content: <p>Post updated!{ ' ' }<a>{ 'View post' }</a></p>, // eslint-disable-line jsx-a11y/anchor-is-valid
-					id: 'SAVE_POST_NOTICE_ID',
-					isDismissible: true,
-					status: 'success',
-					spokenMessage: 'Post updated!',
-				},
-				type: 'CREATE_NOTICE',
-			} ) );
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
+				'Post updated.',
+				{
+					id: SAVE_POST_NOTICE_ID,
+					actions: [
+						{ label: 'View post', url: undefined },
+					],
+				}
+			);
 		} );
 
 		it( 'should do nothing if the updated post was autosaved', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getPublishedPost();
 			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
 
-			handler( { post, previousPost, isAutosave: true }, store );
+			handler( { post, previousPost, isAutosave: true } );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 0 );
-		} );
-
-		it( 'should dispatch dirtying action if edits linger after autosave', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState( true ) };
-
-			const previousPost = getPublishedPost();
-			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
-
-			handler( { post, previousPost, isAutosave: true }, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( { type: 'DIRTY_ARTIFICIALLY' } );
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).not.toHaveBeenCalled();
 		} );
 	} );
 
 	describe( '.REQUEST_POST_UPDATE_FAILURE', () => {
 		it( 'should dispatch a notice on failure when publishing a draft fails.', () => {
 			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
-			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
 
 			const action = {
 				post: {
@@ -353,16 +329,13 @@ describe( 'effects', () => {
 				},
 			};
 
-			handler( action, store );
+			handler( action );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Publishing failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+			expect( dataDispatch( 'core/notices' ).createErrorNotice ).toHaveBeenCalledWith( 'Publishing failed', { id: SAVE_POST_NOTICE_ID } );
 		} );
 
 		it( 'should not dispatch a notice when there were no changes for autosave to save.', () => {
 			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
-			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
 
 			const action = {
 				post: {
@@ -383,15 +356,13 @@ describe( 'effects', () => {
 				},
 			};
 
-			handler( action, store );
+			handler( action );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 0 );
+			expect( dataDispatch( 'core/notices' ).createErrorNotice ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should dispatch a notice on failure when trying to update a draft.', () => {
 			const handler = effects.REQUEST_POST_UPDATE_FAILURE;
-			const dispatch = jest.fn();
-			const store = { getState: () => {}, dispatch };
 
 			const action = {
 				post: {
@@ -409,10 +380,9 @@ describe( 'effects', () => {
 				},
 			};
 
-			handler( action, store );
+			handler( action );
 
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( createErrorNotice( 'Updating failed', { id: 'SAVE_POST_NOTICE_ID' } ) );
+			expect( dataDispatch( 'core/notices' ).createErrorNotice ).toHaveBeenCalledWith( 'Updating failed', { id: SAVE_POST_NOTICE_ID } );
 		} );
 	} );
 
@@ -441,12 +411,14 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post, settings: {} }, { getState } );
 
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
 				setupEditorState( post, [], {} ),
 			] );
 		} );
@@ -468,14 +440,16 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post }, { getState } );
 
-			expect( result[ 1 ].blocks ).toHaveLength( 1 );
+			expect( result[ 0 ].blocks ).toHaveLength( 1 );
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
-				setupEditorState( post, result[ 1 ].blocks, {} ),
+				setupEditorState( post, result[ 0 ].blocks, {} ),
 			] );
 		} );
 
@@ -495,14 +469,88 @@ describe( 'effects', () => {
 					template: null,
 					templateLock: false,
 				},
+				template: {
+					isValid: true,
+				},
 			} );
 
 			const result = handler( { post }, { getState } );
 
 			expect( result ).toEqual( [
-				setTemplateValidity( true ),
 				setupEditorState( post, [], { title: 'A History of Pork' } ),
 			] );
+		} );
+	} );
+
+	describe( 'validateBlocksToTemplate', () => {
+		let store;
+		beforeEach( () => {
+			store = createRegistry().registerStore( 'test', {
+				actions,
+				selectors,
+				reducer,
+			} );
+			applyMiddlewares( store );
+
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+		} );
+
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
+
+		it( 'should return undefined if no template assigned', () => {
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return undefined if invalid but unlocked', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/foo', {} ],
+				],
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return undefined if locked and valid', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/test-block' ],
+				],
+				templateLock: 'all',
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toBe( undefined );
+		} );
+
+		it( 'should return validity set action if invalid on default state', () => {
+			store.dispatch( updateEditorSettings( {
+				template: [
+					[ 'core/foo' ],
+				],
+				templateLock: 'all',
+			} ) );
+
+			const result = validateBlocksToTemplate( resetBlocks( [
+				createBlock( 'core/test-block' ),
+			] ), store );
+
+			expect( result ).toEqual( setTemplateValidity( false ) );
 		} );
 	} );
 } );

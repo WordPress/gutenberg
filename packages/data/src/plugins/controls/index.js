@@ -22,6 +22,8 @@ export default function( registry ) {
 					store,
 					enhancer( createStore )( options.reducer )
 				);
+
+				registry.namespaces[ reducerKey ].supportControls = true;
 			}
 
 			return store;

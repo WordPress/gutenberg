@@ -6,19 +6,145 @@ import { castArray, mapValues } from 'lodash';
 /**
  * Internal dependencies
  */
-import {
-	isActionLike,
-	isAsyncIterable,
-	isIterable,
-	toAsyncIterable,
-	createRegistry,
-} from '../registry';
+import { createRegistry } from '../registry';
 
 describe( 'createRegistry', () => {
 	let registry;
 
+	const unsubscribes = [];
+	function subscribeWithUnsubscribe( ...args ) {
+		const unsubscribe = registry.subscribe( ...args );
+		unsubscribes.push( unsubscribe );
+		return unsubscribe;
+	}
+	function subscribeUntil( predicates ) {
+		predicates = castArray( predicates );
+
+		return new Promise( ( resolve ) => {
+			subscribeWithUnsubscribe( () => {
+				if ( predicates.every( ( predicate ) => predicate() ) ) {
+					resolve();
+				}
+			} );
+		} );
+	}
+
 	beforeEach( () => {
 		registry = createRegistry();
+	} );
+
+	afterEach( () => {
+		let unsubscribe;
+		while ( ( unsubscribe = unsubscribes.shift() ) ) {
+			unsubscribe();
+		}
+	} );
+
+	describe( 'registerGenericStore', () => {
+		let getSelectors;
+		let getActions;
+		let subscribe;
+
+		beforeEach( () => {
+			getSelectors = () => ( {} );
+			getActions = () => ( {} );
+			subscribe = () => ( {} );
+		} );
+
+		it( 'should throw if not all required config elements are present', () => {
+			expect( () => registry.registerGenericStore( 'grocer', {} ) ).toThrow();
+			expect( () => registry.registerGenericStore( 'grocer', { getSelectors, getActions } ) ).toThrow();
+			expect( () => registry.registerGenericStore( 'grocer', { getActions, subscribe } ) ).toThrow();
+		} );
+
+		describe( 'getSelectors', () => {
+			it( 'should make selectors available via registry.select', () => {
+				const items = {
+					broccoli: { price: 2, quantity: 15 },
+					lettuce: { price: 1, quantity: 12 },
+				};
+
+				function getPrice( itemName ) {
+					const item = items[ itemName ];
+					return item && item.price;
+				}
+
+				function getQuantity( itemName ) {
+					const item = items[ itemName ];
+					return item && item.quantity;
+				}
+
+				getSelectors = () => ( { getPrice, getQuantity } );
+
+				registry.registerGenericStore( 'grocer', { getSelectors, getActions, subscribe } );
+
+				expect( registry.select( 'grocer' ).getPrice ).toEqual( getPrice );
+				expect( registry.select( 'grocer' ).getQuantity ).toEqual( getQuantity );
+			} );
+		} );
+
+		describe( 'getActions', () => {
+			it( 'should make actions available via registry.dispatch', () => {
+				const dispatch = jest.fn();
+
+				function setPrice( itemName, price ) {
+					return { type: 'SET_PRICE', itemName, price };
+				}
+
+				function setQuantity( itemName, quantity ) {
+					return { type: 'SET_QUANTITY', itemName, quantity };
+				}
+
+				getActions = () => {
+					return {
+						setPrice: ( ...args ) => dispatch( setPrice( ...args ) ),
+						setQuantity: ( ...args ) => dispatch( setQuantity( ...args ) ),
+					};
+				};
+
+				registry.registerGenericStore( 'grocer', { getSelectors, getActions, subscribe } );
+
+				expect( dispatch ).not.toHaveBeenCalled();
+
+				registry.dispatch( 'grocer' ).setPrice( 'broccoli', 3 );
+				expect( dispatch ).toHaveBeenCalledTimes( 1 );
+				expect( dispatch ).toHaveBeenCalledWith(
+					{ type: 'SET_PRICE', itemName: 'broccoli', price: 3 }
+				);
+
+				registry.dispatch( 'grocer' ).setQuantity( 'lettuce', 8 );
+				expect( dispatch ).toHaveBeenCalledTimes( 2 );
+				expect( dispatch ).toHaveBeenCalledWith(
+					{ type: 'SET_QUANTITY', itemName: 'lettuce', quantity: 8 }
+				);
+			} );
+		} );
+
+		describe( 'subscribe', () => {
+			it( 'should send out updates to listeners of the registry', () => {
+				const registryListener = jest.fn();
+
+				let listener = () => {};
+				const storeChanged = () => {
+					listener();
+				};
+				subscribe = ( newListener ) => {
+					listener = newListener;
+				};
+
+				const unsubscribe = registry.subscribe( registryListener );
+				registry.registerGenericStore( 'grocer', { getSelectors, getActions, subscribe } );
+
+				expect( registryListener ).not.toHaveBeenCalled();
+				storeChanged();
+				expect( registryListener ).toHaveBeenCalledTimes( 1 );
+				storeChanged();
+				expect( registryListener ).toHaveBeenCalledTimes( 2 );
+				unsubscribe();
+				storeChanged();
+				expect( registryListener ).toHaveBeenCalledTimes( 2 );
+			} );
+		} );
 	} );
 
 	describe( 'registerStore', () => {
@@ -54,6 +180,7 @@ describe( 'createRegistry', () => {
 		} );
 	} );
 
+	// TODO: Refactor this into registerStore tests after this function is removed.
 	describe( 'registerReducer', () => {
 		it( 'Should append reducers to the state', () => {
 			const reducer1 = () => 'chicken';
@@ -64,36 +191,14 @@ describe( 'createRegistry', () => {
 
 			const store2 = registry.registerReducer( 'red2', reducer2 );
 			expect( store2.getState() ).toEqual( 'ribs' );
+
+			// This uses deprecated functions and will produce a warning.
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
+	// TODO: Refactor this into registerStore tests after this function is removed.
 	describe( 'registerResolvers', () => {
-		const unsubscribes = [];
-		afterEach( () => {
-			let unsubscribe;
-			while ( ( unsubscribe = unsubscribes.shift() ) ) {
-				unsubscribe();
-			}
-		} );
-
-		function subscribeWithUnsubscribe( ...args ) {
-			const unsubscribe = registry.subscribe( ...args );
-			unsubscribes.push( unsubscribe );
-			return unsubscribe;
-		}
-
-		function subscribeUntil( predicates ) {
-			predicates = castArray( predicates );
-
-			return new Promise( ( resolve ) => {
-				subscribeWithUnsubscribe( () => {
-					if ( predicates.every( ( predicate ) => predicate() ) ) {
-						resolve();
-					}
-				} );
-			} );
-		}
-
 		it( 'should not do anything for selectors which do not have resolvers', () => {
 			registry.registerReducer( 'demo', ( state = 'OK' ) => state );
 			registry.registerSelectors( 'demo', {
@@ -102,6 +207,9 @@ describe( 'createRegistry', () => {
 			registry.registerResolvers( 'demo', {} );
 
 			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
+
+			// This uses deprecated functions and will produce a warning.
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'should behave as a side effect for the given selector, with arguments', () => {
@@ -117,7 +225,7 @@ describe( 'createRegistry', () => {
 
 			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
 			expect( value ).toBe( 'OK' );
-			expect( resolver ).toHaveBeenCalledWith( 'OK', 'arg1', 'arg2' );
+			expect( resolver ).toHaveBeenCalledWith( 'arg1', 'arg2' );
 			registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
 			expect( resolver ).toHaveBeenCalledTimes( 1 );
 			registry.select( 'demo' ).getValue( 'arg3', 'arg4' );
@@ -219,53 +327,6 @@ describe( 'createRegistry', () => {
 			return promise;
 		} );
 
-		it( 'should resolve mixed type action array to dispatch', () => {
-			registry.registerReducer( 'counter', ( state = 0, action ) => {
-				return action.type === 'INCREMENT' ? state + 1 : state;
-			} );
-			registry.registerSelectors( 'counter', {
-				getCount: ( state ) => state,
-			} );
-			registry.registerResolvers( 'counter', {
-				getCount: () => [
-					{ type: 'INCREMENT' },
-					Promise.resolve( { type: 'INCREMENT' } ),
-				],
-			} );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'counter' ).getCount() === 2,
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
-			] );
-
-			registry.select( 'counter' ).getCount();
-
-			return promise;
-		} );
-
-		it( 'should resolve generator action to dispatch', () => {
-			registry.registerReducer( 'demo', ( state = 'NOTOK', action ) => {
-				return action.type === 'SET_OK' ? 'OK' : state;
-			} );
-			registry.registerSelectors( 'demo', {
-				getValue: ( state ) => state,
-			} );
-			registry.registerResolvers( 'demo', {
-				* getValue() {
-					yield { type: 'SET_OK' };
-				},
-			} );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'demo' ).getValue() === 'OK',
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'demo', 'getValue' ),
-			] );
-
-			registry.select( 'demo' ).getValue();
-
-			return promise;
-		} );
-
 		it( 'should resolve promise action to dispatch', () => {
 			registry.registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 				return action.type === 'SET_OK' ? 'OK' : state;
@@ -311,30 +372,6 @@ describe( 'createRegistry', () => {
 			} );
 		} );
 
-		it( 'should resolve async iterator action to dispatch', () => {
-			registry.registerReducer( 'counter', ( state = 0, action ) => {
-				return action.type === 'INCREMENT' ? state + 1 : state;
-			} );
-			registry.registerSelectors( 'counter', {
-				getCount: ( state ) => state,
-			} );
-			registry.registerResolvers( 'counter', {
-				getCount: async function* () {
-					yield { type: 'INCREMENT' };
-					yield await Promise.resolve( { type: 'INCREMENT' } );
-				},
-			} );
-
-			const promise = subscribeUntil( [
-				() => registry.select( 'counter' ).getCount() === 2,
-				() => registry.select( 'core/data' ).hasFinishedResolution( 'counter', 'getCount' ),
-			] );
-
-			registry.select( 'counter' ).getCount();
-
-			return promise;
-		} );
-
 		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
 			registry.registerReducer( 'demo', ( state = 'NOTOK', action ) => {
 				return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
@@ -352,6 +389,37 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue();
 
 			return promise;
+		} );
+
+		it( 'should invalidate the resolver\'s resolution cache', async () => {
+			registry.registerStore( 'demo', {
+				reducer: ( state = 'NOTOK', action ) => {
+					return action.type === 'SET_OK' && state === 'NOTOK' ? 'OK' : 'NOTOK';
+				},
+				selectors: {
+					getValue: ( state ) => state,
+				},
+				resolvers: {
+					getValue: {
+						fulfill: () => Promise.resolve( { type: 'SET_OK' } ),
+						shouldInvalidate: ( action ) => action.type === 'INVALIDATE',
+					},
+				},
+				actions: {
+					invalidate: () => ( { type: 'INVALIDATE' } ),
+				},
+			} );
+
+			let promise = subscribeUntil( () => registry.select( 'demo' ).getValue() === 'OK' );
+			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK
+			await promise;
+
+			// Invalidate the cache
+			registry.dispatch( 'demo' ).invalidate();
+
+			promise = subscribeUntil( () => registry.select( 'demo' ).getValue() === 'NOTOK' );
+			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK
+			await promise;
 		} );
 	} );
 
@@ -375,20 +443,6 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'subscribe', () => {
-		const unsubscribes = [];
-		afterEach( () => {
-			let unsubscribe;
-			while ( ( unsubscribe = unsubscribes.shift() ) ) {
-				unsubscribe();
-			}
-		} );
-
-		function subscribeWithUnsubscribe( ...args ) {
-			const unsubscribe = registry.subscribe( ...args );
-			unsubscribes.push( unsubscribe );
-			return unsubscribe;
-		}
-
 		it( 'registers multiple selectors to the public API', () => {
 			let incrementedValue = null;
 			const store = registry.registerReducer( 'myAwesomeReducer', ( state = 0 ) => state + 1 );
@@ -470,6 +524,9 @@ describe( 'createRegistry', () => {
 			registry.dispatch( 'counter' ).increment(); // state = 1
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
+
+			// This uses deprecated functions and will produce a warning.
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -484,7 +541,16 @@ describe( 'createRegistry', () => {
 				// representation of the object, the latter applying its
 				// function proxying.
 				expect( _registry ).toMatchObject(
-					mapValues( registry, () => expect.any( Function ) )
+					mapValues( registry, ( value, key ) => {
+						if ( key === 'stores' ) {
+							return expect.any( Object );
+						}
+						// TODO: Remove this after namsespaces is removed.
+						if ( key === 'namespaces' ) {
+							return registry.stores;
+						}
+						return expect.any( Function );
+					} )
 				);
 
 				actualOptions = options;
@@ -506,116 +572,5 @@ describe( 'createRegistry', () => {
 
 			expect( registry.select() ).toBe( 10 );
 		} );
-	} );
-} );
-
-describe( 'isActionLike', () => {
-	it( 'returns false if non-action-like', () => {
-		expect( isActionLike( undefined ) ).toBe( false );
-		expect( isActionLike( null ) ).toBe( false );
-		expect( isActionLike( [] ) ).toBe( false );
-		expect( isActionLike( {} ) ).toBe( false );
-		expect( isActionLike( 1 ) ).toBe( false );
-		expect( isActionLike( 0 ) ).toBe( false );
-		expect( isActionLike( Infinity ) ).toBe( false );
-		expect( isActionLike( { type: null } ) ).toBe( false );
-	} );
-
-	it( 'returns true if action-like', () => {
-		expect( isActionLike( { type: 'POW' } ) ).toBe( true );
-	} );
-} );
-
-describe( 'isAsyncIterable', () => {
-	it( 'returns false if not async iterable', () => {
-		expect( isAsyncIterable( undefined ) ).toBe( false );
-		expect( isAsyncIterable( null ) ).toBe( false );
-		expect( isAsyncIterable( [] ) ).toBe( false );
-		expect( isAsyncIterable( {} ) ).toBe( false );
-	} );
-
-	it( 'returns true if async iterable', async () => {
-		async function* getAsyncIterable() {
-			yield new Promise( ( resolve ) => process.nextTick( resolve ) );
-		}
-
-		const result = getAsyncIterable();
-
-		expect( isAsyncIterable( result ) ).toBe( true );
-
-		await result;
-	} );
-} );
-
-describe( 'isIterable', () => {
-	it( 'returns false if not iterable', () => {
-		expect( isIterable( undefined ) ).toBe( false );
-		expect( isIterable( null ) ).toBe( false );
-		expect( isIterable( {} ) ).toBe( false );
-		expect( isIterable( Promise.resolve( {} ) ) ).toBe( false );
-	} );
-
-	it( 'returns true if iterable', () => {
-		function* getIterable() {
-			yield 'foo';
-		}
-
-		const result = getIterable();
-
-		expect( isIterable( result ) ).toBe( true );
-		expect( isIterable( [] ) ).toBe( true );
-	} );
-} );
-
-describe( 'toAsyncIterable', () => {
-	it( 'normalizes async iterable', async () => {
-		async function* getAsyncIterable() {
-			yield await Promise.resolve( { ok: true } );
-		}
-
-		const object = getAsyncIterable();
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes promise', async () => {
-		const object = Promise.resolve( { ok: true } );
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes object', async () => {
-		const object = { ok: true };
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes array of promise', async () => {
-		const object = [ Promise.resolve( { ok: true } ) ];
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes mixed array', async () => {
-		const object = [ { foo: 'bar' }, Promise.resolve( { ok: true } ) ];
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { foo: 'bar' } );
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
-	} );
-
-	it( 'normalizes generator', async () => {
-		function* getIterable() {
-			yield Promise.resolve( { ok: true } );
-		}
-
-		const object = getIterable();
-		const normalized = toAsyncIterable( object );
-
-		expect( ( await normalized.next() ).value ).toEqual( { ok: true } );
 	} );
 } );

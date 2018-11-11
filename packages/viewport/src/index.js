@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, forEach, debounce, mapValues, property } from 'lodash';
+import { reduce, forEach, debounce, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -47,7 +47,7 @@ const OPERATORS = {
  * maximum of one time per call stack.
  */
 const setIsMatching = debounce( () => {
-	const values = mapValues( queries, property( 'matches' ) );
+	const values = mapValues( queries, ( query ) => query.matches );
 	dispatch( 'core/viewport' ).setIsMatching( values );
 }, { leading: true } );
 

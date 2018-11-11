@@ -11,10 +11,12 @@ import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
-	getBlockType,
-	children,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
+import {
+	Path,
+	SVG,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -39,9 +41,10 @@ const supports = {
 
 const schema = {
 	content: {
-		type: 'array',
-		source: 'children',
+		type: 'string',
+		source: 'html',
 		selector: 'h1,h2,h3,h4,h5,h6',
+		default: '',
 	},
 	level: {
 		type: 'number',
@@ -60,9 +63,9 @@ export const name = 'core/heading';
 export const settings = {
 	title: __( 'Heading' ),
 
-	description: __( 'Introduce topics and help visitors (and search engines!) understand how your content is organized.' ),
+	description: __( 'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.' ),
 
-	icon: <svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5 4v3h5.5v12h3V7H19V4z" /><path fill="none" d="M0 0h24v24H0V0z" /></svg>,
+	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M5 4v3h5.5v12h3V7H19V4z" /><Path fill="none" d="M0 0h24v24H0V0z" /></SVG>,
 
 	category: 'common',
 
@@ -97,7 +100,7 @@ export const settings = {
 				transform( node ) {
 					return createBlock( 'core/heading', {
 						...getBlockAttributes(
-							getBlockType( 'core/heading' ),
+							'core/heading',
 							node.outerHTML
 						),
 						level: getLevelFromHeadingNodeName( node.nodeName ),
@@ -167,10 +170,7 @@ export const settings = {
 
 	merge( attributes, attributesToMerge ) {
 		return {
-			content: children.concat(
-				attributes.content,
-				attributesToMerge.content
-			),
+			content: attributes.content + attributesToMerge.content,
 		};
 	},
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blob",
-	"version": "1.0.3",
+	"version": "2.1.0",
 	"description": "Blob utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -18,8 +18,9 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime-corejs2": "7.0.0-beta.56"
+		"@babel/runtime": "^7.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

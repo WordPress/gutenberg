@@ -7,9 +7,9 @@ import { flatMap } from 'lodash';
 /**
  * Internal dependencies
  */
-import IconButton from '../icon-button';
+import ToolbarButton from '../toolbar-button';
+import DropdownMenu from '../dropdown-menu';
 import ToolbarContainer from './toolbar-container';
-import ToolbarButtonContainer from './toolbar-button-container';
 
 /**
  * Renders a toolbar with controls.
@@ -41,7 +41,7 @@ import ToolbarButtonContainer from './toolbar-button-container';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( { controls = [], children, className } ) {
+function Toolbar( { controls = [], children, className, isCollapsed, icon, label } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
@@ -55,31 +55,26 @@ function Toolbar( { controls = [], children, className } ) {
 		controlSets = [ controlSets ];
 	}
 
+	if ( isCollapsed ) {
+		return (
+			<DropdownMenu
+				icon={ icon }
+				label={ label }
+				controls={ controlSets }
+				className={ classnames( 'components-toolbar', className ) }
+			/>
+		);
+	}
+
 	return (
 		<ToolbarContainer className={ classnames( 'components-toolbar', className ) }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
-					<ToolbarButtonContainer
+					<ToolbarButton
 						key={ [ indexOfSet, indexOfControl ].join() }
-						className={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
-					>
-						<IconButton
-							icon={ control.icon }
-							label={ control.title }
-							shortcut={ control.shortcut }
-							data-subscript={ control.subscript }
-							onClick={ ( event ) => {
-								event.stopPropagation();
-								control.onClick();
-							} }
-							className={ classnames( 'components-toolbar__control', {
-								'is-active': control.isActive,
-							} ) }
-							aria-pressed={ control.isActive }
-							disabled={ control.isDisabled }
-						/>
-						{ control.children }
-					</ToolbarButtonContainer>
+						containerClassName={ indexOfSet > 0 && indexOfControl === 0 ? 'has-left-divider' : null }
+						{ ...control }
+					/>
 				) )
 			) ) }
 			{ children }

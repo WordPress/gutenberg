@@ -44,7 +44,7 @@ class FlatTermSelector extends Component {
 			this.setState( { loading: false } );
 			this.initRequest = this.fetchTerms( {
 				include: this.props.terms.join( ',' ),
-				per_page: 100,
+				per_page: -1,
 			} );
 			this.initRequest.then(
 				() => {
@@ -60,7 +60,6 @@ class FlatTermSelector extends Component {
 				}
 			);
 		}
-		this.searchTerms();
 	}
 
 	componentWillUnmount() {
@@ -173,14 +172,14 @@ class FlatTermSelector extends Component {
 
 		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
-		const newTermPlaceholderLabel = get(
+		const newTermLabel = get(
 			taxonomy,
-			[ 'data', 'labels', 'add_new_item' ],
+			[ 'labels', 'add_new_item' ],
 			slug === 'post_tag' ? __( 'Add New Tag' ) : __( 'Add New Term' )
 		);
 		const singularName = get(
 			taxonomy,
-			[ 'data', 'labels', 'singular_name' ],
+			[ 'labels', 'singular_name' ],
 			slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
 		);
 		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
@@ -196,7 +195,7 @@ class FlatTermSelector extends Component {
 				onInputChange={ this.searchTerms }
 				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
 				disabled={ loading }
-				placeholder={ newTermPlaceholderLabel }
+				label={ newTermLabel }
 				messages={ {
 					added: termAddedLabel,
 					removed: termRemovedLabel,

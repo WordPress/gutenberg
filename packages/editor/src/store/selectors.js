@@ -23,11 +23,24 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
-import { serialize, getBlockType, getBlockTypes, hasBlockSupport, hasChildBlocks, getUnknownTypeHandlerName } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
-import { moment } from '@wordpress/date';
-import deprecated from '@wordpress/deprecated';
+import {
+	serialize,
+	getBlockType,
+	getBlockTypes,
+	hasBlockSupport,
+	hasChildBlocksWithInserterSupport,
+	getFreeformContentHandlerName,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
+import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+import { select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+
+/**
+ * Dependencies
+ */
+import { PREFERENCES_DEFAULTS } from './defaults';
 
 /***
  * Module constants
@@ -41,6 +54,7 @@ export const INSERTER_UTILITY_NONE = 0;
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
+const ONE_MINUTE_IN_MS = 60 * 1000;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -89,6 +103,26 @@ export function isEditedPostNew( state ) {
 }
 
 /**
+ * Returns true if content includes unsaved changes, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether content includes unsaved changes.
+ */
+export function hasChangedContent( state ) {
+	return (
+		state.editor.present.blocks.isDirty ||
+
+		// `edits` is intended to contain only values which are different from
+		// the saved post, so the mere presence of a property is an indicator
+		// that the value is different than what is known to be saved. While
+		// content in Visual mode is represented by the blocks state, in Text
+		// mode it is tracked by `edits.content`.
+		'content' in state.editor.present.edits
+	);
+}
+
+/**
  * Returns true if there are unsaved values for the current edit session, or
  * false if the editing state matches the saved or new post.
  *
@@ -97,23 +131,34 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
+	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
+	// Edits should contain only fields which differ from the saved post (reset
+	// at initial load and save complete). Thus, a non-empty edits state can be
+	// inferred to contain unsaved values.
+	if ( Object.keys( state.editor.present.edits ).length > 0 ) {
+		return true;
+	}
+
+	// Edits and change detectiona are reset at the start of a save, but a post
+	// is still considered dirty until the point at which the save completes.
+	// Because the save is performed optimistically, the prior states are held
+	// until committed. These can be referenced to determine whether there's a
+	// chance that state may be reverted into one considered dirty.
+	return inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
- * Returns true if there are no unsaved values for the current edit session and if
- * the currently edited post is new (and has never been saved before).
+ * Returns true if there are no unsaved values for the current edit session and
+ * if the currently edited post is new (has never been saved before).
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether new post and unsaved values exist.
  */
 export function isCleanNewPost( state ) {
-	deprecated( 'isCleanNewPost selector', {
-		version: '3.8',
-		plugin: 'Gutenberg',
-	} );
-
 	return ! isEditedPostDirty( state ) && isEditedPostNew( state );
 }
 
@@ -184,9 +229,41 @@ export function getCurrentPostLastRevisionId( state ) {
  *
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
-export function getPostEdits( state ) {
-	return state.editor.present.edits;
-}
+export const getPostEdits = createSelector(
+	( state ) => {
+		return {
+			...state.initialEdits,
+			...state.editor.present.edits,
+		};
+	},
+	( state ) => [
+		state.editor.present.edits,
+		state.initialEdits,
+	]
+);
+
+/**
+ * Returns a new reference when edited values have changed. This is useful in
+ * inferring where an edit has been made between states by comparison of the
+ * return values using strict equality.
+ *
+ * @example
+ *
+ * ```
+ * const hasEditOccurred = (
+ *    getReferenceByDistinctEdits( beforeState ) !==
+ *    getReferenceByDistinctEdits( afterState )
+ * );
+ * ```
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {*} A value whose reference will change only when an edit occurs.
+ */
+export const getReferenceByDistinctEdits = createSelector(
+	() => [],
+	( state ) => [ state.editor ],
+);
 
 /**
  * Returns an attribute value of the saved post.
@@ -292,7 +369,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+		( post.status === 'future' && ! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) );
 }
 
 /**
@@ -356,17 +433,40 @@ export function isEditedPostSaveable( state ) {
 
 /**
  * Returns true if the edited post has content. A post has content if it has at
- * least one block or otherwise has a non-empty content property assigned.
+ * least one saveable block or otherwise has a non-empty content property
+ * assigned.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
-	return (
-		! getBlockCount( state ) &&
-		! getEditedPostAttribute( state, 'content' )
-	);
+	const blocks = getBlocksForSerialization( state );
+
+	// While the condition of truthy content string is sufficient to determine
+	// emptiness, testing saveable blocks length is a trivial operation. Since
+	// this function can be called frequently, optimize for the fast case as a
+	// condition of the mere existence of blocks. Note that the value of edited
+	// content is used in place of blocks, thus allowed to fall through.
+	if ( blocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
+		// Pierce the abstraction of the serializer in knowing that blocks are
+		// joined with with newlines such that even if every individual block
+		// produces an empty save result, the serialized content is non-empty.
+		if ( blocks.length > 1 ) {
+			return false;
+		}
+
+		// Freeform and unregistered blocks omit comment delimiters in their
+		// output. The freeform block specifically may produce an empty string
+		// to save. In the case of a single freeform block, fall through to the
+		// full serialize. Otherwise, the single block is assumed non-empty by
+		// virtue of its comment delimiters.
+		if ( blocks[ 0 ].name !== getFreeformContentHandlerName() ) {
+			return false;
+		}
+	}
+
+	return ! getEditedPostContent( state );
 }
 
 /**
@@ -387,9 +487,17 @@ export function isEditedPostAutosaveable( state ) {
 		return true;
 	}
 
+	// To avoid an expensive content serialization, use the content dirtiness
+	// flag in place of content field comparison against the known autosave.
+	// This is not strictly accurate, and relies on a tolerance toward autosave
+	// request failures for unnecessary saves.
+	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
 	// If the title, excerpt or content has changed, the post is autosaveable.
 	const autosave = getAutosave( state );
-	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
+	return [ 'title', 'excerpt' ].some( ( field ) => (
 		autosave[ field ] !== getEditedPostAttribute( state, field )
 	) );
 }
@@ -427,33 +535,34 @@ export function hasAutosave( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = moment( getEditedPostAttribute( state, 'date' ) );
-	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = moment().add( 1, 'minute' );
+	const date = getEditedPostAttribute( state, 'date' );
+	// Offset the date by one minute (network latency)
+	const checkedDate = new Date( Number( getDate( date ) ) - ONE_MINUTE_IN_MS );
 
-	return date.isAfter( now );
+	return isInTheFuture( checkedDate );
 }
 
 /**
- * Gets the document title to be used.
+ * Returns whether the current post should be considered to have a "floating"
+ * date (i.e. that it would publish "Immediately" rather than at a set time).
  *
- * @param {Object} state Global application state.
+ * Unlike in the PHP backend, the REST API returns a full date string for posts
+ * where the 0000-00-00T00:00:00 placeholder is present in the database. To
+ * infer that a post is set to publish "Immediately" we check whether the date
+ * and modified date are the same.
  *
- * @return {string} Document title.
+ * @param  {Object}  state Editor state.
+ *
+ * @return {boolean} Whether the edited post has a floating date value.
  */
-export function getDocumentTitle( state ) {
-	deprecated( 'getDocumentTitle selector', {
-		version: '3.8',
-		plugin: 'Gutenberg',
-	} );
-
-	let title = getEditedPostAttribute( state, 'title' );
-
-	if ( ! title || ! title.trim() ) {
-		title = isCleanNewPost( state ) ? __( 'New post' ) : __( '(Untitled)' );
+export function isEditedPostDateFloating( state ) {
+	const date = getEditedPostAttribute( state, 'date' );
+	const modified = getEditedPostAttribute( state, 'modified' );
+	const status = getEditedPostAttribute( state, 'status' );
+	if ( status === 'draft' || status === 'auto-draft' ) {
+		return date === modified;
 	}
-
-	return title;
+	return false;
 }
 
 /**
@@ -488,7 +597,7 @@ export const getBlockDependantsCacheBust = createSelector(
  * @return {string} Block name.
  */
 export function getBlockName( state, clientId ) {
-	const block = state.editor.present.blocksByClientId[ clientId ];
+	const block = state.editor.present.blocks.byClientId[ clientId ];
 	return block ? block.name : null;
 }
 
@@ -505,7 +614,7 @@ export function getBlockName( state, clientId ) {
  */
 export const getBlock = createSelector(
 	( state, clientId ) => {
-		const block = state.editor.present.blocksByClientId[ clientId ];
+		const block = state.editor.present.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
 		}
@@ -538,9 +647,10 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		state.editor.present.blocksByClientId[ clientId ],
+		state.editor.present.blocks.byClientId[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -571,10 +681,23 @@ export const getBlocks = createSelector(
 		);
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks,
 	]
 );
+
+/**
+ * Returns an array containing the clientIds of all descendants
+ * of the blocks given.
+ *
+ * @param {Object} state Global application state.
+ * @param {Array} clientIds Array of blocks to inspect.
+ *
+ * @return {Array} ids of descendants.
+ */
+export const getClientIdsOfDescendants = ( state, clientIds ) => flatMap( clientIds, ( clientId ) => {
+	const descendants = getBlockOrder( state, clientId );
+	return [ ...descendants, ...getClientIdsOfDescendants( state, descendants ) ];
+} );
 
 /**
  * Returns an array containing the clientIds of the top-level blocks
@@ -586,15 +709,11 @@ export const getBlocks = createSelector(
  */
 export const getClientIdsWithDescendants = createSelector(
 	( state ) => {
-		const getDescendants = ( clientIds ) => flatMap( clientIds, ( clientId ) => {
-			const descendants = getBlockOrder( state, clientId );
-			return [ ...descendants, ...getDescendants( descendants ) ];
-		} );
 		const topLevelIds = getBlockOrder( state );
-		return [ ...topLevelIds, ...getDescendants( topLevelIds ) ];
+		return [ ...topLevelIds, ...getClientIdsOfDescendants( state, topLevelIds ) ];
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 	]
 );
 
@@ -610,16 +729,16 @@ export const getClientIdsWithDescendants = createSelector(
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
 		if ( ! blockName ) {
-			return size( state.editor.present.blocksByClientId );
+			return size( state.editor.present.blocks.byClientId );
 		}
 		return reduce(
-			state.editor.present.blocksByClientId,
+			state.editor.present.blocks.byClientId,
 			( count, block ) => block.name === blockName ? count + 1 : count,
 			0
 		);
 	},
 	( state ) => [
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks.byClientId,
 	]
 );
 
@@ -638,11 +757,10 @@ export const getBlocksByClientId = createSelector(
 		( clientId ) => getBlock( state, clientId )
 	),
 	( state ) => [
-		state.editor.present.blocksByClientId,
-		state.editor.present.blockOrder,
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks,
 	]
 );
 
@@ -748,17 +866,46 @@ export function getSelectedBlock( state ) {
  *
  * @return {?string} Root client ID, if exists
  */
-export function getBlockRootClientId( state, clientId ) {
-	const { blockOrder } = state.editor.present;
+export const getBlockRootClientId = createSelector(
+	( state, clientId ) => {
+		const { order } = state.editor.present.blocks;
 
-	for ( const rootClientId in blockOrder ) {
-		if ( includes( blockOrder[ rootClientId ], clientId ) ) {
-			return rootClientId;
+		for ( const rootClientId in order ) {
+			if ( includes( order[ rootClientId ], clientId ) ) {
+				return rootClientId;
+			}
 		}
-	}
 
-	return null;
-}
+		return null;
+	},
+	( state ) => [
+		state.editor.present.blocks.order,
+	]
+);
+
+/**
+ * Given a block client ID, returns the root of the hierarchy from which the block is nested, return the block itself for root level blocks.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block from which to find root client ID.
+ *
+ * @return {string} Root client ID
+ */
+export const getBlockHierarchyRootClientId = createSelector(
+	( state, clientId ) => {
+		let rootClientId = clientId;
+		let current = clientId;
+		while ( rootClientId ) {
+			current = rootClientId;
+			rootClientId = getBlockRootClientId( state, current );
+		}
+
+		return current;
+	},
+	( state ) => [
+		state.editor.present.blocks.order,
+	]
+);
 
 /**
  * Returns the client ID of the block adjacent one at the given reference
@@ -801,8 +948,8 @@ export function getAdjacentBlockClientId( state, startClientId, modifier = 1 ) {
 		return null;
 	}
 
-	const { blockOrder } = state.editor.present;
-	const orderSet = blockOrder[ rootClientId ];
+	const { order } = state.editor.present.blocks;
+	const orderSet = order[ rootClientId ];
 	const index = orderSet.indexOf( startClientId );
 	const nextIndex = ( index + ( 1 * modifier ) );
 
@@ -901,7 +1048,7 @@ export const getMultiSelectedBlockClientIds = createSelector(
 		return blockOrder.slice( startIndex, endIndex + 1 );
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
 	],
@@ -925,11 +1072,12 @@ export const getMultiSelectedBlocks = createSelector(
 		return multiSelectedBlockClientIds.map( ( clientId ) => getBlock( state, clientId ) );
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
-		state.editor.present.blocksByClientId,
+		state.editor.present.blocks.byClientId,
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -963,10 +1111,10 @@ export function getLastMultiSelectedBlockClientId( state ) {
  * specified client ID is the first block of the multi-selection set, or false
  * otherwise.
  *
- * @param {Object} state      Editor state.
- * @param {string} clientId   Block client ID.
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
  *
- * @return {boolean} Whether block is first in mult-selection.
+ * @return {boolean} Whether block is first in multi-selection.
  */
 export function isFirstMultiSelectedBlock( state, clientId ) {
 	return getFirstMultiSelectedBlockClientId( state ) === clientId;
@@ -1006,7 +1154,7 @@ export const isAncestorMultiSelected = createSelector(
 		return isMultiSelected;
 	},
 	( state ) => [
-		state.editor.present.blockOrder,
+		state.editor.present.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
 	],
@@ -1062,7 +1210,7 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  * @return {Array} Ordered client IDs of editor blocks.
  */
 export function getBlockOrder( state, rootClientId ) {
-	return state.editor.present.blockOrder[ rootClientId || '' ] || EMPTY_ARRAY;
+	return state.editor.present.blocks.order[ rootClientId || '' ] || EMPTY_ARRAY;
 }
 
 /**
@@ -1101,15 +1249,20 @@ export function isBlockSelected( state, clientId ) {
 /**
  * Returns true if one of the block's inner blocks is selected.
  *
- * @param {Object} state    Editor state.
- * @param {string} clientId Block client ID.
+ * @param {Object}  state    Editor state.
+ * @param {string}  clientId Block client ID.
+ * @param {boolean} deep     Perform a deep check.
  *
  * @return {boolean} Whether the block as an inner block selected
  */
-export function hasSelectedInnerBlock( state, clientId ) {
+export function hasSelectedInnerBlock( state, clientId, deep = false ) {
 	return some(
 		getBlockOrder( state, clientId ),
-		( innerClientId ) => isBlockSelected( state, innerClientId )
+		( innerClientId ) => (
+			isBlockSelected( state, innerClientId ) ||
+			isBlockMultiSelected( state, innerClientId ) ||
+			( deep && hasSelectedInnerBlock( state, innerClientId, deep ) )
+		)
 	);
 }
 
@@ -1163,11 +1316,11 @@ export function isMultiSelecting( state ) {
 }
 
 /**
- * Whether is selection disable or not.
+ * Selector that returns if multi-selection is enabled or not.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} True if multi is disable, false if not.
+ * @return {boolean} True if it should be possible to multi-select blocks, false if multi-selection is disabled.
  */
 export function isSelectionEnabled( state ) {
 	return state.blockSelection.isEnabled;
@@ -1198,28 +1351,41 @@ export function isTyping( state ) {
 }
 
 /**
+ * Returns true if the caret is within formatted text, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the caret is within formatted text.
+ */
+export function isCaretWithinFormattedText( state ) {
+	return state.isCaretWithinFormattedText;
+}
+
+/**
  * Returns the insertion point, the index at which the new inserted block would
  * be placed. Defaults to the last index.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} Insertion point object with `rootClientId`, `layout`,
- * `index`.
+ * @return {Object} Insertion point object with `rootClientId`, `index`.
  */
 export function getBlockInsertionPoint( state ) {
-	let rootClientId, layout, index;
+	let rootClientId, index;
 
-	const { end } = state.blockSelection;
+	const { insertionPoint, blockSelection } = state;
+	if ( insertionPoint !== null ) {
+		return insertionPoint;
+	}
+
+	const { end } = blockSelection;
 	if ( end ) {
 		rootClientId = getBlockRootClientId( state, end ) || undefined;
-
-		layout = get( getBlock( state, end ), [ 'attributes', 'layout' ] );
 		index = getBlockIndex( state, end, rootClientId ) + 1;
 	} else {
 		index = getBlockOrder( state ).length;
 	}
 
-	return { rootClientId, layout, index };
+	return { rootClientId, index };
 }
 
 /**
@@ -1230,7 +1396,7 @@ export function getBlockInsertionPoint( state ) {
  * @return {?boolean} Whether the insertion point is visible or not.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.isInsertionPointVisible;
+	return state.insertionPoint !== null;
 }
 
 /**
@@ -1371,6 +1537,31 @@ export function getSuggestedPostFormat( state ) {
 }
 
 /**
+ * Returns a set of blocks which are to be used in consideration of the post's
+ * generated save content.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {WPBlock[]} Filtered set of blocks for save.
+ */
+export function getBlocksForSerialization( state ) {
+	const blocks = getBlocks( state );
+
+	// A single unmodified default block is assumed to be equivalent to an
+	// empty post.
+	const isSingleUnmodifiedDefaultBlock = (
+		blocks.length === 1 &&
+		isUnmodifiedDefaultBlock( blocks[ 0 ] )
+	);
+
+	if ( isSingleUnmodifiedDefaultBlock ) {
+		return [];
+	}
+
+	return blocks;
+}
+
+/**
  * Returns the content of the post being edited, preferring raw string edit
  * before falling back to serialization of block state.
  *
@@ -1385,47 +1576,41 @@ export const getEditedPostContent = createSelector(
 			return edits.content;
 		}
 
-		const blocks = getBlocks( state );
+		const blocks = getBlocksForSerialization( state );
+		const content = serialize( blocks );
 
-		if ( blocks.length === 1 && blocks[ 0 ].name === getUnknownTypeHandlerName() ) {
-			return removep( serialize( blocks ) );
+		// For compatibility purposes, treat a post consisting of a single
+		// freeform block as legacy content and downgrade to a pre-block-editor
+		// removep'd content format.
+		const isSingleFreeformBlock = (
+			blocks.length === 1 &&
+			blocks[ 0 ].name === getFreeformContentHandlerName()
+		);
+
+		if ( isSingleFreeformBlock ) {
+			return removep( content );
 		}
 
-		return serialize( blocks );
+		return content;
 	},
 	( state ) => [
+		state.editor.present.blocks,
 		state.editor.present.edits.content,
-		state.editor.present.blocksByClientId,
-		state.editor.present.blockOrder,
+		state.initialEdits.content,
 	],
 );
 
 /**
- * Returns the user notices array.
+ * Determines if the given block type is allowed to be inserted into the block list.
  *
- * @param {Object} state Global application state.
- *
- * @return {Array} List of notices.
- */
-export function getNotices( state ) {
-	return state.notices;
-}
-
-/**
- * Determines if the given block type is allowed to be inserted, and, if
- * parentClientId is provided, whether it is allowed to be nested within the
- * given parent.
- *
- * @param {Object}  state          Editor state.
- * @param {string}  blockName      The name of the given block type, e.g.
- *                                 'core/paragraph'.
- * @param {?string} parentClientId The parent that the given block is to be
- *                                 nested within, or null.
+ * @param {Object}  state        Editor state.
+ * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
 export const canInsertBlockType = createSelector(
-	( state, blockName, parentClientId = null ) => {
+	( state, blockName, rootClientId = null ) => {
 		const checkAllowList = ( list, item, defaultResult = null ) => {
 			if ( isBoolean( list ) ) {
 				return list;
@@ -1448,17 +1633,17 @@ export const canInsertBlockType = createSelector(
 			return false;
 		}
 
-		const isLocked = !! getTemplateLock( state, parentClientId );
+		const isLocked = !! getTemplateLock( state, rootClientId );
 		if ( isLocked ) {
 			return false;
 		}
 
-		const parentBlockListSettings = getBlockListSettings( state, parentClientId );
+		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
 		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
 		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
 
 		const blockAllowedParentBlocks = blockType.parent;
-		const parentName = getBlockName( state, parentClientId );
+		const parentName = getBlockName( state, rootClientId );
 		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
 
 		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
@@ -1471,9 +1656,9 @@ export const canInsertBlockType = createSelector(
 
 		return true;
 	},
-	( state, blockName, parentClientId ) => [
-		state.blockListSettings[ parentClientId ],
-		state.editor.present.blocksByClientId[ parentClientId ],
+	( state, blockName, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.editor.present.blocks.byClientId[ rootClientId ],
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	],
@@ -1513,8 +1698,8 @@ function getInsertUsage( state, id ) {
  *
  * Items are returned ordered descendingly by their 'utility' and 'frecency'.
  *
- * @param {Object}  state          Editor state.
- * @param {?string} parentClientId The block we are inserting into, if any.
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
  *
  * @return {Editor.InserterItem[]} Items that appear in inserter.
  *
@@ -1532,7 +1717,7 @@ function getInsertUsage( state, id ) {
  * @property {number}   frecency          Hueristic that combines frequency and recency.
  */
 export const getInserterItems = createSelector(
-	( state, parentClientId = null ) => {
+	( state, rootClientId = null ) => {
 		const calculateUtility = ( category, count, isContextual ) => {
 			if ( isContextual ) {
 				return INSERTER_UTILITY_HIGH;
@@ -1570,7 +1755,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			return canInsertBlockType( state, blockType.name, parentClientId );
+			return canInsertBlockType( state, blockType.name, rootClientId );
 		};
 
 		const buildBlockTypeInserterItem = ( blockType ) => {
@@ -1595,12 +1780,12 @@ export const getInserterItems = createSelector(
 				isDisabled,
 				utility: calculateUtility( blockType.category, count, isContextual ),
 				frecency: calculateFrecency( time, count ),
-				hasChildBlocks: hasChildBlocks( blockType.name ),
+				hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( blockType.name ),
 			};
 		};
 
 		const shouldIncludeReusableBlock = ( reusableBlock ) => {
-			if ( ! canInsertBlockType( state, 'core/block', parentClientId ) ) {
+			if ( ! canInsertBlockType( state, 'core/block', rootClientId ) ) {
 				return false;
 			}
 
@@ -1614,7 +1799,7 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			if ( ! canInsertBlockType( state, referencedBlockType.name, parentClientId ) ) {
+			if ( ! canInsertBlockType( state, referencedBlockType.name, rootClientId ) ) {
 				return false;
 			}
 
@@ -1649,7 +1834,7 @@ export const getInserterItems = createSelector(
 			.filter( shouldIncludeBlockType )
 			.map( buildBlockTypeInserterItem );
 
-		const reusableBlockInserterItems = getReusableBlocks( state )
+		const reusableBlockInserterItems = __experimentalGetReusableBlocks( state )
 			.filter( shouldIncludeReusableBlock )
 			.map( buildReusableBlockInserterItem );
 
@@ -1659,10 +1844,9 @@ export const getInserterItems = createSelector(
 			[ 'desc', 'desc' ]
 		);
 	},
-	( state, parentClientId ) => [
-		state.blockListSettings[ parentClientId ],
-		state.editor.present.blockOrder,
-		state.editor.present.blocksByClientId,
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.editor.present.blocks,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -1679,7 +1863,7 @@ export const getInserterItems = createSelector(
  *
  * @return {Object} The reusable block, or null if none exists.
  */
-export const getReusableBlock = createSelector(
+export const __experimentalGetReusableBlock = createSelector(
 	( state, ref ) => {
 		const block = state.reusableBlocks.data[ ref ];
 		if ( ! block ) {
@@ -1707,7 +1891,7 @@ export const getReusableBlock = createSelector(
  *
  * @return {boolean} Whether or not the reusable block is being saved.
  */
-export function isSavingReusableBlock( state, ref ) {
+export function __experimentalIsSavingReusableBlock( state, ref ) {
 	return state.reusableBlocks.isSaving[ ref ] || false;
 }
 
@@ -1720,7 +1904,7 @@ export function isSavingReusableBlock( state, ref ) {
  *
  * @return {boolean} Whether the reusable block is being fetched.
  */
-export function isFetchingReusableBlock( state, ref ) {
+export function __experimentalIsFetchingReusableBlock( state, ref ) {
 	return !! state.reusableBlocks.isFetching[ ref ];
 }
 
@@ -1731,8 +1915,11 @@ export function isFetchingReusableBlock( state, ref ) {
  *
  * @return {Array} An array of all reusable blocks.
  */
-export function getReusableBlocks( state ) {
-	return map( state.reusableBlocks.data, ( value, ref ) => getReusableBlock( state, ref ) );
+export function __experimentalGetReusableBlocks( state ) {
+	return map(
+		state.reusableBlocks.data,
+		( value, ref ) => __experimentalGetReusableBlock( state, ref )
+	);
 }
 
 /**
@@ -1867,23 +2054,24 @@ export function getBlockListSettings( state, clientId ) {
 	return state.blockListSettings[ clientId ];
 }
 
-/*
+/**
  * Returns the editor settings.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} The editor settings object
+ * @return {Object} The editor settings object.
  */
 export function getEditorSettings( state ) {
 	return state.settings;
 }
 
-/*
- * Returns the editor settings.
+/**
+ * Returns the token settings.
  *
  * @param {Object} state Editor state.
+ * @param {?string} name Token name.
  *
- * @return {Object} The editor settings object
+ * @return {Object} Token settings object, or the named token settings object if set.
  */
 export function getTokenSettings( state, name ) {
 	if ( ! name ) {
@@ -1894,6 +2082,61 @@ export function getTokenSettings( state, name ) {
 }
 
 /**
+ * Returns whether the post is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostLocked( state ) {
+	return state.postLock.isLocked;
+}
+
+/**
+ * Returns whether post saving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is locked.
+ */
+export function isPostSavingLocked( state ) {
+	return Object.keys( state.postSavingLock ).length > 0;
+}
+
+/**
+ * Returns whether the edition of the post has been taken over.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Is post lock takeover.
+ */
+export function isPostLockTakeover( state ) {
+	return state.postLock.isTakeover;
+}
+
+/**
+ * Returns details about the post lock user.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} A user object.
+ */
+export function getPostLockUser( state ) {
+	return state.postLock.user;
+}
+
+/**
+ * Returns the active post lock.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The lock object.
+ */
+export function getActivePostLock( state ) {
+	return state.postLock.activePostLock;
+}
+
+/**
  * Returns whether or not the user has the unfiltered_html capability.
  *
  * @param {Object} state Editor state.
@@ -1901,5 +2144,75 @@ export function getTokenSettings( state, name ) {
  * @return {boolean} Whether the user can or can't post unfiltered HTML.
  */
 export function canUserUseUnfilteredHTML( state ) {
-	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered_html' ] );
+	return has( getCurrentPost( state ), [ '_links', 'wp:action-unfiltered-html' ] );
+}
+
+/**
+ * Returns whether the pre-publish panel should be shown
+ * or skipped when the user clicks the "publish" button.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the pre-publish panel should be shown or not.
+ */
+export function isPublishSidebarEnabled( state ) {
+	if ( state.preferences.hasOwnProperty( 'isPublishSidebarEnabled' ) ) {
+		return state.preferences.isPublishSidebarEnabled;
+	}
+	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
+}
+
+//
+// Deprecated
+//
+
+export function getNotices() {
+	deprecated( 'getNotices selector (`core/editor` store)', {
+		alternative: 'getNotices selector (`core/notices` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return select( 'core/notices' ).getNotices();
+}
+
+export function getReusableBlock( state, ref ) {
+	deprecated( "wp.data.select( 'core/editor' ).getReusableBlock( ref )", {
+		alternative: "wp.data.select( 'core' ).getEntityRecord( 'postType', 'wp_block', ref )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalGetReusableBlock( state, ref );
+}
+
+export function isSavingReusableBlock( state, ref ) {
+	deprecated( 'isSavingReusableBlock selector (`core/editor` store)', {
+		alternative: '__experimentalIsSavingReusableBlock selector (`core/edtior` store)',
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
+	} );
+
+	return __experimentalIsSavingReusableBlock( state, ref );
+}
+
+export function isFetchingReusableBlock( state, ref ) {
+	deprecated( "wp.data.select( 'core/editor' ).isFetchingReusableBlock( ref )", {
+		alternative: "wp.data.select( 'core' ).isResolving( 'getEntityRecord', 'wp_block', ref )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalIsFetchingReusableBlock( state, ref );
+}
+
+export function getReusableBlocks( state ) {
+	deprecated( "wp.data.select( 'core/editor' ).getReusableBlocks( ref )", {
+		alternative: "wp.data.select( 'core' ).getEntityRecords( 'postType', 'wp_block' )",
+		plugin: 'Gutenberg',
+		version: '4.4.0',
+	} );
+
+	return __experimentalGetReusableBlocks( state );
 }

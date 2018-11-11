@@ -7,6 +7,7 @@
 .editor-rich-text__tinymce {
 	margin: 0;
 	position: relative;
+	line-height: $editor-line-height;
 
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
@@ -24,14 +25,6 @@
 		color: $blue-medium-700;
 	}
 
-	&:focus a[data-mce-selected] {
-		padding: 0 2px;
-		margin: 0 -2px;
-		border-radius: 2px;
-		box-shadow: 0 0 0 1px $blue-medium-100;
-		background: $blue-medium-100;
-	}
-
 	code {
 		padding: 2px;
 		border-radius: 2px;
@@ -45,11 +38,9 @@
 		}
 	}
 
-	&:focus code[data-mce-selected] {
-		background: $light-gray-400;
-	}
-
+	// Style TinyMCE inline boundaries on select inline text elements.
 	&:focus {
+		a,
 		b,
 		i,
 		strong,
@@ -64,7 +55,26 @@
 				border-radius: 2px;
 				box-shadow: 0 0 0 1px $light-gray-400;
 				background: $light-gray-400;
+
+				// Enforce a dark text color so active inline boundaries
+				// are always readable.
+				// See https://github.com/WordPress/gutenberg/issues/9508
+				color: $dark-gray-900;
 			}
+		}
+
+		// Link inline boundaries get special colors.
+		a[data-mce-selected] {
+			box-shadow: 0 0 0 1px $blue-medium-100;
+			background: $blue-medium-100;
+			color: $blue-medium-900;
+		}
+
+		// <code> inline boundaries need special treatment because their
+		// un-selected style is already padded.
+		code[data-mce-selected] {
+			background: $light-gray-400;
+			box-shadow: 0 0 0 1px $light-gray-400;
 		}
 	}
 
@@ -89,13 +99,22 @@
 		}
 	}
 
+	// Placeholder text.
 	& + .editor-rich-text__tinymce {
-		opacity: 0.5;
 		pointer-events: none;
+
+		// Use opacity to work in various editor styles.
+		// We don't specify the color here, because blocks or editor styles might provide their own.
+		&,
+		p {
+			opacity: 0.62;
+		}
 	}
 
-	&.mce-content-body {
-		line-height: $editor-line-height;
+	// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
+	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
+	&[data-is-placeholder-visible="true"] + figcaption.editor-rich-text__tinymce {
+		opacity: 0.8;
 	}
 }
 
