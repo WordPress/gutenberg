@@ -176,3 +176,160 @@ If you have settings that affects only selected content inside a block (example:
 The inspector region is shown in place of the post settings sidebar when a block is selected.
 
 Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the inspector region.
+
+{% codetabs %}
+{% ES5 %}
+```js
+var el = wp.element.createElement,
+	Fragment = wp.element.Fragment
+	registerBlockType = wp.blocks.registerBlockType,
+	RichText = wp.editor.RichText,
+	InspectorControls = wp.editor.InspectorControls,
+	AlignmentToolbar = wp.editor.AlignmentToolbar;
+
+registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
+	title: 'Hello World (Step 4)',
+
+	icon: 'universal-access-alt',
+
+	category: 'layout',
+
+	attributes: {
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: 'p',
+		},
+		alignment: {
+			type: 'string',
+		},
+	},
+
+	edit: function( props ) {
+		var content = props.attributes.content,
+			alignment = props.attributes.alignment;
+
+		function onChangeContent( newContent ) {
+			props.setAttributes( { content: newContent } );
+		}
+
+		function onChangeAlignment( newAlignment ) {
+			props.setAttributes( { alignment: newAlignment } );
+		}
+
+		return (
+			el(
+				Fragment,
+				null,
+				el(
+					InspectorControls,
+					null,
+					el(
+						AlignmentToolbar,
+						{
+							value: alignment,
+							onChange: onChangeAlignment,
+						}
+					)
+				),
+				el(
+					RichText,
+					{
+						key: 'editable',
+						tagName: 'p',
+						className: props.className,
+						style: { textAlign: alignment },
+						onChange: onChangeContent,
+						value: content,
+					}
+				)
+			)
+		);
+	},
+
+	save: function( props ) {
+		var content = props.attributes.content,
+			alignment = props.attributes.alignment;
+
+		return el( RichText.Content, {
+			tagName: 'p',
+			className: props.className,
+			style: { textAlign: alignment },
+			value: content
+		} );
+	},
+} );
+```
+{% ESNext %}
+```js
+const { registerBlockType } = wp.blocks;
+const { Fragment } = wp.element;
+const {
+	RichText
+	InspectorControls,
+	AlignmentToolbar,
+} = wp.editor;
+
+registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
+	title: 'Hello World (Step 4)',
+
+	icon: 'universal-access-alt',
+
+	category: 'layout',
+
+	attributes: {
+		content: {
+			type: 'string',
+			source: 'html',
+			selector: 'p',
+		},
+		alignment: {
+			type: 'string',
+		},
+	},
+
+	edit( { attributes, className, setAttributes } ) {
+		const { content, alignment } = attributes;
+
+		function onChangeContent( newContent ) {
+			setAttributes( { content: newContent } );
+		}
+
+		function onChangeAlignment( newAlignment ) {
+			setAttributes( { alignment: newAlignment } );
+		}
+
+		return (
+			<Fragment>
+				<InspectorControls>
+					<AlignmentToolbar
+						value={ alignment }
+						onChange={ onChangeAlignment }
+					/>
+				</InspectorControls>
+				<RichText
+					key="editable"
+					tagName="p"
+					className={ className }
+					style={ { textAlign: alignment } }
+					onChange={ onChangeContent }
+					value={ content }
+				/>
+			</Fragment>
+		);
+	},
+
+	save( { attributes } ) {
+		const { content, alignment } = attributes;
+
+		return (
+			<RichText.Content
+				style={ { textAlign: alignment } }
+				value={ content }
+				tagName="p"
+			/>
+		);
+	},
+} );
+```
+{% end %}
