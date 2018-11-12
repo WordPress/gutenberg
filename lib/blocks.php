@@ -257,6 +257,8 @@ if ( ! function_exists( 'excerpt_remove_blocks' ) ) {
 	 */
 	function excerpt_remove_blocks( $content ) {
 		$allowed_blocks = array(
+			// Classic blocks have their blockName set to null.
+			null,
 			'core/columns',
 			'core/freeform',
 			'core/heading',
