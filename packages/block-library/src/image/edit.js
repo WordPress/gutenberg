@@ -481,7 +481,15 @@ class ImageEdit extends Component {
 								imageHeight,
 							} = sizes;
 
-							const defaultedAlt = alt ? alt : sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), this.getFilename( url ) );
+							const filename = this.getFilename( url );
+							let defaultedAlt;
+							if ( alt ) {
+								defaultedAlt = alt;
+							} else if ( filename ) {
+								defaultedAlt = sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), filename );
+							} else {
+								defaultedAlt = __( 'This image has an empty alt attribute' );
+							}
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
