@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "4.2.0",
+	"version": "4.3.0",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -16,6 +16,7 @@
 	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
+		"@wordpress/annotations": "file:packages/annotations",
 		"@wordpress/api-fetch": "file:packages/api-fetch",
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
@@ -106,7 +107,7 @@
 		"stylelint": "9.5.0",
 		"stylelint-config-wordpress": "13.1.0",
 		"symlink-or-copy": "1.2.0",
-		"uuid": "3.1.0",
+		"uuid": "3.3.2",
 		"webpack": "4.8.3",
 		"webpack-bundle-analyzer": "3.0.2",
 		"webpack-cli": "2.1.3",

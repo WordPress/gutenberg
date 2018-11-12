@@ -115,3 +115,5 @@ This list is manually curated to include valuable contributions by volunteers th
 | @LukePettway | @luke_pettway |
 | @pratikthink | @pratikthink |
 | @amdrew | @sumobi |
+| @MaedahBatool | @MaedahBatool |
+| @luehrsen | @luehrsen |
