@@ -912,6 +912,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "FocalPointPicker",
+		"slug": "focal-point-picker",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/focal-point-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "FocusableIframe",
 		"slug": "focusable-iframe",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/focusable-iframe/README.md",
