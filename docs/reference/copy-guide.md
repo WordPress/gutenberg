@@ -152,7 +152,7 @@ Guidelines for writing one-line feature descriptions, or short descriptions to c
 If the user doesn't understand what using a particular option will result in, it doesn't matter how clever your pun is. Wordplay and idioms are frequently unclear, and easily misunderstood. If you use them at all, they should be as supplemental information— never to explain the main idea—and they should be something you’re fairly certain will be understandable to a pretty wide range of people.
 
 #### TWO: Refer back to section one, and look out for those bulk-adding phrases.
-Active voice is typically the better way to go, and cutting out the bulky phrasing is particularly important when you’ve got limited space and you need people to be able to make decisions and act. Often you can tighten a UI instruction phrase to be both shorter and clearer:
+Active voice is typically the better way to go, and cutting out the bulky phrasing is particularly important when you’ve got limited space and you need people to be able to make decisions and act. Often you can shorten a UI instruction phrase to be both shorter and clearer:
 
 > When you click X, Y happens.
 
@@ -160,7 +160,7 @@ vs.
 
 > Click X to do Y.
 
-We sometimes think that adding the extra words helps the user feel like they’re being walked through the product, but most of the time, they really are just extra words.
+While it can feel like adding the extra words helps walk a user through the product, the extra words just serve to obscure the point being communicated:
 
 > When you click the “settings” button, the pop-up will display the advanced settings that are available.
 
@@ -168,7 +168,7 @@ vs.
 
 > Click “settings” to access the advanced settings.
 
-Similar phrases are “Once you do X…” or “If you want to do X.” Sometimes there are decision points where “If you want to do X” is entirely appropriate and needed because there are different paths the user can take based on their goal, but we often use it to mean “Here is a thing you can do,” which you can express more simply with something like “To do X…”
+Similar phrases are “Once you do X…” or “If you want to do X…” Sometimes there are decision points where “If you want to do X…” is entirely appropriate because there are different paths the user can take based on their goal. But, we often use it to mean “Here is a thing you can do,” which you can express more simply as: “To do X…”
 
 #### THREE: Be specific.
 When an action depends on the user having completed some prior action, be specific about what’s required and what happens next. We often default to “when you’re ready.”
