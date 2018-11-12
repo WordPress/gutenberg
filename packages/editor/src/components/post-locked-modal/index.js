@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import jQuery from 'jquery';
 import { get } from 'lodash';
 
 /**
@@ -12,7 +11,8 @@ import { Modal, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import { Component } from '@wordpress/element';
-import { compose, withGlobalEvents } from '@wordpress/compose';
+import { addAction, removeAction } from '@wordpress/hooks';
+import { compose, withGlobalEvents, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,17 +30,30 @@ class PostLockedModal extends Component {
 	}
 
 	componentDidMount() {
+		const hookNamePrefix = this.getHookNamePrefix();
+
 		// Details on these events on the Heartbeat API docs
 		// https://developer.wordpress.org/plugins/javascript/heartbeat-api/
-		jQuery( document )
-			.on( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.on( 'heartbeat-tick.refresh-lock', this.receivePostLock );
+		addAction( 'heartbeat.send', hookNamePrefix + '-send', this.sendPostLock );
+		addAction( 'heartbeat.tick', hookNamePrefix + '-tick', this.receivePostLock );
 	}
 
 	componentWillUnmount() {
-		jQuery( document )
-			.off( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.off( 'heartbeat-tick.refresh-lock', this.receivePostLock );
+		const hookNamePrefix = this.getHookNamePrefix();
+
+		removeAction( 'heartbeat.send', hookNamePrefix + '-send' );
+		removeAction( 'heartbeat.tick', hookNamePrefix + '-tick' );
+	}
+
+	/**
+	 * Returns a `@wordpress/hooks` hook name specific to the instance of the
+	 * component.
+	 *
+	 * @return {string} Hook name prefix.
+	 */
+	getHookNamePrefix() {
+		const { instanceId } = this.props;
+		return 'core/editor/post-locked-modal-' + instanceId + '-heartbeat';
 	}
 
 	/**
@@ -231,5 +244,6 @@ export default compose(
 	} ),
 	withGlobalEvents( {
 		beforeunload: 'releasePostLock',
-	} )
+	} ),
+	withInstanceId,
 )( PostLockedModal );
