@@ -102,6 +102,31 @@ function getFlattenedBlocks( blocks ) {
 }
 
 /**
+ * Given a block order map object, returns *all* of the block client IDs that are
+ * a descendant of the given root client ID.
+ *
+ * Calling this with `rootClientId` set to `''` results in a list of client IDs
+ * that are in the post. That is, it excludes blocks like fetched reusable
+ * blocks which are stored into state but not visible.
+ *
+ * @param {Object}  blocksOrder  Object that maps block client IDs to a list of
+ *                               nested block client IDs.
+ * @param {?string} rootClientId The root client ID to search. Defaults to ''.
+ *
+ * @return {Array} List of descendant client IDs.
+ */
+function getNestedBlockClientIds( blocksOrder, rootClientId = '' ) {
+	const attachedClientIds = [];
+	if ( blocksOrder[ rootClientId ] ) {
+		blocksOrder[ rootClientId ].forEach( ( clientId ) => {
+			attachedClientIds.push( clientId );
+			attachedClientIds.push( ...getNestedBlockClientIds( blocksOrder, clientId ) );
+		} );
+	}
+	return attachedClientIds;
+}
+
+/**
  * Returns an object against which it is safe to perform mutating operations,
  * given the original object and its current working copy.
  *
@@ -212,6 +237,35 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 };
 
 /**
+ * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `RESET_BLOCKS` action. When dispatched, this action will replace all
+ * blocks that exist in the post, leaving blocks that exist only in state (e.g.
+ * reusable blocks) alone.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withBlockReset = ( reducer ) => ( state, action ) => {
+	if ( state && action.type === 'RESET_BLOCKS' ) {
+		const visibleClientIds = getNestedBlockClientIds( state.order );
+		return {
+			...state,
+			byClientId: {
+				...omit( state.byClientId, visibleClientIds ),
+				...getFlattenedBlocks( action.blocks ),
+			},
+			order: {
+				...omit( state.order, visibleClientIds ),
+				...mapBlockOrder( action.blocks ),
+			},
+		};
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -280,6 +334,8 @@ export const editor = flow( [
 	blocks: flow( [
 		combineReducers,
 
+		withBlockReset,
+
 		// Track whether changes exist, resetting at each post save. Relies on
 		// editor initialization firing post reset as an effect.
 		withChangeDetection( {
@@ -289,7 +345,6 @@ export const editor = flow( [
 	] )( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
 				case 'SETUP_EDITOR_STATE':
 					return getFlattenedBlocks( action.blocks );
 
@@ -392,7 +447,6 @@ export const editor = flow( [
 
 		order( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
 				case 'SETUP_EDITOR_STATE':
 					return mapBlockOrder( action.blocks );
 
