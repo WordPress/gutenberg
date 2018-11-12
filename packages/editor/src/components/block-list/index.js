@@ -2,8 +2,7 @@
  * External dependencies
  */
 import {
-	filter,
-	last,
+	findLast,
 	map,
 	invert,
 	mapValues,
@@ -89,8 +88,7 @@ class BlockList extends Component {
 		}
 
 		const y = clientY - blockContentBoundaries.top;
-		const hoveredBlocks = filter( this.coordMapKeys, ( coordY ) => coordY < y );
-		const key = last( hoveredBlocks );
+		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
 		this.onSelectionChange( this.coordMap[ key ] );
 	}
