@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+import { isEqual } from 'lodash';
 import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
@@ -29,7 +30,6 @@ export type BlockListType = {
 	mergeBlocksAction: ( string, string ) => mixed,
 	blocks: Array<BlockType>,
 	aztechtml: string,
-	refresh: boolean,
 };
 
 type PropsType = BlockListType;
@@ -40,6 +40,7 @@ type StateType = {
 	blockTypePickerVisible: boolean,
 	blocks: Array<BlockType>,
 	selectedBlockType: string,
+	refresh: boolean,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -55,6 +56,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
+			refresh: false,
 		};
 	}
 
@@ -132,14 +134,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			};
 		}
 
-		if ( state.blocks !== props.blocks ) {
+		if ( ! isEqual( state.blocks, props.blocks ) ) {
 			const blockFocused = props.blocks.find( block => block.focused );
 			if ( blockFocused ) {
 				BlockManager.focusDataSourceItem( state.dataSource, blockFocused.clientId );
 			}
+			// TODO: handle attributes change here
 			return {
 				...state,
 				blocks: props.blocks,
+				refresh: ! state.refresh,
 			};
 		}
 
@@ -287,7 +291,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				<FlatList
 					style={ styles.list }
 					data={ this.state.blocks }
-					extraData={ { refresh: this.props.refresh, inspectBlocks: this.state.inspectBlocks } }
+					extraData={ { refresh: this.state.refresh, inspectBlocks: this.state.inspectBlocks } }
 					keyExtractor={ ( item ) => item.clientId }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
@@ -352,7 +356,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.setState( { inspectBlocks } );
 	}
 
-	renderItem( value: { item: BlockType, clientId: string } ) {
+	renderItem( value: { item: BlockType } ) {
 		const insertHere = (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ styles.lineStyleAddHere }></View>
@@ -364,13 +368,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<View>
 				<BlockHolder
-					key={ value.clientId }
+					key={ value.item.clientId }
 					onInlineToolbarButtonPressed={ this.onInlineToolbarButtonPressed.bind( this ) }
 					onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
 					onChange={ this.onChange.bind( this ) }
 					showTitle={ this.state.inspectBlocks }
 					focused={ value.item.focused }
-					clientId={ value.clientId }
+					clientId={ value.item.clientId }
 					insertBlocksAfter={ ( blocks ) =>
 						this.insertBlocksAfter.bind( this )( value.item.clientId, blocks )
 					}

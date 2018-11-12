@@ -2,7 +2,7 @@
  * @format */
 
 import { connect } from 'react-redux';
-import { isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import MainApp from './MainApp';
 import { parse, serialize } from '@wordpress/blocks';
@@ -11,22 +11,14 @@ import { compose } from '@wordpress/compose';
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 const mapStateToProps = ( state, ownProps ) => {
-	let blocks = ownProps.blocks;
-	let refresh = false;
-
-	const newBlocks = ownProps.blocks.map( ( block ) => {
-		block.focused = ownProps.isBlockSelected( block.clientId );
-		return block;
+	const blocks = ownProps.blocksFromState.map( block => {
+		const newBlock = cloneDeep( block );
+		newBlock.focused = ownProps.isBlockSelected( block.clientId );
+		return newBlock;
 	} );
 
-	if ( ! isEqual( blocks, newBlocks ) ) {
-		blocks = newBlocks;
-		refresh = true;
-	}
-
 	return {
-		blocks,
-		refresh,
+		blocks
 	};
 };
 
@@ -82,11 +74,12 @@ export default compose( [
 			rootClientId,
 			isBlockSelected,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId, rootClientId ),
-			blocks: getBlocks(),
+			blocksFromState: getBlocks(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
+			clearSelectedBlock,
 			insertBlock,
 			mergeBlocks,
 			moveBlocksDown,
@@ -104,7 +97,10 @@ export default compose( [
 			onMoveUp: moveBlocksUp,
 			onRemove: removeBlock,
 			onResetBlocks: resetBlocks,
-			onSelect: selectBlock,
+			onSelect: ( clientId ) => {
+				clearSelectedBlock();
+				selectBlock( clientId );
+			},
 			onAttributesUpdate: updateBlockAttributes,
 		};
 	} ),
