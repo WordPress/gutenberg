@@ -24,7 +24,12 @@ class Blocks_API extends WP_UnitTestCase {
 <!-- /wp:spacer -->';
 
 	public $filtered_content = '
+
 <p>paragraph</p>
+
+
+
+
 ';
 
 	/**
