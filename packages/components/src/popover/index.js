@@ -56,7 +56,7 @@ class Popover extends Component {
 			popoverSize: null,
 		};
 
-		// Property used keep track of the previous anchor rect
+		// Property used keep track of the previous anchor rectangle
 		// used to compute the popover position and size.
 		this.anchorRect = {};
 	}
