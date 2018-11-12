@@ -8,6 +8,6 @@
 		right: 0;
 		pointer-events: none;
 		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
-		@include region_focus(0.1s);
+		@include editor-animation__region-focus(0.1s);
 	}
 }

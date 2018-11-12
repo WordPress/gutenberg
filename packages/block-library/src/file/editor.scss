@@ -5,7 +5,7 @@
 	margin-bottom: 0;
 
 	&.is-transient {
-		@include loading_fade;
+		@include editor-animation__loading-fade;
 	}
 
 	.wp-block-file__content-wrapper {

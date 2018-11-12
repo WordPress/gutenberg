@@ -1,78 +1,42 @@
-@keyframes fade-in {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
-@mixin animate_fade {
-	animation: animate_fade 0.1s ease-out;
+@mixin editor-animation__animate-fade {
+	animation: editor-animation__animate-fade 0.1s ease-out;
 	animation-fill-mode: forwards;
 }
 
-@mixin move_background {
+@mixin editor-animation__move-background {
 	background-size: 28px 28px;
-	animation: move_background 0.5s linear infinite;
+	animation: editor-animation__move-background 0.5s linear infinite;
 }
 
-@mixin loading_fade {
-	animation: loading_fade 1.6s ease-in-out infinite;
+@mixin editor-animation__loading-fade {
+	animation: editor-animation__loading-fade 1.6s ease-in-out infinite;
 }
 
-@mixin slide_in_right {
+@mixin editor-animation__slide-in-right {
 	transform: translateX(+100%);
-	animation: slide_in_right 0.1s forwards;
+	animation: editor-animation__slide-in-right 0.1s forwards;
 }
 
-@mixin slide_in_top {
+@mixin editor-animation__slide-in-top {
 	transform: translateY(-100%);
-	animation: slide_in_top 0.1s forwards;
+	animation: editor-animation__slide-in-top 0.1s forwards;
 }
 
-@mixin fade_in($speed: 0.2s, $delay: 0s) {
-	animation: fade-in $speed ease-out $delay;
+@mixin editor-animation__fade-in($speed: 0.2s, $delay: 0s) {
+	animation: editor-animation__fade-in $speed ease-out $delay;
 	animation-fill-mode: forwards;
 }
 
-@keyframes editor_region_focus {
-	from {
-		box-shadow: inset 0 0 0 0 $blue-medium-400;
-	}
-	to {
-		box-shadow: inset 0 0 0 4px $blue-medium-400;
-	}
-}
-
-@mixin region_focus($speed: 0.2s) {
-	animation: editor_region_focus $speed ease-out;
+@mixin editor-animation__region-focus($speed: 0.2s) {
+	animation: editor-animation__region-focus $speed ease-out;
 	animation-fill-mode: forwards;
 }
 
-@keyframes rotation {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
+@mixin editor-animation__rotation($speed: 1s) {
+	animation: editor-animation__rotation $speed infinite linear;
 }
 
-@mixin animate_rotation($speed: 1s) {
-	animation: rotation $speed infinite linear;
-}
-
-@keyframes modal-appear {
-	from {
-		margin-top: $grid-size * 4;
-	}
-	to {
-		margin-top: 0;
-	}
-}
-
-@mixin modal_appear() {
-	animation: modal-appear 0.1s ease-out;
+@mixin editor-animation__modal-appear() {
+	animation: editor-animation__modal-appear 0.1s ease-out;
 	animation-fill-mode: forwards;
 }

@@ -18,7 +18,7 @@ ul.wp-block-gallery li {
 	}
 
 	&.is-transient img {
-		@include loading_fade;
+		@include editor-animation__loading-fade;
 	}
 
 	.editor-rich-text {

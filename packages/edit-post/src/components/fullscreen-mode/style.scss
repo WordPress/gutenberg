@@ -19,9 +19,9 @@ body.is-fullscreen-mode {
 	}
 
 	// Animations
-	@include fade_in(0.3s);
+	@include editor-animation__fade-in(0.3s);
 
 	.edit-post-header {
-		@include slide_in_top();
+		@include editor-animation__slide-in-top();
 	}
 }

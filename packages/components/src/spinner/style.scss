@@ -19,6 +19,6 @@
 		height: 4px;
 		border-radius: 100%;
 		transform-origin: 6px 6px;
-		@include animate_rotation;
+		@include editor-animation__rotation;
 	}
 }

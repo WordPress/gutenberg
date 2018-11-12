@@ -128,7 +128,7 @@
 		left: auto;
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
-		@include slide_in_right;
+		@include editor-animation__slide-in-right;
 
 		body.is-fullscreen-mode & {
 			top: 0;

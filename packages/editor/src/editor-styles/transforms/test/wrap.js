@@ -40,7 +40,7 @@ describe( 'CSS selector wrap', () => {
 	it( 'should ignore keyframes', () => {
 		const callback = wrap( '.my-namespace' );
 		const input = `
-		@keyframes move_background {
+		@keyframes editor-animation__move-background {
 			from {
 				background-position: 0 0;
 			}

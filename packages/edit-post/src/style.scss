@@ -20,8 +20,15 @@
 @import "./components/visual-editor/style.scss";
 @import "./components/options-modal/style.scss";
 
-// Fade animations
-@keyframes animate_fade {
+
+/**
+ * Animations
+ */
+
+// These keyframes should not be part of the _animations.scss mixins file.
+// Because keyframe animations can't be defined as mixins properly, they are duplicated.
+// Since hey are intended only for the editor, we add them here instead.
+@keyframes editor-animation__animate-fade {
 	from {
 		opacity: 0;
 		transform: translateY(4px);
@@ -32,7 +39,7 @@
 	}
 }
 
-@keyframes move_background {
+@keyframes editor-animation__move-background {
 	from {
 		background-position: 0 0;
 	}
@@ -41,7 +48,7 @@
 	}
 }
 
-@keyframes loading_fade {
+@keyframes editor-animation__loading-fade {
 	0% {
 		opacity: 0.5;
 	}
@@ -53,15 +60,50 @@
 	}
 }
 
-@keyframes slide_in_right {
+@keyframes editor-animation__slide-in-right {
 	100% {
 		transform: translateX(0%);
 	}
 }
 
-@keyframes slide_in_top {
+@keyframes editor-animation__slide-in-top {
 	100% {
 		transform: translateY(0%);
+	}
+}
+@keyframes editor-animation__fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes editor-animation__region-focus {
+	from {
+		box-shadow: inset 0 0 0 0 $blue-medium-400;
+	}
+	to {
+		box-shadow: inset 0 0 0 4px $blue-medium-400;
+	}
+}
+
+@keyframes editor-animation__rotation {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes editor-animation__modal-appear {
+	from {
+		margin-top: $grid-size * 4;
+	}
+	to {
+		margin-top: 0;
 	}
 }
 
