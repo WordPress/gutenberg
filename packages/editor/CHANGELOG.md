@@ -1,4 +1,10 @@
-## 7.0.0 (Unreleased)
+## 7.0.1  (Unreleased)
+
+### Bug Fixes
+
+- Fix multi-selection triggering too often when using floated blocks.
+
+## 7.0.0 (2018-11-12)
 
 ### Breaking Changes
 
