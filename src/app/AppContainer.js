@@ -1,80 +1,108 @@
 /** @flow
  * @format */
 
-import { connect } from 'react-redux';
-import { cloneDeep } from 'lodash';
-
 import MainApp from './MainApp';
+import React from 'react';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import type { BlockType } from '../store/types';
 
-const mapStateToProps = ( state, ownProps ) => {
-	const blocks = ownProps.blocksFromState.map( block => {
-		const newBlock = cloneDeep( block );
-		newBlock.focused = ownProps.isBlockSelected( block.clientId );
-		return newBlock;
-	} );
-
-	return {
-		blocks
-	};
+type PropsType = {
+	rootClientId: string,
+	isBlockSelected: string => boolean,
+	selectedBlockIndex: number,
+	blocks: Array<BlockType>,
+	onInsertBlock: ( BlockType, number, string ) => mixed,
+	onMerge: ( string, string ) => mixed,
+	onMoveDown: string => mixed,
+	onMoveUp: string => mixed,
+	onRemove: string => mixed,
+	onResetBlocks: Array<BlockType> => mixed,
+	onSelect: string => mixed,
+	onAttributesUpdate: ( string, mixed ) => mixed,
+	initialHtml: string,
 };
 
-const mapDispatchToProps = ( dispatch, ownProps ) => {
-	return {
-		...ownProps,
-		onChange: ( clientId, attributes ) => {
-			ownProps.onAttributesUpdate( clientId, attributes );
-		},
-		focusBlockAction: ( clientId ) => {
-			ownProps.onSelect( clientId );
-		},
-		moveBlockUpAction: ( clientId ) => {
-			ownProps.onMoveUp( clientId );
-		},
-		moveBlockDownAction: ( clientId ) => {
-			ownProps.onMoveDown( clientId );
-		},
-		deleteBlockAction: ( clientId ) => {
-			ownProps.onRemove( clientId );
-		},
-		createBlockAction: ( clientId, block ) => {
-			ownProps.onInsertBlock( block, ownProps.selectedBlockIndex + 1, ownProps.rootClientId );
-		},
-		parseBlocksAction: ( html ) => {
-			const parsed = parse( html );
-			ownProps.onResetBlocks( parsed );
-		},
-		serializeToNativeAction: () => {
-			const html = serialize( ownProps.blocks );
-			RNReactNativeGutenbergBridge.provideToNative_Html( html );
-		},
-		mergeBlocksAction: ( blockOneClientId, blockTwoClientId ) => {
-			ownProps.onMerge( blockOneClientId, blockTwoClientId );
-		},
-	};
-};
+class AppContainer extends React.Component<PropsType> {
+	constructor( props: PropsType ) {
+		super( props );
 
-const AppContainer = connect( mapStateToProps, mapDispatchToProps )( MainApp );
+		this.parseBlocksAction( props.initialHtml );
+	}
+
+	onChange = ( clientId, attributes ) => {
+		this.props.onAttributesUpdate( clientId, attributes );
+	};
+
+	focusBlockAction = ( clientId ) => {
+		this.props.onSelect( clientId );
+	};
+
+	moveBlockUpAction = ( clientId ) => {
+		this.props.onMoveUp( clientId );
+	};
+
+	moveBlockDownAction = ( clientId ) => {
+		this.props.onMoveDown( clientId );
+	};
+
+	deleteBlockAction = ( clientId ) => {
+		this.props.onRemove( clientId );
+	};
+
+	createBlockAction = ( clientId, block ) => {
+		this.props.onInsertBlock( block, this.props.selectedBlockIndex + 1, this.props.rootClientId );
+	};
+
+	parseBlocksAction = ( html = '' ) => {
+		const parsed = parse( html );
+		this.props.onResetBlocks( parsed );
+	};
+
+	serializeToNativeAction = () => {
+		const html = serialize( this.props.blocks );
+		RNReactNativeGutenbergBridge.provideToNative_Html( html );
+	};
+
+	mergeBlocksAction = ( blockOneClientId, blockTwoClientId ) => {
+		this.props.onMerge( blockOneClientId, blockTwoClientId );
+	};
+
+	render() {
+		return (
+			<MainApp
+				blocks={ this.props.blocks }
+				onChange={ this.onChange }
+				focusBlockAction={ this.focusBlockAction }
+				moveBlockUpAction={ this.moveBlockUpAction }
+				moveBlockDownAction={ this.moveBlockDownAction }
+				deleteBlockAction={ this.deleteBlockAction }
+				createBlockAction={ this.createBlockAction }
+				parseBlocksAction={ this.parseBlocksAction }
+				serializeToNativeAction={ this.serializeToNativeAction }
+				mergeBlocksAction={ this.mergeBlocksAction }
+				isBlockSelected={ this.props.isBlockSelected }
+			/>
+		);
+	}
+}
 
 export default compose( [
-	withSelect( ( select, ownProps ) => {
+	withSelect( ( select ) => {
 		const {
 			getBlockIndex,
 			getBlocks,
 			getSelectedBlockClientId,
 			isBlockSelected,
 		} = select( 'core/editor' );
-		const { rootClientId } = ownProps;
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
-			rootClientId,
 			isBlockSelected,
-			selectedBlockIndex: getBlockIndex( selectedBlockClientId, rootClientId ),
-			blocksFromState: getBlocks(),
+			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
+			blocks: getBlocks(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -91,6 +119,7 @@ export default compose( [
 		} = dispatch( 'core/editor' );
 
 		return {
+			clearSelectedBlock,
 			onInsertBlock: insertBlock,
 			onMerge: mergeBlocks,
 			onMoveDown: moveBlocksDown,
