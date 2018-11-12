@@ -29,7 +29,6 @@ const MyDateTimePicker = withState( {
 		<DateTimePicker
 			currentDate={ date }
 			onChange={ ( date ) => setState( { date } ) }
-			locale={ settings.l10n.locale }
 			is12Hour={ is12HourTime }
 		/>
 	);
@@ -54,13 +53,6 @@ The function called when a new date or time has been selected. It is passed the 
 - Type: `Function`
 - Required: No
 - Default: `noop`
-
-### locale
-
-The localization for the display of the date and time.
-
-- Type: `string`
-- Required: No
 
 ### is12Hour
 

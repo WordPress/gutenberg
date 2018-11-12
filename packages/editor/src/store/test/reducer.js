@@ -279,7 +279,7 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		it( 'should return history (empty edits, blocks), dirty flag by default', () => {
+		it( 'should return history (empty edits, blocks) by default', () => {
 			const state = editor( undefined, {} );
 
 			expect( state.past ).toEqual( [] );
@@ -287,7 +287,7 @@ describe( 'state', () => {
 			expect( state.present.edits ).toEqual( {} );
 			expect( state.present.blocks.byClientId ).toEqual( {} );
 			expect( state.present.blocks.order ).toEqual( {} );
-			expect( state.isDirty ).toBe( false );
+			expect( state.present.blocks.isDirty ).toBe( false );
 		} );
 
 		it( 'should key by reset blocks clientId', () => {

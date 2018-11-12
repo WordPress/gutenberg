@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 4.2.0
+ * Version: 4.3.0-rc.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -98,6 +98,14 @@ function is_gutenberg_page() {
 	global $post;
 
 	if ( ! is_admin() ) {
+		return false;
+	}
+
+	/*
+	 * There have been reports of specialized loading scenarios where `get_current_screen`
+	 * does not exist. In these cases, it is safe to say we are not loading Gutenberg.
+	 */
+	if ( ! function_exists( 'get_current_screen' ) ) {
 		return false;
 	}
 

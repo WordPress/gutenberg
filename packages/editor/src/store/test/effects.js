@@ -25,7 +25,6 @@ import actions, {
 	resetBlocks,
 	selectBlock,
 	setTemplateValidity,
-	editPost,
 } from '../actions';
 import effects, { validateBlocksToTemplate } from '../effects';
 import { SAVE_POST_NOTICE_ID } from '../effects/posts';
@@ -222,16 +221,6 @@ describe( 'effects', () => {
 	describe( '.REQUEST_POST_UPDATE_SUCCESS', () => {
 		const handler = effects.REQUEST_POST_UPDATE_SUCCESS;
 
-		function createGetState( hasLingeringEdits = false ) {
-			let state = reducer( undefined, {} );
-			if ( hasLingeringEdits ) {
-				state = reducer( state, editPost( { edited: true } ) );
-			}
-
-			const getState = () => state;
-			return getState;
-		}
-
 		const defaultPost = {
 			id: 1,
 			title: {
@@ -259,14 +248,11 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getDraftPost();
 			const post = getPublishedPost();
 			const postType = getPostType();
 
-			handler( { post, previousPost, postType }, store );
+			handler( { post, previousPost, postType } );
 
 			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
 				'Post published.',
@@ -280,14 +266,11 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch notices when reverting a published post to a draft', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getPublishedPost();
 			const post = getDraftPost();
 			const postType = getPostType();
 
-			handler( { post, previousPost, postType }, store );
+			handler( { post, previousPost, postType } );
 
 			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
 				'Post reverted to draft.',
@@ -299,14 +282,11 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should dispatch notices when just updating a published post again', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getPublishedPost();
 			const post = getPublishedPost();
 			const postType = getPostType();
 
-			handler( { post, previousPost, postType }, store );
+			handler( { post, previousPost, postType } );
 
 			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
 				'Post updated.',
@@ -320,28 +300,12 @@ describe( 'effects', () => {
 		} );
 
 		it( 'should do nothing if the updated post was autosaved', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState() };
-
 			const previousPost = getPublishedPost();
 			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
 
-			handler( { post, previousPost, isAutosave: true }, store );
+			handler( { post, previousPost, isAutosave: true } );
 
 			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).not.toHaveBeenCalled();
-		} );
-
-		it( 'should dispatch dirtying action if edits linger after autosave', () => {
-			const dispatch = jest.fn();
-			const store = { dispatch, getState: createGetState( true ) };
-
-			const previousPost = getPublishedPost();
-			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
-
-			handler( { post, previousPost, isAutosave: true }, store );
-
-			expect( dispatch ).toHaveBeenCalledTimes( 1 );
-			expect( dispatch ).toHaveBeenCalledWith( { type: 'DIRTY_ARTIFICIALLY' } );
 		} );
 	} );
 

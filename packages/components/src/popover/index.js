@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * WordPress dependencies
@@ -34,13 +35,12 @@ class Popover extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.focus = this.focus.bind( this );
-		this.refresh = this.refresh.bind( this );
 		this.getAnchorRect = this.getAnchorRect.bind( this );
-		this.updatePopoverSize = this.updatePopoverSize.bind( this );
 		this.computePopoverPosition = this.computePopoverPosition.bind( this );
-		this.throttledComputePopoverPosition = this.throttledComputePopoverPosition.bind( this );
 		this.maybeClose = this.maybeClose.bind( this );
+		this.throttledRefresh = this.throttledRefresh.bind( this );
+		this.refresh = this.refresh.bind( this );
+		this.refreshOnAnchorMove = this.refreshOnAnchorMove.bind( this );
 
 		this.contentNode = createRef();
 		this.anchorNode = createRef();
@@ -55,10 +55,14 @@ class Popover extends Component {
 			isMobile: false,
 			popoverSize: null,
 		};
+
+		// Property used keep track of the previous anchor rect
+		// used to compute the popover position and size.
+		this.anchorRect = {};
 	}
 
 	componentDidMount() {
-		this.toggleWindowEvents( true );
+		this.toggleAutoRefresh( true );
 		this.refresh();
 
 		/*
@@ -74,41 +78,81 @@ class Popover extends Component {
 
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.position !== this.props.position ) {
-			this.computePopoverPosition();
+			this.computePopoverPosition( this.state.popoverSize, this.anchorRect );
 		}
 	}
 
 	componentWillUnmount() {
-		this.toggleWindowEvents( false );
-
 		clearTimeout( this.focusTimeout );
+		this.toggleAutoRefresh( false );
 	}
 
-	toggleWindowEvents( isListening ) {
-		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-
+	toggleAutoRefresh( isActive ) {
 		window.cancelAnimationFrame( this.rafHandle );
-		window[ handler ]( 'resize', this.throttledComputePopoverPosition );
-		window[ handler ]( 'scroll', this.throttledComputePopoverPosition, true );
+
+		// Refresh the popover every time the window is resized or scrolled
+		const handler = isActive ? 'addEventListener' : 'removeEventListener';
+		window[ handler ]( 'resize', this.throttledRefresh );
+		window[ handler ]( 'scroll', this.throttledRefresh, true );
+
+		/*
+		 * There are sometimes we need to reposition or resize the popover that are not
+		 * handled by the resize/scroll window events (i.e. CSS changes in the layout
+		 * that changes the position of the anchor).
+		 *
+		 * For these situations, we refresh the popover every 0.5s
+		 */
+		if ( isActive ) {
+			this.autoRefresh = setInterval( this.refreshOnAnchorMove, 500 );
+		} else {
+			clearInterval( this.autoRefresh );
+		}
 	}
 
-	throttledComputePopoverPosition( event ) {
-		if ( event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
+	throttledRefresh( event ) {
+		window.cancelAnimationFrame( this.rafHandle );
+		if ( event && event.type === 'scroll' && this.contentNode.current.contains( event.target ) ) {
 			return;
 		}
-		this.rafHandle = window.requestAnimationFrame( () => this.computePopoverPosition() );
+		this.rafHandle = window.requestAnimationFrame( this.refresh );
+	}
+
+	/**
+	 * Calling refreshOnAnchorMove
+	 * will only refresh the popover position if the anchor moves.
+	 */
+	refreshOnAnchorMove() {
+		const { getAnchorRect = this.getAnchorRect } = this.props;
+		const anchorRect = getAnchorRect( this.anchorNode.current );
+		const didAnchorRectChange = ! isShallowEqual( anchorRect, this.anchorRect );
+		if ( didAnchorRectChange ) {
+			this.anchorRect = anchorRect;
+			this.computePopoverPosition( this.state.popoverSize, anchorRect );
+		}
 	}
 
 	/**
 	 * Calling `refresh()` will force the Popover to recalculate its size and
 	 * position. This is useful when a DOM change causes the anchor node to change
 	 * position.
-	 *
-	 * @return {void}
 	 */
 	refresh() {
-		const popoverSize = this.updatePopoverSize();
-		this.computePopoverPosition( popoverSize );
+		const { getAnchorRect = this.getAnchorRect } = this.props;
+		const anchorRect = getAnchorRect( this.anchorNode.current );
+		const contentRect = this.contentNode.current.getBoundingClientRect();
+		const popoverSize = {
+			width: contentRect.width,
+			height: contentRect.height,
+		};
+		const didPopoverSizeChange = ! this.state.popoverSize || (
+			popoverSize.width !== this.state.popoverSize.width ||
+			popoverSize.height !== this.state.popoverSize.height
+		);
+		if ( didPopoverSizeChange ) {
+			this.setState( { popoverSize } );
+		}
+		this.anchorRect = anchorRect;
+		this.computePopoverPosition( popoverSize, anchorRect );
 	}
 
 	focus() {
@@ -160,28 +204,11 @@ class Popover extends Component {
 		};
 	}
 
-	updatePopoverSize() {
-		const rect = this.contentNode.current.getBoundingClientRect();
-		if (
-			! this.state.popoverSize ||
-			rect.width !== this.state.popoverSize.width ||
-			rect.height !== this.state.popoverSize.height
-		) {
-			const popoverSize = {
-				height: rect.height,
-				width: rect.width,
-			};
-			this.setState( { popoverSize } );
-			return popoverSize;
-		}
-		return this.state.popoverSize;
-	}
-
-	computePopoverPosition( popoverSize ) {
-		const { getAnchorRect = this.getAnchorRect, position = 'top', expandOnMobile } = this.props;
+	computePopoverPosition( popoverSize, anchorRect ) {
+		const { position = 'top', expandOnMobile } = this.props;
 		const newPopoverPosition = computePopoverPosition(
-			getAnchorRect( this.anchorNode.current ),
-			popoverSize || this.state.popoverSize,
+			anchorRect,
+			popoverSize,
 			position,
 			expandOnMobile
 		);

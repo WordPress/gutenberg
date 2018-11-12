@@ -21,8 +21,8 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-02', {
 		return el( 'p', { className: props.className }, 'Hello editor.' );
 	},
 
-	save: function( props ) {
-		return el( 'p', { className: props.className }, 'Hello saved content.' );
+	save: function() {
+		return el( 'p', {}, 'Hello saved content.' );
 	}
 } );
 ```
@@ -41,8 +41,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-02', {
 		return <p className={ className }>Hello editor.</p>;
 	},
 
-	save( { className } ) {
-		return <p className={ className }>Hello saved content.</p>;
+	save() {
+		return <p>Hello saved content.</p>;
 	}
 } );
 ```

@@ -115,7 +115,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor="#C44B4B"
 				textColor="#000000"
-				fontSize={ 17 }
+				fontSize={ 23 }
 			/>
 		);
 
@@ -125,7 +125,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor="#C44B4B"
 				textColor="#000000"
-				fontSize={ 18 }
+				fontSize={ 24 }
 			/>
 		);
 
@@ -137,7 +137,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor="#C44B4B"
 				textColor="#000000"
-				fontSize={ 17 }
+				fontSize={ 23 }
 				isLargeText={ true }
 			/>
 		);
@@ -148,7 +148,7 @@ describe( 'ContrastChecker', () => {
 			<ContrastChecker
 				backgroundColor="#C44B4B"
 				textColor="#000000"
-				fontSize={ 18 }
+				fontSize={ 24 }
 				isLargeText={ false }
 			/>
 		);
