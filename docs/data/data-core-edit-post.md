@@ -103,20 +103,6 @@ enabled by default.
 
 Whether or not the panel is enabled.
 
-### isEditorSidebarPanelOpened
-
-Returns true if the given panel is enabled, or false otherwise. Panels are
-enabled by default.
-
-*Parameters*
-
- * state: Global application state.
- * panel: A string that identifies the panel.
-
-*Returns*
-
-Whether or not the panel is enabled.
-
 ### isEditorPanelOpened
 
 Returns true if the given panel is open, or false otherwise. Panels are
@@ -308,14 +294,6 @@ Returns an action object used to enable or disable a panel in the editor.
  * panelName: A string that identifies the panel to enable or disable.
 
 ### toggleEditorPanelOpened
-
-Returns an action object used to open or close a panel in the editor.
-
-*Parameters*
-
- * panelName: A string that identifies the panel to open or close.
-
-### toggleGeneralSidebarEditorPanel
 
 Returns an action object used to open or close a panel in the editor.
 

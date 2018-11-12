@@ -32,6 +32,38 @@ export function removeBlockTypes( names ) {
 }
 
 /**
+ * Returns an action object used in signalling that new block styles have been added.
+ *
+ * @param {string}       blockName  Block name.
+ * @param {Array|Object} styles     Block styles.
+ *
+ * @return {Object} Action object.
+ */
+export function addBlockStyles( blockName, styles ) {
+	return {
+		type: 'ADD_BLOCK_STYLES',
+		styles: castArray( styles ),
+		blockName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that block styles have been removed.
+ *
+ * @param {string}       blockName  Block name.
+ * @param {Array|string} styleNames Block style names.
+ *
+ * @return {Object} Action object.
+ */
+export function removeBlockStyles( blockName, styleNames ) {
+	return {
+		type: 'REMOVE_BLOCK_STYLES',
+		styleNames: castArray( styleNames ),
+		blockName,
+	};
+}
+
+/**
  * Returns an action object used to set the default block name.
  *
  * @param {string} name Block name.

@@ -1,3 +1,22 @@
+## 6.0.0 (2018-11-12)
+
+### Breaking Change
+
+- The `PanelColor` component has been removed.
+
+## 5.1.1 (2018-11-09)
+
+## 5.1.0 (2018-11-09)
+
+### New Feature
+
+- Adjust a11y roles for MenuItem component, so that aria-checked is used properly, related change in Editor/Components/BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
+- `Popover` components are now automatically refreshed every 0.5s in order to recalculate their size or position.
+
+### Deprecation
+
+- `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
+
 ## 5.0.2 (2018-11-03)
 
 ### Polish

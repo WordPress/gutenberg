@@ -171,18 +171,8 @@ export const requestPostUpdate = async ( action, store ) => {
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const requestPostUpdateSuccess = ( action, store ) => {
+export const requestPostUpdateSuccess = ( action ) => {
 	const { previousPost, post, isAutosave, postType } = action;
-	const { dispatch, getState } = store;
-
-	// TEMPORARY: If edits remain after a save completes, the user must be
-	// prompted about unsaved changes. This should be refactored as part of
-	// the `isEditedPostDirty` selector instead.
-	//
-	// See: https://github.com/WordPress/gutenberg/issues/7409
-	if ( Object.keys( getPostEdits( getState() ) ).length ) {
-		dispatch( { type: 'DIRTY_ARTIFICIALLY' } );
-	}
 
 	// Autosaves are neither shown a notice nor redirected.
 	if ( isAutosave ) {

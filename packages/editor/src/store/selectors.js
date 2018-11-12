@@ -32,7 +32,7 @@ import {
 	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { isInTheFuture } from '@wordpress/date';
+import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 import { select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -103,6 +103,26 @@ export function isEditedPostNew( state ) {
 }
 
 /**
+ * Returns true if content includes unsaved changes, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether content includes unsaved changes.
+ */
+export function hasChangedContent( state ) {
+	return (
+		state.editor.present.blocks.isDirty ||
+
+		// `edits` is intended to contain only values which are different from
+		// the saved post, so the mere presence of a property is an indicator
+		// that the value is different than what is known to be saved. While
+		// content in Visual mode is represented by the blocks state, in Text
+		// mode it is tracked by `edits.content`.
+		'content' in state.editor.present.edits
+	);
+}
+
+/**
  * Returns true if there are unsaved values for the current edit session, or
  * false if the editing state matches the saved or new post.
  *
@@ -111,7 +131,23 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
+	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
+	// Edits should contain only fields which differ from the saved post (reset
+	// at initial load and save complete). Thus, a non-empty edits state can be
+	// inferred to contain unsaved values.
+	if ( Object.keys( state.editor.present.edits ).length > 0 ) {
+		return true;
+	}
+
+	// Edits and change detectiona are reset at the start of a save, but a post
+	// is still considered dirty until the point at which the save completes.
+	// Because the save is performed optimistically, the prior states are held
+	// until committed. These can be referenced to determine whether there's a
+	// chance that state may be reverted into one considered dirty.
+	return inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
@@ -333,7 +369,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && ! isInTheFuture( new Date( Number( new Date( post.date ) ) + ONE_MINUTE_IN_MS ) ) );
+		( post.status === 'future' && ! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) );
 }
 
 /**
@@ -451,9 +487,17 @@ export function isEditedPostAutosaveable( state ) {
 		return true;
 	}
 
+	// To avoid an expensive content serialization, use the content dirtiness
+	// flag in place of content field comparison against the known autosave.
+	// This is not strictly accurate, and relies on a tolerance toward autosave
+	// request failures for unnecessary saves.
+	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
 	// If the title, excerpt or content has changed, the post is autosaveable.
 	const autosave = getAutosave( state );
-	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
+	return [ 'title', 'excerpt' ].some( ( field ) => (
 		autosave[ field ] !== getEditedPostAttribute( state, field )
 	) );
 }
@@ -493,7 +537,7 @@ export function hasAutosave( state ) {
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	// Offset the date by one minute (network latency)
-	const checkedDate = new Date( Number( new Date( date ) ) + ONE_MINUTE_IN_MS );
+	const checkedDate = new Date( Number( getDate( date ) ) - ONE_MINUTE_IN_MS );
 
 	return isInTheFuture( checkedDate );
 }
@@ -1272,11 +1316,11 @@ export function isMultiSelecting( state ) {
 }
 
 /**
- * Whether is selection disable or not.
+ * Selector that returns if multi-selection is enabled or not.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} True if multi is disable, false if not.
+ * @return {boolean} True if it should be possible to multi-select blocks, false if multi-selection is disabled.
  */
 export function isSelectionEnabled( state ) {
 	return state.blockSelection.isEnabled;
@@ -2056,7 +2100,7 @@ export function isPostLocked( state ) {
  * @return {boolean} Is locked.
  */
 export function isPostSavingLocked( state ) {
-	return state.postSavingLock.length > 0;
+	return Object.keys( state.postSavingLock ).length > 0;
 }
 
 /**

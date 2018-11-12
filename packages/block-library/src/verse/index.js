@@ -85,13 +85,12 @@ export const settings = {
 		);
 	},
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const { textAlign, content } = attributes;
 
 		return (
 			<RichText.Content
 				tagName="pre"
-				className={ className }
 				style={ { textAlign: textAlign } }
 				value={ content }
 			/>

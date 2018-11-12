@@ -1,3 +1,37 @@
+## 7.0.0 (2018-11-12)
+
+### Breaking Change
+
+- The `PanelColor` component has been removed.
+
+### New Feature
+
+- In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
+
+### Bug Fixes
+
+- Avoid unnecessary re-renders when navigating between blocks.
+- PostPublishPanel: return focus to element that opened the panel
+- Capture focus on self in InsertionPoint inserter
+- Correct insertion point opacity selector
+- Set code editor as RTL
+
+## 6.2.1 (2018-11-09)
+
+### Deprecations
+
+- `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
+
+### Polish
+
+- Reactive block styles.
+
+## 6.2.0 (2018-11-09)
+
+### New Features
+
+- Adjust a11y roles for menu items, and make sure screen readers can properly use BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
+
 ## 6.1.1 (2018-11-03)
 
 ### Polish
