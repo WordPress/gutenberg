@@ -142,25 +142,37 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
 function gutenberg_render_block( $block ) {
 	global $post;
 
-	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
+	$global_post = $post;
+	$pre_render  = apply_filters( 'block_pre_render', $block );
+	$post        = $global_post;
+
+	if ( null === $pre_render ) {
+		return '';
+	}
+
+	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $pre_render['blockName'] );
+	$is_dynamic    = $pre_render['blockName'] && null !== $block_type && $block_type->is_dynamic();
 	$inner_content = '';
 	$index         = 0;
 
-	foreach ( $block['innerContent'] as $chunk ) {
-		$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
+	foreach ( $pre_render['innerContent'] as $chunk ) {
+		$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $pre_render['innerBlocks'][ $index++ ] );
 	}
 
 	if ( $is_dynamic ) {
-		$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
+		$attributes  = is_array( $pre_render['attrs'] ) ? (array) $pre_render['attrs'] : array();
 		$global_post = $post;
 		$output      = $block_type->render( $attributes, $inner_content );
 		$post        = $global_post;
-
-		return $output;
+	} else {
+		$output = $inner_content;
 	}
 
-	return $inner_content;
+	$global_post = $post;
+	$post_render = apply_filters( 'block_post_render', $output );
+	$post        = $global_post;
+
+	return $post_render;
 }
 
 if ( ! function_exists( 'do_blocks' ) ) {
