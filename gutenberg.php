@@ -101,6 +101,14 @@ function is_gutenberg_page() {
 		return false;
 	}
 
+	/*
+	 * There have been reports of specialized loading scenarios where `get_current_screen`
+	 * does not exist. In these cases, it is safe to say we are not loading Gutenberg.
+	 */
+	if ( ! function_exists( 'get_current_screen' ) ) {
+		return false;
+	}
+
 	if ( get_current_screen()->base !== 'post' ) {
 		return false;
 	}
