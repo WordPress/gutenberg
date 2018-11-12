@@ -1,14 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
 import { IconButton, ResizableBox, Toolbar } from '@wordpress/components';
 import {
 	BlockControls,
+	BlockIcon,
 	MediaPlaceholder,
 	MediaUpload,
 } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import icon from './icon';
 
 /**
  * Constants
@@ -67,7 +73,7 @@ class MediaContainer extends Component {
 		const { onSelectMedia, className } = this.props;
 		return (
 			<MediaPlaceholder
-				icon="format-image"
+				icon=<BlockIcon icon={ icon } />
 				labels={ {
 					title: __( 'Media area' ),
 				} }

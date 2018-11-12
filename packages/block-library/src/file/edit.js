@@ -6,29 +6,35 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
+import {
+	getBlobByURL,
+	isBlobURL,
+	revokeBlobURL,
+} from '@wordpress/blob';
 import {
 	ClipboardButton,
 	IconButton,
 	Toolbar,
 	withNotices,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { Component, Fragment } from '@wordpress/element';
 import {
-	MediaUpload,
-	MediaPlaceholder,
-	MediaUploadCheck,
 	BlockControls,
+	BlockIcon,
+	MediaUpload,
+	MediaUploadCheck,
+	MediaPlaceholder,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
-import { compose } from '@wordpress/compose';
+import { Component, Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import icon from './icon';
 import FileBlockInspector from './inspector';
 
 class FileEdit extends Component {
@@ -136,7 +142,7 @@ class FileEdit extends Component {
 		if ( ! href || hasError ) {
 			return (
 				<MediaPlaceholder
-					icon="media-default"
+					icon=<BlockIcon icon={ icon } />
 					labels={ {
 						title: __( 'File' ),
 						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
