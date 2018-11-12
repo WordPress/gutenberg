@@ -2,7 +2,8 @@
  * External dependencies
  */
 import {
-	findLast,
+	filter,
+	last,
 	map,
 	invert,
 	mapValues,
@@ -22,6 +23,7 @@ import { compose } from '@wordpress/compose';
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import { getBlockDOMNode } from '../../utils/dom';
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -78,9 +80,14 @@ class BlockList extends Component {
 			this.props.onStartMultiSelect();
 		}
 
-		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
-		const y = clientY - boundaries.top;
-		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
+		const blockContentBoundaries = getBlockDOMNode( this.selectionAtStart ).getBoundingClientRect();
+		if ( clientY >= blockContentBoundaries.top && clientY <= blockContentBoundaries.bottom ) {
+			return;
+		}
+
+		const y = clientY - blockContentBoundaries.top;
+		const hoveredBlocks = filter( this.coordMapKeys, ( coordY ) => coordY < y );
+		const key = last( hoveredBlocks );
 
 		this.onSelectionChange( this.coordMap[ key ] );
 	}
