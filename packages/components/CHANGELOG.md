@@ -1,5 +1,9 @@
 ## 6.0.1 (Unreleased)
 
+### Polish
+
+- Remove `<DateTimePicker />` obsolete `locale` prop (and pass-through to child components) and obsolete `is12Hour` prop pass through to `<DateTime />` [#11649](https://github.com/WordPress/gutenberg/pull/11649) 
+
 ### Bug Fixes
 
 - Avoid constantly recomputing the popover position.
@@ -13,10 +17,6 @@
 ## 5.1.1 (2018-11-09)
 
 ## 5.1.0 (2018-11-09)
-
-### Polish
-
-- Remove `<DateTimePicker />` obsolete `locale` prop (and pass-through to child components) and obsolete `is12Hour` prop pass through to `<DateTime />` [#11649](https://github.com/WordPress/gutenberg/pull/11649) 
 
 ### New Feature
 
