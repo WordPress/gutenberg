@@ -21,7 +21,7 @@ const mapStateToProps = ( state, ownProps ) => {
 
 	if ( ! isEqual( blocks, newBlocks ) ) {
 		blocks = newBlocks;
-		refresh = ! ownProps.refresh;
+		refresh = true;
 	}
 
 	return {
@@ -49,7 +49,7 @@ const mapDispatchToProps = ( dispatch, ownProps ) => {
 			ownProps.onRemove( clientId );
 		},
 		createBlockAction: ( clientId, block ) => {
-			ownProps.onInsertBlock( block, ownProps.selectedBlockIndex + 1 );
+			ownProps.onInsertBlock( block, ownProps.selectedBlockIndex + 1, ownProps.rootClientId );
 		},
 		parseBlocksAction: ( html ) => {
 			const parsed = parse( html );
@@ -79,6 +79,7 @@ export default compose( [
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
+			rootClientId,
 			isBlockSelected,
 			selectedBlockIndex: getBlockIndex( selectedBlockClientId, rootClientId ),
 			blocks: getBlocks(),

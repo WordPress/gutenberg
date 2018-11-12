@@ -50,7 +50,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		super( props );
 		this.state = {
 			blocks: [],
-			dataSource: null,
+			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
 			showHtml: false,
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
@@ -59,13 +59,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onBlockHolderPressed( clientId: string ) {
-		this.focusDataSourceItem( clientId );
 		this.props.focusBlockAction( clientId );
 	}
 
-	focusDataSourceItem( clientId: string ) {
-		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
-			const block = this.state.dataSource.get( i );
+	static focusDataSourceItem( dataSource: DataSource, clientId: string ) {
+		for ( let i = 0; i < dataSource.size(); ++i ) {
+			const block = dataSource.get( i );
 			if ( block.clientId === clientId ) {
 				block.focused = true;
 			} else {
@@ -108,30 +107,39 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		if ( focusedItemIndex === -1 ) {
 			focusedItemIndex = this.state.dataSource.size() - 1;
 		}
-		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
 
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue, { content: 'new test text for a ' + itemValue + ' block' } );
-		newBlock.focused = false;
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
+
 		if ( this.scrollTo ) {
 			this.scrollTo( focusedItemIndex + 1 );
 		}
 
-		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
+		this.props.createBlockAction( newBlock.clientId, newBlock );
 
 		// now set the focus
 		this.props.focusBlockAction( newBlock.clientId );
 	}
 
 	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
+		if ( props.fullparse === true ) {
+			return {
+				...state,
+				dataSource: new DataSource( props.blocks, ( item: BlockType ) => item.clientId ),
+			};
+		}
+
 		if ( state.blocks !== props.blocks ) {
+			const blockFocused = props.blocks.find( block => block.focused );
+			if ( blockFocused ) {
+				BlockManager.focusDataSourceItem( state.dataSource, blockFocused.clientId );
+			}
 			return {
 				...state,
 				blocks: props.blocks,
-				dataSource: new DataSource( props.blocks, ( item: BlockType ) => item.clientId ),
 			};
 		}
 
