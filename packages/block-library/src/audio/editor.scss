@@ -4,7 +4,4 @@
 
 .wp-block-audio audio {
 	width: 100%;
-
-	// The audio block has no intrinsic width and needs an explicit min-width to not collapse.
-	min-width: $break-mobile / 2;
 }

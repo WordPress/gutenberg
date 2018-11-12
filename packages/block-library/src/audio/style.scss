@@ -4,3 +4,8 @@
 	text-align: center;
 	font-size: $default-font-size;
 }
+
+.wp-block-audio audio {
+	// The audio block has no intrinsic width and needs an explicit min-width to not collapse.
+	min-width: $break-mobile / 2;
+}
