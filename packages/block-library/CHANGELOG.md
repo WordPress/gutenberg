@@ -1,3 +1,9 @@
+## 2.2.3 (Unreleased)
+
+### Bug Fixes
+
+- Add a minimum width for the audio block to fixed floated audio blocks.
+
 ## 2.2.2 (2018-11-12)
 
 ### Polish
