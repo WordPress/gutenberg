@@ -140,7 +140,7 @@ class PostTitle extends Component {
 								/* eslint-enable jsx-a11y/no-autofocus */
 							/>
 						</KeyboardShortcuts>
-						{ isSelected && isPostTypeViewable && <PostPermalink /> }
+						{ isSelected && isPostTypeViewable && <PostPermalink postTitle={ title } /> }
 					</div>
 				</div>
 			</PostTypeSupportCheck>

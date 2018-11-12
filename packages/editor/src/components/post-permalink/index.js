@@ -17,7 +17,7 @@ import { safeDecodeURI } from '@wordpress/url';
  * Internal Dependencies
  */
 import PostPermalinkEditor from './editor.js';
-import { getWPAdminURL } from '../../utils/url';
+import { getWPAdminURL, cleanForSlug } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -57,13 +57,18 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, postLink, isEditable, samplePermalink, isPublished } = this.props;
-		const { isCopied, isEditingPermalink } = this.state;
-		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
+		const { isNew, postLink, permalinkParts, postSlug, postTitle, isEditable, isPublished } = this.props;
 
 		if ( isNew || ! postLink ) {
 			return null;
 		}
+
+		const { isCopied, isEditingPermalink } = this.state;
+		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
+
+		const { prefix, suffix } = permalinkParts;
+		const slug = postSlug || cleanForSlug( postTitle );
+		const samplePermalink = ( isEditable ) ? prefix + slug + suffix : prefix;
 
 		return (
 			<div className="editor-post-permalink">
@@ -92,6 +97,7 @@ class PostPermalink extends Component {
 
 				{ isEditingPermalink &&
 					<PostPermalinkEditor
+						postSlug={ slug }
 						onSave={ () => this.setState( { isEditingPermalink: false } ) }
 					/>
 				}
@@ -128,7 +134,8 @@ export default compose( [
 			isEditedPostNew,
 			isPermalinkEditable,
 			getCurrentPost,
-			getPermalink,
+			getPermalinkParts,
+			getEditedPostAttribute,
 			isCurrentPostPublished,
 		} = select( 'core/editor' );
 
@@ -137,8 +144,9 @@ export default compose( [
 		return {
 			isNew: isEditedPostNew(),
 			postLink: link,
+			permalinkParts: getPermalinkParts(),
+			postSlug: getEditedPostAttribute( 'slug' ),
 			isEditable: isPermalinkEditable(),
-			samplePermalink: getPermalink(),
 			isPublished: isCurrentPostPublished(),
 		};
 	} ),
