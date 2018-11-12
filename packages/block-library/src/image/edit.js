@@ -6,6 +6,7 @@ import {
 	get,
 	isEmpty,
 	map,
+	last,
 	pick,
 	compact,
 } from 'lodash';
@@ -13,6 +14,7 @@ import {
 /**
  * WordPress dependencies
  */
+import { getPath } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
@@ -256,8 +258,10 @@ class ImageEdit extends Component {
 	}
 
 	getFilename( url ) {
-		const fileName = url.match( /.*\/(.+?)(?:\?.*)?$/ );
-		return fileName[ 1 ];
+		const path = getPath( url );
+		if ( path ) {
+			return last( path.split( '/' ) );
+		}
 	}
 
 	getImageSizes() {
