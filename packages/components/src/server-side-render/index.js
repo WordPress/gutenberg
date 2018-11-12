@@ -39,6 +39,8 @@ export class ServerSideRender extends Component {
 	componentDidMount() {
 		this.isStillMounted = true;
 		this.fetch( this.props );
+		// Only debounce once the initial fetch occurs to ensure that the first
+		// renders show data as soon as possible.
 		this.fetch = debounce( this.fetch, 500 );
 	}
 
