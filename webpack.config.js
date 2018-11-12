@@ -179,9 +179,9 @@ const config = {
 							require( 'cssnano' )( {
 								preset: [ 'default', {
 									discardComments: {
-							                    removeAll: true,
-							                },
-								}]
+										removeAll: true,
+									},
+								} ],
 							} ),
 						] )
 							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
