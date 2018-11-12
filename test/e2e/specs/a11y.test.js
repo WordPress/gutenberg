@@ -23,7 +23,7 @@ describe( 'a11y', () => {
 		await newPost();
 	} );
 
-	it( 'passes aXe Javascript Accessibility API checks', async () => {
+	it( 'passes aXe JavaScript Accessibility API checks', async () => {
 		const handle = await page.evaluateHandle( `
 			// Inject axe source code
 			${ axeCore.source }
