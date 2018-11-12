@@ -201,9 +201,13 @@
 
 	// Warnings
 	&.has-warning .editor-block-list__block-edit {
-		> :not(.editor-warning) {
+		> * {
 			pointer-events: none;
 			user-select: none;
+		}
+
+		.editor-warning {
+			pointer-events: all;
 		}
 	}
 
