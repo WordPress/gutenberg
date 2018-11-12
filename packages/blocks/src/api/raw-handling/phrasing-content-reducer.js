@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { unwrap, replaceTag } from '@wordpress/dom';
+import { wrap, unwrap, replaceTag } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -14,17 +14,34 @@ function isBlockContent( node, schema = {} ) {
 
 export default function( node, doc, schema ) {
 	if ( node.nodeName === 'SPAN' ) {
-		const { fontWeight, fontStyle } = node.style;
+		const {
+			fontWeight,
+			fontStyle,
+			textDecorationLine,
+			verticalAlign,
+		} = node.style;
 
 		if ( fontWeight === 'bold' || fontWeight === '700' ) {
-			node = replaceTag( node, 'strong', doc );
-		} else if ( fontStyle === 'italic' ) {
-			node = replaceTag( node, 'em', doc );
+			wrap( doc.createElement( 'strong' ), node );
+		}
+
+		if ( fontStyle === 'italic' ) {
+			wrap( doc.createElement( 'em' ), node );
+		}
+
+		if ( textDecorationLine === 'line-through' ) {
+			wrap( doc.createElement( 'del' ), node );
+		}
+
+		if ( verticalAlign === 'super' ) {
+			wrap( doc.createElement( 'sup' ), node );
+		} else if ( verticalAlign === 'sub' ) {
+			wrap( doc.createElement( 'sub' ), node );
 		}
 	} else if ( node.nodeName === 'B' ) {
-		node = replaceTag( node, 'strong', doc );
+		node = replaceTag( node, 'strong' );
 	} else if ( node.nodeName === 'I' ) {
-		node = replaceTag( node, 'em', doc );
+		node = replaceTag( node, 'em' );
 	} else if ( node.nodeName === 'A' ) {
 		if ( node.target.toLowerCase() === '_blank' ) {
 			node.rel = 'noreferrer noopener';

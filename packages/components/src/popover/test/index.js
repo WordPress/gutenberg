@@ -15,7 +15,7 @@ describe( 'Popover', () => {
 		let wrapper;
 		beforeEach( () => {
 			jest.spyOn( Popover.prototype, 'computePopoverPosition' ).mockImplementation( noop );
-			jest.spyOn( Popover.prototype, 'toggleWindowEvents' ).mockImplementation( noop );
+			jest.spyOn( Popover.prototype, 'toggleAutoRefresh' ).mockImplementation( noop );
 		} );
 
 		afterEach( () => {
@@ -30,19 +30,19 @@ describe( 'Popover', () => {
 			}
 		} );
 
-		it( 'should add window events', () => {
+		it( 'should turn on auto refresh', () => {
 			wrapper = TestUtils.renderIntoDocument( <Popover /> );
-			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( true );
+			expect( Popover.prototype.toggleAutoRefresh ).toHaveBeenCalledWith( true );
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
 		} );
 
-		it( 'should remove window events', () => {
+		it( 'should turn off auto refresh', () => {
 			wrapper = TestUtils.renderIntoDocument( <Popover /> );
 			/* eslint-disable react/no-find-dom-node */
 			ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
 			/* eslint-enable react/no-find-dom-node */
 
-			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( false );
+			expect( Popover.prototype.toggleAutoRefresh ).toHaveBeenCalledWith( false );
 		} );
 
 		it( 'should set offset and forced positions on changed position', () => {
@@ -52,7 +52,7 @@ describe( 'Popover', () => {
 
 			ReactDOM.render( <Popover position={ 'bottom right' } />, node );
 
-			expect( Popover.prototype.toggleWindowEvents ).not.toHaveBeenCalled();
+			expect( Popover.prototype.toggleAutoRefresh ).not.toHaveBeenCalled();
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
 		} );
 

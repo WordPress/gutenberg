@@ -22,7 +22,6 @@ export function PostSchedule( { date, onUpdateDate } ) {
 			key="date-time-picker"
 			currentDate={ date }
 			onChange={ onUpdateDate }
-			locale={ settings.l10n.locale }
 			is12Hour={ is12HourTime }
 		/>
 	);

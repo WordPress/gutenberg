@@ -32,7 +32,7 @@ import {
 	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { moment } from '@wordpress/date';
+import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 import { select } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -54,6 +54,7 @@ export const INSERTER_UTILITY_NONE = 0;
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
 const MILLISECONDS_PER_WEEK = 7 * 24 * 3600 * 1000;
+const ONE_MINUTE_IN_MS = 60 * 1000;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
@@ -102,6 +103,26 @@ export function isEditedPostNew( state ) {
 }
 
 /**
+ * Returns true if content includes unsaved changes, or false otherwise.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether content includes unsaved changes.
+ */
+export function hasChangedContent( state ) {
+	return (
+		state.editor.present.blocks.isDirty ||
+
+		// `edits` is intended to contain only values which are different from
+		// the saved post, so the mere presence of a property is an indicator
+		// that the value is different than what is known to be saved. While
+		// content in Visual mode is represented by the blocks state, in Text
+		// mode it is tracked by `edits.content`.
+		'content' in state.editor.present.edits
+	);
+}
+
+/**
  * Returns true if there are unsaved values for the current edit session, or
  * false if the editing state matches the saved or new post.
  *
@@ -110,7 +131,23 @@ export function isEditedPostNew( state ) {
  * @return {boolean} Whether unsaved values exist.
  */
 export function isEditedPostDirty( state ) {
-	return state.editor.isDirty || inSomeHistory( state, isEditedPostDirty );
+	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
+	// Edits should contain only fields which differ from the saved post (reset
+	// at initial load and save complete). Thus, a non-empty edits state can be
+	// inferred to contain unsaved values.
+	if ( Object.keys( state.editor.present.edits ).length > 0 ) {
+		return true;
+	}
+
+	// Edits and change detectiona are reset at the start of a save, but a post
+	// is still considered dirty until the point at which the save completes.
+	// Because the save is performed optimistically, the prior states are held
+	// until committed. These can be referenced to determine whether there's a
+	// chance that state may be reverted into one considered dirty.
+	return inSomeHistory( state, isEditedPostDirty );
 }
 
 /**
@@ -192,9 +229,18 @@ export function getCurrentPostLastRevisionId( state ) {
  *
  * @return {Object} Object of key value pairs comprising unsaved edits.
  */
-export function getPostEdits( state ) {
-	return state.editor.present.edits;
-}
+export const getPostEdits = createSelector(
+	( state ) => {
+		return {
+			...state.initialEdits,
+			...state.editor.present.edits,
+		};
+	},
+	( state ) => [
+		state.editor.present.edits,
+		state.initialEdits,
+	]
+);
 
 /**
  * Returns a new reference when edited values have changed. This is useful in
@@ -323,7 +369,7 @@ export function isCurrentPostPublished( state ) {
 	const post = getCurrentPost( state );
 
 	return [ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
-		( post.status === 'future' && moment( post.date ).isBefore( moment() ) );
+		( post.status === 'future' && ! isInTheFuture( new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS ) ) );
 }
 
 /**
@@ -441,9 +487,17 @@ export function isEditedPostAutosaveable( state ) {
 		return true;
 	}
 
+	// To avoid an expensive content serialization, use the content dirtiness
+	// flag in place of content field comparison against the known autosave.
+	// This is not strictly accurate, and relies on a tolerance toward autosave
+	// request failures for unnecessary saves.
+	if ( hasChangedContent( state ) ) {
+		return true;
+	}
+
 	// If the title, excerpt or content has changed, the post is autosaveable.
 	const autosave = getAutosave( state );
-	return [ 'title', 'excerpt', 'content' ].some( ( field ) => (
+	return [ 'title', 'excerpt' ].some( ( field ) => (
 		autosave[ field ] !== getEditedPostAttribute( state, field )
 	) );
 }
@@ -481,11 +535,11 @@ export function hasAutosave( state ) {
  * @return {boolean} Whether the post has been published.
  */
 export function isEditedPostBeingScheduled( state ) {
-	const date = moment( getEditedPostAttribute( state, 'date' ) );
-	// Adding 1 minute as an error threshold between the server and the client dates.
-	const now = moment().add( 1, 'minute' );
+	const date = getEditedPostAttribute( state, 'date' );
+	// Offset the date by one minute (network latency)
+	const checkedDate = new Date( Number( getDate( date ) ) - ONE_MINUTE_IN_MS );
 
-	return date.isAfter( now );
+	return isInTheFuture( checkedDate );
 }
 
 /**
@@ -596,6 +650,7 @@ export const getBlock = createSelector(
 		state.editor.present.blocks.byClientId[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -703,6 +758,7 @@ export const getBlocksByClientId = createSelector(
 	),
 	( state ) => [
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 		state.editor.present.blocks,
 	]
@@ -1021,6 +1077,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.blockSelection.end,
 		state.editor.present.blocks.byClientId,
 		state.editor.present.edits.meta,
+		state.initialEdits.meta,
 		state.currentPost.meta,
 	]
 );
@@ -1259,11 +1316,11 @@ export function isMultiSelecting( state ) {
 }
 
 /**
- * Whether is selection disable or not.
+ * Selector that returns if multi-selection is enabled or not.
  *
  * @param {Object} state Global application state.
  *
- * @return {boolean} True if multi is disable, false if not.
+ * @return {boolean} True if it should be possible to multi-select blocks, false if multi-selection is disabled.
  */
 export function isSelectionEnabled( state ) {
 	return state.blockSelection.isEnabled;
@@ -1537,8 +1594,9 @@ export const getEditedPostContent = createSelector(
 		return content;
 	},
 	( state ) => [
-		state.editor.present.edits.content,
 		state.editor.present.blocks,
+		state.editor.present.edits.content,
+		state.initialEdits.content,
 	],
 );
 
@@ -2042,7 +2100,7 @@ export function isPostLocked( state ) {
  * @return {boolean} Is locked.
  */
 export function isPostSavingLocked( state ) {
-	return state.postSavingLock.length > 0;
+	return Object.keys( state.postSavingLock ).length > 0;
 }
 
 /**

@@ -16,10 +16,14 @@ export * from './font-sizes';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as PanelColor } from './panel-color';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
-export { default as RichText } from './rich-text';
+export {
+	default as RichText,
+	RichTextShortcut,
+	RichTextToolbarButton,
+	RichTextInserterItem,
+} from './rich-text';
 export { default as ServerSideRender } from './server-side-render';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';

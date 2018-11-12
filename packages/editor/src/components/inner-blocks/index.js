@@ -142,7 +142,7 @@ InnerBlocks = compose( [
 			insertBlocks,
 			updateBlockListSettings,
 		} = dispatch( 'core/editor' );
-		const { block, clientId } = ownProps;
+		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
 
 		return {
 			replaceInnerBlocks( blocks ) {
@@ -150,7 +150,7 @@ InnerBlocks = compose( [
 				if ( clientIds.length ) {
 					replaceBlocks( clientIds, blocks );
 				} else {
-					insertBlocks( blocks, undefined, clientId );
+					insertBlocks( blocks, undefined, clientId, templateInsertUpdatesSelection );
 				}
 			},
 			updateNestedSettings( settings ) {
