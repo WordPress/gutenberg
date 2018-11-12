@@ -152,7 +152,6 @@ const MEANINGFUL_ATTRIBUTES = [
 const TEXT_NORMALIZATIONS = [
 	identity,
 	getTextWithCollapsedWhitespace,
-	decodeEntities,
 ];
 
 /**
@@ -168,10 +167,12 @@ export class IdentityEntityParser {
 	 *
 	 * In this implementation, undefined is always returned.
 	 *
+	 * @param {string} entity Entity fragment discovered in HTML.
+	 *
 	 * @return {?string} Entity substitute value.
 	 */
-	parse() {
-		return undefined;
+	parse( entity ) {
+		return decodeEntities( '&' + entity + ';' );
 	}
 }
 
