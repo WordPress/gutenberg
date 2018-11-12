@@ -32,7 +32,10 @@ function the_gutenberg_project() {
 		<noscript>
 			<div class="error" style='margin-top:32px'><p>
 			<?php
-			_e( 'The Block Editor requires JavaScript. Go to your browser\'s settings and enable JavaScript before using it.', 'gutenberg' );
+				printf(
+					__( 'The Block Editor requires JavaScript, please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+					'https://wordpress.org/plugins/classic-editor/'
+				) ;
 			?>
 			</p></div>
 		</noscript>
