@@ -128,11 +128,18 @@
 		left: auto;
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
-		@include editor-animation__slide-in-right;
+		transform: translateX(+100%);
+		animation: editor-animation__slide-in-right 0.1s forwards;
 
 		body.is-fullscreen-mode & {
 			top: 0;
 		}
+	}
+}
+
+@keyframes editor-animation__slide-in-right {
+	100% {
+		transform: translateX(0%);
 	}
 }
 

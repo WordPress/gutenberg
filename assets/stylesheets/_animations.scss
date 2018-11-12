@@ -1,39 +1,10 @@
-@mixin editor-animation__animate-fade {
-	animation: editor-animation__animate-fade 0.1s ease-out;
-	animation-fill-mode: forwards;
-}
-
-@mixin editor-animation__move-background {
-	background-size: 28px 28px;
-	animation: editor-animation__move-background 0.5s linear infinite;
-}
-
 @mixin editor-animation__loading-fade {
 	animation: editor-animation__loading-fade 1.6s ease-in-out infinite;
-}
-
-@mixin editor-animation__slide-in-right {
-	transform: translateX(+100%);
-	animation: editor-animation__slide-in-right 0.1s forwards;
-}
-
-@mixin editor-animation__slide-in-top {
-	transform: translateY(-100%);
-	animation: editor-animation__slide-in-top 0.1s forwards;
 }
 
 @mixin editor-animation__fade-in($speed: 0.2s, $delay: 0s) {
 	animation: editor-animation__fade-in $speed ease-out $delay;
 	animation-fill-mode: forwards;
-}
-
-@mixin editor-animation__region-focus($speed: 0.2s) {
-	animation: editor-animation__region-focus $speed ease-out;
-	animation-fill-mode: forwards;
-}
-
-@mixin editor-animation__rotation($speed: 1s) {
-	animation: editor-animation__rotation $speed infinite linear;
 }
 
 @mixin editor-animation__modal-appear() {
