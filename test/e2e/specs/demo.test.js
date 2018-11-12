@@ -40,6 +40,6 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should be immediately saveable', async () => {
-		await page.$( 'button.editor-post-save-draft' );
+		expect( await page.$( 'button.editor-post-save-draft' ) ).toBeTruthy();
 	} );
 } );

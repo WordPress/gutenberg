@@ -57,6 +57,10 @@ function toFormat( { type, attributes } ) {
 		return attributes ? { type, attributes } : { type };
 	}
 
+	if ( formatType.__experimentalCreatePrepareEditableTree ) {
+		return null;
+	}
+
 	if ( ! attributes ) {
 		return { type: formatType.name };
 	}
@@ -359,11 +363,13 @@ function createFromElement( {
 				} ),
 			} );
 
-			// Reuse the last format if it's equal.
-			if ( isFormatEqual( newFormat, lastFormat ) ) {
-				format = lastFormat;
-			} else {
-				format = newFormat;
+			if ( newFormat ) {
+				// Reuse the last format if it's equal.
+				if ( isFormatEqual( newFormat, lastFormat ) ) {
+					format = lastFormat;
+				} else {
+					format = newFormat;
+				}
 			}
 		}
 

@@ -42,8 +42,11 @@ import {
 	getSelectionEnd,
 	remove,
 	isCollapsed,
+	LINE_SEPARATOR,
+	charAt,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
+import { withFilters } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -238,6 +241,7 @@ export class RichText extends Component {
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
+			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
 
@@ -252,6 +256,7 @@ export class RichText extends Component {
 				element.setAttribute( 'data-mce-bogus', '1' );
 				return element;
 			},
+			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
 
@@ -413,10 +418,7 @@ export class RichText extends Component {
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-		// Don't apply changes if there's no transform. Content will be up to
-		// date. In the future we could always let it flow back in the live DOM
-		// if there are no performance issues.
-		this.onChange( transformed, record === transformed );
+		this.onChange( transformed );
 	}
 
 	/**
@@ -492,8 +494,6 @@ export class RichText extends Component {
 	 * @link https://en.wikipedia.org/wiki/Caret_navigation
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
-	 *
-	 * @return {?boolean} True if the event was handled.
 	 */
 	onDeleteKeyDown( event ) {
 		const { onMerge, onRemove } = this.props;
@@ -533,7 +533,7 @@ export class RichText extends Component {
 			onRemove( ! isReverse );
 		}
 
-		return true;
+		event.preventDefault();
 	}
 
 	/**
@@ -545,32 +545,46 @@ export class RichText extends Component {
 		const { keyCode } = event;
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			event.preventDefault();
-
-			if ( this.onDeleteKeyDown( event ) ) {
-				return;
-			}
-
 			const value = this.createRecord();
 			const start = getSelectionStart( value );
 			const end = getSelectionEnd( value );
 
-			if ( keyCode === BACKSPACE ) {
-				this.onChange( remove(
-					value,
-					// Only remove the line if the selection is
-					// collapsed.
-					isCollapsed( value ) ? start - 1 : start,
-					end
-				) );
-			} else {
-				this.onChange( remove(
-					value,
-					start,
-					// Only remove the line if the selection is collapsed.
-					isCollapsed( value ) ? end + 1 : end,
-				) );
+			// Always handle uncollapsed selections ourselves.
+			if ( ! isCollapsed( value ) ) {
+				this.onChange( remove( value ) );
+				event.preventDefault();
+				return;
 			}
+
+			if ( this.multilineTag ) {
+				let newValue;
+
+				if ( keyCode === BACKSPACE ) {
+					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
+						newValue = remove(
+							value,
+							// Only remove the line if the selection is
+							// collapsed.
+							isCollapsed( value ) ? start - 1 : start,
+							end
+						);
+					}
+				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
+					newValue = remove(
+						value,
+						start,
+						// Only remove the line if the selection is collapsed.
+						isCollapsed( value ) ? end + 1 : end,
+					);
+				}
+
+				if ( newValue ) {
+					this.onChange( newValue );
+					event.preventDefault();
+				}
+			}
+
+			this.onDeleteKeyDown( event );
 		} else if ( keyCode === ENTER ) {
 			event.preventDefault();
 
@@ -780,6 +794,22 @@ export class RichText extends Component {
 			record.end = length;
 			this.applyRecord( record );
 		}
+
+		// If any format props update, reapply value.
+		const shouldReapply = Object.keys( this.props ).some( ( name ) => {
+			if ( name.indexOf( 'format_' ) !== 0 ) {
+				return false;
+			}
+
+			return Object.keys( this.props[ name ] ).some( ( subName ) => {
+				return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
+			} );
+		} );
+
+		if ( shouldReapply ) {
+			const record = this.formatToValue( value );
+			this.applyRecord( record );
+		}
 	}
 
 	formatToValue( value ) {
@@ -809,11 +839,25 @@ export class RichText extends Component {
 		return value;
 	}
 
-	valueToFormat( { formats, text } ) {
+	valueToEditableHTML( value ) {
+		return unstableToDom( {
+			value,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
+			createLinePadding( doc ) {
+				const element = doc.createElement( 'br' );
+				element.setAttribute( 'data-mce-bogus', '1' );
+				return element;
+			},
+			prepareEditableTree: this.props.prepareEditableTree,
+		} ).body.innerHTML;
+	}
+
+	valueToFormat( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
 			return children.fromDOM( unstableToDom( {
-				value: { formats, text },
+				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} ).body.childNodes );
@@ -821,20 +865,19 @@ export class RichText extends Component {
 
 		if ( this.props.format === 'string' ) {
 			return toHTMLString( {
-				value: { formats, text },
+				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
-		return { formats, text };
+		return value;
 	}
 
 	render() {
 		const {
 			tagName: Tagname = 'div',
 			style,
-			value,
 			wrapperClassName,
 			className,
 			inlineToolbar = false,
@@ -883,7 +926,7 @@ export class RichText extends Component {
 								getSettings={ this.getSettings }
 								onSetup={ this.onSetup }
 								style={ style }
-								defaultValue={ value }
+								defaultValue={ this.valueToEditableHTML( record ) }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
@@ -930,12 +973,15 @@ const RichTextContainer = compose( [
 	withBlockEditContext( ( context, ownProps ) => {
 		// When explicitly set as not selected, do nothing.
 		if ( ownProps.isSelected === false ) {
-			return {};
+			return {
+				clientId: context.clientId,
+			};
 		}
 		// When explicitly set as selected, use the value stored in the context instead.
 		if ( ownProps.isSelected === true ) {
 			return {
 				isSelected: context.isSelected,
+				clientId: context.clientId,
 			};
 		}
 
@@ -943,6 +989,7 @@ const RichTextContainer = compose( [
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
+			clientId: context.clientId,
 		};
 	} ),
 	withSelect( ( select ) => {
@@ -973,6 +1020,7 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withSafeTimeout,
+	withFilters( 'experimentalRichText' ),
 ] )( RichText );
 
 RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
