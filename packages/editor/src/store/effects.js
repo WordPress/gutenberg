@@ -26,6 +26,7 @@ import {
 	resetBlocks,
 	setTemplateValidity,
 	insertDefaultBlock,
+	__experimentalFetchReusableBlocks as fetchReusableBlocksAction,
 } from './actions';
 import {
 	getBlock,
@@ -45,7 +46,6 @@ import {
 	deleteReusableBlocks,
 	convertBlockToReusable,
 	convertBlockToStatic,
-	receiveReusableBlocks,
 } from './effects/reusable-blocks';
 import {
 	requestPostUpdate,
@@ -232,6 +232,11 @@ export default {
 			//
 			// See: https://github.com/WordPress/gutenberg/pull/9403
 			validateBlocksToTemplate( setupAction, store ),
+
+			// Fetch reusable blocks when the editor initialises. This ensures that they
+			// appear in the block autocompleter. This is temporary until reusable blocks
+			// are fetched using a select() resolver.
+			fetchReusableBlocksAction(),
 		] );
 	},
 	RESET_BLOCKS: [
@@ -254,7 +259,6 @@ export default {
 	DELETE_REUSABLE_BLOCK: ( action, store ) => {
 		deleteReusableBlocks( action, store );
 	},
-	RECEIVE_REUSABLE_BLOCKS: receiveReusableBlocks,
 	CONVERT_BLOCK_TO_STATIC: convertBlockToStatic,
 	CONVERT_BLOCK_TO_REUSABLE: convertBlockToReusable,
 	REMOVE_BLOCKS: [

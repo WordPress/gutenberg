@@ -981,6 +981,98 @@ describe( 'state', () => {
 			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'chicken', 'ribs', 'veggies' ] );
 		} );
 
+		it( 'should receive blocks', () => {
+			const original = deepFreeze( editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					clientId: 'block1',
+					attributes: {},
+					innerBlocks: [],
+				} ],
+			} ) );
+			const state = editor( original, {
+				type: 'RECEIVE_BLOCKS',
+				blocks: [
+					{
+						clientId: 'block2',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'block3',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			expect( state.present.blocks.order ).toEqual( {
+				'': [ 'block1' ],
+				block1: [],
+				block2: [],
+				block3: [],
+			} );
+			expect( state.present.blocks.byClientId ).toEqual( {
+				block1: { clientId: 'block1' },
+				block2: { clientId: 'block2' },
+				block3: { clientId: 'block3' },
+			} );
+			expect( state.present.blocks.attributes ).toEqual( {
+				block1: {},
+				block2: {},
+				block3: {},
+			} );
+		} );
+
+		it( 'should receive reusable blocks', () => {
+			const original = deepFreeze( editor( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [ {
+					clientId: 'block1',
+					attributes: {},
+					innerBlocks: [],
+				} ],
+			} ) );
+			const state = editor( original, {
+				type: 'RECEIVE_REUSABLE_BLOCKS',
+				results: [
+					{
+						reusableBlock: {},
+						parsedBlock: {
+							clientId: 'block2',
+							attributes: {},
+							innerBlocks: [],
+						},
+					},
+					{
+						reusableBlock: {},
+						parsedBlock: {
+							clientId: 'block3',
+							attributes: {},
+							innerBlocks: [],
+						},
+					},
+				],
+			} );
+
+			expect( state.present.blocks.order ).toEqual( {
+				'': [ 'block1' ],
+				block1: [],
+				block2: [],
+				block3: [],
+			} );
+			expect( state.present.blocks.byClientId ).toEqual( {
+				block1: { clientId: 'block1' },
+				block2: { clientId: 'block2' },
+				block3: { clientId: 'block3' },
+			} );
+			expect( state.present.blocks.attributes ).toEqual( {
+				block1: {},
+				block2: {},
+				block3: {},
+			} );
+		} );
+
 		describe( 'edits()', () => {
 			it( 'should save newly edited properties', () => {
 				const original = editor( undefined, {

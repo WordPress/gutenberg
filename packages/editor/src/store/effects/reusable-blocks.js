@@ -217,16 +217,6 @@ export const deleteReusableBlocks = async ( action, store ) => {
 };
 
 /**
- * Receive Reusable Blocks Effect Handler.
- *
- * @param {Object} action  action object.
- * @return {Object} receive blocks action
- */
-export const receiveReusableBlocks = ( action ) => {
-	return receiveBlocks( map( action.results, 'parsedBlock' ) );
-};
-
-/**
  * Convert a reusable block to a static block effect handler
  *
  * @param {Object} action  action object.

@@ -19,7 +19,6 @@ import {
 import {
 	fetchReusableBlocks,
 	saveReusableBlocks,
-	receiveReusableBlocks,
 	deleteReusableBlocks,
 	convertBlockToStatic,
 	convertBlockToReusable,
@@ -299,20 +298,6 @@ describe( 'reusable blocks effects', () => {
 				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
 				id: 123,
 			} );
-		} );
-	} );
-
-	describe( 'receiveReusableBlocks', () => {
-		it( 'should receive parsed blocks', () => {
-			const action = receiveReusableBlocksAction( [
-				{
-					parsedBlock: { clientId: 'broccoli' },
-				},
-			] );
-
-			expect( receiveReusableBlocks( action ) ).toEqual( receiveBlocks( [
-				{ clientId: 'broccoli' },
-			] ) );
 		} );
 	} );
 
