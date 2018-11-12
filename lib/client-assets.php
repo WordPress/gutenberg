@@ -470,6 +470,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-dom',
 			'wp-element',
 			'wp-hooks',
+			'wp-html-entities',
 			'wp-i18n',
 			'wp-is-shallow-equal',
 			'wp-polyfill',

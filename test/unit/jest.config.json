@@ -14,5 +14,8 @@
 		"/test/e2e",
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/"
+	],
+	"transformIgnorePatterns": [
+		"node_modules/(?!(simple-html-tokenizer)/)"
 	]
 }
