@@ -8,38 +8,12 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockFormatControls } from '@wordpress/editor';
-import { Toolbar } from '@wordpress/components';
+import { Toolbar, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-const TOOLBAR_BUTTON_TAG_EDIT = 'edit';
-
-const TOOLBAR_BUTTONS = [
-	{
-		icon: 'edit',
-		title: __( 'Edit image' ),
-		tag: TOOLBAR_BUTTON_TAG_EDIT,
-	},
-];
 
 export default function ImageEdit( props ) {
 	const { attributes, isSelected, setAttributes } = props;
 	const { url, caption } = attributes;
-
-	const toggleToolbarButton = ( tag ) => {
-		return () => {
-			switch ( tag ) {
-				case TOOLBAR_BUTTON_TAG_EDIT:
-					onMediaLibraryPress();
-					break;
-			}
-		};
-	};
-
-	const toolbarControls = TOOLBAR_BUTTONS.map( ( control ) => ( {
-		...control,
-		onClick: toggleToolbarButton( control.tag ),
-		isActive: true,
-	} ) );
 
 	const onUploadPress = () => {
 		// This method should present an image picker from
@@ -64,10 +38,21 @@ export default function ImageEdit( props ) {
 		);
 	}
 
+	const toolbarEditButton = (
+		<Toolbar>
+			<IconButton
+				className="components-toolbar__control"
+				label={ __( 'Edit image' ) }
+				icon="edit"
+				onClick={ onMediaLibraryPress }
+			/>
+		</Toolbar>
+	);
+
 	return (
 		<View style={ { flex: 1 } }>
 			<BlockFormatControls>
-				<Toolbar controls={ toolbarControls } />
+				{ toolbarEditButton }
 			</BlockFormatControls>
 			<Image
 				style={ { width: '100%', height: 200 } }
