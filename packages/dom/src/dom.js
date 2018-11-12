@@ -620,12 +620,11 @@ export function unwrap( node ) {
  *
  * @param {Element}  node    The node to replace
  * @param {string}   tagName The new tag name.
- * @param {Document} doc     The document of the node.
  *
  * @return {Element} The new node.
  */
-export function replaceTag( node, tagName, doc ) {
-	const newNode = doc.createElement( tagName );
+export function replaceTag( node, tagName ) {
+	const newNode = node.ownerDocument.createElement( tagName );
 
 	while ( node.firstChild ) {
 		newNode.appendChild( node.firstChild );
@@ -634,4 +633,15 @@ export function replaceTag( node, tagName, doc ) {
 	node.parentNode.replaceChild( newNode, node );
 
 	return newNode;
+}
+
+/**
+ * Wraps the given node with a new node with the given tag name.
+ *
+ * @param {Element} newNode       The node to insert.
+ * @param {Element} referenceNode The node to wrap.
+ */
+export function wrap( newNode, referenceNode ) {
+	referenceNode.parentNode.insertBefore( newNode, referenceNode );
+	newNode.appendChild( referenceNode );
 }

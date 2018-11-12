@@ -13,7 +13,7 @@ function ContrastChecker( {
 	backgroundColor,
 	fallbackBackgroundColor,
 	fallbackTextColor,
-	fontSize,
+	fontSize, // font size value in pixels
 	isLargeText,
 	textColor,
 } ) {
@@ -27,7 +27,7 @@ function ContrastChecker( {
 	if ( hasTransparency || tinycolor.isReadable(
 		tinyBackgroundColor,
 		tinyTextColor,
-		{ level: 'AA', size: ( isLargeText || ( isLargeText !== false && fontSize >= 18 ) ? 'large' : 'small' ) }
+		{ level: 'AA', size: ( isLargeText || ( isLargeText !== false && fontSize >= 24 ) ? 'large' : 'small' ) }
 	) ) {
 		return null;
 	}

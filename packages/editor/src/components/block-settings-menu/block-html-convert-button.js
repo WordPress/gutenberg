@@ -12,22 +12,17 @@ import BlockConvertButton from './block-convert-button';
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock, canUserUseUnfilteredHTML } = select( 'core/editor' );
-		const block = getBlock( clientId );
+		const block = select( 'core/editor' ).getBlock( clientId );
+
 		return {
 			block,
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			shouldRender: ( block && block.name === 'core/html' ),
 		};
 	} ),
-	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML } ) => ( {
+	withDispatch( ( dispatch, { block } ) => ( {
 		onClick: () => dispatch( 'core/editor' ).replaceBlocks(
 			block.clientId,
-			rawHandler( {
-				HTML: getBlockContent( block ),
-				mode: 'BLOCKS',
-				canUserUseUnfilteredHTML,
-			} ),
+			rawHandler( { HTML: getBlockContent( block ) } ),
 		),
 	} ) ),
 )( BlockConvertButton );

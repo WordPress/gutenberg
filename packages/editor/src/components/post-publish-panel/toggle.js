@@ -3,6 +3,7 @@
  */
 import { Button } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
@@ -16,10 +17,20 @@ export function PostPublishPanelToggle( {
 	onToggle,
 	isOpen,
 	forceIsSaving,
+	forceIsDirty,
 } ) {
-	const isButtonEnabled = (
-		! isSaving && ! forceIsSaving && isPublishable && isSaveable
-	) || isPublished;
+	const isButtonDisabled =
+		isPublished ||
+		isSaving ||
+		forceIsSaving ||
+		! isSaveable ||
+		( ! isPublishable && ! forceIsDirty );
+
+	deprecated( 'PostPublishPanelToggle', {
+		version: '4.5',
+		alternative: 'PostPublishButton',
+		plugin: 'Gutenberg',
+	} );
 
 	return (
 		<Button
@@ -27,7 +38,7 @@ export function PostPublishPanelToggle( {
 			isPrimary
 			onClick={ onToggle }
 			aria-expanded={ isOpen }
-			disabled={ ! isButtonEnabled }
+			disabled={ isButtonDisabled }
 			isBusy={ isSaving && isPublished }
 		>
 			{ isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' ) }

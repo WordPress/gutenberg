@@ -11,7 +11,6 @@ import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
-	getBlockType,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 import {
@@ -101,7 +100,7 @@ export const settings = {
 				transform( node ) {
 					return createBlock( 'core/heading', {
 						...getBlockAttributes(
-							getBlockType( 'core/heading' ),
+							'core/heading',
 							node.outerHTML
 						),
 						level: getLevelFromHeadingNodeName( node.nodeName ),

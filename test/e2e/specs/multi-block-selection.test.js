@@ -117,4 +117,25 @@ describe( 'Multi-block selection', () => {
 		// Verify selection
 		await expectMultiSelected( blocks, true );
 	} );
+
+	it( 'should speak() number of blocks selected with multi-block selection', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'First Paragraph' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Second Paragraph' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Third Paragraph' );
+
+		// Multiselect via keyboard.
+		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( META_KEY, 'a' );
+
+		// TODO: It would be great to do this test by spying on `wp.a11y.speak`,
+		// but it's very difficult to do that because `wp.a11y` has
+		// DOM-dependant side-effect setup code and doesn't seem straightforward
+		// to mock. Instead, we check for the DOM node that `wp.a11y.speak()`
+		// inserts text into.
+		const speakTextContent = await page.$eval( '#a11y-speak-assertive', ( element ) => element.textContent );
+		expect( speakTextContent.trim() ).toEqual( '3 blocks selected.' );
+	} );
 } );
