@@ -53,7 +53,7 @@ class Popover extends Component {
 			contentHeight: null,
 			contentWidth: null,
 			isMobile: false,
-			popoverSize: {},
+			popoverSize: null,
 		};
 
 		// Property used keep track of the previous anchor rect
@@ -144,7 +144,7 @@ class Popover extends Component {
 			width: contentRect.width,
 			height: contentRect.height,
 		};
-		const didPopoverSizeChange = (
+		const didPopoverSizeChange = ! this.state.popoverSize || (
 			popoverSize.width !== this.state.popoverSize.width ||
 			popoverSize.height !== this.state.popoverSize.height
 		);

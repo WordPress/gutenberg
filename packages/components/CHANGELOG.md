@@ -1,3 +1,9 @@
+## 6.0.1 (Unreleased)
+
+### Bug Fixes
+
+- Avoid constantly recomputing the popover position.
+
 ## 6.0.0 (2018-11-12)
 
 ### Breaking Change
