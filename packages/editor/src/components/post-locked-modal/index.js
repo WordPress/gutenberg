@@ -104,18 +104,15 @@ class PostLockedModal extends Component {
 			return;
 		}
 
-		const data = {
-			action: 'wp-remove-post-lock',
-			_wpnonce: postLockUtils.unlockNonce,
-			post_ID: postId,
-			active_post_lock: activePostLock,
-		};
+		const data = new window.FormData();
+		data.append( 'action', 'wp-remove-post-lock' );
+		data.append( '_wpnonce', postLockUtils.unlockNonce );
+		data.append( 'post_ID', postId );
+		data.append( 'active_post_lock', activePostLock );
 
-		jQuery.post( {
-			async: false,
-			url: postLockUtils.ajaxUrl,
-			data,
-		} );
+		const xhr = new window.XMLHttpRequest();
+		xhr.open( 'POST', postLockUtils.ajaxUrl, false );
+		xhr.send( data );
 	}
 
 	render() {
