@@ -79,7 +79,7 @@ export class PostPublishButton extends Component {
 		};
 
 		const buttonProps = {
-			'aria-disabled': isButtonDisabled,
+			disabled: isButtonDisabled,
 			className: 'editor-post-publish-button',
 			isBusy: isSaving && isPublished,
 			isLarge: true,
@@ -88,7 +88,7 @@ export class PostPublishButton extends Component {
 		};
 
 		const toggleProps = {
-			'aria-disabled': isToggleDisabled,
+			disabled: isToggleDisabled,
 			'aria-expanded': isOpen,
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,

@@ -11,7 +11,7 @@ import { PostPublishButton } from '../';
 jest.mock( '../../../../../components/src/button' );
 
 describe( 'PostPublishButton', () => {
-	describe( 'aria-disabled', () => {
+	describe( 'disabled', () => {
 		it( 'should be true if post is currently saving', () => {
 			const wrapper = shallow(
 				<PostPublishButton
@@ -21,7 +21,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if forceIsSaving is true', () => {
@@ -33,7 +33,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if post is not publishable and not forceIsDirty', () => {
@@ -45,7 +45,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if post is not saveable', () => {
@@ -56,7 +56,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be true if post saving is locked', () => {
@@ -68,7 +68,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( true );
+			expect( wrapper.prop( 'disabled' ) ).toBe( true );
 		} );
 
 		it( 'should be false if post is saveable but not publishable and forceIsDirty is true', () => {
@@ -80,7 +80,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( false );
+			expect( wrapper.prop( 'disabled' ) ).toBe( false );
 		} );
 
 		it( 'should be false if post is publishave and saveable', () => {
@@ -91,7 +91,7 @@ describe( 'PostPublishButton', () => {
 				/>
 			);
 
-			expect( wrapper.prop( 'aria-disabled' ) ).toBe( false );
+			expect( wrapper.prop( 'disabled' ) ).toBe( false );
 		} );
 	} );
 
