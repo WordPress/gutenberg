@@ -1,5 +1,10 @@
 ## 7.0.1  (Unreleased)
 
+### Polish
+
+- Remove unnecessary `locale` prop usage [#11649](https://github.com/WordPress/gutenberg/pull/11649)
+
+
 ### Bug Fixes
 
 - Fix multi-selection triggering too often when using floated blocks.
@@ -33,10 +38,6 @@
 - Reactive block styles.
 
 ## 6.2.0 (2018-11-09)
-
-### Polish
-
-- Remove unnecessary `locale` prop usage [#11649](https://github.com/WordPress/gutenberg/pull/11649)
 
 ### New Features
 
