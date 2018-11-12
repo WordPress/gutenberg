@@ -139,7 +139,7 @@ class URLInput extends Component {
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if ( ! showSuggestions || ! posts.length || loading ) {
 			// In the Windows version of Firefox the up and down arrows don't move the caret
-			// within an input field like they do for Mac Firedox/Chrome/Safari. This causes
+			// within an input field like they do for Mac Firefox/Chrome/Safari. This causes
 			// a form of focus trapping that is disruptive to the user experience. This disruption
 			// only happens if the caret is not in the first or last position in the text input.
 			// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
