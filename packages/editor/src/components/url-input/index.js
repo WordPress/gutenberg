@@ -138,6 +138,38 @@ class URLInput extends Component {
 		// If the suggestions are not shown or loading, we shouldn't handle the arrow keys
 		// We shouldn't preventDefault to allow block arrow keys navigation
 		if ( ! showSuggestions || ! posts.length || loading ) {
+			// In the Windows version of Firefox the up and down arrows don't move the caret
+			// within an input field like they do for Mac Firedox/Chrome/Safari. This causes
+			// a form of focus trapping that is disruptive to the user experience. This disruption
+			// only happens if the caret is not in the first or last position in the text input.
+			// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
+			switch ( event.keyCode ) {
+				// When UP is pressed, if the caret is at the start of the text, move it to the 0
+				// position.
+				case UP: {
+					if ( 0 !== event.target.selectionStart ) {
+						event.stopPropagation();
+						event.preventDefault();
+
+						// Set the input caret to position 0
+						event.target.setSelectionRange( 0, 0 );
+					}
+					break;
+				}
+				// When DOWN is pressed, if the caret is not at the end of the text, move it to the
+				// last position.
+				case DOWN: {
+					if ( this.props.value.length !== event.target.selectionStart ) {
+						event.stopPropagation();
+						event.preventDefault();
+
+						// Set the input caret to the last position
+						event.target.setSelectionRange( this.props.value.length, this.props.value.length );
+					}
+					break;
+				}
+			}
+
 			return;
 		}
 
