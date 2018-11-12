@@ -1,3 +1,9 @@
+## 2.2.2 (2018-11-12)
+
+### Polish
+
+- Columns Block: Improve usability while editing columns.
+
 ## 2.2.1 (2018-11-09)
 
 ## 2.2.0 (2018-11-09)

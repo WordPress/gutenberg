@@ -1,14 +1,22 @@
-## 7.0.0 (Unreleased)
+## 7.0.0 (2018-11-12)
 
-### Breaking Changes
+### Breaking Change
 
 - The `PanelColor` component has been removed.
 
-## 6.2.1 (2018-11-09)
-
-### New Features
+### New Feature
 
 - In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
+
+### Bug Fixes
+
+- Avoid unnecessary re-renders when navigating between blocks.
+- PostPublishPanel: return focus to element that opened the panel
+- Capture focus on self in InsertionPoint inserter
+- Correct insertion point opacity selector
+- Set code editor as RTL
+
+## 6.2.1 (2018-11-09)
 
 ### Deprecations
 
