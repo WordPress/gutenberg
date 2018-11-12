@@ -81,6 +81,9 @@ class BlockList extends Component {
 		}
 
 		const blockContentBoundaries = getBlockDOMNode( this.selectionAtStart ).getBoundingClientRect();
+
+		// prevent multi-selection from triggering when the selected block is a float
+		// and the cursor is still between the top and the bottom of the block.
 		if ( clientY >= blockContentBoundaries.top && clientY <= blockContentBoundaries.bottom ) {
 			return;
 		}
