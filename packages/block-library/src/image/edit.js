@@ -264,10 +264,6 @@ class ImageEdit extends Component {
 		}
 	}
 
-	getImageSizes() {
-		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
-	}
-
 	getLinkDestinationOptions() {
 		return [
 			{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
