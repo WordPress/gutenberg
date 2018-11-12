@@ -32,7 +32,7 @@ function the_gutenberg_project() {
 		<noscript>
 			<div class="error" style='margin-top:32px'><p>
 			<?php
-			_e( 'The block editor requires Javascript to be enabled.', 'gutenberg' );
+			_e( 'The Block Editor requires JavaScript. Go to your browser\'s settings and enable JavaScript before using it.', 'gutenberg' );
 			?>
 			</p></div>
 		</noscript>
