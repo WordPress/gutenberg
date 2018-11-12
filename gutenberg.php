@@ -28,17 +28,17 @@ gutenberg_pre_init();
 function the_gutenberg_project() {
 	global $post_type_object;
 	?>
+	<noscript>
+		<div class="error" style='position:absolute;top:32px;z-index:40'><p>
+		<?php
+			printf(
+				__( 'The Block Editor requires JavaScript, please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+				'https://wordpress.org/plugins/classic-editor/'
+			) ;
+		?>
+		</p></div>
+	</noscript>
 	<div class="block-editor gutenberg">
-		<noscript>
-			<div class="error" style='margin-top:32px'><p>
-			<?php
-				printf(
-					__( 'The Block Editor requires JavaScript, please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-					'https://wordpress.org/plugins/classic-editor/'
-				) ;
-			?>
-			</p></div>
-		</noscript>
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="block-editor__container gutenberg__editor"></div>
 		<div id="metaboxes" style="display: none;">
