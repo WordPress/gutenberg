@@ -7,7 +7,7 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText, BlockFormatControls } from '@wordpress/editor';
+import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -51,9 +51,9 @@ export default function ImageEdit( props ) {
 
 	return (
 		<View style={ { flex: 1 } }>
-			<BlockFormatControls>
+			<BlockControls>
 				{ toolbarEditButton }
-			</BlockFormatControls>
+			</BlockControls>
 			<Image
 				style={ { width: '100%', height: 200 } }
 				resizeMethod="scale"
