@@ -318,6 +318,14 @@
 		right: 0;
 	}
 
+	// Position the sticky toolbar correctly beyond the mobile breakpoint.
+	@include break-small() {
+		&[data-align="right"] .editor-block-contextual-toolbar,
+		&[data-align="left"] .editor-block-contextual-toolbar {
+			top: $block-padding;
+		}
+	}
+
 	// Left
 	&[data-align="left"] {
 		// This is in the editor only; the image should be floated on the frontend.
