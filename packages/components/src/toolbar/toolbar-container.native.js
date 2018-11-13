@@ -3,8 +3,10 @@
  */
 import { View } from 'react-native';
 
+import styles from './toolbar-container.scss';
+
 const ToolbarContainer = ( props ) => (
-	<View style={ { flexDirection: 'row', borderRightWidth:1, borderRightColor: '#a8bece', paddingLeft: 5, paddingRight: 5} }>
+	<View style={ styles.container }>
 		{ props.children }
 	</View>
 );
