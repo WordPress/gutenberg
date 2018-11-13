@@ -107,13 +107,12 @@ describe( 'Input ', () => {
 
 	describe( 'is re-rendered', () => {
 		test( 'onChange event for value.length <= 4', () => {
-			const onChange = jest.fn();
 			const testRenderer = TestRenderer.create(
 				<Input
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#aaa' }
-					onChange={ onChange }
+					onChange={ () => {} }
 				/>
 			);
 			testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#fff' } } );
@@ -121,13 +120,12 @@ describe( 'Input ', () => {
 		} );
 
 		test( 'onChange event for value.length > 4', () => {
-			const onChange = jest.fn();
 			const testRenderer = TestRenderer.create(
 				<Input
 					label={ 'Color value in hexadecimal' }
 					valueKey="hex"
 					value={ '#aaa' }
-					onChange={ onChange }
+					onChange={ () => {} }
 				/>
 			);
 			testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ffffff' } } );
