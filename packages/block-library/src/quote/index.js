@@ -17,15 +17,18 @@ import {
 import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 import { G, Path, SVG } from '@wordpress/components';
 
+const ATTRIBUTE_QUOTE = 'value';
+const ATTRIBUTE_CITATION = 'citation';
+
 const blockAttributes = {
-	value: {
+	[ ATTRIBUTE_QUOTE ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 		default: '',
 	},
-	citation: {
+	[ ATTRIBUTE_CITATION ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'cite',
@@ -201,6 +204,7 @@ export const settings = {
 				</BlockControls>
 				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
+						identifier={ ATTRIBUTE_QUOTE }
 						multiline
 						value={ value }
 						onChange={
@@ -222,6 +226,7 @@ export const settings = {
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
+							identifier={ ATTRIBUTE_CITATION }
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {

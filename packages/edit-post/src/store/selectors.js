@@ -5,11 +5,6 @@ import createSelector from 'rememo';
 import { get, includes, some, flatten, values } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Returns the current editing mode.
  *
  * @param {Object} state Global application state.
@@ -116,24 +111,6 @@ export function isPublishSidebarOpened( state ) {
 export function isEditorPanelEnabled( state, panelName ) {
 	const panels = getPreference( state, 'panels' );
 	return get( panels, [ panelName, 'enabled' ], true );
-}
-
-/**
- * Returns true if the given panel is enabled, or false otherwise. Panels are
- * enabled by default.
- *
- * @param {Object} state Global application state.
- * @param {string} panel A string that identifies the panel.
- *
- * @return {boolean} Whether or not the panel is enabled.
- */
-export function isEditorSidebarPanelOpened( state, panel ) {
-	deprecated( 'isEditorSidebarPanelOpened', {
-		alternative: 'isEditorPanelEnabled',
-		plugin: 'Gutenberg',
-		version: '4.3',
-	} );
-	return isEditorPanelEnabled( state, panel );
 }
 
 /**

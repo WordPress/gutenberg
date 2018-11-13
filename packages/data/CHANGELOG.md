@@ -1,3 +1,13 @@
+## 3.1.3 (Unreleased)
+
+### Bug Fix
+
+- Resolve an issue where `withSelect`'s `mapSelectToProps` would not be rerun if the wrapped component had incurred a store change during its mount lifecycle.
+
+## 3.1.2 (2018-11-09)
+
+## 3.1.1 (2018-11-09)
+
 ## 3.1.0 (2018-11-03)
 
 ### New Features

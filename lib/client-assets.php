@@ -144,13 +144,6 @@ function gutenberg_register_scripts_and_styles() {
 
 	register_tinymce_scripts();
 
-	gutenberg_override_script(
-		'wp-polyfill',
-		null,
-		array(
-			'wp-polyfill-ecmascript',
-		)
-	);
 	wp_script_add_data(
 		'wp-polyfill',
 		'data',
@@ -324,6 +317,13 @@ function gutenberg_register_scripts_and_styles() {
 		)
 	);
 	gutenberg_override_script(
+		'wp-annotations',
+		gutenberg_url( 'build/annotations/index.js' ),
+		array( 'wp-polyfill', 'wp-data', 'wp-rich-text', 'wp-hooks', 'wp-i18n' ),
+		filemtime( gutenberg_dir_path() . 'build/annotations/index.js' ),
+		true
+	);
+	gutenberg_override_script(
 		'wp-core-data',
 		gutenberg_url( 'build/core-data/index.js' ),
 		array( 'wp-data', 'wp-api-fetch', 'wp-polyfill', 'wp-url', 'lodash' ),
@@ -486,7 +486,7 @@ function gutenberg_register_scripts_and_styles() {
 			'lodash',
 			'wp-a11y',
 			'wp-data',
-			'wp-polyfill-ecmascript',
+			'wp-polyfill',
 		),
 		filemtime( gutenberg_dir_path() . 'build/notices/index.js' ),
 		true
@@ -605,28 +605,26 @@ function gutenberg_register_scripts_and_styles() {
 			),
 			'toolbar1'         => implode(
 				',',
-				array_merge(
-					apply_filters(
-						'mce_buttons',
-						array(
-							'formatselect',
-							'bold',
-							'italic',
-							'bullist',
-							'numlist',
-							'blockquote',
-							'alignleft',
-							'aligncenter',
-							'alignright',
-							'link',
-							'unlink',
-							'wp_more',
-							'spellchecker',
-							'wp_add_media',
-						),
-						'editor'
+				apply_filters(
+					'mce_buttons',
+					array(
+						'formatselect',
+						'bold',
+						'italic',
+						'bullist',
+						'numlist',
+						'blockquote',
+						'alignleft',
+						'aligncenter',
+						'alignright',
+						'link',
+						'unlink',
+						'wp_more',
+						'spellchecker',
+						'wp_add_media',
+						'kitchensink',
 					),
-					array( 'kitchensink' )
+					'editor'
 				)
 			),
 			'toolbar2'         => implode(
@@ -725,7 +723,6 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-compose',
 			'wp-core-data',
 			'wp-data',
-			'wp-deprecated',
 			'wp-dom-ready',
 			'wp-editor',
 			'wp-element',
@@ -752,7 +749,7 @@ function gutenberg_register_scripts_and_styles() {
 			'wp-compose',
 			'wp-element',
 			'wp-i18n',
-			'wp-polyfill-ecmascript',
+			'wp-polyfill',
 		),
 		filemtime( gutenberg_dir_path() . 'build/list-reusable-blocks/index.js' ),
 		true
@@ -868,6 +865,24 @@ function gutenberg_register_scripts_and_styles() {
 			$live_reload_url
 		);
 	}
+
+	// Temporary backward compatibility for `wp-polyfill-ecmascript`, which has
+	// since been absorbed into `wp-polyfill`.
+	//
+	// [TODO][REMOVEME] To be removed in Gutenberg v4.5.
+	gutenberg_override_script(
+		'wp-polyfill-ecmascript',
+		null,
+		array(
+			'wp-polyfill',
+			'wp-deprecated',
+		)
+	);
+	wp_script_add_data(
+		'wp-polyfill-ecmascript',
+		'data',
+		'wp.deprecated( "wp-polyfill-ecmascript script handle", { plugin: "Gutenberg", version: "4.5" } );'
+	);
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -980,7 +995,7 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/element-closest@2.0.2/element-closest.js'
 	);
 	gutenberg_register_vendor_script(
-		'wp-polyfill-ecmascript',
+		'wp-polyfill',
 		'https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.0.0/polyfill' . $suffix . '.js'
 	);
 }
@@ -1614,7 +1629,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
 		'disablePostFormats'     => ! current_theme_supports( 'post-formats' ),
 		'titlePlaceholder'       => apply_filters( 'enter_title_here', __( 'Add title', 'gutenberg' ), $post ),
-		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Write your story', 'gutenberg' ), $post ),
+		'bodyPlaceholder'        => apply_filters( 'write_your_story', __( 'Start writing or type / to choose a block', 'gutenberg' ), $post ),
 		'isRTL'                  => is_rtl(),
 		'autosaveInterval'       => 10,
 		'maxUploadFileSize'      => $max_upload_size,

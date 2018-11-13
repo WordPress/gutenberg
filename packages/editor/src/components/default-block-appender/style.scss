@@ -1,23 +1,23 @@
 .editor-default-block-appender {
 	clear: both; // The appender doesn't scale well to sit next to floats, so clear them.
 
-	input[type="text"].editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
+	textarea.editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
 		font-family: $editor-font;
 		font-size: $editor-font-size; // It should match the default paragraph size.
 		border: none;
 		background: none;
 		box-shadow: none;
 		display: block;
-		margin-left: 0;
-		margin-right: 0;
-		max-width: none; // Overrides upstream CSS from the admin.
+		margin-left: $border-width;
+		margin-right: $border-width;
 		cursor: text;
 		width: 100%;
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
+		resize: none;
 
 		// Emulate the dimensions of a paragraph block.
-		padding: 0 #{ $block-padding + $border-width };
+		padding: 0 #{ $block-padding };
 
 		// Use opacity to work in various editor styles.
 		color: $dark-opacity-300;

@@ -61,6 +61,12 @@ class NavigableToolbar extends Component {
 		}
 	}
 
+	componentDidMount() {
+		if ( this.props.focusOnMount ) {
+			this.focusToolbar();
+		}
+	}
+
 	render() {
 		const { children, ...props } = this.props;
 		return (

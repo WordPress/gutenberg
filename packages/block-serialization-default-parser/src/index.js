@@ -2,7 +2,7 @@ let document;
 let offset;
 let output;
 let stack;
-const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:[^}]+|}+(?=})|(?!}\s+-->)[^])+?}\s+)?(\/)?-->/g;
+const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:[^}]+|}+(?=})|(?!}\s+-->)[^])*?}\s+)?(\/)?-->/g;
 
 function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	return {
