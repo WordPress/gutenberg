@@ -62,10 +62,9 @@ class PostLockedModal extends Component {
 	 * When the user does not send a heartbeat in a heartbeat-tick
 	 * the user is no longer editing and another user can start editing.
 	 *
-	 * @param {Object} event Event.
-	 * @param {Object} data  Data to send in the heartbeat request.
+	 * @param {Object} data Data to send in the heartbeat request.
 	 */
-	sendPostLock( event, data ) {
+	sendPostLock( data ) {
 		const { isLocked, activePostLock, postId } = this.props;
 		if ( isLocked ) {
 			return;
@@ -80,10 +79,9 @@ class PostLockedModal extends Component {
 	/**
 	 * Refresh post locks: update the lock string or show the dialog if somebody has taken over editing.
 	 *
-	 * @param {Object} event Event.
-	 * @param {Object} data  Data received in the heartbeat request
+	 * @param {Object} data Data received in the heartbeat request
 	 */
-	receivePostLock( event, data ) {
+	receivePostLock( data ) {
 		if ( ! data[ 'wp-refresh-post-lock' ] ) {
 			return;
 		}
