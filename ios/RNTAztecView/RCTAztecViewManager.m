@@ -1,15 +1,6 @@
-#import "RCTAztecViewManager.h"
 #import <React/RCTViewManager.h>
 
-// USE "WordPress-Swift.h" to run on WPiOS, or "RNTAztecView-Swift.h" to run Example App.
-#import "RNTAztecView-Swift.h"
-//#import "WordPress-Swift.h"
-
-
-typedef void (^ActionBlock)(RCTAztecView *aztecView);
-
-@implementation RCTAztecViewManager (RCTExternModule)
-RCT_EXPORT_MODULE(RCTAztecView)
+@interface RCT_EXTERN_MODULE(RCTAztecViewManager, NSObject)
 
 RCT_REMAP_VIEW_PROPERTY(text, contents, NSDictionary)
 RCT_EXPORT_VIEW_PROPERTY(onContentSizeChange, RCTBubblingEventBlock)
@@ -22,26 +13,6 @@ RCT_EXPORT_VIEW_PROPERTY(onActiveFormatsChange, RCTBubblingEventBlock)
 RCT_EXPORT_VIEW_PROPERTY(placeholder, NSString)
 RCT_EXPORT_VIEW_PROPERTY(placeholderTextColor, UIColor)
 
-- (void)executeBlock:(ActionBlock)block onNode:(NSNumber *)node {
-
-    [self.bridge.uiManager addUIBlock:^(__unused RCTUIManager *uiManager, NSDictionary<NSNumber *, UIView *> *viewRegistry) {
-        id view = viewRegistry[node];
-        if (![view isKindOfClass:[RCTAztecView class]]) {
-            RCTLogError(@"Invalid view returned from registry, expecting RCTAztecView, got: %@", view);
-            return;
-        }
-        RCTAztecView *listView = view;
-        if (block) {
-            block(listView);
-        }
-    }];
-}
-
-RCT_EXPORT_METHOD(applyFormat:(nonnull NSNumber *)node format:(NSString *)format)
-{    
-    [self executeBlock:^(RCTAztecView *aztecView) {
-        [aztecView applyWithFormat:format];
-    } onNode:node];
-}
+RCT_EXTERN_METHOD(applyFormat:(nonnull NSNumber *)node format:(NSString *)format)
 
 @end

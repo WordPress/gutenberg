@@ -10,7 +10,7 @@ Pod::Spec.new do |s|
   s.homepage         = 'https://github.com/wordpress-mobile/react-native-aztec'
   s.authors          = 'Automattic'
   s.source           = { :git => 'https://github.com/wordpress-mobile/react-native-aztec.git' }
-  s.source_files     = 'ios/**/*.{h,m,swift}'
+  s.source_files     = 'ios/RNTAztecView/*.{h,m,swift}'
   s.public_header_files = 'ios/RNTAztecView/*.h'
   s.requires_arc     = true
   s.platforms        = { :ios => "10.0" }
