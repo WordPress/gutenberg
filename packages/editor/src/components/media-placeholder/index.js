@@ -258,8 +258,13 @@ class MediaPlaceholder extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
+	let hasUploadPermissions = false;
+	if ( undefined !== select( 'core' ) ) {
+		hasUploadPermissions = select( 'core' ).hasUploadPermissions();
+	}
+
 	return {
-		hasUploadPermissions: select( 'core' ).hasUploadPermissions(),
+		hasUploadPermissions: hasUploadPermissions,
 	};
 } );
 

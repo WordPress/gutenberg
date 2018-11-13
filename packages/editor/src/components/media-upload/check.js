@@ -3,13 +3,17 @@
  */
 import { withSelect } from '@wordpress/data';
 
-export function MediaUploadCheck( { hasUploadPermissions, fallback, children } ) {
-	const optionalFallback = fallback || null;
-	return hasUploadPermissions ? children : optionalFallback;
+export function MediaUploadCheck( { hasUploadPermissions, fallback = null, children } ) {
+	return hasUploadPermissions ? children : fallback;
 }
 
 export default withSelect( ( select ) => {
+	let hasUploadPermissions = false;
+	if ( undefined !== select( 'core' ) ) {
+		hasUploadPermissions = select( 'core' ).hasUploadPermissions();
+	}
+
 	return {
-		hasUploadPermissions: select( 'core' ).hasUploadPermissions(),
+		hasUploadPermissions: hasUploadPermissions,
 	};
 } )( MediaUploadCheck );
