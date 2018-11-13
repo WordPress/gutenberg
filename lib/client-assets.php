@@ -763,11 +763,16 @@ function gutenberg_register_scripts_and_styles() {
 
 	/*
 	 * Translators: If there are characters in your language that are not supported
-	 * by Noto Serif, translate this to 'off'. Do not translate into your own language.
+	 * by a Noto font, translate this to 'off'. Do not translate into your own language.
 	 */
-	if ( 'off' !== _x( 'on', 'Noto Serif font: on or off', 'gutenberg' ) ) {
-		$query_args = array(
-			'family' => urlencode( 'Noto Serif:400,400i,700,700i' ),
+	if ( 'off' !== _x( 'on', 'Noto Font: on or off', 'gutenberg' ) ) {
+		/*
+		 * Translators: Use this to specify the proper Noto font family that is
+		 * supported by your language. This must correspond to a Google Font.
+		 */
+		$font_family = _x( 'Noto Serif:400,400i,700,700i', 'Google Noto Font', 'gutenberg' );
+		$query_args  = array(
+			'family' => urlencode( $font_family ),
 		);
 
 		$fonts_url = esc_url_raw( add_query_arg( $query_args, 'https://fonts.googleapis.com/css' ) );
@@ -1559,6 +1564,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			),
 		),
 	);
+
+	/*
+	 * Set a locale specific default font.
+	 * Translators: Use this to specify the CSS font family for the default font
+	 */
+	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
+	$styles[]           = array(
+		'css' => "body { font-family: '$locale_font_family' }",
+	);
+
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
 			if ( filter_var( $style, FILTER_VALIDATE_URL ) ) {
