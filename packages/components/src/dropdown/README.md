@@ -55,7 +55,7 @@ The direction in which the popover should open relative to its parent node. Spec
 - Required: No
 - Default: `"top center"`
 
-## renderToggle
+### renderToggle
 
 A callback invoked to render the Dropdown Toggle Button.
 
@@ -68,14 +68,14 @@ The first argument of the callback is an object containing the following propert
  - `onToggle`: A function switching the dropdown menu's state from open to closed and vice versa
  - `onClose`: A function that closes the menu if invoked
 
-## renderContent
+### renderContent
 
 A callback invoked to render the content of the dropdown menu. Its first argument is the same as the `renderToggle` prop.
 
 - Type: `Function`
 - Required: Yes
 
-## expandOnMobile
+### expandOnMobile
 
 Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to avoid this behavior.
 
@@ -83,7 +83,7 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Required: No
  - Default: `false`
 
- ## headerTitle
+### headerTitle
 
  Set this to customize the text that is shown in the dropdown's header when
  it is fullscreen on mobile.
