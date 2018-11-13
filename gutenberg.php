@@ -33,7 +33,7 @@ function the_gutenberg_project() {
 		<?php
 			// Using Gutenberg as Plugin
 			if ( is_plugin_active( 'gutenberg/gutenberg.php' ) ) {
-				$current_url = esc_url( $_SERVER['REQUEST_URI'] . "&classic-editor" );
+				$current_url = esc_url( add_query_arg( 'classic-editor', true, $_SERVER['REQUEST_URI'] ) );
 				printf(
 					__( 'The Block Editor requires JavaScript. You can use the <a href="%s">Classic Editor</a>.', 'gutenberg' ),
 					$current_url
