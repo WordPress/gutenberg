@@ -40,8 +40,8 @@ function defaultGetInserterItems( rootClientId ) {
  *                   block is selected.
  */
 function defaultGetSelectedBlockName() {
-	const selectedBlock = select( 'core/editor' ).getSelectedBlock();
-	return selectedBlock ? selectedBlock.name : null;
+	const selectedBlockClientId = select( 'core/editor' ).getSelectedBlockClientId();
+	return selectedBlockClientId ? select( 'core/editor' ).getBlockName( selectedBlockClientId ) : null;
 }
 
 /**

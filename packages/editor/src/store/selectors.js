@@ -602,6 +602,19 @@ export function getBlockName( state, clientId ) {
 }
 
 /**
+ * Returns whether a block is valid or not.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Is Valid.
+ */
+export function isBlockValid( state, clientId ) {
+	const block = state.editor.present.blocks.byClientId[ clientId ];
+	return block && block.isValid;
+}
+
+/**
  * Returns a block given its client ID. This is a parsed copy of the block,
  * containing its `blockName`, `clientId`, and current `attributes` state. This
  * is not the block's registration settings, which must be retrieved from the
@@ -1503,14 +1516,14 @@ export function getSuggestedPostFormat( state ) {
 	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
-		name = getBlock( state, blocks[ 0 ] ).name;
+		name = getBlockName( state, blocks[ 0 ] );
 	}
 
 	// If there are two blocks in the content and the last one is a text blocks
 	// grab the name of the first one to also suggest a post format from it.
 	if ( blocks.length === 2 ) {
-		if ( getBlock( state, blocks[ 1 ] ).name === 'core/paragraph' ) {
-			name = getBlock( state, blocks[ 0 ] ).name;
+		if ( getBlockName( state, blocks[ 1 ] ) === 'core/paragraph' ) {
+			name = getBlockName( state, blocks[ 0 ] );
 		}
 	}
 
@@ -1789,17 +1802,17 @@ export const getInserterItems = createSelector(
 				return false;
 			}
 
-			const referencedBlock = getBlock( state, reusableBlock.clientId );
-			if ( ! referencedBlock ) {
+			const referencedBlockName = getBlockName( state, reusableBlock.clientId );
+			if ( ! referencedBlockName ) {
 				return false;
 			}
 
-			const referencedBlockType = getBlockType( referencedBlock.name );
+			const referencedBlockType = getBlockType( referencedBlockName );
 			if ( ! referencedBlockType ) {
 				return false;
 			}
 
-			if ( ! canInsertBlockType( state, referencedBlockType.name, rootClientId ) ) {
+			if ( ! canInsertBlockType( state, referencedBlockName, rootClientId ) ) {
 				return false;
 			}
 
@@ -1809,8 +1822,8 @@ export const getInserterItems = createSelector(
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
 			const id = `core/block/${ reusableBlock.id }`;
 
-			const referencedBlock = getBlock( state, reusableBlock.clientId );
-			const referencedBlockType = getBlockType( referencedBlock.name );
+			const referencedBlockName = getBlockName( state, reusableBlock.clientId );
+			const referencedBlockType = getBlockType( referencedBlockName );
 
 			const { time, count = 0 } = getInsertUsage( state, id ) || {};
 			const utility = calculateUtility( 'reusable', count, false );

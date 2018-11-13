@@ -155,10 +155,10 @@ export default compose( [
 			isEditedPostDirty,
 			getBlockRootClientId,
 			getTemplateLock,
-			getSelectedBlock,
+			getSelectedBlockClientId,
 		} = select( 'core/editor' );
-		const block = getSelectedBlock();
-		const selectedBlockClientIds = block ? [ block.clientId ] : getMultiSelectedBlockClientIds();
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
 
 		return {
 			rootBlocksClientIds: getBlockOrder(),
