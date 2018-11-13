@@ -104,6 +104,7 @@ class ImageEdit extends Component {
 		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
+		this.onImageError = this.onImageError.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -198,14 +199,6 @@ class ImageEdit extends Component {
 		const { url } = this.props.attributes;
 
 		if ( newURL !== url ) {
-			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock(
-				{ attributes: { url: newURL } }
-			);
-			if ( undefined !== embedBlock ) {
-				this.props.onReplace( embedBlock );
-				return;
-			}
 			this.props.setAttributes( {
 				url: newURL,
 				id: undefined,
@@ -215,6 +208,16 @@ class ImageEdit extends Component {
 		this.setState( {
 			isEditing: false,
 		} );
+	}
+
+	onImageError( url ) {
+		// Check if there's an embed block that handles this URL.
+		const embedBlock = createUpgradedEmbedBlock(
+			{ attributes: { url } }
+		);
+		if ( undefined !== embedBlock ) {
+			this.props.onReplace( embedBlock );
+		}
 	}
 
 	onSetCustomHref( value ) {
@@ -518,7 +521,12 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />;
+							const img = <img
+								src={ url }
+								alt={ defaultedAlt }
+								onClick={ this.onImageClick }
+								onError={ () => this.onImageError( url ) }
+							/>;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
