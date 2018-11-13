@@ -14,12 +14,12 @@ describe( 'undo', () => {
 		await newPost();
 	} );
 
-	it( 'should undo typing after mouse move', async () => {
+	it( 'should undo typing after a pause', async () => {
 		await clickBlockAppender();
 
-		await page.keyboard.type( 'before move' );
-		await page.mouse.down();
-		await page.keyboard.type( ' after move' );
+		await page.keyboard.type( 'before pause' );
+		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+		await page.keyboard.type( ' after pause' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
@@ -34,20 +34,6 @@ describe( 'undo', () => {
 		await page.keyboard.type( 'before keyboard ' );
 		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.type( 'after keyboard' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await pressWithModifier( META_KEY, 'z' );
-
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should undo typing after arrow navigation', async () => {
-		await clickBlockAppender();
-
-		await page.keyboard.type( 'before keyboard' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( ' after keyboard' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 

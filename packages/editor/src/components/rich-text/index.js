@@ -20,7 +20,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -128,6 +128,14 @@ export class RichText extends Component {
 
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
 		this.lastHistoryValue = value;
+	}
+
+	componentDidMount() {
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	setRef( node ) {
@@ -371,6 +379,10 @@ export class RichText extends Component {
 		this.onChange( transformed, {
 			withoutHistory: true,
 		} );
+
+		// Create an undo level when input stops for over a second.
+		this.props.clearTimeout( this.onInput.timeout );
+		this.onInput.timeout = this.props.setTimeout( this.onCreateUndoLevel, 1000 );
 	}
 
 	onCompositionEnd() {
@@ -580,10 +592,6 @@ export class RichText extends Component {
 				this.splitContent();
 			}
 		}
-
-		if ( [ LEFT, RIGHT, UP, DOWN ].indexOf( keyCode ) >= 0 ) {
-			this.onCreateUndoLevel();
-		}
 	}
 
 	/**
@@ -762,18 +770,6 @@ export class RichText extends Component {
 		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
 			this.applyRecord( record );
-		}
-
-		if ( isSelected && ! prevProps.isSelected ) {
-			document.addEventListener( 'selectionchange', this.onSelectionChange );
-			window.addEventListener( 'mousedown', this.onCreateUndoLevel );
-			window.addEventListener( 'touchstart', this.onCreateUndoLevel );
-		}
-
-		if ( ! isSelected && prevProps.isSelected ) {
-			document.removeEventListener( 'selectionchange', this.onSelectionChange );
-			window.removeEventListener( 'mousedown', this.onCreateUndoLevel );
-			window.removeEventListener( 'touchstart', this.onCreateUndoLevel );
 		}
 	}
 
