@@ -39,7 +39,6 @@ class HeadingEdit extends Component {
 		} = attributes;
 
 		const tagName = 'h' + level;
-
 		return (
 			<View>
 				<BlockControls>
@@ -48,6 +47,7 @@ class HeadingEdit extends Component {
 				<RichText
 					tagName={ tagName }
 					value={ content }
+					isSelected={ this.props.isSelected }
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
