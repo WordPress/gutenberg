@@ -48,7 +48,7 @@ export function NavigableMenu( {
 			stopNavigationEvents
 			onlyBrowserTabstops={ false }
 			role={ role }
-			aria-orientation={ orientation }
+			aria-orientation={ role === 'presentation' ? null : orientation }
 			eventToOffset={ eventToOffset }
 			{ ...rest }
 		/>

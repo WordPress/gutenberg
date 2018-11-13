@@ -1,12 +1,8 @@
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { select, dispatch } from '@wordpress/data';
+import { select, dispatch, withSelect } from '@wordpress/data';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Registers a new format provided a unique name and an object defining its
@@ -41,13 +37,6 @@ export function registerFormatType( name, settings ) {
 	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
 		window.console.error(
 			'Format "' + settings.name + '" is already registered.'
-		);
-		return;
-	}
-
-	if ( ! settings || ! isFunction( settings.edit ) ) {
-		window.console.error(
-			'The "edit" property must be specified and must be a valid function.'
 		);
 		return;
 	}
@@ -123,6 +112,34 @@ export function registerFormatType( name, settings ) {
 	}
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
+
+	if (
+		settings.__experimentalCreatePrepareEditableTree &&
+		settings.__experimentalGetPropsForEditableTreePreparation
+	) {
+		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
+			return withSelect( ( sel, { clientId, identifier } ) => ( {
+				[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
+					sel,
+					{
+						richTextIdentifier: identifier,
+						blockClientId: clientId,
+					}
+				),
+			} ) )( ( props ) => (
+				<OriginalComponent
+					{ ...props }
+					prepareEditableTree={ [
+						...( props.prepareEditableTree || [] ),
+						settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], 	{
+							richTextIdentifier: props.identifier,
+							blockClientId: props.clientId,
+						} ),
+					] }
+				/>
+			) );
+		} );
+	}
 
 	return settings;
 }

@@ -12,6 +12,7 @@ import {
 	IconButton,
 	Spinner,
 	CheckboxControl,
+	withFocusReturn,
 	withConstrainedTabbing,
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -142,5 +143,6 @@ export default compose( [
 			},
 		};
 	} ),
+	withFocusReturn,
 	withConstrainedTabbing,
 ] )( PostPublishPanel );

@@ -3,15 +3,27 @@
 	height: $icon-button-size;
 }
 
-// Style this the same as the block buttons in the library.
-// Needs specificiity to override the icon button.
-.components-icon-button.editor-block-switcher__toggle {
-	width: auto;
+.components-icon-button.editor-block-switcher__toggle,
+.components-icon-button.editor-block-switcher__no-switcher-icon {
 	margin: 0;
 	display: block;
 	height: $icon-button-size;
 	padding: 3px;
+}
 
+
+.components-icon-button.editor-block-switcher__no-switcher-icon {
+	width: $icon-button-size + 6px + 6px;
+	.editor-block-icon {
+		margin-right: auto;
+		margin-left: auto;
+	}
+}
+
+// Style this the same as the block buttons in the library.
+// Needs specificiity to override the icon button.
+.components-icon-button.editor-block-switcher__toggle {
+	width: auto;
 	// Unset icon button styles.
 	&:active,
 	&:not(:disabled):not([aria-disabled="true"]):hover,

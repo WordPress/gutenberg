@@ -7,7 +7,6 @@ import { flatMap, filter, compact } from 'lodash';
  * Internal dependencies
  */
 import { createBlock, getBlockTransforms, findTransform } from '../factory';
-import { getBlockType } from '../registration';
 import { getBlockContent } from '../serializer';
 import { getBlockAttributes, parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
@@ -103,7 +102,7 @@ function htmlToBlocks( { html, rawTransforms } ) {
 		return createBlock(
 			blockName,
 			getBlockAttributes(
-				getBlockType( blockName ),
+				blockName,
 				node.outerHTML
 			)
 		);
