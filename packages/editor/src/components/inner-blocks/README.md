@@ -90,6 +90,13 @@ const TEMPLATE = [ [ 'core/columns', {}, [
 
 The previous example creates an InnerBlocks area containing two columns one with an image and the other with a paragraph.
 
+### `templateInsertUpdatesSelection`
+* **Type:** `Boolean`
+* **Default:** `true`
+
+If true when child blocks in the template are inserted the selection is updated.
+If false the selection should not be updated when child blocks specified in the template are inserted.
+
 ### `templateLock`
 * **Type:** `String|Boolean`
 

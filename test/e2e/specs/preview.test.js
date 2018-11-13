@@ -94,12 +94,12 @@ describe( 'Preview', () => {
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World!' );
 
-		// Preview for published post (no unsaved changes) directs to canonical
-		// URL for post.
+		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
 		await publishPost();
+		// Wait until the publish panel is closed
 		await Promise.all( [
-			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-preview' ) ),
+			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
 			editorPage.click( '.editor-post-publish-panel__header button' ),
 		] );
 		expectedPreviewURL = await editorPage.$eval( '.components-notice.is-success a', ( node ) => node.href );

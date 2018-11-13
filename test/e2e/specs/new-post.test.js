@@ -73,4 +73,11 @@ describe( 'new editor state', () => {
 		// focused by default when a post already has a title.
 		expect( activeElementTagName ).toEqual( 'body' );
 	} );
+
+	it( 'should be saveable with sufficient initial edits', async () => {
+		await newPost( { title: 'Here is the title' } );
+
+		// Verify saveable by presence of the Save Draft button.
+		await page.$( 'button.editor-post-save-draft' );
+	} );
 } );
