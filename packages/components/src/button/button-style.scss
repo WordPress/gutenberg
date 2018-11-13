@@ -1,0 +1,18 @@
+.container {
+	flex: 1;
+    padding-top: 3px;
+    padding-right: 3px;
+    padding-bottom: 3px;
+    padding-left: 3px;
+	justify-content: center;
+	align-items: center;
+}
+
+.button {
+	flex: 1;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	border-width: 1px;
+	border-radius: 6px;
+}
