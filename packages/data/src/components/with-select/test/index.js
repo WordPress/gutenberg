@@ -7,7 +7,7 @@ import TestRenderer from 'react-test-renderer';
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
-import { Component } from '@wordpress/element';
+import { Component, renderToString } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -298,6 +298,35 @@ describe( 'withSelect', () => {
 
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'should not leave lingering listeners if rendered to string', () => {
+		registry.registerStore( 'demo', {
+			reducer: () => ( {} ),
+			selectors: {
+				getState: ( state ) => state,
+			},
+			actions: {
+				update: () => ( { type: 'update' } ),
+			},
+		} );
+
+		const DataBoundComponent = compose( [
+			withSelect( () => {} ),
+		] )( () => <div /> );
+
+		const unsubscribe = jest.fn();
+		const subscribe = jest.fn( () => unsubscribe );
+
+		renderToString(
+			<RegistryProvider value={ { ...registry, subscribe } }>
+				<DataBoundComponent />
+			</RegistryProvider>
+		);
+
+		// A case could be made to enforce that no subscriptions were made. For
+		// the purposes of the test, at least ensure there are none lingering.
+		expect( subscribe.mock.calls ).toHaveLength( unsubscribe.mock.calls.length );
 	} );
 
 	it( 'should render if props have changed but not state', () => {
