@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import { visitAdmin } from './';
+
+/**
+ * Internal dependencies
+ */
+import { visitAdmin } from './visit-admin';
 
 export async function newPost( {
 	postType,

@@ -1,4 +1,11 @@
+/**
+ * External dependencies
+ */
 import fetch from 'node-fetch';
+
+/**
+ * Internal dependencies
+ */
 import { getJSONResponse } from './get-json-response';
 
 /**
