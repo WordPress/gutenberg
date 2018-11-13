@@ -42,6 +42,9 @@ type StateType = {
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
+	// a scrolling function for when on Android (when the dataSource is up-to-date to perform the scroll)
+	scrollTo: number => void;
+
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
@@ -98,8 +101,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	onBlockTypeSelected( itemValue: string ) {
 		this.setState( { ...this.state, selectedBlockType: itemValue, blockTypePickerVisible: false } );
 
-		// find currently focused block
-		const focusedItemIndex = this.findDataSourceIndexForFocusedItem();
+		// find currently focused block. It can be '-1' if no block is currently selected or there are no blocks at all.
+		let focusedItemIndex = this.findDataSourceIndexForFocusedItem();
+		if ( focusedItemIndex === -1 ) {
+			focusedItemIndex = this.state.dataSource.size() - 1;
+		}
 		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
 
 		// create an empty block of the selected type
@@ -108,6 +114,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
+		if ( this.scrollTo ) {
+			this.scrollTo( focusedItemIndex + 1 );
+		}
+
 		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
 
 		// now set the focus
@@ -139,9 +149,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			case InlineToolbarButton.DELETE:
 				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
 				this.props.deleteBlockAction( clientId );
-				break;
-			case InlineToolbarButton.PLUS:
-				this.showBlockTypePicker( true );
 				break;
 			case InlineToolbarButton.SETTINGS:
 				// TODO: implement settings
@@ -266,6 +273,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		if ( Platform.OS === 'android' ) {
 			list = (
 				<RecyclerViewList
+					ref={ ( component: RecyclerViewList ) =>
+						( this.scrollTo = ( index ) => component.scrollToIndex( { index: index, animated: true } ) )
+					}
 					style={ styles.list }
 					dataSource={ this.state.dataSource }
 					renderItem={ this.renderItem.bind( this ) }
@@ -291,7 +301,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				{ list }
-				<BlockToolbar />
+				<BlockToolbar
+					onInsertClick={ () => {
+						this.showBlockTypePicker( true );
+					} }
+				/>
 			</KeyboardAvoidingView>
 		);
 	}
