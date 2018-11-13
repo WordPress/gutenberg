@@ -3,7 +3,7 @@
  */
 import { TouchableOpacity, Text, View } from 'react-native';
 
-import styles from './button-style';
+import styles from './button-style.scss';
 
 export default function Button( props ) {
 	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;
