@@ -16,7 +16,7 @@ exports[`undo Should undo to expected level intervals 1`] = `
 
 exports[`undo should undo typing after arrow navigation 1`] = `
 "<!-- wp:paragraph -->
-<p>before keyboar after keyboardd</p>
+<p>before keyboard after keyboard</p>
 <!-- /wp:paragraph -->"
 `;
 

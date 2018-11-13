@@ -46,7 +46,7 @@ describe( 'undo', () => {
 		await clickBlockAppender();
 
 		await page.keyboard.type( 'before keyboard' );
-		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( ' after keyboard' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
