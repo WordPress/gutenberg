@@ -19,7 +19,7 @@ import { isValidHex } from './utils';
 import TextControl from '../text-control';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
-class Input extends Component {
+export class Input extends Component {
 	constructor( { value } ) {
 		super( ...arguments );
 		this.state = { value: String( value ).toLowerCase() };
