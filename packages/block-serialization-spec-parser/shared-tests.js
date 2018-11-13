@@ -1,7 +1,64 @@
 export const jsTester = ( parse ) => () => {
-	describe( 'basic parsing', () => {
-		test( 'parse() works properly', () => {
-			expect( parse( '<!-- wp:core/more --><!--more--><!-- /wp:core/more -->' ) ).toMatchSnapshot();
+	describe( 'output structure', () => {
+		test( 'output is an array', () => {
+			expect( parse( '' ) ).toEqual( expect.any( Array ) );
+			expect( parse( 'test' ) ).toEqual( expect.any( Array ) );
+			expect( parse( '<!-- wp:void /-->' ) ).toEqual( expect.any( Array ) );
+			expect( parse( '<!-- wp:block --><!-- wp:inner /--><!-- /wp:block -->' ) ).toEqual( expect.any( Array ) );
+			expect( parse( '<!-- wp:first /--><!-- wp:second /-->' ) ).toEqual( expect.any( Array ) );
+		} );
+
+		test( 'parses blocks of various types', () => {
+			expect( parse( '<!-- wp:void /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {"value":true} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {"a":{}} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void { "value" : true } /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {\n\t"value" : true\n} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:block --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {"value":true} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {} -->inner<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+			expect( parse( '<!-- wp:block {"value":{"a" : "true"}} -->inner<!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/block' );
+		} );
+
+		test( 'blockName is namespaced string (except freeform)', () => {
+			expect( parse( 'freeform has null name' )[ 0 ] ).toHaveProperty( 'blockName', null );
+			expect( parse( '<!-- wp:more /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/more' );
+			expect( parse( '<!-- wp:core/more /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/more' );
+			expect( parse( '<!-- wp:my/more /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'my/more' );
+		} );
+
+		test( 'JSON attributes are key/value object', () => {
+			expect( parse( 'freeform has empty attrs' )[ 0 ] ).toHaveProperty( 'attrs', {} );
+			expect( parse( '<!-- wp:void /-->' )[ 0 ] ).toHaveProperty( 'attrs', {} );
+			expect( parse( '<!-- wp:void {} /-->' )[ 0 ] ).toHaveProperty( 'blockName', 'core/void' );
+			expect( parse( '<!-- wp:void {} /-->' )[ 0 ] ).toHaveProperty( 'attrs', {} );
+			expect( parse( '<!-- wp:void {"key": "value"} /-->' )[ 0 ] ).toHaveProperty( 'attrs', { key: 'value' } );
+			expect( parse( '<!-- wp:block --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'attrs', {} );
+			expect( parse( '<!-- wp:block {} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'attrs', {} );
+			expect( parse( '<!-- wp:block {"key": "value"} --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'attrs', { key: 'value' } );
+		} );
+
+		test( 'innerBlocks is a list', () => {
+			expect( parse( 'freeform has empty innerBlocks' )[ 0 ] ).toHaveProperty( 'innerBlocks', [] );
+			expect( parse( '<!-- wp:void /-->' )[ 0 ] ).toHaveProperty( 'innerBlocks', [] );
+			expect( parse( '<!-- wp:block --><!-- /wp:block -->' )[ 0 ] ).toHaveProperty( 'innerBlocks', [] );
+
+			const withInner = parse( '<!-- wp:block --><!-- wp:inner /--><!-- /wp:block -->' )[ 0 ];
+			expect( withInner ).toHaveProperty( 'innerBlocks', expect.any( Array ) );
+			expect( withInner.innerBlocks ).toHaveLength( 1 );
+
+			const withTwoInner = parse( '<!-- wp:block -->a<!-- wp:first /-->b<!-- wp:second /-->c<!-- /wp:block -->' )[ 0 ];
+			expect( withTwoInner ).toHaveProperty( 'innerBlocks', expect.any( Array ) );
+			expect( withTwoInner.innerBlocks ).toHaveLength( 2 );
+		} );
+
+		test( 'innerHTML is a string', () => {
+			expect( parse( 'test' )[ 0 ] ).toHaveProperty( 'innerHTML', expect.any( String ) );
+			expect( parse( '<!-- wp:test /-->' )[ 0 ] ).toHaveProperty( 'innerHTML', expect.any( String ) );
+			expect( parse( '<!-- wp:test --><!-- /wp:test -->' )[ 0 ] ).toHaveProperty( 'innerHTML', expect.any( String ) );
+			expect( parse( '<!-- wp:test -->test<!-- /wp:test -->' )[ 0 ] ).toHaveProperty( 'innerHTML', expect.any( String ) );
 		} );
 	} );
 
@@ -131,7 +188,13 @@ export const phpTester = ( name, filename ) => makeTest(
 		}
 
 		try {
-			return JSON.parse( process.stdout );
+			/*
+ 			 * Due to an issue with PHP's json_encode() serializing an empty associative array
+ 			 * as an empty list `[]` we're manually replacing the already-encoded bit here.
+ 			 *
+ 			 * This is an issue with the test runner, not with the parser.
+ 			 */
+			return JSON.parse( process.stdout.replace( /"attrs":\s*\[\]/g, '"attrs":{}' ) );
 		} catch ( e ) {
 			throw new Error( 'failed to parse JSON:\n' + process.stdout );
 		}

@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 import {
+	ACCESS_MODIFIER_KEYS,
+	pressWithModifier,
 	newPost,
 	insertBlock,
 	searchForBlock,
-	selectBlockByClientId,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -34,17 +35,16 @@ async function getFirstInserterIcon() {
 	return await getInnerHTML( INSERTER_ICON_SELECTOR );
 }
 
+async function selectFirstBlock() {
+	await pressWithModifier( ACCESS_MODIFIER_KEYS, 'o' );
+	const navButtons = await page.$$( '.editor-block-navigation__item-button' );
+	await navButtons[ 0 ].click();
+}
+
 describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	const dashIconRegex = /<svg.*?class=".*?dashicons-cart.*?">.*?<\/svg>/;
 	const circleString = '<circle cx="10" cy="10" r="10" fill="red" stroke="blue" stroke-width="10"></circle>';
 	const svgIcon = new RegExp( `<svg.*?viewBox="0 0 20 20".*?>${ circleString }</svg>` );
-
-	const getBlockIdFromBlockName = async ( blockName ) => {
-		return await page.$eval(
-			`[data-type="${ blockName }"] > .editor-block-list__block-edit`,
-			( el ) => el.getAttribute( 'data-block' )
-		);
-	};
 
 	const validateSvgIcon = ( iconHtml ) => {
 		expect( iconHtml ).toMatch( svgIcon );
@@ -81,7 +81,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders correctly the icon on the inspector', async () => {
 			await insertBlock( blockTitle );
-			await selectBlockByClientId( await getBlockIdFromBlockName( blockName ) );
+			await selectFirstBlock();
 			validateIcon( await getInnerHTML( INSPECTOR_ICON_SELECTOR ) );
 		} );
 	}
@@ -105,7 +105,6 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	} );
 
 	describe( 'Block with dash icon and background and foreground colors', () => {
-		const blockName = 'test/test-dash-icon-colors';
 		const blockTitle = 'TestDashIconColors';
 		it( 'Renders the icon in the inserter with the correct colors', async () => {
 			await searchForBlock( blockTitle );
@@ -116,7 +115,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders the icon in the inspector with the correct colors', async () => {
 			await insertBlock( blockTitle );
-			await selectBlockByClientId( await getBlockIdFromBlockName( blockName ) );
+			await selectFirstBlock();
 			validateDashIcon(
 				await getInnerHTML( INSPECTOR_ICON_SELECTOR )
 			);
@@ -126,7 +125,6 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	} );
 
 	describe( 'Block with svg icon and background color', () => {
-		const blockName = 'test/test-svg-icon-background';
 		const blockTitle = 'TestSvgIconBackground';
 		it( 'Renders the icon in the inserter with the correct background color and an automatically compute readable foreground color', async () => {
 			await searchForBlock( blockTitle );
@@ -137,7 +135,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 
 		it( 'Renders correctly the icon on the inspector', async () => {
 			await insertBlock( blockTitle );
-			await selectBlockByClientId( await getBlockIdFromBlockName( blockName ) );
+			await selectFirstBlock();
 			validateSvgIcon(
 				await getInnerHTML( INSPECTOR_ICON_SELECTOR )
 			);

@@ -7,7 +7,9 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText } from '@wordpress/editor';
+import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
+import { Toolbar, IconButton } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 export default function ImageEdit( props ) {
 	const { attributes, isSelected, setAttributes } = props;
@@ -20,9 +22,11 @@ export default function ImageEdit( props ) {
 	};
 
 	const onMediaLibraryPress = () => {
-		// Call onMediaLibraryPress from the Native<->RN bridge. It should trigger an image picker from
-		// the WordPress media library and call the provided callback to set the image URL.
-		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => setAttributes( { url: mediaUrl } ) );
+		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
+			if ( mediaUrl ) {
+				setAttributes( { url: mediaUrl } );
+			}
+		} );
 	};
 
 	if ( ! url ) {
@@ -34,8 +38,22 @@ export default function ImageEdit( props ) {
 		);
 	}
 
+	const toolbarEditButton = (
+		<Toolbar>
+			<IconButton
+				className="components-toolbar__control"
+				label={ __( 'Edit image' ) }
+				icon="edit"
+				onClick={ onMediaLibraryPress }
+			/>
+		</Toolbar>
+	);
+
 	return (
 		<View style={ { flex: 1 } }>
+			<BlockControls>
+				{ toolbarEditButton }
+			</BlockControls>
 			<Image
 				style={ { width: '100%', height: 200 } }
 				resizeMethod="scale"

@@ -25,7 +25,7 @@ function FontSizePicker( {
 	disableCustomFontSizes = false,
 	onChange,
 	value,
-	withSlider,
+	withSlider = false,
 } ) {
 	const onChangeValue = ( event ) => {
 		const newValue = event.target.value;
