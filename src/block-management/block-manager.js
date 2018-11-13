@@ -140,9 +140,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				this.state.dataSource.splice( dataSourceBlockIndex, 1 );
 				this.props.deleteBlockAction( clientId );
 				break;
-			case InlineToolbarButton.PLUS:
-				this.showBlockTypePicker( true );
-				break;
 			case InlineToolbarButton.SETTINGS:
 				// TODO: implement settings
 				break;
