@@ -8,7 +8,7 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
-import { Toolbar, IconButton } from '@wordpress/components';
+import { Toolbar, IconButton, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function ImageEdit( props ) {
@@ -40,7 +40,7 @@ export default function ImageEdit( props ) {
 
 	const toolbarEditButton = (
 		<Toolbar>
-			<IconButton
+			<ToolbarButton
 				className="components-toolbar__control"
 				label={ __( 'Edit image' ) }
 				icon="edit"
