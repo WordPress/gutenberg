@@ -11,6 +11,7 @@ export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
 export { getAllBlocks } from './get-all-blocks';
 export { getEditedPostContent } from './get-edited-post-content';
+export { getUrl } from './get-url';
 export { insertBlock } from './insert-block';
 export { isEmbedding } from './is-embedding';
 export { JSONResponse } from './json-response';

@@ -3,14 +3,7 @@
  */
 import { goToWPPath } from './go-to-wp-path';
 import { login } from './login';
-
-const WP_ADMIN_USER = {
-	username: 'admin',
-};
-
-const {
-	WP_USERNAME = WP_ADMIN_USER.username,
-} = process.env;
+import { WP_USERNAME, WP_ADMIN_USER } from './config';
 
 /**
  * Switches the current user to whichever user we should be
