@@ -28,7 +28,7 @@ export default class AppProvider extends React.Component<PropsType, StateType> {
 			store:
 				typeof props.initialData === 'object' ?
 					props.initialData :
-					setupStore( html2State( props.initialData || initialHtml ) ),
+					setupStore( html2State( props.initialData !== undefined ? props.initialData : initialHtml ) ),
 		};
 	}
 
