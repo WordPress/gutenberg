@@ -4,10 +4,19 @@ import renderer from 'react-test-renderer';
 
 import App from './App';
 import BlockHolder from '../block-management/block-holder';
+import { dispatch, select } from '@wordpress/data';
 
 describe( 'App', () => {
 	it( 'renders without crashing', () => {
 		const app = renderer.create( <App /> );
+		const rendered = app.toJSON();
+		expect( rendered ).toBeTruthy();
+	} );
+
+	it( 'renders without crashing with a block focused', () => {
+		const app = renderer.create( <App /> );
+		const blocks = select( 'core/editor' ).getBlocks();
+		dispatch( 'core/editor' ).selectBlock( blocks[ 0 ].clientId );
 		const rendered = app.toJSON();
 		expect( rendered ).toBeTruthy();
 	} );
