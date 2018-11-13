@@ -51,3 +51,29 @@ exports[`Input  is re-rendered onChange event for value.length > 4 1`] = `
   </div>
 </div>
 `;
+
+exports[`Input  values are lowercased on mount 1`] = `
+<div
+  className="components-base-control components-color-picker__inputs-field"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-text-control-9"
+    >
+      Color value in hexadecimal
+    </label>
+    <input
+      className="components-text-control__input"
+      id="inspector-text-control-9"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      type="text"
+      value="#aaa"
+    />
+  </div>
+</div>
+`;

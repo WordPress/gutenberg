@@ -134,4 +134,18 @@ describe( 'Input ', () => {
 			expect( testRenderer.toJSON() ).toMatchSnapshot();
 		} );
 	} );
+
+	describe( 'values are lowercased', () => {
+		test( 'on mount', () => {
+			const testRenderer = TestRenderer.create(
+				<Input
+					label={ 'Color value in hexadecimal' }
+					valueKey="hex"
+					value={ '#AAA' }
+					onChange={ () => {} }
+				/>
+			);
+			expect( testRenderer.toJSON() ).toMatchSnapshot();
+		} );
+	} );
 } );
