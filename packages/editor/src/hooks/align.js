@@ -141,9 +141,8 @@ export const withToolbarControls = createHigherOrderComponent(
 // Exported just for testing purposes, not exported outside the module.
 export const insideSelectWithDataAlign = ( BlockListBlock ) => (
 	( props ) => {
-		const { block, hasWideEnabled } = props;
-		const { name: blockName } = block;
-		const { align } = block.attributes;
+		const { blockName, blockAttributes, hasWideEnabled } = props;
+		const { align } = blockAttributes;
 		const validAlignments = getValidAlignments(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true ),
