@@ -98,9 +98,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	onBlockTypeSelected( itemValue: string ) {
 		this.setState( { ...this.state, selectedBlockType: itemValue, blockTypePickerVisible: false } );
 
-		// find currently focused block
+		// find currently focused block. It can be '-1' if no block is currently selected or there are no blocks at all.
 		const focusedItemIndex = this.findDataSourceIndexForFocusedItem();
-		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
+		const clientIdFocused = focusedItemIndex > -1 ? this.state.dataSource.get( focusedItemIndex ).clientId : '';
 
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue, { content: 'new test text for a ' + itemValue + ' block' } );
@@ -291,7 +291,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				{ list }
-				<BlockToolbar />
+				<BlockToolbar
+					onInsertClick={ () => {
+						this.showBlockTypePicker( true );
+					} }
+				/>
 			</KeyboardAvoidingView>
 		);
 	}
