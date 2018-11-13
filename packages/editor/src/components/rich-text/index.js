@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import {
-	defer,
 	find,
 	isNil,
 	isEqual,
@@ -21,7 +20,7 @@ import {
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, UP, DOWN } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -61,6 +60,7 @@ import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
 import { ListEdit } from './list-edit';
+import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 /**
  * Browser dependencies
@@ -91,7 +91,6 @@ export class RichText extends Component {
 			this.onSplit = this.props.unstableOnSplit;
 		}
 
-		this.onInit = this.onInit.bind( this );
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -99,7 +98,6 @@ export class RichText extends Component {
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
-		this.onPropagateUndo = this.onPropagateUndo.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
@@ -129,14 +127,7 @@ export class RichText extends Component {
 		this.state = {};
 
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+		this.lastHistoryValue = value;
 	}
 
 	setRef( node ) {
@@ -157,46 +148,12 @@ export class RichText extends Component {
 	 */
 	onSetup( editor ) {
 		this.editor = editor;
-
-		editor.on( 'init', this.onInit );
 		editor.on( 'nodechange', this.onNodeChange );
-		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-		// The change event in TinyMCE fires every time an undo level is added.
-		editor.on( 'change', this.onCreateUndoLevel );
 	}
 
 	setFocusedElement() {
 		if ( this.props.setFocusedElement ) {
 			this.props.setFocusedElement( this.props.instanceId );
-		}
-	}
-
-	onInit() {
-		this.editor.shortcuts.add( rawShortcut.primary( 'z' ), '', 'Undo' );
-		this.editor.shortcuts.add( rawShortcut.primaryShift( 'z' ), '', 'Redo' );
-
-		// Remove TinyMCE Core shortcut for consistency with global editor
-		// shortcuts. Also clashes with Mac browsers.
-		this.editor.shortcuts.remove( 'meta+y', '', 'Redo' );
-	}
-
-	/**
-	 * Handles an undo event from TinyMCE.
-	 *
-	 * @param {UndoEvent} event The undo event as triggered by TinyMCE.
-	 */
-	onPropagateUndo( event ) {
-		const { onUndo, onRedo } = this.props;
-		const { command } = event;
-
-		if ( command === 'Undo' && onUndo ) {
-			defer( onUndo );
-			event.preventDefault();
-		}
-
-		if ( command === 'Redo' && onRedo ) {
-			defer( onRedo );
-			event.preventDefault();
 		}
 	}
 
@@ -411,7 +368,9 @@ export class RichText extends Component {
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-		this.onChange( transformed );
+		this.onChange( transformed, {
+			withoutHistory: true,
+		} );
 	}
 
 	onCompositionEnd() {
@@ -451,7 +410,7 @@ export class RichText extends Component {
 	 * @param {boolean} _withoutApply If true, the record won't be applied to
 	 *                                the live DOM.
 	 */
-	onChange( record, _withoutApply ) {
+	onChange( record, { withoutHistory, _withoutApply } = {} ) {
 		if ( ! _withoutApply ) {
 			this.applyRecord( record );
 		}
@@ -461,28 +420,20 @@ export class RichText extends Component {
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
 		this.setState( { start, end } );
+
+		if ( ! withoutHistory ) {
+			this.onCreateUndoLevel();
+		}
 	}
 
-	onCreateUndoLevel( event ) {
-		// TinyMCE fires a `change` event when the first letter in an instance
-		// is typed. This should not create a history record in Gutenberg.
-		// https://github.com/tinymce/tinymce/blob/4.7.11/src/core/main/ts/api/UndoManager.ts#L116-L125
-		// In other cases TinyMCE won't fire a `change` with at least a previous
-		// record present, so this is a reliable check.
-		// https://github.com/tinymce/tinymce/blob/4.7.11/src/core/main/ts/api/UndoManager.ts#L272-L275
-		if ( event && event.lastLevel === null ) {
+	onCreateUndoLevel() {
+		// If the content is the same, no level needs to be created.
+		if ( this.lastHistoryValue === this.savedContent ) {
 			return;
 		}
 
-		// Always ensure the content is up-to-date. This is needed because e.g.
-		// making something bold will trigger a TinyMCE change event but no
-		// input event. Avoid dispatching an action if the original event is
-		// blur because the content will already be up-to-date.
-		if ( ! event || ! event.originalEvent || event.originalEvent.type !== 'blur' ) {
-			this.onChange( this.createRecord(), true );
-		}
-
 		this.props.onCreateUndoLevel();
+		this.lastHistoryValue = this.savedContent;
 	}
 
 	/**
@@ -628,6 +579,10 @@ export class RichText extends Component {
 			} else {
 				this.splitContent();
 			}
+		}
+
+		if ( [ LEFT, RIGHT, UP, DOWN ].indexOf( keyCode ) >= 0 ) {
+			this.onCreateUndoLevel();
 		}
 	}
 
@@ -808,6 +763,18 @@ export class RichText extends Component {
 			const record = this.formatToValue( value );
 			this.applyRecord( record );
 		}
+
+		if ( isSelected && ! prevProps.isSelected ) {
+			document.addEventListener( 'selectionchange', this.onSelectionChange );
+			window.addEventListener( 'mousedown', this.onCreateUndoLevel );
+			window.addEventListener( 'touchstart', this.onCreateUndoLevel );
+		}
+
+		if ( ! isSelected && prevProps.isSelected ) {
+			document.removeEventListener( 'selectionchange', this.onSelectionChange );
+			window.removeEventListener( 'mousedown', this.onCreateUndoLevel );
+			window.removeEventListener( 'touchstart', this.onCreateUndoLevel );
+		}
 	}
 
 	formatToValue( value ) {
@@ -963,6 +930,7 @@ export class RichText extends Component {
 						</Fragment>
 					) }
 				</Autocomplete>
+				{ isSelected && <RemoveBrowserShortcuts /> }
 			</div>
 		);
 	}

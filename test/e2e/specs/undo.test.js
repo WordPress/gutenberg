@@ -10,8 +10,50 @@ import {
 } from '../support/utils';
 
 describe( 'undo', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await newPost();
+	} );
+
+	it( 'should undo typing after mouse move', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( 'before move' );
+		await page.mouse.down();
+		await page.keyboard.type( ' after move' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressWithModifier( META_KEY, 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should undo typing after non input change', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( 'before keyboard ' );
+		await pressWithModifier( META_KEY, 'b' );
+		await page.keyboard.type( 'after keyboard' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressWithModifier( META_KEY, 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should undo typing after arrow navigation', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( 'before keyboard' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( ' after keyboard' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressWithModifier( META_KEY, 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'Should undo to expected level intervals', async () => {
