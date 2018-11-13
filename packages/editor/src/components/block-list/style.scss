@@ -201,11 +201,13 @@
 
 	// Warnings
 	&.has-warning .editor-block-list__block-edit {
+		// When a block has a warning, you shouldn't be able to manipulate the contents.
 		> * {
 			pointer-events: none;
 			user-select: none;
 		}
 
+		// Allow the warning action buttons to be manipulable.
 		.editor-warning {
 			pointer-events: all;
 		}
