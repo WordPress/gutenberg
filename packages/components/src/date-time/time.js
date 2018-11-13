@@ -192,30 +192,30 @@ class TimePicker extends Component {
 	}
 
 	renderMonth( month ) {
-		return(
+		return (
 			<div className="components-datetime__time-field components-datetime__time-field-month">
-			<select
-				aria-label={ __( 'Month' ) }
-				className="components-datetime__time-field-month-select"
-				value={ month }
-				onChange={ this.onChangeMonth }
-				onBlur={ this.updateMonth }
-			>
-				<option value="01">{ __( 'January' ) }</option>
-				<option value="02">{ __( 'February' ) }</option>
-				<option value="03">{ __( 'March' ) }</option>
-				<option value="04">{ __( 'April' ) }</option>
-				<option value="05">{ __( 'May' ) }</option>
-				<option value="06">{ __( 'June' ) }</option>
-				<option value="07">{ __( 'July' ) }</option>
-				<option value="08">{ __( 'August' ) }</option>
-				<option value="09">{ __( 'September' ) }</option>
-				<option value="10">{ __( 'October' ) }</option>
-				<option value="11">{ __( 'November' ) }</option>
-				<option value="12">{ __( 'December' ) }</option>
-			</select>
-		</div>
-		)
+				<select
+					aria-label={ __( 'Month' ) }
+					className="components-datetime__time-field-month-select"
+					value={ month }
+					onChange={ this.onChangeMonth }
+					onBlur={ this.updateMonth }
+				>
+					<option value="01">{ __( 'January' ) }</option>
+					<option value="02">{ __( 'February' ) }</option>
+					<option value="03">{ __( 'March' ) }</option>
+					<option value="04">{ __( 'April' ) }</option>
+					<option value="05">{ __( 'May' ) }</option>
+					<option value="06">{ __( 'June' ) }</option>
+					<option value="07">{ __( 'July' ) }</option>
+					<option value="08">{ __( 'August' ) }</option>
+					<option value="09">{ __( 'September' ) }</option>
+					<option value="10">{ __( 'October' ) }</option>
+					<option value="11">{ __( 'November' ) }</option>
+					<option value="12">{ __( 'December' ) }</option>
+				</select>
+			</div>
+		);
 	}
 
 	renderDay( day ) {
@@ -235,13 +235,11 @@ class TimePicker extends Component {
 		);
 	}
 
-
-
 	render() {
 		const { is12Hour } = this.props;
 		const { day, month, year, minutes, hours, am } = this.state;
-		const renderMonthDay = [ this.renderMonth(month), this.renderDay(day) ];
-		const renderDayMonth = [ this.renderDay(day), this.renderMonth(month) ];
+		const renderMonthDay = [ this.renderMonth( month ), this.renderDay( day ) ];
+		const renderDayMonth = [ this.renderDay( day ), this.renderMonth( month ) ];
 
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
