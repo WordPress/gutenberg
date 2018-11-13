@@ -15,7 +15,6 @@ import {
 	map,
 	orderBy,
 	reduce,
-	size,
 	some,
 } from 'lodash';
 import createSelector from 'rememo';
@@ -728,16 +727,17 @@ export const getClientIdsWithDescendants = createSelector(
  */
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
+		const clientIds = getClientIdsWithDescendants( state );
 		if ( ! blockName ) {
-			return size( state.editor.present.blocks.byClientId );
+			return clientIds.length;
 		}
-		return reduce(
-			state.editor.present.blocks.byClientId,
-			( count, block ) => block.name === blockName ? count + 1 : count,
-			0
-		);
+		return reduce( clientIds, ( count, clientId ) => {
+			const block = state.editor.present.blocks.byClientId[ clientId ];
+			return block.name === blockName ? count + 1 : count;
+		}, 0 );
 	},
 	( state ) => [
+		state.editor.present.blocks.order,
 		state.editor.present.blocks.byClientId,
 	]
 );
