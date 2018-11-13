@@ -198,6 +198,17 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         }
     }
 
+    /*
+     * This property/method is used to tell the native AztecText to grab the focus when isSelected is true
+     *
+     */
+    @ReactProp(name = "isSelected", defaultBoolean = false)
+    public void isSelected(final ReactAztecText view, boolean selected) {
+        if (selected) {
+            view.requestFocus();
+        }
+    }
+
     @ReactProp(name = "onContentSizeChange", defaultBoolean = false)
     public void setOnContentSizeChange(final ReactAztecText view, boolean onContentSizeChange) {
         if (onContentSizeChange) {
