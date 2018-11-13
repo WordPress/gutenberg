@@ -28,4 +28,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidProvideHTML(_ html: String) {
         print("Did receive HTML: \(html)")
     }
+    
+    func gutenbergDidRequestMediaPicker(callback: @escaping MediaPickerDidPickMediaCallback) {
+        print("Gutenberg did request media picker, passing a sample url in callback")
+        callback("https://cldup.com/cXyG__fTLN.jpg")
+    }
 }
