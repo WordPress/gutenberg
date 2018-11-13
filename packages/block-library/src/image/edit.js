@@ -6,6 +6,7 @@ import {
 	get,
 	isEmpty,
 	map,
+	last,
 	pick,
 	compact,
 } from 'lodash';
@@ -13,7 +14,8 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { getPath } from '@wordpress/url';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
@@ -102,6 +104,7 @@ class ImageEdit extends Component {
 		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
+		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 
@@ -281,6 +284,13 @@ class ImageEdit extends Component {
 		return () => {
 			this.props.setAttributes( { width, height } );
 		};
+	}
+
+	getFilename( url ) {
+		const path = getPath( url );
+		if ( path ) {
+			return last( path.split( '/' ) );
+		}
 	}
 
 	getLinkDestinationOptions() {
@@ -539,10 +549,19 @@ class ImageEdit extends Component {
 								imageHeight,
 							} = sizes;
 
+							const filename = this.getFilename( url );
+							let defaultedAlt;
+							if ( alt ) {
+								defaultedAlt = alt;
+							} else if ( filename ) {
+								defaultedAlt = sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), filename );
+							} else {
+								defaultedAlt = __( 'This image has an empty alt attribute' );
+							}
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const img = <img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (

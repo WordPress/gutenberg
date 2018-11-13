@@ -1,6 +1,8 @@
-## 3.0.0 (Unreleased)
+## 3.0.1 (2018-11-12)
 
-### Breaking Changes
+## 3.0.0 (2018-11-12)
+
+### Breaking Change
 
 - `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
 - `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
