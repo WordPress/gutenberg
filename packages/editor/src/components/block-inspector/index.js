@@ -26,13 +26,13 @@ const BlockInspector = ( { selectedBlockName, selectedBlockClientId, blockType, 
 		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
 
-	const isSelectedBlockUnregistered = selectedBlockName === getUnregisteredTypeHandlerName();
+	const isSelectedBlockUnregistered = !! selectedBlockClientId && selectedBlockName === getUnregisteredTypeHandlerName();
 
 	/*
 	 * If the selected block is of an unregistered type, avoid showing it as an actual selection
 	 * because we want the user to focus on the unregistered block warning, not block settings.
 	 */
-	if ( ! selectedBlockClientId || isSelectedBlockUnregistered ) {
+	if ( ! blockType || ! selectedBlockClientId || isSelectedBlockUnregistered ) {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
@@ -82,6 +82,7 @@ export default withSelect(
 		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
 		const blockType = selectedBlockName && getBlockType( selectedBlockName );
 		const blockStyles = selectedBlockName && getBlockStyles( selectedBlockName );
+
 		return {
 			count: getSelectedBlockCount(),
 			hasBlockStyles: blockStyles && blockStyles.length > 0,
