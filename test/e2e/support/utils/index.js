@@ -34,4 +34,5 @@ export { switchToAdminUser } from './switch-to-admin-user';
 export { switchToEditor } from './switch-to-editor';
 export { switchToTestUser } from './switch-to-test-user';
 export { toggleOption } from './toggle-option';
+export { visitAdmin } from './visit-admin';
 export { waitForPageDimensions } from './wait-for-page-dimensions';
