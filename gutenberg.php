@@ -29,12 +29,21 @@ function the_gutenberg_project() {
 	global $post_type_object;
 	?>
 	<noscript>
-		<div class="error" style='position:absolute;top:32px;z-index:40'><p>
+		<div class="error" style="position:absolute;top:32px;z-index:40"><p>
 		<?php
-			printf(
-				__( 'The Block Editor requires JavaScript, please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-				'https://wordpress.org/plugins/classic-editor/'
-			) ;
+			// Using Gutenberg as Plugin
+			if ( is_plugin_active( 'gutenberg/gutenberg.php' ) ) {
+				$current_url = esc_url( $_SERVER['REQUEST_URI'] . "&classic-editor" );
+				printf(
+					__( 'The Block Editor requires JavaScript. You can use the <a href="%s">Classic Editor</a>.', 'gutenberg' ),
+					$current_url
+				) ;
+			} else { // Using Gutenberg in Core
+				printf(
+					__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+					'https://wordpress.org/plugins/classic-editor/'
+				) ;
+			}
 		?>
 		</p></div>
 	</noscript>
