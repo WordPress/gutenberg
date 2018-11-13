@@ -602,6 +602,53 @@ export function getBlockName( state, clientId ) {
 }
 
 /**
+ * Returns a block's attributes given its client ID, or null if no block exists with
+ * the client ID.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object?} Block attributes.
+ */
+export const getBlockAttributes = createSelector(
+	( state, clientId ) => {
+		const block = state.editor.present.blocks.byClientId[ clientId ];
+		if ( ! block ) {
+			return null;
+		}
+
+		let { attributes } = block;
+
+		// Inject custom source attribute values.
+		//
+		// TODO: Create generic external sourcing pattern, not explicitly
+		// targeting meta attributes.
+		const type = getBlockType( block.name );
+		if ( type ) {
+			attributes = reduce( type.attributes, ( result, value, key ) => {
+				if ( value.source === 'meta' ) {
+					if ( result === attributes ) {
+						result = { ...result };
+					}
+
+					result[ key ] = getPostMeta( state, value.meta );
+				}
+
+				return result;
+			}, attributes );
+		}
+
+		return attributes;
+	},
+	( state, clientId ) => [
+		state.editor.present.blocks.byClientId[ clientId ],
+		state.editor.present.edits.meta,
+		state.initialEdits.meta,
+		state.currentPost.meta,
+	]
+);
+
+/**
  * Returns whether a block is valid or not.
  *
  * @param {Object} state    Editor state.
@@ -632,30 +679,9 @@ export const getBlock = createSelector(
 			return null;
 		}
 
-		let { attributes } = block;
-
-		// Inject custom source attribute values.
-		//
-		// TODO: Create generic external sourcing pattern, not explicitly
-		// targeting meta attributes.
-		const type = getBlockType( block.name );
-		if ( type ) {
-			attributes = reduce( type.attributes, ( result, value, key ) => {
-				if ( value.source === 'meta' ) {
-					if ( result === attributes ) {
-						result = { ...result };
-					}
-
-					result[ key ] = getPostMeta( state, value.meta );
-				}
-
-				return result;
-			}, attributes );
-		}
-
 		return {
 			...block,
-			attributes,
+			attributes: getBlockAttributes( state, clientId ),
 			innerBlocks: getBlocks( state, clientId ),
 		};
 	},

@@ -166,9 +166,9 @@ export class BlockListBlock extends Component {
 	}
 
 	setAttributes( attributes ) {
-		const { block, onChange } = this.props;
-		const type = getBlockType( block.name );
-		onChange( block.clientId, attributes );
+		const { clientId, blockName, onChange } = this.props;
+		const type = getBlockType( blockName );
+		onChange( clientId, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
 			if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
@@ -231,7 +231,7 @@ export class BlockListBlock extends Component {
 	}
 
 	mergeBlocks( forward = false ) {
-		const { block, previousBlockClientId, nextBlockClientId, onMerge } = this.props;
+		const { clientId, previousBlockClientId, nextBlockClientId, onMerge } = this.props;
 
 		// Do nothing when it's the first block.
 		if (
@@ -242,9 +242,9 @@ export class BlockListBlock extends Component {
 		}
 
 		if ( forward ) {
-			onMerge( block.clientId, nextBlockClientId );
+			onMerge( clientId, nextBlockClientId );
 		} else {
-			onMerge( previousBlockClientId, block.clientId );
+			onMerge( previousBlockClientId, clientId );
 		}
 	}
 
@@ -390,7 +390,6 @@ export class BlockListBlock extends Component {
 			<HoverArea container={ this.wrapperNode }>
 				{ ( { hoverArea } ) => {
 					const {
-						block,
 						order,
 						mode,
 						isFocusMode,
@@ -412,16 +411,18 @@ export class BlockListBlock extends Component {
 						isParentOfSelectedBlock,
 						isDraggable,
 						className,
+						blockName,
+						isValid,
+						blockAttributes,
 					} = this.props;
 					const isHovered = this.state.isHovered && ! isMultiSelecting;
-					const { name: blockName, isValid } = block;
 					const blockType = getBlockType( blockName );
 					// translators: %s: Type of block (i.e. Text, Image etc)
 					const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 					// The block as rendered in the editor is composed of general block UI
 					// (mover, toolbar, wrapper) and the display of the block content.
 
-					const isUnregisteredBlock = block.name === getUnregisteredTypeHandlerName();
+					const isUnregisteredBlock = blockName === getUnregisteredTypeHandlerName();
 
 					// If the block is selected and we're typing the block should not appear.
 					// Empty paragraph blocks should always show up as unselected.
@@ -462,7 +463,7 @@ export class BlockListBlock extends Component {
 					if ( blockType.getEditWrapperProps ) {
 						wrapperProps = {
 							...wrapperProps,
-							...blockType.getEditWrapperProps( block.attributes ),
+							...blockType.getEditWrapperProps( blockAttributes ),
 						};
 					}
 					const blockElementId = `block-${ clientId }`;
@@ -475,7 +476,7 @@ export class BlockListBlock extends Component {
 						<BlockEdit
 							name={ blockName }
 							isSelected={ isSelected }
-							attributes={ block.attributes }
+							attributes={ blockAttributes }
 							setAttributes={ this.setAttributes }
 							insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 							onReplace={ isLocked ? undefined : onReplace }
@@ -507,7 +508,7 @@ export class BlockListBlock extends Component {
 							onMouseOverHandled={ this.hideHoverEffects }
 							onMouseLeave={ this.hideHoverEffects }
 							className={ wrapperClassName }
-							data-type={ block.name }
+							data-type={ blockName }
 							onTouchStart={ this.onTouchStart }
 							onFocus={ this.onFocus }
 							onClick={ this.onClick }
@@ -592,10 +593,10 @@ export class BlockListBlock extends Component {
 										{ ! isValid && [
 											<BlockInvalidWarning
 												key="invalid-warning"
-												block={ block }
+												clientId={ clientId }
 											/>,
 											<div key="invalid-preview">
-												{ getSaveElement( blockType, block.attributes ) }
+												{ getSaveElement( blockType, blockAttributes ) }
 											</div>,
 										] }
 									</BlockCrashBoundary>
@@ -638,7 +639,9 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isBlockSelected,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
-		getBlock,
+		getBlockName,
+		isBlockValid,
+		getBlockAttributes,
 		isAncestorMultiSelected,
 		isBlockMultiSelected,
 		isFirstMultiSelectedBlock,
@@ -657,11 +660,11 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
-	const block = getBlock( clientId );
 	const previousBlockClientId = getPreviousBlockClientId( clientId );
-	const previousBlock = getBlock( previousBlockClientId );
 	const templateLock = getTemplateLock( rootClientId );
 	const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+	const blockName = getBlockName( clientId );
+	const blockAttributes = getBlockAttributes( clientId );
 
 	return {
 		nextBlockClientId: getNextBlockClientId( clientId ),
@@ -677,14 +680,19 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
-		isEmptyDefaultBlock: block && isUnmodifiedDefaultBlock( block ),
-		isPreviousBlockADefaultEmptyBlock: previousBlock && isUnmodifiedDefaultBlock( previousBlock ),
+		isEmptyDefaultBlock: blockName && isUnmodifiedDefaultBlock( { name: blockName, attributes: blockAttributes } ),
+		isPreviousBlockADefaultEmptyBlock: previousBlockClientId && isUnmodifiedDefaultBlock( {
+			name: getBlockName( previousBlockClientId ),
+			attributes: getBlockAttributes( previousBlockClientId ),
+		} ),
+		isValid: isBlockValid( clientId ),
 		isMovable: 'all' !== templateLock,
 		isLocked: !! templateLock,
 		isFocusMode: focusMode && isLargeViewport,
 		hasFixedToolbar: hasFixedToolbar && isLargeViewport,
+		blockName,
+		blockAttributes,
 		previousBlockClientId,
-		block,
 		isSelected,
 		isParentOfSelectedBlock,
 		// We only care about this value when the shift key is pressed.

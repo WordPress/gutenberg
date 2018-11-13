@@ -111,8 +111,8 @@ export const withToolbarControls = createHigherOrderComponent( ( BlockEdit ) => 
  */
 export const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
 	return ( props ) => {
-		const { align } = props.block.attributes;
-		const validAlignments = getBlockValidAlignments( props.block.name );
+		const { align } = props.blockAttributes;
+		const validAlignments = getBlockValidAlignments( props.blockName );
 
 		let wrapperProps = props.wrapperProps;
 		if ( includes( validAlignments, align ) ) {
