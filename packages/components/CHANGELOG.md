@@ -1,3 +1,13 @@
+## 6.0.1 (2018-11-12)
+
+### Bug Fixes
+
+- Avoid constantly recomputing the popover position.
+
+### Polish
+
+- Remove `<DateTimePicker />` obsolete `locale` prop (and pass-through to child components) and obsolete `is12Hour` prop pass through to `<DateTime />` [#11649](https://github.com/WordPress/gutenberg/pull/11649)
+
 ## 6.0.0 (2018-11-12)
 
 ### Breaking Change
@@ -82,7 +92,7 @@
 
 - `withAPIData` has been removed. Please use the Core Data module or `@wordpress/api-fetch` directly instead.
 - `Draggable` as a DOM node drag handler has been deprecated. Please, use `Draggable` as a wrap component for your DOM node drag handler.
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 - `withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
 
 ### New Feature

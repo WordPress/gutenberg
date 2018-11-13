@@ -1,3 +1,13 @@
+## 7.0.1 (2018-11-12)
+
+### Polish
+
+- Remove unnecessary `locale` prop usage [#11649](https://github.com/WordPress/gutenberg/pull/11649)
+
+### Bug Fixes
+
+- Fix multi-selection triggering too often when using floated blocks.
+
 ## 7.0.0 (2018-11-12)
 
 ### Breaking Change

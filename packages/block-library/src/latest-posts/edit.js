@@ -33,7 +33,7 @@ import { withSelect } from '@wordpress/data';
  * Module Constants
  */
 const CATEGORIES_LIST_QUERY = {
-	per_page: 100,
+	per_page: -1,
 };
 const MAX_POSTS_COLUMNS = 6;
 
