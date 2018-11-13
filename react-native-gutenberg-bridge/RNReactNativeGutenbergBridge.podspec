@@ -24,6 +24,7 @@ Pod::Spec.new do |s|
   s.dependency 'React/RCTNetwork', react_native_version
   s.dependency 'React/RCTText', react_native_version
   s.dependency 'React/RCTActionSheet', react_native_version
+  s.dependency 'React/DevSupport', react_native_version
 
   s.dependency 'yoga', "#{react_native_version}.React"
 end
