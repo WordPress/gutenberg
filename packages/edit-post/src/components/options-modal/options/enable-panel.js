@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -10,9 +10,14 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import BaseOption from './base';
 
 export default compose(
-	withSelect( ( select, { panelName } ) => ( {
-		isChecked: select( 'core/edit-post' ).isEditorPanelEnabled( panelName ),
-	} ) ),
+	withSelect( ( select, { panelName } ) => {
+		const { isEditorPanelEnabled, isEditorPanelRemoved } = select( 'core/edit-post' );
+		return {
+			isRemoved: isEditorPanelRemoved( panelName ),
+			isChecked: isEditorPanelEnabled( panelName ),
+		};
+	} ),
+	ifCondition( ( { isRemoved } ) => ! isRemoved ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onChange: () => dispatch( 'core/edit-post' ).toggleEditorPanelEnabled( panelName ),
 	} ) )

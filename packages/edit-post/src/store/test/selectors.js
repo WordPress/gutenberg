@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import {
@@ -16,6 +21,7 @@ import {
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
 	isEditorPanelEnabled,
+	isEditorPanelRemoved,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -195,6 +201,30 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isEditorPanelRemoved', () => {
+		it( 'should return false by default', () => {
+			const state = deepFreeze( {
+				preferences: {
+					panels: {},
+				},
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return true when panel was removed', () => {
+			const state = deepFreeze( {
+				preferences: {
+					panels: {
+						'post-status': { removed: true },
+					},
+				},
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isEditorPanelEnabled', () => {
 		it( 'should return true by default', () => {
 			const state = {
@@ -226,6 +256,21 @@ describe( 'selectors', () => {
 					},
 				},
 			};
+
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return false when a panel is enabled but removed', () => {
+			const state = deepFreeze( {
+				preferences: {
+					panels: {
+						'post-status': {
+							enabled: true,
+							removed: true,
+						},
+					},
+				},
+			} );
 
 			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
 		} );

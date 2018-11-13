@@ -73,6 +73,17 @@ export const preferences = combineReducers( {
 					},
 				};
 			}
+
+			case 'REMOVE_PANEL': {
+				const { panelName } = action;
+				return {
+					...state,
+					[ panelName ]: {
+						...state[ panelName ],
+						removed: true,
+					},
+				};
+			}
 		}
 
 		return state;

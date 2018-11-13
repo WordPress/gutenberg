@@ -169,6 +169,21 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should remove panels', () => {
+			const original = deepFreeze( {
+				panels: {
+					'post-status': {},
+				},
+			} );
+			const state = preferences( original, {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
+			} );
+			expect( state.panels ).toEqual( {
+				'post-status': { removed: true },
+			} );
+		} );
+
 		it( 'should return switched mode', () => {
 			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
 				type: 'SWITCH_MODE',
