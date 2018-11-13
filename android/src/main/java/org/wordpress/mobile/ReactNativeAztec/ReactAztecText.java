@@ -43,7 +43,7 @@ public class ReactAztecText extends AztecText {
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
-        this.setOnKeyListener(new ReactAztecText.OnKeyListener() {
+        this.setAztecKeyListener(new ReactAztecText.OnAztecKeyListener() {
             @Override
             public boolean onEnterKey() {
                 if (shouldHandleOnEnter) {
