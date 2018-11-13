@@ -157,7 +157,7 @@ class WP_Block_Type {
 		* @param array			$prepared_attributes	Block attributes.
 		* @param WP_Block_Type	$block_type				Block object which attributes are filtered.
 		*/
-		$prepared_attributes = apply_filters( 'block_attributes', $prepared_attributes, $this );
+		$prepared_attributes = apply_filters( 'block_prepared_attributes', $prepared_attributes, $this );
 
 		return $prepared_attributes;
 	}
