@@ -17,7 +17,7 @@ import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 
 // Gutenberg imports
-import { createBlock, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -189,62 +189,33 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.props.focusBlockAction( newBlock.clientId );
 	}
 
-	mergeBlocks( clientId: string, forward: boolean ) {
+	mergeBlocks = ( forward: boolean = false ) => {
 		// find currently focused block
-		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
+		const focusedItemIndex = this.state.blocks.findIndex( ( block ) => block.focused );
 		if ( focusedItemIndex === -1 ) {
 			// do nothing if it's not found.
 			// Updates calls from the native side may arrive late, and the block already been deleted
 			return;
 		}
 
-		// Do nothing when it's the first block and backspace is pressed
-		// Do nothing when it's the last block and delete is pressed
+		const block = this.state.blocks[ focusedItemIndex ];
+		const previousBlock = this.state.blocks[ focusedItemIndex - 1 ];
+		const nextBlock = this.state.blocks[ focusedItemIndex + 1 ];
+
+		// Do nothing when it's the first block.
 		if (
-			( ! forward && focusedItemIndex === 0 ) ||
-			( forward && ! focusedItemIndex === this.state.dataSource.size() - 1 )
+			( ! forward && ! previousBlock ) ||
+			( forward && ! nextBlock )
 		) {
 			return;
 		}
 
-		let blockA = null;
-		let blockB = null;
 		if ( forward ) {
-			blockA = this.state.dataSource.get( focusedItemIndex );
-			blockB = this.state.dataSource.get( focusedItemIndex + 1 );
+			this.props.mergeBlocksAction( block.clientId, nextBlock.clientId );
 		} else {
-			blockA = this.state.dataSource.get( focusedItemIndex - 1 );
-			blockB = this.state.dataSource.get( focusedItemIndex );
+			this.props.mergeBlocksAction( previousBlock.clientId, block.clientId );
 		}
-
-		// Ignore merge if blocks aren't known
-		if ( ! blockA || ! blockB ) {
-			// Updates calls from the native side may arrive late, and one of the block
-			// may not be available
-			return;
-		}
-
-		const blockType = getBlockType( blockA.name );
-
-		// Only focus the previous block if it's not mergeable
-		if ( ! blockType.merge ) {
-			// TO DO: move the focus to the prev block
-			return;
-		}
-
-		// We can only merge blocks with similar types
-		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.name === blockB.name ?
-			[ blockB ] :
-			switchToBlockType( blockB, blockA.name );
-
-		// If the block types can not match, do nothing
-		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-			return;
-		}
-
-		this.props.mergeBlocksAction( blockA.clientId, blockB.clientId );
-	}
+	};
 
 	onChange( clientId: string, attributes: mixed ) {
 		// Update Redux store
@@ -375,9 +346,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					insertBlocksAfter={ ( blocks ) =>
 						this.insertBlocksAfter.bind( this )( value.item.clientId, blocks )
 					}
-					mergeBlocks={ ( forward = false ) =>
-						this.mergeBlocks.bind( this )( value.item.clientId, forward )
-					}
+					mergeBlocks={ this.mergeBlocks }
 					{ ...value.item }
 				/>
 				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
