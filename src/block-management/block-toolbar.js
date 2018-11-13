@@ -18,7 +18,6 @@ export default class BlockToolbar extends Component<PropsType> {
 		return (
 			<View style={ { height: 50, backgroundColor: '#DCDCDC', flexDirection: 'row' } }>
 				<IconButton
-					className="block-list-appender__toggle"
 					label={ __( 'Add block' ) }
 					icon="insert"
 					onClick={ this.props.onInsertClick }
