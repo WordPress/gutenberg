@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { cloneDeep, isEqual } from 'lodash';
+import { isEqual } from 'lodash';
 
 import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
@@ -52,7 +52,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		super( props );
 
 		const blocks = props.blocks.map( ( block ) => {
-			const newBlock = cloneDeep( block );
+			const newBlock = { ...block };
 			newBlock.focused = props.isBlockSelected( block.clientId );
 			return newBlock;
 		} );
@@ -132,7 +132,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 
 		const blocks = props.blocks.map( ( block ) => {
-			const newBlock = cloneDeep( block );
+			const newBlock = { ...block };
 			newBlock.focused = props.isBlockSelected( block.clientId );
 			return newBlock;
 		} );
