@@ -101,7 +101,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'linkClass', 'href', 'rel', 'target' ],
+				attributes: [ 'href', 'rel', 'target' ],
 				children: imageSchema,
 			},
 			figcaption: {
