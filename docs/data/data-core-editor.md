@@ -398,6 +398,20 @@ the client ID.
 
 Block name.
 
+### getBlockAttributes
+
+Returns a block's attributes given its client ID, or null if no block exists with
+the client ID.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Block attributes.
+
 ### isBlockValid
 
 Returns whether a block is valid or not.
