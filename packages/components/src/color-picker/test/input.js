@@ -104,4 +104,34 @@ describe( 'Input ', () => {
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'is re-rendered', () => {
+		test( 'onChange event for value.length <= 4', () => {
+			const onChange = jest.fn();
+			const testRenderer = TestRenderer.create(
+				<Input
+					label={ 'Color value in hexadecimal' }
+					valueKey="hex"
+					value={ '#aaa' }
+					onChange={ onChange }
+				/>
+			);
+			testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#fff' } } );
+			expect( testRenderer.toJSON() ).toMatchSnapshot();
+		} );
+
+		test( 'onChange event for value.length > 4', () => {
+			const onChange = jest.fn();
+			const testRenderer = TestRenderer.create(
+				<Input
+					label={ 'Color value in hexadecimal' }
+					valueKey="hex"
+					value={ '#aaa' }
+					onChange={ onChange }
+				/>
+			);
+			testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ffffff' } } );
+			expect( testRenderer.toJSON() ).toMatchSnapshot();
+		} );
+	} );
 } );

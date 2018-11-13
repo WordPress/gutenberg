@@ -1,0 +1,53 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Input  is re-rendered onChange event for value.length <= 4 1`] = `
+<div
+  className="components-base-control components-color-picker__inputs-field"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-text-control-7"
+    >
+      Color value in hexadecimal
+    </label>
+    <input
+      className="components-text-control__input"
+      id="inspector-text-control-7"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      type="text"
+      value="#fff"
+    />
+  </div>
+</div>
+`;
+
+exports[`Input  is re-rendered onChange event for value.length > 4 1`] = `
+<div
+  className="components-base-control components-color-picker__inputs-field"
+>
+  <div
+    className="components-base-control__field"
+  >
+    <label
+      className="components-base-control__label"
+      htmlFor="inspector-text-control-8"
+    >
+      Color value in hexadecimal
+    </label>
+    <input
+      className="components-text-control__input"
+      id="inspector-text-control-8"
+      onBlur={[Function]}
+      onChange={[Function]}
+      onKeyDown={[Function]}
+      type="text"
+      value="#ffffff"
+    />
+  </div>
+</div>
+`;
