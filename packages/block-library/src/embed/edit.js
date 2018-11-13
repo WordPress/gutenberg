@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { isFromWordPress, createUpgradedEmbedBlock, getClassNames, createPasteFallbackBlock } from './util';
+import { DEFAULT_EMBED_BLOCK } from './constants';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -70,10 +71,10 @@ export function getEmbedEditComponent( title, icon, responsive = true, pasting =
 				return;
 			}
 
-			// This URL can be embedded, so pass it over to the core embed block to continue.
+			// This URL can be embedded, so pass it over to the default embed block to continue.
 			if ( url && ! fetching && ! cannotEmbed ) {
 				this.props.onReplace(
-					createBlock( 'core/embed', { url } )
+					createBlock( DEFAULT_EMBED_BLOCK, { url } )
 				);
 			}
 		}

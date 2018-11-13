@@ -168,8 +168,8 @@ describe( 'Embedding content', () => {
 	} );
 
 	it( 'should handle non-embeddable pasted URLs', async () => {
-		// URL that cannot be embedded.
 		await clickBlockAppender();
+		// URL that cannot be embedded.
 		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 		await pressWithModifier( META_KEY, 'a' ); // Select the URL we just typed.
 		await pressWithModifier( META_KEY, 'x' ); // Cut it.
@@ -185,8 +185,8 @@ describe( 'Embedding content', () => {
 	} );
 
 	it( 'should handle embeddable pasted URLs', async () => {
-		// URL that can be embedded.
 		await clickBlockAppender();
+		// URL that can be embedded.
 		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 		await pressWithModifier( META_KEY, 'a' ); // Select the URL we just typed.
 		await pressWithModifier( META_KEY, 'x' ); // Cut it.
@@ -196,8 +196,8 @@ describe( 'Embedding content', () => {
 	} );
 
 	it( 'should put unknown but embeddable pasted URLs into the generic embed block', async () => {
-		// URL that can be embedded.
 		await clickBlockAppender();
+		// URL that can be embedded, but we don't have a specific block for.
 		await page.keyboard.type( 'https://giphy.com/gifs/reaction-jdOm0IddQuJP2' );
 		await pressWithModifier( META_KEY, 'a' ); // Select the URL we just typed.
 		await pressWithModifier( META_KEY, 'x' ); // Cut it.
