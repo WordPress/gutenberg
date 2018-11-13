@@ -30,14 +30,6 @@ export class Input extends Component {
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 	}
 
-	componentWillReceiveProps( nextProps ) {
-		if ( nextProps.value !== this.props.value ) {
-			this.setState( {
-				value: toLowerCase( nextProps.value ),
-			} );
-		}
-	}
-
 	handleBlur() {
 		const { valueKey, onChange } = this.props;
 		const { value } = this.state;
