@@ -18,11 +18,13 @@ import IconButton from '../icon-button';
 import { isValidHex } from './utils';
 import TextControl from '../text-control';
 
+const toLowerCase = ( value ) => String( value ).toLowerCase();
+
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
 export class Input extends Component {
 	constructor( { value } ) {
 		super( ...arguments );
-		this.state = { value: String( value ).toLowerCase() };
+		this.state = { value: toLowerCase( value ) };
 		this.handleBlur = this.handleBlur.bind( this );
 		this.handleChange = this.handleChange.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
@@ -31,7 +33,7 @@ export class Input extends Component {
 	componentWillReceiveProps( nextProps ) {
 		if ( nextProps.value !== this.props.value ) {
 			this.setState( {
-				value: String( nextProps.value ).toLowerCase(),
+				value: toLowerCase( nextProps.value ),
 			} );
 		}
 	}
