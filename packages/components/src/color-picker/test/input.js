@@ -147,5 +147,25 @@ describe( 'Input ', () => {
 			);
 			expect( testRenderer.toJSON() ).toMatchSnapshot();
 		} );
+
+		test( 'on subsequent prop updates', () => {
+			const testRenderer = TestRenderer.create(
+				<Input
+					label={ 'Color value in hexadecimal' }
+					valueKey="hex"
+					value={ '#AAA' }
+					onChange={ () => {} }
+				/>
+			);
+			testRenderer.update(
+				<Input
+					label={ 'Color value in hexadecimal' }
+					valueKey="hex"
+					value={ '#FFF' }
+					onChange={ () => {} }
+				/>
+			);
+			expect( testRenderer.toJSON() ).toMatchSnapshot();
+		} );
 	} );
 } );
