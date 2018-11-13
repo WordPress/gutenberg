@@ -22,6 +22,7 @@ export { observeFocusLoss } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
 export { pressTimes } from './press-times';
+export { pressWithModifier } from './press-with-modifier';
 export { publishPost } from './publish-post';
 export { publishPostWithoutPrePublishChecks } from './publish-post-without-pre-publish-checks';
 export { saveDraft } from './save-draft';
