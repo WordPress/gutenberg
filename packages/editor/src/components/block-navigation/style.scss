@@ -1,6 +1,15 @@
 $tree-border-width: 2px;
 $tree-item-height: 36px;
 
+.editor-block-navigation__container {
+	padding: $grid-size - $border-width;
+}
+
+.editor-block-navigation__label {
+	margin: 0 0 $grid-size;
+	color: $dark-gray-300;
+}
+
 .editor-block-navigation__list,
 .editor-block-navigation__paragraph {
 	padding: 0;
@@ -50,13 +59,24 @@ $tree-item-height: 36px;
 }
 
 .editor-block-navigation__item-button {
-	padding: 6px;
 	display: flex;
 	align-items: center;
+	width: 100%;
+	padding: 6px;
+	text-align: left;
+	color: $dark-gray-600;
 	border-radius: 4px;
 
 	.editor-block-icon {
 		margin-right: 6px;
+	}
+
+	&:hover:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__hover;
+	}
+
+	&:focus:not(:disabled):not([aria-disabled="true"]) {
+		@include menu-style__focus;
 	}
 
 	&.is-selected,
