@@ -26,6 +26,15 @@ import { createBlock } from '@wordpress/blocks';
 
 export const common = [
 	{
+		name: 'core-embed/paste-handler',
+		settings: {
+			title: 'Internal embed paste handler',
+			icon: embedContentIcon,
+			description: 'Used to process pasted URLs into an actual embed block.',
+			isPasteHandler: true,
+		},
+	},
+	{
 		name: 'core-embed/twitter',
 		settings: {
 			title: 'Twitter',

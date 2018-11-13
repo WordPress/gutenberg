@@ -1,7 +1,15 @@
 /**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost, isEmbedding, setUpResponseMocking, JSONResponse } from '../support/utils';
+import {
+	clickBlockAppender,
+	newPost,
+	isEmbedding,
+	setUpResponseMocking,
+	JSONResponse,
+	pressWithModifier,
+	META_KEY,
+} from '../support/utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
@@ -80,11 +88,13 @@ const MOCK_RESPONSES = [
 		match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
 		onRequestMatch: JSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
+	{
+		match: isEmbedding( 'https://giphy.com/gifs/reaction-jdOm0IddQuJP2' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+	},
 ];
 
 const addEmbeds = async () => {
-	await newPost();
-
 	// Valid embed.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
@@ -135,15 +145,14 @@ const addEmbeds = async () => {
 	await page.keyboard.press( 'Enter' );
 };
 
-const setUp = async () => {
-	await setUpResponseMocking( MOCK_RESPONSES );
-	await addEmbeds();
-};
-
 describe( 'Embedding content', () => {
-	beforeEach( setUp );
+	beforeAll( () => {
+		setUpResponseMocking( MOCK_RESPONSES );
+	} );
+	beforeEach( newPost );
 
 	it( 'should render embeds in the correct state', async () => {
+		await addEmbeds();
 		// The successful embeds should be in a correctly classed figure element.
 		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
@@ -156,5 +165,44 @@ describe( 'Embedding content', () => {
 		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
 		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
 		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
+	} );
+
+	it( 'should handle non-embeddable pasted URLs', async () => {
+		// URL that cannot be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await pressWithModifier( META_KEY, 'a' ); // Select the URL we just typed.
+		await pressWithModifier( META_KEY, 'x' ); // Cut it.
+		await pressWithModifier( META_KEY, 'v' ); // Paste it. This should trigger the embed paste transformation.
+		// wait for a paragraph with the url in it
+		await page.waitForSelector( '.editor-block-list__block[data-type="core/paragraph"]' );
+		// Get the innerText from the rich text editor.
+		const text = await page.$eval(
+			'.editor-block-list__block[data-type="core/paragraph"] .editor-rich-text',
+			( element ) => element.innerText
+		);
+		expect( text ).toMatch( 'https://twitter.com/wooyaygutenberg123454312' );
+	} );
+
+	it( 'should handle embeddable pasted URLs', async () => {
+		// URL that can be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
+		await pressWithModifier( META_KEY, 'a' ); // Select the URL we just typed.
+		await pressWithModifier( META_KEY, 'x' ); // Cut it.
+		await pressWithModifier( META_KEY, 'v' ); // Paste it. This should trigger the embed paste transformation.
+		// Wait for the embed block.
+		await page.waitForSelector( 'figure.wp-block-embed-youtube.wp-embed-aspect-16-9' );
+	} );
+
+	it( 'should put unknown but embeddable pasted URLs into the generic embed block', async () => {
+		// URL that can be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( 'https://giphy.com/gifs/reaction-jdOm0IddQuJP2' );
+		await pressWithModifier( META_KEY, 'a' ); // Select the URL we just typed.
+		await pressWithModifier( META_KEY, 'x' ); // Cut it.
+		await pressWithModifier( META_KEY, 'v' ); // Paste it. This should trigger the embed paste transformation.
+		// Wait for the embed block.
+		await page.waitForSelector( '.editor-block-list__block[data-type="core/embed"]' );
 	} );
 } );

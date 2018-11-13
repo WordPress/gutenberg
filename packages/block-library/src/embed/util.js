@@ -163,3 +163,7 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
 
 	return existingClassNames;
 }
+
+export function createPasteFallbackBlock( url ) {
+	return createBlock( 'core/paragraph', { content: url } );
+}

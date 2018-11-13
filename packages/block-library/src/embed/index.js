@@ -25,7 +25,7 @@ export const settings = getEmbedBlockSettings( {
 				type: 'raw',
 				isMatch: ( node ) => node.nodeName === 'P' && /^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ),
 				transform: ( node ) => {
-					return createBlock( 'core/embed', {
+					return createBlock( 'core-embed/paste-handler', {
 						url: node.textContent.trim(),
 					} );
 				},

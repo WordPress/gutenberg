@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isFromWordPress, createUpgradedEmbedBlock, getClassNames } from './util';
+import { isFromWordPress, createUpgradedEmbedBlock, getClassNames, createPasteFallbackBlock } from './util';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -17,8 +17,9 @@ import { kebabCase, toLower } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
+import { createBlock } from '@wordpress/blocks';
 
-export function getEmbedEditComponent( title, icon, responsive = true ) {
+export function getEmbedEditComponent( title, icon, responsive = true, pasting = false ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -29,11 +30,16 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			this.getResponsiveHelp = this.getResponsiveHelp.bind( this );
 			this.toggleResponsive = this.toggleResponsive.bind( this );
 			this.handleIncomingPreview = this.handleIncomingPreview.bind( this );
+			this.handlePaste = this.handlePaste.bind( this );
 
 			this.state = {
 				editingURL: false,
 				url: this.props.attributes.url,
 			};
+
+			if ( pasting ) {
+				this.handlePaste();
+			}
 
 			if ( this.props.preview ) {
 				this.handleIncomingPreview();
@@ -52,11 +58,35 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			}
 		}
 
+		handlePaste() {
+			const { url } = this.props.attributes;
+			const { fetching, cannotEmbed } = this.props;
+
+			// This URL can't be embedded, so replace with the fallback block.
+			if ( url && ! fetching && cannotEmbed ) {
+				this.props.onReplace(
+					createPasteFallbackBlock( this.props.attributes.url )
+				);
+				return;
+			}
+
+			// This URL can be embedded, so pass it over to the core embed block to continue.
+			if ( url && ! fetching && ! cannotEmbed ) {
+				this.props.onReplace(
+					createBlock( 'core/embed', { url } )
+				);
+			}
+		}
+
 		componentDidUpdate( prevProps ) {
 			const hasPreview = undefined !== this.props.preview;
 			const hadPreview = undefined !== prevProps.preview;
 			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
 			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
+
+			if ( pasting ) {
+				this.handlePaste();
+			}
 
 			if ( ( hasPreview && ! hadPreview ) || switchedPreview || switchedURL ) {
 				if ( this.props.cannotEmbed ) {
