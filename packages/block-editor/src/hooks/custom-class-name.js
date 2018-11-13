@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import { assign, difference, omit } from 'lodash';
+import { assign, difference } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { addFilter } from '@wordpress/hooks';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
@@ -132,19 +132,21 @@ export function getHTMLRootElementClasses( innerHTML ) {
  */
 export function addParsedDifference( blockAttributes, blockType, innerHTML ) {
 	if ( hasBlockSupport( blockType, 'customClassName', true ) ) {
-		// To determine difference, serialize block given the known set of
-		// attributes, with the exception of `className`. This will determine
-		// the default set of classes. From there, any difference in innerHTML
-		// can be considered as custom classes.
-		const attributesSansClassName = omit( blockAttributes, [ 'className' ] );
-		const serialized = getSaveContent( blockType, attributesSansClassName );
+		// To determine difference, serialize the block given the known set of
+		// attributes to determine the default set of classes. From there, any
+		// difference in innerHTML can be considered as custom classes.
+		removeFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props' );
+		const serialized = getSaveContent( blockType, blockAttributes );
+		addFilter( 'blocks.getSaveContent.extraProps', 'core/custom-class-name/save-props', addSaveProps );
 		const defaultClasses = getHTMLRootElementClasses( serialized );
 		const actualClasses = getHTMLRootElementClasses( innerHTML );
 		const customClasses = difference( actualClasses, defaultClasses );
 
-		if ( customClasses.length ) {
-			blockAttributes.className = customClasses.join( ' ' );
-		} else if ( serialized ) {
+		blockAttributes.className = classnames( {
+			[ blockAttributes.className ]: ! serialized,
+		}, ...customClasses );
+
+		if ( ! blockAttributes.className ) {
 			delete blockAttributes.className;
 		}
 	}

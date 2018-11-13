@@ -10,7 +10,13 @@ import { getHTMLRootElementClasses } from '../custom-class-name';
 
 describe( 'custom className', () => {
 	const blockSettings = {
-		save: () => <div className="default" />,
+		save: ( { attributes } ) => {
+			if ( attributes.className === 'is-varied-on-classname' ) {
+				return <div className="varied" />;
+			}
+
+			return <div className="default" />;
+		},
 		category: 'common',
 		title: 'block title',
 	};
@@ -155,6 +161,16 @@ describe( 'custom className', () => {
 			);
 
 			expect( attributes.className ).toBe( 'custom1 custom3' );
+		} );
+
+		it( 'should allow save to consider the className attribute', () => {
+			const attributes = addParsedDifference(
+				{ className: 'is-varied-on-classname' },
+				blockSettings,
+				'<div class="varied is-varied-on-classname foo"></div>'
+			);
+
+			expect( attributes.className ).toBe( 'is-varied-on-classname foo' );
 		} );
 
 		it( 'should not remove the custom classes for dynamic blocks', () => {
