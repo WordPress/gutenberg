@@ -60,6 +60,18 @@ export default class TokenList {
 	}
 
 	/**
+	 * Returns the stringified form of the TokenList.
+	 *
+	 * @link https://dom.spec.whatwg.org/#DOMTokenList-stringification-behavior
+	 * @link https://www.ecma-international.org/ecma-262/9.0/index.html#sec-tostring
+	 *
+	 * @return {string} Token set as string.
+	 */
+	toString() {
+		return this.value;
+	}
+
+	/**
 	 * Returns the token with index `index`.
 	 *
 	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-item

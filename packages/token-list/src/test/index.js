@@ -28,11 +28,23 @@ describe( 'token-list', () => {
 	} );
 
 	describe( 'value', () => {
+		it( 'gets the stringified value', () => {
+			const list = new TokenList( 'abc   ' );
+
+			expect( list.value ).toBe( 'abc' );
+		} );
+
 		it( 'sets to stringified value', () => {
 			const list = new TokenList();
 			list.value = undefined;
 
 			expect( list.value ).toBe( 'undefined' );
+		} );
+
+		it( 'is the stringifier of the instance', () => {
+			const list = new TokenList( 'abc   ' );
+
+			expect( String( list ) ).toBe( 'abc' );
 		} );
 	} );
 
