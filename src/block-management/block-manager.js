@@ -42,6 +42,9 @@ type StateType = {
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
+	// a scrolling function for when on Android (when the dataSource is up-to-date to perform the scroll)
+	scrollTo: number => void;
+
 	constructor( props: PropsType ) {
 		super( props );
 		this.state = {
@@ -111,6 +114,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
+		if ( this.scrollTo ) {
+			this.scrollTo( focusedItemIndex + 1 );
+		}
+
 		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
 
 		// now set the focus
@@ -266,6 +273,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		if ( Platform.OS === 'android' ) {
 			list = (
 				<RecyclerViewList
+					ref={ ( component: RecyclerViewList ) =>
+						( this.scrollTo = ( index ) => component.scrollToIndex( { index: index, animated: true } ) )
+					}
 					style={ styles.list }
 					dataSource={ this.state.dataSource }
 					renderItem={ this.renderItem.bind( this ) }
