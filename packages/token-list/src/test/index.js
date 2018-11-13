@@ -25,6 +25,34 @@ describe( 'token-list', () => {
 			expect( list.value ).toBe( 'abc' );
 			expect( list ).toHaveLength( 1 );
 		} );
+
+		describe( 'array method inheritence', () => {
+			it( 'entries', () => {
+				const list = new TokenList( 'abc   ' );
+
+				expect( [ ...list.entries() ] ).toEqual( [ [ 0, 'abc' ] ] );
+			} );
+
+			it( 'forEach', () => {
+				expect.assertions( 1 );
+
+				const list = new TokenList( 'abc   ' );
+
+				list.forEach( ( item ) => expect( item ).toBe( 'abc' ) );
+			} );
+
+			it( 'values', () => {
+				const list = new TokenList( 'abc   ' );
+
+				expect( [ ...list.values() ] ).toEqual( [ 'abc' ] );
+			} );
+
+			it( 'keys', () => {
+				const list = new TokenList( 'abc   ' );
+
+				expect( [ ...list.keys() ] ).toEqual( [ 0 ] );
+			} );
+		} );
 	} );
 
 	describe( 'value', () => {
