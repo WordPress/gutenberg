@@ -14,7 +14,7 @@ import {
 	ToggleControl,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
@@ -143,11 +143,6 @@ class InlineLinkUI extends Component {
 	}
 
 	onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
-			this.resetState();
-		}
-
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
@@ -234,6 +229,7 @@ class InlineLinkUI extends Component {
 			>
 				<URLPopover
 					onClickOutside={ this.onClickOutside }
+					onClose={ this.resetState }
 					focusOnMount={ showInput ? 'firstElement' : false }
 					renderSettings={ () => (
 						<ToggleControl
