@@ -10,12 +10,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     lazy var bridgeDelegate: BridgeDelegate = {
         let sourceURL = RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index", fallbackResource: nil)!
-        
-        return BridgeDelegate(sourceURL: sourceURL, mediaProvider: self.mediaProvider)
+        return BridgeDelegate(sourceURL: sourceURL)
     }()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        
+
+        bridgeDelegate.aztecViewManager.attachmentDelegate = mediaProvider
+        bridgeDelegate.aztecViewManager.imageProvider = mediaProvider
+
         let bridge = RCTBridge(delegate: bridgeDelegate, launchOptions: launchOptions)
         let rootView = RCTRootView(bridge: bridge, moduleName: "example", initialProperties: nil)
         

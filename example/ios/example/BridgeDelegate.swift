@@ -9,14 +9,11 @@ import Foundation
 import RNTAztecView
 
 class BridgeDelegate: NSObject, RCTBridgeDelegate {
-    
-    let mediaProvider: MediaProvider
     let sourceURL: URL
+    let aztecViewManager = RCTAztecViewManager()
     
-    init(sourceURL: URL, mediaProvider: MediaProvider) {
-        self.mediaProvider = mediaProvider
+    init(sourceURL: URL) {
         self.sourceURL = sourceURL
-        
         super.init()
     }
     
@@ -25,6 +22,6 @@ class BridgeDelegate: NSObject, RCTBridgeDelegate {
     }
     
     func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
-        return [RCTAztecViewManager(attachmentDelegate: mediaProvider, imageProvider: mediaProvider)]
+        return [aztecViewManager]
     }
 }
