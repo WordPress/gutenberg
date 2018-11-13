@@ -48,6 +48,26 @@ describe( 'token-list', () => {
 		} );
 	} );
 
+	describe( 'Symbol.iterator', () => {
+		it( 'returns a generator', () => {
+			const list = new TokenList();
+
+			expect( list[ Symbol.iterator ]().next ).toEqual( expect.any( Function ) );
+		} );
+
+		it( 'yields entries', () => {
+			expect.assertions( 2 );
+
+			const classes = [ 'abc', 'def' ];
+			const list = new TokenList( classes.join( ' ' ) );
+
+			let i = 0;
+			for ( const item of list ) {
+				expect( item ).toBe( classes[ i++ ] );
+			}
+		} );
+	} );
+
 	describe( 'item', () => {
 		it( 'should return undefined if item at index does not exist', () => {
 			const list = new TokenList();

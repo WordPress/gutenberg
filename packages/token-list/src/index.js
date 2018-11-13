@@ -72,6 +72,17 @@ export default class TokenList {
 	}
 
 	/**
+	 * Returns an iterator for the TokenList, iterating items of the set.
+	 *
+	 * @link https://dom.spec.whatwg.org/#domtokenlist
+	 *
+	 * @return {Generator} TokenList iterator.
+	 */
+	* [ Symbol.iterator ]() {
+		return yield* this._valueAsArray;
+	}
+
+	/**
 	 * Returns the token with index `index`.
 	 *
 	 * @link https://dom.spec.whatwg.org/#dom-domtokenlist-item
