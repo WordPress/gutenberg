@@ -521,12 +521,7 @@ class ImageEdit extends Component {
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img
-								src={ url }
-								alt={ defaultedAlt }
-								onClick={ this.onImageClick }
-								onError={ () => this.onImageError( url ) }
-							/>;
+							const img = <img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
