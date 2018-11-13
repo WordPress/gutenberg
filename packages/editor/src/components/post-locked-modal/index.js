@@ -240,8 +240,8 @@ export default compose(
 			updatePostLock,
 		};
 	} ),
+	withInstanceId,
 	withGlobalEvents( {
 		beforeunload: 'releasePostLock',
-	} ),
-	withInstanceId,
+	} )
 )( PostLockedModal );
