@@ -1,6 +1,6 @@
 import TestRenderer from 'react-test-renderer';
 import { Input } from '../inputs';
-import { DOWN, ENTER, UP } from '@wordpress/keycodes';
+import { DOWN, ENTER, SPACE, UP } from '@wordpress/keycodes';
 
 describe( 'Input ', () => {
 	describe( 'calls onChange prop', () => {
@@ -72,6 +72,36 @@ describe( 'Input ', () => {
 			).root;
 			testInstance.findByType( 'input' ).props.onBlur();
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'does not call onChange prop', () => {
+		test( 'onKeyDown event when keyDown is not ENTER, DOWN, or UP', () => {
+			const onChange = jest.fn();
+			const testInstance = TestRenderer.create(
+				<Input
+					label={ 'Color value in hexadecimal' }
+					valueKey="hex"
+					value={ '#fff' }
+					onChange={ onChange }
+				/>
+			).root;
+			testInstance.findByType( 'input' ).props.onKeyDown( { keyCode: SPACE } );
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		test( 'onChange when value.length <= 4', () => {
+			const onChange = jest.fn();
+			const testInstance = TestRenderer.create(
+				<Input
+					label={ 'Color value in hexadecimal' }
+					valueKey="hex"
+					value={ '#fff' }
+					onChange={ onChange }
+				/>
+			).root;
+			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#fff' } } );
+			expect( onChange ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
