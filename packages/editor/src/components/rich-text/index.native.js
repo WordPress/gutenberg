@@ -360,6 +360,7 @@ export class RichText extends Component {
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					isSelected = { this.props.isSelected } 
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
