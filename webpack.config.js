@@ -177,7 +177,11 @@ const config = {
 					if ( config.mode === 'production' ) {
 						return postcss( [
 							require( 'cssnano' )( {
-								preset: 'default',
+								preset: [ 'default', {
+									discardComments: {
+										removeAll: true,
+									},
+								} ],
 							} ),
 						] )
 							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )

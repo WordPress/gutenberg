@@ -23,7 +23,7 @@ export default function BlockIcon( { icon, showColors = false, className } ) {
 	} : {};
 
 	return (
-		<div
+		<span
 			style={ style }
 			className={ classnames(
 				'editor-block-icon',
@@ -32,6 +32,6 @@ export default function BlockIcon( { icon, showColors = false, className } ) {
 			) }
 		>
 			{ renderedIcon }
-		</div>
+		</span>
 	);
 }

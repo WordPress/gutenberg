@@ -116,3 +116,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @pratikthink | @pratikthink |
 | @amdrew | @sumobi |
 | @MaedahBatool | @MaedahBatool |
+| @luehrsen | @luehrsen |

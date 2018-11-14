@@ -1,3 +1,9 @@
+## 2.0.0 (2018-11-12)
+
+### Breaking Change
+
+- JS and PHP parsers now behave consistently when parsing empty attributes.
+
 ## 1.1.1 (2018-11-09)
 
 ## 1.1.0 (2018-11-09)
