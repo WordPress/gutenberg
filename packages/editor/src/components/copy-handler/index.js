@@ -26,14 +26,14 @@ class CopyHandler extends Component {
 	}
 
 	onCopy( event ) {
-		const { selectedBlockClientIds, getBlocks } = this.props;
+		const { hasMultiSelection, selectedBlockClientIds, getBlocks } = this.props;
 
-		if ( ! selectedBlockClientIds || selectedBlockClientIds.length === 0 ) {
+		if ( selectedBlockClientIds.length === 0 ) {
 			return;
 		}
 
 		// Let native copy behaviour take over in input fields.
-		if ( selectedBlockClientIds.length === 1 && documentHasSelection() ) {
+		if ( ! hasMultiSelection && documentHasSelection() ) {
 			return;
 		}
 
@@ -46,11 +46,11 @@ class CopyHandler extends Component {
 	}
 
 	onCut( event ) {
-		const { selectedBlockClientIds } = this.props;
+		const { hasMultiSelection, selectedBlockClientIds } = this.props;
 
 		this.onCopy( event );
 
-		if ( selectedBlockClientIds && selectedBlockClientIds.length ) {
+		if ( hasMultiSelection ) {
 			this.props.onRemove( selectedBlockClientIds );
 		}
 	}
@@ -66,12 +66,14 @@ export default compose( [
 			getMultiSelectedBlockClientIds,
 			getSelectedBlockClientId,
 			getBlocks,
+			hasMultiSelection,
 		} = select( 'core/editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
 
 		return {
+			hasMultiSelection: hasMultiSelection(),
 			selectedBlockClientIds,
 
 			// We only care about this value when the copy is performed
