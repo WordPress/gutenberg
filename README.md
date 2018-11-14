@@ -23,7 +23,7 @@ This repo is the development hub for the <a href="https://make.wordpress.org/cor
 >
 > — Matt Mullenweg
 
-One thing that sets WordPress apart from other systems is that it allows you to create a post layout as rich as you can imagine—but only if you know HTML and CSS and build your own custom theme. By thinking of the editor as a tool that can let you both write rich posts and create beautiful layouts, we can transform WordPress into something users _love_, as opposed something they pick because it happens to be what everyone else uses.
+One thing that sets WordPress apart is that it allows you to create a post layout that's as rich as you can imagine—but only if you can build your own custom theme with HTML and CSS. By thinking of the editor as a tool that allows you to write rich posts **and** create beautiful layouts, we can transform WordPress into something users _love_, as opposed to something they choose because it happens to be what everyone else uses.
 
 **Gutenberg is a new way forward.** It looks at the editor as more than a content field, revisiting a layout that has been largely unchanged for almost a decade. This project allows us to holistically design a modern editing experience, and build a foundation for things to come.
 
