@@ -7,7 +7,7 @@ Printing since 1440.
 
 ![Gutenberg editing](https://cldup.com/H0oKBfpidk.png)
 
-This repo is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in core</a>. `Gutenberg` is the project name.
+This repo is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in WordPress Core</a>. `Gutenberg` is the project name.
 
 ## Getting started
 - **Download:** If you want to use the latest release with your WordPress, <a href="https://wordpress.org/plugins/gutenberg/">download the latest release from the WordPress.org plugins repository</a>. 
