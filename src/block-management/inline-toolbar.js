@@ -17,18 +17,6 @@ export default class InlineToolbar extends React.Component<PropsType> {
 		return (
 			<View style={ styles.inlineToolbar }>
 				<TouchableOpacity
-					onPress={ this.props.onButtonPressed.bind(
-						this,
-						InlineToolbarButton.PLUS,
-						this.props.clientId
-					) }
-				>
-					<View style={ styles.inlineToolbarButton }>
-						<Text>+</Text>
-					</View>
-				</TouchableOpacity>
-				<View style={ styles.buttonSeparator } />
-				<TouchableOpacity
 					onPress={ this.props.onButtonPressed.bind( this, InlineToolbarButton.UP, this.props.clientId ) }
 				>
 					<View style={ styles.inlineToolbarButton }>
