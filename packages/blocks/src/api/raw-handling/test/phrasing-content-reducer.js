@@ -6,15 +6,19 @@ import { deepFilterHTML } from '../utils';
 
 describe( 'phrasingContentReducer', () => {
 	it( 'should transform font weight', () => {
-		expect( deepFilterHTML( '<span style="font-weight:bold">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<strong>test</strong>' );
+		expect( deepFilterHTML( '<span style="font-weight:bold">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<strong><span style="font-weight:bold">test</span></strong>' );
 	} );
 
 	it( 'should transform numeric font weight', () => {
-		expect( deepFilterHTML( '<span style="font-weight:700">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<strong>test</strong>' );
+		expect( deepFilterHTML( '<span style="font-weight:700">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<strong><span style="font-weight:700">test</span></strong>' );
 	} );
 
 	it( 'should transform font style', () => {
-		expect( deepFilterHTML( '<span style="font-style:italic">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<em>test</em>' );
+		expect( deepFilterHTML( '<span style="font-style:italic">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<em><span style="font-style:italic">test</span></em>' );
+	} );
+
+	it( 'should transform nested formatting', () => {
+		expect( deepFilterHTML( '<span style="font-style:italic;font-weight:bold">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<strong><em><span style="font-style:italic;font-weight:bold">test</span></em></strong>' );
 	} );
 
 	it( 'should remove invalid phrasing content', () => {

@@ -236,13 +236,6 @@ export const editor = flow( [
 		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
-
-	// Track whether changes exist, resetting at each post save. Relies on
-	// editor initialization firing post reset as an effect.
-	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
-	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
@@ -264,9 +257,6 @@ export const editor = flow( [
 
 				return state;
 
-			case 'DIRTY_ARTIFICIALLY':
-				return { ...state };
-
 			case 'UPDATE_POST':
 			case 'RESET_POST':
 				const getCanonicalValue = action.type === 'UPDATE_POST' ?
@@ -287,7 +277,16 @@ export const editor = flow( [
 		return state;
 	},
 
-	blocks: combineReducers( {
+	blocks: flow( [
+		combineReducers,
+
+		// Track whether changes exist, resetting at each post save. Relies on
+		// editor initialization firing post reset as an effect.
+		withChangeDetection( {
+			resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+			ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		} ),
+	] )( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
 				case 'RESET_BLOCKS':
@@ -705,14 +704,18 @@ export function blockSelection( state = {
 				end: action.clientId,
 				initialPosition: action.initialPosition,
 			};
-		case 'INSERT_BLOCKS':
-			return {
-				...state,
-				start: action.blocks[ 0 ].clientId,
-				end: action.blocks[ 0 ].clientId,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
+		case 'INSERT_BLOCKS': {
+			if ( action.updateSelection ) {
+				return {
+					...state,
+					start: action.blocks[ 0 ].clientId,
+					end: action.blocks[ 0 ].clientId,
+					initialPosition: null,
+					isMultiSelecting: false,
+				};
+			}
+			return state;
+		}
 		case 'REMOVE_BLOCKS':
 			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
 				return state;

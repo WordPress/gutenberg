@@ -36,6 +36,18 @@ the post has been saved.
 
 Whether the post is new.
 
+### hasChangedContent
+
+Returns true if content includes unsaved changes, or false otherwise.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether content includes unsaved changes.
+
 ### isEditedPostDirty
 
 Returns true if there are unsaved values for the current edit session, or
@@ -885,7 +897,7 @@ True if multi-selecting, false if not.
 
 ### isSelectionEnabled
 
-Whether is selection disable or not.
+Selector that returns if multi-selection is enabled or not.
 
 *Parameters*
 
@@ -893,7 +905,7 @@ Whether is selection disable or not.
 
 *Returns*
 
-True if multi is disable, false if not.
+True if it should be possible to multi-select blocks, false if multi-selection is disabled.
 
 ### getBlockMode
 
@@ -1532,8 +1544,8 @@ inserted, optionally at a specific index respective a root block list.
 
  * block: Block object to insert.
  * index: Index at which block should be inserted.
- * rootClientId: Optional root client ID of block list on which
-                              to insert.
+ * rootClientId: Optional root client ID of block list on which to insert.
+ * updateSelection: If true block selection will be updated. If false, block selection will not change. Defaults to true.
 
 ### insertBlocks
 
@@ -1544,8 +1556,8 @@ be inserted, optionally at a specific index respective a root block list.
 
  * blocks: Block objects to insert.
  * index: Index at which block should be inserted.
- * rootClientId: Optional root client ID of block list on
-                               which to insert.
+ * rootClientId: Optional root cliente ID of block list on which to insert.
+ * updateSelection: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
 
 ### showInsertionPoint
 

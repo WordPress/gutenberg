@@ -58,21 +58,6 @@ if ( ! function_exists( 'gutenberg_parse_blocks' ) ) {
 	 * @return array  Array of parsed block objects.
 	 */
 	function gutenberg_parse_blocks( $content ) {
-		/*
-		 * If there are no blocks in the content, return a single block, rather
-		 * than wasting time trying to parse the string.
-		 */
-		if ( ! has_blocks( $content ) ) {
-			return array(
-				array(
-					'blockName'   => null,
-					'attrs'       => array(),
-					'innerBlocks' => array(),
-					'innerHTML'   => $content,
-				),
-			);
-		}
-
 		/**
 		 * Filter to allow plugins to replace the server-side block parser
 		 *
@@ -148,27 +133,34 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
  * Renders a single block into a HTML string.
  *
  * @since 1.9.0
+ * @since 4.4.0 renders full nested tree of blocks before reassembling into HTML string
+ * @global WP_Post $post The post to edit.
  *
  * @param  array $block A single parsed block object.
  * @return string String of rendered HTML.
  */
 function gutenberg_render_block( $block ) {
-	$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-	$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : array();
-	$raw_content = isset( $block['innerHTML'] ) ? $block['innerHTML'] : null;
+	global $post;
 
-	if ( $block_name ) {
-		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
-		if ( null !== $block_type && $block_type->is_dynamic() ) {
-			return $block_type->render( $attributes );
-		}
+	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
+	$inner_content = '';
+	$index         = 0;
+
+	foreach ( $block['innerContent'] as $chunk ) {
+		$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
 	}
 
-	if ( $raw_content ) {
-		return $raw_content;
+	if ( $is_dynamic ) {
+		$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
+		$global_post = $post;
+		$output      = $block_type->render( $attributes, $inner_content );
+		$post        = $global_post;
+
+		return $output;
 	}
 
-	return '';
+	return $inner_content;
 }
 
 if ( ! function_exists( 'do_blocks' ) ) {
@@ -176,91 +168,20 @@ if ( ! function_exists( 'do_blocks' ) ) {
 	 * Parses dynamic blocks out of `post_content` and re-renders them.
 	 *
 	 * @since 0.1.0
-	 * @global WP_Post $post The post to edit.
+	 * @since 4.4.0 performs full parse on input post content
 	 *
 	 * @param  string $content Post content.
 	 * @return string          Updated post content.
 	 */
 	function do_blocks( $content ) {
-		global $post;
+		$blocks = gutenberg_parse_blocks( $content );
+		$output = '';
 
-		$rendered_content      = '';
-		$dynamic_block_pattern = get_dynamic_blocks_regex();
-
-		/*
-		 * Back up global post, to restore after render callback.
-		 * Allows callbacks to run new WP_Query instances without breaking the global post.
-		 */
-		$global_post = $post;
-
-		while ( preg_match( $dynamic_block_pattern, $content, $block_match, PREG_OFFSET_CAPTURE ) ) {
-			$opening_tag     = $block_match[0][0];
-			$offset          = $block_match[0][1];
-			$block_name      = $block_match[1][0];
-			$is_self_closing = isset( $block_match[4] );
-
-			// Reset attributes JSON to prevent scope bleed from last iteration.
-			$block_attributes_json = null;
-			if ( isset( $block_match[3] ) ) {
-				$block_attributes_json = $block_match[3][0];
-			}
-
-			// Since content is a working copy since the last match, append to
-			// rendered content up to the matched offset...
-			$rendered_content .= substr( $content, 0, $offset );
-
-			// ...then update the working copy of content.
-			$content = substr( $content, $offset + strlen( $opening_tag ) );
-
-			// Make implicit core namespace explicit.
-			$is_implicit_core_namespace = ( false === strpos( $block_name, '/' ) );
-			$normalized_block_name      = $is_implicit_core_namespace ? 'core/' . $block_name : $block_name;
-
-			// Find registered block type. We can assume it exists since we use the
-			// `get_dynamic_block_names` function as a source for pattern matching.
-			$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $normalized_block_name );
-
-			// Attempt to parse attributes JSON, if available.
-			$attributes = array();
-			if ( ! empty( $block_attributes_json ) ) {
-				$decoded_attributes = json_decode( $block_attributes_json, true );
-				if ( ! is_null( $decoded_attributes ) ) {
-					$attributes = $decoded_attributes;
-				}
-			}
-
-			$inner_content = '';
-
-			if ( ! $is_self_closing ) {
-				$end_tag_pattern = '/<!--\s+\/wp:' . preg_quote( $block_name, '/' ) . '\s+-->/';
-				if ( ! preg_match( $end_tag_pattern, $content, $block_match_end, PREG_OFFSET_CAPTURE ) ) {
-					// If no closing tag is found, abort all matching, and continue
-					// to append remainder of content to rendered output.
-					break;
-				}
-
-				// Update content to omit text up to and including closing tag.
-				$end_tag    = $block_match_end[0][0];
-				$end_offset = $block_match_end[0][1];
-
-				$inner_content = substr( $content, 0, $end_offset );
-				$content       = substr( $content, $end_offset + strlen( $end_tag ) );
-			}
-
-			// Replace dynamic block with server-rendered output.
-			$rendered_content .= $block_type->render( $attributes, $inner_content );
-
-			// Restore global $post.
-			$post = $global_post;
+		foreach ( $blocks as $block ) {
+			$output .= gutenberg_render_block( $block );
 		}
 
-		// Append remaining unmatched content.
-		$rendered_content .= $content;
-
-		// Strip remaining block comment demarcations.
-		$rendered_content = preg_replace( '/<!--\s+\/?wp:.*?-->\r?\n?/m', '', $rendered_content );
-
-		return $rendered_content;
+		return $output;
 	}
 
 	add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.

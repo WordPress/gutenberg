@@ -279,7 +279,7 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		it( 'should return history (empty edits, blocks), dirty flag by default', () => {
+		it( 'should return history (empty edits, blocks) by default', () => {
 			const state = editor( undefined, {} );
 
 			expect( state.past ).toEqual( [] );
@@ -287,7 +287,7 @@ describe( 'state', () => {
 			expect( state.present.edits ).toEqual( {} );
 			expect( state.present.blocks.byClientId ).toEqual( {} );
 			expect( state.present.blocks.order ).toEqual( {} );
-			expect( state.isDirty ).toBe( false );
+			expect( state.present.blocks.isDirty ).toBe( false );
 		} );
 
 		it( 'should key by reset blocks clientId', () => {
@@ -1567,6 +1567,7 @@ describe( 'state', () => {
 					clientId: 'ribs',
 					name: 'core/freeform',
 				} ],
+				updateSelection: true,
 			} );
 
 			expect( state3 ).toEqual( {
@@ -1574,6 +1575,24 @@ describe( 'state', () => {
 				end: 'ribs',
 				initialPosition: null,
 				isMultiSelecting: false,
+			} );
+		} );
+
+		it( 'should not select inserted block if updateSelection flag is false', () => {
+			const original = deepFreeze( { start: 'a', end: 'b' } );
+
+			const state3 = blockSelection( original, {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					clientId: 'ribs',
+					name: 'core/freeform',
+				} ],
+				updateSelection: false,
+			} );
+
+			expect( state3 ).toEqual( {
+				start: 'a',
+				end: 'b',
 			} );
 		} );
 

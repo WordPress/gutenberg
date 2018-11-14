@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, filter, first, get, mapKeys, orderBy } from 'lodash';
+import { castArray, filter, first, mapKeys, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ export class BlockSwitcher extends Component {
 	}
 
 	render() {
-		const { blocks, onTransform, inserterItems } = this.props;
+		const { blocks, onTransform, inserterItems, hasBlockStyles } = this.props;
 		const { hoveredClassName } = this.state;
 
 		if ( ! blocks || ! blocks.length ) {
@@ -55,10 +55,22 @@ export class BlockSwitcher extends Component {
 
 		const sourceBlockName = blocks[ 0 ].name;
 		const blockType = getBlockType( sourceBlockName );
-		const hasStyles = blocks.length === 1 && get( blockType, [ 'styles' ], [] ).length !== 0;
 
-		if ( ! hasStyles && ! possibleBlockTransformations.length ) {
-			return null;
+		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
+			if ( blocks.length > 1 ) {
+				return null;
+			}
+			return (
+				<Toolbar>
+					<IconButton
+						disabled
+						className="editor-block-switcher__no-switcher-icon"
+						label={ __( 'Block icon' ) }
+					>
+						<BlockIcon icon={ blockType.icon } showColors />
+					</IconButton>
+				</Toolbar>
+			);
 		}
 
 		return (
@@ -106,7 +118,7 @@ export class BlockSwitcher extends Component {
 				} }
 				renderContent={ ( { onClose } ) => (
 					<Fragment>
-						{ hasStyles &&
+						{ hasBlockStyles &&
 							<PanelBody
 								title={ __( 'Block Styles' ) }
 								initialOpen
@@ -154,10 +166,15 @@ export class BlockSwitcher extends Component {
 export default compose(
 	withSelect( ( select, { clientIds } ) => {
 		const { getBlocksByClientId, getBlockRootClientId, getInserterItems } = select( 'core/editor' );
+		const { getBlockStyles } = select( 'core/blocks' );
 		const rootClientId = getBlockRootClientId( first( castArray( clientIds ) ) );
+		const blocks = getBlocksByClientId( clientIds );
+		const firstBlock = blocks && blocks.length === 1 ? blocks[ 0 ] : null;
+		const styles = firstBlock && getBlockStyles( firstBlock.name );
 		return {
-			blocks: getBlocksByClientId( clientIds ),
+			blocks,
 			inserterItems: getInserterItems( rootClientId ),
+			hasBlockStyles: styles && styles.length > 0,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => ( {

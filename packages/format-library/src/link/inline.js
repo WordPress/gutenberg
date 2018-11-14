@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { sprintf, __ } from '@wordpress/i18n';
@@ -23,6 +28,7 @@ import { URLInput, URLPopover } from '@wordpress/editor';
  * Internal dependencies
  */
 import PositionedAtSelection from './positioned-at-selection';
+import { isValidHref } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -78,23 +84,40 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 );
 
-const LinkViewer = ( { url, editLink } ) => (
-	// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
-	<div
-		className="editor-format-toolbar__link-container-content"
-		onKeyPress={ stopKeyPropagation }
-	>
+const LinkViewerUrl = ( { url } ) => {
+	const prependedURL = prependHTTP( url );
+	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
+		'has-invalid-link': ! isValidHref( prependedURL ),
+	} );
+
+	if ( ! url ) {
+		return <span className={ linkClassName }></span>;
+	}
+
+	return (
 		<ExternalLink
-			className="editor-format-toolbar__link-container-value"
+			className={ linkClassName }
 			href={ url }
 		>
 			{ filterURLForDisplay( safeDecodeURI( url ) ) }
 		</ExternalLink>
-		<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
-	</div>
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
-);
+	);
+};
+
+const LinkViewer = ( { url, editLink } ) => {
+	return (
+		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
+		<div
+			className="editor-format-toolbar__link-container-content"
+			onKeyPress={ stopKeyPropagation }
+		>
+			<LinkViewerUrl url={ url } />
+			<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
+		</div>
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
+	);
+};
 
 class InlineLinkUI extends Component {
 	constructor() {
@@ -109,7 +132,10 @@ class InlineLinkUI extends Component {
 		this.resetState = this.resetState.bind( this );
 		this.autocompleteRef = createRef();
 
-		this.state = {};
+		this.state = {
+			opensInNewWindow: false,
+			inputValue: '',
+		};
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -146,7 +172,7 @@ class InlineLinkUI extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		const { activeAttributes: { url }, value, onChange } = this.props;
+		const { activeAttributes: { url = '' }, value, onChange } = this.props;
 
 		this.setState( { opensInNewWindow } );
 
@@ -178,10 +204,12 @@ class InlineLinkUI extends Component {
 
 		this.resetState();
 
-		if ( isActive ) {
+		if ( ! isValidHref( url ) ) {
+			speak( __( 'Warning: the link has been inserted but may have errors. Please test it.' ), 'assertive' );
+		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
-			speak( __( 'Link added.' ), 'assertive' );
+			speak( __( 'Link inserted' ), 'assertive' );
 		}
 	}
 

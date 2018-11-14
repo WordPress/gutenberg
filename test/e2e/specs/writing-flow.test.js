@@ -223,4 +223,43 @@ describe( 'adding blocks', () => {
 		) );
 		expect( isInBlock ).toBe( true );
 	} );
+
+	it( 'should not delete trailing spaces when deleting a word with backspace', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1 2 3 4' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+		const blockText = await page.evaluate( () => document.activeElement.textContent );
+		expect( blockText ).toBe( '1 2 3 4' );
+	} );
+
+	it( 'should not delete trailing spaces when deleting a word with alt + backspace', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'alpha beta gamma delta' );
+		if ( process.platform === 'darwin' ) {
+			await pressWithModifier( 'Alt', 'Backspace' );
+		} else {
+			await pressWithModifier( META_KEY, 'Backspace' );
+		}
+		await page.keyboard.type( 'delta' );
+		const blockText = await page.evaluate( () => document.activeElement.textContent );
+		expect( blockText ).toBe( 'alpha beta gamma delta' );
+	} );
+
+	it( 'should create valid paragraph blocks when rapidly pressing Enter', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		// Check that none of the paragraph blocks have <br> in them.
+		const postContent = await getEditedPostContent();
+		expect( postContent.indexOf( 'br' ) ).toBe( -1 );
+	} );
 } );

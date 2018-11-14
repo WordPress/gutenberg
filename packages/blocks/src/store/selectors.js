@@ -31,6 +31,18 @@ export function getBlockType( state, name ) {
 }
 
 /**
+ * Returns block styles by block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block type name.
+ *
+ * @return {Array?} Block Styles.
+ */
+export function getBlockStyles( state, name ) {
+	return state.blockStyles[ name ];
+}
+
+/**
  * Returns all the available categories.
  *
  * @param {Object} state Data state.

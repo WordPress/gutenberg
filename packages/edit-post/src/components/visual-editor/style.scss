@@ -29,9 +29,9 @@
 
 		// Center the block toolbar on wide and full-wide blocks.
 		// Use specific selector to not affect nested block toolbars.
-		&[data-align="wide"] > .editor-block-contextual-toolbar,
-		&[data-align="full"] > .editor-block-contextual-toolbar {
-			width: calc(100% + #{ $block-side-ui-width * 2 + $block-padding * 2 + $border-width * 2 }); // Matches the negative margins applied to parent blocks.
+		&[data-align="wide"] > .editor-block-list__block-edit > .editor-block-contextual-toolbar,
+		&[data-align="full"] > .editor-block-list__block-edit > .editor-block-contextual-toolbar {
+			width: calc(100% + #{ $block-padding * 2 + $border-width * 2 }); // Matches the negative margins applied to parent blocks.
 			height: 0; // This collapses the container to an invisible element without margin.
 			text-align: center;
 
@@ -42,9 +42,11 @@
 			}
 		}
 
-		// The centering math changes when a fullwide image doesn't have block padding.
-		&[data-align="full"] > .editor-block-contextual-toolbar {
-			width: calc(100% + #{ $block-side-ui-width * 2 + $block-padding * 2 }); // Matches the negative margins applied to non-parent blocks, except for borders which are gone in fullwide.
+		// The centering math is simpler for a fullwide block, which doesn't have any block padding.
+		&[data-align="full"] > .editor-block-list__block-edit > .editor-block-contextual-toolbar {
+			width: 100%;
+			margin-left: 0;
+			margin-right: 0;
 
 			.editor-block-toolbar {
 				max-width: $content-width - $border-width - $border-width;
@@ -84,6 +86,12 @@
 }
 
 .edit-post-visual-editor {
+	// If the first block is floated, it needs top margin, unlike the rule in line 69.
+	.editor-block-list__layout > .editor-block-list__block[data-align="left"]:first-child,
+	.editor-block-list__layout > .editor-block-list__block[data-align="right"]:first-child {
+		margin-top: $block-padding + $block-spacing + $border-width + $border-width + $block-padding;
+	}
+
 	.editor-default-block-appender {
 		// Default to centered and content-width, like blocks
 		margin-left: auto;

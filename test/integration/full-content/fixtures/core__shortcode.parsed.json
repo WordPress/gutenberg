@@ -3,12 +3,14 @@
         "blockName": "core/shortcode",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n[gallery ids=\"238,338\"]\n"
+        "innerHTML": "\n[gallery ids=\"238,338\"]\n",
+        "innerContent": [ "\n[gallery ids=\"238,338\"]\n" ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n"
+        "innerHTML": "\n",
+        "innerContent": [ "\n" ]
     }
 ]
