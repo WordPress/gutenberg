@@ -25,6 +25,7 @@ import {
 	PanelBody,
 	ResizableBox,
 	SelectControl,
+	Spinner,
 	TextControl,
 	TextareaControl,
 	Toolbar,
@@ -517,6 +518,7 @@ class ImageEdit extends Component {
 										{ getInspectorControls( imageWidth, imageHeight ) }
 										<div style={ { width, height } }>
 											{ img }
+											{ isBlobURL( url ) && <Spinner /> }
 										</div>
 									</Fragment>
 								);
@@ -591,6 +593,7 @@ class ImageEdit extends Component {
 										} }
 									>
 										{ img }
+										{ isBlobURL( url ) && <Spinner /> }
 									</ResizableBox>
 								</Fragment>
 							);
