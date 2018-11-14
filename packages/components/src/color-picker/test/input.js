@@ -68,11 +68,11 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#ffffff' } } );
+			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#aaaaaa' } } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
 				state: 'commit',
-				hex: '#fff',
+				hex: '#aaaaaa',
 			} );
 		} );
 
@@ -96,7 +96,7 @@ describe( 'Input ', () => {
 	} );
 
 	describe( 'does call onChange with draft state', () => {
-		test( 'onChange when value.length <= 4', () => {
+		test( 'onChange event for value.length <= 4', () => {
 			const onChange = jest.fn();
 			const testInstance = TestRenderer.create(
 				<Input
@@ -106,11 +106,11 @@ describe( 'Input ', () => {
 					onChange={ onChange }
 				/>
 			).root;
-			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#fff' } } );
+			testInstance.findByType( 'input' ).props.onChange( { target: { value: '#aaaaa' } } );
 			expect( onChange ).toHaveBeenCalledTimes( 1 );
 			expect( onChange ).toHaveBeenCalledWith( {
 				state: 'draft',
-				hex: '#fff',
+				hex: '#aaaaa',
 			} );
 		} );
 	} );
