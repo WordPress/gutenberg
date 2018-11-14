@@ -37,18 +37,10 @@ export class Input extends Component {
 
 	handleChange( value ) {
 		const { valueKey, onChange } = this.props;
-		// Protect against expanding a value while we're typing.
-		if ( value.length > 4 ) {
-			onChange( {
-				state: 'commit',
-				[ valueKey ]: value,
-			} );
-		} else {
-			onChange( {
-				state: 'draft',
-				[ valueKey ]: value,
-			} );
-		}
+		onChange( {
+			state: 'draft',
+			[ valueKey ]: value,
+		} );
 	}
 
 	handleKeyDown( { keyCode } ) {
