@@ -26,18 +26,7 @@ class CopyHandler extends Component {
 	}
 
 	onCopy( event ) {
-		const { hasMultiSelection, selectedBlockClientIds, getBlocksByClientId } = this.props;
-
-		if ( selectedBlockClientIds.length === 0 ) {
-			return;
-		}
-
-		// Let native copy behaviour take over in input fields.
-		if ( ! hasMultiSelection && documentHasSelection() ) {
-			return;
-		}
-
-		const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
+		const serialized = serialize( this.props.getSelectedBlocks() );
 
 		event.clipboardData.setData( 'text/plain', serialized );
 		event.clipboardData.setData( 'text/html', serialized );
@@ -65,7 +54,6 @@ export default compose( [
 		const {
 			getMultiSelectedBlockClientIds,
 			getSelectedBlockClientId,
-			getBlocksByClientId,
 			hasMultiSelection,
 		} = select( 'core/editor' );
 
@@ -75,13 +63,28 @@ export default compose( [
 		return {
 			hasMultiSelection: hasMultiSelection(),
 			selectedBlockClientIds,
-
-			// We only care about this value when the copy is performed
-			// We call it dynamically in the event handler to avoid unnecessary re-renders.
-			getBlocksByClientId,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( 'core/editor' ).removeBlocks,
-	} ) ),
+	withDispatch( ( dispatch, ownProps, select ) => {
+		const { getBlocksByClientId } = select( 'core/editor' );
+		const { removeBlocks } = dispatch( 'core/editor' );
+
+		return {
+			getSelectedBlocks: function() {
+				const { hasMultiSelection, selectedBlockClientIds } = ownProps;
+
+				if ( selectedBlockClientIds.length === 0 ) {
+					return;
+				}
+
+				// Let native copy behaviour take over in input fields.
+				if ( ! hasMultiSelection && documentHasSelection() ) {
+					return;
+				}
+
+				return serialize( getBlocksByClientId( selectedBlockClientIds ) );
+			},
+			onRemove: removeBlocks,
+		};
+	} ),
 ] )( CopyHandler );
