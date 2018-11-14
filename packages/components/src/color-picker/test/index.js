@@ -4,6 +4,11 @@
 import TestRenderer from 'react-test-renderer';
 
 /**
+ * WordPress dependencies.
+ */
+import { UP } from '@wordpress/keycodes';
+
+/**
  * Internal dependencies
  */
 import ColorPicker from '../';
@@ -47,6 +52,20 @@ describe( 'ColorPicker', () => {
 		);
 		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
 		testRenderer.root.findByType( 'input' ).props.onBlur();
+		expect( testRenderer.toJSON() ).toMatchSnapshot();
+	} );
+
+	test( 'should commit changes to all views on keyDown = UP', () => {
+		const color = '#FFF';
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: UP } );
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 } );
