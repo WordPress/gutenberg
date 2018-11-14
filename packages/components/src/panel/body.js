@@ -52,8 +52,8 @@ export class PanelBody extends Component {
 							aria-expanded={ isOpened }
 						>
 							{ /*
-								This span is wrapping the icon so when `isOpened` is updated the
-								state of `aria-expanded` isn't re-announced to NVDA
+								Firefox + NVDA don't announce aria-expanded because the browser
+								repaints the whole element, so this wrapping span hides that.
 							*/ }
 							<span aria-hidden="true">
 								{ isOpened ?
