@@ -9,9 +9,9 @@ SelectControl allow users to select from a single-option menu. It functions as a
 ## Table of contents
 
 
-1. [Design guidelines](http://#design-guidelines)
-2. [Development guidelines](http://#development-guidelines)
-3. [Related components](http://#related-components)
+1. [Design guidelines](http://##design-guidelines)
+2. [Development guidelines](http://##development-guidelines)
+3. [Related components](http://##related-components)
 
 ## Design guidelines
 
