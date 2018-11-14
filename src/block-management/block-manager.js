@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { isEqual } from 'lodash';
+import { xorBy, isEqual } from 'lodash';
 
 import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
@@ -72,6 +72,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.props.focusBlockAction( clientId );
 	}
 
+	static focusDataSourceItem( dataSource: DataSource, clientId: string ) {
+		for ( let i = 0; i < dataSource.size(); ++i ) {
+			const block = dataSource.get( i );
+			if ( block.clientId === clientId ) {
+				block.focused = true;
+			} else {
+				block.focused = false;
+			}
+		}
+	}
+
 	getDataSourceIndexFromClientId( clientId: string ) {
 		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
 			const block = this.state.dataSource.get( i );
@@ -124,20 +135,28 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
-		if ( props.fullparse === true ) {
-			return {
-				...state,
-				dataSource: new DataSource( props.blocks, ( item: BlockType ) => item.clientId ),
-			};
-		}
-
 		const blocks = props.blocks.map( ( block ) => {
 			const newBlock = { ...block };
 			newBlock.focused = props.isBlockSelected( block.clientId );
 			return newBlock;
 		} );
 
+		// if the blocks in the list (not the order or the block attribute)
+		// have changed without our knowledge, recreate the dataSource
+		if ( xorBy( state.blocks, blocks, 'clientId' ).length !== 0 ) {
+			return {
+				dataSource: new DataSource( blocks, ( item: BlockType ) => item.clientId ),
+				blocks,
+				refresh: ! state.refresh,
+			};
+		}
+
+		// if some properties of the blocks have changed, assume it's `focused` and manually update in dataSource
 		if ( ! isEqual( state.blocks, blocks ) ) {
+			const blockFocused = blocks.find( ( block ) => block.focused );
+			if ( blockFocused ) {
+				BlockManager.focusDataSourceItem( state.dataSource, blockFocused.clientId );
+			}
 			return {
 				...state,
 				blocks,
