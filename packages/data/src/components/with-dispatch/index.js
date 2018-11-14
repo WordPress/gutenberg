@@ -51,6 +51,10 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				// dispatch does not occur until the function is called.
 				const propsToDispatchers = mapDispatchToProps( this.props.registry.dispatch, props.ownProps, this.props.registry.select );
 				this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
+					if ( typeof dispatcher !== 'function' ) {
+						throw new TypeError( `${ propName } returned from mapDispatchToProps in withDispatch HOC must be a function` );
+					}
+
 					// Prebind with prop name so we have reference to the original
 					// dispatcher to invoke. Track between re-renders to avoid
 					// creating new function references every render.

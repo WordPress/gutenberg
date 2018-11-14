@@ -165,4 +165,22 @@ describe( 'withDispatch', () => {
 		counterUpdateHandler();
 		expect( store.getState() ).toBe( 3 );
 	} );
+
+	it( 'throws an error when mapDispatchToProps returns non-function property', () => {
+		const expectedError = 'count returned from mapDispatchToProps in withDispatch HOC must be a function';
+		const Component = withDispatch( () => {
+			return {
+				count: 3,
+			};
+		} )( ( props ) => <span>{ props.count }</span> );
+
+		expect( () => {
+			TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<Component />
+				</RegistryProvider>
+			);
+		} ).toThrowError( expectedError );
+		expect( console ).toHaveErrored();
+	} );
 } );
