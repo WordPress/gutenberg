@@ -173,6 +173,179 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
 </div>
 `;
 
+exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = `
+<div
+  className="components-color-picker is-alpha-disabled"
+>
+  <div
+    className="components-color-picker__saturation"
+  >
+    <div>
+      <div
+        className="components-color-picker__saturation-color"
+        onMouseDown={[Function]}
+        onTouchMove={[Function]}
+        onTouchStart={[Function]}
+        role="application"
+        style={
+          Object {
+            "background": "hsl(210,100%, 50%)",
+          }
+        }
+      >
+        <div
+          className="components-color-picker__saturation-white"
+        />
+        <div
+          className="components-color-picker__saturation-black"
+        />
+        <button
+          aria-describedby="color-picker-saturation-4"
+          aria-label="Choose a shade"
+          className="components-color-picker__saturation-pointer"
+          onKeyDown={[Function]}
+          style={
+            Object {
+              "left": "17%",
+              "top": "20%",
+            }
+          }
+        />
+        <div
+          className="screen-reader-text"
+          id="color-picker-saturation-4"
+        >
+          Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div
+    className="components-color-picker__body"
+  >
+    <div
+      className="components-color-picker__controls"
+    >
+      <div
+        className="components-color-picker__swatch"
+      >
+        <div
+          className="components-color-picker__active"
+          style={
+            Object {
+              "backgroundColor": "rgb(170, 187, 204)",
+            }
+          }
+        />
+      </div>
+      <div
+        className="components-color-picker__toggles"
+      >
+        <div>
+          <div
+            className="components-color-picker__hue"
+          >
+            <div
+              className="components-color-picker__hue-gradient"
+            />
+            <div
+              className="components-color-picker__hue-bar"
+              onMouseDown={[Function]}
+              onTouchMove={[Function]}
+              onTouchStart={[Function]}
+            >
+              <div
+                aria-describedby="components-color-picker__hue-description-4"
+                aria-label="Hue value in degrees, from 0 to 359."
+                aria-orientation="horizontal"
+                aria-valuemax="1"
+                aria-valuemin="359"
+                aria-valuenow={210}
+                className="components-color-picker__hue-pointer"
+                onKeyDown={[Function]}
+                role="slider"
+                style={
+                  Object {
+                    "left": "58.333333333333336%",
+                  }
+                }
+                tabIndex="0"
+              />
+              <p
+                className="components-color-picker__hue-description screen-reader-text"
+                id="components-color-picker__hue-description-4"
+              >
+                Move the arrow left or right to change hue.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      className="components-color-picker__inputs-wrapper"
+    >
+      <div
+        className="components-color-picker__inputs-fields"
+      >
+        <div
+          className="components-base-control components-color-picker__inputs-field"
+        >
+          <div
+            className="components-base-control__field"
+          >
+            <label
+              className="components-base-control__label"
+              htmlFor="inspector-text-control-4"
+            >
+              Color value in hexadecimal
+            </label>
+            <input
+              className="components-text-control__input"
+              id="inspector-text-control-4"
+              onBlur={[Function]}
+              onChange={[Function]}
+              onKeyDown={[Function]}
+              type="text"
+              value="#aabbcc"
+            />
+          </div>
+        </div>
+      </div>
+      <div
+        className="components-color-picker__inputs-toggle"
+      >
+        <button
+          aria-label="Change color format"
+          className="components-button components-icon-button"
+          onBlur={[Function]}
+          onClick={[Function]}
+          onFocus={[Function]}
+          onMouseEnter={[Function]}
+          onMouseLeave={[Function]}
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            className="dashicon dashicons-arrow-down-alt2"
+            focusable="false"
+            height={20}
+            role="img"
+            viewBox="0 0 20 20"
+            width={20}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 6l5 5 5-5 2 1-7 7-7-7z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
 exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
 <div
   className="components-color-picker is-alpha-disabled"
