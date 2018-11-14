@@ -398,6 +398,19 @@ the client ID.
 
 Block name.
 
+### isBlockValid
+
+Returns whether a block is valid or not.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Is Valid.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block,
