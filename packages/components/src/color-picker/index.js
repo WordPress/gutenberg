@@ -48,7 +48,15 @@ import { colorToState, simpleCheckForValidColor } from './utils';
 export default class ColorPicker extends Component {
 	constructor( { color = '0071a1' } ) {
 		super( ...arguments );
-		this.state = colorToState( color );
+		const colors = colorToState( color );
+		this.state = {
+			...colors,
+			draftValues: {
+				hex: colors.hex,
+				hsl: colors.hsl,
+				rgb: colors.rgb,
+			},
+		};
 		this.handleChange = this.handleChange.bind( this );
 		this.handleInputChange = this.handleInputChange.bind( this );
 	}
@@ -58,9 +66,15 @@ export default class ColorPicker extends Component {
 		const isValidColor = simpleCheckForValidColor( data );
 		if ( isValidColor ) {
 			const colors = colorToState( data, data.h || oldHue );
-			this.setState(
-				colors,
-				debounce( partial( onChangeComplete, colors ), 100 )
+			this.setState( {
+				...colors,
+				draftValues: {
+					hex: colors.hex,
+					hsl: colors.hsl,
+					rgb: colors.rgb,
+				},
+			},
+			debounce( partial( onChangeComplete, colors ), 100 )
 			);
 		}
 	}
@@ -68,6 +82,14 @@ export default class ColorPicker extends Component {
 	handleInputChange( data ) {
 		if ( data.state === 'commit' ) {
 			this.handleChange( data );
+		} else {
+			this.setState( {
+				draftValues: {
+					hex: data.hex,
+					hsl: data.hsl,
+					rgb: data.rgb,
+				},
+			} );
 		}
 	}
 
