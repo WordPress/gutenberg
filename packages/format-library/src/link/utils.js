@@ -60,7 +60,7 @@ export function isValidHref( href ) {
 		}
 
 		const fragment = getFragment( trimmedHref );
-		if ( fragment && ! isValidFragment( trimmedHref ) ) {
+		if ( fragment && ! isValidFragment( fragment ) ) {
 			return false;
 		}
 	}
