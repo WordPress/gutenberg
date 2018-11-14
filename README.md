@@ -25,15 +25,15 @@ This repo is the development hub for the <a href="https://make.wordpress.org/cor
 
 One thing that sets WordPress apart is that it allows you to create a post layout that's as rich as you can imagine—but only if you can build your own custom theme with HTML and CSS. By thinking of the editor as a tool that allows you to write rich posts **and** create beautiful layouts, we can transform WordPress into something users _love_, as opposed to something they choose because it happens to be what everyone else uses.
 
-**Gutenberg is a new way forward.** It looks at the editor as more than a content field, revisiting a layout that has been largely unchanged for almost a decade. This project allows us to holistically design a modern editing experience, and build a foundation for things to come.
+**Gutenberg is a new way forward.** It looks at the editor as more than a content field, revisiting a layout that has been largely unchanged for almost a decade. This project allows The WordPress Project to holistically design a modern editing experience and build a foundation for things to come.
 
 Here's why we're looking at the whole editing screen, as opposed to just the content field:
 
-1. **The block unifies multiple interfaces.** If we add that on top of the existing interface, it would _add_ complexity, as opposed to removing it.
-2. **Simplified (and enhanced) editing.** By revisiting the interface, we can modernize the writing, editing, and publishing experience, with usability and simplicity in mind, benefitting both new and casual users.
+1. **The block unifies multiple interfaces.** If Gutenberg added blocks on top of the existing interface, it would _add_ complexity, as opposed to removing it.
+2. **Simplified (and enhanced) editing.** By revisiting the interface, Gutenberg can modernize the writing, editing, and publishing experience, with usability and simplicity in mind, benefitting both new and casual users.
 3. **Better interface usability.** When singular block interface takes center stage, it demonstrates a clear path forward for developers to create premium blocks, superior to both shortcodes and widgets.
-4. **A fresh look at content creation.** Considering the whole interface lays a solid foundation for the next focus, full site customization.
-5. **Modern tooling.** Looking at the full editor screen also gives us the opportunity to drastically modernize the foundation, and take steps towards a more fluid and JavaScript-powered future that fully leverages the WordPress REST API.
+4. **A fresh look at content creation.** Considering the whole interface lays a solid foundation for the next focus: full site customization.
+5. **Modern tooling.** Looking at the full editor screen also gives WordPress the opportunity to drastically modernize the foundation, and take steps towards a more fluid and JavaScript-powered future that fully leverages the WordPress REST API.
 
 ![Writing in Gutenberg 1.6](https://make.wordpress.org/core/files/2017/10/gutenberg-typing-1_6.gif)
 
