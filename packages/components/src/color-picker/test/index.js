@@ -22,4 +22,17 @@ describe( 'ColorPicker', () => {
 
 		expect( renderer.toJSON() ).toMatchSnapshot();
 	} );
+
+	test( 'should only update input view for draft changes', () => {
+		const color = '#FFF';
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
+		expect( testRenderer.toJSON() ).toMatchSnapshot();
+	} );
 } );
