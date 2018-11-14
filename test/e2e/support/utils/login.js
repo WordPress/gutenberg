@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { pressWithModifier } from './press-with-modifier';
-import { META_KEY } from './';
+import { META_KEY } from './meta-key';
 import { WP_USERNAME, WP_PASSWORD } from './config';
 
 export async function login( username = WP_USERNAME, password = WP_PASSWORD ) {
