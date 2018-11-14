@@ -6,6 +6,9 @@ import {
 	get,
 	has,
 	map,
+	pick,
+	mapValues,
+	includes,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -22,6 +25,7 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -32,7 +36,9 @@ import {
 	POST_UPDATE_TRANSACTION_ID,
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
+	AUTOSAVE_PROPERTIES,
 } from './constants';
+import { getPostRawValue } from './reducer';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -320,21 +326,33 @@ export function getEditedPostAttribute( state, attributeName ) {
  * Returns an attribute value of the current autosave revision for a post, or
  * null if there is no autosave for the post.
  *
+ * @deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector from the
+ *             '@wordpress/core-data' package and access properties on the returned autosave object
+ *             using getPostRawValue.
+ *
  * @param {Object} state         Global application state.
  * @param {string} attributeName Autosave attribute name.
  *
  * @return {*} Autosave attribute value.
  */
-export function getAutosaveAttribute( state, attributeName ) {
-	if ( ! hasAutosave( state ) ) {
-		return null;
+export const getAutosaveAttribute = createRegistrySelector( ( select ) => ( state, attributeName ) => {
+	deprecated( '`wp.data.select( \'core/editor\' ).getAutosaveAttribute( attributeName )`', {
+		alternative: '`wp.data.select( \'core\' ).getAutosave( postType, postId )`',
+		plugin: 'Gutenberg',
+	} );
+
+	if ( ! includes( AUTOSAVE_PROPERTIES, attributeName ) ) {
+		return;
 	}
 
-	const autosave = getAutosave( state );
-	if ( autosave.hasOwnProperty( attributeName ) ) {
-		return autosave[ attributeName ];
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	const autosave = select( 'core' ).getAutosave( postType, postId );
+
+	if ( autosave ) {
+		return getPostRawValue( autosave[ attributeName ] );
 	}
-}
+} );
 
 /**
  * Returns the current visibility of the post being edited, preferring the
@@ -495,18 +513,34 @@ export function isEditedPostEmpty( state ) {
 /**
  * Returns true if the post can be autosaved, or false otherwise.
  *
- * @param  {Object}  state Global application state.
+ * @param {Object} state    Global application state.
+ * @param {Object} autosave A raw autosave object from the REST API.
  *
  * @return {boolean} Whether the post can be autosaved.
  */
-export function isEditedPostAutosaveable( state ) {
+export const isEditedPostAutosaveable = createRegistrySelector( ( select ) => function( state, autosave ) {
+	if ( arguments.length === 1 ) {
+		// Note: if this deprecation is removed, the selector can also be
+		// reverted to a normal selector instead of a registry selector.
+		// Unit tests will also need to be updated to reflect the removal
+		// of the registry selector.
+		deprecated( '`wp.data.select( \'core/editor\' ).isEditedPostAutosaveable()`', {
+			alternative: '`wp.data.select( \'core/editor\' ).isEditedPostAutosaveable( autosave )`',
+			plugin: 'Gutenberg',
+		} );
+
+		const postType = getCurrentPostType( state );
+		const postId = getCurrentPostId( state );
+		autosave = select( 'core' ).getAutosave( postType, postId );
+	}
+
 	// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
 	if ( ! isEditedPostSaveable( state ) ) {
 		return false;
 	}
 
 	// If we don't already have an autosave, the post is autosaveable.
-	if ( ! hasAutosave( state ) ) {
+	if ( ! autosave ) {
 		return true;
 	}
 
@@ -518,36 +552,56 @@ export function isEditedPostAutosaveable( state ) {
 		return true;
 	}
 
-	// If the title, excerpt or content has changed, the post is autosaveable.
-	const autosave = getAutosave( state );
+	// If the title or excerpt has changed, the post is autosaveable.
 	return [ 'title', 'excerpt' ].some( ( field ) => (
-		autosave[ field ] !== getEditedPostAttribute( state, field )
+		getPostRawValue( autosave[ field ] ) !== getEditedPostAttribute( state, field )
 	) );
-}
+} );
 
 /**
  * Returns the current autosave, or null if one is not set (i.e. if the post
  * has yet to be autosaved, or has been saved or published since the last
  * autosave).
  *
+ * @deprecated since 5.0. Callers should use the `getAutosave( postType, postId )`
+ * 			   selector from the '@wordpress/core-data' package.
+ *
  * @param {Object} state Editor state.
  *
  * @return {?Object} Current autosave, if exists.
  */
-export function getAutosave( state ) {
-	return state.autosave;
-}
+export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
+	deprecated( '`wp.data.select( \'core/editor\' ).getAutosave()`', {
+		alternative: '`wp.data.select( \'core\' ).getAutosave( postType, postId )`',
+		plugin: 'Gutenberg',
+	} );
+
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	const autosave = select( 'core' ).getAutosave( postType, postId );
+	return mapValues( pick( autosave, AUTOSAVE_PROPERTIES ), getPostRawValue );
+} );
 
 /**
  * Returns the true if there is an existing autosave, otherwise false.
+ *
+ * @deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector
+ *             from the '@wordpress/core-data' package and check for a truthy value.
  *
  * @param {Object} state Global application state.
  *
  * @return {boolean} Whether there is an existing autosave.
  */
-export function hasAutosave( state ) {
-	return !! getAutosave( state );
-}
+export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
+	deprecated( '`wp.data.select( \'core/editor\' ).hasAutosave()`', {
+		alternative: '`!! wp.data.select( \'core\' ).getAutosave( postType, postId )`',
+		plugin: 'Gutenberg',
+	} );
+
+	const postType = getCurrentPostType( state );
+	const postId = getCurrentPostId( state );
+	return !! select( 'core' ).getAutosave( postType, postId );
+} );
 
 /**
  * Return true if the post being edited is being scheduled. Preferring the
@@ -574,7 +628,7 @@ export function isEditedPostBeingScheduled( state ) {
  * infer that a post is set to publish "Immediately" we check whether the date
  * and modified date are the same.
  *
- * @param  {Object}  state Editor state.
+ * @param {Object} state Editor state.
  *
  * @return {boolean} Whether the edited post has a floating date value.
  */

@@ -18,9 +18,10 @@ import {
 	receiveThemeSupports,
 	receiveEmbedPreview,
 	receiveUserPermission,
+	receiveAutosave,
 } from './actions';
 import { getKindEntities } from './entities';
-import { apiFetch } from './controls';
+import { apiFetch, select } from './controls';
 
 /**
  * Requests authors from the REST API.
@@ -168,4 +169,19 @@ export function* canUser( action, resource, id ) {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
 	yield receiveUserPermission( key, isAllowed );
+}
+
+/**
+ * Request autosave data from the REST API.
+ *
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ */
+export function* getAutosave( postType, postId ) {
+	const { baseURL } = yield select( 'getEntity', 'postType', postType );
+	const autosaveResponse = yield apiFetch( { path: `${ baseURL }/${ postId }/autosaves?context=edit` } );
+
+	if ( autosaveResponse && autosaveResponse[ 0 ] ) {
+		yield receiveAutosave( postId, autosaveResponse[ 0 ] );
+	}
 }

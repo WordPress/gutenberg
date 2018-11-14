@@ -1,3 +1,9 @@
+## 2.1.0 (Unreleased)
+
+### New features
+- The `getAutosave` selector has been added.
+- The `receiveAutosave` action has been added.
+
 ## 2.0.16 (2019-01-03)
 
 ### Bug Fixes

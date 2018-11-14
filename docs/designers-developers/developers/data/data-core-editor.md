@@ -193,10 +193,16 @@ saved state of the post.
 
 Post attribute value.
 
-### getAutosaveAttribute
+### getAutosaveAttribute (deprecated)
 
 Returns an attribute value of the current autosave revision for a post, or
 null if there is no autosave for the post.
+
+*Deprecated*
+
+Deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector from the
+            '@wordpress/core-data' package and access properties on the returned autosave object
+            using getPostRawValue.
 
 *Parameters*
 
@@ -303,16 +309,22 @@ Returns true if the post can be autosaved, or false otherwise.
 *Parameters*
 
  * state: Global application state.
+ * autosave: A raw autosave object from the REST API.
 
 *Returns*
 
 Whether the post can be autosaved.
 
-### getAutosave
+### getAutosave (deprecated)
 
 Returns the current autosave, or null if one is not set (i.e. if the post
 has yet to be autosaved, or has been saved or published since the last
 autosave).
+
+*Deprecated*
+
+Deprecated since 5.0. Callers should use the `getAutosave( postType, postId )`
+			   selector from the '@wordpress/core-data' package.
 
 *Parameters*
 
@@ -322,9 +334,14 @@ autosave).
 
 Current autosave, if exists.
 
-### hasAutosave
+### hasAutosave (deprecated)
 
 Returns the true if there is an existing autosave, otherwise false.
+
+*Deprecated*
+
+Deprecated since 5.0. Callers should use the `getAutosave( postType, postId )` selector
+            from the '@wordpress/core-data' package and check for a truthy value.
 
 *Parameters*
 
@@ -752,14 +769,19 @@ post has been received, either by initialization or save.
 
  * post: Post object.
 
-### resetAutosave
+### resetAutosave (deprecated)
 
 Returns an action object used in signalling that the latest autosave of the
 post has been received, by initialization or autosave.
 
+*Deprecated*
+
+Deprecated since 5.0. Callers should use the `receiveAutosave( postId, autosave )`
+			   selector from the '@wordpress/core-data' package.
+
 *Parameters*
 
- * post: Autosave post object.
+ * newAutosave: Autosave post object.
 
 ### __experimentalRequestPostUpdateStart
 

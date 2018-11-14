@@ -15,6 +15,9 @@
 ### Deprecations
 
 - `EditorGlobalKeyboardShortcuts` has been deprecated in favor of `VisualEditorGlobalKeyboardShortcuts`.
+- The `getAutosave`, `getAutosaveAttribute`, and `hasAutosave` selectors are deprecated. Please use the `getAutosave` selector in the `@wordpress/core-data` package.
+- The `resetAutosave` action is deprecated. An equivalent action `receiveAutosave` has been added to the `@wordpress/core-data` package.
+- The `isEditedPostAutosaveable` action now requires that the parameter `autosave` is provided.
 
 ### Bug Fixes
 

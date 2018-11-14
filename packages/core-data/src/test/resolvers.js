@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser } from '../resolvers';
-import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission } from '../actions';
+import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser, getAutosave } from '../resolvers';
+import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission, receiveAutosave } from '../actions';
 import { apiFetch } from '../controls';
 
 describe( 'getEntityRecord', () => {
@@ -159,3 +159,52 @@ describe( 'canUser', () => {
 		expect( received.value ).toBeUndefined();
 	} );
 } );
+
+describe( 'getAutosave', () => {
+	const SUCCESSFUL_RESPONSE = [ {
+		title: 'test title',
+		excerpt: 'test excerpt',
+		content: 'test content',
+	} ];
+
+	it( 'yields with fetched autosave post', async () => {
+		const postType = 'post';
+		const postId = 1;
+		const baseURL = '/wp/v2/posts';
+		const postEntity = { name: 'post', kind: 'postType', baseURL };
+		const fulfillment = getAutosave( postType, postId );
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Trigger generator with the postEntity and assert that correct path is formed
+		// in the apiFetch request.
+		const { value: apiFetchAction } = fulfillment.next( postEntity );
+		expect( apiFetchAction.request ).toEqual( { path: `${ baseURL }/${ postId }/autosaves?context=edit` } );
+
+		// Provide apiFetch response and trigger Action
+		const received = ( await fulfillment.next( SUCCESSFUL_RESPONSE ) ).value;
+		expect( received ).toEqual( receiveAutosave( 1, SUCCESSFUL_RESPONSE[ 0 ] ) );
+	} );
+
+	it( 'yields undefined if no autosave exists for the post', async () => {
+		const postType = 'post';
+		const postId = 1;
+		const baseURL = '/wp/v2/posts';
+		const entities = { name: 'post', kind: 'postType', baseURL };
+		const fulfillment = getAutosave( postType, postId );
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Trigger generator with the postEntity and assert that correct path is formed
+		// in the apiFetch request.
+		const { value: apiFetchAction } = fulfillment.next( entities );
+		expect( apiFetchAction.request ).toEqual( { path: `${ baseURL }/${ postId }/autosaves?context=edit` } );
+
+		// Provide apiFetch response and trigger Action
+		const received = ( await fulfillment.next( [] ) ).value;
+		expect( received ).toBeUndefined();
+	} );
+} );
+

@@ -181,6 +181,34 @@ https://developer.wordpress.org/rest-api/reference/
 Whether or not the user can perform the action,
                             or `undefined` if the OPTIONS request is still being made.
 
+### getAutosave
+
+Returns the latest autosave that is a child of the provided post id, if one exists.
+
+*Parameters*
+
+ * state: State tree.
+ * postType: The type of the parent post.
+ * postId: The id of the parent post.
+
+*Returns*
+
+The autosave object, or undefined if there is none.
+
+### hasFetchedAutosave
+
+Returns true if the REST request for an autosave has completed.
+
+*Parameters*
+
+ * state: State tree.
+ * postType: The type of the parent post.
+ * postId: The id of the parent post.
+
+*Returns*
+
+True if the REST request was completed. False otherwise.
+
 ## Actions
 
 ### receiveUserQuery
@@ -257,3 +285,13 @@ permission to perform an action on a REST resource.
 
  * key: A key that represents the action and REST resource.
  * isAllowed: Whether or not the user can perform the action.
+
+### receiveAutosave
+
+Returns an action object used in signalling that the latest autosave of the
+post has been received, by initialization or autosave.
+
+*Parameters*
+
+ * postId: The id of the post that is parent to the autosave.
+ * autosave: Autosave post object.

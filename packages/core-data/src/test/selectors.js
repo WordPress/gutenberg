@@ -12,6 +12,7 @@ import {
 	getEmbedPreview,
 	isPreviewEmbedFallback,
 	canUser,
+	getAutosave,
 } from '../selectors';
 
 describe( 'getEntityRecord', () => {
@@ -143,5 +144,37 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
+	} );
+} );
+
+describe( 'getAutosave', () => {
+	it( 'returns undefined for the provided post id if no autosave exists for it in state', () => {
+		const postType = 'post';
+		const postId = 2;
+		const autosave = { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+		const state = {
+			autosaves: {
+				1: autosave,
+			},
+		};
+
+		const result = getAutosave( state, postType, postId );
+
+		expect( result ).toBeUndefined();
+	} );
+
+	it( 'returns the autosave for the provided post id, if it exists in state', () => {
+		const postType = 'post';
+		const postId = 1;
+		const autosave = { title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } };
+		const state = {
+			autosaves: {
+				[ postId ]: autosave,
+			},
+		};
+
+		const result = getAutosave( state, postType, postId );
+
+		expect( result ).toEqual( autosave );
 	} );
 } );

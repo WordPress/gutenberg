@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews, userPermissions } from '../reducer';
+import { terms, entities, embedPreviews, userPermissions, autosaves } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -137,6 +137,53 @@ describe( 'userPermissions()', () => {
 
 		expect( state ).toEqual( {
 			'create/media': true,
+		} );
+	} );
+} );
+
+describe( 'autosaves', () => {
+	it( 'returns an empty object by default', () => {
+		const state = autosaves( undefined, {} );
+
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'returns the current state with the new autosave merged in, keyed by its parent post id', () => {
+		const existingAutosave = {
+			title: {
+				raw: 'Some',
+			},
+			content: {
+				raw: 'other',
+			},
+			excerpt: {
+				raw: 'autosave',
+			},
+			status: 'publish',
+		};
+
+		const newAutosave = {
+			title: {
+				raw: 'The Title',
+			},
+			content: {
+				raw: 'The Content',
+			},
+			excerpt: {
+				raw: 'The Excerpt',
+			},
+			status: 'draft',
+		};
+
+		const state = autosaves( { 1: existingAutosave }, {
+			type: 'RECEIVE_AUTOSAVE',
+			postId: 2,
+			autosave: newAutosave,
+		} );
+
+		expect( state ).toEqual( {
+			1: existingAutosave,
+			2: newAutosave,
 		} );
 	} );
 } );

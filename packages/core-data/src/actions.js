@@ -159,3 +159,20 @@ export function receiveUserPermission( key, isAllowed ) {
 		isAllowed,
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the latest autosave of the
+ * post has been received, by initialization or autosave.
+ *
+ * @param {number} postId   The id of the post that is parent to the autosave.
+ * @param {Object} autosave Autosave post object.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveAutosave( postId, autosave ) {
+	return {
+		type: 'RECEIVE_AUTOSAVE',
+		postId,
+		autosave,
+	};
+}

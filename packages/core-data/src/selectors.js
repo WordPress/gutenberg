@@ -202,3 +202,29 @@ export function canUser( state, action, resource, id ) {
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	return get( state, [ 'userPermissions', key ] );
 }
+
+/**
+ * Returns the latest autosave that is a child of the provided post id, if one exists.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ *
+ * @return {?Object} The autosave object, or undefined if there is none.
+ */
+export function getAutosave( state, postType, postId ) {
+	return state.autosaves[ postId ];
+}
+
+/**
+ * Returns true if the REST request for an autosave has completed.
+ *
+ * @param {Object} state State tree.
+ * @param {string} postType The type of the parent post.
+ * @param {number} postId   The id of the parent post.
+ *
+ * @return {boolean} True if the REST request was completed. False otherwise.
+ */
+export const hasFetchedAutosave = createRegistrySelector( ( select ) => ( state, postType, postId ) => {
+	return select( 'core/data' ).hasFinishedResolution( REDUCER_KEY, 'getAutosave', [ postType, postId ] );
+} );

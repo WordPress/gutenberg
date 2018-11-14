@@ -1,8 +1,13 @@
 /**
  * External dependencies
  */
-import { castArray, pick, has } from 'lodash';
+import { castArray, pick, mapValues } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
+
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -14,10 +19,14 @@ import {
 	apiFetch,
 } from './controls';
 import {
+	getPostRawValue,
+} from './reducer';
+import {
 	STORE_KEY,
 	POST_UPDATE_TRANSACTION_ID,
 	SAVE_POST_NOTICE_ID,
 	TRASH_POST_NOTICE_ID,
+	AUTOSAVE_PROPERTIES,
 } from './constants';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -90,15 +99,23 @@ export function resetPost( post ) {
  * Returns an action object used in signalling that the latest autosave of the
  * post has been received, by initialization or autosave.
  *
- * @param {Object} post Autosave post object.
+ * @deprecated since 5.0. Callers should use the `receiveAutosave( postId, autosave )`
+ * 			   selector from the '@wordpress/core-data' package.
+ *
+ * @param {Object} newAutosave Autosave post object.
  *
  * @return {Object} Action object.
  */
-export function resetAutosave( post ) {
-	return {
-		type: 'RESET_AUTOSAVE',
-		post,
-	};
+export function* resetAutosave( newAutosave ) {
+	deprecated( 'resetAutosave action (`core/editor` store)', {
+		alternative: 'receiveAutosave action (`core` store)',
+		plugin: 'Gutenberg',
+	} );
+
+	const postId = yield select( STORE_KEY, 'getCurrentPostId' );
+	yield dispatch( 'core', 'receiveAutosave', postId, newAutosave );
+
+	return { type: '__INERT__' };
 }
 
 /**
@@ -262,7 +279,7 @@ export function* savePost( options = {} ) {
 	const isAutosave = !! options.isAutosave;
 
 	if ( isAutosave ) {
-		edits = pick( edits, [ 'title', 'content', 'excerpt' ] );
+		edits = pick( edits, AUTOSAVE_PROPERTIES );
 	}
 
 	const isEditedPostNew = yield select(
@@ -330,15 +347,14 @@ export function* savePost( options = {} ) {
 	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
 	let method = 'PUT';
 	if ( isAutosave ) {
-		const autoSavePost = yield select(
-			STORE_KEY,
-			'getAutosave',
-		);
+		const autosavePost = yield select( 'core', 'getAutosave', post.type, post.id );
+		const mappedAutosavePost = mapValues( pick( autosavePost, AUTOSAVE_PROPERTIES ), getPostRawValue );
+
 		// Ensure autosaves contain all expected fields, using autosave or
 		// post values as fallback if not otherwise included in edits.
 		toSend = {
-			...pick( post, [ 'title', 'content', 'excerpt' ] ),
-			...autoSavePost,
+			...pick( post, AUTOSAVE_PROPERTIES ),
+			...mappedAutosavePost,
 			...toSend,
 		};
 		path += '/autosaves';
@@ -362,9 +378,12 @@ export function* savePost( options = {} ) {
 			method,
 			data: toSend,
 		} );
-		const resetAction = isAutosave ? 'resetAutosave' : 'resetPost';
 
-		yield dispatch( STORE_KEY, resetAction, newPost );
+		if ( isAutosave ) {
+			yield dispatch( 'core', 'receiveAutosave', post.id, newPost );
+		} else {
+			yield dispatch( STORE_KEY, 'resetPost', newPost );
+		}
 
 		yield dispatch(
 			STORE_KEY,

@@ -55,6 +55,7 @@ const postType = {
 		item_published: 'Post published',
 	},
 };
+const postId = 44;
 const postTypeSlug = 'post';
 
 describe( 'Post generator actions', () => {
@@ -85,7 +86,8 @@ describe( 'Post generator actions', () => {
 				return postObject;
 			};
 			currentPost = () => ( {
-				id: 44,
+				id: postId,
+				type: postTypeSlug,
 				title: 'bar',
 				content: 'bar',
 				excerpt: 'crackers',
@@ -106,13 +108,7 @@ describe( 'Post generator actions', () => {
 				return postObject;
 			};
 			autoSavePost = { status: 'autosave', bar: 'foo' };
-			autoSavePostToSend = () => (
-				{
-					...editPostToSendOptimistic(),
-					bar: 'foo',
-					status: 'autosave',
-				}
-			);
+			autoSavePostToSend = () => editPostToSendOptimistic();
 			savedPost = () => (
 				{
 					...currentPost(),
@@ -273,14 +269,16 @@ describe( 'Post generator actions', () => {
 				},
 			],
 			[
-				'yield action for selecting the autoSavePost',
+				'yield action for selecting the autosavePost',
 				( isAutosaving ) => isAutosaving,
 				() => {
 					const { value } = fulfillment.next();
 					expect( value ).toEqual(
 						select(
-							STORE_KEY,
-							'getAutosave'
+							'core',
+							'getAutosave',
+							postTypeSlug,
+							postId
 						)
 					);
 				},
@@ -357,13 +355,12 @@ describe( 'Post generator actions', () => {
 				'yields action for dispatch the appropriate reset action',
 				() => {
 					const { value } = fulfillment.next( savedPost() );
-					expect( value ).toEqual(
-						dispatch(
-							STORE_KEY,
-							isAutosave ? 'resetAutosave' : 'resetPost',
-							savedPost()
-						)
-					);
+
+					if ( isAutosave ) {
+						expect( value ).toEqual( dispatch( 'core', 'receiveAutosave', postId, savedPost() ) );
+					} else {
+						expect( value ).toEqual( dispatch( STORE_KEY, 'resetPost', savedPost() ) );
+					}
 				},
 			],
 			[
@@ -662,17 +659,6 @@ describe( 'Editor actions', () => {
 			const result = actions.resetPost( post );
 			expect( result ).toEqual( {
 				type: 'RESET_POST',
-				post,
-			} );
-		} );
-	} );
-
-	describe( 'resetAutosave', () => {
-		it( 'should return the RESET_AUTOSAVE action', () => {
-			const post = {};
-			const result = actions.resetAutosave( post );
-			expect( result ).toEqual( {
-				type: 'RESET_AUTOSAVE',
 				post,
 			} );
 		} );
