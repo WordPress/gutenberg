@@ -2,7 +2,7 @@
 [![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-![Gutenberg editing](https://cldup.com/H0oKBfpidk.png)
+![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://cldup.com/H0oKBfpidk.png)
 
 This repo is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in WordPress Core</a>. `Gutenberg` is the project name.
 
