@@ -18,7 +18,7 @@ ul.wp-block-gallery li {
 	}
 
 	&.is-transient img {
-		@include loading_fade;
+		@include edit-post__loading-fade-animation;
 	}
 
 	.editor-rich-text {
@@ -120,4 +120,15 @@ ul.wp-block-gallery li {
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
+}
+
+// Last item always needs margins reset.
+// When block is selected, only reset the right margin of the 2nd to last item.
+.wp-block-gallery {
+	.is-selected & .blocks-gallery-image:nth-last-child(2),
+	.is-selected & .blocks-gallery-item:nth-last-child(2),
+	.is-typing & .blocks-gallery-image:nth-last-child(2),
+	.is-typing & .blocks-gallery-item:nth-last-child(2) {
+		margin-right: 0;
+	}
 }

@@ -19,9 +19,16 @@ body.js.is-fullscreen-mode {
 	}
 
 	// Animations
-	@include fade_in(0.3s);
+	@include edit-post__fade-in-animation(0.3s);
 
 	.edit-post-header {
-		@include slide_in_top();
+		transform: translateY(-100%);
+		animation: edit-post-fullscreen-mode__slide-in-animation 0.1s forwards;
+	}
+}
+
+@keyframes edit-post-fullscreen-mode__slide-in-animation {
+	100% {
+		transform: translateY(0%);
 	}
 }

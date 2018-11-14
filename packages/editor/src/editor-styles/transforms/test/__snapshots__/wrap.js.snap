@@ -8,9 +8,9 @@ src: url(sansation_light.woff);
 `;
 
 exports[`CSS selector wrap should ignore keyframes 1`] = `
-"@keyframes move_background {
+"@keyframes edit-post__fade-in-animation {
 from {
-background-position: 0 0;
+opacity: 0;
 }
 }"
 `;
