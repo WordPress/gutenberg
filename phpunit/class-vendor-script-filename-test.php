@@ -11,12 +11,12 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 			// Development mode scripts.
 			array(
 				'react-handle',
-				'https://unpkg.com/react@16.4.1/umd/react.development.js',
+				'https://unpkg.com/react@16.6.3/umd/react.development.js',
 				'react-handle.HASH.js',
 			),
 			array(
 				'react-dom-handle',
-				'https://unpkg.com/react-dom@16.4.1/umd/react-dom.development.js',
+				'https://unpkg.com/react-dom@16.6.3/umd/react-dom.development.js',
 				'react-dom-handle.HASH.js',
 			),
 			array(
@@ -32,12 +32,12 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 			// Production mode scripts.
 			array(
 				'react-handle',
-				'https://unpkg.com/react@16.4.1/umd/react.production.min.js',
+				'https://unpkg.com/react@16.6.3/umd/react.production.min.js',
 				'react-handle.min.HASH.js',
 			),
 			array(
 				'react-dom-handle',
-				'https://unpkg.com/react-dom@16.4.1/umd/react-dom.production.min.js',
+				'https://unpkg.com/react-dom@16.6.3/umd/react-dom.production.min.js',
 				'react-dom-handle.min.HASH.js',
 			),
 			array(
