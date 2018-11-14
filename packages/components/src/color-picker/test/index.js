@@ -6,7 +6,7 @@ import TestRenderer from 'react-test-renderer';
 /**
  * WordPress dependencies.
  */
-import { DOWN, UP } from '@wordpress/keycodes';
+import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -80,6 +80,20 @@ describe( 'ColorPicker', () => {
 		);
 		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
 		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: DOWN } );
+		expect( testRenderer.toJSON() ).toMatchSnapshot();
+	} );
+
+	test( 'should commit changes to all views on keyDown = ENTER', () => {
+		const color = '#FFF';
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: ENTER } );
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
 } );
