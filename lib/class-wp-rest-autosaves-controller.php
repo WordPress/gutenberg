@@ -188,10 +188,6 @@ class WP_REST_Autosaves_Controller extends WP_REST_Revisions_Controller {
 		$user_id           = get_current_user_id();
 
 		if ( ( 'draft' === $post->post_status || 'auto-draft' === $post->post_status ) && $post->post_author == $user_id ) {
-			// To avoid resetting the draft's parent, clear the parent of the
-			// prepared revision which is assigned the draft's own ID.
-			unset( $prepared_post->post_parent );
-
 			// Draft posts for the same author: autosaving updates the post and does not create a revision.
 			// Convert the post object to an array and add slashes, wp_update_post expects escaped array.
 			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );

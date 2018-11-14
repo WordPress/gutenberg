@@ -12,9 +12,7 @@
  */
 class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controller_Testcase {
 	protected static $post_id;
-	protected static $parent_page_id;
 	protected static $page_id;
-	protected static $draft_page_id;
 
 	protected static $autosave_post_id;
 	protected static $autosave_page_id;
@@ -45,6 +43,9 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 	}
 
 	public static function wpSetUpBeforeClass( $factory ) {
+		self::$post_id = $factory->post->create();
+		self::$page_id = $factory->post->create( array( 'post_type' => 'page' ) );
+
 		self::$editor_id      = $factory->user->create(
 			array(
 				'role' => 'editor',
@@ -55,23 +56,6 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 				'role' => 'contributor',
 			)
 		);
-
-		self::$post_id        = $factory->post->create();
-		self::$parent_page_id = $factory->post->create( array(
-			'post_type' => 'page',
-		) );
-		self::$page_id        = $factory->post->create( array(
-			'post_type'   => 'page',
-			'post_parent' => self::$parent_page_id,
-		) );
-		self::$draft_page_id  = $factory->post->create( array(
-			'post_type'   => 'page',
-			'post_parent' => self::$parent_page_id,
-			// The "update post" behavior of the autosave endpoint only occurs
-			// when saving a draft/auto-draft authored by the current user.
-			'post_status' => 'draft',
-			'post_author' => self::$editor_id,
-		) );
 
 		wp_set_current_user( self::$editor_id );
 
@@ -88,7 +72,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 			array(
 				'post_content' => 'This content is better.',
 				'post_ID'      => self::$page_id,
-				'post_type'    => 'page',
+				'post_type'    => 'post',
 			)
 		);
 
@@ -97,9 +81,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 	public static function wpTearDownAfterClass() {
 		// Also deletes revisions.
 		wp_delete_post( self::$post_id, true );
-		wp_delete_post( self::$parent_page_id, true );
 		wp_delete_post( self::$page_id, true );
-		wp_delete_post( self::$draft_page_id, true );
 
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$contributor_id );
@@ -306,26 +288,6 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->check_create_autosave_response( $response );
-	}
-
-	public function test_update_item_draft_page_with_parent() {
-		wp_set_current_user( self::$editor_id );
-		$request = new WP_REST_Request( 'POST', '/wp/v2/pages/' . self::$draft_page_id . '/autosaves' );
-		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
-
-		$params = $this->set_post_data(
-			array(
-				'id'     => self::$draft_page_id,
-				'author' => self::$editor_id,
-			)
-		);
-
-		$request->set_body_params( $params );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-
-		$this->assertEquals( self::$draft_page_id, $data['id'] );
-		$this->assertEquals( self::$parent_page_id, $data['parent'] );
 	}
 
 	public function test_update_item_nopriv() {
