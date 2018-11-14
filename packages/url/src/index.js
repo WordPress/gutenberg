@@ -37,13 +37,13 @@ export function getProtocol( url ) {
  *
  * @param {string} protocol The url protocol.
  *
- * @return {boolean} True if the argument is a valid protocol (e.g. http://, tel:).
+ * @return {boolean} True if the argument is a valid protocol (e.g. http:, tel:).
  */
 export function isValidProtocol( protocol ) {
 	if ( ! protocol ) {
 		return false;
 	}
-	return /^[a-z\-.\+]+[0-9]*:(?:\/\/)?\/?$/i.test( protocol );
+	return /^[a-z\-.\+]+[0-9]*:$/i.test( protocol );
 }
 
 /**
