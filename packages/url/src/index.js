@@ -138,7 +138,7 @@ export function isValidQueryString( queryString ) {
  * @return {?string} The fragment part of the URL.
  */
 export function getFragment( url ) {
-	const matches = /^\S+(#[^\s\?]*)/.exec( url );
+	const matches = /^\S+?(#[^\s\?]*)/.exec( url );
 	if ( matches ) {
 		return matches[ 1 ];
 	}
