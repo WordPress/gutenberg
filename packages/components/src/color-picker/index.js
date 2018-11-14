@@ -50,6 +50,7 @@ export default class ColorPicker extends Component {
 		super( ...arguments );
 		this.state = colorToState( color );
 		this.handleChange = this.handleChange.bind( this );
+		this.handleInputChange = this.handleInputChange.bind( this );
 	}
 
 	handleChange( data ) {
@@ -62,6 +63,10 @@ export default class ColorPicker extends Component {
 				debounce( partial( onChangeComplete, colors ), 100 )
 			);
 		}
+	}
+
+	handleInputChange( data ) {
+		this.handleChange( data );
 	}
 
 	render() {
@@ -110,7 +115,7 @@ export default class ColorPicker extends Component {
 						rgb={ rgb }
 						hsl={ hsl }
 						hex={ hex }
-						onChange={ this.handleChange }
+						onChange={ this.handleInputChange }
 						disableAlpha={ disableAlpha }
 					/>
 				</div>
