@@ -807,7 +807,7 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_style_add_data( 'wp-components', 'rtl', 'replace' );
 
-	if (gutenberg_post_has_blocks( get_the_ID() ) ) {
+	if ( gutenberg_post_has_blocks( get_the_ID() ) ) {
 		gutenberg_override_style(
 			'wp-block-library',
 			gutenberg_url( 'build/block-library/style.css' ),
