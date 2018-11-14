@@ -302,7 +302,6 @@ class ImageEdit extends Component {
 			isLargeViewport,
 			isSelected,
 			className,
-			maxWidth,
 			noticeUI,
 			toggleSelection,
 			isRTL,
@@ -577,9 +576,9 @@ class ImageEdit extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth={ maxWidth }
+										maxWidth="100%"
 										minHeight={ minHeight }
-										maxHeight={ maxWidth / ratio }
+										maxHeight="100%"
 										lockAspectRatio
 										enable={ {
 											top: false,
@@ -627,11 +626,10 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
+		const { isRTL, imageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
-			maxWidth,
 			isRTL,
 			imageSizes,
 		};
