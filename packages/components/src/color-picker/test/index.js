@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import ShallowRenderer from 'react-test-renderer/shallow';
+import TestRenderer from 'react-test-renderer';
 
 /**
  * Internal dependencies
@@ -12,8 +12,7 @@ describe( 'ColorPicker', () => {
 	test( 'should render color picker', () => {
 		const color = '#FFF';
 
-		const renderer = new ShallowRenderer();
-		renderer.render(
+		const renderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
 				onChangeComplete={ () => {} }
@@ -21,6 +20,6 @@ describe( 'ColorPicker', () => {
 			/>
 		);
 
-		expect( renderer.getRenderOutput() ).toMatchSnapshot();
+		expect( renderer.toJSON() ).toMatchSnapshot();
 	} );
 } );
