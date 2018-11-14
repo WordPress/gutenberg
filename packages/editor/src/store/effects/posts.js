@@ -9,6 +9,7 @@ import { pick, includes } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 // TODO: Ideally this would be the only dispatch in scope. This requires either
 // refactoring editor actions to yielded controls, or replacing direct dispatch
 // on the editor store with action creators (e.g. `REQUEST_POST_UPDATE_START`).
@@ -313,8 +314,10 @@ export const refreshPost = async ( action, store ) => {
 	const postTypeSlug = getCurrentPostType( getState() );
 	const postType = await resolveSelector( 'core', 'getPostType', postTypeSlug );
 	const newPost = await apiFetch( {
-		path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
-		data: { context: 'edit' },
+		path: addQueryArgs(
+			`/wp/v2/${ postType.rest_base }/${ post.id }`,
+			{ context: 'edit' }
+		),
 	} );
 	dispatch( resetPost( newPost ) );
 };
