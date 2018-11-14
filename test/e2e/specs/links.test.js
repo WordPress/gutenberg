@@ -387,6 +387,21 @@ describe( 'Links', () => {
 		// Expect the the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+
+		// Press Cmd+K to insert a link
+		await pressWithModifier( META_KEY, 'K' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+
+		// Tab to the settings icon button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+
+		// Expect the the escape key to dismiss the popover normally.
+		await page.keyboard.press( 'Escape' );
+		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
 	} );
 
 	it( 'can be modified using the keyboard once a link has been set', async () => {
