@@ -45,6 +45,8 @@ import Inputs from './inputs';
 import Saturation from './saturation';
 import { colorToState, simpleCheckForValidColor } from './utils';
 
+const toLowerCase = ( value ) => String( value ).toLowerCase();
+
 export default class ColorPicker extends Component {
 	constructor( { color = '0071a1' } ) {
 		super( ...arguments );
@@ -52,7 +54,7 @@ export default class ColorPicker extends Component {
 		this.state = {
 			...colors,
 			draftValues: {
-				hex: colors.hex,
+				hex: toLowerCase( colors.hex ),
 				hsl: colors.hsl,
 				rgb: colors.rgb,
 			},
@@ -69,7 +71,7 @@ export default class ColorPicker extends Component {
 			this.setState( {
 				...colors,
 				draftValues: {
-					hex: colors.hex,
+					hex: toLowerCase( colors.hex ),
 					hsl: colors.hsl,
 					rgb: colors.rgb,
 				},
@@ -82,20 +84,52 @@ export default class ColorPicker extends Component {
 	handleInputChange( data ) {
 		if ( data.state === 'commit' ) {
 			this.handleChange( data );
-		} else {
-			this.setState( {
-				draftValues: {
-					hex: data.hex,
-					hsl: data.hsl,
-					rgb: data.rgb,
-				},
-			} );
+		} else if ( data.state === 'draft' ) {
+			if ( data.source === 'hex' ) {
+				this.setState( {
+					draftValues: {
+						hex: toLowerCase( data.hex ),
+					},
+				} );
+			} else if ( data.source === 'rgb' ) {
+				this.setState( {
+					draftValues: {
+						rgb: {
+							r: data.r,
+							g: data.g,
+							b: data.b,
+							a: data.a,
+						},
+					},
+				} );
+			} else if ( data.source === 'hsl' ) {
+				this.setState( {
+					draftValues: {
+						hsl: {
+							h: data.h,
+							s: data.s,
+							l: data.l,
+							a: data.a,
+						},
+					},
+				} );
+			}
 		}
 	}
 
 	render() {
 		const { className, disableAlpha } = this.props;
-		const { color, hex, hsl, hsv, rgb } = this.state;
+		const {
+			color,
+			hsl,
+			hsv,
+			rgb,
+			draftValues: {
+				hex: draftHex,
+				hsl: draftHsl,
+				rgb: draftRgb,
+			},
+		} = this.state;
 		const classes = classnames( className, {
 			'components-color-picker': true,
 			'is-alpha-disabled': disableAlpha,
@@ -136,9 +170,9 @@ export default class ColorPicker extends Component {
 					</div>
 
 					<Inputs
-						rgb={ rgb }
-						hsl={ hsl }
-						hex={ hex }
+						rgb={ draftRgb }
+						hsl={ draftHsl }
+						hex={ draftHex }
 						onChange={ this.handleInputChange }
 						disableAlpha={ disableAlpha }
 					/>

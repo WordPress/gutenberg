@@ -18,21 +18,17 @@ import IconButton from '../icon-button';
 import { isValidHex } from './utils';
 import TextControl from '../text-control';
 
-const toLowerCase = ( value ) => String( value ).toLowerCase();
-
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
 export class Input extends Component {
-	constructor( { value } ) {
+	constructor() {
 		super( ...arguments );
-		this.state = { value: toLowerCase( value ) };
 		this.handleBlur = this.handleBlur.bind( this );
 		this.handleChange = this.handleChange.bind( this );
 		this.handleKeyDown = this.handleKeyDown.bind( this );
 	}
 
 	handleBlur() {
-		const { valueKey, onChange } = this.props;
-		const { value } = this.state;
+		const { value, valueKey, onChange } = this.props;
 		onChange( {
 			state: 'commit',
 			[ valueKey ]: value,
@@ -47,16 +43,19 @@ export class Input extends Component {
 				state: 'commit',
 				[ valueKey ]: value,
 			} );
+		} else {
+			onChange( {
+				state: 'draft',
+				[ valueKey ]: value,
+			} );
 		}
-		this.setState( { value } );
 	}
 
 	handleKeyDown( { keyCode } ) {
 		if ( keyCode !== ENTER && keyCode !== UP && keyCode !== DOWN ) {
 			return;
 		}
-		const { value } = this.state;
-		const { valueKey, onChange } = this.props;
+		const { value, valueKey, onChange } = this.props;
 		onChange( {
 			state: 'commit',
 			[ valueKey ]: value,
@@ -64,8 +63,7 @@ export class Input extends Component {
 	}
 
 	render() {
-		const { label, ...props } = this.props;
-		const { value } = this.state;
+		const { label, value, ...props } = this.props;
 		return (
 			<TextControl
 				className="components-color-picker__inputs-field"
@@ -74,7 +72,7 @@ export class Input extends Component {
 				onChange={ ( newValue ) => this.handleChange( newValue ) }
 				onBlur={ this.handleBlur }
 				onKeyDown={ this.handleKeyDown }
-				{ ...omit( props, [ 'onChange', 'value', 'valueKey' ] ) }
+				{ ...omit( props, [ 'onChange', 'valueKey' ] ) }
 			/>
 		);
 	}
