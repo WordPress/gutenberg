@@ -53,11 +53,9 @@ export default class ColorPicker extends Component {
 		const colors = colorToState( color );
 		this.state = {
 			...colors,
-			draftValues: {
-				hex: toLowerCase( colors.hex ),
-				hsl: colors.hsl,
-				rgb: colors.rgb,
-			},
+			draftHex: toLowerCase( colors.hex ),
+			draftRgb: colors.rgb,
+			draftHsl: colors.hsl,
 		};
 		this.handleChange = this.handleChange.bind( this );
 		this.handleInputChange = this.handleInputChange.bind( this );
@@ -70,11 +68,9 @@ export default class ColorPicker extends Component {
 			const colors = colorToState( data, data.h || oldHue );
 			this.setState( {
 				...colors,
-				draftValues: {
-					hex: toLowerCase( colors.hex ),
-					hsl: colors.hsl,
-					rgb: colors.rgb,
-				},
+				draftHex: toLowerCase( colors.hex ),
+				draftHsl: colors.hsl,
+				draftRgb: colors.rgb,
 			},
 			debounce( partial( onChangeComplete, colors ), 100 )
 			);
@@ -87,30 +83,24 @@ export default class ColorPicker extends Component {
 		} else if ( data.state === 'draft' ) {
 			if ( data.source === 'hex' ) {
 				this.setState( {
-					draftValues: {
-						hex: toLowerCase( data.hex ),
-					},
+					draftHex: toLowerCase( data.hex ),
 				} );
 			} else if ( data.source === 'rgb' ) {
 				this.setState( {
-					draftValues: {
-						rgb: {
-							r: data.r,
-							g: data.g,
-							b: data.b,
-							a: data.a,
-						},
+					draftRgb: {
+						r: data.r,
+						g: data.g,
+						b: data.b,
+						a: data.a,
 					},
 				} );
 			} else if ( data.source === 'hsl' ) {
 				this.setState( {
-					draftValues: {
-						hsl: {
-							h: data.h,
-							s: data.s,
-							l: data.l,
-							a: data.a,
-						},
+					draftHsl: {
+						h: data.h,
+						s: data.s,
+						l: data.l,
+						a: data.a,
 					},
 				} );
 			}
@@ -124,11 +114,9 @@ export default class ColorPicker extends Component {
 			hsl,
 			hsv,
 			rgb,
-			draftValues: {
-				hex: draftHex,
-				hsl: draftHsl,
-				rgb: draftRgb,
-			},
+			draftHex,
+			draftHsl,
+			draftRgb,
 		} = this.state;
 		const classes = classnames( className, {
 			'components-color-picker': true,
