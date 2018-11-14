@@ -38,6 +38,7 @@ describe( 'isValidHref', () => {
 			expect( isValidHref( 'mailto: test@somewhere.com' ) ).toBe( false );
 			expect( isValidHref( 'ht#tp://this/is/invalid' ) ).toBe( false );
 			expect( isValidHref( 'ht#tp://th&is/is/invalid' ) ).toBe( false );
+			expect( isValidHref( 'http:/test.com' ) ).toBe( false );
 			expect( isValidHref( 'http://?test.com' ) ).toBe( false );
 			expect( isValidHref( 'http://#test.com' ) ).toBe( false );
 			expect( isValidHref( 'http://test.com?double?params' ) ).toBe( false );
