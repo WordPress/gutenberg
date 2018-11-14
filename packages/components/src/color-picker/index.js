@@ -66,7 +66,9 @@ export default class ColorPicker extends Component {
 	}
 
 	handleInputChange( data ) {
-		this.handleChange( data );
+		if ( data.state === 'commit' ) {
+			this.handleChange( data );
+		}
 	}
 
 	render() {

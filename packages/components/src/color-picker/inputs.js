@@ -33,14 +33,20 @@ export class Input extends Component {
 	handleBlur() {
 		const { valueKey, onChange } = this.props;
 		const { value } = this.state;
-		onChange( { [ valueKey ]: value } );
+		onChange( {
+			state: 'commit',
+			[ valueKey ]: value,
+		} );
 	}
 
 	handleChange( value ) {
 		const { valueKey, onChange } = this.props;
 		// Protect against expanding a value while we're typing.
 		if ( value.length > 4 ) {
-			onChange( { [ valueKey ]: value } );
+			onChange( {
+				state: 'commit',
+				[ valueKey ]: value,
+			} );
 		}
 		this.setState( { value } );
 	}
@@ -51,7 +57,10 @@ export class Input extends Component {
 		}
 		const { value } = this.state;
 		const { valueKey, onChange } = this.props;
-		onChange( { [ valueKey ]: value } );
+		onChange( {
+			state: 'commit',
+			[ valueKey ]: value,
+		} );
 	}
 
 	render() {
@@ -117,6 +126,7 @@ export class Inputs extends Component {
 				this.props.onChange( {
 					hex: data.hex,
 					source: 'hex',
+					state: data.state,
 				} );
 			}
 		} else if ( data.r || data.g || data.b ) {
@@ -125,6 +135,7 @@ export class Inputs extends Component {
 				g: data.g || this.props.rgb.g,
 				b: data.b || this.props.rgb.b,
 				source: 'rgb',
+				state: data.state,
 			} );
 		} else if ( data.a ) {
 			if ( data.a < 0 ) {
@@ -139,6 +150,7 @@ export class Inputs extends Component {
 				l: this.props.hsl.l,
 				a: Math.round( data.a * 100 ) / 100,
 				source: 'rgb',
+				state: data.state,
 			} );
 		} else if ( data.h || data.s || data.l ) {
 			this.props.onChange( {
@@ -146,6 +158,7 @@ export class Inputs extends Component {
 				s: data.s || this.props.hsl.s,
 				l: data.l || this.props.hsl.l,
 				source: 'hsl',
+				state: data.state,
 			} );
 		}
 	}
