@@ -29,18 +29,6 @@
 	&:focus:not(:disabled):not([aria-disabled="true"]) {
 		@include menu-style__focus;
 	}
-
-	// Colorize plugin icons to ensure contrast and cohesion, but allow plugin developers to override.
-	svg,
-	svg * {
-		fill: $dark-gray-500;
-	}
-
-	&:hover svg,
-	&:hover svg * {
-		// !important allows icons from plugins to be overriden and given a dark-gray fill.
-		fill: $dark-gray-900 !important;
-	}
 }
 
 .components-menu-item__info-wrapper {
