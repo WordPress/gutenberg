@@ -11,6 +11,7 @@ import { Fragment } from '@wordpress/element';
  */
 
 import { RichTextShortcut } from './shortcut';
+import BlockFormatControls from '../block-format-controls';
 
 function isListRootSelected( editor ) {
 	return (
@@ -56,43 +57,45 @@ export const ListEdit = ( { editor, onTagNameChange, tagName } ) => (
 			character="m"
 			onUse={ () => editor.execCommand( 'Outdent' ) }
 		/>
-		<Toolbar
-			controls={ [
-				{
-					icon: 'editor-ul',
-					title: __( 'Convert to unordered list' ),
-					isActive: isActiveListType( editor, 'ul', tagName ),
-					onClick() {
-						if ( isListRootSelected( editor ) ) {
-							onTagNameChange( 'ul' );
-						} else {
-							editor.execCommand( 'InsertUnorderedList' );
-						}
+		<BlockFormatControls>
+			<Toolbar
+				controls={ [
+					{
+						icon: 'editor-ul',
+						title: __( 'Convert to unordered list' ),
+						isActive: isActiveListType( editor, 'ul', tagName ),
+						onClick() {
+							if ( isListRootSelected( editor ) ) {
+								onTagNameChange( 'ul' );
+							} else {
+								editor.execCommand( 'InsertUnorderedList' );
+							}
+						},
 					},
-				},
-				{
-					icon: 'editor-ol',
-					title: __( 'Convert to ordered list' ),
-					isActive: isActiveListType( editor, 'ol', tagName ),
-					onClick() {
-						if ( isListRootSelected( editor ) ) {
-							onTagNameChange( 'ol' );
-						} else {
-							editor.execCommand( 'InsertOrderedList' );
-						}
+					{
+						icon: 'editor-ol',
+						title: __( 'Convert to ordered list' ),
+						isActive: isActiveListType( editor, 'ol', tagName ),
+						onClick() {
+							if ( isListRootSelected( editor ) ) {
+								onTagNameChange( 'ol' );
+							} else {
+								editor.execCommand( 'InsertOrderedList' );
+							}
+						},
 					},
-				},
-				{
-					icon: 'editor-outdent',
-					title: __( 'Outdent list item' ),
-					onClick: () => editor.execCommand( 'Outdent' ),
-				},
-				{
-					icon: 'editor-indent',
-					title: __( 'Indent list item' ),
-					onClick: () => editor.execCommand( 'Indent' ),
-				},
-			] }
-		/>
+					{
+						icon: 'editor-outdent',
+						title: __( 'Outdent list item' ),
+						onClick: () => editor.execCommand( 'Outdent' ),
+					},
+					{
+						icon: 'editor-indent',
+						title: __( 'Indent list item' ),
+						onClick: () => editor.execCommand( 'Indent' ),
+					},
+				] }
+			/>
+		</BlockFormatControls>
 	</Fragment>
 );

@@ -875,13 +875,11 @@ export class RichText extends Component {
 				onFocus={ this.setFocusedElement }
 			>
 				{ isSelected && this.editor && this.multilineTag === 'li' && (
-					<BlockFormatControls>
-						<ListEdit
-							editor={ this.editor }
-							onTagNameChange={ onTagNameChange }
-							tagName={ Tagname }
-						/>
-					</BlockFormatControls>
+					<ListEdit
+						editor={ this.editor }
+						onTagNameChange={ onTagNameChange }
+						tagName={ Tagname }
+					/>
 				) }
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
