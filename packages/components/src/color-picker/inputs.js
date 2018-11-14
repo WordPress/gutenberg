@@ -15,7 +15,6 @@ import { DOWN, ENTER, UP } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import IconButton from '../icon-button';
-import { isValidHex } from './utils';
 import TextControl from '../text-control';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
@@ -112,13 +111,11 @@ export class Inputs extends Component {
 
 	handleChange( data ) {
 		if ( data.hex ) {
-			if ( isValidHex( data.hex ) ) {
-				this.props.onChange( {
-					hex: data.hex,
-					source: 'hex',
-					state: data.state,
-				} );
-			}
+			this.props.onChange( {
+				hex: data.hex,
+				source: 'hex',
+				state: data.state,
+			} );
 		} else if ( data.r || data.g || data.b ) {
 			this.props.onChange( {
 				r: data.r || this.props.rgb.r,

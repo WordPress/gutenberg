@@ -43,7 +43,7 @@ import Alpha from './alpha';
 import Hue from './hue';
 import Inputs from './inputs';
 import Saturation from './saturation';
-import { colorToState, simpleCheckForValidColor } from './utils';
+import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
 const toLowerCase = ( value ) => String( value ).toLowerCase();
 
@@ -63,8 +63,8 @@ export default class ColorPicker extends Component {
 
 	handleChange( data ) {
 		const { oldHue, onChangeComplete = noop } = this.props;
-		const isValidColor = simpleCheckForValidColor( data );
-		if ( isValidColor ) {
+		const isValid = data.hex ? isValidHex( data.hex ) : simpleCheckForValidColor( data );
+		if ( isValid ) {
 			const colors = colorToState( data, data.h || oldHue );
 			this.setState( {
 				...colors,
