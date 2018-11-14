@@ -16,6 +16,7 @@ import { DOWN, ENTER, UP } from '@wordpress/keycodes';
  */
 import IconButton from '../icon-button';
 import TextControl from '../text-control';
+import { isValidHex } from './utils';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
 export class Input extends Component {
@@ -36,10 +37,17 @@ export class Input extends Component {
 
 	handleChange( value ) {
 		const { valueKey, onChange } = this.props;
-		onChange( {
-			state: 'draft',
-			[ valueKey ]: value,
-		} );
+		if ( value.length > 4 && isValidHex( value ) ) {
+			onChange( {
+				state: 'commit',
+				[ valueKey ]: value,
+			} );
+		} else {
+			onChange( {
+				state: 'draft',
+				[ valueKey ]: value,
+			} );
+		}
 	}
 
 	handleKeyDown( { keyCode } ) {
