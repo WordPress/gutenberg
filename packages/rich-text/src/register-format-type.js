@@ -114,10 +114,55 @@ export function registerFormatType( name, settings ) {
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
 	if (
-		settings.__experimentalCreatePrepareEditableTree &&
 		settings.__experimentalGetPropsForEditableTreePreparation
 	) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
+			let Component = OriginalComponent;
+			if (
+				settings.__experimentalCreatePrepareEditableTree ||
+				settings.__experimentalCreateFormatToValue ||
+				settings.__experimentalCreateValueToFormat
+			) {
+				Component = ( props ) => {
+					const additionalProps = {};
+
+					if ( settings.__experimentalCreatePrepareEditableTree ) {
+						additionalProps.prepareEditableTree = [
+							...( props.prepareEditableTree || [] ),
+							settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], {
+								richTextIdentifier: props.identifier,
+								blockClientId: props.clientId,
+							} ),
+						];
+					}
+
+					if ( settings.__experimentalCreateFormatToValue ) {
+						additionalProps.filterFormatToValue = [
+							...( props.formatToValue || [] ),
+							settings.__experimentalCreateFormatToValue( props[ `format_${ name }` ], {
+								richTextIdentifier: props.identifier,
+								blockClientId: props.clientId,
+							} ),
+						];
+					}
+
+					if ( settings.__experimentalCreateValueToFormat ) {
+						additionalProps.filterValueToFormat = [
+							...( props.valueToFormat || [] ),
+							settings.__experimentalCreateValueToFormat( props[ `format_${ name }` ], {
+								richTextIdentifier: props.identifier,
+								blockClientId: props.clientId,
+							} ),
+						];
+					}
+
+					return <OriginalComponent
+						{ ...props }
+						{ ...additionalProps }
+					/>;
+				};
+			}
+
 			return withSelect( ( sel, { clientId, identifier } ) => ( {
 				[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
 					sel,
@@ -126,18 +171,7 @@ export function registerFormatType( name, settings ) {
 						blockClientId: clientId,
 					}
 				),
-			} ) )( ( props ) => (
-				<OriginalComponent
-					{ ...props }
-					prepareEditableTree={ [
-						...( props.prepareEditableTree || [] ),
-						settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], 	{
-							richTextIdentifier: props.identifier,
-							blockClientId: props.clientId,
-						} ),
-					] }
-				/>
-			) );
+			} ) )( Component );
 		} );
 	}
 

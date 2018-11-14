@@ -7,6 +7,9 @@ import {
 	isNil,
 	isEqual,
 	omit,
+	pickBy,
+	get,
+	isPlainObject,
 } from 'lodash';
 import memize from 'memize';
 
@@ -106,7 +109,7 @@ export class RichText extends Component {
 		this.setRef = this.setRef.bind( this );
 		this.isActive = this.isActive.bind( this );
 
-		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
+		this.formatToValueMemoized = memize( this.formatToValueMemoized.bind( this ), { size: 1 } );
 
 		this.savedContent = value;
 		this.patterns = getPatterns( {
@@ -682,6 +685,11 @@ export class RichText extends Component {
 				return false;
 			}
 
+			// Allow primitives and arrays:
+			if ( ! isPlainObject( this.props[ name ] ) ) {
+				return this.props[ name ] !== prevProps[ name ];
+			}
+
 			return Object.keys( this.props[ name ] ).some( ( subName ) => {
 				return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
 			} );
@@ -689,14 +697,67 @@ export class RichText extends Component {
 
 		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
+
+			// Maintain the previous selection:
+			record.start = this.state.start;
+			record.end = this.state.end;
+
 			this.applyRecord( record );
 		}
 	}
 
+	/**
+	 * Filters the format to value with the filterFormatToValue prop.
+	 *
+	 * This allows the formatToValue function to be filtered from the outside.
+	 * The filter runs after the value is converted from the outside data format.
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @param {Object} formatProps The props that have been defined by formats.
+	 * @return {Object} A new rich-text value.
+	 */
+	filterFormatToValue( value, formatProps ) {
+		const { identifier: richTextIdentifier, clientId: blockClientId } = this.props;
+
+		return get( this.props, [ 'filterFormatToValue' ], [] ).reduce( ( accumulator, filterFunction ) => {
+			return filterFunction( accumulator, formatProps, { richTextIdentifier, blockClientId } );
+		}, value );
+	}
+
+	/**
+	 * @see this.formatToValueMemoized.
+	 *
+	 * @param {*} value The outside value, data type depends on props.
+	 * @return {Object} An internal rich-text value.
+	 */
 	formatToValue( value ) {
+		const formatProps = this.getFormatProps();
+
+		return this.formatToValueMemoized( value, formatProps );
+	}
+
+	/**
+	 * Get props that are provided by formats to modify RichText.
+	 *
+	 * @return {Object} Props that start with 'format_'.
+	 */
+	getFormatProps() {
+		return pickBy( this.props, ( propValue, name ) => name.startsWith( 'format_' ) );
+	}
+
+	/**
+	 * Converts the outside data structure to our internal representation.
+	 *
+	 * @param {*} value The outside value, data type depends on props.
+	 * @param {Object} formatProps The props that have been defined by formats.
+	 * @return {Object} An internal rich-text value.
+	 */
+	formatToValueMemoized( value, formatProps ) {
+		let record = value;
+
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			return create( {
+			record = create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -704,7 +765,7 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
-			return create( {
+			record = create( {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -714,10 +775,10 @@ export class RichText extends Component {
 		// Guard for blocks passing `null` in onSplit callbacks. May be removed
 		// if onSplit is revised to not pass a `null` value.
 		if ( value === null ) {
-			return create();
+			record = create();
 		}
 
-		return value;
+		return this.filterFormatToValue( record, formatProps );
 	}
 
 	valueToEditableHTML( value ) {
@@ -734,7 +795,33 @@ export class RichText extends Component {
 		} ).body.innerHTML;
 	}
 
+	/**
+	 * Filters the value to format with the filterValueToFormat prop.
+	 *
+	 * This allows the valueToFormat function to be filtered from the outside.
+	 * The filter runs before the value is converted to the outside data format.
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @return {Object} A new rich-text value.
+	 */
+	filterValueToFormat( value ) {
+		const formatProps = this.getFormatProps();
+		const { identifier: richTextIdentifier, clientId: blockClientId } = this.props;
+
+		return get( this.props, [ 'filterValueToFormat' ], [] ).reduce( ( accumulator, filterFunction ) => {
+			return filterFunction( accumulator, formatProps, { richTextIdentifier, blockClientId } );
+		}, value );
+	}
+
+	/**
+	 * Converts the internal value to the external data format.
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @return {*} The external data format, data type depends on props.
+	 */
 	valueToFormat( value ) {
+		value = this.filterValueToFormat( value );
+
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
 			return children.fromDOM( unstableToDom( {

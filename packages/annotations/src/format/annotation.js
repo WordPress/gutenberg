@@ -2,13 +2,9 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { applyFormat, removeFormat } from '@wordpress/rich-text';
 
 const name = 'core/annotation';
-
-/**
- * WordPress dependencies
- */
-import { applyFormat, removeFormat } from '@wordpress/rich-text';
 
 /**
  * Applies given annotations to the given record.
@@ -64,19 +60,20 @@ export const annotation = {
 		return null;
 	},
 	__experimentalGetPropsForEditableTreePreparation( select, { richTextIdentifier, blockClientId } ) {
-		return {
-			annotations: select( 'core/annotations' ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier ),
-		};
+		return select( 'core/annotations' ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier );
 	},
-	__experimentalCreatePrepareEditableTree( props ) {
-		return ( formats, text ) => {
-			if ( props.annotations.length === 0 ) {
-				return formats;
+	__experimentalCreateFormatToValue( annotations ) {
+		return ( value ) => {
+			if ( annotations.length === 0 ) {
+				return value;
 			}
 
-			let record = { formats, text };
-			record = applyAnnotations( record, props.annotations );
-			return record.formats;
+			value = applyAnnotations( value, annotations );
+
+			return value;
 		};
+	},
+	__experimentalCreateValueToFormat() {
+		return removeAnnotations;
 	},
 };
