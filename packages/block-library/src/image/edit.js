@@ -536,6 +536,9 @@ class ImageEdit extends Component {
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
+							// This is horrendous. Consider it a proof of concept.
+							const maxWidth = document.querySelector( '.editor-block-list__block-edit' ).offsetWidth;
+
 							let showRightHandle = false;
 							let showLeftHandle = false;
 
@@ -576,9 +579,9 @@ class ImageEdit extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth="100%"
+										maxWidth={ maxWidth }
 										minHeight={ minHeight }
-										maxHeight="100%"
+										maxHeight={ maxWidth / ratio }
 										lockAspectRatio
 										enable={ {
 											top: false,
