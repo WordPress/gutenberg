@@ -2,6 +2,7 @@
  * External dependencies
  */
 import TestRenderer from 'react-test-renderer';
+import { omit } from 'lodash';
 
 /**
  * Internal dependencies
@@ -47,20 +48,13 @@ describe( 'withDispatch', () => {
 		);
 		const testInstance = testRenderer.root;
 
-		const incrementBeforeSetProps = testInstance.findByType( 'button' ).props.onClick;
-
-		// Verify that dispatch respects props at the time of being invoked by
-		// changing props after the initial mount.
 		testRenderer.update(
 			<RegistryProvider value={ registry }>
 				<Component count={ 2 } />
 			</RegistryProvider>
 		);
 
-		// Function value reference should not have changed in props update.
-		expect( testInstance.findByType( 'button' ).props.onClick ).toBe( incrementBeforeSetProps );
-
-		incrementBeforeSetProps();
+		testInstance.findByType( 'button' ).props.onClick();
 
 		expect( store.getState() ).toBe( 2 );
 	} );
@@ -118,5 +112,29 @@ describe( 'withDispatch', () => {
 		testInstance.findByType( 'button' ).props.onClick();
 		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
 		expect( secondRegistryAction ).toHaveBeenCalledTimes( 2 );
+	} );
+
+	it( 'passes new merge props if mapDispatchToProps varies on ownProps', () => {
+		const Component = withDispatch( ( _dispatch, ownProps ) => {
+			return { [ ownProps.propName ]() {} };
+		} )( ( props ) => <button { ...omit( props, 'propName' ) } /> );
+
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component propName="onClick" />
+			</RegistryProvider>
+		);
+
+		const instance = testRenderer.root;
+
+		expect( Object.keys( instance.findByType( 'button' ).props ) ).toEqual( [ 'onClick' ] );
+
+		testRenderer.update(
+			<RegistryProvider value={ registry }>
+				<Component propName="onKeyDown" />
+			</RegistryProvider>
+		);
+
+		expect( Object.keys( instance.findByType( 'button' ).props ) ).toEqual( [ 'onKeyDown' ] );
 	} );
 } );
