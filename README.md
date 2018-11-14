@@ -10,10 +10,10 @@ Printing since 1440.
 This repo is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in WordPress Core</a>. `Gutenberg` is the project name.
 
 ## Getting started
-- **Download:** If you want to use the latest release with your WordPress, <a href="https://wordpress.org/plugins/gutenberg/">download the latest release from the WordPress.org plugins repository</a>. 
-- **Discuss:** Conversations and discussions take place in #core-editor on <a href="https://make.wordpress.org/chat/">the core WordPress Slack</a>.
-- **Contribute:** Development happens here. Get started by reading the <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">CONTRIBUTING</a> guidelines.
-- **Learn:** Discover more about the project <a href="https://wordpress.org/gutenberg">here</a>.
+- **Download:** If you want to use the latest release with your WordPress site, <a href="https://wordpress.org/plugins/gutenberg/">download the latest release from the WordPress.org plugins repository</a>. 
+- **Discuss:** Conversations and discussions take place in <a href="https://wordpress.slack.com/messages/C02QB2JS7">`#core-editor` channel on the Making WordPress Slack</a>.
+- **Contribute:** Development of Gutenberg happens in this GitHub repo. Get started by <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">reading the contributing guidelines</a>.
+- **Learn:** <a href="https://wordpress.org/gutenberg/">Discover more about the project on WordPress.org</a>.
 
 **Gutenberg is more than an editor.** While the project is currently focused on building the new editor for WordPress, it doesn't end there. This lays the groundwork for a new model for WordPress Core that will ultimately impact the entire publishing experience of the platform.
 
