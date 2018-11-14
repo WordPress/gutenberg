@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { dateI18n, getSettings } from '@wordpress/date';
+import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
 import { withSelect } from '@wordpress/data';
 
 export function PostScheduleLabel( { date, isFloating } ) {
-	const settings = getSettings();
+	const settings = __experimentalGetSettings();
+
 	return date && ! isFloating ?
-		dateI18n( settings.formats.datetime, date ) :
+		dateI18n( settings.formats.datetimeAbbreviated, date ) :
 		__( 'Immediately' );
 }
 

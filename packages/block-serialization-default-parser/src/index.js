@@ -2,15 +2,20 @@ let document;
 let offset;
 let output;
 let stack;
-const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?!}\s+-->)[^])+?}\s+)?(\/)?-->/g;
+const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:[^}]+|}+(?=})|(?!}\s+-->)[^])*?}\s+)?(\/)?-->/g;
 
-function Block( blockName, attrs, innerBlocks, innerHTML ) {
+function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	return {
 		blockName,
 		attrs,
 		innerBlocks,
 		innerHTML,
+		innerContent,
 	};
+}
+
+function Freeform( innerHTML ) {
+	return Block( null, {}, [], innerHTML, [ innerHTML ] );
 }
 
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
@@ -78,19 +83,16 @@ function proceed() {
 			// in the top-level of the document
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingHtmlStart ) {
-					output.push( {
-						attrs: {},
-						innerHTML: document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ),
-					} );
+					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
 				}
-				output.push( Block( blockName, attrs, [], '' ) );
+				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner block
 			addInnerBlock(
-				Block( blockName, attrs, [], '' ),
+				Block( blockName, attrs, [], '', [] ),
 				startOffset,
 				tokenLength,
 			);
@@ -101,7 +103,7 @@ function proceed() {
 			// track all newly-opened blocks on the stack
 			stack.push(
 				Frame(
-					Block( blockName, attrs, [], '' ),
+					Block( blockName, attrs, [], '', [] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -133,10 +135,9 @@ function proceed() {
 			// otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
-			stackTop.block.innerHTML += document.substr(
-				stackTop.prevOffset,
-				startOffset - stackTop.prevOffset,
-			);
+			const html = document.substr( stackTop.prevOffset, startOffset - stackTop.prevOffset );
+			stackTop.block.innerHTML += html;
+			stackTop.block.innerContent.push( html );
 			stackTop.prevOffset = startOffset + tokenLength;
 
 			addInnerBlock(
@@ -196,7 +197,7 @@ function nextToken() {
 	const namespace = namespaceMatch || 'core/';
 	const name = namespace + nameMatch;
 	const hasAttrs = !! attrsMatch;
-	const attrs = hasAttrs ? parseJSON( attrsMatch ) : null;
+	const attrs = hasAttrs ? parseJSON( attrsMatch ) : {};
 
 	// This state isn't allowed
 	// This is an error
@@ -223,40 +224,35 @@ function addFreeform( rawLength ) {
 		return;
 	}
 
-	// why is this not a Frame? it's because the current grammar
-	// specifies an object that's different. we can update the
-	// specification and change here if we want to but for now we
-	// want this parser to be spec-compliant
-	output.push( {
-		attrs: {},
-		innerHTML: document.substr( offset, length ),
-	} );
+	output.push( Freeform( document.substr( offset, length ) ) );
 }
 
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
-	parent.block.innerHTML += document.substr(
-		parent.prevOffset,
-		tokenStart - parent.prevOffset,
-	);
+	const html = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+
+	if ( html ) {
+		parent.block.innerHTML += html;
+		parent.block.innerContent.push( html );
+	}
+
+	parent.block.innerContent.push( null );
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
 function addBlockFromStack( endOffset ) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
-	if ( endOffset ) {
-		block.innerHTML += document.substr( prevOffset, endOffset - prevOffset );
-	} else {
-		block.innerHTML += document.substr( prevOffset );
+	const html = endOffset ? document.substr( prevOffset, endOffset - prevOffset ) : document.substr( prevOffset );
+
+	if ( html ) {
+		block.innerHTML += html;
+		block.innerContent.push( html );
 	}
 
 	if ( null !== leadingHtmlStart ) {
-		output.push( {
-			attrs: {},
-			innerHTML: document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ),
-		} );
+		output.push( Freeform( document.substr( leadingHtmlStart, tokenStart - leadingHtmlStart ) ) );
 	}
 
 	output.push( block );

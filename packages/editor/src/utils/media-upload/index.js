@@ -7,7 +7,6 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -31,7 +30,6 @@ export default function( {
 	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
-	allowedType,
 } ) {
 	const {
 		getCurrentPostId,
@@ -40,20 +38,8 @@ export default function( {
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
 	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
-	let allowedTypesToUse = allowedTypes;
-	if ( ! allowedTypes && allowedType ) {
-		deprecated( 'allowedType parameter property of wp.editor.mediaUpload', {
-			version: '4.2',
-			alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
-		} );
-		if ( allowedType === '*' ) {
-			allowedTypesToUse = undefined;
-		} else {
-			allowedTypesToUse = [ allowedType ];
-		}
-	}
 	mediaUpload( {
-		allowedTypes: allowedTypesToUse,
+		allowedTypes,
 		filesList,
 		onFileChange,
 		additionalData: {

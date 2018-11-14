@@ -1,3 +1,109 @@
+## 7.0.1 (2018-11-12)
+
+### Polish
+
+- Remove unnecessary `locale` prop usage [#11649](https://github.com/WordPress/gutenberg/pull/11649)
+
+### Bug Fixes
+
+- Fix multi-selection triggering too often when using floated blocks.
+
+## 7.0.0 (2018-11-12)
+
+### Breaking Change
+
+- The `PanelColor` component has been removed.
+
+### New Feature
+
+- In `NavigableToolbar`, a property focusOnMount was added, if true, the toolbar will get focus as soon as it mounted. Defaults to false.
+
+### Bug Fixes
+
+- Avoid unnecessary re-renders when navigating between blocks.
+- PostPublishPanel: return focus to element that opened the panel
+- Capture focus on self in InsertionPoint inserter
+- Correct insertion point opacity selector
+- Set code editor as RTL
+
+## 6.2.1 (2018-11-09)
+
+### Deprecations
+
+- `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
+
+### Polish
+
+- Reactive block styles.
+
+## 6.2.0 (2018-11-09)
+
+### New Features
+
+- Adjust a11y roles for menu items, and make sure screen readers can properly use BlockNavigationList ([#11431](https://github.com/WordPress/gutenberg/issues/11431)).
+
+## 6.1.1 (2018-11-03)
+
+### Polish
+
+- Remove `findDOMNode` usage from the `Inserter` component.
+- Remove `findDOMNode` usage from the `Block` component.
+- Remove `findDOMNode` usage from the `NavigableToolbar` component.
+
+## 6.1.0 (2018-10-30)
+
+### Deprecations
+
+- The Reusable Blocks Data API is marked as experimental as it's subject to change in the future ([#11230](https://github.com/WordPress/gutenberg/pull/11230)).
+
+## 6.0.1 (2018-10-30)
+
+### Bug Fixes
+
+- Tweak the vanilla style sheet for consistency.
+- Fix the "Copy Post Text" button not copying the post text.
+
+## 6.0.0 (2018-10-29)
+
+### Breaking Changes
+
+- The `labels.name` property has been removed from `MediaPlaceholder` in favor of the new `labels.instructions` prop.
+- The `UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
+- `mediaDetails` in object passed to `onFileChange` callback of `mediaUpload`. Please use `media_details` property instead.
+
+### New Features
+
+- In `MediaPlaceholder`, provide default values for title and instructions labels when allowed type is one of image, audio or video.
+- New actions `lockPostSaving` and `unlockPostSaving` were introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
+- New selector `isPostSavingLocked` was introduced ([#10649](https://github.com/WordPress/gutenberg/pull/10649)).
+
+### Polish
+
+- Add animated logo to preview interstitial screen.
+- Tweak the editor styles support.
+
+### Bug Fixes
+
+- Made preview interstitial text translatable.
+
+## 5.0.1 (2018-10-22)
+
+## 5.0.0 (2018-10-19)
+
+### Breaking Changes
+
+- The `checkTemplateValidity` action has been removed. Validity is verified automatically upon block reset.
+
+### Deprecations
+
+- `wp.editor.PanelColor` has been deprecated in favor of `wp.editor.PanelColorSettings`.
+
+### New Features
+
+- Added `onClose` prop to `URLPopover` component.
+
+## 4.0.3 (2018-10-18)
+
 ## 4.0.0 (2018-09-30)
 
 ### Breaking Changes
@@ -12,6 +118,7 @@
 ### Deprecations
 
 - The `checkTemplateValidity` action has been deprecated. Validity is verified automatically upon block reset.
+- The `UnsavedChangesWarning` component `forceIsDirty` prop has been deprecated.
 
 ## 3.0.0 (2018-09-05)
 
@@ -33,7 +140,7 @@
 - `isFetchingSharedBlock` selector has been removed. Use `isFetchingReusableBlock` instead.
 - `getSharedBlocks` selector has been removed. Use `getReusableBlocks` instead.
 - `editorMediaUpload` has been removed. Use `mediaUpload` instead.
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 - `wp.editor.DocumentTitle` component has been removed.
 - `getDocumentTitle` selector (`core/editor`) has been removed.
 

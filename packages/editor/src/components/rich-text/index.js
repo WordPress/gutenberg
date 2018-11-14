@@ -5,27 +5,25 @@ import classnames from 'classnames';
 import {
 	defer,
 	find,
-	identity,
 	isNil,
-	noop,
 	isEqual,
+	omit,
 } from 'lodash';
 import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML, createRef } from '@wordpress/element';
+import { Component, Fragment, RawHTML } from '@wordpress/element';
 import {
 	isHorizontalEdge,
 	getRectangleFromRange,
 	getScrollContainer,
 } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, rawShortcut } from '@wordpress/keycodes';
-import { Slot } from '@wordpress/components';
+import { BACKSPACE, DELETE, ENTER, rawShortcut } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { rawHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { isURL } from '@wordpress/url';
 import {
@@ -37,43 +35,48 @@ import {
 	toHTMLString,
 	getTextContent,
 	insert,
+	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
+	getSelectionStart,
+	getSelectionEnd,
+	remove,
+	isCollapsed,
+	LINE_SEPARATOR,
+	charAt,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
+import { withFilters } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
-import { FORMATTING_CONTROLS } from './formatting-controls';
+import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import TinyMCE from './tinymce';
+import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
-import TokenUI from './tokens/ui';
 
 /**
  * Browser dependencies
  */
 
-const { Node, getSelection } = window;
-
-/**
- * Zero-width space character used by TinyMCE as a caret landing point for
- * inline boundary nodes.
- *
- * @see tinymce/src/core/main/ts/text/Zwsp.ts
- *
- * @type {string}
- */
-const TINYMCE_ZWSP = '\uFEFF';
+const { getSelection } = window;
 
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
+
+		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
+			this.multilineTag = multiline === true ? 'p' : multiline;
+		}
+
+		if ( this.multilineTag === 'li' ) {
+			this.multilineWrapperTags = [ 'ul', 'ol' ];
+		}
 
 		this.onInit = this.onInit.bind( this );
 		this.getSettings = this.getSettings.bind( this );
@@ -82,7 +85,6 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
-		this.onHorizontalNavigationKeyDown = this.onHorizontalNavigationKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onKeyUp = this.onKeyUp.bind( this );
 		this.onPropagateUndo = this.onPropagateUndo.bind( this );
@@ -102,8 +104,11 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
 		this.savedContent = value;
-		this.containerRef = createRef();
-		this.patterns = getPatterns( { onReplace, multiline } );
+		this.patterns = getPatterns( {
+			onReplace,
+			multilineTag: this.multilineTag,
+			valueToFormat: this.valueToFormat,
+		} );
 		this.enterPatterns = getBlockTransforms( 'from' ).filter( ( { type, trigger } ) =>
 			type === 'pattern' && trigger === 'enter'
 		);
@@ -140,7 +145,7 @@ export class RichText extends Component {
 	getSettings( settings ) {
 		settings = {
 			...settings,
-			forced_root_block: this.props.multiline || false,
+			forced_root_block: this.multilineTag || false,
 			// Allow TinyMCE to keep one undo level for comparing changes.
 			// Prevent it otherwise from accumulating any history.
 			custom_undo_redo_levels: 1,
@@ -167,10 +172,7 @@ export class RichText extends Component {
 
 		editor.on( 'init', this.onInit );
 		editor.on( 'nodechange', this.onNodeChange );
-		editor.on( 'keydown', this.onKeyDown );
-		editor.on( 'keyup', this.onKeyUp );
 		editor.on( 'BeforeExecCommand', this.onPropagateUndo );
-		editor.on( 'focus', this.onFocus );
 		// The change event in TinyMCE fires every time an undo level is added.
 		editor.on( 'change', this.onCreateUndoLevel );
 
@@ -228,24 +230,34 @@ export class RichText extends Component {
 	}
 
 	createRecord() {
-		const { multiline } = this.props;
-		const range = window.getSelection().getRangeAt( 0 );
+		const range = getSelection().getRangeAt( 0 );
 
 		return create( {
 			element: this.editableRef,
 			range,
-			multilineTag: multiline,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
 			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
+			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
 
 	applyRecord( record ) {
-		const { multiline } = this.props;
-
-		apply( record, this.editableRef, multiline );
+		apply( {
+			value: record,
+			current: this.editableRef,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
+			createLinePadding( doc ) {
+				const element = doc.createElement( 'br' );
+				element.setAttribute( 'data-mce-bogus', '1' );
+				return element;
+			},
+			prepareEditableTree: this.props.prepareEditableTree,
+		} );
 	}
 
 	isEmpty() {
@@ -253,11 +265,11 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a paste event from TinyMCE.
+	 * Handles a paste event.
 	 *
 	 * Saves the pasted data as plain text in `pastedPlainText`.
 	 *
-	 * @param {PasteEvent} event The paste event as triggered by TinyMCE.
+	 * @param {PasteEvent} event The paste event.
 	 */
 	onPaste( event ) {
 		const clipboardData = event.clipboardData;
@@ -299,7 +311,7 @@ export class RichText extends Component {
 		// Note: a pasted file may have the URL as plain text.
 		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
-			const content = rawHandler( {
+			const content = pasteHandler( {
 				HTML: `<img src="${ createBlobURL( file ) }">`,
 				mode: 'BLOCKS',
 				tagName: this.props.tagName,
@@ -351,7 +363,7 @@ export class RichText extends Component {
 			mode = 'AUTO';
 		}
 
-		const content = rawHandler( {
+		const content = pasteHandler( {
 			HTML: html,
 			plainText,
 			mode,
@@ -406,10 +418,7 @@ export class RichText extends Component {
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-		// Don't apply changes if there's no transform. Content will be up to
-		// date. In the future we could always let it flow back in the live DOM
-		// if there are no performance issues.
-		this.onChange( transformed, record === transformed );
+		this.onChange( transformed );
 	}
 
 	/**
@@ -421,9 +430,16 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { start, end } = this.createRecord();
+		const { start, end, formats } = this.createRecord();
 
 		if ( start !== this.state.start || end !== this.state.end ) {
+			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
+			if ( ! isCaretWithinFormattedText && formats[ start ] ) {
+				this.props.onEnterFormattedText();
+			} else if ( isCaretWithinFormattedText && ! formats[ start ] ) {
+				this.props.onExitFormattedText();
+			}
+
 			this.setState( { start, end } );
 		}
 	}
@@ -477,7 +493,7 @@ export class RichText extends Component {
 	 *
 	 * @link https://en.wikipedia.org/wiki/Caret_navigation
 	 *
-	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
+	 * @param {KeyboardEvent} event Keydown event.
 	 */
 	onDeleteKeyDown( event ) {
 		const { onMerge, onRemove } = this.props;
@@ -488,10 +504,8 @@ export class RichText extends Component {
 		const { keyCode } = event;
 		const isReverse = keyCode === BACKSPACE;
 
-		const { isCollapsed } = getSelection();
-
 		// Only process delete if the key press occurs at uncollapsed edge.
-		if ( ! isCollapsed ) {
+		if ( ! isCollapsed( this.createRecord() ) ) {
 			return;
 		}
 
@@ -520,90 +534,69 @@ export class RichText extends Component {
 		}
 
 		event.preventDefault();
-
-		// Calling onMerge() or onRemove() will destroy the editor, so it's
-		// important that we stop other handlers (e.g. ones registered by
-		// TinyMCE) from also handling this event.
-		event.stopImmediatePropagation();
 	}
 
 	/**
-	 * Handles a horizontal navigation key down event to handle the case where
-	 * TinyMCE attempts to preventDefault when on the outside edge of an inline
-	 * boundary when arrowing _away_ from the boundary, not within it. Replaces
-	 * the TinyMCE event `preventDefault` behavior with a noop, such that those
-	 * relying on `defaultPrevented` are not misinformed about the arrow event.
+	 * Handles a keydown event.
 	 *
-	 * If TinyMCE#4476 is resolved, this handling may be removed.
-	 *
-	 * @see https://github.com/tinymce/tinymce/issues/4476
-	 *
-	 * @param {tinymce.EditorEvent<KeyboardEvent>} event Keydown event.
-	 */
-	onHorizontalNavigationKeyDown( event ) {
-		const { focusNode } = getSelection();
-		const { nodeType, nodeValue } = focusNode;
-
-		if ( nodeType !== Node.TEXT_NODE ) {
-			return;
-		}
-
-		if ( nodeValue.length !== 1 || nodeValue[ 0 ] !== TINYMCE_ZWSP ) {
-			return;
-		}
-
-		const { keyCode } = event;
-
-		// Consider to be moving away from inline boundary based on:
-		//
-		// 1. Within a text fragment consisting only of ZWSP.
-		// 2. If in reverse, there is no previous sibling. If forward, there is
-		//    no next sibling (i.e. end of node).
-		const isReverse = keyCode === LEFT;
-		const edgeSibling = isReverse ? 'previousSibling' : 'nextSibling';
-		if ( ! focusNode[ edgeSibling ] ) {
-			// Note: This is not reassigning on the native event, rather the
-			// "fixed" TinyMCE copy, which proxies its preventDefault to the
-			// native event. By reassigning here, we're effectively preventing
-			// the proxied call on the native event, but not otherwise mutating
-			// the original event object.
-			event.preventDefault = noop;
-		}
-	}
-
-	/**
-	 * Handles a keydown event from TinyMCE.
-	 *
-	 * @param {KeydownEvent} event The keydown event as triggered by TinyMCE.
+	 * @param {KeyboardEvent} event The keydown event.
 	 */
 	onKeyDown( event ) {
 		const { keyCode } = event;
 
-		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
-		if ( isDelete ) {
+		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			const value = this.createRecord();
+			const start = getSelectionStart( value );
+			const end = getSelectionEnd( value );
+
+			// Always handle uncollapsed selections ourselves.
+			if ( ! isCollapsed( value ) ) {
+				this.onChange( remove( value ) );
+				event.preventDefault();
+				return;
+			}
+
+			if ( this.multilineTag ) {
+				let newValue;
+
+				if ( keyCode === BACKSPACE ) {
+					if ( charAt( value, start - 1 ) === LINE_SEPARATOR ) {
+						newValue = remove(
+							value,
+							// Only remove the line if the selection is
+							// collapsed.
+							isCollapsed( value ) ? start - 1 : start,
+							end
+						);
+					}
+				} else if ( charAt( value, end ) === LINE_SEPARATOR ) {
+					newValue = remove(
+						value,
+						start,
+						// Only remove the line if the selection is collapsed.
+						isCollapsed( value ) ? end + 1 : end,
+					);
+				}
+
+				if ( newValue ) {
+					this.onChange( newValue );
+					event.preventDefault();
+				}
+			}
+
 			this.onDeleteKeyDown( event );
-		}
+		} else if ( keyCode === ENTER ) {
+			event.preventDefault();
 
-		const isHorizontalNavigation = keyCode === LEFT || keyCode === RIGHT;
-		if ( isHorizontalNavigation ) {
-			this.onHorizontalNavigationKeyDown( event );
-		}
+			const record = this.createRecord();
 
-		// If we click shift+Enter on inline RichTexts, we avoid creating two contenteditables
-		// We also split the content and call the onSplit prop if provided.
-		if ( keyCode === ENTER ) {
 			if ( this.props.onReplace ) {
-				const text = getTextContent( this.getRecord() );
+				const text = getTextContent( record );
 				const transformation = findTransform( this.enterPatterns, ( item ) => {
 					return item.regExp.test( text );
 				} );
 
 				if ( transformation ) {
-					// Calling onReplace() will destroy the editor, so it's
-					// important that we stop other handlers (e.g. ones
-					// registered by TinyMCE) from also handling this event.
-					event.stopImmediatePropagation();
-					event.preventDefault();
 					this.props.onReplace( [
 						transformation.transform( { content: text } ),
 					] );
@@ -611,36 +604,39 @@ export class RichText extends Component {
 				}
 			}
 
-			if ( this.props.multiline ) {
-				if ( ! this.props.onSplit ) {
-					return;
-				}
-
-				const record = this.getRecord();
-
-				if ( ! isEmptyLine( record ) ) {
-					return;
-				}
-
-				event.preventDefault();
-
-				this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
-			} else {
-				event.preventDefault();
-
-				if ( event.shiftKey || ! this.props.onSplit ) {
-					this.editor.execCommand( 'InsertLineBreak', false, event );
+			if ( this.multilineTag ) {
+				if ( this.props.onSplit && isEmptyLine( record ) ) {
+					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
-					this.splitContent();
+					this.onChange( insertLineSeparator( record ) );
 				}
+			} else if ( event.shiftKey || ! this.props.onSplit ) {
+				const text = getTextContent( record );
+				const length = text.length;
+				let toInsert = '\n';
+
+				// If the caret is at the end of the text, and there is no
+				// trailing line break or no text at all, we have to insert two
+				// line breaks in order to create a new line visually and place
+				// the caret there.
+				if ( record.end === length && (
+					text.charAt( length - 1 ) !== '\n' || length === 0
+				) ) {
+					toInsert = '\n\n';
+				}
+
+				this.onChange( insert( record, toInsert ) );
+			} else {
+				this.splitContent();
 			}
 		}
 	}
 
 	/**
-	 * Handles TinyMCE key up event.
+	 * Handles a keyup event.
 	 *
-	 * @param {number} keyCode The key code that has been pressed on the keyboard.
+	 * @param {number} $1.keyCode The key code that has been pressed on the
+	 *                            keyboard.
 	 */
 	onKeyUp( { keyCode } ) {
 		// The input event does not fire when the whole field is selected and
@@ -757,7 +753,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { tagName, value } = this.props;
+		const { tagName, value, isSelected } = this.props;
 
 		if (
 			tagName === prevProps.tagName &&
@@ -776,31 +772,61 @@ export class RichText extends Component {
 
 			const record = this.formatToValue( value );
 
-			if ( this.isActive() ) {
-				const length = getTextContent( prevProps.value ).length;
+			if ( isSelected ) {
+				const prevRecord = this.formatToValue( prevProps.value );
+				const length = getTextContent( prevRecord ).length;
 				record.start = length;
 				record.end = length;
 			}
 
 			this.applyRecord( record );
+			this.savedContent = value;
+		}
+
+		// If blocks are merged, but the content remains the same, e.g. merging
+		// an empty paragraph into another, then also set the selection to the
+		// end.
+		if ( isSelected && ! prevProps.isSelected && ! this.isActive() ) {
+			const record = this.formatToValue( value );
+			const prevRecord = this.formatToValue( prevProps.value );
+			const length = getTextContent( prevRecord ).length;
+			record.start = length;
+			record.end = length;
+			this.applyRecord( record );
+		}
+
+		// If any format props update, reapply value.
+		const shouldReapply = Object.keys( this.props ).some( ( name ) => {
+			if ( name.indexOf( 'format_' ) !== 0 ) {
+				return false;
+			}
+
+			return Object.keys( this.props[ name ] ).some( ( subName ) => {
+				return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
+			} );
+		} );
+
+		if ( shouldReapply ) {
+			const record = this.formatToValue( value );
+			this.applyRecord( record );
 		}
 	}
 
 	formatToValue( value ) {
-		const { format, multiline } = this.props;
-
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
 			return create( {
 				html: children.toHTML( value ),
-				multilineTag: multiline,
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
-		if ( format === 'string' ) {
+		if ( this.props.format === 'string' ) {
 			return create( {
 				html: value,
-				multilineTag: multiline,
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 
@@ -813,37 +839,56 @@ export class RichText extends Component {
 		return value;
 	}
 
-	valueToFormat( { formats, text } ) {
-		const { format, multiline } = this.props;
+	valueToEditableHTML( value ) {
+		return unstableToDom( {
+			value,
+			multilineTag: this.multilineTag,
+			multilineWrapperTags: this.multilineWrapperTags,
+			createLinePadding( doc ) {
+				const element = doc.createElement( 'br' );
+				element.setAttribute( 'data-mce-bogus', '1' );
+				return element;
+			},
+			prepareEditableTree: this.props.prepareEditableTree,
+		} ).body.innerHTML;
+	}
 
+	valueToFormat( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
-			return children.fromDOM( unstableToDom( { formats, text }, multiline ).body.childNodes );
+			return children.fromDOM( unstableToDom( {
+				value,
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
+			} ).body.childNodes );
 		}
 
-		if ( format === 'string' ) {
-			return toHTMLString( { formats, text }, multiline );
+		if ( this.props.format === 'string' ) {
+			return toHTMLString( {
+				value,
+				multilineTag: this.multilineTag,
+				multilineWrapperTags: this.multilineWrapperTags,
+			} );
 		}
 
-		return { formats, text };
+		return value;
 	}
 
 	render() {
 		const {
 			tagName: Tagname = 'div',
 			style,
-			value,
 			wrapperClassName,
 			className,
 			inlineToolbar = false,
 			formattingControls,
 			placeholder,
-			multiline: MultilineTag,
 			keepPlaceholderOnFocus = false,
 			isSelected,
 			autocompleters,
 		} = this.props;
 
+		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
 
 		// Generating a key that includes `tagName` ensures that if the tag
@@ -854,37 +899,20 @@ export class RichText extends Component {
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
 		const record = this.getRecord();
 
-		const formatToolbar = this.editor && (
-			<FormatToolbar
-				record={ record }
-				onChange={ this.onChange }
-				enabledControls={ formattingControls }
-				editor={ this.editor }
-			/>
-		);
-
 		return (
 			<div className={ classes }
-				ref={ this.containerRef }
 				onFocus={ this.setFocusedElement }
 			>
 				{ isSelected && ! inlineToolbar && (
 					<BlockFormatControls>
-						{ formatToolbar }
+						<FormatToolbar controls={ formattingControls } />
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
 					<div className="editor-rich-text__inline-toolbar">
-						{ formatToolbar }
+						<FormatToolbar controls={ formattingControls } />
 					</div>
 				) }
-				{ isSelected &&
-					<TokenUI
-						editor={ this.editor }
-						containerRef={ this.containerRef }
-					/>
-				}
-
 				<Autocomplete
 					onReplace={ this.props.onReplace }
 					completers={ autocompleters }
@@ -898,7 +926,7 @@ export class RichText extends Component {
 								getSettings={ this.getSettings }
 								onSetup={ this.onSetup }
 								style={ style }
-								defaultValue={ value }
+								defaultValue={ this.valueToEditableHTML( record ) }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
@@ -910,7 +938,11 @@ export class RichText extends Component {
 								key={ key }
 								onPaste={ this.onPaste }
 								onInput={ this.onInput }
-								multilineTag={ MultilineTag }
+								onKeyDown={ this.onKeyDown }
+								onKeyUp={ this.onKeyUp }
+								onFocus={ this.onFocus }
+								multilineTag={ this.multilineTag }
+								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
 							/>
 							{ isPlaceholderVisible &&
@@ -921,7 +953,7 @@ export class RichText extends Component {
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 								</Tagname>
 							}
-							{ isSelected && <Slot name="RichText.Siblings" /> }
+							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
 						</Fragment>
 					) }
 				</Autocomplete>
@@ -931,8 +963,9 @@ export class RichText extends Component {
 }
 
 RichText.defaultProps = {
-	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
-	format: 'rich-text',
+	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
+	format: 'string',
+	value: '',
 };
 
 const RichTextContainer = compose( [
@@ -940,12 +973,15 @@ const RichTextContainer = compose( [
 	withBlockEditContext( ( context, ownProps ) => {
 		// When explicitly set as not selected, do nothing.
 		if ( ownProps.isSelected === false ) {
-			return {};
+			return {
+				clientId: context.clientId,
+			};
 		}
 		// When explicitly set as selected, use the value stored in the context instead.
 		if ( ownProps.isSelected === true ) {
 			return {
 				isSelected: context.isSelected,
+				clientId: context.clientId,
 			};
 		}
 
@@ -953,15 +989,17 @@ const RichTextContainer = compose( [
 		return {
 			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
 			setFocusedElement: context.setFocusedElement,
+			clientId: context.clientId,
 		};
 	} ),
 	withSelect( ( select ) => {
-		const { isViewportMatch = identity } = select( 'core/viewport' ) || {};
-		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
+		const { isViewportMatch } = select( 'core/viewport' );
+		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
 
 		return {
 			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
+			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -969,51 +1007,63 @@ const RichTextContainer = compose( [
 			createUndoLevel,
 			redo,
 			undo,
+			enterFormattedText,
+			exitFormattedText,
 		} = dispatch( 'core/editor' );
 
 		return {
 			onCreateUndoLevel: createUndoLevel,
 			onRedo: redo,
 			onUndo: undo,
+			onEnterFormattedText: enterFormattedText,
+			onExitFormattedText: exitFormattedText,
 		};
 	} ),
 	withSafeTimeout,
+	withFilters( 'experimentalRichText' ),
 ] )( RichText );
 
-RichTextContainer.Content = ( { value, format, tagName: Tag, multiline, ...props } ) => {
+RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
 	let html = value;
+	let MultilineTag;
+
+	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
+		MultilineTag = multiline === true ? 'p' : multiline;
+	}
 
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		html = children.toHTML( value );
-	} else if ( format !== 'string' ) {
-		html = toHTMLString( value, multiline );
+	}
+
+	if ( ! html && MultilineTag ) {
+		html = `<${ MultilineTag }></${ MultilineTag }>`;
 	}
 
 	const content = <RawHTML>{ html }</RawHTML>;
 
 	if ( Tag ) {
-		return <Tag { ...props }>{ content }</Tag>;
+		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
 	}
 
 	return content;
 };
 
-RichTextContainer.isEmpty = ( value ) => {
+RichTextContainer.isEmpty = ( value = '' ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
 		return ! value || value.length === 0;
 	}
 
-	if ( typeof value === 'string' ) {
-		return value.length === 0;
-	}
-
-	return isEmpty( value );
+	return value.length === 0;
 };
 
 RichTextContainer.Content.defaultProps = {
-	format: 'rich-text',
+	format: 'string',
+	value: '',
 };
 
 export default RichTextContainer;
+export { RichTextShortcut } from './shortcut';
+export { RichTextToolbarButton } from './toolbar-button';
+export { RichTextInserterItem } from './inserter-list-item';

@@ -22,9 +22,15 @@ import {
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
-import { getBlobByURL } from '@wordpress/blob';
+import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+
+/**
+ * Internal dependencies
+ */
+import { createUpgradedEmbedBlock } from '../embed/util';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
+const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 class VideoEdit extends Component {
 	constructor() {
@@ -36,6 +42,7 @@ class VideoEdit extends Component {
 		};
 
 		this.videoPlayer = createRef();
+		this.posterImageButton = createRef();
 		this.toggleAttribute = this.toggleAttribute.bind( this );
 		this.onSelectURL = this.onSelectURL.bind( this );
 		this.onSelectPoster = this.onSelectPoster.bind( this );
@@ -45,7 +52,7 @@ class VideoEdit extends Component {
 	componentDidMount() {
 		const { attributes, noticeOperations, setAttributes } = this.props;
 		const { id, src = '' } = attributes;
-		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
+		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 			if ( file ) {
 				mediaUpload( {
@@ -82,6 +89,14 @@ class VideoEdit extends Component {
 		// Set the block's src from the edit component's state, and switch off
 		// the editing UI.
 		if ( newSrc !== src ) {
+			// Check if there's an embed block that handles this URL.
+			const embedBlock = createUpgradedEmbedBlock(
+				{ attributes: { url: newSrc } }
+			);
+			if ( undefined !== embedBlock ) {
+				this.props.onReplace( embedBlock );
+				return;
+			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
 
@@ -96,6 +111,9 @@ class VideoEdit extends Component {
 	onRemovePoster() {
 		const { setAttributes } = this.props;
 		setAttributes( { poster: '' } );
+
+		// Move focus back to the Media Upload button.
+		this.posterImageButton.current.focus();
 	}
 
 	render() {
@@ -132,10 +150,6 @@ class VideoEdit extends Component {
 			return (
 				<MediaPlaceholder
 					icon="media-video"
-					labels={ {
-						title: __( 'Video' ),
-						name: __( 'a video' ),
-					} }
 					className={ className }
 					onSelect={ onSelectVideo }
 					onSelectURL={ this.onSelectURL }
@@ -200,9 +214,13 @@ class VideoEdit extends Component {
 							<MediaUpload
 								title={ __( 'Select Poster Image' ) }
 								onSelect={ this.onSelectPoster }
-								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
 								render={ ( { open } ) => (
-									<Button isDefault onClick={ open }>
+									<Button
+										isDefault
+										onClick={ open }
+										ref={ this.posterImageButton }
+									>
 										{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
 									</Button>
 								) }

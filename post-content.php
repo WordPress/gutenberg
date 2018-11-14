@@ -1,6 +1,6 @@
-<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
-<div class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-image-text"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p></div>
-<!-- /wp:cover-image -->
+<!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
+<div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-text"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p></div>
+<!-- /wp:cover -->
 
 <!-- wp:paragraph -->
 <p><?php _e( 'The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you&#8217;ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.', 'gutenberg' ); ?></p>
@@ -149,9 +149,9 @@ https://vimeo.com/22439234
 <p style="text-align:center">
 	<em>
 		<?php
-		sprintf(
+		echo sprintf(
 			/* translators: %s: Gutenberg GitHub repository URL */
-			_e( 'If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="%s">GitHub repository</a>.', 'gutenberg' ),
+			__( 'If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="%s">GitHub repository</a>.', 'gutenberg' ),
 			'https://github.com/WordPress/gutenberg'
 		);
 		?>

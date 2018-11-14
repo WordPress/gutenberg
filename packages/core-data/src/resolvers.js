@@ -14,7 +14,7 @@ import { addQueryArgs } from '@wordpress/url';
 import {
 	receiveUserQuery,
 	receiveEntityRecords,
-	receiveThemeSupportsFromIndex,
+	receiveThemeSupports,
 	receiveEmbedPreview,
 } from './actions';
 import { getKindEntities } from './entities';
@@ -66,12 +66,21 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	yield receiveEntityRecords( kind, name, Object.values( records ), query );
 }
 
+getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
+	return (
+		action.type === 'RECEIVE_ITEMS' &&
+		action.invalidateCache &&
+		kind === action.kind &&
+		name === action.name
+	);
+};
+
 /**
  * Requests theme supports data from the index.
  */
 export function* getThemeSupports() {
-	const index = yield apiFetch( { path: '/' } );
-	yield receiveThemeSupportsFromIndex( index );
+	const activeThemes = yield apiFetch( { path: '/wp/v2/themes?status=active' } );
+	yield receiveThemeSupports( activeThemes[ 0 ].theme_supports );
 }
 
 /**

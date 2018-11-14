@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { over, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,15 @@ import { includes } from 'lodash';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
-import { UP, RIGHT, DOWN, LEFT, ENTER, BACKSPACE } from '@wordpress/keycodes';
+import {
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT,
+	ENTER,
+	BACKSPACE,
+	ESCAPE,
+} from '@wordpress/keycodes';
 import { withSafeTimeout, compose } from '@wordpress/compose';
 
 /**
@@ -41,6 +49,12 @@ class ObserveTyping extends Component {
 		this.stopTypingOnMouseMove = this.stopTypingOnMouseMove.bind( this );
 		this.startTypingInTextField = this.startTypingInTextField.bind( this );
 		this.stopTypingOnNonTextField = this.stopTypingOnNonTextField.bind( this );
+		this.stopTypingOnEscapeKey = this.stopTypingOnEscapeKey.bind( this );
+
+		this.onKeyDown = over( [
+			this.startTypingInTextField,
+			this.stopTypingOnEscapeKey,
+		] );
 
 		this.lastMouseMove = null;
 	}
@@ -109,6 +123,17 @@ class ObserveTyping extends Component {
 	}
 
 	/**
+	 * Unsets typing flag if user presses Escape while typing flag is active.
+	 *
+	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
+	 */
+	stopTypingOnEscapeKey( event ) {
+		if ( this.props.isTyping && event.keyCode === ESCAPE ) {
+			this.props.onStopTyping();
+		}
+	}
+
+	/**
 	 * Handles a keypress or keydown event to infer intention to start typing.
 	 *
 	 * @param {KeyboardEvent} event Keypress or keydown event to interpret.
@@ -165,7 +190,7 @@ class ObserveTyping extends Component {
 			<div
 				onFocus={ this.stopTypingOnNonTextField }
 				onKeyPress={ this.startTypingInTextField }
-				onKeyDown={ this.startTypingInTextField }
+				onKeyDown={ this.onKeyDown }
 			>
 				{ children }
 			</div>

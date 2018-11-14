@@ -56,7 +56,7 @@ $block-inserter-search-height: 38px;
 	}
 }
 
-.editor-inserter__results-portal {
+.editor-inserter__inline-elements {
 	margin-top: -1px;
 }
 
@@ -110,12 +110,11 @@ $block-inserter-search-height: 38px;
 
 .editor-inserter__reusable-blocks-panel {
 	position: relative;
+	text-align: right;
+}
 
-	.editor-inserter__manage-reusable-blocks {
-		bottom: 5px;
-		position: absolute;
-		right: 0;
-	}
+.editor-inserter__manage-reusable-blocks {
+	margin: $grid-size-large 0 0 $grid-size-large;
 }
 
 .editor-inserter__no-results {

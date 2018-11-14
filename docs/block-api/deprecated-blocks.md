@@ -112,7 +112,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	},
 
 	save: function( props ) {
-		return el( 'div', {}, props.attributes.text );
+		return el( 'div', {}, props.attributes.content );
 	},
 
 	deprecated: [
@@ -153,7 +153,7 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 	},
 
 	save( props ) {
-		return <div>{ props.attributes.text }</div>;
+		return <div>{ props.attributes.content }</div>;
 	},
 
 	deprecated: [
@@ -204,8 +204,8 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				title: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'p',
 				},
 			},
@@ -245,8 +245,8 @@ registerBlockType( 'gutenberg/block-with-deprecated-version', {
 		{
 			attributes: {
 				title: {
-					type: 'array',
-					source: 'children',
+					type: 'string',
+					source: 'html',
 					selector: 'p',
 				},
 			},

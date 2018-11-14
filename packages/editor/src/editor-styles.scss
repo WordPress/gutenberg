@@ -1,18 +1,14 @@
-.wp-block {
-	width: $content-width;
-}
-
 body {
 	font-family: $editor-font;
+	font-size: $editor-font-size;
 	line-height: $editor-line-height;
 	color: $dark-gray-900;
-	font-size: $editor-font-size;
 }
 
 p {
 	font-size: $editor-font-size;
+	line-height: $editor-line-height;
 }
-
 
 ul,
 ol {
@@ -20,10 +16,19 @@ ol {
 	padding: 0;
 }
 
-ul:not(.wp-block-gallery) {
+ul {
 	list-style-type: disc;
 }
 
 ol {
 	list-style-type: decimal;
+}
+
+ul ul,
+ol ul {
+	list-style-type: circle;
+}
+
+.mce-content-body {
+	line-height: $editor-line-height;
 }

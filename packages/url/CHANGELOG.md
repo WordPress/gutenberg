@@ -1,6 +1,35 @@
+## 2.3.0 (2018-11-12)
+
+### New Features
+
+- Added `getProtocol`.
+- Added `isValidProtocol`.
+- Added `getAuthority`
+- Added `isValidAuthority`.
+- Added `getPath`.
+- Added `isValidPath`.
+- Added `getQueryString`.
+- Added `isValidQueryString`.
+- Added `getFragment`.
+- Added `isValidFragment`.
+
+## 2.2.0 (2018-10-29)
+
+### New Features
+
+- Added `getQueryArg`.
+- Added `hasQueryArg`.
+- Added `removeQueryArgs`.
+
+## 2.1.0 (2018-10-16)
+
+### New Feature
+
+- Added `safeDecodeURI`.
+
 ## 2.0.1 (2018-09-30)
 
-### Bug Fixes
+### Bug Fix
 
 - Fix typo in the `qs` dependency definition in the `package.json`
 

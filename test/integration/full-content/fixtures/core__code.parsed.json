@@ -1,12 +1,16 @@
 [
     {
         "blockName": "core/code",
-        "attrs": null,
+        "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<pre class=\"wp-block-code\"><code>export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}</code></pre>\n"
+        "innerHTML": "\n<pre class=\"wp-block-code\"><code>export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}</code></pre>\n",
+        "innerContent": [ "\n<pre class=\"wp-block-code\"><code>export default function MyButton() {\n\treturn &lt;Button&gt;Click Me!&lt;/Button&gt;;\n}</code></pre>\n" ]
     },
     {
+        "blockName": null,
         "attrs": {},
-        "innerHTML": "\n"
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [ "\n" ]
     }
 ]

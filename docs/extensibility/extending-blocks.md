@@ -21,6 +21,18 @@ wp.blocks.registerBlockStyle( 'core/quote', {
 
 The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
+By adding `isDefault: true`, you can make registered style variation to be active by default when a block is inserted.
+
+To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
+
+_Example:_
+
+```js
+wp.blocks.unregisterBlockStyle( 'core/quote', 'fancy-quote' );
+```
+
+The above removes the variation named `fancy-quote` from the `core/quote` block.
+
 ### Filters
 
 Extending blocks can involve more than just providing alternative styles, in this case, you can use one of the following filters to extend the block settings.
@@ -155,23 +167,23 @@ wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', wit
 {% ESNext %}
 ```js
 const { createHigherOrderComponent } = wp.compose;
-const { Fragment } = wp.Element;
+const { Fragment } = wp.element;
 const { InspectorControls } = wp.editor;
 const { PanelBody } = wp.components;
 
-const withInspectorControls =  createHigherOrderComponent(BlockEdit => {
-  return props => {
-    return (
-      <Fragment>
-		<InspectorControls>
-			<PanelBody>
-				My custom control
-			</PanelBody>
-		<InspectorControls />
-        <BlockEdit { ...props } />
-      </Fragment>
-    );
-  };
+const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {
+	return ( props ) => {
+		return (
+			<Fragment>
+				<BlockEdit { ...props } />
+				<InspectorControls>
+					<PanelBody>
+						My custom control
+					</PanelBody>
+				</InspectorControls>
+			</Fragment>
+		);
+	};
 }, "withInspectorControl" );
 
 wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
@@ -321,9 +333,13 @@ function my_plugin_block_categories( $categories, $post ) {
 			array(
 				'slug' => 'my-category',
 				'title' => __( 'My category', 'my-plugin' ),
+				'icon'  => '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>',
 			),
 		)
 	);
 }
 add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
+
+You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+

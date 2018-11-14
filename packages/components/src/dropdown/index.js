@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { Component, createRef } from '@wordpress/element';
 
 /**
@@ -11,12 +12,14 @@ import Popover from '../popover';
 class Dropdown extends Component {
 	constructor() {
 		super( ...arguments );
+
 		this.toggle = this.toggle.bind( this );
 		this.close = this.close.bind( this );
-		this.clickOutside = this.clickOutside.bind( this );
-		this.bindContainer = this.bindContainer.bind( this );
+		this.closeIfClickOutside = this.closeIfClickOutside.bind( this );
 		this.refresh = this.refresh.bind( this );
-		this.popoverRef = createRef();
+
+		this.containerRef = createRef();
+
 		this.state = {
 			isOpen: false,
 		};
@@ -38,19 +41,18 @@ class Dropdown extends Component {
 		}
 	}
 
-	bindContainer( ref ) {
-		this.container = ref;
-	}
-
 	/**
 	 * When contents change height due to user interaction,
 	 * `refresh` can be called to re-render Popover with correct
 	 * attributes which allow scroll, if need be.
+	 * @deprecated
 	 */
 	refresh() {
-		if ( this.popoverRef.current ) {
-			this.popoverRef.current.refresh();
-		}
+		deprecated( 'Dropdown.refresh()', {
+			plugin: 'Gutenberg',
+			version: '4.5',
+			hint: 'Popover is now automatically re-rendered without needing to execute "refresh"',
+		} );
 	}
 
 	toggle() {
@@ -59,8 +61,16 @@ class Dropdown extends Component {
 		} ) );
 	}
 
-	clickOutside( event ) {
-		if ( ! this.container.contains( event.target ) ) {
+	/**
+	 * Closes the dropdown if a click occurs outside the dropdown wrapper. This
+	 * is intentionally distinct from `onClose` in that a click outside the
+	 * popover may occur in the toggling of the dropdown via its toggle button.
+	 * The correct behavior is to keep the dropdown closed.
+	 *
+	 * @param {MouseEvent} event Click event triggering `onClickOutside`.
+	 */
+	closeIfClickOutside( event ) {
+		if ( ! this.containerRef.current.contains( event.target ) ) {
 			this.close();
 		}
 	}
@@ -84,15 +94,14 @@ class Dropdown extends Component {
 		const args = { isOpen, onToggle: this.toggle, onClose: this.close };
 
 		return (
-			<div className={ className } ref={ this.bindContainer }>
+			<div className={ className } ref={ this.containerRef }>
 				{ renderToggle( args ) }
 				{ isOpen && (
 					<Popover
 						className={ contentClassName }
-						ref={ this.popoverRef }
 						position={ position }
 						onClose={ this.close }
-						onClickOutside={ this.clickOutside }
+						onClickOutside={ this.closeIfClickOutside }
 						expandOnMobile={ expandOnMobile }
 						headerTitle={ headerTitle }
 					>

@@ -1,20 +1,46 @@
-Gutenberg's deprecation policy is intended to support backwards-compatibility for two minor releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
+Gutenberg's deprecation policy is intended to support backwards-compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
+
+## 4.5.0
+- `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
+- `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
 
 ## 4.4.0
 
-- The block attribute sources `children` and `node` have been removed. Please use the `rich-text` source instead. See the core blocks for examples.
-- `wp.blocks.node.matcher` has been removed. Please use `wp.richTextValue.create` instead.
-- `wp.blocks.node.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
-- `wp.blocks.node.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
-- `wp.blocks.children.toHTML` has been removed. Please use `wp.richTextValue.toHTMLString` instead.
-- `wp.blocks.children.fromDOM` has been removed. Please use `wp.richTextValue.create` instead.
-- `wp.blocks.children.concat` has been removed. Please use `wp.richTextValue.concat` instead.
-- `wp.blocks.children.getChildrenArray` has been removed. Please use `wp.richTextValue.create` instead.
+- `wp.date.getSettings` has been removed. Please use `wp.date.__experimentalGetSettings` instead.
+- `wp.compose.remountOnPropChange` has been removed.
+- The following editor store actions have been removed: `createNotice`, `removeNotice`, `createSuccessNotice`, `createInfoNotice`, `createErrorNotice`, `createWarningNotice`. Use the equivalent actions by the same name from the `@wordpress/notices` module.
+- The id prop of wp.nux.DotTip has been removed. Please use the tipId prop instead.
+- `wp.blocks.isValidBlock` has been removed. Please use `wp.blocks.isValidBlockContent` instead but keep in mind that the order of params has changed.
+- `wp.data` `registry.registerReducer` has been deprecated. Use `registry.registerStore` instead.
+- `wp.data` `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
+- `wp.data` `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
+- `wp.data` `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
+- `moment` has been removed from the public API for the date module.
+
+## 4.3.0
+
+- `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
+- `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
+- `wp.components.PanelColor` component has been removed. Please use `wp.editor.PanelColorSettings` instead.
+- `wp.editor.PanelColor` component has been removed. Please use `wp.editor.PanelColorSettings` instead.
 
 ## 4.2.0
 
 - Writing resolvers as async generators has been removed. Use the controls plugin instead.
 - `wp.components.AccessibleSVG` component has been removed. Please use `wp.components.SVG` instead.
+- The `wp.editor.UnsavedChangesWarning` component no longer accepts a `forceIsDirty` prop.
+- `setActiveMetaBoxLocations` action (`core/edit-post`) has been removed.
+- `initializeMetaBoxState` action (`core/edit-post`) has been removed.
+- `wp.editPost.initializeEditor` no longer returns an object. Use the `setActiveMetaBoxLocations` action (`core/edit-post`) in place of the existing object's `initializeMetaBoxes` function.
+- `setMetaBoxSavedData` action (`core/edit-post`) has been removed.
+- `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
+- `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
+- Attribute type coercion has been removed. Omit the source to preserve type via serialized comment demarcation.
+- `mediaDetails` in object passed to `onFileChange` callback of `wp.editor.mediaUpload`. Please use `media_details` property instead.
+- `wp.components.CodeEditor` has been removed. Used `wp.codeEditor` directly instead.
+- `wp.blocks.setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
+- `wp.blocks.getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
+- The Reusable Blocks Data API was marked as experimental as it's subject to change in the future.
 
 ## 4.1.0
 

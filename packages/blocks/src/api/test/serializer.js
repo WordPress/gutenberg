@@ -18,7 +18,8 @@ import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
+	setFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../';
 
@@ -29,7 +30,8 @@ describe( 'block serializer', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -37,12 +39,29 @@ describe( 'block serializer', () => {
 
 	describe( 'getSaveContent()', () => {
 		describe( 'function save', () => {
+			const fruitBlockSave = ( { attributes } ) => createElement( 'div', null, attributes.fruit );
+
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
 					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 						name: 'core/fruit',
+						save: fruitBlockSave,
 					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).toBe( '<div>Bananas</div>' );
+			} );
+
+			it( 'should work when block type is passed as string', () => {
+				registerBlockType( 'core/fruit', {
+					title: 'Fruit',
+					category: 'widgets',
+					save: fruitBlockSave,
+				} );
+
+				const saved = getSaveContent(
+					'core/fruit',
 					{ fruit: 'Bananas' }
 				);
 
@@ -77,22 +96,27 @@ describe( 'block serializer', () => {
 		} );
 
 		it( 'should only return attributes which are not matched from content', () => {
-			const attributes = getCommentAttributes( {
-				fruit: 'bananas',
-				category: 'food',
-				ripeness: 'ripe',
-			}, { attributes: {
-				fruit: {
-					type: 'string',
-					source: 'text',
+			const attributes = getCommentAttributes(
+				{
+					attributes: {
+						fruit: {
+							type: 'string',
+							source: 'text',
+						},
+						category: {
+							type: 'string',
+						},
+						ripeness: {
+							type: 'string',
+						},
+					},
 				},
-				category: {
-					type: 'string',
-				},
-				ripeness: {
-					type: 'string',
-				},
-			} } );
+				{
+					fruit: 'bananas',
+					category: 'food',
+					ripeness: 'ripe',
+				}
+			);
 
 			expect( attributes ).toEqual( {
 				category: 'food',
@@ -101,17 +125,22 @@ describe( 'block serializer', () => {
 		} );
 
 		it( 'should skip attributes whose values are undefined', () => {
-			const attributes = getCommentAttributes( {
-				fruit: 'bananas',
-				ripeness: undefined,
-			}, { attributes: {
-				fruit: {
-					type: 'string',
+			const attributes = getCommentAttributes(
+				{
+					attributes: {
+						fruit: {
+							type: 'string',
+						},
+						ripeness: {
+							type: 'string',
+						},
+					},
 				},
-				ripeness: {
-					type: 'string',
-				},
-			} } );
+				{
+					fruit: 'bananas',
+					ripeness: undefined,
+				}
+			);
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
 		} );
@@ -196,10 +225,10 @@ describe( 'block serializer', () => {
 	} );
 
 	describe( 'serializeBlock()', () => {
-		it( 'serializes the fallback block without comment delimiters', () => {
-			registerBlockType( 'core/unknown-block', {
+		it( 'serializes the freeform content fallback block without comment delimiters', () => {
+			registerBlockType( 'core/freeform-block', {
 				category: 'common',
-				title: 'unknown block',
+				title: 'freeform block',
 				attributes: {
 					fruit: {
 						type: 'string',
@@ -207,8 +236,26 @@ describe( 'block serializer', () => {
 				},
 				save: ( { attributes } ) => attributes.fruit,
 			} );
-			setUnknownTypeHandlerName( 'core/unknown-block' );
-			const block = createBlock( 'core/unknown-block', { fruit: 'Bananas' } );
+			setFreeformContentHandlerName( 'core/freeform-block' );
+			const block = createBlock( 'core/freeform-block', { fruit: 'Bananas' } );
+
+			const content = serializeBlock( block );
+
+			expect( content ).toBe( 'Bananas' );
+		} );
+		it( 'serializes the unregistered fallback block without comment delimiters', () => {
+			registerBlockType( 'core/unregistered-block', {
+				category: 'common',
+				title: 'unregistered block',
+				attributes: {
+					fruit: {
+						type: 'string',
+					},
+				},
+				save: ( { attributes } ) => attributes.fruit,
+			} );
+			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
+			const block = createBlock( 'core/unregistered-block', { fruit: 'Bananas' } );
 
 			const content = serializeBlock( block );
 

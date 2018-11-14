@@ -12,13 +12,13 @@ import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
-	getBlockType,
 } from '@wordpress/blocks';
 import {
 	BlockControls,
 	RichText,
 } from '@wordpress/editor';
-import { replace, join, split, isEmpty } from '@wordpress/rich-text';
+import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wordpress/rich-text';
+import { G, Path, SVG } from '@wordpress/components';
 
 const listContentSchema = {
 	...getPhrasingContentSchema(),
@@ -47,9 +47,11 @@ const schema = {
 		default: false,
 	},
 	values: {
-		source: 'rich-text',
+		type: 'string',
+		source: 'html',
 		selector: 'ol,ul',
 		multiline: 'li',
+		default: '',
 	},
 };
 
@@ -57,8 +59,8 @@ export const name = 'core/list';
 
 export const settings = {
 	title: __( 'List' ),
-	description: __( 'Numbers, bullets, up to you. Add a list of items.' ),
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M9 19h12v-2H9v2zm0-6h12v-2H9v2zm0-8v2h12V5H9zm-4-.5c-.828 0-1.5.672-1.5 1.5S4.172 7.5 5 7.5 6.5 6.828 6.5 6 5.828 4.5 5 4.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z" /></g></svg>,
+	description: __( 'Create a bulleted or numbered list.' ),
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><G><Path d="M9 19h12v-2H9v2zm0-6h12v-2H9v2zm0-8v2h12V5H9zm-4-.5c-.828 0-1.5.672-1.5 1.5S4.172 7.5 5 7.5 6.5 6.828 6.5 6 5.828 4.5 5 4.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5zm0 6c-.828 0-1.5.672-1.5 1.5s.672 1.5 1.5 1.5 1.5-.672 1.5-1.5-.672-1.5-1.5-1.5z" /></G></SVG>,
 	category: 'common',
 	keywords: [ __( 'bullet list' ), __( 'ordered list' ), __( 'numbered list' ) ],
 
@@ -74,9 +76,12 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
-						values: join( blockAttributes.map( ( { content } ) =>
-							replace( content, /\n/g, '\u2028' )
-						), '\u2028' ),
+						values: toHTMLString( {
+							value: join( blockAttributes.map( ( { content } ) =>
+								replace( create( { html: content } ), /\n/g, LINE_SEPARATOR )
+							), LINE_SEPARATOR ),
+							multilineTag: 'li',
+						} ),
 					} );
 				},
 			},
@@ -85,7 +90,10 @@ export const settings = {
 				blocks: [ 'core/quote' ],
 				transform: ( { value } ) => {
 					return createBlock( 'core/list', {
-						values: value,
+						values: toHTMLString( {
+							value: create( { html: value, multilineTag: 'p' } ),
+							multilineTag: 'li',
+						} ),
 					} );
 				},
 			},
@@ -99,7 +107,7 @@ export const settings = {
 				transform( node ) {
 					return createBlock( 'core/list', {
 						...getBlockAttributes(
-							getBlockType( 'core/list' ),
+							'core/list',
 							node.outerHTML
 						),
 						ordered: node.nodeName === 'OL',
@@ -111,7 +119,7 @@ export const settings = {
 				regExp: /^[*-]\s/,
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
-						values: content,
+						values: `<li>${ content }</li>`,
 					} );
 				},
 			},
@@ -121,7 +129,7 @@ export const settings = {
 				transform: ( { content } ) => {
 					return createBlock( 'core/list', {
 						ordered: true,
-						values: content,
+						values: `<li>${ content }</li>`,
 					} );
 				},
 			},
@@ -131,16 +139,30 @@ export const settings = {
 				type: 'block',
 				blocks: [ 'core/paragraph' ],
 				transform: ( { values } ) =>
-					split( values, '\u2028' ).map( ( content ) =>
-						createBlock( 'core/paragraph', { content } )
-					),
+					split( create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ), LINE_SEPARATOR )
+						.map( ( piece ) =>
+							createBlock( 'core/paragraph', {
+								content: toHTMLString( { value: piece } ),
+							} )
+						),
 			},
 			{
 				type: 'block',
 				blocks: [ 'core/quote' ],
 				transform: ( { values } ) => {
 					return createBlock( 'core/quote', {
-						value: values,
+						value: toHTMLString( {
+							value: create( {
+								html: values,
+								multilineTag: 'li',
+								multilineWrapperTags: [ 'ul', 'ol' ],
+							} ),
+							multilineTag: 'p',
+						} ),
 					} );
 				},
 			},
@@ -182,16 +204,15 @@ export const settings = {
 	],
 
 	merge( attributes, attributesToMerge ) {
-		const { values, content } = attributesToMerge;
-		const valueToMerge = values || content;
+		const { values } = attributesToMerge;
 
-		if ( isEmpty( valueToMerge ) ) {
+		if ( ! values || values === '<li></li>' ) {
 			return attributes;
 		}
 
 		return {
 			...attributes,
-			values: join( [ attributes.values, valueToMerge ], '\u2028' ),
+			values: attributes.values + values,
 		};
 	},
 
@@ -312,6 +333,7 @@ export const settings = {
 						] }
 					/>
 					<RichText
+						identifier="values"
 						multiline="li"
 						tagName={ tagName }
 						unstableGetSettings={ this.getEditorSettings }
@@ -329,7 +351,7 @@ export const settings = {
 										blocks.push( createBlock( 'core/paragraph' ) );
 									}
 
-									if ( ! RichText.isEmpty( after ) ) {
+									if ( after !== '<li></li>' ) {
 										blocks.push( createBlock( 'core/list', {
 											ordered,
 											values: after,

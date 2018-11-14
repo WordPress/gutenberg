@@ -1,3 +1,10 @@
+// Override the default list style type _only in the editor_
+// to avoid :not() selector specificity issues.
+// See https://github.com/WordPress/gutenberg/pull/10358
+ul.wp-block-gallery li {
+	list-style-type: none;
+}
+
 .blocks-gallery-item {
 
 	// Hide the focus outline that otherwise briefly appears when selecting a block.
@@ -5,6 +12,7 @@
 		outline: none;
 	}
 
+	img:focus,
 	.is-selected {
 		outline: 4px solid theme(primary);
 	}
@@ -101,6 +109,10 @@
 
 .blocks-gallery-item__remove {
 	padding: 0;
+
+	&.components-button:focus {
+		color: inherit;
+	}
 }
 
 .blocks-gallery-item .components-spinner {

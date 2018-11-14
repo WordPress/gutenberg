@@ -1,23 +1,28 @@
 /**
  * External dependencies
  */
-import { noop, isFunction } from 'lodash';
+import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, createPortal } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { Consumer } from './context';
+
 let occurrences = 0;
 
-class Fill extends Component {
+class FillComponent extends Component {
 	constructor() {
 		super( ...arguments );
 		this.occurrence = ++occurrences;
 	}
 
 	componentDidMount() {
-		const { registerFill = noop } = this.context;
+		const { registerFill } = this.props;
 
 		registerFill( this.props.name, this );
 	}
@@ -26,7 +31,7 @@ class Fill extends Component {
 		if ( ! this.occurrence ) {
 			this.occurrence = ++occurrences;
 		}
-		const { getSlot = noop } = this.context;
+		const { getSlot } = this.props;
 		const slot = getSlot( this.props.name );
 		if ( slot && ! slot.props.bubblesVirtually ) {
 			slot.forceUpdate();
@@ -34,17 +39,13 @@ class Fill extends Component {
 	}
 
 	componentWillUnmount() {
-		const { unregisterFill = noop } = this.context;
+		const { unregisterFill } = this.props;
 
 		unregisterFill( this.props.name, this );
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { name } = this.props;
-		const {
-			unregisterFill = noop,
-			registerFill = noop,
-		} = this.context;
+		const { name, unregisterFill, registerFill } = this.props;
 
 		if ( prevProps.name !== name ) {
 			unregisterFill( prevProps.name, this );
@@ -57,8 +58,7 @@ class Fill extends Component {
 	}
 
 	render() {
-		const { getSlot = noop } = this.context;
-		const { name } = this.props;
+		const { name, getSlot } = this.props;
 		let { children } = this.props;
 		const slot = getSlot( name );
 
@@ -75,10 +75,17 @@ class Fill extends Component {
 	}
 }
 
-Fill.contextTypes = {
-	getSlot: noop,
-	registerFill: noop,
-	unregisterFill: noop,
-};
+const Fill = ( props ) => (
+	<Consumer>
+		{ ( { getSlot, registerFill, unregisterFill } ) => (
+			<FillComponent
+				{ ...props }
+				getSlot={ getSlot }
+				registerFill={ registerFill }
+				unregisterFill={ unregisterFill }
+			/>
+		) }
+	</Consumer>
+);
 
 export default Fill;

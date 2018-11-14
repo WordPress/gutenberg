@@ -46,9 +46,9 @@ describe( 'Preview', () => {
 	 * @return {Promise} Promise resolving once navigation completes.
 	 */
 	async function waitForPreviewNavigation( previewPage ) {
-		const nagivationCompleted = previewPage.waitForNavigation();
+		const navigationCompleted = previewPage.waitForNavigation();
 		await page.click( '.editor-post-preview' );
-		return nagivationCompleted;
+		return navigationCompleted;
 	}
 
 	it( 'Should open a preview window for a new post', async () => {
@@ -67,7 +67,7 @@ describe( 'Preview', () => {
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
-		const [ , postId ] = await ( await editorPage.waitForFunction( () => {
+		const [ , postId ] = await( await editorPage.waitForFunction( () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
@@ -94,12 +94,12 @@ describe( 'Preview', () => {
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World!' );
 
-		// Preview for published post (no unsaved changes) directs to canonical
-		// URL for post.
+		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
 		await publishPost();
+		// Wait until the publish panel is closed
 		await Promise.all( [
-			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-preview' ) ),
+			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
 			editorPage.click( '.editor-post-publish-panel__header button' ),
 		] );
 		expectedPreviewURL = await editorPage.$eval( '.components-notice.is-success a', ( node ) => node.href );

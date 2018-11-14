@@ -32,13 +32,13 @@ export function split( { formats, text, start, end }, string ) {
 		nextStart += string.length + substring.length;
 
 		if ( start !== undefined && end !== undefined ) {
-			if ( start > startIndex && start < nextStart ) {
+			if ( start >= startIndex && start < nextStart ) {
 				value.start = start - startIndex;
 			} else if ( start < startIndex && end > startIndex ) {
 				value.start = 0;
 			}
 
-			if ( end > startIndex && end < nextStart ) {
+			if ( end >= startIndex && end < nextStart ) {
 				value.end = end - startIndex;
 			} else if ( start < nextStart && end > nextStart ) {
 				value.end = substring.length;
