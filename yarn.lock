@@ -7621,9 +7621,9 @@ react-native-randombytes@^3.5.1:
     buffer "^4.9.1"
     sjcl "^1.0.3"
 
-"react-native-recyclerview-list@git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#336f7159eb6e7bad467c041b3f34667d485e7b58":
+"react-native-recyclerview-list@git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#6ab9578439ff6648d6250a2589989487dc3728fa":
   version "0.3.2"
-  resolved "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#336f7159eb6e7bad467c041b3f34667d485e7b58"
+  resolved "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#6ab9578439ff6648d6250a2589989487dc3728fa"
   dependencies:
     prop-types "^15.6.0"
 
@@ -7757,15 +7757,15 @@ react-transform-hmr@^1.0.4:
     global "^4.3.0"
     react-proxy "^1.1.7"
 
-react@16.6.1:
-  version "16.6.1"
-  resolved "https://registry.yarnpkg.com/react/-/react-16.6.1.tgz#ee2aef4f0a09e494594882029821049772f915fe"
-  integrity sha512-OtawJThYlvRgm9BXK+xTL7BIlDx8vv21j+fbQDjRRUyok6y7NyjlweGorielTahLZHYIdKUoK2Dp9ByVWuMqxw==
+react@16.6.3:
+  version "16.6.3"
+  resolved "https://registry.yarnpkg.com/react/-/react-16.6.3.tgz#25d77c91911d6bbdd23db41e70fb094cc1e0871c"
+  integrity sha512-zCvmH2vbEolgKxtqXL2wmGCUxUyNheYn/C+PD1YAjfxHC54+MhdruyhO7QieQrYsYeTxrn93PM2y0jRH1zEExw==
   dependencies:
     loose-envify "^1.1.0"
     object-assign "^4.1.1"
     prop-types "^15.6.2"
-    scheduler "^0.11.0"
+    scheduler "^0.11.2"
 
 react@^0.14.0:
   version "0.14.9"
@@ -8373,7 +8373,7 @@ schedule@^0.3.0:
   dependencies:
     object-assign "^4.1.1"
 
-scheduler@^0.11.0, scheduler@^0.11.2:
+scheduler@^0.11.2:
   version "0.11.2"
   resolved "https://registry.yarnpkg.com/scheduler/-/scheduler-0.11.2.tgz#a8db5399d06eba5abac51b705b7151d2319d33d3"
   integrity sha512-+WCP3s3wOaW4S7C1tl3TEXp4l9lJn0ZK8G3W3WKRWmw77Z2cIFUW2MiNTMHn5sCjxN+t7N43HAOOgMjyAg5hlg==
