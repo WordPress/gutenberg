@@ -8,6 +8,11 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { visitAdmin } from './visit-admin';
 
+/**
+ * Creates new post.
+ *
+ * @param {Object} obj Object to create new post, along with tips enabling option.
+ */
 export async function newPost( {
 	postType,
 	title,
