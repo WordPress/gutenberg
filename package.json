@@ -14,7 +14,7 @@
   },
   "peerDependencies": {
     "react": "16.5.0",
-    "react-native": "0.57.1"
+    "react-native": "0.57.5"
   },
   "dependencies": {
     "prop-types": "15.6.0"
