@@ -10,7 +10,7 @@ import ColorPicker from '../';
 
 describe( 'ColorPicker', () => {
 	test( 'should render color picker', () => {
-		const color = '#fff';
+		const color = '#FFF';
 
 		const renderer = new ShallowRenderer();
 		renderer.render(
