@@ -35,4 +35,18 @@ describe( 'ColorPicker', () => {
 		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
+
+	test( 'should commit changes to all views on blur', () => {
+		const color = '#FFF';
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root.findByType( 'input' ).props.onBlur();
+		expect( testRenderer.toJSON() ).toMatchSnapshot();
+	} );
 } );
