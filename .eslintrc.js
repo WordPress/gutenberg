@@ -165,6 +165,10 @@ module.exports = {
 				selector: 'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
 				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
 			},
+			{
+				selector: 'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
+				message: 'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+			},
 		],
 		'react/forbid-elements': [ 'error', {
 			forbid: [
