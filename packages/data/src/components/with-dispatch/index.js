@@ -39,7 +39,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 
 			proxyDispatch( propName, ...args ) {
 				// Original dispatcher is a pre-bound (dispatching) action creator.
-				mapDispatchToProps( this.props.registry.dispatch, this.props.ownProps )[ propName ]( ...args );
+				mapDispatchToProps( this.props.registry.dispatch, this.props.ownProps, this.props.registry.select )[ propName ]( ...args );
 			}
 
 			setProxyProps( props ) {
@@ -49,7 +49,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				// called, it is done only to determine the keys for which
 				// proxy functions should be created. The actual registry
 				// dispatch does not occur until the function is called.
-				const propsToDispatchers = mapDispatchToProps( this.props.registry.dispatch, props.ownProps );
+				const propsToDispatchers = mapDispatchToProps( this.props.registry.dispatch, props.ownProps, this.props.registry.select );
 				this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
 					// Prebind with prop name so we have reference to the original
 					// dispatcher to invoke. Track between re-renders to avoid
