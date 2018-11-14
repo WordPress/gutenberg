@@ -602,6 +602,19 @@ export function getBlockName( state, clientId ) {
 }
 
 /**
+ * Returns whether a block is valid or not.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {boolean} Is Valid.
+ */
+export function isBlockValid( state, clientId ) {
+	const block = state.editor.present.blocks.byClientId[ clientId ];
+	return !! block && block.isValid;
+}
+
+/**
  * Returns a block given its client ID. This is a parsed copy of the block,
  * containing its `blockName`, `clientId`, and current `attributes` state. This
  * is not the block's registration settings, which must be retrieved from the
