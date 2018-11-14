@@ -1,13 +1,8 @@
-@mixin editor-animation__loading-fade {
-	animation: editor-animation__loading-fade 1.6s ease-in-out infinite;
+@mixin edit-post__loading-fade-animation {
+	animation: edit-post__loading-fade-animation 1.6s ease-in-out infinite;
 }
 
-@mixin editor-animation__fade-in($speed: 0.2s, $delay: 0s) {
-	animation: editor-animation__fade-in $speed ease-out $delay;
-	animation-fill-mode: forwards;
-}
-
-@mixin editor-animation__modal-appear() {
-	animation: editor-animation__modal-appear 0.1s ease-out;
+@mixin edit-post__fade-in-animation($speed: 0.2s, $delay: 0s) {
+	animation: edit-post__fade-in-animation $speed ease-out $delay;
 	animation-fill-mode: forwards;
 }

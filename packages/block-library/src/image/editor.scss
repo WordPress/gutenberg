@@ -2,7 +2,7 @@
 	position: relative;
 
 	&.is-transient img {
-		@include editor-animation__loading-fade;
+		@include edit-post__loading-fade-animation;
 	}
 
 	figcaption img {

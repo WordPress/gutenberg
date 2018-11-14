@@ -40,7 +40,7 @@ describe( 'CSS selector wrap', () => {
 	it( 'should ignore keyframes', () => {
 		const callback = wrap( '.my-namespace' );
 		const input = `
-		@keyframes editor-animation__fade-in {
+		@keyframes edit-post__fade-in-animation {
 			from {
 				opacity: 0;
 			}

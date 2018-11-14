@@ -19,11 +19,11 @@
 		height: 4px;
 		border-radius: 100%;
 		transform-origin: 6px 6px;
-		animation: editor-animation__rotation 1s infinite linear;
+		animation: components-spinner__animation 1s infinite linear;
 	}
 }
 
-@keyframes editor-animation__rotation {
+@keyframes components-spinner__animation {
 	from {
 		transform: rotate(0deg);
 	}

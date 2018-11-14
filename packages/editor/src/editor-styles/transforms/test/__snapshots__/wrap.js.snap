@@ -8,7 +8,7 @@ src: url(sansation_light.woff);
 `;
 
 exports[`CSS selector wrap should ignore keyframes 1`] = `
-"@keyframes editor-animation__fade-in {
+"@keyframes edit-post__fade-in-animation {
 from {
 opacity: 0;
 }

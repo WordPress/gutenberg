@@ -9,7 +9,7 @@
 	z-index: z-index(".components-modal__screen-overlay");
 
 	// This animates the appearance of the white background.
-	@include editor-animation__fade-in();
+	@include edit-post__fade-in-animation();
 }
 
 // The modal window element.
@@ -40,7 +40,17 @@
 		transform: translate(-50%, -50%);
 
 		// Animate the modal frame/contents appearing on the page.
-		@include editor_animation__modal-appear();
+		animation: edit-post__modal-appear-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+	}
+}
+
+@keyframes edit-post__modal-appear-animation {
+	from {
+		margin-top: $grid-size * 4;
+	}
+	to {
+		margin-top: 0;
 	}
 }
 
