@@ -43,7 +43,7 @@
 
 	&:hover svg,
 	&:hover svg * {
-		// !important allows icons from plugins to be overriden and given a dark-gray fill
+		// !important allows icons from plugins to be overriden and given a dark-gray fill.
 		fill: $dark-gray-900 !important;
 	}
 
