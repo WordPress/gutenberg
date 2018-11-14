@@ -98,7 +98,7 @@
 		"phpegjs": "1.0.0-beta7",
 		"postcss-color-function": "4.0.1",
 		"puppeteer": "1.6.1",
-		"react-test-renderer": "16.4.1",
+		"react-test-renderer": "16.6.3",
 		"rimraf": "2.6.2",
 		"rtlcss": "2.4.0",
 		"sass-loader": "6.0.7",

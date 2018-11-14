@@ -28,7 +28,7 @@
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",
-		"react-test-renderer": "^16.4.1"
+		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"
