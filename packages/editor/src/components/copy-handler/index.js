@@ -26,7 +26,7 @@ class CopyHandler extends Component {
 	}
 
 	onCopy( event ) {
-		const { hasMultiSelection, selectedBlockClientIds, getBlocks } = this.props;
+		const { hasMultiSelection, selectedBlockClientIds, getBlocksByClientId } = this.props;
 
 		if ( selectedBlockClientIds.length === 0 ) {
 			return;
@@ -37,7 +37,7 @@ class CopyHandler extends Component {
 			return;
 		}
 
-		const serialized = serialize( getBlocks( selectedBlockClientIds ) );
+		const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
 
 		event.clipboardData.setData( 'text/plain', serialized );
 		event.clipboardData.setData( 'text/html', serialized );
@@ -65,7 +65,7 @@ export default compose( [
 		const {
 			getMultiSelectedBlockClientIds,
 			getSelectedBlockClientId,
-			getBlocks,
+			getBlocksByClientId,
 			hasMultiSelection,
 		} = select( 'core/editor' );
 
@@ -78,7 +78,7 @@ export default compose( [
 
 			// We only care about this value when the copy is performed
 			// We call it dynamically in the event handler to avoid unnecessary re-renders.
-			getBlocks,
+			getBlocksByClientId,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
