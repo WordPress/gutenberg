@@ -20,6 +20,7 @@ import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
 import PopoverDetectOutside from './detect-outside';
 import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
+import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
@@ -40,7 +41,6 @@ class Popover extends Component {
 		this.maybeClose = this.maybeClose.bind( this );
 		this.throttledRefresh = this.throttledRefresh.bind( this );
 		this.refresh = this.refresh.bind( this );
-		this.stopEventPropagationOutsidePopover = this.stopEventPropagationOutsidePopover.bind( this );
 		this.refreshOnAnchorMove = this.refreshOnAnchorMove.bind( this );
 
 		this.contentNode = createRef();
@@ -184,14 +184,6 @@ class Popover extends Component {
 		}
 	}
 
-	/**
-	 * Stop all onMouseDown events propagating further - they should only go to the popover
- 	 * @param {string} event Event object
-	 */
-	stopEventPropagationOutsidePopover( event ) {
-		event.stopPropagation();
-	}
-
 	getAnchorRect( anchor ) {
 		if ( ! anchor || ! anchor.parentNode ) {
 			return;
@@ -297,7 +289,7 @@ class Popover extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		let content = (
 			<PopoverDetectOutside onClickOutside={ onClickOutside }>
-				<div
+				<IsolatedEventContainer
 					className={ classes }
 					style={ {
 						top: ! isMobile && popoverTop ? popoverTop + 'px' : undefined,
@@ -306,7 +298,6 @@ class Popover extends Component {
 					} }
 					{ ...contentProps }
 					onKeyDown={ this.maybeClose }
-					onMouseDown={ this.stopEventPropagationOutsidePopover }
 				>
 					{ isMobile && (
 						<div className="components-popover__header">
@@ -327,7 +318,7 @@ class Popover extends Component {
 					>
 						{ children }
 					</div>
-				</div>
+				</IsolatedEventContainer>
 			</PopoverDetectOutside>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
