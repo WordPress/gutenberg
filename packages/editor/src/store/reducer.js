@@ -20,7 +20,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { getBlockType, isReusableBlock } from '@wordpress/blocks';
+import { getBlockType, isReusableBlock, isTransientAttribute } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -260,7 +260,7 @@ export const editor = flow( [
 				blockType = getBlockType( block.name );
 
 				for ( attributeName in block.attributes ) {
-					if ( blockType.attributes[ attributeName ].transient === true ) {
+					if ( isTransientAttribute( blockType, attributeName ) ) {
 						// If this is the first match in the loop, lazily
 						// create a new state object.
 						if ( nextState === present ) {

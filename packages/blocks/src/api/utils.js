@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, keys, isEqual, isFunction, isString } from 'lodash';
+import { every, get, has, keys, isEqual, isFunction, isString } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
@@ -120,4 +120,8 @@ export function normalizeBlockType( blockTypeOrName ) {
 	}
 
 	return blockTypeOrName;
+}
+
+export function isTransientAttribute( blockType, attributeName ) {
+	return get( blockType, [ 'attributes', attributeName, 'transient' ] ) === true;
 }

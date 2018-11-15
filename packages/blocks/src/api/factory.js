@@ -26,7 +26,7 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getBlockType, getBlockTypes } from './registration';
-import { normalizeBlockType } from './utils';
+import { normalizeBlockType, isTransientAttribute } from './utils';
 
 /**
  * Returns a block object given its type and attributes.
@@ -112,7 +112,7 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 export function getTransientAttributes( blockType, attributes ) {
 	return pickBy(
 		attributes,
-		( value, key ) => blockType.attributes[ key ].transient === true
+		( value, attributeName ) => isTransientAttribute( blockType, attributeName )
 	);
 }
 

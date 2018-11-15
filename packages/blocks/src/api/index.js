@@ -50,6 +50,7 @@ export {
 	isUnmodifiedDefaultBlock,
 	normalizeIconObject,
 	isValidIcon,
+	isTransientAttribute,
 } from './utils';
 export {
 	doBlocksMatchTemplate,
