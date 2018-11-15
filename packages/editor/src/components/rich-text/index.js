@@ -418,14 +418,13 @@ export class RichText extends Component {
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
 	 *
-	 * @param {Object}  record        The record to sync and apply.
-	 * @param {boolean} _withoutApply If true, the record won't be applied to
-	 *                                the live DOM.
+	 * @param {Object}  record            The record to sync and apply.
+	 * @param {Object}  $2                Named options.
+	 * @param {boolean} $2.withoutHistory If true, no undo level will be
+	 *                                    created.
 	 */
-	onChange( record, { withoutHistory, _withoutApply } = {} ) {
-		if ( ! _withoutApply ) {
-			this.applyRecord( record );
-		}
+	onChange( record, { withoutHistory } = {} ) {
+		this.applyRecord( record );
 
 		const { start, end } = record;
 
@@ -604,7 +603,7 @@ export class RichText extends Component {
 		// The input event does not fire when the whole field is selected and
 		// BACKSPACE is pressed.
 		if ( keyCode === BACKSPACE ) {
-			this.onChange( this.createRecord(), true );
+			this.onChange( this.createRecord() );
 		}
 
 		// `scrollToRect` is called on `nodechange`, whereas calling it on
