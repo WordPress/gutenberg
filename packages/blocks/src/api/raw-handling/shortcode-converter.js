@@ -11,12 +11,7 @@ import { regexp, next } from '@wordpress/shortcode';
 /**
  * Internal dependencies
  */
-import {
-	createBlock,
-	getBlockTransforms,
-	// getTransientAttributes,
-	findTransform,
-} from '../factory';
+import { createBlock, getBlockTransforms, findTransform } from '../factory';
 import { getBlockType } from '../registration';
 import { getBlockAttributes } from '../parser';
 
@@ -63,24 +58,16 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 			( schema ) => schema.shortcode( match.shortcode.attrs, match ),
 		);
 
-		const blockType = getBlockType( transformation.blockName );
-
-		// // @see getTransientAttributes for context
-		// const transientAttributes = getTransientAttributes( blockType, attributes );
-
 		const block = createBlock(
 			transformation.blockName,
-			{
-				...getBlockAttributes(
-					{
-						...blockType,
-						attributes: transformation.attributes,
-					},
-					match.shortcode.content,
-					attributes,
-				),
-				// ...transientAttributes,
-			}
+			getBlockAttributes(
+				{
+					...getBlockType( transformation.blockName ),
+					attributes: transformation.attributes,
+				},
+				match.shortcode.content,
+				attributes,
+			)
 		);
 
 		return [
