@@ -91,8 +91,8 @@ Whether the publish sidebar is open.
 
 ### isEditorPanelRemoved
 
-Returns true if the given panel is removed, or false otherwise. Panels are
-not removed by default.
+Returns true if the given panel was programmatically removed, or false otherwise.
+All panels are not removed by default.
 
 *Parameters*
 
