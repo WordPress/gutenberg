@@ -23,12 +23,12 @@ type PropsType = {
 };
 
 const AppProvider = ( { initialData }: PropsType ) => {
-	if (initialData === undefined) {
+	if ( initialData === undefined ) {
 		initialData = initialHtml;
 	}
 	return (
 		<AppContainer initialHtml={ initialData } />
 	);
-}
+};
 
 export default AppProvider;
