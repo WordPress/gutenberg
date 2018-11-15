@@ -519,7 +519,6 @@ class ImageEdit extends Component {
 							} else {
 								defaultedAlt = __( 'This image has an empty alt attribute' );
 							}
-      
 							const img = (
 								// Disable reason: Image itself is not meant to be interactive, but
 								// should direct focus to block.
