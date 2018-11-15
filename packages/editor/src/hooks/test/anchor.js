@@ -62,5 +62,17 @@ describe( 'anchor', () => {
 
 			expect( extraProps.id ).toBe( 'foo' );
 		} );
+
+		it( 'should have no id property if anchor attribute id is an empty string', () => {
+			const attributes = { anchor: '' };
+			const extraProps = getSaveContentExtraProps( {}, {
+				...blockSettings,
+				supports: {
+					anchor: true,
+				},
+			}, attributes );
+
+			expect( extraProps ).not.toHaveProperty( 'id' );
+		} );
 	} );
 } );

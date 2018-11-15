@@ -97,7 +97,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
  * @return {Object} Filtered props applied to save element.
  */
 export function addSaveProps( extraProps, blockType, attributes ) {
-	if ( hasBlockSupport( blockType, 'anchor' ) ) {
+	if ( hasBlockSupport( blockType, 'anchor' ) && attributes.anchor !== '' ) {
 		extraProps.id = attributes.anchor;
 	}
 
