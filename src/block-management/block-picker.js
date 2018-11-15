@@ -39,6 +39,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 				transparent={ true }
 				isVisible={ this.props.visible }
 				onSwipe={ this.props.onDismiss.bind( this ) }
+				onBackButtonPress={ this.props.onDismiss.bind( this ) }
 				swipeDirection="down"
 				style={ [ styles.bottomModal, this.props.style ] }
 				backdropColor={ 'lightgrey' }
