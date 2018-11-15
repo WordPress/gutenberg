@@ -134,15 +134,6 @@ export function activeGeneralSidebar( state = DEFAULT_ACTIVE_GENERAL_SIDEBAR, ac
 	return state;
 }
 
-export function panel( state = 'document', action ) {
-	switch ( action.type ) {
-		case 'SET_ACTIVE_PANEL':
-			return action.panel;
-	}
-
-	return state;
-}
-
 /**
  * Reducer for storing the name of the open modal, or null if no modal is open.
  *
@@ -220,7 +211,6 @@ const metaBoxes = combineReducers( {
 export default combineReducers( {
 	preferences,
 	activeGeneralSidebar,
-	panel,
 	activeModal,
 	publishSidebarActive,
 	metaBoxes,
