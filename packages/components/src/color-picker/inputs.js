@@ -10,6 +10,7 @@ import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { DOWN, ENTER, UP } from '@wordpress/keycodes';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -76,6 +77,8 @@ export class Input extends Component {
 		);
 	}
 }
+
+const PureIconButton = pure( IconButton );
 
 export class Inputs extends Component {
 	constructor( { hsl } ) {
@@ -277,7 +280,7 @@ export class Inputs extends Component {
 			<div className="components-color-picker__inputs-wrapper">
 				{ this.renderFields() }
 				<div className="components-color-picker__inputs-toggle">
-					<IconButton
+					<PureIconButton
 						icon="arrow-down-alt2"
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }
