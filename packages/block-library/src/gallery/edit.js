@@ -72,7 +72,7 @@ class GalleryEdit extends Component {
 
 	setAttributes( attributes ) {
 		if ( attributes.ids ) {
-			throw new Error( "Don't use this attribute, dangit." );
+			throw new Error( 'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes' );
 		}
 
 		if ( attributes.images ) {
