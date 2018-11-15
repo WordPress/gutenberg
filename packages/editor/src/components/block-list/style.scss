@@ -430,8 +430,8 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		// Position hover label on the right
-		> .editor-block-list__block-edit .editor-block-list__breadcrumb {
+		// Position hover label on the right for the top level block.
+		> .editor-block-list__block-edit > .editor-block-list__breadcrumb {
 			right: 0;
 		}
 
@@ -805,12 +805,6 @@
 	&[data-align="right"] .editor-block-contextual-toolbar {
 		/*rtl:ignore*/
 		margin-left: $block-padding + $border-width;
-	}
-
-	// Don't do it for wide elements, this causes a horizontal scrollbar.
-	&[data-align="full"] .editor-block-contextual-toolbar {
-		margin-left: -$block-padding - $block-side-ui-width;
-		margin-right: -$block-padding - $block-side-ui-width;
 	}
 
 	// Reset pointer-events on children.
