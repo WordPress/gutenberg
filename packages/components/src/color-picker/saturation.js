@@ -36,7 +36,7 @@ import { clamp, noop, throttle } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
-import { withInstanceId } from '@wordpress/compose';
+import { compose, pure, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -185,4 +185,7 @@ export class Saturation extends Component {
 	}
 }
 
-export default withInstanceId( Saturation );
+export default compose(
+	pure,
+	withInstanceId
+)( Saturation );

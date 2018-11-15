@@ -33,7 +33,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { withInstanceId } from '@wordpress/compose';
+import { compose, pure, withInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
@@ -171,4 +171,7 @@ export class Hue extends Component {
 	}
 }
 
-export default withInstanceId( Hue );
+export default compose(
+	pure,
+	withInstanceId
+)( Hue );
