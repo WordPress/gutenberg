@@ -384,10 +384,13 @@ export class RichText extends Component {
 	/**
 	 * Handle input on the next selection change event.
 	 *
-	 * @param {Event} event Input event.
+	 * @param {SyntheticEvent} event Synthetic input event.
 	 */
 	onInput( event ) {
-		// Don't trigger a change yet if characters are being composed.
+		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
+		// (CJK), do not trigger a change if characters are being composed.
+		// Browsers setting `isComposing` to `true` will emit a final `input`
+		// event when the characters are composed.
 		if ( event.nativeEvent.isComposing ) {
 			return;
 		}
