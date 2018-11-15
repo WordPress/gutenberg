@@ -16,6 +16,7 @@
                     "caption": ""
                 }
             ],
+            "ids": [],
             "columns": 1,
             "imageCrop": true,
             "linkTo": "none"
