@@ -383,10 +383,12 @@ export class RichText extends Component {
 
 	/**
 	 * Handle input on the next selection change event.
+	 *
+	 * @param {Event} event Input event.
 	 */
-	onInput( { isComposing } ) {
+	onInput( event ) {
 		// Don't trigger a change yet if characters are being composed.
-		if ( isComposing ) {
+		if ( event.nativeEvent.isComposing ) {
 			return;
 		}
 
