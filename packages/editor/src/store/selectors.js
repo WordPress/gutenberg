@@ -34,8 +34,6 @@ import {
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
-import { select } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Dependencies
@@ -2237,59 +2235,4 @@ export function isPublishSidebarEnabled( state ) {
 		return state.preferences.isPublishSidebarEnabled;
 	}
 	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
-}
-
-//
-// Deprecated
-//
-
-export function getNotices() {
-	deprecated( 'getNotices selector (`core/editor` store)', {
-		alternative: 'getNotices selector (`core/notices` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return select( 'core/notices' ).getNotices();
-}
-
-export function getReusableBlock( state, ref ) {
-	deprecated( "wp.data.select( 'core/editor' ).getReusableBlock( ref )", {
-		alternative: "wp.data.select( 'core' ).getEntityRecord( 'postType', 'wp_block', ref )",
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return __experimentalGetReusableBlock( state, ref );
-}
-
-export function isSavingReusableBlock( state, ref ) {
-	deprecated( 'isSavingReusableBlock selector (`core/editor` store)', {
-		alternative: '__experimentalIsSavingReusableBlock selector (`core/edtior` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
-	} );
-
-	return __experimentalIsSavingReusableBlock( state, ref );
-}
-
-export function isFetchingReusableBlock( state, ref ) {
-	deprecated( "wp.data.select( 'core/editor' ).isFetchingReusableBlock( ref )", {
-		alternative: "wp.data.select( 'core' ).isResolving( 'getEntityRecord', 'wp_block', ref )",
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return __experimentalIsFetchingReusableBlock( state, ref );
-}
-
-export function getReusableBlocks( state ) {
-	deprecated( "wp.data.select( 'core/editor' ).getReusableBlocks( ref )", {
-		alternative: "wp.data.select( 'core' ).getEntityRecords( 'postType', 'wp_block' )",
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return __experimentalGetReusableBlocks( state );
 }

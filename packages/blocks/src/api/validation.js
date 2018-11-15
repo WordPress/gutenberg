@@ -14,7 +14,6 @@ import {
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -545,17 +544,6 @@ export function isEquivalentHTML( actual, expected ) {
 	}
 
 	return true;
-}
-
-export function isValidBlock( innerHTML, blockType, attributes ) {
-	deprecated( 'isValidBlock', {
-		plugin: 'Gutenberg',
-		version: '4.4',
-		alternative: 'isValidBlockContent',
-		hint: 'The order of params has changed.',
-	} );
-
-	return isValidBlockContent( blockType, attributes, innerHTML );
 }
 
 /**
