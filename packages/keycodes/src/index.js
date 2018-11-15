@@ -53,7 +53,7 @@ const modifiers = {
 	alt: () => [ ALT ],
 	ctrlShift: () => [ CTRL, SHIFT ],
 	shift: () => [ SHIFT ],
-	shiftAlt: ( _isApple ) => _isApple() ? [ 'Shift', 'Alt' ] : [ 'Shift', 'Control' ],
+	shiftAlt: ( _isApple ) => _isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
 };
 
 /**
