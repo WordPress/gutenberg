@@ -69,6 +69,28 @@ export function annotations( state = {}, action ) {
 				} );
 			} );
 
+		case 'ANNOTATION_UPDATE_RANGE':
+			return mapValues( state, ( annotationsForBlock ) => {
+				let hasChangedRange = false;
+
+				const newAnnotations = annotationsForBlock.map( ( annotation ) => {
+					if ( annotation.id === action.annotationId ) {
+						hasChangedRange = true;
+						return {
+							...annotation,
+							range: {
+								start: action.start,
+								end: action.end,
+							},
+						};
+					}
+
+					return annotation;
+				} );
+
+				return hasChangedRange ? newAnnotations : annotationsForBlock;
+			} );
+
 		case 'ANNOTATION_REMOVE_SOURCE':
 			return mapValues( state, ( annotationsForBlock ) => {
 				return filterWithReference( annotationsForBlock, ( annotation ) => {
