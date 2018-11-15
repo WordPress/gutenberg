@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import TextareaAutosize from 'react-autosize-textarea';
 
 /**
@@ -67,12 +66,11 @@ export function DefaultBlockAppender( {
 }
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlock, getEditorSettings, getTemplateLock } = select( 'core/editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const lastBlock = getBlock( ownProps.lastBlockClientId );
-		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
-		const isLastBlockValid = get( lastBlock, [ 'isValid' ] );
+		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
+		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 		const { bodyPlaceholder } = getEditorSettings();
 
 		return {
