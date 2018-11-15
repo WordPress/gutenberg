@@ -33,4 +33,21 @@ class WP_REST_Blocks_Controller extends WP_REST_Posts_Controller {
 
 		return parent::check_read_permission( $post );
 	}
+
+	/**
+	 * Retrieves the block's schema, conforming to JSON Schema.
+	 *
+	 * @since 4.4.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$schema = parent::get_item_schema();
+
+		// Allow all contexts to access the raw title and content of a block.
+		unset( $schema['properties']['title']['properties']['raw']['context'] );
+		unset( $schema['properties']['content']['properties']['raw']['context'] );
+
+		return $schema;
+	}
 }
