@@ -8,6 +8,7 @@ export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
+export { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
 export { getAllBlocks } from './get-all-blocks';
 export { getEditedPostContent } from './get-edited-post-content';
 export { getUrl } from './get-url';

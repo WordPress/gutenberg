@@ -89,6 +89,20 @@ Returns true if the publish sidebar is opened.
 
 Whether the publish sidebar is open.
 
+### isEditorPanelRemoved
+
+Returns true if the given panel was programmatically removed, or false otherwise.
+All panels are not removed by default.
+
+*Parameters*
+
+ * state: Global application state.
+ * panelName: A string that identifies the panel.
+
+*Returns*
+
+Whether or not the panel is removed.
+
 ### isEditorPanelEnabled
 
 Returns true if the given panel is enabled, or false otherwise. Panels are
@@ -300,6 +314,14 @@ Returns an action object used to open or close a panel in the editor.
 *Parameters*
 
  * panelName: A string that identifies the panel to open or close.
+
+### removeEditorPanel
+
+Returns an action object used to remove a panel from the editor.
+
+*Parameters*
+
+ * panelName: A string that identifies the panel to remove.
 
 ### toggleFeature
 
