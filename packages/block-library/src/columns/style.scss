@@ -38,5 +38,13 @@
 		&:nth-child(even) {
 			margin-left: $grid-size-large * 2;
 		}
+
+		&:not(:first-child) {
+			margin-left: $grid-size-large * 2;
+		}
+
+		&:not(:last-child) {
+			margin-right: $grid-size-large * 2;
+		}
 	}
 }
