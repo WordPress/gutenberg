@@ -46,7 +46,7 @@ import {
 	charAt,
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
-import { withFilters } from '@wordpress/components';
+import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -887,9 +887,9 @@ export class RichText extends Component {
 					</BlockFormatControls>
 				) }
 				{ isSelected && inlineToolbar && (
-					<div className="editor-rich-text__inline-toolbar">
+					<IsolatedEventContainer className="editor-rich-text__inline-toolbar">
 						<FormatToolbar controls={ formattingControls } />
-					</div>
+					</IsolatedEventContainer>
 				) }
 				<Autocomplete
 					onReplace={ this.props.onReplace }
