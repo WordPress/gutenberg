@@ -15,8 +15,6 @@ import {
 	isEqual,
 	overSome,
 	get,
-	map,
-	pick,
 } from 'lodash';
 
 /**
@@ -101,6 +99,31 @@ function getFlattenedBlocks( blocks ) {
 	}
 
 	return flattenedBlocks;
+}
+
+/**
+ * Given a block order map object, returns *all* of the block client IDs that are
+ * a descendant of the given root client ID.
+ *
+ * Calling this with `rootClientId` set to `''` results in a list of client IDs
+ * that are in the post. That is, it excludes blocks like fetched reusable
+ * blocks which are stored into state but not visible.
+ *
+ * @param {Object}  blocksOrder  Object that maps block client IDs to a list of
+ *                               nested block client IDs.
+ * @param {?string} rootClientId The root client ID to search. Defaults to ''.
+ *
+ * @return {Array} List of descendant client IDs.
+ */
+function getNestedBlockClientIds( blocksOrder, rootClientId = '' ) {
+	const attachedClientIds = [];
+	if ( blocksOrder[ rootClientId ] ) {
+		blocksOrder[ rootClientId ].forEach( ( clientId ) => {
+			attachedClientIds.push( clientId );
+			attachedClientIds.push( ...getNestedBlockClientIds( blocksOrder, clientId ) );
+		} );
+	}
+	return attachedClientIds;
 }
 
 /**
@@ -214,18 +237,29 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Higher-order reducer targeting the combined reducer, augmenting the
- * RESET_BLOCKS action with a list of client IDs that should remain in editor
- * state as they are being referenced by a reusable block.
+ * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `RESET_BLOCKS` action. When dispatched, this action will replace all
+ * blocks that exist in the post, leaving blocks that exist only in state (e.g.
+ * reusable blocks) alone.
  *
  * @param {Function} reducer Original reducer function.
  *
  * @return {Function} Enhanced reducer function.
  */
-const withReusableBlockClientIdsOnReset = ( reducer ) => ( state, action ) => {
+const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( state && action.type === 'RESET_BLOCKS' ) {
-		const reusableBlockClientIds = map( state.reusableBlocks.data, 'clientId' );
-		action = { ...action, reusableBlockClientIds };
+		const visibleClientIds = getNestedBlockClientIds( state.order );
+		return {
+			...state,
+			byClientId: {
+				...omit( state.byClientId, visibleClientIds ),
+				...getFlattenedBlocks( action.blocks ),
+			},
+			order: {
+				...omit( state.order, visibleClientIds ),
+				...mapBlockOrder( action.blocks ),
+			},
+		};
 	}
 
 	return reducer( state, action );
@@ -300,6 +334,8 @@ export const editor = flow( [
 	blocks: flow( [
 		combineReducers,
 
+		withBlockReset,
+
 		// Track whether changes exist, resetting at each post save. Relies on
 		// editor initialization firing post reset as an effect.
 		withChangeDetection( {
@@ -309,12 +345,6 @@ export const editor = flow( [
 	] )( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
-					return {
-						...pick( state, action.reusableBlockClientIds ),
-						...getFlattenedBlocks( action.blocks ),
-					};
-
 				case 'SETUP_EDITOR_STATE':
 					return getFlattenedBlocks( action.blocks );
 
@@ -417,12 +447,6 @@ export const editor = flow( [
 
 		order( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
-					return {
-						...pick( state, action.reusableBlockClientIds ),
-						...mapBlockOrder( action.blocks ),
-					};
-
 				case 'SETUP_EDITOR_STATE':
 					return mapBlockOrder( action.blocks );
 
@@ -1177,11 +1201,7 @@ export function autosave( state = null, action ) {
 	return state;
 }
 
-export default flow( [
-	combineReducers,
-	withReusableBlockClientIdsOnReset,
-	optimist,
-] )( {
+export default optimist( combineReducers( {
 	editor,
 	initialEdits,
 	currentPost,
@@ -1199,4 +1219,4 @@ export default flow( [
 	autosave,
 	settings,
 	postSavingLock,
-} );
+} ) );
