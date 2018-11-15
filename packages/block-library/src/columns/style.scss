@@ -22,6 +22,12 @@
 		flex-grow: 0;
 	}
 
+	// Prevent the columns from growing wider than their distributed sizes.
+	min-width: 0;
+
+	// Prevent long unbroken words from overflowing.
+	word-break: break-word;
+
 	// Add space between columns. Themes can customize this if they wish to work differently.
 	// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 	@include break-small() {
