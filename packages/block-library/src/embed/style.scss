@@ -20,6 +20,11 @@
 	margin-bottom: 1em;
 }
 
+// Stops preview placeholder URLs to break out of their container box.
+.components-placeholder__error {
+	width: 100%;
+}
+
 .wp-embed-responsive {
 	.wp-block-embed {
 		// Add responsiveness to common aspect ratios.
