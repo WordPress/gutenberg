@@ -1616,7 +1616,7 @@ export const getEditedPostContent = createSelector(
 /**
  * Determines if the given block type is allowed to be inserted into the block list.
  * This function is not exported and not memoized because using a memoized selector
- * inside another memoized selector is just a wait of time.
+ * inside another memoized selector is just a waste of time.
  *
  * @param {Object}  state        Editor state.
  * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
