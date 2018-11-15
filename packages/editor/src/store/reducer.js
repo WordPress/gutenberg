@@ -116,14 +116,11 @@ function getFlattenedBlocks( blocks ) {
  * @return {Array} List of descendant client IDs.
  */
 function getNestedBlockClientIds( blocksOrder, rootClientId = '' ) {
-	const attachedClientIds = [];
-	if ( blocksOrder[ rootClientId ] ) {
-		blocksOrder[ rootClientId ].forEach( ( clientId ) => {
-			attachedClientIds.push( clientId );
-			attachedClientIds.push( ...getNestedBlockClientIds( blocksOrder, clientId ) );
-		} );
-	}
-	return attachedClientIds;
+	return reduce( blocksOrder[ rootClientId ], ( result, clientId ) => [
+		...result,
+		clientId,
+		...getNestedBlockClientIds( blocksOrder, clientId ),
+	], [] );
 }
 
 /**
