@@ -11,6 +11,7 @@ import { MenuItem } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { shortcuts } from '../editor-global-keyboard-shortcuts';
 
 export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
@@ -27,6 +28,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 			onClick={ onToggleMode }
 			icon="html"
 			label={ small ? label : undefined }
+			shortcut={ shortcuts.toggleEditor.display }
 		>
 			{ ! small && label }
 		</MenuItem>

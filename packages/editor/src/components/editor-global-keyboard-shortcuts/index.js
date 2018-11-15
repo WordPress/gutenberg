@@ -39,6 +39,10 @@ export const shortcuts = {
 		raw: rawShortcut.primaryAlt( 'y' ),
 		display: displayShortcut.primaryAlt( 'y' ),
 	},
+	toggleEditor: {
+		raw: rawShortcut.primaryAlt( 'v' ),
+		display: displayShortcut.primaryAlt( 'v' ),
+	},
 };
 
 class EditorGlobalKeyboardShortcuts extends Component {
@@ -118,7 +122,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 				/>
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
-						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
+						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, onToggleMode } ) => (
 							<KeyboardShortcuts
 								bindGlobal
 								shortcuts={ {
@@ -136,6 +140,10 @@ class EditorGlobalKeyboardShortcuts extends Component {
 									// Does not clash with any known browser/native shortcuts, but preventDefault
 									// is used to prevent any obscure unknown shortcuts from triggering.
 									[ shortcuts.insertAfter.raw ]: flow( preventDefault, onInsertAfter ),
+
+									// Does not clash with any known browser/native shortcuts, but preventDefault
+									// is used to prevent any obscure unknown shortcuts from triggering.
+									[ shortcuts.toggleEditor.raw ]: flow( preventDefault, onToggleMode ),
 								} }
 							/>
 						) }

@@ -15,6 +15,7 @@ function BlockActions( {
 	onRemove,
 	onInsertBefore,
 	onInsertAfter,
+	onToggleEditor,
 	isLocked,
 	canDuplicate,
 	children,
@@ -24,6 +25,7 @@ function BlockActions( {
 		onRemove,
 		onInsertAfter,
 		onInsertBefore,
+		onToggleEditor,
 		isLocked,
 		canDuplicate,
 	} );
@@ -70,6 +72,7 @@ export default compose( [
 			multiSelect,
 			removeBlocks,
 			insertDefaultBlock,
+			toggleBlockMode,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -104,6 +107,11 @@ export default compose( [
 			onInsertAfter() {
 				if ( ! isLocked ) {
 					insertDefaultBlock( {}, rootClientId, lastSelectedIndex + 1 );
+				}
+			},
+			onToggleEditor() {
+				if ( ! isLocked ) {
+					toggleBlockMode( clientIds );
 				}
 			},
 		};
