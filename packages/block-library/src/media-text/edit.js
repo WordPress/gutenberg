@@ -187,6 +187,7 @@ class MediaTextEdit extends Component {
 					<InnerBlocks
 						allowedBlocks={ ALLOWED_BLOCKS }
 						template={ TEMPLATE }
+						templateInsertUpdatesSelection={ false }
 					/>
 				</div>
 			</Fragment>
