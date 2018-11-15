@@ -85,7 +85,6 @@ export class RichText extends Component {
 
 			deprecated( 'wp.editor.RichText onSplit prop', {
 				plugin: 'Gutenberg',
-				version: '4.6',
 				alternative: 'wp.editor.RichText unstableOnSplit prop',
 			} );
 		} else if ( this.props.unstableOnSplit ) {
