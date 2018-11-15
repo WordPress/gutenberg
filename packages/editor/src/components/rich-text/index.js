@@ -47,6 +47,7 @@ import {
 } from '@wordpress/rich-text';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withFilters, IsolatedEventContainer } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -77,6 +78,18 @@ export class RichText extends Component {
 
 		if ( this.multilineTag === 'li' ) {
 			this.multilineWrapperTags = [ 'ul', 'ol' ];
+		}
+
+		if ( this.props.onSplit ) {
+			this.onSplit = this.props.onSplit;
+
+			deprecated( 'wp.editor.RichText onSplit prop', {
+				plugin: 'Gutenberg',
+				version: '4.6',
+				alternative: 'wp.editor.RichText unstableOnSplit prop',
+			} );
+		} else if ( this.props.unstableOnSplit ) {
+			this.onSplit = this.props.unstableOnSplit;
 		}
 
 		this.onInit = this.onInit.bind( this );
@@ -295,7 +308,7 @@ export class RichText extends Component {
 			if ( shouldReplace ) {
 				// Necessary to allow the paste bin to be removed without errors.
 				this.props.setTimeout( () => this.props.onReplace( content ) );
-			} else if ( this.props.onSplit ) {
+			} else if ( this.onSplit ) {
 				// Necessary to get the right range.
 				// Also done in the TinyMCE paste plugin.
 				this.props.setTimeout( () => this.splitContent( content ) );
@@ -330,7 +343,7 @@ export class RichText extends Component {
 
 		if ( shouldReplace ) {
 			mode = 'BLOCKS';
-		} else if ( this.props.onSplit ) {
+		} else if ( this.onSplit ) {
 			mode = 'AUTO';
 		}
 
@@ -345,7 +358,7 @@ export class RichText extends Component {
 		if ( typeof content === 'string' ) {
 			const recordToInsert = create( { html: content } );
 			this.onChange( insert( this.getRecord(), recordToInsert ) );
-		} else if ( this.props.onSplit ) {
+		} else if ( this.onSplit ) {
 			if ( ! content.length ) {
 				return;
 			}
@@ -592,12 +605,12 @@ export class RichText extends Component {
 			}
 
 			if ( this.multilineTag ) {
-				if ( this.props.onSplit && isEmptyLine( record ) ) {
-					this.props.onSplit( ...split( record ).map( this.valueToFormat ) );
+				if ( this.onSplit && isEmptyLine( record ) ) {
+					this.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
 					this.onChange( insertLineSeparator( record ) );
 				}
-			} else if ( event.shiftKey || ! this.props.onSplit ) {
+			} else if ( event.shiftKey || ! this.onSplit ) {
 				const text = getTextContent( record );
 				const length = text.length;
 				let toInsert = '\n';
@@ -678,10 +691,9 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		const { onSplit } = this.props;
 		const record = this.createRecord();
 
-		if ( ! onSplit ) {
+		if ( ! this.onSplit ) {
 			return;
 		}
 
@@ -713,7 +725,7 @@ export class RichText extends Component {
 			after = this.valueToFormat( after );
 		}
 
-		onSplit( before, after, ...blocks );
+		this.onSplit( before, after, ...blocks );
 	}
 
 	onNodeChange( { parents } ) {

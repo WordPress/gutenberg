@@ -242,7 +242,7 @@ class ParagraphBlock extends Component {
 							content: nextContent,
 						} );
 					} }
-					onSplit={ this.splitBlock }
+					unstableOnSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onReplace={ this.onReplace }
 					onRemove={ () => onReplace( [] ) }
