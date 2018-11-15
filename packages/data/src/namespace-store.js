@@ -27,9 +27,7 @@ export default function createNamespace( key, options, registry ) {
 	const reducer = options.reducer;
 	const store = createReduxStore( reducer, key, registry );
 
-	let selectors = {};
-	let resolvers = {};
-	let actions = {};
+	let selectors, actions, resolvers;
 	if ( options.actions ) {
 		actions = mapActions( options.actions, store );
 	}
