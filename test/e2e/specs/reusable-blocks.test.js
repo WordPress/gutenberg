@@ -7,7 +7,6 @@ import {
 	pressWithModifier,
 	searchForBlock,
 	getEditedPostContent,
-	META_KEY,
 } from '../support/utils';
 
 function waitForAndAcceptDialog() {
@@ -215,8 +214,8 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Select all the blocks
-		await pressWithModifier( META_KEY, 'a' );
-		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( 'primary', 'a' );
+		await pressWithModifier( 'primary', 'a' );
 
 		// Trigger isTyping = false
 		await page.mouse.move( 200, 300, { steps: 10 } );

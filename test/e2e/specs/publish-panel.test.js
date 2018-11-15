@@ -52,7 +52,7 @@ describe( 'PostPublishPanel', () => {
 	it( 'should retain focus within the panel', async () => {
 		await page.type( '.editor-post-title__input', 'E2E Test Post' );
 		await openPublishPanel();
-		await pressWithModifier( 'Shift', 'Tab' );
+		await pressWithModifier( 'shift', 'Tab' );
 
 		const focusedElementClassList = await page.$eval( ':focus', ( focusedElement ) => {
 			return Object.values( focusedElement.classList );

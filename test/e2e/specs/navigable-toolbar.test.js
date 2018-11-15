@@ -44,7 +44,7 @@ describe( 'block toolbar', () => {
 				await page.keyboard.type( 'Example' );
 
 				// Upward
-				await pressWithModifier( 'Alt', 'F10' );
+				await pressWithModifier( 'alt', 'F10' );
 				expect( await isInBlockToolbar() ).toBe( true );
 
 				// Downward

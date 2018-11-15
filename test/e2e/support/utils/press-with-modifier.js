@@ -1,35 +1,31 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { capitalize, castArray } from 'lodash';
 
 /**
- * Platform-specific modifier for the access key chord.
- *
- * @see pressWithModifier
- *
- * @type {string}
+ * WordPress dependencies
  */
-export const ACCESS_MODIFIER_KEYS =
-  process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
+import { rawShortcut } from '@wordpress/keycodes';
 
 /**
- * Performs a key press with modifier (Shift, Control, Meta, Mod), where "Mod"
- * is normalized to platform-specific modifier (Meta in MacOS, else Control).
+ * Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
+ * is normalized to platform-specific modifier.
  *
- * @param {string|Array} modifiers Modifier key or array of modifier keys.
- * @param {string} key      	   Key to press while modifier held.
+ * @param {string} modifier Modifier key.
+ * @param {string} key Key to press while modifier held.
  */
-export async function pressWithModifier( modifiers, key ) {
-	const modifierKeys = castArray( modifiers );
+export async function pressWithModifier( modifier, key ) {
+	const isAppleOS = () => process.platform === 'darwin';
+	const rawModifier = rawShortcut[ modifier ]( '', isAppleOS ).split( '+' );
 
 	await Promise.all(
-		modifierKeys.map( async ( modifier ) => page.keyboard.down( modifier ) )
+		castArray( rawModifier ).map( async ( item ) => page.keyboard.down( capitalize( item ) ) )
 	);
 
 	await page.keyboard.press( key );
 
 	await Promise.all(
-		modifierKeys.map( async ( modifier ) => page.keyboard.up( modifier ) )
+		castArray( rawModifier ).map( async ( item ) => page.keyboard.up( capitalize( item ) ) )
 	);
 }

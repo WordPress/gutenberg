@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	ACCESS_MODIFIER_KEYS,
 	pressWithModifier,
 	newPost,
 	insertBlock,
@@ -36,7 +35,7 @@ async function getFirstInserterIcon() {
 }
 
 async function selectFirstBlock() {
-	await pressWithModifier( ACCESS_MODIFIER_KEYS, 'o' );
+	await pressWithModifier( 'access', 'o' );
 	const navButtons = await page.$$( '.editor-block-navigation__item-button' );
 	await navButtons[ 0 ].click();
 }

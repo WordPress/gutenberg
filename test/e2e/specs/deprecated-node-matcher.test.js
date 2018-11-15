@@ -5,7 +5,6 @@ import {
 	newPost,
 	insertBlock,
 	getEditedPostContent,
-	META_KEY,
 	pressWithModifier,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
@@ -38,7 +37,7 @@ describe( 'Deprecated Node Matcher', () => {
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

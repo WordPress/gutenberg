@@ -6,7 +6,6 @@ import {
 	insertBlock,
 	newPost,
 	pressWithModifier,
-	META_KEY,
 } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
@@ -60,7 +59,7 @@ describe( 'Multi-block selection', () => {
 
 		// Multiselect via keyboard
 		await page.click( 'body' );
-		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( 'primary', 'a' );
 
 		// Verify selection
 		await expectMultiSelected( blocks, true );
@@ -73,8 +72,8 @@ describe( 'Multi-block selection', () => {
 
 		// Select all via double shortcut.
 		await page.click( firstBlockSelector );
-		await pressWithModifier( META_KEY, 'a' );
-		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( 'primary', 'a' );
+		await pressWithModifier( 'primary', 'a' );
 		await expectMultiSelected( blocks, true );
 	} );
 
@@ -127,8 +126,8 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'Third Paragraph' );
 
 		// Multiselect via keyboard.
-		await pressWithModifier( META_KEY, 'a' );
-		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( 'primary', 'a' );
+		await pressWithModifier( 'primary', 'a' );
 
 		// TODO: It would be great to do this test by spying on `wp.a11y.speak`,
 		// but it's very difficult to do that because `wp.a11y` has

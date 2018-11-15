@@ -80,10 +80,10 @@ describe( 'Publishing', () => {
 		await newPost();
 
 		// Region navigate to Sidebar.
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
+		await pressWithModifier( 'primary', '`' );
+		await pressWithModifier( 'primary', '`' );
+		await pressWithModifier( 'primary', '`' );
+		await pressWithModifier( 'primary', '`' );
 
 		// Tab lands at first (presumed selected) option "Document".
 		await page.keyboard.press( 'Tab' );
