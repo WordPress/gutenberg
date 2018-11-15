@@ -384,7 +384,12 @@ export class RichText extends Component {
 	/**
 	 * Handle input on the next selection change event.
 	 */
-	onInput() {
+	onInput( { isComposing } ) {
+		// Don't trigger a change yet if characters are being composed.
+		if ( isComposing ) {
+			return;
+		}
+
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
