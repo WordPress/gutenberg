@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { View, Text } from 'react-native';
-import type { BlockType } from '../../store/';
+import type { BlockType } from '../../store/types';
 
 type PropsType = BlockType & {
 	onChange: ( clientId: string, attributes: mixed ) => void,

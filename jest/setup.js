@@ -5,3 +5,5 @@ jest.mock( '../react-native-gutenberg-bridge', () => {
 		subscribeParentGetHtml: jest.fn(),
 	};
 } );
+
+jest.mock( 'react-native-recyclerview-list' );

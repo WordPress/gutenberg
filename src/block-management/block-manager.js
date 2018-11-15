@@ -4,18 +4,20 @@
  */
 
 import React from 'react';
+import { xorBy, isEqual } from 'lodash';
+
 import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
 import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { InlineToolbarButton } from './constants';
-import type { BlockType } from '../store/';
+import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 
 // Gutenberg imports
-import { createBlock, getBlockType, switchToBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -23,13 +25,12 @@ export type BlockListType = {
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
-	createBlockAction: ( string, BlockType, string ) => mixed,
+	createBlockAction: ( string, BlockType ) => mixed,
 	parseBlocksAction: string => mixed,
 	serializeToNativeAction: void => void,
-	mergeBlocksAction: ( string, string, BlockType ) => mixed,
+	mergeBlocksAction: ( string, string ) => mixed,
 	blocks: Array<BlockType>,
-	aztechtml: string,
-	refresh: boolean,
+	isBlockSelected: string => boolean,
 };
 
 type PropsType = BlockListType;
@@ -38,7 +39,9 @@ type StateType = {
 	showHtml: boolean,
 	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
+	blocks: Array<BlockType>,
 	selectedBlockType: string,
+	refresh: boolean,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -47,23 +50,31 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	constructor( props: PropsType ) {
 		super( props );
+
+		const blocks = props.blocks.map( ( block ) => {
+			const newBlock = { ...block };
+			newBlock.focused = props.isBlockSelected( block.clientId );
+			return newBlock;
+		} );
+
 		this.state = {
-			dataSource: new DataSource( this.props.blocks, ( item: BlockType ) => item.clientId ),
+			blocks: blocks,
+			dataSource: new DataSource( blocks, ( item: BlockType ) => item.clientId ),
 			showHtml: false,
 			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
+			refresh: false,
 		};
 	}
 
 	onBlockHolderPressed( clientId: string ) {
-		this.focusDataSourceItem( clientId );
 		this.props.focusBlockAction( clientId );
 	}
 
-	focusDataSourceItem( clientId: string ) {
-		for ( let i = 0; i < this.state.dataSource.size(); ++i ) {
-			const block = this.state.dataSource.get( i );
+	static focusDataSourceItem( dataSource: DataSource, clientId: string ) {
+		for ( let i = 0; i < dataSource.size(); ++i ) {
+			const block = dataSource.get( i );
 			if ( block.clientId === clientId ) {
 				block.focused = true;
 			} else {
@@ -106,31 +117,53 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		if ( focusedItemIndex === -1 ) {
 			focusedItemIndex = this.state.dataSource.size() - 1;
 		}
-		const clientIdFocused = this.state.dataSource.get( focusedItemIndex ).clientId;
 
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue, { content: 'new test text for a ' + itemValue + ' block' } );
-		newBlock.focused = false;
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
+
 		if ( this.scrollTo ) {
 			this.scrollTo( focusedItemIndex + 1 );
 		}
 
-		this.props.createBlockAction( newBlock.clientId, newBlock, clientIdFocused );
+		this.props.createBlockAction( newBlock.clientId, newBlock );
 
 		// now set the focus
 		this.props.focusBlockAction( newBlock.clientId );
 	}
 
 	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
-		if ( props.fullparse === true ) {
+		const blocks = props.blocks.map( ( block ) => {
+			const newBlock = { ...block };
+			newBlock.focused = props.isBlockSelected( block.clientId );
+			return newBlock;
+		} );
+
+		// if the blocks in the list (not the order or the block attribute)
+		// have changed without our knowledge, recreate the dataSource
+		if ( xorBy( state.blocks, blocks, 'clientId' ).length !== 0 ) {
 			return {
-				...state,
-				dataSource: new DataSource( props.blocks, ( item: BlockType ) => item.clientId ),
+				dataSource: new DataSource( blocks, ( item: BlockType ) => item.clientId ),
+				blocks,
+				refresh: ! state.refresh,
 			};
 		}
+
+		// if some properties of the blocks have changed, assume it's `focused` and manually update in dataSource
+		if ( ! isEqual( state.blocks, blocks ) ) {
+			const blockFocused = blocks.find( ( block ) => block.focused );
+			if ( blockFocused ) {
+				BlockManager.focusDataSourceItem( state.dataSource, blockFocused.clientId );
+			}
+			return {
+				...state,
+				blocks,
+				refresh: ! state.refresh,
+			};
+		}
+
 		// no state change necessary
 		return null;
 	}
@@ -166,89 +199,42 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
 
 		const newBlock = blocks[ 0 ];
-		newBlock.focused = true;
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
-		this.props.createBlockAction( newBlock.clientId, newBlock, clientId );
+		this.props.createBlockAction( newBlock.clientId, newBlock );
 
 		// now set the focus
-		this.props.focusBlockAction( newBlock.clientId ); // this not working atm
+		this.props.focusBlockAction( newBlock.clientId );
 	}
 
-	mergeBlocks( clientId: string, forward: boolean ) {
+	mergeBlocks = ( forward: boolean = false ) => {
 		// find currently focused block
-		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
+		const focusedItemIndex = this.state.blocks.findIndex( ( block ) => block.focused );
 		if ( focusedItemIndex === -1 ) {
 			// do nothing if it's not found.
 			// Updates calls from the native side may arrive late, and the block already been deleted
 			return;
 		}
 
-		// Do nothing when it's the first block and backspace is pressed
-		// Do nothing when it's the last block and delete is pressed
+		const block = this.state.blocks[ focusedItemIndex ];
+		const previousBlock = this.state.blocks[ focusedItemIndex - 1 ];
+		const nextBlock = this.state.blocks[ focusedItemIndex + 1 ];
+
+		// Do nothing when it's the first block.
 		if (
-			( ! forward && focusedItemIndex === 0 ) ||
-			( forward && ! focusedItemIndex === this.state.dataSource.size() - 1 )
+			( ! forward && ! previousBlock ) ||
+			( forward && ! nextBlock )
 		) {
 			return;
 		}
 
-		let blockA = null;
-		let blockB = null;
 		if ( forward ) {
-			blockA = this.state.dataSource.get( focusedItemIndex );
-			blockB = this.state.dataSource.get( focusedItemIndex + 1 );
+			this.props.mergeBlocksAction( block.clientId, nextBlock.clientId );
 		} else {
-			blockA = this.state.dataSource.get( focusedItemIndex - 1 );
-			blockB = this.state.dataSource.get( focusedItemIndex );
+			this.props.mergeBlocksAction( previousBlock.clientId, block.clientId );
 		}
-
-		// Ignore merge if blocks aren't known
-		if ( ! blockA || ! blockB ) {
-			// Updates calls from the native side may arrive late, and one of the block
-			// may not be available
-			return;
-		}
-
-		const blockType = getBlockType( blockA.name );
-
-		// Only focus the previous block if it's not mergeable
-		if ( ! blockType.merge ) {
-			// TO DO: move the focus to the prev block
-			return;
-		}
-
-		// We can only merge blocks with similar types
-		// thus, we transform the block to merge first
-		const blocksWithTheSameType = blockA.name === blockB.name ?
-			[ blockB ] :
-			switchToBlockType( blockB, blockA.name );
-
-		// If the block types can not match, do nothing
-		if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
-			return;
-		}
-
-		// Calling the merge to update the attributes and remove the block to be merged
-		const updatedAttributes = blockType.merge(
-			blockA.attributes,
-			blocksWithTheSameType[ 0 ].attributes
-		);
-
-		const newBlock = {
-			...blockA,
-			attributes: {
-				...blockA.attributes,
-				...updatedAttributes,
-			},
-		};
-		newBlock.focused = true;
-
-		// set it into the datasource, and use the same object instance to send it to props/redux
-		this.state.dataSource.splice( this.getDataSourceIndexFromClientId( blockA.clientId ), 2, newBlock );
-		this.props.mergeBlocksAction( blockA.clientId, blockB.clientId, newBlock );
-	}
+	};
 
 	onChange( clientId: string, attributes: mixed ) {
 		// Update Redux store
@@ -291,8 +277,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			list = (
 				<FlatList
 					style={ styles.list }
-					data={ this.props.blocks }
-					extraData={ this.props.refresh, this.state.inspectBlocks }
+					data={ this.state.blocks }
+					extraData={ { refresh: this.state.refresh, inspectBlocks: this.state.inspectBlocks } }
 					keyExtractor={ ( item ) => item.clientId }
 					renderItem={ this.renderItem.bind( this ) }
 				/>
@@ -357,7 +343,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.setState( { inspectBlocks } );
 	}
 
-	renderItem( value: { item: BlockType, clientId: string } ) {
+	renderItem( value: { item: BlockType } ) {
 		const insertHere = (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ styles.lineStyleAddHere }></View>
@@ -369,19 +355,17 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return (
 			<View>
 				<BlockHolder
-					key={ value.clientId }
+					key={ value.item.clientId }
 					onInlineToolbarButtonPressed={ this.onInlineToolbarButtonPressed.bind( this ) }
 					onBlockHolderPressed={ this.onBlockHolderPressed.bind( this ) }
 					onChange={ this.onChange.bind( this ) }
 					showTitle={ this.state.inspectBlocks }
 					focused={ value.item.focused }
-					clientId={ value.clientId }
+					clientId={ value.item.clientId }
 					insertBlocksAfter={ ( blocks ) =>
 						this.insertBlocksAfter.bind( this )( value.item.clientId, blocks )
 					}
-					mergeBlocks={ ( forward = false ) =>
-						this.mergeBlocks.bind( this )( value.item.clientId, forward )
-					}
+					mergeBlocks={ this.mergeBlocks }
 					{ ...value.item }
 				/>
 				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }

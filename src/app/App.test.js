@@ -3,9 +3,8 @@
 import renderer from 'react-test-renderer';
 
 import App from './App';
-import initialHtml from './initial-html';
-import { html2State, setupStore } from '../store';
 import BlockHolder from '../block-management/block-holder';
+import { dispatch, select } from '@wordpress/data';
 
 describe( 'App', () => {
 	it( 'renders without crashing', () => {
@@ -15,20 +14,10 @@ describe( 'App', () => {
 	} );
 
 	it( 'renders without crashing with a block focused', () => {
-		// construct a state object with the first block focused
-		const state = html2State( initialHtml );
-		const block0 = { ...state.blocks[ 0 ] };
-		block0.focused = true;
-		state.blocks[ 0 ] = block0;
-
-		// create a Store with the state object
-		const store = setupStore( state );
-
-		// render an App using the specified Store
-		const app = renderer.create( <App initialData={ store } /> );
+		const app = renderer.create( <App /> );
+		const blocks = select( 'core/editor' ).getBlocks();
+		dispatch( 'core/editor' ).selectBlock( blocks[ 0 ].clientId );
 		const rendered = app.toJSON();
-
-		// App should be rendered OK
 		expect( rendered ).toBeTruthy();
 	} );
 
