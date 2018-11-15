@@ -78,7 +78,7 @@ class GalleryEdit extends Component {
 		if ( attributes.images ) {
 			attributes = {
 				...attributes,
-				id: map( attributes.images, 'id' ),
+				ids: map( attributes.images, 'id' ),
 			};
 		}
 
