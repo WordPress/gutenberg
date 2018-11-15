@@ -13,12 +13,17 @@
 class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controller_Testcase {
 	protected static $post_id;
 	protected static $page_id;
+	protected static $draft_page_id;
 
 	protected static $autosave_post_id;
 	protected static $autosave_page_id;
 
 	protected static $editor_id;
 	protected static $contributor_id;
+
+	protected static $parent_page_id;
+	protected static $child_page_id;
+	protected static $child_draft_page_id;
 
 	protected function set_post_data( $args = array() ) {
 		$defaults = array(
@@ -76,6 +81,33 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 			)
 		);
 
+		self::$draft_page_id       = $factory->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'draft',
+			)
+		);
+		self::$parent_page_id      = $factory->post->create(
+			array(
+				'post_type' => 'page',
+			)
+		);
+		self::$child_page_id       = $factory->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_parent' => self::$parent_page_id,
+			)
+		);
+		self::$child_draft_page_id = $factory->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_parent' => self::$parent_page_id,
+				// The "update post" behavior of the autosave endpoint only occurs
+				// when saving a draft/auto-draft authored by the current user.
+				'post_status' => 'draft',
+				'post_author' => self::$editor_id,
+			)
+		);
 	}
 
 	public static function wpTearDownAfterClass() {
@@ -96,9 +128,9 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/wp/v2/posts/(?P<parent>[\d]+)/autosaves', $routes );
+		$this->assertArrayHasKey( '/wp/v2/posts/(?P<id>[\d]+)/autosaves', $routes );
 		$this->assertArrayHasKey( '/wp/v2/posts/(?P<parent>[\d]+)/autosaves/(?P<id>[\d]+)', $routes );
-		$this->assertArrayHasKey( '/wp/v2/pages/(?P<parent>[\d]+)/autosaves', $routes );
+		$this->assertArrayHasKey( '/wp/v2/pages/(?P<id>[\d]+)/autosaves', $routes );
 		$this->assertArrayHasKey( '/wp/v2/pages/(?P<parent>[\d]+)/autosaves/(?P<id>[\d]+)', $routes );
 	}
 
@@ -117,6 +149,21 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$data     = $response->get_data();
 		$this->assertEquals( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertEqualSets( array( 'view', 'edit', 'embed' ), $data['endpoints'][0]['args']['context']['enum'] );
+	}
+
+	public function test_registered_query_params() {
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
+		$response = $this->server->dispatch( $request );
+		$data     = $response->get_data();
+		$keys     = array_keys( $data['endpoints'][0]['args'] );
+		sort( $keys );
+		$this->assertEquals(
+			array(
+				'context',
+				'parent',
+			),
+			$keys
+		);
 	}
 
 	public function test_get_items() {
@@ -517,4 +564,42 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 		$this->assertEquals( $parent_post_id, self::$post_id );
 	}
 
+	public function test_update_item_draft_page_with_parent() {
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/pages/' . self::$child_draft_page_id . '/autosaves' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+
+		$params = $this->set_post_data(
+			array(
+				'id'     => self::$child_draft_page_id,
+				'author' => self::$editor_id,
+			)
+		);
+
+		$request->set_body_params( $params );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( self::$child_draft_page_id, $data['id'] );
+		$this->assertEquals( self::$parent_page_id, $data['parent'] );
+	}
+
+	public function test_schema_validation_is_applied() {
+		wp_set_current_user( self::$editor_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/pages/' . self::$draft_page_id . '/autosaves' );
+		$request->add_header( 'content-type', 'application/x-www-form-urlencoded' );
+
+		$params = $this->set_post_data(
+			array(
+				'id'             => self::$draft_page_id,
+				'comment_status' => 'garbage',
+			)
+		);
+
+		$request->set_body_params( $params );
+
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertNotEquals( 'garbage', get_post( self::$draft_page_id )->comment_status );
+	}
 }
