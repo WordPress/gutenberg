@@ -1,13 +1,8 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
@@ -25,7 +20,6 @@ function PostLink( {
 	postLink,
 	permalinkParts,
 	editPermalink,
-	postType,
 	forceEmptyField,
 	setState,
 } ) {
@@ -43,22 +37,15 @@ function PostLink( {
 		);
 	}
 
-	const singularLabel = get( postType, [ 'labels', 'singular_name' ] );
 	return (
 		<PanelBody
-			title={
-				// translators: %s: post type singular name label e.g: Post, Page etc...
-				sprintf( __( '%s Link' ), singularLabel )
-			}
+			title={ __( 'Permalink' ) }
 			opened={ isOpened }
 			onToggle={ onTogglePanel }
 		>
 			{ isEditable && (
 				<TextControl
-					label={
-						// translators: %s: post type singular name label e.g: Post, Page etc...
-						sprintf( __( '%s URL' ), singularLabel )
-					}
+					label={ __( 'URL' ) }
 					value={ forceEmptyField ? '' : postName }
 					onChange={ ( newValue ) => {
 						editPermalink( newValue );

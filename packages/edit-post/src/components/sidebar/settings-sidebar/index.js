@@ -34,9 +34,9 @@ const SettingsSidebar = ( { sidebarName } ) => (
 					<PostStatus />
 					<LastRevision />
 					<PostTaxonomies />
+					<PostLink />
 					<FeaturedImage />
 					<PostExcerpt />
-					<PostLink />
 					<DiscussionPanel />
 					<PageAttributes />
 					<MetaBoxes location="side" />
