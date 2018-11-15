@@ -1,4 +1,8 @@
-## 7.0.2 (Unreleased)
+## 8.0.0 (Unreleased)
+
+### Breaking Changes
+
+- The reusable blocks actions and selectors have been marked as experimental.
 
 ### Bug Fixes
 

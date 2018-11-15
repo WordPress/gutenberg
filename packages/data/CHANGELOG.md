@@ -1,4 +1,11 @@
-## 3.1.3 (Unreleased)
+## 4.0.0 (Unreleased)
+
+### Breaking Changes
+
+- `registry.registerReducer` has been deprecated. Use `registry.registerStore` instead.
+- `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
+- `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
+- `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
 
 ### Bug Fix
 

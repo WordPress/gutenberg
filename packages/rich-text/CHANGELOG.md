@@ -1,3 +1,9 @@
+## 3.0.0 (Unreleased)
+
+### Breaking Changes
+
+- `toHTMLString` always expects an object instead of multiple arguments.
+
 ## 2.0.4 (2018-11-09)
 
 ## 2.0.3 (2018-11-09)
