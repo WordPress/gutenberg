@@ -261,6 +261,9 @@ function gutenberg_register_scripts_and_styles() {
 					'monthsShort'   => array_values( $wp_locale->month_abbrev ),
 					'weekdays'      => array_values( $wp_locale->weekday ),
 					'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+					'week'          => array(
+						'dow' => (int) get_option( 'start_of_week', 0 )
+					)
 				)
 			)
 		),
