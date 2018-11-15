@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { get } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
@@ -114,6 +119,7 @@ export default compose( [
 
 		const { link } = getCurrentPost();
 		const postTypeName = getEditedPostAttribute( 'type' );
+		const postType = getPostType( postTypeName );
 		return {
 			isNew: isEditedPostNew(),
 			postLink: link,
@@ -121,11 +127,11 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			permalinkParts: getPermalinkParts(),
-			postType: getPostType( postTypeName ),
+			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
-	ifCondition( ( { isNew, postLink, postType } ) => {
-		return ! isNew && postLink && postType;
+	ifCondition( ( { isNew, postLink, isViewable } ) => {
+		return ! isNew && postLink && isViewable;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
