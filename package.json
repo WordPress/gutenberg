@@ -112,6 +112,7 @@
     "shallowequal": "^1.0.2",
     "simple-html-tokenizer": "^0.5.1",
     "tinycolor2": "^1.4.1",
-    "turbo-combine-reducers": "^1.0.2"
+    "turbo-combine-reducers": "^1.0.2",
+    "tannin": "^1.0.1"
   }
 }
