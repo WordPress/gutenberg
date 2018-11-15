@@ -33,8 +33,8 @@ const SettingsSidebar = ( { sidebarName } ) => (
 				<Fragment>
 					<PostStatus />
 					<LastRevision />
-					<PostTaxonomies />
 					<PostLink />
+					<PostTaxonomies />
 					<FeaturedImage />
 					<PostExcerpt />
 					<DiscussionPanel />
