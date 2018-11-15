@@ -1,10 +1,21 @@
 /**
  * External dependencies
  */
-import Jed from 'jed';
+import Tannin from 'tannin';
 import memoize from 'memize';
+import sprintfjs from 'sprintf-js';
 
-let i18n;
+/**
+ * Default locale data to use for Tannin domain when not otherwise provided.
+ * Assumes an English plural forms expression.
+ *
+ * @type {Object}
+ */
+const DEFAULT_LOCALE_DATA = {
+	'': {
+		plural_forms: 'plural=(n!=1)',
+	},
+};
 
 /**
  * Log to console, once per message; or more precisely, per referentially equal
@@ -16,48 +27,39 @@ let i18n;
 const logErrorOnce = memoize( console.error ); // eslint-disable-line no-console
 
 /**
- * Merges locale data into the Jed instance by domain. Creates a new Jed
- * instance if one has not yet been assigned.
+ * The underlying instance of Tannin to which exported functions interface.
+ *
+ * @type {Tannin}
+ */
+const i18n = new Tannin( {} );
+
+/**
+ * Merges locale data into the Tannin instance by domain. Accepts data in a
+ * Jed-formatted JSON object shape.
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {?Object} localeData Locale data configuration.
- * @param {?string} domain     Domain for which configuration applies.
+ * @param {?Object} data   Locale data configuration.
+ * @param {?string} domain Domain for which configuration applies.
  */
-export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
-	if ( ! i18n ) {
-		i18n = new Jed( {
-			domain: 'default',
-			locale_data: {
-				default: { '': {} },
-			},
-		} );
-	}
+export function setLocaleData( data, domain = 'default' ) {
+	i18n.data[ domain ] = {
+		...DEFAULT_LOCALE_DATA,
+		...i18n.data[ domain ],
+		...data,
+	};
 
-	i18n.options.locale_data[ domain ] = Object.assign(
-		{},
-		i18n.options.locale_data[ domain ],
-		localeData
-	);
+	// Populate default domain configuration (supported locale date which omits
+	// a plural forms expression).
+	i18n.data[ domain ][ '' ] = {
+		...DEFAULT_LOCALE_DATA[ '' ],
+		...i18n.data[ domain ][ '' ],
+	};
 }
 
 /**
- * Returns the current Jed instance, initializing with a default configuration
- * if not already assigned.
- *
- * @return {Jed} Jed instance.
- */
-function getI18n() {
-	if ( ! i18n ) {
-		setLocaleData();
-	}
-
-	return i18n;
-}
-
-/**
- * Wrapper for Jed's `dcnpgettext`, its most qualified function. Absorbs errors
- * which are thrown as the result of invalid translation.
+ * Wrapper for Tannin's `dcnpgettext`. Populates default locale data if not
+ * otherwise previously assigned.
  *
  * @param {?string} domain  Domain to retrieve the translated text.
  * @param {?string} context Context information for the translators.
@@ -69,15 +71,13 @@ function getI18n() {
  *
  * @return {string} The translated string.
  */
-const dcnpgettext = memoize( ( domain = 'default', context, single, plural, number ) => {
-	try {
-		return getI18n().dcnpgettext( domain, context, single, plural, number );
-	} catch ( error ) {
-		logErrorOnce( 'Jed localization error: \n\n' + error.toString() );
-
-		return single;
+function dcnpgettext( domain = 'default', context, single, plural, number ) {
+	if ( ! i18n.data[ domain ] ) {
+		setLocaleData( undefined, domain );
 	}
-} );
+
+	return i18n.dcnpgettext( domain, context, single, plural, number );
+}
 
 /**
  * Retrieve the translation of text.
@@ -158,9 +158,9 @@ export function _nx( single, plural, number, context, domain ) {
  */
 export function sprintf( format, ...args ) {
 	try {
-		return Jed.sprintf( format, ...args );
+		return sprintfjs.sprintf( format, ...args );
 	} catch ( error ) {
-		logErrorOnce( 'Jed sprintf error: \n\n' + error.toString() );
+		logErrorOnce( 'sprintf error: \n\n' + error.toString() );
 
 		return format;
 	}
