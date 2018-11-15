@@ -325,6 +325,7 @@ export default class TinyMCE extends Component {
 			onInput,
 			onKeyDown,
 			onKeyUp,
+			onCompositionEnd,
 		} = this.props;
 
 		/*
@@ -354,6 +355,7 @@ export default class TinyMCE extends Component {
 			onFocus: this.onFocus,
 			onKeyDown,
 			onKeyUp,
+			onCompositionEnd,
 		} );
 	}
 }
