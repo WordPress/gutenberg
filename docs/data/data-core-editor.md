@@ -1829,7 +1829,3 @@ Returns an action object used to signal that post saving is unlocked.
 *Parameters*
 
  * lockName: The lock name.
-
-### createNotice
-
-### fetchReusableBlocks
