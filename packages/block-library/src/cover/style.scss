@@ -10,6 +10,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
 
 	&.has-left-content {
 		justify-content: flex-start;
@@ -104,5 +105,5 @@
 	width: 100%;
 	height: 100%;
 	z-index: z-index(".wp-block-cover__video-background");
-	object-fit: fill;
+	object-fit: cover;
 }
