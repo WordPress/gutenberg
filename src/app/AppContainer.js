@@ -58,7 +58,9 @@ class AppContainer extends React.Component<PropsType> {
 	};
 
 	createBlockAction = ( clientId, block ) => {
-		this.props.onInsertBlock( block, this.props.selectedBlockIndex + 1, this.props.rootClientId );
+		const indexAfterSelected = this.props.selectedBlockIndex + 1;
+		const insertionIndex = indexAfterSelected || this.props.blocks.length;
+		this.props.onInsertBlock( block, insertionIndex, this.props.rootClientId );
 	};
 
 	parseBlocksAction = ( html = '' ) => {
