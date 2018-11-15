@@ -8,8 +8,6 @@
 		background: none;
 		box-shadow: none;
 		display: block;
-		margin-left: $border-width;
-		margin-right: $border-width;
 		cursor: text;
 		width: 100%;
 		outline: $border-width solid transparent;
@@ -17,7 +15,9 @@
 		resize: none;
 
 		// Emulate the dimensions of a paragraph block.
-		padding: 0 #{ $block-padding };
+		// On mobile and in nested contexts, the plus to add blocks shows up on the right.
+		// The rightmost padding makes sure it doesn't overlap text.
+		padding: 0 #{ $block-padding + $icon-button-size } 0 $block-padding;
 
 		// Use opacity to work in various editor styles.
 		color: $dark-opacity-300;
