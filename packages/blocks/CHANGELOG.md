@@ -1,4 +1,8 @@
-## 5.3.2 (Unreleased)
+## 6.0.0 (Unreleased)
+
+### Breaking Changes
+
+- `isValidBlock` has been removed. Please use `isValidBlockContent` instead but keep in mind that the order of params has changed.
 
 ### Bug Fix
 

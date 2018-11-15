@@ -1,4 +1,11 @@
-## 3.1.3 (Unreleased)
+## 4.0.0 (Unreleased)
+
+### Breaking Changes
+
+- `registry.registerReducer` has been removed. Use `registry.registerStore` instead.
+- `registry.registerSelectors` has been removed. Use `registry.registerStore` instead.
+- `registry.registerActions` has been removed. Use `registry.registerStore` instead.
+- `registry.registerResolvers` has been removed. Use `registry.registerStore` instead.
 
 ### Bug Fix
 
