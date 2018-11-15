@@ -87,6 +87,7 @@ class ParagraphEdit extends Component {
 				<RichText
 					tagName="p"
 					value={ content }
+					isSelected={ this.props.isSelected }
 					style={ {
 						...style,
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
