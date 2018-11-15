@@ -257,19 +257,19 @@ function gutenberg_register_scripts_and_styles() {
 			get_user_locale(),
 			wp_json_encode(
 				array(
-					'months'        => array_values( $wp_locale->month ),
-					'monthsShort'   => array_values( $wp_locale->month_abbrev ),
-					'weekdays'      => array_values( $wp_locale->weekday ),
-					'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
-					'week'          => array(
+					'months'         => array_values( $wp_locale->month ),
+					'monthsShort'    => array_values( $wp_locale->month_abbrev ),
+					'weekdays'       => array_values( $wp_locale->weekday ),
+					'weekdaysShort'  => array_values( $wp_locale->weekday_abbrev ),
+					'week'           => array(
 						'dow' => (int) get_option( 'start_of_week', 0 ),
 					),
 					'longDateFormat' => array(
-						'LT' => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-						'LTS' => null,
-						'L' => null,
-						'LL' => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-						'LLL' => __( 'F j, Y g:i a', 'default' ),
+						'LT'   => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+						'LTS'  => null,
+						'L'    => null,
+						'LL'   => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+						'LLL'  => __( 'F j, Y g:i a', 'default' ),
 						'LLLL' => null,
 					),
 				)
