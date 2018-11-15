@@ -97,6 +97,16 @@
 					margin-left: $grid-size-large * 2;
 				}
 			}
+
+			@include break-small() {
+				&:not(:first-child) {
+					margin-left: $grid-size-large * 2;
+				}
+
+				&:not(:last-child) {
+					margin-right: $grid-size-large * 2;
+				}
+			}
 		}
 	}
 }
