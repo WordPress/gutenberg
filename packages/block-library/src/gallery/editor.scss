@@ -17,8 +17,8 @@ ul.wp-block-gallery li {
 		outline: 4px solid theme(primary);
 	}
 
-	&.is-transient img {
-		@include edit-post__loading-fade-animation;
+	.is-transient img {
+		opacity: 0.3;
 	}
 
 	.editor-rich-text {
@@ -119,7 +119,8 @@ ul.wp-block-gallery li {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	transform: translate(-50%, -50%);
+	margin-top: -9px;
+	margin-left: -9px;
 }
 
 // Last item always needs margins reset.
