@@ -116,6 +116,21 @@ class GalleryEdit extends Component {
 		if ( ! images[ index ] ) {
 			return;
 		}
+
+		// If URL and other image data has been resolved, update
+		// `transientImageIds` to signal the corresponding entry's resolution
+		let { transientImageIds } = this.props.attributes;
+		if ( attributes.url ) {
+			transientImageIds = [ ...transientImageIds ];
+			transientImageIds[ index ] = null;
+		}
+
+		// If all IDs in `transientImageIds` have been resolved, clear the
+		// entire transient attribute.
+		if ( transientImageIds.every( ( id ) => id === null ) ) {
+			transientImageIds = undefined;
+		}
+
 		setAttributes( {
 			images: [
 				...images.slice( 0, index ),
@@ -125,6 +140,7 @@ class GalleryEdit extends Component {
 				},
 				...images.slice( index + 1 ),
 			],
+			transientImageIds,
 		} );
 	}
 
@@ -160,7 +176,7 @@ class GalleryEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, className, noticeOperations, noticeUI } = this.props;
-		const { images, _imageIds = [], columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
+		const { images, transientImageIds = [], columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
 
 		const dropZone = (
 			<DropZone
@@ -192,7 +208,7 @@ class GalleryEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( images.length === 0 && _imageIds.length === 0 ) {
+		if ( images.length === 0 && transientImageIds.length === 0 ) {
 			return (
 				<Fragment>
 					{ controls }
@@ -253,7 +269,7 @@ class GalleryEdit extends Component {
 									url={ img.url }
 									alt={ img.alt }
 									id={ img.id }
-									seedId={ _imageIds[ index ] }
+									seedId={ transientImageIds[ index ] }
 									isSelected={ isSelected && this.state.selectedImage === index }
 									onRemove={ this.onRemoveImage( index ) }
 									onSelect={ this.onSelectImage( index ) }

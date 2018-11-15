@@ -20,7 +20,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { isReusableBlock } from '@wordpress/blocks';
+import { getBlockType, isReusableBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 
 /**
@@ -243,12 +243,12 @@ export const editor = flow( [
 				return nextState;
 			}
 
-			// For each changed block in the present, check for any silent
+			// For each changed block in the present, check for any transient
 			// attribute. If such an attribute is found, delete it from the
 			// state.
 			//
-			// @see getSilentAttributes for context
-			let blockId, block, attributeName;
+			// @see getTransientAttributes for context
+			let blockId, block, blockType, attributeName;
 			for ( blockId in present.blocks.byClientId ) {
 				block = present.blocks.byClientId[ blockId ];
 
@@ -257,9 +257,10 @@ export const editor = flow( [
 					continue;
 				}
 
+				blockType = getBlockType( block.name );
+
 				for ( attributeName in block.attributes ) {
-					// A leading underscore indicates a silent attribute
-					if ( attributeName.indexOf( '_' ) === 0 ) {
+					if ( blockType.attributes[ attributeName ].transient === true ) {
 						// If this is the first match in the loop, lazily
 						// create a new state object.
 						if ( nextState === present ) {

@@ -67,6 +67,11 @@ export const settings = {
 			selector: 'a[download]',
 			default: _x( 'Download', 'button label' ),
 		},
+		transientShouldFetch: {
+			transient: true,
+			type: 'boolean',
+			default: false,
+		},
 	},
 
 	supports: {

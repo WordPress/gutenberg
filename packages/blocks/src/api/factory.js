@@ -65,11 +65,11 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 		return result;
 	}, {} );
 
-	// Silent attributes are the exception to the above.
+	// Transient attributes are the exception to the above.
 	//
-	// @see getSilentAttributes
-	const silentAttributes = getSilentAttributes( attributes );
-	sanitizedAttributes = { ...sanitizedAttributes, ...silentAttributes };
+	// @see getTransientAttributes
+	const transientAttributes = getTransientAttributes( blockType, attributes );
+	sanitizedAttributes = { ...sanitizedAttributes, ...transientAttributes };
 
 	const clientId = uuid();
 
@@ -85,35 +85,34 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 }
 
 /**
- * Given a map of attributes, returns its subset of silent attributes.
+ * Given a map of attributes, returns its subset of transient attributes.
  *
- * "Silent attributes" represent a special kind of attributes that are not
- * declared in a block's type. In addition to not being declared, their names
- * MUST start with an underscore.
+ * "Transient attributes", declared in the block type with the `transient:
+ * true` property, represent a special kind of attributes that:
  *
- * Critically, silent attributes:
  * - are ignored during block serialization;
  * - don't make their way to the editor's edit history.
  *
- * Combined, these properties make silent attributes useful transient cues for
- * blocks that need to manage data resolution on their own. Without it, these
+ * Combined, these properties make transient attributes useful cues for blocks
+ * that need to manage data resolution on their own. Without it, these
  * resolutions create unwanted undo levels that can easily leave the editor in
  * a state out of which a user cannot get out.
  *
  * For instance, a [gallery] shortcode can be converted to a Gallery block, but
  * the latter needs to take the shortcode's image IDs, request image data from
  * the media endpoint, and upon resolution update its own attributes to include
- * image source and alt text. Thanks to its `_imageIds` silent attribute,
- * triggering Undo doesn't cause the block to retrigger this change.
+ * image source and alt text. Thanks to its `transientImageIds` transient
+ * attribute, triggering Undo doesn't cause the block to retrigger this change.
  *
- * @param {Object} attributes  Block attributes.
+ * @param {Object} blockType  Block type.
+ * @param {Object} attributes Block attributes.
  *
- * @return {Object} "Silent" block attributes.
+ * @return {Object} "Transient" block attributes.
  */
-export function getSilentAttributes( attributes ) {
+export function getTransientAttributes( blockType, attributes ) {
 	return pickBy(
 		attributes,
-		( value, key ) => key.indexOf( '_' ) === 0
+		( value, key ) => blockType.attributes[ key ].transient === true
 	);
 }
 

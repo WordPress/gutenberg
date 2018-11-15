@@ -14,7 +14,7 @@ import { regexp, next } from '@wordpress/shortcode';
 import {
 	createBlock,
 	getBlockTransforms,
-	getSilentAttributes,
+	// getTransientAttributes,
 	findTransform,
 } from '../factory';
 import { getBlockType } from '../registration';
@@ -65,10 +65,8 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 
 		const blockType = getBlockType( transformation.blockName );
 
-		// Silent attributes are not a part of the block type.
-		//
-		// @see getSilentAttributes for context
-		const silentAttributes = getSilentAttributes( attributes );
+		// // @see getTransientAttributes for context
+		// const transientAttributes = getTransientAttributes( blockType, attributes );
 
 		const block = createBlock(
 			transformation.blockName,
@@ -81,7 +79,7 @@ function segmentHTMLToShortcodeBlock( HTML, lastIndex = 0 ) {
 					match.shortcode.content,
 					attributes,
 				),
-				...silentAttributes,
+				// ...transientAttributes,
 			}
 		);
 

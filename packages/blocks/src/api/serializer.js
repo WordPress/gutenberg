@@ -152,6 +152,13 @@ export function getCommentAttributes( blockType, attributes ) {
 			return result;
 		}
 
+		// Ignore "transient" attributes.
+		//
+		// @see getTransientAttributes
+		if ( attributeSchema.transient === true ) {
+			return result;
+		}
+
 		// Ignore all attributes but the ones with an "undefined" source
 		// "undefined" source refers to attributes saved in the block comment.
 		if ( attributeSchema.source !== undefined ) {

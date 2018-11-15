@@ -52,7 +52,7 @@ class FileEdit extends Component {
 		const { href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
-		if ( isBlobURL( href ) && attributes._shouldFetch ) {
+		if ( isBlobURL( href ) && attributes.transientShouldFetch ) {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
@@ -132,7 +132,7 @@ class FileEdit extends Component {
 		const { hasError, showCopyConfirmation } = this.state;
 		const attachmentPage = media && media.link;
 
-		if ( ! href || hasError || ( isBlobURL( href ) && ! attributes._shouldFetch ) ) {
+		if ( ! href || hasError || ( isBlobURL( href ) && ! attributes.transientShouldFetch ) ) {
 			return (
 				<MediaPlaceholder
 					icon="media-default"

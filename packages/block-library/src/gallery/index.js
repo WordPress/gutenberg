@@ -63,6 +63,11 @@ const blockAttributes = {
 		type: 'string',
 		default: 'none',
 	},
+	transientImageIds: {
+		type: 'array',
+		default: [],
+		transient: true,
+	},
 };
 
 export const name = 'core/gallery';
@@ -108,7 +113,7 @@ export const settings = {
 							return ids.split( ',' ).map( () => ( {} ) );
 						},
 					},
-					_imageIds: {
+					transientImageIds: {
 						type: 'array',
 						shortcode: ( { named: { ids } } ) => {
 							if ( ! ids ) {

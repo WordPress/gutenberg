@@ -35,6 +35,11 @@ const embedAttributes = {
 		type: 'boolean',
 		default: true,
 	},
+	transientShouldFetch: {
+		transient: true,
+		type: 'boolean',
+		default: false,
+	},
 };
 
 export function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {}, responsive = true } ) {
@@ -106,7 +111,26 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 
 		deprecated: [
 			{
-				attributes: embedAttributes,
+				attributes: {
+					url: {
+						type: 'string',
+					},
+					caption: {
+						type: 'string',
+						source: 'html',
+						selector: 'figcaption',
+					},
+					type: {
+						type: 'string',
+					},
+					providerNameSlug: {
+						type: 'string',
+					},
+					allowResponsive: {
+						type: 'boolean',
+						default: true,
+					},
+				},
 				save( { attributes } ) {
 					const { url, caption, type, providerNameSlug } = attributes;
 
