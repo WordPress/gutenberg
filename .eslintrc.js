@@ -181,6 +181,7 @@ module.exports = {
 				};
 			} ),
 		} ],
+		'linebreak-style': 'off',
 	},
 	overrides: [
 		{

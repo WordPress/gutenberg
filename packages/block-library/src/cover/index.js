@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -197,7 +196,6 @@ export const settings = {
 					return;
 				}
 				let mediaType;
-				let src;
 				// for media selections originated from a file upload.
 				if ( media.media_type ) {
 					if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
@@ -217,13 +215,8 @@ export const settings = {
 					mediaType = media.type;
 				}
 
-				if ( mediaType === IMAGE_BACKGROUND_TYPE ) {
-					// Try the "large" size URL, falling back to the "full" size URL below.
-					src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
-				}
-
 				setAttributes( {
-					url: src || media.url,
+					url: media.url,
 					id: media.id,
 					backgroundType: mediaType,
 				} );
