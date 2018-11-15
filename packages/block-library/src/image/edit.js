@@ -507,10 +507,17 @@ class ImageEdit extends Component {
 							} else {
 								defaultedAlt = __( 'This image has an empty alt attribute' );
 							}
-							// Disable reason: Image itself is not meant to be
-							// interactive, but should direct focus to block
-							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />;
+
+							const img = (
+								// Disable reason: Image itself is not meant to be interactive, but
+								// should direct focus to block.
+								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+								<Fragment>
+									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />
+									{ isBlobURL( url ) && <Spinner /> }
+								</Fragment>
+								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+							);
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
@@ -518,7 +525,6 @@ class ImageEdit extends Component {
 										{ getInspectorControls( imageWidth, imageHeight ) }
 										<div style={ { width, height } }>
 											{ img }
-											{ isBlobURL( url ) && <Spinner /> }
 										</div>
 									</Fragment>
 								);
@@ -593,7 +599,6 @@ class ImageEdit extends Component {
 										} }
 									>
 										{ img }
-										{ isBlobURL( url ) && <Spinner /> }
 									</ResizableBox>
 								</Fragment>
 							);
