@@ -99,7 +99,7 @@ export const settings = {
 							href: blobURL,
 							fileName: file.name,
 							textLinkHref: blobURL,
-							_shouldFetch: true,
+							transientShouldFetch: true,
 						} ) );
 					} );
 
