@@ -21,7 +21,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 	 * @access public
 	 */
 	public function __construct() {
-		$this->namespace = 'gutenberg/v1';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'block-renderer';
 	}
 

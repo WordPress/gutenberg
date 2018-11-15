@@ -19,7 +19,7 @@ import {
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
-import { getBlobByURL } from '@wordpress/blob';
+import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -40,7 +40,7 @@ class AudioEdit extends Component {
 		const { attributes, noticeOperations, setAttributes } = this.props;
 		const { id, src = '' } = attributes;
 
-		if ( ! id && src.indexOf( 'blob:' ) === 0 ) {
+		if ( ! id && isBlobURL( src ) ) {
 			const file = getBlobByURL( src );
 
 			if ( file ) {
@@ -103,10 +103,6 @@ class AudioEdit extends Component {
 			return (
 				<MediaPlaceholder
 					icon="media-audio"
-					labels={ {
-						title: __( 'Audio' ),
-						name: __( 'an audio' ),
-					} }
 					className={ className }
 					onSelect={ onSelectAudio }
 					onSelectURL={ this.onSelectURL }

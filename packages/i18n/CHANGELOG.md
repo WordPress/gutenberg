@@ -1,9 +1,19 @@
-## 3.0.0 (Unreleased)
+## 3.1.0 (Unreleased)
 
-### Braking Change
+### Enhancements
 
-- `wp.i18n.getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
-- `wp.i18n.dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+- The module has been internally refactored to use [Tannin](https://github.com/aduth/tannin) in place of [Jed](https://github.com/messageformat/Jed/). This has no impact on the public interface of the module, but should come with considerable benefit to performance, memory usage, and bundle size.
+
+## 3.0.0 (2018-09-30)
+
+### Breaking Changes
+
+- `getI18n` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+- `dcnpgettext` has been removed. Use `__`, `_x`, `_n`, or `_nx` instead.
+
+### Bug Fixes
+
+- The initialization of the internal Jed instance now correctly assigns its default data.
 
 ## 2.0.0 (2018-09-05)
 

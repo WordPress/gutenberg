@@ -149,8 +149,7 @@ describe( 'adding blocks', () => {
 		await pressWithModifier( META_KEY, 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// When returning to Visual mode, backspace in selected block should
-		// reset to an unmodified default block.
+		// Backspace to remove the content in this block, resetting it.
 		await page.keyboard.press( 'Backspace' );
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
@@ -158,5 +157,109 @@ describe( 'adding blocks', () => {
 		await pressWithModifier( META_KEY, 'b' );
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at end', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at end and continue writing', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		await page.keyboard.type( 'b' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break mid text', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break at start', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert line break in empty container', async () => {
+		await clickBlockAppender();
+		await pressWithModifier( 'Shift', 'Enter' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate native inputs vertically, not horizontally', async () => {
+		// See: https://github.com/WordPress/gutenberg/issues/9626
+
+		// Title is within the editor's writing flow, and is a <textarea>
+		await page.click( '.editor-post-title' );
+
+		// Should remain in title upon ArrowRight:
+		await page.keyboard.press( 'ArrowRight' );
+		let isInTitle = await page.evaluate( () => (
+			!! document.activeElement.closest( '.editor-post-title' )
+		) );
+		expect( isInTitle ).toBe( true );
+
+		// Should remain in title upon modifier + ArrowDown:
+		await pressWithModifier( META_KEY, 'ArrowDown' );
+		isInTitle = await page.evaluate( () => (
+			!! document.activeElement.closest( '.editor-post-title' )
+		) );
+		expect( isInTitle ).toBe( true );
+
+		// Should navigate into blocks list upon ArrowDown:
+		await page.keyboard.press( 'ArrowDown' );
+		const isInBlock = await page.evaluate( () => (
+			!! document.activeElement.closest( '[data-type]' )
+		) );
+		expect( isInBlock ).toBe( true );
+	} );
+
+	it( 'should not delete trailing spaces when deleting a word with backspace', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1 2 3 4' );
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( '4' );
+		const blockText = await page.evaluate( () => document.activeElement.textContent );
+		expect( blockText ).toBe( '1 2 3 4' );
+	} );
+
+	it( 'should not delete trailing spaces when deleting a word with alt + backspace', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'alpha beta gamma delta' );
+		if ( process.platform === 'darwin' ) {
+			await pressWithModifier( 'Alt', 'Backspace' );
+		} else {
+			await pressWithModifier( META_KEY, 'Backspace' );
+		}
+		await page.keyboard.type( 'delta' );
+		const blockText = await page.evaluate( () => document.activeElement.textContent );
+		expect( blockText ).toBe( 'alpha beta gamma delta' );
+	} );
+
+	it( 'should create valid paragraph blocks when rapidly pressing Enter', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		// Check that none of the paragraph blocks have <br> in them.
+		const postContent = await getEditedPostContent();
+		expect( postContent.indexOf( 'br' ) ).toBe( -1 );
 	} );
 } );

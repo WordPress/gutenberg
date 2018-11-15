@@ -20,11 +20,11 @@ const table = deepFreeze( {
 		{
 			cells: [
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 			],
@@ -32,11 +32,11 @@ const table = deepFreeze( {
 		{
 			cells: [
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 			],
@@ -49,11 +49,11 @@ const tableWithContent = deepFreeze( {
 		{
 			cells: [
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 			],
@@ -61,11 +61,11 @@ const tableWithContent = deepFreeze( {
 		{
 			cells: [
 				{
-					content: [],
+					content: '',
 					tag: 'td',
 				},
 				{
-					content: [ 'test' ],
+					content: 'test',
 					tag: 'td',
 				},
 			],
@@ -87,7 +87,7 @@ describe( 'updateCellContent', () => {
 			section: 'body',
 			rowIndex: 1,
 			columnIndex: 1,
-			content: [ 'test' ],
+			content: 'test',
 		} );
 
 		expect( state ).toEqual( tableWithContent );
@@ -106,23 +106,11 @@ describe( 'insertRow', () => {
 				{
 					cells: [
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 						{
-							content: [],
-							tag: 'td',
-						},
-					],
-				},
-				{
-					cells: [
-						{
-							content: [],
-							tag: 'td',
-						},
-						{
-							content: [ 'test' ],
+							content: '',
 							tag: 'td',
 						},
 					],
@@ -130,11 +118,23 @@ describe( 'insertRow', () => {
 				{
 					cells: [
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 						{
-							content: [],
+							content: 'test',
+							tag: 'td',
+						},
+					],
+				},
+				{
+					cells: [
+						{
+							content: '',
+							tag: 'td',
+						},
+						{
+							content: '',
 							tag: 'td',
 						},
 					],
@@ -158,15 +158,15 @@ describe( 'insertColumn', () => {
 				{
 					cells: [
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 					],
@@ -174,15 +174,15 @@ describe( 'insertColumn', () => {
 				{
 					cells: [
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 						{
-							content: [ 'test' ],
+							content: 'test',
 							tag: 'td',
 						},
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 					],
@@ -206,11 +206,11 @@ describe( 'deleteRow', () => {
 				{
 					cells: [
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 						{
-							content: [ 'test' ],
+							content: 'test',
 							tag: 'td',
 						},
 					],
@@ -234,7 +234,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 					],
@@ -242,7 +242,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: [ 'test' ],
+							content: 'test',
 							tag: 'td',
 						},
 					],
@@ -259,7 +259,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: [],
+							content: '',
 							tag: 'td',
 						},
 					],
@@ -267,7 +267,7 @@ describe( 'deleteColumn', () => {
 				{
 					cells: [
 						{
-							content: [ 'test' ],
+							content: 'test',
 							tag: 'td',
 						},
 					],

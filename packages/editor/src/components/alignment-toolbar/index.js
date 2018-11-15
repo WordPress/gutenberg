@@ -17,37 +17,37 @@ import { compose } from '@wordpress/compose';
  */
 import { withBlockEditContext } from '../block-edit/context';
 
-const ALIGNMENT_CONTROLS = [
+const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
 		icon: 'editor-alignleft',
-		title: __( 'Align left' ),
+		title: __( 'Align text left' ),
 		align: 'left',
 	},
 	{
 		icon: 'editor-aligncenter',
-		title: __( 'Align center' ),
+		title: __( 'Align text center' ),
 		align: 'center',
 	},
 	{
 		icon: 'editor-alignright',
-		title: __( 'Align right' ),
+		title: __( 'Align text right' ),
 		align: 'right',
 	},
 ];
 
-export function AlignmentToolbar( { isCollapsed, value, onChange } ) {
+export function AlignmentToolbar( { isCollapsed, value, onChange, alignmentControls = DEFAULT_ALIGNMENT_CONTROLS } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find( ALIGNMENT_CONTROLS, ( control ) => control.align === value );
+	const activeAlignment = find( alignmentControls, ( control ) => control.align === value );
 
 	return (
 		<Toolbar
 			isCollapsed={ isCollapsed }
 			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
 			label={ __( 'Change Text Alignment' ) }
-			controls={ ALIGNMENT_CONTROLS.map( ( control ) => {
+			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
 				const isActive = ( value === align );
 

@@ -19,6 +19,5 @@ const MyIcon = () => (
 			<Path d="M2 6v14l2 2h14v-2H4V6H2z" />
 		</G>
 	</SVG>
-	>
 );
 ```

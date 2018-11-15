@@ -20,7 +20,7 @@ describe( 'Toolbar', () => {
 			expect( toolbar.type() ).toBeNull();
 		} );
 
-		it( 'should render a list of controls with IconButtons', () => {
+		it( 'should render a list of controls with ToolbarButtons', () => {
 			const clickHandler = ( event ) => event;
 			const controls = [
 				{
@@ -32,17 +32,18 @@ describe( 'Toolbar', () => {
 				},
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'IconButton' );
+			const listItem = toolbar.find( 'ToolbarButton' );
 			expect( listItem.props() ).toMatchObject( {
+				containerClassName: null,
 				icon: 'wordpress',
-				label: 'WordPress',
-				'data-subscript': 'wp',
-				'aria-pressed': false,
-				className: 'components-toolbar__control',
+				title: 'WordPress',
+				subscript: 'wp',
+				onClick: clickHandler,
+				isActive: false,
 			} );
 		} );
 
-		it( 'should render a list of controls with IconButtons and active control', () => {
+		it( 'should render a list of controls with ToolbarButtons and active control', () => {
 			const clickHandler = ( event ) => event;
 			const controls = [
 				{
@@ -54,10 +55,14 @@ describe( 'Toolbar', () => {
 				},
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'IconButton' );
+			const listItem = toolbar.find( 'ToolbarButton' );
 			expect( listItem.props() ).toMatchObject( {
-				'aria-pressed': true,
-				className: 'components-toolbar__control is-active',
+				containerClassName: null,
+				icon: 'wordpress',
+				title: 'WordPress',
+				subscript: 'wp',
+				onClick: clickHandler,
+				isActive: true,
 			} );
 		} );
 
@@ -79,8 +84,8 @@ describe( 'Toolbar', () => {
 
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
 			expect( toolbar.children() ).toHaveLength( 2 );
-			expect( toolbar.childAt( 0 ).hasClass( 'has-left-divider' ) ).toBe( false );
-			expect( toolbar.childAt( 1 ).hasClass( 'has-left-divider' ) ).toBe( true );
+			expect( toolbar.childAt( 0 ).prop( 'containerClassName' ) ).toBeNull();
+			expect( toolbar.childAt( 1 ).prop( 'containerClassName' ) ).toBe( 'has-left-divider' );
 		} );
 
 		it( 'should call the clickHandler on click.', () => {
@@ -96,10 +101,10 @@ describe( 'Toolbar', () => {
 				},
 			];
 			const toolbar = shallow( <Toolbar controls={ controls } /> );
-			const listItem = toolbar.find( 'IconButton' );
+			const listItem = toolbar.find( 'ToolbarButton' );
 			listItem.simulate( 'click', event );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
-			expect( clickHandler ).toHaveBeenCalledWith();
+			expect( clickHandler ).toHaveBeenCalledWith( event );
 		} );
 	} );
 } );

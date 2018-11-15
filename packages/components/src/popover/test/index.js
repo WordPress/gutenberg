@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
 import TestUtils from 'react-dom/test-utils';
 import ReactDOM from 'react-dom';
 import { noop } from 'lodash';
@@ -16,7 +15,7 @@ describe( 'Popover', () => {
 		let wrapper;
 		beforeEach( () => {
 			jest.spyOn( Popover.prototype, 'computePopoverPosition' ).mockImplementation( noop );
-			jest.spyOn( Popover.prototype, 'toggleWindowEvents' ).mockImplementation( noop );
+			jest.spyOn( Popover.prototype, 'toggleAutoRefresh' ).mockImplementation( noop );
 		} );
 
 		afterEach( () => {
@@ -31,19 +30,19 @@ describe( 'Popover', () => {
 			}
 		} );
 
-		it( 'should add window events', () => {
+		it( 'should turn on auto refresh', () => {
 			wrapper = TestUtils.renderIntoDocument( <Popover /> );
-			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( true );
+			expect( Popover.prototype.toggleAutoRefresh ).toHaveBeenCalledWith( true );
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
 		} );
 
-		it( 'should remove window events', () => {
+		it( 'should turn off auto refresh', () => {
 			wrapper = TestUtils.renderIntoDocument( <Popover /> );
 			/* eslint-disable react/no-find-dom-node */
 			ReactDOM.unmountComponentAtNode( ReactDOM.findDOMNode( wrapper ).parentNode );
 			/* eslint-enable react/no-find-dom-node */
 
-			expect( Popover.prototype.toggleWindowEvents ).toHaveBeenCalledWith( false );
+			expect( Popover.prototype.toggleAutoRefresh ).toHaveBeenCalledWith( false );
 		} );
 
 		it( 'should set offset and forced positions on changed position', () => {
@@ -53,7 +52,7 @@ describe( 'Popover', () => {
 
 			ReactDOM.render( <Popover position={ 'bottom right' } />, node );
 
-			expect( Popover.prototype.toggleWindowEvents ).not.toHaveBeenCalled();
+			expect( Popover.prototype.toggleAutoRefresh ).not.toHaveBeenCalled();
 			expect( Popover.prototype.computePopoverPosition ).toHaveBeenCalled();
 		} );
 
@@ -96,16 +95,17 @@ describe( 'Popover', () => {
 
 	describe( '#render()', () => {
 		it( 'should render content', () => {
-			const wrapper = shallow( <Popover>Hello</Popover>, { disableLifecycleMethods: true } );
+			const wrapper = TestUtils.renderIntoDocument( <Popover>Hello</Popover> );
+			const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
 
-			expect( wrapper.type() ).toBe( 'span' );
-			expect( wrapper.find( '.components-popover__content' ).prop( 'children' ) ).toBe( 'Hello' );
+			expect( content ).toMatchSnapshot();
 		} );
 
-		it( 'should pass additional to portaled element', () => {
-			const wrapper = shallow( <Popover role="tooltip">Hello</Popover>, { disableLifecycleMethods: true } );
+		it( 'should pass additional props to portaled element', () => {
+			const wrapper = TestUtils.renderIntoDocument( <Popover role="tooltip">Hello</Popover> );
+			const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
 
-			expect( wrapper.find( '.components-popover' ).prop( 'role' ) ).toBe( 'tooltip' );
+			expect( content ).toMatchSnapshot();
 		} );
 	} );
 } );

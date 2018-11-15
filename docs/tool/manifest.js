@@ -8,11 +8,11 @@ const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/maste
 /**
  * Generates the package manifest.
  *
- * @param {Object} packagesConfig Packages Docs Config
+ * @param {Array} packageFolderNames Package folder names.
  *
  * @return {Array} Manifest
  */
-function getPackageManifest( packagesConfig ) {
+function getPackageManifest( packageFolderNames ) {
 	return [
 		{
 			title: 'Packages',
@@ -21,10 +21,8 @@ function getPackageManifest( packagesConfig ) {
 			parent: null,
 		},
 	].concat(
-		Object.entries( packagesConfig ).map( ( [ folderName, config ] ) => {
-			const path = config.isNpmReady === false ?
-				`${ baseRepoUrl }/${ folderName }/README.md` :
-				`${ baseRepoUrl }/packages/${ folderName }/README.md`;
+		packageFolderNames.map( ( folderName ) => {
+			const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
 			return {
 				title: `@wordpress/${ folderName }`,
 				slug: `packages-${ folderName }`,

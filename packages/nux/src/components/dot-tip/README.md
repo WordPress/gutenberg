@@ -1,14 +1,14 @@
 DotTip
 ========
 
-`DotTip` is a React component that renders a single _tip_ on the screen. The tip will point to the React element that `DotTip` is nested within. Each tip is uniquely identified by a string passed to `id`.
+`DotTip` is a React component that renders a single _tip_ on the screen. The tip will point to the React element that `DotTip` is nested within. Each tip is uniquely identified by a string passed to `tipId`.
 
 ## Usage
 
 ```jsx
 <button onClick={ ... }>
 	Add to Cart
-	<DotTip id="acme/add-to-cart">
+	<DotTip tipId="acme/add-to-cart">
 		Click here to add the product to your shopping cart.
 	</DotTip>
 </button>
@@ -19,7 +19,7 @@ DotTip
 
 The component accepts the following props:
 
-### id
+### tipId
 
 A string that uniquely identifies the tip. Identifiers should be prefixed with the name of the plugin, followed by a `/`. For example, `acme/add-to-cart`.
 

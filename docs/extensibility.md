@@ -57,7 +57,7 @@ Learn more in the [Extending Blocks](../docs/extensibility/extending-blocks.md) 
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-Refer to the [Plugins](https://github.com/WordPress/gutenberg/blob/master/packages/plugins/README.md) and [Edit Post](https://github.com/WordPress/gutenberg/blob/master/edit-post/README.md) section for more information.
+Refer to the [Plugins](https://github.com/WordPress/gutenberg/blob/master/packages/plugins/README.md) and [Edit Post](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/README.md) section for more information.
 
 ## Meta Boxes
 

@@ -29,8 +29,8 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -85,6 +85,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			alignment = props.attributes.alignment;
 
 		return el( RichText.Content, {
+			tagName: 'p',
 			className: props.className,
 			style: { textAlign: alignment },
 			value: content
@@ -111,8 +112,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -151,12 +152,11 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 		);
 	},
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const { content, alignment } = attributes;
 
 		return (
 			<RichText.Content
-				className={ className }
 				style={ { textAlign: alignment } }
 				value={ content }
 				tagName="p"

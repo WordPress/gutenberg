@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isString, isArray } from 'lodash';
+import { isArray, isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ class IconButton extends Component {
 		const tooltipText = tooltip || label;
 
 		// Should show the tooltip if...
-		const showTooltip = (
+		const showTooltip = ! additionalProps.disabled && (
 			// an explicit tooltip is passed or...
 			tooltip ||
 			// there's a shortcut or...
@@ -41,7 +41,7 @@ class IconButton extends Component {
 		);
 
 		let element = (
-			<Button { ...additionalProps } aria-label={ label } className={ classes }>
+			<Button aria-label={ label } { ...additionalProps } className={ classes }>
 				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
 				{ children }
 			</Button>
@@ -49,7 +49,10 @@ class IconButton extends Component {
 
 		if ( showTooltip ) {
 			element = (
-				<Tooltip text={ tooltipText } shortcut={ shortcut }>
+				<Tooltip
+					text={ tooltipText }
+					shortcut={ shortcut }
+				>
 					{ element }
 				</Tooltip>
 			);

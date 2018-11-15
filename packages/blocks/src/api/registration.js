@@ -8,7 +8,7 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters, addFilter } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 
 /**
@@ -172,22 +172,41 @@ export function unregisterBlockType( name ) {
 }
 
 /**
- * Assigns name of block handling unknown block types.
+ * Assigns name of block for handling non-block content.
  *
- * @param {string} name Block name.
+ * @param {string} blockName Block name.
  */
-export function setUnknownTypeHandlerName( name ) {
-	dispatch( 'core/blocks' ).setFallbackBlockName( name );
+export function setFreeformContentHandlerName( blockName ) {
+	dispatch( 'core/blocks' ).setFreeformFallbackBlockName( blockName );
 }
 
 /**
- * Retrieves name of block handling unknown block types, or undefined if no
+ * Retrieves name of block handling non-block content, or undefined if no
  * handler has been defined.
  *
  * @return {?string} Blog name.
  */
-export function getUnknownTypeHandlerName() {
-	return select( 'core/blocks' ).getFallbackBlockName();
+export function getFreeformContentHandlerName() {
+	return select( 'core/blocks' ).getFreeformFallbackBlockName();
+}
+
+/**
+ * Assigns name of block handling unregistered block types.
+ *
+ * @param {string} blockName Block name.
+ */
+export function setUnregisteredTypeHandlerName( blockName ) {
+	dispatch( 'core/blocks' ).setUnregisteredFallbackBlockName( blockName );
+}
+
+/**
+ * Retrieves name of block handling unregistered block types, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog name.
+ */
+export function getUnregisteredTypeHandlerName() {
+	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
 }
 
 /**
@@ -310,17 +329,15 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
-	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariation.name }`, ( settings, name ) => {
-		if ( blockName !== name ) {
-			return settings;
-		}
+	dispatch( 'core/blocks' ).addBlockStyles( blockName, styleVariation );
+};
 
-		return {
-			...settings,
-			styles: [
-				...get( settings, [ 'styles' ], [] ),
-				styleVariation,
-			],
-		};
-	} );
+/**
+ * Unregisters a block style variation for the given block.
+ *
+ * @param {string} blockName          Name of block (example: “core/latest-posts”).
+ * @param {string} styleVariationName Name of class applied to the block.
+ */
+export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
+	dispatch( 'core/blocks' ).removeBlockStyles( blockName, styleVariationName );
 };

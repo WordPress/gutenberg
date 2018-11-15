@@ -89,18 +89,33 @@ Returns true if the publish sidebar is opened.
 
 Whether the publish sidebar is open.
 
-### isEditorSidebarPanelOpened
+### isEditorPanelEnabled
 
-Returns true if the editor sidebar panel is open, or false otherwise.
+Returns true if the given panel is enabled, or false otherwise. Panels are
+enabled by default.
 
 *Parameters*
 
  * state: Global application state.
- * panel: Sidebar panel name.
+ * panelName: A string that identifies the panel.
 
 *Returns*
 
-Whether the sidebar panel is open.
+Whether or not the panel is enabled.
+
+### isEditorPanelOpened
+
+Returns true if the given panel is open, or false otherwise. Panels are
+closed by default.
+
+*Parameters*
+
+ * state: Global application state.
+ * panelName: A string that identifies the panel.
+
+*Returns*
+
+Whether or not the panel is open.
 
 ### isModalActive
 
@@ -142,9 +157,61 @@ When the value is not set it defaults to true.
 
 Whether the plugin item is pinned.
 
-### getMetaBoxes
+### getActiveMetaBoxLocations
 
-Returns the state of legacy meta boxes.
+Returns an array of active meta box locations.
+
+*Parameters*
+
+ * state: Post editor state.
+
+*Returns*
+
+Active meta box locations.
+
+### isMetaBoxLocationVisible
+
+Returns true if a metabox location is active and visible
+
+*Parameters*
+
+ * state: Post editor state.
+ * location: Meta box location to test.
+
+*Returns*
+
+Whether the meta box location is active and visible.
+
+### isMetaBoxLocationActive
+
+Returns true if there is an active meta box in the given location, or false
+otherwise.
+
+*Parameters*
+
+ * state: Post editor state.
+ * location: Meta box location to test.
+
+*Returns*
+
+Whether the meta box location is active.
+
+### getMetaBoxesPerLocation
+
+Returns the list of all the available meta boxes for a given location.
+
+*Parameters*
+
+ * state: Global application state.
+ * location: Meta box location to test.
+
+*Returns*
+
+List of meta boxes.
+
+### getAllMetaBoxes
+
+Returns the list of all the available meta boxes.
 
 *Parameters*
 
@@ -152,20 +219,7 @@ Returns the state of legacy meta boxes.
 
 *Returns*
 
-State of meta boxes.
-
-### getMetaBox
-
-Returns the state of legacy meta boxes.
-
-*Parameters*
-
- * state: Global application state.
- * location: Location of the meta box.
-
-*Returns*
-
-State of meta box at specified location.
+List of meta boxes.
 
 ### hasMetaBoxes
 
@@ -207,7 +261,7 @@ Returns an action object signalling that the user closed the sidebar.
 
 ### openModal
 
-Returns an action object used in signalling that the user opened an editor sidebar.
+Returns an action object used in signalling that the user opened a modal.
 
 *Parameters*
 
@@ -215,7 +269,7 @@ Returns an action object used in signalling that the user opened an editor sideb
 
 ### closeModal
 
-Returns an action object signalling that the user closed the sidebar.
+Returns an action object signalling that the user closed a modal.
 
 ### openPublishSidebar
 
@@ -231,13 +285,21 @@ publish sidebar.
 
 Returns an action object used in signalling that the user toggles the publish sidebar.
 
-### toggleGeneralSidebarEditorPanel
+### toggleEditorPanelEnabled
 
-Returns an action object used in signalling that use toggled a panel in the editor.
+Returns an action object used to enable or disable a panel in the editor.
 
 *Parameters*
 
- * panel: The panel to toggle.
+ * panelName: A string that identifies the panel to enable or disable.
+
+### toggleEditorPanelOpened
+
+Returns an action object used to open or close a panel in the editor.
+
+*Parameters*
+
+ * panelName: A string that identifies the panel to open or close.
 
 ### toggleFeature
 
@@ -255,21 +317,14 @@ Returns an action object used to toggle a plugin name flag.
 
  * pluginName: Plugin name.
 
-### initializeMetaBoxState
+### setAvailableMetaBoxesPerLocation
 
-Returns an action object used to check the state of meta boxes at a location.
-
-This should only be fired once to initialize meta box state. If a meta box
-area is empty, this will set the store state to indicate that React should
-not render the meta box area.
-
-Example: metaBoxes = { side: true, normal: false }.
-
-This indicates that the sidebar has a meta box but the normal area does not.
+Returns an action object used in signaling
+what Meta boxes are available in which location.
 
 *Parameters*
 
- * metaBoxes: Whether meta box locations are active.
+ * metaBoxesPerLocation: Meta boxes per location.
 
 ### requestMetaBoxUpdates
 
@@ -278,12 +333,3 @@ Returns an action object used to request meta box update.
 ### metaBoxUpdatesSuccess
 
 Returns an action object used signal a successful meta box update.
-
-### setMetaBoxSavedData
-
-Returns an action object used to set the saved meta boxes data.
-This is used to check if the meta boxes have been touched when leaving the editor.
-
-*Parameters*
-
- * dataPerLocation: Meta Boxes Data per location.

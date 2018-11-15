@@ -80,7 +80,7 @@ describe( 'block deletion -', () => {
 			await page.click( '.editor-post-title' );
 
 			// Click on the third (image) block so that its wrapper is selected and backspace to delete it.
-			await page.click( '.editor-block-list__block:nth-child(3)' );
+			await page.click( '.editor-block-list__block:nth-child(3) .components-placeholder__label' );
 			await page.keyboard.press( 'Backspace' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();

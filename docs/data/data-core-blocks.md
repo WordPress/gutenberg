@@ -23,6 +23,19 @@ Returns a block type by name.
 
 Block Type.
 
+### getBlockStyles
+
+Returns block styles by block name.
+
+*Parameters*
+
+ * state: Data state.
+ * name: Block type name.
+
+*Returns*
+
+Block Styles.
+
 ### getCategories
 
 Returns all the available categories.
@@ -47,9 +60,9 @@ Returns the name of the default block name.
 
 Default block name.
 
-### getFallbackBlockName
+### getFreeformFallbackBlockName
 
-Returns the name of the fallback block name.
+Returns the name of the block for handling non-block content.
 
 *Parameters*
 
@@ -57,7 +70,19 @@ Returns the name of the fallback block name.
 
 *Returns*
 
-Fallback block name.
+Name of the block for handling non-block content.
+
+### getUnregisteredFallbackBlockName
+
+Returns the name of the block for handling unregistered blocks.
+
+*Parameters*
+
+ * state: Data state.
+
+*Returns*
+
+Name of the block for handling unregistered blocks.
 
 ### getChildBlockNames
 
@@ -149,6 +174,24 @@ Returns an action object used to remove a registered block type.
 
  * names: Block name.
 
+### addBlockStyles
+
+Returns an action object used in signalling that new block styles have been added.
+
+*Parameters*
+
+ * blockName: Block name.
+ * styles: Block styles.
+
+### removeBlockStyles
+
+Returns an action object used in signalling that block styles have been removed.
+
+*Parameters*
+
+ * blockName: Block name.
+ * styleNames: Block style names.
+
 ### setDefaultBlockName
 
 Returns an action object used to set the default block name.
@@ -157,9 +200,19 @@ Returns an action object used to set the default block name.
 
  * name: Block name.
 
-### setFallbackBlockName
+### setFreeformFallbackBlockName
 
-Returns an action object used to set the fallback block name.
+Returns an action object used to set the name of the block used as a fallback
+for non-block content.
+
+*Parameters*
+
+ * name: Block name.
+
+### setUnregisteredFallbackBlockName
+
+Returns an action object used to set the name of the block used as a fallback
+for unregistered blocks.
 
 *Parameters*
 

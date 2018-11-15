@@ -10,14 +10,14 @@
 	}
 
 	.editor-block-settings-menu__content {
-		padding: $item-spacing - $border-width;
+		padding: $grid-size - $border-width;
 	}
 
 	.editor-block-settings-menu__separator {
-		margin-top: $item-spacing;
-		margin-bottom: $item-spacing;
-		margin-left: -$item-spacing + $border-width;
-		margin-right: -$item-spacing + $border-width;
+		margin-top: $grid-size;
+		margin-bottom: $grid-size;
+		margin-left: -$grid-size + $border-width;
+		margin-right: -$grid-size + $border-width;
 		border-top: $border-width solid $light-gray-500;
 
 		// Check if the separator is the last child in the node and if so, hide itself

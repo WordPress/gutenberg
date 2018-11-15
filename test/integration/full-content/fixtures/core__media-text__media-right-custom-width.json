@@ -1,0 +1,34 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/media-text",
+        "isValid": true,
+        "attributes": {
+            "align": "full",
+            "mediaAlt": "",
+            "mediaPosition": "right",
+            "mediaId": 17897,
+            "mediaUrl": "http://localhost/wp-content/uploads/2018/09/Jul-26-2018-11-34-54.mp4",
+            "mediaType": "video",
+            "mediaWidth": 41,
+            "isStackedOnMobile": false
+        },
+        "innerBlocks": [
+            {
+                "clientId": "_clientId_0",
+                "name": "core/paragraph",
+                "isValid": true,
+                "attributes": {
+                    "content": "My video",
+                    "align": "right",
+                    "dropCap": false,
+                    "placeholder": "Content…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "originalContent": "<p style=\"text-align:right\" class=\"has-large-font-size\">My video</p>"
+            }
+        ],
+        "originalContent": "<div class=\"wp-block-media-text alignfull has-media-on-the-right\" style=\"grid-template-columns:auto 41%\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<video controls src=\"http://localhost/wp-content/uploads/2018/09/Jul-26-2018-11-34-54.mp4\"></video>\n\t</figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
+    }
+]

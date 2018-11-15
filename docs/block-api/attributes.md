@@ -19,6 +19,7 @@ _Example_: Extract the `src` attribute from an image found in the block's markup
 ```js
 {
 	url: {
+		type: 'string',
 		source: 'attribute',
 		selector: 'img',
 		attribute: 'src',
@@ -34,6 +35,7 @@ Use `text` to extract the inner text from markup.
 ```js
 {
 	content: {
+		type: 'string',
 		source: 'text',
 		selector: 'figcaption',
 	}
@@ -48,6 +50,7 @@ Use `html` to extract the inner HTML from markup.
 ```js
 {
 	content: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	}
@@ -55,26 +58,18 @@ Use `html` to extract the inner HTML from markup.
 // { "content": "The inner text of the <strong>figcaption</strong> element" }
 ```
 
-### `children`
-
-Use `children` to extract child nodes of the matched element, returned as an array of virtual elements. This is most commonly used in combination with the `RichText` component.
-
-_Example_: Extract child nodes from a paragraph of rich text.
+Use the `multiline` property to extract the inner HTML of matching tag names for the use in `RichText` with the `multiline` prop.
 
 ```js
 {
 	content: {
-		source: 'children',
-		selector: 'p'
+		type: 'string',
+		source: 'html',
+		multiline: 'p',
+		selector: 'blockquote',
 	}
 }
-// {
-//   "content": [
-//     "Vestibulum eu ",
-//     { "type": "strong", "children": "tortor" },
-//     " vel urna."
-//   ]
-// }
+// { "content": "<p>First line</p><p>Second line</p>" }
 ```
 
 ### `query`
@@ -86,11 +81,20 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 ```js
 {
 	images: {
+		type: 'array',
 		source: 'query'
 		selector: 'img',
 		query: {
-			url: { source: 'attribute', attribute: 'src' },
-			alt: { source: 'attribute', attribute: 'alt' },
+			url: {
+				type: 'string',
+				source: 'attribute',
+				attribute: 'src',
+			},
+			alt: {
+				type: 'string',
+				source: 'attribute',
+				attribute: 'alt',
+			},
 		}
 	}
 }

@@ -3,25 +3,17 @@
  */
 import Slot from './slot';
 import Fill from './fill';
-import Provider from './provider';
+import Provider, { Consumer } from './context';
 
 export { Slot };
 export { Fill };
-export { Provider };
+export { Provider, Consumer };
 
 export function createSlotFill( name ) {
-	const FillComponent = ( { children, ...props } ) => (
-		<Fill name={ name } { ...props }>
-			{ children }
-		</Fill>
-	);
+	const FillComponent = ( props ) => <Fill name={ name } { ...props } />;
 	FillComponent.displayName = name + 'Fill';
 
-	const SlotComponent = ( { children, ...props } ) => (
-		<Slot name={ name } { ...props }>
-			{ children }
-		</Slot>
-	);
+	const SlotComponent = ( props ) => <Slot name={ name } { ...props } />;
 	SlotComponent.displayName = name + 'Slot';
 
 	return {

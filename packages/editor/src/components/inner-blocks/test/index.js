@@ -3,9 +3,7 @@
  */
 import {
 	createBlock,
-	getBlockType,
 	getBlockTypes,
-	setUnknownTypeHandlerName,
 	getSaveElement,
 	registerBlockType,
 	serialize,
@@ -20,7 +18,6 @@ import InnerBlocks from '../';
 
 describe( 'InnerBlocks', () => {
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -54,7 +51,7 @@ describe( 'InnerBlocks', () => {
 
 		const saved = renderToString(
 			getSaveElement(
-				getBlockType( 'core/fruit' ),
+				'core/fruit',
 				{ fruit: 'Bananas' },
 				[ createBlock( 'core/fruit', { fruit: 'Apples' } ) ],
 			)

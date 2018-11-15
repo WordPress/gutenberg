@@ -44,7 +44,7 @@ export class BlockMover extends Component {
 	}
 
 	render() {
-		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, layout, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
+		const { onMoveUp, onMoveDown, isFirst, isLast, isDraggable, onDragStart, onDragEnd, clientIds, blockElementId, blockType, firstIndex, isLocked, instanceId, isHidden } = this.props;
 		const { isFocused } = this.state;
 		const blocksCount = castArray( clientIds ).length;
 		if ( isLocked || ( isFirst && isLast ) ) {
@@ -72,7 +72,6 @@ export class BlockMover extends Component {
 					icon={ dragHandle }
 					clientId={ clientIds }
 					blockElementId={ blockElementId }
-					layout={ layout }
 					isVisible={ isDraggable }
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }

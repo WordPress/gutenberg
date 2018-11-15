@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import ResizableBox from 're-resizable';
 import classnames from 'classnames';
 
 /**
@@ -10,7 +9,7 @@ import classnames from 'classnames';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/editor';
-import { BaseControl, PanelBody } from '@wordpress/components';
+import { BaseControl, PanelBody, ResizableBox, G, SVG, Path } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 
 export const name = 'core/spacer';
@@ -18,9 +17,9 @@ export const name = 'core/spacer';
 export const settings = {
 	title: __( 'Spacer' ),
 
-	description: __( 'Add an element with empty space and custom height.' ),
+	description: __( 'Add white space between blocks and customize its height.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g><path d="M13 4v2h3.59L6 16.59V13H4v7h7v-2H7.41L18 7.41V11h2V4h-7" /></g></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><G><Path d="M13 4v2h3.59L6 16.59V13H4v7h7v-2H7.41L18 7.41V11h2V4h-7" /></G></SVG>,
 
 	category: 'layout',
 
@@ -47,10 +46,6 @@ export const settings = {
 							height,
 						} }
 						minHeight="20"
-						handleClasses={ {
-							top: 'block-library-spacer__resize-handler-top',
-							bottom: 'block-library-spacer__resize-handler-bottom',
-						} }
 						enable={ {
 							top: false,
 							right: false,

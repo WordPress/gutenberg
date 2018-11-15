@@ -90,6 +90,12 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Annotations",
+		"slug": "annotations",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/extensibility/annotations.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Design",
 		"slug": "design",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/design.md",
@@ -195,6 +201,12 @@
 		"title": "Release Process",
 		"slug": "release",
 		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/release.md",
+		"parent": "reference"
+	},
+	{
+		"title": "Scripts",
+		"slug": "scripts",
+		"markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/reference\/scripts.md",
 		"parent": "reference"
 	},
 	{

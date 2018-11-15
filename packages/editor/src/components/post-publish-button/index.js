@@ -10,6 +10,8 @@ import { Button } from '@wordpress/components';
 import { Component, createRef } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
+import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -28,18 +30,36 @@ export class PostPublishButton extends Component {
 
 	render() {
 		const {
-			isSaving,
-			onStatusChange,
-			onSave,
-			isBeingScheduled,
-			visibility,
-			isPublishable,
-			isSaveable,
-			hasPublishAction,
-			onSubmit = noop,
+			forceIsDirty,
 			forceIsSaving,
+			hasPublishAction,
+			isBeingScheduled,
+			isOpen,
+			isPostSavingLocked,
+			isPublishable,
+			isPublished,
+			isSaveable,
+			isSaving,
+			isToggle,
+			onSave,
+			onStatusChange,
+			onSubmit = noop,
+			onToggle,
+			visibility,
 		} = this.props;
-		const isButtonEnabled = isPublishable && isSaveable;
+		const isButtonDisabled =
+			isSaving ||
+			forceIsSaving ||
+			! isSaveable ||
+			isPostSavingLocked ||
+			( ! isPublishable && ! forceIsDirty );
+
+		const isToggleDisabled =
+			isPublished ||
+			isSaving ||
+			forceIsSaving ||
+			! isSaveable ||
+			( ! isPublishable && ! forceIsDirty );
 
 		let publishStatus;
 		if ( ! hasPublishAction ) {
@@ -58,39 +78,64 @@ export class PostPublishButton extends Component {
 			onSave();
 		};
 
+		const buttonProps = {
+			'aria-disabled': isButtonDisabled,
+			className: 'editor-post-publish-button',
+			isBusy: isSaving && isPublished,
+			isLarge: true,
+			isPrimary: true,
+			onClick,
+		};
+
+		const toggleProps = {
+			'aria-disabled': isToggleDisabled,
+			'aria-expanded': isOpen,
+			className: 'editor-post-publish-panel__toggle',
+			isBusy: isSaving && isPublished,
+			isPrimary: true,
+			onClick: onToggle,
+		};
+
+		const toggleChildren = isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' );
+		const buttonChildren = <PublishButtonLabel forceIsSaving={ forceIsSaving } />;
+
+		const componentProps = isToggle ? toggleProps : buttonProps;
+		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<Button
 				ref={ this.buttonNode }
-				className="editor-post-publish-button"
-				isPrimary
-				isLarge
-				onClick={ onClick }
-				disabled={ ! isButtonEnabled }
-				isBusy={ isSaving }
+				{ ...componentProps }
 			>
-				<PublishButtonLabel forceIsSaving={ forceIsSaving } />
+				{ componentChildren }
+				<DotTip tipId="core/editor.publish">
+					{ __( 'Finished writing? That’s great, let’s get this published right now. Just click “Publish” and you’re good to go.' ) }
+				</DotTip>
 			</Button>
 		);
 	}
 }
 
 export default compose( [
-	withSelect( ( select, { forceIsSaving, forceIsDirty } ) => {
+	withSelect( ( select ) => {
 		const {
 			isSavingPost,
 			isEditedPostBeingScheduled,
 			getEditedPostVisibility,
+			isCurrentPostPublished,
 			isEditedPostSaveable,
 			isEditedPostPublishable,
+			isPostSavingLocked,
 			getCurrentPost,
 			getCurrentPostType,
 		} = select( 'core/editor' );
 		return {
-			isSaving: forceIsSaving || isSavingPost(),
+			isSaving: isSavingPost(),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
-			isPublishable: forceIsDirty || isEditedPostPublishable(),
+			isPostSavingLocked: isPostSavingLocked(),
+			isPublishable: isEditedPostPublishable(),
+			isPublished: isCurrentPostPublished(),
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
 			postType: getCurrentPostType(),
 		};

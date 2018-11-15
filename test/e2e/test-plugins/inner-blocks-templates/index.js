@@ -4,7 +4,17 @@
 	var InnerBlocks = wp.editor.InnerBlocks;
 	var __ = wp.i18n.__;
 	var TEMPLATE = [
-		[ 'core/paragraph', { fontSize: 'large', content: 'Content…' } ],
+		[ 'core/paragraph', {
+			fontSize: 'large',
+			content: 'Content…',
+		} ],
+	];
+
+	var TEMPLATE_PARAGRAPH_PLACEHOLDER = [
+		[ 'core/paragraph', {
+			fontSize: 'large',
+			placeholder: 'Content…',
+		} ],
 	];
 
 	var save = function() {
@@ -39,6 +49,23 @@
 					{
 						template: TEMPLATE,
 						templateLock: 'all',
+					}
+			);
+		},
+
+		save,
+	} );
+
+	registerBlockType( 'test/test-inner-blocks-paragraph-placeholder', {
+		title: 'Test Inner Blocks Paragraph Placeholder',
+		icon: 'cart',
+		category: 'common',
+
+		edit: function( props ) {
+			return el(
+					InnerBlocks,
+					{
+						template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
 					}
 			);
 		},

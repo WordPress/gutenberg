@@ -17,8 +17,9 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
 
-		const largeButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__buttons ")]//*[text()=\'L\']' ) )[ 0 ];
-		await largeButton.click();
+		await page.click( '.components-font-size-picker__selector' );
+		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
+		await changeSizeButton.click();
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -31,7 +32,7 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		await page.keyboard.type( '14' );
+		await page.keyboard.type( '13' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -57,7 +58,10 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph with font size reset using button' );
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		await page.keyboard.type( '14' );
+		await page.keyboard.type( '13' );
+
+		// Blur the range control
+		await page.click( '.components-base-control__label' );
 
 		const resetButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__buttons ")]//*[text()=\'Reset\']' ) )[ 0 ];
 		await resetButton.click();
@@ -72,8 +76,9 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph with font size reset using input field' );
 
-		const largeButton = ( await page.$x( '//*[contains(concat(" ", @class, " "), " components-font-size-picker__buttons ")]//*[text()=\'L\']' ) )[ 0 ];
-		await largeButton.click();
+		await page.click( '.components-font-size-picker__selector' );
+		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
+		await changeSizeButton.click();
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
 		await page.keyboard.press( 'Backspace' );

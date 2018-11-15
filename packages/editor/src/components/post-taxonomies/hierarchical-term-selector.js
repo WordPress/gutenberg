@@ -29,6 +29,8 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name,parent',
 };
 
+const MIN_TERMS_COUNT_FOR_FILTER = 8;
+
 class HierarchicalTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
@@ -145,7 +147,7 @@ class HierarchicalTermSelector extends Component {
 					_x( '%s added', 'term' ),
 					get(
 						this.props.taxonomy,
-						[ 'data', 'labels', 'singular_name' ],
+						[ 'labels', 'singular_name' ],
 						slug === 'category' ? __( 'Category' ) : __( 'Term' )
 					)
 				);
@@ -276,7 +278,7 @@ class HierarchicalTermSelector extends Component {
 
 		const resultCount = getResultCount( filteredTermsTree );
 		const resultsFoundMessage = sprintf(
-			_n( '%d result found.', '%d results found.', resultCount, 'term' ),
+			_n( '%d result found.', '%d results found.', resultCount ),
 			resultCount
 		);
 		this.props.debouncedSpeak( resultsFoundMessage, 'assertive' );
@@ -346,7 +348,7 @@ class HierarchicalTermSelector extends Component {
 		const { availableTermsTree, availableTerms, filteredTermsTree, formName, formParent, loading, showForm, filterValue } = this.state;
 		const labelWithFallback = ( labelProperty, fallbackIsCategory, fallbackIsNotCategory ) => get(
 			taxonomy,
-			[ 'data', 'labels', labelProperty ],
+			[ 'labels', labelProperty ],
 			slug === 'category' ? fallbackIsCategory : fallbackIsNotCategory
 		);
 		const newTermButtonLabel = labelWithFallback(
@@ -384,14 +386,15 @@ class HierarchicalTermSelector extends Component {
 				slug === 'category' ? __( 'Categories' ) : __( 'Terms' )
 			)
 		);
+		const showFilter = availableTerms.length >= MIN_TERMS_COUNT_FOR_FILTER;
 
 		return [
-			<label
+			showFilter && <label
 				key="filter-label"
 				htmlFor={ filterInputId }>
 				{ filterLabel }
 			</label>,
-			<input
+			showFilter && <input
 				type="search"
 				id={ filterInputId }
 				value={ filterValue }

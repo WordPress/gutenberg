@@ -7,11 +7,14 @@ import TestRenderer from 'react-test-renderer';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import remountOnPropChange from '../';
+
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'remountOnPropChange', () => {
 	let count = 0;
@@ -52,6 +55,8 @@ describe( 'remountOnPropChange', () => {
 			<Wrapped monitor="unchanged" other="2" />
 		);
 		expect( testRenderer.toJSON() ).toBe( '1' );
+
+		expect( deprecated ).toHaveBeenCalled();
 	} );
 
 	it( 'Should remount the inner component if the prop value changes', () => {
@@ -67,5 +72,7 @@ describe( 'remountOnPropChange', () => {
 			<Wrapped monitor="updated" />
 		);
 		expect( testRenderer.toJSON() ).toBe( '2' );
+
+		expect( deprecated ).toHaveBeenCalled();
 	} );
 } );

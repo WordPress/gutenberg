@@ -13,8 +13,8 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/editor';
-import { parse } from '@wordpress/blocks';
+import { RichText, BlockControls } from '@wordpress/editor';
+import { parse, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -28,6 +28,8 @@ class HeadingEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			mergeBlocks,
+			insertBlocksAfter,
 		} = this.props;
 
 		const {
@@ -37,13 +39,15 @@ class HeadingEdit extends Component {
 		} = attributes;
 
 		const tagName = 'h' + level;
-
 		return (
 			<View>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<BlockControls>
+					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				</BlockControls>
 				<RichText
 					tagName={ tagName }
 					value={ content }
+					isSelected={ this.props.isSelected }
 					style={ {
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
 					} }
@@ -55,6 +59,18 @@ class HeadingEdit extends Component {
 							content: newParaBlock.attributes.content,
 						} );
 					} }
+					onMerge={ mergeBlocks }
+					onSplit={
+						insertBlocksAfter ?
+							( before, after, ...blocks ) => {
+								setAttributes( { content: before } );
+								insertBlocksAfter( [
+									...blocks,
+									createBlock( 'core/paragraph', { content: after } ),
+								] );
+							} :
+							undefined
+					}
 					onContentSizeChange={ ( event ) => {
 						setAttributes( { aztecHeight: event.aztecHeight } );
 					} }

@@ -36,7 +36,7 @@ const DEFAULT_STORAGE_KEY = 'WP_DATA';
 /**
  * Higher-order reducer to provides an initial value when state is undefined.
  *
- * @param {Functigon} reducer      Original reducer.
+ * @param {Function} reducer      Original reducer.
  * @param {*}         initialState Value to use as initial state.
  *
  * @return {Function} Enhanced reducer.

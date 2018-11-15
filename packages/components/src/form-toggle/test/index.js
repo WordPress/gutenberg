@@ -30,6 +30,9 @@ describe( 'FormToggle', () => {
 		} );
 
 		it( 'should render an id prop for the input checkbox', () => {
+			// Disabled because of our rule restricting literal IDs, preferring
+			// `withInstanceId`. In this case, it's fine to use literal IDs.
+			// eslint-disable-next-line no-restricted-syntax
 			const formToggle = shallow( <FormToggle id="test" /> );
 			expect( formToggle.find( '.components-form-toggle__input' ).prop( 'id' ) ).toBe( 'test' );
 		} );

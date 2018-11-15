@@ -57,6 +57,7 @@ add_action( 'do_meta_boxes', 'gutenberg_meta_box_save', 1000 );
  *
  * @param string $location The location of the meta box, 'side', 'normal'.
  * @param int    $post_id  Post ID.
+ * @return string Modified location of the meta box.
  *
  * @hooked redirect_post_location priority 10
  */
@@ -113,12 +114,18 @@ function gutenberg_filter_meta_boxes( $meta_boxes ) {
 		'revisionsdiv',
 		'postexcerpt',
 		'trackbacksdiv',
-		'postcustom',
 		'commentstatusdiv',
 		'commentsdiv',
 		'slugdiv',
 		'authordiv',
 	);
+
+	// Whether or not to load the 'postcustom' meta box is stored as a user meta
+	// field so that we're not always loading its assets.
+	$enable_custom_fields = (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true );
+	if ( ! $enable_custom_fields ) {
+		$core_normal_meta_boxes[] = 'postcustom';
+	}
 
 	$taxonomy_callbacks_to_unset = array(
 		'post_tags_meta_box',
@@ -232,10 +239,15 @@ function gutenberg_show_meta_box_warning( $callback ) {
 		return;
 	}
 
-	if ( is_array( $callback ) ) {
-		$reflection = new ReflectionMethod( $callback[0], $callback[1] );
-	} else {
-		$reflection = new ReflectionFunction( $callback );
+	try {
+		if ( is_array( $callback ) ) {
+			$reflection = new ReflectionMethod( $callback[0], $callback[1] );
+		} else {
+			$reflection = new ReflectionFunction( $callback );
+		}
+	} catch ( ReflectionException $exception ) {
+		// We could not properly reflect on the callable, so we abort here.
+		return;
 	}
 
 	if ( $reflection->isInternal() ) {
@@ -291,30 +303,52 @@ function the_gutenberg_metaboxes() {
 	 */
 	$wp_meta_boxes = apply_filters( 'filter_gutenberg_meta_boxes', $wp_meta_boxes );
 	$locations     = array( 'side', 'normal', 'advanced' );
-	$meta_box_data = array();
+	$priorities    = array( 'high', 'sorted', 'core', 'default', 'low' );
 	// Render meta boxes.
 	?>
 	<form class="metabox-base-form">
 	<?php gutenberg_meta_box_post_form_hidden_fields( $post ); ?>
+	</form>
+	<form id="toggle-custom-fields-form" method="post" action="<?php echo esc_attr( admin_url( 'admin-post.php' ) ); ?>">
+		<?php wp_nonce_field( 'toggle_custom_fields' ); ?>
+		<input type="hidden" name="action" value="toggle_custom_fields" />
 	</form>
 	<?php foreach ( $locations as $location ) : ?>
 		<form class="metabox-location-<?php echo esc_attr( $location ); ?>">
 			<div id="poststuff" class="sidebar-open">
 				<div id="postbox-container-2" class="postbox-container">
 					<?php
-					$number_metaboxes = do_meta_boxes(
+					do_meta_boxes(
 						$current_screen,
 						$location,
 						$post
 					);
-
-					$meta_box_data[ $location ] = $number_metaboxes > 0;
 					?>
 				</div>
 			</div>
 		</form>
 	<?php endforeach; ?>
 	<?php
+
+	$meta_boxes_per_location = array();
+	foreach ( $locations as $location ) {
+		$meta_boxes_per_location[ $location ] = array();
+		foreach ( $priorities as $priority ) {
+			if ( isset( $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ] ) ) {
+				$meta_boxes = (array) $wp_meta_boxes[ $current_screen->id ][ $location ][ $priority ];
+				foreach ( $meta_boxes as $meta_box ) {
+					if ( false == $meta_box || ! $meta_box['title'] ) {
+						continue;
+					}
+
+					$meta_boxes_per_location[ $location ][] = array(
+						'id'    => $meta_box['id'],
+						'title' => $meta_box['title'],
+					);
+				}
+			}
+		}
+	}
 
 	/**
 	 * Sadly we probably can not add this data directly into editor settings.
@@ -324,7 +358,9 @@ function the_gutenberg_metaboxes() {
 	 * editor instance. If a cleaner solution can be imagined, please change
 	 * this, and try to get this data to load directly into the editor settings.
 	 */
-	$script = 'window._wpLoadGutenbergEditor.then( function( editor ) { editor.initializeMetaBoxes( ' . wp_json_encode( $meta_box_data ) . ' ) } );';
+	$script = 'window._wpLoadGutenbergEditor.then( function() {
+		wp.data.dispatch( \'core/edit-post\' ).setAvailableMetaBoxesPerLocation( ' . wp_json_encode( $meta_boxes_per_location ) . ' );
+	} );';
 
 	wp_add_inline_script( 'wp-edit-post', $script );
 
@@ -336,6 +372,30 @@ function the_gutenberg_metaboxes() {
 	 */
 	if ( wp_script_is( 'wp-edit-post', 'done' ) ) {
 		printf( "<script type='text/javascript'>\n%s\n</script>\n", trim( $script ) );
+	}
+
+	/**
+	 * If the 'postcustom' meta box is enabled, then we need to perform some
+	 * extra initialization on it.
+	 */
+	$enable_custom_fields = (bool) get_user_meta( get_current_user_id(), 'enable_custom_fields', true );
+	if ( $enable_custom_fields ) {
+		$script = "( function( $ ) {
+			if ( $('#postcustom').length ) {
+				$( '#the-list' ).wpList( {
+					addBefore: function( s ) {
+						s.data += '&post_id=$post->ID';
+						return s;
+					},
+					addAfter: function() {
+						$('table#list-table').show();
+					}
+				});
+			}
+		} )( jQuery );";
+
+		wp_enqueue_script( 'wp-lists' );
+		wp_add_inline_script( 'wp-lists', $script );
 	}
 
 	// Reset meta box data.
@@ -381,3 +441,25 @@ function gutenberg_meta_box_post_form_hidden_fields( $post ) {
 	// Permalink title nonce.
 	wp_nonce_field( 'samplepermalink', 'samplepermalinknonce', false );
 }
+
+/**
+ * Admin action which toggles the 'enable_custom_fields' option, then redirects
+ * back to the editor. This allows Gutenberg to render a control that lets the
+ * user to completely enable or disable the 'postcustom' meta box.
+ *
+ * @since 5.2.0
+ */
+function gutenberg_toggle_custom_fields() {
+	check_admin_referer( 'toggle_custom_fields' );
+
+	$current_user_id = get_current_user_id();
+	if ( $current_user_id ) {
+		$enable_custom_fields = (bool) get_user_meta( $current_user_id, 'enable_custom_fields', true );
+		update_user_meta( $current_user_id, 'enable_custom_fields', ! $enable_custom_fields );
+	}
+
+	wp_safe_redirect( wp_get_referer() );
+	exit;
+}
+
+add_action( 'admin_post_toggle_custom_fields', 'gutenberg_toggle_custom_fields' );

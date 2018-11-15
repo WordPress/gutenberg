@@ -17,7 +17,7 @@ import { blockAutocompleter, userAutocompleter } from '../components';
 
 const defaultAutocompleters = [ userAutocompleter ];
 
-const fetchReusableBlocks = once( () => dispatch( 'core/editor' ).fetchReusableBlocks() );
+const fetchReusableBlocks = once( () => dispatch( 'core/editor' ).__experimentalFetchReusableBlocks() );
 
 function setDefaultCompleters( completers, blockName ) {
 	if ( ! completers ) {

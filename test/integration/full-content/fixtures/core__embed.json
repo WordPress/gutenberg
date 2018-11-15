@@ -5,9 +5,7 @@
         "isValid": true,
         "attributes": {
             "url": "https://example.com/",
-            "caption": [
-                "Embedded content from an example URL"
-            ],
+            "caption": "Embedded content from an example URL",
             "allowResponsive": true
         },
         "innerBlocks": [],

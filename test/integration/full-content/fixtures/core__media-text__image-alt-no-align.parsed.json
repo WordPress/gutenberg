@@ -1,0 +1,39 @@
+[
+    {
+        "blockName": "core/media-text",
+        "attrs": {
+            "align": "none",
+            "mediaId": 17985,
+            "mediaType": "image"
+        },
+        "innerBlocks": [
+            {
+                "blockName": "core/paragraph",
+                "attrs": {
+                    "placeholder": "Content…",
+                    "fontSize": "large"
+                },
+                "innerBlocks": [],
+                "innerHTML": "\n\t\t<p class=\"has-large-font-size\">Content</p>\n\t\t",
+                "innerContent": [
+                    "\n\t\t<p class=\"has-large-font-size\">Content</p>\n\t\t"
+                ]
+            }
+        ],
+        "innerHTML": "\n<div class=\"wp-block-media-text\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"http://localhost/wp-content/uploads/2018/09/1600px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg\" alt=\"my alt\"/>\n\t</figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>\n",
+        "innerContent": [
+            "\n<div class=\"wp-block-media-text\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"http://localhost/wp-content/uploads/2018/09/1600px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg\" alt=\"my alt\"/>\n\t</figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t",
+            null,
+            "\n\t</div>\n</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

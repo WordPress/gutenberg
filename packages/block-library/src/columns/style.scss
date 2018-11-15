@@ -1,7 +1,49 @@
 .wp-block-columns {
 	display: flex;
+
+	// Responsiveness: Allow wrapping on mobile.
+	flex-wrap: wrap;
+
+	@include break-medium() {
+		flex-wrap: nowrap;
+	}
 }
 
 .wp-block-column {
 	flex: 1;
+	margin-bottom: 1em;
+
+	// Responsiveness: Show at most one columns on mobile.
+	flex-basis: 100%;
+
+	// Beyond mobile, allow 2 columns.
+	@include break-small() {
+		flex-basis: 50%;
+		flex-grow: 0;
+	}
+
+	// Add space between columns. Themes can customize this if they wish to work differently.
+	// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
+	@include break-small() {
+		padding-left: $grid-size-large;
+		padding-right: $grid-size-large;
+
+		&:nth-child(odd) {
+			padding-left: 0;
+		}
+
+		&:nth-child(even) {
+			padding-right: 0;
+		}
+	}
+
+	@include break-medium() {
+		&:not(:first-child) {
+			padding-left: $grid-size-large;
+		}
+
+		&:not(:last-child) {
+			padding-right: $grid-size-large;
+		}
+	}
 }
