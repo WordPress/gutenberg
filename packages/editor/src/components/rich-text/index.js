@@ -92,6 +92,7 @@ export class RichText extends Component {
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
 		this.onInput = this.onInput.bind( this );
+		this.onCompositionEnd = this.onCompositionEnd.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.getRecord = this.getRecord.bind( this );
 		this.createRecord = this.createRecord.bind( this );
@@ -383,12 +384,28 @@ export class RichText extends Component {
 
 	/**
 	 * Handle input on the next selection change event.
+	 *
+	 * @param {SyntheticEvent} event Synthetic input event.
 	 */
-	onInput() {
+	onInput( event ) {
+		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
+		// (CJK), do not trigger a change if characters are being composed.
+		// Browsers setting `isComposing` to `true` will usually emit a final
+		// `input` event when the characters are composed.
+		if ( event.nativeEvent.isComposing ) {
+			return;
+		}
+
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
 		this.onChange( transformed );
+	}
+
+	onCompositionEnd() {
+		// Ensure the value is up-to-date for browsers that don't emit a final
+		// input event after composition.
+		this.onChange( this.createRecord() );
 	}
 
 	/**
@@ -915,6 +932,7 @@ export class RichText extends Component {
 								key={ key }
 								onPaste={ this.onPaste }
 								onInput={ this.onInput }
+								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
 								onKeyUp={ this.onKeyUp }
 								onFocus={ this.onFocus }
