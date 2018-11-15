@@ -52,7 +52,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	</URLPopover>
 );
 
-class MediaPlaceholder extends Component {
+export class MediaPlaceholder extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
@@ -258,13 +258,10 @@ class MediaPlaceholder extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	let hasUploadPermissions = false;
-	if ( undefined !== select( 'core' ) ) {
-		hasUploadPermissions = select( 'core' ).hasUploadPermissions();
-	}
+	const { hasUploadPermissions } = select( 'core' );
 
 	return {
-		hasUploadPermissions: hasUploadPermissions,
+		hasUploadPermissions: hasUploadPermissions(),
 	};
 } );
 
