@@ -27,7 +27,7 @@ export const settings = getEmbedBlockSettings( {
 				transform: ( node ) => {
 					return createBlock( 'core/embed', {
 						url: node.textContent.trim(),
-						hransientShouldFetch: true,
+						transientShouldFetch: true,
 					} );
 				},
 			},
