@@ -123,13 +123,13 @@ class ImageEdit extends Component {
 			if ( file ) {
 				mediaUpload( {
 					filesList: [ file ],
-					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onFileChange: ( [ image ] ) => {
 						setAttributes( pickRelevantMediaFiles( image ) );
 					},
+					allowedTypes: ALLOWED_MEDIA_TYPES,
 					onError: ( message ) => {
-						this.setState( { hasError: true } );
 						noticeOperations.createErrorNotice( message );
+						this.setState( { isEditing: true } );
 					},
 				} );
 			}
