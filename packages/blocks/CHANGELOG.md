@@ -1,3 +1,9 @@
+## 5.3.2 (Unreleased)
+
+### Bug Fix
+
+- The block validator is more lenient toward equivalent encoding forms.
+
 ## 5.3.1 (2018-11-12)
 
 ## 5.3.0 (2018-11-09)
