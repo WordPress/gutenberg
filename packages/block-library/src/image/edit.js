@@ -302,6 +302,7 @@ class ImageEdit extends Component {
 			isLargeViewport,
 			isSelected,
 			className,
+			maxWidth,
 			noticeUI,
 			toggleSelection,
 			isRTL,
@@ -536,8 +537,12 @@ class ImageEdit extends Component {
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
-							// This is horrendous. Consider it a proof of concept.
-							const maxWidth = document.querySelector( '.editor-block-list__block-edit' ).offsetWidth;
+							// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
+							// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
+							// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
+							// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
+							// @todo It would be good to revisit this once a content-width variable becomes available.
+							const maxWidthBuffer = maxWidth * 2.5;
 
 							let showRightHandle = false;
 							let showLeftHandle = false;
@@ -579,9 +584,9 @@ class ImageEdit extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth={ maxWidth }
+										maxWidth={ maxWidthBuffer }
 										minHeight={ minHeight }
-										maxHeight={ maxWidth / ratio }
+										maxHeight={ maxWidthBuffer / ratio }
 										lockAspectRatio
 										enable={ {
 											top: false,
@@ -629,10 +634,11 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { isRTL, imageSizes } = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
+			maxWidth,
 			isRTL,
 			imageSizes,
 		};
