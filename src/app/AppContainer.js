@@ -1,12 +1,13 @@
 /** @flow
  * @format */
 
-import MainApp from './MainApp';
 import React from 'react';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+
+import MainApp from './MainApp';
 import type { BlockType } from '../store/types';
 
 type PropsType = {
@@ -25,11 +26,19 @@ type PropsType = {
 	initialHtml: string,
 };
 
-class AppContainer extends React.Component<PropsType> {
+type StateType = {
+	lastHtmlSent: string,
+};
+
+class AppContainer extends React.Component<PropsType, StateType> {
 	constructor( props: PropsType ) {
 		super( props );
 
 		this.parseBlocksAction( props.initialHtml );
+
+		this.state = {
+			lastHtmlSent: '',
+		};
 	}
 
 	onChange = ( clientId, attributes ) => {
@@ -63,7 +72,10 @@ class AppContainer extends React.Component<PropsType> {
 
 	serializeToNativeAction = () => {
 		const html = serialize( this.props.blocks );
-		RNReactNativeGutenbergBridge.provideToNative_Html( html );
+		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.state.lastHtmlSent !== html );
+		this.setState( {
+			lastHtmlSent: html,
+		} );
 	};
 
 	mergeBlocksAction = ( blockOneClientId, blockTwoClientId ) => {
