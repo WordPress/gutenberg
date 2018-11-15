@@ -32,7 +32,7 @@ function render_block_core_categories( $attributes ) {
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
 		$title                    = __( 'Categories', 'gutenberg' );
-		
+
 		if ( ! is_admin() ) {
 			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
 		}
