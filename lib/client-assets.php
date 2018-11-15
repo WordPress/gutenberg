@@ -973,7 +973,8 @@ function gutenberg_register_vendor_scripts() {
 
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@16.6.3/umd/react' . $react_suffix . '.js'
+		'https://unpkg.com/react@16.6.3/umd/react' . $react_suffix . '.js',
+		array( 'wp-polyfill' )
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
