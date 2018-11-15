@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -71,6 +71,16 @@ const blockAttributes = {
 
 export const name = 'core/gallery';
 
+const parseShortCodeIds = ( ids ) => {
+	if ( ! ids ) {
+		return [];
+	}
+
+	return ids.split( ',' ).map( ( id ) => (
+		parseInt( id, 10 )
+	) );
+};
+
 export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Display multiple images in a rich gallery.' ),
@@ -106,19 +116,15 @@ export const settings = {
 					images: {
 						type: 'array',
 						shortcode: ( { named: { ids } } ) => {
-							if ( ! ids ) {
-								return [];
-							}
-
-							return ids.split( ',' ).map( ( id ) => ( {
-								id: parseInt( id, 10 ),
+							return parseShortCodeIds( ids ).map( ( id ) => ( {
+								id,
 							} ) );
 						},
 					},
 					ids: {
 						type: 'array',
 						shortcode: ( { named: { ids } } ) => {
-							return ids.split( ',' );
+							return parseShortCodeIds( ids );
 						},
 					},
 					columns: {
@@ -150,8 +156,12 @@ export const settings = {
 					mediaUpload( {
 						filesList: files,
 						onFileChange: ( images ) => {
+							const imagesAttr = images.map(
+								( image ) => pickRelevantMediaFiles( image )
+							);
 							onChange( block.clientId, {
-								images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+								ids: map( imagesAttr, 'id' ),
+								images: imagesAttr,
 							} );
 						},
 						allowedTypes: [ 'image' ],
