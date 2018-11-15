@@ -5,6 +5,7 @@ import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorProp
 class AztecView extends React.Component {
   
   static propTypes = {
+    isSelected: PropTypes.bool,
     disableGutenbergMode: PropTypes.bool,
     text: PropTypes.object,
     placeholder: PropTypes.string,
