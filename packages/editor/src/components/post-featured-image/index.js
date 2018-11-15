@@ -17,6 +17,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import PostFeaturedImageCheck from './check';
 import MediaUpload from '../media-upload';
+import MediaUploadCheck from '../media-upload/check';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -27,6 +28,7 @@ const DEFAULT_REMOVE_FEATURE_IMAGE_LABEL = __( 'Remove image' );
 
 function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onRemoveImage, media, postType } ) {
 	const postLabel = get( postType, [ 'labels' ], {} );
+	const instructions = <p>{ __( 'To edit the featured image, you need permission to upload media.' ) }</p>;
 
 	let mediaWidth, mediaHeight, mediaSourceUrl;
 	if ( media ) {
@@ -46,59 +48,67 @@ function PostFeaturedImage( { currentPostId, featuredImageId, onUpdateImage, onR
 		<PostFeaturedImageCheck>
 			<div className="editor-post-featured-image">
 				{ !! featuredImageId &&
-					<MediaUpload
-						title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
-						onSelect={ onUpdateImage }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						modalClass="editor-post-featured-image__media-modal"
-						render={ ( { open } ) => (
-							<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Edit or update the image' ) }>
-								{ media &&
-									<ResponsiveWrapper
-										naturalWidth={ mediaWidth }
-										naturalHeight={ mediaHeight }
-									>
-										<img src={ mediaSourceUrl } alt="" />
-									</ResponsiveWrapper>
-								}
-								{ ! media && <Spinner /> }
-							</Button>
-						) }
-						value={ featuredImageId }
-					/>
-				}
-				{ !! featuredImageId && media && ! media.isLoading &&
-				<MediaUpload
-					title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
-					onSelect={ onUpdateImage }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					modalClass="editor-post-featured-image__media-modal"
-					render={ ( { open } ) => (
-						<Button onClick={ open } isDefault isLarge>
-							{ __( 'Replace image' ) }
-						</Button>
-					) }
-				/>
-				}
-				{ ! featuredImageId &&
-					<div>
+					<MediaUploadCheck fallback={ instructions }>
 						<MediaUpload
 							title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
 							onSelect={ onUpdateImage }
 							allowedTypes={ ALLOWED_MEDIA_TYPES }
 							modalClass="editor-post-featured-image__media-modal"
 							render={ ( { open } ) => (
-								<Button className="editor-post-featured-image__toggle" onClick={ open }>
-									{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+								<Button className="editor-post-featured-image__preview" onClick={ open } aria-label={ __( 'Edit or update the image' ) }>
+									{ media &&
+										<ResponsiveWrapper
+											naturalWidth={ mediaWidth }
+											naturalHeight={ mediaHeight }
+										>
+											<img src={ mediaSourceUrl } alt="" />
+										</ResponsiveWrapper>
+									}
+									{ ! media && <Spinner /> }
+								</Button>
+							) }
+							value={ featuredImageId }
+						/>
+					</MediaUploadCheck>
+				}
+				{ !! featuredImageId && media && ! media.isLoading &&
+					<MediaUploadCheck>
+						<MediaUpload
+							title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
+							onSelect={ onUpdateImage }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							modalClass="editor-post-featured-image__media-modal"
+							render={ ( { open } ) => (
+								<Button onClick={ open } isDefault isLarge>
+									{ __( 'Replace image' ) }
 								</Button>
 							) }
 						/>
+					</MediaUploadCheck>
+				}
+				{ ! featuredImageId &&
+					<div>
+						<MediaUploadCheck fallback={ instructions }>
+							<MediaUpload
+								title={ postLabel.featured_image || DEFAULT_FEATURE_IMAGE_LABEL }
+								onSelect={ onUpdateImage }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								modalClass="editor-post-featured-image__media-modal"
+								render={ ( { open } ) => (
+									<Button className="editor-post-featured-image__toggle" onClick={ open }>
+										{ postLabel.set_featured_image || DEFAULT_SET_FEATURE_IMAGE_LABEL }
+									</Button>
+								) }
+							/>
+						</MediaUploadCheck>
 					</div>
 				}
 				{ !! featuredImageId &&
-					<Button onClick={ onRemoveImage } isLink isDestructive>
-						{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
-					</Button>
+					<MediaUploadCheck>
+						<Button onClick={ onRemoveImage } isLink isDestructive>
+							{ postLabel.remove_featured_image || DEFAULT_REMOVE_FEATURE_IMAGE_LABEL }
+						</Button>
+					</MediaUploadCheck>
 				}
 			</div>
 		</PostFeaturedImageCheck>

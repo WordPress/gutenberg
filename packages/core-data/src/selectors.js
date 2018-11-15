@@ -169,3 +169,14 @@ export function isPreviewEmbedFallback( state, url ) {
 	}
 	return preview.html === oEmbedLinkCheck;
 }
+
+/**
+ * Return Upload Permissions.
+ *
+ * @param  {Object}  state State tree.
+ *
+ * @return {boolean} Upload Permissions.
+ */
+export function hasUploadPermissions( state ) {
+	return state.hasUploadPermissions;
+}
