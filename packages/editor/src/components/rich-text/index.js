@@ -778,6 +778,11 @@ export class RichText extends Component {
 
 		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
+
+			// Maintain the previous selection:
+			record.start = this.state.start;
+			record.end = this.state.end;
+
 			this.applyRecord( record );
 		}
 	}
