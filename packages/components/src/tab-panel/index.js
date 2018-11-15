@@ -20,6 +20,7 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 		aria-selected={ selected }
 		id={ tabId }
 		onClick={ onClick }
+		type="button"
 		{ ...rest }
 	>
 		{ children }
