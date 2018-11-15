@@ -1155,6 +1155,19 @@ Items are returned ordered descendingly by their 'utility' and 'frecency'.
 
 Items that appear in inserter.
 
+### hasInserterItems
+
+Determines whether there are items to show in the inserter.
+
+*Parameters*
+
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
+
+*Returns*
+
+Items that appear in inserter.
+
 ### __experimentalGetReusableBlock
 
 Returns the reusable block with the given ID.

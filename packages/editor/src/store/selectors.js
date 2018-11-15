@@ -1615,6 +1615,64 @@ export const getEditedPostContent = createSelector(
 
 /**
  * Determines if the given block type is allowed to be inserted into the block list.
+ * This function is not exported and not memoized because using a memoized selector
+ * inside another memoized selector is just a wait of time.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given block type is allowed to be inserted.
+ */
+const canInsertBlockTypeUnmemoized = ( state, blockName, rootClientId = null ) => {
+	const checkAllowList = ( list, item, defaultResult = null ) => {
+		if ( isBoolean( list ) ) {
+			return list;
+		}
+		if ( isArray( list ) ) {
+			return includes( list, item );
+		}
+		return defaultResult;
+	};
+
+	const blockType = getBlockType( blockName );
+	if ( ! blockType ) {
+		return false;
+	}
+
+	const { allowedBlockTypes } = getEditorSettings( state );
+
+	const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
+	if ( ! isBlockAllowedInEditor ) {
+		return false;
+	}
+
+	const isLocked = !! getTemplateLock( state, rootClientId );
+	if ( isLocked ) {
+		return false;
+	}
+
+	const parentBlockListSettings = getBlockListSettings( state, rootClientId );
+	const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
+	const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
+
+	const blockAllowedParentBlocks = blockType.parent;
+	const parentName = getBlockName( state, rootClientId );
+	const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
+
+	if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
+		return hasParentAllowedBlock || hasBlockAllowedParent;
+	} else if ( hasParentAllowedBlock !== null ) {
+		return hasParentAllowedBlock;
+	} else if ( hasBlockAllowedParent !== null ) {
+		return hasBlockAllowedParent;
+	}
+
+	return true;
+};
+
+/**
+ * Determines if the given block type is allowed to be inserted into the block list.
  *
  * @param {Object}  state        Editor state.
  * @param {string}  blockName    The name of the block type, e.g.' core/paragraph'.
@@ -1623,52 +1681,7 @@ export const getEditedPostContent = createSelector(
  * @return {boolean} Whether the given block type is allowed to be inserted.
  */
 export const canInsertBlockType = createSelector(
-	( state, blockName, rootClientId = null ) => {
-		const checkAllowList = ( list, item, defaultResult = null ) => {
-			if ( isBoolean( list ) ) {
-				return list;
-			}
-			if ( isArray( list ) ) {
-				return includes( list, item );
-			}
-			return defaultResult;
-		};
-
-		const blockType = getBlockType( blockName );
-		if ( ! blockType ) {
-			return false;
-		}
-
-		const { allowedBlockTypes } = getEditorSettings( state );
-
-		const isBlockAllowedInEditor = checkAllowList( allowedBlockTypes, blockName, true );
-		if ( ! isBlockAllowedInEditor ) {
-			return false;
-		}
-
-		const isLocked = !! getTemplateLock( state, rootClientId );
-		if ( isLocked ) {
-			return false;
-		}
-
-		const parentBlockListSettings = getBlockListSettings( state, rootClientId );
-		const parentAllowedBlocks = get( parentBlockListSettings, [ 'allowedBlocks' ] );
-		const hasParentAllowedBlock = checkAllowList( parentAllowedBlocks, blockName );
-
-		const blockAllowedParentBlocks = blockType.parent;
-		const parentName = getBlockName( state, rootClientId );
-		const hasBlockAllowedParent = checkAllowList( blockAllowedParentBlocks, parentName );
-
-		if ( hasParentAllowedBlock !== null && hasBlockAllowedParent !== null ) {
-			return hasParentAllowedBlock || hasBlockAllowedParent;
-		} else if ( hasParentAllowedBlock !== null ) {
-			return hasParentAllowedBlock;
-		} else if ( hasBlockAllowedParent !== null ) {
-			return hasBlockAllowedParent;
-		}
-
-		return true;
-	},
+	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.editor.present.blocks.byClientId[ rootClientId ],
@@ -1690,6 +1703,54 @@ export const canInsertBlockType = createSelector(
 function getInsertUsage( state, id ) {
 	return state.preferences.insertUsage[ id ] || null;
 }
+
+/**
+ * Returns whether we can show a block type in the inserter
+ *
+ * @param {Object} state Global State
+ * @param {Object} blockType BlockType
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given block type is allowed to be shown in the inserter.
+ */
+const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
+	if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
+		return false;
+	}
+
+	return canInsertBlockTypeUnmemoized( state, blockType.name, rootClientId );
+};
+
+/**
+ * Returns whether we can show a reusable block in the inserter
+ *
+ * @param {Object} state Global State
+ * @param {Object} reusableBlock Reusable block object
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Whether the given block type is allowed to be shown in the inserter.
+ */
+const canIncludeReusableBlockInInserter = ( state, reusableBlock, rootClientId ) => {
+	if ( ! canInsertBlockTypeUnmemoized( state, 'core/block', rootClientId ) ) {
+		return false;
+	}
+
+	const referencedBlockName = getBlockName( state, reusableBlock.clientId );
+	if ( ! referencedBlockName ) {
+		return false;
+	}
+
+	const referencedBlockType = getBlockType( referencedBlockName );
+	if ( ! referencedBlockType ) {
+		return false;
+	}
+
+	if ( ! canInsertBlockTypeUnmemoized( state, referencedBlockName, rootClientId ) ) {
+		return false;
+	}
+
+	return true;
+};
 
 /**
  * Determines the items that appear in the inserter. Includes both static
@@ -1763,14 +1824,6 @@ export const getInserterItems = createSelector(
 			}
 		};
 
-		const shouldIncludeBlockType = ( blockType ) => {
-			if ( ! hasBlockSupport( blockType, 'inserter', true ) ) {
-				return false;
-			}
-
-			return canInsertBlockType( state, blockType.name, rootClientId );
-		};
-
 		const buildBlockTypeInserterItem = ( blockType ) => {
 			const id = blockType.name;
 
@@ -1795,28 +1848,6 @@ export const getInserterItems = createSelector(
 				frecency: calculateFrecency( time, count ),
 				hasChildBlocksWithInserterSupport: hasChildBlocksWithInserterSupport( blockType.name ),
 			};
-		};
-
-		const shouldIncludeReusableBlock = ( reusableBlock ) => {
-			if ( ! canInsertBlockType( state, 'core/block', rootClientId ) ) {
-				return false;
-			}
-
-			const referencedBlockName = getBlockName( state, reusableBlock.clientId );
-			if ( ! referencedBlockName ) {
-				return false;
-			}
-
-			const referencedBlockType = getBlockType( referencedBlockName );
-			if ( ! referencedBlockType ) {
-				return false;
-			}
-
-			if ( ! canInsertBlockType( state, referencedBlockName, rootClientId ) ) {
-				return false;
-			}
-
-			return true;
 		};
 
 		const buildReusableBlockInserterItem = ( reusableBlock ) => {
@@ -1844,11 +1875,11 @@ export const getInserterItems = createSelector(
 		};
 
 		const blockTypeInserterItems = getBlockTypes()
-			.filter( shouldIncludeBlockType )
+			.filter( ( blockType ) => canIncludeBlockTypeInInserter( state, blockType, rootClientId ) )
 			.map( buildBlockTypeInserterItem );
 
 		const reusableBlockInserterItems = __experimentalGetReusableBlocks( state )
-			.filter( shouldIncludeReusableBlock )
+			.filter( ( block ) => canIncludeReusableBlockInInserter( state, block, rootClientId ) )
 			.map( buildReusableBlockInserterItem );
 
 		return orderBy(
@@ -1861,6 +1892,39 @@ export const getInserterItems = createSelector(
 		state.blockListSettings[ rootClientId ],
 		state.editor.present.blocks,
 		state.preferences.insertUsage,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.reusableBlocks.data,
+		getBlockTypes(),
+	],
+);
+
+/**
+ * Determines whether there are items to show in the inserter.
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {boolean} Items that appear in inserter.
+ */
+export const hasInserterItems = createSelector(
+	( state, rootClientId = null ) => {
+		const hasBlockType = some(
+			getBlockTypes(),
+			( blockType ) => canIncludeBlockTypeInInserter( state, blockType, rootClientId )
+		);
+		if ( hasBlockType ) {
+			return true;
+		}
+		const hasReusableBlock = some(
+			__experimentalGetReusableBlocks( state ),
+			( block ) => canIncludeReusableBlockInInserter( state, block, rootClientId )
+		);
+
+		return hasReusableBlock;
+	},
+	( state, rootClientId ) => [
+		state.blockListSettings[ rootClientId ],
+		state.editor.present.blocks,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.reusableBlocks.data,
