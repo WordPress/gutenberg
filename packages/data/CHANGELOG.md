@@ -2,10 +2,10 @@
 
 ### Breaking Changes
 
-- `registry.registerReducer` has been deprecated. Use `registry.registerStore` instead.
-- `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
-- `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
-- `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
+- `registry.registerReducer` has been removed. Use `registry.registerStore` instead.
+- `registry.registerSelectors` has been removed. Use `registry.registerStore` instead.
+- `registry.registerActions` has been removed. Use `registry.registerStore` instead.
+- `registry.registerResolvers` has been removed. Use `registry.registerStore` instead.
 
 ### Bug Fix
 
