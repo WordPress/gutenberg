@@ -64,9 +64,9 @@ export const fetchReusableBlocks = async ( action, store ) => {
 
 	let result;
 	if ( id ) {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } );
 	} else {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1&context=edit` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
 	}
 
 	try {
