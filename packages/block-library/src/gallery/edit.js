@@ -119,7 +119,7 @@ class GalleryEdit extends Component {
 
 		// If URL and other image data has been resolved, update
 		// `transientImageIds` to signal the corresponding entry's resolution
-		let { transientImageIds } = this.props.attributes;
+		let { transientImageIds = [] } = this.props.attributes;
 		if ( attributes.url ) {
 			transientImageIds = [ ...transientImageIds ];
 			transientImageIds[ index ] = null;

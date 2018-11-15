@@ -65,7 +65,6 @@ const blockAttributes = {
 	},
 	transientImageIds: {
 		type: 'array',
-		default: [],
 		transient: true,
 	},
 };

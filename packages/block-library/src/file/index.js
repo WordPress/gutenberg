@@ -70,7 +70,6 @@ export const settings = {
 		transientShouldFetch: {
 			transient: true,
 			type: 'boolean',
-			default: false,
 		},
 	},
 

@@ -38,7 +38,6 @@ const embedAttributes = {
 	transientShouldFetch: {
 		transient: true,
 		type: 'boolean',
-		default: false,
 	},
 };
 
