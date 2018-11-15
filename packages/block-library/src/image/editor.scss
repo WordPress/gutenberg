@@ -2,11 +2,20 @@
 	position: relative;
 
 	&.is-transient img {
-		@include loading_fade;
+		opacity: 0.3;
 	}
 
 	figcaption img {
 		display: inline;
+	}
+
+	// Shown while image is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
 	}
 }
 

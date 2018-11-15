@@ -26,18 +26,18 @@ class CopyHandler extends Component {
 	}
 
 	onCopy( event ) {
-		const { multiSelectedBlocks, selectedBlock } = this.props;
+		const { hasMultiSelection, selectedBlockClientIds, getBlocksByClientId } = this.props;
 
-		if ( ! multiSelectedBlocks.length && ! selectedBlock ) {
+		if ( selectedBlockClientIds.length === 0 ) {
 			return;
 		}
 
 		// Let native copy behaviour take over in input fields.
-		if ( selectedBlock && documentHasSelection() ) {
+		if ( ! hasMultiSelection && documentHasSelection() ) {
 			return;
 		}
 
-		const serialized = serialize( selectedBlock || multiSelectedBlocks );
+		const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
 
 		event.clipboardData.setData( 'text/plain', serialized );
 		event.clipboardData.setData( 'text/html', serialized );
@@ -46,12 +46,12 @@ class CopyHandler extends Component {
 	}
 
 	onCut( event ) {
-		const { multiSelectedBlockClientIds } = this.props;
+		const { hasMultiSelection, selectedBlockClientIds } = this.props;
 
 		this.onCopy( event );
 
-		if ( multiSelectedBlockClientIds.length ) {
-			this.props.onRemove( multiSelectedBlockClientIds );
+		if ( hasMultiSelection ) {
+			this.props.onRemove( selectedBlockClientIds );
 		}
 	}
 
@@ -63,14 +63,22 @@ class CopyHandler extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			getMultiSelectedBlocks,
 			getMultiSelectedBlockClientIds,
-			getSelectedBlock,
+			getSelectedBlockClientId,
+			getBlocksByClientId,
+			hasMultiSelection,
 		} = select( 'core/editor' );
+
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
+
 		return {
-			multiSelectedBlocks: getMultiSelectedBlocks(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			selectedBlock: getSelectedBlock(),
+			hasMultiSelection: hasMultiSelection(),
+			selectedBlockClientIds,
+
+			// We only care about this value when the copy is performed
+			// We call it dynamically in the event handler to avoid unnecessary re-renders.
+			getBlocksByClientId,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

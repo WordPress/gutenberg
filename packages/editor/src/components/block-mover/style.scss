@@ -3,7 +3,7 @@
 	opacity: 0;
 
 	&.is-visible {
-		@include fade_in;
+		@include edit-post__fade-in-animation;
 	}
 
 	// 24px is the smallest size of a good pressable button.

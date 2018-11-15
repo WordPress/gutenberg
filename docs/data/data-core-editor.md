@@ -398,6 +398,19 @@ the client ID.
 
 Block name.
 
+### isBlockValid
+
+Returns whether a block is valid or not.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Is Valid.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block,
@@ -1132,6 +1145,19 @@ The 'frecency' property is a heuristic (https://en.wikipedia.org/wiki/Frecency)
 that combines block usage frequenty and recency.
 
 Items are returned ordered descendingly by their 'utility' and 'frecency'.
+
+*Parameters*
+
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
+
+*Returns*
+
+Items that appear in inserter.
+
+### hasInserterItems
+
+Determines whether there are items to show in the inserter.
 
 *Parameters*
 

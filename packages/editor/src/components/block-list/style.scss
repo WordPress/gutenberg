@@ -909,7 +909,7 @@
 		// Animate in
 		.editor-block-list__block:hover & {
 			opacity: 0;
-			@include fade_in(60ms, 0.5s);
+			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
 	}
 

@@ -5,7 +5,7 @@
 	overflow: hidden;
 
 	&.is-saving {
-		animation: loading_fade 0.5s infinite;
+		animation: edit-post__loading-fade-animation 0.5s infinite;
 	}
 
 	.dashicon {

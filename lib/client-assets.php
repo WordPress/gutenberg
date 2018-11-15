@@ -908,12 +908,22 @@ function gutenberg_preload_api_request( $memo, $path ) {
 		return $memo;
 	}
 
+	$method = 'GET';
+	if ( is_array( $path ) && 2 === count( $path ) ) {
+		$method = end( $path );
+		$path   = reset( $path );
+
+		if ( ! in_array( $method, array( 'GET', 'OPTIONS' ), true ) ) {
+			$method = 'GET';
+		}
+	}
+
 	$path_parts = parse_url( $path );
 	if ( false === $path_parts ) {
 		return $memo;
 	}
 
-	$request = new WP_REST_Request( 'GET', $path_parts['path'] );
+	$request = new WP_REST_Request( $method, $path_parts['path'] );
 	if ( ! empty( $path_parts['query'] ) ) {
 		parse_str( $path_parts['query'], $query_params );
 		$request->set_query_params( $query_params );
@@ -928,10 +938,19 @@ function gutenberg_preload_api_request( $memo, $path ) {
 			$data['_links'] = $links;
 		}
 
-		$memo[ $path ] = array(
-			'body'    => $data,
-			'headers' => $response->headers,
-		);
+		if ( 'OPTIONS' === $method ) {
+			$response = rest_send_allow_header( $response, $server, $request );
+
+			$memo[ $method ][ $path ] = array(
+				'body'    => $data,
+				'headers' => $response->headers,
+			);
+		} else {
+			$memo[ $path ] = array(
+				'body'    => $data,
+				'headers' => $response->headers,
+			);
+		}
 	}
 
 	return $memo;
@@ -954,11 +973,11 @@ function gutenberg_register_vendor_scripts() {
 
 	gutenberg_register_vendor_script(
 		'react',
-		'https://unpkg.com/react@16.4.1/umd/react' . $react_suffix . '.js'
+		'https://unpkg.com/react@16.6.3/umd/react' . $react_suffix . '.js'
 	);
 	gutenberg_register_vendor_script(
 		'react-dom',
-		'https://unpkg.com/react-dom@16.4.1/umd/react-dom' . $react_suffix . '.js',
+		'https://unpkg.com/react-dom@16.6.3/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
 	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
@@ -1431,6 +1450,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		sprintf( '/wp/v2/%s/%s?context=edit', $rest_base, $post->ID ),
 		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
+		array( '/wp/v2/media', 'OPTIONS' ),
 	);
 
 	/**
