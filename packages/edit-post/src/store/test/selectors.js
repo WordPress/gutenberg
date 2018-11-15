@@ -204,9 +204,7 @@ describe( 'selectors', () => {
 	describe( 'isEditorPanelRemoved', () => {
 		it( 'should return false by default', () => {
 			const state = deepFreeze( {
-				preferences: {
-					panels: {},
-				},
+				removedPanels: [],
 			} );
 
 			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( false );
@@ -214,11 +212,9 @@ describe( 'selectors', () => {
 
 		it( 'should return true when panel was removed', () => {
 			const state = deepFreeze( {
-				preferences: {
-					panels: {
-						'post-status': { removed: true },
-					},
-				},
+				removedPanels: [
+					'post-status',
+				],
 			} );
 
 			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
@@ -266,10 +262,10 @@ describe( 'selectors', () => {
 					panels: {
 						'post-status': {
 							enabled: true,
-							removed: true,
 						},
 					},
 				},
+				removedPanels: [ 'post-status' ],
 			} );
 
 			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );

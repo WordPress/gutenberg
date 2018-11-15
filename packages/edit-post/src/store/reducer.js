@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -117,6 +117,28 @@ export const preferences = combineReducers( {
 } );
 
 /**
+ * Reducer storing the list of all programmatically removed panels.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function removedPanels( state = [], action ) {
+	switch ( action.type ) {
+		case 'REMOVE_PANEL':
+			if ( ! includes( state, action.panelName ) ) {
+				return [
+					...state,
+					action.panelName,
+				];
+			}
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the next active general sidebar state. The active general
  * sidebar is a unique name to identify either an editor or plugin sidebar.
  *
@@ -209,9 +231,10 @@ const metaBoxes = combineReducers( {
 } );
 
 export default combineReducers( {
-	preferences,
 	activeGeneralSidebar,
 	activeModal,
-	publishSidebarActive,
 	metaBoxes,
+	preferences,
+	publishSidebarActive,
+	removedPanels,
 } );

@@ -100,8 +100,8 @@ export function isPublishSidebarOpened( state ) {
 }
 
 /**
- * Returns true if the given panel is removed, or false otherwise. Panels are
- * not removed by default.
+ * Returns true if the given panel was programmatically removed, or false otherwise.
+ * All panels are not removed by default.
  *
  * @param {Object} state     Global application state.
  * @param {string} panelName A string that identifies the panel.
@@ -109,8 +109,7 @@ export function isPublishSidebarOpened( state ) {
  * @return {boolean} Whether or not the panel is removed.
  */
 export function isEditorPanelRemoved( state, panelName ) {
-	const panels = getPreference( state, 'panels' );
-	return get( panels, [ panelName, 'removed' ], false );
+	return includes( state.removedPanels, panelName );
 }
 
 /**

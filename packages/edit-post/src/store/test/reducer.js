@@ -13,6 +13,7 @@ import {
 	activeModal,
 	isSavingMetaBoxes,
 	metaBoxLocations,
+	removedPanels,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -169,21 +170,6 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should remove panels', () => {
-			const original = deepFreeze( {
-				panels: {
-					'post-status': {},
-				},
-			} );
-			const state = preferences( original, {
-				type: 'REMOVE_PANEL',
-				panelName: 'post-status',
-			} );
-			expect( state.panels ).toEqual( {
-				'post-status': { removed: true },
-			} );
-		} );
-
 		it( 'should return switched mode', () => {
 			const state = preferences( deepFreeze( { editorMode: 'visual' } ), {
 				type: 'SWITCH_MODE',
@@ -326,6 +312,26 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				normal: [ 'postcustom' ],
 			} );
+		} );
+	} );
+
+	describe( 'removedPanels', () => {
+		it( 'should remove panel', () => {
+			const original = deepFreeze( [] );
+			const state = removedPanels( original, {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
+			} );
+			expect( state ).toEqual( [ 'post-status' ] );
+		} );
+
+		it( 'should not remove already removed panel', () => {
+			const original = deepFreeze( [ 'post-status' ] );
+			const state = removedPanels( original, {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
+			} );
+			expect( state ).toBe( original );
 		} );
 	} );
 } );
