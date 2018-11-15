@@ -1,3 +1,9 @@
+## 7.0.2 (Unreleased)
+
+### Bug Fixes
+
+- Stop propagating to DOM elements the `focusOnMount` prop from `NavigableToolbar` components
+
 ## 7.0.1 (2018-11-12)
 
 ### Polish

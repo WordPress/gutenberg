@@ -22,7 +22,11 @@ import {
 import FullscreenModeClose from '../fullscreen-mode-close';
 
 function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
-	const toolbarAriaLabel = hasFixedToolbar ? __( 'Document and block tools' ) : __( 'Document tools' );
+	const toolbarAriaLabel = hasFixedToolbar ?
+		/* translators: accessibility text for the editor toolbar when Unified Toolbar is on */
+		__( 'Document and block tools' ) :
+		/* translators: accessibility text for the editor toolbar when Unified Toolbar is off */
+		__( 'Document tools' );
 
 	return (
 		<NavigableToolbar

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress Dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { IconButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
@@ -99,10 +99,24 @@ class GalleryImage extends Component {
 				break;
 		}
 
-		// Disable reason: Image itself is not meant to be
-		// interactive, but should direct image selection and unfocus caption fields
-		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-		const img = url ? <img src={ url } alt={ alt } data-id={ id } onClick={ this.onImageClick } tabIndex="0" onKeyDown={ this.onImageClick } aria-label={ ariaLabel } /> : <Spinner />;
+		const img = (
+			// Disable reason: Image itself is not meant to be interactive, but should
+			// direct image selection and unfocus caption fields.
+			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+			<Fragment>
+				<img
+					src={ url }
+					alt={ alt }
+					data-id={ id }
+					onClick={ this.onImageClick }
+					tabIndex="0"
+					onKeyDown={ this.onImageClick }
+					aria-label={ ariaLabel }
+				/>
+				{ isBlobURL( url ) && <Spinner /> }
+			</Fragment>
+			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+		);
 
 		const className = classnames( {
 			'is-selected': isSelected,

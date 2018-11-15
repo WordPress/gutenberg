@@ -201,9 +201,15 @@
 
 	// Warnings
 	&.has-warning .editor-block-list__block-edit {
-		> :not(.editor-warning) {
+		// When a block has a warning, you shouldn't be able to manipulate the contents.
+		> * {
 			pointer-events: none;
 			user-select: none;
+		}
+
+		// Allow the warning action buttons to be manipulable.
+		.editor-warning {
+			pointer-events: all;
 		}
 	}
 
@@ -310,6 +316,14 @@
 	&[data-align="right"] .editor-block-contextual-toolbar {
 		left: auto;
 		right: 0;
+	}
+
+	// Position the sticky toolbar correctly beyond the mobile breakpoint.
+	@include break-small() {
+		&[data-align="right"] .editor-block-contextual-toolbar,
+		&[data-align="left"] .editor-block-contextual-toolbar {
+			top: $block-padding;
+		}
 	}
 
 	// Left
@@ -895,7 +909,7 @@
 		// Animate in
 		.editor-block-list__block:hover & {
 			opacity: 0;
-			@include fade_in(60ms, 0.5s);
+			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
 	}
 

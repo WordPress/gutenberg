@@ -8,6 +8,7 @@ import {
 	newPost,
 	pressWithModifier,
 	pressTimes,
+	insertBlock,
 } from '../support/utils';
 
 /**
@@ -431,5 +432,38 @@ describe( 'Links', () => {
 		await page.keyboard.press( 'Enter' );
 		const assertiveContent = await page.evaluate( () => document.querySelector( '#a11y-speak-assertive' ).textContent );
 		expect( assertiveContent.trim() ).toBe( 'Warning: the link has been inserted but may have errors. Please test it.' );
+	} );
+
+	it( 'link popover remains visible after a mouse drag event', async () => {
+		// Create some blocks so we components with event handlers on the page
+		for ( let loop = 0; loop < 5; loop++ ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'This is Gutenberg' );
+		}
+
+		// Focus on first paragraph, so the link popover will appear over the subsequent ones
+		await page.mouse.click( 120, 280 );
+
+		// Select some text
+		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+
+		// Click on the Link button
+		await page.click( 'button[aria-label="Link"]' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+
+		// Click on the Link Settings button
+		await page.click( 'button[aria-label="Link Settings"]' );
+
+		// Move mouse over the 'open in new tab' section, then click and drag
+		await page.mouse.move( 50, 330 );
+		await page.mouse.down();
+		await page.mouse.move( 100, 330, { steps: 10 } );
+		await page.mouse.up();
+
+		// The link popover should still be visible
+		const popover = await page.$$( '.editor-url-popover' );
+		expect( popover ).toHaveLength( 1 );
 	} );
 } );

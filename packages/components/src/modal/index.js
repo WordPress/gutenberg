@@ -16,6 +16,7 @@ import { withInstanceId } from '@wordpress/compose';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
+import IsolatedEventContainer from '../isolated-event-container';
 
 // Used to count the number of open modals.
 let parentElement,
@@ -26,7 +27,6 @@ class Modal extends Component {
 		super( props );
 
 		this.prepareDOM();
-		this.stopEventPropagationOutsideModal = this.stopEventPropagationOutsideModal.bind( this );
 	}
 
 	/**
@@ -103,14 +103,6 @@ class Modal extends Component {
 	}
 
 	/**
-	 * Stop all onMouseDown events propagating further - they should only go to the modal
- 	 * @param {string} event Event object
-	 */
-	stopEventPropagationOutsideModal( event ) {
-		event.stopPropagation();
-	}
-
-	/**
 	 * Renders the modal.
 	 *
 	 * @return {WPElement} The modal element.
@@ -136,9 +128,8 @@ class Modal extends Component {
 		// other elements underneath the modal overlay.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
-			<div
+			<IsolatedEventContainer
 				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
-				onMouseDown={ this.stopEventPropagationOutsideModal }
 			>
 				<ModalFrame
 					className={ classnames(
@@ -164,7 +155,7 @@ class Modal extends Component {
 						{ children }
 					</div>
 				</ModalFrame>
-			</div>,
+			</IsolatedEventContainer>,
 			this.node
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
