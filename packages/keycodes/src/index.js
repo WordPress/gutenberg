@@ -43,7 +43,7 @@ export const CTRL = 'ctrl';
 export const COMMAND = 'meta';
 export const SHIFT = 'shift';
 
-const modifiers = {
+export const modifiers = {
 	primary: ( _isApple ) => _isApple() ? [ COMMAND ] : [ CTRL ],
 	primaryShift: ( _isApple ) => _isApple() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
 	primaryAlt: ( _isApple ) => _isApple() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
@@ -53,7 +53,7 @@ const modifiers = {
 	alt: () => [ ALT ],
 	ctrlShift: () => [ CTRL, SHIFT ],
 	shift: () => [ SHIFT ],
-	shiftAlt: ( _isApple ) => _isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
+	shiftAlt: () => [ SHIFT, ALT ],
 };
 
 /**
@@ -65,7 +65,7 @@ const modifiers = {
  */
 export const rawShortcut = mapValues( modifiers, ( modifier ) => {
 	return ( character, _isApple = isAppleOS ) => {
-		return [ ...modifier( _isApple ), character.toLowerCase() ].filter( ( key ) => key !== '' ).join( '+' );
+		return [ ...modifier( _isApple ), character.toLowerCase() ].join( '+' );
 	};
 } );
 

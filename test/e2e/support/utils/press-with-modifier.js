@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { capitalize, castArray } from 'lodash';
+import { capitalize } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { rawShortcut } from '@wordpress/keycodes';
+import { modifiers } from '@wordpress/keycodes';
 
 /**
  * Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
@@ -17,15 +17,23 @@ import { rawShortcut } from '@wordpress/keycodes';
  */
 export async function pressWithModifier( modifier, key ) {
 	const isAppleOS = () => process.platform === 'darwin';
-	const rawModifier = rawShortcut[ modifier ]( '', isAppleOS ).split( '+' );
+	const mappedModifiers = modifiers[ modifier ]( isAppleOS );
 
 	await Promise.all(
-		castArray( rawModifier ).map( async ( item ) => page.keyboard.down( capitalize( item ) ) )
+		mappedModifiers.map( async ( mod ) => {
+			const ctrlMapping = mod === 'ctrl' ? 'control' : mod;
+			const capitalizedMod = capitalize( ctrlMapping );
+			return page.keyboard.down( capitalizedMod );
+		} )
 	);
 
 	await page.keyboard.press( key );
 
 	await Promise.all(
-		castArray( rawModifier ).map( async ( item ) => page.keyboard.up( capitalize( item ) ) )
+		mappedModifiers.map( async ( mod ) => {
+			const ctrlMapping = mod === 'ctrl' ? 'control' : mod;
+			const capitalizedMod = capitalize( ctrlMapping );
+			return page.keyboard.up( capitalizedMod );
+		} )
 	);
 }
