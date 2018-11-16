@@ -600,12 +600,6 @@ export class RichText extends Component {
 	 *                            keyboard.
 	 */
 	onKeyUp( { keyCode } ) {
-		// The input event does not fire when the whole field is selected and
-		// BACKSPACE is pressed.
-		if ( keyCode === BACKSPACE ) {
-			this.onChange( this.createRecord() );
-		}
-
 		// `scrollToRect` is called on `nodechange`, whereas calling it on
 		// `keyup` *when* moving to a new RichText element results in incorrect
 		// scrolling. Though the following allows false positives, it results
