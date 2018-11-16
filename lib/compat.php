@@ -311,6 +311,8 @@ function gutenberg_warn_classic_about_blocks() {
  * WordPress Core uses this hook to display this notice, it never displays.
  * Outputting the notice on the `admin_notices` hook allows Gutenberg to
  * consume the notice and display it with the Notices API.
+ *
+ * @since 4.5.0
  */
 function gutenberg_show_privacy_policy_help_text() {
 	if ( is_gutenberg_page() ) {
