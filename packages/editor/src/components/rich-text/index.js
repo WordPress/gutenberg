@@ -883,11 +883,9 @@ const RichTextContainer = compose( [
 		};
 	} ),
 	withSelect( ( select ) => {
-		const { isViewportMatch } = select( 'core/viewport' );
 		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
 
 		return {
-			isViewportSmall: isViewportMatch( '< small' ),
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		};
