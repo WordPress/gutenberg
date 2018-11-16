@@ -96,11 +96,11 @@
 		width: 100%;
 	}
 
-	// Center-aligned cover blocks should not use our global aligncenter block rules
-	&.aligncenter {
+	// Aligned cover blocks should not use our global alignment rules
+	&.aligncenter,
+	&.alignleft,
+	&.alignright {
 		display: flex;
-		margin-left: inherit;
-		margin-right: inherit;
 	}
 }
 
