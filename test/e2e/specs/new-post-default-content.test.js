@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { newPost, getEditedPostContent, openDocumentSettingsSidebar } from '../support/utils';
+import { findSidebarPanelWithTitle, newPost, getEditedPostContent, openDocumentSettingsSidebar } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'new editor filtered state', () => {
@@ -27,7 +27,7 @@ describe( 'new editor filtered state', () => {
 
 		// open the sidebar, we want to see the excerpt.
 		await openDocumentSettingsSidebar();
-		const [ excerptButton ] = await page.$x( '//div[@class="edit-post-sidebar"]//button[@class="components-button components-panel__body-toggle"][contains(text(),"Excerpt")]' );
+		const excerptButton = await findSidebarPanelWithTitle( 'Excerpt' );
 		if ( excerptButton ) {
 			await excerptButton.click( 'button' );
 		}

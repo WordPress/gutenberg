@@ -7,7 +7,6 @@ import {
 	escapeAttribute,
 	isValidAttributeName,
 } from '@wordpress/escape-html';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -28,19 +27,6 @@ import { toTree } from './to-tree';
  * @return {string} HTML string.
  */
 export function toHTMLString( { value, multilineTag, multilineWrapperTags } ) {
-	// Check other arguments for backward compatibility.
-	if ( value === undefined ) {
-		deprecated( 'wp.richText.toHTMLString positional parameters', {
-			version: '4.4',
-			alternative: 'named parameters',
-			plugin: 'Gutenberg',
-		} );
-
-		value = arguments[ 0 ];
-		multilineTag = arguments[ 1 ];
-		multilineWrapperTags = arguments[ 2 ];
-	}
-
 	const tree = toTree( {
 		value,
 		multilineTag,

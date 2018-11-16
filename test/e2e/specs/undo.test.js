@@ -10,8 +10,36 @@ import {
 } from '../support/utils';
 
 describe( 'undo', () => {
-	beforeAll( async () => {
+	beforeEach( async () => {
 		await newPost();
+	} );
+
+	it( 'should undo typing after a pause', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( 'before pause' );
+		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+		await page.keyboard.type( ' after pause' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressWithModifier( META_KEY, 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should undo typing after non input change', async () => {
+		await clickBlockAppender();
+
+		await page.keyboard.type( 'before keyboard ' );
+		await pressWithModifier( META_KEY, 'b' );
+		await page.keyboard.type( 'after keyboard' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressWithModifier( META_KEY, 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'Should undo to expected level intervals', async () => {
