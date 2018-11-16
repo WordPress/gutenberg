@@ -1,4 +1,9 @@
 <?php
+/**
+ * Returns array with the list of WordPress packages and their dependencies.
+ *
+ * @package gutenberg
+ */
 
 return array(
 	'wp-url'                                => array(),
