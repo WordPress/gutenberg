@@ -14,7 +14,9 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  * @param {?string|WPNotice}       statusOrNotice        Notice status, or a
  *                                                       notice object.
  *                                                       Defaults to `info`.
- * @param {string}                 content               Notice message.
+ * @param {string|?Object}         contentOrOptions      Notice message, or
+ *                                                       options if the first
+ *                                                       argument is WPNotice.
  * @param {?Object}                options               Notice options.
  * @param {?string}                options.context       Context under which to
  *                                                       group notice.
@@ -24,22 +26,29 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  * @param {?boolean}               options.isDismissible Whether the notice can
  *                                                       be dismissed by user.
  *                                                       Defaults to `true`.
+ * @param {?boolean}               options.speak         Whether the notice
+ *                                                       content should be
+ *                                                       announced to screen
+ *                                                       readers. Defaults to
+ *                                                       `true`.
  * @param {?Array<WPNoticeAction>} options.actions       User actions to be
  *                                                       presented with notice.
  */
-export function* createNotice( statusOrNotice = DEFAULT_STATUS, content, options = {} ) {
-	let status, __unstableHTML;
+export function* createNotice( statusOrNotice = DEFAULT_STATUS, contentOrOptions, options = {} ) {
+	let status, content, __unstableHTML;
 
 	if ( isPlainObject( statusOrNotice ) ) {
-		// Support overloaded form `createNotice( notice: WPNotice )`.
-		options = statusOrNotice;
-		( { status = DEFAULT_STATUS, content, __unstableHTML } = options );
+		// Support overloaded form `createNotice( notice: WPNotice, options: ?Object )`.
+		options = { ...contentOrOptions, ...statusOrNotice };
+		( { status = DEFAULT_STATUS, content, __unstableHTML } = statusOrNotice );
 	} else {
 		// Else consider the first argument the status type string.
 		status = statusOrNotice;
+		content = contentOrOptions;
 	}
 
 	const {
+		speak = true,
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
 		id = uniqueId( context ),
@@ -51,7 +60,9 @@ export function* createNotice( statusOrNotice = DEFAULT_STATUS, content, options
 	// supported, cast to a string.
 	content = String( content );
 
-	yield { type: 'SPEAK', message: content };
+	if ( speak ) {
+		yield { type: 'SPEAK', message: content };
+	}
 
 	yield {
 		type: 'CREATE_NOTICE',

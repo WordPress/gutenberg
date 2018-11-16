@@ -113,6 +113,28 @@ describe( 'actions', () => {
 				},
 			} );
 		} );
+
+		it( 'yields action when speak disabled', () => {
+			const result = createNotice( {
+				id,
+				content: '',
+				__unstableHTML: 'my <strong>message</strong>',
+				isDismissible: false,
+			}, { speak: false } );
+
+			expect( result.next().value ).toEqual( {
+				type: 'CREATE_NOTICE',
+				context: DEFAULT_CONTEXT,
+				notice: {
+					id,
+					status: DEFAULT_STATUS,
+					content: '',
+					__unstableHTML: 'my <strong>message</strong>',
+					isDismissible: false,
+					actions: [],
+				},
+			} );
+		} );
 	} );
 
 	describe( 'createSuccessNotice', () => {
