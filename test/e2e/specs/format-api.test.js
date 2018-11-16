@@ -3,6 +3,7 @@
  */
 import {
 	clickBlockAppender,
+	getEditedPostContent,
 	META_KEY,
 	newPost,
 	pressWithModifier,
@@ -45,5 +46,6 @@ describe( 'Using Format API', () => {
 		await page.click( '[aria-label="Custom Link"]' );
 		const paragraphContent = await page.$eval( 'div[data-type="core/paragraph"] p', ( element ) => element.innerHTML );
 		expect( paragraphContent ).toEqual( '<a href="#test" class="my-plugin-link" data-mce-selected=\"inline-boundary\">First paragraph</a>' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
