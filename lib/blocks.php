@@ -139,28 +139,25 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
  * @param  array $block A single parsed block object.
  * @return string String of rendered HTML.
  */
-function gutenberg_render_block( $block ) {
+function gutenberg_render_block( $source_block ) {
 	global $post;
 
 	$global_post = $post;
-	$pre_render  = apply_filters( 'block_pre_render', $block );
+	$pre_render  = apply_filters( 'block_pre_render', null, $source_block );
 	$post        = $global_post;
+	$block       = isset( $pre_render ) ? $pre_render : $source_block;
 
-	if ( null === $pre_render ) {
-		return '';
-	}
-
-	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $pre_render['blockName'] );
-	$is_dynamic    = $pre_render['blockName'] && null !== $block_type && $block_type->is_dynamic();
+	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
 	$inner_content = '';
 	$index         = 0;
 
-	foreach ( $pre_render['innerContent'] as $chunk ) {
-		$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $pre_render['innerBlocks'][ $index++ ] );
+	foreach ( $block['innerContent'] as $chunk ) {
+		$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
 	}
 
 	if ( $is_dynamic ) {
-		$attributes  = is_array( $pre_render['attrs'] ) ? (array) $pre_render['attrs'] : array();
+		$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
 		$global_post = $post;
 		$output      = $block_type->render( $attributes, $inner_content );
 		$post        = $global_post;
@@ -169,7 +166,7 @@ function gutenberg_render_block( $block ) {
 	}
 
 	$global_post = $post;
-	$post_render = apply_filters( 'block_post_render', $output );
+	$post_render = apply_filters( 'block_post_render', $output, $block );
 	$post        = $global_post;
 
 	return $post_render;
