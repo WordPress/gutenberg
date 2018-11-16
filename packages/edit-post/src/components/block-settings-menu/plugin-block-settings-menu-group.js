@@ -13,6 +13,9 @@ import { withSelect } from '@wordpress/data';
 const { Fill: PluginBlockSettingsMenuGroup, Slot } = createSlotFill( 'PluginBlockSettingsMenuGroup' );
 
 const PluginBlockSettingsMenuGroupSlot = ( { fillProps, selectedBlocks } ) => {
+	if ( !! selectedBlocks ) {
+		return null;
+	}
 	selectedBlocks = map( selectedBlocks, ( block ) => block.name );
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } } >
