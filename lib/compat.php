@@ -316,9 +316,7 @@ function gutenberg_show_privacy_policy_help_text() {
 	if ( is_gutenberg_page() ) {
 		remove_action( 'edit_form_after_title', array( 'WP_Privacy_Policy_Content', 'notice' ) );
 
-		global $post;
-
-		WP_Privacy_Policy_Content::notice( $post );
+		WP_Privacy_Policy_Content::notice( get_post() );
 	}
 }
 add_action( 'admin_notices', 'gutenberg_show_privacy_policy_help_text' );
