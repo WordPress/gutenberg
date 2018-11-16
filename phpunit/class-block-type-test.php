@@ -140,6 +140,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'wrongTypeDefaulted' => 5,
 			/* missingDefaulted */
 			'undefined'          => 'include',
+			'intendedNull'       => null,
 		);
 
 		$block_type = new WP_Block_Type(
@@ -160,6 +161,10 @@ class Block_Type_Test extends WP_UnitTestCase {
 						'type'    => 'string',
 						'default' => 'define',
 					),
+					'intendedNull'       => array(
+						'type'    => array( 'string', 'null' ),
+						'default' => 'wrong',
+					),
 				),
 			)
 		);
@@ -169,10 +174,11 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			array(
 				'correct'            => 'include',
-				'wrongType'          => null,
+				/* wrongType */
 				'wrongTypeDefaulted' => 'defaulted',
 				'missingDefaulted'   => 'define',
 				'undefined'          => 'include',
+				'intendedNull'       => null,
 			),
 			$prepared_attributes
 		);

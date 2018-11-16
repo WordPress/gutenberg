@@ -141,18 +141,14 @@ class WP_Block_Type {
 
 			$schema = $this->attributes[ $attribute_name ];
 
-			// Validate value by JSON schema.
+			// Validate value by JSON schema. An invalid value should revert to
+			// its default, if one exists. This occurs by virtue of the missing
+			// attributes loop immediately following. If there is not a default
+			// assigned, the attribute value should remain unset.
 			$is_valid = rest_validate_value_from_schema( $value, $schema );
 			if ( is_wp_error( $is_valid ) ) {
-				// Assigning `null` will trigger defaulting, if applicable.
-				$value = null;
+				unset( $attributes[ $attribute_name ] );
 			}
-
-			if ( is_null( $value ) && isset( $schema['default'] ) ) {
-				$value = $schema['default'];
-			}
-
-			$attributes[ $attribute_name ] = $value;
 		}
 
 		// Populate values of any missing attributes for which the block type
