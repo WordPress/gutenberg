@@ -1488,6 +1488,17 @@ export function isAutosavingPost( state ) {
 }
 
 /**
+ * Returns true if the post is being previewed, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the post is being previewed.
+ */
+export function isPreviewingPost( state ) {
+	return isSavingPost( state ) && state.saving.isPreview;
+}
+
+/**
  * Returns a suggested post format for the current post, inferred only if there
  * is a single block within the post and it is of a type known to match a
  * default post format. Returns null if the format cannot be determined.

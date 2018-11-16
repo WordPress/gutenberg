@@ -1058,6 +1058,18 @@ Returns true if the post is autosaving, or false otherwise.
 
 Whether the post is autosaving.
 
+### isPreviewingPost
+
+Returns true if the post is being previewed, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the post is being previewed.
+
 ### getSuggestedPostFormat
 
 Returns a suggested post format for the current post, inferred only if there

@@ -49,6 +49,7 @@ const effects = {
 		subscribe( () => {
 			const isSavingPost = select( 'core/editor' ).isSavingPost();
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+			const isPreviewingPost = select( 'core/editor' ).isPreviewingPost();
 			const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 
 			// Save metaboxes on save completion when past save wasn't an autosave.
@@ -57,7 +58,7 @@ const effects = {
 				wasSavingPost &&
 				! wasAutosavingPost &&
 				! isSavingPost &&
-				! isAutosavingPost
+				( ! isAutosavingPost || isPreviewingPost )
 			);
 
 			// Save current state for next inspection.

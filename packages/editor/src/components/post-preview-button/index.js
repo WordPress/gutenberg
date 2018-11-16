@@ -151,7 +151,7 @@ export class PostPreviewButton extends Component {
 
 		// Request an autosave. This happens asynchronously and causes the component
 		// to update when finished.
-		this.props.autosave();
+		this.props.autosave( { isPreview: true } );
 
 		// Display a 'Generating preview' message in the Preview tab while we wait for the
 		// autosave to finish.
@@ -199,12 +199,7 @@ export default compose( [
 			getEditedPostAttribute,
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
-			isAutosavingPost,
 		} = select( 'core/editor' );
-		const {
-			hasMetaBoxes,
-			isSavingMetaBoxes,
-		} = select( 'core/edit-post' );
 		const {
 			getPostType,
 		} = select( 'core' );
@@ -216,13 +211,9 @@ export default compose( [
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			hasMetaBoxes: hasMetaBoxes(),
-			isSavingMetaBoxes: isSavingMetaBoxes(),
-			isAutosavingPost: isAutosavingPost(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
-		requestMetaBoxUpdates: dispatch( 'core/edit-post' ).requestMetaBoxUpdates,
 		autosave: dispatch( 'core/editor' ).autosave,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
