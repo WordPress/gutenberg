@@ -113,6 +113,7 @@ export class RichText extends Component {
 			onReplace,
 			onCreateUndoLevel: this.onCreateUndoLevel,
 			valueToFormat: this.valueToFormat,
+			onChange: this.onChange,
 		} );
 		this.enterPatterns = getBlockTransforms( 'from' )
 			.filter( ( { type } ) => type === 'enter' );

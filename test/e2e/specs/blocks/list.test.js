@@ -51,7 +51,6 @@ describe( 'List', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1. ' );
 		await pressWithModifier( META_KEY, 'z' );
-		await page.keyboard.type( 'November' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -10,7 +10,7 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 
-export function getPatterns( { onReplace, valueToFormat, onCreateUndoLevel } ) {
+export function getPatterns( { onReplace, valueToFormat, onCreateUndoLevel, onChange } ) {
 	const prefixTransforms = getBlockTransforms( 'from' )
 		.filter( ( { type } ) => type === 'prefix' );
 
@@ -46,25 +46,35 @@ export function getPatterns( { onReplace, valueToFormat, onCreateUndoLevel } ) {
 			return record;
 		},
 		( record ) => {
+			const BACKTICK = '`';
+			const start = getSelectionStart( record );
 			const text = getTextContent( record );
+			const characterBefore = text.slice( start - 1, start );
 
 			// Quick check the text for the necessary character.
-			if ( text.indexOf( '`' ) === -1 ) {
+			if ( characterBefore !== BACKTICK ) {
 				return record;
 			}
 
-			const match = text.match( /`([^`]+)`/ );
+			const textBefore = text.slice( 0, start - 1 );
+			const indexBefore = textBefore.lastIndexOf( BACKTICK );
 
-			if ( ! match ) {
+			if ( indexBefore === -1 ) {
 				return record;
 			}
 
-			const start = match.index;
-			const end = start + match[ 1 ].length;
+			const startIndex = indexBefore;
+			const endIndex = start - 2;
 
-			record = remove( record, start, start + 1 );
-			record = remove( record, end, end + 1 );
-			record = applyFormat( record, { type: 'code' }, start, end );
+			if ( startIndex === endIndex ) {
+				return record;
+			}
+
+			onChange( record );
+
+			record = remove( record, startIndex, startIndex + 1 );
+			record = remove( record, endIndex, endIndex + 1 );
+			record = applyFormat( record, { type: 'code' }, startIndex, endIndex );
 
 			return record;
 		},
