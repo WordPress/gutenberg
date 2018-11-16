@@ -23,7 +23,7 @@ describe( 'CSS selector wrap', () => {
 
 	it( 'should ignore selectors', () => {
 		const callback = wrap( '.my-namespace', 'body' );
-		const input = `h1, body { color: red; }`;
+		const input = `h1, :root, body { color: red; }`;
 		const output = traverse( input, callback );
 
 		expect( output ).toMatchSnapshot();

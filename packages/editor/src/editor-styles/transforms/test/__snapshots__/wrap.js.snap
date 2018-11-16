@@ -17,6 +17,7 @@ opacity: 0;
 
 exports[`CSS selector wrap should ignore selectors 1`] = `
 ".my-namespace h1,
+.my-namespace:not(EDITOR_STYLES),
 body {
 color: red;
 }"
