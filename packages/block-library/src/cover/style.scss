@@ -97,8 +97,8 @@
 	}
 
 	// Prevents misplaced flex alignment in IE11.
-	// See: https://github.com/WordPress/gutenberg/issues/5791
 	&::after {
+		display: block;
 		content: "";
 		font-size: 0;
 		min-height: inherit;
