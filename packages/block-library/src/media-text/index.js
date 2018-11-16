@@ -159,7 +159,6 @@ export const settings = {
 		const mediaTypeRenders = {
 			image: () => <img src={ mediaUrl } alt={ mediaAlt } className={ ( mediaId && mediaType === 'image' ) ? `wp-image-${ mediaId }` : null } />,
 			video: () => <video controls src={ mediaUrl } />,
-
 		};
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 		const className = classnames( {
