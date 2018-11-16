@@ -124,13 +124,13 @@ exports[`adding blocks should navigate around inline boundaries 1`] = `
 
 exports[`adding blocks should not delete surrounding space when deleting a selected word 1`] = `
 "<!-- wp:paragraph -->
-<p>alpha  gamma</p>
+<p>alpha  gamma</p>
 <!-- /wp:paragraph -->"
 `;
 
 exports[`adding blocks should not delete surrounding space when deleting a selected word 2`] = `
 "<!-- wp:paragraph -->
-<p>alpha betagamma</p>
+<p>alpha beta gamma</p>
 <!-- /wp:paragraph -->"
 `;
 

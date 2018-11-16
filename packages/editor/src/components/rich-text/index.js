@@ -510,13 +510,6 @@ export class RichText extends Component {
 			const start = getSelectionStart( value );
 			const end = getSelectionEnd( value );
 
-			// Always handle uncollapsed selections ourselves.
-			if ( ! isCollapsed( value ) ) {
-				this.onChange( remove( value ) );
-				event.preventDefault();
-				return;
-			}
-
 			if ( this.multilineTag ) {
 				let newValue;
 

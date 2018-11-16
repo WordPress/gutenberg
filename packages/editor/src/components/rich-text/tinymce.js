@@ -272,11 +272,9 @@ export default class TinyMCE extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode } = event;
-		const { startContainer, startOffset, endContainer, endOffset } = getSelection().getRangeAt( 0 );
-		const isCollapsed = startContainer === endContainer && startOffset === endOffset;
 
 		// Disables TinyMCE behaviour.
-		if ( keyCode === ENTER || ( ! isCollapsed && ( keyCode === DELETE || keyCode === BACKSPACE ) ) ) {
+		if ( keyCode === ENTER ) {
 			event.preventDefault();
 			// For some reason this is needed to also prevent the insertion of
 			// line breaks.
