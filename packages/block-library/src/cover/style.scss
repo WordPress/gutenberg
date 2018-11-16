@@ -95,6 +95,13 @@
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+
+	// Aligned cover blocks should not use our global alignment rules
+	&.aligncenter,
+	&.alignleft,
+	&.alignright {
+		display: flex;
+	}
 }
 
 .wp-block-cover__video-background {
