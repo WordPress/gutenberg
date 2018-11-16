@@ -33,19 +33,19 @@ describe( 'AdminNotices', () => {
 		expect( createNotice ).toHaveBeenCalledTimes( 2 );
 		expect( createNotice.mock.calls[ 0 ] ).toEqual( [
 			{
-				status: 'success',
+				status: 'warning',
 				content: '',
-				__unstableHTML: '<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
-				isDismissible: true,
+				__unstableHTML: 'Warning',
+				isDismissible: false,
 			},
 			{ speak: false },
 		] );
 		expect( createNotice.mock.calls[ 1 ] ).toEqual( [
 			{
-				status: 'warning',
+				status: 'success',
 				content: '',
-				__unstableHTML: 'Warning',
-				isDismissible: false,
+				__unstableHTML: '<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
+				isDismissible: true,
 			},
 			{ speak: false },
 		] );

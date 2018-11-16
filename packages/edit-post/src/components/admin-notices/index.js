@@ -25,7 +25,9 @@ const NOTICE_CLASS_STATUSES = {
  * @return {Element[]} Admin notice elements.
  */
 function getAdminNotices() {
-	return [ ...document.querySelectorAll( '.notice' ) ];
+	// The order is reversed to match expectations of rendered order, since a
+	// NoticesList is itself rendered in reverse order (newest to oldest).
+	return [ ...document.querySelectorAll( '.notice' ) ].reverse();
 }
 
 /**
