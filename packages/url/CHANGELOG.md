@@ -1,3 +1,9 @@
+## 2.3.1 (Unreleased)
+
+### Bug fixes
+- The `isValidProtocol` function now correctly considers the protocol of the URL as only incoporating characters up to and including the colon (':').
+- `getFragment` is now greedier and matches fragments from the first occurence of the '#' symbol instead of the last.
+
 ## 2.3.0 (2018-11-12)
 
 ### New Features
