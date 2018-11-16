@@ -18,8 +18,17 @@ registerCoreBlocks();
 registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
 setUnregisteredTypeHandlerName( UnsupportedBlock.name );
 
-const AppProvider = () => (
-	<AppContainer initialHtml={ initialHtml } />
-);
+type PropsType = {
+	initialData: string,
+};
+
+const AppProvider = ( { initialData }: PropsType ) => {
+	if ( initialData === undefined ) {
+		initialData = initialHtml;
+	}
+	return (
+		<AppContainer initialHtml={ initialData } />
+	);
+};
 
 export default AppProvider;
