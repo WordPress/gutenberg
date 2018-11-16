@@ -6,7 +6,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @protocol GutenbergBridgeDelegate <NSObject>
 
-- (void)gutenbergDidProvideHTML:(NSString *)html;
+- (void)gutenbergDidProvideHTML:(NSString *)html changed:(BOOL)changed;
 - (void)gutenbergDidRequestMediaPickerWithCallback:(MediaPickerDidPickMediaCallback)callback;
 
 @end

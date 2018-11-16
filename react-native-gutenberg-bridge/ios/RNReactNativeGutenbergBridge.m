@@ -18,10 +18,10 @@ RCT_EXPORT_MODULE()
 
 //provideToNative_Html
 
-RCT_EXPORT_METHOD(provideToNative_Html:(NSString *)html)
+RCT_EXPORT_METHOD(provideToNative_Html:(NSString *)html changed:(BOOL)changed)
 {
     if (self.delegate) {
-        [self.delegate gutenbergDidProvideHTML:html];
+        [self.delegate gutenbergDidProvideHTML:html changed:changed];
     }
 }
 
