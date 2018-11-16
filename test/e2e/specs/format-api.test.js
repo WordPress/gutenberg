@@ -39,7 +39,6 @@ describe( 'Using Format API', () => {
 	it( 'Clicking the control wraps the selected text properly with HTML code', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
-		//await page.click( '.wp-block-paragraph', { clickCount: 3 } );
 		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
 		await pressWithModifier( META_KEY, 'A' );
 		await page.mouse.move( 200, 300, { steps: 10 } );
