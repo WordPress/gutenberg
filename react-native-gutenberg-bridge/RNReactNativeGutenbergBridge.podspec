@@ -12,8 +12,9 @@ Pod::Spec.new do |s|
   s.license      = 'MIT'
   s.author       = { 'author' => 'author@domain.cn' }
   s.platform     = :ios, '10.0'
-  s.source       = { :git => 'https://github.com/author/RNReactNativeGutenbergBridge.git', :tag => 'master' }
-  s.source_files = 'ios/*.{h,m}'
+  s.source       = { :git =>
+'https://github.com/wordpress-mobile/gutenberg-mobile.git', :tag => 'master' }
+  s.source_files = 'react-native-gutenberg-bridge/ios/*.{h,m}'
   s.requires_arc = true
 
   s.dependency 'React/Core', react_native_version
