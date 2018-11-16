@@ -6,7 +6,7 @@ import { includes } from 'lodash';
 /**
  * @const string IS_ROOT_TAG Regex to check if the selector is a root tag selector.
  */
-const IS_ROOT_TAG = /^(body|html).*$/;
+const IS_ROOT_TAG = /^(body|html|:root).*$/;
 
 const wrap = ( namespace, ignore = [] ) => ( node ) => {
 	const updateSelector = ( selector ) => {
@@ -18,6 +18,12 @@ const wrap = ( namespace, ignore = [] ) => ( node ) => {
 		{if ( ! selector.match( IS_ROOT_TAG ) ) {
 			return namespace + ' ' + selector;
 		}}
+
+		// If explicity :root selector namespace with pseudo to respect original specificity intended on namespace.
+		if ( ':root' === selector.trim() ) {
+			// We use an invalid negation to inherit the negation's :pseudo specificity weight applied on namespace.
+			return selector.replace( ':root', `${ namespace }:not(EDITOR_STYLES)` );
+		}
 
 		// HTML and Body elements cannot be contained within our container so lets extract their styles.
 		return selector.replace( /^(body|html)/, namespace );
