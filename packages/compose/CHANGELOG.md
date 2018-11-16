@@ -1,3 +1,9 @@
+## 3.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- `remountOnPropChange` has been removed.
+
 ## 2.1.2 (2018-11-09)
 
 ## 2.1.1 (2018-11-09)

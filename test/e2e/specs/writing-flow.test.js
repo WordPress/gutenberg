@@ -223,42 +223,58 @@ describe( 'adding blocks', () => {
 		expect( isInBlock ).toBe( true );
 	} );
 
-	it( 'should not delete trailing spaces when deleting a word with backspace', async () => {
+	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '1 2 3 4' );
+		await page.keyboard.type( '1 2 3' );
+		await pressTimes( 'ArrowLeft', ' 3'.length );
 		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.type( '4' );
-		const blockText = await page.evaluate( () => document.activeElement.textContent );
-		expect( blockText ).toBe( '1 2 3 4' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should not delete trailing spaces when deleting a word with alt + backspace', async () => {
+	it( 'should not delete surrounding space when deleting a word with Alt+Backspace', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( 'alpha beta gamma delta' );
+		await page.keyboard.type( 'alpha beta gamma' );
+		await pressTimes( 'ArrowLeft', ' gamma'.length );
+
 		if ( process.platform === 'darwin' ) {
 			await pressWithModifier( 'alt', 'Backspace' );
 		} else {
 			await pressWithModifier( 'primary', 'Backspace' );
 		}
-		await page.keyboard.type( 'delta' );
-		const blockText = await page.evaluate( () => document.activeElement.textContent );
-		expect( blockText ).toBe( 'alpha beta gamma delta' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.type( 'beta' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not delete surrounding space when deleting a selected word', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'alpha beta gamma' );
+		await pressTimes( 'ArrowLeft', ' gamma'.length );
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowLeft', 'beta'.length );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.type( 'beta' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should create valid paragraph blocks when rapidly pressing Enter', async () => {
 		await clickBlockAppender();
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
+		await pressTimes( 'Enter', 10 );
+
 		// Check that none of the paragraph blocks have <br> in them.
-		const postContent = await getEditedPostContent();
-		expect( postContent.indexOf( 'br' ) ).toBe( -1 );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

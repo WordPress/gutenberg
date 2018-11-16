@@ -6,12 +6,14 @@ import { mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import MediaPlaceholder from '../';
+import { MediaPlaceholder } from '../';
+
+jest.mock( '../../media-upload/check', () => () => null );
 
 describe( 'MediaPlaceholder', () => {
 	it( 'renders successfully when allowedTypes property is not specified', () => {
 		expect( () => mount(
-			<MediaPlaceholder />
+			<MediaPlaceholder hasUploadPermissions={ false } />
 		) ).not.toThrow();
 	} );
 } );
