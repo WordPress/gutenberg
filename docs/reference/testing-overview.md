@@ -342,11 +342,6 @@ test( 'should contain mars if planets is true', () => {
 
 It's tempting to snapshot deep renders, but that makes for huge snapshots. Additionally, deep renders no longer test a single component, but an entire tree. With `shallow`, we snapshot just the components that are directly rendered by the component we want to test.
 
-### Code Coverage
-
-Code coverage is measured for each PR using the [codecov.io](https://codecov.io/gh/WordPress/gutenberg) tool.
-[Code coverage](https://en.wikipedia.org/wiki/Code_coverage) is a way of measuring the amount of code covered by the tests in the test suite of a project.  In Gutenberg, it is currently measured for JavaScript code only.
-
 ## End to end Testing
 
 If you're using the built-in [local environment](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#local-environment), you can run the e2e tests locally using this command:

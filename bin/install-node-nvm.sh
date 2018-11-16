@@ -1,5 +1,5 @@
 #!/bin/bash
-NVM_VERSION="v0.33.8"
+NVM_VERSION=`curl -Ls -w %{url_effective} -o /dev/null https://github.com/creationix/nvm/releases/latest | rev | cut -d '/' -f 1 | rev`
 
 # Exit if any command fails
 set -e
@@ -73,7 +73,7 @@ npm install
 npm install npm -g
 
 # There was a bug in NPM that caused changes in package-lock.json. Handle that.
-if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/null; then
+if [ "$TRAVIS" != "true" ] && ! git diff --no-ext-diff --exit-code package-lock.json >/dev/null; then
 	if ask "$(warning_message "Your package-lock.json changed, which may mean there's an issue with your NPM cache. Would you like to try and automatically clean it up?" )" N 10; then
 		rm -rf node_modules/
 		npm cache clean --force >/dev/null 2>&1
@@ -83,7 +83,7 @@ if [ "$TRAVIS" != "true" ] && ! git diff --exit-code package-lock.json >/dev/nul
 		npm install
 
 		# Check that it's cleaned up now.
-		if git diff --exit-code package-lock.json >/dev/null; then
+		if git diff --no-ext-diff --exit-code package-lock.json >/dev/null; then
 			echo -e $(warning_message "Confirmed that the NPM cache is cleaned up." )
 		else
 			echo -e $(error_message "We were unable to clean the NPM cache, please manually review the changes to package-lock.json. Continuing with the setup process..." )

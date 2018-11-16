@@ -13,7 +13,7 @@ Within Gutenberg, these components can be accessed by importing from the `compon
  */
 import { Button } from '@wordpress/components';
 
-export default function MyButton() {
+const MyButton = () => {
 	return <Button>Click Me!</Button>;
 }
 ```

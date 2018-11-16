@@ -21,6 +21,8 @@ Install the module
 npm install @wordpress/element --save
 ```
 
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ## Usage
 
 Let's render a customized greeting into an empty element:
@@ -47,7 +49,7 @@ Refer to the [official React Quick Start guide](https://reactjs.org/docs/hello-w
 
 At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](../../blocks/README.md), we observe the following technical requirements:
 
-- An understanding of a block in terms of its underlying values (in the [random image example](../../blocks/README.md#example), a category)
+- An understanding of a block in terms of its underlying values (in the [random image example](../blocks/README.md#example), a category)
 - A means to describe the UI of a block given these values
 
 At its most basic, React provides a simple input / output mechanism. __Given a set of inputs ("props"), a developer describes the output to be shown on the page.__ This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.

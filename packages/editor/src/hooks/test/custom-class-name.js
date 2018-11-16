@@ -15,6 +15,12 @@ describe( 'custom className', () => {
 		title: 'block title',
 	};
 
+	const dynamicBlockSettings = {
+		save: () => null,
+		category: 'common',
+		title: 'block title',
+	};
+
 	describe( 'addAttribute()', () => {
 		const addAttribute = applyFilters.bind( null, 'blocks.registerBlockType' );
 
@@ -149,6 +155,16 @@ describe( 'custom className', () => {
 			);
 
 			expect( attributes.className ).toBe( 'custom1 custom3' );
+		} );
+
+		it( 'should not remove the custom classes for dynamic blocks', () => {
+			const attributes = addParsedDifference(
+				{ className: 'custom1' },
+				dynamicBlockSettings,
+				null,
+			);
+
+			expect( attributes.className ).toBe( 'custom1' );
 		} );
 	} );
 } );

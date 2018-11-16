@@ -24,5 +24,7 @@ exports[`BlockAlignmentToolbar should match snapshot 1`] = `
       },
     ]
   }
+  icon="align-left"
+  label="Change Alignment"
 />
 `;

@@ -32,5 +32,5 @@ Output uses the block's `render_callback` function, set when defining the block.
 
 ## API Endpoint
 
-The API endpoint for getting the output for ServerSideRender is `/gutenberg/v1/block-renderer/:block`. It accepts any params, which are used as `attributes` for the block's `render_callback` method.
+The API endpoint for getting the output for ServerSideRender is `/wp/v2/block-renderer/:block`. It accepts any params, which are used as `attributes` for the block's `render_callback` method.
 

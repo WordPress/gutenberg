@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { dcnpgettext, sprintf, __, _x, _n, _nx, setLocaleData } from '../';
+import { sprintf, __, _x, _n, _nx, setLocaleData } from '../';
 
 // Mock memoization as identity function. Inline since Jest errors on out-of-
 // scope references in a mock callback.
@@ -22,27 +22,18 @@ const localeData = {
 
 	'hello %s': [ 'bonjour %s' ],
 
-	'%d banana': [ 'une banane', '%d bananes' ],
+	'%d banana': [ '%d banane', '%d bananes' ],
 
-	'fruit\u0004%d apple': [ 'une pomme', '%d pommes' ],
+	'fruit\u0004%d apple': [ '%d pomme', '%d pommes' ],
 };
 const additionalLocaleData = {
 	cheeseburger: [ 'hamburger au fromage' ],
-	'%d cat': [ 'un chat', '%d chats' ],
+	'%d cat': [ '%d chat', '%d chats' ],
 };
 
 setLocaleData( localeData, 'test_domain' );
 
 describe( 'i18n', () => {
-	describe( 'dcnpgettext()', () => {
-		it( 'absorbs errors', () => {
-			const result = dcnpgettext( 'domain-without-data', undefined, 'Hello' );
-
-			expect( console ).toHaveErrored();
-			expect( result ).toBe( 'Hello' );
-		} );
-	} );
-
 	describe( '__', () => {
 		it( 'use the translation', () => {
 			expect( __( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
@@ -61,7 +52,7 @@ describe( 'i18n', () => {
 		} );
 
 		it( 'use the singular form', () => {
-			expect( _n( '%d banana', '%d bananas', 1, 'test_domain' ) ).toBe( 'une banane' );
+			expect( _n( '%d banana', '%d bananas', 1, 'test_domain' ) ).toBe( '%d banane' );
 		} );
 	} );
 
@@ -71,7 +62,7 @@ describe( 'i18n', () => {
 		} );
 
 		it( 'use the singular form', () => {
-			expect( _nx( '%d apple', '%d apples', 1, 'fruit', 'test_domain' ) ).toBe( 'une pomme' );
+			expect( _nx( '%d apple', '%d apples', 1, 'fruit', 'test_domain' ) ).toBe( '%d pomme' );
 		} );
 	} );
 
@@ -90,10 +81,24 @@ describe( 'i18n', () => {
 		} );
 	} );
 
-	describe( 'setAdditionalLocale', () => {
+	describe( 'setLocaleData', () => {
 		beforeAll( () => {
 			setLocaleData( additionalLocaleData, 'test_domain' );
 		} );
+
+		it( 'supports omitted plural forms expression', () => {
+			setLocaleData( {
+				'': {
+					domain: 'test_domain2',
+					lang: 'fr',
+				},
+
+				'%d banana': [ '%d banane', '%d bananes' ],
+			}, 'test_domain2' );
+
+			expect( _n( '%d banana', '%d bananes', 2, 'test_domain2' ) ).toBe( '%d bananes' );
+		} );
+
 		describe( '__', () => {
 			it( 'existing translation still available', () => {
 				expect( __( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
@@ -110,7 +115,7 @@ describe( 'i18n', () => {
 			} );
 
 			it( 'new singular form was added', () => {
-				expect( _n( '%d cat', '%d cats', 1, 'test_domain' ) ).toBe( 'un chat' );
+				expect( _n( '%d cat', '%d cats', 1, 'test_domain' ) ).toBe( '%d chat' );
 			} );
 
 			it( 'new plural form was added', () => {

@@ -11,7 +11,6 @@ describe( 'selectors', () => {
 				[ 'test/tip-a', 'test/tip-b', 'test/tip-c' ],
 				[ 'test/tip-α', 'test/tip-β', 'test/tip-γ' ],
 			],
-			tipInstanceIds: {},
 			preferences: {
 				dismissedTips: {
 					'test/tip-1': true,
@@ -57,7 +56,6 @@ describe( 'selectors', () => {
 		it( 'should return true by default', () => {
 			const state = {
 				guides: [],
-				tipInstanceIds: {},
 				preferences: {
 					areTipsEnabled: true,
 					dismissedTips: {},
@@ -69,7 +67,6 @@ describe( 'selectors', () => {
 		it( 'should return false if tips are disabled', () => {
 			const state = {
 				guides: [],
-				tipInstanceIds: {},
 				preferences: {
 					areTipsEnabled: false,
 					dismissedTips: {},
@@ -81,7 +78,6 @@ describe( 'selectors', () => {
 		it( 'should return false if the tip is dismissed', () => {
 			const state = {
 				guides: [],
-				tipInstanceIds: {},
 				preferences: {
 					areTipsEnabled: true,
 					dismissedTips: {
@@ -97,7 +93,6 @@ describe( 'selectors', () => {
 				guides: [
 					[ 'test/tip-1', 'test/tip-2', 'test/tip-3' ],
 				],
-				tipInstanceIds: {},
 				preferences: {
 					areTipsEnabled: true,
 					dismissedTips: {},
@@ -105,53 +100,12 @@ describe( 'selectors', () => {
 			};
 			expect( isTipVisible( state, 'test/tip-2' ) ).toBe( false );
 		} );
-
-		it( 'should return true if an instanceId that was registered first is provided', () => {
-			const state = {
-				guides: [],
-				tipInstanceIds: {
-					'test/tip': [ 123, 456 ],
-				},
-				preferences: {
-					areTipsEnabled: true,
-					dismissedTips: {},
-				},
-			};
-			expect( isTipVisible( state, 'test/tip', 123 ) ).toBe( true );
-		} );
-
-		it( 'should return false if an instanceId that was NOT registered is provided', () => {
-			const state = {
-				guides: [],
-				tipInstanceIds: {},
-				preferences: {
-					areTipsEnabled: true,
-					dismissedTips: {},
-				},
-			};
-			expect( isTipVisible( state, 'test/tip', 123 ) ).toBe( false );
-		} );
-
-		it( 'should return false if an instanceId that was NOT registered first is provided', () => {
-			const state = {
-				guides: [],
-				tipInstanceIds: {
-					'test/tip': [ 123, 456 ],
-				},
-				preferences: {
-					areTipsEnabled: true,
-					dismissedTips: {},
-				},
-			};
-			expect( isTipVisible( state, 'test/tip', 456 ) ).toBe( false );
-		} );
 	} );
 
 	describe( 'areTipsEnabled', () => {
 		it( 'should return true if tips are enabled', () => {
 			const state = {
 				guides: [],
-				tipInstanceIds: {},
 				preferences: {
 					areTipsEnabled: true,
 					dismissedTips: {},
@@ -163,7 +117,6 @@ describe( 'selectors', () => {
 		it( 'should return false if tips are disabled', () => {
 			const state = {
 				guides: [],
-				tipInstanceIds: {},
 				preferences: {
 					areTipsEnabled: false,
 					dismissedTips: {},

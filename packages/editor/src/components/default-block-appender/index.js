@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { get } from 'lodash';
+import TextareaAutosize from 'react-autosize-textarea';
 
 /**
  * WordPress dependencies
@@ -12,7 +11,6 @@ import { compose } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { DotTip } from '@wordpress/nux';
 
 /**
  * Internal dependencies
@@ -27,15 +25,13 @@ export function DefaultBlockAppender( {
 	onAppend,
 	showPrompt,
 	placeholder,
-	layout,
 	rootClientId,
-	hasTip,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Write your story' );
+	const value = decodeEntities( placeholder ) || __( 'Start writing or type / to choose a block' );
 
 	// The appender "button" is in-fact a text field so as to support
 	// transitions by WritingFlow occurring by arrow key press. WritingFlow
@@ -50,47 +46,38 @@ export function DefaultBlockAppender( {
 	//
 	// See: https://gist.github.com/cvrebert/68659d0333a578d75372
 
+	// The wp-block className is important for editor styles.
+
 	return (
-		<div
-			data-root-client-id={ rootClientId || '' }
-			className={ classnames( 'editor-default-block-appender', {
-				'has-tip': hasTip,
-			} ) }>
-			<BlockDropZone rootClientId={ rootClientId } layout={ layout } />
-			<input
+		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
+			<BlockDropZone rootClientId={ rootClientId } />
+			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
-				type="text"
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
-			<InserterWithShortcuts rootClientId={ rootClientId } layout={ layout } />
-			<Inserter position="top right">
-				<DotTip id="core/editor.inserter">
-					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kind of content: you can insert text, headings, images, lists, and lots more!' ) }
-				</DotTip>
-			</Inserter>
+			<InserterWithShortcuts rootClientId={ rootClientId } />
+			<Inserter position="top right" />
 		</div>
 	);
 }
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlock, getEditorSettings, getTemplateLock } = select( 'core/editor' );
-		const { isTipVisible } = select( 'core/nux' );
+		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const lastBlock = getBlock( ownProps.lastBlockClientId );
-		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
+		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
+		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 		const { bodyPlaceholder } = getEditorSettings();
 
 		return {
-			isVisible: isEmpty || ! isLastBlockDefault,
+			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			showPrompt: isEmpty,
 			isLocked: !! getTemplateLock( ownProps.rootClientId ),
 			placeholder: bodyPlaceholder,
-			hasTip: isTipVisible( 'core/editor.inserter' ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -99,23 +86,12 @@ export default compose(
 			startTyping,
 		} = dispatch( 'core/editor' );
 
-		const { dismissTip } = dispatch( 'core/nux' );
-
 		return {
 			onAppend() {
-				const { layout, rootClientId, hasTip } = ownProps;
+				const { rootClientId } = ownProps;
 
-				let attributes;
-				if ( layout ) {
-					attributes = { layout };
-				}
-
-				insertDefaultBlock( attributes, rootClientId );
+				insertDefaultBlock( undefined, rootClientId );
 				startTyping();
-
-				if ( hasTip ) {
-					dismissTip( 'core/editor.inserter' );
-				}
 			},
 		};
 	} ),

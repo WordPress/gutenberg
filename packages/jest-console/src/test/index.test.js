@@ -72,6 +72,18 @@ describe( 'jest-console', () => {
 					expect( console )[ matcherNameWith ]( message );
 					expect( spy.assertionsNumber ).toBe( 2 );
 				} );
+
+				describe( 'lifecycle', () => {
+					beforeAll( () => {
+						// This is a difficult one to test, since the matcher's
+						// own lifecycle is defined to run before ours. Infer
+						// that we're being watched by testing the console
+						// method as being a spy.
+						expect( console[ methodName ].assertionsNumber ).toBeGreaterThanOrEqual( 0 );
+					} );
+
+					it( 'captures logging in lifecycle', () => {} );
+				} );
 			} );
 		}
 	);

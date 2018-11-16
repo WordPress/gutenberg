@@ -5,11 +5,17 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/editor';
+import { ENTER } from '@wordpress/keycodes';
+import {
+	getDefaultBlockName,
+	createBlock,
+} from '@wordpress/blocks';
 
 export default class MoreEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChangeInput = this.onChangeInput.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 
 		this.state = {
 			defaultText: __( 'Read more' ),
@@ -24,6 +30,14 @@ export default class MoreEdit extends Component {
 
 		const value = event.target.value.length === 0 ? undefined : event.target.value;
 		this.props.setAttributes( { customText: value } );
+	}
+
+	onKeyDown( event ) {
+		const { keyCode } = event;
+		const { insertBlocksAfter } = this.props;
+		if ( keyCode === ENTER ) {
+			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
+		}
 	}
 
 	render() {
@@ -52,6 +66,7 @@ export default class MoreEdit extends Component {
 						value={ value }
 						size={ inputLength }
 						onChange={ this.onChangeInput }
+						onKeyDown={ this.onKeyDown }
 					/>
 				</div>
 			</Fragment>

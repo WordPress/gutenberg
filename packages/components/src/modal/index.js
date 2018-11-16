@@ -16,6 +16,7 @@ import { withInstanceId } from '@wordpress/compose';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
+import IsolatedEventContainer from '../isolated-event-container';
 
 // Used to count the number of open modals.
 let parentElement,
@@ -117,19 +118,19 @@ class Modal extends Component {
 			children,
 			aria,
 			instanceId,
+			isDismissable,
 			...otherProps
 		} = this.props;
 
-		const headingId = (
-			aria.labelledby ||
-			'components-modal-header-' + instanceId
-		);
+		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
 
+		// Disable reason: this stops mouse events from triggering tooltips and
+		// other elements underneath the modal overlay.
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
-			<div className={ classnames(
-				'components-modal__screen-overlay',
-				overlayClassName
-			) }>
+			<IsolatedEventContainer
+				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
+			>
 				<ModalFrame
 					className={ classnames(
 						'components-modal__frame',
@@ -140,21 +141,24 @@ class Modal extends Component {
 						labelledby: title ? headingId : null,
 						describedby: aria.describedby,
 					} }
-					{ ...otherProps } >
-					<ModalHeader
-						closeLabel={ closeButtonLabel }
-						onClose={ onRequestClose }
-						title={ title }
-						headingId={ headingId }
-						icon={ icon } />
-					<div
-						className={ 'components-modal__content' }>
+					{ ...otherProps }
+				>
+					<div className={ 'components-modal__content' } tabIndex="0">
+						<ModalHeader
+							closeLabel={ closeButtonLabel }
+							headingId={ headingId }
+							icon={ icon }
+							isDismissable={ isDismissable }
+							onClose={ onRequestClose }
+							title={ title }
+						/>
 						{ children }
 					</div>
 				</ModalFrame>
-			</div>,
+			</IsolatedEventContainer>,
 			this.node
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }
 
@@ -166,6 +170,7 @@ Modal.defaultProps = {
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
+	isDismissable: true,
 	/* accessibility */
 	aria: {
 		labelledby: null,

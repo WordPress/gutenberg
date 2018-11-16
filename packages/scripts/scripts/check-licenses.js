@@ -3,12 +3,13 @@
  */
 const spawn = require( 'cross-spawn' );
 const { existsSync, readFileSync } = require( 'fs' );
+const { sep } = require( 'path' );
 const chalk = require( 'chalk' );
 
 /**
  * Internal dependencies
  */
-const { hasCliArg } = require( '../utils' );
+const { getCliArg, hasCliArg } = require( '../utils' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -24,6 +25,13 @@ const ERROR = chalk.reset.inverse.bold.red( ' ERROR ' );
 const prod = hasCliArg( '--prod' ) || hasCliArg( '--production' );
 const dev = hasCliArg( '--dev' ) || hasCliArg( '--development' );
 const gpl2 = hasCliArg( '--gpl2' );
+const ignored = hasCliArg( '--ignore' ) ?
+	getCliArg( '--ignore' )
+		// "--ignore=a, b" -> "[ 'a', ' b' ]"
+		.split( ',' )
+		// "[ 'a', ' b' ]" -> "[ 'a', 'b' ]"
+		.map( ( moduleName ) => moduleName.trim() ) :
+	[];
 
 /*
  * A list of license strings that we've found to be GPL2 compatible.
@@ -37,6 +45,7 @@ const gpl2CompatibleLicenses = [
 	'BSD',
 	'BSD-2-Clause',
 	'BSD-3-Clause',
+	'BSD-3-Clause-W3C',
 	'BSD-like',
 	'CC-BY-3.0',
 	'CC-BY-4.0',
@@ -103,6 +112,9 @@ const licenseFileStrings = {
 	BSD: [
 		'Redistributions in binary form must reproduce the above copyright notice,',
 	],
+	'BSD-3-Clause-W3C': [
+		'W3C 3-clause BSD License',
+	],
 	MIT: [
 		'Permission is hereby granted, free of charge,',
 		'## License\n\nMIT',
@@ -135,7 +147,7 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	}
 
 	// We can skip the parsing below if there isn't an 'OR' in the license.
-	if ( licenseType.indexOf( 'OR' ) < 0 ) {
+	if ( ! licenseType.includes( 'OR' ) ) {
 		return false;
 	}
 
@@ -155,6 +167,23 @@ const checkLicense = ( allowedLicense, licenseType ) => {
 	return undefined !== subLicenseTypes.find( ( subLicenseType ) => checkLicense( allowedLicense, subLicenseType ) );
 };
 
+/**
+ * Returns true if the given module path is not to be ignored for consideration
+ * in license validation, or false otherwise.
+ *
+ * @param {string} moduleName Module path.
+ *
+ * @return {boolean} Whether module path is not to be ignored.
+ */
+const isNotIgnoredModule = ( moduleName ) => (
+	! ignored.some( ( ignoredItem ) => (
+		// `moduleName` is a file path to the module directory. Assume CLI arg
+		// is passed as basename of package (directory(s) after node_modules).
+		// Prefix with sep to avoid false-positives on prefixing variations.
+		moduleName.endsWith( sep + ignoredItem )
+	) )
+);
+
 // Use `npm ls` to grab a list of all the packages.
 const child = spawn.sync( 'npm', [
 	'ls',
@@ -163,7 +192,10 @@ const child = spawn.sync( 'npm', [
 	...( dev ? [ '--dev' ] : [] ),
 ] );
 
-const modules = child.stdout.toString().split( '\n' );
+const modules = child.stdout
+	.toString()
+	.split( '\n' )
+	.filter( isNotIgnoredModule );
 
 modules.forEach( ( path ) => {
 	if ( ! path ) {
@@ -192,6 +224,11 @@ modules.forEach( ( path ) => {
 				.join( ' OR ' )
 		);
 	let licenseType = typeof license === 'object' ? license.type : license;
+
+	// Check if the license we've detected is telling us to look in the license file, instead.
+	if ( licenseType && licenseFiles.find( ( licenseFile ) => licenseType.includes( licenseFile ) ) ) {
+		licenseType = undefined;
+	}
 
 	/*
 	 * If we haven't been able to detect a license in the package.json file, try reading

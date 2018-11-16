@@ -10,10 +10,10 @@ import { isEqual } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { getBlockAttributes, getBlockContent, getBlockType, isValidBlock } from '@wordpress/blocks';
+import { getBlockAttributes, getBlockContent, getBlockType, isValidBlockContent, getSaveContent } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-class BlockHTML extends Component {
+export class BlockHTML extends Component {
 	constructor( props ) {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
@@ -32,10 +32,20 @@ class BlockHTML extends Component {
 	}
 
 	onBlur() {
+		const { html } = this.state;
 		const blockType = getBlockType( this.props.block.name );
-		const attributes = getBlockAttributes( blockType, this.state.html, this.props.block.attributes );
-		const isValid = isValidBlock( this.state.html, blockType, attributes );
-		this.props.onChange( this.props.clientId, attributes, this.state.html, isValid );
+		const attributes = getBlockAttributes( blockType, html, this.props.block.attributes );
+
+		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
+		const content = html ? html : getSaveContent( blockType, attributes );
+		const isValid = html ? isValidBlockContent( blockType, attributes, content ) : true;
+
+		this.props.onChange( this.props.clientId, attributes, content, isValid );
+
+		// Ensure the state is updated if we reset so it displays the default content
+		if ( ! html ) {
+			this.setState( { html: content } );
+		}
 	}
 
 	onChange( event ) {

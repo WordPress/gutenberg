@@ -1,8 +1,7 @@
 .wp-block-quote {
 	margin: 0;
 
-	cite {
-		display: block;
+	&__citation {
 		font-size: $default-font-size;
 	}
 }

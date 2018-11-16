@@ -2,7 +2,8 @@
 	margin: 20px 0;
 
 	cite,
-	footer {
+	footer,
+	&__citation {
 		color: $dark-gray-300;
 		font-size: $default-font-size;
 		margin-top: 1em;

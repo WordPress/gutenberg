@@ -6,10 +6,11 @@
 	}
 
 	&.alignright {
+		/*rtl:ignore*/
 		text-align: right;
 	}
 
-	&__button {
+	.wp-block-file__button {
 		background: $dark-gray-700;
 		border-radius: 2em;
 		color: $white;
@@ -17,7 +18,7 @@
 		padding: 0.5em 1em;
 	}
 
-	a#{&}__button {
+	a.wp-block-file__button {
 		text-decoration: none;
 
 		&:hover,
@@ -31,7 +32,7 @@
 		}
 	}
 
-	* + &__button {
+	* + .wp-block-file__button {
 		margin-left: 0.75em;
 	}
 }

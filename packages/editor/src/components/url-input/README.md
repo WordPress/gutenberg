@@ -22,7 +22,7 @@ Render a URL input button that pops up an input to search for and select a post 
   "_links": {
     "self": [ { "embeddable": true, "href": "https://example.com/wp-json/wp/v2/pages/1" } ],
     "about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
-    "collection": [ { "href": "https://example.com/wp-json/gutenberg/v1/search" } ]
+    "collection": [ { "href": "https://example.com/wp-json/wp/v2/search" } ]
   }
 }
 ```
@@ -120,7 +120,7 @@ Renders the URL input field used by the `URLInputButton` component. It can be us
   "_links": {
     "self": [ { "embeddable": true, "href": "https://example.com/wp-json/wp/v2/pages/1" } ],
     "about": [ { "href": "https://example.com/wp-json/wp/v2/types/page" } ],
-    "collection": [ { "href": "https://example.com/wp-json/gutenberg/v1/search" } ]
+    "collection": [ { "href": "https://example.com/wp-json/wp/v2/search" } ]
   }
 }
 ```

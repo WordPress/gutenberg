@@ -1,3 +1,5 @@
+/* eslint-disable react/forbid-elements */
+
 /**
  * External dependencies
  */
@@ -14,8 +16,10 @@ import { addFilter, removeFilter } from '@wordpress/hooks';
 import {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
-	getUnknownTypeHandlerName,
+	setFreeformContentHandlerName,
+	getFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
+	getUnregisteredTypeHandlerName,
 	setDefaultBlockName,
 	getDefaultBlockName,
 	getBlockType,
@@ -24,7 +28,6 @@ import {
 	hasBlockSupport,
 	isReusableBlock,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
-	registerBlockStyle,
 } from '../registration';
 
 describe( 'blocks', () => {
@@ -39,7 +42,8 @@ describe( 'blocks', () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
-		setUnknownTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		setDefaultBlockName( undefined );
 		unstable__bootstrapServerSideBlockDefinitions( {} );
 	} );
@@ -364,17 +368,31 @@ describe( 'blocks', () => {
 		} );
 	} );
 
-	describe( 'setUnknownTypeHandlerName()', () => {
+	describe( 'setFreeformContentHandlerName()', () => {
 		it( 'assigns unknown type handler', () => {
-			setUnknownTypeHandlerName( 'core/test-block' );
+			setFreeformContentHandlerName( 'core/test-block' );
 
-			expect( getUnknownTypeHandlerName() ).toBe( 'core/test-block' );
+			expect( getFreeformContentHandlerName() ).toBe( 'core/test-block' );
 		} );
 	} );
 
-	describe( 'getUnknownTypeHandlerName()', () => {
+	describe( 'getFreeformContentHandlerName()', () => {
 		it( 'defaults to undefined', () => {
-			expect( getUnknownTypeHandlerName() ).toBeNull();
+			expect( getFreeformContentHandlerName() ).toBeNull();
+		} );
+	} );
+
+	describe( 'setUnregisteredTypeHandlerName()', () => {
+		it( 'assigns unknown type handler', () => {
+			setUnregisteredTypeHandlerName( 'core/test-block' );
+
+			expect( getUnregisteredTypeHandlerName() ).toBe( 'core/test-block' );
+		} );
+	} );
+
+	describe( 'getUnregisteredTypeHandlerName()', () => {
+		it( 'defaults to undefined', () => {
+			expect( getUnregisteredTypeHandlerName() ).toBeNull();
 		} );
 	} );
 
@@ -562,37 +580,6 @@ describe( 'blocks', () => {
 		it( 'should return false for other blocks', () => {
 			const block = { name: 'core/paragraph' };
 			expect( isReusableBlock( block ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'registerBlockStyle', () => {
-		afterEach( () => {
-			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-without-styles/big' );
-			removeFilter( 'blocks.registerBlockType', 'my-plugin/block-without-styles/small' );
-		} );
-
-		it( 'should add styles', () => {
-			registerBlockStyle( 'my-plugin/block-without-styles', { name: 'big', label: 'Big style' } );
-			const settings = registerBlockType( 'my-plugin/block-without-styles', defaultBlockSettings );
-
-			expect( settings.styles ).toEqual( [
-				{ name: 'big', label: 'Big style' },
-			] );
-		} );
-
-		it( 'should accumulate styles', () => {
-			registerBlockStyle( 'my-plugin/block-without-styles', { name: 'small', label: 'Small style' } );
-			registerBlockStyle( 'my-plugin/block-without-styles', { name: 'big', label: 'Big style' } );
-			const settings = registerBlockType( 'my-plugin/block-without-styles', {
-				...defaultBlockSettings,
-				styles: [ { name: 'normal', label: 'Normal style' } ],
-			} );
-
-			expect( settings.styles ).toEqual( [
-				{ name: 'normal', label: 'Normal style' },
-				{ name: 'small', label: 'Small style' },
-				{ name: 'big', label: 'Big style' },
-			] );
 		} );
 	} );
 } );

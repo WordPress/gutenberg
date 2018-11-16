@@ -13,9 +13,7 @@ edit() {
 }
 ```
 
-// Todo: for more advanced uses, `edit` can return a component with lifecycle.
-
-The function receives the following properties through an object argument.
+The function receives the following properties through an object argument:
 
 ### attributes
 

@@ -5,10 +5,14 @@
             "ref": 123
         },
         "innerBlocks": [],
-        "innerHTML": ""
+        "innerHTML": "",
+        "innerContent": []
     },
     {
+        "blockName": null,
         "attrs": {},
-        "innerHTML": "\n"
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [ "\n" ]
     }
 ]

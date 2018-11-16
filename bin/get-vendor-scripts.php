@@ -20,6 +20,11 @@ function add_action() {}
 /**
  * Hi, phpcs
  */
+function add_filter() {}
+
+/**
+ * Hi, phpcs
+ */
 function wp_add_inline_script() {}
 
 // Instead of loading script files, just show how they need to be loaded.

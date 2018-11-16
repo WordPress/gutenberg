@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CSS traverse Should traverse the CSS 1`] = `
+"namespace h1 {
+color: red;
+}"
+`;

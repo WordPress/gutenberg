@@ -17,5 +17,5 @@ const MyClipboardButton = withState( {
 	>
 		{ hasCopied ? 'Copied!' : 'Copy Text' }
 	</ClipboardButton>
-) )
+) );
 ```

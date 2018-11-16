@@ -1,17 +1,12 @@
 .wp-block-table {
-	overflow-x: auto;
-	display: block;
-	border-collapse: collapse;
 	width: 100%;
-
-	tbody {
-		width: 100%;
-		min-width: $break-mobile / 2;
-	}
+	min-width: $break-mobile / 2;
+	border-collapse: collapse;
 
 	td,
 	th {
 		padding: 0.5em;
 		border: 1px solid currentColor;
+		word-break: break-all;
 	}
 }

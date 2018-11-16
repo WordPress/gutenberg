@@ -11,5 +11,7 @@ Talks given about Gutenberg, including slides and videos as they are available.
 
 ## Videos
 - [All `Gutenberg` tagged Talks at WordPress.tv](https://wordpress.tv/tag/gutenberg/)
-- [Matt Mullenweg: State of the Word 2017](https://wordpress.tv/2017/12/04/matt-mullenweg-state-of-the-word-2017/) with Gutenberg demo by Matías Ventura at 35:00 minutes
+- 2018-Jun - [Beyond Gutenberg](https://wordpress.tv/2018/07/09/matias-ventura-beyond-gutenberg/) by Matías Ventura
+- 2018-Jun - [Anatomy of a block: Gutenberg design patterns](https://wordpress.tv/2018/07/08/tammie-lister-anatomy-of-a-block-gutenberg-design-patterns/) by Tammie Lister
+- 2017-Dec - [State of the Word 2017](https://wordpress.tv/2017/12/04/matt-mullenweg-state-of-the-word-2017/) by Matt Mullenweg (Gutenberg demo by Matías Ventura at 35:00)
 - [Gutenberg is Coming (Don’t Be Afraid)](https://training.ithemes.com/webinar/gutenberg-is-coming-dont-be-afraid/) from iThemes Training

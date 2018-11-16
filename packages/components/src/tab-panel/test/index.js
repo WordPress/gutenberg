@@ -13,6 +13,11 @@ import TabPanel from '../';
  */
 import { Component } from '@wordpress/element';
 
+/**
+ * Mock Functions
+ */
+jest.mock( '@wordpress/deprecated', () => jest.fn() );
+
 describe( 'TabPanel', () => {
 	const getElementByClass = ( wrapper, className ) => {
 		return TestUtils.findRenderedDOMComponentWithClass( wrapper, className );
@@ -60,8 +65,8 @@ describe( 'TabPanel', () => {
 						className: 'gamma',
 					},
 				],
-				children: ( tabName ) => {
-					return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
+				children: ( tab ) => {
+					return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
 				},
 			};
 
@@ -137,8 +142,8 @@ describe( 'TabPanel', () => {
 					className: 'beta',
 				},
 			],
-			children: ( tabName ) => {
-				return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
+			children: ( tab ) => {
+				return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
 			},
 		};
 		const wrapper = TestUtils.renderIntoDocument(

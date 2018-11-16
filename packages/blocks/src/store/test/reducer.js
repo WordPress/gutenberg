@@ -6,14 +6,22 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { blockTypes, categories, defaultBlockName, fallbackBlockName, DEFAULT_CATEGORIES } from '../reducer';
+import {
+	blockStyles,
+	blockTypes,
+	categories,
+	defaultBlockName,
+	freeformFallbackBlockName,
+	unregisteredFallbackBlockName,
+	DEFAULT_CATEGORIES,
+} from '../reducer';
 
 describe( 'blockTypes', () => {
 	it( 'should return an empty object as default state', () => {
 		expect( blockTypes( undefined, {} ) ).toEqual( {} );
 	} );
 
-	it( 'should add add a new block type', () => {
+	it( 'should add a new block type', () => {
 		const original = deepFreeze( {
 			'core/paragraph': { name: 'core/paragraph' },
 		} );
@@ -46,6 +54,87 @@ describe( 'blockTypes', () => {
 	} );
 } );
 
+describe( 'blockStyles', () => {
+	it( 'should return an empty object as default state', () => {
+		expect( blockStyles( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'should add a new block styles', () => {
+		const original = deepFreeze( {} );
+
+		let state = blockStyles( original, {
+			type: 'ADD_BLOCK_STYLES',
+			blockName: 'core/image',
+			styles: [ { name: 'fancy' } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'fancy' },
+			],
+		} );
+
+		state = blockStyles( state, {
+			type: 'ADD_BLOCK_STYLES',
+			blockName: 'core/image',
+			styles: [ { name: 'lightbox' } ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'fancy' },
+				{ name: 'lightbox' },
+			],
+		} );
+	} );
+
+	it( 'should add block styles when adding a block', () => {
+		const original = deepFreeze( {
+			'core/image': [
+				{ name: 'fancy' },
+			],
+		} );
+
+		const state = blockStyles( original, {
+			type: 'ADD_BLOCK_TYPES',
+			blockTypes: [ {
+				name: 'core/image',
+				styles: [
+					{ name: 'original' },
+				],
+			} ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'original' },
+				{ name: 'fancy' },
+			],
+		} );
+	} );
+
+	it( 'should remove block styles', () => {
+		const original = deepFreeze( {
+			'core/image': [
+				{ name: 'fancy' },
+				{ name: 'lightbox' },
+			],
+		} );
+
+		const state = blockStyles( original, {
+			type: 'REMOVE_BLOCK_STYLES',
+			blockName: 'core/image',
+			styleNames: [ 'fancy' ],
+		} );
+
+		expect( state ).toEqual( {
+			'core/image': [
+				{ name: 'lightbox' },
+			],
+		} );
+	} );
+} );
+
 describe( 'defaultBlockName', () => {
 	it( 'should return null as default state', () => {
 		expect( defaultBlockName( undefined, {} ) ).toBeNull();
@@ -60,7 +149,7 @@ describe( 'defaultBlockName', () => {
 		expect( state ).toBe( 'core/paragraph' );
 	} );
 
-	it( 'should reset the fallback block name', () => {
+	it( 'should reset the default block name', () => {
 		const state = defaultBlockName( 'core/code', {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
@@ -70,22 +159,46 @@ describe( 'defaultBlockName', () => {
 	} );
 } );
 
-describe( 'fallbackBlockName', () => {
+describe( 'freeformFallbackBlockName', () => {
 	it( 'should return null as default state', () => {
-		expect( fallbackBlockName( undefined, {} ) ).toBeNull();
+		expect( freeformFallbackBlockName( undefined, {} ) ).toBeNull();
 	} );
 
-	it( 'should set the fallback block name', () => {
-		const state = fallbackBlockName( null, {
-			type: 'SET_FALLBACK_BLOCK_NAME',
+	it( 'should set the freeform content fallback block name', () => {
+		const state = freeformFallbackBlockName( null, {
+			type: 'SET_FREEFORM_FALLBACK_BLOCK_NAME',
 			name: 'core/paragraph',
 		} );
 
 		expect( state ).toBe( 'core/paragraph' );
 	} );
 
-	it( 'should reset the fallback block name', () => {
-		const state = fallbackBlockName( 'core/code', {
+	it( 'should reset the freeform content fallback block name', () => {
+		const state = freeformFallbackBlockName( 'core/code', {
+			type: 'REMOVE_BLOCK_TYPES',
+			names: [ 'core/code' ],
+		} );
+
+		expect( state ).toBeNull();
+	} );
+} );
+
+describe( 'unregisteredFallbackBlockName', () => {
+	it( 'should return null as default state', () => {
+		expect( unregisteredFallbackBlockName( undefined, {} ) ).toBeNull();
+	} );
+
+	it( 'should set the unregistered fallback block name', () => {
+		const state = unregisteredFallbackBlockName( null, {
+			type: 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME',
+			name: 'core/paragraph',
+		} );
+
+		expect( state ).toBe( 'core/paragraph' );
+	} );
+
+	it( 'should reset the unregistered fallback block name', () => {
+		const state = unregisteredFallbackBlockName( 'core/code', {
 			type: 'REMOVE_BLOCK_TYPES',
 			names: [ 'core/code' ],
 		} );

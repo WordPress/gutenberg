@@ -1,41 +1,52 @@
 /**
+ * External dependencies
+ */
+import { invoke } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
+import { TextControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, withInstanceId } from '@wordpress/compose';
+import { compose, withState } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import PostTypeSupportCheck from '../post-type-support-check';
 
-export function PageAttributesOrder( { onUpdateOrder, instanceId, order } ) {
-	const setUpdatedOrder = ( event ) => {
-		const newOrder = Number( event.target.value );
-		if ( newOrder >= 0 ) {
-			onUpdateOrder( newOrder );
-		}
-	};
-	// Create unique identifier for inputs
-	const inputId = `editor-page-attributes__order-${ instanceId }`;
-
-	return (
-		<Fragment>
-			<label htmlFor={ inputId }>
-				{ __( 'Order' ) }
-			</label>
-			<input
-				type="text"
-				value={ order || 0 }
+export const PageAttributesOrder = withState( {
+	orderInput: null,
+} )(
+	( { onUpdateOrder, order = 0, orderInput, setState } ) => {
+		const setUpdatedOrder = ( value ) => {
+			setState( {
+				orderInput: value,
+			} );
+			const newOrder = Number( value );
+			if ( Number.isInteger( newOrder ) && invoke( value, [ 'trim' ] ) !== '' ) {
+				onUpdateOrder( Number( value ) );
+			}
+		};
+		const value = orderInput === null ? order : orderInput;
+		return (
+			<TextControl
+				className="editor-page-attributes__order"
+				type="number"
+				label={ __( 'Order' ) }
+				value={ value }
 				onChange={ setUpdatedOrder }
-				id={ inputId }
 				size={ 6 }
+				onBlur={ () => {
+					setState( {
+						orderInput: null,
+					} );
+				} }
 			/>
-		</Fragment>
-	);
-}
+		);
+	}
+);
 
 function PageAttributesOrderWithChecks( props ) {
 	return (
@@ -58,5 +69,4 @@ export default compose( [
 			} );
 		},
 	} ) ),
-	withInstanceId,
 ] )( PageAttributesOrderWithChecks );

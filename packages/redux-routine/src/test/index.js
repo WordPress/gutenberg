@@ -35,9 +35,9 @@ describe( 'createMiddleware', () => {
 		expect( store.getState() ).toBe( 1 );
 	} );
 
-	it( 'should continue only once control condition resolves', ( done ) => {
+	it( 'should continue only once control condition resolves', async () => {
 		const middleware = createMiddleware( {
-			WAIT: () => new Promise( ( resolve ) => setTimeout( resolve, 0 ) ),
+			WAIT: () => new Promise( ( resolve ) => resolve() ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
@@ -45,23 +45,15 @@ describe( 'createMiddleware', () => {
 			yield { type: 'CHANGE', nextState: 1 };
 		}
 
-		store.dispatch( createAction() );
-		expect( store.getState() ).toBe( null );
-
-		jest.runAllTimers();
-
-		// Promise resolution occurs on next tick.
-		process.nextTick( () => {
-			expect( store.getState() ).toBe( 1 );
-			done();
-		} );
+		await store.dispatch( createAction() );
+		expect( store.getState() ).toBe( 1 );
 	} );
 
-	it( 'should throw if promise rejects', ( done ) => {
+	it( 'should throw if promise rejects', async () => {
 		const middleware = createMiddleware( {
-			WAIT_FAIL: () => new Promise( ( resolve, reject ) => {
-				setTimeout( () => reject( 'Message' ), 0 );
-			} ),
+			WAIT_FAIL: () => new Promise( ( resolve, reject ) =>
+				reject( 'Message' )
+			),
 		} );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
@@ -69,16 +61,13 @@ describe( 'createMiddleware', () => {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
 				expect( error.message ).toBe( 'Message' );
-				done();
 			}
 		}
 
-		store.dispatch( createAction() );
-
-		jest.runAllTimers();
+		await store.dispatch( createAction() );
 	} );
 
-	it( 'should throw if promise throws', ( done ) => {
+	it( 'should throw if promise throws', () => {
 		const middleware = createMiddleware( {
 			WAIT_FAIL: () => new Promise( () => {
 				throw new Error( 'Message' );
@@ -90,13 +79,10 @@ describe( 'createMiddleware', () => {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
 				expect( error.message ).toBe( 'Message' );
-				done();
 			}
 		}
 
-		store.dispatch( createAction() );
-
-		jest.runAllTimers();
+		return store.dispatch( createAction() );
 	} );
 
 	it( 'assigns sync controlled return value into yield assignment', () => {
@@ -114,12 +100,10 @@ describe( 'createMiddleware', () => {
 		expect( store.getState() ).toBe( 2 );
 	} );
 
-	it( 'assigns async controlled return value into yield assignment', ( done ) => {
+	it( 'assigns async controlled return value into yield assignment', async () => {
 		const middleware = createMiddleware( {
 			WAIT: ( action ) => new Promise( ( resolve ) => {
-				setTimeout( () => {
-					resolve( action.value );
-				}, 0 );
+				resolve( action.value );
 			} ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
@@ -128,29 +112,8 @@ describe( 'createMiddleware', () => {
 			return { type: 'CHANGE', nextState };
 		}
 
-		store.dispatch( createAction() );
-		expect( store.getState() ).toBe( null );
+		await store.dispatch( createAction() );
 
-		jest.runAllTimers();
-
-		process.nextTick( () => {
-			expect( store.getState() ).toBe( 2 );
-			done();
-		} );
-	} );
-
-	it( 'kills continuation if control returns undefined', () => {
-		const middleware = createMiddleware( {
-			KILL: () => {},
-		} );
-		const store = createStoreWithMiddleware( middleware );
-		function* createAction() {
-			yield { type: 'KILL' };
-			return { type: 'CHANGE', nextState: 1 };
-		}
-
-		store.dispatch( createAction() );
-
-		expect( store.getState() ).toBe( null );
+		expect( store.getState() ).toBe( 2 );
 	} );
 } );

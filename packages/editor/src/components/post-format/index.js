@@ -7,7 +7,7 @@ import { find, get, includes, union } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, SelectControl } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
@@ -42,15 +42,15 @@ function PostFormat( { onUpdatePostFormat, postFormat = 'standard', supportedFor
 			<div className="editor-post-format">
 				<div className="editor-post-format__content">
 					<label htmlFor={ postFormatSelectorId }>{ __( 'Post Format' ) }</label>
-					<select
+					<SelectControl
 						value={ postFormat }
-						onChange={ ( event ) => onUpdatePostFormat( event.target.value ) }
+						onChange={ ( format ) => onUpdatePostFormat( format ) }
 						id={ postFormatSelectorId }
-					>
-						{ formats.map( ( format ) => (
-							<option key={ format.id } value={ format.id }>{ format.caption }</option>
-						) ) }
-					</select>
+						options={ formats.map( ( format ) => ( {
+							label: format.caption,
+							value: format.id,
+						} ) ) }
+					/>
 				</div>
 
 				{ suggestion && suggestion.id !== postFormat && (

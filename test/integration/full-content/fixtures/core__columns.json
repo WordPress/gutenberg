@@ -18,9 +18,7 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column One, Paragraph One"
-                            ],
+                            "content": "Column One, Paragraph One",
                             "dropCap": false
                         },
                         "innerBlocks": [],
@@ -31,9 +29,7 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column One, Paragraph Two"
-                            ],
+                            "content": "Column One, Paragraph Two",
                             "dropCap": false
                         },
                         "innerBlocks": [],
@@ -53,9 +49,7 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column Two, Paragraph One"
-                            ],
+                            "content": "Column Two, Paragraph One",
                             "dropCap": false
                         },
                         "innerBlocks": [],
@@ -66,9 +60,7 @@
                         "name": "core/paragraph",
                         "isValid": true,
                         "attributes": {
-                            "content": [
-                                "Column Three, Paragraph One"
-                            ],
+                            "content": "Column Three, Paragraph One",
                             "dropCap": false
                         },
                         "innerBlocks": [],

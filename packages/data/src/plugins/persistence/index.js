@@ -36,7 +36,7 @@ const DEFAULT_STORAGE_KEY = 'WP_DATA';
 /**
  * Higher-order reducer to provides an initial value when state is undefined.
  *
- * @param {Functigon} reducer      Original reducer.
+ * @param {Function} reducer      Original reducer.
  * @param {*}         initialState Value to use as initial state.
  *
  * @return {Function} Enhanced reducer.
@@ -144,15 +144,6 @@ export default function( registry, pluginOptions ) {
 
 	return {
 		registerStore( reducerKey, options ) {
-			// REMOVEME: Deprecation: v3.7
-			if ( options.reducer.__deprecatedKeyToPersist ) {
-				options = {
-					...options,
-					persist: [ options.reducer.__deprecatedKeyToPersist ],
-				};
-				delete options.reducer.__deprecatedKeyToPersist;
-			}
-
 			if ( ! options.persist ) {
 				return registry.registerStore( reducerKey, options );
 			}

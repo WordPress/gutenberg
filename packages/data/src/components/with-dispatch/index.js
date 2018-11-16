@@ -7,7 +7,7 @@ import { mapValues } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { pure, compose, remountOnPropChange, createHigherOrderComponent } from '@wordpress/compose';
+import { pure, compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,7 +30,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 	compose( [
 		pure,
 		( WrappedComponent ) => {
-			const ComponentWithDispatch = remountOnPropChange( 'registry' )( class extends Component {
+			class ComponentWithDispatch extends Component {
 				constructor( props ) {
 					super( ...arguments );
 
@@ -48,8 +48,12 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				}
 
 				setProxyProps( props ) {
-					// Assign as instance property so that in reconciling subsequent
-					// renders, the assigned prop values are referentially equal.
+					// Assign as instance property so that in subsequent render
+					// reconciliation, the prop values are referentially equal.
+					// Importantly, note that while `mapDispatchToProps` is
+					// called, it is done only to determine the keys for which
+					// proxy functions should be created. The actual registry
+					// dispatch does not occur until the function is called.
 					const propsToDispatchers = mapDispatchToProps( this.props.registry.dispatch, props.ownProps );
 					this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
 						// Prebind with prop name so we have reference to the original
@@ -66,7 +70,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				render() {
 					return <WrappedComponent { ...this.props.ownProps } { ...this.proxyProps } />;
 				}
-			} );
+			}
 
 			return ( ownProps ) => (
 				<RegistryConsumer>

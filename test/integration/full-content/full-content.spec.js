@@ -3,7 +3,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { uniq, isObject, omit, startsWith, get } from 'lodash';
+import { uniq, startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -15,7 +15,7 @@ import {
 	serialize,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
-import { parse as grammarParse } from '@wordpress/block-serialization-spec-parser';
+import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { registerCoreBlocks } from '@wordpress/block-library';
 
 const fixturesDir = path.join( __dirname, 'fixtures' );
@@ -50,31 +50,6 @@ function writeFixtureFile( filename, content ) {
 	);
 }
 
-function normalizeReactTree( element ) {
-	if ( Array.isArray( element ) ) {
-		return element.map( ( child ) => normalizeReactTree( child ) );
-	}
-
-	// Check if we got an object first, then if it actually has a `type` like a
-	// React component.  Sometimes we get other stuff here, which probably
-	// indicates a bug.
-	if ( isObject( element ) && element.type && element.props ) {
-		const toReturn = {
-			type: element.type,
-		};
-		const attributes = omit( element.props, 'children' );
-		if ( Object.keys( attributes ).length ) {
-			toReturn.attributes = attributes;
-		}
-		if ( element.props.children ) {
-			toReturn.children = normalizeReactTree( element.props.children );
-		}
-		return toReturn;
-	}
-
-	return element;
-}
-
 function normalizeParsedBlocks( blocks ) {
 	return blocks.map( ( block, index ) => {
 		// Clone and remove React-instance-specific stuff; also, attribute
@@ -83,12 +58,6 @@ function normalizeParsedBlocks( blocks ) {
 
 		// Change client IDs to a predictable value
 		block.clientId = '_clientId_' + index;
-
-		// Walk each attribute and get a more concise representation of any
-		// React elements
-		for ( const k in block.attributes ) {
-			block.attributes[ k ] = normalizeReactTree( block.attributes[ k ] );
-		}
 
 		// Recurse to normalize inner blocks
 		block.innerBlocks = normalizeParsedBlocks( block.innerBlocks );
@@ -148,13 +117,15 @@ describe( 'full post content fixture', () => {
 
 			const blocksActual = parse( content );
 
-			// Block validation logs during deprecation migration. Since this
-			// is expected for deprecated blocks, match on filename and allow.
+			// Block validation may log errors during deprecation migration,
+			// unless explicitly handled from a valid block via isEligible.
+			// Match on filename for deprecated blocks fixtures to allow.
 			const isDeprecated = /__deprecated([-_]|$)/.test( f );
 			if ( isDeprecated ) {
-				// eslint-disable-next-line no-console
+				/* eslint-disable no-console */
 				console.warn.mockReset();
-				expect( console ).toHaveErrored();
+				console.error.mockReset();
+				/* eslint-enable no-console */
 			}
 
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
@@ -223,7 +194,8 @@ describe( 'full post content fixture', () => {
 			.map( ( block ) => block.name )
 			// We don't want tests for each oembed provider, which all have the same
 			// `save` functions and attributes.
-			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 )
+			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
+			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 && name !== 'core/template' )
 			.forEach( ( name ) => {
 				const nameToFilename = name.replace( /\//g, '__' );
 				const foundFixtures = fileBasenames

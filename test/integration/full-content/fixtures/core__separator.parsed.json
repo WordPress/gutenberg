@@ -1,12 +1,16 @@
 [
     {
         "blockName": "core/separator",
-        "attrs": null,
+        "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<hr class=\"wp-block-separator\" />\n"
+        "innerHTML": "\n<hr class=\"wp-block-separator\" />\n",
+        "innerContent": [ "\n<hr class=\"wp-block-separator\" />\n" ]
     },
     {
+        "blockName": null,
         "attrs": {},
-        "innerHTML": "\n"
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [ "\n" ]
     }
 ]

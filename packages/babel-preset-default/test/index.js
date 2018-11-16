@@ -16,6 +16,7 @@ describe( 'Babel preset default', () => {
 
 		const output = transform( input, {
 			configFile: false,
+			envName: 'production',
 			presets: [ babelPresetDefault ],
 		} );
 

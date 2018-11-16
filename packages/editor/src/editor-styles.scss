@@ -1,0 +1,34 @@
+body {
+	font-family: $editor-font;
+	font-size: $editor-font-size;
+	line-height: $editor-line-height;
+	color: $dark-gray-900;
+}
+
+p {
+	font-size: $editor-font-size;
+	line-height: $editor-line-height;
+}
+
+ul,
+ol {
+	margin: 0;
+	padding: 0;
+}
+
+ul {
+	list-style-type: disc;
+}
+
+ol {
+	list-style-type: decimal;
+}
+
+ul ul,
+ol ul {
+	list-style-type: circle;
+}
+
+.mce-content-body {
+	line-height: $editor-line-height;
+}

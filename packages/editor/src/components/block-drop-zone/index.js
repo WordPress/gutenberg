@@ -1,22 +1,44 @@
 /**
  * External Dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
 import {
-	rawHandler,
-	cloneBlock,
+	DropZone,
+	withFilters,
+} from '@wordpress/components';
+import {
+	pasteHandler,
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+const parseDropEvent = ( event ) => {
+	let result = {
+		srcRootClientId: null,
+		srcClientId: null,
+		srcIndex: null,
+		type: null,
+	};
+
+	if ( ! event.dataTransfer ) {
+		return result;
+	}
+
+	try {
+		result = Object.assign( result, JSON.parse( event.dataTransfer.getData( 'text' ) ) );
+	} catch ( err ) {
+		return result;
+	}
+
+	return result;
+};
 
 class BlockDropZone extends Component {
 	constructor() {
@@ -48,7 +70,7 @@ class BlockDropZone extends Component {
 	}
 
 	onHTMLDrop( HTML, position ) {
-		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
@@ -56,28 +78,29 @@ class BlockDropZone extends Component {
 	}
 
 	onDrop( event, position ) {
-		if ( ! event.dataTransfer ) {
+		const { rootClientId: dstRootClientId, clientId: dstClientId, index: dstIndex, getClientIdsOfDescendants } = this.props;
+		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
+
+		const isBlockDropType = ( dropType ) => dropType === 'block';
+		const isSameLevel = ( srcRoot, dstRoot ) => {
+			// Note that rootClientId of top-level blocks will be undefined OR a void string,
+			// so we also need to account for that case separately.
+			return ( srcRoot === dstRoot ) || ( ! srcRoot === true && ! dstRoot === true );
+		};
+		const isSameBlock = ( src, dst ) => src === dst;
+		const isSrcBlockAnAncestorOfDstBlock = ( src, dst ) => getClientIdsOfDescendants( [ src ] ).some( ( id ) => id === dst );
+
+		if ( ! isBlockDropType( type ) ||
+			isSameBlock( srcClientId, dstClientId ) ||
+			isSrcBlockAnAncestorOfDstBlock( srcClientId, dstClientId ) ) {
 			return;
 		}
 
-		let clientId, type, rootClientId, fromIndex;
-
-		try {
-			( { clientId, type, rootClientId, fromIndex } = JSON.parse( event.dataTransfer.getData( 'text' ) ) );
-		} catch ( err ) {
-			return;
-		}
-
-		if ( type !== 'block' ) {
-			return;
-		}
-		const { index } = this.props;
 		const positionIndex = this.getInsertIndex( position );
-
-		// If the block is kept at the same level and moved downwards, subtract
-		// to account for blocks shifting upward to occupy its old position.
-		const insertIndex = index && fromIndex < index && rootClientId === this.props.rootClientId ? positionIndex - 1 : positionIndex;
-		this.props.moveBlockToPosition( clientId, rootClientId, insertIndex );
+		// If the block is kept at the same level and moved downwards,
+		// subtract to account for blocks shifting upward to occupy its old position.
+		const insertIndex = dstIndex && srcIndex < dstIndex && isSameLevel( srcRootClientId, dstRootClientId ) ? positionIndex - 1 : positionIndex;
+		this.props.moveBlockToPosition( srcClientId, srcRootClientId, insertIndex );
 	}
 
 	render() {
@@ -109,34 +132,26 @@ export default compose(
 		} = dispatch( 'core/editor' );
 
 		return {
-			insertBlocks( blocks, insertIndex ) {
-				const { rootClientId, layout } = ownProps;
+			insertBlocks( blocks, index ) {
+				const { rootClientId } = ownProps;
 
-				if ( layout ) {
-					// A block's transform function may return a single
-					// transformed block or an array of blocks, so ensure
-					// to first coerce to an array before mapping to inject
-					// the layout attribute.
-					blocks = castArray( blocks ).map( ( block ) => (
-						cloneBlock( block, { layout } )
-					) );
-				}
-
-				insertBlocks( blocks, insertIndex, rootClientId );
+				insertBlocks( blocks, index, rootClientId );
 			},
 			updateBlockAttributes( ...args ) {
 				updateBlockAttributes( ...args );
 			},
-			moveBlockToPosition( clientId, fromRootClientId, index ) {
-				const { rootClientId, layout } = ownProps;
-				moveBlockToPosition( clientId, fromRootClientId, rootClientId, layout, index );
+			moveBlockToPosition( srcClientId, srcRootClientId, dstIndex ) {
+				const { rootClientId: dstRootClientId } = ownProps;
+				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, dstIndex );
 			},
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getTemplateLock } = select( 'core/editor' );
+		const { getClientIdsOfDescendants, getTemplateLock } = select( 'core/editor' );
 		return {
 			isLocked: !! getTemplateLock( rootClientId ),
+			getClientIdsOfDescendants,
 		};
-	} )
+	} ),
+	withFilters( 'editor.BlockDropZone' )
 )( BlockDropZone );

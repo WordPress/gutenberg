@@ -75,7 +75,7 @@ export class PostVisibility extends Component {
 		};
 
 		return [
-			<fieldset key="visibility-selector">
+			<fieldset key="visibility-selector" className="editor-post-visibility__dialog-fieldset">
 				<legend className="editor-post-visibility__dialog-legend">
 					{ __( 'Post Visibility' ) }
 				</legend>

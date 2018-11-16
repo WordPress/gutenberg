@@ -1,5 +1,19 @@
 # Editor
 
+Building blocks for WordPress editors.
+
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/editor --save
+```
+
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
+## How it works
+
 The logic flow concerning the editor includes: inferring a block representation of the post content (parsing); describing the state of a post (representation); rendering of the post to the DOM (rendering); attaching controls to manipulate the content a.k.a blocks (UI).
 
 ![Diagram](https://docs.google.com/drawings/d/1iuownt5etcih7rMMvPvh0Mny8zUA1Z28saxjxaWmfJ0/pub?w=1234&h=453)

@@ -14,6 +14,7 @@ You can also customize the toolbar to include controls specific to your block ty
 {% ES5 %}
 ```js
 var el = wp.element.createElement,
+	Fragment = wp.element.Fragment
 	registerBlockType = wp.blocks.registerBlockType,
 	RichText = wp.editor.RichText,
 	BlockControls = wp.editor.BlockControls,
@@ -28,8 +29,8 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -49,30 +50,34 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			props.setAttributes( { alignment: newAlignment } );
 		}
 
-		return [
+		return (
 			el(
-				BlockControls,
-				{ key: 'controls' },
+				Fragment,
+				null,
 				el(
-					AlignmentToolbar,
+					BlockControls,
+					null,
+					el(
+						AlignmentToolbar,
+						{
+							value: alignment,
+							onChange: onChangeAlignment,
+						}
+					)
+				),
+				el(
+					RichText,
 					{
-						value: alignment,
-						onChange: onChangeAlignment
+						key: 'editable',
+						tagName: 'p',
+						className: props.className,
+						style: { textAlign: alignment },
+						onChange: onChangeContent,
+						value: content,
 					}
 				)
-			),
-			el(
-				RichText,
-				{
-					key: 'editable',
-					tagName: 'p',
-					className: props.className,
-					style: { textAlign: alignment },
-					onChange: onChangeContent,
-					value: content,
-				}
 			)
-		];
+		);
 	},
 
 	save: function( props ) {
@@ -80,6 +85,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 			alignment = props.attributes.alignment;
 
 		return el( RichText.Content, {
+			tagName: 'p',
 			className: props.className,
 			style: { textAlign: alignment },
 			value: content
@@ -90,6 +96,7 @@ registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-04', {
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
+const { Fragment } = wp.element;
 const {
 	RichText,
 	BlockControls,
@@ -105,8 +112,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 
 	attributes: {
 		content: {
-			type: 'array',
-			source: 'children',
+			type: 'string',
+			source: 'html',
 			selector: 'p',
 		},
 		alignment: {
@@ -125,30 +132,31 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-04', {
 			setAttributes( { alignment: newAlignment } );
 		}
 
-		return [
-			<BlockControls key="controls">
-				<AlignmentToolbar
-					value={ alignment }
-					onChange={ onChangeAlignment }
+		return (
+			<Fragment>
+				<BlockControls>
+					<AlignmentToolbar
+						value={ alignment }
+						onChange={ onChangeAlignment }
+					/>
+				</BlockControls>
+				<RichText
+					key="editable"
+					tagName="p"
+					className={ className }
+					style={ { textAlign: alignment } }
+					onChange={ onChangeContent }
+					value={ content }
 				/>
-			</BlockControls>,
-			<RichText
-				key="editable"
-				tagName="p"
-				className={ className }
-				style={ { textAlign: alignment } }
-				onChange={ onChangeContent }
-				value={ content }
-			/>
-		];
+			</Fragment>
+		);
 	},
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const { content, alignment } = attributes;
 
 		return (
 			<RichText.Content
-				className={ className }
 				style={ { textAlign: alignment } }
 				value={ content }
 				tagName="p"

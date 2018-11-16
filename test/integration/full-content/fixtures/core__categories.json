@@ -4,9 +4,9 @@
         "name": "core/categories",
         "isValid": true,
         "attributes": {
-            "showPostCounts": false,
             "displayAsDropdown": false,
-            "showHierarchy": false
+            "showHierarchy": false,
+            "showPostCounts": false
         },
         "innerBlocks": [],
         "originalContent": ""

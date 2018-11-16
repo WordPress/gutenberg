@@ -15,6 +15,7 @@ export function Button( props, ref ) {
 		isPrimary,
 		isLarge,
 		isSmall,
+		isTertiary,
 		isToggled,
 		isBusy,
 		isDefault,
@@ -22,7 +23,6 @@ export function Button( props, ref ) {
 		isDestructive,
 		className,
 		disabled,
-		focus,
 		...additionalProps
 	} = props;
 
@@ -32,6 +32,7 @@ export function Button( props, ref ) {
 		'is-primary': isPrimary,
 		'is-large': isLarge,
 		'is-small': isSmall,
+		'is-tertiary': isTertiary,
 		'is-toggled': isToggled,
 		'is-busy': isBusy,
 		'is-link': isLink,
@@ -45,7 +46,6 @@ export function Button( props, ref ) {
 		...tagProps,
 		...additionalProps,
 		className: classes,
-		autoFocus: focus,
 		ref,
 	} );
 }

@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import 'element-closest';
-
-/**
  * Given a block client ID, returns the corresponding DOM node for the block,
  * if exists. As much as possible, this helper should be avoided, and used only
  * in cases where isolated behaviors need remote access to a block node.
@@ -52,6 +47,21 @@ export function isBlockFocusStop( element ) {
  */
 export function isInSameBlock( a, b ) {
 	return a.closest( '[data-block]' ) === b.closest( '[data-block]' );
+}
+
+/**
+ * Returns true if an elements is considered part of the block and not its children.
+ *
+ * @param {HTMLElement} blockElement Block container element.
+ * @param {HTMLElement} element      Element.
+ *
+ * @return {boolean} Whether element is in the block Element but not its children.
+ */
+export function isInsideRootBlock( blockElement, element ) {
+	const innerBlocksContainer = blockElement.querySelector( '.editor-block-list__layout' );
+	return blockElement.contains( element ) && (
+		! innerBlocksContainer || ! innerBlocksContainer.contains( element )
+	);
 }
 
 /**

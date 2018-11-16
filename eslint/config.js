@@ -18,7 +18,6 @@ module.exports = {
 		},
 	},
 	globals: {
-		wp: true,
 		window: true,
 		document: true,
 	},

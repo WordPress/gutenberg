@@ -1,14 +1,29 @@
 .editor-block-switcher {
 	position: relative;
+	height: $icon-button-size;
+}
+
+.components-icon-button.editor-block-switcher__toggle,
+.components-icon-button.editor-block-switcher__no-switcher-icon {
+	margin: 0;
+	display: block;
+	height: $icon-button-size;
+	padding: 3px;
+}
+
+
+.components-icon-button.editor-block-switcher__no-switcher-icon {
+	width: $icon-button-size + 6px + 6px;
+	.editor-block-icon {
+		margin-right: auto;
+		margin-left: auto;
+	}
 }
 
 // Style this the same as the block buttons in the library.
 // Needs specificiity to override the icon button.
 .components-icon-button.editor-block-switcher__toggle {
 	width: auto;
-	margin: 0;
-	padding: 6px;
-
 	// Unset icon button styles.
 	&:active,
 	&:not(:disabled):not([aria-disabled="true"]):hover,
@@ -19,28 +34,42 @@
 		border: none;
 	}
 
-	.editor-block-icon {
-		background: $light-gray-200;
-		height: $icon-button-size-small;
-		margin: 0;
-		padding: 0 6px;
+	.editor-block-icon,
+	.editor-block-switcher__transform {
+		width: $icon-button-size + 3px + 3px;
+		height: $icon-button-size-small + 6px;
+		position: relative;
+		margin: 0 auto;
+		padding: 3px;
 		display: flex;
 		align-items: center;
-
-		svg {
-			height: 21px;
-			width: 21px;
-		}
+		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
 	}
 
-	// Block hover style.
-	&:not(:disabled):hover .editor-block-icon {
-		@include block-style__hover();
+	// Add a dropdown arrow indicator.
+	.editor-block-icon::after {
+		@include dropdown-arrow();
+	}
+
+	.editor-block-switcher__transform {
+		margin-top: 6px;
+		border-radius: $radius-round-rectangle;
+	}
+
+	// Block hover and focus style.
+	&[aria-expanded="true"] .editor-block-icon,
+	&[aria-expanded="true"] .editor-block-switcher__transform,
+	&:not(:disabled):hover .editor-block-icon,
+	&:not(:disabled):hover .editor-block-switcher__transform,
+	&:not(:disabled):focus .editor-block-icon,
+	&:not(:disabled):focus .editor-block-switcher__transform {
+		transform: translateY(-$icon-button-size);
 	}
 
 	// Block focus style.
-	&:not(:disabled):focus .editor-block-icon {
-		@include block-style__focus-active();
+	&:not(:disabled):focus .editor-block-icon,
+	&:not(:disabled):focus .editor-block-switcher__transform {
+		@include formatting-button-style__focus();
 	}
 }
 

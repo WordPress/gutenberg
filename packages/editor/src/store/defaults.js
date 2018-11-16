@@ -1,76 +1,79 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 export const PREFERENCES_DEFAULTS = {
 	insertUsage: {},
+	isPublishSidebarEnabled: true,
 };
 
 /**
  * The default editor settings
  *
- *  alignWide         boolean        Enable/Disable Wide/Full Alignments
- *  colors            Array          Palette colors
- *  fontSizes         Array          Available font sizes
- *  maxWidth          number         Max width to constraint resizing
- *  blockTypes        boolean|Array  Allowed block types
- *  hasFixedToolbar   boolean        Whether or not the editor toolbar is fixed
+ *  alignWide       boolean        Enable/Disable Wide/Full Alignments
+ *  colors          Array          Palette colors
+ *  fontSizes       Array          Available font sizes
+ *  imageSizes      Array          Available image sizes
+ *  maxWidth        number         Max width to constraint resizing
+ *  blockTypes      boolean|Array  Allowed block types
+ *  hasFixedToolbar boolean        Whether or not the editor toolbar is fixed
+ *  focusMode       boolean        Whether the focus mode is enabled or not
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	alignWide: false,
 	colors: [
 		{
-			name: __( 'pale pink' ),
+			name: __( 'Pale pink' ),
 			slug: 'pale-pink',
 			color: '#f78da7',
 		},
-		{	name: __( 'vivid red' ),
+		{	name: __( 'Vivid red' ),
 			slug: 'vivid-red',
 			color: '#cf2e2e',
 		},
 		{
-			name: __( 'luminous vivid orange' ),
+			name: __( 'Luminous vivid orange' ),
 			slug: 'luminous-vivid-orange',
 			color: '#ff6900',
 		},
 		{
-			name: __( 'luminous vivid amber' ),
+			name: __( 'Luminous vivid amber' ),
 			slug: 'luminous-vivid-amber',
 			color: '#fcb900',
 		},
 		{
-			name: __( 'light green cyan' ),
+			name: __( 'Light green cyan' ),
 			slug: 'light-green-cyan',
 			color: '#7bdcb5',
 		},
 		{
-			name: __( 'vivid green cyan' ),
+			name: __( 'Vivid green cyan' ),
 			slug: 'vivid-green-cyan',
 			color: '#00d084',
 		},
 		{
-			name: __( 'pale cyan blue' ),
+			name: __( 'Pale cyan blue' ),
 			slug: 'pale-cyan-blue',
 			color: '#8ed1fc',
 		},
 		{
-			name: __( 'vivid cyan blue' ),
+			name: __( 'Vivid cyan blue' ),
 			slug: 'vivid-cyan-blue',
 			color: '#0693e3',
 		},
 		{
-			name: __( 'very light gray' ),
+			name: __( 'Very light gray' ),
 			slug: 'very-light-gray',
 			color: '#eeeeee',
 		},
 		{
-			name: __( 'cyan bluish gray' ),
+			name: __( 'Cyan bluish gray' ),
 			slug: 'cyan-bluish-gray',
 			color: '#abb8c3',
 		},
 		{
-			name: __( 'very dark gray' ),
+			name: __( 'Very dark gray' ),
 			slug: 'very-dark-gray',
 			color: '#313131',
 		},
@@ -78,29 +81,37 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	fontSizes: [
 		{
-			name: __( 'small' ),
-			shortName: __( 'S' ),
-			size: 14,
+			name: _x( 'Small', 'font size name' ),
+			size: 13,
 			slug: 'small',
 		},
 		{
-			name: __( 'regular' ),
-			shortName: __( 'M' ),
+			name: _x( 'Normal', 'font size name' ),
 			size: 16,
-			slug: 'regular',
+			slug: 'normal',
 		},
 		{
-			name: __( 'large' ),
-			shortName: __( 'L' ),
+			name: _x( 'Medium', 'font size name' ),
+			size: 20,
+			slug: 'medium',
+		},
+		{
+			name: _x( 'Large', 'font size name' ),
 			size: 36,
 			slug: 'large',
 		},
 		{
-			name: __( 'larger' ),
-			shortName: __( 'XL' ),
+			name: _x( 'Huge', 'font size name' ),
 			size: 48,
-			slug: 'larger',
+			slug: 'huge',
 		},
+	],
+
+	imageSizes: [
+		{ slug: 'thumbnail', label: __( 'Thumbnail' ) },
+		{ slug: 'medium', label: __( 'Medium' ) },
+		{ slug: 'large', label: __( 'Large' ) },
+		{ slug: 'full', label: __( 'Full Size' ) },
 	],
 
 	// This is current max width of the block inner area
@@ -116,3 +127,10 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 };
+
+/**
+ * Default initial edits state.
+ *
+ * @type {Object}
+ */
+export const INITIAL_EDITS_DEFAULTS = {};

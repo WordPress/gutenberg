@@ -11,10 +11,16 @@ const path = require( 'path' );
 const { getPackagePath, hasPackageProp } = require( './package' );
 const { exit, getCliArgs } = require( './process' );
 
-const first = ( list ) => list[ 0 ];
+const getCliArg = ( arg ) => {
+	for ( const cliArg of getCliArgs() ) {
+		const [ name, value ] = cliArg.split( '=' );
+		if ( name === arg ) {
+			return value || null;
+		}
+	}
+};
 
-const hasCliArg = ( arg ) => getCliArgs()
-	.some( ( value ) => first( value.split( '=' ) ) === arg );
+const hasCliArg = ( arg ) => getCliArg( arg ) !== undefined;
 
 const fromProjectRoot = ( fileName ) =>
 	path.join( path.dirname( getPackagePath() ), fileName );
@@ -86,6 +92,7 @@ module.exports = {
 	fromConfigRoot,
 	getCliArgs,
 	hasCliArg,
+	getCliArg,
 	hasProjectFile,
 	hasPackageProp,
 	spawnScript,

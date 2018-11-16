@@ -5,3 +5,16 @@
 	}
 	margin-bottom: 10px;
 }
+
+.editor-page-attributes__order {
+	width: 100%;
+	.components-base-control__field {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	input {
+		width: 66px;
+	}
+}

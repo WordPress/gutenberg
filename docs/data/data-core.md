@@ -1,54 +1,6 @@
 # **core**: WordPress Core Data
 
-## Selectors 
-
-### getTerms
-
-Returns all the available terms for the given taxonomy.
-
-*Parameters*
-
- * state: Data state.
- * taxonomy: Taxonomy name.
-
-### getCategories
-
-Returns all the available categories.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Categories list.
-
-### isRequestingTerms
-
-Returns true if a request is in progress for terms data of a given taxonomy,
-or false otherwise.
-
-*Parameters*
-
- * state: Data state.
- * taxonomy: Taxonomy name.
-
-*Returns*
-
-Whether a request is in progress for taxonomy's terms.
-
-### isRequestingCategories
-
-Returns true if a request is in progress for categories data, or false
-otherwise.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Whether a request is in progress for categories.
+## Selectors
 
 ### isRequestingEmbedPreview
 
@@ -59,10 +11,6 @@ otherwise.
 
  * state: Data state.
  * url: URL the preview would be for.
-
-*Returns*
-
-Whether a request is in progress for an embed preview.
 
 ### getAuthors
 
@@ -75,6 +23,19 @@ Returns all available authors.
 *Returns*
 
 Authors list.
+
+### getUserQueryResults
+
+Returns all the users returned by a query ID.
+
+*Parameters*
+
+ * state: Data state.
+ * queryID: Query ID.
+
+*Returns*
+
+Users list.
 
 ### getEntitiesByKind
 
@@ -175,17 +136,19 @@ get back from the oEmbed preview API.
 
 Is the preview for the URL an oEmbed link fallback.
 
-## Actions
+### hasUploadPermissions
 
-### receiveTerms
-
-Returns an action object used in signalling that terms have been received
-for a given taxonomy.
+Return Upload Permissions.
 
 *Parameters*
 
- * taxonomy: Taxonomy name.
- * terms: Terms received.
+ * state: State tree.
+
+*Returns*
+
+Upload Permissions.
+
+## Actions
 
 ### receiveUserQuery
 
@@ -214,14 +177,15 @@ Returns an action object used in signalling that entity records have been receiv
  * name: Name of the received entity.
  * records: Records received.
  * query: Query Object.
+ * invalidateCache: Should invalidate query caches
 
-### receiveThemeSupportsFromIndex
+### receiveThemeSupports
 
 Returns an action object used in signalling that the index has been received.
 
 *Parameters*
 
- * index: Index received.
+ * themeSupports: Theme support for the current theme.
 
 ### receiveEmbedPreview
 
@@ -232,3 +196,21 @@ a given URl has been received.
 
  * url: URL to preview the embed for.
  * preview: Preview data.
+
+### saveEntityRecord
+
+Action triggered to save an entity record.
+
+*Parameters*
+
+ * kind: Kind of the received entity.
+ * name: Name of the received entity.
+ * record: Record to be saved.
+
+### receiveUploadPermissions
+
+Returns an action object used in signalling that Upload permissions have been received.
+
+*Parameters*
+
+ * hasUploadPermissions: Does the user have permission to upload files?

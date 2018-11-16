@@ -8,7 +8,7 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters, addFilter } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 
 /**
@@ -40,19 +40,6 @@ import { isValidIcon, normalizeIconObject } from './utils';
  * @property {WPComponent}               edit       Component rendering element to be
  *                                                  interacted with in an editor.
  */
-
-/**
- * Constant mapping post formats to the expected default block.
- *
- * @type {Object}
- */
-const POST_FORMAT_BLOCK_MAP = {
-	audio: 'core/audio',
-	gallery: 'core/gallery',
-	image: 'core/image',
-	quote: 'core/quote',
-	video: 'core/video',
-};
 
 let serverSideBlockDefinitions = {};
 
@@ -185,22 +172,41 @@ export function unregisterBlockType( name ) {
 }
 
 /**
- * Assigns name of block handling unknown block types.
+ * Assigns name of block for handling non-block content.
  *
- * @param {string} name Block name.
+ * @param {string} blockName Block name.
  */
-export function setUnknownTypeHandlerName( name ) {
-	dispatch( 'core/blocks' ).setFallbackBlockName( name );
+export function setFreeformContentHandlerName( blockName ) {
+	dispatch( 'core/blocks' ).setFreeformFallbackBlockName( blockName );
 }
 
 /**
- * Retrieves name of block handling unknown block types, or undefined if no
+ * Retrieves name of block handling non-block content, or undefined if no
  * handler has been defined.
  *
  * @return {?string} Blog name.
  */
-export function getUnknownTypeHandlerName() {
-	return select( 'core/blocks' ).getFallbackBlockName();
+export function getFreeformContentHandlerName() {
+	return select( 'core/blocks' ).getFreeformFallbackBlockName();
+}
+
+/**
+ * Assigns name of block handling unregistered block types.
+ *
+ * @param {string} blockName Block name.
+ */
+export function setUnregisteredTypeHandlerName( blockName ) {
+	dispatch( 'core/blocks' ).setUnregisteredFallbackBlockName( blockName );
+}
+
+/**
+ * Retrieves name of block handling unregistered block types, or undefined if no
+ * handler has been defined.
+ *
+ * @return {?string} Blog name.
+ */
+export function getUnregisteredTypeHandlerName() {
+	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
 }
 
 /**
@@ -219,20 +225,6 @@ export function setDefaultBlockName( name ) {
  */
 export function getDefaultBlockName() {
 	return select( 'core/blocks' ).getDefaultBlockName();
-}
-
-/**
- * Retrieves the expected default block for the post format.
- *
- * @param	{string} postFormat Post format
- * @return {string}            Block name.
- */
-export function getDefaultBlockForPostFormat( postFormat ) {
-	const blockName = POST_FORMAT_BLOCK_MAP[ postFormat ];
-	if ( blockName && getBlockType( blockName ) ) {
-		return blockName;
-	}
-	return null;
 }
 
 /**
@@ -262,17 +254,11 @@ export function getBlockTypes() {
  * @param  {string}          feature         Feature to retrieve
  * @param  {*}               defaultSupports Default value to return if not
  *                                           explicitly defined
- * @return {?*}                              Block support value
+ *
+ * @return {?*} Block support value
  */
 export function getBlockSupport( nameOrType, feature, defaultSupports ) {
-	const blockType = 'string' === typeof nameOrType ?
-		getBlockType( nameOrType ) :
-		nameOrType;
-
-	return get( blockType, [
-		'supports',
-		feature,
-	], defaultSupports );
+	return select( 'core/blocks' ).getBlockSupport( nameOrType, feature, defaultSupports );
 }
 
 /**
@@ -286,7 +272,7 @@ export function getBlockSupport( nameOrType, feature, defaultSupports ) {
  * @return {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
-	return !! getBlockSupport( nameOrType, feature, defaultSupports );
+	return select( 'core/blocks' ).hasBlockSupport( nameOrType, feature, defaultSupports );
 }
 
 /**
@@ -325,23 +311,33 @@ export const hasChildBlocks = ( blockName ) => {
 };
 
 /**
+ * Returns a boolean indicating if a block has at least one child block with inserter support.
+ *
+ * @param {string} blockName Block type name.
+ *
+ * @return {boolean} True if a block contains at least one child blocks with inserter support
+ *                   and false otherwise.
+ */
+export const hasChildBlocksWithInserterSupport = ( blockName ) => {
+	return select( 'core/blocks' ).hasChildBlocksWithInserterSupport( blockName );
+};
+
+/**
  * Registers a new block style variation for the given block.
  *
  * @param {string} blockName      Name of block (example: “core/latest-posts”).
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
-	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariation.name }`, ( settings, name ) => {
-		if ( blockName !== name ) {
-			return settings;
-		}
+	dispatch( 'core/blocks' ).addBlockStyles( blockName, styleVariation );
+};
 
-		return {
-			...settings,
-			styles: [
-				...get( settings, [ 'styles' ], [] ),
-				styleVariation,
-			],
-		};
-	} );
+/**
+ * Unregisters a block style variation for the given block.
+ *
+ * @param {string} blockName          Name of block (example: “core/latest-posts”).
+ * @param {string} styleVariationName Name of class applied to the block.
+ */
+export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
+	dispatch( 'core/blocks' ).removeBlockStyles( blockName, styleVariationName );
 };

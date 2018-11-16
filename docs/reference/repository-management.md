@@ -123,6 +123,7 @@ A pull request can generally be merged once it is:
 - In compliance with all relevant code review criteria.
 - Covered by sufficient tests, as necessary.
 - Vetted against all potential edge cases.
+- Changelog entries were properly added.
 - Reviewed by someone other than the original author.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.

@@ -2,7 +2,11 @@
 
 exports[`splitting and merging blocks should delete an empty first line 1`] = `
 "<!-- wp:paragraph -->
-<p></p>
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Still Second</p>
 <!-- /wp:paragraph -->"
 `;
 

@@ -10,7 +10,10 @@ Install the module
 npm install @wordpress/hooks --save
 ```
 
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+
 ### Usage
+
 In your JavaScript project, use hooks as follows:
 ```javascript
 import { createHooks } from '@wordpress/hooks';
@@ -19,15 +22,15 @@ myObject.hooks = createHooks();
 myObject.hooks.addAction(); //etc...
 ```
 
-In the WordPress context, API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
+In the WordPress context, API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc. One notable difference from the PHP API is that `addAction()` and `addFilter()` also need to include a namespace as the second argument.
 
 ### API Usage
 
 * `createHooks()`
-* `addAction( 'hookName', 'functionName', callback, priority )`
-* `addFilter( 'hookName', 'functionName', callback, priority )`
-* `removeAction( 'hookName', 'functionName' )`
-* `removeFilter( 'hookName', 'functionName' )`
+* `addAction( 'hookName', 'namespace', 'functionName', callback, priority )`
+* `addFilter( 'hookName', 'namespace', 'functionName', callback, priority )`
+* `removeAction( 'hookName', 'namespace', 'functionName' )`
+* `removeFilter( 'hookName', 'namespace', 'functionName' )`
 * `removeAllActions( 'hookName' )`
 * `removeAllFilters( 'hookName' )`
 * `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`

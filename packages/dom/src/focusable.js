@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import 'element-closest';
-
-/**
  * References:
  *
  * Focusable:

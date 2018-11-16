@@ -1,1 +1,3 @@
-export default () => <span className="components-spinner" />;
+export default function Spinner() {
+	return <span className="components-spinner" />;
+}

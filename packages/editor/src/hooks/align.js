@@ -2,14 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { assign, includes } from 'lodash';
+import { assign, get, has, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, getBlockSupport, getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -23,6 +23,10 @@ import { BlockControls, BlockAlignmentToolbar } from '../components';
  * @return {Object}          Filtered block settings
  */
 export function addAttribute( settings ) {
+	// allow blocks to specify their own attribute definition with default values if needed.
+	if ( has( settings.attributes, [ 'align', 'type' ] ) ) {
+		return settings;
+	}
 	if ( hasBlockSupport( settings, 'align' ) ) {
 		// Use Lodash's assign to gracefully handle if attributes are undefined
 		settings.attributes = assign( settings.attributes, {
@@ -73,7 +77,16 @@ export const withToolbarControls = createHigherOrderComponent( ( BlockEdit ) => 
 	return ( props ) => {
 		const validAlignments = getBlockValidAlignments( props.name );
 
-		const updateAlignment = ( nextAlign ) => props.setAttributes( { align: nextAlign } );
+		const updateAlignment = ( nextAlign ) => {
+			if ( ! nextAlign ) {
+				const blockType = getBlockType( props.name );
+				const blockDefaultAlign = get( blockType, [ 'attributes', 'align', 'default' ] );
+				if ( blockDefaultAlign ) {
+					nextAlign = '';
+				}
+			}
+			props.setAttributes( { align: nextAlign } );
+		};
 
 		return [
 			validAlignments.length > 0 && props.isSelected && (

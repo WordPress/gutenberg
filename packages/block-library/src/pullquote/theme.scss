@@ -4,9 +4,11 @@
 	color: $dark-gray-600;
 
 	cite,
-	footer {
+	footer,
+	&__citation {
 		color: $dark-gray-600;
 		text-transform: uppercase;
 		font-size: $default-font-size;
+		font-style: normal;
 	}
 }

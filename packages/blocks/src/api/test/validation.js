@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 import {
+	IdentityEntityParser,
 	getTextPiecesSplitOnWhitespace,
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
-	isEqualTextTokensWithCollapsedWhitespace,
+	isEquivalentTextTokens,
 	getNormalizedStyleValue,
 	getStyleProperties,
 	isEqualAttributesOfName,
@@ -13,14 +14,14 @@ import {
 	isEqualTokensOfType,
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
-	isValidBlock,
+	isValidBlockContent,
+	isClosedByToken,
 } from '../validation';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 	getBlockType,
-	setUnknownTypeHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -35,9 +36,18 @@ describe( 'validation', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'IdentityEntityParser', () => {
+		it( 'can be constructed', () => {
+			expect( new IdentityEntityParser() instanceof IdentityEntityParser ).toBe( true );
+		} );
+
+		it( 'returns parse as decoded value', () => {
+			expect( new IdentityEntityParser().parse( 'quot' ) ).toBe( '"' );
 		} );
 	} );
 
@@ -99,9 +109,9 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'isEqualTextTokensWithCollapsedWhitespace()', () => {
+	describe( 'isEquivalentTextTokens()', () => {
 		it( 'should return false if not equal with collapsed whitespace', () => {
-			const isEqual = isEqualTextTokensWithCollapsedWhitespace(
+			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
 				{ chars: 'a \n c \t b  ' },
 			);
@@ -111,7 +121,7 @@ describe( 'validation', () => {
 		} );
 
 		it( 'should return true if equal with collapsed whitespace', () => {
-			const isEqual = isEqualTextTokensWithCollapsedWhitespace(
+			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
 				{ chars: 'a \n b \t c  ' },
 			);
@@ -320,6 +330,53 @@ describe( 'validation', () => {
 		} );
 	} );
 
+	describe( 'isClosedByToken()', () => {
+		it( 'should return true if self-closed token is closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( true );
+		} );
+
+		it( 'should return false if open token is not closed by an end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: false },
+				{ type: 'EndTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token has a different name to the end token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'EndTag', tagName: 'span' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by a start token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				{ type: 'StartTag', tagName: 'div' },
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+
+		it( 'should return false if self-closed token is not closed by an undefined token', () => {
+			const isClosed = isClosedByToken(
+				{ type: 'StartTag', tagName: 'div', selfClosing: true },
+				undefined,
+			);
+
+			expect( isClosed ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEquivalentHTML()', () => {
 		it( 'should return false for effectively inequivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
@@ -333,8 +390,8 @@ describe( 'validation', () => {
 
 		it( 'should return true for effectively equivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
-				'<div>&quot; Hello<span   class="b a" id="foo"> World!</  span>  "</div>',
-				'<div  >" Hello\n<span id="foo" class="a  b">World!</span>"</div>'
+				'<div>&quot; Hello<span   class="b a" id="foo" data-foo="here &mdash; there"> World! &#128517;</  span>  "</div>',
+				'<div  >" Hello\n<span id="foo" class="a  b" data-foo="here — there">World! 😅</span>"</div>'
 			);
 
 			expect( isEquivalent ).toBe( true );
@@ -444,16 +501,77 @@ describe( 'validation', () => {
 
 			expect( isEquivalent ).toBe( true );
 		} );
+
+		it( 'should return true when comparing empty strings', () => {
+			const isEquivalent = isEquivalentHTML(
+				'',
+				'',
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return false if supplied malformed HTML', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></blockquote>',
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</p></blockquote>',
+			);
+
+			expect( console ).toHaveWarned();
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return false if supplied two sets of malformed HTML', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div>fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></div>',
+				'<blockquote>fsdfsdfsd<p>fdsfsdfsdd</p a></blockquote>',
+			);
+
+			expect( console ).toHaveWarned();
+			expect( isEquivalent ).toBe( false );
+		} );
+
+		it( 'should return true when comparing self-closing and normal tags', () => {
+			let isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none" />',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+
+			isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none" />'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should return true when comparing self-closing and normal tags, ignoring trailing space', () => {
+			let isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"/>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+
+			isEquivalent = isEquivalentHTML(
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"></path>',
+				'<path d="M0,0h24v24H0V0z M0,0h24v24H0V0z" fill="none"/>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
 	} );
 
-	describe( 'isValidBlock()', () => {
+	describe( 'isValidBlockContent()', () => {
 		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Apples',
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Apples'
 			);
 
 			expect( console ).toHaveWarned();
@@ -469,10 +587,10 @@ describe( 'validation', () => {
 				},
 			} );
 
-			const isValid = isValidBlock(
-				'Bananas',
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( console ).toHaveErrored();
@@ -482,10 +600,22 @@ describe( 'validation', () => {
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Bananas',
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
+			);
+
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'works also when block type object is passed as object', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const isValid = isValidBlockContent(
 				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( isValid ).toBe( true );
