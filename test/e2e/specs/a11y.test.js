@@ -18,7 +18,7 @@ describe( 'a11y', () => {
 	} );
 
 	it( 'tabs header bar', async () => {
-		await pressWithModifier( 'primary', '~' );
+		await pressWithModifier( 'ctrl', '~' );
 
 		await page.keyboard.press( 'Tab' );
 

@@ -6,7 +6,7 @@ import { capitalize } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { modifiers } from '@wordpress/keycodes';
+import { modifiers, SHIFT, ALT, CTRL } from '@wordpress/keycodes';
 
 /**
  * Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
@@ -17,12 +17,16 @@ import { modifiers } from '@wordpress/keycodes';
  */
 export async function pressWithModifier( modifier, key ) {
 	const isAppleOS = () => process.platform === 'darwin';
-	const mappedModifiers = modifiers[ modifier ]( isAppleOS );
+	const overWrittenModifiers = {
+		...modifiers,
+		shiftAlt: ( _isApple ) => _isApple ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
+	};
+	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS );
+	const ctrlSwap = ( mod ) => mod === CTRL ? 'control' : mod;
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const ctrlMapping = mod === 'ctrl' ? 'control' : mod;
-			const capitalizedMod = capitalize( ctrlMapping );
+			const capitalizedMod = capitalize( ctrlSwap( mod ) );
 			return page.keyboard.down( capitalizedMod );
 		} )
 	);
@@ -31,8 +35,7 @@ export async function pressWithModifier( modifier, key ) {
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {
-			const ctrlMapping = mod === 'ctrl' ? 'control' : mod;
-			const capitalizedMod = capitalize( ctrlMapping );
+			const capitalizedMod = capitalize( ctrlSwap( mod ) );
 			return page.keyboard.up( capitalizedMod );
 		} )
 	);

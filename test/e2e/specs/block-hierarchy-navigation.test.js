@@ -61,10 +61,10 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
-		await pressWithModifier( 'primary', '`' );
-		await pressWithModifier( 'primary', '`' );
-		await pressWithModifier( 'primary', '`' );
-		await pressWithModifier( 'primary', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
 		await pressTimes( 'Tab', 4 );
 
 		// Tweak the columns count by increasing it by one.
