@@ -68,6 +68,9 @@ function the_gutenberg_project() {
  */
 function gutenberg_menu() {
 	global $submenu;
+	if ( ! user_can_richedit() ) {
+		return false;
+	}
 
 	add_menu_page(
 		'Gutenberg',
@@ -139,6 +142,10 @@ function is_gutenberg_page() {
 	}
 
 	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return false;
+	}
+
+	if ( ! user_can_richedit() ) {
 		return false;
 	}
 
@@ -274,6 +281,10 @@ add_action( 'admin_init', 'gutenberg_redirect_demo' );
  * @since 1.5.0
  */
 function gutenberg_add_edit_link_filters() {
+	if ( ! user_can_richedit() ) {
+		return;
+	}
+
 	// For hierarchical post types.
 	add_filter( 'page_row_actions', 'gutenberg_add_edit_link', 10, 2 );
 	// For non-hierarchical post types.
