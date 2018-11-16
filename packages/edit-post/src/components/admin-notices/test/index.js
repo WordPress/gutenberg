@@ -21,6 +21,7 @@ describe( 'AdminNotices', () => {
 					<span class="screen-reader-text">Dismiss this notice.</span>
 				</button>
 			</div>
+			<div class="notice notice-warning">Warning</div>
 		`;
 	} );
 
@@ -29,12 +30,25 @@ describe( 'AdminNotices', () => {
 
 		renderer.create( <AdminNotices createNotice={ createNotice } /> );
 
-		expect( createNotice ).toHaveBeenCalledWith( {
-			status: 'success',
-			content: '',
-			__unstableHTML: '<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
-			isDismissible: true,
-		}, { speak: false } );
+		expect( createNotice ).toHaveBeenCalledTimes( 2 );
+		expect( createNotice.mock.calls[ 0 ] ).toEqual( [
+			{
+				status: 'success',
+				content: '',
+				__unstableHTML: '<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
+				isDismissible: true,
+			},
+			{ speak: false },
+		] );
+		expect( createNotice.mock.calls[ 1 ] ).toEqual( [
+			{
+				status: 'warning',
+				content: '',
+				__unstableHTML: 'Warning',
+				isDismissible: false,
+			},
+			{ speak: false },
+		] );
 		expect( document.body.childElementCount ).toBe( 0 );
 	} );
 } );

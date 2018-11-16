@@ -36,10 +36,20 @@ function getAdminNotices() {
  * @return {Element} Upgraded notice HTML.
  */
 function getNoticeHTMLFromElement( element ) {
-	return [ ...element.childNodes ].filter( ( child ) => (
-		child.nodeType !== window.Node.ELEMENT_NODE ||
-		! child.classList.contains( 'notice-dismiss' )
-	) ).map( ( child ) => child.outerHTML ).join( '' );
+	const fragments = [];
+
+	for ( const child of element.childNodes ) {
+		if ( child.nodeType !== window.Node.ELEMENT_NODE ) {
+			const value = child.nodeValue.trim();
+			if ( value ) {
+				fragments.push( child.nodeValue );
+			}
+		} else if ( ! child.classList.contains( 'notice-dismiss' ) ) {
+			fragments.push( child.outerHTML );
+		}
+	}
+
+	return fragments.join( '' );
 }
 
 /**
