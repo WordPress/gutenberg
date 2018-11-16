@@ -139,7 +139,7 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'wrongType'          => 5,
 			'wrongTypeDefaulted' => 5,
 			/* missingDefaulted */
-			'undefined'          => 'omit',
+			'undefined'          => 'include',
 		);
 
 		$block_type = new WP_Block_Type(
@@ -172,9 +172,20 @@ class Block_Type_Test extends WP_UnitTestCase {
 				'wrongType'          => null,
 				'wrongTypeDefaulted' => 'defaulted',
 				'missingDefaulted'   => 'define',
+				'undefined'          => 'include',
 			),
 			$prepared_attributes
 		);
+	}
+
+	function test_prepare_attributes_none_defined() {
+		$attributes = array( 'exists' => 'keep' );
+
+		$block_type = new WP_Block_Type( 'core/dummy', array() );
+
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $attributes );
+
+		$this->assertEquals( $attributes, $prepared_attributes );
 	}
 
 	function test_has_block_with_mixed_content() {

@@ -120,36 +120,51 @@ class WP_Block_Type {
 
 	/**
 	 * Validates attributes against the current block schema, populating
-	 * defaulted and missing values, and omitting unknown attributes.
+	 * defaulted and missing values.
 	 *
 	 * @param  array $attributes Original block attributes.
 	 * @return array             Prepared block attributes.
 	 */
 	public function prepare_attributes_for_render( $attributes ) {
+		// If there are no attribute definitions for the block type, skip
+		// processing and return vebatim.
 		if ( ! isset( $this->attributes ) ) {
 			return $attributes;
 		}
 
-		$prepared_attributes = array();
+		foreach ( $attributes as $attribute_name => $value ) {
+			// If the attribute is not defined by the block type, it cannot be
+			// validated.
+			if ( ! isset( $this->attributes[ $attribute_name ] ) ) {
+				continue;
+			}
 
-		foreach ( $this->attributes as $attribute_name => $schema ) {
-			$value = null;
+			$schema = $this->attributes[ $attribute_name ];
 
-			if ( isset( $attributes[ $attribute_name ] ) ) {
-				$is_valid = rest_validate_value_from_schema( $attributes[ $attribute_name ], $schema );
-				if ( ! is_wp_error( $is_valid ) ) {
-					$value = rest_sanitize_value_from_schema( $attributes[ $attribute_name ], $schema );
-				}
+			// Validate value by JSON schema.
+			$is_valid = rest_validate_value_from_schema( $value, $schema );
+			if ( is_wp_error( $is_valid ) ) {
+				// Assigning `null` will trigger defaulting, if applicable.
+				$value = null;
 			}
 
 			if ( is_null( $value ) && isset( $schema['default'] ) ) {
 				$value = $schema['default'];
 			}
 
-			$prepared_attributes[ $attribute_name ] = $value;
+			$attributes[ $attribute_name ] = $value;
 		}
 
-		return $prepared_attributes;
+		// Populate values of any missing attributes for which the block type
+		// defines a default.
+		$missing_schema_attributes = array_diff_key( $this->attributes, $attributes );
+		foreach ( $missing_schema_attributes as $attribute_name => $schema ) {
+			if ( isset( $schema['default'] ) ) {
+				$attributes[ $attribute_name ] = $schema['default'];
+			}
+		}
+
+		return $attributes;
 	}
 
 	/**
