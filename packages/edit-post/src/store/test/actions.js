@@ -4,6 +4,7 @@
 import {
 	toggleEditorPanelEnabled,
 	toggleEditorPanelOpened,
+	removeEditorPanel,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 	openPublishSidebar,
@@ -55,6 +56,15 @@ describe( 'actions', () => {
 		it( 'should return an TOGGLE_PUBLISH_SIDEBAR action', () => {
 			expect( togglePublishSidebar() ).toEqual( {
 				type: 'TOGGLE_PUBLISH_SIDEBAR',
+			} );
+		} );
+	} );
+
+	describe( 'removeEditorPanel', () => {
+		it( 'should return a REMOVE_PANEL action', () => {
+			expect( removeEditorPanel( 'post-status' ) ).toEqual( {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
 			} );
 		} );
 	} );

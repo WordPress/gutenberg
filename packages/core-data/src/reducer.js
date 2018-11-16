@@ -217,6 +217,23 @@ export function embedPreviews( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing Upload permissions.
+ *
+ * @param  {Object}  state  Current state.
+ * @param  {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function hasUploadPermissions( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_UPLOAD_PERMISSIONS':
+			return action.hasUploadPermissions;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -224,4 +241,5 @@ export default combineReducers( {
 	themeSupports,
 	entities,
 	embedPreviews,
+	hasUploadPermissions,
 } );

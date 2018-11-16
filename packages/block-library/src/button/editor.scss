@@ -53,8 +53,8 @@ $blocks-button__line-height: $big-font-size + 6px;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 
-	// the width of input box plus two icon buttons plus a padding
-	$blocks-button__link-input-width: 300px + 2 * $icon-button-size + 8px;
+	// the width of input box plus padding plus two icon buttons.
+	$blocks-button__link-input-width: 300px + 2px + 2 * $icon-button-size;
 	width: $blocks-button__link-input-width;
 
 	.editor-url-input {

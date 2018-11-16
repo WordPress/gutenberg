@@ -1,13 +1,20 @@
 /**
  * External dependencies
  */
-import { tokenize } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
+import Tokenizer from 'simple-html-tokenizer/dist/es6/tokenizer';
+import {
+	identity,
+	xor,
+	fromPairs,
+	isEqual,
+	includes,
+	stubTrue,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -135,6 +142,40 @@ const MEANINGFUL_ATTRIBUTES = [
 ];
 
 /**
+ * Array of functions which receive a text string on which to apply normalizing
+ * behavior for consideration in text token equivalence, carefully ordered from
+ * least-to-most expensive operations.
+ *
+ * @type {Array}
+ */
+const TEXT_NORMALIZATIONS = [
+	identity,
+	getTextWithCollapsedWhitespace,
+];
+
+/**
+ * Subsitute EntityParser class for `simple-html-tokenizer` which bypasses
+ * entity substitution in favor of validator's internal normalization.
+ *
+ * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
+ */
+export class IdentityEntityParser {
+	/**
+	 * Returns a substitute string for an entity string sequence between `&`
+	 * and `;`, or undefined if no substitution should occur.
+	 *
+	 * In this implementation, undefined is always returned.
+	 *
+	 * @param {string} entity Entity fragment discovered in HTML.
+	 *
+	 * @return {?string} Entity substitute value.
+	 */
+	parse( entity ) {
+		return decodeEntities( '&' + entity + ';' );
+	}
+}
+
+/**
  * Object of logger functions.
  */
 const log = ( () => {
@@ -186,6 +227,10 @@ export function getTextPiecesSplitOnWhitespace( text ) {
  * @return {string} Trimmed text with consecutive whitespace collapsed.
  */
 export function getTextWithCollapsedWhitespace( text ) {
+	// This is an overly simplified whitespace comparison. The specification is
+	// more prescriptive of whitespace behavior in inline and block contexts.
+	//
+	// See: https://medium.com/@patrickbrosset/when-does-white-space-matter-in-html-b90e8a7cdd33
 	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
 }
 
@@ -220,18 +265,28 @@ export function getMeaningfulAttributePairs( token ) {
  *
  * @return {boolean} Whether two text tokens are equivalent.
  */
-export function isEqualTextTokensWithCollapsedWhitespace( actual, expected ) {
-	// This is an overly simplified whitespace comparison. The specification is
-	// more prescriptive of whitespace behavior in inline and block contexts.
-	//
-	// See: https://medium.com/@patrickbrosset/when-does-white-space-matter-in-html-b90e8a7cdd33
-	const isEquivalentText = isEqual( ...[ actual.chars, expected.chars ].map( getTextWithCollapsedWhitespace ) );
+export function isEquivalentTextTokens( actual, expected ) {
+	// This function is intentionally written as syntactically "ugly" as a hot
+	// path optimization. Text is progressively normalized in order from least-
+	// to-most operationally expensive, until the earliest point at which text
+	// can be confidently inferred as being equal.
+	let actualChars = actual.chars;
+	let expectedChars = expected.chars;
 
-	if ( ! isEquivalentText ) {
-		log.warning( 'Expected text `%s`, saw `%s`.', expected.chars, actual.chars );
+	for ( let i = 0; i < TEXT_NORMALIZATIONS.length; i++ ) {
+		const normalize = TEXT_NORMALIZATIONS[ i ];
+
+		actualChars = normalize( actualChars );
+		expectedChars = normalize( expectedChars );
+
+		if ( actualChars === expectedChars ) {
+			return true;
+		}
 	}
 
-	return isEquivalentText;
+	log.warning( 'Expected text `%s`, saw `%s`.', expected.chars, actual.chars );
+
+	return false;
 }
 
 /**
@@ -359,8 +414,8 @@ export const isEqualTokensOfType = {
 			...[ actual, expected ].map( getMeaningfulAttributePairs )
 		);
 	},
-	Chars: isEqualTextTokensWithCollapsedWhitespace,
-	Comment: isEqualTextTokensWithCollapsedWhitespace,
+	Chars: isEquivalentTextTokens,
+	Comment: isEquivalentTextTokens,
 };
 
 /**
@@ -396,7 +451,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  */
 function getHTMLTokens( html ) {
 	try {
-		return tokenize( html );
+		return new Tokenizer( new IdentityEntityParser() ).tokenize( html );
 	} catch ( e ) {
 		log.warning( 'Malformed HTML detected: %s', html );
 	}
@@ -489,17 +544,6 @@ export function isEquivalentHTML( actual, expected ) {
 	}
 
 	return true;
-}
-
-export function isValidBlock( innerHTML, blockType, attributes ) {
-	deprecated( 'isValidBlock', {
-		plugin: 'Gutenberg',
-		version: '4.4',
-		alternative: 'isValidBlockContent',
-		hint: 'The order of params has changed.',
-	} );
-
-	return isValidBlockContent( blockType, attributes, innerHTML );
 }
 
 /**
