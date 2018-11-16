@@ -4,15 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { applyFormat, removeFormat } from '@wordpress/rich-text';
 
-/**
- * Internal dependencies
- */
-import { __experimentalRemoveAnnotation, __experimentalUpdateAnnotationRange } from '../store/actions';
-import store from '../store';
-
 const FORMAT_NAME = 'core/annotation';
 
 const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
+const STORE_KEY = 'core/annotations';
 
 /**
  * Applies given annotations to the given record.
@@ -97,24 +92,25 @@ function retrieveAnnotationPositions( formats ) {
 /**
  * Updates annotations in the state based on positions retrieved from RichText.
  *
- * @param {Array} annotations The annotations that are currently applied.
- * @param {Array} positions The current positions of the given annotations.
+ * @param {Array}    annotations           The annotations that are currently applied.
+ * @param {Array}    positions             The current positions of the given annotations.
+ * @param {Function} removeAnnotation      Function to remove an annotation from the state.
+ * @param {Function} updateAnnotationRange Function to update an annotation range in the state.
  */
-function updateAnnotationsWithPositions( annotations, positions ) {
+function updateAnnotationsWithPositions( annotations, positions, { removeAnnotation, updateAnnotationRange } ) {
 	annotations.forEach( ( currentAnnotation ) => {
 		const position = positions[ currentAnnotation.id ];
 		// If we cannot find an annotation, delete it.
 		if ( ! position ) {
 			// Apparently the annotation has been removed, so remove it from the state:
 			// Remove...
-			store.dispatch( __experimentalRemoveAnnotation( currentAnnotation.id ) );
+			removeAnnotation( currentAnnotation.id );
+			return;
 		}
 
 		const { start, end } = currentAnnotation;
 		if ( start !== position.start || end !== position.end ) {
-			// Moving annotation...
-
-			store.dispatch( __experimentalUpdateAnnotationRange( currentAnnotation.id, position.start, position.end ) );
+			updateAnnotationRange( currentAnnotation.id, position.start, position.end );
 		}
 	} );
 }
@@ -132,25 +128,33 @@ export const annotation = {
 		return null;
 	},
 	__experimentalGetPropsForEditableTreePreparation( select, { richTextIdentifier, blockClientId } ) {
-		return select( 'core/annotations' ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier );
-	},
-	__experimentalCreateFormatToValue( annotations ) {
-		return ( value ) => {
-			if ( annotations.length === 0 ) {
-				return value;
-			}
-
-			value = applyAnnotations( value, annotations );
-
-			return value;
+		return {
+			annotations: select( STORE_KEY ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier ),
 		};
 	},
-	__experimentalCreateValueToFormat( annotations ) {
-		return ( value ) => {
-			const positions = retrieveAnnotationPositions( value.formats );
-			updateAnnotationsWithPositions( annotations, positions );
+	__experimentalCreatePrepareEditableTree( { annotations } ) {
+		return ( formats, text ) => {
+			if ( annotations.length === 0 ) {
+				return formats;
+			}
 
-			return removeAnnotations( value );
+			let record = { formats, text };
+			record = applyAnnotations( record, annotations );
+			return record.formats;
+		};
+	},
+	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
+		return {
+			removeAnnotation: dispatch( STORE_KEY ).__experimentalRemoveAnnotation,
+			updateAnnotationRange: dispatch( STORE_KEY ).__experimentalUpdateAnnotationRange,
+		};
+	},
+	__experimentalCreateOnChangeEditableValue( props ) {
+		return ( formats ) => {
+			const positions = retrieveAnnotationPositions( formats );
+			const { removeAnnotation, updateAnnotationRange, annotations } = props;
+
+			updateAnnotationsWithPositions( annotations, positions, { removeAnnotation, updateAnnotationRange } );
 		};
 	},
 };

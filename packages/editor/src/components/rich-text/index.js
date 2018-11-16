@@ -39,6 +39,7 @@ import {
 	getSelectionStart,
 	getSelectionEnd,
 	remove,
+	removeFormat,
 	isCollapsed,
 	LINE_SEPARATOR,
 	charAt,
@@ -109,7 +110,7 @@ export class RichText extends Component {
 		this.setRef = this.setRef.bind( this );
 		this.isActive = this.isActive.bind( this );
 
-		this.formatToValueMemoized = memize( this.formatToValueMemoized.bind( this ), { size: 1 } );
+		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
 		this.savedContent = value;
 		this.patterns = getPatterns( {
@@ -410,6 +411,18 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Calls all registered onChangeEditableValue handlers.
+	 *
+	 * @param {Array}  formats The formats of the latest rich-text value.
+	 * @param {string} text    The text of the latest rich-text value.
+	 */
+	onChangeEditableValue( { formats, text } ) {
+		get( this.props, [ 'onChangeEditableValue' ], [] ).forEach( ( eventHandler ) => {
+			eventHandler( formats, text );
+		} );
+	}
+
+	/**
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
 	 *
@@ -422,6 +435,8 @@ export class RichText extends Component {
 		this.applyRecord( record );
 
 		const { start, end } = record;
+
+		this.onChangeEditableValue( record );
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
@@ -707,36 +722,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Filters the format to value with the filterFormatToValue prop.
-	 *
-	 * This allows the formatToValue function to be filtered from the outside.
-	 * The filter runs after the value is converted from the outside data format.
-	 *
-	 * @param {Object} value The internal rich-text value.
-	 * @param {Object} formatProps The props that have been defined by formats.
-	 * @return {Object} A new rich-text value.
-	 */
-	filterFormatToValue( value, formatProps ) {
-		const { identifier: richTextIdentifier, clientId: blockClientId } = this.props;
-
-		return get( this.props, [ 'filterFormatToValue' ], [] ).reduce( ( accumulator, filterFunction ) => {
-			return filterFunction( accumulator, formatProps, { richTextIdentifier, blockClientId } );
-		}, value );
-	}
-
-	/**
-	 * @see this.formatToValueMemoized.
-	 *
-	 * @param {*} value The outside value, data type depends on props.
-	 * @return {Object} An internal rich-text value.
-	 */
-	formatToValue( value ) {
-		const formatProps = this.getFormatProps();
-
-		return this.formatToValueMemoized( value, formatProps );
-	}
-
-	/**
 	 * Get props that are provided by formats to modify RichText.
 	 *
 	 * @return {Object} Props that start with 'format_'.
@@ -749,15 +734,12 @@ export class RichText extends Component {
 	 * Converts the outside data structure to our internal representation.
 	 *
 	 * @param {*} value The outside value, data type depends on props.
-	 * @param {Object} formatProps The props that have been defined by formats.
 	 * @return {Object} An internal rich-text value.
 	 */
-	formatToValueMemoized( value, formatProps ) {
-		let record = value;
-
+	formatToValue( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
-			record = create( {
+			return create( {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -765,7 +747,7 @@ export class RichText extends Component {
 		}
 
 		if ( this.props.format === 'string' ) {
-			record = create( {
+			return create( {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
@@ -775,10 +757,10 @@ export class RichText extends Component {
 		// Guard for blocks passing `null` in onSplit callbacks. May be removed
 		// if onSplit is revised to not pass a `null` value.
 		if ( value === null ) {
-			record = create();
+			return create();
 		}
 
-		return this.filterFormatToValue( record, formatProps );
+		return value;
 	}
 
 	valueToEditableHTML( value ) {
@@ -796,21 +778,23 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Filters the value to format with the filterValueToFormat prop.
+	 * Removes editor only formats from the value.
 	 *
-	 * This allows the valueToFormat function to be filtered from the outside.
-	 * The filter runs before the value is converted to the outside data format.
+	 * Editor only formats are applied using `prepareEditableTree`, so we need to
+	 * remove them before converting the internal state
 	 *
 	 * @param {Object} value The internal rich-text value.
 	 * @return {Object} A new rich-text value.
 	 */
-	filterValueToFormat( value ) {
-		const formatProps = this.getFormatProps();
-		const { identifier: richTextIdentifier, clientId: blockClientId } = this.props;
+	removeEditorOnlyFormats( value ) {
+		this.props.formatTypes.forEach( ( formatType ) => {
+			// Remove formats created by prepareEditableTree, because they are editor only.
+			if ( formatType.__experimentalCreatePrepareEditableTree ) {
+				value = removeFormat( value, formatType.name, 0, value.text.length );
+			}
+		} );
 
-		return get( this.props, [ 'filterValueToFormat' ], [] ).reduce( ( accumulator, filterFunction ) => {
-			return filterFunction( accumulator, formatProps, { richTextIdentifier, blockClientId } );
-		}, value );
+		return value;
 	}
 
 	/**
@@ -820,7 +804,7 @@ export class RichText extends Component {
 	 * @return {*} The external data format, data type depends on props.
 	 */
 	valueToFormat( value ) {
-		value = this.filterValueToFormat( value );
+		value = this.removeEditorOnlyFormats( value );
 
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
@@ -970,10 +954,12 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
+		const { getFormatTypes } = select( 'core/rich-text' );
 
 		return {
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
+			formatTypes: getFormatTypes(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import { mapKeys } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { select, dispatch, withSelect } from '@wordpress/data';
+import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
+import { compose } from '@wordpress/compose';
 
 /**
  * Registers a new format provided a unique name and an object defining its
@@ -136,20 +142,25 @@ export function registerFormatType( name, settings ) {
 						];
 					}
 
-					if ( settings.__experimentalCreateFormatToValue ) {
-						additionalProps.filterFormatToValue = [
-							...( props.formatToValue || [] ),
-							settings.__experimentalCreateFormatToValue( props[ `format_${ name }` ], {
-								richTextIdentifier: props.identifier,
-								blockClientId: props.clientId,
-							} ),
-						];
-					}
+					if ( settings.__experimentalCreateOnChangeEditableValue ) {
+						const dispatchProps = Object.keys( props ).reduce( ( accumulator, propKey ) => {
+							const propValue = props[ propKey ];
+							const keyPrefix = `format_${ name }_dispatch_`;
+							if ( propKey.startsWith( keyPrefix ) ) {
+								const realKey = propKey.replace( keyPrefix, '' );
 
-					if ( settings.__experimentalCreateValueToFormat ) {
-						additionalProps.filterValueToFormat = [
-							...( props.valueToFormat || [] ),
-							settings.__experimentalCreateValueToFormat( props[ `format_${ name }` ], {
+								accumulator[ realKey ] = propValue;
+							}
+
+							return accumulator;
+						}, {} );
+
+						additionalProps.onChangeEditableValue = [
+							...( props.onChangeEditableValue || [] ),
+							settings.__experimentalCreateOnChangeEditableValue( {
+								...props[ `format_${ name }` ],
+								...dispatchProps,
+							}, {
 								richTextIdentifier: props.identifier,
 								blockClientId: props.clientId,
 							} ),
@@ -163,15 +174,35 @@ export function registerFormatType( name, settings ) {
 				};
 			}
 
-			return withSelect( ( sel, { clientId, identifier } ) => ( {
-				[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
-					sel,
-					{
-						richTextIdentifier: identifier,
-						blockClientId: clientId,
-					}
-				),
-			} ) )( Component );
+			const hocs = [
+				withSelect( ( sel, { clientId, identifier } ) => ( {
+					[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
+						sel,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					),
+				} ) ),
+			];
+
+			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
+				hocs.push( withDispatch( ( disp, { clientId, identifier } ) => {
+					const dispatchProps = settings.__experimentalGetPropsForEditableTreeChangeHandler(
+						disp,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					);
+
+					return mapKeys( dispatchProps, ( value, key ) => {
+						return `format_${ name }_dispatch_${ key }`;
+					} );
+				} ) );
+			}
+
+			return compose( hocs )( Component );
 		} );
 	}
 
