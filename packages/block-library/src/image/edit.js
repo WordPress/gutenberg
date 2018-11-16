@@ -759,9 +759,9 @@ class ImageEdit extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth={ maxWidthBuffer }
+										maxWidth={ imageWidth || maxWidthBuffer }
 										minHeight={ minHeight }
-										maxHeight={ maxWidthBuffer / ratio }
+										maxHeight={ imageHeight || ( maxWidthBuffer / ratio ) }
 										lockAspectRatio
 										enable={ {
 											top: false,
@@ -775,8 +775,7 @@ class ImageEdit extends Component {
 										onResizeStop={ ( event, direction, elt, delta ) => {
 											let newWidth = parseInt( constrainedWidth + delta.width, 10 );
 
-											// Snap-to-border for the last pixel when resizing by dragging.
-											// That highlights the 100% width button.
+											// Snap-to-border for the last pixel when resizing by dragging. Takes care of rounding of the last pixel.
 											if ( Math.abs( constrainedWidth - newWidth ) < 2 ) {
 												newWidth = constrainedWidth;
 											}
@@ -786,7 +785,13 @@ class ImageEdit extends Component {
 												newWidth = imageWidth;
 											}
 
-											this.updateWidth( newWidth, imageWidth, imageHeight );
+											if ( newWidth >= blockWidth ) {
+												// The image was resized to greater than the block width. Reset the width and height (that will also highlight the 100% width button).
+												this.resetWidthHeight();
+											} else {
+												this.updateWidth( newWidth, imageWidth, imageHeight );
+											}
+
 											toggleSelection( true );
 										} }
 									>
