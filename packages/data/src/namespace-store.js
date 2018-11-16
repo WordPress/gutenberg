@@ -9,6 +9,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import createMiddleware from '@wordpress/redux-routine';
+
+/**
  * Internal dependencies
  */
 import promise from './promise-middleware';
@@ -39,6 +44,12 @@ export default function createNamespace( key, options, registry ) {
 		const result = mapResolvers( options.resolvers, selectors, fulfillment, store );
 		resolvers = result.resolvers;
 		selectors = result.selectors;
+	}
+	if ( options.controls ) {
+		const middleware = createMiddleware( options.controls );
+		const enhancer = applyMiddleware( middleware );
+
+		Object.assign( store, enhancer( () => store )( reducer ) );
 	}
 
 	const getSelectors = () => selectors;

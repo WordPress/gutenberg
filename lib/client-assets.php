@@ -208,8 +208,7 @@ function gutenberg_register_scripts_and_styles() {
 				'	var userId = ' . get_current_user_ID() . ';',
 				'	var storageKey = "WP_DATA_USER_" + userId;',
 				'	wp.data',
-				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } )',
-				'		.use( wp.data.plugins.controls );',
+				'		.use( wp.data.plugins.persistence, { storageKey: storageKey } );',
 				'} )()',
 			)
 		)
