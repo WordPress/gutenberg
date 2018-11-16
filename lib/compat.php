@@ -461,7 +461,7 @@ function gutenberg_render_block_core_image( $html, $block ) {
 	$image_src = '';
 	$srcset = '';
 	$sizes = '';
-//Q( $image_dimensions );
+
 	if ( empty( $image_dimensions ) ) {
 		// We don't have enough data to construct new img tag. Fall back to the existing HTML.
 		return $html;

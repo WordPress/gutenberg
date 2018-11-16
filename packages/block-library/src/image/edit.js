@@ -318,46 +318,53 @@ class ImageEdit extends Component {
 		} );
 	}
 
-	updateWidth( width, imageWidth, imageHeight, userSet ) {
+	updateWidth( width, fileWidth, fileHeight, userSet ) {
 		width = parseInt( width, 10 );
 
 		// Reset the image size when the user deletes the value.
-		if ( ! width || ! imageWidth || ! imageHeight ) {
+		if ( ! width || ! fileWidth || ! fileHeight ) {
 			this.resetWidthHeight();
 			return;
 		}
 
-		const height = round( imageHeight * ( width / imageWidth ) );
-		this.setWidthHeight( width, height, imageWidth, imageHeight, userSet );
+		const height = round( fileHeight * ( width / fileWidth ) );
+		this.setWidthHeight( width, height, fileWidth, fileHeight, userSet );
 	}
 
-	updateHeight( height, imageWidth, imageHeight, userSet ) {
+	updateHeight( height, fileWidth, fileHeight, userSet ) {
 		height = parseInt( height, 10 );
 
 		// Reset the image size when the user deletes the value.
-		if ( ! height || ! imageWidth || ! imageHeight ) {
+		if ( ! height || ! fileWidth || ! fileHeight ) {
 			this.resetWidthHeight();
 			return;
 		}
 
-		const width = round( imageWidth * ( height / imageHeight ) );
-		this.setWidthHeight( width, height, imageWidth, imageHeight, userSet );
+		const width = round( fileWidth * ( height / fileHeight ) );
+		this.setWidthHeight( width, height, fileWidth, fileHeight, userSet );
 	}
 
-	setWidthHeight( width, height, imageWidth, imageHeight, userSet ) {
+	setWidthHeight( width, height, fileWidth, fileHeight, userSet ) {
 		// Set image size and also whether set directly by the user.
 		userSet = userSet || undefined;
 
 		this.props.setAttributes( {
 			width,
 			height,
-			imageWidth,
-			imageHeight,
+			fileWidth,
+			fileHeight,
 			userSet,
 		} );
 	}
 
-	resetWidthHeight() {
+	resetWidthHeight( fileWidth, fileHeight ) {
+		if ( fileWidth && fileHeight ) {
+			this.props.setAttributes( {
+				fileWidth,
+				fileHeight,
+			} );
+		}
+
 		this.props.setAttributes( {
 			width: undefined,
 			height: undefined,
@@ -609,7 +616,7 @@ class ImageEdit extends Component {
 								</ButtonGroup>
 								<Button
 									isSmall
-									onClick={ this.resetWidthHeight }
+									onClick={ () => this.resetWidthHeight( imageWidth, imageHeight ) }
 								>
 									{ __( 'Reset' ) }
 								</Button>
@@ -786,8 +793,8 @@ class ImageEdit extends Component {
 											}
 
 											if ( newWidth >= blockWidth ) {
-												// The image was resized to greater than the block width. Reset the width and height (that will also highlight the 100% width button).
-												this.resetWidthHeight();
+												// The image was resized to greater than the block width. Reset to 100% width and height (that will also highlight the 100% width button).
+												this.resetWidthHeight( imageWidth, imageHeight );
 											} else {
 												this.updateWidth( newWidth, imageWidth, imageHeight );
 											}
