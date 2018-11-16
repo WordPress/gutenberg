@@ -14,11 +14,7 @@ import memize from 'memize';
  * WordPress dependencies
  */
 import { Component, Fragment, RawHTML } from '@wordpress/element';
-import {
-	isHorizontalEdge,
-	getRectangleFromRange,
-	getScrollContainer,
-} from '@wordpress/dom';
+import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -94,10 +90,8 @@ export class RichText extends Component {
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onChange = this.onChange.bind( this );
-		this.onNodeChange = this.onNodeChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
 		this.onPaste = this.onPaste.bind( this );
 		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
 		this.setFocusedElement = this.setFocusedElement.bind( this );
@@ -156,7 +150,6 @@ export class RichText extends Component {
 	 */
 	onSetup( editor ) {
 		this.editor = editor;
-		editor.on( 'nodechange', this.onNodeChange );
 	}
 
 	setFocusedElement() {
@@ -594,48 +587,6 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles a keyup event.
-	 *
-	 * @param {number} $1.keyCode The key code that has been pressed on the
-	 *                            keyboard.
-	 */
-	onKeyUp( { keyCode } ) {
-		// `scrollToRect` is called on `nodechange`, whereas calling it on
-		// `keyup` *when* moving to a new RichText element results in incorrect
-		// scrolling. Though the following allows false positives, it results
-		// in much smoother scrolling.
-		if ( this.props.isViewportSmall && keyCode !== BACKSPACE && keyCode !== ENTER ) {
-			this.scrollToRect( getRectangleFromRange( this.editor.selection.getRng() ) );
-		}
-	}
-
-	scrollToRect( rect ) {
-		const { top: caretTop } = rect;
-		const container = getScrollContainer( this.editableRef );
-
-		if ( ! container ) {
-			return;
-		}
-
-		// When scrolling, avoid positioning the caret at the very top of
-		// the viewport, providing some "air" and some textual context for
-		// the user, and avoiding toolbars.
-		const graceOffset = 100;
-
-		// Avoid pointless scrolling by establishing a threshold under
-		// which scrolling should be skipped;
-		const epsilon = 10;
-		const delta = caretTop - graceOffset;
-
-		if ( Math.abs( delta ) > epsilon ) {
-			container.scrollTo(
-				container.scrollLeft,
-				container.scrollTop + delta,
-			);
-		}
-	}
-
-	/**
 	 * Splits the content at the location of the selection.
 	 *
 	 * Replaces the content of the editor inside this element with the contents
@@ -681,29 +632,6 @@ export class RichText extends Component {
 		}
 
 		this.onSplit( before, after, ...blocks );
-	}
-
-	onNodeChange( { parents } ) {
-		if ( ! this.isActive() ) {
-			return;
-		}
-
-		if ( this.props.isViewportSmall ) {
-			let rect;
-			const selectedAnchor = find( parents, ( node ) => node.tagName === 'A' );
-			if ( selectedAnchor ) {
-				// If we selected a link, position the Link UI below the link
-				rect = selectedAnchor.getBoundingClientRect();
-			} else {
-				// Otherwise, position the Link UI below the cursor or text selection
-				rect = getRectangleFromRange( this.editor.selection.getRng() );
-			}
-
-			// Originally called on `focusin`, that hook turned out to be
-			// premature. On `nodechange` we can work with the finalized TinyMCE
-			// instance and scroll to proper position.
-			this.scrollToRect( rect );
-		}
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -901,7 +829,6 @@ export class RichText extends Component {
 								onInput={ this.onInput }
 								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
-								onKeyUp={ this.onKeyUp }
 								onFocus={ this.onFocus }
 								multilineTag={ this.multilineTag }
 								multilineWrapperTags={ this.multilineWrapperTags }
