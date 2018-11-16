@@ -3,7 +3,7 @@
  */
 import validateNamespace from './validateNamespace.js';
 import validateHookName from './validateHookName.js';
-import { doAction } from './';
+import { doAction, applyFilters } from './';
 
 /**
  * Returns a function which, when invoked, will add a hook.
@@ -41,6 +41,24 @@ function createAddHook( hooks ) {
 			// eslint-disable-next-line no-console
 			console.error( 'If specified, the hook priority must be a number.' );
 			return;
+		}
+
+		// Check for the special 'all' hook.
+		if ( 'all' === hookName ) {
+			// Shim doAction and applyFilters to trigger the all listener for every hook.
+			if ( ! hooks.__allShimmed ) {
+				const originalDoAction = doAction;
+				const originalApplyFilters = applyFilters;
+				doAction = ( innerHookName, ...args ) => {
+					originalDoAction( innerHookName, ...args );
+					originalDoAction( 'all', ...args );
+				};
+				applyFilters = ( innerHookName, ...args ) => {
+					originalApplyFilters( innerHookName, ...args );
+					originalApplyFilters( 'all', ...args );
+				};
+				hooks.__allShimmed = true;
+			}
 		}
 
 		const handler = { callback, priority, namespace };
