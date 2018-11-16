@@ -388,7 +388,7 @@ describe( 'Links', () => {
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( META_KEY, 'K' );
+		await pressWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -459,7 +459,7 @@ describe( 'Links', () => {
 		await page.click( '.editor-block-navigation__item button' );
 
 		// Select some text
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );

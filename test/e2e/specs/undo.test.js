@@ -22,7 +22,7 @@ describe( 'undo', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( META_KEY, 'z' );
+		await pressWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -31,12 +31,12 @@ describe( 'undo', () => {
 		await clickBlockAppender();
 
 		await page.keyboard.type( 'before keyboard ' );
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'after keyboard' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( META_KEY, 'z' );
+		await pressWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
