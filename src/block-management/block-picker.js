@@ -52,7 +52,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 					</View>
 					<View style={ styles.lineStyle } />
 					<FlatList
-						keyboardShouldPersistTaps='always'
+						keyboardShouldPersistTaps="always"
 						numColumns={ 3 }
 						data={ this.availableBlockTypes }
 						keyExtractor={ ( item ) => item.name }
