@@ -156,11 +156,11 @@ class PostLockedModal extends Component {
 							{ userDisplayName ?
 								sprintf(
 									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-									__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved.' ),
+									__( '%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' ),
 									userDisplayName
 								) :
 								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-								__( 'Another user now has editing control of this post. Don\'t worry, your changes up to this moment have been saved.' )
+								__( 'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' )
 							}
 						</div>
 						<p>
