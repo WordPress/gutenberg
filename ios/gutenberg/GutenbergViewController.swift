@@ -25,8 +25,9 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-    func gutenbergDidProvideHTML(_ html: String) {
-        print("Did receive HTML: \(html)")
+    
+    func gutenbergDidProvideHTML(_ html: String, changed: Bool) {
+        print("Did receive HTML: \(html) changed: \(changed)")
     }
 
     func gutenbergDidRequestMediaPicker(callback: @escaping MediaPickerDidPickMediaCallback) {
