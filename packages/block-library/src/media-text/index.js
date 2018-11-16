@@ -13,6 +13,7 @@ import {
 	InnerBlocks,
 	getColorClassName,
 } from '@wordpress/editor';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -72,10 +73,71 @@ export const settings = {
 			type: 'number',
 			default: 50,
 		},
+		isStackedOnMobile: {
+			type: 'boolean',
+			default: false,
+		},
 	},
 
 	supports: {
 		align: [ 'wide', 'full' ],
+	},
+
+	transforms: {
+		from: [
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				transform: ( { alt, url, id } ) => (
+					createBlock( 'core/media-text', {
+						mediaAlt: alt,
+						mediaId: id,
+						mediaUrl: url,
+						mediaType: 'image',
+					} )
+				),
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/video' ],
+				transform: ( { src, id } ) => (
+					createBlock( 'core/media-text', {
+						mediaId: id,
+						mediaUrl: src,
+						mediaType: 'video',
+					} )
+				),
+			},
+		],
+		to: [
+			{
+				type: 'block',
+				blocks: [ 'core/image' ],
+				isMatch: ( { mediaType, mediaUrl } ) => {
+					return ! mediaUrl || mediaType === 'image';
+				},
+				transform: ( { mediaAlt, mediaId, mediaUrl } ) => {
+					return createBlock( 'core/image', {
+						alt: mediaAlt,
+						id: mediaId,
+						url: mediaUrl,
+					} );
+				},
+			},
+			{
+				type: 'block',
+				blocks: [ 'core/video' ],
+				isMatch: ( { mediaType, mediaUrl } ) => {
+					return ! mediaUrl || mediaType === 'video';
+				},
+				transform: ( { mediaId, mediaUrl } ) => {
+					return createBlock( 'core/video', {
+						id: mediaId,
+						src: mediaUrl,
+					} );
+				},
+			},
+		],
 	},
 
 	edit,
@@ -84,6 +146,7 @@ export const settings = {
 		const {
 			backgroundColor,
 			customBackgroundColor,
+			isStackedOnMobile,
 			mediaAlt,
 			mediaPosition,
 			mediaType,
@@ -99,6 +162,7 @@ export const settings = {
 		const className = classnames( {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			[ backgroundClass ]: backgroundClass,
+			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
 
 		let gridTemplateColumns;

@@ -6,7 +6,7 @@ import { shallow, mount } from 'enzyme';
 /**
  * Internal dependencies
  */
-import PanelBody from '../body';
+import { PanelBody } from '../body';
 
 jest.mock( '../../button' );
 

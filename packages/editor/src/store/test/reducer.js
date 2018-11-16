@@ -23,6 +23,7 @@ import {
 	shouldOverwriteState,
 	getPostRawValue,
 	editor,
+	initialEdits,
 	currentPost,
 	isTyping,
 	isCaretWithinFormattedText,
@@ -37,6 +38,7 @@ import {
 	autosave,
 	postSavingLock,
 } from '../reducer';
+import { INITIAL_EDITS_DEFAULTS } from '../defaults';
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -277,7 +279,7 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		it( 'should return history (empty edits, blocks), dirty flag by default', () => {
+		it( 'should return history (empty edits, blocks) by default', () => {
 			const state = editor( undefined, {} );
 
 			expect( state.past ).toEqual( [] );
@@ -285,7 +287,7 @@ describe( 'state', () => {
 			expect( state.present.edits ).toEqual( {} );
 			expect( state.present.blocks.byClientId ).toEqual( {} );
 			expect( state.present.blocks.order ).toEqual( {} );
-			expect( state.isDirty ).toBe( false );
+			expect( state.present.blocks.isDirty ).toBe( false );
 		} );
 
 		it( 'should key by reset blocks clientId', () => {
@@ -1038,22 +1040,6 @@ describe( 'state', () => {
 				} );
 			} );
 
-			it( 'should save initial post state', () => {
-				const state = editor( undefined, {
-					type: 'SETUP_EDITOR_STATE',
-					edits: {
-						status: 'draft',
-						title: 'post title',
-					},
-					blocks: [],
-				} );
-
-				expect( state.present.edits ).toEqual( {
-					status: 'draft',
-					title: 'post title',
-				} );
-			} );
-
 			it( 'should omit content when resetting', () => {
 				// Use case: When editing in Text mode, we defer to content on
 				// the property, but we reset blocks by parse when switching
@@ -1240,6 +1226,88 @@ describe( 'state', () => {
 
 				expect( state.past ).toHaveLength( 3 );
 			} );
+		} );
+	} );
+
+	describe( 'initialEdits', () => {
+		it( 'should default to initial edits', () => {
+			const state = initialEdits( undefined, {} );
+
+			expect( state ).toBe( INITIAL_EDITS_DEFAULTS );
+		} );
+
+		it( 'should return initial edits on post reset', () => {
+			const state = initialEdits( undefined, {
+				type: 'RESET_POST',
+			} );
+
+			expect( state ).toBe( INITIAL_EDITS_DEFAULTS );
+		} );
+
+		it( 'should return referentially equal state if setup includes no edits', () => {
+			const original = initialEdits( undefined, {} );
+			const state = initialEdits( deepFreeze( original ), {
+				type: 'SETUP_EDITOR',
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'should return referentially equal state if reset while having made no edits', () => {
+			const original = initialEdits( undefined, {} );
+			const state = initialEdits( deepFreeze( original ), {
+				type: 'RESET_POST',
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'should return setup edits', () => {
+			const original = initialEdits( undefined, {} );
+			const state = initialEdits( deepFreeze( original ), {
+				type: 'SETUP_EDITOR',
+				edits: {
+					title: '',
+					content: '',
+				},
+			} );
+
+			expect( state ).toEqual( {
+				title: '',
+				content: '',
+			} );
+		} );
+
+		it( 'should unset content on editor setup', () => {
+			const original = initialEdits( undefined, {
+				type: 'SETUP_EDITOR',
+				edits: {
+					title: '',
+					content: '',
+				},
+			} );
+			const state = initialEdits( deepFreeze( original ), {
+				type: 'SETUP_EDITOR_STATE',
+			} );
+
+			expect( state ).toEqual( { title: '' } );
+		} );
+
+		it( 'should unset values on post update', () => {
+			const original = initialEdits( undefined, {
+				type: 'SETUP_EDITOR',
+				edits: {
+					title: '',
+				},
+			} );
+			const state = initialEdits( deepFreeze( original ), {
+				type: 'UPDATE_POST',
+				edits: {
+					title: '',
+				},
+			} );
+
+			expect( state ).toEqual( {} );
 		} );
 	} );
 
@@ -1499,6 +1567,7 @@ describe( 'state', () => {
 					clientId: 'ribs',
 					name: 'core/freeform',
 				} ],
+				updateSelection: true,
 			} );
 
 			expect( state3 ).toEqual( {
@@ -1506,6 +1575,24 @@ describe( 'state', () => {
 				end: 'ribs',
 				initialPosition: null,
 				isMultiSelecting: false,
+			} );
+		} );
+
+		it( 'should not select inserted block if updateSelection flag is false', () => {
+			const original = deepFreeze( { start: 'a', end: 'b' } );
+
+			const state3 = blockSelection( original, {
+				type: 'INSERT_BLOCKS',
+				blocks: [ {
+					clientId: 'ribs',
+					name: 'core/freeform',
+				} ],
+				updateSelection: false,
+			} );
+
+			expect( state3 ).toEqual( {
+				start: 'a',
+				end: 'b',
 			} );
 		} );
 

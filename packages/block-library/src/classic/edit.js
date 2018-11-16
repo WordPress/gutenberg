@@ -115,6 +115,7 @@ export default class ClassicEdit extends Component {
 			}
 		} );
 
+		// TODO: the following is for back-compat with WP 4.9, not needed in WP 5.0. Remove it after the release.
 		editor.addButton( 'kitchensink', {
 			tooltip: _x( 'More', 'button to expand options' ),
 			icon: 'dashicon dashicons-editor-kitchensink',
@@ -127,11 +128,19 @@ export default class ClassicEdit extends Component {
 			},
 		} );
 
+		// Show the second, third, etc. toolbars when the `kitchensink` button is removed by a plugin.
+		editor.on( 'init', function() {
+			if ( editor.settings.toolbar1 && editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1 ) {
+				editor.dom.addClass( ref, 'has-advanced-toolbar' );
+			}
+		} );
+
 		editor.addButton( 'wp_add_media', {
 			tooltip: __( 'Insert Media' ),
 			icon: 'dashicon dashicons-admin-media',
 			cmd: 'WP_Medialib',
 		} );
+		// End TODO.
 
 		editor.on( 'init', () => {
 			const rootNode = this.editor.getBody();

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, every, map } from 'lodash';
+import { noop, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import { noop, every, map } from 'lodash';
 import { Fragment } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { isReusableBlock } from '@wordpress/blocks';
+import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -50,31 +50,26 @@ export function ReusableBlockConvertButton( {
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
 		const {
-			getBlock,
+			getBlocksByClientId,
 			canInsertBlockType,
 			__experimentalGetReusableBlock: getReusableBlock,
 		} = select( 'core/editor' );
-		const {
-			getFreeformFallbackBlockName,
-			getUnregisteredFallbackBlockName,
-		} = select( 'core/blocks' );
 
-		const blocks = map( clientIds, ( clientId ) => getBlock( clientId ) );
+		const blocks = getBlocksByClientId( clientIds );
 
 		const isVisible = (
-			// Guard against the case where a regular block has *just* been converted to a
-			// reusable block and doesn't yet exist in the editor store.
-			every( blocks, ( block ) => !! block ) &&
-
 			// Hide 'Add to Reusable Blocks' when Reusable Blocks are disabled, i.e. when
 			// core/block is not in the allowed_block_types filter.
 			canInsertBlockType( 'core/block' ) &&
 
-			// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
-			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
-			( blocks.length !== 1 || (
-				blocks[ 0 ].name !== getFreeformFallbackBlockName() &&
-				blocks[ 0 ].name !== getUnregisteredFallbackBlockName()
+			every( blocks, ( block ) => (
+				// Guard against the case where a regular block has *just* been converted to a
+				// reusable block and doesn't yet exist in the editor store.
+				!! block &&
+				// Only show the option to covert to reusable blocks on valid blocks.
+				block.isValid &&
+				// Make sure the block supports being converted into a reusable block (by default that is the case).
+				hasBlockSupport( block.name, 'reusable', true )
 			) )
 		);
 

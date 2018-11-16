@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import {
@@ -23,13 +18,7 @@ import {
 	isEditorPanelEnabled,
 } from '../selectors';
 
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
-
 describe( 'selectors', () => {
-	beforeEach( () => {
-		deprecated.mockClear();
-	} );
-
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {

@@ -96,13 +96,12 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 		);
 	},
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const { content } = attributes;
 
 		return (
 			<RichText.Content
 				tagName="p"
-				className={ className }
 				value={ content }
 			/>
 		);

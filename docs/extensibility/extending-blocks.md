@@ -333,9 +333,13 @@ function my_plugin_block_categories( $categories, $post ) {
 			array(
 				'slug' => 'my-category',
 				'title' => __( 'My category', 'my-plugin' ),
+				'icon'  => '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>',
 			),
 		)
 	);
 }
 add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
+
+You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+

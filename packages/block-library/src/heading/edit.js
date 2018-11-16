@@ -42,6 +42,7 @@ export default function HeadingEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<RichText
+				identifier="content"
 				wrapperClassName="wp-block-heading"
 				tagName={ tagName }
 				value={ content }

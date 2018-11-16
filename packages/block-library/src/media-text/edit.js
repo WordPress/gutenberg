@@ -18,9 +18,9 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	PanelBody,
 	TextareaControl,
+	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
-
 /**
  * Internal dependencies
  */
@@ -112,12 +112,19 @@ class MediaTextEdit extends Component {
 			setAttributes,
 			setBackgroundColor,
 		} = this.props;
-		const { mediaAlt, mediaPosition, mediaType, mediaWidth } = attributes;
+		const {
+			isStackedOnMobile,
+			mediaAlt,
+			mediaPosition,
+			mediaType,
+			mediaWidth,
+		} = attributes;
 		const temporaryMediaWidth = this.state.mediaWidth;
 		const classNames = classnames( className, {
 			'has-media-on-the-right': 'right' === mediaPosition,
 			'is-selected': isSelected,
 			[ backgroundColor.class ]: backgroundColor.class,
+			'is-stacked-on-mobile': isStackedOnMobile,
 		} );
 		const widthString = `${ temporaryMediaWidth || mediaWidth }%`;
 		const style = {
@@ -143,14 +150,21 @@ class MediaTextEdit extends Component {
 		const onMediaAltChange = ( newMediaAlt ) => {
 			setAttributes( { mediaAlt: newMediaAlt } );
 		};
-		const mediaTextGeneralSettings = mediaType === 'image' && (
+		const mediaTextGeneralSettings = (
 			<PanelBody title={ __( 'Media & Text Settings' ) }>
-				<TextareaControl
+				<ToggleControl
+					label={ __( 'Stack on mobile' ) }
+					checked={ isStackedOnMobile }
+					onChange={ () => setAttributes( {
+						isStackedOnMobile: ! isStackedOnMobile,
+					} ) }
+				/>
+				{ mediaType === 'image' && ( <TextareaControl
 					label={ __( 'Alt Text (Alternative Text)' ) }
 					value={ mediaAlt }
 					onChange={ onMediaAltChange }
 					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
-				/>
+				/> ) }
 			</PanelBody>
 		);
 		return (

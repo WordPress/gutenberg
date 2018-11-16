@@ -11,7 +11,10 @@ import { Component } from '@wordpress/element';
 import { parse, createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
-const minHeight = 50;
+/**
+ * Import style
+ */
+import styles from './style.scss';
 
 const name = 'core/paragraph';
 
@@ -68,14 +71,16 @@ class ParagraphEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
-			style,
 			mergeBlocks,
+			style,
 		} = this.props;
 
 		const {
 			placeholder,
 			content,
 		} = attributes;
+
+		const minHeight = styles.blockText.minHeight;
 
 		return (
 			<View>

@@ -504,6 +504,13 @@ inserter: false,
 multiple: false,
 ```
 
+- `reusable` (default `true`): A block may want to disable the ability of being converted into a reusable block.
+By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
+
+```js
+// Don't allow the block to be converted into a reusable block.
+reusable: false,
+```
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).

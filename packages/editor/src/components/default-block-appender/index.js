@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { get } from 'lodash';
+import TextareaAutosize from 'react-autosize-textarea';
 
 /**
  * WordPress dependencies
@@ -31,7 +32,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Write your story' );
+	const value = decodeEntities( placeholder ) || __( 'Start writing or type / to choose a block' );
 
 	// The appender "button" is in-fact a text field so as to support
 	// transitions by WritingFlow occurring by arrow key press. WritingFlow
@@ -51,11 +52,10 @@ export function DefaultBlockAppender( {
 	return (
 		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
 			<BlockDropZone rootClientId={ rootClientId } />
-			<input
+			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
-				type="text"
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }

@@ -21,7 +21,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Component, findDOMNode, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
 import {
 	getCategories,
@@ -163,7 +163,7 @@ export class InserterMenu extends Component {
 				this.props.setTimeout( () => {
 					// We need a generic way to access the panel's container
 					// eslint-disable-next-line react/no-find-dom-node
-					scrollIntoView( findDOMNode( this.panels[ panel ] ), this.inserterResults.current, {
+					scrollIntoView( this.panels[ panel ], this.inserterResults.current, {
 						alignWithTop: true,
 					} );
 				} );

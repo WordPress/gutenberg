@@ -37,6 +37,7 @@ function BlockNavigationList( {
 								} ) }
 								onClick={ () => selectBlock( block.clientId ) }
 								isSelected={ block.clientId === selectedBlockClientId }
+								role="menuitemradio"
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ blockType.title }

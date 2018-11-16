@@ -30,6 +30,7 @@ export { combineReducers };
 export const select = defaultRegistry.select;
 export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
+export const registerGenericStore = defaultRegistry.registerGenericStore;
 export const registerStore = defaultRegistry.registerStore;
 export const registerReducer = defaultRegistry.registerReducer;
 export const registerActions = defaultRegistry.registerActions;

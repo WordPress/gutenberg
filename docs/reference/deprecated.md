@@ -1,5 +1,9 @@
 Gutenberg's deprecation policy is intended to support backwards-compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 4.5.0
+- `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
+- `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
+
 ## 4.4.0
 
 - `wp.date.getSettings` has been removed. Please use `wp.date.__experimentalGetSettings` instead.
@@ -7,6 +11,11 @@ Gutenberg's deprecation policy is intended to support backwards-compatibility fo
 - The following editor store actions have been removed: `createNotice`, `removeNotice`, `createSuccessNotice`, `createInfoNotice`, `createErrorNotice`, `createWarningNotice`. Use the equivalent actions by the same name from the `@wordpress/notices` module.
 - The id prop of wp.nux.DotTip has been removed. Please use the tipId prop instead.
 - `wp.blocks.isValidBlock` has been removed. Please use `wp.blocks.isValidBlockContent` instead but keep in mind that the order of params has changed.
+- `wp.data` `registry.registerReducer` has been deprecated. Use `registry.registerStore` instead.
+- `wp.data` `registry.registerSelectors` has been deprecated. Use `registry.registerStore` instead.
+- `wp.data` `registry.registerActions` has been deprecated. Use `registry.registerStore` instead.
+- `wp.data` `registry.registerResolvers` has been deprecated. Use `registry.registerStore` instead.
+- `moment` has been removed from the public API for the date module.
 
 ## 4.3.0
 

@@ -34,7 +34,7 @@ export class DateTimePicker extends Component {
 	}
 
 	render() {
-		const { currentDate, is12Hour, locale, onChange } = this.props;
+		const { currentDate, is12Hour, onChange } = this.props;
 
 		return (
 			<div className="components-datetime">
@@ -48,8 +48,6 @@ export class DateTimePicker extends Component {
 						<DatePicker
 							currentDate={ currentDate }
 							onChange={ onChange }
-							locale={ locale }
-							is12Hour={ is12Hour }
 						/>
 					</Fragment>
 				) }

@@ -28,7 +28,11 @@ import { combineReducers } from '@wordpress/data';
  */
 import withHistory from '../utils/with-history';
 import withChangeDetection from '../utils/with-change-detection';
-import { PREFERENCES_DEFAULTS, EDITOR_SETTINGS_DEFAULTS } from './defaults';
+import {
+	PREFERENCES_DEFAULTS,
+	EDITOR_SETTINGS_DEFAULTS,
+	INITIAL_EDITS_DEFAULTS,
+} from './defaults';
 import { insertAt, moveTo } from './array';
 
 /**
@@ -95,6 +99,23 @@ function getFlattenedBlocks( blocks ) {
 	}
 
 	return flattenedBlocks;
+}
+
+/**
+ * Returns an object against which it is safe to perform mutating operations,
+ * given the original object and its current working copy.
+ *
+ * @param {Object} original Original object.
+ * @param {Object} working  Working object.
+ *
+ * @return {Object} Mutation-safe object.
+ */
+function getMutateSafeObject( original, working ) {
+	if ( original === working ) {
+		return { ...original };
+	}
+
+	return working;
 }
 
 /**
@@ -215,27 +236,14 @@ export const editor = flow( [
 		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
 		shouldOverwriteState,
 	} ),
-
-	// Track whether changes exist, resetting at each post save. Relies on
-	// editor initialization firing post reset as an effect.
-	withChangeDetection( {
-		resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
-	} ),
 ] )( {
 	edits( state = {}, action ) {
 		switch ( action.type ) {
 			case 'EDIT_POST':
-			case 'SETUP_EDITOR_STATE':
 				return reduce( action.edits, ( result, value, key ) => {
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
-						// Avoid mutating original state by creating shallow
-						// clone. Should only occur once per reduce.
-						if ( result === state ) {
-							result = { ...state };
-						}
-
+						result = getMutateSafeObject( state, result );
 						result[ key ] = value;
 					}
 
@@ -249,9 +257,6 @@ export const editor = flow( [
 
 				return state;
 
-			case 'DIRTY_ARTIFICIALLY':
-				return { ...state };
-
 			case 'UPDATE_POST':
 			case 'RESET_POST':
 				const getCanonicalValue = action.type === 'UPDATE_POST' ?
@@ -263,10 +268,7 @@ export const editor = flow( [
 						return result;
 					}
 
-					if ( state === result ) {
-						result = { ...state };
-					}
-
+					result = getMutateSafeObject( state, result );
 					delete result[ key ];
 					return result;
 				}, state );
@@ -275,7 +277,16 @@ export const editor = flow( [
 		return state;
 	},
 
-	blocks: combineReducers( {
+	blocks: flow( [
+		combineReducers,
+
+		// Track whether changes exist, resetting at each post save. Relies on
+		// editor initialization firing post reset as an effect.
+		withChangeDetection( {
+			resetTypes: [ 'SETUP_EDITOR_STATE', 'REQUEST_POST_UPDATE_START' ],
+			ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		} ),
+	] )( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
 				case 'RESET_BLOCKS':
@@ -297,11 +308,7 @@ export const editor = flow( [
 					// Consider as updates only changed values
 					const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
 						if ( value !== result[ key ] ) {
-							// Avoid mutating original block by creating shallow clone
-							if ( result === state[ action.clientId ].attributes ) {
-								result = { ...result };
-							}
-
+							result = getMutateSafeObject( state[ action.clientId ].attributes, result );
 							result[ key ] = value;
 						}
 
@@ -516,6 +523,51 @@ export const editor = flow( [
 } );
 
 /**
+ * Reducer returning the initial edits state. With matching shape to that of
+ * `editor.edits`, the initial edits are those applied programmatically, are
+ * not considered in prmopting the user for unsaved changes, and are included
+ * in (and reset by) the next save payload.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Object} Next state.
+ */
+export function initialEdits( state = INITIAL_EDITS_DEFAULTS, action ) {
+	switch ( action.type ) {
+		case 'SETUP_EDITOR':
+			if ( ! action.edits ) {
+				break;
+			}
+
+			return action.edits;
+
+		case 'SETUP_EDITOR_STATE':
+			if ( 'content' in state ) {
+				return omit( state, 'content' );
+			}
+
+			return state;
+
+		case 'UPDATE_POST':
+			return reduce( action.edits, ( result, value, key ) => {
+				if ( ! result.hasOwnProperty( key ) ) {
+					return result;
+				}
+
+				result = getMutateSafeObject( state, result );
+				delete result[ key ];
+				return result;
+			}, state );
+
+		case 'RESET_POST':
+			return INITIAL_EDITS_DEFAULTS;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning the last-known state of the current post, in the format
  * returned by the WP REST API.
  *
@@ -652,14 +704,18 @@ export function blockSelection( state = {
 				end: action.clientId,
 				initialPosition: action.initialPosition,
 			};
-		case 'INSERT_BLOCKS':
-			return {
-				...state,
-				start: action.blocks[ 0 ].clientId,
-				end: action.blocks[ 0 ].clientId,
-				initialPosition: null,
-				isMultiSelecting: false,
-			};
+		case 'INSERT_BLOCKS': {
+			if ( action.updateSelection ) {
+				return {
+					...state,
+					start: action.blocks[ 0 ].clientId,
+					end: action.blocks[ 0 ].clientId,
+					initialPosition: null,
+					isMultiSelecting: false,
+				};
+			}
+			return state;
+		}
 		case 'REMOVE_BLOCKS':
 			if ( ! action.clientIds || ! action.clientIds.length || action.clientIds.indexOf( state.start ) === -1 ) {
 				return state;
@@ -924,10 +980,7 @@ export const reusableBlocks = combineReducers( {
 					const value = { clientId, title };
 
 					if ( ! isEqual( nextState[ id ], value ) ) {
-						if ( nextState === state ) {
-							nextState = { ...nextState };
-						}
-
+						nextState = getMutateSafeObject( state, nextState );
 						nextState[ id ] = value;
 					}
 
@@ -1096,6 +1149,7 @@ export function autosave( state = null, action ) {
 
 export default optimist( combineReducers( {
 	editor,
+	initialEdits,
 	currentPost,
 	isTyping,
 	isCaretWithinFormattedText,

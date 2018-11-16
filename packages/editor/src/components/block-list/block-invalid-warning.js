@@ -94,7 +94,6 @@ const blockToHTML = ( block ) => createBlock( 'core/html', {
 } );
 const blockToBlocks = ( block ) => rawHandler( {
 	HTML: block.originalContent,
-	mode: 'BLOCKS',
 } );
 
 export default withDispatch( ( dispatch, { block } ) => {

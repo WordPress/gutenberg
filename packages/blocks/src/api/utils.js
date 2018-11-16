@@ -13,7 +13,7 @@ import { Component, isValidElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { getDefaultBlockName } from './registration';
+import { getBlockType, getDefaultBlockName } from './registration';
 import { createBlock } from './factory';
 
 /**
@@ -103,4 +103,21 @@ export function normalizeIconObject( icon ) {
 	}
 
 	return icon;
+}
+
+/**
+ * Normalizes block type passed as param. When string is passed then
+ * it converts it to the matching block type object.
+ * It passes the original object otherwise.
+ *
+ * @param {string|Object} blockTypeOrName  Block type or name.
+ *
+ * @return {?Object} Block type.
+ */
+export function normalizeBlockType( blockTypeOrName ) {
+	if ( isString( blockTypeOrName ) ) {
+		return getBlockType( blockTypeOrName );
+	}
+
+	return blockTypeOrName;
 }

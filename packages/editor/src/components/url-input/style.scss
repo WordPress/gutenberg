@@ -1,11 +1,10 @@
 // Link input
-$input-padding: 9px 8px;
+$input-padding: 8px;
 $input-size: 300px;
 
 .editor-block-list__block .editor-url-input,
 .components-popover .editor-url-input,
 .editor-url-input {
-	width: 100%;
 	flex-grow: 1;
 	position: relative;
 	padding: 1px;
@@ -28,8 +27,8 @@ $input-size: 300px;
 
 	.components-spinner {
 		position: absolute;
-		right: 0;
-		top: $input-padding;
+		right: $input-padding;
+		top: $input-padding + 1;
 		margin: 0;
 	}
 }
@@ -38,9 +37,10 @@ $input-size: 300px;
 .editor-url-input__suggestions {
 	max-height: 200px;
 	transition: all 0.15s ease-in-out;
-	list-style: none;
 	padding: 4px 0;
-	width: $input-size + 2 * $icon-button-size;
+	// To match the url-input width: input width + padding + 2 buttons.
+	width: $input-size + 2 + 2 * $icon-button-size;
+	overflow-y: auto;
 }
 
 // Hide suggestions on mobile until we @todo find a better way to show them
@@ -53,7 +53,7 @@ $input-size: 300px;
 }
 
 .editor-url-input__suggestion {
-	padding: 4px #{ $icon-button-size + $input-padding } 4px $input-padding;
+	padding: 4px $input-padding;
 	color: $dark-gray-300; // lightest we can use for contrast
 	display: block;
 	font-size: $default-font-size;

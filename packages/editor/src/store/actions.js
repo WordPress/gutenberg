@@ -17,14 +17,16 @@ import { dispatch } from '@wordpress/data';
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post Post object.
+ * @param {Object} post  Post object.
+ * @param {Object} edits Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post ) {
+export function setupEditor( post, edits ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
+		edits,
 	};
 }
 
@@ -76,18 +78,16 @@ export function updatePost( edits ) {
 /**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object}  post            Post object.
- * @param {Array}   blocks          Array of blocks.
- * @param {Object}  edits           Initial edited attributes object.
+ * @param {Object} post   Post object.
+ * @param {Array}  blocks Array of blocks.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post, blocks, edits ) {
+export function setupEditorState( post, blocks ) {
 	return {
 		type: 'SETUP_EDITOR_STATE',
 		post,
 		blocks,
-		edits,
 	};
 }
 
@@ -295,35 +295,36 @@ export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId,
  * Returns an action object used in signalling that a single block should be
  * inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object}  block        Block object to insert.
- * @param {?number} index        Index at which block should be inserted.
- * @param {?string} rootClientId Optional root client ID of block list on which
- *                               to insert.
+ * @param {Object}  block            Block object to insert.
+ * @param {?number} index            Index at which block should be inserted.
+ * @param {?string} rootClientId     Optional root client ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlock( block, index, rootClientId ) {
-	return insertBlocks( [ block ], index, rootClientId );
+export function insertBlock( block, index, rootClientId, updateSelection = true ) {
+	return insertBlocks( [ block ], index, rootClientId, updateSelection );
 }
 
 /**
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks       Block objects to insert.
- * @param {?number}  index        Index at which block should be inserted.
- * @param {?string}  rootClientId Optional root client ID of block list on
- *                                which to insert.
+ * @param {Object[]} blocks          Block objects to insert.
+ * @param {?number}  index           Index at which block should be inserted.
+ * @param {?string}  rootClientId    Optional root cliente ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlocks( blocks, index, rootClientId ) {
+export function insertBlocks( blocks, index, rootClientId, updateSelection = true ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
 		index,
 		rootClientId,
 		time: Date.now(),
+		updateSelection,
 	};
 }
 
@@ -381,6 +382,14 @@ export function synchronizeTemplate() {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that attributes of the post have
+ * been edited.
+ *
+ * @param {Object} edits Post attributes to edit.
+ *
+ * @return {Object} Action object.
+ */
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',
@@ -776,22 +785,6 @@ export function unlockPostSaving( lockName ) {
 	return {
 		type: 'UNLOCK_POST_SAVING',
 		lockName,
-	};
-}
-
-/**
- * Returns an action object signaling that a new term is added to the edited post.
- *
- * @param {string} slug  Taxonomy slug.
- * @param {Object} term  Term object.
- *
- * @return {Object} Action object.
- */
-export function addTermToEditedPost( slug, term ) {
-	return {
-		type: 'ADD_TERM_TO_EDITED_POST',
-		slug,
-		term,
 	};
 }
 

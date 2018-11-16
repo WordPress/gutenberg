@@ -11,13 +11,14 @@ export const PREFERENCES_DEFAULTS = {
 /**
  * The default editor settings
  *
- *  alignWide         boolean        Enable/Disable Wide/Full Alignments
- *  colors            Array          Palette colors
- *  fontSizes         Array          Available font sizes
- *  maxWidth          number         Max width to constraint resizing
- *  blockTypes        boolean|Array  Allowed block types
- *  hasFixedToolbar   boolean        Whether or not the editor toolbar is fixed
- *  focusMode         boolean        Whether the focus mode is enabled or not
+ *  alignWide       boolean        Enable/Disable Wide/Full Alignments
+ *  colors          Array          Palette colors
+ *  fontSizes       Array          Available font sizes
+ *  imageSizes      Array          Available image sizes
+ *  maxWidth        number         Max width to constraint resizing
+ *  blockTypes      boolean|Array  Allowed block types
+ *  hasFixedToolbar boolean        Whether or not the editor toolbar is fixed
+ *  focusMode       boolean        Whether the focus mode is enabled or not
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -106,6 +107,13 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 		},
 	],
 
+	imageSizes: [
+		{ slug: 'thumbnail', label: __( 'Thumbnail' ) },
+		{ slug: 'medium', label: __( 'Medium' ) },
+		{ slug: 'large', label: __( 'Large' ) },
+		{ slug: 'full', label: __( 'Full Size' ) },
+	],
+
 	// This is current max width of the block inner area
 	// It's used to constraint image resizing and this value could be overridden later by themes
 	maxWidth: 580,
@@ -119,3 +127,10 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 };
+
+/**
+ * Default initial edits state.
+ *
+ * @type {Object}
+ */
+export const INITIAL_EDITS_DEFAULTS = {};

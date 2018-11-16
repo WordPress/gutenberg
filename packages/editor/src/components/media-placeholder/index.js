@@ -131,7 +131,7 @@ class MediaPlaceholder extends Component {
 			onHTMLDrop = noop,
 			multiple = false,
 			notices,
-			allowedTypes,
+			allowedTypes = [],
 		} = this.props;
 
 		const {

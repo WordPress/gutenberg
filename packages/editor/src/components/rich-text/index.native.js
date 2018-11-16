@@ -14,6 +14,7 @@ import {
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
+import { BlockFormatControls } from '@wordpress/editor';
 import {
 	isEmpty,
 	create,
@@ -172,23 +173,16 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles any case where the content of the AztecRN instance has changed.
+	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 
 	onChange( event ) {
-		// If we had a timer set to propagate a change, let's cancel it, because the user meanwhile typed something extra
-		if ( !! this.currentTimer ) {
-			clearTimeout( this.currentTimer );
-		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
 		this.lastContent = contentWithoutRootTag;
-		// Set a time to call the onChange prop if nothing changes in the next second
-		this.currentTimer = setTimeout( function() {
-			this.props.onChange( {
-				content: this.lastContent,
-			} );
-		}.bind( this ), 1000 );
+		this.props.onChange( {
+			content: this.lastContent,
+		} );
 	}
 
 	/**
@@ -227,12 +221,6 @@ export class RichText extends Component {
 		const empty = this.isEmpty();
 
 		if ( onMerge ) {
-			// The onMerge event can cause a content update event for this block.  Such event should
-			// definitely be processed by our native components, since they have no knowledge of
-			// how the split works.  Setting lastEventCount to undefined forces the native component to
-			// always update when provided with new content.
-			this.lastEventCount = undefined;
-
 			onMerge( ! isReverse );
 		}
 
@@ -280,12 +268,21 @@ export class RichText extends Component {
 			this.lastContent = undefined;
 			return true;
 		}
-		// The check below allows us to avoid updating the content right after an `onChange` call
-		// first time the component is drawn with empty content `lastContent` is undefined
+		// The check below allows us to avoid updating the content right after an `onChange` call.
+		// The first time the component is drawn `lastContent` and `lastEventCount ` are both undefined
+		if ( this.lastEventCount &&
+			nextProps.value &&
+			this.lastContent &&
+			nextProps.value === this.lastContent ) {
+			return false;
+		}
+
+		// If the component is changed React side (merging/splitting/custom text actions) we need to make sure
+		// the native is updated as well
 		if ( nextProps.value &&
 			this.lastContent &&
-			this.lastEventCount ) {
-			return false;
+			nextProps.value !== this.lastContent ) {
+			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
 		return true;
@@ -349,9 +346,9 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				<View style={ { flex: 1 } }>
+				<BlockFormatControls>
 					<Toolbar controls={ toolbarControls } />
-				</View>
+				</BlockFormatControls>
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;

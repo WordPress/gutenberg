@@ -10,7 +10,7 @@ import edit from './edit';
 export const name = 'core/nextpage';
 
 export const settings = {
-	title: __( 'Page break' ),
+	title: __( 'Page Break' ),
 
 	description: __( 'Separate your content into a multi-page experience.' ),
 

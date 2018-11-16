@@ -4,26 +4,26 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
+import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
 
 const name = 'core/italic';
 
 export const italic = {
 	name,
 	title: __( 'Italic' ),
-	match: {
-		tagName: 'em',
-	},
-	edit( { isActive, value, onChange, ToolbarButton, Shortcut } ) {
+	tagName: 'em',
+	className: null,
+	edit( { isActive, value, onChange } ) {
 		const onToggle = () => onChange( toggleFormat( value, { type: name } ) );
 
 		return (
 			<Fragment>
-				<Shortcut
+				<RichTextShortcut
 					type="primary"
 					character="i"
 					onUse={ onToggle }
 				/>
-				<ToolbarButton
+				<RichTextToolbarButton
 					name="italic"
 					icon="editor-italic"
 					title={ __( 'Italic' ) }

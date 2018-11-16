@@ -67,7 +67,7 @@ const getAttachmentsCollection = ( ids ) => {
 		order: 'ASC',
 		orderby: 'post__in',
 		post__in: ids,
-		per_page: 100,
+		posts_per_page: -1,
 		query: true,
 		type: 'image',
 	} );

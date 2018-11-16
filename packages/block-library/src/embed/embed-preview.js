@@ -18,6 +18,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, SandBox } from '@wordpress/components';
 import { RichText, BlockIcon } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import WpEmbedPreview from './wp-embed-preview';
+
 const EmbedPreview = ( props ) => {
 	const { preview, url, type, caption, onCaptionChange, isSelected, className, icon, label } = props;
 	const { scripts } = preview;
@@ -30,9 +35,8 @@ const EmbedPreview = ( props ) => {
 	const sandboxClassnames = classnames( type, className, 'wp-block-embed__wrapper' );
 
 	const embedWrapper = 'wp-embed' === type ? (
-		<div
-			className={ sandboxClassnames }
-			dangerouslySetInnerHTML={ { __html: html } }
+		<WpEmbedPreview
+			html={ html }
 		/>
 	) : (
 		<div className="wp-block-embed__wrapper">
