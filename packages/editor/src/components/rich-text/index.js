@@ -263,24 +263,23 @@ export class RichText extends Component {
 			window.console.log( 'Received item:\n\n', file );
 
 			if ( shouldReplace ) {
-				// Necessary to allow the paste bin to be removed without errors.
-				this.props.setTimeout( () => this.props.onReplace( content ) );
+				this.props.onReplace( content );
 			} else if ( this.onSplit ) {
-				// Necessary to get the right range.
-				// Also done in the TinyMCE paste plugin.
-				this.props.setTimeout( () => this.splitContent( content ) );
+				this.splitContent( content );
 			}
 
 			return;
 		}
 
+		const record = this.getRecord();
+
 		// There is a selection, check if a URL is pasted.
-		if ( ! this.editor.selection.isCollapsed() ) {
+		if ( ! isCollapsed( record ) ) {
 			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
 
 			// A URL was pasted, turn the selection into a link
 			if ( isURL( pastedText ) ) {
-				this.onChange( applyFormat( this.getRecord(), {
+				this.onChange( applyFormat( record, {
 					type: 'a',
 					attributes: {
 						href: decodeEntities( pastedText ),
@@ -314,7 +313,7 @@ export class RichText extends Component {
 
 		if ( typeof content === 'string' ) {
 			const recordToInsert = create( { html: content } );
-			this.onChange( insert( this.getRecord(), recordToInsert ) );
+			this.onChange( insert( record, recordToInsert ) );
 		} else if ( this.onSplit ) {
 			if ( ! content.length ) {
 				return;
