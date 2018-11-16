@@ -510,6 +510,13 @@ export class RichText extends Component {
 			const start = getSelectionStart( value );
 			const end = getSelectionEnd( value );
 
+			// Always handle full content deletion ourselves.
+			if ( start === 0 && end !== 0 && end === value.text.length ) {
+				this.onChange( remove( value ) );
+				event.preventDefault();
+				return;
+			}
+
 			if ( this.multilineTag ) {
 				let newValue;
 

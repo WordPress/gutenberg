@@ -10,6 +10,7 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
+import { isEntirelySelected } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -272,9 +273,13 @@ export default class TinyMCE extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode } = event;
+		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
 
 		// Disables TinyMCE behaviour.
-		if ( keyCode === ENTER ) {
+		if (
+			keyCode === ENTER ||
+			( isDelete && isEntirelySelected( this.editorNode ) )
+		) {
 			event.preventDefault();
 			// For some reason this is needed to also prevent the insertion of
 			// line breaks.
