@@ -14,10 +14,9 @@ describe( 'AdminNotices', () => {
 		// outputs of (a) non-element first child of the element (whitespace
 		// text node) and (b) untrimmed content.
 		document.body.innerHTML = `
-				<p>
-					My <strong>notice</strong> text
-				</p>
 			<div class="notice updated is-dismissible">
+				<p>My <strong>notice</strong> text</p>
+				<p>My second line of text</p>
 				<button type="button" class="notice-dismiss">
 					<span class="screen-reader-text">Dismiss this notice.</span>
 				</button>
@@ -32,10 +31,10 @@ describe( 'AdminNotices', () => {
 
 		expect( createNotice ).toHaveBeenCalledWith( {
 			status: 'success',
+			content: '',
+			__unstableHTML: '<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
 			isDismissible: true,
-			content: 'My notice text',
-			__unstableHTML: 'My <strong>notice</strong> text',
-		} );
+		}, { speak: false } );
 		expect( document.body.childElementCount ).toBe( 0 );
 	} );
 } );

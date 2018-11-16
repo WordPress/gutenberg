@@ -29,19 +29,17 @@ function getAdminNotices() {
 }
 
 /**
- * Given an admin notice Element, returns the element from which content should
- * be sourced.
+ * Given an admin notice Element, returns the relevant notice content HTML.
  *
  * @param {Element} element Admin notice element.
  *
  * @return {Element} Upgraded notice HTML.
  */
-function getNoticeContentSourceFromElement( element ) {
-	if ( element.firstElementChild && element.firstElementChild.nodeName === 'P' ) {
-		return element.firstElementChild;
-	}
-
-	return element;
+function getNoticeHTMLFromElement( element ) {
+	return [ ...element.childNodes ].filter( ( child ) => (
+		child.nodeType !== window.Node.ELEMENT_NODE ||
+		! child.classList.contains( 'notice-dismiss' )
+	) ).map( ( child ) => child.outerHTML ).join( '' );
 }
 
 /**
@@ -69,9 +67,8 @@ function getNoticeStatusFromClassList( element ) {
  */
 function getNoticeFromElement( element ) {
 	const status = getNoticeStatusFromClassList( element );
-	const contentSource = getNoticeContentSourceFromElement( element );
-	const __unstableHTML = contentSource.innerHTML.trim();
-	const content = contentSource.textContent.trim();
+	const content = '';
+	const __unstableHTML = getNoticeHTMLFromElement( element );
 	const isDismissible = element.classList.contains( 'is-dismissible' );
 
 	return { status, content, __unstableHTML, isDismissible };
@@ -87,7 +84,7 @@ export class AdminNotices extends Component {
 		getAdminNotices().forEach( ( element ) => {
 			// Convert and create.
 			const notice = getNoticeFromElement( element );
-			createNotice( notice );
+			createNotice( notice, { speak: false } );
 
 			// Remove (now-redundant) admin notice element.
 			element.parentNode.removeChild( element );
