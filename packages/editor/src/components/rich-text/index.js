@@ -510,8 +510,8 @@ export class RichText extends Component {
 			const start = getSelectionStart( value );
 			const end = getSelectionEnd( value );
 
-			// Always handle uncollapsed selections ourselves.
-			if ( ! isCollapsed( value ) ) {
+			// Always handle full content deletion ourselves.
+			if ( start === 0 && end !== 0 && end === value.text.length ) {
 				this.onChange( remove( value ) );
 				event.preventDefault();
 				return;
@@ -600,12 +600,6 @@ export class RichText extends Component {
 	 *                            keyboard.
 	 */
 	onKeyUp( { keyCode } ) {
-		// The input event does not fire when the whole field is selected and
-		// BACKSPACE is pressed.
-		if ( keyCode === BACKSPACE ) {
-			this.onChange( this.createRecord() );
-		}
-
 		// `scrollToRect` is called on `nodechange`, whereas calling it on
 		// `keyup` *when* moving to a new RichText element results in incorrect
 		// scrolling. Though the following allows false positives, it results
