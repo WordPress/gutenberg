@@ -37,13 +37,13 @@ export function getProtocol( url ) {
  *
  * @param {string} protocol The url protocol.
  *
- * @return {boolean} True if the argument is a valid protocol (e.g. http://, tel:).
+ * @return {boolean} True if the argument is a valid protocol (e.g. http:, tel:).
  */
 export function isValidProtocol( protocol ) {
 	if ( ! protocol ) {
 		return false;
 	}
-	return /^[a-z\-.\+]+[0-9]*:(?:\/\/)?\/?$/i.test( protocol );
+	return /^[a-z\-.\+]+[0-9]*:$/i.test( protocol );
 }
 
 /**
@@ -138,7 +138,7 @@ export function isValidQueryString( queryString ) {
  * @return {?string} The fragment part of the URL.
  */
 export function getFragment( url ) {
-	const matches = /^\S+(#[^\s\?]*)/.exec( url );
+	const matches = /^\S+?(#[^\s\?]*)/.exec( url );
 	if ( matches ) {
 		return matches[ 1 ];
 	}

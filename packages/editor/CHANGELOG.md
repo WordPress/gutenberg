@@ -1,3 +1,13 @@
+## 8.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- The reusable blocks actions and selectors have been marked as experimental.
+
+### Bug Fixes
+
+- Stop propagating to DOM elements the `focusOnMount` prop from `NavigableToolbar` components
+
 ## 7.0.1 (2018-11-12)
 
 ### Polish

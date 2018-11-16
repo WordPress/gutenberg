@@ -18,6 +18,7 @@
 		color: $dark-gray-900;
 		transition: border 0.1s ease-out;
 		padding: #{ $block-padding + 5px } $block-padding;
+		word-break: keep-all;
 
 		// Stack borders on mobile.
 		border: $border-width solid transparent;

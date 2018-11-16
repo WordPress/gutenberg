@@ -33,7 +33,7 @@ import {
 	getBlocks,
 	getBlockCount,
 	getPreviousBlockClientId,
-	getSelectedBlock,
+	getSelectedBlockClientId,
 	getSelectedBlockCount,
 	getTemplate,
 	getTemplateLock,
@@ -104,7 +104,7 @@ export function selectPreviousBlock( action, store ) {
 
 	const firstRemovedBlockClientId = action.clientIds[ 0 ];
 	const state = store.getState();
-	const currentSelectedBlock = getSelectedBlock( state );
+	const selectedBlockClientId = getSelectedBlockClientId( state );
 
 	// recreate the state before the block was removed.
 	const previousState = { ...state, editor: { present: last( state.editor.past ) } };
@@ -118,7 +118,7 @@ export function selectPreviousBlock( action, store ) {
 
 	// Dispatch select block action if the currently selected block
 	// is not already the block we want to be selected.
-	if ( blockClientIdToSelect !== currentSelectedBlock ) {
+	if ( blockClientIdToSelect !== selectedBlockClientId ) {
 		return selectBlock( blockClientIdToSelect, -1 );
 	}
 }

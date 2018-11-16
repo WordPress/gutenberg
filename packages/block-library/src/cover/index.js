@@ -214,6 +214,7 @@ export const settings = {
 					}
 					mediaType = media.type;
 				}
+
 				setAttributes( {
 					url: media.url,
 					id: media.id,
