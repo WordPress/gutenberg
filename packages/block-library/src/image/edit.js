@@ -7,6 +7,7 @@ import {
 	isEmpty,
 	map,
 	pick,
+	round,
 	compact,
 } from 'lodash';
 
@@ -45,7 +46,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import ImageSize from './image-size';
+import ImageSize, { getBlockWidth } from './image-size';
 
 /**
  * Module constants
@@ -95,7 +96,7 @@ class ImageEdit extends Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.updateWidth = this.updateWidth.bind( this );
 		this.updateHeight = this.updateHeight.bind( this );
-		this.updateDimensions = this.updateDimensions.bind( this );
+		this.resetWidthHeight = this.resetWidthHeight.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
@@ -128,7 +129,12 @@ class ImageEdit extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
-		const { id, url = '' } = this.props.attributes;
+		const { id, url = '', fileWidth } = this.props.attributes;
+		const imageData = this.props.image;
+		const blockWidth = getBlockWidth();
+
+		// Store the current block width inside the editor.
+		this.props.setAttributes( { editWidth: blockWidth } );
 
 		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
 			revokeBlobURL( url );
@@ -138,6 +144,25 @@ class ImageEdit extends Component {
 			this.setState( {
 				captionFocused: false,
 			} );
+		}
+
+		if ( url && imageData && ! fileWidth ) {
+			// Old post or just uploaded image. Attempt to update the image props.
+			const sizeFull = get( imageData, [ 'media_details', 'sizes', 'full' ] );
+			const sizeLarge = get( imageData, [ 'media_details', 'sizes', 'large' ] );
+
+			if ( sizeFull && url === sizeFull.source_url ) {
+				if ( sizeLarge && this.imageMatchesRatio( sizeFull.width, sizeFull.height, sizeLarge.width, sizeLarge.height ) ) {
+					// If the full size image was used, and there's a large size that matches the ratio, replace full with large size.
+					this.updateImageURL( sizeLarge.source_url, pick( sizeLarge, [ 'width', 'height' ] ) );
+				} else {
+					// Add image file dimensions.
+					this.props.setAttributes( {
+						fileWidth: get( sizeFull, [ 'actual_size', 'width' ] ) || sizeFull.width,
+						fileHeight: get( sizeFull, [ 'actual_size', 'height' ] ) || sizeFull.height,
+					} );
+				}
+			}
 		}
 	}
 
@@ -164,10 +189,30 @@ class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
+		const blockWidth = getBlockWidth();
+		let src = media.url;
+		let img = {};
+		let actualWidth;
+		let actualHeight;
+
+		if ( media.sizes ) {
+			// The "full" size is already included in `sizes`.
+			img = media.sizes.large || media.sizes.full;
+			src = img.url;
+			actualWidth = get( img, [ 'actual_size', 'width' ] ) || img.width;
+			actualHeight = get( img, [ 'actual_size', 'height' ] ) || img.height;
+		}
+
+		const attr = pickRelevantMediaFiles( media );
+		attr.url = src;
+
 		this.props.setAttributes( {
-			...pickRelevantMediaFiles( media ),
-			width: undefined,
-			height: undefined,
+			...attr,
+
+			// Not used in the editor, passed to the front-end in block attributes.
+			fileWidth: actualWidth,
+			fileHeight: actualHeight,
+			editWidth: blockWidth,
 		} );
 	}
 
@@ -197,7 +242,10 @@ class ImageEdit extends Component {
 			this.props.setAttributes( {
 				url: newURL,
 				id: undefined,
+				fileWidth: undefined,
+				fileHeight: undefined,
 			} );
+			this.resetWidthHeight();
 		}
 
 		this.setState( {
@@ -230,27 +278,122 @@ class ImageEdit extends Component {
 	}
 
 	updateAlignment( nextAlign ) {
-		const extraUpdatedAttributes = [ 'wide', 'full' ].indexOf( nextAlign ) !== -1 ?
-			{ width: undefined, height: undefined } :
-			{};
-		this.props.setAttributes( { ...extraUpdatedAttributes, align: nextAlign } );
+		if ( nextAlign === 'wide' || nextAlign === 'full' ) {
+			// Reset all sizing attributes.
+			this.resetWidthHeight();
+		}
+
+		this.props.setAttributes( { align: nextAlign } );
 	}
 
-	updateImageURL( url ) {
-		this.props.setAttributes( { url, width: undefined, height: undefined } );
+	updateImageURL( url, imageSizeOptions ) {
+		this.resetWidthHeight();
+		let fileWidth;
+		let fileHeight;
+
+		if ( imageSizeOptions.width && imageSizeOptions.height ) {
+			fileWidth = imageSizeOptions.width;
+			fileHeight = imageSizeOptions.height;
+		} else {
+			// Find the image data.
+			map( imageSizeOptions, ( { value, imageData } ) => {
+				if ( value === url ) {
+					fileWidth = imageData.width;
+					fileHeight = imageData.height;
+					return false;
+				}
+			} );
+		}
+
+		this.props.setAttributes( {
+			url,
+			fileWidth,
+			fileHeight,
+		} );
 	}
 
-	updateWidth( width ) {
-		this.props.setAttributes( { width: parseInt( width, 10 ) } );
+	updateWidth( width, imageWidth, imageHeight, userSet ) {
+		width = parseInt( width, 10 );
+
+		// Reset the image size when the user deletes the value.
+		if ( ! width || ! imageWidth || ! imageHeight ) {
+			this.resetWidthHeight();
+			return;
+		}
+
+		const height = round( imageHeight * ( width / imageWidth ) );
+		this.setWidthHeight( width, height, imageWidth, imageHeight, userSet );
 	}
 
-	updateHeight( height ) {
-		this.props.setAttributes( { height: parseInt( height, 10 ) } );
+	updateHeight( height, imageWidth, imageHeight, userSet ) {
+		height = parseInt( height, 10 );
+
+		// Reset the image size when the user deletes the value.
+		if ( ! height || ! imageWidth || ! imageHeight ) {
+			this.resetWidthHeight();
+			return;
+		}
+
+		const width = round( imageWidth * ( height / imageHeight ) );
+		this.setWidthHeight( width, height, imageWidth, imageHeight, userSet );
 	}
 
-	updateDimensions( width = undefined, height = undefined ) {
-		return () => {
-			this.props.setAttributes( { width, height } );
+	setWidthHeight( width, height, imageWidth, imageHeight, userSet ) {
+		// Set image size and also whether set directly by the user.
+		userSet = userSet || undefined;
+
+		this.props.setAttributes( {
+			width,
+			height,
+			imageWidth,
+			imageHeight,
+			userSet,
+		} );
+	}
+
+	resetWidthHeight() {
+		this.props.setAttributes( {
+			width: undefined,
+			height: undefined,
+			userSet: undefined,
+		} );
+	}
+
+	/**
+	 * Helper function to test if aspect ratios for two images match.
+	 *
+	 * @param {number} fullWidth  Width of the image in pixels.
+	 * @param {number} fullHeight Height of the image in pixels.
+	 * @param {number} targetWidth  Width of the smaller image in pixels.
+	 * @param {number} targetHeight Height of the smaller image in pixels.
+	 * @return {boolean} True if aspect ratios match within 1px. False if not.
+	 */
+	imageMatchesRatio( fullWidth, fullHeight, targetWidth, targetHeight ) {
+		if ( ! fullWidth || ! fullHeight || ! targetWidth || ! targetHeight ) {
+			return false;
+		}
+
+		const { width, height } = this.constrainImageDimensions( fullWidth, fullHeight, targetWidth );
+
+		// If the image dimensions are within 1px of the expected size, we consider it a match.
+		return ( Math.abs( width - targetWidth ) <= 1 && Math.abs( height - targetHeight ) <= 1 );
+	}
+
+	constrainImageDimensions( fullWidth, fullHeight, targetWidth ) {
+		const ratio = targetWidth / fullWidth;
+
+		// Very small dimensions may result in 0, 1 should be the minimum.
+		const height = Math.max( 1, round( fullHeight * ratio ) );
+		let width = Math.max( 1, round( fullWidth * ratio ) );
+
+		// Sometimes, due to rounding, we'll end up with a result like this: 465x700 in a 177x177 box is 117x176... a pixel short.
+		if ( width === targetWidth - 1 ) {
+			width = targetWidth; // Round it up
+		}
+
+		return {
+			width: width,
+			height: height,
 		};
 	}
 
@@ -272,13 +415,14 @@ class ImageEdit extends Component {
 	getImageSizeOptions() {
 		const { imageSizes, image } = this.props;
 		return compact( map( imageSizes, ( { name, slug } ) => {
-			const sizeUrl = get( image, [ 'media_details', 'sizes', slug, 'source_url' ] );
-			if ( ! sizeUrl ) {
+			const imageData = get( image, [ 'media_details', 'sizes', slug ] );
+			if ( ! imageData || ! imageData.source_url ) {
 				return null;
 			}
 			return {
-				value: sizeUrl,
 				label: name,
+				value: imageData.source_url,
+				imageData: imageData,
 			};
 		} ) );
 	}
@@ -296,7 +440,7 @@ class ImageEdit extends Component {
 			toggleSelection,
 			isRTL,
 		} = this.props;
-		const { url, alt, caption, align, id, href, linkDestination, width, height, linkTarget } = attributes;
+		const { url, alt, caption, align, id, href, linkDestination, width, height, userSet, linkTarget } = attributes;
 		const isExternal = isExternalImage( id, url );
 		const imageSizeOptions = this.getImageSizeOptions();
 
@@ -387,7 +531,9 @@ class ImageEdit extends Component {
 							label={ __( 'Image Size' ) }
 							value={ url }
 							options={ imageSizeOptions }
-							onChange={ this.updateImageURL }
+							onChange={ ( src ) => {
+								this.updateImageURL( src, imageSizeOptions );
+							} }
 						/>
 					) }
 					{ isResizable && (
@@ -400,45 +546,57 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : '' }
+									value={ userSet ? width : '' }
 									placeholder={ imageWidth }
 									min={ 1 }
-									onChange={ this.updateWidth }
+									onChange={ ( value ) => {
+										this.updateWidth( value, imageWidth, imageHeight, true );
+									} }
 								/>
 								<TextControl
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : '' }
+									value={ userSet ? height : '' }
 									placeholder={ imageHeight }
 									min={ 1 }
-									onChange={ this.updateHeight }
+									onChange={ ( value ) => {
+										this.updateHeight( value, imageWidth, imageHeight, true );
+									} }
 								/>
 							</div>
 							<div className="block-library-image__dimensions__row">
 								<ButtonGroup aria-label={ __( 'Image Size' ) }>
-									{ [ 25, 50, 75, 100 ].map( ( scale ) => {
-										const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-										const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+									{ [ 25, 50, 75, 100 ].map( ( percent ) => {
+										const blockWidth = getBlockWidth();
 
-										const isCurrent = width === scaledWidth && height === scaledHeight;
+										// Percentage is relative to the block width.
+										let scaledWidth = round( blockWidth * ( percent / 100 ) );
+										let isCurrent = false;
+
+										if ( scaledWidth > imageWidth ) {
+											scaledWidth = imageWidth;
+											isCurrent = percent === 100 && ( ! width || width === scaledWidth );
+										} else {
+											isCurrent = ( width === scaledWidth ) || ( ! width && percent === 100 && imageWidth > blockWidth );
+										}
 
 										return (
 											<Button
-												key={ scale }
+												key={ percent }
 												isSmall
 												isPrimary={ isCurrent }
 												aria-pressed={ isCurrent }
-												onClick={ this.updateDimensions( scaledWidth, scaledHeight ) }
+												onClick={ () => this.updateWidth( scaledWidth, imageWidth, imageHeight ) }
 											>
-												{ scale }%
+												{ percent }%
 											</Button>
 										);
 									} ) }
 								</ButtonGroup>
 								<Button
 									isSmall
-									onClick={ this.updateDimensions() }
+									onClick={ this.resetWidthHeight }
 								>
 									{ __( 'Reset' ) }
 								</Button>
@@ -492,21 +650,36 @@ class ImageEdit extends Component {
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
 							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
 
+							// Floating a resized image can produce inaccurate `imageWidthWithinContainer`.
+							const ratio = imageWidth / imageHeight;
+							const blockWidth = getBlockWidth();
+							let constrainedWidth;
+							let constrainedHeight;
+
+							if ( ( align === 'wide' || align === 'full' ) && imageWidthWithinContainer > blockWidth ) {
+								// Do not limit the width.
+								constrainedWidth = imageWidthWithinContainer;
+								constrainedHeight = imageHeightWithinContainer;
+							} else {
+								constrainedWidth = width || imageWidth;
+								constrainedWidth = constrainedWidth	> blockWidth ? blockWidth : constrainedWidth;
+								constrainedHeight = round( constrainedWidth / ratio ) || undefined;
+							}
+
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
 									<Fragment>
 										{ getInspectorControls( imageWidth, imageHeight ) }
-										<div style={ { width, height } }>
+										<div style={ {
+											width: constrainedWidth,
+											height: constrainedHeight,
+										} }>
 											{ img }
 										</div>
 									</Fragment>
 								);
 							}
 
-							const currentWidth = width || imageWidthWithinContainer;
-							const currentHeight = height || imageHeightWithinContainer;
-
-							const ratio = imageWidth / imageHeight;
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
 
@@ -544,9 +717,9 @@ class ImageEdit extends Component {
 									{ getInspectorControls( imageWidth, imageHeight ) }
 									<ResizableBox
 										size={
-											width && height ? {
-												width,
-												height,
+											( constrainedWidth && constrainedHeight ) ? {
+												width: constrainedWidth,
+												height: constrainedHeight,
 											} : undefined
 										}
 										minWidth={ minWidth }
@@ -564,10 +737,20 @@ class ImageEdit extends Component {
 											toggleSelection( false );
 										} }
 										onResizeStop={ ( event, direction, elt, delta ) => {
-											setAttributes( {
-												width: parseInt( currentWidth + delta.width, 10 ),
-												height: parseInt( currentHeight + delta.height, 10 ),
-											} );
+											let newWidth = parseInt( constrainedWidth + delta.width, 10 );
+
+											// Snap-to-border for the last pixel when resizing by dragging.
+											// That highlights the 100% width button.
+											if ( Math.abs( constrainedWidth - newWidth ) < 2 ) {
+												newWidth = constrainedWidth;
+											}
+
+											// Don't upscale.
+											if ( newWidth > imageWidth ) {
+												newWidth = imageWidth;
+											}
+
+											this.updateWidth( newWidth, imageWidth, imageHeight );
 											toggleSelection( true );
 										} }
 									>

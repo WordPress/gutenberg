@@ -30,15 +30,9 @@ export const name = 'core/image';
 const blockAttributes = {
 	url: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'src',
 	},
 	alt: {
 		type: 'string',
-		source: 'attribute',
-		selector: 'img',
-		attribute: 'alt',
 		default: '',
 	},
 	caption: {
@@ -62,6 +56,19 @@ const blockAttributes = {
 		type: 'number',
 	},
 	height: {
+		type: 'number',
+	},
+	fileWidth: {
+		type: 'number',
+	},
+	fileHeight: {
+		type: 'number',
+	},
+	userSet: {
+		type: 'boolean',
+		default: false,
+	},
+	editWidth: {
 		type: 'number',
 	},
 	linkDestination: {
