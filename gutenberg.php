@@ -42,8 +42,7 @@ function the_gutenberg_project() {
 		} else { // Using Gutenberg in Core.
 			printf(
 				// Translators: link is for Classic Editor plugin.
-				__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-				'https://wordpress.org/plugins/classic-editor/'
+				__( 'The Block Editor requires JavaScript. Please try the <a href="https://wordpress.org/plugins/classic-editor/">Classic Editor plugin</a>.', 'gutenberg' )
 			);
 		}
 		?>
