@@ -5,24 +5,19 @@ import { Component } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
 
 /**
- * Set of class name suffixes to associate as the status of an admin notice.
+ * Mapping of server-supported notice class names to an equivalent notices
+ * module status.
  *
- * @type {Set}
+ * @type {Map}
  */
-const NOTICE_STATUSES = new Set( [
-	'success',
-	'warning',
-	'error',
-	'info',
-] );
-
-/**
- * Pattern matching a class list item matching the pattern of an admin notice
- * status class.
- *
- * @type {RegExp}
- */
-const REGEXP_NOTICE_STATUS = /^notice-(\w+)$/;
+const NOTICE_CLASS_STATUSES = {
+	'notice-success': 'success',
+	updated: 'success',
+	'notice-warning': 'warning',
+	'notice-error': 'error',
+	error: 'error',
+	'notice-info': 'info',
+};
 
 /**
  * Returns an array of admin notice Elements.
@@ -59,9 +54,8 @@ function getNoticeContentSourceFromElement( element ) {
  */
 function getNoticeStatusFromClassList( element ) {
 	for ( const className of element.classList ) {
-		const match = className.match( REGEXP_NOTICE_STATUS );
-		if ( match && NOTICE_STATUSES.has( match[ 1 ] ) ) {
-			return match[ 1 ];
+		if ( NOTICE_CLASS_STATUSES.hasOwnProperty( className ) ) {
+			return NOTICE_CLASS_STATUSES[ className ];
 		}
 	}
 }

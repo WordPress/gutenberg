@@ -14,10 +14,10 @@ describe( 'AdminNotices', () => {
 		// outputs of (a) non-element first child of the element (whitespace
 		// text node) and (b) untrimmed content.
 		document.body.innerHTML = `
-			<div class="notice notice-success is-dismissible">
 				<p>
 					My <strong>notice</strong> text
 				</p>
+			<div class="notice updated is-dismissible">
 				<button type="button" class="notice-dismiss">
 					<span class="screen-reader-text">Dismiss this notice.</span>
 				</button>
