@@ -450,14 +450,15 @@ describe( 'Links', () => {
 	} );
 
 	it( 'link popover remains visible after a mouse drag event', async () => {
-		// Create some blocks so we components with event handlers on the page
+		// Create some blocks so we have components with event handlers on the page
 		for ( let loop = 0; loop < 5; loop++ ) {
 			await insertBlock( 'Paragraph' );
 			await page.keyboard.type( 'This is Gutenberg' );
 		}
 
 		// Focus on first paragraph, so the link popover will appear over the subsequent ones
-		await page.mouse.click( 120, 280 );
+		await page.click( '[aria-label="Block Navigation"]' );
+		await page.click( '.editor-block-navigation__item button' );
 
 		// Select some text
 		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
@@ -472,9 +473,12 @@ describe( 'Links', () => {
 		await page.click( 'button[aria-label="Link Settings"]' );
 
 		// Move mouse over the 'open in new tab' section, then click and drag
-		await page.mouse.move( 50, 330 );
+		const settings = await page.$( '.editor-url-popover__settings' );
+		const bounds = await settings.boundingBox();
+
+		await page.mouse.move( bounds.x, bounds.y );
 		await page.mouse.down();
-		await page.mouse.move( 100, 330, { steps: 10 } );
+		await page.mouse.move( bounds.x + ( bounds.width / 2 ), bounds.y, { steps: 10 } );
 		await page.mouse.up();
 
 		// The link popover should still be visible
