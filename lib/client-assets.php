@@ -137,7 +137,7 @@ function gutenberg_override_style( $handle, $src, $deps = array(), $ver = false,
  * Registers all the WordPress packages scripts that are in the standardized
  * `build/` location.
  *
- * @since 4.3.0
+ * @since 4.5.0
  */
 function gutenberg_register_packages_scripts() {
 	$packages_dependencies = include dirname( __FILE__ ) . '/packages-dependencies.php';
