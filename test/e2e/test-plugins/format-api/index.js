@@ -15,16 +15,19 @@
 						onClick: function() {
 							props.onChange(
 								wp.richText.toggleFormat(
-									props.value, { type: 'my-plugin/link', attributes: {
-										url: '#test',
-										} }
+									props.value, {
+										type: 'my-plugin/link',
+										attributes: {
+											url: '#test',
+										}
+									}
 								)
 							);
 						},
 						isActive: props.isActive,
-						}
+					}
 				);
-			},
+			}
 		}
 	);
 } )();
