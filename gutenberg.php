@@ -205,7 +205,7 @@ function gutenberg_pre_init() {
 
 /**
  * Enable Gutenberg based on user_can_richedit setting.
- * Set use_block_editor_for_post based on user setting for disable visual editor.
+ * Set gutenberg_can_edit_post based on user setting for disable visual editor.
  */
 add_filter( 'gutenberg_can_edit_post_type', 'user_can_richedit', 5 );
 add_filter( 'gutenberg_can_edit_post', 'user_can_richedit', 5 );
