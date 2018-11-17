@@ -1,4 +1,4 @@
-/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
 
 /**
  * External dependencies
@@ -141,7 +141,7 @@ export function registerBlockType( name, settings ) {
 	}
 
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
-		console.error(
+		console.warn(
 			'The block "' + name + '" can have a maximum of 3 keywords.'
 		);
 		settings.keywords = settings.keywords.slice( 0, 3 );
