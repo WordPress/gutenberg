@@ -68,9 +68,6 @@ function the_gutenberg_project() {
  */
 function gutenberg_menu() {
 	global $submenu;
-	if ( ! user_can_richedit() ) {
-		return false;
-	}
 
 	add_menu_page(
 		'Gutenberg',
@@ -145,10 +142,6 @@ function is_gutenberg_page() {
 		return false;
 	}
 
-	if ( ! user_can_richedit() ) {
-		return false;
-	}
-
 	return true;
 }
 
@@ -206,6 +199,14 @@ function gutenberg_pre_init() {
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
+
+/**
+ * Enable Gutenberg based on user_can_richedit setting.
+ * Set use_block_editor_for_post based on user setting for disable visual editor.
+ */
+add_filter( 'gutenberg_can_edit_post_type', 'user_can_richedit', 5 );
+add_filter( 'gutenberg_can_edit_post', 'user_can_richedit', 5 );
+add_filter( 'use_block_editor_for_post', 'user_can_richedit', 5 );
 
 /**
  * Initialize Gutenberg.
@@ -281,10 +282,6 @@ add_action( 'admin_init', 'gutenberg_redirect_demo' );
  * @since 1.5.0
  */
 function gutenberg_add_edit_link_filters() {
-	if ( ! user_can_richedit() ) {
-		return;
-	}
-
 	// For hierarchical post types.
 	add_filter( 'page_row_actions', 'gutenberg_add_edit_link', 10, 2 );
 	// For non-hierarchical post types.
