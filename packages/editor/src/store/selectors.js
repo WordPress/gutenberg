@@ -746,7 +746,12 @@ export function isEditedPostBeingScheduled( state ) {
  * infer that a post is set to publish "Immediately" we check whether the date
  * and modified date are the same.
  *
- * @param {Object} state Editor state.
+ * Additionally, "private" is a post status that is similar to published, but a
+ * post can be set to private, but not yet saved to the database. In this case,
+ * the date should still be considered floating until the status is offically
+ * saved.
+ *
+ * @param  {Object}  state Editor state.
  *
  * @return {boolean} Whether the edited post has a floating date value.
  */
@@ -754,10 +759,12 @@ export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
 	const status = getEditedPostAttribute( state, 'status' );
+	const savedStatus = getCurrentPostAttribute( state, 'status' );
 	if (
 		status === 'draft' ||
 		status === 'auto-draft' ||
-		status === 'pending'
+		status === 'pending' ||
+		( status === 'private' && status !== savedStatus )
 	) {
 		return date === modified;
 	}
