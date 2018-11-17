@@ -19,9 +19,9 @@ export async function pressWithModifier( modifier, key ) {
 	const isAppleOS = () => process.platform === 'darwin';
 	const overWrittenModifiers = {
 		...modifiers,
-		shiftAlt: ( _isApple ) => _isApple ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
+		shiftAlt: ( _isApple ) => _isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
 	};
-	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS() );
+	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS );
 	const ctrlSwap = ( mod ) => mod === CTRL ? 'control' : mod;
 
 	await Promise.all(
