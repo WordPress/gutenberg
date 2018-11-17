@@ -426,7 +426,7 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta = null
 	 * @param array $block_attributes The block attributes.
 	 * @param array $image_meta The image attachment meta data.
 	 */
-	return apply_filters( 'gutenberg_get_image_width_height', $image_dimensions, $block_attributes, $image_meta );
+	return apply_filters( 'block_core_image_get_width_height', $image_dimensions, $block_attributes, $image_meta );
 }
 
 function gutenberg_render_block_core_image( $html, $block ) {
@@ -520,7 +520,11 @@ function gutenberg_render_block_core_image( $html, $block ) {
 			$value = esc_attr( $value );
 		}
 
-		$attr .= sprintf( ' %s="%s"', $name, $value );
+		if ( empty( $value ) ) {
+			$attr .= ' ' . $name;
+		} else {
+			$attr .= sprintf( ' %s="%s"', $name, $value );
+		}
 	}
 
 	$image_tag = '<img' . $attr . '/ >';
