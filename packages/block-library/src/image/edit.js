@@ -39,6 +39,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	BlockAlignmentToolbar,
 	mediaUpload,
 } from '@wordpress/editor';
@@ -328,21 +329,23 @@ class ImageEdit extends Component {
 				);
 			} else {
 				toolbarEditButton = (
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectImage }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				);
 			}
 		}
