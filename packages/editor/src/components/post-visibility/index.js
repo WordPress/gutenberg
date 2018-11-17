@@ -33,20 +33,10 @@ export class PostVisibility extends Component {
 	}
 
 	setPrivate() {
-		if (
-			// eslint-disable-next-line no-alert
-			! window.confirm(
-				__( 'Would you like to privately publish this post now?' )
-			)
-		) {
-			return;
-		}
-
-		const { onUpdateVisibility, onSave } = this.props;
+		const { onUpdateVisibility } = this.props;
 
 		onUpdateVisibility( 'private' );
 		this.setState( { hasPassword: false } );
-		onSave();
 	}
 
 	setPasswordProtected() {
@@ -159,10 +149,14 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { savePost, editPost } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( 'core/editor' );
 		return {
+<<<<<<< HEAD
 			onSave: savePost,
 			onUpdateVisibility( status, password = '' ) {
+=======
+			onUpdateVisibility( status, password = null ) {
+>>>>>>> Prevent publishing on visibility change to private
 				editPost( { status, password } );
 			},
 		};
