@@ -82,10 +82,10 @@ describe( 'Sidebar', () => {
 		await newPost();
 
 		// Region navigate to Sidebar.
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
 
 		// Tab lands at first (presumed selected) option "Document".
 		await page.keyboard.press( 'Tab' );
