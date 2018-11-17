@@ -67,6 +67,9 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
+	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return;
+	}
 	global $submenu;
 
 	add_menu_page(
@@ -206,7 +209,6 @@ function gutenberg_pre_init() {
  */
 add_filter( 'gutenberg_can_edit_post_type', 'user_can_richedit', 5 );
 add_filter( 'gutenberg_can_edit_post', 'user_can_richedit', 5 );
-add_filter( 'use_block_editor_for_post', 'user_can_richedit', 5 );
 
 /**
  * Initialize Gutenberg.
