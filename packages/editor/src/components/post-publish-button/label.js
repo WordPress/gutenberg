@@ -18,6 +18,7 @@ export function PublishButtonLabel( {
 	hasPublishAction,
 	isAutosaving,
 	hasNonPostEntityChanges,
+	visibility,
 } ) {
 	if ( isPublishing ) {
 		return __( 'Publishing…' );
@@ -37,6 +38,10 @@ export function PublishButtonLabel( {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	}
 
+	if ( 'private' === visibility ) {
+		return __( 'Publish Privately' );
+	}
+
 	return __( 'Publish' );
 }
 
@@ -50,6 +55,7 @@ export default compose( [
 			getCurrentPost,
 			getCurrentPostType,
 			isAutosavingPost,
+			getEditedPostVisibility,
 		} = select( 'core/editor' );
 		return {
 			isPublished: isCurrentPostPublished(),
@@ -63,6 +69,7 @@ export default compose( [
 			),
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
+			visibility: getEditedPostVisibility(),
 		};
 	} ),
 ] )( PublishButtonLabel );
