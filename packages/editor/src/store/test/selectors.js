@@ -4229,6 +4229,121 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'should not list a reusable block item if it is being inserted inside it self', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1ref: {
+									name: 'core/block',
+									clientId: 'block1ref',
+									attributes: {
+										ref: 1,
+									},
+								},
+								itselfBlock1: { name: 'core/test-block-a' },
+								itselfBlock2: { name: 'core/test-block-b' },
+							},
+							order: {
+								'': [ 'block1ref' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				reusableBlocks: {
+					data: {
+						1: { clientId: 'itselfBlock1', title: 'Reusable Block 1' },
+						2: { clientId: 'itselfBlock2', title: 'Reusable Block 2' },
+					},
+				},
+				currentPost: {},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const items = getInserterItems( state, 'itselfBlock1' );
+			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
+			expect( reusableBlockItems ).toHaveLength( 1 );
+			expect( reusableBlockItems[ 0 ] ).toEqual( {
+				id: 'core/block/2',
+				name: 'core/block',
+				initialAttributes: { ref: 2 },
+				title: 'Reusable Block 2',
+				icon: {
+					src: 'test',
+				},
+				category: 'reusable',
+				keywords: [],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+		} );
+
+		it( 'should not list a reusable block item if it is being inserted inside a descendent', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block2ref: {
+									name: 'core/block',
+									clientId: 'block1ref',
+									attributes: {
+										ref: 2,
+									},
+								},
+								referredBlock1: { name: 'core/test-block-a' },
+								referredBlock2: { name: 'core/test-block-b' },
+								childReferredBlock2: { name: 'core/test-block-a' },
+								grandchildReferredBlock2: { name: 'core/test-block-b' },
+							},
+							order: {
+								'': [ 'block2ref' ],
+								referredBlock2: [ 'childReferredBlock2' ],
+								childReferredBlock2: [ 'grandchildReferredBlock2' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				reusableBlocks: {
+					data: {
+						1: { clientId: 'referredBlock1', title: 'Reusable Block 1' },
+						2: { clientId: 'referredBlock2', title: 'Reusable Block 2' },
+					},
+				},
+				currentPost: {},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const items = getInserterItems( state, 'grandchildReferredBlock2' );
+			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
+			expect( reusableBlockItems ).toHaveLength( 1 );
+			expect( reusableBlockItems[ 0 ] ).toEqual( {
+				id: 'core/block/1',
+				name: 'core/block',
+				initialAttributes: { ref: 1 },
+				title: 'Reusable Block 1',
+				icon: {
+					src: 'test',
+				},
+				category: 'reusable',
+				keywords: [],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+		} );
 		it( 'should order items by descending utility and frecency', () => {
 			const state = {
 				editor: {
@@ -4278,8 +4393,12 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { name: 'core/test-block-a' },
 								block2: { name: 'core/test-block-a' },
+								block3: { name: 'core/test-block-a' },
+								block4: { name: 'core/test-block-a' },
 							},
-							order: {},
+							order: {
+								'': [ 'block3', 'block4' ],
+							},
 						},
 						edits: {},
 					},
@@ -4302,14 +4421,14 @@ describe( 'selectors', () => {
 			const stateSecondBlockRestricted = {
 				...state,
 				blockListSettings: {
-					block2: {
+					block4: {
 						allowedBlocks: [ 'core/test-block-b' ],
 					},
 				},
 			};
 
-			const firstBlockFirstCall = getInserterItems( state, 'block1' );
-			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block1' );
+			const firstBlockFirstCall = getInserterItems( state, 'block3' );
+			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block3' );
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
@@ -4319,8 +4438,8 @@ describe( 'selectors', () => {
 				'core/block/2',
 			] );
 
-			const secondBlockFirstCall = getInserterItems( state, 'block2' );
-			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block2' );
+			const secondBlockFirstCall = getInserterItems( state, 'block4' );
+			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block4' );
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
 				'core/test-freeform',
