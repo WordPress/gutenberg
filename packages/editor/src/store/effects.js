@@ -267,6 +267,7 @@ export default {
 	MULTI_SELECT: ( action, { getState } ) => {
 		const blockCount = getSelectedBlockCount( getState() );
 
+		/* translators: %s: number of selected blocks */
 		speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
 	},
 };
