@@ -78,7 +78,11 @@ describe( 'DocumentOutline', () => {
 		} );
 
 		it( 'should not render when no heading blocks provided', () => {
-			const blocks = [ paragraph ];
+			const blocks = [ paragraph ].map( ( block, index ) => {
+				// Change client IDs to a predictable value
+				block.clientId = '_clientId_' + index;
+				return block;
+			} );
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper.html() ).toBe( null );
