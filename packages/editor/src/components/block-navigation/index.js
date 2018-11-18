@@ -74,6 +74,10 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 		)
 	);
 
+	if ( ! rootBlocks || rootBlocks.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<NavigableMenu
 			role="presentation"
@@ -94,13 +98,6 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
 				/>
-			) }
-			{ ( ! rootBlocks || rootBlocks.length === 0 ) && (
-				// If there are no blocks in this document, don't render a list of blocks.
-				// Instead: inform the user no blocks exist yet.
-				<p className="editor-block-navigation__paragraph">
-					{ __( 'No blocks created yet.' ) }
-				</p>
 			) }
 		</NavigableMenu>
 	);
