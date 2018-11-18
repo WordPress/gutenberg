@@ -4,11 +4,6 @@
 import classnames from 'classnames';
 
 /**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
@@ -51,7 +46,6 @@ const TableOfContentsItem = ( {
 			<span className="document-outline__item-content">
 				{ children }
 			</span>
-			<span className="screen-reader-text">{ __( '(Click to focus this heading)' ) }</span>
 		</a>
 	</li>
 );
