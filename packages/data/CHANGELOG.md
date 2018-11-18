@@ -1,3 +1,16 @@
+## 4.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- `registry.registerReducer` has been removed. Use `registry.registerStore` instead.
+- `registry.registerSelectors` has been removed. Use `registry.registerStore` instead.
+- `registry.registerActions` has been removed. Use `registry.registerStore` instead.
+- `registry.registerResolvers` has been removed. Use `registry.registerStore` instead.
+
+### Bug Fix
+
+- Resolve an issue where `withSelect`'s `mapSelectToProps` would not be rerun if the wrapped component had incurred a store change during its mount lifecycle.
+
 ## 3.1.2 (2018-11-09)
 
 ## 3.1.1 (2018-11-09)

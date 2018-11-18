@@ -24,10 +24,11 @@ export function insertLineSeparator(
 ) {
 	const beforeText = getTextContent( value ).slice( 0, startIndex );
 	const previousLineSeparatorIndex = beforeText.lastIndexOf( LINE_SEPARATOR );
+	const previousLineSeparatorFormats = value.formats[ previousLineSeparatorIndex ];
 	let formats = [ , ];
 
-	if ( previousLineSeparatorIndex !== -1 ) {
-		formats = [ value.formats[ previousLineSeparatorIndex ] ];
+	if ( previousLineSeparatorFormats ) {
+		formats = [ previousLineSeparatorFormats ];
 	}
 
 	const valueToInsert = {

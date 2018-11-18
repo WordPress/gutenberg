@@ -25,6 +25,7 @@ import {
 	PanelBody,
 	ResizableBox,
 	SelectControl,
+	Spinner,
 	TextControl,
 	TextareaControl,
 	Toolbar,
@@ -38,6 +39,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	BlockAlignmentToolbar,
 	mediaUpload,
 } from '@wordpress/editor';
@@ -61,7 +63,9 @@ const NEW_TAB_REL = 'noreferrer noopener';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
+	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+	imageProps.url = get( image, [ 'sizes', 'large', 'url' ] ) || get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) || image.url;
+	return imageProps;
 };
 
 /**
@@ -367,21 +371,23 @@ class ImageEdit extends Component {
 				);
 			} else {
 				toolbarEditButton = (
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectImage }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				);
 			}
 		}
@@ -558,10 +564,17 @@ class ImageEdit extends Component {
 							} else {
 								defaultedAlt = __( 'This image has an empty alt attribute' );
 							}
-							// Disable reason: Image itself is not meant to be
-							// interactive, but should direct focus to block
-							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />;
+
+							const img = (
+								// Disable reason: Image itself is not meant to be interactive, but
+								// should direct focus to block.
+								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+								<Fragment>
+									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />
+									{ isBlobURL( url ) && <Spinner /> }
+								</Fragment>
+								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+							);
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
@@ -580,6 +593,13 @@ class ImageEdit extends Component {
 							const ratio = imageWidth / imageHeight;
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
+
+							// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
+							// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
+							// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
+							// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
+							// @todo It would be good to revisit this once a content-width variable becomes available.
+							const maxWidthBuffer = maxWidth * 2.5;
 
 							let showRightHandle = false;
 							let showLeftHandle = false;
@@ -621,9 +641,9 @@ class ImageEdit extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth={ maxWidth }
+										maxWidth={ maxWidthBuffer }
 										minHeight={ minHeight }
-										maxHeight={ maxWidth / ratio }
+										maxHeight={ maxWidthBuffer / ratio }
 										lockAspectRatio
 										enable={ {
 											top: false,

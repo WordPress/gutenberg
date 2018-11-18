@@ -9,7 +9,7 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Component, Fragment, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import { Spinner, withSpokenMessages, Popover } from '@wordpress/components';
@@ -231,28 +231,26 @@ class URLInput extends Component {
 		const { showSuggestions, posts, selectedSuggestion, loading } = this.state;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<Fragment>
-				<div className="editor-url-input">
-					<input
-						autoFocus={ autoFocus }
-						type="text"
-						aria-label={ __( 'URL' ) }
-						required
-						value={ value }
-						onChange={ this.onChange }
-						onInput={ stopEventPropagation }
-						placeholder={ __( 'Paste URL or type to search' ) }
-						onKeyDown={ this.onKeyDown }
-						role="combobox"
-						aria-expanded={ showSuggestions }
-						aria-autocomplete="list"
-						aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
-						aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
-						ref={ this.inputRef }
-					/>
+			<div className="editor-url-input">
+				<input
+					autoFocus={ autoFocus }
+					type="text"
+					aria-label={ __( 'URL' ) }
+					required
+					value={ value }
+					onChange={ this.onChange }
+					onInput={ stopEventPropagation }
+					placeholder={ __( 'Paste URL or type to search' ) }
+					onKeyDown={ this.onKeyDown }
+					role="combobox"
+					aria-expanded={ showSuggestions }
+					aria-autocomplete="list"
+					aria-owns={ `editor-url-input-suggestions-${ instanceId }` }
+					aria-activedescendant={ selectedSuggestion !== null ? `editor-url-input-suggestion-${ instanceId }-${ selectedSuggestion }` : undefined }
+					ref={ this.inputRef }
+				/>
 
-					{ ( loading ) && <Spinner /> }
-				</div>
+				{ ( loading ) && <Spinner /> }
 
 				{ showSuggestions && !! posts.length &&
 					<Popover position="bottom" noArrow focusOnMount={ false }>
@@ -281,7 +279,7 @@ class URLInput extends Component {
 						</div>
 					</Popover>
 				}
-			</Fragment>
+			</div>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}

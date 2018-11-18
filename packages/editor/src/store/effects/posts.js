@@ -110,7 +110,6 @@ export const requestPostUpdate = async ( action, store ) => {
 			...pick( post, [ 'title', 'content', 'excerpt' ] ),
 			...getAutosave( state ),
 			...toSend,
-			parent: post.id,
 		};
 
 		request = apiFetch( {
@@ -313,8 +312,7 @@ export const refreshPost = async ( action, store ) => {
 	const postTypeSlug = getCurrentPostType( getState() );
 	const postType = await resolveSelector( 'core', 'getPostType', postTypeSlug );
 	const newPost = await apiFetch( {
-		path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
-		data: { context: 'edit' },
+		path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit`,
 	} );
 	dispatch( resetPost( newPost ) );
 };

@@ -756,6 +756,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "IsolatedEventContainer",
+		"slug": "isolated-event-container",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/isolated-event-container/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "KeyboardShortcuts",
 		"slug": "keyboard-shortcuts",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/keyboard-shortcuts/README.md",

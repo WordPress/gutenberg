@@ -103,7 +103,7 @@ export default compose( [
 		const {
 			getEditedPostAttribute,
 			getBlockInsertionPoint,
-			getInserterItems,
+			hasInserterItems,
 		} = select( 'core/editor' );
 
 		if ( rootClientId === undefined && index === undefined ) {
@@ -117,7 +117,7 @@ export default compose( [
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			hasItems: getInserterItems( rootClientId ).length > 0,
+			hasItems: hasInserterItems( rootClientId ),
 			rootClientId,
 			index,
 		};

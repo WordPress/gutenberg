@@ -80,7 +80,7 @@ describe( 'List', () => {
 	it( 'can be created by converting a paragraph with line breaks', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'one' );
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'two' );
 		await convertBlock( 'List' );
 

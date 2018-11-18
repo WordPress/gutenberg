@@ -58,6 +58,7 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
+export { default as IsolatedEventContainer } from './isolated-event-container';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
