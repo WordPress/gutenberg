@@ -90,6 +90,12 @@
 		"parent": "extensibility"
 	},
 	{
+		"title": "Annotations",
+		"slug": "annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/extensibility/annotations.md",
+		"parent": "extensibility"
+	},
+	{
 		"title": "Design",
 		"slug": "design",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design.md",
@@ -255,6 +261,12 @@
 		"title": "@wordpress/a11y",
 		"slug": "packages-a11y",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/a11y/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/annotations",
+		"slug": "packages-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/annotations/README.md",
 		"parent": "packages"
 	},
 	{
@@ -927,6 +939,12 @@
 		"title": "WordPress Core Data",
 		"slug": "data-core",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core.md",
+		"parent": "data"
+	},
+	{
+		"title": "Annotations",
+		"slug": "data-core-annotations",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/data/data-core-annotations.md",
 		"parent": "data"
 	},
 	{

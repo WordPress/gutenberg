@@ -343,6 +343,26 @@ describe( 'block parser', () => {
 				undefAmbiguousStringWithDefault: 'ok',
 			} );
 		} );
+
+		it( 'should work when block type is passed as string', () => {
+			registerBlockType( 'core/meal', {
+				title: 'Meal',
+				category: 'widgets',
+				attributes: {
+					content: {
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: () => {},
+			} );
+
+			const innerHTML = '<div data-number="10">Ribs</div>';
+
+			expect( getBlockAttributes( 'core/meal', innerHTML ) ).toEqual( {
+				content: 'Ribs',
+			} );
+		} );
 	} );
 
 	describe( 'getMigratedBlock', () => {

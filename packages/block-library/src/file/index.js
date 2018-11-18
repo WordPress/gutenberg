@@ -77,20 +77,27 @@ export const settings = {
 		from: [
 			{
 				type: 'files',
-				isMatch: ( files ) => files.length === 1,
+				isMatch( files ) {
+					return files.length > 0;
+				},
 				// We define a lower priorty (higher number) than the default of 10. This
 				// ensures that the File block is only created as a fallback.
 				priority: 15,
 				transform: ( files ) => {
-					const file = files[ 0 ];
-					const blobURL = createBlobURL( file );
+					const blocks = [];
 
-					// File will be uploaded in componentDidMount()
-					return createBlock( 'core/file', {
-						href: blobURL,
-						fileName: file.name,
-						textLinkHref: blobURL,
+					files.map( ( file ) => {
+						const blobURL = createBlobURL( file );
+
+						// File will be uploaded in componentDidMount()
+						blocks.push( createBlock( 'core/file', {
+							href: blobURL,
+							fileName: file.name,
+							textLinkHref: blobURL,
+						} ) );
 					} );
+
+					return blocks;
 				},
 			},
 			{

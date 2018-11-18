@@ -128,12 +128,12 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/editor' );
 		const { clientId } = ownProps;
-		const parentClientId = getBlockRootClientId( clientId );
+		const rootClientId = getBlockRootClientId( clientId );
 		return {
 			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
 			block: getBlock( clientId ),
 			blockListSettings: getBlockListSettings( clientId ),
-			parentLock: getTemplateLock( parentClientId ),
+			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -142,7 +142,7 @@ InnerBlocks = compose( [
 			insertBlocks,
 			updateBlockListSettings,
 		} = dispatch( 'core/editor' );
-		const { block, clientId } = ownProps;
+		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
 
 		return {
 			replaceInnerBlocks( blocks ) {
@@ -150,7 +150,7 @@ InnerBlocks = compose( [
 				if ( clientIds.length ) {
 					replaceBlocks( clientIds, blocks );
 				} else {
-					insertBlocks( blocks, undefined, clientId );
+					insertBlocks( blocks, undefined, clientId, templateInsertUpdatesSelection );
 				}
 			},
 			updateNestedSettings( settings ) {

@@ -6,23 +6,17 @@ import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
-function fromFormat( { type, attributes, object } ) {
+function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	const formatType = getFormatType( type );
 
 	if ( ! formatType ) {
 		return { type, attributes, object };
 	}
 
-	if ( ! attributes ) {
-		return {
-			type: formatType.match.tagName,
-			object: formatType.object,
-		};
-	}
-
-	const elementAttributes = {};
+	const elementAttributes = { ...unregisteredAttributes };
 
 	for ( const name in attributes ) {
 		const key = formatType.attributes[ name ];
@@ -34,8 +28,16 @@ function fromFormat( { type, attributes, object } ) {
 		}
 	}
 
+	if ( formatType.className ) {
+		if ( elementAttributes.class ) {
+			elementAttributes.class = `${ formatType.className } ${ elementAttributes.class }`;
+		} else {
+			elementAttributes.class = formatType.className;
+		}
+	}
+
 	return {
-		type: formatType.match.tagName,
+		type: formatType.tagName,
 		object: formatType.object,
 		attributes: elementAttributes,
 	};
@@ -44,7 +46,7 @@ function fromFormat( { type, attributes, object } ) {
 export function toTree( {
 	value,
 	multilineTag,
-	multilineWrapperTags,
+	multilineWrapperTags = [],
 	createEmpty,
 	append,
 	getLastChild,
@@ -55,8 +57,9 @@ export function toTree( {
 	appendText,
 	onStartIndex,
 	onEndIndex,
+	isEditableTree,
 } ) {
-	const { formats, text, start, end } = value;
+	const { formats, text, start, end, formatPlaceholder } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
@@ -71,6 +74,22 @@ export function toTree( {
 		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
 	} else {
 		append( tree, '' );
+	}
+
+	function setFormatPlaceholder( pointer, index ) {
+		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === index ) {
+			const parent = getParent( pointer );
+
+			if ( formatPlaceholder.format === undefined ) {
+				pointer = getParent( parent );
+			} else {
+				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
+			}
+
+			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
+		}
+
+		return pointer;
 	}
 
 	for ( let i = 0; i < formatsLength; i++ ) {
@@ -127,15 +146,14 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes, object } = format;
 				const parent = getParent( pointer );
-				const newNode = append( parent, fromFormat( { type, attributes, object } ) );
+				const newNode = append( parent, fromFormat( format ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );
 				}
 
-				pointer = append( object ? parent : newNode, '' );
+				pointer = append( format.object ? parent : newNode, '' );
 			} );
 		}
 
@@ -145,6 +163,8 @@ export function toTree( {
 			lastCharacter = character;
 			continue;
 		}
+
+		pointer = setFormatPlaceholder( pointer, 0 );
 
 		// If there is selection at 0, handle it before characters are inserted.
 		if ( i === 0 ) {
@@ -168,6 +188,8 @@ export function toTree( {
 				appendText( pointer, character );
 			}
 		}
+
+		pointer = setFormatPlaceholder( pointer, i + 1 );
 
 		if ( onStartIndex && start === i + 1 ) {
 			onStartIndex( tree, pointer );

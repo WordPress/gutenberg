@@ -43,13 +43,6 @@ describe( 'block toolbar', () => {
 				// until starting to type within it.
 				await page.keyboard.type( 'Example' );
 
-				// [TEMPORARY]: With non-unified toolbar, the toolbar will not
-				// be visible since the user has entered a "typing" mode.
-				// Future iterations should ensure Alt+F10 works in a block
-				// to focus the toolbar regardless of whether it is presently
-				// visible.
-				await page.keyboard.press( 'Escape' );
-
 				// Upward
 				await pressWithModifier( 'Alt', 'F10' );
 				expect( await isInBlockToolbar() ).toBe( true );

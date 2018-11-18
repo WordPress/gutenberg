@@ -21,7 +21,7 @@ import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 
-const BlockInspector = ( { selectedBlock, blockType, count } ) => {
+const BlockInspector = ( { selectedBlock, blockType, count, hasBlockStyles } ) => {
 	if ( count > 1 ) {
 		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
@@ -46,7 +46,7 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 					<div className="editor-block-inspector__card-description">{ blockType.description }</div>
 				</div>
 			</div>
-			{ !! blockType.styles && (
+			{ hasBlockStyles && (
 				<div>
 					<PanelBody
 						title={ __( 'Styles' ) }
@@ -80,12 +80,15 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 export default withSelect(
 	( select ) => {
 		const { getSelectedBlock, getSelectedBlockCount } = select( 'core/editor' );
+		const { getBlockStyles } = select( 'core/blocks' );
 		const selectedBlock = getSelectedBlock();
 		const blockType = selectedBlock && getBlockType( selectedBlock.name );
+		const blockStyles = selectedBlock && getBlockStyles( selectedBlock.name );
 		return {
+			count: getSelectedBlockCount(),
+			hasBlockStyles: blockStyles && blockStyles.length > 0,
 			selectedBlock,
 			blockType,
-			count: getSelectedBlockCount(),
 		};
 	}
 )( BlockInspector );

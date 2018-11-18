@@ -5,11 +5,12 @@ import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { G, Path, SVG } from '@wordpress/components';
+import edit from './edit';
 
 export const name = 'core/nextpage';
 
 export const settings = {
-	title: __( 'Page break' ),
+	title: __( 'Page Break' ),
 
 	description: __( 'Separate your content into a multi-page experience.' ),
 
@@ -42,13 +43,7 @@ export const settings = {
 		],
 	},
 
-	edit() {
-		return (
-			<div className="wp-block-nextpage">
-				<span>{ __( 'Page break' ) }</span>
-			</div>
-		);
-	},
+	edit,
 
 	save() {
 		return (

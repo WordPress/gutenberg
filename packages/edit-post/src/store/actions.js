@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {string} name Sidebar name to be opened.
@@ -114,22 +109,6 @@ export function toggleEditorPanelOpened( panelName ) {
 		type: 'TOGGLE_PANEL_OPENED',
 		panelName,
 	};
-}
-
-/**
- * Returns an action object used to open or close a panel in the editor.
- *
- * @param {string} panelName A string that identifies the panel to open or close.
- *
- * @return {Object} Action object.
-*/
-export function toggleGeneralSidebarEditorPanel( panelName ) {
-	deprecated( 'toggleGeneralSidebarEditorPanel', {
-		alternative: 'toggleEditorPanelOpened',
-		plugin: 'Gutenberg',
-		version: '4.3.0',
-	} );
-	return toggleEditorPanelOpened( panelName );
 }
 
 /**

@@ -444,9 +444,27 @@ function gutenberg_register_post_types() {
 		'wp_block',
 		array(
 			'labels'                => array(
-				'name'          => __( 'Blocks', 'gutenberg' ),
-				'singular_name' => __( 'Block', 'gutenberg' ),
-				'search_items'  => __( 'Search Blocks', 'gutenberg' ),
+				'name'                     => _x( 'Blocks', 'post type general name', 'gutenberg' ),
+				'singular_name'            => _x( 'Block', 'post type singular name', 'gutenberg' ),
+				'menu_name'                => _x( 'Blocks', 'admin menu', 'gutenberg' ),
+				'name_admin_bar'           => _x( 'Block', 'add new on admin bar', 'gutenberg' ),
+				'add_new'                  => _x( 'Add New', 'Block', 'gutenberg' ),
+				'add_new_item'             => __( 'Add New Block', 'gutenberg' ),
+				'new_item'                 => __( 'New Block', 'gutenberg' ),
+				'edit_item'                => __( 'Edit Block', 'gutenberg' ),
+				'view_item'                => __( 'View Block', 'gutenberg' ),
+				'all_items'                => __( 'All Blocks', 'gutenberg' ),
+				'search_items'             => __( 'Search Blocks', 'gutenberg' ),
+				'not_found'                => __( 'No blocks found.', 'gutenberg' ),
+				'not_found_in_trash'       => __( 'No blocks found in Trash.', 'gutenberg' ),
+				'filter_items_list'        => __( 'Filter blocks list', 'gutenberg' ),
+				'items_list_navigation'    => __( 'Blocks list navigation', 'gutenberg' ),
+				'items_list'               => __( 'Blocks list', 'gutenberg' ),
+				'item_published'           => __( 'Block published.', 'gutenberg' ),
+				'item_published_privately' => __( 'Block published privately.', 'gutenberg' ),
+				'item_reverted_to_draft'   => __( 'Block reverted to draft.', 'gutenberg' ),
+				'item_scheduled'           => __( 'Block scheduled.', 'gutenberg' ),
+				'item_updated'             => __( 'Block updated.', 'gutenberg' ),
 			),
 			'public'                => false,
 			'show_ui'               => true,
@@ -515,6 +533,35 @@ function gutenberg_register_post_types() {
 	}
 }
 add_action( 'init', 'gutenberg_register_post_types' );
+
+/**
+ * Apply the correct labels for Reusable Blocks in the bulk action updated messages.
+ *
+ * @since 4.3.0
+ *
+ * @param array $messages    Arrays of messages, each keyed by the corresponding post type.
+ * @param array $bulk_counts Array of item counts for each message, used to build internationalized strings.
+ *
+ * @return array
+ */
+function gutenberg_bulk_post_updated_messages( $messages, $bulk_counts ) {
+	$messages['wp_block'] = array(
+		// translators: Number of blocks updated.
+		'updated'   => _n( '%s block updated.', '%s blocks updated.', $bulk_counts['updated'], 'gutenberg' ),
+		// translators: Blocks not updated because they're locked.
+		'locked'    => ( 1 == $bulk_counts['locked'] ) ? __( '1 block not updated, somebody is editing it.', 'gutenberg' ) : _n( '%s block not updated, somebody is editing it.', '%s blocks not updated, somebody is editing them.', $bulk_counts['locked'], 'gutenberg' ),
+		// translators: Number of blocks deleted.
+		'deleted'   => _n( '%s block permanently deleted.', '%s blocks permanently deleted.', $bulk_counts['deleted'], 'gutenberg' ),
+		// translators: Number of blocks trashed.
+		'trashed'   => _n( '%s block moved to the Trash.', '%s blocks moved to the Trash.', $bulk_counts['trashed'], 'gutenberg' ),
+		// translators: Number of blocks untrashed.
+		'untrashed' => _n( '%s block restored from the Trash.', '%s blocks restored from the Trash.', $bulk_counts['untrashed'], 'gutenberg' ),
+	);
+
+	return $messages;
+}
+
+add_filter( 'bulk_post_updated_messages', 'gutenberg_bulk_post_updated_messages', 10, 2 );
 
 /**
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.

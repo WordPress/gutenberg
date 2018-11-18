@@ -140,7 +140,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for exisiting blocks.
+Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for existing blocks.
 
 #### Attributes (optional)
 
@@ -490,7 +490,7 @@ className: false,
 html: false,
 ```
 
-- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programatically, set `inserter` to `false`.
+- `inserter` (default `true`): By default, all blocks will appear in the Gutenberg inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
 
 ```js
 // Hide this block from the inserter.
@@ -504,6 +504,13 @@ inserter: false,
 multiple: false,
 ```
 
+- `reusable` (default `true`): A block may want to disable the ability of being converted into a reusable block.
+By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
+
+```js
+// Don't allow the block to be converted into a reusable block.
+reusable: false,
+```
 ## Edit and Save
 
 The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).

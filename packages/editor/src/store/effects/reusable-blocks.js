@@ -26,14 +26,14 @@ import { dispatch as dataDispatch } from '@wordpress/data';
  */
 import { resolveSelector } from './utils';
 import {
-	receiveReusableBlocks as receiveReusableBlocksAction,
+	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
 	removeBlocks,
 	replaceBlocks,
 	receiveBlocks,
-	saveReusableBlock,
+	__experimentalSaveReusableBlock as saveReusableBlock,
 } from '../actions';
 import {
-	getReusableBlock,
+	__experimentalGetReusableBlock as getReusableBlock,
 	getBlock,
 	getBlocks,
 	getBlocksByClientId,

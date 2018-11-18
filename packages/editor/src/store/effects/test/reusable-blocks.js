@@ -27,13 +27,13 @@ import {
 import {
 	resetBlocks,
 	receiveBlocks,
-	saveReusableBlock,
-	deleteReusableBlock,
+	__experimentalSaveReusableBlock as saveReusableBlock,
+	__experimentalDeleteReusableBlock as deleteReusableBlock,
 	removeBlocks,
-	convertBlockToReusable as convertBlockToReusableAction,
-	convertBlockToStatic as convertBlockToStaticAction,
-	receiveReusableBlocks as receiveReusableBlocksAction,
-	fetchReusableBlocks as fetchReusableBlocksAction,
+	__experimentalConvertBlockToReusable as convertBlockToReusableAction,
+	__experimentalConvertBlockToStatic as convertBlockToStaticAction,
+	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
+	__experimentalFetchReusableBlocks as fetchReusableBlocksAction,
 } from '../../actions';
 import reducer from '../../reducer';
 import '../../..'; // Ensure store dependencies are imported via root.

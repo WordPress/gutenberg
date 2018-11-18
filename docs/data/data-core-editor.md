@@ -36,6 +36,18 @@ the post has been saved.
 
 Whether the post is new.
 
+### hasChangedContent
+
+Returns true if content includes unsaved changes, or false otherwise.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether content includes unsaved changes.
+
 ### isEditedPostDirty
 
 Returns true if there are unsaved values for the current edit session, or
@@ -138,6 +150,20 @@ been saved.
 *Returns*
 
 Object of key value pairs comprising unsaved edits.
+
+### getReferenceByDistinctEdits
+
+Returns a new reference when edited values have changed. This is useful in
+inferring where an edit has been made between states by comparison of the
+return values using strict equality.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+A value whose reference will change only when an edit occurs.
 
 ### getCurrentPostAttribute
 
@@ -707,7 +733,7 @@ otherwise.
 
 *Returns*
 
-Whether block is first in mult-selection.
+Whether block is first in multi-selection.
 
 ### isBlockMultiSelected
 
@@ -871,7 +897,7 @@ True if multi-selecting, false if not.
 
 ### isSelectionEnabled
 
-Whether is selection disable or not.
+Selector that returns if multi-selection is enabled or not.
 
 *Parameters*
 
@@ -879,7 +905,7 @@ Whether is selection disable or not.
 
 *Returns*
 
-True if multi is disable, false if not.
+True if it should be possible to multi-select blocks, false if multi-selection is disabled.
 
 ### getBlockMode
 
@@ -1074,17 +1100,13 @@ Post content.
 
 ### canInsertBlockType
 
-Determines if the given block type is allowed to be inserted, and, if
-parentClientId is provided, whether it is allowed to be nested within the
-given parent.
+Determines if the given block type is allowed to be inserted into the block list.
 
 *Parameters*
 
  * state: Editor state.
- * blockName: The name of the given block type, e.g.
-                                'core/paragraph'.
- * parentClientId: The parent that the given block is to be
-                                nested within, or null.
+ * blockName: The name of the block type, e.g.' core/paragraph'.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
@@ -1114,13 +1136,13 @@ Items are returned ordered descendingly by their 'utility' and 'frecency'.
 *Parameters*
 
  * state: Editor state.
- * parentClientId: The block we are inserting into, if any.
+ * rootClientId: Optional root client ID of block list.
 
 *Returns*
 
 Items that appear in inserter.
 
-### getReusableBlock
+### __experimentalGetReusableBlock
 
 Returns the reusable block with the given ID.
 
@@ -1133,7 +1155,7 @@ Returns the reusable block with the given ID.
 
 The reusable block, or null if none exists.
 
-### isSavingReusableBlock
+### __experimentalIsSavingReusableBlock
 
 Returns whether or not the reusable block with the given ID is being saved.
 
@@ -1146,7 +1168,7 @@ Returns whether or not the reusable block with the given ID is being saved.
 
 Whether or not the reusable block is being saved.
 
-### isFetchingReusableBlock
+### __experimentalIsFetchingReusableBlock
 
 Returns true if the reusable block with the given ID is being fetched, or
 false otherwise.
@@ -1160,7 +1182,7 @@ false otherwise.
 
 Whether the reusable block is being fetched.
 
-### getReusableBlocks
+### __experimentalGetReusableBlocks
 
 Returns an array of all reusable blocks.
 
@@ -1381,6 +1403,7 @@ the specified post object and editor settings.
 *Parameters*
 
  * post: Post object.
+ * edits: Initial edited attributes object.
 
 ### resetPost
 
@@ -1417,7 +1440,6 @@ Returns an action object used to setup the editor state when first opening an ed
 
  * post: Post object.
  * blocks: Array of blocks.
- * edits: Initial edited attributes object.
 
 ### resetBlocks
 
@@ -1522,8 +1544,8 @@ inserted, optionally at a specific index respective a root block list.
 
  * block: Block object to insert.
  * index: Index at which block should be inserted.
- * rootClientId: Optional root client ID of block list on which
-                              to insert.
+ * rootClientId: Optional root client ID of block list on which to insert.
+ * updateSelection: If true block selection will be updated. If false, block selection will not change. Defaults to true.
 
 ### insertBlocks
 
@@ -1534,13 +1556,19 @@ be inserted, optionally at a specific index respective a root block list.
 
  * blocks: Block objects to insert.
  * index: Index at which block should be inserted.
- * rootClientId: Optional root cliente ID of block list on
-                               which to insert.
+ * rootClientId: Optional root cliente ID of block list on which to insert.
+ * updateSelection: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
 
 ### showInsertionPoint
 
 Returns an action object used in signalling that the insertion point should
 be shown.
+
+*Parameters*
+
+ * rootClientId: Optional root client ID of block list on
+                              which to insert.
+ * index: Index at which block should be inserted.
 
 ### hideInsertionPoint
 
@@ -1557,6 +1585,15 @@ Returns an action object resetting the template validity.
 ### synchronizeTemplate
 
 Returns an action object synchronize the template with the list of blocks
+
+### editPost
+
+Returns an action object used in signalling that attributes of the post have
+been edited.
+
+*Parameters*
+
+ * edits: Post attributes to edit.
 
 ### savePost
 
@@ -1649,7 +1686,7 @@ Returns an action object used to lock the editor.
 
  * lock: Details about the post lock status, user, and nonce.
 
-### fetchReusableBlocks
+### __experimentalFetchReusableBlocks
 
 Returns an action object used to fetch a single reusable block or all
 reusable blocks from the REST API into the store.
@@ -1659,7 +1696,7 @@ reusable blocks from the REST API into the store.
  * id: If given, only a single reusable block with this ID will
                     be fetched.
 
-### receiveReusableBlocks
+### __experimentalReceiveReusableBlocks
 
 Returns an action object used in signalling that reusable blocks have been
 received. `results` is an array of objects containing:
@@ -1670,7 +1707,7 @@ received. `results` is an array of objects containing:
 
  * results: Reusable blocks received.
 
-### saveReusableBlock
+### __experimentalSaveReusableBlock
 
 Returns an action object used to save a reusable block that's in the store to
 the REST API.
@@ -1679,7 +1716,7 @@ the REST API.
 
  * id: The ID of the reusable block to save.
 
-### deleteReusableBlock
+### __experimentalDeleteReusableBlock
 
 Returns an action object used to delete a reusable block via the REST API.
 
@@ -1687,7 +1724,7 @@ Returns an action object used to delete a reusable block via the REST API.
 
  * id: The ID of the reusable block to delete.
 
-### updateReusableBlockTitle
+### __experimentalUpdateReusableBlockTitle
 
 Returns an action object used in signalling that a reusable block's title is
 to be updated.
@@ -1697,7 +1734,7 @@ to be updated.
  * id: The ID of the reusable block to update.
  * title: The new title.
 
-### convertBlockToStatic
+### __experimentalConvertBlockToStatic
 
 Returns an action object used to convert a reusable block into a static block.
 
@@ -1705,7 +1742,7 @@ Returns an action object used to convert a reusable block into a static block.
 
  * clientId: The client ID of the block to attach.
 
-### convertBlockToReusable
+### __experimentalConvertBlockToReusable
 
 Returns an action object used to convert a static block into a reusable block.
 
@@ -1767,13 +1804,6 @@ Returns an action object used to signal that post saving is unlocked.
 
  * lockName: The lock name.
 
-### addTermToEditedPost
-
-Returns an action object signaling that a new term is added to the edited post.
-
-*Parameters*
-
- * slug: Taxonomy slug.
- * term: Term object.
-
 ### createNotice
+
+### fetchReusableBlocks

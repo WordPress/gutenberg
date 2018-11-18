@@ -9,7 +9,6 @@ import { pick, includes } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 // TODO: Ideally this would be the only dispatch in scope. This requires either
 // refactoring editor actions to yielded controls, or replacing direct dispatch
 // on the editor store with action creators (e.g. `REQUEST_POST_UPDATE_START`).
@@ -172,18 +171,8 @@ export const requestPostUpdate = async ( action, store ) => {
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const requestPostUpdateSuccess = ( action, store ) => {
+export const requestPostUpdateSuccess = ( action ) => {
 	const { previousPost, post, isAutosave, postType } = action;
-	const { dispatch, getState } = store;
-
-	// TEMPORARY: If edits remain after a save completes, the user must be
-	// prompted about unsaved changes. This should be refactored as part of
-	// the `isEditedPostDirty` selector instead.
-	//
-	// See: https://github.com/WordPress/gutenberg/issues/7409
-	if ( Object.keys( getPostEdits( getState() ) ).length ) {
-		dispatch( { type: 'DIRTY_ARTIFICIALLY' } );
-	}
 
 	// Autosaves are neither shown a notice nor redirected.
 	if ( isAutosave ) {
@@ -266,25 +255,6 @@ export const requestPostUpdateFailure = ( action ) => {
 	dataDispatch( 'core/notices' ).createErrorNotice( noticeMessage, {
 		id: SAVE_POST_NOTICE_ID,
 	} );
-
-	if ( error && 'cloudflare_error' === error.code ) {
-		dataDispatch( 'core/notices' ).createErrorNotice(
-			__( 'Cloudflare is blocking REST API requests.' ),
-			{
-				actions: [
-					{
-						label: __( 'Learn More' ),
-						url: addQueryArgs( 'post.php', {
-							post: post.id,
-							action: 'edit',
-							'classic-editor': '',
-							'cloudflare-error': '',
-						} ),
-					},
-				],
-			},
-		);
-	}
 };
 
 /**

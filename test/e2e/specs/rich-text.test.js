@@ -45,4 +45,17 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should apply formatting when selection is collapsed', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Some ' );
+		// All following characters should now be bold.
+		await pressWithModifier( META_KEY, 'b' );
+		await page.keyboard.type( 'bold' );
+		// All following characters should no longer be bold.
+		await pressWithModifier( META_KEY, 'b' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

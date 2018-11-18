@@ -9,9 +9,10 @@ import { __ } from '@wordpress/i18n';
 import NavigableToolbar from '../navigable-toolbar';
 import { BlockToolbar } from '../';
 
-function BlockContextualToolbar() {
+function BlockContextualToolbar( { focusOnMount } ) {
 	return (
 		<NavigableToolbar
+			focusOnMount={ focusOnMount }
 			className="editor-block-contextual-toolbar"
 			aria-label={ __( 'Block Toolbar' ) }
 		>

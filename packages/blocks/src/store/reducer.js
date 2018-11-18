@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { keyBy, omit } from 'lodash';
+import { keyBy, omit, mapValues, get, uniqBy, filter, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,10 +34,54 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy( action.blockTypes, 'name' ),
+				...keyBy(
+					map( action.blockTypes, ( blockType ) => omit( blockType, 'styles ' ) ),
+					'name'
+				),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the block style variations.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockStyles( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_TYPES':
+			return {
+				...state,
+				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
+					return uniqBy( [
+						...get( blockType, [ 'styles' ], [] ),
+						...get( state, [ blockType.name ], [] ),
+					], ( style ) => style.name );
+				} ),
+			};
+		case 'ADD_BLOCK_STYLES':
+			return {
+				...state,
+				[ action.blockName ]: uniqBy( [
+					...get( state, [ action.blockName ], [] ),
+					...( action.styles ),
+				], ( style ) => style.name ),
+			};
+		case 'REMOVE_BLOCK_STYLES':
+			return {
+				...state,
+				[ action.blockName ]: filter(
+					get( state, [ action.blockName ], [] ),
+					( style ) => action.styleNames.indexOf( style.name ) === -1,
+				),
+			};
 	}
 
 	return state;
@@ -68,7 +112,6 @@ export function createBlockNameSetterReducer( setActionType ) {
 }
 
 export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK_NAME' );
-
 export const freeformFallbackBlockName = createBlockNameSetterReducer( 'SET_FREEFORM_FALLBACK_BLOCK_NAME' );
 export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME' );
 
@@ -90,6 +133,7 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 
 export default combineReducers( {
 	blockTypes,
+	blockStyles,
 	defaultBlockName,
 	freeformFallbackBlockName,
 	unregisteredFallbackBlockName,

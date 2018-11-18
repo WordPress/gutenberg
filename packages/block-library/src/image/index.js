@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	getBlockAttributes,
-	getBlockType,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
@@ -133,8 +132,7 @@ export const settings = {
 					const anchorElement = node.querySelector( 'a' );
 					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
-					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href } );
+					const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href } );
 					return createBlock( 'core/image', attributes );
 				},
 			},

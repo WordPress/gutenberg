@@ -1,5 +1,6 @@
 export {
 	createBlock,
+	switchToBlockType,
 } from './factory';
 export {
 	default as parse,
@@ -18,6 +19,7 @@ export {
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
+	isReusableBlock,
 } from './registration';
 export { getPhrasingContentSchema } from './raw-handling';
 export { default as children } from './children';

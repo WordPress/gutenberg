@@ -558,7 +558,7 @@ describe( 'validation', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const isValid = isValidBlockContent(
-				getBlockType( 'core/test-block' ),
+				'core/test-block',
 				{ fruit: 'Bananas' },
 				'Apples'
 			);
@@ -577,7 +577,7 @@ describe( 'validation', () => {
 			} );
 
 			const isValid = isValidBlockContent(
-				getBlockType( 'core/test-block' ),
+				'core/test-block',
 				{ fruit: 'Bananas' },
 				'Bananas'
 			);
@@ -587,6 +587,18 @@ describe( 'validation', () => {
 		} );
 
 		it( 'returns true is block is valid', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
+			);
+
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'works also when block type object is passed as object', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const isValid = isValidBlockContent(

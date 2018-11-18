@@ -1,11 +1,4 @@
 {
-	"coverageDirectory": "coverage",
-	"coveragePathIgnorePatterns": [
-		"/node_modules/",
-		"<rootDir>/.*/build/",
-		"<rootDir>/.*/build-module/",
-		"<rootDir>/.*/test/"
-	],
 	"moduleNameMapper": {
 		"\\.(scss|css)$": "<rootDir>/node_modules/@wordpress/jest-preset-default/scripts/style-mock.js"
 	},

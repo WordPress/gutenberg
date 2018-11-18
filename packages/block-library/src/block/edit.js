@@ -146,9 +146,9 @@ class ReusableBlockEdit extends Component {
 export default compose( [
 	withSelect( ( select, ownProps ) => {
 		const {
-			getReusableBlock,
-			isFetchingReusableBlock,
-			isSavingReusableBlock,
+			__experimentalGetReusableBlock: getReusableBlock,
+			__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
+			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
 			getBlock,
 		} = select( 'core/editor' );
 		const { ref } = ownProps.attributes;
@@ -163,10 +163,10 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const {
-			fetchReusableBlocks,
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 			updateBlockAttributes,
-			updateReusableBlockTitle,
-			saveReusableBlock,
+			__experimentalUpdateReusableBlockTitle: updateReusableBlockTitle,
+			__experimentalSaveReusableBlock: saveReusableBlock,
 		} = dispatch( 'core/editor' );
 		const { ref } = ownProps.attributes;
 

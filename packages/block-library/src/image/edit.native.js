@@ -2,11 +2,14 @@
  * External dependencies
  */
 import { View, Image, TextInput } from 'react-native';
+import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder } from '@wordpress/editor';
+import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
+import { Toolbar, IconButton } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 export default function ImageEdit( props ) {
 	const { attributes, isSelected, setAttributes } = props;
@@ -19,9 +22,11 @@ export default function ImageEdit( props ) {
 	};
 
 	const onMediaLibraryPress = () => {
-		// This method should present an image picker from
-		// the WordPress media library.
-		//TODO: Implement media library method.
+		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
+			if ( mediaUrl ) {
+				setAttributes( { url: mediaUrl } );
+			}
+		} );
 	};
 
 	if ( ! url ) {
@@ -33,14 +38,28 @@ export default function ImageEdit( props ) {
 		);
 	}
 
+	const toolbarEditButton = (
+		<Toolbar>
+			<IconButton
+				className="components-toolbar__control"
+				label={ __( 'Edit image' ) }
+				icon="edit"
+				onClick={ onMediaLibraryPress }
+			/>
+		</Toolbar>
+	);
+
 	return (
 		<View style={ { flex: 1 } }>
+			<BlockControls>
+				{ toolbarEditButton }
+			</BlockControls>
 			<Image
 				style={ { width: '100%', height: 200 } }
 				resizeMethod="scale"
 				source={ { uri: url } }
 			/>
-			{ ( caption.length > 0 || isSelected ) && (
+			{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 				<View style={ { padding: 12, flex: 1 } }>
 					<TextInput
 						style={ { textAlign: 'center' } }

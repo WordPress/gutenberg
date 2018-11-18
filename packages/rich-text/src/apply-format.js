@@ -2,15 +2,13 @@
  * External dependencies
  */
 
-import { find, reject } from 'lodash';
+import { find } from 'lodash';
 
 /**
  * Internal dependencies
  */
 
 import { normaliseFormats } from './normalise-formats';
-import { insert } from './insert';
-import { ZERO_WIDTH_NO_BREAK_SPACE } from './special-characters';
 
 /**
  * Apply a format object to a Rich Text value from the given `startIndex` to the
@@ -56,10 +54,16 @@ export function applyFormat(
 			const previousFormat = newFormats[ startIndex - 1 ] || [];
 			const hasType = find( previousFormat, { type: format.type } );
 
-			return insert( { formats, text, start, end }, {
-				formats: hasType ? [ reject( previousFormat, { type: format.type } ) ] : [ [ ...previousFormat, format ] ],
-				text: ZERO_WIDTH_NO_BREAK_SPACE,
-			} );
+			return {
+				formats,
+				text,
+				start,
+				end,
+				formatPlaceholder: {
+					index: startIndex,
+					format: hasType ? undefined : format,
+				},
+			};
 		}
 	} else {
 		for ( let index = startIndex; index < endIndex; index++ ) {

@@ -6,14 +6,16 @@ import {
 	get,
 	isEmpty,
 	map,
+	last,
 	pick,
-	startCase,
+	compact,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { getPath } from '@wordpress/url';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
@@ -98,7 +100,9 @@ class ImageEdit extends Component {
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
+		this.onUploadError = this.onUploadError.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -140,6 +144,14 @@ class ImageEdit extends Component {
 		}
 	}
 
+	onUploadError( message ) {
+		const { noticeOperations } = this.props;
+		noticeOperations.createErrorNotice( message );
+		this.setState( {
+			isEditing: true,
+		} );
+	}
+
 	onSelectImage( media ) {
 		if ( ! media || ! media.url ) {
 			this.props.setAttributes( {
@@ -168,7 +180,7 @@ class ImageEdit extends Component {
 		if ( value === LINK_DESTINATION_NONE ) {
 			href = undefined;
 		} else if ( value === LINK_DESTINATION_MEDIA ) {
-			href = this.props.attributes.url;
+			href = ( this.props.image && this.props.image.source_url ) || this.props.attributes.url;
 		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
 			href = this.props.image && this.props.image.link;
 		} else {
@@ -245,8 +257,11 @@ class ImageEdit extends Component {
 		};
 	}
 
-	getAvailableSizes() {
-		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
+	getFilename( url ) {
+		const path = getPath( url );
+		if ( path ) {
+			return last( path.split( '/' ) );
+		}
 	}
 
 	getLinkDestinationOptions() {
@@ -264,11 +279,36 @@ class ImageEdit extends Component {
 		} );
 	}
 
+	getImageSizeOptions() {
+		const { imageSizes, image } = this.props;
+		return compact( map( imageSizes, ( { name, slug } ) => {
+			const sizeUrl = get( image, [ 'media_details', 'sizes', slug, 'source_url' ] );
+			if ( ! sizeUrl ) {
+				return null;
+			}
+			return {
+				value: sizeUrl,
+				label: name,
+			};
+		} ) );
+	}
+
 	render() {
 		const { isEditing } = this.state;
-		const { attributes, setAttributes, isLargeViewport, isSelected, className, maxWidth, noticeOperations, noticeUI, toggleSelection, isRTL } = this.props;
+		const {
+			attributes,
+			setAttributes,
+			isLargeViewport,
+			isSelected,
+			className,
+			maxWidth,
+			noticeUI,
+			toggleSelection,
+			isRTL,
+		} = this.props;
 		const { url, alt, caption, align, id, href, linkDestination, width, height, linkTarget } = attributes;
 		const isExternal = isExternalImage( id, url );
+		const imageSizeOptions = this.getImageSizeOptions();
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -325,7 +365,7 @@ class ImageEdit extends Component {
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
 						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
+						onError={ this.onUploadError }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						value={ { id, src } }
@@ -340,7 +380,6 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const availableSizes = this.getAvailableSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
 
@@ -353,14 +392,11 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 					/>
-					{ ! isEmpty( availableSizes ) && (
+					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
-							options={ map( availableSizes, ( size, name ) => ( {
-								value: size.source_url,
-								label: startCase( name ),
-							} ) ) }
+							options={ imageSizeOptions }
 							onChange={ this.updateImageURL }
 						/>
 					) }
@@ -461,10 +497,19 @@ class ImageEdit extends Component {
 								imageHeight,
 							} = sizes;
 
+							const filename = this.getFilename( url );
+							let defaultedAlt;
+							if ( alt ) {
+								defaultedAlt = alt;
+							} else if ( filename ) {
+								defaultedAlt = sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), filename );
+							} else {
+								defaultedAlt = __( 'This image has an empty alt attribute' );
+							}
 							// Disable reason: Image itself is not meant to be
 							// interactive, but should direct focus to block
 							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const img = <img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />;
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
@@ -574,12 +619,13 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL } = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
+			imageSizes,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

@@ -13,6 +13,7 @@ import {
 	Placeholder,
 	DropZone,
 	IconButton,
+	withFilters,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
@@ -130,7 +131,7 @@ class MediaPlaceholder extends Component {
 			onHTMLDrop = noop,
 			multiple = false,
 			notices,
-			allowedTypes,
+			allowedTypes = [],
 		} = this.props;
 
 		const {
@@ -233,4 +234,4 @@ class MediaPlaceholder extends Component {
 	}
 }
 
-export default MediaPlaceholder;
+export default withFilters( 'editor.MediaPlaceholder' )( MediaPlaceholder );

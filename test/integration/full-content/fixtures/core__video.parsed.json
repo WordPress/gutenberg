@@ -3,12 +3,14 @@
         "blockName": "core/video",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-video\"><video controls src=\"https://awesome-fake.video/file.mp4\"></video></figure>\n"
+        "innerHTML": "\n<figure class=\"wp-block-video\"><video controls src=\"https://awesome-fake.video/file.mp4\"></video></figure>\n",
+        "innerContent": [ "\n<figure class=\"wp-block-video\"><video controls src=\"https://awesome-fake.video/file.mp4\"></video></figure>\n" ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n"
+        "innerHTML": "\n",
+        "innerContent": [ "\n" ]
     }
 ]

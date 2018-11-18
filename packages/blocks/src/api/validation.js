@@ -13,6 +13,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import { getSaveContent } from './serializer';
+import { normalizeBlockType } from './utils';
 
 /**
  * Globally matches any consecutive whitespace
@@ -508,13 +509,14 @@ export function isValidBlock( innerHTML, blockType, attributes ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param {string} blockType  Block type.
- * @param {Object} attributes Parsed block attributes.
- * @param {string} innerHTML  Original block content.
+ * @param {string|Object} blockTypeOrName Block type.
+ * @param {Object}        attributes      Parsed block attributes.
+ * @param {string}        innerHTML       Original block content.
  *
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockType, attributes, innerHTML ) {
+export function isValidBlockContent( blockTypeOrName, attributes, innerHTML ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
 	let saveContent;
 	try {
 		saveContent = getSaveContent( blockType, attributes );

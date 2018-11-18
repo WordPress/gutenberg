@@ -5,7 +5,7 @@ import { compose } from '@wordpress/compose';
 import { Popover, Button, IconButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { deprecated } from '@wordpress/deprecated';
+import deprecated from '@wordpress/deprecated';
 
 function getAnchorRect( anchor ) {
 	// The default getAnchorRect() excludes an element's top and bottom padding

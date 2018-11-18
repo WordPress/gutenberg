@@ -13,9 +13,23 @@ describe( 'adding blocks', () => {
 		await newPost();
 	} );
 
+	/**
+	 * Given a Puppeteer ElementHandle, clicks below its bounding box.
+	 *
+	 * @param {Puppeteer.ElementHandle} elementHandle Element handle.
+	 *
+	 * @return {Promise} Promise resolving when click occurs.
+	 */
+	async function clickBelow( elementHandle ) {
+		const box = await elementHandle.boundingBox();
+		const x = box.x + ( box.width / 2 );
+		const y = box.y + box.height + 100;
+		return page.mouse.click( x, y );
+	}
+
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// Click below editor to focus last field (block appender)
-		await page.click( '.editor-writing-flow__click-redirect' );
+		await clickBelow( await page.$( '.editor-default-block-appender' ) );
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
@@ -67,11 +81,20 @@ describe( 'adding blocks', () => {
 		await page.click( '.editor-post-title__input' );
 
 		// Using the between inserter
-		const insertionPoint = await page.$( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
+		const insertionPoint = await page.$( '[data-type="core/quote"] .editor-inserter__toggle' );
 		const rect = await insertionPoint.boundingBox();
 		await page.mouse.move( rect.x + ( rect.width / 2 ), rect.y + ( rect.height / 2 ), { steps: 10 } );
-		await page.waitForSelector( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
-		await page.click( '[data-type="core/quote"] .editor-block-list__insertion-point-button' );
+		await page.waitForSelector( '[data-type="core/quote"] .editor-inserter__toggle' );
+		await page.click( '[data-type="core/quote"] .editor-inserter__toggle' );
+		// [TODO]: Search input should be focused immediately. It shouldn't be
+		// necessary to have `waitForFunction`.
+		await page.waitForFunction( () => (
+			document.activeElement &&
+			document.activeElement.classList.contains( 'editor-inserter__search' )
+		) );
+		await page.keyboard.type( 'para' );
+		await pressTimes( 'Tab', 3 );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Switch to Text Mode to check HTML Output

@@ -3,12 +3,12 @@
 /**
  * External dependencies
  */
-import { get, isFunction, some, reject } from 'lodash';
+import { get, isFunction, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { applyFilters, addFilter } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
 
 /**
@@ -329,19 +329,7 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
-	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariation.name }`, ( settings, name ) => {
-		if ( blockName !== name ) {
-			return settings;
-		}
-
-		return {
-			...settings,
-			styles: [
-				...get( settings, [ 'styles' ], [] ),
-				styleVariation,
-			],
-		};
-	} );
+	dispatch( 'core/blocks' ).addBlockStyles( blockName, styleVariation );
 };
 
 /**
@@ -351,14 +339,5 @@ export const registerBlockStyle = ( blockName, styleVariation ) => {
  * @param {string} styleVariationName Name of class applied to the block.
  */
 export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
-	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariationName }/unregister`, ( settings, name ) => {
-		if ( blockName !== name ) {
-			return settings;
-		}
-
-		return {
-			...settings,
-			styles: reject( get( settings, [ 'styles' ], [] ), { name: styleVariationName } ),
-		};
-	} );
+	dispatch( 'core/blocks' ).removeBlockStyles( blockName, styleVariationName );
 };

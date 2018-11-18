@@ -25,7 +25,7 @@ const MyMenuItem = withState( {
 
 MenuItem supports the following props. Any additional props are passed through to the underlying [Button](../button) or [IconButton](../icon-button) component.
 
-### `children` 
+### `children`
 
 - Type: `WPElement`
 - Required: No
@@ -65,3 +65,11 @@ Refer to documentation for [IconButton's `icon` prop](../icon-button/README.md#i
 - Required: No
 
 Refer to documentation for [Shortcut's `shortcut` prop](../shortcut/README.md#shortcut).
+
+### `role`
+
+- Type: `string`
+- Require: No
+- Default: `'menuitem'`
+
+[Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use menuitemradio for single select, and menuitemcheckbox for multiselect.

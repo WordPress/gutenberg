@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray } from 'lodash';
+import { isArray, isString } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ import { Component } from '@wordpress/element';
  */
 import Tooltip from '../tooltip';
 import Button from '../button';
-import Icon from '../icon';
+import Dashicon from '../dashicon';
 
 // This is intentionally a Component class, not a function component because it
 // is common to apply a ref to the button element (only supported in class)
@@ -25,7 +25,7 @@ class IconButton extends Component {
 		const tooltipText = tooltip || label;
 
 		// Should show the tooltip if...
-		const showTooltip = (
+		const showTooltip = ! additionalProps.disabled && (
 			// an explicit tooltip is passed or...
 			tooltip ||
 			// there's a shortcut or...
@@ -42,14 +42,17 @@ class IconButton extends Component {
 
 		let element = (
 			<Button aria-label={ label } { ...additionalProps } className={ classes }>
-				<Icon icon={ icon } />
+				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
 				{ children }
 			</Button>
 		);
 
 		if ( showTooltip ) {
 			element = (
-				<Tooltip text={ tooltipText } shortcut={ shortcut }>
+				<Tooltip
+					text={ tooltipText }
+					shortcut={ shortcut }
+				>
 					{ element }
 				</Tooltip>
 			);

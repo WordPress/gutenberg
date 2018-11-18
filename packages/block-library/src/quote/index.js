@@ -17,15 +17,18 @@ import {
 import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 import { G, Path, SVG } from '@wordpress/components';
 
+const ATTRIBUTE_QUOTE = 'value';
+const ATTRIBUTE_CITATION = 'citation';
+
 const blockAttributes = {
-	value: {
+	[ ATTRIBUTE_QUOTE ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 		default: '',
 	},
-	citation: {
+	[ ATTRIBUTE_CITATION ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'cite',
@@ -115,7 +118,7 @@ export const settings = {
 				blocks: [ 'core/paragraph' ],
 				transform: ( { value, citation } ) => {
 					const paragraphs = [];
-					if ( value ) {
+					if ( value && value !== '<p></p>' ) {
 						paragraphs.push(
 							...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
 								.map( ( piece ) =>
@@ -125,7 +128,7 @@ export const settings = {
 								)
 						);
 					}
-					if ( citation ) {
+					if ( citation && citation !== '<p></p>' ) {
 						paragraphs.push(
 							createBlock( 'core/paragraph', {
 								content: citation,
@@ -189,7 +192,6 @@ export const settings = {
 
 	edit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
 		const { align, value, citation } = attributes;
-
 		return (
 			<Fragment>
 				<BlockControls>
@@ -202,6 +204,7 @@ export const settings = {
 				</BlockControls>
 				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
+						identifier={ ATTRIBUTE_QUOTE }
 						multiline
 						value={ value }
 						onChange={
@@ -216,19 +219,24 @@ export const settings = {
 								onReplace( [] );
 							}
 						} }
-						/* translators: the text of the quotation */
-						placeholder={ __( 'Write quote…' ) }
+						placeholder={
+							// translators: placeholder text used for the quote
+							__( 'Write quote…' )
+						}
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
+							identifier={ ATTRIBUTE_CITATION }
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {
 									citation: nextCitation,
 								} )
 							}
-							/* translators: the individual or entity quoted */
-							placeholder={ __( 'Write citation…' ) }
+							placeholder={
+								// translators: placeholder text used for the citation
+								__( 'Write citation…' )
+							}
 							className="wp-block-quote__citation"
 						/>
 					) }

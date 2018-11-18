@@ -132,17 +132,27 @@ function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
 	}
 }
 
+function prepareFormats( prepareEditableTree = [], value ) {
+	return prepareEditableTree.reduce( ( accumlator, fn ) => {
+		return fn( accumlator, value.text );
+	}, value.formats );
+}
+
 export function toDom( {
 	value,
 	multilineTag,
 	multilineWrapperTags,
 	createLinePadding,
+	prepareEditableTree,
 } ) {
 	let startPath = [];
 	let endPath = [];
 
 	const tree = toTree( {
-		value,
+		value: {
+			...value,
+			formats: prepareFormats( prepareEditableTree, value ),
+		},
 		multilineTag,
 		multilineWrapperTags,
 		createEmpty,
@@ -159,6 +169,7 @@ export function toDom( {
 		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
 		},
+		isEditableTree: true,
 	} );
 
 	if ( createLinePadding ) {
@@ -187,6 +198,7 @@ export function apply( {
 	multilineTag,
 	multilineWrapperTags,
 	createLinePadding,
+	prepareEditableTree,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
@@ -194,6 +206,7 @@ export function apply( {
 		multilineTag,
 		multilineWrapperTags,
 		createLinePadding,
+		prepareEditableTree,
 	} );
 
 	applyValue( body, current );
