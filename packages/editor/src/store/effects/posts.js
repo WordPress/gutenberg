@@ -183,7 +183,7 @@ export const requestPostUpdateSuccess = ( action ) => {
 	const willPublish = includes( publishStatus, post.status );
 
 	let noticeMessage;
-	let shouldShowLink = true;
+	let shouldShowLink = postType.viewable;
 
 	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
