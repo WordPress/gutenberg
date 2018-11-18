@@ -25,7 +25,7 @@ function TableOfContents( { hasBlocks } ) {
 					disabled={ ! hasBlocks }
 				/>
 			) }
-			renderContent={ () => <TableOfContentsPanel /> }
+			renderContent={ ( { onClose } ) => <TableOfContentsPanel close={ onClose } /> }
 		/>
 	);
 }

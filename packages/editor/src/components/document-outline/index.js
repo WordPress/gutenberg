@@ -61,7 +61,7 @@ const computeOutlineHeadings = ( blocks = [], path = [] ) => {
 
 const isEmptyHeading = ( heading ) => ! heading.attributes.content || heading.attributes.content.length === 0;
 
-export const DocumentOutline = ( { blocks = [], title, isTitleSupported } ) => {
+export const DocumentOutline = ( { blocks = [], title, close, isTitleSupported } ) => {
 	const headings = computeOutlineHeadings( blocks );
 
 	if ( headings.length < 1 ) {
@@ -83,6 +83,7 @@ export const DocumentOutline = ( { blocks = [], title, isTitleSupported } ) => {
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
+						close={ close }
 						target={ '#' + titleNode.id }
 					>
 						{ title }
@@ -107,6 +108,7 @@ export const DocumentOutline = ( { blocks = [], title, isTitleSupported } ) => {
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							path={ item.path }
+							close={ close }
 							target={ '#block-' + item.clientId }
 						>
 							{ item.isEmpty ?
