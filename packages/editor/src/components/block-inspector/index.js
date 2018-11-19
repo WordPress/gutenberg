@@ -20,10 +20,11 @@ import BlockIcon from '../block-icon';
 import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
+import MultiSelectionInspector from '../multi-selection-inspector';
 
 const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, count, hasBlockStyles } ) => {
 	if ( count > 1 ) {
-		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
+		return <MultiSelectionInspector />;
 	}
 
 	const isSelectedBlockUnregistered = selectedBlockName === getUnregisteredTypeHandlerName();
