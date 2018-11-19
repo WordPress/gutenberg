@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { deburr, toLower } from 'lodash';
+import { deburr, toLower, trim } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,5 +39,5 @@ export function getWPAdminURL( page, query ) {
  * @return {string} Processed string
  */
 export function cleanForSlug( string ) {
-	return toLower( deburr( string.replace( /[\s\./_]+/g, '-' ) ) );
+	return toLower( deburr( trim( string.replace( /[\s\./_]+/g, '-' ), '-' ) ) );
 }
