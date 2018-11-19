@@ -121,20 +121,13 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes } = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
 			const file = getBlobByURL( url );
-
 			if ( file ) {
-				mediaUpload( {
-					filesList: [ file ],
-					onFileChange: ( [ image ] ) => {
-						setAttributes( pickRelevantMediaFiles( image ) );
-					},
-					allowedTypes: ALLOWED_MEDIA_TYPES,
-				} );
+				this.uploadFile( file );
 			}
 		}
 	}
@@ -152,6 +145,28 @@ class ImageEdit extends Component {
 				captionFocused: false,
 			} );
 		}
+	}
+
+	uploadFile( file ) {
+		this.props.setAttributes(
+			{ url: this.props.attributes.url },
+			{ transient: true }
+		);
+
+		mediaUpload( {
+			filesList: [ file ],
+			onFileChange: ( [ image ] ) => {
+				const { setAttributes } = this.props;
+				const { id, url, ...nextAttributes } = pickRelevantMediaFiles( image );
+				if ( isTemporaryImage( id, url ) ) {
+					setAttributes( { ...nextAttributes, id } );
+					setAttributes( { url }, { transient: true } );
+				} else {
+					setAttributes( { ...nextAttributes, id, url } );
+				}
+			},
+			allowedTypes: ALLOWED_MEDIA_TYPES,
+		} );
 	}
 
 	onUploadError( message ) {
