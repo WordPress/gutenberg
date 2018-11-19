@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PluginBlockSettingsMenuGroupSlot should render normally if block selected has name property 1`] = `
+<PluginBlockSettingsMenuGroupSlot
+  fillProps={
+    Object {
+      "selectedBlocks": Array [
+        "paragraph",
+      ],
+    }
+  }
+>
+  [Function]
+</PluginBlockSettingsMenuGroupSlot>
+`;
