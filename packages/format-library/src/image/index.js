@@ -3,9 +3,9 @@
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { Fragment, Component } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { insertObject } from '@wordpress/rich-text';
-import { MediaUpload, RichTextInserterItem } from '@wordpress/editor';
+import { MediaUpload, RichTextInserterItem, MediaUploadCheck } from '@wordpress/editor';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -46,7 +46,7 @@ export const image = {
 			const { value, onChange } = this.props;
 
 			return (
-				<Fragment>
+				<MediaUploadCheck>
 					<RichTextInserterItem
 						name={ name }
 						icon={ <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 16h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v9c0 1.1.9 2 2 2zM4 5h10v9H4V5zm14 9v2h4v-2h-4zM2 20h20v-2H2v2zm6.4-8.8L7 9.4 5 12h8l-2.6-3.4-2 2.6z" /></SVG> }
@@ -73,7 +73,7 @@ export const image = {
 							return null;
 						} }
 					/> }
-				</Fragment>
+				</MediaUploadCheck>
 			);
 		}
 	},

@@ -24,25 +24,28 @@ You can check how this component is implemented for the edit post page using `wp
 
 ## Usage
 
+To make sure the current user has Upload permissions, you need to wrap the MediaUpload component into the MediaUploadCheck one.
 
 ```jsx
 import { Button } from '@wordpress/components';
-import { MediaUpload } from '@wordpress/editor';
+import { MediaUpload, MediaUploadCheck } from '@wordpress/editor';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function MyMediaUploader() {
 	return (
-		<MediaUpload
-			onSelect={ ( media ) => console.log( 'selected ' + media.length ) }
-			allowedTypes={ ALLOWED_MEDIA_TYPES }
-			value={ mediaId }
-			render={ ( { open } ) => (
-				<Button onClick={ open }>
-					Open Media Library
-				</Button>
-			) }
-		/>
+		<MediaUploadCheck>
+			<MediaUpload
+				onSelect={ ( media ) => console.log( 'selected ' + media.length ) }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ mediaId }
+				render={ ( { open } ) => (
+					<Button onClick={ open }>
+						Open Media Library
+					</Button>
+				) }
+			/>
+		</MediaUploadCheck>
 	);
 }
 ```

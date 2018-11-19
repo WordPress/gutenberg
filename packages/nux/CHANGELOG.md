@@ -1,3 +1,9 @@
+## 3.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- The id prop of DotTip has been removed. Please use the tipId prop instead.
+
 ## 2.0.13 (2018-11-12)
 
 ## 2.0.12 (2018-11-12)

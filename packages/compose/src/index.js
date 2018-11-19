@@ -6,7 +6,6 @@ import { flowRight } from 'lodash';
 export { default as createHigherOrderComponent } from './create-higher-order-component';
 export { default as ifCondition } from './if-condition';
 export { default as pure } from './pure';
-export { default as remountOnPropChange } from './remount-on-prop-change';
 export { default as withGlobalEvents } from './with-global-events';
 export { default as withInstanceId } from './with-instance-id';
 export { default as withSafeTimeout } from './with-safe-timeout';

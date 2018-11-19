@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 4.3.0
+ * Version: 4.4.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -41,9 +41,9 @@ function the_gutenberg_project() {
 			);
 		} else { // Using Gutenberg in Core.
 			printf(
-				// Translators: link is for Classic Editor plugin.
+				/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
 				__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-				'https://wordpress.org/plugins/classic-editor/'
+				__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
 			);
 		}
 		?>
@@ -67,6 +67,9 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
+	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return;
+	}
 	global $submenu;
 
 	add_menu_page(
@@ -199,6 +202,13 @@ function gutenberg_pre_init() {
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
+
+/**
+ * Enable Gutenberg based on user_can_richedit setting.
+ * Set gutenberg_can_edit_post based on user setting for disable visual editor.
+ */
+add_filter( 'gutenberg_can_edit_post_type', 'user_can_richedit', 5 );
+add_filter( 'gutenberg_can_edit_post', 'user_can_richedit', 5 );
 
 /**
  * Initialize Gutenberg.

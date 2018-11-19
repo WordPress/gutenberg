@@ -14,7 +14,8 @@ function BlockContextualToolbar( { focusOnMount } ) {
 		<NavigableToolbar
 			focusOnMount={ focusOnMount }
 			className="editor-block-contextual-toolbar"
-			aria-label={ __( 'Block Toolbar' ) }
+			/* translators: accessibility text for the block toolbar */
+			aria-label={ __( 'Block tools' ) }
 		>
 			<BlockToolbar />
 		</NavigableToolbar>

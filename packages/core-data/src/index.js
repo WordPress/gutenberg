@@ -41,12 +41,10 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 	return result;
 }, {} );
 
-const store = registerStore( REDUCER_KEY, {
+registerStore( REDUCER_KEY, {
 	reducer,
 	controls,
 	actions: { ...actions, ...entityActions },
 	selectors: { ...selectors, ...entitySelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
 } );
-
-export default store;
