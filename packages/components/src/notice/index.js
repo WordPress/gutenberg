@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,10 +22,15 @@ function Notice( {
 	onRemove = noop,
 	isDismissible = true,
 	actions = [],
+	__unstableHTML,
 } ) {
 	const classes = classnames( className, 'components-notice', 'is-' + status, {
 		'is-dismissible': isDismissible,
 	} );
+
+	if ( __unstableHTML ) {
+		children = <RawHTML>{ children }</RawHTML>;
+	}
 
 	return (
 		<div className={ classes }>

@@ -54,7 +54,7 @@ describe( 'insertLineSeparator', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
 	} );
 
-	it( 'should insert line separator in nested item', () => {
+	it( 'should insert line separator with previous line separator formats', () => {
 		const value = {
 			formats: [ , , , [ ol ], , ],
 			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a`,
@@ -72,5 +72,25 @@ describe( 'insertLineSeparator', () => {
 		expect( result ).not.toBe( value );
 		expect( result ).toEqual( expected );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
+	} );
+
+	it( 'should insert line separator without formats if previous line separator did not have any', () => {
+		const value = {
+			formats: [ , , , , , ],
+			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a`,
+			start: 5,
+			end: 5,
+		};
+		const expected = {
+			formats: [ , , , , , , ],
+			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a${ LINE_SEPARATOR }`,
+			start: 6,
+			end: 6,
+		};
+		const result = insertLineSeparator( deepFreeze( value ) );
+
+		expect( result ).not.toBe( value );
+		expect( result ).toEqual( expected );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
 	} );
 } );

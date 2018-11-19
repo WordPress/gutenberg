@@ -14,7 +14,7 @@ import {
 	ToggleControl,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
@@ -84,12 +84,27 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 );
 
-const LinkViewer = ( { url, editLink } ) => {
+const LinkViewerUrl = ( { url } ) => {
 	const prependedURL = prependHTTP( url );
 	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
 		'has-invalid-link': ! isValidHref( prependedURL ),
 	} );
 
+	if ( ! url ) {
+		return <span className={ linkClassName }></span>;
+	}
+
+	return (
+		<ExternalLink
+			className={ linkClassName }
+			href={ url }
+		>
+			{ filterURLForDisplay( safeDecodeURI( url ) ) }
+		</ExternalLink>
+	);
+};
+
+const LinkViewer = ( { url, editLink } ) => {
 	return (
 		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -97,12 +112,7 @@ const LinkViewer = ( { url, editLink } ) => {
 			className="editor-format-toolbar__link-container-content"
 			onKeyPress={ stopKeyPropagation }
 		>
-			<ExternalLink
-				className={ linkClassName }
-				href={ url }
-			>
-				{ filterURLForDisplay( safeDecodeURI( url ) ) }
-			</ExternalLink>
+			<LinkViewerUrl url={ url } />
 			<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
 		</div>
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
@@ -122,7 +132,10 @@ class InlineLinkUI extends Component {
 		this.resetState = this.resetState.bind( this );
 		this.autocompleteRef = createRef();
 
-		this.state = {};
+		this.state = {
+			opensInNewWindow: false,
+			inputValue: '',
+		};
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -143,11 +156,6 @@ class InlineLinkUI extends Component {
 	}
 
 	onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
-			this.resetState();
-		}
-
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
@@ -159,7 +167,7 @@ class InlineLinkUI extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		const { activeAttributes: { url }, value, onChange } = this.props;
+		const { activeAttributes: { url = '' }, value, onChange } = this.props;
 
 		this.setState( { opensInNewWindow } );
 
@@ -234,6 +242,7 @@ class InlineLinkUI extends Component {
 			>
 				<URLPopover
 					onClickOutside={ this.onClickOutside }
+					onClose={ this.resetState }
 					focusOnMount={ showInput ? 'firstElement' : false }
 					renderSettings={ () => (
 						<ToggleControl

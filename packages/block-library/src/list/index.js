@@ -1,22 +1,18 @@
 /**
  * External dependencies
  */
-import { find, omit } from 'lodash';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
 } from '@wordpress/blocks';
-import {
-	BlockControls,
-	RichText,
-} from '@wordpress/editor';
+import { RichText } from '@wordpress/editor';
 import { replace, join, split, create, toHTMLString, LINE_SEPARATOR } from '@wordpress/rich-text';
 import { G, Path, SVG } from '@wordpress/components';
 
@@ -114,25 +110,25 @@ export const settings = {
 					} );
 				},
 			},
-			{
-				type: 'pattern',
-				regExp: /^[*-]\s/,
-				transform: ( { content } ) => {
+			...[ '*', '-' ].map( ( prefix ) => ( {
+				type: 'prefix',
+				prefix,
+				transform( content ) {
 					return createBlock( 'core/list', {
 						values: `<li>${ content }</li>`,
 					} );
 				},
-			},
-			{
-				type: 'pattern',
-				regExp: /^1[.)]\s/,
-				transform: ( { content } ) => {
+			} ) ),
+			...[ '1.', '1)' ].map( ( prefix ) => ( {
+				type: 'prefix',
+				prefix,
+				transform( content ) {
 					return createBlock( 'core/list', {
 						ordered: true,
 						values: `<li>${ content }</li>`,
 					} );
 				},
-			},
+			} ) ),
 		],
 		to: [
 			{
@@ -216,158 +212,50 @@ export const settings = {
 		};
 	},
 
-	edit: class extends Component {
-		constructor() {
-			super( ...arguments );
+	edit( {
+		attributes,
+		insertBlocksAfter,
+		setAttributes,
+		mergeBlocks,
+		onReplace,
+		className,
+	} ) {
+		const { ordered, values } = attributes;
 
-			this.setupEditor = this.setupEditor.bind( this );
-			this.getEditorSettings = this.getEditorSettings.bind( this );
-			this.setNextValues = this.setNextValues.bind( this );
+		return (
+			<RichText
+				identifier="values"
+				multiline="li"
+				tagName={ ordered ? 'ol' : 'ul' }
+				onChange={ ( nextValues ) => setAttributes( { values: nextValues } ) }
+				value={ values }
+				wrapperClassName="block-library-list"
+				className={ className }
+				placeholder={ __( 'Write list…' ) }
+				onMerge={ mergeBlocks }
+				unstableOnSplit={
+					insertBlocksAfter ?
+						( before, after, ...blocks ) => {
+							if ( ! blocks.length ) {
+								blocks.push( createBlock( 'core/paragraph' ) );
+							}
 
-			this.state = {
-				internalListType: null,
-			};
-		}
+							if ( after !== '<li></li>' ) {
+								blocks.push( createBlock( 'core/list', {
+									ordered,
+									values: after,
+								} ) );
+							}
 
-		findInternalListType( { parents } ) {
-			const list = find( parents, ( node ) => node.nodeName === 'UL' || node.nodeName === 'OL' );
-			return list ? list.nodeName : null;
-		}
-
-		setupEditor( editor ) {
-			editor.on( 'nodeChange', ( nodeInfo ) => {
-				this.setState( {
-					internalListType: this.findInternalListType( nodeInfo ),
-				} );
-			} );
-
-			// Check for languages that do not have square brackets on their keyboards.
-			const lang = window.navigator.browserLanguage || window.navigator.language;
-			const keyboardHasSquareBracket = ! /^(?:fr|nl|sv|ru|de|es|it)/.test( lang );
-
-			if ( keyboardHasSquareBracket ) {
-				// `[` is keycode 219; `]` is keycode 221.
-				editor.shortcuts.add( 'meta+219', 'Decrease indent', 'Outdent' );
-				editor.shortcuts.add( 'meta+221', 'Increase indent', 'Indent' );
-			} else {
-				editor.shortcuts.add( 'meta+shift+m', 'Decrease indent', 'Outdent' );
-				editor.shortcuts.add( 'meta+m', 'Increase indent', 'Indent' );
-			}
-
-			this.editor = editor;
-		}
-
-		createSetListType( type, command ) {
-			return () => {
-				const { setAttributes } = this.props;
-				const { internalListType } = this.state;
-				if ( internalListType ) {
-					// Only change list types, don't toggle off internal lists.
-					if ( internalListType !== type && this.editor ) {
-						this.editor.execCommand( command );
-					}
-				} else {
-					setAttributes( { ordered: type === 'OL' } );
+							setAttributes( { values: before } );
+							insertBlocksAfter( blocks );
+						} :
+						undefined
 				}
-			};
-		}
-
-		createExecCommand( command ) {
-			return () => {
-				if ( this.editor ) {
-					this.editor.execCommand( command );
-				}
-			};
-		}
-
-		getEditorSettings( editorSettings ) {
-			return {
-				...editorSettings,
-				plugins: ( editorSettings.plugins || [] ).concat( 'lists' ),
-				lists_indent_on_tab: false,
-			};
-		}
-
-		setNextValues( nextValues ) {
-			this.props.setAttributes( { values: nextValues } );
-		}
-
-		render() {
-			const {
-				attributes,
-				insertBlocksAfter,
-				setAttributes,
-				mergeBlocks,
-				onReplace,
-				className,
-			} = this.props;
-			const { ordered, values } = attributes;
-			const tagName = ordered ? 'ol' : 'ul';
-
-			return (
-				<Fragment>
-					<BlockControls
-						controls={ [
-							{
-								icon: 'editor-ul',
-								title: __( 'Convert to unordered list' ),
-								isActive: ! ordered,
-								onClick: this.createSetListType( 'UL', 'InsertUnorderedList' ),
-							},
-							{
-								icon: 'editor-ol',
-								title: __( 'Convert to ordered list' ),
-								isActive: ordered,
-								onClick: this.createSetListType( 'OL', 'InsertOrderedList' ),
-							},
-							{
-								icon: 'editor-outdent',
-								title: __( 'Outdent list item' ),
-								onClick: this.createExecCommand( 'Outdent' ),
-							},
-							{
-								icon: 'editor-indent',
-								title: __( 'Indent list item' ),
-								onClick: this.createExecCommand( 'Indent' ),
-							},
-						] }
-					/>
-					<RichText
-						identifier="values"
-						multiline="li"
-						tagName={ tagName }
-						unstableGetSettings={ this.getEditorSettings }
-						unstableOnSetup={ this.setupEditor }
-						onChange={ this.setNextValues }
-						value={ values }
-						wrapperClassName="block-library-list"
-						className={ className }
-						placeholder={ __( 'Write list…' ) }
-						onMerge={ mergeBlocks }
-						onSplit={
-							insertBlocksAfter ?
-								( before, after, ...blocks ) => {
-									if ( ! blocks.length ) {
-										blocks.push( createBlock( 'core/paragraph' ) );
-									}
-
-									if ( after !== '<li></li>' ) {
-										blocks.push( createBlock( 'core/list', {
-											ordered,
-											values: after,
-										} ) );
-									}
-
-									setAttributes( { values: before } );
-									insertBlocksAfter( blocks );
-								} :
-								undefined
-						}
-						onRemove={ () => onReplace( [] ) }
-					/>
-				</Fragment>
-			);
-		}
+				onRemove={ () => onReplace( [] ) }
+				onTagNameChange={ ( tag ) => setAttributes( { ordered: tag === 'ol' } ) }
+			/>
+		);
 	},
 
 	save( { attributes } ) {

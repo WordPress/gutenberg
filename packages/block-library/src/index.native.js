@@ -3,6 +3,7 @@
  */
 import {
 	registerBlockType,
+	setDefaultBlockName,
 } from '@wordpress/blocks';
 
 /**
@@ -27,3 +28,5 @@ export const registerCoreBlocks = () => {
 		registerBlockType( name, settings );
 	} );
 };
+
+setDefaultBlockName( paragraph.name );

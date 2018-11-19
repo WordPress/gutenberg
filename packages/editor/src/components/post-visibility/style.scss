@@ -33,3 +33,7 @@
 		margin-left: 28px;
 	}
 }
+
+.edit-post-post-visibility__dialog.components-popover.is-bottom {
+	z-index: z-index(".edit-post-post-visibility__dialog.components-popover.is-bottom");
+}

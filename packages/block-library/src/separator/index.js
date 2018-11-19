@@ -27,8 +27,7 @@ export const settings = {
 	transforms: {
 		from: [
 			{
-				type: 'pattern',
-				trigger: 'enter',
+				type: 'enter',
 				regExp: /^-{3,}$/,
 				transform: () => createBlock( 'core/separator' ),
 			},

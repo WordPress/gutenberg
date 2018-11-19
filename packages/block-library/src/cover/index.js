@@ -26,6 +26,7 @@ import {
 	BlockAlignmentToolbar,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	AlignmentToolbar,
 	PanelColorSettings,
 	RichText,
@@ -214,6 +215,7 @@ export const settings = {
 					}
 					mediaType = media.type;
 				}
+
 				setAttributes( {
 					url: media.url,
 					id: media.id,
@@ -258,21 +260,23 @@ export const settings = {
 										setAttributes( { contentAlign: nextAlign } );
 									} }
 								/>
-								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectMedia }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
-												icon="edit"
-												onClick={ open }
-											/>
-										) }
-									/>
-								</Toolbar>
+								<MediaUploadCheck>
+									<Toolbar>
+										<MediaUpload
+											onSelect={ onSelectMedia }
+											allowedTypes={ ALLOWED_MEDIA_TYPES }
+											value={ id }
+											render={ ( { open } ) => (
+												<IconButton
+													className="components-toolbar__control"
+													label={ __( 'Edit media' ) }
+													icon="edit"
+													onClick={ open }
+												/>
+											) }
+										/>
+									</Toolbar>
+								</MediaUploadCheck>
 							</Fragment>
 						) }
 					</BlockControls>

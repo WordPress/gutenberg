@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -50,6 +51,7 @@ class MediaTextEdit extends Component {
 		const { setAttributes } = this.props;
 
 		let mediaType;
+		let src;
 		// for media selections originated from a file upload.
 		if ( media.media_type ) {
 			if ( media.media_type === 'image' ) {
@@ -63,11 +65,16 @@ class MediaTextEdit extends Component {
 			mediaType = media.type;
 		}
 
+		if ( mediaType === 'image' ) {
+			// Try the "large" size URL, falling back to the "full" size URL below.
+			src = get( media, [ 'sizes', 'large', 'url' ] ) || get( media, [ 'media_details', 'sizes', 'large', 'source_url' ] );
+		}
+
 		setAttributes( {
 			mediaAlt: media.alt,
 			mediaId: media.id,
 			mediaType,
-			mediaUrl: media.url,
+			mediaUrl: src || media.url,
 		} );
 	}
 
@@ -187,6 +194,7 @@ class MediaTextEdit extends Component {
 					<InnerBlocks
 						allowedBlocks={ ALLOWED_BLOCKS }
 						template={ TEMPLATE }
+						templateInsertUpdatesSelection={ false }
 					/>
 				</div>
 			</Fragment>

@@ -75,6 +75,16 @@ Removes an annotation with a specific ID.
 
  * annotationId: The annotation to remove.
 
+### __experimentalUpdateAnnotationRange
+
+Updates the range of an annotation.
+
+*Parameters*
+
+ * annotationId: ID of the annotation to update.
+ * start: The start of the new range.
+ * end: The end of the new range.
+
 ### __experimentalRemoveAnnotationsBySource
 
 Removes all annotations of a specific source.
