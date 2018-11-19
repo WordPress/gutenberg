@@ -165,10 +165,10 @@ export class BlockListBlock extends Component {
 		}
 	}
 
-	setAttributes( attributes ) {
+	setAttributes( attributes, options ) {
 		const { block, onChange } = this.props;
 		const type = getBlockType( block.name );
-		onChange( block.clientId, attributes );
+		onChange( block.clientId, attributes, options );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
 			if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
@@ -703,8 +703,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	} = dispatch( 'core/editor' );
 
 	return {
-		onChange( clientId, attributes ) {
-			updateBlockAttributes( clientId, attributes );
+		onChange( clientId, attributes, options ) {
+			updateBlockAttributes( clientId, attributes, options );
 		},
 		onSelect( clientId = ownProps.clientId, initialPosition ) {
 			selectBlock( clientId, initialPosition );

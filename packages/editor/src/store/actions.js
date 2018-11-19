@@ -122,16 +122,20 @@ export function receiveBlocks( blocks ) {
  * Returns an action object used in signalling that the block attributes with
  * the specified client ID has been updated.
  *
- * @param {string} clientId   Block client ID.
- * @param {Object} attributes Block attributes to be merged.
+ * @param {string}   clientId          Block client ID.
+ * @param {Object}   attributes        Block attributes to be merged.
+ * @param {?Object}  options           Optional options.
+ * @param {?boolean} options.transient Whether attribute should be considered
+ *                                     to be in a transient state.
  *
  * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientId, attributes ) {
+export function updateBlockAttributes( clientId, attributes, options ) {
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientId,
 		attributes,
+		...options,
 	};
 }
 
