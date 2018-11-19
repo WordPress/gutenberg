@@ -97,7 +97,7 @@ class PostPermalink extends Component {
 
 				{ isEditingPermalink &&
 					<PostPermalinkEditor
-						postSlug={ slug }
+						slug={ slug }
 						onSave={ () => this.setState( { isEditingPermalink: false } ) }
 					/>
 				}

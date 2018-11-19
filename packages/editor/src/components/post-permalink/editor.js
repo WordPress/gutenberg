@@ -13,11 +13,11 @@ import { compose } from '@wordpress/compose';
 import { cleanForSlug } from '../../utils/url';
 
 class PostPermalinkEditor extends Component {
-	constructor( { permalinkParts, postSlug } ) {
+	constructor( { permalinkParts, slug } ) {
 		super( ...arguments );
 
 		this.state = {
-			editedPostName: postSlug || permalinkParts.postName,
+			editedPostName: slug || permalinkParts.postName,
 		};
 
 		this.onSavePermalink = this.onSavePermalink.bind( this );
