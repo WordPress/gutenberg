@@ -57,7 +57,7 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, postLink, permalinkParts, postSlug, postTitle, isEditable, isPublished } = this.props;
+		const { isNew, postLink, permalinkParts, postSlug, postTitle, postID, isEditable, isPublished } = this.props;
 
 		if ( isNew || ! postLink ) {
 			return null;
@@ -67,7 +67,7 @@ class PostPermalink extends Component {
 		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
 		const { prefix, suffix } = permalinkParts;
-		const slug = postSlug || cleanForSlug( postTitle );
+		const slug = postSlug || cleanForSlug( postTitle ) || postID;
 		const samplePermalink = ( isEditable ) ? prefix + slug + suffix : prefix;
 
 		return (
@@ -139,7 +139,7 @@ export default compose( [
 			isCurrentPostPublished,
 		} = select( 'core/editor' );
 
-		const { link } = getCurrentPost();
+		const { id, link } = getCurrentPost();
 
 		return {
 			isNew: isEditedPostNew(),
@@ -149,6 +149,7 @@ export default compose( [
 			isEditable: isPermalinkEditable(),
 			isPublished: isCurrentPostPublished(),
 			postTitle: getEditedPostAttribute( 'title' ),
+			postID: id,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
