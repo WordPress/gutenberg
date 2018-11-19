@@ -8,8 +8,9 @@ import styles from './button-style.scss';
 export default function Button( props ) {
 	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;
 
-	const buttonBorderColor = ariaPressed ? '#a8bece' : '#00000000';
-	const buttonBackgroundColor = ariaPressed ? '#F9FBFC' : 'white';
+	const buttonBorderColor = ariaPressed ? '#2e4453' : '#00000000';
+	const buttonBackgroundColor = ariaPressed ? '#2e4453' : 'white';
+	const subscriptColor = ariaPressed ? 'white' : '#3d596d';
 
 	return (
 		<TouchableOpacity
@@ -20,7 +21,7 @@ export default function Button( props ) {
 		>
 			<View style={ [styles.button, { aspectRatio: 1, borderColor: buttonBorderColor, backgroundColor: buttonBackgroundColor } ] }>
 				{ children }
-				{ subscript && ( <Text style={ { fontVariant: [ 'small-caps' ], color: '#3d596d' } }>{ subscript }</Text> ) }
+				{ subscript && ( <Text style={ { fontVariant: [ 'small-caps' ], color: subscriptColor } }>{ subscript }</Text> ) }
 			</View>
 		</TouchableOpacity>
 	);
