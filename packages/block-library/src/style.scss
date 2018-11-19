@@ -22,6 +22,9 @@
 @import "./verse/style.scss";
 @import "./video/style.scss";
 
+// Class names are doubled to increase specificity to assure colors take effect
+// over another base class color.
+
 .has-pale-pink-background-color.has-pale-pink-background-color {
 	background-color: #f78da7;
 }
