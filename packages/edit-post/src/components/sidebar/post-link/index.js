@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { PanelBody, TextControl } from '@wordpress/components';
+import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
@@ -77,7 +77,7 @@ function PostLink( {
 			<p className="edit-post-post-link__preview-label">
 				{ __( 'Preview' ) }
 			</p>
-			<a
+			<ExternalLink
 				className="edit-post-post-link__link"
 				href={ postLink }
 				target="_blank"
@@ -88,14 +88,14 @@ function PostLink( {
 					</Fragment> ) :
 					postLink
 				}
-			</a>
-			<a
+			</ExternalLink>
+			<ExternalLink
 				className="edit-post-post-link__permalink-settings"
 				href={ addQueryArgs( 'options-permalink.php' ) }
 				target="_blank"
 			>
 				{ __( 'Permalink Settings' ) }
-			</a>
+			</ExternalLink>
 		</PanelBody>
 	);
 }
