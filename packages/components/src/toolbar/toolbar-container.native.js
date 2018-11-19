@@ -3,7 +3,7 @@
  */
 import { View } from 'react-native';
 
-import styles from './toolbar-container.scss';
+import styles from './style.native.scss';
 
 const ToolbarContainer = ( props ) => (
 	<View style={ styles.container }>
