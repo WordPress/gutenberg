@@ -52,7 +52,7 @@ function render_block_core_categories( $attributes ) {
 		$class .= " {$attributes['className']}";
 	}
 
-	$items_markup = '<label for="' . $id . '">' . $title . '</label>' . $items_markup;
+	$items_markup = '<label for="' . $id . '">' . $title . '</label> ' . $items_markup;
 
 	$block_content = sprintf(
 		$wrapper_markup,
