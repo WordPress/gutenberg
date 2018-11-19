@@ -46,7 +46,10 @@ function registerMiddleware( middleware ) {
 
 function apiFetch( options ) {
 	const raw = ( nextOptions ) => {
-		const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
+		// TODO: We should set eslint's `no-unused-vars` rule's `ignoreRestSiblings` option to true
+		// (https://eslint.org/docs/rules/no-unused-vars#ignorerestsiblings) and remove the next line.
+		// eslint-disable-next-line no-unused-vars
+		const { url, path, data, parse = true, usePreloaded = true, ...remainingOptions } = nextOptions;
 		let { body, headers } = nextOptions;
 
 		// Merge explicitly-provided headers with default values.

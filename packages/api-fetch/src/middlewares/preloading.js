@@ -27,8 +27,8 @@ const createPreloadingMiddleware = ( preloadedData ) => ( options, next ) => {
 			.join( '&' );
 	}
 
-	const { parse = true } = options;
-	if ( typeof options.path === 'string' ) {
+	const { parse = true, usePreloaded = true } = options;
+	if ( usePreloaded && typeof options.path === 'string' ) {
 		const method = options.method || 'GET';
 		const path = getStablePath( options.path );
 
