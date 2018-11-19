@@ -356,19 +356,19 @@ function gutenberg_register_scripts_and_styles() {
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backwards compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
-
 	$fonts_url = '';
 
 	/*
-	 * Translators: If there are characters in your language that are not supported
-	 * by Noto Serif, translate this to 'off'. Do not translate into your own language.
+	 * Translators: Use this to specify the proper Google Font name and variants
+	 * to load that is supported by your language. Do not translate.
+	 * Set to 'off' to disable loading.
 	 */
-	if ( 'off' !== _x( 'on', 'Noto Serif font: on or off', 'gutenberg' ) ) {
+	$font_family = _x( 'Noto Serif:400,400i,700,700i', 'Google Font Name and Variants', 'gutenberg' );
+	if ( 'off' !== $font_family ) {
 		$query_args = array(
-			'family' => urlencode( 'Noto Serif:400,400i,700,700i' ),
+			'family' => urlencode( $font_family ),
 		);
-
-		$fonts_url = esc_url_raw( add_query_arg( $query_args, 'https://fonts.googleapis.com/css' ) );
+		$fonts_url  = esc_url_raw( add_query_arg( $query_args, 'https://fonts.googleapis.com/css' ) );
 	}
 
 	gutenberg_override_style(
@@ -1172,6 +1172,16 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 			),
 		),
 	);
+
+	/*
+	 * Set a locale specific default font.
+	 * Translators: Use this to specify the CSS font family for the default font
+	 */
+	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
+	$styles[]           = array(
+		'css' => "body { font-family: '$locale_font_family' }",
+	);
+
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
 			if ( filter_var( $style, FILTER_VALIDATE_URL ) ) {
