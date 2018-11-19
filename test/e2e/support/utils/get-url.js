@@ -2,6 +2,7 @@
  * Node dependencies
  */
 import { join } from 'path';
+import { URL } from 'url';
 
 import { WP_BASE_URL } from './config';
 
