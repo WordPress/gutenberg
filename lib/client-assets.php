@@ -143,7 +143,8 @@ function gutenberg_register_packages_scripts() {
 	$packages_dependencies = include dirname( __FILE__ ) . '/packages-dependencies.php';
 
 	foreach ( $packages_dependencies as $handle => $dependencies ) {
-		$package_name = substr( $handle, 3 );
+		// Remove `wp-` prefix from the handle to get the package's name.
+		$package_name = strpos( $handle, 'wp-' ) === 0 ? substr( $handle, 3 ) : $handle;
 		$path         = "build/$package_name/index.js";
 		gutenberg_override_script(
 			$handle,

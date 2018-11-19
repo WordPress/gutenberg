@@ -17,7 +17,7 @@ const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-w
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 
 /**
- * Local dependencies
+ * Internal dependencies
  */
 const { dependencies } = require( './package' );
 
@@ -55,7 +55,7 @@ const externals = {
 };
 
 gutenbergPackages.forEach( ( name ) => {
-	externals[ `${ WORDPRESS_NAMESPACE }${ name }` ] = {
+	externals[ WORDPRESS_NAMESPACE + name ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
 	};
 } );
