@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { sprintf, _n } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { serialize } from '@wordpress/blocks';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -16,6 +16,8 @@ import {
 import BlockIcon from '../block-icon';
 
 function MultiSelectionInspector( { blocks } ) {
+	const words = wordCount( serialize( blocks ), 'words' );
+
 	return (
 		<div className="editor-multi-selection-inspector__card">
 			<BlockIcon icon={
@@ -23,10 +25,16 @@ function MultiSelectionInspector( { blocks } ) {
 			} showColors />
 			<div className="editor-multi-selection-inspector__card-content">
 				<div className="editor-multi-selection-inspector__card-title">
-					{ sprintf( __( '%d blocks' ), blocks.length ) }
+					{
+						/* translators: %d: number of blocks */
+						sprintf( _n( '%d block', '%d blocks', blocks.length ), blocks.length )
+					}
 				</div>
 				<div className="editor-multi-selection-inspector__card-description">
-					{ sprintf( __( '%d words.' ), wordCount( serialize( blocks ), 'words' ) ) }
+					{
+						/* translators: %d: number of words */
+						sprintf( _n( '%d word', '%d words', words ), words )
+					}
 				</div>
 			</div>
 		</div>
