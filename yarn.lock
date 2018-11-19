@@ -7628,7 +7628,7 @@ react-native-randombytes@^3.5.1:
     buffer "^4.9.1"
     sjcl "^1.0.3"
 
-"react-native-recyclerview-list@git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#53db23e2fa4f4cabfb2dcaa45496656ccc44c84a":
+"react-native-recyclerview-list@git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#v1.0.0":
   version "1.0.0"
   resolved "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#53db23e2fa4f4cabfb2dcaa45496656ccc44c84a"
   dependencies:
