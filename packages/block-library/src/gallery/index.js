@@ -157,7 +157,7 @@ export const settings = {
 						filesList: files,
 						onFileChange: ( images ) => {
 							const imagesAttr = images.map(
-								( image ) => pickRelevantMediaFiles( image )
+								pickRelevantMediaFiles
 							);
 							onChange( block.clientId, {
 								ids: map( imagesAttr, 'id' ),
