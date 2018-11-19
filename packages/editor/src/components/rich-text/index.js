@@ -177,6 +177,20 @@ export class RichText extends Component {
 	createRecord() {
 		const range = getSelection().getRangeAt( 0 );
 
+		// If the range is shallowly equal to the last, return the last
+		// calculated value. This is useful when creating values on the
+		// `selectionchange` event, which fires more often than it should
+		// without a change in selection.
+		//
+		// Shallowly checking equality for ranges is fine:
+		//
+		// > Thus subsequent calls of this method returns the same range object
+		// > if nothing has removed the context object's range in the meantime.
+		// > In particular, getSelection().getRangeAt( 0 ) ===
+		// > getSelection().getRangeAt( 0 ) evaluates to true if the selection
+		// > is not empty.
+		// >
+		// > https://w3c.github.io/selection-api/#dom-selection-getrangeat
 		if ( range === this.createRecord.lastRange ) {
 			return this.createRecord.lastRecord;
 		}
