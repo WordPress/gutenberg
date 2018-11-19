@@ -1,8 +1,6 @@
-# Block API
+# Block registration 
 
-Blocks are the fundamental element of the Gutenberg editor. They are the primary way in which plugins and themes can register their own functionality and extend the capabilities of the editor. This document covers the main properties of block registration.
-
-## Register Block Type
+## `register_block_type`
 
 * **Type:** `Function`
 
@@ -466,6 +464,8 @@ parent: [ 'core/columns' ],
 
 #### supports (optional)
 
+*Some [block supports](#supports-optional) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.*
+
 * **Type:** `Object`
 
 Optional block extended support features. The following options are supported:
@@ -548,8 +548,4 @@ By default all blocks can be converted to a reusable block. If supports reusable
 // Don't allow the block to be converted into a reusable block.
 reusable: false,
 ```
-## Edit and Save
 
-The `edit` and `save` functions define the editor interface with which a user would interact, and the markup to be serialized back when a post is saved. They are the heart of how a block operates, so they are [covered separately](../docs/block-api/block-edit-save.md).
-
-*Some [block supports](#supports-optional) — for example, `anchor` or `className` — apply their attributes by adding additional props on the element returned by `save`. This will work automatically for default HTML tag elements (`div`, etc). However, if the return value of your `save` is a custom component element, you will need to ensure that your custom component handles these props in order for the attributes to be persisted.*

@@ -1,5 +1,15 @@
 # Theme Support
 
+The new Blocks include baseline support in all themes, enhancements to opt-in to and the ability to extend and customize.
+
+There are a few new concepts to consider when building themes:
+
+- **Editor Color Palette** - A default set of colors is provided, but themes and register their own and optionally lock users into picking from the defined palette.
+- **Editor Text Size Palette** - A default set of sizes is provided, but themes and register their own and optionally lock users into picking from preselected sizes.
+- **Responsive Embeds** - Themes must opt-in to responsive embeds.
+- **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
+- **Dark Mode** - If a Theme is a Dark Theme with a dark background containing light text, the theme author can opt-in to the Dark Mode.
+
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
 
 Some advanced block features require opt-in support in the theme itself as it's difficult for the block to provide these styles, they may require some architecting of the theme itself, in order to work well.
@@ -57,7 +67,7 @@ Here's the markup for an `Image` with a caption:
 
 ```html
 <figure class="wp-block-image">
-	<img src="..." alt="" width="200px">
+	<img src="..." alt="" width="200px" />
 	<figcaption>Short image caption.</figcaption>
 </figure>
 ```
@@ -67,7 +77,7 @@ Here's the markup for a left-floated image:
 ```html
 <div class="wp-block-image">
 	<figure class="alignleft">
-		<img src="..." alt="" width="200px">
+		<img src="..." alt="" width="200px" />
 		<figcaption>Short image caption.</figcaption>
 	</figure>
 </div>
@@ -118,12 +128,11 @@ Themes are responsible for creating the classes that apply the colors in differe
 }
 ```
 
-The class name is built appending 'has-', followed by the class name *using* kebab case and ending with the context name.
+The class name is built appending 'has-', followed by the class name _using_ kebab case and ending with the context name.
 
 ### Block Font Sizes:
 
 Blocks may allow the user to configure the font sizes they use, e.g., the paragraph block. Gutenberg provides a default set of font sizes, but a theme can overwrite it and provide its own:
-
 
 ```php
 add_theme_support( 'editor-font-sizes', array(
@@ -157,13 +166,13 @@ add_theme_support( 'editor-font-sizes', array(
 The font sizes are rendered on the font size picker in the order themes provide them.
 
 Themes are responsible for creating the classes that apply the correct font size styles.
-The class name is built appending 'has-', followed by the font size name *using* kebab case and ending with `-font-size`.
+The class name is built appending 'has-', followed by the font size name _using_ kebab case and ending with `-font-size`.
 
 As an example for the regular font size, a theme may provide the following class.
 
 ```css
 .has-regular-font-size {
-    font-size: 16px;
+	font-size: 16px;
 }
 ```
 
@@ -262,9 +271,7 @@ add_theme_support( 'wp-block-styles' );
 The embed blocks automatically apply styles to embedded content to reflect the aspect ratio of content that is embedded in an iFrame. A block styled with the aspect ratio responsive styles would look like:
 
 ```html
-<figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio">
-   ...
-</figure>
+<figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio">...</figure>
 ```
 
 To make the content resize and keep its aspect ratio, the `<body>` element needs the `wp-embed-responsive` class. This is not set by default, and requires the theme to opt in to the `responsive-embeds` feature:

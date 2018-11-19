@@ -1,14 +1,62 @@
-# The Language of Gutenberg
+# Key Concepts
+
+## Blocks
+
+Blocks are an abstract unit for organizing and composing content, strung together to create content for a webpage.
+
+Blocks are hiearchical, in that a block can be a child or parent to another block. One example is a two-column Columns block can be the parent block to multiple child blocks in each column.
+
+If it helps, you can think of blocks as a more graceful shortcode, with rich formatting tools for users to compose content. To this point, there is a new Block Grammar. Distilled, the block grammar is an HTML comment, either a self-closing tag or with a begining tag and ending tag. In the main tag, depending on the block type and user customizations, there can be a JSON object. This raw form of the block is referred to as serialized.
+
+```html
+<!-- wp:paragraph {"key": "value"} -->
+<p>Welcome to the world of blocks.</p>
+<!-- /wp:paragraph -->
+```
+
+Blocks can be static or dynamic. Static blocks contain rendered content and an object of Attributes used to re-render based on changes. Dynamic blocks require server-side data and rendering while the post content is being generated (rendering).
+
+Each block contains Attributes or configuration settings, which can be sourced from raw HTML in the content, via meta or other customizible origins.
+
+The Paragraph is the default Block. Instead of a new line upon typing return on a keyboard, try to think of it as an empty paragraph block (type / to trigger an autocompleting Slash Inserter -- /image will pull up Images as well as Instagram embeds).
+
+Users insert new blocks by clicking the plus button for the Block Inserter, typing / for the Slash Inserter or typing return for a blank Paragraph block.
+
+Blocks can be duplicated within content using the menu from the block's toolbar or via keyboard shortcut.
+
+Blocks can be made repeatable, shared across posts and post types and used multiple times in the same post. Changes in one place reflect everywhere that reusable block is used.
+
+Blocks can be limited or locked-in-place by Templates and custom code.
+
+#### More on Blocks
+
+- **Block API**
+- **Block Styles**
+- **Tutorial: Building A Custom Block**
+
+## Block Categories
+
+In the Block Inserter, the accordion-sorted, popup modal that shows a site's available blocks to users, each accordion title is a Block Category, which are either the defaults or customized by developers through Plugins or code.
+
+## Reusable Blocks
+
+Reusable Blocks are a way to share a block (or multiple blocks) as a reusable, repeatable piece of content.
+
+Any edits to a reusable block are made to every usage of a repeatable block.
+
+Reusable Blocks are stored as a hidden post type, and are dynamic blocks that "ref" or reference the post_id and return the post_content for that wp_block.
+
+## Templates
 
 At the core of Gutenberg lies the concept of the block. From a technical point of view, blocks both raise the level of abstraction from a single document to a collection of meaningful elements, and they replace ambiguity—inherent in HTML—with explicit structure. A post in Gutenberg is then a _collection of blocks_.
 
-To understand how blocks operate at a data-structure level, let's take a small detour to the simile of the printing press of Johannes Gutenberg. In letterpress, a finished page was assembled from individual characters, a test print made in a [galley](https://en.wikipedia.org/wiki/Galley_proof), and then locked into a [chase](https://en.wikipedia.org/wiki/Chase_(printing)) to create a fully formed page. Once printed, there's no need to know whether it was set via individual letters, type slugs from a [linotype machine](https://en.wikipedia.org/wiki/Linotype_machine), or even one giant plate.
+To understand how blocks operate at a data-structure level, let's take a small detour to the simile of the printing press of Johannes Gutenberg. In letterpress, a finished page was assembled from individual characters, a test print made in a [galley](https://en.wikipedia.org/wiki/Galley_proof), and then locked into a [chase](<https://en.wikipedia.org/wiki/Chase_(printing)>) to create a fully formed page. Once printed, there's no need to know whether it was set via individual letters, type slugs from a [linotype machine](https://en.wikipedia.org/wiki/Linotype_machine), or even one giant plate.
 
 This is true for content blocks. They are the way in which the user creates their content, but they no longer matter once the content is finished. That is, until it needs to be edited. Imagine if the printing press was able to print a page _while_ also including in the page the instructions to generate again the set of movable type required to print it. What we are doing with blocks could be compared to printing invisible marks in the margins so that the printer can make adjustments to an already printed page without needing to set the page again from scratch.
 
 Content in WordPress is stored as HTML-like text in `post_content`. HTML is a robust document markup format and has been used to describe content as simple as unformatted paragraphs of text and as complex as entire application interfaces. Understanding HTML is not trivial; a significant number of existing documents and tools deal with technically invalid or ambiguous code. This code, even when valid, can be incredibly tricky and complicated to parse – and to understand.
 
-The main point is to let the machines work at what they are good at, and optimize for the user and the document. The analogy with the printing press can be taken further in that what matters is the printed page, not the arrangement of metal type that originated it. As a matter of fact, the arrangement of type is a pretty inconvenient storage mechanism. The page is both the result _and_ the proper way to store the data. The metal type is just an instrument for publication and editing, but more ephemeral in nature. Exactly as our use of an object tree (e.g. JSON) in the editor. We have the ability to rebuild this structure from the printed page, as if we printed notations in the margins that allows a machine to know which [sorts](https://en.wikipedia.org/wiki/Sort_(typesetting)) (metal type) to assemble to recreate the page.
+The main point is to let the machines work at what they are good at, and optimize for the user and the document. The analogy with the printing press can be taken further in that what matters is the printed page, not the arrangement of metal type that originated it. As a matter of fact, the arrangement of type is a pretty inconvenient storage mechanism. The page is both the result _and_ the proper way to store the data. The metal type is just an instrument for publication and editing, but more ephemeral in nature. Exactly as our use of an object tree (e.g. JSON) in the editor. We have the ability to rebuild this structure from the printed page, as if we printed notations in the margins that allows a machine to know which [sorts](<https://en.wikipedia.org/wiki/Sort_(typesetting)>) (metal type) to assemble to recreate the page.
 
 ## Blocks are higher-level than HTML
 
@@ -20,7 +68,7 @@ Additionally, how do we even know this came from our editor? Maybe someone snuck
 
 ## The post dichotomy
 
-A Gutenberg post is the proper block-aware representation of a post, a collection of semantically consistent descriptions of what each block is and what its essential data is. This representation only ever exists in memory. It is the [chase](https://en.wikipedia.org/wiki/Chase_(printing)) in the typesetter's workshop, ever-shifting as sorts are attached and repositioned.
+A Gutenberg post is the proper block-aware representation of a post, a collection of semantically consistent descriptions of what each block is and what its essential data is. This representation only ever exists in memory. It is the [chase](<https://en.wikipedia.org/wiki/Chase_(printing)>) in the typesetter's workshop, ever-shifting as sorts are attached and repositioned.
 
 A Gutenberg post is not the artifact it produces, namely the `post_content`. The latter is the printed page, optimized for the reader, but retaining its invisible markings for later editing.
 
@@ -34,25 +82,21 @@ The tree of objects describes the list of blocks that compose a post.
 
 ```js
 [
-    {
-        type: 'core/cover-image',
-        attributes: {
-            url: 'my-hero.jpg',
-            align: 'full',
-            hasParallax: false,
-            hasBackgroundDim: true
-        },
-        children: [
-            "Gutenberg posts aren't HTML"
-        ]
-    },
-    {
-        type: 'core/paragraph',
-        children: [
-            "Lately I've been hearing plen…"
-        ]
-    }
-]
+	{
+		type: "core/cover-image",
+		attributes: {
+			url: "my-hero.jpg",
+			align: "full",
+			hasParallax: false,
+			hasBackgroundDim: true
+		},
+		children: ["Gutenberg posts aren't HTML"]
+	},
+	{
+		type: "core/paragraph",
+		children: ["Lately I've been hearing plen…"]
+	}
+];
 ```
 
 ## Serialization and the Purpose of HTML Comments
@@ -87,16 +131,14 @@ When blocks are saved to the content, after the editing session, its attributes�
 
 ```html
 <!-- wp:image -->
-<figure class="wp-block-image">
-	<img src="source.jpg" alt="" />
-</figure>
+<figure class="wp-block-image"><img src="source.jpg" alt="" /></figure>
 <!-- /wp:image -->
 ```
 
 A purely dynamic block that is to be server rendered before display could look like this:
 
 ```html
-<!-- wp:latest-posts {"postsToShow":4,"displayPostDate":true} /-->
+<!-- wp:latest-posts {"postsToShow":4,"displayPostDate":true} / -->
 ```
 
 ## The Gutenberg Lifecycle

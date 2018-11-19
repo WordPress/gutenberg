@@ -27,13 +27,11 @@ A block should have a straightforward, short name so users can easily find it in
 
 Blocks should have an identifying icon, ideally using a single color. Try to avoid using the same icon used by an existing block. The core block icons are based on [Material Design Icons](https://material.io/tools/icons/). Look to that icon set, or to [Dashicons](https://developer.wordpress.org/resource/dashicons/) for style inspiration.
 
-![A screenshot of the Block Library with concise block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/blocks-do.png)
-
+![A screenshot of the Block Library with concise block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/assets/blocks-do.png)
 **Do:**
-Use concise block names.
+Use conise block names.
 
-![A screenshot of the Block Library with long, multi-line block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/blocks-dont.png)
-
+![A screenshot of the Block Library with long, multi-line block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/assets/blocks-dont.png)
 **Don't:**
 Avoid long, multi-line block names.
 
@@ -42,12 +40,10 @@ Avoid long, multi-line block names.
 Every block should include a description in the “Block” tab of the Settings sidebar. This description should explain your block's function clearly. Keep it to a single sentence.
 
 ![A screenshot of a short block description](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/block-descriptions-do.png)
-
 **Do:**
 Use a short, simple, block description.
 
 ![A screenshot of a long block description that includes branding](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/design/block-descriptions-dont.png)
-
 **Don't:**
 Avoid long descriptions and branding.
 
