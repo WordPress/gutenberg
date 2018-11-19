@@ -22,6 +22,7 @@ module.exports = {
 		'/gutenberg/test/',
 		'/gutenberg/packages/',
 	],
+	testURL: 'http://localhost/',
 	modulePathIgnorePatterns: [ '<rootDir>/gutenberg/gutenberg-mobile' ],
 	moduleDirectories: [ 'node_modules', 'symlinked-packages' ],
 	moduleNameMapper: {
