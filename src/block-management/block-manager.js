@@ -268,7 +268,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
 		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
 		// And fix problems with RecyclerViewList on Android
-		let list = (
+		const list = (
 			<FlatList
 				style={ styles.list }
 				data={ this.state.blocks }
