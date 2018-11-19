@@ -7,7 +7,7 @@ import { Svg, Path as SvgPath } from 'react-native-svg';
 /**
  * Internal dependencies
  */
-import styles from '../../dashicon/style.scss';
+import styles from './style.scss';
 
 export {
 	Circle,
@@ -33,10 +33,19 @@ export const SVG = ( props ) => {
 	}
 
 	const safeProps = styleValues.length === 0 ? { ...omit( props, [ 'style' ] ) } : { ...props, style: styleValues };
+
+	if (styleValues !== undefined && styleValues.length > 0) {
+		console.log('markosavic','color ' + styleValues[0].color);
+	}
+
 	return (
 		<Svg
 			height="100%"
 			width="100%"
+			style={{
+				color: 'green',
+				fill: 'currentColor',
+			  }}
 			{ ...safeProps }
 		/>
 	);
@@ -46,7 +55,6 @@ export const Path = ( props ) => {
 
 	return (
 		<SvgPath
-			fill="#3d596d"
 			{ ...props }
 		/>
 	);
