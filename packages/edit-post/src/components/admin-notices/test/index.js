@@ -14,14 +14,19 @@ describe( 'AdminNotices', () => {
 		// outputs of (a) non-element first child of the element (whitespace
 		// text node) and (b) untrimmed content.
 		document.body.innerHTML = `
-			<div class="notice updated is-dismissible">
-				<p>My <strong>notice</strong> text</p>
-				<p>My second line of text</p>
-				<button type="button" class="notice-dismiss">
-					<span class="screen-reader-text">Dismiss this notice.</span>
-				</button>
+			<div id="wpbody-content">
+				<div class="notice updated is-dismissible">
+					<p>My <strong>notice</strong> text</p>
+					<p>My second line of text</p>
+					<button type="button" class="notice-dismiss">
+						<span class="screen-reader-text">Dismiss this notice.</span>
+					</button>
+				</div>
+				<div class="notice notice-warning">Warning</div>
+				<aside class="elsewhere">
+					<div class="notice">Ignore me</div>
+				</aside>
 			</div>
-			<div class="notice notice-warning">Warning</div>
 		`;
 	} );
 
@@ -49,6 +54,8 @@ describe( 'AdminNotices', () => {
 				isDismissible: true,
 			},
 		] );
-		expect( document.body.childElementCount ).toBe( 0 );
+
+		// Verify all but `<aside>` are removed.
+		expect( document.getElementById( 'wpbody-content' ).childElementCount ).toBe( 1 );
 	} );
 } );
