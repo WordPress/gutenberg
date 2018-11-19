@@ -20,12 +20,9 @@ Yields action objects used in signalling that a notice is to be created.
 
 *Parameters*
 
- * statusOrNotice: Notice status, or a
-                                                      notice object.
+ * status: Notice status.
                                                       Defaults to `info`.
- * contentOrOptions: Notice message, or
-                                                      options if the first
-                                                      argument is WPNotice.
+ * content: Notice message.
  * options: Notice options.
  * options.context: Context under which to
                                                       group notice.

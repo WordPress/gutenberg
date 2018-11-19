@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isPlainObject, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 
 /**
  * Internal dependencies
@@ -11,12 +11,9 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 /**
  * Yields action objects used in signalling that a notice is to be created.
  *
- * @param {?string|WPNotice}       statusOrNotice        Notice status, or a
- *                                                       notice object.
+ * @param {?string}                status                Notice status.
  *                                                       Defaults to `info`.
- * @param {string|?Object}         contentOrOptions      Notice message, or
- *                                                       options if the first
- *                                                       argument is WPNotice.
+ * @param {string}                 content               Notice message.
  * @param {?Object}                options               Notice options.
  * @param {?string}                options.context       Context under which to
  *                                                       group notice.
@@ -34,25 +31,14 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  * @param {?Array<WPNoticeAction>} options.actions       User actions to be
  *                                                       presented with notice.
  */
-export function* createNotice( statusOrNotice = DEFAULT_STATUS, contentOrOptions, options = {} ) {
-	let status, content, __unstableHTML;
-
-	if ( isPlainObject( statusOrNotice ) ) {
-		// Support overloaded form `createNotice( notice: WPNotice, options: ?Object )`.
-		options = { ...contentOrOptions, ...statusOrNotice };
-		( { status = DEFAULT_STATUS, content, __unstableHTML } = statusOrNotice );
-	} else {
-		// Else consider the first argument the status type string.
-		status = statusOrNotice;
-		content = contentOrOptions;
-	}
-
+export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 	const {
 		speak = true,
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
 		id = uniqueId( context ),
 		actions = [],
+		__unstableHTML,
 	} = options;
 
 	// The supported value shape of content is currently limited to plain text

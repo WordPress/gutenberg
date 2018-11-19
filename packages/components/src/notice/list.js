@@ -4,11 +4,6 @@
 import { noop, omit } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { RawHTML } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import Notice from './';
@@ -31,15 +26,11 @@ function NoticeList( { notices, onRemove = noop, className = 'components-notice-
 			{ children }
 			{ [ ...notices ].reverse().map( ( notice ) => (
 				<Notice
-					{ ...omit( notice, [ 'content', '__unstableHTML' ] ) }
+					{ ...omit( notice, [ 'content' ] ) }
 					key={ notice.id }
 					onRemove={ removeNotice( notice.id ) }
 				>
-					{
-						notice.__unstableHTML ?
-							<RawHTML>{ notice.__unstableHTML }</RawHTML> :
-							notice.content
-					}
+					{ notice.content }
 				</Notice>
 			) ) }
 		</div>

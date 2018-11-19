@@ -37,7 +37,7 @@ function getAdminNotices() {
  *
  * @return {Element} Upgraded notice HTML.
  */
-function getNoticeHTMLFromElement( element ) {
+function getNoticeHTML( element ) {
 	const fragments = [];
 
 	for ( const child of element.childNodes ) {
@@ -62,28 +62,12 @@ function getNoticeHTMLFromElement( element ) {
  *
  * @return {?string} Upgraded status type.
  */
-function getNoticeStatusFromClassList( element ) {
+function getNoticeStatus( element ) {
 	for ( const className of element.classList ) {
 		if ( NOTICE_CLASS_STATUSES.hasOwnProperty( className ) ) {
 			return NOTICE_CLASS_STATUSES[ className ];
 		}
 	}
-}
-
-/**
- * Given an admin notice Element, returns a notices module object.
- *
- * @param {Element} element Admin notice element.
- *
- * @return {WPNotice} Notice object.
- */
-function getNoticeFromElement( element ) {
-	const status = getNoticeStatusFromClassList( element );
-	const content = '';
-	const __unstableHTML = getNoticeHTMLFromElement( element );
-	const isDismissible = element.classList.contains( 'is-dismissible' );
-
-	return { status, content, __unstableHTML, isDismissible };
 }
 
 export class AdminNotices extends Component {
@@ -95,8 +79,14 @@ export class AdminNotices extends Component {
 		const { createNotice } = this.props;
 		getAdminNotices().forEach( ( element ) => {
 			// Convert and create.
-			const notice = getNoticeFromElement( element );
-			createNotice( notice, { speak: false } );
+			const status = getNoticeStatus( element );
+			const content = getNoticeHTML( element );
+			const isDismissible = element.classList.contains( 'is-dismissible' );
+			createNotice( status, content, {
+				speak: false,
+				__unstableHTML: true,
+				isDismissible,
+			} );
 
 			// Remove (now-redundant) admin notice element.
 			element.parentNode.removeChild( element );

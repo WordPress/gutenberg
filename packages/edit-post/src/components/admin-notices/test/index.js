@@ -32,22 +32,22 @@ describe( 'AdminNotices', () => {
 
 		expect( createNotice ).toHaveBeenCalledTimes( 2 );
 		expect( createNotice.mock.calls[ 0 ] ).toEqual( [
+			'warning',
+			'Warning',
 			{
-				status: 'warning',
-				content: '',
-				__unstableHTML: 'Warning',
+				speak: false,
+				__unstableHTML: true,
 				isDismissible: false,
 			},
-			{ speak: false },
 		] );
 		expect( createNotice.mock.calls[ 1 ] ).toEqual( [
+			'success',
+			'<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
 			{
-				status: 'success',
-				content: '',
-				__unstableHTML: '<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
+				speak: false,
+				__unstableHTML: true,
 				isDismissible: true,
 			},
-			{ speak: false },
 		] );
 		expect( document.body.childElementCount ).toBe( 0 );
 	} );

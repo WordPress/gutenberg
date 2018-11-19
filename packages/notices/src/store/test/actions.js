@@ -87,40 +87,17 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'yields actions when notice object passed', () => {
-			const result = createNotice( {
-				id,
-				content,
-				__unstableHTML: 'my <strong>message</strong>',
-				isDismissible: false,
-			} );
-
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: content,
-			} );
-
-			expect( result.next().value ).toEqual( {
-				type: 'CREATE_NOTICE',
-				context: DEFAULT_CONTEXT,
-				notice: {
-					id,
-					status: DEFAULT_STATUS,
-					content,
-					__unstableHTML: 'my <strong>message</strong>',
-					isDismissible: false,
-					actions: [],
-				},
-			} );
-		} );
-
 		it( 'yields action when speak disabled', () => {
-			const result = createNotice( {
-				id,
-				content: '',
-				__unstableHTML: 'my <strong>message</strong>',
-				isDismissible: false,
-			}, { speak: false } );
+			const result = createNotice(
+				undefined,
+				'my <strong>message</strong>',
+				{
+					id,
+					__unstableHTML: true,
+					isDismissible: false,
+					speak: false,
+				}
+			);
 
 			expect( result.next().value ).toEqual( {
 				type: 'CREATE_NOTICE',
@@ -128,8 +105,8 @@ describe( 'actions', () => {
 				notice: {
 					id,
 					status: DEFAULT_STATUS,
-					content: '',
-					__unstableHTML: 'my <strong>message</strong>',
+					content: 'my <strong>message</strong>',
+					__unstableHTML: true,
 					isDismissible: false,
 					actions: [],
 				},
