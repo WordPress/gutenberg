@@ -9,7 +9,6 @@ import {
 	convertBlock,
 	pressWithModifier,
 	insertBlock,
-	META_KEY,
 } from '../../support/utils';
 
 describe( 'List', () => {
@@ -50,7 +49,7 @@ describe( 'List', () => {
 	it( 'can undo asterisk transform', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1. ' );
-		await pressWithModifier( META_KEY, 'z' );
+		await pressWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
