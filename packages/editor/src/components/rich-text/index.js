@@ -115,12 +115,12 @@ export class RichText extends Component {
 		this.savedContent = value;
 		this.patterns = getPatterns( {
 			onReplace,
-			multilineTag: this.multilineTag,
+			onCreateUndoLevel: this.onCreateUndoLevel,
 			valueToFormat: this.valueToFormat,
+			onChange: this.onChange,
 		} );
-		this.enterPatterns = getBlockTransforms( 'from' ).filter( ( { type, trigger } ) =>
-			type === 'pattern' && trigger === 'enter'
-		);
+		this.enterPatterns = getBlockTransforms( 'from' )
+			.filter( ( { type } ) => type === 'enter' );
 
 		this.state = {};
 

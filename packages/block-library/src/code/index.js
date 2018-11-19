@@ -39,8 +39,7 @@ export const settings = {
 	transforms: {
 		from: [
 			{
-				type: 'pattern',
-				trigger: 'enter',
+				type: 'enter',
 				regExp: /^```$/,
 				transform: () => createBlock( 'core/code' ),
 			},
