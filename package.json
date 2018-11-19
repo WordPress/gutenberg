@@ -6,6 +6,10 @@
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
     "scssfiles": "src/*.scss src/**/*.scss"
   },
+  "engines": {
+    "node": ">=8.0.0 <9.0.0",
+    "npm": ">=6.0.0"
+  },
   "devDependencies": {
     "@babel/core": "^7.1.0",
     "@babel/plugin-proposal-async-generator-functions": "^7.1.0",
