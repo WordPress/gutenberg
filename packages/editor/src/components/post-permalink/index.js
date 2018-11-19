@@ -148,6 +148,7 @@ export default compose( [
 			postSlug: getEditedPostAttribute( 'slug' ),
 			isEditable: isPermalinkEditable(),
 			isPublished: isCurrentPostPublished(),
+			postTitle: getEditedPostAttribute( 'title' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
