@@ -93,9 +93,13 @@ Exposed APIs that are still being tested, discussed and are subject to change sh
 Example:
 
 ```js
-export {
-	internalApi as __experimentalExposedApi
-} from './internalApi.js';
+export { __experimentalDoAction } from './api';
+```
+
+If an API must be exposed but is clearly not intended to be supported into the future, you may also use `__unstable` as a prefix to differentiate it from an experimental API. Unstable APIs should serve an immediate and temporary purpose. They should _never_ be used by plugin developers as they can be removed at any point without notice, and thus should be omitted from public-facing documentation. The inline code documentation should clearly caution their use.
+
+```js
+export { __unstableDoAction } from './api';
 ```
 
 ### Variable Naming

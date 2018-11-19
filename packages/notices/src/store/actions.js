@@ -6,7 +6,7 @@ import { uniqueId } from 'lodash';
 /**
  * Internal dependencies
  */
-import { DEFAULT_CONTEXT } from './constants';
+import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 
 /**
  * Yields action objects used in signalling that a notice is to be created.
@@ -23,18 +23,32 @@ import { DEFAULT_CONTEXT } from './constants';
  * @param {?boolean}               options.isDismissible Whether the notice can
  *                                                       be dismissed by user.
  *                                                       Defaults to `true`.
+ * @param {?boolean}               options.speak         Whether the notice
+ *                                                       content should be
+ *                                                       announced to screen
+ *                                                       readers. Defaults to
+ *                                                       `true`.
  * @param {?Array<WPNoticeAction>} options.actions       User actions to be
  *                                                       presented with notice.
  */
-export function* createNotice( status = 'info', content, options = {} ) {
+export function* createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 	const {
+		speak = true,
 		isDismissible = true,
 		context = DEFAULT_CONTEXT,
 		id = uniqueId( context ),
 		actions = [],
+		__unstableHTML,
 	} = options;
 
-	yield { type: 'SPEAK', message: content };
+	// The supported value shape of content is currently limited to plain text
+	// strings. To avoid setting expectation that e.g. a WPElement could be
+	// supported, cast to a string.
+	content = String( content );
+
+	if ( speak ) {
+		yield { type: 'SPEAK', message: content };
+	}
 
 	yield {
 		type: 'CREATE_NOTICE',
@@ -43,6 +57,7 @@ export function* createNotice( status = 'info', content, options = {} ) {
 			id,
 			status,
 			content,
+			__unstableHTML,
 			isDismissible,
 			actions,
 		},
