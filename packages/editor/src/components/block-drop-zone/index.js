@@ -19,6 +19,11 @@ import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import MediaUploadCheck from '../media-upload/check';
+
 const parseDropEvent = ( event ) => {
 	let result = {
 		srcRootClientId: null,
@@ -111,14 +116,16 @@ class BlockDropZone extends Component {
 		const isAppender = index === undefined;
 
 		return (
-			<DropZone
-				className={ classnames( 'editor-block-drop-zone', {
-					'is-appender': isAppender,
-				} ) }
-				onFilesDrop={ this.onFilesDrop }
-				onHTMLDrop={ this.onHTMLDrop }
-				onDrop={ this.onDrop }
-			/>
+			<MediaUploadCheck>
+				<DropZone
+					className={ classnames( 'editor-block-drop-zone', {
+						'is-appender': isAppender,
+					} ) }
+					onFilesDrop={ this.onFilesDrop }
+					onHTMLDrop={ this.onHTMLDrop }
+					onDrop={ this.onDrop }
+				/>
+			</MediaUploadCheck>
 		);
 	}
 }

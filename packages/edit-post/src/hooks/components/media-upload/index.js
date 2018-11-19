@@ -163,6 +163,8 @@ class MediaUpload extends Component {
 	}
 
 	onOpen() {
+		this.updateCollection();
+
 		if ( ! this.props.value ) {
 			return;
 		}
@@ -178,9 +180,24 @@ class MediaUpload extends Component {
 
 	onClose() {
 		const { onClose } = this.props;
-
 		if ( onClose ) {
 			onClose();
+		}
+	}
+
+	updateCollection() {
+		const frameContent = this.frame.content.get();
+		if ( frameContent ) {
+			const collection = frameContent.collection;
+
+			// clean all attachments we have in memory.
+			collection.toArray().forEach( ( model ) => model.trigger( 'destroy', model ) );
+
+			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			collection.mirroring._hasMore = true;
+
+			// request items
+			collection.more();
 		}
 	}
 

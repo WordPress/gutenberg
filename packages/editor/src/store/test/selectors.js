@@ -2511,54 +2511,44 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getGlobalBlockCount', () => {
-		it( 'should return the global number of top-level blocks in the post', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
-							},
+		const state = {
+			editor: {
+				present: {
+					blocks: {
+						byClientId: {
+							123: { clientId: 123, name: 'core/heading', attributes: {} },
+							456: { clientId: 456, name: 'core/paragraph', attributes: {} },
+							789: { clientId: 789, name: 'core/paragraph', attributes: {} },
+						},
+						order: {
+							'': [ 123, 456 ],
 						},
 					},
 				},
-			};
+			},
+		};
 
+		it( 'should return the global number of blocks in the post', () => {
 			expect( getGlobalBlockCount( state ) ).toBe( 2 );
 		} );
 
-		it( 'should return the global umber of blocks of a given type', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: { clientId: 123, name: 'core/columns', attributes: {} },
-								456: { clientId: 456, name: 'core/paragraph', attributes: {} },
-								789: { clientId: 789, name: 'core/paragraph', attributes: {} },
-								124: { clientId: 123, name: 'core/heading', attributes: {} },
-							},
-						},
-					},
-				},
-			};
-
-			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 1 );
+		it( 'should return the global number of blocks in the post of a given type', () => {
+			expect( getGlobalBlockCount( state, 'core/paragraph' ) ).toBe( 1 );
 		} );
 
 		it( 'should return 0 if no blocks exist', () => {
-			const state = {
+			const emptyState = {
 				editor: {
 					present: {
 						blocks: {
 							byClientId: {},
+							order: {},
 						},
 					},
 				},
 			};
-			expect( getGlobalBlockCount( state ) ).toBe( 0 );
-			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 0 );
+			expect( getGlobalBlockCount( emptyState ) ).toBe( 0 );
+			expect( getGlobalBlockCount( emptyState, 'core/heading' ) ).toBe( 0 );
 		} );
 	} );
 
