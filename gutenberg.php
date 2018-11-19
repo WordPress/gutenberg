@@ -67,10 +67,6 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $post;
-	if ( ! gutenberg_can_edit_post( $post ) ) {
-		return;
-	}
 	global $submenu;
 
 	add_menu_page(
