@@ -1,5 +1,6 @@
+/**
+ * Verify if publish checks are enabled.
+ */
 export async function arePrePublishChecksEnabled() {
-	return page.evaluate( () =>
-		window.wp.data.select( 'core/editor' ).isPublishSidebarEnabled()
-	);
+	await page.evaluate( () => window.wp.data.select( 'core/editor' ).isPublishSidebarEnabled() );
 }

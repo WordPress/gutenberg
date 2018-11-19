@@ -1,3 +1,8 @@
+/**
+ * Convert editor's block type
+ *
+ * @param {?string} name Block name
+ */
 export async function convertBlock( name ) {
 	await page.mouse.move( 200, 300, { steps: 10 } );
 	await page.mouse.move( 250, 350, { steps: 10 } );
