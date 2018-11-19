@@ -46,6 +46,14 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'can undo asterisk transform', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1. ' );
+		await pressWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be created by typing "/list"', async () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();

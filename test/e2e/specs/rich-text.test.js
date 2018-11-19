@@ -56,4 +56,15 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should transform backtick to code', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'A `backtick`' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
