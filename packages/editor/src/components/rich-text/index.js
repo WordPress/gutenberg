@@ -7,6 +7,9 @@ import {
 	isNil,
 	isEqual,
 	omit,
+	pickBy,
+	get,
+	isPlainObject,
 } from 'lodash';
 import memize from 'memize';
 
@@ -36,6 +39,7 @@ import {
 	getSelectionStart,
 	getSelectionEnd,
 	remove,
+	removeFormat,
 	isCollapsed,
 	LINE_SEPARATOR,
 	charAt,
@@ -407,6 +411,18 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Calls all registered onChangeEditableValue handlers.
+	 *
+	 * @param {Array}  formats The formats of the latest rich-text value.
+	 * @param {string} text    The text of the latest rich-text value.
+	 */
+	onChangeEditableValue( { formats, text } ) {
+		get( this.props, [ 'onChangeEditableValue' ], [] ).forEach( ( eventHandler ) => {
+			eventHandler( formats, text );
+		} );
+	}
+
+	/**
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
 	 *
@@ -419,6 +435,8 @@ export class RichText extends Component {
 		this.applyRecord( record );
 
 		const { start, end } = record;
+
+		this.onChangeEditableValue( record );
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
@@ -682,6 +700,11 @@ export class RichText extends Component {
 				return false;
 			}
 
+			// Allow primitives and arrays:
+			if ( ! isPlainObject( this.props[ name ] ) ) {
+				return this.props[ name ] !== prevProps[ name ];
+			}
+
 			return Object.keys( this.props[ name ] ).some( ( subName ) => {
 				return this.props[ name ][ subName ] !== prevProps[ name ][ subName ];
 			} );
@@ -689,10 +712,30 @@ export class RichText extends Component {
 
 		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
+
+			// Maintain the previous selection:
+			record.start = this.state.start;
+			record.end = this.state.end;
+
 			this.applyRecord( record );
 		}
 	}
 
+	/**
+	 * Get props that are provided by formats to modify RichText.
+	 *
+	 * @return {Object} Props that start with 'format_'.
+	 */
+	getFormatProps() {
+		return pickBy( this.props, ( propValue, name ) => name.startsWith( 'format_' ) );
+	}
+
+	/**
+	 * Converts the outside data structure to our internal representation.
+	 *
+	 * @param {*} value The outside value, data type depends on props.
+	 * @return {Object} An internal rich-text value.
+	 */
 	formatToValue( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
@@ -734,7 +777,35 @@ export class RichText extends Component {
 		} ).body.innerHTML;
 	}
 
+	/**
+	 * Removes editor only formats from the value.
+	 *
+	 * Editor only formats are applied using `prepareEditableTree`, so we need to
+	 * remove them before converting the internal state
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @return {Object} A new rich-text value.
+	 */
+	removeEditorOnlyFormats( value ) {
+		this.props.formatTypes.forEach( ( formatType ) => {
+			// Remove formats created by prepareEditableTree, because they are editor only.
+			if ( formatType.__experimentalCreatePrepareEditableTree ) {
+				value = removeFormat( value, formatType.name, 0, value.text.length );
+			}
+		} );
+
+		return value;
+	}
+
+	/**
+	 * Converts the internal value to the external data format.
+	 *
+	 * @param {Object} value The internal rich-text value.
+	 * @return {*} The external data format, data type depends on props.
+	 */
 	valueToFormat( value ) {
+		value = this.removeEditorOnlyFormats( value );
+
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
 			return children.fromDOM( unstableToDom( {
@@ -883,10 +954,12 @@ const RichTextContainer = compose( [
 	} ),
 	withSelect( ( select ) => {
 		const { canUserUseUnfilteredHTML, isCaretWithinFormattedText } = select( 'core/editor' );
+		const { getFormatTypes } = select( 'core/rich-text' );
 
 		return {
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
+			formatTypes: getFormatTypes(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
