@@ -66,7 +66,6 @@ return array(
 		'wp-a11y',
 		'wp-api-fetch',
 		'wp-compose',
-		'wp-deprecated',
 		'wp-dom',
 		'wp-element',
 		'wp-hooks',
