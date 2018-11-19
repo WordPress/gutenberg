@@ -17,7 +17,7 @@ function getPackageManifest( packageFolderNames ) {
 		{
 			title: 'Packages',
 			slug: 'packages',
-			markdown_source: `${ baseRepoUrl }/docs/packages.md`,
+			markdown_source: `${ baseRepoUrl }/docs/designers-developers/developers/packages.md`,
 			parent: null,
 		},
 	].concat(
@@ -72,7 +72,7 @@ function getDataManifest( parsedNamespaces ) {
 	return [ {
 		title: 'Data Package Reference',
 		slug: 'data',
-		markdown_source: `${ baseRepoUrl }/docs/designers-developers/reference/developer-reference/data/README.md`,
+		markdown_source: `${ baseRepoUrl }/docs/designers-developers/developers/reference/data/README.md`,
 		parent: null,
 	} ].concat(
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
