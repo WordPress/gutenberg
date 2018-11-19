@@ -71,7 +71,7 @@ const blockAttributes = {
 
 export const name = 'core/gallery';
 
-const parseShortCodeIds = ( ids ) => {
+const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
 		return [];
 	}
