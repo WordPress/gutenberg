@@ -1,5 +1,5 @@
 # Use the same RN version that the JS tools use
-react_native_version = '0.57.1'
+react_native_version = '0.57.5'
 
 Pod::Spec.new do |s|
   s.name         = 'RNReactNativeGutenbergBridge'

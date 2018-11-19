@@ -39,8 +39,15 @@ $ git submodule update
 Before running the demo app, you need to download and install the project dependencies. This is done via the following command:
 
 ```
+nvm install v8.12.0
 yarn install
 ```
+
+Note: using node v9.x currently produces the following error:
+```
+error sane@3.1.0: The engine "node" is incompatible with this module. Expected version "6.* || 8.* || >= 10.*".
+```
+To be revisited, as we don't need to impose a limit in version per se.
 
 ## Run
 
