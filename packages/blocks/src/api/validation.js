@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Tokenizer from 'simple-html-tokenizer/dist/es6/tokenizer';
+import { Tokenizer } from 'simple-html-tokenizer';
 import {
 	identity,
 	xor,
