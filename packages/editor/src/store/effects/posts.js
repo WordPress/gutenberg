@@ -313,6 +313,7 @@ export const refreshPost = async ( action, store ) => {
 	const postType = await resolveSelector( 'core', 'getPostType', postTypeSlug );
 	const newPost = await apiFetch( {
 		path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit`,
+		usePreloaded: false,
 	} );
 	dispatch( resetPost( newPost ) );
 };
