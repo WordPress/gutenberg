@@ -96,7 +96,7 @@
 			el(
 				PluginSidebar,
 				{
-					name: 'title-sidebar',
+					name: 'annotations-sidebar',
 					title: __( 'Annotations Sidebar' )
 				},
 				el(
@@ -107,7 +107,7 @@
 			el(
 				PluginSidebarMoreMenuItem,
 				{
-					target: 'title-sidebar'
+					target: 'annotations-sidebar'
 				},
 				__( 'Annotations Sidebar' )
 			)
