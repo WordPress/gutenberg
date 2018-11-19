@@ -179,10 +179,7 @@ export class BlockListBlock extends Component {
 		}, {} );
 
 		if ( size( metaAttributes ) ) {
-			this.props.onMetaChange( {
-				...this.props.meta,
-				...metaAttributes,
-			} );
+			this.props.onMetaChange( metaAttributes );
 		}
 	}
 
@@ -646,7 +643,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isTyping,
 		isCaretWithinFormattedText,
 		getBlockIndex,
-		getEditedPostAttribute,
 		getBlockMode,
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
@@ -673,7 +669,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isTypingWithinBlock: ( isSelected || isParentOfSelectedBlock ) && isTyping(),
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		order: getBlockIndex( clientId, rootClientId ),
-		meta: getEditedPostAttribute( 'meta' ),
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),

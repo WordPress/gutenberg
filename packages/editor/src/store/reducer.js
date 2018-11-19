@@ -36,6 +36,16 @@ import {
 import { insertAt, moveTo } from './array';
 
 /**
+ * Set of post properties for which edits should assume a merging behavior,
+ * assuming an object value.
+ *
+ * @type {Set}
+ */
+const EDIT_MERGE_PROPERTIES = new Set( [
+	'meta',
+] );
+
+/**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
  *
@@ -244,7 +254,14 @@ export const editor = flow( [
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
 						result = getMutateSafeObject( state, result );
-						result[ key ] = value;
+
+						if ( EDIT_MERGE_PROPERTIES.has( key ) ) {
+							// Merge properties should assign to current value.
+							result[ key ] = { ...result[ key ], ...value };
+						} else {
+							// Otherwise override.
+							result[ key ] = value;
+						}
 					}
 
 					return result;
@@ -264,7 +281,7 @@ export const editor = flow( [
 					( key ) => getPostRawValue( action.post[ key ] );
 
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getCanonicalValue( key ) ) {
+					if ( ! isEqual( value, getCanonicalValue( key ) ) ) {
 						return result;
 					}
 
