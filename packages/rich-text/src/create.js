@@ -74,11 +74,17 @@ function toFormat( { type, attributes } ) {
 		}
 	}
 
-	return {
+	const format = {
 		type: formatType.name,
 		attributes: registeredAttributes,
 		unregisteredAttributes,
 	};
+
+	if ( formatType.__experimentalCreatePrepareEditableTree ) {
+		format.onlyShadow = true;
+	}
+
+	return format;
 }
 
 /**
@@ -120,6 +126,7 @@ export function create( {
 	unwrapNode,
 	filterString,
 	removeAttribute,
+	onChangeEditableValue,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -137,7 +144,7 @@ export function create( {
 	}
 
 	if ( ! multilineTag ) {
-		return createFromElement( {
+		const { accumulator, shadowAccumulator } = createFromElement( {
 			element,
 			range,
 			removeNode,
@@ -145,9 +152,15 @@ export function create( {
 			filterString,
 			removeAttribute,
 		} );
+
+		if ( onChangeEditableValue ) {
+			onChangeEditableValue( shadowAccumulator, accumulator.text );
+		}
+
+		return accumulator;
 	}
 
-	return createFromMultilineElement( {
+	const { accumulator, shadowAccumulator } = createFromMultilineElement( {
 		element,
 		range,
 		multilineTag,
@@ -157,6 +170,12 @@ export function create( {
 		filterString,
 		removeAttribute,
 	} );
+
+	if ( onChangeEditableValue ) {
+		onChangeEditableValue( shadowAccumulator, accumulator.text );
+	}
+
+	return accumulator;
 }
 
 /**
@@ -279,20 +298,29 @@ function createFromElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
+	shadowCurrentWrapperTags = [],
 	removeNode,
 	unwrapNode,
 	filterString,
 	removeAttribute,
 } ) {
 	const accumulator = createEmptyValue();
+	const shadowAccumulator = [];
 
 	if ( ! element ) {
-		return accumulator;
+		return {
+			accumulator,
+			shadowAccumulator,
+		};
 	}
 
 	if ( ! element.hasChildNodes() ) {
 		accumulateSelection( accumulator, element, range, createEmptyValue() );
-		return accumulator;
+
+		return {
+			accumulator,
+			shadowAccumulator,
+		};
 	}
 
 	const length = element.childNodes.length;
@@ -323,6 +351,7 @@ function createFromElement( {
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
 			accumulator.formats.length += text.length;
+			shadowAccumulator.length += text.length;
 			continue;
 		}
 
@@ -342,22 +371,31 @@ function createFromElement( {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			accumulator.text += '\n';
 			accumulator.formats.length += 1;
+			shadowAccumulator.length += 1;
 			continue;
 		}
 
 		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
+		const shadowLastFormats = shadowAccumulator[ accumulator.formats.length - 1 ];
+		const shadowLastFormat = shadowLastFormats && shadowLastFormats[ shadowLastFormats.length - 1 ];
 		let format;
+		let shadowFormat;
 		let value;
 
 		if ( ! unwrapNode || ! unwrapNode( node ) ) {
-			const newFormat = toFormat( {
+			let newFormat = toFormat( {
 				type,
 				attributes: getAttributes( {
 					element: node,
 					removeAttribute,
 				} ),
 			} );
+			const shadowNewFormat = newFormat;
+
+			if ( newFormat.hasOwnProperty( 'onlyShadow' ) && newFormat.onlyShadow ) {
+				newFormat = null;
+			}
 
 			if ( newFormat ) {
 				// Reuse the last format if it's equal.
@@ -367,10 +405,19 @@ function createFromElement( {
 					format = newFormat;
 				}
 			}
+
+			if ( shadowNewFormat ) {
+				// Reuse the last format if it's equal.
+				if ( isFormatEqual( shadowNewFormat, shadowLastFormat ) ) {
+					shadowFormat = shadowLastFormat;
+				} else {
+					shadowFormat = shadowNewFormat;
+				}
+			}
 		}
 
 		if ( multilineWrapperTags && multilineWrapperTags.indexOf( type ) !== -1 ) {
-			value = createFromMultilineElement( {
+			const returned = createFromMultilineElement( {
 				element: node,
 				range,
 				multilineTag,
@@ -380,10 +427,14 @@ function createFromElement( {
 				filterString,
 				removeAttribute,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
+				shadowCurrentWrapperTags: [ ...shadowCurrentWrapperTags, shadowFormat ],
 			} );
+			value = returned.accumulator;
+
 			format = undefined;
+			shadowFormat = undefined;
 		} else {
-			value = createFromElement( {
+			const returned = createFromElement( {
 				element: node,
 				range,
 				multilineTag,
@@ -393,6 +444,8 @@ function createFromElement( {
 				filterString,
 				removeAttribute,
 			} );
+
+			value = returned.accumulator;
 		}
 
 		const text = value.text;
@@ -416,9 +469,16 @@ function createFromElement( {
 			} else {
 				formats[ start ] = [ format ];
 			}
+
+			if ( shadowAccumulator[ start ] ) {
+				shadowAccumulator[ start ].unshift( shadowFormat );
+			} else {
+				shadowAccumulator[ start ] = [ shadowFormat ];
+			}
 		} else {
 			accumulator.text += text;
 			accumulator.formats.length += text.length;
+			shadowAccumulator.length += text.length;
 
 			let i = value.formats.length;
 
@@ -434,18 +494,35 @@ function createFromElement( {
 					}
 				}
 
+				if ( shadowFormat ) {
+					if ( shadowAccumulator[ formatIndex ] ) {
+						shadowAccumulator[ formatIndex ].push( shadowFormat );
+					} else {
+						shadowAccumulator[ formatIndex ] = [ shadowFormat ];
+					}
+				}
+
 				if ( value.formats[ i ] ) {
 					if ( formats[ formatIndex ] ) {
 						formats[ formatIndex ].push( ...value.formats[ i ] );
 					} else {
 						formats[ formatIndex ] = value.formats[ i ];
 					}
+
+					if ( shadowAccumulator[ formatIndex ] ) {
+						shadowAccumulator[ formatIndex ].push( ...value.formats[ i ] );
+					} else {
+						shadowAccumulator[ formatIndex ] = value.formats[ i ];
+					}
 				}
 			}
 		}
 	}
 
-	return accumulator;
+	return {
+		accumulator,
+		shadowAccumulator,
+	};
 }
 
 /**
@@ -482,11 +559,16 @@ function createFromMultilineElement( {
 	filterString,
 	removeAttribute,
 	currentWrapperTags = [],
+	shadowCurrentWrapperTags = [],
 } ) {
 	const accumulator = createEmptyValue();
+	let shadowAccumulator = createEmptyValue().formats;
 
 	if ( ! element || ! element.hasChildNodes() ) {
-		return accumulator;
+		return {
+			accumulator,
+			shadowAccumulator,
+		};
 	}
 
 	const length = element.children.length;
@@ -499,7 +581,7 @@ function createFromMultilineElement( {
 			continue;
 		}
 
-		let value = createFromElement( {
+		const childAccumulator = createFromElement( {
 			element: node,
 			range,
 			multilineTag,
@@ -510,9 +592,11 @@ function createFromMultilineElement( {
 			filterString,
 			removeAttribute,
 		} );
+		let { accumulator: value } = childAccumulator;
+		const { shadowAccumulator: shadowValue } = childAccumulator;
 
 		// If a line consists of one single line break (invisible), consider the
-		// line empty, wether this is the browser's doing or not.
+		// line empty, whether this is the browser's doing or not.
 		if ( value.text === '\n' ) {
 			const start = value.start;
 			const end = value.end;
@@ -531,17 +615,22 @@ function createFromMultilineElement( {
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
 			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
+			const shadowFormats = shadowCurrentWrapperTags.length > 0 ? [ shadowCurrentWrapperTags ] : [ , ];
 			accumulator.formats = accumulator.formats.concat( formats );
+			shadowAccumulator = shadowAccumulator.concat( shadowFormats );
 			accumulator.text += LINE_SEPARATOR;
 		}
 
 		accumulateSelection( accumulator, node, range, value );
-
 		accumulator.formats = accumulator.formats.concat( value.formats );
+		shadowAccumulator = shadowAccumulator.concat( shadowValue );
 		accumulator.text += value.text;
 	}
 
-	return accumulator;
+	return {
+		accumulator,
+		shadowAccumulator,
+	};
 }
 
 /**

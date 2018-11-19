@@ -39,7 +39,6 @@ import {
 	getSelectionStart,
 	getSelectionEnd,
 	remove,
-	removeFormat,
 	isCollapsed,
 	LINE_SEPARATOR,
 	charAt,
@@ -109,6 +108,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.isActive = this.isActive.bind( this );
+		this.onChangeEditableValue = this.onChangeEditableValue.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -187,6 +187,7 @@ export class RichText extends Component {
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
 			prepareEditableTree: this.props.prepareEditableTree,
+			onChangeEditableValue: this.onChangeEditableValue,
 		} );
 	}
 
@@ -416,7 +417,7 @@ export class RichText extends Component {
 	 * @param {Array}  formats The formats of the latest rich-text value.
 	 * @param {string} text    The text of the latest rich-text value.
 	 */
-	onChangeEditableValue( { formats, text } ) {
+	onChangeEditableValue( formats, text ) {
 		get( this.props, [ 'onChangeEditableValue' ], [] ).forEach( ( eventHandler ) => {
 			eventHandler( formats, text );
 		} );
@@ -435,8 +436,6 @@ export class RichText extends Component {
 		this.applyRecord( record );
 
 		const { start, end } = record;
-
-		this.onChangeEditableValue( record );
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
@@ -778,34 +777,12 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Removes editor only formats from the value.
-	 *
-	 * Editor only formats are applied using `prepareEditableTree`, so we need to
-	 * remove them before converting the internal state
-	 *
-	 * @param {Object} value The internal rich-text value.
-	 * @return {Object} A new rich-text value.
-	 */
-	removeEditorOnlyFormats( value ) {
-		this.props.formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				value = removeFormat( value, formatType.name, 0, value.text.length );
-			}
-		} );
-
-		return value;
-	}
-
-	/**
 	 * Converts the internal value to the external data format.
 	 *
 	 * @param {Object} value The internal rich-text value.
 	 * @return {*} The external data format, data type depends on props.
 	 */
 	valueToFormat( value ) {
-		value = this.removeEditorOnlyFormats( value );
-
 		// Handle deprecated `children` and `node` sources.
 		if ( this.usedDeprecatedChildrenSource ) {
 			return children.fromDOM( unstableToDom( {
