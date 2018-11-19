@@ -7,7 +7,7 @@ import React from 'react';
 import { xorBy, isEqual } from 'lodash';
 
 import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
-import RecyclerViewList, { DataSource } from 'react-native-recyclerview-list';
+import { DataSource } from 'react-native-recyclerview-list';
 import BlockHolder from './block-holder';
 import { InlineToolbarButton } from './constants';
 import type { BlockType } from '../store/types';
@@ -265,36 +265,18 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderList() {
-		let list;
 		const behavior = Platform.OS === 'ios' ? 'padding' : null;
-		if ( Platform.OS === 'android' ) {
-			list = (
-				<RecyclerViewList
-					ref={ ( component: RecyclerViewList ) =>
-						( this.scrollTo = ( index ) => component.scrollToIndex( { index: index, animated: true } ) )
-					}
-					style={ styles.list }
-					dataSource={ this.state.dataSource }
-					renderItem={ this.renderItem.bind( this ) }
-					ListEmptyComponent={
-						<View style={ { borderColor: '#e7e7e7', borderWidth: 10, margin: 10, padding: 20 } }>
-							<Text style={ { fontSize: 15 } }>No blocks :(</Text>
-						</View>
-					}
-				/>
-			);
-		} else {
-			// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
-			list = (
-				<FlatList
-					style={ styles.list }
-					data={ this.state.blocks }
-					extraData={ { refresh: this.state.refresh, inspectBlocks: this.state.inspectBlocks } }
-					keyExtractor={ ( item ) => item.clientId }
-					renderItem={ this.renderItem.bind( this ) }
-				/>
-			);
-		}
+		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
+		// And fix problems with RecyclerViewList on Android
+		let list = (
+			<FlatList
+				style={ styles.list }
+				data={ this.state.blocks }
+				extraData={ { refresh: this.state.refresh, inspectBlocks: this.state.inspectBlocks } }
+				keyExtractor={ ( item ) => item.clientId }
+				renderItem={ this.renderItem.bind( this ) }
+			/>
+		);
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
 				{ list }
