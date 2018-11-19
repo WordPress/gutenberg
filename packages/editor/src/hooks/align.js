@@ -18,9 +18,22 @@ import { withSelect } from '@wordpress/data';
 import { BlockControls, BlockAlignmentToolbar } from '../components';
 
 /**
- * Internal Constants
- */
+ * An array which includes all possible valid alignments,
+ * used to validate if an alignment is valid or not.
+ *
+ * @constant
+ * @type {string[]}
+*/
 const ALL_ALIGNMENTS = [ 'left', 'center', 'right', 'wide', 'full' ];
+
+/**
+ * An array which includes all wide alignments.
+ * In order for this alignments to be valid they need to be supported by the block,
+ * and by the theme.
+ *
+ * @constant
+ * @type {string[]}
+*/
 const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
 
 /**
@@ -34,7 +47,7 @@ const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
  *
  * @return {string[]} Valid alignments.
  */
-export const getValidAlignments = ( blockAlign, hasWideBlockSupport = true, hasWideEnabled = true ) => {
+export function getValidAlignments( blockAlign, hasWideBlockSupport = true, hasWideEnabled = true ) {
 	let validAlignments;
 	if ( Array.isArray( blockAlign ) ) {
 		validAlignments = blockAlign;
@@ -47,13 +60,13 @@ export const getValidAlignments = ( blockAlign, hasWideBlockSupport = true, hasW
 
 	if (
 		! hasWideEnabled ||
-			( blockAlign === true && ! hasWideBlockSupport )
+		( blockAlign === true && ! hasWideBlockSupport )
 	) {
 		return without( validAlignments, ...WIDE_ALIGNMENTS );
 	}
 
 	return validAlignments;
-};
+}
 
 /**
  * Filters registered block settings, extending attributes to include `align`.
@@ -158,7 +171,7 @@ export const withDataAlign = createHigherOrderComponent(
 			( select ) => {
 				const { getEditorSettings } = select( 'core/editor' );
 				return {
-					hasWideEnabled: getEditorSettings().alignWide,
+					hasWideEnabled: !! getEditorSettings().alignWide,
 				};
 			}
 		),
