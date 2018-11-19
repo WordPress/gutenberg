@@ -124,7 +124,7 @@ export const settings = {
 					ids: {
 						type: 'array',
 						shortcode: ( { named: { ids } } ) => {
-							return parseShortCodeIds( ids );
+							return parseShortcodeIds( ids );
 						},
 					},
 					columns: {
