@@ -122,17 +122,17 @@ export function setCategories( categories ) {
 }
 
 /**
- * Returns an action object used to the icon of a category.
+ * Returns an action object used to update a category.
  *
- * @param {string}       slug Block category slug.
- * @param {string|Array} icon Block category icon.
+ * @param {string} slug     Block category slug.
+ * @param {Object} category Object containing the category properties that should be updated.
  *
  * @return {Object} Action object.
  */
-export function setCategoryIcon( slug, icon ) {
+export function updateCategory( slug, category ) {
 	return {
-		type: 'SET_CATEGORY_ICON',
+		type: 'UPDATE_CATEGORY',
 		slug,
-		icon,
+		category,
 	};
 }

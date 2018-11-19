@@ -22,11 +22,11 @@ export function setCategories( categories ) {
 }
 
 /**
- * Sets the category icon.
+ * Updates a category.
  *
- * @param {string}       slug Block category slug.
- * @param {string|Array} icon Block category icon.
+ * @param {string} slug          Block category slug.
+ * @param {Object} category Object containing the category properties that should be updated.
  */
-export function setCategoryIcon( slug, icon ) {
-	dispatch( 'core/blocks' ).setCategoryIcon( slug, icon );
+export function updateCategory( slug, category ) {
+	dispatch( 'core/blocks' ).updateCategory( slug, category );
 }

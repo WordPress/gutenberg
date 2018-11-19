@@ -226,11 +226,11 @@ Returns an action object used to set block categories.
 
  * categories: Block categories.
 
-### setCategoryIcon
+### updateCategory
 
-Returns an action object used to the icon of a category.
+Returns an action object used to update a category.
 
 *Parameters*
 
  * slug: Block category slug.
- * icon: Block category icon.
+ * category: Object containing the category properties that should be updated.

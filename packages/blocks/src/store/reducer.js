@@ -5,6 +5,7 @@ import {
 	filter,
 	find,
 	get,
+	isEmpty,
 	keyBy,
 	map,
 	mapValues,
@@ -136,14 +137,17 @@ export function categories( state = DEFAULT_CATEGORIES, action ) {
 	switch ( action.type ) {
 		case 'SET_CATEGORIES':
 			return action.categories || [];
-		case 'SET_CATEGORY_ICON': {
+		case 'UPDATE_CATEGORY': {
+			if ( ! action.category || isEmpty( action.category ) ) {
+				return state;
+			}
 			const categoryToChange = find( state, [ 'slug', action.slug ] );
 			if ( categoryToChange ) {
 				return map( state, ( category ) => {
 					if ( category.slug === action.slug ) {
 						return {
 							...category,
-							icon: action.icon,
+							...action.category,
 						};
 					}
 					return category;
