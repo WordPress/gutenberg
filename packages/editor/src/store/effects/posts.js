@@ -312,7 +312,8 @@ export const refreshPost = async ( action, store ) => {
 	const postTypeSlug = getCurrentPostType( getState() );
 	const postType = await resolveSelector( 'core', 'getPostType', postTypeSlug );
 	const newPost = await apiFetch( {
-		path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit`,
+		// Timestamp arg allows caller to bypass browser caching, which is expected for this specific function.
+		path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit&_timestamp=${ Date.now() }`,
 	} );
 	dispatch( resetPost( newPost ) );
 };
