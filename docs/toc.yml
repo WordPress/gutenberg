@@ -1,0 +1,29 @@
+- docs/readme.md
+  - docs/designers-developers/README.md
+    - docs/designers-developers/key-concepts.md
+    - docs/designers-developers/developers/README.md
+      - docs/designers-developers/developers/block-api/README.md
+        - docs/designers-developers/developers/block-api/block-registration.md
+        - docs/designers-developers/developers/block-api/block-edit-save.md
+        - docs/designers-developers/developers/block-api/block-attributes.md
+        - docs/designers-developers/developers/block-api/block-deprecation.md
+        - docs/designers-developers/developers/block-api/block-templates.md
+        - docs/designers-developers/developers/block-api/block-annotations.md
+      - docs/designers-developers/developers/filters/README.md
+        - docs/designers-developers/developers/filters/block-filters.md
+        - docs/designers-developers/developers/filters/editor-filters.md
+        - docs/designers-developers/developers/filters/parser-filters.md
+        - docs/designers-developers/developers/filters/autocomplete-filters.md
+      - docs/designers-developers/developers/data/README.md
+        - {{ data stuff here }}
+      - docs/designers-developers/developers/themes/README.md
+        - docs/designers-developers/developers/themes/theme-support.md
+      - docs/designers-developers/developers/backwards-compatibility/README.md
+        - docs/designers-developers/developers/backwards-compatibility/deprecations.md
+        - docs/designers-developers/developers/backwards-compatibility/meta-box.md
+    - docs/designers-developers/designers/README.md
+      - docs/designers-developers/designers/block-design.md
+      - docs/designers-developers/designers/design-patterns.md
+      - docs/designers-developers/designers/design-resources.md
+    - docs/designers-developers/glossary.md
+    - docs/designers-developers/faq.md
