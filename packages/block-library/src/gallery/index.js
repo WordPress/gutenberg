@@ -116,7 +116,7 @@ export const settings = {
 					images: {
 						type: 'array',
 						shortcode: ( { named: { ids } } ) => {
-							return parseShortCodeIds( ids ).map( ( id ) => ( {
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
 								id,
 							} ) );
 						},
