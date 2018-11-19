@@ -16,6 +16,16 @@ exports[`List can be converted to paragraphs 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`List can be converted when nested to paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>one</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>two</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`List can be created by converting a paragraph 1`] = `
 "<!-- wp:list -->
 <ul><li>test</li></ul>
@@ -77,6 +87,12 @@ exports[`List should create paragraph on split at end and merge back with conten
 exports[`List should create paragraph on split at end and merge back with content 2`] = `
 "<!-- wp:list -->
 <ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should split indented list item 1`] = `
+"<!-- wp:list -->
+<ul><li>one<ul><li>two</li><li>three</li></ul></li></ul>
 <!-- /wp:list -->"
 `;
 

@@ -8,9 +8,8 @@ import { get, isFunction, some } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { applyFilters, addFilter } from '@wordpress/hooks';
+import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -173,41 +172,12 @@ export function unregisterBlockType( name ) {
 }
 
 /**
- * Assigns name of block handling unknown block types.
- *
- * @param {string} name Block name.
- */
-export function setUnknownTypeHandlerName( name ) {
-	deprecated( 'setUnknownTypeHandlerName', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-		alternative: 'setFreeformContentHandlerName and setUnregisteredTypeHandlerName',
-	} );
-	setFreeformContentHandlerName( name );
-}
-
-/**
- * Retrieves name of block handling unknown block types, or undefined if no
- * handler has been defined.
- *
- * @return {?string} Blog name.
- */
-export function getUnknownTypeHandlerName() {
-	deprecated( 'getUnknownTypeHandlerName', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-		alternative: 'getFreeformContentHandlerName and getUnregisteredTypeHandlerName',
-	} );
-	return getFreeformContentHandlerName();
-}
-
-/**
  * Assigns name of block for handling non-block content.
  *
- * @param {string} name Block name.
+ * @param {string} blockName Block name.
  */
-export function setFreeformContentHandlerName( name ) {
-	dispatch( 'core/blocks' ).setFreeformFallbackBlockName( name );
+export function setFreeformContentHandlerName( blockName ) {
+	dispatch( 'core/blocks' ).setFreeformFallbackBlockName( blockName );
 }
 
 /**
@@ -223,10 +193,10 @@ export function getFreeformContentHandlerName() {
 /**
  * Assigns name of block handling unregistered block types.
  *
- * @param {string} name Block name.
+ * @param {string} blockName Block name.
  */
-export function setUnregisteredTypeHandlerName( name ) {
-	dispatch( 'core/blocks' ).setUnregisteredFallbackBlockName( name );
+export function setUnregisteredTypeHandlerName( blockName ) {
+	dispatch( 'core/blocks' ).setUnregisteredFallbackBlockName( blockName );
 }
 
 /**
@@ -359,17 +329,15 @@ export const hasChildBlocksWithInserterSupport = ( blockName ) => {
  * @param {Object} styleVariation Object containing `name` which is the class name applied to the block and `label` which identifies the variation to the user.
  */
 export const registerBlockStyle = ( blockName, styleVariation ) => {
-	addFilter( 'blocks.registerBlockType', `${ blockName }/${ styleVariation.name }`, ( settings, name ) => {
-		if ( blockName !== name ) {
-			return settings;
-		}
+	dispatch( 'core/blocks' ).addBlockStyles( blockName, styleVariation );
+};
 
-		return {
-			...settings,
-			styles: [
-				...get( settings, [ 'styles' ], [] ),
-				styleVariation,
-			],
-		};
-	} );
+/**
+ * Unregisters a block style variation for the given block.
+ *
+ * @param {string} blockName          Name of block (example: “core/latest-posts”).
+ * @param {string} styleVariationName Name of class applied to the block.
+ */
+export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
+	dispatch( 'core/blocks' ).removeBlockStyles( blockName, styleVariationName );
 };

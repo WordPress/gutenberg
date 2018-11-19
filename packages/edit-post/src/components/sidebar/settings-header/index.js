@@ -17,27 +17,46 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 		__( 'Block' ) :
 		sprintf( _n( '%d Block', '%d Blocks', blockCount ), blockCount );
 
+	const [ documentAriaLabel, documentActiveClass ] = sidebarName === 'edit-post/document' ?
+		// translators: ARIA label for the Document Settings sidebar tab, selected.
+		[ __( 'Document settings (selected)' ), 'is-active' ] :
+		// translators: ARIA label for the Document Settings sidebar tab, not selected.
+		[ __( 'Document settings' ), '' ];
+
+	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
+		// translators: ARIA label for the Block Settings sidebar tab, selected.
+		[ __( 'Block settings (selected)' ), 'is-active' ] :
+		// translators: ARIA label for the Block Settings sidebar tab, not selected.
+		[ __( 'Block settings' ), '' ];
+
 	return (
 		<SidebarHeader
 			className="edit-post-sidebar__panel-tabs"
 			closeLabel={ __( 'Close settings' ) }
 		>
-			<button
-				onClick={ openDocumentSettings }
-				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/document' ? 'is-active' : '' }` }
-				aria-label={ __( 'Document settings' ) }
-				data-label={ __( 'Document' ) }
-			>
-				{ __( 'Document' ) }
-			</button>
-			<button
-				onClick={ openBlockSettings }
-				className={ `edit-post-sidebar__panel-tab ${ sidebarName === 'edit-post/block' ? 'is-active' : '' }` }
-				aria-label={ __( 'Block settings' ) }
-				data-label={ blockLabel }
-			>
-				{ blockLabel }
-			</button>
+			{ /* Use a list so screen readers will announce how many tabs there are. */ }
+			<ul>
+				<li>
+					<button
+						onClick={ openDocumentSettings }
+						className={ `edit-post-sidebar__panel-tab ${ documentActiveClass }` }
+						aria-label={ documentAriaLabel }
+						data-label={ __( 'Document' ) }
+					>
+						{ __( 'Document' ) }
+					</button>
+				</li>
+				<li>
+					<button
+						onClick={ openBlockSettings }
+						className={ `edit-post-sidebar__panel-tab ${ blockActiveClass }` }
+						aria-label={ blockAriaLabel }
+						data-label={ blockLabel }
+					>
+						{ blockLabel }
+					</button>
+				</li>
+			</ul>
 		</SidebarHeader>
 	);
 };

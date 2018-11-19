@@ -103,10 +103,6 @@ class AudioEdit extends Component {
 			return (
 				<MediaPlaceholder
 					icon="media-audio"
-					labels={ {
-						title: __( 'Audio' ),
-						name: __( 'an audio' ),
-					} }
 					className={ className }
 					onSelect={ onSelectAudio }
 					onSelectURL={ this.onSelectURL }

@@ -15,15 +15,15 @@ exports[`MoreMenu should match snapshot 1`] = `
       <IconButton
         aria-expanded={false}
         icon="ellipsis"
-        label="More"
+        label="Show more tools & options"
         onClick={[Function]}
       >
         <Tooltip
-          text="More"
+          text="Show more tools & options"
         >
           <Button
             aria-expanded={false}
-            aria-label="More"
+            aria-label="Show more tools & options"
             className="components-icon-button"
             onBlur={[Function]}
             onClick={[Function]}
@@ -33,7 +33,7 @@ exports[`MoreMenu should match snapshot 1`] = `
           >
             <button
               aria-expanded={false}
-              aria-label="More"
+              aria-label="Show more tools & options"
               className="components-button components-icon-button"
               onBlur={[Function]}
               onClick={[Function]}

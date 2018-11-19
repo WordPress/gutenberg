@@ -12,7 +12,6 @@ import {
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import '@wordpress/core-data'; // Needed to load the core store
 
 /**
  * Internal dependencies
@@ -28,15 +27,16 @@ import {
 import {
 	resetBlocks,
 	receiveBlocks,
-	saveReusableBlock,
-	deleteReusableBlock,
+	__experimentalSaveReusableBlock as saveReusableBlock,
+	__experimentalDeleteReusableBlock as deleteReusableBlock,
 	removeBlocks,
-	convertBlockToReusable as convertBlockToReusableAction,
-	convertBlockToStatic as convertBlockToStaticAction,
-	receiveReusableBlocks as receiveReusableBlocksAction,
-	fetchReusableBlocks as fetchReusableBlocksAction,
+	__experimentalConvertBlockToReusable as convertBlockToReusableAction,
+	__experimentalConvertBlockToStatic as convertBlockToStaticAction,
+	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
+	__experimentalFetchReusableBlocks as fetchReusableBlocksAction,
 } from '../../actions';
 import reducer from '../../reducer';
+import '../../..'; // Ensure store dependencies are imported via root.
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
@@ -399,6 +399,46 @@ describe( 'reusable blocks effects', () => {
 					expect.objectContaining( {
 						name: 'core/test-block',
 						attributes: { name: 'Big Bird' },
+					} ),
+				],
+				time: expect.any( Number ),
+			} );
+		} );
+
+		it( 'should convert a reusable block with nested blocks into a static block', () => {
+			const associatedBlock = createBlock( 'core/block', { ref: 123 } );
+			const reusableBlock = { id: 123, title: 'My cool block' };
+			const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' }, [
+				createBlock( 'core/test-block', { name: 'Oscar the Grouch' } ),
+				createBlock( 'core/test-block', { name: 'Cookie Monster' } ),
+			] );
+
+			const state = reduce( [
+				resetBlocks( [ associatedBlock ] ),
+				receiveReusableBlocksAction( [ { reusableBlock, parsedBlock } ] ),
+				receiveBlocks( [ parsedBlock ] ),
+			], reducer, undefined );
+
+			const dispatch = jest.fn();
+			const store = { getState: () => state, dispatch };
+
+			convertBlockToStatic( convertBlockToStaticAction( associatedBlock.clientId ), store );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ associatedBlock.clientId ],
+				blocks: [
+					expect.objectContaining( {
+						name: 'core/test-block',
+						attributes: { name: 'Big Bird' },
+						innerBlocks: [
+							expect.objectContaining( {
+								attributes: { name: 'Oscar the Grouch' },
+							} ),
+							expect.objectContaining( {
+								attributes: { name: 'Cookie Monster' },
+							} ),
+						],
 					} ),
 				],
 				time: expect.any( Number ),

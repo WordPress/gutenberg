@@ -1,15 +1,25 @@
-// Hide all action buttons except the inserter on mobile.
-.edit-post-header-toolbar > .components-button {
-	display: none;
-
-	@include break-small() {
-		display: inline-flex;
-	}
-}
-
 .edit-post-header-toolbar {
 	display: inline-flex;
 	align-items: center;
+
+	// Hide all action buttons except the inserter on mobile.
+	> .components-button {
+		display: none;
+
+		@include break-small() {
+			display: inline-flex;
+		}
+	}
+
+	// Hide table of contents and block navigation on mobile.
+	.editor-block-navigation,
+	.table-of-contents {
+		display: none;
+
+		@include break-small() {
+			display: flex;
+		}
+	}
 }
 
 // Block toolbar when fixed to the top of the screen.
@@ -40,7 +50,7 @@
 	}
 
 	// Move toolbar into top Editor Bar.
-	@include break-large {
+	@include break-xlarge {
 		padding-left: $grid-size;
 		position: static;
 		left: auto;
@@ -54,23 +64,11 @@
 		}
 
 		.editor-block-toolbar {
-			margin: -9px 0;
+			margin: -($grid-size + $border-width) 0;
 		}
 
 		.editor-block-toolbar .components-toolbar {
-			padding: 9px;
+			padding: ($grid-size + $border-width + $border-width) $grid-size-small ($grid-size + $border-width);
 		}
-	}
-}
-
-.edit-post-header-toolbar .table-of-contents {
-	display: none;
-
-	.is-sidebar-opened & {
-		right: $sidebar-width + 16px;
-	}
-
-	@include break-small() {
-		display: block;
 	}
 }

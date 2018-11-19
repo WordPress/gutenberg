@@ -69,16 +69,14 @@ describe( 'block', () => {
 	it( 'should render a block option label', () => {
 		const labelComponents = shallow( <div>
 			{ blockCompleter.getOptionLabel( {
-				icon: {
-					src: 'expected-icon',
-				},
+				icon: 'expected-icon',
 				title: 'expected-text',
 			} ) }
 		</div> ).children();
 
 		expect( labelComponents ).toHaveLength( 2 );
 		expect( labelComponents.at( 0 ).name() ).toBe( 'BlockIcon' );
-		expect( labelComponents.at( 0 ).prop( 'icon' ) ).toBe( 'expected-icon' );
+		expect( labelComponents.at( 0 ).prop( 'icon' ) ).toEqual( 'expected-icon' );
 		expect( labelComponents.at( 1 ).text() ).toBe( 'expected-text' );
 	} );
 

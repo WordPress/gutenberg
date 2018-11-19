@@ -80,7 +80,7 @@ describe( 'List', () => {
 	it( 'can be created by converting a paragraph with line breaks', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'one' );
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'two' );
 		await convertBlock( 'List' );
 
@@ -91,6 +91,21 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await convertBlock( 'Paragraph' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'can be converted when nested to paragraphs', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		// Pointer device is needed. Shift+Tab won't focus the toolbar.
+		// To do: fix so Shift+Tab works.
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+		await page.click( 'button[aria-label="Indent list item"]' );
 		await page.keyboard.type( 'two' );
 		await convertBlock( 'Paragraph' );
 
@@ -152,6 +167,22 @@ describe( 'List', () => {
 		// Should merge lists into one.
 		await page.keyboard.press( 'ArrowDown' );
 		await pressTimes( 'ArrowLeft', 'two'.length );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should split indented list item', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		// Pointer device is needed. Shift+Tab won't focus the toolbar.
+		// To do: fix so Shift+Tab works.
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+		await page.click( 'button[aria-label="Indent list item"]' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'three' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

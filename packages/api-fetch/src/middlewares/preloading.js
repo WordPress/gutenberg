@@ -28,12 +28,14 @@ const createPreloadingMiddleware = ( preloadedData ) => ( options, next ) => {
 	}
 
 	const { parse = true } = options;
-	if ( typeof options.path === 'string' && parse ) {
+	if ( typeof options.path === 'string' ) {
 		const method = options.method || 'GET';
 		const path = getStablePath( options.path );
 
-		if ( 'GET' === method && preloadedData[ path ] ) {
+		if ( parse && 'GET' === method && preloadedData[ path ] ) {
 			return Promise.resolve( preloadedData[ path ].body );
+		} else if ( 'OPTIONS' === method && preloadedData[ method ][ path ] ) {
+			return Promise.resolve( preloadedData[ method ][ path ] );
 		}
 	}
 

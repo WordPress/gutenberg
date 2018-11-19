@@ -4,7 +4,7 @@
 import { View } from 'react-native';
 
 export default ( props ) => (
-	<View style={ { flex: 1, flexDirection: 'row' } }>
+	<View style={ { flexDirection: 'row' } }>
 		{ props.children }
 	</View>
 );

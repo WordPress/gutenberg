@@ -17,23 +17,44 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ### create
 
 ```js
-create( ?input: Element | string, ?range: Range, ?multilineTag: string, ?settings: Object ): Object
+create( {
+	?element: Element,
+	?text: string,
+	?html: string,
+	?range: Range,
+	?multilineTag: string,
+	?multilineWrapperTags: Array,
+	?removeNode: Function,
+	?unwrapNode: Function,
+	?filterString: Function,
+	?removeAttribute: Function,
+} ): Object
 ```
 
-Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without a given `input`, an empty value will be created. If `multilineTag` is provided, any content of direct children whose type matches `multilineTag` will be separated by two newlines. The `settings` object can be used to filter out content.
+Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any arguments, an empty value will be created. If `multilineTag` is provided, any content of direct children whose type matches `multilineTag` will be separated by a line separator. The remaining parameters can be used to filter out content.
 
 ### toHTMLString
 
 ```js
-toHTMLString( value: Object, ?multilineTag: string ): string
+toHTMLString( {
+	value: Object,
+	?multilineTag: string,
+	?multilineWrapperTags: Array,
+} ): string
 ```
 
-Create an HTML string from a Rich Text value. If a `multilineTag` is provided, text separated by two new lines will be wrapped in it.
+Create an HTML string from a Rich Text value. If a `multilineTag` is provided, text separated by a line separator will be wrapped in it.
 
 ### apply
 
 ```js
-apply( value: Object, current: Element, ?multilineTag ): void
+apply( {
+	value: Object,
+	current: Element,
+	?multilineTag: string
+	?multilineWrapperTags: Array,
+	?createLinePadding: Function,
+} ): void
 ```
 
 Create an `Element` tree from a Rich Text value and applies the difference to the `Element` tree contained by `current`. If a `multilineTag` is provided, text separated by two new lines will be wrapped in an `Element` of that type.

@@ -8,15 +8,13 @@ import '@wordpress/viewport';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import './hooks';
 import './plugins';
-import store from './store';
-import { initializeMetaBoxState } from './store/actions';
+import './store';
 import Editor from './editor';
 
 /**
@@ -24,18 +22,27 @@ import Editor from './editor';
  * an unhandled error occurs, replacing previously mounted editor element using
  * an initial state from prior to the crash.
  *
- * @param {Object}  postType       Post type of the post to edit.
- * @param {Object}  postId         ID of the post to edit.
- * @param {Element} target         DOM node in which editor is rendered.
- * @param {?Object} settings       Editor settings object.
- * @param {Object}  overridePost   Post properties to override.
+ * @param {Object}  postType     Post type of the post to edit.
+ * @param {Object}  postId       ID of the post to edit.
+ * @param {Element} target       DOM node in which editor is rendered.
+ * @param {?Object} settings     Editor settings object.
+ * @param {Object}  initialEdits Programmatic edits to apply initially, to be
+ *                               considered as non-user-initiated (bypass for
+ *                               unsaved changes prompt).
  */
-export function reinitializeEditor( postType, postId, target, settings, overridePost ) {
+export function reinitializeEditor( postType, postId, target, settings, initialEdits ) {
 	unmountComponentAtNode( target );
-	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
 
 	render(
-		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } recovery />,
+		<Editor
+			settings={ settings }
+			onError={ reboot }
+			postId={ postId }
+			postType={ postType }
+			initialEdits={ initialEdits }
+			recovery
+		/>,
 		target
 	);
 }
@@ -46,17 +53,17 @@ export function reinitializeEditor( postType, postId, target, settings, override
  * The return value of this function is not necessary if we change where we
  * call initializeEditor(). This is due to metaBox timing.
  *
- * @param {string}  id            Unique identifier for editor instance.
- * @param {Object}  postType      Post type of the post to edit.
- * @param {Object}  postId        ID of the post to edit.
- * @param {?Object} settings      Editor settings object.
- * @param {Object}  overridePost  Post properties to override.
- *
- * @return {Object} Editor interface.
+ * @param {string}  id           Unique identifier for editor instance.
+ * @param {Object}  postType     Post type of the post to edit.
+ * @param {Object}  postId       ID of the post to edit.
+ * @param {?Object} settings     Editor settings object.
+ * @param {Object}  initialEdits Programmatic edits to apply initially, to be
+ *                               considered as non-user-initiated (bypass for
+ *                               unsaved changes prompt).
  */
-export function initializeEditor( id, postType, postId, settings, overridePost ) {
+export function initializeEditor( id, postType, postId, settings, initialEdits ) {
 	const target = document.getElementById( id );
-	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, overridePost );
+	const reboot = reinitializeEditor.bind( null, postType, postId, target, settings, initialEdits );
 
 	registerCoreBlocks();
 
@@ -68,21 +75,15 @@ export function initializeEditor( id, postType, postId, settings, overridePost )
 	] );
 
 	render(
-		<Editor settings={ settings } onError={ reboot } postId={ postId } postType={ postType } overridePost={ overridePost } />,
+		<Editor
+			settings={ settings }
+			onError={ reboot }
+			postId={ postId }
+			postType={ postType }
+			initialEdits={ initialEdits }
+		/>,
 		target
 	);
-
-	return {
-		initializeMetaBoxes( metaBoxes ) {
-			deprecated( 'editor.initializeMetaBoxes', {
-				alternative: 'setActiveMetaBoxLocations action (`core/edit-post`)',
-				plugin: 'Gutenberg',
-				version: '4.2',
-			} );
-
-			store.dispatch( initializeMetaBoxState( metaBoxes ) );
-		},
-	};
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';

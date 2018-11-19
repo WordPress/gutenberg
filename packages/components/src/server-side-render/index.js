@@ -1,7 +1,7 @@
 /**
  * External dependencies.
  */
-import { isEqual } from 'lodash';
+import { isEqual, debounce } from 'lodash';
 
 /**
  * WordPress dependencies.
@@ -39,6 +39,9 @@ export class ServerSideRender extends Component {
 	componentDidMount() {
 		this.isStillMounted = true;
 		this.fetch( this.props );
+		// Only debounce once the initial fetch occurs to ensure that the first
+		// renders show data as soon as possible.
+		this.fetch = debounce( this.fetch, 500 );
 	}
 
 	componentWillUnmount() {
@@ -52,27 +55,32 @@ export class ServerSideRender extends Component {
 	}
 
 	fetch( props ) {
+		if ( ! this.isStillMounted ) {
+			return;
+		}
 		if ( null !== this.state.response ) {
 			this.setState( { response: null } );
 		}
 		const { block, attributes = null, urlQueryArgs = {} } = props;
 
 		const path = rendererPath( block, attributes, urlQueryArgs );
-
-		return apiFetch( { path } )
+		// Store the latest fetch request so that when we process it, we can
+		// check if it is the current request, to avoid race conditions on slow networks.
+		const fetchRequest = this.currentFetchRequest = apiFetch( { path } )
 			.then( ( response ) => {
-				if ( this.isStillMounted && response && response.rendered ) {
+				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest && response && response.rendered ) {
 					this.setState( { response: response.rendered } );
 				}
 			} )
 			.catch( ( error ) => {
-				if ( this.isStillMounted ) {
+				if ( this.isStillMounted && fetchRequest === this.currentFetchRequest ) {
 					this.setState( { response: {
 						error: true,
 						errorMsg: error.message,
 					} } );
 				}
 			} );
+		return fetchRequest;
 	}
 
 	render() {

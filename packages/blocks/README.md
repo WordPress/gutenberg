@@ -249,13 +249,12 @@ editor interface where blocks are implemented.
   An object can also be passed, in this case, icon, as specified above, should be included in the src property.
   Besides src the object can contain background and foreground colors, this colors will appear with the icon
   when they are applicable e.g.: in the inserter.
-- `attributes: Object | Function` - An object of attribute schemas, where the
+- `attributes: Object` - An object of attribute schemas, where the
   keys of the object define the shape of attributes, and each value an object
   schema describing the `type`, `default` (optional), and
   [`source`](https://wordpress.org/gutenberg/handbook/block-api/attributes/)
   (optional) of the attribute. If `source` is omitted, the attribute is
-  serialized into the block's comment delimiters. Alternatively, define
-  `attributes` as a function which returns the attributes object.
+  serialized into the block's comment delimiters.
 - `category: string` - Slug of the block's category. The category is used to
   organize the blocks in the block inserter.
 - `edit( { attributes: Object, setAttributes: Function } ): WPElement` -

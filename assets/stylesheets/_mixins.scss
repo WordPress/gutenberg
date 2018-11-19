@@ -14,6 +14,12 @@
 	}
 }
 
+@mixin break-xlarge() {
+	@media (min-width: #{ ($break-xlarge) }) {
+		@content;
+	}
+}
+
 @mixin break-large() {
 	@media (min-width: #{ ($break-large) }) {
 		@content;

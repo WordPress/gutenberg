@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	ACCESS_MODIFIER_KEYS,
 	newPost,
 	pressWithModifier,
 } from '../support/utils';
@@ -19,7 +18,7 @@ describe( 'a11y', () => {
 	} );
 
 	it( 'tabs header bar', async () => {
-		await pressWithModifier( 'Control', '~' );
+		await pressWithModifier( 'ctrl', '~' );
 
 		await page.keyboard.press( 'Tab' );
 
@@ -32,7 +31,7 @@ describe( 'a11y', () => {
 
 	it( 'constrains focus to a modal when tabbing', async () => {
 		// Open keyboard help modal.
-		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'h' );
+		await pressWithModifier( 'access', 'h' );
 
 		// The close button should not be focused by default; this is a strange UX
 		// experience.
@@ -46,7 +45,7 @@ describe( 'a11y', () => {
 	} );
 
 	it( 'returns focus to the first tabbable in a modal after blurring a tabbable', async () => {
-		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'h' );
+		await pressWithModifier( 'access', 'h' );
 
 		// Click to move focus to an element after the last tabbable within the
 		// modal.
@@ -58,13 +57,13 @@ describe( 'a11y', () => {
 	} );
 
 	it( 'returns focus to the last tabbable in a modal after blurring a tabbable and tabbing in reverse direction', async () => {
-		await pressWithModifier( ACCESS_MODIFIER_KEYS, 'h' );
+		await pressWithModifier( 'access', 'h' );
 
 		// Click to move focus to an element before the first tabbable within
 		// the modal.
 		await page.click( '.components-modal__header-heading' );
 
-		await pressWithModifier( 'Shift', 'Tab' );
+		await pressWithModifier( 'shift', 'Tab' );
 
 		expect( await isCloseButtonFocused() ).toBe( true );
 	} );

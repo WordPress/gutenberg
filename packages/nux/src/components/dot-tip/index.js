@@ -58,19 +58,19 @@ export function DotTip( {
 }
 
 export default compose(
-	withSelect( ( select, { id } ) => {
+	withSelect( ( select, { tipId } ) => {
 		const { isTipVisible, getAssociatedGuide } = select( 'core/nux' );
-		const associatedGuide = getAssociatedGuide( id );
+		const associatedGuide = getAssociatedGuide( tipId );
 		return {
-			isVisible: isTipVisible( id ),
+			isVisible: isTipVisible( tipId ),
 			hasNextTip: !! ( associatedGuide && associatedGuide.nextTipId ),
 		};
 	} ),
-	withDispatch( ( dispatch, { id } ) => {
+	withDispatch( ( dispatch, { tipId } ) => {
 		const { dismissTip, disableTips } = dispatch( 'core/nux' );
 		return {
 			onDismiss() {
-				dismissTip( id );
+				dismissTip( tipId );
 			},
 			onDisable() {
 				disableTips();

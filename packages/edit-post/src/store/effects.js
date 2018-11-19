@@ -27,6 +27,8 @@ import {
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { onChangeListener } from './utils';
 
+const VIEW_AS_LINK_SELECTOR = '#wp-admin-bar-view a';
+
 const effects = {
 	SET_META_BOXES_PER_LOCATIONS( action, store ) {
 		// Allow toggling metaboxes panels
@@ -154,6 +156,26 @@ const effects = {
 		// Collapse sidebar when viewport shrinks.
 		// Reopen sidebar it if viewport expands and it was closed because of a previous shrink.
 		subscribe( onChangeListener( isMobileViewPort, adjustSidebar ) );
+
+		// Update View as link when currentPost link changes
+		const updateViewAsLink = ( newPermalink ) => {
+			if ( ! newPermalink ) {
+				return;
+			}
+
+			const nodeToUpdate = document.querySelector(
+				VIEW_AS_LINK_SELECTOR
+			);
+			if ( ! nodeToUpdate ) {
+				return;
+			}
+			nodeToUpdate.setAttribute( 'href', newPermalink );
+		};
+
+		subscribe( onChangeListener(
+			() => select( 'core/editor' ).getCurrentPost().link,
+			updateViewAsLink
+		) );
 	},
 
 };

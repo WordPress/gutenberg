@@ -40,9 +40,9 @@ describe( 'CSS selector wrap', () => {
 	it( 'should ignore keyframes', () => {
 		const callback = wrap( '.my-namespace' );
 		const input = `
-		@keyframes move_background {
+		@keyframes edit-post__fade-in-animation {
 			from {
-				background-position: 0 0;
+				opacity: 0;
 			}
 		}`;
 		const output = traverse( input, callback );

@@ -1,3 +1,9 @@
+## 3.1.0 (2018-11-15)
+
+### Enhancements
+
+- The module has been internally refactored to use [Tannin](https://github.com/aduth/tannin) in place of [Jed](https://github.com/messageformat/Jed/). This has no impact on the public interface of the module, but should come with considerable benefit to performance, memory usage, and bundle size.
+
 ## 3.0.0 (2018-09-30)
 
 ### Breaking Changes

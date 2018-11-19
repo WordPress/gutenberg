@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 import {
+	IdentityEntityParser,
 	getTextPiecesSplitOnWhitespace,
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
-	isEqualTextTokensWithCollapsedWhitespace,
+	isEquivalentTextTokens,
 	getNormalizedStyleValue,
 	getStyleProperties,
 	isEqualAttributesOfName,
@@ -13,7 +14,7 @@ import {
 	isEqualTokensOfType,
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
-	isValidBlock,
+	isValidBlockContent,
 	isClosedByToken,
 } from '../validation';
 import {
@@ -37,6 +38,16 @@ describe( 'validation', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'IdentityEntityParser', () => {
+		it( 'can be constructed', () => {
+			expect( new IdentityEntityParser() instanceof IdentityEntityParser ).toBe( true );
+		} );
+
+		it( 'returns parse as decoded value', () => {
+			expect( new IdentityEntityParser().parse( 'quot' ) ).toBe( '"' );
 		} );
 	} );
 
@@ -98,9 +109,9 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'isEqualTextTokensWithCollapsedWhitespace()', () => {
+	describe( 'isEquivalentTextTokens()', () => {
 		it( 'should return false if not equal with collapsed whitespace', () => {
-			const isEqual = isEqualTextTokensWithCollapsedWhitespace(
+			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
 				{ chars: 'a \n c \t b  ' },
 			);
@@ -110,7 +121,7 @@ describe( 'validation', () => {
 		} );
 
 		it( 'should return true if equal with collapsed whitespace', () => {
-			const isEqual = isEqualTextTokensWithCollapsedWhitespace(
+			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
 				{ chars: 'a \n b \t c  ' },
 			);
@@ -379,8 +390,8 @@ describe( 'validation', () => {
 
 		it( 'should return true for effectively equivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
-				'<div>&quot; Hello<span   class="b a" id="foo"> World!</  span>  "</div>',
-				'<div  >" Hello\n<span id="foo" class="a  b">World!</span>"</div>'
+				'<div>&quot; Hello<span   class="b a" id="foo" data-foo="here &mdash; there"> World! &#128517;</  span>  "</div>',
+				'<div  >" Hello\n<span id="foo" class="a  b" data-foo="here — there">World! 😅</span>"</div>'
 			);
 
 			expect( isEquivalent ).toBe( true );
@@ -553,14 +564,14 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'isValidBlock()', () => {
+	describe( 'isValidBlockContent()', () => {
 		it( 'returns false if block is not valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Apples',
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Apples'
 			);
 
 			expect( console ).toHaveWarned();
@@ -576,10 +587,10 @@ describe( 'validation', () => {
 				},
 			} );
 
-			const isValid = isValidBlock(
-				'Bananas',
-				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( console ).toHaveErrored();
@@ -589,10 +600,22 @@ describe( 'validation', () => {
 		it( 'returns true is block is valid', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const isValid = isValidBlock(
-				'Bananas',
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
+			);
+
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'works also when block type object is passed as object', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const isValid = isValidBlockContent(
 				getBlockType( 'core/test-block' ),
-				{ fruit: 'Bananas' }
+				{ fruit: 'Bananas' },
+				'Bananas'
 			);
 
 			expect( isValid ).toBe( true );

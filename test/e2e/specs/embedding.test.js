@@ -1,16 +1,16 @@
 /**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost } from '../support/utils';
+import { clickBlockAppender, newPost, isEmbedding, setUpResponseMocking, JSONResponse } from '../support/utils';
 
-const INTERCEPT_EMBED_SUCCESS_URLS = [
-	'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
-	'https://www.youtube.com/watch?v=lXMskKTw3Bc',
-	'https://cloudup.com/cQFlxqtY4ob',
-	'https://twitter.com/notnownikki',
-];
-
-const VIDEO_URL = 'https://www.youtube.com/watch?v=lXMskKTw3Bc';
+const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
+	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
+	html: '<div class="wp-embedded-content" data-secret="shhhh it is a secret">WordPress embed</div>',
+	type: 'rich',
+	provider_name: 'WordPress',
+	provider_url: 'https://wordpress.org',
+	version: '1.0',
+};
 
 const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 	url: 'https://twitter.com/notnownikki',
@@ -30,29 +30,57 @@ const MOCK_EMBED_VIDEO_SUCCESS_RESPONSE = {
 	version: '1.0',
 };
 
-const setupEmbedRequestInterception = async () => {
-	// Intercept successful embed requests so that scripts loaded from third parties
-	// cannot leave errors in the console and cause the test to fail.
-	await page.setRequestInterception( true );
-	page.on( 'request', async ( request ) => {
-		const requestUrl = request.url();
-		const hasEmbedSuccessUrl = INTERCEPT_EMBED_SUCCESS_URLS.some(
-			( url ) => -1 !== requestUrl.indexOf( encodeURIComponent( url ) )
-		);
-		if ( hasEmbedSuccessUrl ) {
-			// If this is the YouTube request, return the video mock response that has
-			// an iframe with set aspect ratio.
-			// Otherwise: use the generic rich response.
-			const embedResponse = -1 !== requestUrl.indexOf( encodeURIComponent( VIDEO_URL ) ) ? MOCK_EMBED_VIDEO_SUCCESS_RESPONSE : MOCK_EMBED_RICH_SUCCESS_RESPONSE;
-			request.respond( {
-				content: 'application/json',
-				body: JSON.stringify( embedResponse ),
-			} );
-		} else {
-			request.continue();
-		}
-	} );
+const MOCK_BAD_EMBED_PROVIDER_RESPONSE = {
+	url: 'https://twitter.com/thatbunty',
+	html: false,
+	provider_name: 'Embed Provider',
+	version: '1.0',
 };
+
+const MOCK_CANT_EMBED_RESPONSE = {
+	provider_name: 'Embed Handler',
+	html: '<a href="https://twitter.com/wooyaygutenberg123454312">https://twitter.com/wooyaygutenberg123454312</a>',
+};
+
+const MOCK_BAD_WORDPRESS_RESPONSE = {
+	code: 'oembed_invalid_url',
+	message: 'Not Found',
+	data: {
+		status: 404,
+	},
+	html: false,
+};
+
+const MOCK_RESPONSES = [
+	{
+		match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
+		onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://cloudup.com/cQFlxqtY4ob' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://twitter.com/notnownikki' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://twitter.com/thatbunty' ),
+		onRequestMatch: JSONResponse( MOCK_BAD_EMBED_PROVIDER_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
+		onRequestMatch: JSONResponse( MOCK_CANT_EMBED_RESPONSE ),
+	},
+];
 
 const addEmbeds = async () => {
 	await newPost();
@@ -71,18 +99,18 @@ const addEmbeds = async () => {
 	await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 	await page.keyboard.press( 'Enter' );
 
-	// Valid provider; erroring provider API.
-	await clickBlockAppender();
-	await page.keyboard.type( '/embed' );
-	await page.keyboard.press( 'Enter' );
-	await page.keyboard.type( 'https://www.reverbnation.com/collection/186-mellow-beats' );
-	await page.keyboard.press( 'Enter' );
-
-	// WordPress content that can't be embedded.
+	// WordPress invalid content.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
 	await page.keyboard.press( 'Enter' );
 	await page.keyboard.type( 'https://wordpress.org/gutenberg/handbook/' );
+	await page.keyboard.press( 'Enter' );
+
+	// Provider whose oembed API has gone wrong.
+	await clickBlockAppender();
+	await page.keyboard.type( '/embed' );
+	await page.keyboard.press( 'Enter' );
+	await page.keyboard.type( 'https://twitter.com/thatbunty' );
 	await page.keyboard.press( 'Enter' );
 
 	// WordPress content that can be embedded.
@@ -108,7 +136,7 @@ const addEmbeds = async () => {
 };
 
 const setUp = async () => {
-	await setupEmbedRequestInterception();
+	await setUpResponseMocking( MOCK_RESPONSES );
 	await addEmbeds();
 };
 
@@ -117,14 +145,16 @@ describe( 'Embedding content', () => {
 
 	it( 'should render embeds in the correct state', async () => {
 		// The successful embeds should be in a correctly classed figure element.
+		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 		await page.waitForSelector( 'figure.wp-block-embed-cloudup' );
+		await page.waitForSelector( 'figure.wp-block-embed-wordpress' );
 		// Video embed should also have the aspect ratio class.
 		await page.waitForSelector( 'figure.wp-block-embed-youtube.wp-embed-aspect-16-9' );
 
 		// Each failed embed should be in the edit state.
 		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
-		await page.waitForSelector( 'input[value="https://www.reverbnation.com/collection/186-mellow-beats"]' );
+		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
 		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
 	} );
 } );

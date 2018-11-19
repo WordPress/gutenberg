@@ -21,19 +21,18 @@ import InspectorControls from '../inspector-controls';
 import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 
-const BlockInspector = ( { selectedBlock, blockType, count } ) => {
+const BlockInspector = ( { selectedBlockClientId, selectedBlockName, blockType, count, hasBlockStyles } ) => {
 	if ( count > 1 ) {
 		return <span className="editor-block-inspector__multi-blocks">{ __( 'Coming Soon' ) }</span>;
 	}
 
-	const isSelectedBlockUnregistered =
-		!! selectedBlock && selectedBlock.name === getUnregisteredTypeHandlerName();
+	const isSelectedBlockUnregistered = selectedBlockName === getUnregisteredTypeHandlerName();
 
 	/*
 	 * If the selected block is of an unregistered type, avoid showing it as an actual selection
 	 * because we want the user to focus on the unregistered block warning, not block settings.
 	 */
-	if ( ! selectedBlock || isSelectedBlockUnregistered ) {
+	if ( ! blockType || ! selectedBlockClientId || isSelectedBlockUnregistered ) {
 		return <span className="editor-block-inspector__no-blocks">{ __( 'No block selected.' ) }</span>;
 	}
 
@@ -46,14 +45,14 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 					<div className="editor-block-inspector__card-description">{ blockType.description }</div>
 				</div>
 			</div>
-			{ !! blockType.styles && (
+			{ hasBlockStyles && (
 				<div>
 					<PanelBody
 						title={ __( 'Styles' ) }
 						initialOpen={ false }
 					>
 						<BlockStyles
-							clientId={ selectedBlock.clientId }
+							clientId={ selectedBlockClientId }
 						/>
 					</PanelBody>
 				</div>
@@ -79,13 +78,18 @@ const BlockInspector = ( { selectedBlock, blockType, count } ) => {
 
 export default withSelect(
 	( select ) => {
-		const { getSelectedBlock, getSelectedBlockCount } = select( 'core/editor' );
-		const selectedBlock = getSelectedBlock();
-		const blockType = selectedBlock && getBlockType( selectedBlock.name );
+		const { getSelectedBlockClientId, getSelectedBlockCount, getBlockName } = select( 'core/editor' );
+		const { getBlockStyles } = select( 'core/blocks' );
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectedBlockName = selectedBlockClientId && getBlockName( selectedBlockClientId );
+		const blockType = selectedBlockClientId && getBlockType( selectedBlockName );
+		const blockStyles = selectedBlockClientId && getBlockStyles( selectedBlockName );
 		return {
-			selectedBlock,
-			blockType,
 			count: getSelectedBlockCount(),
+			hasBlockStyles: blockStyles && blockStyles.length > 0,
+			selectedBlockName,
+			selectedBlockClientId,
+			blockType,
 		};
 	}
 )( BlockInspector );
