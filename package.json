@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
@@ -60,8 +60,8 @@
     "start:debug": "node --inspect-brk node_modules/.bin/react-native start",
     "start:inside-gb:debug": "node --inspect-brk node_modules/.bin/react-native start:inside-gb",
     "bundle": "yarn bundle:android && yarn bundle:ios",
-    "bundle:android": "mkdir -p build/android && yarn react-native bundle --platform android --dev false --entry-file index.js --assets-dest build/android --bundle-output build/android/App.js --sourcemap-output build/android/App.js.map",
-    "bundle:ios": "mkdir -p build/ios && yarn react-native bundle --platform ios --dev false --entry-file index.js --assets-dest build/ios --bundle-output build/ios/App.js --sourcemap-output build/ios/App.js.map",
+    "bundle:android": "mkdir -p bundle/android && yarn react-native bundle --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.js --sourcemap-output bundle/android/App.js.map",
+    "bundle:ios": "mkdir -p bundle/ios && yarn react-native bundle --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
     "android": "react-native run-android",
     "prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
     "wpandroid": "yarn android --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
@@ -74,7 +74,7 @@
     "test:debug": "cross-env NODE_ENV=test node --inspect-brk node_modules/jest/bin/jest.js --runInBand --verbose --config jest.config.js",
     "flow": "flow",
     "prettier": "prettier-eslint --write $npm_package_config_jsfiles $npm_package_config_scssfiles",
-    "clean": "yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node; yarn clean:bundle;",
+    "clean": "yarn clean:aztec; yarn cache clean; yarn clean:haste; yarn clean:jest; yarn clean:metro; yarn clean:react; yarn clean:watchman; yarn clean:node;",
     "clean:runtime": "yarn clean:haste; yarn clean:react; yarn clean:metro; yarn clean:jest; yarn clean:watchman; yarn clean:babel-cache",
     "clean:aztec": "cd react-native-aztec && yarn clean && cd example && yarn clean",
     "clean:haste": "rm -rf /tmp/haste-map-react-native-packager-*",
@@ -86,9 +86,9 @@
     "clean:node": "rm -rf node_modules",
     "clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
     "clean:babel-cache": "rm -rf ./node_modules/.cache/babel-loader/*",
-    "clean:bundle": "rm -rf build",
     "lint": "eslint . --ext .js",
-    "lint:fix": "yarn lint --fix"
+    "lint:fix": "yarn lint --fix",
+    "version": "yarn bundle && git add -A bundle"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0",
@@ -111,7 +111,7 @@
     "react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
     "react-native-modal": "^6.5.0",
     "react-native-recyclerview-list": "git+https://github.com/wordpress-mobile/react-native-recyclerview-list.git#v1.0.0",
-    "react-native-svg": "^6.5.2",
+    "react-native-svg": "6.5.2",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
     "redux-multi": "^0.1.12",
@@ -120,8 +120,8 @@
     "rememo": "^3.0.0",
     "shallowequal": "^1.0.2",
     "simple-html-tokenizer": "^0.5.1",
+    "tannin": "^1.0.1",
     "tinycolor2": "^1.4.1",
-    "turbo-combine-reducers": "^1.0.2",
-    "tannin": "^1.0.1"
+    "turbo-combine-reducers": "^1.0.2"
   }
 }
