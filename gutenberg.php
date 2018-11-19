@@ -67,6 +67,9 @@ function the_gutenberg_project() {
  * @since 0.1.0
  */
 function gutenberg_menu() {
+	if ( ! gutenberg_can_edit_post( $post ) ) {
+		return;
+	}
 	global $submenu;
 
 	add_menu_page(
@@ -199,6 +202,13 @@ function gutenberg_pre_init() {
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
+
+/**
+ * Enable Gutenberg based on user_can_richedit setting.
+ * Set gutenberg_can_edit_post based on user setting for disable visual editor.
+ */
+add_filter( 'gutenberg_can_edit_post_type', 'user_can_richedit', 5 );
+add_filter( 'gutenberg_can_edit_post', 'user_can_richedit', 5 );
 
 /**
  * Initialize Gutenberg.
