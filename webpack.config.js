@@ -137,6 +137,7 @@ const config = {
 			'deprecated',
 			'dom-ready',
 			'redux-routine',
+			'token-list',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
