@@ -73,6 +73,17 @@
 						},
 					},
 					__( 'Add annotation' )
+				),
+				el(
+					Button,
+					{
+						isPrimary: true,
+						onClick: () => {
+							dispatch( 'core/annotations' ).__experimentalRemoveAnnotationsBySource( 'e2e-tests' );
+						}
+					},
+
+					__( 'Remove annotations' )
 				)
 			);
 		}
