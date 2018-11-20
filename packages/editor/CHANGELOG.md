@@ -1,4 +1,4 @@
-## 9.0.0 (Unreleased)
+## 9.0.0 (2018-11-20)
 
 ### Breaking Changes
 
