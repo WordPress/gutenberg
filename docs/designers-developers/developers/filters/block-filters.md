@@ -1,8 +1,4 @@
-# Extending Blocks (Experimental)
-
-[Hooks](https://developer.wordpress.org/plugins/hooks/) are a way for one piece of code to interact/modify another piece of code. They make up the foundation for how plugins and themes interact with Gutenberg, but they’re also used extensively by WordPress Core itself. There are two types of hooks: [Actions](https://developer.wordpress.org/plugins/hooks/actions/) and [Filters](https://developer.wordpress.org/plugins/hooks/filters/). They were initially implemented in PHP, but for the purpose of Gutenberg they were ported to JavaScript and published to npm as [@wordpress/hooks](https://www.npmjs.com/package/@wordpress/hooks) package for general purpose use. You can also learn more about both APIs: [PHP](https://codex.wordpress.org/Plugin_API/) and [JavaScript](https://github.com/WordPress/packages/tree/master/packages/hooks).
-
-## Modifying Blocks
+# Block Filters
 
 To modify the behavior of existing blocks, Gutenberg exposes several APIs:
 
@@ -93,7 +89,7 @@ wp.hooks.addFilter(
 );
 ```
 
-_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](../../docs/block-api/block-edit-save.md#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
+_Note:_ This filter must always be run on every page load, and not in your browser's developer tools console. Otherwise, a [block validation](../../../../docs/designers-developers/developers/block-api/block-edit-save.md#validation) error will occur the next time the post is edited. This is due to the fact that block validation occurs by verifying that the saved output matches what is stored in the post's content during editor initialization. So, if this filter does not exist when the editor loads, the block will be marked as invalid.
 
 #### `blocks.getBlockDefaultClassName`
 
@@ -342,4 +338,3 @@ add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
 
 You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
-

@@ -251,7 +251,7 @@ Our [list of supported browsers can be found in the Make WordPress handbook](htt
 
 ## How do I make my own block?
 
-The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](../../docs/blocks.md) section to get started.
+The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](../../docs/designers-developers/developers/tutorials/block-tutorial/intro.md) section to get started.
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -297,7 +297,7 @@ Blocks will be able to provide base structural CSS styles, and themes can add st
 
 Other features, like the new _wide_ and _full-wide_ alignment options, will simply be CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-*See:* [Theme Support](../../docs/extensibility/theme-support.md)
+*See:* [Theme Support](../../docs/designers-developers/developers/themes/theme-support.md)
 
 ## How will editor styles work?
 
@@ -310,7 +310,7 @@ function gutenbergtheme_editor_styles() {
 add_action( 'enqueue_block_editor_assets', 'gutenbergtheme_editor_styles' );
 ```
 
-*Details:* [Editor Styles](../../docs/extensibility/theme-support.md#editor-styles)
+*See:* [Editor Styles](../../docs/designers-developers/developers/themes/theme-support.md#editor-styles)
 
 ## Should I be concerned that Gutenberg will make my plugin obsolete?
 
@@ -333,11 +333,13 @@ Custom TinyMCE buttons will still work in the “Classic” block, which is a bl
 (Gutenberg comes with a new universal inserter tool, which gives you access to every block available, searchable, sorted by recency and categories. This inserter tool levels the playing field for every plugin that adds content to the editor, and provides a single interface to learn how to use.)
 
 ## How will shortcodes work in Gutenberg?
+
 Shortcodes will continue to work as they do now.
 
 However we see the block as an evolution of the `[shortcode]`. Instead of having to type out code, you can use the universal inserter tray to pick a block and get a richer interface for both configuring the block and previewing it. We would recommend people eventually upgrade their shortcodes to be blocks.
 
 ## Should I move shortcodes to content blocks?
+
 We think so. Blocks are designed to be visually representative of the final look, and they will likely become the expected way in which users will discover and insert content in WordPress.
 
 ## Will Gutenberg be made properly accessible?
@@ -346,19 +348,13 @@ Accessibility is not an afterthought. Not every aspect of Gutenberg is accessibl
 
 If you would like to contribute to the accessibility of Gutenberg, we can always use more people to test and contribute.
 
-## Are there any design resources for Gutenberg?
-
-Yes, primarily in [design principles](../../docs/reference/design-principles.md)
-
-We are still adding more documentation.
-
 ## How is data stored? I've seen HTML comments, what is their purpose?
 
 Our approach—as outlined in [the technical overview introduction](https://make.wordpress.org/core/2017/01/17/editor-technical-overview/)—is to augment the existing data format in a way that doesn’t break the decade-and-a-half-fabric of content WordPress provides. In other terms, this optimizes for a format that prioritizes human readability (the HTML document of the web) and easy-to-render-anywhere over a machine convenient file (JSON in post-meta) that benefits the editing context primarily.
 
 This also [gives us the flexibility](https://github.com/WordPress/gutenberg/issues/1516) to store those blocks that are inherently separate from the content stream (reusable pieces like widgets or small post type elements) elsewhere, and just keep token references for their placement.
 
-We suggest you look at the [language of Gutenberg](../../docs/language.md) to learn more about how this aspect of the project works.
+We suggest you look at the [Gutenberg key concepts](../../docs/designers-developers/key-concepts.md) to learn more about how this aspect of the project works.
 
 ## How can I parse the post content back out into blocks in PHP or JS?
 In JS:
