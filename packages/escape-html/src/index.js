@@ -52,6 +52,17 @@ export function escapeLessThan( value ) {
 }
 
 /**
+ * Returns a string with less-than sign replaced.
+ *
+ * @param {string} value Original string.
+ *
+ * @return {string} Escaped string.
+ */
+export function escapeGreaterThan( value ) {
+	return value.replace( />/g, '&gt;' );
+}
+
+/**
  * Returns an escaped attribute value.
  *
  * @link https://w3c.github.io/html/syntax.html#elements-attributes
@@ -80,7 +91,7 @@ export function escapeAttribute( value ) {
  * @return {string} Escaped HTML element value.
  */
 export function escapeHTML( value ) {
-	return escapeLessThan( escapeAmpersand( value ) );
+	return escapeLessThan( escapeGreaterThan( escapeAmpersand( value ) ) );
 }
 
 /**
