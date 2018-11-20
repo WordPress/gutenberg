@@ -908,11 +908,6 @@
 		}
 	}
 
-	&.is-light .components-toolbar {
-		background: rgba($white, 0.5);
-		color: $dark-gray-700;
-	}
-
 	// Position the breadcrumb closer on mobile.
 	[data-align="left"] &,
 	[data-align="right"] & {

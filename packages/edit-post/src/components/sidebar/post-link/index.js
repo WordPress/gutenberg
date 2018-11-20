@@ -12,6 +12,7 @@ import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
+import { cleanForSlug } from '@wordpress/editor';
 
 /**
  * Module Constants
@@ -27,15 +28,19 @@ function PostLink( {
 	editPermalink,
 	forceEmptyField,
 	setState,
+	postTitle,
+	postSlug,
+	postID,
 } ) {
-	const { prefix, postName, suffix } = permalinkParts;
+	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
+	const currentSlug = postSlug || cleanForSlug( postTitle ) || postID;
 	if ( isEditable ) {
 		prefixElement = prefix && (
 			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
 		);
-		postNameElement = postName && (
-			<span className="edit-post-post-link__link-post-name">{ postName }</span>
+		postNameElement = currentSlug && (
+			<span className="edit-post-post-link__link-post-name">{ currentSlug }</span>
 		);
 		suffixElement = suffix && (
 			<span className="edit-post-post-link__link-suffix">{ suffix }</span>
@@ -51,7 +56,7 @@ function PostLink( {
 			{ isEditable && (
 				<TextControl
 					label={ __( 'URL' ) }
-					value={ forceEmptyField ? '' : postName }
+					value={ forceEmptyField ? '' : currentSlug }
 					onChange={ ( newValue ) => {
 						editPermalink( newValue );
 						// When we delete the field the permalink gets
@@ -66,6 +71,14 @@ function PostLink( {
 							}
 							return;
 						}
+						if ( forceEmptyField ) {
+							setState( {
+								forceEmptyField: false,
+							} );
+						}
+					} }
+					onBlur={ ( event ) => {
+						editPermalink( cleanForSlug( event.target.value ) );
 						if ( forceEmptyField ) {
 							setState( {
 								forceEmptyField: false,
@@ -117,7 +130,7 @@ export default compose( [
 			getPostType,
 		} = select( 'core' );
 
-		const { link } = getCurrentPost();
+		const { link, id } = getCurrentPost();
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
 		return {
@@ -128,6 +141,9 @@ export default compose( [
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			permalinkParts: getPermalinkParts(),
 			isViewable: get( postType, [ 'viewable' ], false ),
+			postTitle: getEditedPostAttribute( 'title' ),
+			postSlug: getEditedPostAttribute( 'slug' ),
+			postID: id,
 		};
 	} ),
 	ifCondition( ( { isNew, postLink, isViewable } ) => {

@@ -1071,6 +1071,18 @@ Returns true if the post is autosaving, or false otherwise.
 
 Whether the post is autosaving.
 
+### isPreviewingPost
+
+Returns true if the post is being previewed, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether the post is being previewed.
+
 ### getSuggestedPostFormat
 
 Returns a suggested post format for the current post, inferred only if there
@@ -1628,7 +1640,7 @@ Returns an action object to save the post.
 *Parameters*
 
  * options: Options for the save.
- * options.autosave: Perform an autosave if true.
+ * options.isAutosave: Perform an autosave if true.
 
 ### mergeBlocks
 
@@ -1642,6 +1654,10 @@ Returns an action object used in signalling that two blocks should be merged
 ### autosave
 
 Returns an action object used in signalling that the post should autosave.
+
+*Parameters*
+
+ * options: Extra flags to identify the autosave.
 
 ### redo
 

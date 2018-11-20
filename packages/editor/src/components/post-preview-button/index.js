@@ -12,6 +12,7 @@ import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
 import { ifCondition, compose } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
 
 function writeInterstitialMessage( targetDocument ) {
 	let markup = renderToString(
@@ -98,10 +99,6 @@ export class PostPreviewButton extends Component {
 		// unintentional forceful redirects.
 		if ( previewLink && ! prevProps.previewLink ) {
 			this.setPreviewWindowLink( previewLink );
-
-			// Once popup redirect is evaluated, even if already closed, delete
-			// reference to avoid later assignment of location in post update.
-			delete this.previewWindow;
 		}
 	}
 
@@ -151,7 +148,7 @@ export class PostPreviewButton extends Component {
 
 		// Request an autosave. This happens asynchronously and causes the component
 		// to update when finished.
-		this.props.autosave();
+		this.props.autosave( { isPreview: true } );
 
 		// Display a 'Generating preview' message in the Preview tab while we wait for the
 		// autosave to finish.
@@ -191,7 +188,7 @@ export class PostPreviewButton extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { forcePreviewLink, forceIsAutosaveable } ) => {
 		const {
 			getCurrentPostId,
 			getCurrentPostAttribute,
@@ -203,13 +200,20 @@ export default compose( [
 		const {
 			getPostType,
 		} = select( 'core' );
+
+		let previewLink = getAutosaveAttribute( 'preview_link' );
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
+		if ( previewLink && featuredImageId ) {
+			previewLink = addQueryArgs( previewLink, { _thumbnail_id: featuredImageId } );
+		}
+
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink: getAutosaveAttribute( 'preview_link' ),
+			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : getAutosaveAttribute( 'preview_link' ),
 			isSaveable: isEditedPostSaveable(),
-			isAutosaveable: isEditedPostAutosaveable(),
+			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),

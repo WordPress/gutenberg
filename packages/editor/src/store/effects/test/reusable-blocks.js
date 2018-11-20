@@ -83,7 +83,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -130,7 +130,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -172,7 +172,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -202,7 +202,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -236,7 +236,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -284,7 +284,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -330,7 +330,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
