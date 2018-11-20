@@ -29,7 +29,7 @@ Blocks should have an identifying icon, ideally using a single color. Try to avo
 
 ![A screenshot of the Block Library with concise block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/blocks-do.png)
 **Do:**
-Use conise block names.
+Use concise block names.
 
 ![A screenshot of the Block Library with long, multi-line block names](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/assets/blocks-dont.png)
 **Don't:**
