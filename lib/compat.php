@@ -345,7 +345,7 @@ add_filter( 'wp_prepare_attachment_for_js', 'gutenberg_prepare_attachment_for_js
 function _gutenberg_cache_images_meta( $content ) {
 	// Need to find all image blocks and get the attachment IDs from them BEFORE the parser is run
 	// so we can get the image attachments meta all at once from the DB.
-	if ( preg_match_all( '/^<!-- wp:image {.*"id":(\d+),.*} -->$/m', $content, $matches ) ) {
+	if ( preg_match_all( '/^<!-- wp:image {.*"id":(\d+).*} -->$/m', $content, $matches ) ) {
 		_prime_post_caches(
 			$matches[1],
 			/* $update_term_cache */ false,
