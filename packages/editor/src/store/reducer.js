@@ -708,15 +708,7 @@ export function isCaretWithinFormattedText( state = false, action ) {
 	return state;
 }
 
-/**
- * Reducer returning the block selection's state.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function blockSelection( state = {
+function rawBlockSelection( state = {
 	start: null,
 	end: null,
 	isMultiSelecting: false,
@@ -821,6 +813,16 @@ export function blockSelection( state = {
 
 	return state;
 }
+
+/**
+ * Reducer returning the block selection's state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export const blockSelection = withHistory()( rawBlockSelection );
 
 export function blocksMode( state = {}, action ) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
