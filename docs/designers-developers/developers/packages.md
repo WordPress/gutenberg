@@ -1,4 +1,4 @@
-# packages
+# Packages
 
 Gutenberg exposes a list of JavaScript packages and tools for WordPress development.
 

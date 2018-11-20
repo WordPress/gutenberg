@@ -1,4 +1,4 @@
-# Block registration 
+# Block Registration 
 
 ## `register_block_type`
 

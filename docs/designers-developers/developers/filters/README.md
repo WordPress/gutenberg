@@ -1,4 +1,4 @@
-# Filters Reference
+# Filter Reference
 
 [Hooks](https://developer.wordpress.org/plugins/hooks/) are a way for one piece of code to interact/modify another piece of code. They provide one way for plugins and themes interact with Gutenberg, but they’re also used extensively by WordPress Core itself.
 
