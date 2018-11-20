@@ -100,7 +100,12 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				selector: 'blockquote',
+				isMatch: ( node ) => (
+					node.nodeName === 'BLOCKQUOTE' &&
+					// The quote block can only handle multiline paragraph
+					// content.
+					Array.from( node.childNodes ).every( ( child ) => child.nodeName === 'P' )
+				),
 				schema: {
 					blockquote: {
 						children: {

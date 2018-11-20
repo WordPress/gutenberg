@@ -63,7 +63,7 @@ $toggle-border-width: 2px;
 		}
 	}
 
-	// checked state
+	// Checked state.
 	&.is-checked .components-form-toggle__track {
 		background-color: theme(toggle);
 		border: $toggle-border-width solid theme(toggle);
@@ -86,9 +86,15 @@ $toggle-border-width: 2px;
 			border: $toggle-border-width solid theme(toggle);
 		}
 	}
+
+	// Disabled state:
+	.components-disabled & {
+		opacity: 0.3;
+	}
 }
 
-.components-form-toggle__input[type="checkbox"] {
+// This needs specificity to override inherited checkbox styles.
+.components-form-toggle input.components-form-toggle__input[type="checkbox"] {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -98,6 +104,17 @@ $toggle-border-width: 2px;
 	margin: 0;
 	padding: 0;
 	z-index: z-index(".components-form-toggle__input");
+
+	// This overrides a border style that is inherited from parent checkbox styles.
+	border: none;
+	&:checked {
+		background: none;
+	}
+
+	// Don't show custom checkbox checkmark.
+	&::before {
+		content: "";
+	}
 }
 
 // Ensure on indicator works in normal and Windows high contrast mode both.
