@@ -84,7 +84,7 @@ export const DocumentOutline = ( { blocks = [], title, close, isTitleSupported }
 						level={ __( 'Title' ) }
 						isValid
 						close={ close }
-						target={ '#' + titleNode.id }
+						target={ `#${ titleNode.id }` }
 					>
 						{ title }
 					</DocumentOutlineItem>
