@@ -1,7 +1,14 @@
 /**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost, isEmbedding, setUpResponseMocking, JSONResponse } from '../support/utils';
+import {
+	clickBlockAppender,
+	newPost,
+	isEmbedding,
+	setUpResponseMocking,
+	JSONResponse,
+	getEditedPostContent,
+} from '../support/utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
@@ -82,9 +89,7 @@ const MOCK_RESPONSES = [
 	},
 ];
 
-const addEmbeds = async () => {
-	await newPost();
-
+const addAllEmbeds = async () => {
 	// Valid embed.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
@@ -135,15 +140,12 @@ const addEmbeds = async () => {
 	await page.keyboard.press( 'Enter' );
 };
 
-const setUp = async () => {
-	await setUpResponseMocking( MOCK_RESPONSES );
-	await addEmbeds();
-};
-
 describe( 'Embedding content', () => {
-	beforeEach( setUp );
+	beforeAll( async () => await setUpResponseMocking( MOCK_RESPONSES ) );
+	beforeEach( newPost );
 
 	it( 'should render embeds in the correct state', async () => {
+		await addAllEmbeds();
 		// The successful embeds should be in a correctly classed figure element.
 		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
@@ -156,5 +158,18 @@ describe( 'Embedding content', () => {
 		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
 		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
 		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
+	} );
+
+	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
+		// URL that can't be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.press( 'Enter' );
+
+		await page.waitForSelector( '.components-placeholder.wp-block-embed > .components-placeholder__fieldset > form > p > button' );
+		await page.click( '.components-placeholder.wp-block-embed > .components-placeholder__fieldset > form > p > button' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
