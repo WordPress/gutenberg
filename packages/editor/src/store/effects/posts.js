@@ -50,7 +50,7 @@ export const requestPostUpdate = async ( action, store ) => {
 	const { dispatch, getState } = store;
 	const state = getState();
 	const post = getCurrentPost( state );
-	const isAutosave = !! action.options.autosave;
+	const isAutosave = !! action.options.isAutosave;
 
 	// Prevent save if not saveable.
 	// We don't check for dirtiness here as this can be overriden in the UI.

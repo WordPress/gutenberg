@@ -1640,7 +1640,7 @@ Returns an action object to save the post.
 *Parameters*
 
  * options: Options for the save.
- * options.autosave: Perform an autosave if true.
+ * options.isAutosave: Perform an autosave if true.
 
 ### mergeBlocks
 

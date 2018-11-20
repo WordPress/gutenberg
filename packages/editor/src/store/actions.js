@@ -396,7 +396,7 @@ export function editPost( edits ) {
  * Returns an action object to save the post.
  *
  * @param {Object}  options          Options for the save.
- * @param {boolean} options.autosave Perform an autosave if true.
+ * @param {boolean} options.isAutosave Perform an autosave if true.
  *
  * @return {Object} Action object.
  */
@@ -444,7 +444,7 @@ export function mergeBlocks( firstBlockClientId, secondBlockClientId ) {
  * @return {Object} Action object.
  */
 export function autosave( options ) {
-	return savePost( { autosave: true, ...options } );
+	return savePost( { isAutosave: true, ...options } );
 }
 
 /**
