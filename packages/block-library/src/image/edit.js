@@ -775,7 +775,7 @@ class ImageEdit extends Component {
 								constrainedHeight = imageHeightWithinContainer;
 							} else {
 								constrainedWidth = width || imageWidth;
-								constrainedWidth = constrainedWidth	> contentWidth ? contentWidth : constrainedWidth;
+								constrainedWidth = constrainedWidth > contentWidth ? contentWidth : constrainedWidth;
 								constrainedHeight = Math.round( constrainedWidth / ratio ) || undefined;
 							}
 
