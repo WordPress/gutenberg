@@ -19,9 +19,11 @@ import styles from './style.scss';
 const name = 'core/paragraph';
 
 class ParagraphEdit extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
+
+		this.aztecHeight = ( props.attributes || {} ).aztecHeight || null;
 	}
 
 	/**
@@ -104,10 +106,13 @@ class ParagraphEdit extends Component {
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
-						setAttributes( {
-							...this.props.attributes,
-							aztecHeight: event.aztecHeight,
-						} );
+						if ( this.aztecHeight !== event.aztecHeight ) {
+							setAttributes( {
+								...this.props.attributes,
+								aztecHeight: event.aztecHeight,
+							} );
+							this.aztecHeight = event.aztecHeight;
+						}
 					}
 					}
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
