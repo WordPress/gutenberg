@@ -24,7 +24,6 @@ import { dispatch as dataDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { resolveSelector } from './utils';
 import {
 	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
 	removeBlocks,
@@ -57,7 +56,7 @@ export const fetchReusableBlocks = async ( action, store ) => {
 
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
@@ -109,7 +108,7 @@ export const fetchReusableBlocks = async ( action, store ) => {
 export const saveReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
@@ -153,7 +152,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 export const deleteReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
