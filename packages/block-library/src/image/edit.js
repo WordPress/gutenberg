@@ -764,7 +764,6 @@ class ImageEdit extends Component {
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 							);
 
-							// Floating a resized image can produce inaccurate `imageWidthWithinContainer`.
 							const ratio = imageWidth / imageHeight;
 							let constrainedWidth;
 							let constrainedHeight;
