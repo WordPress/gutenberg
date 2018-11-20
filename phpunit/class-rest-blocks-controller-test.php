@@ -18,11 +18,11 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 	protected static $post_id;
 
 	/**
-	 * Our fake user's ID.
+	 * Our fake user IDs, keyed by their role.
 	 *
-	 * @var int
+	 * @var array
 	 */
-	protected static $user_id;
+	protected static $user_ids;
 
 	/**
 	 * Create fake data before our tests run.
@@ -35,14 +35,14 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 				'post_type'    => 'wp_block',
 				'post_status'  => 'publish',
 				'post_title'   => 'My cool block',
-				'post_content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
+				'post_content' => '<!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph -->',
 			)
 		);
 
-		self::$user_id = $factory->user->create(
-			array(
-				'role' => 'editor',
-			)
+		self::$user_ids = array(
+			'editor'      => $factory->user->create( array( 'role' => 'editor' ) ),
+			'author'      => $factory->user->create( array( 'role' => 'author' ) ),
+			'contributor' => $factory->user->create( array( 'role' => 'contributor' ) ),
 		);
 	}
 
@@ -52,7 +52,9 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$post_id );
 
-		self::delete_user( self::$user_id );
+		foreach ( self::$user_ids as $user_id ) {
+			self::delete_user( $user_id );
+		}
 	}
 
 	/**
@@ -89,7 +91,7 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 	 */
 	public function test_capabilities( $action, $role, $expected_status ) {
 		if ( $role ) {
-			$user_id = $this->factory->user->create( array( 'role' => $role ) );
+			$user_id = self::$user_ids[ $role ];
 			wp_set_current_user( $user_id );
 		} else {
 			wp_set_current_user( 0 );
@@ -101,7 +103,7 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 				$request->set_body_params(
 					array(
 						'title'   => 'Test',
-						'content' => '<!-- wp:core/paragraph --><p>Test</p><!-- /wp:core/paragraph -->',
+						'content' => '<!-- wp:paragraph --><p>Test</p><!-- /wp:paragraph -->',
 					)
 				);
 
@@ -124,7 +126,7 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 						'post_type'    => 'wp_block',
 						'post_status'  => 'publish',
 						'post_title'   => 'My cool block',
-						'post_content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
+						'post_content' => '<!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph -->',
 						'post_author'  => $user_id,
 					)
 				);
@@ -133,7 +135,7 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 				$request->set_body_params(
 					array(
 						'title'   => 'Test',
-						'content' => '<!-- wp:core/paragraph --><p>Test</p><!-- /wp:core/paragraph -->',
+						'content' => '<!-- wp:paragraph --><p>Test</p><!-- /wp:paragraph -->',
 					)
 				);
 
@@ -154,7 +156,7 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 				$request->set_body_params(
 					array(
 						'title'   => 'Test',
-						'content' => '<!-- wp:core/paragraph --><p>Test</p><!-- /wp:core/paragraph -->',
+						'content' => '<!-- wp:paragraph --><p>Test</p><!-- /wp:paragraph -->',
 					)
 				);
 
@@ -171,9 +173,32 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 			default:
 				$this->fail( "'$action' is not a valid action." );
 		}
+	}
 
-		if ( isset( $user_id ) ) {
-			self::delete_user( $user_id );
-		}
+	/**
+	 * Check that the raw title and content of a block can be accessed when there
+	 * is no set schema, and that the rendered content of a block is not included
+	 * in the response.
+	 */
+	public function test_content() {
+		wp_set_current_user( self::$user_ids['author'] );
+
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/blocks/' . self::$post_id );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals(
+			array(
+				'raw' => 'My cool block',
+			),
+			$data['title']
+		);
+		$this->assertEquals(
+			array(
+				'raw'       => '<!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph -->',
+				'protected' => false,
+			),
+			$data['content']
+		);
 	}
 }
