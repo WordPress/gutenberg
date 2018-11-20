@@ -527,8 +527,10 @@ function gutenberg_render_block_core_image( $html, $block ) {
 
 	$attr = '';
 	foreach ( $image_attributes as $name => $value ) {
-		// Sanitize for valid HTML 5.0 attribute names, see: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes.
-		$is_invalid_attribute = preg_match( '/[^a-z0-9-]+/', '', strtolower( $name ) );
+		// Sanitize for valid HTML 5.0 attribute names
+		//
+		// See: https://www.w3.org/TR/html52/syntax.html#attribute-names .
+		$is_invalid_attribute = preg_match( '/[\\\\u007F-\\\\u009F "\'>\/="\\\\uFDD0-\\\\uFDEF]/', strtolower( $name ) );
 
 		if ( $is_invalid_attribute ) {
 			continue;
