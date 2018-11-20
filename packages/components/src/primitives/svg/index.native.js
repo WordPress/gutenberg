@@ -6,7 +6,7 @@ import { Svg } from 'react-native-svg';
 /**
  * Internal dependencies
  */
-import styles from './style.native.scss';
+import styles from './style.scss';
 
 export {
 	Circle,
