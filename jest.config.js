@@ -43,8 +43,10 @@ module.exports = {
 		],
 	},
 	transformIgnorePatterns: [
-		// this is required for now to have jest transform some of our modules
+		// This is required for now to have jest transform some of our modules
 		// See: https://github.com/wordpress-mobile/gutenberg-mobile/pull/257#discussion_r234978268
-		'node_modules/(?!(simple-html-tokenizer|react-native|react-native-svg|react-native-recyclerview-list|react-native-modal|react-native-animatable)/)',
+		// There is no overloading in jest so we need to rewrite the config from react-native-jest-preset:
+		// https://github.com/facebook/react-native/blob/master/jest-preset.json#L20
+		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
 	],
 };
