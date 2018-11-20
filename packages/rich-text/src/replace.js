@@ -43,8 +43,20 @@ export function replace( { formats, text, start, end }, pattern, replacement ) {
 
 		formats = formats.slice( 0, offset ).concat( newFormats, formats.slice( offset + match.length ) );
 
-		if ( start ) {
-			start = end = offset + newText.length;
+		if ( start !== undefined && start >= offset ) {
+			if ( start <= offset + match.length ) {
+				start = offset + newText.length;
+			} else {
+				start = start - match.length + newText.length;
+			}
+		}
+
+		if ( end !== undefined && end >= offset ) {
+			if ( end <= offset + match.length ) {
+				end = offset + newText.length;
+			} else {
+				end = end - match.length + newText.length;
+			}
 		}
 
 		return newText;

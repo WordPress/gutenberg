@@ -14,6 +14,7 @@ import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
 } from './special-characters';
+import { replace } from './replace';
 
 /**
  * Browser dependencies
@@ -82,6 +83,22 @@ function toFormat( { type, attributes } ) {
 }
 
 /**
+ * Given a value, removes trailing spaces, because they will not be displaged
+ * by the browser.
+ *
+ * @param {Object} value Value to trim.
+ *
+ * @return {Object} Trimmed value.
+ */
+function trim( value ) {
+	value = replace( value, /^ +/, '' );
+	value = replace( value, / +$/, '' );
+	value = replace( value, / +/, ' ' );
+
+	return value;
+}
+
+/**
  * Create a RichText value from an `Element` tree (DOM), an HTML string or a
  * plain text string, with optionally a `Range` object to set the selection. If
  * called without any input, an empty value will be created. If
@@ -137,14 +154,14 @@ export function create( {
 	}
 
 	if ( ! multilineTag ) {
-		return createFromElement( {
+		return trim( createFromElement( {
 			element,
 			range,
 			removeNode,
 			unwrapNode,
 			filterString,
 			removeAttribute,
-		} );
+		} ) );
 	}
 
 	return createFromMultilineElement( {
@@ -297,11 +314,10 @@ function createFromElement( {
 
 	const length = element.childNodes.length;
 
-	// Remove any line breaks in text nodes. They are not content, but used to
-	// format the HTML. Line breaks in HTML are stored as BR elements.
-	// See https://www.w3.org/TR/html5/syntax.html#newlines.
 	const filterStringComplete = ( string ) => {
-		string = string.replace( /[\r\n]/g, '' );
+		// Reduce any whitespace used for HTML formatting to one space
+		// character, because it will also be displayed as such by the browser.
+		string = string.replace( /[\n\r\t ]+/g, ' ' );
 
 		if ( filterString ) {
 			string = filterString( string );
@@ -499,7 +515,7 @@ function createFromMultilineElement( {
 			continue;
 		}
 
-		let value = createFromElement( {
+		const value = trim( createFromElement( {
 			element: node,
 			range,
 			multilineTag,
@@ -509,24 +525,7 @@ function createFromMultilineElement( {
 			unwrapNode,
 			filterString,
 			removeAttribute,
-		} );
-
-		// If a line consists of one single line break (invisible), consider the
-		// line empty, wether this is the browser's doing or not.
-		if ( value.text === '\n' ) {
-			const start = value.start;
-			const end = value.end;
-
-			value = createEmptyValue();
-
-			if ( start !== undefined ) {
-				value.start = 0;
-			}
-
-			if ( end !== undefined ) {
-				value.end = 0;
-			}
-		}
+		} ) );
 
 		// Multiline value text should be separated by a double line break.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
