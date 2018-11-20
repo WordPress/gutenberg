@@ -46,7 +46,7 @@ class WP_REST_Blocks_Controller extends WP_REST_Posts_Controller {
 	public function filter_response_by_context( $data, $context ) {
 		$data = parent::filter_response_by_context( $data, $context );
 
-		/**
+		/*
 		 * Remove `content.rendered` from the response. It doesn't make sense for a
 		 * reusable block to have rendered content on its own, since rendering a
 		 * block requires it to be inside a post or a page.
