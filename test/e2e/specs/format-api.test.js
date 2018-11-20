@@ -34,7 +34,7 @@ describe( 'Using Format API', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		await page.mouse.move( 200, 300, { steps: 10 } );
-		expect( await page.$( '.editor-format-toolbar' ) ).not.toBeNull();
+		expect( await page.$( '[aria-label="Custom Link"]' ) ).not.toBeNull();
 	} );
 
 	it( 'Clicking the control wraps the selected text properly with HTML code', async () => {
@@ -44,8 +44,6 @@ describe( 'Using Format API', () => {
 		await pressWithModifier( META_KEY, 'A' );
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.click( '[aria-label="Custom Link"]' );
-		const paragraphContent = await page.$eval( 'div[data-type="core/paragraph"] p', ( element ) => element.innerHTML );
-		expect( paragraphContent ).toEqual( '<a href="#test" class="my-plugin-link" data-mce-selected=\"inline-boundary\">First paragraph</a>' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
