@@ -3,7 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { Button, Notice } from '@wordpress/components';
 
 /**
@@ -103,7 +103,7 @@ class ImportForm extends Component {
 					isDefault
 					className="list-reusable-blocks-import-form__button"
 				>
-					{ __( 'Import' ) }
+					{ _x( 'Import', 'button label' ) }
 				</Button>
 			</form>
 		);

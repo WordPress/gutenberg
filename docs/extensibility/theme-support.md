@@ -191,37 +191,17 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 ## Editor styles
 
-Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style). This support is opt-in because these styles are applied differently from the classic editor.
+Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
 
- - In the classic editor, the stylesheet is applied as is in the iframe of the post content editor.
- - Since Gutenberg doesn't make use of iFrames, this is not possible. Instead Gutenberg wrap all the provided styles with `.editor-block-list__block` to avoid leaking styles outside the editor's content area.
+In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. Gutenberg, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors.
 
-This technique should allow the editor styles to work properly in both editors in most cases.
-
-Enabling editor styles support is done using:
+Because it works a little differently, you need to opt-in to this by adding an extra snippet to your theme, in addition to the add_editor_style function:
 
 ```php
-add_theme_support( 'editor-styles' );
+add_theme_support('editor-styles');
 ```
 
-Alternatively, a theme can provide a stylesheet that will change the editor's appearance entirely. You can use this to change colors, fonts, and any other visual aspect of the editor.
-
-### Add the stylesheet
-
-The first thing to do is to create a new stylesheet file in your theme directory. We'll assume the file is named `style-editor.css`.
-
-Next, load your newly-created editor stylesheet in your theme:
-
-```php
-/**
- * Enqueue block editor style
- */
-function mytheme_block_editor_styles() {
-	wp_enqueue_style( 'mytheme-block-editor-styles', get_theme_file_uri( '/style-editor.css' ), false, '1.0', 'all' );
-}
-
-add_action( 'enqueue_block_editor_assets', 'mytheme_block_editor_styles' );
-```
+You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside Gutenberg.
 
 If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
 
@@ -238,7 +218,7 @@ You can style the editor like any other webpage. Here's how to change the backgr
 
 ```css
 /* Add this to your `style-editor.css` file */
-body.block-editor-page {
+body {
 	background-color: #d3ebf3;
 	color: #00005d;
 }
@@ -250,19 +230,17 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 ```css
 /* Main column width */
-body.block-editor-page .editor-post-title__block,
-body.block-editor-page .editor-default-block-appender,
-body.block-editor-page .editor-block-list__block {
+.wp-block {
 	max-width: 720px;
 }
 
 /* Width of "wide" blocks */
-body.block-editor-page .editor-block-list__block[data-align="wide"] {
+.wp-block[data-align="wide"] {
 	max-width: 1080px;
 }
 
 /* Width of "full-wide" blocks */
-body.block-editor-page .editor-block-list__block[data-align="full"] {
+.wp-block[data-align="full"] {
 	max-width: none;
 }
 ```
@@ -277,4 +255,20 @@ Core blocks include default styles. The styles are enqueued for editing but are 
 
 ```php
 add_theme_support( 'wp-block-styles' );
+```
+
+## Responsive embedded content
+
+The embed blocks automatically apply styles to embedded content to reflect the aspect ratio of content that is embedded in an iFrame. A block styled with the aspect ratio responsive styles would look like:
+
+```html
+<figure class="wp-embed-aspect-16-9 wp-has-aspect-ratio">
+   ...
+</figure>
+```
+
+To make the content resize and keep its aspect ratio, the `<body>` element needs the `wp-embed-responsive` class. This is not set by default, and requires the theme to opt in to the `responsive-embeds` feature:
+
+```php
+add_theme_support( 'responsive-embeds' );
 ```

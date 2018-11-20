@@ -272,7 +272,9 @@ class REST_Block_Renderer_Controller_Test extends WP_Test_REST_Controller_Testca
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( self::$block_name );
 		$defaults   = array();
 		foreach ( $block_type->attributes as $key => $attribute ) {
-			$defaults[ $key ] = isset( $attribute['default'] ) ? $attribute['default'] : null;
+			if ( isset( $attribute['default'] ) ) {
+				$defaults[ $key ] = $attribute['default'];
+			}
 		}
 
 		$request = new WP_REST_Request( 'GET', self::$rest_api_route . self::$block_name );

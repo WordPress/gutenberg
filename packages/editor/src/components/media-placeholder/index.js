@@ -13,15 +13,18 @@ import {
 	Placeholder,
 	DropZone,
 	IconButton,
+	withFilters,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import deprecated from '@wordpress/deprecated';
+import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import MediaUpload from '../media-upload';
+import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
 import { mediaUpload } from '../../utils/';
 
@@ -49,7 +52,7 @@ const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	</URLPopover>
 );
 
-class MediaPlaceholder extends Component {
+export class MediaPlaceholder extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
@@ -64,25 +67,8 @@ class MediaPlaceholder extends Component {
 		this.closeURLInput = this.closeURLInput.bind( this );
 	}
 
-	getAllowedTypes() {
-		const { allowedTypes, type: deprecatedType } = this.props;
-		let allowedTypesToUse = allowedTypes;
-		if ( ! allowedTypes && deprecatedType ) {
-			deprecated( 'type property of wp.editor.MediaPlaceholder', {
-				version: '4.2',
-				alternative: 'allowedTypes property containing an array with the allowedTypes or do not pass any property if all types are allowed',
-			} );
-			if ( deprecatedType === '*' ) {
-				allowedTypesToUse = undefined;
-			} else {
-				allowedTypesToUse = [ deprecatedType ];
-			}
-		}
-		return allowedTypesToUse;
-	}
-
 	onlyAllowsImages() {
-		const allowedTypes = this.getAllowedTypes();
+		const { allowedTypes } = this.props;
 		if ( ! allowedTypes ) {
 			return false;
 		}
@@ -118,8 +104,7 @@ class MediaPlaceholder extends Component {
 	}
 
 	onFilesUpload( files ) {
-		const { onSelect, multiple, onError } = this.props;
-		const allowedTypes = this.getAllowedTypes();
+		const { onSelect, multiple, onError, allowedTypes } = this.props;
 		const setMedia = multiple ? onSelect : ( [ media ] ) => onSelect( media );
 		mediaUpload( {
 			allowedTypes,
@@ -142,13 +127,15 @@ class MediaPlaceholder extends Component {
 			accept,
 			icon,
 			className,
-			labels,
+			labels = {},
 			onSelect,
 			value = {},
 			onSelectURL,
 			onHTMLDrop = noop,
 			multiple = false,
 			notices,
+			allowedTypes = [],
+			hasUploadPermissions,
 		} = this.props;
 
 		const {
@@ -156,46 +143,95 @@ class MediaPlaceholder extends Component {
 			src,
 		} = this.state;
 
-		const allowedTypes = this.getAllowedTypes();
+		let instructions = labels.instructions || '';
+		let title = labels.title || '';
+
+		if ( ! hasUploadPermissions && ! onSelectURL ) {
+			instructions = __( 'To edit this block, you need permission to upload media.' );
+		}
+
+		if ( ! instructions || ! title ) {
+			const isOneType = 1 === allowedTypes.length;
+			const isAudio = isOneType && 'audio' === allowedTypes[ 0 ];
+			const isImage = isOneType && 'image' === allowedTypes[ 0 ];
+			const isVideo = isOneType && 'video' === allowedTypes[ 0 ];
+
+			if ( ! instructions ) {
+				if ( hasUploadPermissions ) {
+					instructions = __( 'Drag a media file, upload a new one or select a file from your library.' );
+
+					if ( isAudio ) {
+						instructions = __( 'Drag an audio, upload a new one or select a file from your library.' );
+					} else if ( isImage ) {
+						instructions = __( 'Drag an image, upload a new one or select a file from your library.' );
+					} else if ( isVideo ) {
+						instructions = __( 'Drag a video, upload a new one or select a file from your library.' );
+					}
+				} else if ( ! hasUploadPermissions && onSelectURL ) {
+					instructions = __( 'Given your current role, you can only link a media file, you cannot upload.' );
+
+					if ( isAudio ) {
+						instructions = __( 'Given your current role, you can only link an audio, you cannot upload.' );
+					} else if ( isImage ) {
+						instructions = __( 'Given your current role, you can only link an image, you cannot upload.' );
+					} else if ( isVideo ) {
+						instructions = __( 'Given your current role, you can only link a video, you cannot upload.' );
+					}
+				}
+			}
+
+			if ( ! title ) {
+				title = __( 'Media' );
+
+				if ( isAudio ) {
+					title = __( 'Audio' );
+				} else if ( isImage ) {
+					title = __( 'Image' );
+				} else if ( isVideo ) {
+					title = __( 'Video' );
+				}
+			}
+		}
 
 		return (
 			<Placeholder
 				icon={ icon }
-				label={ labels.title }
-				// translators: %s: media name label e.g: "an audio","an image", "a video"
-				instructions={ sprintf( __( 'Drag %s, upload a new one or select a file from your library.' ), labels.name ) }
+				label={ title }
+				instructions={ instructions }
 				className={ classnames( 'editor-media-placeholder', className ) }
 				notices={ notices }
 			>
-				<DropZone
-					onFilesDrop={ this.onFilesUpload }
-					onHTMLDrop={ onHTMLDrop }
-				/>
-				<FormFileUpload
-					isLarge
-					className="editor-media-placeholder__button"
-					onChange={ this.onUpload }
-					accept={ accept }
-					multiple={ multiple }
-				>
-					{ __( 'Upload' ) }
-				</FormFileUpload>
-				<MediaUpload
-					gallery={ multiple && this.onlyAllowsImages() }
-					multiple={ multiple }
-					onSelect={ onSelect }
-					allowedTypes={ allowedTypes }
-					value={ value.id }
-					render={ ( { open } ) => (
-						<Button
-							isLarge
-							className="editor-media-placeholder__button"
-							onClick={ open }
-						>
-							{ __( 'Media Library' ) }
-						</Button>
-					) }
-				/>
+				<MediaUploadCheck>
+					<DropZone
+						onFilesDrop={ this.onFilesUpload }
+						onHTMLDrop={ onHTMLDrop }
+					/>
+					<FormFileUpload
+						isLarge
+						className="editor-media-placeholder__button"
+						onChange={ this.onUpload }
+						accept={ accept }
+						multiple={ multiple }
+					>
+						{ __( 'Upload' ) }
+					</FormFileUpload>
+					<MediaUpload
+						gallery={ multiple && this.onlyAllowsImages() }
+						multiple={ multiple }
+						onSelect={ onSelect }
+						allowedTypes={ allowedTypes }
+						value={ value.id }
+						render={ ( { open } ) => (
+							<Button
+								isLarge
+								className="editor-media-placeholder__button"
+								onClick={ open }
+							>
+								{ __( 'Media Library' ) }
+							</Button>
+						) }
+					/>
+				</MediaUploadCheck>
 				{ onSelectURL && (
 					<div className="editor-media-placeholder__url-input-container">
 						<Button
@@ -221,4 +257,15 @@ class MediaPlaceholder extends Component {
 	}
 }
 
-export default MediaPlaceholder;
+const applyWithSelect = withSelect( ( select ) => {
+	const { hasUploadPermissions } = select( 'core' );
+
+	return {
+		hasUploadPermissions: hasUploadPermissions(),
+	};
+} );
+
+export default compose(
+	applyWithSelect,
+	withFilters( 'editor.MediaPlaceholder' ),
+)( MediaPlaceholder );

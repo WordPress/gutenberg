@@ -12,6 +12,7 @@ import {
 	replaceAction,
 	onSubKey,
 } from '../utils';
+import { DEFAULT_ENTITY_KEY } from '../entities';
 import getQueryParts from './get-query-parts';
 
 /**
@@ -67,7 +68,7 @@ function items( state = {}, action ) {
 		case 'RECEIVE_ITEMS':
 			return {
 				...state,
-				...keyBy( action.items, action.key || 'id' ),
+				...keyBy( action.items, action.key || DEFAULT_ENTITY_KEY ),
 			};
 	}
 
@@ -107,7 +108,7 @@ const queries = flowRight( [
 	// reducer tracks only a single query object.
 	onSubKey( 'stableKey' ),
 ] )( ( state = null, action ) => {
-	const { type, page, perPage, key = 'id' } = action;
+	const { type, page, perPage, key = DEFAULT_ENTITY_KEY } = action;
 
 	if ( type !== 'RECEIVE_ITEMS' ) {
 		return state;

@@ -10,6 +10,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
 
 	&.has-left-content {
 		justify-content: flex-start;
@@ -55,6 +56,13 @@
 
 	&.has-parallax {
 		background-attachment: fixed;
+
+		// Mobile Safari does not support fixed background attachment properly.
+		// See also https://stackoverflow.com/questions/24154666/background-size-cover-not-working-on-ios
+		// Chrome on Android does not appear to support the attachment at all: https://issuetracker.google.com/issues/36908439
+		@supports (-webkit-overflow-scrolling: touch) {
+			background-attachment: scroll;
+		}
 	}
 
 	&.has-background-dim::before {
@@ -87,6 +95,13 @@
 		max-width: $content-width / 2;
 		width: 100%;
 	}
+
+	// Aligned cover blocks should not use our global alignment rules
+	&.aligncenter,
+	&.alignleft,
+	&.alignright {
+		display: flex;
+	}
 }
 
 .wp-block-cover__video-background {
@@ -97,5 +112,5 @@
 	width: 100%;
 	height: 100%;
 	z-index: z-index(".wp-block-cover__video-background");
-	object-fit: fill;
+	object-fit: cover;
 }

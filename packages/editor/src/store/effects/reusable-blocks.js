@@ -16,22 +16,23 @@ import {
 	cloneBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+// TODO: Ideally this would be the only dispatch in scope. This requires either
+// refactoring editor actions to yielded controls, or replacing direct dispatch
+// on the editor store with action creators (e.g. `REMOVE_REUSABLE_BLOCK`).
+import { dispatch as dataDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { resolveSelector } from './utils';
 import {
-	receiveReusableBlocks as receiveReusableBlocksAction,
-	createSuccessNotice,
-	createErrorNotice,
+	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
 	removeBlocks,
 	replaceBlocks,
 	receiveBlocks,
-	saveReusableBlock,
+	__experimentalSaveReusableBlock as saveReusableBlock,
 } from '../actions';
 import {
-	getReusableBlock,
+	__experimentalGetReusableBlock as getReusableBlock,
 	getBlock,
 	getBlocks,
 	getBlocksByClientId,
@@ -55,16 +56,16 @@ export const fetchReusableBlocks = async ( action, store ) => {
 
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
 
 	let result;
 	if ( id ) {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } );
 	} else {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1&context=edit` } );
+		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
 	}
 
 	try {
@@ -107,7 +108,7 @@ export const fetchReusableBlocks = async ( action, store ) => {
 export const saveReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
@@ -131,13 +132,14 @@ export const saveReusableBlocks = async ( action, store ) => {
 			id,
 		} );
 		const message = isTemporary ? __( 'Block created.' ) : __( 'Block updated.' );
-		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
+			id: REUSABLE_BLOCK_NOTICE_ID,
+		} );
 	} catch ( error ) {
 		dispatch( { type: 'SAVE_REUSABLE_BLOCK_FAILURE', id } );
-		dispatch( createErrorNotice( error.message, {
+		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
-			spokenMessage: error.message,
-		} ) );
+		} );
 	}
 };
 
@@ -150,7 +152,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 export const deleteReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
@@ -194,17 +196,18 @@ export const deleteReusableBlocks = async ( action, store ) => {
 			optimist: { type: COMMIT, id: transactionId },
 		} );
 		const message = __( 'Block deleted.' );
-		dispatch( createSuccessNotice( message, { id: REUSABLE_BLOCK_NOTICE_ID } ) );
+		dataDispatch( 'core/notices' ).createSuccessNotice( message, {
+			id: REUSABLE_BLOCK_NOTICE_ID,
+		} );
 	} catch ( error ) {
 		dispatch( {
 			type: 'DELETE_REUSABLE_BLOCK_FAILURE',
 			id,
 			optimist: { type: REVERT, id: transactionId },
 		} );
-		dispatch( createErrorNotice( error.message, {
+		dataDispatch( 'core/notices' ).createErrorNotice( error.message, {
 			id: REUSABLE_BLOCK_NOTICE_ID,
-			spokenMessage: error.message,
-		} ) );
+		} );
 	}
 };
 
@@ -233,7 +236,7 @@ export const convertBlockToStatic = ( action, store ) => {
 	if ( referencedBlock.name === 'core/template' ) {
 		newBlocks = referencedBlock.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) );
 	} else {
-		newBlocks = [ createBlock( referencedBlock.name, referencedBlock.attributes ) ];
+		newBlocks = [ cloneBlock( referencedBlock ) ];
 	}
 	store.dispatch( replaceBlocks( oldBlock.clientId, newBlocks ) );
 };
@@ -278,7 +281,6 @@ export const convertBlockToReusable = ( action, store ) => {
 		action.clientIds,
 		createBlock( 'core/block', {
 			ref: reusableBlock.id,
-			layout: parsedBlock.attributes.layout,
 		} )
 	) );
 

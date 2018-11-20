@@ -114,13 +114,8 @@
 	}
 
 	// Last item always needs margins reset.
-	// When block is selected, only reset the right margin of the 2nd to last item.
 	.blocks-gallery-image:last-child,
-	.blocks-gallery-item:last-child,
-	.is-selected & .blocks-gallery-image:nth-last-child(2),
-	.is-selected & .blocks-gallery-item:nth-last-child(2),
-	.is-typing & .blocks-gallery-image:nth-last-child(2),
-	.is-typing & .blocks-gallery-item:nth-last-child(2) {
+	.blocks-gallery-item:last-child {
 		margin-right: 0;
 	}
 
@@ -133,8 +128,6 @@
 	}
 
 	// Apply max-width to floated items that have no intrinsic width.
-	[data-align="left"] &,
-	[data-align="right"] &,
 	&.alignleft,
 	&.alignright {
 		max-width: $content-width / 2;
@@ -147,5 +140,12 @@
 	&.aligncenter,
 	&.alignright {
 		display: flex;
+	}
+
+	// If the gallery is centered, center the content inside as well.
+	&.aligncenter {
+		.blocks-gallery-item figure {
+			justify-content: center;
+		}
 	}
 }

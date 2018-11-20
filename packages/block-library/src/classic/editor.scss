@@ -88,12 +88,16 @@
 	}
 
 	.alignright {
+		/*rtl:ignore*/
 		float: right;
+		/*rtl:ignore*/
 		margin: 0.5em 0 0.5em 1em;
 	}
 
 	.alignleft {
+		/*rtl:ignore*/
 		float: left;
+		/*rtl:ignore*/
 		margin: 0.5em 1em 0.5em 0;
 	}
 
@@ -122,6 +126,11 @@
 	.mce-btn.mce-active i,
 	.mce-btn.mce-active:hover i {
 		color: $dark-gray-800;
+	}
+
+	// Prevent i tags in buttons from picking up theme editor styles.
+	.mce-btn i {
+		font-style: normal;
 	}
 
 	// Adjust padding to not cause a jump.
@@ -207,9 +216,12 @@ div[data-type="core/freeform"] .editor-block-contextual-toolbar + div {
 // So we move it to the right, and make room for it.
 @include break-small() {
 	.editor-block-list__block[data-type="core/freeform"] {
+		.editor-block-switcher__no-switcher-icon {
+			display: none;
+		}
 		.editor-block-contextual-toolbar {
 			float: right;
-			margin-right: -$block-side-ui-clearance - $border-width;
+			margin-right: $icon-button-size - $block-padding + $border-width;
 			transform: translateY(-#{ $block-padding - $border-width });
 			top: $block-padding;
 

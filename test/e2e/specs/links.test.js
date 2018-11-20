@@ -2,12 +2,12 @@
  * Internal dependencies
  */
 import {
-	META_KEY,
 	clickBlockAppender,
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
 	pressTimes,
+	insertBlock,
 } from '../support/utils';
 
 /**
@@ -15,7 +15,6 @@ import {
  *
  * @type {string}
  */
-const SELECT_WORD_MODIFIER_KEYS = process.platform === 'darwin' ? [ 'Shift', 'Alt' ] : [ 'Shift', 'Control' ];
 
 describe( 'Links', () => {
 	beforeEach( async () => {
@@ -37,7 +36,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -61,10 +60,10 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( META_KEY, 'K' );
+		await pressWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -88,7 +87,7 @@ describe( 'Links', () => {
 		await moveMouse();
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( META_KEY, 'K' );
+		await pressWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -109,10 +108,10 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg: https://wordpress.org/gutenberg' );
 
 		// Select the URL
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -127,7 +126,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -148,7 +147,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -283,7 +282,7 @@ describe( 'Links', () => {
 		await newPost();
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Wait for the URL field to auto-focus
@@ -323,10 +322,10 @@ describe( 'Links', () => {
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( META_KEY, 'K' );
+		await pressWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -359,10 +358,10 @@ describe( 'Links', () => {
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( SELECT_WORD_MODIFIER_KEYS, 'ArrowLeft' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( META_KEY, 'K' );
+		await pressWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -378,7 +377,7 @@ describe( 'Links', () => {
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( META_KEY, 'K' );
+		await pressWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -387,5 +386,101 @@ describe( 'Links', () => {
 		// Expect the the escape key to dismiss the popover normally.
 		await page.keyboard.press( 'Escape' );
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+
+		// Press Cmd+K to insert a link
+		await pressWithModifier( 'primary', 'K' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+
+		// Tab to the settings icon button.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+
+		// Expect the the escape key to dismiss the popover normally.
+		await page.keyboard.press( 'Escape' );
+		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+	} );
+
+	it( 'can be modified using the keyboard once a link has been set', async () => {
+		const URL = 'https://wordpress.org/gutenberg';
+
+		// Create a block with some text and format it as a link.
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressWithModifier( 'primary', 'K' );
+		await waitForAutoFocus();
+		await page.keyboard.type( URL );
+		await page.keyboard.press( 'Enter' );
+
+		// Deselect the link text by moving the caret to the end of the line
+		// and the link popover should not be displayed.
+		await page.keyboard.press( 'End' );
+		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
+
+		// Move the caret back into the link text and the link popover
+		// should be displayed.
+		await page.keyboard.press( 'ArrowLeft' );
+		expect( await page.$( '.editor-url-popover' ) ).not.toBeNull();
+
+		// Press Cmd+K to edit the link and the url-input should become
+		// focused with the value previously inserted.
+		await pressWithModifier( 'primary', 'K' );
+		await waitForAutoFocus();
+		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.classList ) );
+		expect( activeElementParentClasses ).toContain( 'editor-url-input' );
+		const activeElementValue = await page.evaluate( () => document.activeElement.value );
+		expect( activeElementValue ).toBe( URL );
+	} );
+
+	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is Gutenberg' );
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressWithModifier( 'primary', 'K' );
+		await waitForAutoFocus();
+		await page.keyboard.type( 'http://#test.com' );
+		await page.keyboard.press( 'Enter' );
+		const assertiveContent = await page.evaluate( () => document.querySelector( '#a11y-speak-assertive' ).textContent );
+		expect( assertiveContent.trim() ).toBe( 'Warning: the link has been inserted but may have errors. Please test it.' );
+	} );
+
+	it( 'link popover remains visible after a mouse drag event', async () => {
+		// Create some blocks so we have components with event handlers on the page
+		for ( let loop = 0; loop < 5; loop++ ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'This is Gutenberg' );
+		}
+
+		// Focus on first paragraph, so the link popover will appear over the subsequent ones
+		await page.click( '[aria-label="Block Navigation"]' );
+		await page.click( '.editor-block-navigation__item button' );
+
+		// Select some text
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+
+		// Click on the Link button
+		await page.click( 'button[aria-label="Link"]' );
+
+		// Wait for the URL field to auto-focus
+		await waitForAutoFocus();
+
+		// Click on the Link Settings button
+		await page.click( 'button[aria-label="Link Settings"]' );
+
+		// Move mouse over the 'open in new tab' section, then click and drag
+		const settings = await page.$( '.editor-url-popover__settings' );
+		const bounds = await settings.boundingBox();
+
+		await page.mouse.move( bounds.x, bounds.y );
+		await page.mouse.down();
+		await page.mouse.move( bounds.x + ( bounds.width / 2 ), bounds.y, { steps: 10 } );
+		await page.mouse.up();
+
+		// The link popover should still be visible
+		const popover = await page.$$( '.editor-url-popover' );
+		expect( popover ).toHaveLength( 1 );
 	} );
 } );

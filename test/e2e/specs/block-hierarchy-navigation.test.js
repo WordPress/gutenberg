@@ -2,8 +2,6 @@
  * Internal dependencies
  */
 import {
-	ACCESS_MODIFIER_KEYS,
-	META_KEY,
 	newPost,
 	insertBlock,
 	getEditedPostContent,
@@ -12,7 +10,7 @@ import {
 } from '../support/utils';
 
 async function openBlockNavigator() {
-	return pressWithModifier( ACCESS_MODIFIER_KEYS, 'o' );
+	return pressWithModifier( 'access', 'o' );
 }
 
 describe( 'Navigating the block hierarchy', () => {
@@ -32,7 +30,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await columnsBlockMenuItem.click();
 
 		// Tweak the columns count.
-		await page.focus( '.edit-post-block-sidebar__panel .components-range-control__number[aria-label="Columns"]' );
+		await page.focus( '.edit-post-settings-sidebar__panel-block .components-range-control__number[aria-label="Columns"]' );
 		page.keyboard.down( 'Shift' );
 		page.keyboard.press( 'ArrowLeft' );
 		page.keyboard.up( 'Shift' );
@@ -63,10 +61,10 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
-		await pressWithModifier( 'Control', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
+		await pressWithModifier( 'ctrl', '`' );
 		await pressTimes( 'Tab', 4 );
 
 		// Tweak the columns count by increasing it by one.
@@ -99,7 +97,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
-		await pressWithModifier( META_KEY, 'A' );
+		await pressWithModifier( 'primary', 'A' );
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

@@ -155,10 +155,7 @@ module.exports = {
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
-				// The <DotTip> component uses the `id` prop for something that does not require an
-				// instanceId; maybe we should change its key.
-				// See: https://github.com/WordPress/gutenberg/issues/10305
-				selector: 'JSXOpeningElement[name.name!="DotTip"] JSXAttribute[name.name="id"][value.type="Literal"]',
+				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
 				message: 'Do not use string literals for IDs; use withInstanceId instead.',
 			},
 			{
@@ -168,7 +165,26 @@ module.exports = {
 				selector: 'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
 				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
 			},
+			{
+				selector: 'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
+				message: 'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+			},
 		],
+		'react/forbid-elements': [ 'error', {
+			forbid: [
+				[ 'circle', 'Circle' ],
+				[ 'g', 'G' ],
+				[ 'path', 'Path' ],
+				[ 'polygon', 'Polygon' ],
+				[ 'rect', 'Rect' ],
+				[ 'svg', 'SVG' ],
+			].map( ( [ element, componentName ] ) => {
+				return {
+					element,
+					message: `use cross-platform <${ componentName }> component instead.`,
+				};
+			} ),
+		} ],
 	},
 	overrides: [
 		{

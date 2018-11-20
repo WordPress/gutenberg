@@ -1,12 +1,10 @@
-.wp-block-media-text,
-.wp-block-media-text.aligncenter {
+.wp-block-media-text {
 	grid-template-areas:
 		"media-text-media media-text-content"
 		"resizer resizer";
 }
 
-.wp-block-media-text.has-media-on-the-right,
-.wp-block-media-text.has-media-on-the-right.aligncenter {
+.wp-block-media-text.has-media-on-the-right {
 	grid-template-areas:
 		"media-text-content media-text-media"
 		"resizer resizer";
@@ -43,7 +41,7 @@ figure.block-library-media-text__media-container {
 
 .wp-block-media-text .block-library-media-text__media-container img,
 .wp-block-media-text .block-library-media-text__media-container video {
-	margin-bottom: -8px;
+	vertical-align: middle;
 	width: 100%;
 }
 
@@ -51,8 +49,17 @@ figure.block-library-media-text__media-container {
 	display: none;
 }
 
-.wp-block-media-text.is-selected {
+.wp-block-media-text.is-selected:not(.is-stacked-on-mobile) {
 	.editor-media-container__resizer .components-resizable-box__handle {
 		display: block;
 	}
 }
+
+@include break-small {
+	.wp-block-media-text.is-selected.is-stacked-on-mobile {
+		.editor-media-container__resizer .components-resizable-box__handle {
+			display: block;
+		}
+	}
+}
+

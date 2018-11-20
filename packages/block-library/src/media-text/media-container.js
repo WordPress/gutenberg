@@ -70,7 +70,6 @@ class MediaContainer extends Component {
 				icon="format-image"
 				labels={ {
 					title: __( 'Media area' ),
-					name: __( 'a media file (image or video)' ),
 				} }
 				className={ className }
 				onSelect={ onSelectMedia }

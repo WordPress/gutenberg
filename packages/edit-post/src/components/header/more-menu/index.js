@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { IconButton, Dropdown, MenuGroup } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 
@@ -14,6 +14,9 @@ import ToolsMoreMenuGroup from '../tools-more-menu-group';
 import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
+const ariaClosed = __( 'Show more tools & options' );
+const ariaOpen = __( 'Hide more tools & options' );
+
 const MoreMenu = () => (
 	<Dropdown
 		className="edit-post-more-menu"
@@ -22,7 +25,7 @@ const MoreMenu = () => (
 		renderToggle={ ( { isOpen, onToggle } ) => (
 			<IconButton
 				icon="ellipsis"
-				label={ _x( 'More', 'button to expand options' ) }
+				label={ isOpen ? ariaOpen : ariaClosed }
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 			/>

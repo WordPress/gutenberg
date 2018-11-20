@@ -6,7 +6,16 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { IconButton, PanelBody, RangeControl, ToggleControl, Toolbar, withNotices } from '@wordpress/components';
+import {
+	IconButton,
+	PanelBody,
+	RangeControl,
+	ToggleControl,
+	Toolbar,
+	withNotices,
+	SVG,
+	Path,
+} from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
@@ -17,6 +26,7 @@ import {
 	BlockAlignmentToolbar,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	AlignmentToolbar,
 	PanelColorSettings,
 	RichText,
@@ -28,6 +38,7 @@ const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 const blockAttributes = {
 	title: {
+		type: 'string',
 		source: 'html',
 		selector: 'p',
 	},
@@ -73,9 +84,9 @@ const VIDEO_BACKGROUND_TYPE = 'video';
 export const settings = {
 	title: __( 'Cover' ),
 
-	description: __( 'Add a full-width image or video, and layer text over it — great for headers.' ),
+	description: __( 'Add an image or video with a text overlay — great for headers.' ),
 
-	icon: <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z" /><path d="M0 0h24v24H0z" fill="none" /></svg>,
+	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z" /><Path d="M0 0h24v24H0z" fill="none" /></SVG>,
 
 	category: 'common',
 
@@ -204,6 +215,7 @@ export const settings = {
 					}
 					mediaType = media.type;
 				}
+
 				setAttributes( {
 					url: media.url,
 					id: media.id,
@@ -248,21 +260,23 @@ export const settings = {
 										setAttributes( { contentAlign: nextAlign } );
 									} }
 								/>
-								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectMedia }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
-												icon="edit"
-												onClick={ open }
-											/>
-										) }
-									/>
-								</Toolbar>
+								<MediaUploadCheck>
+									<Toolbar>
+										<MediaUpload
+											onSelect={ onSelectMedia }
+											allowedTypes={ ALLOWED_MEDIA_TYPES }
+											value={ id }
+											render={ ( { open } ) => (
+												<IconButton
+													className="components-toolbar__control"
+													label={ __( 'Edit media' ) }
+													icon="edit"
+													onClick={ open }
+												/>
+											) }
+										/>
+									</Toolbar>
+								</MediaUploadCheck>
 							</Fragment>
 						) }
 					</BlockControls>
@@ -320,8 +334,7 @@ export const settings = {
 							className={ className }
 							labels={ {
 								title: label,
-								/* translators: Fragment of the sentence: "Drag %s, upload a new one or select a file from your library." */
-								name: __( 'an image or a video' ),
+								instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
 							} }
 							onSelect={ onSelectMedia }
 							accept="image/*,video/*"
@@ -366,7 +379,7 @@ export const settings = {
 		}
 	),
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const {
 			align,
 			backgroundType,
@@ -387,7 +400,6 @@ export const settings = {
 		}
 
 		const classes = classnames(
-			className,
 			dimRatioToClass( dimRatio ),
 			overlayColorClass,
 			{
@@ -455,16 +467,16 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			title: {
+				type: 'string',
 				source: 'html',
 				selector: 'h2',
 			},
 		},
 
-		save( { attributes, className } ) {
+		save( { attributes } ) {
 			const { url, title, hasParallax, dimRatio, align } = attributes;
 			const style = backgroundImageStyles( url );
 			const classes = classnames(
-				className,
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,

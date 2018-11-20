@@ -98,7 +98,9 @@ class PostTitle extends Component {
 			title,
 		} = this.props;
 		const { isSelected } = this.state;
-		const className = classnames( 'editor-post-title__block', {
+
+		// The wp-block className is important for editor styles.
+		const className = classnames( 'wp-block editor-post-title__block', {
 			'is-selected': isSelected,
 			'is-focus-mode': isFocusMode,
 			'has-fixed-toolbar': hasFixedToolbar,

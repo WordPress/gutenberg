@@ -10,9 +10,11 @@ import { Svg } from 'react-native-svg';
 import styles from '../../dashicon/style.scss';
 
 export {
+	Circle,
 	G,
 	Path,
 	Polygon,
+	Rect,
 } from 'react-native-svg';
 
 export const SVG = ( props ) => {

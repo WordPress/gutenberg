@@ -19,6 +19,7 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	MediaPlaceholder,
+	MediaUploadCheck,
 	BlockControls,
 	RichText,
 	mediaUpload,
@@ -138,7 +139,7 @@ class FileEdit extends Component {
 					icon="media-default"
 					labels={ {
 						title: __( 'File' ),
-						name: __( 'a file' ),
+						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
@@ -165,20 +166,22 @@ class FileEdit extends Component {
 					} }
 				/>
 				<BlockControls>
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectFile }
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit file' ) }
-									onClick={ open }
-									icon="edit"
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectFile }
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit file' ) }
+										onClick={ open }
+										icon="edit"
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				</BlockControls>
 				<div className={ classes }>
 					<div className={ `${ className }__content-wrapper` }>

@@ -1,22 +1,28 @@
 /**
  * External Dependencies
  */
-import { castArray } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
 import {
-	rawHandler,
-	cloneBlock,
+	DropZone,
+	withFilters,
+} from '@wordpress/components';
+import {
+	pasteHandler,
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import MediaUploadCheck from '../media-upload/check';
 
 const parseDropEvent = ( event ) => {
 	let result = {
@@ -69,7 +75,7 @@ class BlockDropZone extends Component {
 	}
 
 	onHTMLDrop( HTML, position ) {
-		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
@@ -110,14 +116,16 @@ class BlockDropZone extends Component {
 		const isAppender = index === undefined;
 
 		return (
-			<DropZone
-				className={ classnames( 'editor-block-drop-zone', {
-					'is-appender': isAppender,
-				} ) }
-				onFilesDrop={ this.onFilesDrop }
-				onHTMLDrop={ this.onHTMLDrop }
-				onDrop={ this.onDrop }
-			/>
+			<MediaUploadCheck>
+				<DropZone
+					className={ classnames( 'editor-block-drop-zone', {
+						'is-appender': isAppender,
+					} ) }
+					onFilesDrop={ this.onFilesDrop }
+					onHTMLDrop={ this.onHTMLDrop }
+					onDrop={ this.onDrop }
+				/>
+			</MediaUploadCheck>
 		);
 	}
 }
@@ -132,17 +140,7 @@ export default compose(
 
 		return {
 			insertBlocks( blocks, index ) {
-				const { rootClientId, layout } = ownProps;
-
-				if ( layout ) {
-					// A block's transform function may return a single
-					// transformed block or an array of blocks, so ensure
-					// to first coerce to an array before mapping to inject
-					// the layout attribute.
-					blocks = castArray( blocks ).map( ( block ) => (
-						cloneBlock( block, { layout } )
-					) );
-				}
+				const { rootClientId } = ownProps;
 
 				insertBlocks( blocks, index, rootClientId );
 			},
@@ -150,8 +148,8 @@ export default compose(
 				updateBlockAttributes( ...args );
 			},
 			moveBlockToPosition( srcClientId, srcRootClientId, dstIndex ) {
-				const { rootClientId: dstRootClientId, layout } = ownProps;
-				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, layout, dstIndex );
+				const { rootClientId: dstRootClientId } = ownProps;
+				moveBlockToPosition( srcClientId, srcRootClientId, dstRootClientId, dstIndex );
 			},
 		};
 	} ),
@@ -161,5 +159,6 @@ export default compose(
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,
 		};
-	} )
+	} ),
+	withFilters( 'editor.BlockDropZone' )
 )( BlockDropZone );

@@ -136,6 +136,18 @@ get back from the oEmbed preview API.
 
 Is the preview for the URL an oEmbed link fallback.
 
+### hasUploadPermissions
+
+Return Upload Permissions.
+
+*Parameters*
+
+ * state: State tree.
+
+*Returns*
+
+Upload Permissions.
+
 ## Actions
 
 ### receiveUserQuery
@@ -165,6 +177,7 @@ Returns an action object used in signalling that entity records have been receiv
  * name: Name of the received entity.
  * records: Records received.
  * query: Query Object.
+ * invalidateCache: Should invalidate query caches
 
 ### receiveThemeSupports
 
@@ -183,3 +196,21 @@ a given URl has been received.
 
  * url: URL to preview the embed for.
  * preview: Preview data.
+
+### saveEntityRecord
+
+Action triggered to save an entity record.
+
+*Parameters*
+
+ * kind: Kind of the received entity.
+ * name: Name of the received entity.
+ * record: Record to be saved.
+
+### receiveUploadPermissions
+
+Returns an action object used in signalling that Upload permissions have been received.
+
+*Parameters*
+
+ * hasUploadPermissions: Does the user have permission to upload files?
