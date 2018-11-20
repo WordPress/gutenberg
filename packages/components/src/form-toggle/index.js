@@ -9,11 +9,14 @@ import { noop } from 'lodash';
  */
 import { Path, SVG } from '../primitives';
 
-function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
+function FormToggle( { className, checked, disabled, id, onChange = noop, ...props } ) {
 	const wrapperClasses = classnames(
 		'components-form-toggle',
 		className,
-		{ 'is-checked': checked },
+		{
+			'is-checked': checked,
+			'is-disabled': disabled,
+		},
 	);
 
 	return (
@@ -23,6 +26,7 @@ function FormToggle( { className, checked, id, onChange = noop, ...props } ) {
 				id={ id }
 				type="checkbox"
 				checked={ checked }
+				disabled={ disabled }
 				onChange={ onChange }
 				{ ...props }
 			/>

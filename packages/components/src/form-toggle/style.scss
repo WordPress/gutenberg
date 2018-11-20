@@ -86,6 +86,14 @@ $toggle-border-width: 2px;
 			border: $toggle-border-width solid theme(toggle);
 		}
 	}
+
+	&.is-disabled {
+		.components-form-toggle__on,
+		.components-form-toggle__off {
+			opacity: 0.25;
+			cursor: default;
+		}
+	}
 }
 
 .components-form-toggle__input[type="checkbox"] {
