@@ -427,6 +427,19 @@ class ImageEdit extends Component {
 		return ( Math.abs( width - targetWidth ) <= 1 && Math.abs( height - targetHeight ) <= 1 );
 	}
 
+	/**
+	 * Calculates the new dimensions for a down-sampled image.
+	 *
+	 * Note that this is nearly a direct port of the equivalent PHP function
+	 * `wp_constrain_dimensions`, and any refactorings should be made in mind
+	 * of cross-environment applicability.
+	 *
+	 * @param {number} fullWidth   Current width of the image.
+	 * @param {number} fullHeight  Current height of the image.
+	 * @param {number} targetWidth Max width in pixels to constrain to.
+	 *
+	 * @return {Object} Object of `width`, `height` values.
+	 */
 	constrainImageDimensions( fullWidth, fullHeight, targetWidth ) {
 		const ratio = targetWidth / fullWidth;
 
