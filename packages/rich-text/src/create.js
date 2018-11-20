@@ -74,11 +74,36 @@ function toFormat( { type, attributes } ) {
 		}
 	}
 
-	return {
+	const format = {
 		type: formatType.name,
 		attributes: registeredAttributes,
 		unregisteredAttributes,
 	};
+
+	if ( formatType.__experimentalCreatePrepareEditableTree ) {
+		format.isEditorOnly = true;
+	}
+
+	return format;
+}
+
+/**
+ * Removes all the formats from the array that are editor-only.
+ *
+ * @param {Array} formats Formats to filter.
+ *
+ * @return {Array} Only formats that should be saved.
+ */
+function removeEditorOnlyFormats( formats ) {
+	return formats.map( ( characterFormats ) => {
+		return characterFormats.filter( ( format ) => {
+			if ( format.hasOwnProperty( 'isEditorOnly' ) && format.isEditorOnly ) {
+				return false;
+			}
+
+			return true;
+		} );
+	} );
 }
 
 /**
@@ -120,6 +145,7 @@ export function create( {
 	unwrapNode,
 	filterString,
 	removeAttribute,
+	onChangeEditableValue,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -137,7 +163,7 @@ export function create( {
 	}
 
 	if ( ! multilineTag ) {
-		return createFromElement( {
+		const accumulator = createFromElement( {
 			element,
 			range,
 			removeNode,
@@ -145,9 +171,17 @@ export function create( {
 			filterString,
 			removeAttribute,
 		} );
+
+		if ( onChangeEditableValue ) {
+			onChangeEditableValue( accumulator.formats, accumulator.text );
+		}
+
+		accumulator.formats = removeEditorOnlyFormats( accumulator.formats );
+
+		return accumulator;
 	}
 
-	return createFromMultilineElement( {
+	const accumulator = createFromMultilineElement( {
 		element,
 		range,
 		multilineTag,
@@ -157,6 +191,14 @@ export function create( {
 		filterString,
 		removeAttribute,
 	} );
+
+	if ( onChangeEditableValue ) {
+		onChangeEditableValue( accumulator.formats, accumulator.text );
+	}
+
+	accumulator.formats = removeEditorOnlyFormats( accumulator.formats );
+
+	return accumulator;
 }
 
 /**
@@ -512,7 +554,7 @@ function createFromMultilineElement( {
 		} );
 
 		// If a line consists of one single line break (invisible), consider the
-		// line empty, wether this is the browser's doing or not.
+		// line empty, whether this is the browser's doing or not.
 		if ( value.text === '\n' ) {
 			const start = value.start;
 			const end = value.end;
