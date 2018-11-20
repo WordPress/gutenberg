@@ -124,8 +124,6 @@ class ImageEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { id, url = '' } = attributes;
 
-		this.setEditWidth();
-
 		if ( isTemporaryImage( id, url ) ) {
 			const file = getBlobByURL( url );
 
@@ -145,8 +143,6 @@ class ImageEdit extends Component {
 		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
 		const { id, url = '', fileWidth } = this.props.attributes;
 		const imageData = this.props.image;
-
-		this.setEditWidth();
 
 		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
 			revokeBlobURL( url );
@@ -223,6 +219,7 @@ class ImageEdit extends Component {
 			// Not used in the editor, passed to the front-end in block attributes.
 			fileWidth,
 			fileHeight,
+			editWidth: this.props.contentWidth,
 		} );
 	}
 
@@ -393,6 +390,7 @@ class ImageEdit extends Component {
 			fileWidth,
 			fileHeight,
 			userSet,
+			editWidth: this.props.contentwidth,
 		} );
 	}
 
@@ -408,6 +406,7 @@ class ImageEdit extends Component {
 			width: undefined,
 			height: undefined,
 			userSet: undefined,
+			editWidth: this.props.contentwidth,
 		} );
 	}
 
@@ -447,18 +446,6 @@ class ImageEdit extends Component {
 			width: width,
 			height: height,
 		};
-	}
-
-	/**
-	 * Update the block's `editWidth` attribute if not aligned to the current
-	 * `contentWidth` prop.
-	 */
-	setEditWidth() {
-		const { attributes, setAttributes, contentWidth } = this.props;
-		const { editWidth } = attributes;
-		if ( contentWidth !== editWidth ) {
-			setAttributes( { editWidth: contentWidth } );
-		}
 	}
 
 	getFilename( url ) {
