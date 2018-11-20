@@ -119,7 +119,7 @@
     "refx": "^3.0.0",
     "rememo": "^3.0.0",
     "shallowequal": "^1.0.2",
-    "simple-html-tokenizer": "^0.5.1",
+    "simple-html-tokenizer": "^0.4.1",
     "tannin": "^1.0.1",
     "tinycolor2": "^1.4.1",
     "turbo-combine-reducers": "^1.0.2"

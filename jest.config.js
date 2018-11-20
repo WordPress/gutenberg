@@ -42,4 +42,7 @@ module.exports = {
 			'react-native-svg',
 		],
 	},
+	"transformIgnorePatterns": [
+		"<rootDir>/node_modules/simple-html-tokenizer/",
+	]
 };
