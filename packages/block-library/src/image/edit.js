@@ -354,7 +354,7 @@ class ImageEdit extends Component {
 		} );
 	}
 
-	updateWidth( width, fileWidth, fileHeight, userSet ) {
+	updateWidth( width, fileWidth, fileHeight, userSetDimensions ) {
 		width = parseInt( width, 10 );
 
 		// Reset the image size when the user deletes the value.
@@ -364,10 +364,10 @@ class ImageEdit extends Component {
 		}
 
 		const height = Math.round( fileHeight * ( width / fileWidth ) );
-		this.setWidthHeight( width, height, fileWidth, fileHeight, userSet );
+		this.setWidthHeight( width, height, fileWidth, fileHeight, userSetDimensions );
 	}
 
-	updateHeight( height, fileWidth, fileHeight, userSet ) {
+	updateHeight( height, fileWidth, fileHeight, userSetDimensions ) {
 		height = parseInt( height, 10 );
 
 		// Reset the image size when the user deletes the value.
@@ -377,19 +377,19 @@ class ImageEdit extends Component {
 		}
 
 		const width = Math.round( fileWidth * ( height / fileHeight ) );
-		this.setWidthHeight( width, height, fileWidth, fileHeight, userSet );
+		this.setWidthHeight( width, height, fileWidth, fileHeight, userSetDimensions );
 	}
 
-	setWidthHeight( width, height, fileWidth, fileHeight, userSet ) {
+	setWidthHeight( width, height, fileWidth, fileHeight, userSetDimensions ) {
 		// Set image size and also whether set directly by the user.
-		userSet = userSet || undefined;
+		userSetDimensions = userSetDimensions || undefined;
 
 		this.props.setAttributes( {
 			width,
 			height,
 			fileWidth,
 			fileHeight,
-			userSet,
+			userSetDimensions,
 			editWidth: this.props.contentwidth,
 		} );
 	}
@@ -405,7 +405,7 @@ class ImageEdit extends Component {
 		this.props.setAttributes( {
 			width: undefined,
 			height: undefined,
-			userSet: undefined,
+			userSetDimensions: undefined,
 			editWidth: this.props.contentwidth,
 		} );
 	}
@@ -511,7 +511,7 @@ class ImageEdit extends Component {
 			linkDestination,
 			width,
 			height,
-			userSet,
+			userSetDimensions,
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
@@ -621,7 +621,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ userSet ? width : '' }
+									value={ userSetDimensions ? width : '' }
 									placeholder={ imageWidth }
 									min={ 1 }
 									onChange={ ( value ) => {
@@ -632,7 +632,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ userSet ? height : '' }
+									value={ userSetDimensions ? height : '' }
 									placeholder={ imageHeight }
 									min={ 1 }
 									onChange={ ( value ) => {

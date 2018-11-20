@@ -76,7 +76,7 @@ const blockAttributes = {
 	fileHeight: {
 		type: 'number',
 	},
-	userSet: {
+	userSetDimensions: {
 		type: 'boolean',
 		default: false,
 	},

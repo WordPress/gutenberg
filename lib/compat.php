@@ -380,11 +380,11 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta = null
 		 * Here we can use `$block_attributes['editWidth']` to scale the image
 		 * if we know the theme's "expected width" (in pixels).
 		 *
-		 * Note that if the `$block_attributes['userSet']` is set/true, the user has entered
+		 * Note that if the `$block_attributes['userSetDimensions']` is set/true, the user has entered
 		 * the width and height by hand, they shouldn't probably be changed.
 		 *
 		 * Something like:
-		 *	if ( empty( $block_attributes['userSet'] ) && ! empty( $block_attributes['editWidth'] ) && $content_width <> $block_attributes['editWidth'] ) {
+		 *	if ( empty( $block_attributes['userSetDimensions'] ) && ! empty( $block_attributes['editWidth'] ) && $content_width <> $block_attributes['editWidth'] ) {
 		 *		// Scale the image if the block width in the editor was different than the current theme width.
 		 *		$scale = $content_width / $block_attributes['editWidth'];
 		 *		$image_width = round( $block_attributes['width'] * $scale );
