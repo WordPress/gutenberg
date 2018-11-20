@@ -975,6 +975,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -982,6 +983,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: false,
 				error: action.error,
+				options: action.options || {},
 			};
 	}
 

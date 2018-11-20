@@ -1943,6 +1943,7 @@ describe( 'state', () => {
 				requesting: true,
 				successful: false,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1954,6 +1955,7 @@ describe( 'state', () => {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1972,6 +1974,7 @@ describe( 'state', () => {
 					code: 'pretend_error',
 					message: 'update failed',
 				},
+				options: {},
 			} );
 		} );
 	} );

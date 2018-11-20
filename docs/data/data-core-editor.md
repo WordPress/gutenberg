@@ -1655,6 +1655,10 @@ Returns an action object used in signalling that two blocks should be merged
 
 Returns an action object used in signalling that the post should autosave.
 
+*Parameters*
+
+ * options: Extra flags to identify the autosave.
+
 ### redo
 
 Returns an action object used in signalling that undo history should
