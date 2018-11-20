@@ -7,6 +7,11 @@ import {
 } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import createNamespace from './namespace-store.js';
@@ -154,10 +159,15 @@ export function createRegistry( storeConfigs = {} ) {
 	};
 
 	//
-	// TODO:
-	// This function will be deprecated as soon as it is no longer internally referenced.
+	// Deprecated
 	//
 	function use( plugin, options ) {
+		deprecated( 'registry.use', {
+			alternative: 'registry.registerGenericStore',
+			plugin: 'Gutenberg',
+			version: '4.6.0',
+		} );
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),

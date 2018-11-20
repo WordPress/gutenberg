@@ -1,3 +1,13 @@
+## 4.1.0 (Unreleased)
+
+### Deprecations
+
+- `registry.use` has been deprecated. Use `registry.registerGenericStore` for custom functionality instead.
+
+### Internal
+
+- Change internal plugins `persistence` and `controls` to built-in features of `namespace-store`
+
 ## 4.0.1 (2018-11-20)
 
 ## 4.0.0 (2018-11-15)
