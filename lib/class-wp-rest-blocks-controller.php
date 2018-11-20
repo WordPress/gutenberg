@@ -47,10 +47,11 @@ class WP_REST_Blocks_Controller extends WP_REST_Posts_Controller {
 		$data = parent::filter_response_by_context( $data, $context );
 
 		/*
-		 * Remove `content.rendered` from the response. It doesn't make sense for a
-		 * reusable block to have rendered content on its own, since rendering a
-		 * block requires it to be inside a post or a page.
+		 * Remove `title.rendered` and `content.rendered` from the response. It
+		 * doesn't make sense for a reusable block to have rendered content on its
+		 * own, since rendering a block requires it to be inside a post or a page.
 		 */
+		unset( $data['title']['rendered'] );
 		unset( $data['content']['rendered'] );
 
 		return $data;
@@ -75,10 +76,11 @@ class WP_REST_Blocks_Controller extends WP_REST_Posts_Controller {
 		$schema['properties']['content']['properties']['raw']['context'] = array( 'view', 'edit' );
 
 		/*
-		 * Remove `content.rendered` from the schema. It doesn’t make sense for a
-		 * reusable block to have rendered content on its own, since rendering a
-		 * block requires it to be inside a post or a page.
+		 * Remove `title.rendered` and `content.rendered` from the schema. It doesn’t
+		 * make sense for a reusable block to have rendered content on its own, since
+		 * rendering a block requires it to be inside a post or a page.
 		 */
+		unset( $schema['properties']['title']['properties']['rendered'] );
 		unset( $schema['properties']['content']['properties']['rendered'] );
 
 		return $schema;

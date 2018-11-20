@@ -189,8 +189,7 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			array(
-				'raw'      => 'My cool block',
-				'rendered' => 'My cool block',
+				'raw' => 'My cool block',
 			),
 			$data['title']
 		);
