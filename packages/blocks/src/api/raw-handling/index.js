@@ -270,6 +270,8 @@ export function rawHandler( { HTML = '' } ) {
 		// from raw HTML. These filters move around some content or add
 		// additional tags, they do not remove any content.
 		const filters = [
+			// Needed to adjust invalid lists.
+			listReducer,
 			// Needed to create more and nextpage blocks.
 			specialCommentConverter,
 			// Needed to create media blocks.
