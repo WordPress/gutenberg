@@ -256,7 +256,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		dataSource.set( index, block );
 	}
 
-	onReplace( clientId: string, blocks: mixed ) {
+	onReplace( clientId: string, blocks: Array<Object> ) {
 		// Insert the optional blocks and then remove the block indentified by clientId
 		this.insertBlocksAfter( clientId, blocks );
 		const dataSourceBlockIndex = this.getDataSourceIndexFromClientId( clientId );
