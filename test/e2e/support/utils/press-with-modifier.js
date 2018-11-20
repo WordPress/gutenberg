@@ -1,35 +1,42 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { capitalize } from 'lodash';
 
 /**
- * Platform-specific modifier for the access key chord.
- *
- * @see pressWithModifier
- *
- * @type {string}
+ * WordPress dependencies
  */
-export const ACCESS_MODIFIER_KEYS =
-  process.platform === 'darwin' ? [ 'Control', 'Alt' ] : [ 'Shift', 'Alt' ];
+import { modifiers, SHIFT, ALT, CTRL } from '@wordpress/keycodes';
 
 /**
- * Performs a key press with modifier (Shift, Control, Meta, Mod), where "Mod"
- * is normalized to platform-specific modifier (Meta in MacOS, else Control).
+ * Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
+ * is normalized to platform-specific modifier.
  *
- * @param {string|Array} modifiers Modifier key or array of modifier keys.
- * @param {string} key      	   Key to press while modifier held.
+ * @param {string} modifier Modifier key.
+ * @param {string} key Key to press while modifier held.
  */
-export async function pressWithModifier( modifiers, key ) {
-	const modifierKeys = castArray( modifiers );
+export async function pressWithModifier( modifier, key ) {
+	const isAppleOS = () => process.platform === 'darwin';
+	const overWrittenModifiers = {
+		...modifiers,
+		shiftAlt: ( _isApple ) => _isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
+	};
+	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS );
+	const ctrlSwap = ( mod ) => mod === CTRL ? 'control' : mod;
 
 	await Promise.all(
-		modifierKeys.map( async ( modifier ) => page.keyboard.down( modifier ) )
+		mappedModifiers.map( async ( mod ) => {
+			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			return page.keyboard.down( capitalizedMod );
+		} )
 	);
 
 	await page.keyboard.press( key );
 
 	await Promise.all(
-		modifierKeys.map( async ( modifier ) => page.keyboard.up( modifier ) )
+		mappedModifiers.map( async ( mod ) => {
+			const capitalizedMod = capitalize( ctrlSwap( mod ) );
+			return page.keyboard.up( capitalizedMod );
+		} )
 	);
 }

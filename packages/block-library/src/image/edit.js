@@ -39,6 +39,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	BlockAlignmentToolbar,
 	mediaUpload,
 } from '@wordpress/editor';
@@ -48,6 +49,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { createUpgradedEmbedBlock } from '../embed/util';
 import ImageSize from './image-size';
 
 /**
@@ -58,6 +60,7 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
+const NEW_TAB_REL = 'noreferrer noopener';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
@@ -102,10 +105,14 @@ class ImageEdit extends Component {
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
+		this.onSetLinkClass = this.onSetLinkClass.bind( this );
+		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
+		this.onImageError = this.onImageError.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -211,8 +218,43 @@ class ImageEdit extends Component {
 		} );
 	}
 
+	onImageError( url ) {
+		// Check if there's an embed block that handles this URL.
+		const embedBlock = createUpgradedEmbedBlock(
+			{ attributes: { url } }
+		);
+		if ( undefined !== embedBlock ) {
+			this.props.onReplace( embedBlock );
+		}
+	}
+
 	onSetCustomHref( value ) {
 		this.props.setAttributes( { href: value } );
+	}
+
+	onSetLinkClass( value ) {
+		this.props.setAttributes( { linkClass: value } );
+	}
+
+	onSetLinkRel( value ) {
+		this.props.setAttributes( { rel: value } );
+	}
+
+	onSetNewTab( value ) {
+		const { rel } = this.props.attributes;
+		const linkTarget = value ? '_blank' : undefined;
+
+		let updatedRel = rel;
+		if ( linkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
+		}
+
+		this.props.setAttributes( {
+			linkTarget,
+			rel: updatedRel,
+		} );
 	}
 
 	onFocusCaption() {
@@ -309,7 +351,20 @@ class ImageEdit extends Component {
 			toggleSelection,
 			isRTL,
 		} = this.props;
-		const { url, alt, caption, align, id, href, linkDestination, width, height, linkTarget } = attributes;
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			id,
+			href,
+			rel,
+			linkClass,
+			linkDestination,
+			width,
+			height,
+			linkTarget,
+		} = attributes;
 		const isExternal = isExternalImage( id, url );
 		const imageSizeOptions = this.getImageSizeOptions();
 
@@ -328,21 +383,23 @@ class ImageEdit extends Component {
 				);
 			} else {
 				toolbarEditButton = (
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectImage }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				);
 			}
 		}
@@ -477,8 +534,18 @@ class ImageEdit extends Component {
 							/>
 							<ToggleControl
 								label={ __( 'Open in New Tab' ) }
-								onChange={ () => setAttributes( { linkTarget: ! linkTarget ? '_blank' : undefined } ) }
+								onChange={ this.onSetNewTab }
 								checked={ linkTarget === '_blank' } />
+							<TextControl
+								label={ __( 'Link CSS Class' ) }
+								value={ linkClass || '' }
+								onChange={ this.onSetLinkClass }
+							/>
+							<TextControl
+								label={ __( 'Link Rel' ) }
+								value={ rel || '' }
+								onChange={ this.onSetLinkRel }
+							/>
 						</Fragment>
 					) }
 				</PanelBody>
@@ -515,7 +582,7 @@ class ImageEdit extends Component {
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<Fragment>
-									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />
+									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
 									{ isBlobURL( url ) && <Spinner /> }
 								</Fragment>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */

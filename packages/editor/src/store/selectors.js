@@ -15,7 +15,6 @@ import {
 	map,
 	orderBy,
 	reduce,
-	size,
 	some,
 } from 'lodash';
 import createSelector from 'rememo';
@@ -34,6 +33,7 @@ import {
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Dependencies
@@ -739,16 +739,17 @@ export const getClientIdsWithDescendants = createSelector(
  */
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
+		const clientIds = getClientIdsWithDescendants( state );
 		if ( ! blockName ) {
-			return size( state.editor.present.blocks.byClientId );
+			return clientIds.length;
 		}
-		return reduce(
-			state.editor.present.blocks.byClientId,
-			( count, block ) => block.name === blockName ? count + 1 : count,
-			0
-		);
+		return reduce( clientIds, ( count, clientId ) => {
+			const block = state.editor.present.blocks.byClientId[ clientId ];
+			return block.name === blockName ? count + 1 : count;
+		}, 0 );
 	},
 	( state ) => [
+		state.editor.present.blocks.order,
 		state.editor.present.blocks.byClientId,
 	]
 );
@@ -1518,7 +1519,35 @@ export function didPostSaveRequestFail( state ) {
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	return isSavingPost( state ) && state.saving.isAutosave;
+	return isSavingPost( state ) && !! state.saving.options.isAutosave;
+}
+
+/**
+ * Returns true if the post is being previewed, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the post is being previewed.
+ */
+export function isPreviewingPost( state ) {
+	return isSavingPost( state ) && !! state.saving.options.isPreview;
+}
+
+/**
+ * Returns the post preview link
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Preview Link.
+ */
+export function getEditedPostPreviewLink( state ) {
+	const featuredImageId = getEditedPostAttribute( state, 'featured_media' );
+	const previewLink = state.previewLink;
+	if ( previewLink && featuredImageId ) {
+		return addQueryArgs( previewLink, { _thumbnail_id: featuredImageId } );
+	}
+
+	return previewLink;
 }
 
 /**

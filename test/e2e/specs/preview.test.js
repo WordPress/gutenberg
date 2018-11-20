@@ -71,7 +71,7 @@ describe( 'Preview', () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
-		let expectedPreviewURL = getUrl( '', `?p=${ postId }&preview=true` );
+		const expectedPreviewURL = getUrl( '', `?p=${ postId }&preview=true` );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Title in preview should match input.
@@ -97,16 +97,6 @@ describe( 'Preview', () => {
 		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
 		await publishPost();
-		// Wait until the publish panel is closed
-		await Promise.all( [
-			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-publish-panel' ) ),
-			editorPage.click( '.editor-post-publish-panel__header button' ),
-		] );
-		expectedPreviewURL = await editorPage.$eval( '.components-notice.is-success a', ( node ) => node.href );
-
-		await editorPage.bringToFront();
-		await waitForPreviewNavigation( previewPage );
-		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();

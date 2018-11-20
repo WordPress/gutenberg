@@ -179,10 +179,7 @@ export class BlockListBlock extends Component {
 		}, {} );
 
 		if ( size( metaAttributes ) ) {
-			this.props.onMetaChange( {
-				...this.props.meta,
-				...metaAttributes,
-			} );
+			this.props.onMetaChange( metaAttributes );
 		}
 	}
 
@@ -427,7 +424,7 @@ export class BlockListBlock extends Component {
 					// Empty paragraph blocks should always show up as unselected.
 					const showEmptyBlockSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 					const showSideInserter = ( isSelected || isHovered ) && isEmptyDefaultBlock;
-					const shouldAppearSelected = ! isFocusMode && ! hasFixedToolbar && ! showSideInserter && isSelected && ! isTypingWithinBlock;
+					const shouldAppearSelected = ! isFocusMode && ! showSideInserter && isSelected && ! isTypingWithinBlock;
 					const shouldAppearHovered = ! isFocusMode && ! hasFixedToolbar && isHovered && ! isEmptyDefaultBlock;
 					// We render block movers and block settings to keep them tabbale even if hidden
 					const shouldRenderMovers = ! isFocusMode && ( isSelected || hoverArea === 'left' ) && ! showEmptyBlockSideInserter && ! isMultiSelecting && ! isPartOfMultiSelection && ! isTypingWithinBlock;
@@ -646,7 +643,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isTyping,
 		isCaretWithinFormattedText,
 		getBlockIndex,
-		getEditedPostAttribute,
 		getBlockMode,
 		isSelectionEnabled,
 		getSelectedBlocksInitialCaretPosition,
@@ -673,7 +669,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isTypingWithinBlock: ( isSelected || isParentOfSelectedBlock ) && isTyping(),
 		isCaretWithinFormattedText: isCaretWithinFormattedText(),
 		order: getBlockIndex( clientId, rootClientId ),
-		meta: getEditedPostAttribute( 'meta' ),
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),

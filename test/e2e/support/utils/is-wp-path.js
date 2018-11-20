@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import { URL } from 'url';
+
+/**
  * Internal dependencies
  */
 import { getUrl } from './get-url';

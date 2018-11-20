@@ -41,9 +41,9 @@ function the_gutenberg_project() {
 			);
 		} else { // Using Gutenberg in Core.
 			printf(
-				// Translators: link is for Classic Editor plugin.
+				/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
 				__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-				'https://wordpress.org/plugins/classic-editor/'
+				__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
 			);
 		}
 		?>
@@ -199,6 +199,13 @@ function gutenberg_pre_init() {
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
+
+/**
+ * Enable Gutenberg based on user_can_richedit setting.
+ * Set gutenberg_can_edit_post based on user setting for disable visual editor.
+ */
+add_filter( 'gutenberg_can_edit_post_type', 'user_can_richedit', 5 );
+add_filter( 'gutenberg_can_edit_post', 'user_can_richedit', 5 );
 
 /**
  * Initialize Gutenberg.

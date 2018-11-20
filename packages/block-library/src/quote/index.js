@@ -90,9 +90,9 @@ export const settings = {
 				} ),
 			},
 			{
-				type: 'pattern',
-				regExp: /^>\s/,
-				transform: ( { content } ) => {
+				type: 'prefix',
+				prefix: '>',
+				transform: ( content ) => {
 					return createBlock( 'core/quote', {
 						value: `<p>${ content }</p>`,
 					} );

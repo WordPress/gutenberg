@@ -50,24 +50,6 @@
 					},
 					__( 'Reset' )
 				)
-			),
-			el(
-				Button,
-				{
-					isPrimary: true,
-					onClick: () => {
-						dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
-							source: 'e2e-tests',
-							blockClientId: select( 'core/editor' ).getBlockOrder()[ 0 ],
-							richTextIdentifier: 'content',
-							range: {
-								start: 9,
-								end: 13,
-							},
-						} );
-					},
-				},
-				__( 'Add annotation' )
 			)
 		);
 	}
