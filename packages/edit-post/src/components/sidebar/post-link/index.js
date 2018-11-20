@@ -30,10 +30,11 @@ function PostLink( {
 	setState,
 	postTitle,
 	postSlug,
+	postID,
 } ) {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
-	const currentSlug = postSlug || cleanForSlug( postTitle );
+	const currentSlug = postSlug || cleanForSlug( postTitle ) || postID;
 	if ( isEditable ) {
 		prefixElement = prefix && (
 			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
@@ -129,7 +130,7 @@ export default compose( [
 			getPostType,
 		} = select( 'core' );
 
-		const { link } = getCurrentPost();
+		const { link, id } = getCurrentPost();
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
 		return {
@@ -142,6 +143,7 @@ export default compose( [
 			isViewable: get( postType, [ 'viewable' ], false ),
 			postTitle: getEditedPostAttribute( 'title' ),
 			postSlug: getEditedPostAttribute( 'slug' ),
+			postID: id,
 		};
 	} ),
 	ifCondition( ( { isNew, postLink, isViewable } ) => {
