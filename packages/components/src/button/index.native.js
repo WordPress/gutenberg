@@ -3,12 +3,12 @@
  */
 import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create( {
     container: {
 		flex: 1,
 		padding: 3,
 		justifyContent: 'center',
-		alignItems: 'center'
+		alignItems: 'center',
     },
     buttonInactive: {
 		flex: 1,
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
 		borderRadius: 6,
 		borderColor: '#2e4453',
 		aspectRatio: 1,
-		backgroundColor: '#2e4453'
+		backgroundColor: '#2e4453',
 	},
 	buttonActive: {
 		flex: 1,
@@ -30,17 +30,17 @@ const styles = StyleSheet.create({
 		borderRadius: 6,
 		borderColor: '#00000000',
 		aspectRatio: 1,
-		backgroundColor: 'white'
+		backgroundColor: 'white',
 	},
 	subscriptInactive: {
-		fontVariant: [ 'small-caps' ], 
-		color: '#3d596d'
+		fontVariant: [ 'small-caps' ],
+		color: '#3d596d',
 	},
 	subscriptActive: {
-		fontVariant: [ 'small-caps' ], 
-		color: 'white'
-	}
-});
+		fontVariant: [ 'small-caps' ],
+		color: 'white',
+	},
+} );
 
 export default function Button( props ) {
 	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;

@@ -23,7 +23,7 @@ export const SVG = ( props ) => {
 
 	let styleValues = {};
 	if ( typeof props.style === 'string' ) {
-		let oneStyle = props.style.split( ' ' ).map( element => styles[ element ] ).filter( Boolean );
+		const oneStyle = props.style.split( ' ' ).map( element => { styles[ element ] } ).filter( Boolean );
 		styleValues = Object.assign( styleValues, ...oneStyle );
 	}
 
@@ -31,8 +31,8 @@ export const SVG = ( props ) => {
 
 	return (
 		<Svg
-			//We want to re-render when style color is change
-			key={safeProps.style.color}
+			//We want to re-render when style color is changed
+			key={ safeProps.style.color }
 			height="100%"
 			width="100%"
 			{ ...safeProps }
