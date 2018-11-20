@@ -4,6 +4,7 @@
 	"description": "HTML entity utilities for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
+	"react-native": "src/index",
 	"keywords": [
 		"wordpress",
 		"html",
