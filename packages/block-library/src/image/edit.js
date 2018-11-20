@@ -9,6 +9,7 @@ import {
 	last,
 	pick,
 	compact,
+	find,
 } from 'lodash';
 
 /**
@@ -338,13 +339,11 @@ class ImageEdit extends Component {
 			fileHeight = imageSizeOptions.height;
 		} else {
 			// Find the image data.
-			map( imageSizeOptions, ( { value, imageData } ) => {
-				if ( value === url ) {
-					fileWidth = imageData.width;
-					fileHeight = imageData.height;
-					return false;
-				}
-			} );
+			const size = find( imageSizeOptions, { value: url } );
+			if ( size ) {
+				fileWidth = size.imageData.width;
+				fileHeight = size.imageData.height;
+			}
 		}
 
 		this.props.setAttributes( {
