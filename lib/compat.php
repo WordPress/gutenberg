@@ -307,8 +307,8 @@ function gutenberg_warn_classic_about_blocks() {
 /**
  * Add 'actual_size' to the prepared attachment data for the Media Library.
  *
- * Needed as `wp_prepare_attachment_for_js()` (for the media modal) constrains the image sizes
- * to the theme's `$content_width`.
+ * Needed as `wp_prepare_attachment_for_js()` (for the media modal) constrains
+ * the image sizes to the theme's `$content_width`.
  *
  * @param array   $response   Array of prepared attachment data.
  * @param WP_Post $attachment Attachment object.
@@ -332,9 +332,9 @@ function gutenberg_prepare_attachment_for_js( $response, $attachment, $meta ) {
 add_filter( 'wp_prepare_attachment_for_js', 'gutenberg_prepare_attachment_for_js', 10, 3 );
 
 /**
- * Warm the object cache with post and meta information for all found
- * image blocks to avoid making individual database calls
- * (similarly to `wp_make_content_images_responsive()`).
+ * Warm the object cache with post and meta information for all found image
+ * blocks to avoid making individual database calls (similarly to
+ * `wp_make_content_images_responsive()`).
  *
  * @access private
  * @since 4.x.x
@@ -365,13 +365,15 @@ function _gutenberg_cache_images_meta( $content ) {
 add_filter( 'the_content', '_gutenberg_cache_images_meta', 3 );
 
 /**
- * Calculates the image width and height based on $block_witdh and the `editWidth` block attribute.
+ * Calculates the image width and height based on $block_witdh and the
+ * `editWidth` block attribute.
  *
- * @since 4.x.x
+ * @since 4.5.0
  *
  * @param array $block_attributes The block attributes.
- * @param array $image_meta Optional. The image attachment meta data.
- * @return array|bool An array of the image width and height, in that order, or false if the image data is missing from $block_attributes.
+ * @param array $image_meta       Optional. The image attachment meta data.
+ * @return array|bool An array of the image width and height, in that order, or
+ *                    false if the image data is missing from $block_attributes.
  */
 function gutenberg_get_image_width_height( $block_attributes, $image_meta = null ) {
 	if ( ! empty( $block_attributes['width'] ) && ! empty( $block_attributes['height'] ) ) {
@@ -444,7 +446,6 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta = null
  *
  * @param string $html  Original HTML.
  * @param array  $block Parsed block.
- *
  * @return string Filtered Image block HTML.
  */
 function gutenberg_render_block_core_image( $html, $block ) {
