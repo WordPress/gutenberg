@@ -33,6 +33,7 @@ import {
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Dependencies
@@ -1518,7 +1519,7 @@ export function didPostSaveRequestFail( state ) {
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	return isSavingPost( state ) && state.saving.options.isAutosave;
+	return isSavingPost( state ) && !! state.saving.options.isAutosave;
 }
 
 /**
@@ -1540,7 +1541,13 @@ export function isPreviewingPost( state ) {
  * @return {string?} Preview Link.
  */
 export function getEditedPostPreviewLink( state ) {
-	return state.previewLink;
+	const featuredImageId = getEditedPostAttribute( state, 'featured_media' );
+	const previewLink = state.previewLink;
+	if ( previewLink && featuredImageId ) {
+		return addQueryArgs( previewLink, { _thumbnail_id: featuredImageId } );
+	}
+
+	return previewLink;
 }
 
 /**

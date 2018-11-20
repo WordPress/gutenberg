@@ -203,11 +203,13 @@ export default compose( [
 		const {
 			getPostType,
 		} = select( 'core' );
+
+		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : getEditedPostPreviewLink(),
+			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),

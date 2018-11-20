@@ -167,16 +167,16 @@ function gutenberg_register_scripts_and_styles() {
 
 	register_tinymce_scripts();
 
-	wp_script_add_data(
+	wp_add_inline_script(
 		'wp-polyfill',
-		'data',
 		gutenberg_get_script_polyfill(
 			array(
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
 				'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata',
 				'Element.prototype.matches && Element.prototype.closest' => 'wp-polyfill-element-closest',
-			)
+			),
+			'after'
 		)
 	);
 
