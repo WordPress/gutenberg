@@ -43,6 +43,6 @@ module.exports = {
 		],
 	},
 	transformIgnorePatterns: [
-		'<rootDir>/node_modules/simple-html-tokenizer/',
+		'node_modules/(?!(simple-html-tokenizer|react-native|react-native-svg|react-native-recyclerview-list|react-native-modal|react-native-animatable)/)',
 	],
 };
