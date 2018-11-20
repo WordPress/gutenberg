@@ -967,7 +967,7 @@ export function saving( state = {}, action ) {
 				requesting: true,
 				successful: false,
 				error: null,
-				isAutosave: action.isAutosave,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -975,6 +975,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -982,6 +983,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: false,
 				error: action.error,
+				options: action.options || {},
 			};
 	}
 
@@ -1204,9 +1206,9 @@ export function autosave( state = null, action ) {
 				preview_link: post.preview_link,
 			};
 
-		case 'REQUEST_POST_UPDATE':
+		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.
-			if ( state && action.options.autosave ) {
+			if ( state && action.options.isAutosave ) {
 				return omit( state, 'preview_link' );
 			}
 			break;

@@ -28,7 +28,6 @@ import {
 	getEditedPostContent,
 	getAutosave,
 	getCurrentPostType,
-	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	isEditedPostNew,
 	POST_UPDATE_TRANSACTION_ID,
@@ -51,12 +50,11 @@ export const requestPostUpdate = async ( action, store ) => {
 	const { dispatch, getState } = store;
 	const state = getState();
 	const post = getCurrentPost( state );
-	const isAutosave = !! action.options.autosave;
+	const isAutosave = !! action.options.isAutosave;
 
 	// Prevent save if not saveable.
-	const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
-
-	if ( ! isSaveable( state ) ) {
+	// We don't check for dirtiness here as this can be overriden in the UI.
+	if ( ! isEditedPostSaveable( state ) ) {
 		return;
 	}
 
@@ -91,7 +89,7 @@ export const requestPostUpdate = async ( action, store ) => {
 	dispatch( {
 		type: 'REQUEST_POST_UPDATE_START',
 		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		isAutosave,
+		options: action.options,
 	} );
 
 	// Optimistically apply updates under the assumption that the post
@@ -150,7 +148,7 @@ export const requestPostUpdate = async ( action, store ) => {
 				type: isRevision ? REVERT : COMMIT,
 				id: POST_UPDATE_TRANSACTION_ID,
 			},
-			isAutosave,
+			options: action.options,
 			postType,
 		} );
 	} catch ( error ) {
@@ -160,6 +158,7 @@ export const requestPostUpdate = async ( action, store ) => {
 			post,
 			edits,
 			error,
+			options: action.options,
 		} );
 	}
 };
