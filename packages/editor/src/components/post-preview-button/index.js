@@ -12,6 +12,7 @@ import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
 import { ifCondition, compose } from '@wordpress/compose';
+import { addQueryArgs } from '@wordpress/url';
 
 function writeInterstitialMessage( targetDocument ) {
 	let markup = renderToString(
@@ -199,6 +200,13 @@ export default compose( [
 		const {
 			getPostType,
 		} = select( 'core' );
+
+		let previewLink = getAutosaveAttribute( 'preview_link' );
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
+		if ( previewLink && featuredImageId ) {
+			previewLink = addQueryArgs( previewLink, { _thumbnail_id: featuredImageId } );
+		}
+
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postId: getCurrentPostId(),
