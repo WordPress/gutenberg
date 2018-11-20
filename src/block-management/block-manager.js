@@ -198,6 +198,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// find currently focused block
 		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
 
+		// TO DO: make sure to insert all the passed blocks  
 		const newBlock = blocks[ 0 ];
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
@@ -251,6 +252,14 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const block = dataSource.get( index );
 		block.attributes = attributes;
 		dataSource.set( index, block );
+	}
+
+	onReplace( clientId: string, blocks: mixed ) {
+		// Insert the optional blocks and then remove the block indentified by clientId
+		this.insertBlocksAfter( clientId, blocks );
+		const dataSourceBlockIndex = this.getDataSourceIndexFromClientId( clientId );
+		this.state.dataSource.splice( dataSourceBlockIndex, 1 );
+		this.props.deleteBlockAction( clientId );
 	}
 
 	renderList() {
@@ -366,6 +375,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 						this.insertBlocksAfter.bind( this )( value.item.clientId, blocks )
 					}
 					mergeBlocks={ this.mergeBlocks }
+					onReplace={ ( blocks ) =>
+						this.onReplace.bind( this )( value.item.clientId, blocks )
+					}
 					{ ...value.item }
 				/>
 				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
