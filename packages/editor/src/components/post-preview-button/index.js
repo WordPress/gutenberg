@@ -147,7 +147,11 @@ export class PostPreviewButton extends Component {
 
 		// Request an autosave. This happens asynchronously and causes the component
 		// to update when finished.
-		this.props.autosave( { isPreview: true } );
+		if ( this.props.isDraft ) {
+			this.props.savePost( { isPreview: true } );
+		} else {
+			this.props.autosave( { isPreview: true } );
+		}
 
 		// Display a 'Generating preview' message in the Preview tab while we wait for the
 		// autosave to finish.
@@ -191,10 +195,10 @@ export default compose( [
 		const {
 			getCurrentPostId,
 			getCurrentPostAttribute,
-			getAutosaveAttribute,
 			getEditedPostAttribute,
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
+			getEditedPostPreviewLink,
 		} = select( 'core/editor' );
 		const {
 			getPostType,
@@ -203,14 +207,16 @@ export default compose( [
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : getAutosaveAttribute( 'preview_link' ),
+			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : getEditedPostPreviewLink(),
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
+			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
+		savePost: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );

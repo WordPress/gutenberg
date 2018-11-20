@@ -1533,6 +1533,17 @@ export function isPreviewingPost( state ) {
 }
 
 /**
+ * Returns the post preview link
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Preview Link.
+ */
+export function getEditedPostPreviewLink( state ) {
+	return state.previewLink;
+}
+
+/**
  * Returns a suggested post format for the current post, inferred only if there
  * is a single block within the post and it is of a type known to match a
  * default post format. Returns null if the format cannot be determined.

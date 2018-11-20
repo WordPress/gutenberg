@@ -1203,13 +1203,29 @@ export function autosave( state = null, action ) {
 				title,
 				excerpt,
 				content,
-				preview_link: post.preview_link,
 			};
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the poost preview link
+ *
+ * @param  {string?} state  The preview link
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {string?} Updated state.
+ */
+export function previewLink( state = null, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_UPDATE_SUCCESS':
+			return action.post.preview_link || action.post.link;
 
 		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.
-			if ( state && action.options.isAutosave ) {
-				return omit( state, 'preview_link' );
+			if ( state && action.options.isPreview ) {
+				return null;
 			}
 			break;
 	}
@@ -1233,6 +1249,7 @@ export default optimist( combineReducers( {
 	reusableBlocks,
 	template,
 	autosave,
+	previewLink,
 	settings,
 	postSavingLock,
 } ) );
