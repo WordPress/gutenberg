@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
-import { addQueryArgs } from '@wordpress/url';
 import { cleanForSlug } from '@wordpress/editor';
 
 /**
@@ -101,13 +100,6 @@ function PostLink( {
 					</Fragment> ) :
 					postLink
 				}
-			</ExternalLink>
-			<ExternalLink
-				className="edit-post-post-link__permalink-settings"
-				href={ addQueryArgs( 'options-permalink.php' ) }
-				target="_blank"
-			>
-				{ __( 'Permalink Settings' ) }
 			</ExternalLink>
 		</PanelBody>
 	);

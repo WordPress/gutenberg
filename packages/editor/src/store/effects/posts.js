@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { pick, includes } from 'lodash';
+import { get, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -182,7 +182,7 @@ export const requestPostUpdateSuccess = ( action ) => {
 	const willPublish = includes( publishStatus, post.status );
 
 	let noticeMessage;
-	let shouldShowLink = true;
+	let shouldShowLink = get( postType, [ 'viewable' ], false );
 
 	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
