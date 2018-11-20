@@ -44,5 +44,13 @@ exports[`Blocks raw handling rawHandler should convert HTML post to blocks with 
 
 <!-- wp:list {\\"ordered\\":true} -->
 <ol><li>Item</li></ol>
-<!-- /wp:list -->"
+<!-- /wp:list -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Text.</p></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:html -->
+<blockquote><h1>Heading</h1><p>Text.</p></blockquote>
+<!-- /wp:html -->"
 `;
