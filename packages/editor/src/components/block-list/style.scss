@@ -874,6 +874,14 @@
 		position: absolute;
 		left: 0;
 	}
+
+	// Weird IE11/React issue where an element called "<jscomp_symbol_react.fragment16>" is briefly visible.
+	// The following rule styles that temporary element to not cause any visual glitches.
+	// @todo: retire this as soon as we can. See also: https://github.com/facebook/react/issues/13414
+	> :not(div) {
+		display: flex;
+		min-width: 100%;
+	}
 }
 
 
