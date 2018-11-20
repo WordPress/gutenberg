@@ -538,7 +538,7 @@ function gutenberg_render_block_core_image( $html, $block ) {
 	$image_tag = '<img' . $attr . ' />';
 
 	// Replace the img tag.
-	$html = preg_replace( '/<img [^>]+>/', $image_tag, $html );
+	$html = preg_replace( '/<img\s?[^>]+>/', $image_tag, $html );
 
 	return $html;
 }
