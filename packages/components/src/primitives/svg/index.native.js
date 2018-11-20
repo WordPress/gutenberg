@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Svg, Path as SvgPath } from 'react-native-svg';
+import { Svg } from 'react-native-svg';
 
 /**
  * Internal dependencies
@@ -11,6 +11,7 @@ import styles from './style.native.scss';
 export {
 	Circle,
 	G,
+	Path,
 	Polygon,
 	Rect,
 } from 'react-native-svg';
@@ -35,15 +36,6 @@ export const SVG = ( props ) => {
 			height="100%"
 			width="100%"
 			{ ...safeProps }
-		/>
-	);
-};
-
-export const Path = ( props ) => {
-
-	return (
-		<SvgPath
-			{ ...props }
 		/>
 	);
 };
