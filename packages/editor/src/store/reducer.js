@@ -1204,7 +1204,7 @@ export function autosave( state = null, action ) {
 				preview_link: post.preview_link,
 			};
 
-		case 'REQUEST_POST_UPDATE':
+		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.
 			if ( state && action.options.autosave ) {
 				return omit( state, 'preview_link' );

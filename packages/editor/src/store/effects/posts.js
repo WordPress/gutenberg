@@ -28,7 +28,6 @@ import {
 	getEditedPostContent,
 	getAutosave,
 	getCurrentPostType,
-	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	isEditedPostNew,
 	POST_UPDATE_TRANSACTION_ID,
@@ -54,9 +53,8 @@ export const requestPostUpdate = async ( action, store ) => {
 	const isAutosave = !! action.options.autosave;
 
 	// Prevent save if not saveable.
-	const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
-
-	if ( ! isSaveable( state ) ) {
+	// We don't check for dirtiness here as this can be overriden in the UI.
+	if ( ! isEditedPostSaveable( state ) ) {
 		return;
 	}
 
