@@ -55,11 +55,10 @@ const effects = {
 
 			// Save metaboxes on save completion, except for autosaves that are not a post preview.
 			const shouldTriggerMetaboxesSave = (
-				hasActiveMetaBoxes &&
-				wasSavingPost &&
-				( ! wasAutosavingPost || wasPreviewingPost ) &&
-				! isSavingPost &&
-				( ! isAutosavingPost || isPreviewingPost )
+				hasActiveMetaBoxes && (
+					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost ) ||
+					( wasAutosavingPost && wasPreviewingPost && ! isPreviewingPost )
+				)
 			);
 
 			// Save current state for next inspection.
