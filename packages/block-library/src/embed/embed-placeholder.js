@@ -22,8 +22,12 @@ const EmbedPlaceholder = ( props ) => {
 					type="submit">
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
-				{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
-				{ cannotEmbed && <p><Button isLarge onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button></p> }
+				{ cannotEmbed &&
+					<p className="components-placeholder__error">
+						{ __( 'Sorry, we could not embed that content.' ) }<br />
+						<Button isLarge onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
+					</p>
+				}
 			</form>
 		</Placeholder>
 	);
