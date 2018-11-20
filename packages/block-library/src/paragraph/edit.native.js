@@ -22,6 +22,21 @@ class ParagraphEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.splitBlock = this.splitBlock.bind( this );
+		this.onReplace = this.onReplace.bind( this );
+	}
+
+	onReplace( blocks ) {
+		const { attributes, onReplace } = this.props;
+		onReplace( blocks.map( ( block, index ) => (
+			index === 0 && block.name === name ?
+				{ ...block,
+					attributes: {
+						...attributes,
+						...block.attributes,
+					},
+				} :
+				block
+		) ) );
 	}
 
 	/**
@@ -42,6 +57,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			insertBlocksAfter,
 			setAttributes,
+			onReplace,
 		} = this.props;
 
 		if ( after !== null ) {
@@ -56,9 +72,8 @@ class ParagraphEdit extends Component {
 		}
 
 		const { content } = attributes;
-		if ( before === null ) {
-			// TODO : If before content is omitted, treat as intent to delete block.
-			// onReplace( [] );
+		if ( before === null  ) {
+			onReplace( [] );
 		} else if ( content !== before ) {
 			// Only update content if it has in-fact changed. In case that user
 			// has created a new paragraph at end of an existing one, the value
@@ -72,6 +87,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			setAttributes,
 			mergeBlocks,
+			onReplace,
 			style,
 		} = this.props;
 
@@ -102,6 +118,7 @@ class ParagraphEdit extends Component {
 					}
 					}
 					onSplit={ this.splitBlock }
+					onReplace={ this.onReplace }
 					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
 						setAttributes( {
