@@ -189,8 +189,13 @@ describe( 'Reusable Blocks', () => {
 
 		// Delete the block and accept the confirmation dialog
 		await page.click( 'button[aria-label="More options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
-		await Promise.all( [ waitForAndAcceptDialog(), convertButton.click() ] );
+		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
+		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
+
+		// Wait for deletion to finish
+		await page.waitForXPath(
+			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block deleted."]'
+		);
 
 		// Check that we have an empty post again
 		expect( await getEditedPostContent() ).toBe( '' );
