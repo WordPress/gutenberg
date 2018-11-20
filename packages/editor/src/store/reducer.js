@@ -36,6 +36,16 @@ import {
 import { insertAt, moveTo } from './array';
 
 /**
+ * Set of post properties for which edits should assume a merging behavior,
+ * assuming an object value.
+ *
+ * @type {Set}
+ */
+const EDIT_MERGE_PROPERTIES = new Set( [
+	'meta',
+] );
+
+/**
  * Returns a post attribute value, flattening nested rendered content using its
  * raw value in place of its original object form.
  *
@@ -99,6 +109,28 @@ function getFlattenedBlocks( blocks ) {
 	}
 
 	return flattenedBlocks;
+}
+
+/**
+ * Given a block order map object, returns *all* of the block client IDs that are
+ * a descendant of the given root client ID.
+ *
+ * Calling this with `rootClientId` set to `''` results in a list of client IDs
+ * that are in the post. That is, it excludes blocks like fetched reusable
+ * blocks which are stored into state but not visible.
+ *
+ * @param {Object}  blocksOrder  Object that maps block client IDs to a list of
+ *                               nested block client IDs.
+ * @param {?string} rootClientId The root client ID to search. Defaults to ''.
+ *
+ * @return {Array} List of descendant client IDs.
+ */
+function getNestedBlockClientIds( blocksOrder, rootClientId = '' ) {
+	return reduce( blocksOrder[ rootClientId ], ( result, clientId ) => [
+		...result,
+		clientId,
+		...getNestedBlockClientIds( blocksOrder, clientId ),
+	], [] );
 }
 
 /**
@@ -212,6 +244,35 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 };
 
 /**
+ * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `RESET_BLOCKS` action. When dispatched, this action will replace all
+ * blocks that exist in the post, leaving blocks that exist only in state (e.g.
+ * reusable blocks) alone.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withBlockReset = ( reducer ) => ( state, action ) => {
+	if ( state && action.type === 'RESET_BLOCKS' ) {
+		const visibleClientIds = getNestedBlockClientIds( state.order );
+		return {
+			...state,
+			byClientId: {
+				...omit( state.byClientId, visibleClientIds ),
+				...getFlattenedBlocks( action.blocks ),
+			},
+			order: {
+				...omit( state.order, visibleClientIds ),
+				...mapBlockOrder( action.blocks ),
+			},
+		};
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -244,7 +305,14 @@ export const editor = flow( [
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
 						result = getMutateSafeObject( state, result );
-						result[ key ] = value;
+
+						if ( EDIT_MERGE_PROPERTIES.has( key ) ) {
+							// Merge properties should assign to current value.
+							result[ key ] = { ...result[ key ], ...value };
+						} else {
+							// Otherwise override.
+							result[ key ] = value;
+						}
 					}
 
 					return result;
@@ -264,7 +332,7 @@ export const editor = flow( [
 					( key ) => getPostRawValue( action.post[ key ] );
 
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getCanonicalValue( key ) ) {
+					if ( ! isEqual( value, getCanonicalValue( key ) ) ) {
 						return result;
 					}
 
@@ -280,6 +348,8 @@ export const editor = flow( [
 	blocks: flow( [
 		combineReducers,
 
+		withBlockReset,
+
 		// Track whether changes exist, resetting at each post save. Relies on
 		// editor initialization firing post reset as an effect.
 		withChangeDetection( {
@@ -289,7 +359,6 @@ export const editor = flow( [
 	] )( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
 				case 'SETUP_EDITOR_STATE':
 					return getFlattenedBlocks( action.blocks );
 
@@ -392,7 +461,6 @@ export const editor = flow( [
 
 		order( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
 				case 'SETUP_EDITOR_STATE':
 					return mapBlockOrder( action.blocks );
 

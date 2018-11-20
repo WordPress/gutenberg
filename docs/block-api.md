@@ -124,18 +124,18 @@ Block styles can be used to provide alternative styles to block. It works by add
 // Register block styles.
 styles: [
 	// Mark style as default.
-	{ 
-		name: 'default', 
-		label: __( 'Rounded' ), 
-		isDefault: true 
+	{
+		name: 'default',
+		label: __( 'Rounded' ),
+		isDefault: true
 	},
-	{ 
-		name: 'outline', 
-		label: __( 'Outline' ) 
+	{
+		name: 'outline',
+		label: __( 'Outline' )
 	},
-	{ 
-		name: 'squared', 
-		label: __( 'Squared' ) 
+	{
+		name: 'squared',
+		label: __( 'Squared' )
 	},
 ],
 ```
@@ -409,6 +409,43 @@ transforms: {
 			},
 		},
 	]
+}
+```
+{% end %}
+
+A prefix transform is a transform that will be applied if the user prefixes some text in e.g. the paragraph block with a given pattern and a trailing space.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'prefix',
+            prefix: '?',
+            transform: function( content ) {
+                return createBlock( 'my-plugin/question', {
+                    content,
+                } );
+            },
+        },
+    ]
+}
+```
+{% ESNext %}
+```js
+transforms: {
+    from: [
+        {
+            type: 'prefix',
+            prefix: '?',
+            transform( content ) {
+                return createBlock( 'my-plugin/question', {
+                    content,
+                } );
+            },
+        },
+    ]
 }
 ```
 {% end %}

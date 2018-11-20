@@ -22,91 +22,94 @@
 @import "./verse/style.scss";
 @import "./video/style.scss";
 
-.has-pale-pink-background-color {
+// Class names are doubled to increase specificity to assure colors take effect
+// over another base class color.
+
+.has-pale-pink-background-color.has-pale-pink-background-color {
 	background-color: #f78da7;
 }
 
-.has-vivid-red-background-color {
+.has-vivid-red-background-color.has-vivid-red-background-color {
 	background-color: #cf2e2e;
 }
 
-.has-luminous-vivid-orange-background-color {
+.has-luminous-vivid-orange-background-color.has-luminous-vivid-orange-background-color {
 	background-color: #ff6900;
 }
 
-.has-luminous-vivid-amber-background-color {
+.has-luminous-vivid-amber-background-color.has-luminous-vivid-amber-background-color {
 	background-color: #fcb900;
 }
 
-.has-light-green-cyan-background-color {
+.has-light-green-cyan-background-color.has-light-green-cyan-background-color {
 	background-color: #7bdcb5;
 }
 
-.has-vivid-green-cyan-background-color {
+.has-vivid-green-cyan-background-color.has-vivid-green-cyan-background-color {
 	background-color: #00d084;
 }
 
-.has-pale-cyan-blue-background-color {
+.has-pale-cyan-blue-background-color.has-pale-cyan-blue-background-color {
 	background-color: #8ed1fc;
 }
 
-.has-vivid-cyan-blue-background-color {
+.has-vivid-cyan-blue-background-color.has-vivid-cyan-blue-background-color {
 	background-color: #0693e3;
 }
 
-.has-very-light-gray-background-color {
+.has-very-light-gray-background-color.has-very-light-gray-background-color {
 	background-color: #eee;
 }
 
-.has-cyan-bluish-gray-background-color {
+.has-cyan-bluish-gray-background-color.has-cyan-bluish-gray-background-color {
 	background-color: #abb8c3;
 }
 
-.has-very-dark-gray-background-color {
+.has-very-dark-gray-background-color.has-very-dark-gray-background-color {
 	background-color: #313131;
 }
 
-.has-pale-pink-color {
+.has-pale-pink-color.has-pale-pink-color {
 	color: #f78da7;
 }
 
-.has-vivid-red-color {
+.has-vivid-red-color.has-vivid-red-color {
 	color: #cf2e2e;
 }
 
-.has-luminous-vivid-orange-color {
+.has-luminous-vivid-orange-color.has-luminous-vivid-orange-color {
 	color: #ff6900;
 }
 
-.has-luminous-vivid-amber-color {
+.has-luminous-vivid-amber-color.has-luminous-vivid-amber-color {
 	color: #fcb900;
 }
 
-.has-light-green-cyan-color {
+.has-light-green-cyan-color.has-light-green-cyan-color {
 	color: #7bdcb5;
 }
 
-.has-vivid-green-cyan-color {
+.has-vivid-green-cyan-color.has-vivid-green-cyan-color {
 	color: #00d084;
 }
 
-.has-pale-cyan-blue-color {
+.has-pale-cyan-blue-color.has-pale-cyan-blue-color {
 	color: #8ed1fc;
 }
 
-.has-vivid-cyan-blue-color {
+.has-vivid-cyan-blue-color.has-vivid-cyan-blue-color {
 	color: #0693e3;
 }
 
-.has-very-light-gray-color {
+.has-very-light-gray-color.has-very-light-gray-color {
 	color: #eee;
 }
 
-.has-cyan-bluish-gray-color {
+.has-cyan-bluish-gray-color.has-cyan-bluish-gray-color {
 	color: #abb8c3;
 }
 
-.has-very-dark-gray-color {
+.has-very-dark-gray-color.has-very-dark-gray-color {
 	color: #313131;
 }
 
@@ -128,6 +131,6 @@
 }
 
 .has-larger-font-size, // not used now, kept because of backward compatibility.
-.has-huge-font-size, {
+.has-huge-font-size {
 	font-size: 42px;
 }

@@ -107,18 +107,16 @@ export const settings = {
 					} );
 				},
 			},
-			{
-				type: 'pattern',
-				regExp: /^(#{2,6})\s/,
-				transform: ( { content, match } ) => {
-					const level = match[ 1 ].length;
-
+			...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+				type: 'prefix',
+				prefix: Array( level + 1 ).join( '#' ),
+				transform( content ) {
 					return createBlock( 'core/heading', {
 						level,
 						content,
 					} );
 				},
-			},
+			} ) ),
 		],
 		to: [
 			{

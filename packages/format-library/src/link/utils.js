@@ -37,10 +37,16 @@ export function isValidHref( href ) {
 		return false;
 	}
 
-	// Does the href start with something that looks like a url protocol?
+	// Does the href start with something that looks like a URL protocol?
 	if ( /^\S+:/.test( trimmedHref ) ) {
 		const protocol = getProtocol( trimmedHref );
 		if ( ! isValidProtocol( protocol ) ) {
+			return false;
+		}
+
+		// Add some extra checks for http(s) URIs, since these are the most common use-case.
+		// This ensures URIs with an http protocol have exactly two forward slashes following the protocol.
+		if ( startsWith( protocol, 'http' ) && ! /^https?:\/\/[^\/\s]/i.test( trimmedHref ) ) {
 			return false;
 		}
 
@@ -60,7 +66,7 @@ export function isValidHref( href ) {
 		}
 
 		const fragment = getFragment( trimmedHref );
-		if ( fragment && ! isValidFragment( trimmedHref ) ) {
+		if ( fragment && ! isValidFragment( fragment ) ) {
 			return false;
 		}
 	}

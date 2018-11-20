@@ -37,6 +37,7 @@ import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import FullscreenMode from '../fullscreen-mode';
+import AdminNotices from '../admin-notices';
 
 function Layout( {
 	mode,
@@ -69,6 +70,7 @@ function Layout( {
 			<BrowserURL />
 			<UnsavedChangesWarning />
 			<AutosaveMonitor />
+			<AdminNotices />
 			<Header />
 			<div
 				className="edit-post-layout__content"

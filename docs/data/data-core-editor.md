@@ -398,6 +398,19 @@ the client ID.
 
 Block name.
 
+### isBlockValid
+
+Returns whether a block is valid or not.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Is Valid.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block,
@@ -1154,6 +1167,19 @@ Items are returned ordered descendingly by their 'utility' and 'frecency'.
 
 Items that appear in inserter.
 
+### hasInserterItems
+
+Determines whether there are items to show in the inserter.
+
+*Parameters*
+
+ * state: Editor state.
+ * rootClientId: Optional root client ID of block list.
+
+*Returns*
+
+Items that appear in inserter.
+
 ### __experimentalGetReusableBlock
 
 Returns the reusable block with the given ID.
@@ -1815,7 +1841,3 @@ Returns an action object used to signal that post saving is unlocked.
 *Parameters*
 
  * lockName: The lock name.
-
-### createNotice
-
-### fetchReusableBlocks
