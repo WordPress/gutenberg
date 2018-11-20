@@ -138,7 +138,7 @@ When blocks are saved to the content, after the editing session, its attributesâ
 A purely dynamic block that is to be server rendered before display could look like this:
 
 ```html
-<!-- wp:latest-posts {"postsToShow":4,"displayPostDate":true} / -->
+<!-- wp:latest-posts {"postsToShow":4,"displayPostDate":true} /-->
 ```
 
 ## The Gutenberg Lifecycle
