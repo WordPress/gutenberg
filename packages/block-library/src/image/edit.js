@@ -381,9 +381,6 @@ class ImageEdit extends Component {
 	}
 
 	setWidthHeight( width, height, fileWidth, fileHeight, userSetDimensions ) {
-		// Set image size and also whether set directly by the user.
-		userSetDimensions = userSetDimensions || undefined;
-
 		this.props.setAttributes( {
 			width,
 			height,
