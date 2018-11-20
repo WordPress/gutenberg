@@ -7,13 +7,12 @@ import combineReducers from 'turbo-combine-reducers';
  * Internal dependencies
  */
 import defaultRegistry from './default-registry';
-import * as plugins from './plugins';
 
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
 export { createRegistry } from './registry';
-export { plugins };
+export { setDefaults as setPersistenceDefaults } from './persistence';
 
 /**
  * The combineReducers helper function turns an object whose values are different

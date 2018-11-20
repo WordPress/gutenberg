@@ -3,6 +3,7 @@
  */
 import { createStore, applyMiddleware } from 'redux';
 import {
+	flow,
 	flowRight,
 	get,
 	mapValues,
@@ -18,6 +19,7 @@ import createMiddleware from '@wordpress/redux-routine';
  */
 import promise from './promise-middleware';
 import createResolversCacheMiddleware from './resolvers-cache-middleware';
+import { createPersistOnChange, createPersistenceInterface, withInitialState } from './persistence';
 
 /**
  * Creates a namespace object with a store derived from the reducer given.
@@ -29,8 +31,27 @@ import createResolversCacheMiddleware from './resolvers-cache-middleware';
  * @return {Object} Store Object.
  */
 export default function createNamespace( key, options, registry ) {
-	const reducer = options.reducer;
-	const store = createReduxStore( reducer, key, registry );
+	let reducer = options.reducer;
+	let store;
+
+	if ( options.persist ) {
+		const persistence = createPersistenceInterface( options.persistenceOptions || {} );
+
+		const initialState = persistence.get()[ key ];
+		reducer = withInitialState( options.reducer, initialState );
+		store = createReduxStore( reducer, key, registry );
+		store.dispatch = flow( [
+			store.dispatch,
+			createPersistOnChange(
+				store.getState,
+				key,
+				options.persist,
+				persistence
+			),
+		] );
+	} else {
+		store = createReduxStore( reducer, key, registry );
+	}
 
 	let selectors, actions, resolvers;
 	if ( options.actions ) {
