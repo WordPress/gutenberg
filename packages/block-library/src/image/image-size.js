@@ -9,11 +9,6 @@ import { noop } from 'lodash';
 import { withGlobalEvents } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 
-export function getBlockWidth() {
-	const node = document.querySelector( 'div.editor-block-list__block' );
-	return node && node.clientWidth - 30;
-}
-
 class ImageSize extends Component {
 	constructor() {
 		super( ...arguments );

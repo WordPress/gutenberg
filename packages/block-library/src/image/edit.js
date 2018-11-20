@@ -50,7 +50,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
-import ImageSize, { getBlockWidth } from './image-size';
+import ImageSize from './image-size';
 
 /**
  * Module constants
@@ -124,6 +124,8 @@ class ImageEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { id, url = '' } = attributes;
 
+		this.setEditWidth();
+
 		if ( isTemporaryImage( id, url ) ) {
 			const file = getBlobByURL( url );
 
@@ -143,10 +145,8 @@ class ImageEdit extends Component {
 		const { id: prevID, url: prevURL = '' } = prevProps.attributes;
 		const { id, url = '', fileWidth } = this.props.attributes;
 		const imageData = this.props.image;
-		const blockWidth = getBlockWidth();
 
-		// Store the current block width inside the editor.
-		this.props.setAttributes( { editWidth: blockWidth } );
+		this.setEditWidth();
 
 		if ( isTemporaryImage( prevID, prevURL ) && ! isTemporaryImage( id, url ) ) {
 			revokeBlobURL( url );
@@ -201,18 +201,17 @@ class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
-		const blockWidth = getBlockWidth();
 		let src = media.url;
 		let img = {};
-		let actualWidth;
-		let actualHeight;
+		let fileWidth;
+		let fileHeight;
 
 		if ( media.sizes ) {
 			// The "full" size is already included in `sizes`.
 			img = media.sizes.large || media.sizes.full;
 			src = img.url;
-			actualWidth = get( img, [ 'actual_size', 'width' ] ) || img.width;
-			actualHeight = get( img, [ 'actual_size', 'height' ] ) || img.height;
+			fileWidth = get( img, [ 'actual_size', 'width' ] ) || img.width;
+			fileHeight = get( img, [ 'actual_size', 'height' ] ) || img.height;
 		}
 
 		const attr = pickRelevantMediaFiles( media );
@@ -222,9 +221,8 @@ class ImageEdit extends Component {
 			...attr,
 
 			// Not used in the editor, passed to the front-end in block attributes.
-			fileWidth: actualWidth,
-			fileHeight: actualHeight,
-			editWidth: blockWidth,
+			fileWidth,
+			fileHeight,
 		} );
 	}
 
@@ -451,6 +449,18 @@ class ImageEdit extends Component {
 		};
 	}
 
+	/**
+	 * Update the block's `editWidth` attribute if not aligned to the current
+	 * `contentWidth` prop.
+	 */
+	setEditWidth() {
+		const { attributes, setAttributes, contentWidth } = this.props;
+		const { editWidth } = attributes;
+		if ( contentWidth !== editWidth ) {
+			setAttributes( { editWidth: contentWidth } );
+		}
+	}
+
 	getFilename( url ) {
 		const path = getPath( url );
 		if ( path ) {
@@ -500,6 +510,7 @@ class ImageEdit extends Component {
 			noticeUI,
 			toggleSelection,
 			isRTL,
+			contentWidth,
 		} = this.props;
 		const {
 			url,
@@ -645,17 +656,15 @@ class ImageEdit extends Component {
 							<div className="block-library-image__dimensions__row">
 								<ButtonGroup aria-label={ __( 'Image Size' ) }>
 									{ [ 25, 50, 75, 100 ].map( ( percent ) => {
-										const blockWidth = getBlockWidth();
-
 										// Percentage is relative to the block width.
-										let scaledWidth = Math.round( blockWidth * ( percent / 100 ) );
+										let scaledWidth = Math.round( contentWidth * ( percent / 100 ) );
 										let isCurrent = false;
 
 										if ( scaledWidth > imageWidth ) {
 											scaledWidth = imageWidth;
 											isCurrent = percent === 100 && ( ! width || width === scaledWidth );
 										} else {
-											isCurrent = ( width === scaledWidth ) || ( ! width && percent === 100 && imageWidth > blockWidth );
+											isCurrent = ( width === scaledWidth ) || ( ! width && percent === 100 && imageWidth > contentWidth );
 										}
 
 										return (
@@ -755,17 +764,16 @@ class ImageEdit extends Component {
 
 							// Floating a resized image can produce inaccurate `imageWidthWithinContainer`.
 							const ratio = imageWidth / imageHeight;
-							const blockWidth = getBlockWidth();
 							let constrainedWidth;
 							let constrainedHeight;
 
-							if ( ( align === 'wide' || align === 'full' ) && imageWidthWithinContainer > blockWidth ) {
+							if ( ( align === 'wide' || align === 'full' ) && imageWidthWithinContainer > contentWidth ) {
 								// Do not limit the width.
 								constrainedWidth = imageWidthWithinContainer;
 								constrainedHeight = imageHeightWithinContainer;
 							} else {
 								constrainedWidth = width || imageWidth;
-								constrainedWidth = constrainedWidth	> blockWidth ? blockWidth : constrainedWidth;
+								constrainedWidth = constrainedWidth	> contentWidth ? contentWidth : constrainedWidth;
 								constrainedHeight = Math.round( constrainedWidth / ratio ) || undefined;
 							}
 
@@ -859,7 +867,7 @@ class ImageEdit extends Component {
 												newWidth = imageWidth;
 											}
 
-											if ( newWidth >= blockWidth ) {
+											if ( newWidth >= contentWidth ) {
 												// The image was resized to greater than the block width. Reset to 100% width and height (that will also highlight the 100% width button).
 												this.resetWidthHeight( imageWidth, imageHeight );
 											} else {
@@ -898,13 +906,21 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
+		const {
+			maxWidth,
+			isRTL,
+			imageSizes,
+			// Note: At the time of implementation, this value will never be
+			// found in settings and always default to the hard-coded value.
+			contentWidth = 580,
+		} = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
 			imageSizes,
+			contentWidth,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
