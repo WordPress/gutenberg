@@ -43,7 +43,8 @@ function render_block_core_categories( $attributes ) {
 	}
 
 	$class = "wp-block-categories wp-block-categories-{$type}";
-	$labelClass = 'wp-block-categories-label';
+
+	$label_class = 'wp-block-categories-label';
 
 	if ( isset( $attributes['align'] ) ) {
 		$class .= " align{$attributes['align']}";
@@ -53,7 +54,7 @@ function render_block_core_categories( $attributes ) {
 		$class .= " {$attributes['className']}";
 	}
 
-	$items_markup = '<label class="' . $labelClass . '" for="' . $id . '">' . $title . '</label> ' . $items_markup;
+	$items_markup = '<label class="' . $label_class . '" for="' . $id . '">' . $title . '</label> ' . $items_markup;
 
 	$block_content = sprintf(
 		$wrapper_markup,

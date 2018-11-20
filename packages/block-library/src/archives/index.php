@@ -67,9 +67,10 @@ function render_block_core_archives( $attributes ) {
 		}
 
 		$label = esc_attr( $label );
-		$labelClass = 'wp-block-archives-label';
 
-		$block_content = '<label class="' . $labelClass . '" for="' . $dropdown_id . '">' . $title . '</label>
+		$label_class = 'wp-block-archives-label';
+
+		$block_content = '<label class="' . $label_class . '" for="' . $dropdown_id . '">' . $title . '</label>
 	<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
 	<option value="">' . $label . '</option>' . $archives . '</select>';
 
