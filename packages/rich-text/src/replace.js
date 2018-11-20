@@ -20,47 +20,64 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @return {Object} A new value with replacements applied.
  */
-export function replace( { formats, text, start, end }, pattern, replacement ) {
-	text = text.replace( pattern, ( match, ...rest ) => {
+export function replace( value, pattern, replacement ) {
+	const { formats, text, start, end } = value;
+
+	let newFormats = formats.slice();
+	let newStart = start;
+	let newEnd = end;
+
+	const newText = text.replace( pattern, ( match, ...rest ) => {
 		const offset = rest[ rest.length - 2 ];
-		let newText = replacement;
-		let newFormats;
+		let replacementText;
+		let replacementFormats;
 
-		if ( typeof newText === 'function' ) {
-			newText = replacement( match, ...rest );
+		if ( typeof replacement === 'function' ) {
+			replacement = replacement( match, ...rest );
 		}
 
-		if ( typeof newText === 'object' ) {
-			newFormats = newText.formats;
-			newText = newText.text;
+		if ( typeof replacement === 'object' ) {
+			replacementText = replacement.text;
+			replacementFormats = replacement.formats;
 		} else {
-			newFormats = Array( newText.length );
+			replacementText = replacement;
+			replacementFormats = Array( replacementText.length );
 
-			if ( formats[ offset ] ) {
-				newFormats = newFormats.fill( formats[ offset ] );
+			if ( newFormats[ offset ] ) {
+				replacementFormats = replacementFormats.fill( newFormats[ offset ] );
 			}
 		}
 
-		formats = formats.slice( 0, offset ).concat( newFormats, formats.slice( offset + match.length ) );
+		newFormats = newFormats.slice( 0, offset ).concat( replacementFormats, newFormats.slice( offset + match.length ) );
 
-		if ( start !== undefined && start >= offset ) {
-			if ( start <= offset + match.length ) {
-				start = offset + newText.length;
+		if ( newStart !== undefined && newStart >= offset ) {
+			if ( newStart <= offset + match.length ) {
+				newStart = offset + replacementText.length;
 			} else {
-				start = start - match.length + newText.length;
+				newStart = newStart - match.length + replacementText.length;
 			}
 		}
 
-		if ( end !== undefined && end >= offset ) {
-			if ( end <= offset + match.length ) {
-				end = offset + newText.length;
+		if ( newEnd !== undefined && newEnd >= offset ) {
+			if ( newEnd <= offset + match.length ) {
+				newEnd = offset + replacementText.length;
 			} else {
-				end = end - match.length + newText.length;
+				newEnd = newEnd - match.length + replacementText.length;
 			}
 		}
 
-		return newText;
+		return replacementText;
 	} );
 
-	return normaliseFormats( { formats, text, start, end } );
+	// No replacement occured.
+	if ( text === newText ) {
+		return value;
+	}
+
+	return normaliseFormats( {
+		formats: newFormats,
+		text: newText,
+		start: newStart,
+		end: newEnd,
+	} );
 }

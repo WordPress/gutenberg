@@ -93,7 +93,7 @@ function toFormat( { type, attributes } ) {
 function trim( value ) {
 	value = replace( value, /^ +/, '' );
 	value = replace( value, / +$/, '' );
-	value = replace( value, / +/, ' ' );
+	value = replace( value, / {2,}/, ' ' );
 
 	return value;
 }
