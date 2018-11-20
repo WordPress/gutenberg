@@ -329,17 +329,25 @@ class ImageEdit extends Component {
 		this.props.setAttributes( { align: nextAlign } );
 	}
 
-	updateImageURL( url, imageSizeOptions ) {
+	/**
+	 * Sets the `url` attribute of the block to the provided value, optionally
+	 * with an explicit dimensions. If `dimensions` are not provided, the
+	 * equivalent image size values will be used instead, if known and exists.
+	 *
+	 * @param {string}  url        URL to assign as block attribute.
+	 * @param {?Object} dimensions Optional object of width, height values.
+	 */
+	updateImageURL( url, dimensions ) {
 		this.resetWidthHeight();
 		let fileWidth;
 		let fileHeight;
 
-		if ( imageSizeOptions.width && imageSizeOptions.height ) {
-			fileWidth = imageSizeOptions.width;
-			fileHeight = imageSizeOptions.height;
+		if ( dimensions && dimensions.width && dimensions.height ) {
+			fileWidth = dimensions.width;
+			fileHeight = dimensions.height;
 		} else {
 			// Find the image data.
-			const size = find( imageSizeOptions, { value: url } );
+			const size = find( this.getImageSizeOptions(), { value: url } );
 			if ( size ) {
 				fileWidth = size.imageData.width;
 				fileHeight = size.imageData.height;
@@ -615,9 +623,7 @@ class ImageEdit extends Component {
 							label={ __( 'Image Size' ) }
 							value={ url }
 							options={ imageSizeOptions }
-							onChange={ ( src ) => {
-								this.updateImageURL( src, imageSizeOptions );
-							} }
+							onChange={ this.updateImageURL }
 						/>
 					) }
 					{ isResizable && (
