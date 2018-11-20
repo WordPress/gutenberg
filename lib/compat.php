@@ -544,11 +544,7 @@ function gutenberg_render_block_core_image( $html, $block ) {
 			$value = esc_attr( $value );
 		}
 
-		if ( empty( $value ) ) {
-			$attr .= ' ' . $name;
-		} else {
-			$attr .= sprintf( ' %s="%s"', $name, $value );
-		}
+		$attr .= sprintf( ' %s="%s"', $name, $value );
 	}
 
 	$image_tag = '<img' . $attr . ' />';
