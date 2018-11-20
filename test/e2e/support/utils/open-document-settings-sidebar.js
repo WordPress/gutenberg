@@ -7,6 +7,6 @@ export async function openDocumentSettingsSidebar() {
 	);
 
 	if ( openButton ) {
-		await page.click( openButton );
+		await openButton.click();
 	}
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, every } from 'lodash';
+import { filter, every, map, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -52,6 +52,10 @@ const blockAttributes = {
 			},
 		},
 	},
+	ids: {
+		type: 'array',
+		default: [],
+	},
 	columns: {
 		type: 'number',
 	},
@@ -66,6 +70,16 @@ const blockAttributes = {
 };
 
 export const name = 'core/gallery';
+
+const parseShortcodeIds = ( ids ) => {
+	if ( ! ids ) {
+		return [];
+	}
+
+	return ids.split( ',' ).map( ( id ) => (
+		parseInt( id, 10 )
+	) );
+};
 
 export const settings = {
 	title: __( 'Gallery' ),
@@ -89,6 +103,7 @@ export const settings = {
 					if ( validImages.length > 0 ) {
 						return createBlock( 'core/gallery', {
 							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
+							ids: validImages.map( ( { id } ) => id ),
 						} );
 					}
 					return createBlock( 'core/gallery' );
@@ -101,13 +116,15 @@ export const settings = {
 					images: {
 						type: 'array',
 						shortcode: ( { named: { ids } } ) => {
-							if ( ! ids ) {
-								return [];
-							}
-
-							return ids.split( ',' ).map( ( id ) => ( {
-								id: parseInt( id, 10 ),
+							return parseShortcodeIds( ids ).map( ( id ) => ( {
+								id,
 							} ) );
+						},
+					},
+					ids: {
+						type: 'array',
+						shortcode: ( { named: { ids } } ) => {
+							return parseShortcodeIds( ids );
 						},
 					},
 					columns: {
@@ -139,8 +156,12 @@ export const settings = {
 					mediaUpload( {
 						filesList: files,
 						onFileChange: ( images ) => {
+							const imagesAttr = images.map(
+								pickRelevantMediaFiles
+							);
 							onChange( block.clientId, {
-								images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+								ids: map( imagesAttr, 'id' ),
+								images: imagesAttr,
 							} );
 						},
 						allowedTypes: [ 'image' ],
@@ -199,6 +220,66 @@ export const settings = {
 	},
 
 	deprecated: [
+		{
+			attributes: blockAttributes,
+			isEligible( { images, ids } ) {
+				return images &&
+					images.length > 0 &&
+					(
+						( ! ids && images ) ||
+						( ids && images && ids.length !== images.length ) ||
+						some( images, ( id, index ) => {
+							if ( ! id && ids[ index ] !== null ) {
+								return true;
+							}
+							return parseInt( id, 10 ) !== ids[ index ];
+						} )
+					);
+			},
+			migrate( attributes ) {
+				return {
+					...attributes,
+					ids: map( attributes.images, ( { id } ) => {
+						if ( ! id ) {
+							return null;
+						}
+						return parseInt( id, 10 );
+					} ),
+				};
+			},
+			save( { attributes } ) {
+				const { images, columns = defaultColumnsNumber( attributes ), imageCrop, linkTo } = attributes;
+				return (
+					<ul className={ `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` } >
+						{ images.map( ( image ) => {
+							let href;
+
+							switch ( linkTo ) {
+								case 'media':
+									href = image.url;
+									break;
+								case 'attachment':
+									href = image.link;
+									break;
+							}
+
+							const img = <img src={ image.url } alt={ image.alt } data-id={ image.id } data-link={ image.link } className={ image.id ? `wp-image-${ image.id }` : null } />;
+
+							return (
+								<li key={ image.id || image.url } className="blocks-gallery-item">
+									<figure>
+										{ href ? <a href={ href }>{ img }</a> : img }
+										{ image.caption && image.caption.length > 0 && (
+											<RichText.Content tagName="figcaption" value={ image.caption } />
+										) }
+									</figure>
+								</li>
+							);
+						} ) }
+					</ul>
+				);
+			},
+		},
 		{
 			attributes: blockAttributes,
 			save( { attributes } ) {

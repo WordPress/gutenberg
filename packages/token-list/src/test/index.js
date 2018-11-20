@@ -25,14 +25,74 @@ describe( 'token-list', () => {
 			expect( list.value ).toBe( 'abc' );
 			expect( list ).toHaveLength( 1 );
 		} );
+
+		describe( 'array method inheritence', () => {
+			it( 'entries', () => {
+				const list = new TokenList( 'abc   ' );
+
+				expect( [ ...list.entries() ] ).toEqual( [ [ 0, 'abc' ] ] );
+			} );
+
+			it( 'forEach', () => {
+				expect.assertions( 1 );
+
+				const list = new TokenList( 'abc   ' );
+
+				list.forEach( ( item ) => expect( item ).toBe( 'abc' ) );
+			} );
+
+			it( 'values', () => {
+				const list = new TokenList( 'abc   ' );
+
+				expect( [ ...list.values() ] ).toEqual( [ 'abc' ] );
+			} );
+
+			it( 'keys', () => {
+				const list = new TokenList( 'abc   ' );
+
+				expect( [ ...list.keys() ] ).toEqual( [ 0 ] );
+			} );
+		} );
 	} );
 
 	describe( 'value', () => {
+		it( 'gets the stringified value', () => {
+			const list = new TokenList( 'abc   ' );
+
+			expect( list.value ).toBe( 'abc' );
+		} );
+
 		it( 'sets to stringified value', () => {
 			const list = new TokenList();
 			list.value = undefined;
 
 			expect( list.value ).toBe( 'undefined' );
+		} );
+
+		it( 'is the stringifier of the instance', () => {
+			const list = new TokenList( 'abc   ' );
+
+			expect( String( list ) ).toBe( 'abc' );
+		} );
+	} );
+
+	describe( 'Symbol.iterator', () => {
+		it( 'returns a generator', () => {
+			const list = new TokenList();
+
+			expect( list[ Symbol.iterator ]().next ).toEqual( expect.any( Function ) );
+		} );
+
+		it( 'yields entries', () => {
+			expect.assertions( 2 );
+
+			const classes = [ 'abc', 'def' ];
+			const list = new TokenList( classes.join( ' ' ) );
+
+			let i = 0;
+			for ( const item of list ) {
+				expect( item ).toBe( classes[ i++ ] );
+			}
 		} );
 	} );
 

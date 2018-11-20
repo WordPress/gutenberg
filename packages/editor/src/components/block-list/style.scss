@@ -686,7 +686,8 @@
 // Don't show the sibling inserter before the selected block.
 .edit-post-layout:not(.has-fixed-toolbar) {
 	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .editor-block-list__insertion-point-inserter {
+	.is-selected > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter,
+	.is-focused > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter {
 		opacity: 0;
 		pointer-events: none;
 
@@ -905,11 +906,6 @@
 			opacity: 0;
 			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
-	}
-
-	&.is-light .components-toolbar {
-		background: rgba($white, 0.5);
-		color: $dark-gray-700;
 	}
 
 	// Position the breadcrumb closer on mobile.

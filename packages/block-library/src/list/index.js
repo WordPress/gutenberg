@@ -110,25 +110,25 @@ export const settings = {
 					} );
 				},
 			},
-			{
-				type: 'pattern',
-				regExp: /^[*-]\s/,
-				transform: ( { content } ) => {
+			...[ '*', '-' ].map( ( prefix ) => ( {
+				type: 'prefix',
+				prefix,
+				transform( content ) {
 					return createBlock( 'core/list', {
 						values: `<li>${ content }</li>`,
 					} );
 				},
-			},
-			{
-				type: 'pattern',
-				regExp: /^1[.)]\s/,
-				transform: ( { content } ) => {
+			} ) ),
+			...[ '1.', '1)' ].map( ( prefix ) => ( {
+				type: 'prefix',
+				prefix,
+				transform( content ) {
 					return createBlock( 'core/list', {
 						ordered: true,
 						values: `<li>${ content }</li>`,
 					} );
 				},
-			},
+			} ) ),
 		],
 		to: [
 			{

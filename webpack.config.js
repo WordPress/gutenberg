@@ -17,6 +17,13 @@ const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-w
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 
 /**
+ * Internal dependencies
+ */
+const { dependencies } = require( './package' );
+
+const WORDPRESS_NAMESPACE = '@wordpress/';
+
+/**
  * Given a string, returns a new string with dash separators converted to
  * camelCase equivalent. This is not as aggressive as `_.camelCase` in
  * converting to uppercase, where Lodash will also capitalize letters
@@ -33,46 +40,9 @@ function camelCaseDash( string ) {
 	);
 }
 
-const gutenbergPackages = [
-	'a11y',
-	'annotations',
-	'api-fetch',
-	'autop',
-	'blob',
-	'blocks',
-	'block-library',
-	'block-serialization-default-parser',
-	'block-serialization-spec-parser',
-	'components',
-	'compose',
-	'core-data',
-	'data',
-	'date',
-	'deprecated',
-	'dom',
-	'dom-ready',
-	'edit-post',
-	'editor',
-	'element',
-	'escape-html',
-	'format-library',
-	'hooks',
-	'html-entities',
-	'i18n',
-	'is-shallow-equal',
-	'keycodes',
-	'list-reusable-blocks',
-	'notices',
-	'nux',
-	'plugins',
-	'redux-routine',
-	'rich-text',
-	'shortcode',
-	'token-list',
-	'url',
-	'viewport',
-	'wordcount',
-];
+const gutenbergPackages = Object.keys( dependencies )
+	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
+	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 const externals = {
 	react: 'React',
@@ -85,7 +55,7 @@ const externals = {
 };
 
 gutenbergPackages.forEach( ( name ) => {
-	externals[ `@wordpress/${ name }` ] = {
+	externals[ WORDPRESS_NAMESPACE + name ] = {
 		this: [ 'wp', camelCaseDash( name ) ],
 	};
 } );
@@ -167,6 +137,7 @@ const config = {
 			'deprecated',
 			'dom-ready',
 			'redux-routine',
+			'token-list',
 		].map( camelCaseDash ) ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
