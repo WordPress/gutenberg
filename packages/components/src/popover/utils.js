@@ -4,6 +4,7 @@
  */
 const HEIGHT_OFFSET = 10; // used by the arrow and a bit of empty space
 const isMobileViewport = () => window.innerWidth < 782;
+const isRTL = () => document.documentElement.dir === 'rtl';
 
 /**
  * Utility used to compute the popover position over the xAxis
@@ -18,6 +19,12 @@ const isMobileViewport = () => window.innerWidth < 782;
  */
 export function computePopoverXAxisPosition( anchorRect, contentSize, xAxis, chosenYAxis ) {
 	const { width } = contentSize;
+	// Correct xAxis for RTL support
+	if ( xAxis === 'left' && isRTL() ) {
+		xAxis = 'right';
+	} else if ( xAxis === 'right' && isRTL() ) {
+		xAxis = 'left';
+	}
 
 	// x axis alignment choices
 	const anchorMidPoint = Math.round( anchorRect.left + ( anchorRect.width / 2 ) );

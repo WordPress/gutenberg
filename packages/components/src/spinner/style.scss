@@ -19,6 +19,15 @@
 		height: 4px;
 		border-radius: 100%;
 		transform-origin: 6px 6px;
-		@include animate_rotation;
+		animation: components-spinner__animation 1s infinite linear;
+	}
+}
+
+@keyframes components-spinner__animation {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
 	}
 }

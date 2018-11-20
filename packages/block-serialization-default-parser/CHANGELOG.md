@@ -1,3 +1,10 @@
+## 2.0.0 (2018-11-12)
+
+### Breaking Changes
+
+- Inner blocks are now cast as arrays instead of objects.
+- JS and PHP parsers now behave consistently when parsing empty attributes.
+
 ## 1.1.1 (2018-11-09)
 
 ## 1.1.0 (2018-11-09)

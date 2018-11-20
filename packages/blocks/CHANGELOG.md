@@ -1,3 +1,15 @@
+## 6.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- `isValidBlock` has been removed. Please use `isValidBlockContent` instead but keep in mind that the order of params has changed.
+
+### Bug Fix
+
+- The block validator is more lenient toward equivalent encoding forms.
+
+## 5.3.1 (2018-11-12)
+
 ## 5.3.0 (2018-11-09)
 
 ### New feature

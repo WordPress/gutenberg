@@ -17,7 +17,7 @@ function WritingMenu( { onClose } ) {
 		>
 			<FeatureToggle
 				feature="fixedToolbar"
-				label={ __( 'Unified Toolbar' ) }
+				label={ __( 'Top Toolbar' ) }
 				info={ __( 'Access all block and document tools in a single place' ) }
 				onToggle={ onClose } />
 			<FeatureToggle

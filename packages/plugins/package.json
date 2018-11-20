@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "2.0.8",
+	"version": "2.0.9",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

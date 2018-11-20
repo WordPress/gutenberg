@@ -5,11 +5,6 @@ import momentLib from 'moment';
 import 'moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
-/**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
 // Changes made here will likely need to be made in `lib/client-assets.php` as
 // well because it uses the `setSettings()` function to change these settings.
 let settings = {
@@ -94,17 +89,6 @@ export function __experimentalGetSettings() {
 	return settings;
 }
 
-// deprecations
-export function getSettings() {
-	deprecated( 'wp.date.getSettings', {
-		version: '4.4',
-		alternative: 'wp.date.__experimentalGetSettings',
-		plugin: 'Gutenberg',
-		hint: 'Unstable APIs are strongly discouraged to be used, and are subject to removal without notice.',
-	} );
-	return settings;
-}
-
 function setupWPTimezone() {
 	// Create WP timezone based off dateSettings.
 	momentLib.tz.add( momentLib.tz.pack( {
@@ -114,19 +98,6 @@ function setupWPTimezone() {
 		offsets: [ -settings.timezone.offset * 60 || 0 ],
 	} ) );
 }
-
-// Create a new moment object which mirrors moment but includes
-// the attached timezone, instead of setting a default timezone on
-// the global moment object.
-export const moment = ( ...args ) => {
-	deprecated( 'wp.date.moment', {
-		version: '4.4',
-		alternative: 'the moment script as a dependency',
-		plugin: 'Gutenberg',
-	} );
-
-	return momentLib.tz( ...args, 'WP' );
-};
 
 // Date constants.
 /**

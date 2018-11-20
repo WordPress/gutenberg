@@ -10,6 +10,7 @@
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";
+@import "./components/sidebar/post-link/style.scss";
 @import "./components/sidebar/post-schedule/style.scss";
 @import "./components/sidebar/post-status/style.scss";
 @import "./components/sidebar/post-visibility/style.scss";
@@ -20,28 +21,15 @@
 @import "./components/visual-editor/style.scss";
 @import "./components/options-modal/style.scss";
 
-// Fade animations
-@keyframes animate_fade {
-	from {
-		opacity: 0;
-		transform: translateY(4px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
-}
 
-@keyframes move_background {
-	from {
-		background-position: 0 0;
-	}
-	to {
-		background-position: 28px 0;
-	}
-}
+/**
+ * Animations
+ */
 
-@keyframes loading_fade {
+// These keyframes should not be part of the _animations.scss mixins file.
+// Because keyframe animations can't be defined as mixins properly, they are duplicated.
+// Since hey are intended only for the editor, we add them here instead.
+@keyframes edit-post__loading-fade-animation {
 	0% {
 		opacity: 0.5;
 	}
@@ -53,15 +41,12 @@
 	}
 }
 
-@keyframes slide_in_right {
-	100% {
-		transform: translateX(0%);
+@keyframes edit-post__fade-in-animation {
+	from {
+		opacity: 0;
 	}
-}
-
-@keyframes slide_in_top {
-	100% {
-		transform: translateY(0%);
+	to {
+		opacity: 1;
 	}
 }
 
