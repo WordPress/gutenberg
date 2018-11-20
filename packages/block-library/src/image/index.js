@@ -216,7 +216,19 @@ export const settings = {
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
 					const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
 					const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
-					const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
+					const imgElement = node.querySelector( 'img' );
+					const url = imgElement.src;
+					const alt = imgElement.alt;
+					const attributes = getBlockAttributes( 'core/image', node.outerHTML, {
+						url,
+						alt,
+						align,
+						id,
+						linkDestination,
+						href,
+						rel,
+						linkClass,
+					} );
 					return createBlock( 'core/image', attributes );
 				},
 			},
