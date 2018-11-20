@@ -22,6 +22,7 @@ import {
  */
 import { isReusableBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -1220,7 +1221,7 @@ export function autosave( state = null, action ) {
 export function previewLink( state = null, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE_SUCCESS':
-			return action.post.preview_link || action.post.link;
+			return action.post.preview_link || addQueryArgs( action.post.link, { preview: true } );
 
 		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.
