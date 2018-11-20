@@ -337,7 +337,7 @@ add_filter( 'wp_prepare_attachment_for_js', 'gutenberg_prepare_attachment_for_js
  * `wp_make_content_images_responsive()`).
  *
  * @access private
- * @since 4.x.x
+ * @since 4.5.0
  *
  * @param string $content The post content.
  * @return string $content Unchanged post content.
@@ -430,7 +430,7 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta = null
 	/**
 	 * Filters the image size for the image block.
 	 *
-	 * @since 4.x.x
+	 * @since 4.5.0
 	 *
 	 * @param array $image_size       The calculated image size width and
 	 *                                height (in that order).
@@ -443,6 +443,8 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta = null
 /**
  * Filters the rendered output of the Image block to include generated HTML
  * attributes for front-end display.
+ *
+ * @since 4.5.0
  *
  * @param string $html  Original HTML.
  * @param array  $block Parsed block.
@@ -513,7 +515,7 @@ function gutenberg_render_block_core_image( $html, $block ) {
 	/**
 	 * Filters the image tag attributes when rendering the core image block.
 	 *
-	 * @since 4.x.x
+	 * @since 4.5.0
 	 *
 	 * @param array  $image_attributes The (recalculated) image attributes.
 	 *                                 Note: expects valid HTML 5.0 attribute names.
