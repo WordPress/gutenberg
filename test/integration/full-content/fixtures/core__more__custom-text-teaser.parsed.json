@@ -7,13 +7,17 @@
         },
         "innerBlocks": [],
         "innerHTML": "\n<!--more Continue Reading-->\n<!--noteaser-->\n",
-        "innerContent": [ "\n<!--more Continue Reading-->\n<!--noteaser-->\n" ]
+        "innerContent": [
+            "\n<!--more Continue Reading-->\n<!--noteaser-->\n"
+        ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "\n",
-        "innerContent": [ "\n" ]
+        "innerContent": [
+            "\n"
+        ]
     }
 ]
