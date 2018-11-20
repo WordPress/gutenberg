@@ -211,11 +211,9 @@ class ImageEdit extends Component {
 			fileHeight = get( img, [ 'actual_size', 'height' ] ) || img.height;
 		}
 
-		const attr = pickRelevantMediaFiles( media );
-		attr.url = src;
-
 		this.props.setAttributes( {
-			...attr,
+			...pickRelevantMediaFiles( media ),
+			url: src,
 
 			// Not used in the editor, passed to the front-end in block attributes.
 			fileWidth,
