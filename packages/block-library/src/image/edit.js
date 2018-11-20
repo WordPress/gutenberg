@@ -207,8 +207,15 @@ class ImageEdit extends Component {
 			// The "full" size is already included in `sizes`.
 			img = media.sizes.large || media.sizes.full;
 			src = img.url;
-			fileWidth = get( img, [ 'actual_size', 'width' ] ) || img.width;
-			fileHeight = get( img, [ 'actual_size', 'height' ] ) || img.height;
+			fileWidth = get( img, [ 'actual_size', 'width' ] );
+			fileHeight = get( img, [ 'actual_size', 'height' ] );
+
+			// Fall back to default image if either width or height is unset,
+			// in case the provided image metadata is inconsistent.
+			if ( ! fileWidth || ! fileHeight ) {
+				fileWidth = img.width;
+				fileHeight = img.height;
+			}
 		}
 
 		this.props.setAttributes( {
