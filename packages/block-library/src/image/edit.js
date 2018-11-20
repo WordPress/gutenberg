@@ -405,19 +405,19 @@ class ImageEdit extends Component {
 	}
 
 	resetWidthHeight( fileWidth, fileHeight ) {
-		if ( fileWidth && fileHeight ) {
-			this.props.setAttributes( {
-				fileWidth,
-				fileHeight,
-			} );
-		}
-
-		this.props.setAttributes( {
+		const nextAttributes = {
 			width: undefined,
 			height: undefined,
 			userSetDimensions: undefined,
 			editWidth: __unstableDOM.getBlockWidth(),
-		} );
+		};
+
+		if ( fileWidth && fileHeight ) {
+			nextAttributes.fileWidth = fileWidth;
+			nextAttributes.fileHeight = fileHeight;
+		}
+
+		this.props.setAttributes( nextAttributes );
 	}
 
 	/**
