@@ -300,7 +300,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		const list = this.renderList();
 		const blockTypePicker = (
 			<BlockPicker
-				visible={ this.state.blockTypePickerVisible }
 				onDismiss={ () => {
 					this.showBlockTypePicker( false );
 				} }
@@ -330,7 +329,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				</View>
 				{ this.state.showHtml && this.renderHTML() }
 				{ ! this.state.showHtml && list }
-				{ blockTypePicker }
+				{ this.state.blockTypePickerVisible && blockTypePicker }
 			</View>
 		);
 	}

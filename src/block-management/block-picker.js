@@ -11,7 +11,6 @@ import { name as unsupportedBlockName } from '../block-types/unsupported-block';
 import { getBlockTypes } from '@wordpress/blocks';
 
 type PropsType = {
-	visible: boolean,
 	style?: StyleSheet,
 	onValueSelected: ( itemValue: string, itemIndex: number ) => void,
 	onDismiss: () => void,
@@ -37,7 +36,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 			<Modal
 				animationType="slide"
 				transparent={ true }
-				isVisible={ this.props.visible }
+				isVisible={ true }
 				onSwipe={ this.props.onDismiss.bind( this ) }
 				onBackButtonPress={ this.props.onDismiss.bind( this ) }
 				swipeDirection="down"
