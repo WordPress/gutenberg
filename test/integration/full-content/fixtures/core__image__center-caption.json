@@ -8,6 +8,7 @@
             "alt": "",
             "caption": "Give it a try. Press the \"really wide\" button on the image toolbar.",
             "align": "center",
+            "userSetDimensions": false,
             "linkDestination": "none"
         },
         "innerBlocks": [],

@@ -9,6 +9,7 @@
             "caption": "",
             "href": "https://wordpress.org/",
             "linkClass": "custom-link",
+            "userSetDimensions": false,
             "linkDestination": "custom"
         },
         "innerBlocks": [],

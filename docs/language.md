@@ -86,7 +86,7 @@ _N.B.:_ The defining aspect of blocks are their semantics and the isolation mech
 When blocks are saved to the content, after the editing session, its attributes—depending on the nature of the block—are serialized to these explicit comment delimiters.
 
 ```html
-<!-- wp:image -->
+<!-- wp:image {"url":"source.jpg"} -->
 <figure class="wp-block-image">
 	<img src="source.jpg" alt="" />
 </figure>

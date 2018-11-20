@@ -8,6 +8,7 @@
             "alt": "",
             "caption": "",
             "href": "https://wordpress.org/",
+            "userSetDimensions": false,
             "linkDestination": "custom"
         },
         "innerBlocks": [],

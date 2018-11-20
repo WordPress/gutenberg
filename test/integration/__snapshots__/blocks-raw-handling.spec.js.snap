@@ -5,8 +5,8 @@ exports[`Blocks raw handling rawHandler should convert HTML post to blocks with 
 <h2>Howdy</h2>
 <!-- /wp:heading -->
 
-<!-- wp:image -->
-<figure class=\\"wp-block-image\\"><img src=\\"https://w.org\\" alt=\\"\\"/></figure>
+<!-- wp:image {\\"url\\":\\"https://w.org/\\"} -->
+<figure class=\\"wp-block-image\\"><img src=\\"https://w.org/\\" alt=\\"\\"/></figure>
 <!-- /wp:image -->
 
 <!-- wp:paragraph -->

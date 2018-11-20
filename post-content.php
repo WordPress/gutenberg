@@ -26,7 +26,7 @@
 <p><?php _e( 'Handling images and media with the utmost care is a primary focus of the new editor. Hopefully, you&#8217;ll find aspects of adding captions or going full-width with your pictures much easier and robust than before.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"center"} -->
+<!-- wp:image {"url":"https://cldup.com/cXyG__fTLN.jpg","alt":"<?php esc_attr_e( 'Beautiful landscape', 'gutenberg' ); ?>","align":"center"} -->
 <div class="wp-block-image">
 	<figure class="aligncenter"><img src="https://cldup.com/cXyG__fTLN.jpg" alt="<?php esc_attr_e( 'Beautiful landscape', 'gutenberg' ); ?>" />
 		<figcaption><?php _e( 'If your theme supports it, you&#8217;ll see the "wide" button on the image toolbar. Give it a try.', 'gutenberg' ); ?></figcaption>
@@ -108,7 +108,7 @@
 <p><?php _e( 'If you combine the new <strong>wide</strong> and <strong>full-wide</strong> alignments with galleries, you can create a very media rich layout, very quickly:', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"align":"full"} -->
+<!-- wp:image {"url":"https://cldup.com/8lhI-gKnI2.jpg","alt":"<?php _e( 'Accessibility is important &mdash; don&#8217;t forget image alt attribute', 'gutenberg' ); ?>","align":"full"} -->
 <figure class="wp-block-image alignfull"><img src="https://cldup.com/8lhI-gKnI2.jpg" alt="<?php _e( 'Accessibility is important &mdash; don&#8217;t forget image alt attribute', 'gutenberg' ); ?>" /></figure>
 <!-- /wp:image -->
 
