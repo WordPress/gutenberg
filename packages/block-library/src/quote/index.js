@@ -100,7 +100,10 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				selector: 'blockquote',
+				isMatch: ( node ) => (
+					node.nodeName === 'BLOCKQUOTE' &&
+					Array.from( node.childNodes ).every( ( child ) => child.nodeName === 'P' )
+				),
 				schema: {
 					blockquote: {
 						children: {
