@@ -197,9 +197,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	insertBlocksAfter( clientId: string, blocks: Array<Object> ) {
 		// find currently focused block
 		const focusedItemIndex = this.getDataSourceIndexFromClientId( clientId );
-
-		// TO DO: make sure to insert all the passed blocks  
+		//TODO: make sure to insert all the passed blocks
 		const newBlock = blocks[ 0 ];
+		if ( ! newBlock ) {
+			return;
+		}
 
 		// set it into the datasource, and use the same object instance to send it to props/redux
 		this.state.dataSource.splice( focusedItemIndex + 1, 0, newBlock );
