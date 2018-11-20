@@ -1518,7 +1518,7 @@ export function didPostSaveRequestFail( state ) {
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	return isSavingPost( state ) && state.saving.options.isAutosave;
+	return isSavingPost( state ) && !! state.saving.options.isAutosave;
 }
 
 /**
