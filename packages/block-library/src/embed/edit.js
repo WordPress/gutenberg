@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isFromWordPress, createUpgradedEmbedBlock, getClassNames } from './util';
+import { isFromWordPress, createUpgradedEmbedBlock, getClassNames, fallback } from './util';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -161,6 +161,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						value={ url }
 						cannotEmbed={ cannotEmbed }
 						onChange={ ( event ) => this.setState( { url: event.target.value } ) }
+						fallback={ () => fallback( url, this.props.onReplace ) }
 					/>
 				);
 			}

@@ -6,7 +6,7 @@ import { Button, Placeholder } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/editor';
 
 const EmbedPlaceholder = ( props ) => {
-	const { icon, label, value, onSubmit, onChange, cannotEmbed } = props;
+	const { icon, label, value, onSubmit, onChange, cannotEmbed, fallback } = props;
 	return (
 		<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
 			<form onSubmit={ onSubmit }>
@@ -23,6 +23,7 @@ const EmbedPlaceholder = ( props ) => {
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
 				{ cannotEmbed && <p className="components-placeholder__error">{ __( 'Sorry, we could not embed that content.' ) }</p> }
+				{ cannotEmbed && <p><Button isLarge onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button></p> }
 			</form>
 		</Placeholder>
 	);
