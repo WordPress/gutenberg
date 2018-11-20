@@ -967,7 +967,7 @@ export function saving( state = {}, action ) {
 				requesting: true,
 				successful: false,
 				error: null,
-				isAutosave: action.isAutosave,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':

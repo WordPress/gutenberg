@@ -51,7 +51,10 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PostPreviewButton />
+				<PostPreviewButton
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }

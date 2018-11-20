@@ -439,10 +439,12 @@ export function mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 /**
  * Returns an action object used in signalling that the post should autosave.
  *
+ * @param {Object?} options Extra flags to identify the autosave.
+ *
  * @return {Object} Action object.
  */
-export function autosave() {
-	return savePost( { autosave: true } );
+export function autosave( options ) {
+	return savePost( { autosave: true, ...options } );
 }
 
 /**

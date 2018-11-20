@@ -98,10 +98,6 @@ export class PostPreviewButton extends Component {
 		// unintentional forceful redirects.
 		if ( previewLink && ! prevProps.previewLink ) {
 			this.setPreviewWindowLink( previewLink );
-
-			// Once popup redirect is evaluated, even if already closed, delete
-			// reference to avoid later assignment of location in post update.
-			delete this.previewWindow;
 		}
 	}
 
@@ -191,7 +187,7 @@ export class PostPreviewButton extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { forcePreviewLink, forceIsAutosaveable } ) => {
 		const {
 			getCurrentPostId,
 			getCurrentPostAttribute,
@@ -207,9 +203,9 @@ export default compose( [
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink: getAutosaveAttribute( 'preview_link' ),
+			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : getAutosaveAttribute( 'preview_link' ),
 			isSaveable: isEditedPostSaveable(),
-			isAutosaveable: isEditedPostAutosaveable(),
+			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),

@@ -1518,7 +1518,7 @@ export function didPostSaveRequestFail( state ) {
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	return isSavingPost( state ) && state.saving.isAutosave;
+	return isSavingPost( state ) && state.saving.options.isAutosave;
 }
 
 /**
@@ -1529,7 +1529,7 @@ export function isAutosavingPost( state ) {
  * @return {boolean} Whether the post is being previewed.
  */
 export function isPreviewingPost( state ) {
-	return isSavingPost( state ) && state.saving.isPreview;
+	return isSavingPost( state ) && !! state.saving.options.isPreview;
 }
 
 /**

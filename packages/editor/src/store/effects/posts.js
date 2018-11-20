@@ -91,7 +91,7 @@ export const requestPostUpdate = async ( action, store ) => {
 	dispatch( {
 		type: 'REQUEST_POST_UPDATE_START',
 		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		isAutosave,
+		options: action.options,
 	} );
 
 	// Optimistically apply updates under the assumption that the post
@@ -150,7 +150,7 @@ export const requestPostUpdate = async ( action, store ) => {
 				type: isRevision ? REVERT : COMMIT,
 				id: POST_UPDATE_TRANSACTION_ID,
 			},
-			isAutosave,
+			options: action.options,
 			postType,
 		} );
 	} catch ( error ) {
@@ -160,6 +160,7 @@ export const requestPostUpdate = async ( action, store ) => {
 			post,
 			edits,
 			error,
+			options: action.options,
 		} );
 	}
 };
