@@ -8,7 +8,6 @@ import {
 	map,
 	last,
 	pick,
-	round,
 	compact,
 } from 'lodash';
 
@@ -369,7 +368,7 @@ class ImageEdit extends Component {
 			return;
 		}
 
-		const height = round( fileHeight * ( width / fileWidth ) );
+		const height = Math.round( fileHeight * ( width / fileWidth ) );
 		this.setWidthHeight( width, height, fileWidth, fileHeight, userSet );
 	}
 
@@ -382,7 +381,7 @@ class ImageEdit extends Component {
 			return;
 		}
 
-		const width = round( fileWidth * ( height / fileHeight ) );
+		const width = Math.round( fileWidth * ( height / fileHeight ) );
 		this.setWidthHeight( width, height, fileWidth, fileHeight, userSet );
 	}
 
@@ -438,8 +437,8 @@ class ImageEdit extends Component {
 		const ratio = targetWidth / fullWidth;
 
 		// Very small dimensions may result in 0, 1 should be the minimum.
-		const height = Math.max( 1, round( fullHeight * ratio ) );
-		let width = Math.max( 1, round( fullWidth * ratio ) );
+		const height = Math.max( 1, Math.round( fullHeight * ratio ) );
+		let width = Math.max( 1, Math.round( fullWidth * ratio ) );
 
 		// Sometimes, due to rounding, we'll end up with a result like this: 465x700 in a 177x177 box is 117x176... a pixel short.
 		if ( width === targetWidth - 1 ) {
@@ -649,7 +648,7 @@ class ImageEdit extends Component {
 										const blockWidth = getBlockWidth();
 
 										// Percentage is relative to the block width.
-										let scaledWidth = round( blockWidth * ( percent / 100 ) );
+										let scaledWidth = Math.round( blockWidth * ( percent / 100 ) );
 										let isCurrent = false;
 
 										if ( scaledWidth > imageWidth ) {
@@ -767,7 +766,7 @@ class ImageEdit extends Component {
 							} else {
 								constrainedWidth = width || imageWidth;
 								constrainedWidth = constrainedWidth	> blockWidth ? blockWidth : constrainedWidth;
-								constrainedHeight = round( constrainedWidth / ratio ) || undefined;
+								constrainedHeight = Math.round( constrainedWidth / ratio ) || undefined;
 							}
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
