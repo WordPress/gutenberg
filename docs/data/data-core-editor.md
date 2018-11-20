@@ -1083,6 +1083,18 @@ Returns true if the post is being previewed, or false otherwise.
 
 Whether the post is being previewed.
 
+### getEditedPostPreviewLink
+
+Returns the post preview link
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Preview Link.
+
 ### getSuggestedPostFormat
 
 Returns a suggested post format for the current post, inferred only if there

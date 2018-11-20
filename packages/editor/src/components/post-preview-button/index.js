@@ -12,7 +12,6 @@ import { __, _x } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { DotTip } from '@wordpress/nux';
 import { ifCondition, compose } from '@wordpress/compose';
-import { addQueryArgs } from '@wordpress/url';
 
 function writeInterstitialMessage( targetDocument ) {
 	let markup = renderToString(
@@ -148,7 +147,11 @@ export class PostPreviewButton extends Component {
 
 		// Request an autosave. This happens asynchronously and causes the component
 		// to update when finished.
-		this.props.autosave( { isPreview: true } );
+		if ( this.props.isDraft ) {
+			this.props.savePost( { isPreview: true } );
+		} else {
+			this.props.autosave( { isPreview: true } );
+		}
 
 		// Display a 'Generating preview' message in the Preview tab while we wait for the
 		// autosave to finish.
@@ -192,33 +195,30 @@ export default compose( [
 		const {
 			getCurrentPostId,
 			getCurrentPostAttribute,
-			getAutosaveAttribute,
 			getEditedPostAttribute,
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
+			getEditedPostPreviewLink,
 		} = select( 'core/editor' );
 		const {
 			getPostType,
 		} = select( 'core' );
 
-		let previewLink = getAutosaveAttribute( 'preview_link' );
-		const featuredImageId = getEditedPostAttribute( 'featured_media' );
-		if ( previewLink && featuredImageId ) {
-			previewLink = addQueryArgs( previewLink, { _thumbnail_id: featuredImageId } );
-		}
-
+		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : getAutosaveAttribute( 'preview_link' ),
+			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
 			isSaveable: isEditedPostSaveable(),
 			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
+			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
+		savePost: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );
