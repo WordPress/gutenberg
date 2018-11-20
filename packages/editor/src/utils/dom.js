@@ -26,6 +26,39 @@ export function getBlockFocusableWrapper( clientId ) {
 }
 
 /**
+ * Returns the expected width of a block which would occupy the editor block
+ * list, in absolute pixels. This value is cached; the cache reset upon change
+ * in viewport size.
+ *
+ * @return {number} Expected block width in pixels.
+ */
+export const getBlockWidth = ( () => {
+	let width;
+	window.addEventListener( 'resize', () => width = undefined );
+
+	return () => {
+		if ( width === undefined ) {
+			const layout = document.querySelector( '.editor-block-list__layout' );
+			if ( ! layout ) {
+				return;
+			}
+
+			const measure = document.createElement( 'div' );
+			measure.className = 'wp-block editor-block-list__block';
+			layout.appendChild( measure );
+			const { clientWidth } = measure;
+			layout.removeChild( measure );
+
+			// 30 = ( 2 * $block-padding ) + ( 2 * $border-width )
+			// See: https://github.com/WordPress/gutenberg/blob/master/assets/stylesheets/_variables.scss
+			width = clientWidth - 30;
+		}
+
+		return width;
+	};
+} )();
+
+/**
  * Returns true if the given HTMLElement is a block focus stop. Blocks without
  * their own text fields rely on the focus stop to be keyboard navigable.
  *

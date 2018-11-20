@@ -43,6 +43,7 @@ import {
 	MediaUploadCheck,
 	BlockAlignmentToolbar,
 	mediaUpload,
+	__unstableDOM,
 } from '@wordpress/editor';
 import { withViewportMatch } from '@wordpress/viewport';
 import { compose } from '@wordpress/compose';
@@ -225,7 +226,7 @@ class ImageEdit extends Component {
 			// Not used in the editor, passed to the front-end in block attributes.
 			fileWidth,
 			fileHeight,
-			editWidth: this.props.contentWidth,
+			editWidth: __unstableDOM.getBlockWidth(),
 		} );
 	}
 
@@ -399,7 +400,7 @@ class ImageEdit extends Component {
 			fileWidth,
 			fileHeight,
 			userSetDimensions,
-			editWidth: this.props.contentwidth,
+			editWidth: __unstableDOM.getBlockWidth(),
 		} );
 	}
 
@@ -415,7 +416,7 @@ class ImageEdit extends Component {
 			width: undefined,
 			height: undefined,
 			userSetDimensions: undefined,
-			editWidth: this.props.contentwidth,
+			editWidth: __unstableDOM.getBlockWidth(),
 		} );
 	}
 
@@ -519,7 +520,6 @@ class ImageEdit extends Component {
 			noticeUI,
 			toggleSelection,
 			isRTL,
-			contentWidth,
 		} = this.props;
 		const {
 			url,
@@ -538,6 +538,7 @@ class ImageEdit extends Component {
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
 		const imageSizeOptions = this.getImageSizeOptions();
+		const blockWidth = __unstableDOM.getBlockWidth();
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -664,14 +665,14 @@ class ImageEdit extends Component {
 								<ButtonGroup aria-label={ __( 'Image Size' ) }>
 									{ [ 25, 50, 75, 100 ].map( ( percent ) => {
 										// Percentage is relative to the block width.
-										let scaledWidth = Math.round( contentWidth * ( percent / 100 ) );
+										let scaledWidth = Math.round( blockWidth * ( percent / 100 ) );
 										let isCurrent = false;
 
 										if ( scaledWidth > imageWidth ) {
 											scaledWidth = imageWidth;
 											isCurrent = percent === 100 && ( ! width || width === scaledWidth );
 										} else {
-											isCurrent = ( width === scaledWidth ) || ( ! width && percent === 100 && imageWidth > contentWidth );
+											isCurrent = ( width === scaledWidth ) || ( ! width && percent === 100 && imageWidth > blockWidth );
 										}
 
 										return (
@@ -773,13 +774,13 @@ class ImageEdit extends Component {
 							let constrainedWidth;
 							let constrainedHeight;
 
-							if ( ( align === 'wide' || align === 'full' ) && imageWidthWithinContainer > contentWidth ) {
+							if ( ( align === 'wide' || align === 'full' ) && imageWidthWithinContainer > blockWidth ) {
 								// Do not limit the width.
 								constrainedWidth = imageWidthWithinContainer;
 								constrainedHeight = imageHeightWithinContainer;
 							} else {
 								constrainedWidth = width || imageWidth;
-								constrainedWidth = constrainedWidth > contentWidth ? contentWidth : constrainedWidth;
+								constrainedWidth = constrainedWidth > blockWidth ? blockWidth : constrainedWidth;
 								constrainedHeight = Math.round( constrainedWidth / ratio ) || undefined;
 							}
 
@@ -873,7 +874,7 @@ class ImageEdit extends Component {
 												newWidth = imageWidth;
 											}
 
-											if ( newWidth >= contentWidth ) {
+											if ( newWidth >= blockWidth ) {
 												// The image was resized to greater than the block width. Reset to 100% width and height (that will also highlight the 100% width button).
 												this.resetWidthHeight( imageWidth, imageHeight );
 											} else {
@@ -912,21 +913,13 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const {
-			maxWidth,
-			isRTL,
-			imageSizes,
-			// Note: At the time of implementation, this value will never be
-			// found in settings and always default to the hard-coded value.
-			contentWidth = 580,
-		} = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
 			imageSizes,
-			contentWidth,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
