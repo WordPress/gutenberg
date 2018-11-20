@@ -23,7 +23,7 @@ export const SVG = ( props ) => {
 
 	let styleValues = {};
 	if ( typeof props.style === 'string' ) {
-		const oneStyle = props.style.split( ' ' ).map( element => { styles[ element ] } ).filter( Boolean );
+		const oneStyle = props.style.split( ' ' ).map( element => styles[ element ] ).filter( Boolean );
 		styleValues = Object.assign( styleValues, ...oneStyle );
 	}
 
