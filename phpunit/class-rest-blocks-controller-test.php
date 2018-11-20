@@ -41,11 +41,21 @@ class REST_Blocks_Controller_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Delete our fake data after each test runs.
+	 */
+	public function tearDown() {
+		parent::tearDown();
+
+		if ( isset( self::$user_id ) ) {
+			self::delete_user( self::$user_id );
+		}
+	}
+
+	/**
 	 * Delete our fake data after our tests run.
 	 */
 	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$post_id );
-		self::delete_user( self::$user_id );
 	}
 
 	/**
