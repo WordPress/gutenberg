@@ -37,6 +37,8 @@ describe( 'Using Plugins API', () => {
 	 * @return {void}
 	 */
 	async function annotateFirstBlock( start, end ) {
+		await clickOnMoreMenuItem( 'Annotations Sidebar' );
+
 		await page.focus( '#annotations-tests-range-start' );
 		await page.keyboard.press( 'Backspace' );
 		await page.keyboard.type( start + '' );
@@ -85,11 +87,24 @@ describe( 'Using Plugins API', () => {
 		}, htmlContent[ 0 ] );
 	}
 
+	/**
+	 * Returns the rerender count from the window counter.
+	 *
+	 * It's not quite the rerender count, but it's counting how many times
+	 * prepareEditableTree is called. We can deduct how many renders that
+	 * entails.
+	 *
+	 * @return {Promise<number>} The amount of 'rerenders' triggered.
+	 */
+	async function getRerenderCount() {
+		return await page.evaluate( () => {
+			return window.annotationsCountingRerenders;
+		} );
+	}
+
 	describe( 'Annotations', () => {
 		it( 'Allows a block to be annotated', async () => {
 			await page.keyboard.type( 'Title' + '\n' + 'Paragraph to annotate' );
-
-			await clickOnMoreMenuItem( 'Annotations Sidebar' );
 
 			let annotations = await page.$$( ANNOTATIONS_SELECTOR );
 			expect( annotations ).toHaveLength( 0 );
@@ -115,7 +130,6 @@ describe( 'Using Plugins API', () => {
 
 		it( 'Keeps the cursor in the same location when applying annotation', async () => {
 			await page.keyboard.type( 'Title' + '\n' + 'ABC' );
-			await clickOnMoreMenuItem( 'Annotations Sidebar' );
 
 			await annotateFirstBlock( 1, 2 );
 
@@ -133,7 +147,6 @@ describe( 'Using Plugins API', () => {
 
 		it( 'Moves when typing before it', async () => {
 			await page.keyboard.type( 'Title' + '\n' + 'ABC' );
-			await clickOnMoreMenuItem( 'Annotations Sidebar' );
 
 			await annotateFirstBlock( 1, 2 );
 
@@ -153,7 +166,6 @@ describe( 'Using Plugins API', () => {
 
 		it( 'Grows when typing inside it', async () => {
 			await page.keyboard.type( 'Title' + '\n' + 'ABC' );
-			await clickOnMoreMenuItem( 'Annotations Sidebar' );
 
 			await annotateFirstBlock( 1, 2 );
 
@@ -168,6 +180,48 @@ describe( 'Using Plugins API', () => {
 			await removeAnnotations();
 			const blockText = await getRichTextInnerHTML();
 			expect( blockText ).toBe( 'AB2C' );
+		} );
+
+		it( 'Should only re-render the relevant block', async () => {
+			await page.keyboard.type( 'Title' + '\n' + 'RerenderCounter' + '\n' );
+
+			const rerendersBeforeTyping = await getRerenderCount();
+
+			await page.keyboard.type( 'More' );
+
+			const rerendersAfterTyping = await getRerenderCount();
+
+			// Typing in the second block should not trigger a re-render in the first block.
+			expect( rerendersAfterTyping ).toEqual( rerendersBeforeTyping );
+		} );
+
+		const ANNOTATION_RERENDERS = 1;
+
+		it( 'Should re-render once when applying an annotation', async () => {
+			await page.keyboard.type( 'Title' + '\n' + 'RerenderCounter' + '\n' );
+
+			const rerendersBeforeAnnotating = await getRerenderCount();
+
+			await annotateFirstBlock( 0, 10 );
+
+			const rerendersAfterAnnotating = await getRerenderCount();
+
+			// Typing in the second block should not trigger a re-render in the first block.
+			expect( rerendersAfterAnnotating ).toEqual( rerendersBeforeAnnotating + ANNOTATION_RERENDERS );
+		} );
+
+		it( 'Should re-render once when removing an annotation', async () => {
+			await page.keyboard.type( 'Title' + '\n' + 'RerenderCounter' + '\n' );
+			await annotateFirstBlock( 0, 10 );
+
+			const rerendersBeforeAnnotating = await getRerenderCount();
+
+			await removeAnnotations();
+
+			const rerendersAfterAnnotating = await getRerenderCount();
+
+			// Typing in the second block should not trigger a re-render in the first block.
+			expect( rerendersAfterAnnotating ).toEqual( rerendersBeforeAnnotating + ANNOTATION_RERENDERS );
 		} );
 	} );
 } );

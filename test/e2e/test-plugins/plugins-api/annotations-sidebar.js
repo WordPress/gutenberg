@@ -15,6 +15,9 @@
 	var registerPlugin = wp.plugins.registerPlugin;
 	var PluginSidebar = wp.editPost.PluginSidebar;
 	var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+	var applyFormat = wp.richText.applyFormat;
+	var registerFormatType = wp.richText.registerFormatType;
+	var domReady = wp.domReady;
 
 	class SidebarContents extends Component {
 		constructor( props ) {
@@ -118,4 +121,38 @@
 		icon: 'text',
 		render: AnnotationsSidebar
 	} );
+
+	window.annotationsCountingRerenders = 0;
+	const props = {};
+
+	const FORMAT_NAME = 'rerender/counter';
+
+	function countRerender( formats, text ) {
+		if ( text.startsWith( 'RerenderCounter' ) ) {
+			window.annotationsCountingRerenders++;
+		}
+
+		return formats;
+	}
+
+	domReady( () => {
+		registerFormatType( FORMAT_NAME, {
+			name: FORMAT_NAME,
+			title: __( 'Rerender counter' ),
+			tagName: 'mark',
+			className: 'annotations-rerender-counter',
+			attributes: {
+				className: 'class',
+			},
+			edit: () => {
+				return null;
+			},
+			__experimentalCreatePrepareEditableTree: () => {
+				return countRerender;
+			},
+			__experimentalGetPropsForEditableTreePreparation: () => {
+				return props;
+			}
+		} );
+	} )
 } )();
