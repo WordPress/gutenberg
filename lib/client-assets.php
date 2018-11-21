@@ -1059,6 +1059,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
 	// are available in Gutenberg. Fixes
 	// https://github.com/WordPress/gutenberg/issues/5667.
+	$user_can_richedit = user_can_richedit();
 	add_filter( 'user_can_richedit', '__return_true' );
 
 	wp_enqueue_script( 'wp-edit-post' );
@@ -1300,6 +1301,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
 		'imageSizes'             => gutenberg_get_available_image_sizes(),
+		'richEditingEnabled'     => $user_can_richedit,
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,
