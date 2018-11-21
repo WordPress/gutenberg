@@ -17,6 +17,7 @@ import { BlockEdit } from '@wordpress/editor';
 type PropsType = BlockType & {
 	showTitle: boolean,
 	onChange: ( clientId: string, attributes: mixed ) => void,
+	onReplace: ( blocks: Array<Object> ) => void,
 	onInlineToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
 	insertBlocksAfter: ( blocks: Array<Object> ) => void,
@@ -47,6 +48,7 @@ export default class BlockHolder extends React.Component<PropsType> {
 				setAttributes={ ( attrs ) =>
 					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
 				}
+				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.props.insertBlocksAfter }
 				mergeBlocks={ this.props.mergeBlocks }
 				isSelected={ this.props.focused }
