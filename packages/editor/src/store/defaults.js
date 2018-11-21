@@ -19,7 +19,7 @@ export const PREFERENCES_DEFAULTS = {
  *  blockTypes         boolean|Array  Allowed block types
  *  hasFixedToolbar    boolean        Whether or not the editor toolbar is fixed
  *  focusMode          boolean        Whether the focus mode is enabled or not
- *  richEditingEnabled boolean        Whether rich editing is enabled or nots
+ *  richEditingEnabled boolean        Whether rich editing is enabled or not
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	alignWide: false,
