@@ -20,6 +20,7 @@ import { _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
+	clearSelectedBlock,
 	setupEditorState,
 	replaceBlocks,
 	selectBlock,
@@ -33,6 +34,7 @@ import {
 	getBlocks,
 	getBlockCount,
 	getPreviousBlockClientId,
+	getSelectedBlock,
 	getSelectedBlockClientId,
 	getSelectedBlockCount,
 	getTemplate,
@@ -121,6 +123,15 @@ export function selectPreviousBlock( action, store ) {
 	if ( blockClientIdToSelect !== selectedBlockClientId ) {
 		return selectBlock( blockClientIdToSelect, -1 );
 	}
+}
+
+export function maybeUpdateBlockSelection( action, store ) {
+	if ( !! getSelectedBlock( store.getState() ) ) {
+		// do nothing if block exists
+		return;
+	}
+	// otherwise, clear block selection
+	clearSelectedBlock();
 }
 
 /**
@@ -270,4 +281,6 @@ export default {
 		/* translators: %s: number of selected blocks */
 		speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
 	},
+	UNDO: maybeUpdateBlockSelection,
+	REDO: maybeUpdateBlockSelection,
 };
