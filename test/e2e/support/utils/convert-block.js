@@ -1,5 +1,5 @@
 /**
- * Convert editor's block type
+ * Convert editor's block type.
  *
  * @param {?string} name Block name
  */
