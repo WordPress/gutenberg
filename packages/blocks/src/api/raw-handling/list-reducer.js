@@ -29,7 +29,11 @@ export default function( node ) {
 		prevElement.nodeName === node.nodeName &&
 		list.children.length === 1
 	) {
-		prevElement.appendChild( list.firstChild );
+		// Move all child nodes, including any text nodes, if any.
+		while ( list.firstChild ) {
+			prevElement.appendChild( list.firstChild );
+		}
+
 		list.parentNode.removeChild( list );
 	}
 
