@@ -8,6 +8,7 @@ import {
 	setUpResponseMocking,
 	JSONResponse,
 	getEditedPostContent,
+	clickButton,
 } from '../support/utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
@@ -168,8 +169,27 @@ describe( 'Embedding content', () => {
 		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
 		await page.keyboard.press( 'Enter' );
 
-		await page.waitForSelector( '.components-placeholder.wp-block-embed > .components-placeholder__fieldset > form > p > button' );
-		await page.click( '.components-placeholder.wp-block-embed > .components-placeholder__fieldset > form > p > button' );
+		await clickButton( 'Convert to link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should allow the user to try embedding a failed URL again', async () => {
+		// URL that can't be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.press( 'Enter' );
+		// Set up a different mock to make sure that try again actually does make the request again.
+		await setUpResponseMocking(
+			[
+				{
+					match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
+					onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+				},
+			]
+		);
+		await clickButton( 'Try again' );
+		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );
 } );
