@@ -3,6 +3,7 @@
  */
 import { Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 
@@ -17,7 +18,7 @@ const MenuIcon = (
 	</SVG>
 );
 
-function BlockNavigationDropdown() {
+function BlockNavigationDropdown( { disableNavigationBlock } ) {
 	return	(
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
@@ -35,6 +36,7 @@ function BlockNavigationDropdown() {
 						label={ __( 'Block Navigation' ) }
 						className="editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
+						aria-disabled={ disableNavigationBlock }
 					/>
 				</Fragment>
 			) }
@@ -45,4 +47,6 @@ function BlockNavigationDropdown() {
 	);
 }
 
-export default BlockNavigationDropdown;
+export default withSelect( ( select ) => ( {
+	disableNavigationBlock: select( 'core/edit-post' ).getEditorMode() === 'text',
+} ) )( BlockNavigationDropdown );
