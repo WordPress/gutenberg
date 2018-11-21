@@ -57,7 +57,6 @@ class ParagraphEdit extends Component {
 		}
 
 		const { content } = attributes;
-		before = null;
 		if ( before === null ) {
 			onReplace( [] );
 		} else if ( content !== before ) {
