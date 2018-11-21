@@ -112,6 +112,20 @@ export function toggleEditorPanelOpened( panelName ) {
 }
 
 /**
+ * Returns an action object used to remove a panel from the editor.
+ *
+ * @param {string} panelName A string that identifies the panel to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeEditorPanel( panelName ) {
+	return {
+		type: 'REMOVE_PANEL',
+		panelName,
+	};
+}
+
+/**
  * Returns an action object used to toggle a feature flag.
  *
  * @param {string} feature Feature name.

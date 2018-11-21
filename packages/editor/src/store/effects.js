@@ -14,7 +14,7 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -33,7 +33,7 @@ import {
 	getBlocks,
 	getBlockCount,
 	getPreviousBlockClientId,
-	getSelectedBlock,
+	getSelectedBlockClientId,
 	getSelectedBlockCount,
 	getTemplate,
 	getTemplateLock,
@@ -104,7 +104,7 @@ export function selectPreviousBlock( action, store ) {
 
 	const firstRemovedBlockClientId = action.clientIds[ 0 ];
 	const state = store.getState();
-	const currentSelectedBlock = getSelectedBlock( state );
+	const selectedBlockClientId = getSelectedBlockClientId( state );
 
 	// recreate the state before the block was removed.
 	const previousState = { ...state, editor: { present: last( state.editor.past ) } };
@@ -118,7 +118,7 @@ export function selectPreviousBlock( action, store ) {
 
 	// Dispatch select block action if the currently selected block
 	// is not already the block we want to be selected.
-	if ( blockClientIdToSelect !== currentSelectedBlock ) {
+	if ( blockClientIdToSelect !== selectedBlockClientId ) {
 		return selectBlock( blockClientIdToSelect, -1 );
 	}
 }
@@ -267,6 +267,7 @@ export default {
 	MULTI_SELECT: ( action, { getState } ) => {
 		const blockCount = getSelectedBlockCount( getState() );
 
-		speak( sprintf( __( '%s blocks selected.' ), blockCount ), 'assertive' );
+		/* translators: %s: number of selected blocks */
+		speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
 	},
 };

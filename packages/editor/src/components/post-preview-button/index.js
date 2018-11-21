@@ -98,10 +98,6 @@ export class PostPreviewButton extends Component {
 		// unintentional forceful redirects.
 		if ( previewLink && ! prevProps.previewLink ) {
 			this.setPreviewWindowLink( previewLink );
-
-			// Once popup redirect is evaluated, even if already closed, delete
-			// reference to avoid later assignment of location in post update.
-			delete this.previewWindow;
 		}
 	}
 
@@ -151,7 +147,11 @@ export class PostPreviewButton extends Component {
 
 		// Request an autosave. This happens asynchronously and causes the component
 		// to update when finished.
-		this.props.autosave();
+		if ( this.props.isDraft ) {
+			this.props.savePost( { isPreview: true } );
+		} else {
+			this.props.autosave( { isPreview: true } );
+		}
 
 		// Display a 'Generating preview' message in the Preview tab while we wait for the
 		// autosave to finish.
@@ -191,30 +191,34 @@ export class PostPreviewButton extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { forcePreviewLink, forceIsAutosaveable } ) => {
 		const {
 			getCurrentPostId,
 			getCurrentPostAttribute,
-			getAutosaveAttribute,
 			getEditedPostAttribute,
 			isEditedPostSaveable,
 			isEditedPostAutosaveable,
+			getEditedPostPreviewLink,
 		} = select( 'core/editor' );
 		const {
 			getPostType,
 		} = select( 'core' );
+
+		const previewLink = getEditedPostPreviewLink();
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );
 		return {
 			postId: getCurrentPostId(),
 			currentPostLink: getCurrentPostAttribute( 'link' ),
-			previewLink: getAutosaveAttribute( 'preview_link' ),
+			previewLink: forcePreviewLink !== undefined ? forcePreviewLink : previewLink,
 			isSaveable: isEditedPostSaveable(),
-			isAutosaveable: isEditedPostAutosaveable(),
+			isAutosaveable: forceIsAutosaveable || isEditedPostAutosaveable(),
 			isViewable: get( postType, [ 'viewable' ], false ),
+			isDraft: [ 'draft', 'auto-draft' ].indexOf( getEditedPostAttribute( 'status' ) ) !== -1,
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		autosave: dispatch( 'core/editor' ).autosave,
+		savePost: dispatch( 'core/editor' ).savePost,
 	} ) ),
 	ifCondition( ( { isViewable } ) => isViewable ),
 ] )( PostPreviewButton );

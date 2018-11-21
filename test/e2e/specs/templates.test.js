@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	META_KEY,
 	newPost,
 	getEditedPostContent,
 	saveDraft,
@@ -49,7 +48,7 @@ describe( 'templates', () => {
 			// re-added after saving and reloading the editor.
 			await page.type( '.editor-post-title__input', 'My Empty Book' );
 			await page.keyboard.press( 'ArrowDown' );
-			await pressWithModifier( META_KEY, 'A' );
+			await pressWithModifier( 'primary', 'A' );
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();

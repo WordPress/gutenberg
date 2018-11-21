@@ -10,6 +10,7 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
+import { isEntirelySelected } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -221,7 +222,18 @@ export default class TinyMCE extends Component {
 				} );
 
 				editor.on( 'init', () => {
-					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
+					// History is handled internally by RichText.
+					//
+					// See: https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/api/UndoManager.ts
+					[ 'z', 'y' ].forEach( ( character ) => {
+						editor.shortcuts.remove( `meta+${ character }` );
+					} );
+					editor.shortcuts.remove( 'meta+shift+z' );
+
+					// Reset TinyMCE's default formatting shortcuts, since
+					// RichText supports only registered formats.
+					//
+					// See: https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
 					[ 'b', 'i', 'u' ].forEach( ( character ) => {
 						editor.shortcuts.remove( `meta+${ character }` );
 					} );
@@ -229,6 +241,7 @@ export default class TinyMCE extends Component {
 						editor.shortcuts.remove( `access+${ number }` );
 					} );
 
+					// Restore the original `setHTML` once initialized.
 					editor.dom.setHTML = setHTML;
 				} );
 
@@ -260,11 +273,13 @@ export default class TinyMCE extends Component {
 
 	onKeyDown( event ) {
 		const { keyCode } = event;
-		const { startContainer, startOffset, endContainer, endOffset } = getSelection().getRangeAt( 0 );
-		const isCollapsed = startContainer === endContainer && startOffset === endOffset;
+		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
 
 		// Disables TinyMCE behaviour.
-		if ( keyCode === ENTER || ( ! isCollapsed && ( keyCode === DELETE || keyCode === BACKSPACE ) ) ) {
+		if (
+			keyCode === ENTER ||
+			( isDelete && isEntirelySelected( this.editorNode ) )
+		) {
 			event.preventDefault();
 			// For some reason this is needed to also prevent the insertion of
 			// line breaks.
@@ -324,7 +339,7 @@ export default class TinyMCE extends Component {
 			onPaste,
 			onInput,
 			onKeyDown,
-			onKeyUp,
+			onCompositionEnd,
 		} = this.props;
 
 		/*
@@ -353,7 +368,7 @@ export default class TinyMCE extends Component {
 			onInput,
 			onFocus: this.onFocus,
 			onKeyDown,
-			onKeyUp,
+			onCompositionEnd,
 		} );
 	}
 }

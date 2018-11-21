@@ -31,6 +31,11 @@ $blocks-button__line-height: $big-font-size + 6px;
 		opacity: 0.8;
 	}
 
+	// Polish the empty placeholder text for the button in variation previews.
+	.editor-rich-text__tinymce[data-is-placeholder-visible="true"] {
+		height: auto;
+	}
+
 	// Don't let the placeholder text wrap in the variation preview.
 	.editor-block-preview__content & {
 		max-width: 100%;

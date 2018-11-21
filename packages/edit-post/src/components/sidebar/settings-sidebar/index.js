@@ -17,6 +17,7 @@ import LastRevision from '../last-revision';
 import PostTaxonomies from '../post-taxonomies';
 import FeaturedImage from '../featured-image';
 import PostExcerpt from '../post-excerpt';
+import PostLink from '../post-link';
 import DiscussionPanel from '../discussion-panel';
 import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
@@ -32,6 +33,7 @@ const SettingsSidebar = ( { sidebarName } ) => (
 				<Fragment>
 					<PostStatus />
 					<LastRevision />
+					<PostLink />
 					<PostTaxonomies />
 					<FeaturedImage />
 					<PostExcerpt />

@@ -7,7 +7,9 @@
 
 	// Apply a min-width, or the embed can collapse when floated.
 	// Instagram widgets have a min-width of 326px, so go a bit beyond that.
-	min-width: 360px;
+	@include break-small() {
+		min-width: 360px;
+	}
 
 	&.is-loading {
 		display: flex;
