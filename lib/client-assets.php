@@ -1211,8 +1211,8 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		),
 	);
 
+	// Set a locale specific default font.
 	/*
-	 * Set a locale specific default font.
 	 * Translators: Use this to specify the CSS font family for the default font
 	 */
 	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
