@@ -34,7 +34,6 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 	render() {
 		return (
 			<Modal
-				animationType="slide"
 				transparent={ true }
 				isVisible={ true }
 				onSwipe={ this.props.onDismiss.bind( this ) }
