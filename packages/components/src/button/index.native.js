@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+
+const isAndroid = Platform.OS == 'android';
+const marginLeft = isAndroid ? -3 : -4;
+const marginBottom = isAndroid ? -0.5 : 0;
 
 const styles = StyleSheet.create( {
 	container: {
@@ -33,14 +37,16 @@ const styles = StyleSheet.create( {
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft: -4,
+		marginLeft: marginLeft,
+		marginBottom: marginBottom
 	},
 	subscriptActive: {
 		color: 'white',
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft: -4,
+		marginLeft: marginLeft,
+		marginBottom: marginBottom
 	},
 } );
 
