@@ -12,6 +12,17 @@ import { addFilter } from '@wordpress/hooks';
 import { compose } from '@wordpress/compose';
 
 /**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
+/**
  * Registers a new format provided a unique name and an object defining its
  * behavior.
  *
@@ -120,8 +131,7 @@ export function registerFormatType( name, settings ) {
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
-	const emptyArray = [];
-	const getFunctionStackMemoized = memize( ( previousStack = emptyArray, newFunction ) => {
+	const getFunctionStackMemoized = memize( ( previousStack = EMPTY_ARRAY, newFunction ) => {
 		return [
 			...previousStack,
 			newFunction,
