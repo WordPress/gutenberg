@@ -11,6 +11,12 @@ describe( 'listReducer', () => {
 		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( output );
 	} );
 
+	it( 'should merge lists with whitespace', () => {
+		const input = '<ul>\n<li>one</li>\n</ul>\n<ul>\n<li>two</li>\n</ul>';
+		const output = '<ul>\n<li>one</li>\n\n<li>two</li>\n</ul>\n';
+		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( output );
+	} );
+
 	it( 'should not merge lists if it has more than one item', () => {
 		const input = '<ul><li>one</li></ul><ul><li>two</li><li>three</li></ul>';
 		expect( deepFilterHTML( input, [ listReducer ] ) ).toEqual( input );
