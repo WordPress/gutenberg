@@ -119,7 +119,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	}
 
 	$class = 'wp-block-latest-comments';
-	if ( $attributes['align'] ) {
+	if ( isset( $attributes['align'] ) ) {
 		$class .= " align{$attributes['align']}";
 	}
 	if ( $attributes['displayAvatar'] ) {
