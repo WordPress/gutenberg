@@ -33,8 +33,6 @@ class AppContainer extends React.Component<PropsType> {
 		super( props );
 
 		this.parseBlocksAction( props.initialHtml );
-
-		this.lastHtml = props.initialHtml;
 	}
 
 	onChange = ( clientId, attributes ) => {
@@ -66,6 +64,7 @@ class AppContainer extends React.Component<PropsType> {
 	parseBlocksAction = ( html = '' ) => {
 		const parsed = parse( html );
 		this.props.onResetBlocks( parsed );
+		this.lastHtml = serialize( parsed );
 	};
 
 	serializeToNativeAction = () => {
