@@ -18,7 +18,6 @@ import { IconClass } from './icon-class';
 
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
-
 		return (
 			this.props.icon !== nextProps.icon ||
 			this.props.size !== nextProps.size ||
@@ -899,7 +898,7 @@ export default class Dashicon extends Component {
 			return null;
 		}
 
-		const iconClass = IconClass(this.props);
+		const iconClass = IconClass( this.props );
 
 		return (
 			<SVG

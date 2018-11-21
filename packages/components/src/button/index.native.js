@@ -47,7 +47,6 @@ const styles = StyleSheet.create( {
 export default function Button( props ) {
 	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;
 
-
 	return (
 		<TouchableOpacity
 			accessible={ true }
