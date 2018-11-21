@@ -6,13 +6,17 @@
         },
         "innerBlocks": [],
         "innerHTML": "\n<div class=\"wp-block-button aligncenter\"><a class=\"wp-block-button__link\" href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n",
-        "innerContent": [ "\n<div class=\"wp-block-button aligncenter\"><a class=\"wp-block-button__link\" href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n" ]
+        "innerContent": [
+            "\n<div class=\"wp-block-button aligncenter\"><a class=\"wp-block-button__link\" href=\"https://github.com/WordPress/gutenberg\">Help build Gutenberg</a></div>\n"
+        ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "\n",
-        "innerContent": [ "\n" ]
+        "innerContent": [
+            "\n"
+        ]
     }
 ]

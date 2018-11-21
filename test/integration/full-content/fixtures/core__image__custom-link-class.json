@@ -8,8 +8,8 @@
             "alt": "",
             "caption": "",
             "href": "https://wordpress.org/",
-			"linkDestination": "custom",
-			"linkClass": "custom-link"
+            "linkClass": "custom-link",
+            "linkDestination": "custom"
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></a></figure>"

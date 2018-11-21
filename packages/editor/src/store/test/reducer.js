@@ -1943,6 +1943,7 @@ describe( 'state', () => {
 				requesting: true,
 				successful: false,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1954,6 +1955,7 @@ describe( 'state', () => {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1972,6 +1974,7 @@ describe( 'state', () => {
 					code: 'pretend_error',
 					message: 'update failed',
 				},
+				options: {},
 			} );
 		} );
 	} );
@@ -2419,7 +2422,6 @@ describe( 'state', () => {
 						raw: 'The Excerpt',
 					},
 					status: 'draft',
-					preview_link: 'https://wordpress.org/?p=1&preview=true',
 				},
 			} );
 
@@ -2427,7 +2429,6 @@ describe( 'state', () => {
 				title: 'The Title',
 				content: 'The Content',
 				excerpt: 'The Excerpt',
-				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
 		} );
 	} );
