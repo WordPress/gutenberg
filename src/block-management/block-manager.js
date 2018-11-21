@@ -378,7 +378,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					}
 					mergeBlocks={ this.mergeBlocks }
 					onReplace={ ( blocks ) =>
-						this.onReplace.bind( this )( value.item.clientId, blocks )
+						this.onReplace( value.item.clientId, blocks )
 					}
 					{ ...value.item }
 				/>
