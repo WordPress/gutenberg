@@ -103,12 +103,12 @@ export class Inputs extends Component {
 		} else if ( this.state.view === 'rgb' ) {
 			this.setState( { view: 'hsl' } );
 
-			speak( __( 'Hue/saturation/lightness mode active' ) );
+			speak( __( 'HSL mode active' ) );
 		} else if ( this.state.view === 'hsl' ) {
 			if ( this.props.hsl.a === 1 ) {
 				this.setState( { view: 'hex' } );
 
-				speak( __( 'Hex color mode active' ) );
+				speak( __( 'HEX color mode active' ) );
 			} else {
 				this.setState( { view: 'rgb' } );
 
@@ -162,7 +162,7 @@ export class Inputs extends Component {
 			return (
 				<div className="components-color-picker__inputs-fields">
 					<Input
-						label={ __( 'Color value in hexadecimal' ) }
+						label={ __( 'Color value in HEX' ) }
 						valueKey="hex"
 						value={ this.props.hex }
 						onChange={ this.handleChange }
