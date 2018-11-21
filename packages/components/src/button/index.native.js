@@ -4,13 +4,13 @@
 import { StyleSheet, TouchableOpacity, Text, View } from 'react-native';
 
 const styles = StyleSheet.create( {
-    container: {
+	container: {
 		flex: 1,
 		padding: 3,
 		justifyContent: 'center',
 		alignItems: 'center',
-    },
-    buttonInactive: {
+	},
+	buttonInactive: {
 		flex: 1,
 		flexDirection: 'row',
 		justifyContent: 'center',
@@ -29,17 +29,24 @@ const styles = StyleSheet.create( {
 		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
-		fontVariant: [ 'small-caps' ],
 		color: '#87a6bc',
+		fontWeight: 'bold',
+		fontSize: 13,
+		alignSelf: 'flex-end',
+		marginLeft: -4,
 	},
 	subscriptActive: {
-		fontVariant: [ 'small-caps' ],
 		color: 'white',
+		fontWeight: 'bold',
+		fontSize: 13,
+		alignSelf: 'flex-end',
+		marginLeft: -4,
 	},
 } );
 
 export default function Button( props ) {
 	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;
+
 
 	return (
 		<TouchableOpacity
@@ -49,8 +56,10 @@ export default function Button( props ) {
 			style={ styles.container }
 		>
 			<View style={ ariaPressed ? styles.buttonActive : styles.buttonInactive }>
-				{ children }
-				{ subscript && ( <Text style={ ariaPressed ? styles.subscriptActive : styles.subscriptInactive }>{ subscript }</Text> ) }
+				<View style={ { flexDirection: 'row' } }>
+					{ children }
+					{ subscript && ( <Text style={ ariaPressed ? styles.subscriptActive : styles.subscriptInactive }>{ subscript }</Text> ) }
+				</View>
 			</View>
 		</TouchableOpacity>
 	);
