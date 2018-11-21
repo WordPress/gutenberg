@@ -39,8 +39,6 @@ export default class ClassicEdit extends Component {
 
 		if ( document.readyState === 'complete' ) {
 			this.initialize();
-		} else {
-			window.addEventListener( 'DOMContentLoaded', this.initialize );
 		}
 	}
 
@@ -62,6 +60,12 @@ export default class ClassicEdit extends Component {
 	initialize() {
 		const { clientId } = this.props;
 		const { settings } = window.wpEditorL10n.tinymce;
+
+		// Prevent multiple inits on the same classic block
+		if ( this.editor && this.editor.initialized ) {
+			return;
+		}
+
 		wp.oldEditor.initialize( `editor-${ clientId }`, {
 			tinymce: {
 				...settings,
@@ -182,6 +186,10 @@ export default class ClassicEdit extends Component {
 				key="editor"
 				id={ `editor-${ clientId }` }
 				className="wp-block-freeform block-library-rich-text__tinymce"
+				contentEditable="true"
+				// Is there a better way to do this? Add an XSS package?
+				dangerouslySetInnerHTML={ { __html: this.props.attributes.content } }
+				onFocus={ this.initialize }
 			/>,
 		];
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
