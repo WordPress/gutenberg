@@ -3,6 +3,11 @@
  */
 import { waitForPageDimensions } from './wait-for-page-dimensions';
 
+/**
+ * Set browser viewport to specified type.
+ *
+ * @param {string} type String to represent dimensions type; can be either small or large.
+ */
 export async function setViewport( type ) {
 	const allowedDimensions = {
 		large: { width: 960, height: 700 },
