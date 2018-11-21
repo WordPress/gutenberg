@@ -8,7 +8,7 @@ You can rebuild those files at any time by running
 yarn bundle
 ```
 
-This is useful in case you want to test some changes in the apps before pushing a new version.
+This is useful in case you want to use an unreleased version of the bundle in the apps. For instance, on a PR that's a work in progress, you might want to include to a specific gutenberg-mobile branch in the apps with an updated bundle so reviewers can see the latest changes before approving them (and releasing a new version).
 
 The recommended method is that you bump the version when you do that. To publish a new version of gutenberg-mobile you just need to run:
 
