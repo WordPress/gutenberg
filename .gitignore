@@ -31,7 +31,6 @@ yarn-error.log*
 *.class
 
 # generated files
-bin/
 gen/
 build/
 build.log
