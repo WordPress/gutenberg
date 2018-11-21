@@ -27,14 +27,12 @@ type PropsType = {
 };
 
 class AppContainer extends React.Component<PropsType> {
-	lastHtmlSent: ?string
+	lastHtml: ?string
 
 	constructor( props: PropsType ) {
 		super( props );
 
 		this.parseBlocksAction( props.initialHtml );
-
-		this.lastHtmlSent = null;
 	}
 
 	onChange = ( clientId, attributes ) => {
@@ -66,12 +64,13 @@ class AppContainer extends React.Component<PropsType> {
 	parseBlocksAction = ( html = '' ) => {
 		const parsed = parse( html );
 		this.props.onResetBlocks( parsed );
+		this.lastHtml = serialize( parsed );
 	};
 
 	serializeToNativeAction = () => {
 		const html = serialize( this.props.blocks );
-		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.lastHtmlSent !== html );
-		this.lastHtmlSent = html;
+		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.lastHtml !== html );
+		this.lastHtml = html;
 	};
 
 	mergeBlocksAction = ( blockOneClientId, blockTwoClientId ) => {
