@@ -138,6 +138,6 @@
 }
 
 // This selector re-enables clicking on any child of a column block.
-:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit .editor-block-list__layout > * {
+:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit > * {
 	pointer-events: all;
 }
