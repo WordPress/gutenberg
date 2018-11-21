@@ -184,6 +184,7 @@ return array(
 	'wp-is-shallow-equal'                   => array(),
 	'wp-keycodes'                           => array(
 		'lodash',
+		'wp-i18n',
 	),
 	'wp-list-reusable-blocks'               => array(
 		'lodash',

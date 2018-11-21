@@ -320,7 +320,7 @@ describe( 'effects', () => {
 			const previousPost = getPublishedPost();
 			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
 
-			handler( { post, previousPost, isAutosave: true } );
+			handler( { post, previousPost, options: { isAutosave: true } } );
 
 			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).not.toHaveBeenCalled();
 		} );
