@@ -84,7 +84,13 @@
 	}
 
 	&.components-placeholder {
-		height: inherit;
+		// use opacity to work in various editor styles
+		background: $dark-opacity-light-200;
+		min-height: 200px;
+
+		.is-dark-theme & {
+			background: $light-opacity-light-200;
+		}
 	}
 
 	// Apply max-width to floated items that have no intrinsic width
