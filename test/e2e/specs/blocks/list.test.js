@@ -194,4 +194,13 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should be immeadiately saved on indentation', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await pressWithModifier( 'primary', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
