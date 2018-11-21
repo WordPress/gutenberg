@@ -21,6 +21,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
+		"@wordpress/i18n": "file:../i18n",
 		"lodash": "^4.17.10"
 	},
 	"publishConfig": {
