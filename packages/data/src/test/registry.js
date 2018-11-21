@@ -444,12 +444,12 @@ describe( 'createRegistry', () => {
 
 		it( 'passes through optional context to getSelectors', () => {
 			const getSelectors = jest.fn();
-			const genericStore = {
+			const customStore = {
 				getSelectors,
 				getActions: () => {},
 				subscribe: () => {},
 			};
-			registry.registerGenericStore( 'store1', genericStore );
+			registry.registerGenericStore( 'store1', customStore );
 
 			const component = { displayName: 'MyComponent' };
 			registry.select( 'store1', { component } );

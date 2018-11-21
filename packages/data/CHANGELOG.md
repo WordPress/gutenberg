@@ -1,3 +1,10 @@
+## 4.1.0 (Unreleased)
+
+### New Features
+
+- `registerGenericStore` `getSelectors()` now takes an optional `context` object.
+- `withSelect` now provides a `context` of `{ component: this }` to `getSelectors()`.
+
 ## 4.0.1 (2018-11-20)
 
 ## 4.0.0 (2018-11-15)

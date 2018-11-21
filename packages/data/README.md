@@ -259,6 +259,9 @@ const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
 
 In the above example, when `HammerPriceDisplay` is rendered into an application, it will pass the price into the underlying `PriceDisplay` component and update automatically if the price of a hammer ever changes in the store.
 
+As a more advanced feature, the `withSelect` component will also automatically set a context of `{ component: this }` whenever the `select()` function is called from within `mapSelectToProps()`. This allows store selectors to know which component is selecting data. Such information is useful for knowing which data is required from a store at a given time by the application using it. Note that this requires the use of `registry.registerGenericStore()` to gain the use of this benefit.
+
+
 #### `withDispatch( mapDispatchToProps: Function ): Function`
 
 Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch) and the props passed to the original component.
@@ -292,7 +295,7 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 
 The `@wordpress/data` module offers a more advanced and generic interface for the purposes of integrating other data systems and situations where more direct control over a data system is needed. In this case, a data store will need to be implemented outside of `@wordpress/data` and then plugged in via three functions:
 
-- `getSelectors()`: Returns an object of selector functions, pre-mapped to the store.
+- `getSelectors( context: Object )`: Returns an object of selector functions, pre-mapped to the store. Takes an optional `context` object (See `withSelect` above for application of this feature.)
 - `getActions()`: Returns an object of action functions, pre-mapped to the store.
 - `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
    - Behaves as Redux [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
@@ -344,12 +347,20 @@ _Example:_
 function createCustomStore() {
 	let storeChanged = () => {};
 	const prices = { hammer: 7.50 };
+	const componentResources = new Map();
 
-	const selectors = {
-		getPrice( itemName ): {
-			return prices[ itemName ];
-		},
-	};
+	const selectorsForComponent = ( component ) => {
+		// Track which data is used by which component with this method.
+		componentResources.set( component, [] );
+		return {
+			getPrice( itemName ): {
+				const resources = [ ...componentResources.get( component ), itemName ];
+				componentResources.set( component, resources );
+
+				return prices[ itemName ];
+			},
+		};
+	}
 
 	const actions = {
 		setPrice( itemName, price ): {
@@ -359,8 +370,9 @@ function createCustomStore() {
 	};
 
 	return {
-		getSelectors() {
-			return selectors;
+		getSelectors( context ) {
+			const { component } = context || {};
+			return selectorsForComponent( component );
 		},
 		getActions() {
 			return actions;
@@ -374,6 +386,7 @@ function createCustomStore() {
 registry.registerGenericStore( 'custom-data', createCustomStore() );
 ```
 
+Note in the above example the handling of the optional `context` argument to `getSelectors()`. When using `withSelect`, this provides information about which component is requesting which data from the store. The benefit of this is the ability to keep track of which data is still currently needed by currently mounted components and which data is no longer needed.
 
 ## Comparison with Redux
 

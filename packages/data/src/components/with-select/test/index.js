@@ -67,13 +67,13 @@ describe( 'withSelect', () => {
 	it( 'passes through the component context to the registry store', () => {
 		const getSelectors = jest.fn();
 
-		const genericStore = {
+		const customStore = {
 			getSelectors,
 			getActions: () => {},
 			subscribe: () => {},
 		};
 
-		registry.registerGenericStore( 'store1', genericStore );
+		registry.registerGenericStore( 'store1', customStore );
 
 		function mapSelectToProps( select ) {
 			select( 'store1' );
