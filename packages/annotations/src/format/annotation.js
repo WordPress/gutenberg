@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import memize from 'memize';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -115,6 +120,40 @@ function updateAnnotationsWithPositions( annotations, positions, { removeAnnotat
 	} );
 }
 
+/**
+ * Create prepareEditableTree memoized based on the annotation props.
+ *
+ * @param {Object} The props with annotations in them.
+ *
+ * @return {Function} The prepareEditableTree.
+ */
+const createPrepareEditableTree = memize( ( props ) => {
+	const { annotations } = props;
+
+	return ( formats, text ) => {
+		if ( annotations.length === 0 ) {
+			return formats;
+		}
+
+		let record = { formats, text };
+		record = applyAnnotations( record, annotations );
+		return record.formats;
+	};
+} );
+
+/**
+ * Returns the annotations as a props object. Memoized to prevent re-renders.
+ *
+ * @param {Array} The annotations to put in the object.
+ *
+ * @return {Object} The annotations props object.
+ */
+const getAnnotationObject = memize( ( annotations ) => {
+	return {
+		annotations,
+	};
+} );
+
 export const annotation = {
 	name: FORMAT_NAME,
 	title: __( 'Annotation' ),
@@ -128,21 +167,9 @@ export const annotation = {
 		return null;
 	},
 	__experimentalGetPropsForEditableTreePreparation( select, { richTextIdentifier, blockClientId } ) {
-		return {
-			annotations: select( STORE_KEY ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier ),
-		};
+		return getAnnotationObject( select( STORE_KEY ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier ) );
 	},
-	__experimentalCreatePrepareEditableTree( { annotations } ) {
-		return ( formats, text ) => {
-			if ( annotations.length === 0 ) {
-				return formats;
-			}
-
-			let record = { formats, text };
-			record = applyAnnotations( record, annotations );
-			return record.formats;
-		};
-	},
+	__experimentalCreatePrepareEditableTree: createPrepareEditableTree,
 	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
 		return {
 			removeAnnotation: dispatch( STORE_KEY ).__experimentalRemoveAnnotation,

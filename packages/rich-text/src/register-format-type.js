@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { mapKeys } from 'lodash';
+import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -119,6 +120,14 @@ export function registerFormatType( name, settings ) {
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
+	const emptyArray = [];
+	const getFunctionStackMemoized = memize( ( previousStack = emptyArray, newFunction ) => {
+		return [
+			...previousStack,
+			newFunction,
+		];
+	} );
+
 	if (
 		settings.__experimentalGetPropsForEditableTreePreparation
 	) {
@@ -133,13 +142,13 @@ export function registerFormatType( name, settings ) {
 					const additionalProps = {};
 
 					if ( settings.__experimentalCreatePrepareEditableTree ) {
-						additionalProps.prepareEditableTree = [
-							...( props.prepareEditableTree || [] ),
+						additionalProps.prepareEditableTree = getFunctionStackMemoized(
+							props.prepareEditableTree,
 							settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], {
 								richTextIdentifier: props.identifier,
 								blockClientId: props.clientId,
-							} ),
-						];
+							} )
+						);
 					}
 
 					if ( settings.__experimentalCreateOnChangeEditableValue ) {
@@ -155,16 +164,16 @@ export function registerFormatType( name, settings ) {
 							return accumulator;
 						}, {} );
 
-						additionalProps.onChangeEditableValue = [
-							...( props.onChangeEditableValue || [] ),
+						additionalProps.onChangeEditableValue = getFunctionStackMemoized(
+							props.onChangeEditableValue,
 							settings.__experimentalCreateOnChangeEditableValue( {
 								...props[ `format_${ name }` ],
 								...dispatchProps,
 							}, {
 								richTextIdentifier: props.identifier,
 								blockClientId: props.clientId,
-							} ),
-						];
+							} )
+						);
 					}
 
 					return <OriginalComponent

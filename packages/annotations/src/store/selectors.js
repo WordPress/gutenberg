@@ -4,6 +4,8 @@
 import createSelector from 'rememo';
 import { get, flatMap } from 'lodash';
 
+const emptyArray = [];
+
 /**
  * Returns the annotations for a specific client ID.
  *
@@ -19,7 +21,7 @@ export const __experimentalGetAnnotationsForBlock = createSelector(
 		} );
 	},
 	( state, blockClientId ) => [
-		get( state, blockClientId, [] ),
+		get( state, blockClientId, emptyArray ),
 	]
 );
 
@@ -54,7 +56,7 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 		} );
 	},
 	( state, blockClientId ) => [
-		get( state, blockClientId, [] ),
+		get( state, blockClientId, emptyArray ),
 	]
 );
 
