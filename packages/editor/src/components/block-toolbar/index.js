@@ -34,9 +34,9 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 					<BlockSwitcher clientIds={ blockClientIds } />
 					<BlockControls.Slot />
 					<BlockFormatControls.Slot />
-					<BlockSettingsMenu clientIds={ blockClientIds } />
 				</Fragment>
 			) }
+			{ isValid && ( <BlockSettingsMenu clientIds={ blockClientIds } /> ) }
 		</div>
 	);
 }
