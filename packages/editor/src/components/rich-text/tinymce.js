@@ -101,7 +101,7 @@ const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
 /**
  * Whether or not the user agent is Internet Explorer.
  *
- * @type {RegExp}
+ * @type {boolean}
  */
 const IS_IE = userAgent.indexOf( 'Trident' ) >= 0;
 
