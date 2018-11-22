@@ -202,6 +202,8 @@ export default class TinyMCE extends Component {
 			settings.plugins.push( 'lists' );
 		}
 
+		const hadFocus = document.activeElement === this.editorNode;
+
 		tinymce.init( {
 			...settings,
 			target: this.editorNode,
@@ -243,6 +245,14 @@ export default class TinyMCE extends Component {
 
 					// Restore the original `setHTML` once initialized.
 					editor.dom.setHTML = setHTML;
+
+					const hasFocus = document.activeElement === this.editorNode;
+
+					// In IE11, focus is lost after initialising TinyMCE, so we
+					// have to set it back.
+					if ( hadFocus && ! hasFocus ) {
+						this.editorNode.focus();
+					}
 				} );
 
 				editor.on( 'keydown', this.onKeyDown, true );
