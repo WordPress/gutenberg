@@ -853,7 +853,10 @@ export function hasSelectedBlock( state ) {
  */
 export function getSelectedBlockClientId( state ) {
 	const { start, end } = state.blockSelection;
-	return start === end && start ? start : null;
+	// We need to check the block exists because the current state.blockSelection reducer
+	// doesn't take into account the UNDO / REDO actions to update selection.
+	// To be removed when that's fixed.
+	return start && start === end && !! state.editor.present.blocks.byClientId[ start ] ? start : null;
 }
 
 /**
