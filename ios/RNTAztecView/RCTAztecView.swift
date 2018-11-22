@@ -7,7 +7,7 @@ class RCTAztecView: Aztec.TextView {
     @objc var onChange: RCTBubblingEventBlock? = nil
     @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
-
+    @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
     
     private var previousContentSize: CGSize = .zero
@@ -205,6 +205,14 @@ class RCTAztecView: Aztec.TextView {
         })
         onActiveFormatsChange(["formats": formats])
     }
+
+    func propagateSelectionChanges() {
+        guard let onSelectionChange = onSelectionChange else {
+            return
+        }
+        let caretData = packCaretDataForRN()
+        onSelectionChange(caretData)
+    }
 }
 
 // MARK: UITextView Delegate Methods
@@ -212,6 +220,7 @@ extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
         propagateFormatChanges()
+        propagateSelectionChanges()
     }
 
     func textViewDidChange(_ textView: UITextView) {
