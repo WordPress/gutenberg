@@ -21,6 +21,7 @@ import Dashicon from '../dashicon';
 class IconButton extends Component {
 	render() {
 		const { icon, children, label, className, tooltip, shortcut, labelPosition, ...additionalProps } = this.props;
+		const { 'aria-pressed': ariaPressed } = this.props;
 		const classes = classnames( 'components-icon-button', className );
 		const tooltipText = tooltip || label;
 
@@ -42,7 +43,7 @@ class IconButton extends Component {
 
 		let element = (
 			<Button aria-label={ label } { ...additionalProps } className={ classes }>
-				{ isString( icon ) ? <Dashicon icon={ icon } /> : icon }
+				{ isString( icon ) ? <Dashicon icon={ icon } ariaPressed={ ariaPressed } /> : icon }
 				{ children }
 			</Button>
 		);
