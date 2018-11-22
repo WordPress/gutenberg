@@ -243,6 +243,15 @@ export default class TinyMCE extends Component {
 
 					// Restore the original `setHTML` once initialized.
 					editor.dom.setHTML = setHTML;
+
+					// In IE11, focus is lost to parent after initialising
+					// TinyMCE, so we have to set it back.
+					if (
+						document.activeElement !== this.editorNode &&
+						document.activeElement.contains( this.editorNode )
+					) {
+						this.editorNode.focus();
+					}
 				} );
 
 				editor.on( 'keydown', this.onKeyDown, true );
