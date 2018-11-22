@@ -26,18 +26,15 @@ describe( 'recordToDom', () => {
 		multilineTag,
 		multilineWrapperTags,
 		record,
-		startPath,
-		endPath,
 	} ) => {
 		it( description, () => {
 			const { body, selection } = toDom( {
 				value: record,
 				multilineTag,
 				multilineWrapperTags,
-				createLinePadding: ( doc ) => doc.createElement( 'br' ),
 			} );
 			expect( body ).toMatchSnapshot();
-			expect( selection ).toEqual( { startPath, endPath } );
+			expect( selection ).toMatchSnapshot();
 		} );
 	} );
 } );

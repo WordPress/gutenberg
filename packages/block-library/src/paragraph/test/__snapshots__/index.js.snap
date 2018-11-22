@@ -21,9 +21,7 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
             data-is-placeholder-visible="true"
             role="textbox"
           >
-            <br
-              data-mce-bogus="1"
-            />
+            ﻿﻿
           </p>
           <p
             class="editor-rich-text__tinymce wp-block-paragraph"

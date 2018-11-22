@@ -23,9 +23,7 @@ exports[`core/quote block edit matches snapshot 1`] = `
             role="textbox"
           >
             <p>
-              <br
-                data-mce-bogus="1"
-              />
+              ﻿﻿
             </p>
           </div>
           <div

@@ -20,9 +20,7 @@ exports[`core/list block edit matches snapshot 1`] = `
           role="textbox"
         >
           <li>
-            <br
-              data-mce-bogus="1"
-            />
+            ﻿﻿
           </li>
         </ul>
         <ul
