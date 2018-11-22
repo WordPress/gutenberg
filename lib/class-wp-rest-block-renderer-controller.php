@@ -59,6 +59,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 								'type'                 => 'object',
 								'additionalProperties' => false,
 								'properties'           => $block_type->get_attributes(),
+								'default'              => array(),
 							),
 							'post_id'    => array(
 								'description' => __( 'ID of the post context.', 'gutenberg' ),
@@ -91,7 +92,7 @@ class WP_REST_Block_Renderer_Controller extends WP_REST_Controller {
 			if ( ! $post || ! current_user_can( 'edit_post', $post->ID ) ) {
 				return new WP_Error(
 					'gutenberg_block_cannot_read',
-					__( 'Sorry, you are not allowed to read Gutenberg blocks of this post', 'gutenberg' ),
+					__( 'Sorry, you are not allowed to read Gutenberg blocks of this post.', 'gutenberg' ),
 					array(
 						'status' => rest_authorization_required_code(),
 					)

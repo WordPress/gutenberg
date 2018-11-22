@@ -21,8 +21,12 @@ import {
  */
 import FullscreenModeClose from '../fullscreen-mode-close';
 
-function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
-	const toolbarAriaLabel = hasFixedToolbar ? __( 'Document and block tools' ) : __( 'Document tools' );
+function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter } ) {
+	const toolbarAriaLabel = hasFixedToolbar ?
+		/* translators: accessibility text for the editor toolbar when Top Toolbar is on */
+		__( 'Document and block tools' ) :
+		/* translators: accessibility text for the editor toolbar when Top Toolbar is off */
+		__( 'Document tools' );
 
 	return (
 		<NavigableToolbar
@@ -31,7 +35,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
 		>
 			<FullscreenModeClose />
 			<div>
-				<Inserter disabled={ mode !== 'visual' } position="bottom right" />
+				<Inserter disabled={ ! showInserter } position="bottom right" />
 				<DotTip tipId="core/editor.inserter">
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>
@@ -52,7 +56,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, mode } ) {
 export default compose( [
 	withSelect( ( select ) => ( {
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
-		mode: select( 'core/edit-post' ).getEditorMode(),
+		showInserter: select( 'core/edit-post' ).getEditorMode() === 'visual' && select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 	} ) ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 ] )( HeaderToolbar );

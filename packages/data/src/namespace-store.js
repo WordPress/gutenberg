@@ -24,34 +24,14 @@ import createResolversCacheMiddleware from './resolvers-cache-middleware';
  * @return {Object} Store Object.
  */
 export default function createNamespace( key, options, registry ) {
-	// TODO: After register[Reducer|Actions|Selectors|Resolvers] are deprecated and removed,
-	//       this function can be greatly simplified because it should no longer be called to modify
-	//       a namespace, but only to create one, and only once for each namespace.
+	const reducer = options.reducer;
+	const store = createReduxStore( reducer, key, registry );
 
-	// TODO: After removing `registry.namespaces`and making stores immutable after create,
-	//       reducer, store, actinos, selectors, and resolvers can all be removed from here.
-	let {
-		reducer,
-		store,
-		actions,
-		selectors,
-		resolvers,
-	} = registry.namespaces[ key ] || {};
-
-	if ( options.reducer ) {
-		reducer = options.reducer;
-		store = createReduxStore( reducer, key, registry );
-	}
+	let selectors, actions, resolvers;
 	if ( options.actions ) {
-		if ( ! store ) {
-			throw new TypeError( 'Cannot specify actions when no reducer is present' );
-		}
 		actions = mapActions( options.actions, store );
 	}
 	if ( options.selectors ) {
-		if ( ! store ) {
-			throw new TypeError( 'Cannot specify selectors when no reducer is present' );
-		}
 		selectors = mapSelectors( options.selectors, store );
 	}
 	if ( options.resolvers ) {
@@ -79,6 +59,8 @@ export default function createNamespace( key, options, registry ) {
 		} );
 	};
 
+	// This can be simplified to just { subscribe, getSelectors, getActions }
+	// Once we remove the use function.
 	return {
 		reducer,
 		store,

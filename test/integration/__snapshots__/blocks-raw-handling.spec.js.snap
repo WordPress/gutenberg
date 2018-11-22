@@ -29,7 +29,28 @@ exports[`Blocks raw handling rawHandler should convert HTML post to blocks with 
 <h3>Shortcode</h3>
 <!-- /wp:heading -->
 
-<!-- wp:gallery {\\"columns\\":3,\\"linkTo\\":\\"attachment\\"} -->
+<!-- wp:gallery {\\"ids\\":[1],\\"columns\\":3,\\"linkTo\\":\\"attachment\\"} -->
 <ul class=\\"wp-block-gallery columns-3 is-cropped\\"><li class=\\"blocks-gallery-item\\"><figure><img data-id=\\"1\\" class=\\"wp-image-1\\"/></figure></li></ul>
-<!-- /wp:gallery -->"
+<!-- /wp:gallery -->
+
+<!-- wp:html -->
+<dl>
+	<dt>Term</dt>
+	<dd>
+		Description.
+	</dd>
+</dl>
+<!-- /wp:html -->
+
+<!-- wp:list {\\"ordered\\":true} -->
+<ol><li>Item</li></ol>
+<!-- /wp:list -->
+
+<!-- wp:quote -->
+<blockquote class=\\"wp-block-quote\\"><p>Text.</p></blockquote>
+<!-- /wp:quote -->
+
+<!-- wp:html -->
+<blockquote><h1>Heading</h1><p>Text.</p></blockquote>
+<!-- /wp:html -->"
 `;

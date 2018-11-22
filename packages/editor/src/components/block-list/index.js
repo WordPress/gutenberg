@@ -22,6 +22,7 @@ import { compose } from '@wordpress/compose';
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
+import { getBlockDOMNode } from '../../utils/dom';
 
 class BlockList extends Component {
 	constructor( props ) {
@@ -78,8 +79,15 @@ class BlockList extends Component {
 			this.props.onStartMultiSelect();
 		}
 
-		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
-		const y = clientY - boundaries.top;
+		const blockContentBoundaries = getBlockDOMNode( this.selectionAtStart ).getBoundingClientRect();
+
+		// prevent multi-selection from triggering when the selected block is a float
+		// and the cursor is still between the top and the bottom of the block.
+		if ( clientY >= blockContentBoundaries.top && clientY <= blockContentBoundaries.bottom ) {
+			return;
+		}
+
+		const y = clientY - blockContentBoundaries.top;
 		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
 		this.onSelectionChange( this.coordMap[ key ] );

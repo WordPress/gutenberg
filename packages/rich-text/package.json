@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "2.0.4",
+	"version": "3.0.2",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,8 +21,8 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.10",
 		"rememo": "^3.0.0"

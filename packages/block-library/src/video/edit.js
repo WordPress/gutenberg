@@ -19,6 +19,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
@@ -207,30 +208,32 @@ class VideoEdit extends Component {
 								{ value: 'none', label: __( 'None' ) },
 							] }
 						/>
-						<BaseControl
-							className="editor-video-poster-control"
-							label={ __( 'Poster Image' ) }
-						>
-							<MediaUpload
-								title={ __( 'Select Poster Image' ) }
-								onSelect={ this.onSelectPoster }
-								allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
-								render={ ( { open } ) => (
-									<Button
-										isDefault
-										onClick={ open }
-										ref={ this.posterImageButton }
-									>
-										{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+						<MediaUploadCheck>
+							<BaseControl
+								className="editor-video-poster-control"
+								label={ __( 'Poster Image' ) }
+							>
+								<MediaUpload
+									title={ __( 'Select Poster Image' ) }
+									onSelect={ this.onSelectPoster }
+									allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
+									render={ ( { open } ) => (
+										<Button
+											isDefault
+											onClick={ open }
+											ref={ this.posterImageButton }
+										>
+											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+										</Button>
+									) }
+								/>
+								{ !! this.props.attributes.poster &&
+									<Button onClick={ this.onRemovePoster } isLink isDestructive>
+										{ __( 'Remove Poster Image' ) }
 									</Button>
-								) }
-							/>
-							{ !! this.props.attributes.poster &&
-								<Button onClick={ this.onRemovePoster } isLink isDestructive>
-									{ __( 'Remove Poster Image' ) }
-								</Button>
-							}
-						</BaseControl>
+								}
+							</BaseControl>
+						</MediaUploadCheck>
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>

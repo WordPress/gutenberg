@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "1.0.0-beta1",
+	"version": "1.0.3",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,6 +26,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/rich-text": "file:../rich-text",
 		"lodash": "^4.17.10",
+		"memize": "^1.0.5",
 		"rememo": "^3.0.0",
 		"uuid": "^3.3.2"
 	},

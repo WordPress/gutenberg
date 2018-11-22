@@ -7,11 +7,6 @@ import {
 } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import createNamespace from './namespace-store.js';
@@ -138,63 +133,6 @@ export function createRegistry( storeConfigs = {} ) {
 		select,
 		dispatch,
 		use,
-	};
-
-	//
-	// Deprecated
-	//
-	registry.registerReducer = ( reducerKey, reducer ) => {
-		deprecated( 'registry.registerReducer', {
-			alternative: 'registry.registerStore',
-			plugin: 'Gutenberg',
-			version: '4.4.0',
-		} );
-
-		const namespace = createNamespace( reducerKey, { reducer }, registry );
-		registerGenericStore( reducerKey, namespace );
-		return namespace.store;
-	};
-
-	//
-	// Deprecated
-	//
-	registry.registerActions = ( reducerKey, actions ) => {
-		deprecated( 'registry.registerActions', {
-			alternative: 'registry.registerStore',
-			plugin: 'Gutenberg',
-			version: '4.4.0',
-		} );
-
-		const namespace = createNamespace( reducerKey, { actions }, registry );
-		registerGenericStore( reducerKey, namespace );
-	};
-
-	//
-	// Deprecated
-	//
-	registry.registerSelectors = ( reducerKey, selectors ) => {
-		deprecated( 'registry.registerSelectors', {
-			alternative: 'registry.registerStore',
-			plugin: 'Gutenberg',
-			version: '4.4.0',
-		} );
-
-		const namespace = createNamespace( reducerKey, { selectors }, registry );
-		registerGenericStore( reducerKey, namespace );
-	};
-
-	//
-	// Deprecated
-	//
-	registry.registerResolvers = ( reducerKey, resolvers ) => {
-		deprecated( 'registry.registerResolvers', {
-			alternative: 'registry.registerStore',
-			plugin: 'Gutenberg',
-			version: '4.4.0',
-		} );
-
-		const namespace = createNamespace( reducerKey, { resolvers }, registry );
-		registerGenericStore( reducerKey, namespace );
 	};
 
 	/**

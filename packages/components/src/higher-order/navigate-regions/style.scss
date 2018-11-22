@@ -8,6 +8,16 @@
 		right: 0;
 		pointer-events: none;
 		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
-		@include region_focus(0.1s);
+		animation: editor-animation__region-focus 0.2s ease-out;
+		animation-fill-mode: forwards;
+	}
+}
+
+@keyframes editor-animation__region-focus {
+	from {
+		box-shadow: inset 0 0 0 0 $blue-medium-400;
+	}
+	to {
+		box-shadow: inset 0 0 0 4px $blue-medium-400;
 	}
 }

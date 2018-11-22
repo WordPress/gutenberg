@@ -4,13 +4,17 @@
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite>...with a caption</cite>\n    </blockquote>\n</figure>\n",
-        "innerContent": [ "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite>...with a caption</cite>\n    </blockquote>\n</figure>\n" ]
+        "innerContent": [
+            "\n<figure class=\"wp-block-pullquote\">\n    <blockquote>\n    <p>Testing pullquote block...</p><cite>...with a caption</cite>\n    </blockquote>\n</figure>\n"
+        ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "\n",
-        "innerContent": [ "\n" ]
+        "innerContent": [
+            "\n"
+        ]
     }
 ]

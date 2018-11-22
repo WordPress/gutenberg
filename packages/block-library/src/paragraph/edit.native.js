@@ -42,6 +42,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			insertBlocksAfter,
 			setAttributes,
+			onReplace,
 		} = this.props;
 
 		if ( after !== null ) {
@@ -57,8 +58,7 @@ class ParagraphEdit extends Component {
 
 		const { content } = attributes;
 		if ( before === null ) {
-			// TODO : If before content is omitted, treat as intent to delete block.
-			// onReplace( [] );
+			onReplace( [] );
 		} else if ( content !== before ) {
 			// Only update content if it has in-fact changed. In case that user
 			// has created a new paragraph at end of an existing one, the value
@@ -87,6 +87,7 @@ class ParagraphEdit extends Component {
 				<RichText
 					tagName="p"
 					value={ content }
+					isSelected={ this.props.isSelected }
 					style={ {
 						...style,
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
