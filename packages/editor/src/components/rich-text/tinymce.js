@@ -32,7 +32,7 @@ const { TEXT_NODE } = window.Node;
  *
  * @type {string}
  */
-export const TINYMCE_ZWSP = '\uFEFF';
+const TINYMCE_ZWSP = '\uFEFF';
 
 /**
  * Determines whether we need a fix to provide `input` events for contenteditable.

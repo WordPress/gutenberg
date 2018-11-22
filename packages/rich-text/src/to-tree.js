@@ -63,6 +63,7 @@ export function toTree( {
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
+	const startString = isEditableTree ? ZERO_WIDTH_NO_BREAK_SPACE : '';
 
 	let lastSeparatorFormats;
 	let lastCharacterFormats;
@@ -70,10 +71,10 @@ export function toTree( {
 
 	// If we're building a multiline tree, start off with a multiline element.
 	if ( multilineTag ) {
-		append( append( tree, { type: multilineTag } ), '' );
+		append( append( tree, { type: multilineTag } ), startString );
 		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
 	} else {
-		append( tree, '' );
+		append( tree, startString );
 	}
 
 	function setFormatPlaceholder( pointer, index ) {
@@ -157,6 +158,10 @@ export function toTree( {
 			} );
 		}
 
+		if ( isEditableTree && character === LINE_SEPARATOR ) {
+			appendText( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
+		}
+
 		// No need for further processing if the character is a line separator.
 		if ( character === LINE_SEPARATOR ) {
 			lastCharacterFormats = characterFormats;
@@ -197,6 +202,12 @@ export function toTree( {
 
 		if ( onEndIndex && end === i + 1 ) {
 			onEndIndex( tree, pointer );
+		}
+
+		const nextCharacter = text[ i + 1 ];
+
+		if ( isEditableTree && ( ! nextCharacter || nextCharacter === LINE_SEPARATOR ) ) {
+			appendText( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
 		}
 
 		lastCharacterFormats = characterFormats;

@@ -55,7 +55,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
+import TinyMCE from './tinymce';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
@@ -185,7 +185,6 @@ export class RichText extends Component {
 			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
@@ -196,11 +195,6 @@ export class RichText extends Component {
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			createLinePadding( doc ) {
-				const element = doc.createElement( 'br' );
-				element.setAttribute( 'data-mce-bogus', '1' );
-				return element;
-			},
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
@@ -768,11 +762,6 @@ export class RichText extends Component {
 			value,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			createLinePadding( doc ) {
-				const element = doc.createElement( 'br' );
-				element.setAttribute( 'data-mce-bogus', '1' );
-				return element;
-			},
 			prepareEditableTree: this.props.prepareEditableTree,
 		} ).body.innerHTML;
 	}

@@ -2,193 +2,200 @@
 
 exports[`recordToDom should create a value with formatting 1`] = `
 <body>
+  ﻿
   <em>
-    test
+    test﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with formatting for split tags 1`] = `
 <body>
+  ﻿
   <em>
-    test
+    test﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with formatting with attributes 1`] = `
 <body>
+  ﻿
   <a
     href="#"
   >
-    test
+    test﻿
   </a>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with image object 1`] = `
 <body>
+  ﻿
   <img
     src=""
   />
-  
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
+  ﻿
   <em>
     <img
       src=""
     />
-    
+    ﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
+  ﻿
   <em>
     <img
       src=""
     />
     te
   </em>
-  st
+  st﻿﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with image object and text before 1`] = `
 <body>
-  te
+  ﻿te
   <em>
     st
     <img
       src=""
     />
-    
+    ﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value with nested formatting 1`] = `
 <body>
+  ﻿
   <em>
     <strong>
-      test
+      test﻿
     </strong>
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should create a value without formatting 1`] = `
 <body>
-  test
+  ﻿test﻿﻿
 </body>
 `;
 
 exports[`recordToDom should create an empty value 1`] = `
 <body>
-  
-  <br />
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should create an empty value from empty tags 1`] = `
 <body>
-  
-  <br />
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should filter format attributes with settings 1`] = `
 <body>
+  ﻿
   <strong>
-    test
+    test﻿
   </strong>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should filter text at end with settings 1`] = `
 <body>
-  test
+  ﻿test﻿﻿
 </body>
 `;
 
 exports[`recordToDom should filter text in format with settings 1`] = `
 <body>
+  ﻿
   <em>
-    test
+    test﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should filter text outside format with settings 1`] = `
 <body>
+  ﻿
   <em>
-    test
+    test﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should filter text with settings 1`] = `
 <body>
-  
-  <br />
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should handle br 1`] = `
 <body>
-  
+  ﻿
   <br />
-  
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should handle br with formatting 1`] = `
 <body>
+  ﻿
   <em>
     
     <br />
-    
+    ﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should handle br with text 1`] = `
 <body>
-  te
+  ﻿te
   <br />
-  st
+  st﻿﻿
 </body>
 `;
 
 exports[`recordToDom should handle double br 1`] = `
 <body>
-  a
+  ﻿a
   <br />
   
   <br />
-  b
+  b﻿﻿
 </body>
 `;
 
 exports[`recordToDom should handle empty list value 1`] = `
 <body>
   <li>
-    
-    <br />
+    ﻿﻿
   </li>
 </body>
 `;
@@ -196,8 +203,7 @@ exports[`recordToDom should handle empty list value 1`] = `
 exports[`recordToDom should handle empty multiline value 1`] = `
 <body>
   <p>
-    
-    <br />
+    ﻿﻿
   </p>
 </body>
 `;
@@ -205,16 +211,13 @@ exports[`recordToDom should handle empty multiline value 1`] = `
 exports[`recordToDom should handle middle empty list value 1`] = `
 <body>
   <li>
-    
-    <br />
+    ﻿
   </li>
   <li>
-    
-    <br />
+    ﻿
   </li>
   <li>
-    
-    <br />
+    ﻿﻿
   </li>
 </body>
 `;
@@ -222,26 +225,26 @@ exports[`recordToDom should handle middle empty list value 1`] = `
 exports[`recordToDom should handle multiline list value 1`] = `
 <body>
   <li>
-    one
+    ﻿one﻿
     <ul>
       <li>
-        a
+        ﻿a﻿
       </li>
       <li>
-        b
+        ﻿b﻿
         <ol>
           <li>
-            1
+            ﻿1﻿
           </li>
           <li>
-            2
+            ﻿2﻿
           </li>
         </ol>
       </li>
     </ul>
   </li>
   <li>
-    three
+    ﻿three﻿﻿
   </li>
 </body>
 `;
@@ -249,10 +252,10 @@ exports[`recordToDom should handle multiline list value 1`] = `
 exports[`recordToDom should handle multiline value 1`] = `
 <body>
   <p>
-    one
+    ﻿one﻿
   </p>
   <p>
-    two
+    ﻿two﻿﻿
   </p>
 </body>
 `;
@@ -260,7 +263,7 @@ exports[`recordToDom should handle multiline value 1`] = `
 exports[`recordToDom should handle multiline value with element selection 1`] = `
 <body>
   <li>
-    one
+    ﻿one﻿﻿
   </li>
 </body>
 `;
@@ -268,11 +271,10 @@ exports[`recordToDom should handle multiline value with element selection 1`] = 
 exports[`recordToDom should handle multiline value with empty 1`] = `
 <body>
   <p>
-    one
+    ﻿one﻿
   </p>
   <p>
-    
-    <br />
+    ﻿﻿
   </p>
 </body>
 `;
@@ -280,11 +282,10 @@ exports[`recordToDom should handle multiline value with empty 1`] = `
 exports[`recordToDom should handle nested empty list value 1`] = `
 <body>
   <li>
-    <br />
+    ﻿
     <ul>
       <li>
-        
-        <br />
+        ﻿﻿
       </li>
     </ul>
   </li>
@@ -293,78 +294,78 @@ exports[`recordToDom should handle nested empty list value 1`] = `
 
 exports[`recordToDom should handle selection before br 1`] = `
 <body>
-  a
+  ﻿a
   <br />
   
   <br />
-  b
+  b﻿﻿
 </body>
 `;
 
 exports[`recordToDom should ignore formats at line separator 1`] = `
 <body>
   <p>
+    ﻿
     <em>
-      one
+      one﻿
     </em>
   </p>
   <p>
+    ﻿
     <em>
-      two
+      two﻿
     </em>
-    
+    ﻿
   </p>
 </body>
 `;
 
 exports[`recordToDom should ignore line breaks to format HTML 1`] = `
 <body>
-  
-  <br />
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should preserve emoji 1`] = `
 <body>
-  🍒
+  ﻿🍒﻿﻿
 </body>
 `;
 
 exports[`recordToDom should preserve emoji in formatting 1`] = `
 <body>
+  ﻿
   <em>
-    🍒
+    🍒﻿
   </em>
-  
+  ﻿
 </body>
 `;
 
 exports[`recordToDom should remove br with settings 1`] = `
 <body>
-  
-  <br />
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should remove with children with settings 1`] = `
 <body>
-  two
+  ﻿two﻿﻿
 </body>
 `;
 
 exports[`recordToDom should remove with settings 1`] = `
 <body>
-  
-  <br />
+  ﻿﻿
 </body>
 `;
 
 exports[`recordToDom should unwrap with settings 1`] = `
 <body>
-  te
+  ﻿te
   <em>
-    st
+    st﻿
   </em>
-  
+  ﻿
 </body>
 `;

@@ -105,33 +105,6 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
-	const length = element.childNodes.length;
-	const doc = element.ownerDocument;
-
-	for ( let index = 0; index < length; index++ ) {
-		const child = element.childNodes[ index ];
-
-		if ( child.nodeType === TEXT_NODE ) {
-			if ( length === 1 && ! child.nodeValue ) {
-				// Pad if the only child is an empty text node.
-				element.appendChild( createLinePadding( doc ) );
-			}
-		} else {
-			if (
-				multilineWrapperTags &&
-				! child.previousSibling &&
-				multilineWrapperTags.indexOf( child.nodeName.toLowerCase() ) !== -1
-			) {
-				// Pad the line if there is no content before a nested wrapper.
-				element.insertBefore( createLinePadding( doc ), child );
-			}
-
-			padEmptyLines( { element: child, createLinePadding, multilineWrapperTags } );
-		}
-	}
-}
-
 function prepareFormats( prepareEditableTree = [], value ) {
 	return prepareEditableTree.reduce( ( accumlator, fn ) => {
 		return fn( accumlator, value.text );
@@ -142,7 +115,6 @@ export function toDom( {
 	value,
 	multilineTag,
 	multilineWrapperTags,
-	createLinePadding,
 	prepareEditableTree,
 } ) {
 	let startPath = [];
@@ -172,10 +144,6 @@ export function toDom( {
 		isEditableTree: true,
 	} );
 
-	if ( createLinePadding ) {
-		padEmptyLines( { element: tree, createLinePadding, multilineWrapperTags } );
-	}
-
 	return {
 		body: tree,
 		selection: { startPath, endPath },
@@ -197,7 +165,6 @@ export function apply( {
 	current,
 	multilineTag,
 	multilineWrapperTags,
-	createLinePadding,
 	prepareEditableTree,
 } ) {
 	// Construct a new element tree in memory.
@@ -205,7 +172,6 @@ export function apply( {
 		value,
 		multilineTag,
 		multilineWrapperTags,
-		createLinePadding,
 		prepareEditableTree,
 	} );
 
