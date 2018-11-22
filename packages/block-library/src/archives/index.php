@@ -32,7 +32,7 @@ function render_block_core_archives( $attributes ) {
 		$class .= ' wp-block-archives-dropdown';
 
 		$dropdown_id = esc_attr( uniqid( 'wp-block-archives-' ) );
-		$title       = __( 'Archives' );
+		$title       = __( 'Archives' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
 
 		/** This filter is documented in wp-includes/widgets/class-wp-widget-archives.php */
 		$dropdown_args = apply_filters(
@@ -50,19 +50,19 @@ function render_block_core_archives( $attributes ) {
 
 		switch ( $dropdown_args['type'] ) {
 			case 'yearly':
-				$label = __( 'Select Year' );
+				$label = __( 'Select Year' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
 				break;
 			case 'monthly':
-				$label = __( 'Select Month' );
+				$label = __( 'Select Month' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
 				break;
 			case 'daily':
-				$label = __( 'Select Day' );
+				$label = __( 'Select Day' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
 				break;
 			case 'weekly':
-				$label = __( 'Select Week' );
+				$label = __( 'Select Week' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
 				break;
 			default:
-				$label = __( 'Select Post' );
+				$label = __( 'Select Post' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
 				break;
 		}
 
@@ -101,7 +101,7 @@ function render_block_core_archives( $attributes ) {
 			$block_content = sprintf(
 				'<div class="%1$s">%2$s</div>',
 				$classnames,
-				__( 'No archives to show.' )
+				__( 'No archives to show.' ) // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
 			);
 		} else {
 
