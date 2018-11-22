@@ -398,7 +398,7 @@ export default class TableEdit extends Component {
 					<Toolbar>
 						<DropdownMenu
 							icon="editor-table"
-							label={ __( 'Edit Table' ) }
+							label={ __( 'Edit table' ) }
 							controls={ this.getTableControls() }
 						/>
 					</Toolbar>
