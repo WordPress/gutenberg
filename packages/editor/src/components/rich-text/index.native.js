@@ -75,6 +75,7 @@ export class RichText extends Component {
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
 		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.state = {
@@ -235,6 +236,10 @@ export class RichText extends Component {
 		}
 	}
 
+	onSelectionChange(start, end, text) {
+		this.setState( { ...this.state, start, end } );
+	}
+
 	isEmpty() {
 		return isEmpty( this.formatToValue( this.props.value ) );
 	}
@@ -380,6 +385,7 @@ export class RichText extends Component {
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+					onSelectionChange={ this.onSelectionChange }
 					isSelected={ this.props.isSelected }
 					blockType={ { tag: tagName } }
 					color={ 'black' }
