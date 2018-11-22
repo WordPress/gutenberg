@@ -28,7 +28,7 @@ type PropsType = {
 };
 
 class AppContainer extends React.Component<PropsType> {
-	lastHtml: ?string
+	lastHtml: ?string;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -40,10 +40,9 @@ class AppContainer extends React.Component<PropsType> {
 			},
 			type: 'draft',
 		};
-		const blocks = parse( props.initialHtml );
 
-		this.props.setupEditor( post, blocks );
-		this.lastHtml = serialize( blocks );
+		this.props.setupEditor( post );
+		this.lastHtml = serialize( parse( props.initialHtml ) );
 	}
 
 	onChange = ( clientId, attributes ) => {
