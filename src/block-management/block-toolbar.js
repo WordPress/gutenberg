@@ -6,6 +6,10 @@
 import React, { Component } from 'react';
 import { View } from 'react-native';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
+import {
+	EditorHistoryRedo,
+	EditorHistoryUndo,
+} from '@wordpress/editor';
 import { BlockFormatControls, BlockControls } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 
@@ -28,6 +32,8 @@ export default class BlockToolbar extends Component<PropsType> {
 						onClick={ this.props.onInsertClick }
 					/>
 				</Toolbar>
+				<EditorHistoryUndo />
+				<EditorHistoryRedo />
 				{ this.props.showKeyboardHideButton && ( <Toolbar>
 					<ToolbarButton
 						label={ __( 'Keyboard hide' ) }
