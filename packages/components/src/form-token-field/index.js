@@ -500,7 +500,7 @@ class FormTokenField extends Component {
 	}
 
 	renderInput() {
-		const { autoCapitalize, autoComplete, maxLength, value, placeholder, instanceId } = this.props;
+		const { autoCapitalize, autoComplete, maxLength, value, instanceId } = this.props;
 
 		let props = {
 			instanceId,
@@ -515,10 +515,6 @@ class FormTokenField extends Component {
 			selectedSuggestionIndex: this.state.selectedSuggestionIndex,
 		};
 
-		if ( value.length === 0 && placeholder ) {
-			props.placeholder = placeholder;
-		}
-
 		if ( ! ( maxLength && value.length >= maxLength ) ) {
 			props = { ...props, onChange: this.onInputChange };
 		}
@@ -531,18 +527,18 @@ class FormTokenField extends Component {
 	render() {
 		const {
 			disabled,
-			placeholder = __( 'Add item.' ),
+			label = __( 'Add item' ),
 			instanceId,
 			className,
 		} = this.props;
 		const { isExpanded } = this.state;
-		const classes = classnames( className, 'components-form-token-field', {
+		const classes = classnames( className, 'components-form-token-field__input-container', {
 			'is-active': this.state.isActive,
 			'is-disabled': disabled,
 		} );
 
 		let tokenFieldProps = {
-			className: classes,
+			className: 'components-form-token-field',
 			tabIndex: '-1',
 		};
 		const matchingSuggestions = this.getMatchingSuggestions();
@@ -560,31 +556,33 @@ class FormTokenField extends Component {
 		// TODO: Refactor click detection to use blur to stop propagation.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return (
-			<div { ...tokenFieldProps } >
-				<label htmlFor={ `components-form-token-input-${ instanceId }` } className="screen-reader-text">
-					{ placeholder }
+			<div { ...tokenFieldProps }>
+				<label
+					htmlFor={ `components-form-token-input-${ instanceId }` }
+					className="components-form-token-field__label"
+				>
+					{ label }
 				</label>
 				<div ref={ this.bindTokensAndInput }
-					className="components-form-token-field__input-container"
+					className={ classes }
 					tabIndex="-1"
 					onMouseDown={ this.onContainerTouched }
 					onTouchStart={ this.onContainerTouched }
 				>
 					{ this.renderTokensAndInput() }
+					{ isExpanded && (
+						<SuggestionsList
+							instanceId={ instanceId }
+							match={ this.props.saveTransform( this.state.incompleteTokenValue ) }
+							displayTransform={ this.props.displayTransform }
+							suggestions={ matchingSuggestions }
+							selectedIndex={ this.state.selectedSuggestionIndex }
+							scrollIntoView={ this.state.selectedSuggestionScroll }
+							onHover={ this.onSuggestionHovered }
+							onSelect={ this.onSuggestionSelected }
+						/>
+					) }
 				</div>
-
-				{ isExpanded && (
-					<SuggestionsList
-						instanceId={ instanceId }
-						match={ this.props.saveTransform( this.state.incompleteTokenValue ) }
-						displayTransform={ this.props.displayTransform }
-						suggestions={ matchingSuggestions }
-						selectedIndex={ this.state.selectedSuggestionIndex }
-						scrollIntoView={ this.state.selectedSuggestionScroll }
-						onHover={ this.onSuggestionHovered }
-						onSelect={ this.onSuggestionSelected }
-					/>
-				) }
 				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="screen-reader-text">
 					{ __( 'Separate with commas' ) }
 				</div>
@@ -598,7 +596,6 @@ FormTokenField.defaultProps = {
 	suggestions: Object.freeze( [] ),
 	maxSuggestions: 100,
 	value: Object.freeze( [] ),
-	placeholder: '',
 	displayTransform: identity,
 	saveTransform: ( token ) => token.trim(),
 	onChange: () => {},

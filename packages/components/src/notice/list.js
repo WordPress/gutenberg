@@ -25,7 +25,11 @@ function NoticeList( { notices, onRemove = noop, className = 'components-notice-
 		<div className={ className }>
 			{ children }
 			{ [ ...notices ].reverse().map( ( notice ) => (
-				<Notice { ...omit( notice, 'content' ) } key={ notice.id } onRemove={ removeNotice( notice.id ) }>
+				<Notice
+					{ ...omit( notice, [ 'content' ] ) }
+					key={ notice.id }
+					onRemove={ removeNotice( notice.id ) }
+				>
 					{ notice.content }
 				</Notice>
 			) ) }

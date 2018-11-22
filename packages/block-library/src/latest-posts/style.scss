@@ -1,8 +1,10 @@
 .wp-block-latest-posts {
 	&.alignleft {
+		/*rtl:ignore*/
 		margin-right: 2em;
 	}
 	&.alignright {
+		/*rtl:ignore*/
 		margin-left: 2em;
 	}
 	&.is-grid {

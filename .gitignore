@@ -2,7 +2,6 @@
 build
 build-module
 build-style
-coverage
 node_modules
 gutenberg.zip
 languages/gutenberg.pot

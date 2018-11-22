@@ -116,6 +116,12 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// Viewing posts on the front end can result in this error, which
+		// has nothing to do with Gutenberg.
+		if ( text.includes( 'net::ERR_UNKNOWN_URL_SCHEME' ) ) {
+			return;
+		}
+
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// Disable reason: We intentionally bubble up the console message

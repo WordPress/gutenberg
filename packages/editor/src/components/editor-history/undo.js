@@ -13,8 +13,11 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 			icon="undo"
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
-			disabled={ ! hasUndo }
-			onClick={ undo }
+			// If there are no undo levels we don't want to actually disable this
+			// button, because it will remove focus for keyboard users.
+			// See: https://github.com/WordPress/gutenberg/issues/3486
+			aria-disabled={ ! hasUndo }
+			onClick={ hasUndo ? undo : undefined }
 			className="editor-history__undo"
 		/>
 	);
@@ -25,6 +28,6 @@ export default compose( [
 		hasUndo: select( 'core/editor' ).hasEditorUndo(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		undo: () => dispatch( 'core/editor' ).undo(),
+		undo: dispatch( 'core/editor' ).undo,
 	} ) ),
 ] )( EditorHistoryUndo );

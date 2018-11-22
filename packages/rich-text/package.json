@@ -1,0 +1,37 @@
+{
+	"name": "@wordpress/rich-text",
+	"version": "3.0.2",
+	"description": "Rich text value and manipulation API.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"rich-text"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/rich-text/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/escape-html": "file:../escape-html",
+		"lodash": "^4.17.10",
+		"rememo": "^3.0.0"
+	},
+	"devDependencies": {
+		"deep-freeze": "^0.0.1",
+		"jsdom": "^11.12.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

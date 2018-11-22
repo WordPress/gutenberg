@@ -1,15 +1,21 @@
 /**
  * External dependencies
  */
-import Jed from 'jed';
+import Tannin from 'tannin';
 import memoize from 'memize';
+import sprintfjs from 'sprintf-js';
 
 /**
- * WordPress dependencies
+ * Default locale data to use for Tannin domain when not otherwise provided.
+ * Assumes an English plural forms expression.
+ *
+ * @type {Object}
  */
-import deprecated from '@wordpress/deprecated';
-
-let i18n;
+const DEFAULT_LOCALE_DATA = {
+	'': {
+		plural_forms: 'plural=(n!=1)',
+	},
+};
 
 /**
  * Log to console, once per message; or more precisely, per referentially equal
@@ -21,48 +27,39 @@ let i18n;
 const logErrorOnce = memoize( console.error ); // eslint-disable-line no-console
 
 /**
- * Merges locale data into the Jed instance by domain. Creates a new Jed
- * instance if one has not yet been assigned.
+ * The underlying instance of Tannin to which exported functions interface.
+ *
+ * @type {Tannin}
+ */
+const i18n = new Tannin( {} );
+
+/**
+ * Merges locale data into the Tannin instance by domain. Accepts data in a
+ * Jed-formatted JSON object shape.
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {?Object} localeData Locale data configuration.
- * @param {?string} domain     Domain for which configuration applies.
+ * @param {?Object} data   Locale data configuration.
+ * @param {?string} domain Domain for which configuration applies.
  */
-export function setLocaleData( localeData = { '': {} }, domain = 'default' ) {
-	if ( ! i18n ) {
-		i18n = new Jed( {
-			domain: 'default',
-			locale_data: {
-				default: {},
-			},
-		} );
-	}
+export function setLocaleData( data, domain = 'default' ) {
+	i18n.data[ domain ] = {
+		...DEFAULT_LOCALE_DATA,
+		...i18n.data[ domain ],
+		...data,
+	};
 
-	i18n.options.locale_data[ domain ] = Object.assign(
-		{},
-		i18n.options.locale_data[ domain ],
-		localeData
-	);
+	// Populate default domain configuration (supported locale date which omits
+	// a plural forms expression).
+	i18n.data[ domain ][ '' ] = {
+		...DEFAULT_LOCALE_DATA[ '' ],
+		...i18n.data[ domain ][ '' ],
+	};
 }
 
 /**
- * Returns the current Jed instance, initializing with a default configuration
- * if not already assigned.
- *
- * @return {Jed} Jed instance.
- */
-function _getI18n() {
-	if ( ! i18n ) {
-		setLocaleData();
-	}
-
-	return i18n;
-}
-
-/**
- * Wrapper for Jed's `dcnpgettext`, its most qualified function. Absorbs errors
- * which are thrown as the result of invalid translation.
+ * Wrapper for Tannin's `dcnpgettext`. Populates default locale data if not
+ * otherwise previously assigned.
  *
  * @param {?string} domain  Domain to retrieve the translated text.
  * @param {?string} context Context information for the translators.
@@ -74,15 +71,13 @@ function _getI18n() {
  *
  * @return {string} The translated string.
  */
-const _dcnpgettext = memoize( ( domain = 'default', context, single, plural, number ) => {
-	try {
-		return _getI18n().dcnpgettext( domain, context, single, plural, number );
-	} catch ( error ) {
-		logErrorOnce( 'Jed localization error: \n\n' + error.toString() );
-
-		return single;
+function dcnpgettext( domain = 'default', context, single, plural, number ) {
+	if ( ! i18n.data[ domain ] ) {
+		setLocaleData( undefined, domain );
 	}
-} );
+
+	return i18n.dcnpgettext( domain, context, single, plural, number );
+}
 
 /**
  * Retrieve the translation of text.
@@ -95,7 +90,7 @@ const _dcnpgettext = memoize( ( domain = 'default', context, single, plural, num
  * @return {string} Translated text.
  */
 export function __( text, domain ) {
-	return _dcnpgettext( domain, undefined, text );
+	return dcnpgettext( domain, undefined, text );
 }
 
 /**
@@ -110,7 +105,7 @@ export function __( text, domain ) {
  * @return {string} Translated context string without pipe.
  */
 export function _x( text, context, domain ) {
-	return _dcnpgettext( domain, context, text );
+	return dcnpgettext( domain, context, text );
 }
 
 /**
@@ -128,7 +123,7 @@ export function _x( text, context, domain ) {
  * @return {string} The translated singular or plural form.
  */
 export function _n( single, plural, number, domain ) {
-	return _dcnpgettext( domain, undefined, single, plural, number );
+	return dcnpgettext( domain, undefined, single, plural, number );
 }
 
 /**
@@ -147,7 +142,7 @@ export function _n( single, plural, number, domain ) {
  * @return {string} The translated singular or plural form.
  */
 export function _nx( single, plural, number, context, domain ) {
-	return _dcnpgettext( domain, context, single, plural, number );
+	return dcnpgettext( domain, context, single, plural, number );
 }
 
 /**
@@ -163,38 +158,10 @@ export function _nx( single, plural, number, context, domain ) {
  */
 export function sprintf( format, ...args ) {
 	try {
-		return Jed.sprintf( format, ...args );
+		return sprintfjs.sprintf( format, ...args );
 	} catch ( error ) {
-		logErrorOnce( 'Jed sprintf error: \n\n' + error.toString() );
+		logErrorOnce( 'sprintf error: \n\n' + error.toString() );
 
 		return format;
 	}
-}
-
-//
-// Deprecated
-//
-
-// TODO: Revert names of internal copies to non-underscore-prefixed, as it is
-// only needed to avoid variable shadowing issues with deprecated version on
-// the exported public interface.
-
-export function getI18n() {
-	deprecated( 'wp.i18n.getI18n', {
-		plugin: 'Gutenberg',
-		version: '4.0',
-		alternative: '`__`, `_x`, `_n`, or `_nx`',
-	} );
-
-	return _getI18n();
-}
-
-export function dcnpgettext( domain, context, single, plural, number ) {
-	deprecated( 'wp.i18n.dcnpgettext', {
-		plugin: 'Gutenberg',
-		version: '4.0',
-		alternative: '`__`, `_x`, `_n`, or `_nx`',
-	} );
-
-	return _dcnpgettext( domain, context, single, plural, number );
 }

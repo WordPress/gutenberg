@@ -1,0 +1,22 @@
+[
+    {
+        "blockName": "core/image",
+        "attrs": {
+            "linkDestination": "custom"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></a></figure>\n",
+        "innerContent": [
+            "\n<figure class=\"wp-block-image\"><a class=\"custom-link\" href=\"https://wordpress.org/\"><img src=\"https://cldup.com/uuUqE_dXzy.jpg\" alt=\"\" /></a></figure>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

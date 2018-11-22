@@ -7,7 +7,6 @@ import {
 	getEditedPostContent,
 	pressTimes,
 	pressWithModifier,
-	META_KEY,
 } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
@@ -44,7 +43,7 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressTimes( 'ArrowRight', 5 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 		// Collapse selection, still within inline boundary.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
@@ -57,13 +56,13 @@ describe( 'splitting and merging blocks', () => {
 		// Regression Test: Caret should reset to end of inline boundary when
 		// backspacing to delete second paragraph.
 		await insertBlock( 'Paragraph' );
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'Foo' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Replace contents of first paragraph with "Bar".
-		await pressTimes( 'Backspace', 3 );
+		await pressTimes( 'Backspace', 4 );
 		await page.keyboard.type( 'Bar' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -129,7 +128,7 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressTimes( 'ArrowLeft', 3 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );
@@ -180,5 +179,35 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.press( 'Delete' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should ensure always a default block', async () => {
+		// Feature: To avoid focus loss, removal of all blocks will result in a
+		// default block insertion at the root. Pressing backspace in a new
+		// paragraph should not effectively allow removal. This is counteracted
+		// with pre-save content processing to save post consisting of only the
+		// unmodified default block as an empty string.
+		//
+		// See: https://github.com/WordPress/gutenberg/issues/9626
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.press( 'Backspace' );
+
+		// There is a default block:
+		expect( await page.$$( '.editor-block-list__block' ) ).toHaveLength( 1 );
+
+		// But the effective saved content is still empty:
+		expect( await getEditedPostContent() ).toBe( '' );
+
+		// And focus is retained:
+		const isInDefaultBlock = await page.evaluate( () => {
+			const activeBlockName = document.activeElement
+				.closest( '[data-type]' )
+				.getAttribute( 'data-type' );
+			const defaultBlockName = window.wp.blocks.getDefaultBlockName();
+
+			return activeBlockName === defaultBlockName;
+		} );
+
+		expect( isInDefaultBlock ).toBe( true );
 	} );
 } );

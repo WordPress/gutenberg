@@ -15,7 +15,12 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '../factory';
-import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
+import {
+	getBlockType,
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+} from '../registration';
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -35,7 +40,6 @@ describe( 'block factory', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -77,6 +81,81 @@ describe( 'block factory', () => {
 			expect( block.innerBlocks ).toHaveLength( 1 );
 			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.clientId ).toBe( 'string' );
+		} );
+
+		it( 'should cast children and node source attributes with default undefined', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [],
+			} );
+		} );
+
+		it( 'should cast children and node source attributes with string as default', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+						default: 'test',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [ 'test' ],
+			} );
+		} );
+
+		it( 'should cast children and node source attributes with unknown type as default', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+						default: 1,
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [],
+			} );
+		} );
+
+		it( 'should cast rich-text source attributes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						source: 'html',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				content: 'test',
+			} );
+
+			expect( block.attributes ).toEqual( {
+				content: 'test',
+			} );
 		} );
 	} );
 
@@ -1099,6 +1178,20 @@ describe( 'block factory', () => {
 
 		it( 'should return single block type transforms of direction', () => {
 			const transforms = getBlockTransforms( 'from', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+			] );
+		} );
+
+		it( 'should return single block type transforms when passed as an object', () => {
+			const transforms = getBlockTransforms(
+				'from',
+				getBlockType( 'core/transform-from-text-block-1' )
+			);
 
 			expect( transforms ).toEqual( [
 				{

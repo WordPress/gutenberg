@@ -15,7 +15,7 @@ const parsedModules = parser( config.dataNamespaces );
 generator( parsedModules, config.dataDocsOutput );
 
 const rootManifest = require( config.rootManifest );
-const packageManifest = getPackageManifest( config.packages );
+const packageManifest = getPackageManifest( config.packageFileNames );
 const componentManifest = getComponentManifest( config.componentPaths );
 const dataManifest = getDataManifest( parsedModules );
 

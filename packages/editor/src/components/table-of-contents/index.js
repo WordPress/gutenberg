@@ -22,6 +22,7 @@ function TableOfContents( { hasBlocks } ) {
 					icon="info-outline"
 					aria-expanded={ isOpen }
 					label={ __( 'Content structure' ) }
+					labelPosition="bottom"
 					disabled={ ! hasBlocks }
 				/>
 			) }

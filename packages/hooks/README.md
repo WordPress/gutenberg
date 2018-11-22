@@ -22,15 +22,15 @@ myObject.hooks = createHooks();
 myObject.hooks.addAction(); //etc...
 ```
 
-In the WordPress context, API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc.
+In the WordPress context, API functions can be called via the global `wp.hooks` like this `wp.hooks.addAction()`, etc. One notable difference from the PHP API is that `addAction()` and `addFilter()` also need to include a namespace as the second argument.
 
 ### API Usage
 
 * `createHooks()`
-* `addAction( 'hookName', 'functionName', callback, priority )`
-* `addFilter( 'hookName', 'functionName', callback, priority )`
-* `removeAction( 'hookName', 'functionName' )`
-* `removeFilter( 'hookName', 'functionName' )`
+* `addAction( 'hookName', 'namespace', 'functionName', callback, priority )`
+* `addFilter( 'hookName', 'namespace', 'functionName', callback, priority )`
+* `removeAction( 'hookName', 'namespace', 'functionName' )`
+* `removeFilter( 'hookName', 'namespace', 'functionName' )`
 * `removeAllActions( 'hookName' )`
 * `removeAllFilters( 'hookName' )`
 * `doAction( 'hookName', arg1, arg2, moreArgs, finalArg )`

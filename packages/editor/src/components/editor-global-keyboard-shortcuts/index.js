@@ -28,8 +28,8 @@ export const shortcuts = {
 		display: displayShortcut.primaryShift( 'd' ),
 	},
 	removeBlock: {
-		raw: rawShortcut.primaryAlt( 'backspace' ),
-		display: displayShortcut.primaryAlt( 'Backspace' ),
+		raw: rawShortcut.access( 'z' ),
+		display: displayShortcut.access( 'z' ),
 	},
 	insertBefore: {
 		raw: rawShortcut.primaryAlt( 't' ),
@@ -155,10 +155,10 @@ export default compose( [
 			isEditedPostDirty,
 			getBlockRootClientId,
 			getTemplateLock,
-			getSelectedBlock,
+			getSelectedBlockClientId,
 		} = select( 'core/editor' );
-		const block = getSelectedBlock();
-		const selectedBlockClientIds = block ? [ block.clientId ] : getMultiSelectedBlockClientIds();
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
 
 		return {
 			rootBlocksClientIds: getBlockOrder(),

@@ -139,7 +139,8 @@ class Block_Type_Test extends WP_UnitTestCase {
 			'wrongType'          => 5,
 			'wrongTypeDefaulted' => 5,
 			/* missingDefaulted */
-			'undefined'          => 'omit',
+			'undefined'          => 'include',
+			'intendedNull'       => null,
 		);
 
 		$block_type = new WP_Block_Type(
@@ -160,6 +161,10 @@ class Block_Type_Test extends WP_UnitTestCase {
 						'type'    => 'string',
 						'default' => 'define',
 					),
+					'intendedNull'       => array(
+						'type'    => array( 'string', 'null' ),
+						'default' => 'wrong',
+					),
 				),
 			)
 		);
@@ -169,12 +174,24 @@ class Block_Type_Test extends WP_UnitTestCase {
 		$this->assertEquals(
 			array(
 				'correct'            => 'include',
-				'wrongType'          => null,
+				/* wrongType */
 				'wrongTypeDefaulted' => 'defaulted',
 				'missingDefaulted'   => 'define',
+				'undefined'          => 'include',
+				'intendedNull'       => null,
 			),
 			$prepared_attributes
 		);
+	}
+
+	function test_prepare_attributes_none_defined() {
+		$attributes = array( 'exists' => 'keep' );
+
+		$block_type = new WP_Block_Type( 'core/dummy', array() );
+
+		$prepared_attributes = $block_type->prepare_attributes_for_render( $attributes );
+
+		$this->assertEquals( $attributes, $prepared_attributes );
 	}
 
 	function test_has_block_with_mixed_content() {

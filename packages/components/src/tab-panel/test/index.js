@@ -60,8 +60,8 @@ describe( 'TabPanel', () => {
 						className: 'gamma',
 					},
 				],
-				children: ( tabName ) => {
-					return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
+				children: ( tab ) => {
+					return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
 				},
 			};
 
@@ -137,8 +137,8 @@ describe( 'TabPanel', () => {
 					className: 'beta',
 				},
 			],
-			children: ( tabName ) => {
-				return <p tabIndex="0" className={ tabName + '-view' }>{ tabName }</p>;
+			children: ( tab ) => {
+				return <p tabIndex="0" className={ tab.name + '-view' }>{ tab.name }</p>;
 			},
 		};
 		const wrapper = TestUtils.renderIntoDocument(

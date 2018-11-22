@@ -35,89 +35,55 @@ class WP_REST_Blocks_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
-	 * Handle a DELETE request.
+	 * Filters a response based on the context defined in the schema.
 	 *
-	 * @since 1.10.0
+	 * @since 4.4.0
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 * @param array  $data    Response data to fiter.
+	 * @param string $context Context defined in the schema.
+	 * @return array Filtered response.
 	 */
-	public function delete_item( $request ) {
-		// Always hard-delete a block.
-		$request->set_param( 'force', true );
+	public function filter_response_by_context( $data, $context ) {
+		$data = parent::filter_response_by_context( $data, $context );
 
-		return parent::delete_item( $request );
+		/*
+		 * Remove `title.rendered` and `content.rendered` from the response. It
+		 * doesn't make sense for a reusable block to have rendered content on its
+		 * own, since rendering a block requires it to be inside a post or a page.
+		 */
+		unset( $data['title']['rendered'] );
+		unset( $data['content']['rendered'] );
+
+		return $data;
 	}
 
 	/**
-	 * Given an update or create request, build the post object that is saved to
-	 * the database.
+	 * Retrieves the block's schema, conforming to JSON Schema.
 	 *
-	 * @since 1.10.0
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return stdClass|WP_Error Post object or WP_Error.
-	 */
-	public function prepare_item_for_database( $request ) {
-		$prepared_post = parent::prepare_item_for_database( $request );
-
-		// Force blocks to always be published.
-		$prepared_post->post_status = 'publish';
-
-		return $prepared_post;
-	}
-
-	/**
-	 * Given a block from the database, build the array that is returned from an
-	 * API response.
-	 *
-	 * @since 1.10.0
-	 *
-	 * @param WP_Post         $post    Post object that backs the block.
-	 * @param WP_REST_Request $request Request object.
-	 * @return WP_REST_Response Response object.
-	 */
-	public function prepare_item_for_response( $post, $request ) {
-		$data = array(
-			'id'      => $post->ID,
-			'title'   => $post->post_title,
-			'content' => $post->post_content,
-		);
-
-		$response = rest_ensure_response( $data );
-
-		return apply_filters( "rest_prepare_{$this->post_type}", $response, $post, $request );
-	}
-
-	/**
-	 * Builds the block's schema, conforming to JSON Schema.
-	 *
-	 * @since 1.10.0
+	 * @since 4.4.0
 	 *
 	 * @return array Item schema data.
 	 */
 	public function get_item_schema() {
-		return array(
-			'$schema'    => 'http://json-schema.org/schema#',
-			'title'      => $this->post_type,
-			'type'       => 'object',
-			'properties' => array(
-				'id'      => array(
-					'description' => __( 'Unique identifier for the block.', 'gutenberg' ),
-					'type'        => 'integer',
-					'readonly'    => true,
-				),
-				'title'   => array(
-					'description' => __( 'The block’s title.', 'gutenberg' ),
-					'type'        => 'string',
-					'required'    => true,
-				),
-				'content' => array(
-					'description' => __( 'The block’s HTML content.', 'gutenberg' ),
-					'type'        => 'string',
-					'required'    => true,
-				),
-			),
-		);
+		$schema = parent::get_item_schema();
+
+		/*
+		 * Allow all contexts to access `title.raw` and `content.raw`. Clients always
+		 * need the raw markup of a reusable block to do anything useful, e.g. parse
+		 * it or display it in an editor.
+		 */
+		$schema['properties']['title']['properties']['raw']['context']   = array( 'view', 'edit' );
+		$schema['properties']['content']['properties']['raw']['context'] = array( 'view', 'edit' );
+
+		/*
+		 * Remove `title.rendered` and `content.rendered` from the schema. It doesn’t
+		 * make sense for a reusable block to have rendered content on its own, since
+		 * rendering a block requires it to be inside a post or a page.
+		 */
+		unset( $schema['properties']['title']['properties']['rendered'] );
+		unset( $schema['properties']['content']['properties']['rendered'] );
+
+		return $schema;
 	}
+
 }

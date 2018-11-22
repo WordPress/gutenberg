@@ -13,7 +13,7 @@ import { compose, createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getColorClassName, getColorObjectByColorValue, getColorObjectByAttributeValues } from './utils';
+import { getColorClassName, getColorObjectByColorValue, getColorObjectByAttributeValues, getMostReadableColor } from './utils';
 
 const DEFAULT_COLORS = [];
 
@@ -54,8 +54,16 @@ export default ( ...args ) => {
 						super( props );
 
 						this.setters = this.createSetters();
+						this.colorUtils = {
+							getMostReadableColor: this.getMostReadableColor.bind( this ),
+						};
 
 						this.state = {};
+					}
+
+					getMostReadableColor( colorValue ) {
+						const { colors } = this.props;
+						return getMostReadableColor( colors, colorValue );
 					}
 
 					createSetters() {
@@ -113,6 +121,7 @@ export default ( ...args ) => {
 									colors: undefined,
 									...this.state,
 									...this.setters,
+									colorUtils: this.colorUtils,
 								} }
 							/>
 						);

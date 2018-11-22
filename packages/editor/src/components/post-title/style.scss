@@ -4,7 +4,7 @@
 	font-size: $editor-font-size;
 
 	@include break-small() {
-		padding: 5px $block-parent-side-ui-clearance;
+		padding: 5px $block-side-ui-clearance;
 	}
 
 	.editor-post-title__input {
@@ -17,13 +17,8 @@
 		line-height: $default-line-height;
 		color: $dark-gray-900;
 		transition: border 0.1s ease-out;
-
-		// Show wider parent padding on Desktop breakpoints.
 		padding: #{ $block-padding + 5px } $block-padding;
-
-		@include break-small() {
-			padding: #{ $block-padding + 5px } $parent-block-padding;
-		}
+		word-break: keep-all;
 
 		// Stack borders on mobile.
 		border: $border-width solid transparent;
@@ -52,7 +47,7 @@
 		}
 	}
 
-	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
+	&:not(.is-focus-mode) {
 		&.is-selected .editor-post-title__input {
 			// use opacity to work in various editor styles
 			border-color: $dark-opacity-light-500;
@@ -61,7 +56,9 @@
 				border-color: $light-opacity-light-500;
 			}
 		}
+	}
 
+	&:not(.is-focus-mode):not(.has-fixed-toolbar) {
 		.editor-post-title__input:hover {
 			border-color: theme(outlines);
 		}
@@ -86,7 +83,7 @@
 	right: 0;
 
 	@include break-small() {
-		left: $block-parent-side-ui-clearance;
-		right: $block-parent-side-ui-clearance;
+		left: $block-side-ui-clearance;
+		right: $block-side-ui-clearance;
 	}
 }

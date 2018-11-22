@@ -4,21 +4,8 @@
         "name": "core/quote",
         "isValid": true,
         "attributes": {
-            "value": [
-                {
-                    "children": {
-                        "type": "p",
-                        "props": {
-                            "children": [
-                                "There is no greater agony than bearing an untold story inside you."
-                            ]
-                        }
-                    }
-                }
-            ],
-            "citation": [
-                "Maya Angelou"
-            ],
+            "value": "<p>There is no greater agony than bearing an untold story inside you.</p>",
+            "citation": "Maya Angelou",
             "className": "is-style-large"
         },
         "innerBlocks": [],

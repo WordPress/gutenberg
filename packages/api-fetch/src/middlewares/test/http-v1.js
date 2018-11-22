@@ -20,7 +20,18 @@ describe( 'HTTP v1 Middleware', () => {
 
 		const requestOptions = { method: 'GET', path: '/wp/v2/posts' };
 		const callback = ( options ) => {
-			expect( options ).toEqual( requestOptions );
+			expect( options ).toBe( requestOptions );
+		};
+
+		httpV1Middleware( requestOptions, callback );
+	} );
+
+	it( "shouldn't touch the options for an undefined method", () => {
+		expect.hasAssertions();
+
+		const requestOptions = { path: '/wp/v2/posts' };
+		const callback = ( options ) => {
+			expect( options ).toBe( requestOptions );
 		};
 
 		httpV1Middleware( requestOptions, callback );

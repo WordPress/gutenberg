@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { find, kebabCase } from 'lodash';
+import { find, kebabCase, map } from 'lodash';
+import tinycolor from 'tinycolor2';
 
 /**
  * Provided an array of color objects as set by the theme or by the editor defaults,
@@ -55,4 +56,19 @@ export function getColorClassName( colorContextName, colorSlug ) {
 	}
 
 	return `has-${ kebabCase( colorSlug ) }-${ colorContextName }`;
+}
+
+/**
+* Given an array of color objects and a color value returns the color value of the most readable color in the array.
+*
+* @param {Array}   colors     Array of color objects as set by the theme or by the editor defaults.
+* @param {?string} colorValue A string containing the color value.
+*
+* @return {string} String with the color value of the most readable color.
+*/
+export function getMostReadableColor( colors, colorValue ) {
+	return tinycolor.mostReadable(
+		colorValue,
+		map( colors, 'color' )
+	).toHexString();
 }

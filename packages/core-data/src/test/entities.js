@@ -1,15 +1,8 @@
 /**
- * WordPress dependencies
- */
-import apiFetch from '@wordpress/api-fetch';
-
-/**
  * Internal dependencies
  */
 import { getMethodName, defaultEntities, getKindEntities } from '../entities';
 import { addEntities } from '../actions';
-
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
 describe( 'getMethodName', () => {
 	it( 'should return the right method name for an entity with the root kind', () => {
@@ -47,44 +40,40 @@ describe( 'getMethodName', () => {
 } );
 
 describe( 'getKindEntities', () => {
-	const POST_TYPES = {
-		post: {
-			rest_base: 'posts',
-		},
-	};
-
-	beforeAll( () => {
-		apiFetch.mockImplementation( ( options ) => {
-			if ( options.path === '/wp/v2/types?context=edit' ) {
-				return Promise.resolve( POST_TYPES );
-			}
-		} );
-	} );
-
 	it( 'shouldn’t do anything if the entities have already been resolved', async () => {
-		const state = {
-			entities: { config: [ { kind: 'postType' } ] },
-		};
-		const fulfillment = getKindEntities( state, 'postType' );
-		const done = ( await fulfillment.next() ).done;
-		expect( done ).toBe( true );
+		const entities = [ { kind: 'postType' } ];
+		const fulfillment = getKindEntities( 'postType' );
+		// Start the generator
+		fulfillment.next();
+		// Provide the entities
+		const end = fulfillment.next( entities );
+		expect( end.done ).toBe( true );
 	} );
 
 	it( 'shouldn’t do anything if there no defined kind config', async () => {
-		const state = { entities: { config: [] } };
-		const fulfillment = getKindEntities( state, 'unknownKind' );
-		const done = ( await fulfillment.next() ).done;
-		expect( done ).toBe( true );
+		const fulfillment = getKindEntities( 'unknownKind' );
+		// Start the generator
+		fulfillment.next();
+		// Provide no entities to continue
+		const end = fulfillment.next( [] );
+		expect( end.done ).toBe( true );
 	} );
 
 	it( 'should fetch and add the entities', async () => {
-		const state = { entities: { config: [] } };
-		const fulfillment = getKindEntities( state, 'postType' );
-		const received = ( await fulfillment.next() ).value;
-		expect( received ).toEqual( addEntities( [ {
+		const fetchedEntities = [ {
 			baseURL: '/wp/v2/posts',
 			kind: 'postType',
 			name: 'post',
-		} ] ) );
+		} ];
+		const fulfillment = getKindEntities( 'postType' );
+		// Start the generator
+		fulfillment.next();
+		// Provide no entities to continue
+		fulfillment.next( [] );
+		// Fetch entities and trigger action
+		const { value: action } = fulfillment.next( fetchedEntities );
+		expect( action ).toEqual( addEntities( fetchedEntities ) );
+		const end = fulfillment.next();
+		expect( end ).toEqual( { done: true, value: fetchedEntities } );
 	} );
 } );

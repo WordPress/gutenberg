@@ -3,19 +3,20 @@
 exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
 <React.Fragment>
   <IfBlockEditSelected(InspectorControlsFill)>
-    <PanelBody>
+    <ForwardRef(PanelBody)>
       <WithInstanceId(ToggleControl)
         checked={false}
         label="Hide the teaser before the \\"More\\" tag"
         onChange={[Function]}
       />
-    </PanelBody>
+    </ForwardRef(PanelBody)>
   </IfBlockEditSelected(InspectorControlsFill)>
   <div
     className="wp-block-more"
   >
     <input
       onChange={[Function]}
+      onKeyDown={[Function]}
       size={1}
       type="text"
       value=""
@@ -27,19 +28,20 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
 exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
 <React.Fragment>
   <IfBlockEditSelected(InspectorControlsFill)>
-    <PanelBody>
+    <ForwardRef(PanelBody)>
       <WithInstanceId(ToggleControl)
         checked={true}
         label="Hide the teaser before the \\"More\\" tag"
         onChange={[Function]}
       />
-    </PanelBody>
+    </ForwardRef(PanelBody)>
   </IfBlockEditSelected(InspectorControlsFill)>
   <div
     className="wp-block-more"
   >
     <input
       onChange={[Function]}
+      onKeyDown={[Function]}
       size={1}
       type="text"
       value=""

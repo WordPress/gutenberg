@@ -42,6 +42,7 @@ async function importReusableBlock( file ) {
 		data: {
 			title: parsedContent.title,
 			content: parsedContent.content,
+			status: 'publish',
 		},
 		method: 'POST',
 	} );

@@ -22,7 +22,7 @@ describe( 'resolveSelector', () => {
 		resolvers: {
 			selectAll: () => {
 				return new Promise( ( resolve ) => {
-					process.nextTick( () => resolve( { type: 'resolve' } ) );
+					resolve( { type: 'resolve' } );
 				} );
 			},
 		},

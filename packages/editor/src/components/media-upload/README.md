@@ -20,27 +20,32 @@ addFilter(
 );
 ```
 
-You can check how this component is implemented for the edit post page using `wp.media` module in [edit-post](../../edit-post/hooks/blocks/media-upload/index.js).
+You can check how this component is implemented for the edit post page using `wp.media` module in [edit-post](../../../../edit-post/src/hooks/components/media-upload/index.js).
 
 ## Usage
 
+To make sure the current user has Upload permissions, you need to wrap the MediaUpload component into the MediaUploadCheck one.
 
 ```jsx
 import { Button } from '@wordpress/components';
-import { MediaUpload } from '@wordpress/editor';
+import { MediaUpload, MediaUploadCheck } from '@wordpress/editor';
+
+const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function MyMediaUploader() {
 	return (
-		<MediaUpload
-			onSelect={ ( media ) => console.log( 'selected ' + media.length ) }
-			type="image"
-			value={ mediaId }
-			render={ ( { open } ) => (
-				<Button onClick={ open }>
-					Open Media Library
-				</Button>
-			) }
-		/>
+		<MediaUploadCheck>
+			<MediaUpload
+				onSelect={ ( media ) => console.log( 'selected ' + media.length ) }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				value={ mediaId }
+				render={ ( { open } ) => (
+					<Button onClick={ open }>
+						Open Media Library
+					</Button>
+				) }
+			/>
+		</MediaUploadCheck>
 	);
 }
 ```
@@ -49,11 +54,14 @@ function MyMediaUploader() {
 
 The component accepts the following props. Props not included in this set will be applied to the element wrapping Popover content.
 
-### type
+### allowedTypes
 
-Type of the media to upload/select from the media library (image, video, audio).
+Array with the types of the media to upload/select from the media library.
+Each type is a string that can contain the general mime type e.g: 'image', 'audio', 'text',
+or the complete mime type e.g: 'audio/mpeg', 'image/gif'.
+If allowedTypes is unset all mime types should be allowed.
 
-- Type: `String`
+- Type: `Array`
 - Required: No
 
 ### multiple

@@ -11,11 +11,14 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	getBlockAttributes,
-	getBlockType,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
+import {
+	Path,
+	SVG,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -39,8 +42,8 @@ const blockAttributes = {
 		default: '',
 	},
 	caption: {
-		type: 'array',
-		source: 'children',
+		type: 'string',
+		source: 'html',
 		selector: 'figcaption',
 	},
 	href: {
@@ -48,6 +51,18 @@ const blockAttributes = {
 		source: 'attribute',
 		selector: 'figure > a',
 		attribute: 'href',
+	},
+	rel: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'rel',
+	},
+	linkClass: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'class',
 	},
 	id: {
 		type: 'number',
@@ -65,6 +80,12 @@ const blockAttributes = {
 		type: 'string',
 		default: 'none',
 	},
+	linkTarget: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'target',
+	},
 };
 
 const imageSchema = {
@@ -80,7 +101,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'href' ],
+				attributes: [ 'href', 'rel', 'target' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -93,13 +114,16 @@ const schema = {
 export const settings = {
 	title: __( 'Image' ),
 
-	description: __( 'They’re worth 1,000 words! Insert a single image.' ),
+	description: __( 'Insert an image to make a visual statement.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" /><path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" /></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0,0h24v24H0V0z" fill="none" /><Path d="m19 5v14h-14v-14h14m0-2h-14c-1.1 0-2 0.9-2 2v14c0 1.1 0.9 2 2 2h14c1.1 0 2-0.9 2-2v-14c0-1.1-0.9-2-2-2z" /><Path d="m14.14 11.86l-3 3.87-2.14-2.59-3 3.86h12l-3.86-5.14z" /></SVG>,
 
 	category: 'common',
 
-	keywords: [ __( 'photo' ) ],
+	keywords: [
+		'img', // "img" is not translated as it is intended to reflect the HTML <img> tag.
+		__( 'photo' ),
+	],
 
 	attributes: blockAttributes,
 
@@ -116,12 +140,13 @@ export const settings = {
 					const alignMatches = /(?:^|\s)align(left|center|right)(?:$|\s)/.exec( className );
 					const align = alignMatches ? alignMatches[ 1 ] : undefined;
 					const idMatches = /(?:^|\s)wp-image-(\d+)(?:$|\s)/.exec( className );
-					const id = idMatches ? idMatches[ 1 ] : undefined;
+					const id = idMatches ? Number( idMatches[ 1 ] ) : undefined;
 					const anchorElement = node.querySelector( 'a' );
 					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
-					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href } );
+					const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
+					const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
+					const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -159,14 +184,27 @@ export const settings = {
 						selector: 'img',
 					},
 					caption: {
-						type: 'array',
-						// To do: needs to support HTML.
-						source: 'text',
+						shortcode: ( attributes, { shortcode } ) => {
+							const { content } = shortcode;
+							return content.replace( /\s*<img[^>]*>\s/, '' );
+						},
 					},
 					href: {
 						type: 'string',
 						source: 'attribute',
 						attribute: 'href',
+						selector: 'a',
+					},
+					rel: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'rel',
+						selector: 'a',
+					},
+					linkClass: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'class',
 						selector: 'a',
 					},
 					id: {
@@ -200,7 +238,19 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id } = attributes;
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			id,
+			linkTarget,
+		} = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -219,8 +269,17 @@ export const settings = {
 
 		const figure = (
 			<Fragment>
-				{ href ? <a href={ href }>{ image }</a> : image }
-				{ caption && caption.length > 0 && <RichText.Content tagName="figcaption" value={ caption } /> }
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ rel }
+					>
+						{ image }
+					</a>
+				) : image }
+				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);
 

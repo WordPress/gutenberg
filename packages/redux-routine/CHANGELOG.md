@@ -1,9 +1,21 @@
-## 3.0.0 (Unreleased)
+## 3.0.3 (2018-10-19)
+
+## 3.0.2 (2018-10-18)
+
+### Bug Fix
+
+- Account for null value in redux-routine createRuntime (introduces `isAction` and `isActionOfType` methods to assist with that).
+
+## 3.0.0 (2018-09-30)
 
 ### Breaking change
 
 - The middleware returns a promise resolving once the runtime finishes iterating over the generator.
 - It's not possible to kill the execution of the runtime anymore by returning `undefined`
+
+## Bug Fixes
+
+- Fix running routines in Firefox.
 
 ## 2.0.0 (2018-09-05)
 

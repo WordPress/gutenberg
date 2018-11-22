@@ -4,16 +4,7 @@
         "name": "core/subhead",
         "isValid": true,
         "attributes": {
-            "content": [
-                "This is a ",
-                {
-                    "type": "em",
-                    "children": [
-                        "subhead"
-                    ]
-                },
-                "."
-            ]
+            "content": "This is a <em>subhead</em>."
         },
         "innerBlocks": [],
         "originalContent": "<p class=\"wp-block-subhead\">This is a <em>subhead</em>.</p>"
