@@ -1,5 +1,5 @@
 /**
- * Verify if publish checks are enabled.
+ * Verifies if publish checks are enabled.
  * @return {boolean} Boolean which represents the state of prepublish checks.
  */
 export async function arePrePublishChecksEnabled() {

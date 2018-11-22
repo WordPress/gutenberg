@@ -4,7 +4,7 @@
 import { waitForPageDimensions } from './wait-for-page-dimensions';
 
 /**
- * Set browser viewport to specified type.
+ * Sets browser viewport to specified type.
  *
  * @param {string} type String to represent dimensions type; can be either small or large.
  */

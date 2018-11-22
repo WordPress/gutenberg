@@ -12,7 +12,7 @@ import { getUrl } from './get-url';
  * Checks if current url is a WordPress path.
  *
  * @param {string} WPPath String to be serialized as pathname.
- * @param {string} query String to be serialized as query portion of URL.
+ * @param {?string} query String to be serialized as query portion of URL.
  * @return {boolean} Boolean represents wheter current URL is or not a WordPress path.
  */
 export function isWPPath( WPPath, query = '' ) {

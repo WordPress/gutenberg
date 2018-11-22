@@ -4,7 +4,7 @@
 import { toggleOption } from './toggle-option';
 
 /**
- * Enable Pre-publish checks
+ * Enables Pre-publish checks.
  */
 export async function enablePrePublishChecks() {
 	await toggleOption( 'Enable Pre-publish Checks', true );
