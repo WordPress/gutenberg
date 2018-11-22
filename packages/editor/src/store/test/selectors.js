@@ -2555,6 +2555,24 @@ describe( 'selectors', () => {
 	describe( 'getSelectedBlockClientId', () => {
 		it( 'should return null if no block is selected', () => {
 			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								23: { clientId: 23, name: 'core/heading', attributes: {} },
+								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+							},
+							order: {
+								'': [ 23, 123 ],
+								23: [],
+								123: [],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
 				blockSelection: { start: null, end: null },
 			};
 
@@ -2563,6 +2581,24 @@ describe( 'selectors', () => {
 
 		it( 'should return null if there is multi selection', () => {
 			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								23: { clientId: 23, name: 'core/heading', attributes: {} },
+								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+							},
+							order: {
+								'': [ 23, 123 ],
+								23: [],
+								123: [],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
 				blockSelection: { start: 23, end: 123 },
 			};
 
@@ -2571,6 +2607,24 @@ describe( 'selectors', () => {
 
 		it( 'should return the selected block ClientId', () => {
 			const state = {
+				currentPost: {},
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								23: { clientId: 23, name: 'core/heading', attributes: {} },
+								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+							},
+							order: {
+								'': [ 23, 123 ],
+								23: [],
+								123: [],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
 				blockSelection: { start: 23, end: 23 },
 			};
 
