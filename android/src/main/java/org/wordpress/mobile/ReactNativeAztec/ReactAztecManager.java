@@ -57,6 +57,8 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @Override
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
+        aztecText.setFocusableInTouchMode(true);
+        aztecText.setFocusable(true);
         aztecText.setCalypsoMode(false);
         return aztecText;
     }
