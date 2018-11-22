@@ -3,9 +3,9 @@
  */
 import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
 
-const isAndroid = Platform.OS == 'android';
-const marginLeft = isAndroid ? -3 : -4;
+const isAndroid = Platform.OS === 'android';
 const marginBottom = isAndroid ? -0.5 : 0;
+const marginLeft = -3;
 
 const styles = StyleSheet.create( {
 	container: {
@@ -33,12 +33,12 @@ const styles = StyleSheet.create( {
 		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
-		color: '#87a6bc',
+		color: '#7B9AB1',
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
 		marginLeft: marginLeft,
-		marginBottom: marginBottom
+		marginBottom: marginBottom,
 	},
 	subscriptActive: {
 		color: 'white',
@@ -46,7 +46,7 @@ const styles = StyleSheet.create( {
 		fontSize: 13,
 		alignSelf: 'flex-end',
 		marginLeft: marginLeft,
-		marginBottom: marginBottom
+		marginBottom: marginBottom,
 	},
 } );
 
@@ -55,6 +55,7 @@ export default function Button( props ) {
 
 	return (
 		<TouchableOpacity
+			activeOpacity={ 0.7 }
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
 			onPress={ onClick }
