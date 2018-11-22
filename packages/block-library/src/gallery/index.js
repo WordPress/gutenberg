@@ -100,13 +100,28 @@ export const settings = {
 				blocks: [ 'core/image' ],
 				transform: ( attributes ) => {
 					const validImages = filter( attributes, ( { id, url } ) => id && url );
+					// init the align attribute from the first item which may be either the place holder or an image.
+					let { align } = attributes[ 0 ];
+
 					if ( validImages.length > 0 ) {
+						// loop through all the images and check if they have the same align.
+						align = validImages.reduce( ( accumulator, imageAttributes, index ) => {
+							const imageAlign = imageAttributes.align;
+
+							if ( accumulator === imageAlign || ( ! index && align ) ) {
+								return imageAlign;
+							}
+							// if there are two different alignments, unset the align attribute.
+							return null;
+						}, align );
+
 						return createBlock( 'core/gallery', {
 							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
 							ids: validImages.map( ( { id } ) => id ),
+							align,
 						} );
 					}
-					return createBlock( 'core/gallery' );
+					return createBlock( 'core/gallery', { align } );
 				},
 			},
 			{
@@ -174,11 +189,11 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
-				transform: ( { images } ) => {
+				transform: ( { images, align } ) => {
 					if ( images.length > 0 ) {
-						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
+						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption, align } ) );
 					}
-					return createBlock( 'core/image' );
+					return createBlock( 'core/image', { align } );
 				},
 			},
 		],
