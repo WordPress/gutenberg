@@ -97,9 +97,13 @@ export function isHorizontalEdge( container, isReverse ) {
 	let node = range.startContainer;
 
 	let extentOffset;
+
 	if ( isReverse ) {
-		// When in reverse, range node should be first.
-		extentOffset = 0;
+		if ( node.nodeValue ) {
+			extentOffset = node.nodeValue.search( /[^\ufeff]/ );
+		} else {
+			extentOffset = 0;
+		}
 	} else if ( node.nodeValue ) {
 		// Otherwise, vary by node type. A text node has no children. Its range
 		// offset reflects its position in nodeValue.
@@ -110,7 +114,7 @@ export function isHorizontalEdge( container, isReverse ) {
 		//
 		// See: https://developer.mozilla.org/en-US/docs/Web/API/Range/startOffset
 		// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeValue
-		extentOffset = node.nodeValue.length;
+		extentOffset = node.nodeValue.replace( /\ufeff+$/, '' ).length;
 	} else {
 		// "For other Node types, the startOffset is the number of child nodes
 		// between the start of the startContainer and the boundary point of

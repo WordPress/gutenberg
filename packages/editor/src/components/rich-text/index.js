@@ -576,21 +576,7 @@ export class RichText extends Component {
 					this.onChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.onSplit ) {
-				const text = getTextContent( record );
-				const length = text.length;
-				let toInsert = '\n';
-
-				// If the caret is at the end of the text, and there is no
-				// trailing line break or no text at all, we have to insert two
-				// line breaks in order to create a new line visually and place
-				// the caret there.
-				if ( record.end === length && (
-					text.charAt( length - 1 ) !== '\n' || length === 0
-				) ) {
-					toInsert = '\n\n';
-				}
-
-				this.onChange( insert( record, toInsert ) );
+				this.onChange( insert( record, '\n' ) );
 			} else {
 				this.splitContent();
 			}
