@@ -1,0 +1,9 @@
+jdk:
+  - openjdk9
+before_install:
+   - ./prepareEnvironment.sh
+install:
+   - echo "Running a custom install command"
+   - cd react-native-gutenberg-bridge
+   - mvn clean install -DskipTests
+
