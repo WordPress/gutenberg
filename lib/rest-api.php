@@ -206,6 +206,11 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 		return $response;
 	}
 
+	$post_type_obj = get_post_type_object( $post->post_type );
+	if ( ! is_post_type_viewable( $post_type_obj ) || ! $post_type_obj->public ) {
+		return $response;
+	}
+
 	if ( ! function_exists( 'get_sample_permalink' ) ) {
 		require_once ABSPATH . '/wp-admin/includes/post.php';
 	}
