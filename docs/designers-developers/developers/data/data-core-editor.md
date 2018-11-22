@@ -1292,11 +1292,12 @@ Returns the permalink for the post.
 
 *Returns*
 
-The permalink.
+The permalink, or null if the post is not viewable.
 
 ### getPermalinkParts
 
-Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+Returns the permalink for a post, split into it's three parts: the prefix,
+the postName, and the suffix.
 
 *Parameters*
 
@@ -1304,7 +1305,8 @@ Returns the permalink for a post, split into it's three parts: the prefix, the p
 
 *Returns*
 
-The prefix, postName, and suffix for the permalink.
+An object containing the prefix, postName, and suffix for
+                 the permalink, or null if the post is not viewable.
 
 ### inSomeHistory
 

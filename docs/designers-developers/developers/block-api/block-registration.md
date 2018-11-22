@@ -233,8 +233,8 @@ transforms: {
                 // An attribute can be source from the shortcode attributes
                 align: {
                     type: 'string',
-                    shortcode: function( named ) {
-                        var align = named.align ? named.align : 'alignnone';
+                    shortcode: function( attributes ) {
+                        var align = attributes.named.align ? attributes.named.align : 'alignnone';
                         return align.replace( 'align', '' );
                     },
                 },

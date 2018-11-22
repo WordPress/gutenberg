@@ -26,6 +26,7 @@ const MoreMenu = () => (
 			<IconButton
 				icon="ellipsis"
 				label={ isOpen ? ariaOpen : ariaClosed }
+				labelPosition="bottom"
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 			/>
