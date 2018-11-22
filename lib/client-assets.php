@@ -87,6 +87,8 @@ if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 			gutenberg_override_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
 			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
 		}
+
+		gutenberg_override_script( 'wp-tinymce-lists', includes_url( 'js/tinymce/' ) . "plugins/lists/plugin{$suffix}.js", array( 'wp-tinymce' ), $tinymce_version );
 	}
 }
 
@@ -619,12 +621,6 @@ function gutenberg_register_vendor_scripts() {
 		'moment',
 		'https://unpkg.com/moment@2.22.1/' . $moment_script,
 		array()
-	);
-	$tinymce_version = '4.7.11';
-	gutenberg_register_vendor_script(
-		'tinymce-latest-lists',
-		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
-		array( 'wp-tinymce' )
 	);
 	gutenberg_register_vendor_script(
 		'lodash',
@@ -1215,10 +1211,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		),
 	);
 
-	/*
-	 * Set a locale specific default font.
-	 * Translators: Use this to specify the CSS font family for the default font
-	 */
+	/* Translators: Use this to specify the CSS font family for the default font */
 	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
 	$styles[]           = array(
 		'css' => "body { font-family: '$locale_font_family' }",

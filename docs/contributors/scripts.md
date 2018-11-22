@@ -50,13 +50,12 @@ The editor also uses some popular third-party packages and scripts. Plugin devel
 | [React](https://reactjs.org) | react  | React is a JavaScript library for building user interfaces |
 | [React Dom](https://reactjs.org/docs/react-dom.html) | react-dom | Serves as the entry point to the DOM and server renderers for React, intended to be paired with React |
 | [Moment](https://momentjs.com/) | moment| Parse, validate, manipulate, and display dates and times in JavaScript |
-| [TinyMCE Lists](https://www.tiny.cloud/docs/plugins/lists/) | tinymce-latest-lists| The `lists` plugin allows you to add numbered and bulleted lists to TinyMCE |
 | [Lodash](https://lodash.com) | lodash| Lodash is a JavaScript library which provides utility functions for common programming tasks |
 
 ## Polyfill Scripts
 
 The editor also provides polyfills for certain features that may not be available in all modern browsers.
-It is recommened to use the main `wp-polyfill` script handle which takes care of loading all the below mentioned polyfills.  
+It is recommened to use the main `wp-polyfill` script handle which takes care of loading all the below mentioned polyfills.
 
 | Script Name | Handle | Description |
 |-------------|--------|-------------|

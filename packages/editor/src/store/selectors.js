@@ -2119,10 +2119,15 @@ export function isPermalinkEditable( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {string} The permalink.
+ * @return {?string} The permalink, or null if the post is not viewable.
  */
 export function getPermalink( state ) {
-	const { prefix, postName, suffix } = getPermalinkParts( state );
+	const permalinkParts = getPermalinkParts( state );
+	if ( ! permalinkParts ) {
+		return null;
+	}
+
+	const { prefix, postName, suffix } = permalinkParts;
 
 	if ( isPermalinkEditable( state ) ) {
 		return prefix + postName + suffix;
@@ -2132,14 +2137,20 @@ export function getPermalink( state ) {
 }
 
 /**
- * Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+ * Returns the permalink for a post, split into it's three parts: the prefix,
+ * the postName, and the suffix.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} The prefix, postName, and suffix for the permalink.
+ * @return {Object} An object containing the prefix, postName, and suffix for
+ *                  the permalink, or null if the post is not viewable.
  */
 export function getPermalinkParts( state ) {
 	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	if ( ! permalinkTemplate ) {
+		return null;
+	}
+
 	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
 
 	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
