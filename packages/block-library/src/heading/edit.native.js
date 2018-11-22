@@ -24,6 +24,12 @@ import './editor.scss';
 const minHeight = 50;
 
 class HeadingEdit extends Component {
+	constructor( props ) {
+		super( props );
+
+		this.aztecHeight = 0;
+	}
+
 	render() {
 		const {
 			attributes,
@@ -49,7 +55,7 @@ class HeadingEdit extends Component {
 					value={ content }
 					isSelected={ this.props.isSelected }
 					style={ {
-						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
+						minHeight: Math.max( minHeight, this.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
@@ -72,7 +78,7 @@ class HeadingEdit extends Component {
 							undefined
 					}
 					onContentSizeChange={ ( event ) => {
-						setAttributes( { aztecHeight: event.aztecHeight } );
+						this.aztecHeight = event.aztecHeight;
 					} }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>

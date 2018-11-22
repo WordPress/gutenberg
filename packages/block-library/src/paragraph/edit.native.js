@@ -23,7 +23,7 @@ class ParagraphEdit extends Component {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
 
-		this.aztecHeight = ( props.attributes || {} ).aztecHeight || null;
+		this.aztecHeight = 0;
 	}
 
 	/**
@@ -92,7 +92,7 @@ class ParagraphEdit extends Component {
 					isSelected={ this.props.isSelected }
 					style={ {
 						...style,
-						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
+						minHeight: Math.max( minHeight, this.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
@@ -101,20 +101,12 @@ class ParagraphEdit extends Component {
 							...this.props.attributes,
 							content: newParaBlock.attributes.content,
 						} );
-					}
-					}
+					} }
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
-						if ( this.aztecHeight !== event.aztecHeight ) {
-							setAttributes( {
-								...this.props.attributes,
-								aztecHeight: event.aztecHeight,
-							} );
-							this.aztecHeight = event.aztecHeight;
-						}
-					}
-					}
+						this.aztecHeight = event.aztecHeight;
+					} }
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 				/>
 			</View>
