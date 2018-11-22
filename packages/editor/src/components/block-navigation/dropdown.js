@@ -32,7 +32,7 @@ function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
 					<IconButton
 						icon={ MenuIcon }
 						aria-expanded={ isOpen }
-						onClick={ onToggle }
+						onClick={ hasBlocks || isTextModeEnabled ? onToggle : undefined }
 						label={ __( 'Block Navigation' ) }
 						className="editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
