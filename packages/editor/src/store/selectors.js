@@ -852,8 +852,8 @@ export function hasSelectedBlock( state ) {
  * @return {?string} Selected block client ID.
  */
 export function getSelectedBlockClientId( state ) {
-	const { start, end } = state.blockSelection;
-	return start === end && start ? start : null;
+	const selectedBlock = getSelectedBlock( state );
+	return get( selectedBlock, [ 'clientId' ], null );
 }
 
 /**
@@ -864,7 +864,11 @@ export function getSelectedBlockClientId( state ) {
  * @return {?Object} Selected block.
  */
 export function getSelectedBlock( state ) {
-	const clientId = getSelectedBlockClientId( state );
+	const { start, end } = state.blockSelection;
+	let clientId = null;
+	if ( start === end && start ) {
+		clientId = start;
+	}
 	return clientId ? getBlock( state, clientId ) : null;
 }
 
