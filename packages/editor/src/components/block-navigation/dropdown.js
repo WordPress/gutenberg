@@ -18,7 +18,7 @@ const MenuIcon = (
 	</SVG>
 );
 
-function BlockNavigationDropdown( { disableNavigationBlock } ) {
+function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
 	return	(
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
@@ -36,7 +36,7 @@ function BlockNavigationDropdown( { disableNavigationBlock } ) {
 						label={ __( 'Block Navigation' ) }
 						className="editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
-						aria-disabled={ disableNavigationBlock }
+						aria-disabled={ ! hasBlocks || isTextModeEnabled }
 					/>
 				</Fragment>
 			) }
@@ -48,5 +48,6 @@ function BlockNavigationDropdown( { disableNavigationBlock } ) {
 }
 
 export default withSelect( ( select ) => ( {
-	disableNavigationBlock: select( 'core/edit-post' ).getEditorMode() === 'text',
+	hasBlocks: !! select( 'core/editor' ).getBlockCount(),
+	isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
 } ) )( BlockNavigationDropdown );
