@@ -33,7 +33,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 		$title = get_the_title( $post_id );
 		if ( ! $title ) {
-			$title = __( '(Untitled)' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
+			$title = __( '(Untitled)' );
 		}
 		$list_items_markup .= sprintf(
 			'<li><a href="%1$s">%2$s</a>',

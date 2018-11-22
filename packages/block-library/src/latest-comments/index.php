@@ -29,7 +29,7 @@ if ( ! function_exists( 'gutenberg_draft_or_post_title' ) ) {
 	function gutenberg_draft_or_post_title( $post = 0 ) {
 		$title = get_the_title( $post );
 		if ( empty( $title ) ) {
-			$title = __( '(no title)' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
+			$title = __( '(no title)' );
 		}
 		return esc_html( $title );
 	}
@@ -96,14 +96,12 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 			// `esc_html`.
 			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . gutenberg_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
 
-			// phpcs:disable WordPress.WP.I18n.MissingArgDomainDefault
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
 				__( '%1$s on %2$s' ),
 				$author_markup,
 				$post_title
 			);
-			// phpcs:enable WordPress.WP.I18n.MissingArgDomainDefault
 
 			if ( $attributes['displayDate'] ) {
 				$list_items_markup .= sprintf(
@@ -145,7 +143,7 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 	) : sprintf(
 		'<div class="%1$s">%2$s</div>',
 		$classnames,
-		__( 'No comments to show.' ) // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
+		__( 'No comments to show.' )
 	);
 
 	return $block_content;
