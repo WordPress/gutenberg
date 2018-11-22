@@ -119,3 +119,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @luehrsen | @luehrsen |
 | @getsource | @mikeschroder |
 | @greatislander | @greatislander |
+| @sharazghouri | @sharaz |
