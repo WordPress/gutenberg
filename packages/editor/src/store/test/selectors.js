@@ -2571,6 +2571,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the selected block ClientId', () => {
 			const state = {
+				editor: { present: { blocks: { byClientId: { 23: { name: 'fake block' } } } } },
 				blockSelection: { start: 23, end: 23 },
 			};
 
