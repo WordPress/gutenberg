@@ -14,6 +14,8 @@ class AztecView extends React.Component {
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
     onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     onContentSizeChange: PropTypes.func,
     onEnter: PropTypes.func,
     onBackspace: PropTypes.func,
@@ -87,6 +89,24 @@ class AztecView extends React.Component {
     onHTMLContentWithCursor(text, selectionStart, selectionEnd);
   }
 
+  _onFocus = (event) => {
+    if (!this.props.onFocus) {
+      return;
+    }
+
+    const { onFocus } = this.props;
+    onFocus(event);
+  }
+  
+  _onBlur = (event) => {
+    if (!this.props.onBlur) {
+      return;
+    }
+
+    const { onBlur } = this.props;
+    onBlur(event);
+  }
+
   render() {
     const { onActiveFormatsChange, ...otherProps } = this.props    
     return (
@@ -95,6 +115,8 @@ class AztecView extends React.Component {
         onContentSizeChange = { this._onContentSizeChange }
         onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
         onEnter = { this._onEnter }
+        onFocus = { this._onFocus }
+        onBlur = { this._onBlur }
         onBackspace = { this._onBackspace }
       />
     );

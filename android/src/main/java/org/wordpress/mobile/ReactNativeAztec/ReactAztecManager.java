@@ -43,6 +43,12 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     public static final String REACT_CLASS = "RCTAztecView";
 
+    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 1;
+    private static final int FOCUS_TEXT_INPUT = 2;
+    private static final int BLUR_TEXT_INPUT = 3;
+
+    private static final String TAG = "ReactAztecText";
+
     @Override
     public String getName() {
         return REACT_CLASS;
@@ -242,13 +248,12 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.shouldHandleOnBackspace = onBackspaceHandling;
     }
 
-    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 1;
-    private static final String TAG = "ReactAztecText";
-
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
                 .put("applyFormat", COMMAND_NOTIFY_APPLY_FORMAT)
+                .put("focusTextInput", FOCUS_TEXT_INPUT)
+                .put("blurTextInput", BLUR_TEXT_INPUT)
                 .build();
     }
 
@@ -263,6 +268,12 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                 parent.applyFormat(format);
                 return;
             }
+            case FOCUS_TEXT_INPUT:
+                parent.requestFocusFromJS();
+                break;
+            case BLUR_TEXT_INPUT:
+                parent.clearFocusFromJS();
+                break;
             default:
                 super.receiveCommand(parent, commandType, args);
         }
