@@ -96,12 +96,14 @@ function gutenberg_render_block_core_latest_comments( $attributes = array() ) {
 			// `esc_html`.
 			$post_title = '<a class="wp-block-latest-comments__comment-link" href="' . esc_url( get_comment_link( $comment ) ) . '">' . gutenberg_draft_or_post_title( $comment->comment_post_ID ) . '</a>';
 
+			// phpcs:disable WordPress.WP.I18n.MissingArgDomainDefault
 			$list_items_markup .= sprintf(
 				/* translators: 1: author name (inside <a> or <span> tag, based on if they have a URL), 2: post title related to this comment */
-				__( '%1$s on %2$s' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomainDefault
+				__( '%1$s on %2$s' ),
 				$author_markup,
 				$post_title
 			);
+			// phpcs:enable WordPress.WP.I18n.MissingArgDomainDefault
 
 			if ( $attributes['displayDate'] ) {
 				$list_items_markup .= sprintf(
