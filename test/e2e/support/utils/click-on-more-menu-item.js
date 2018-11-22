@@ -1,4 +1,3 @@
-
 /**
  * Clicks on More Menu item, searches for the button with the text provided and clicks it.
  *
