@@ -33,7 +33,7 @@ const styles = StyleSheet.create( {
 		backgroundColor: '#2e4453',
 	},
 	subscriptInactive: {
-		color: '#7B9AB1',
+		color: '#7b9ab1',
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
