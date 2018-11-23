@@ -64,7 +64,7 @@ export default function Button( props ) {
 	const isDisabled = ariaDisabled || disabled;
 	const buttonViewStyle = {
 		opacity: isDisabled ? 0.2 : 1,
-		...( ariaPressed ? styles.buttonActive : styles.buttonInactive )
+		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
 	};
 
 	return (
