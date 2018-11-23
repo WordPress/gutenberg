@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType} from 'react-native';
+import TextInputState from 'react-native/lib/TextInputState';
 
 class AztecView extends React.Component {
   
@@ -91,6 +92,8 @@ class AztecView extends React.Component {
   }
 
   _onFocus = (event) => {
+    TextInputState.focusTextInput(ReactNative.findNodeHandle(this));
+
     if (!this.props.onFocus) {
       return;
     }
@@ -100,6 +103,8 @@ class AztecView extends React.Component {
   }
   
   _onBlur = (event) => {
+    TextInputState.blurTextInput(ReactNative.findNodeHandle(this));
+
     if (!this.props.onBlur) {
       return;
     }
