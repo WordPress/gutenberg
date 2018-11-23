@@ -38,14 +38,17 @@
 	height: 60px;
 	background: $white;
 
-	> * {
+	// Actual preview contents.
+	.editor-block-preview__content {
 		transform: scale(0.7);
 		transform-origin: center center;
-		font-family: $editor-font;
-	}
-
-	.editor-block-preview__content {
 		width: 100%;
+
+		// Unset some of the styles that might be inherited from the editor style.
+		margin: 0;
+		padding: 0;
+		overflow: visible;
+		min-height: auto;
 	}
 }
 
