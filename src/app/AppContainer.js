@@ -24,7 +24,7 @@ type PropsType = {
 	onSelect: string => mixed,
 	onAttributesUpdate: ( string, mixed ) => mixed,
 	initialHtml: string,
-	setupEditor: ( mixed, Array<BlockType> ) => mixed,
+	setupEditor: ( mixed, ?mixed ) => mixed,
 };
 
 class AppContainer extends React.Component<PropsType> {
