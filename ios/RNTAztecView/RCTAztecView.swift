@@ -120,9 +120,14 @@ class RCTAztecView: Aztec.TextView {
     }
     
     func packCaretDataForRN() -> [AnyHashable: Any] {
+        var start = selectedRange.location
+        var end = selectedRange.location + selectedRange.length
+        if selectionAffinity == .backward {
+            (start, end) = (end, start)
+        }
         return ["text": getHTML(),
-                "selectionStart": selectedRange.location,
-                "selectionEnd": selectedRange.location + selectedRange.length,
+                "selectionStart": start,
+                "selectionEnd": end,
         ]
     }
 
