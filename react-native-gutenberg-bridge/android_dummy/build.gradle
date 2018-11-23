@@ -1,0 +1,49 @@
+
+buildscript {
+    repositories {
+        jcenter()
+        google()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.wordpress-mobile.gutenberg-mobile'
+
+android {
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+    }
+    lintOptions {
+        abortOnError false
+    }
+}
+
+repositories {
+    google()
+    jcenter()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "https://unpkg.com/react-native@0.57.5/android"
+    }
+    maven {
+        // Local Maven repo containing AARs with JSC library built for Android
+        url "https://unpkg.com/jsc-android@224109.1.0/dist/"
+    }
+}
+
+dependencies {
+    implementation 'com.facebook.react:react-native:+'
+}
