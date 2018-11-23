@@ -17,6 +17,10 @@ type PropsType = {
 	onInsertClick: void => void,
 	onKeyboardHide: void => void,
 	showKeyboardHideButton: boolean,
+	hasRedo: boolean,
+	hasUndo: boolean,
+	redo: void => void,
+	undo: void => void,
 };
 
 export class BlockToolbar extends Component<PropsType> {
