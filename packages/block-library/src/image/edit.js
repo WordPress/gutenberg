@@ -661,23 +661,25 @@ class ImageEdit extends Component {
 									} }
 								/>
 							</div>
+							<p className="block-library-image__dimensions__row">
+								{ __( 'Relative Image Size' ) }
+							</p>
 							<div className="block-library-image__dimensions__row">
-								<ButtonGroup aria-label={ __( 'Image Size' ) }>
+								<ButtonGroup aria-label={ __( 'Relative Image Size' ) }>
 									{ [ 25, 50, 75, 100 ].map( ( percent ) => {
 										// Percentage is relative to the block width.
-										let scaledWidth = Math.round( blockWidth * ( percent / 100 ) );
+										const scaledWidth = Math.round( blockWidth * ( percent / 100 ) );
+										const disabled = scaledWidth > imageWidth;
 										let isCurrent = false;
 
-										if ( scaledWidth > imageWidth ) {
-											scaledWidth = imageWidth;
-											isCurrent = percent === 100 && ( ! width || width === scaledWidth );
-										} else {
+										if ( ! disabled ) {
 											isCurrent = ( width === scaledWidth ) || ( ! width && percent === 100 && imageWidth > blockWidth );
 										}
 
 										return (
 											<Button
 												key={ percent }
+												disabled={ disabled }
 												isSmall
 												isPrimary={ isCurrent }
 												aria-pressed={ isCurrent }
