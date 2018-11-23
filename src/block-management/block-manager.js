@@ -6,7 +6,7 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 
-import { Platform, Switch, Text, View, FlatList, KeyboardAvoidingView } from 'react-native';
+import { Switch, Text, View, FlatList, Keyboard } from 'react-native';
 import BlockHolder from './block-holder';
 import { InlineToolbarButton } from './constants';
 import type { BlockType } from '../store/types';
@@ -14,9 +14,14 @@ import styles from './block-manager.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
+import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 
 // Gutenberg imports
 import { createBlock } from '@wordpress/blocks';
+import EventEmitter from 'events';
+
+const keyboardDidShow = 'keyboardDidShow';
+const keyboardDidHide = 'keyboardDidHide';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -40,9 +45,13 @@ type StateType = {
 	blocks: Array<BlockType>,
 	selectedBlockType: string,
 	refresh: boolean,
+	isKeyboardVisible: boolean,
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
+	keyboardDidShowListener: EventEmitter;
+	keyboardDidHideListener: EventEmitter;
+
 	constructor( props: PropsType ) {
 		super( props );
 
@@ -59,6 +68,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
 			refresh: false,
+			isKeyboardVisible: false,
 		};
 	}
 
@@ -66,6 +76,10 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	// once we move the action to the toolbar
 	showBlockTypePicker( show: boolean ) {
 		this.setState( { ...this.state, blockTypePickerVisible: show } );
+	}
+
+	onKeyboardHide() {
+		Keyboard.dismiss();
 	}
 
 	onBlockTypeSelected( itemValue: string ) {
@@ -114,7 +128,25 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// TODO: implement settings
 				break;
 		}
-	};
+	}
+
+	componentDidMount() {
+		this.keyboardDidShowListener = Keyboard.addListener( keyboardDidShow, this.keyboardDidShow );
+		this.keyboardDidHideListener = Keyboard.addListener( keyboardDidHide, this.keyboardDidHide );
+	}
+
+	componentWillUnmount() {
+		Keyboard.removeListener( keyboardDidShow, this.keyboardDidShow );
+		Keyboard.removeListener( keyboardDidHide, this.keyboardDidHide );
+	}
+
+	keyboardDidShow = () => {
+		this.setState( { isKeyboardVisible: true } );
+	}
+
+	keyboardDidHide = () => {
+		this.setState( { isKeyboardVisible: false } );
+	}
 
 	insertBlocksAfter( clientId: string, blocks: Array<Object> ) {
 		//TODO: make sure to insert all the passed blocks
@@ -164,7 +196,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	renderList() {
-		const behavior = Platform.OS === 'ios' ? 'padding' : null;
 		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
 		// And fix problems with RecyclerViewList on Android
 		const list = (
@@ -177,12 +208,16 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			/>
 		);
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } } behavior={ behavior }>
+			<KeyboardAvoidingView style={ { flex: 1 } }>
 				{ list }
 				<BlockToolbar
 					onInsertClick={ () => {
 						this.showBlockTypePicker( true );
 					} }
+					onKeyboardHide={ () => {
+						this.onKeyboardHide();
+					} }
+					showKeyboardHideButton={ this.state.isKeyboardVisible }
 				/>
 			</KeyboardAvoidingView>
 		);
