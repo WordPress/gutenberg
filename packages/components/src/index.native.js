@@ -6,7 +6,6 @@ export { default as ToolbarButton } from './toolbar-button';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
 export { default as IconButton } from './icon-button';
 export { default as Spinner } from './spinner';
-export { default as ToolbarButton } from './toolbar-button';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components
