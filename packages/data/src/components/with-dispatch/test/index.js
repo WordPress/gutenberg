@@ -136,7 +136,7 @@ describe( 'withDispatch', () => {
 			},
 		} );
 
-		const Component = withDispatch( ( _dispatch, ownProps, _select ) => {
+		const Component = withDispatch( ( _dispatch, ownProps, { select: _select } ) => {
 			const outerCount = _select( 'counter' ).getCount();
 			return {
 				update: () => {

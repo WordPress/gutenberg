@@ -65,7 +65,7 @@ export default compose( [
 			selectedBlockClientIds,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps, select ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const { getBlocksByClientId } = select( 'core/editor' );
 		const { removeBlocks } = dispatch( 'core/editor' );
 

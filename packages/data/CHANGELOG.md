@@ -2,7 +2,7 @@
 
 ### New Feature
 
-- `withDispatch`'s `mapDispatchToProps` function takes the `select` function as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).
+- `withDispatch`'s `mapDispatchToProps` function takes the `registry` object as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).
 
 ## 4.0.1 (2018-11-20)
 

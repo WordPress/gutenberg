@@ -39,7 +39,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 
 			proxyDispatch( propName, ...args ) {
 				// Original dispatcher is a pre-bound (dispatching) action creator.
-				mapDispatchToProps( this.props.registry.dispatch, this.props.ownProps, this.props.registry.select )[ propName ]( ...args );
+				mapDispatchToProps( this.props.registry.dispatch, this.props.ownProps, this.props.registry )[ propName ]( ...args );
 			}
 
 			setProxyProps( props ) {
@@ -49,7 +49,7 @@ const withDispatch = ( mapDispatchToProps ) => createHigherOrderComponent(
 				// called, it is done only to determine the keys for which
 				// proxy functions should be created. The actual registry
 				// dispatch does not occur until the function is called.
-				const propsToDispatchers = mapDispatchToProps( this.props.registry.dispatch, props.ownProps, this.props.registry.select );
+				const propsToDispatchers = mapDispatchToProps( this.props.registry.dispatch, props.ownProps, this.props.registry );
 				this.proxyProps = mapValues( propsToDispatchers, ( dispatcher, propName ) => {
 					if ( typeof dispatcher !== 'function' ) {
 						// eslint-disable-next-line no-console

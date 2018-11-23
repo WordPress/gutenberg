@@ -669,7 +669,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 	};
 } );
 
-const applyWithDispatch = withDispatch( ( dispatch, ownProps, select ) => {
+const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	const { getBlockSelectionStart } = select( 'core/editor' );
 	const {
 		updateBlockAttributes,
