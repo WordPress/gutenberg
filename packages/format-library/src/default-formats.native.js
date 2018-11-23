@@ -13,4 +13,4 @@ export default [
 	italic,
 	link,
 	strikethrough,
-]
+];
