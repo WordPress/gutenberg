@@ -48,6 +48,8 @@ public class ReactAztecText extends AztecText {
     String lastSentFormattingOptionsEventString = "";
     boolean shouldHandleOnEnter = false;
     boolean shouldHandleOnBackspace = false;
+    boolean shouldHandleOnSelectionChange = false;
+    boolean shouldHandleActiveFormatsChange = false;
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
@@ -69,6 +71,13 @@ public class ReactAztecText extends AztecText {
         });
         mInputMethodManager = (InputMethodManager)
                 Assertions.assertNotNull(getContext().getSystemService(Context.INPUT_METHOD_SERVICE));
+        this.setOnSelectionChangedListener(new OnSelectionChangedListener() {
+            @Override
+            public void onSelectionChanged(int selStart, int selEnd) {
+                ReactAztecText.this.updateToolbarButtons(selStart, selEnd);
+                ReactAztecText.this.propagateSelectionChanges(selStart, selEnd);
+            }
+        });
     }
 
     @Override
@@ -163,26 +172,6 @@ public class ReactAztecText extends AztecText {
         setIntrinsicContentSize();
     }
 
-    void setActiveFormatsChange(boolean enabled) {
-        // If it's not enabled set an empty listener on AztecText
-        if (!enabled) {
-            setOnSelectionChangedListener(new OnSelectionChangedListener() {
-                @Override
-                public void onSelectionChanged(int selStart, int selEnd) {
-                    // nope
-                }
-            });
-            return;
-        }
-
-        setOnSelectionChangedListener(new OnSelectionChangedListener() {
-            @Override
-            public void onSelectionChanged(int selStart, int selEnd) {
-               ReactAztecText.this.updateToolbarButtons(selStart, selEnd);
-            }
-        });
-    }
-
     private void updateToolbarButtons(int selStart, int selEnd) {
         ArrayList<ITextFormat> appliedStyles = getAppliedStyles(selStart, selEnd);
         updateToolbarButtons(appliedStyles);
@@ -216,13 +205,27 @@ public class ReactAztecText extends AztecText {
         }
         lastSentFormattingOptionsEventString = newOptionsAsString;
 
+        if (shouldHandleActiveFormatsChange) {
+            ReactContext reactContext = (ReactContext) getContext();
+            EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+            eventDispatcher.dispatchEvent(
+                    new ReactAztecFormattingChangeEvent(
+                            getId(),
+                            formattingOptions.toArray(new String[formattingOptions.size()])
+                    )
+            );
+        }
+    }
+
+    private void propagateSelectionChanges(int selStart, int selEnd) {
+        if (!shouldHandleOnSelectionChange) {
+            return;
+        }
+        String content = toHtml(false);
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecFormattingChangeEvent(
-                        getId(),
-                        formattingOptions.toArray(new String[formattingOptions.size()])
-                )
+                new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd)
         );
     }
 

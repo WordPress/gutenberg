@@ -84,6 +84,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onActiveFormatsChange")))
                 .put(
+                        "topSelectionChange",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onSelectionChange")))
+                .put(
                         "topEndEditing",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
@@ -226,7 +231,12 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     @ReactProp(name = "onActiveFormatsChange", defaultBoolean = false)
     public void setOnActiveFormatsChange(final ReactAztecText view, boolean onActiveFormatsChange) {
-        view.setActiveFormatsChange(onActiveFormatsChange);
+        view.shouldHandleActiveFormatsChange = onActiveFormatsChange;
+    }
+
+    @ReactProp(name = "onSelectionChange", defaultBoolean = false)
+    public void setOnSelectionChange(final ReactAztecText view, boolean onSelectionChange) {
+        view.shouldHandleOnSelectionChange = onSelectionChange;
     }
 
     @ReactProp(name = "onScroll", defaultBoolean = false)
