@@ -103,13 +103,30 @@ export const settings = {
 				isMatch: ( node ) => (
 					node.nodeName === 'BLOCKQUOTE' &&
 					// The quote block can only handle multiline paragraph
-					// content.
-					Array.from( node.childNodes ).every( ( child ) => child.nodeName === 'P' )
+					// content with an optional last cite child.
+					Array.from( node.childNodes ).every(
+						( child, index, children ) => {
+							// Child is paragraph.
+							if ( child.nodeName === 'P' ) {
+								return true;
+							}
+							// Is last child and is a cite.
+							if (
+								index === children.length - 1 &&
+								child.nodeName === 'CITE'
+							) {
+								return true;
+							}
+						}
+					)
 				),
 				schema: {
 					blockquote: {
 						children: {
 							p: {
+								children: getPhrasingContentSchema(),
+							},
+							cite: {
 								children: getPhrasingContentSchema(),
 							},
 						},
