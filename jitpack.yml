@@ -2,6 +2,6 @@ install:
    - echo "Changing into the android folder of the Bridge module"
    - pushd react-native-gutenberg-bridge/android
    - ./gradlew clean -Pgroup=cogithub.wordpress-mobile.gutenberg-mobile -Pversion=$VERSION install
-   - popd && pushd react-native-gutenberg-bridge-dummy/android
+   - popd && pushd react-native-gutenberg-bridge/android_dummy
    - ./gradlew clean -Pgroup=cogithub.wordpress-mobile.gutenberg-mobile -Pversion=$VERSION install
 
