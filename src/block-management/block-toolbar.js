@@ -5,11 +5,9 @@
 
 import React, { Component } from 'react';
 import { View } from 'react-native';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
-import {
-	EditorHistoryRedo,
-	EditorHistoryUndo,
-} from '@wordpress/editor';
 import { BlockFormatControls, BlockControls } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 
@@ -21,24 +19,44 @@ type PropsType = {
 	showKeyboardHideButton: boolean,
 };
 
-export default class BlockToolbar extends Component<PropsType> {
+export class BlockToolbar extends Component<PropsType> {
 	render() {
+		const {
+			hasRedo,
+			hasUndo,
+			redo,
+			undo,
+			onInsertClick,
+			onKeyboardHide,
+			showKeyboardHideButton,
+		} = this.props;
+
 		return (
 			<View style={ styles.container }>
 				<Toolbar>
 					<ToolbarButton
 						label={ __( 'Add block' ) }
 						icon="insert"
-						onClick={ this.props.onInsertClick }
+						onClick={ onInsertClick }
+					/>
+					<ToolbarButton
+						label={ __( 'Undo' ) }
+						icon="undo"
+						disabled={ ! hasUndo }
+						onClick={ hasUndo ? undo : undefined }
+					/>
+					<ToolbarButton
+						label={ __( 'Redo' ) }
+						icon="redo"
+						disabled={ ! hasRedo }
+						onClick={ hasRedo ? redo : undefined }
 					/>
 				</Toolbar>
-				<EditorHistoryUndo />
-				<EditorHistoryRedo />
-				{ this.props.showKeyboardHideButton && ( <Toolbar>
+				{ showKeyboardHideButton && ( <Toolbar>
 					<ToolbarButton
 						label={ __( 'Keyboard hide' ) }
 						icon="arrow-down"
-						onClick={ this.props.onKeyboardHide }
+						onClick={ onKeyboardHide }
 					/>
 				</Toolbar> ) }
 				<BlockControls.Slot />
@@ -47,3 +65,14 @@ export default class BlockToolbar extends Component<PropsType> {
 		);
 	}
 }
+
+export default compose( [
+	withSelect( ( select ) => ( {
+		hasRedo: select( 'core/editor' ).hasEditorRedo(),
+		hasUndo: select( 'core/editor' ).hasEditorUndo(),
+	} ) ),
+	withDispatch( ( dispatch ) => ( {
+		redo: dispatch( 'core/editor' ).redo,
+		undo: dispatch( 'core/editor' ).undo,
+	} ) ),
+] )( BlockToolbar );
