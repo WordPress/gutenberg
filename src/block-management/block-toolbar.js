@@ -42,13 +42,13 @@ export class BlockToolbar extends Component<PropsType> {
 					<ToolbarButton
 						label={ __( 'Undo' ) }
 						icon="undo"
-						disabled={ ! hasUndo }
+						isDisabled={ ! hasUndo }
 						onClick={ undo }
 					/>
 					<ToolbarButton
 						label={ __( 'Redo' ) }
 						icon="redo"
-						disabled={ ! hasRedo }
+						isDisabled={ ! hasRedo }
 						onClick={ redo }
 					/>
 				</Toolbar>
