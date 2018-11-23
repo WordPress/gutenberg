@@ -1,9 +1,5 @@
-jdk:
-  - openjdk9
-before_install:
-   - ./prepareEnvironment.sh
 install:
-   - echo "Running a custom install command"
-   - cd react-native-gutenberg-bridge
-   - mvn clean install -DskipTests
+   - echo "Changing into the android folder of the Bridge module"
+   - cd react-native-gutenberg-bridge/android
+   - gradle install
 
