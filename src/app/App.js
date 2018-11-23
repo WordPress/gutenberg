@@ -13,6 +13,7 @@ import AppContainer from './AppContainer';
 import initialHtml from './initial-html';
 
 import * as UnsupportedBlock from '../block-types/unsupported-block/';
+import '@wordpress/format-library';
 
 registerCoreBlocks();
 registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
