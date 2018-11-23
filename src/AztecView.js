@@ -5,6 +5,7 @@ import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorProp
 class AztecView extends React.Component {
   
   static propTypes = {
+    isSelected: PropTypes.bool,
     disableGutenbergMode: PropTypes.bool,
     text: PropTypes.object,
     placeholder: PropTypes.string,
@@ -13,6 +14,8 @@ class AztecView extends React.Component {
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
     onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     onContentSizeChange: PropTypes.func,
     onEnter: PropTypes.func,
     onBackspace: PropTypes.func,
@@ -87,6 +90,24 @@ class AztecView extends React.Component {
     onHTMLContentWithCursor(text, selectionStart, selectionEnd);
   }
 
+  _onFocus = (event) => {
+    if (!this.props.onFocus) {
+      return;
+    }
+
+    const { onFocus } = this.props;
+    onFocus(event);
+  }
+  
+  _onBlur = (event) => {
+    if (!this.props.onBlur) {
+      return;
+    }
+
+    const { onBlur } = this.props;
+    onBlur(event);
+  }
+
   _onSelectionChange = (event) => {
     if (!this.props.onSelectionChange) {
       return;
@@ -105,6 +126,8 @@ class AztecView extends React.Component {
         onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
         onSelectionChange = { this._onSelectionChange }
         onEnter = { this._onEnter }
+        onFocus = { this._onFocus }
+        onBlur = { this._onBlur }
         onBackspace = { this._onBackspace }
       />
     );
