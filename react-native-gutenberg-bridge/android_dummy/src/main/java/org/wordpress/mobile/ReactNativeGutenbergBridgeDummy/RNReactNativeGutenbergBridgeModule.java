@@ -9,7 +9,7 @@ import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridgeDummy.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 
 public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext mReactContext;
