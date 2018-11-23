@@ -13,75 +13,72 @@ import {
  */
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { Toolbar } from '@wordpress/components';
 import { BlockFormatControls } from '@wordpress/editor';
 import {
 	isEmpty,
+	apply,
 	create,
 	split,
+	unstableToDom,
 	toHTMLString,
 } from '@wordpress/rich-text';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { children } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-
-const FORMATTING_CONTROLS = [
-	{
-		icon: 'editor-bold',
-		title: __( 'Bold' ),
-		format: 'bold',
-	},
-	{
-		icon: 'editor-italic',
-		title: __( 'Italic' ),
-		format: 'italic',
-	},
-	// TODO: get this back after alpha
-	// {
-	// 	icon: 'admin-links',
-	// 	title: __( 'Link' ),
-	// 	format: 'link',
-	// },
-	{
-		icon: 'editor-strikethrough',
-		title: __( 'Strikethrough' ),
-		format: 'strikethrough',
-	},
-];
+import FormatEdit from './format-edit';
+import FormatToolbar from './format-toolbar';
 
 const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
 };
 
-export function getFormatValue( formatName ) {
-	if ( 'link' === formatName ) {
-		//TODO: Implement link command
-	}
-	return { isActive: true };
-}
-
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
 		this.isIOS = Platform.OS === 'ios';
+		this.getRecord = this.getRecord.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
-		this.changeFormats = this.changeFormats.bind( this );
-		this.toggleFormat = this.toggleFormat.bind( this );
-		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
+		this.onFormatChange = this.onFormatChange.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
-		this.state = {
-			formats: {},
-			selectedNodeId: 0,
-		};
+		this.state = {};
+	}
+
+	/**
+	 * Get the current record (value and selection) from props and state.
+	 *
+	 * @return {Object} The current record (value and selection).
+	 */
+	getRecord() {
+		const { formats, text } = this.formatToValue( this.props.value );
+		const { start, end } = this.state;
+
+		return { formats, text, start, end };
+	}
+
+	applyRecord( record ) {
+		const current = unstableToDom( {
+			value: this.getRecord(),
+		} ).body
+		try {
+			apply( {
+				value: record,
+				current: current,
+			} );
+		} catch (e) {
+			// This is terrible, we need a better check or fixing JSDOM
+			if ( e.message == "Wrong document") {
+				// JSDOM is not playing nice
+				console.log("ignoring dom exception");
+			}
+		}
 	}
 
 	/*
@@ -149,19 +146,15 @@ export class RichText extends Component {
 		return this.removeRootTagsProduceByAztec( value );
 	}
 
-	onActiveFormatsChange( formats ) {
-		// force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
-		// This is needed because our shouldComponentUpdate impl. doesn't take in consideration props yet.
-		this.forceUpdate();
-		const newFormats = formats.reduce( ( accFormats, activeFormat ) => {
-			accFormats[ activeFormat ] = getFormatValue( activeFormat );
-			return accFormats;
-		}, {} );
+	onFormatChange( record ) {
+		this.applyRecord( record );
 
-		this.setState( {
-			formats: merge( {}, newFormats ),
-			selectedNodeId: this.state.selectedNodeId + 1,
+		const { start, end } = record;
+		this.lastContent = this.valueToFormat( record );
+		this.props.onChange( {
+			content: this.lastContent
 		} );
+		this.setState( { start, end } );
 	}
 
 	/*
@@ -249,14 +242,12 @@ export class RichText extends Component {
 		if ( Array.isArray( value ) ) {
 			return create( {
 				html: children.toHTML( value ),
-				multilineTag: this.multilineTag,
 			} );
 		}
 
 		if ( this.props.format === 'string' ) {
 			return create( {
 				html: value,
-				multilineTag: this.multilineTag,
 			} );
 		}
 
@@ -310,67 +301,26 @@ export class RichText extends Component {
 		}
 	}
 
-	isFormatActive( format ) {
-		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	removeFormat( format ) {
-		this._editor.applyFormat( format );
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	applyFormat( format, args, node ) {
-		this._editor.applyFormat( format );
-	}
-
-	changeFormats( formats ) {
-		const newStateFormats = {};
-		forEach( formats, ( formatValue, format ) => {
-			newStateFormats[ format ] = getFormatValue( format );
-			const isActive = this.isFormatActive( format );
-			if ( isActive && ! formatValue ) {
-				this.removeFormat( format );
-			} else if ( ! isActive && formatValue ) {
-				this.applyFormat( format );
-			}
-		} );
-
-		this.setState( ( state ) => ( {
-			formats: merge( {}, state.formats, newStateFormats ),
-		} ) );
-	}
-
-	toggleFormat( format ) {
-		return () => this.changeFormats( {
-			[ format ]: ! this.state.formats[ format ],
-		} );
-	}
-
 	render() {
 		const {
 			tagName,
 			style,
 			formattingControls,
+			isSelected,
 			value,
 		} = this.props;
 
-		const toolbarControls = FORMATTING_CONTROLS
-			.filter( ( control ) => formattingControls.indexOf( control.format ) !== -1 )
-			.map( ( control ) => ( {
-				...control,
-				onClick: this.toggleFormat( control.format ),
-				isActive: this.isFormatActive( control.format ),
-			} ) );
-
 		// Save back to HTML from React tree
 		const html = '<' + tagName + '>' + value + '</' + tagName + '>';
+		const record = this.getRecord();
 
 		return (
 			<View>
-				<BlockFormatControls>
-					<Toolbar controls={ toolbarControls } />
-				</BlockFormatControls>
+				{ isSelected && (
+					<BlockFormatControls>
+						<FormatToolbar controls={ formattingControls } />
+					</BlockFormatControls>
+				)}
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
@@ -383,7 +333,6 @@ export class RichText extends Component {
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
-					onActiveFormatsChange={ this.onActiveFormatsChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChange }
 					isSelected={ this.props.isSelected }
@@ -392,13 +341,14 @@ export class RichText extends Component {
 					maxImagesWidth={ 200 }
 					style={ style }
 				/>
+				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
 		);
 	}
 }
 
 RichText.defaultProps = {
-	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
+	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
 	format: 'string',
 };
 
@@ -428,3 +378,5 @@ RichTextContainer.Content.defaultProps = {
 };
 
 export default RichTextContainer;
+export { RichTextShortcut } from './shortcut';
+export { RichTextToolbarButton } from './toolbar-button';
