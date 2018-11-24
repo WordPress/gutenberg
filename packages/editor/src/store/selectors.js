@@ -629,8 +629,7 @@ export const getBlock = createSelector(
 		if ( ! block ) {
 			return null;
 		}
-
-		let { attributes } = block;
+		let attributes = state.editor.present.blocks.attributesByClientId[ clientId ];
 
 		// Inject custom source attribute values.
 		//
@@ -659,6 +658,7 @@ export const getBlock = createSelector(
 	},
 	( state, clientId ) => [
 		state.editor.present.blocks.byClientId[ clientId ],
+		state.editor.present.blocks.attributesByClientId[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
 		state.editor.present.edits.meta,
 		state.initialEdits.meta,
@@ -1090,6 +1090,7 @@ export const getMultiSelectedBlocks = createSelector(
 		state.editor.present.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
+		state.editor.present.blocks.attributesByClientId,
 		state.editor.present.blocks.byClientId,
 		state.editor.present.edits.meta,
 		state.initialEdits.meta,
@@ -1140,7 +1141,7 @@ const isAncestorOf = createSelector(
 		return possibleAncestorId === idToCheck;
 	},
 	( state ) => [
-		state.editor.present.blocks,
+		state.editor.present.blocks.order,
 	],
 );
 
@@ -1947,7 +1948,8 @@ export const getInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.present.blocks,
+		state.editor.present.blocks.byClientId,
+		state.editor.present.blocks.order,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -1981,7 +1983,8 @@ export const hasInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.present.blocks,
+		state.editor.present.blocks.order,
+		state.editor.present.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.reusableBlocks.data,

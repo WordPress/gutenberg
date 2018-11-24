@@ -106,10 +106,36 @@ function getFlattenedBlocks( blocks ) {
 
 		stack.push( ...innerBlocks );
 
-		flattenedBlocks[ block.clientId ] = block;
+		flattenedBlocks[ block.clientId ] = omit( block, [ 'attributes' ] );
 	}
 
 	return flattenedBlocks;
+}
+
+/**
+ * Given an array of blocks, returns an object containing all block attributes, recursing
+ * into inner blocks. Keys correspond to the block client ID, the value of
+ * which is the block attributes object.
+ *
+ * @param {Array} blocks Blocks to flatten.
+ *
+ * @return {Object} Flattened block attributes object.
+ */
+function getFlattenedBlockAttributes( blocks ) {
+	const flattenedBlockAttributes = {};
+
+	const stack = [ ...blocks ];
+	while ( stack.length ) {
+		// `innerBlocks` is redundant data which can fall out of sync, since
+		// this is reflected in `blocks.order`, so exclude from appended block.
+		const { innerBlocks, ...block } = stack.shift();
+
+		stack.push( ...innerBlocks );
+
+		flattenedBlockAttributes[ block.clientId ] = block.attributes || {};
+	}
+
+	return flattenedBlockAttributes;
 }
 
 /**
@@ -263,6 +289,10 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 				...omit( state.byClientId, visibleClientIds ),
 				...getFlattenedBlocks( action.blocks ),
 			},
+			attributesByClientId: {
+				...omit( state.attributesByClientId, visibleClientIds ),
+				...getFlattenedBlockAttributes( action.blocks ),
+			},
 			order: {
 				...omit( state.order, visibleClientIds ),
 				...mapBlockOrder( action.blocks ),
@@ -369,48 +399,23 @@ export const editor = flow( [
 						...getFlattenedBlocks( action.blocks ),
 					};
 
-				case 'UPDATE_BLOCK_ATTRIBUTES':
-					// Ignore updates if block isn't known
-					if ( ! state[ action.clientId ] ) {
-						return state;
-					}
-
-					// Consider as updates only changed values
-					const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
-						if ( value !== result[ key ] ) {
-							result = getMutateSafeObject( state[ action.clientId ].attributes, result );
-							result[ key ] = value;
-						}
-
-						return result;
-					}, state[ action.clientId ].attributes );
-
-					// Skip update if nothing has been changed. The reference will
-					// match the original block if `reduce` had no changed values.
-					if ( nextAttributes === state[ action.clientId ].attributes ) {
-						return state;
-					}
-
-					// Otherwise merge attributes into state
-					return {
-						...state,
-						[ action.clientId ]: {
-							...state[ action.clientId ],
-							attributes: nextAttributes,
-						},
-					};
-
+				// TODO: Check if this action is necessary
 				case 'UPDATE_BLOCK':
 					// Ignore updates if block isn't known
 					if ( ! state[ action.clientId ] ) {
 						return state;
 					}
 
+					const changes = omit( action.updates, 'attributes' );
+					if ( keys( changes ).length === 0 ) {
+						return state;
+					}
+
 					return {
 						...state,
 						[ action.clientId ]: {
 							...state[ action.clientId ],
-							...action.updates,
+							...omit( action.updates, 'attributes' ),
 						},
 					};
 
@@ -432,6 +437,83 @@ export const editor = flow( [
 
 				case 'REMOVE_BLOCKS':
 					return omit( state, action.clientIds );
+			}
+
+			return state;
+		},
+
+		attributesByClientId( state = {}, action ) {
+			switch ( action.type ) {
+				case 'SETUP_EDITOR_STATE':
+					return getFlattenedBlockAttributes( action.blocks );
+
+				case 'RECEIVE_BLOCKS':
+					return {
+						...state,
+						...getFlattenedBlockAttributes( action.blocks ),
+					};
+
+				case 'UPDATE_BLOCK_ATTRIBUTES':
+					// Ignore updates if block isn't known
+					if ( ! state[ action.clientId ] ) {
+						return state;
+					}
+
+					// Consider as updates only changed values
+					const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
+						if ( value !== result[ key ] ) {
+							result = getMutateSafeObject( state[ action.clientId ].attributes, result );
+							result[ key ] = value;
+						}
+
+						return result;
+					}, state[ action.clientId ] );
+
+					// Skip update if nothing has been changed. The reference will
+					// match the original block if `reduce` had no changed values.
+					if ( nextAttributes === state[ action.clientId ] ) {
+						return state;
+					}
+
+					// Otherwise merge attributes into state
+					return {
+						...state,
+						[ action.clientId ]: nextAttributes,
+					};
+
+				// TODO: Check if this action is necessary
+				case 'UPDATE_BLOCK':
+					// Ignore updates if block isn't known
+					if ( ! state[ action.clientId ] || ! action.updates.attributes ) {
+						return state;
+					}
+
+					return {
+						...state,
+						[ action.clientId ]: {
+							...state[ action.clientId ],
+							...action.updates.attributes,
+						},
+					};
+
+				case 'INSERT_BLOCKS':
+					return {
+						...state,
+						...getFlattenedBlockAttributes( action.blocks ),
+					};
+
+				case 'REPLACE_BLOCKS':
+					if ( ! action.blocks ) {
+						return state;
+					}
+
+					return {
+						...omit( state, action.clientIds ),
+						...getFlattenedBlockAttributes( action.blocks ),
+					};
+
+				case 'REMOVE_BLOCKS':
+					return omit( state, action.clientIds );
 
 				case 'SAVE_REUSABLE_BLOCK_SUCCESS': {
 					const { id, updatedId } = action;
@@ -441,18 +523,16 @@ export const editor = flow( [
 						return state;
 					}
 
-					return mapValues( state, ( block ) => {
-						if ( block.name === 'core/block' && block.attributes.ref === id ) {
+					// TODO fix this by moving this to a higher level (we need the block name)
+					return mapValues( state, ( attributes ) => {
+						if ( attributes.ref && attributes.ref === id ) {
 							return {
-								...block,
-								attributes: {
-									...block.attributes,
-									ref: updatedId,
-								},
+								...attributes,
+								ref: updatedId,
 							};
 						}
 
-						return block;
+						return attributes;
 					} );
 				}
 			}
