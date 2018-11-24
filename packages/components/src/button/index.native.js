@@ -1,20 +1,71 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, View, Platform } from 'react-native';
+
+const isAndroid = Platform.OS === 'android';
+const marginBottom = isAndroid ? -0.5 : 0;
+const marginLeft = -3;
+
+const styles = StyleSheet.create( {
+	container: {
+		flex: 1,
+		padding: 3,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	buttonInactive: {
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		aspectRatio: 1,
+		backgroundColor: 'white',
+	},
+	buttonActive: {
+		flex: 1,
+		flexDirection: 'row',
+		justifyContent: 'center',
+		alignItems: 'center',
+		borderRadius: 6,
+		borderColor: '#2e4453',
+		aspectRatio: 1,
+		backgroundColor: '#2e4453',
+	},
+	subscriptInactive: {
+		color: '#7b9ab1',
+		fontWeight: 'bold',
+		fontSize: 13,
+		alignSelf: 'flex-end',
+		marginLeft: marginLeft,
+		marginBottom: marginBottom,
+	},
+	subscriptActive: {
+		color: 'white',
+		fontWeight: 'bold',
+		fontSize: 13,
+		alignSelf: 'flex-end',
+		marginLeft: marginLeft,
+		marginBottom: marginBottom,
+	},
+} );
 
 export default function Button( props ) {
 	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;
+
 	return (
 		<TouchableOpacity
+			activeOpacity={ 0.7 }
 			accessible={ true }
 			accessibilityLabel={ ariaLabel }
 			onPress={ onClick }
-			style={ { borderColor: ariaPressed ? 'black' : 'white', borderWidth: 1, borderRadius: 2 } }
+			style={ styles.container }
 		>
-			<View style={ { height: 44, width: 44, flexDirection: 'row', justifyContent: 'center', alignItems: 'center' } }>
-				{ children }
-				{ subscript && ( <Text style={ { fontVariant: [ 'small-caps' ] } }>{ subscript }</Text> ) }
+			<View style={ ariaPressed ? styles.buttonActive : styles.buttonInactive }>
+				<View style={ { flexDirection: 'row' } }>
+					{ children }
+					{ subscript && ( <Text style={ ariaPressed ? styles.subscriptActive : styles.subscriptInactive }>{ subscript }</Text> ) }
+				</View>
 			</View>
 		</TouchableOpacity>
 	);

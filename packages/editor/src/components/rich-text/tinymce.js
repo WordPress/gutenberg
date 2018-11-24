@@ -23,6 +23,7 @@ import { diffAriaProps, pickAriaProps } from './aria';
 
 const { getSelection } = window;
 const { TEXT_NODE } = window.Node;
+const { userAgent } = window.navigator;
 
 /**
  * Zero-width space character used by TinyMCE as a caret landing point for
@@ -33,23 +34,6 @@ const { TEXT_NODE } = window.Node;
  * @type {string}
  */
 export const TINYMCE_ZWSP = '\uFEFF';
-
-/**
- * Determines whether we need a fix to provide `input` events for contenteditable.
- *
- * @param {Element} editorNode The root editor node.
- *
- * @return {boolean} A boolean indicating whether the fix is needed.
- */
-function needsInternetExplorerInputFix( editorNode ) {
-	return (
-		// Rely on userAgent in the absence of a reasonable feature test for contenteditable `input` events.
-		/Trident/.test( window.navigator.userAgent ) &&
-		// IE11 dispatches input events for `<input>` and `<textarea>`.
-		! /input/i.test( editorNode.tagName ) &&
-		! /textarea/i.test( editorNode.tagName )
-	);
-}
 
 /**
  * Applies a fix that provides `input` events for contenteditable in Internet Explorer.
@@ -113,6 +97,14 @@ function applyInternetExplorerInputFix( editorNode ) {
 }
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
+
+/**
+ * Whether or not the user agent is Internet Explorer.
+ *
+ * @type {boolean}
+ */
+const IS_IE = userAgent.indexOf( 'Trident' ) >= 0;
+
 export default class TinyMCE extends Component {
 	constructor() {
 		super();
@@ -243,6 +235,16 @@ export default class TinyMCE extends Component {
 
 					// Restore the original `setHTML` once initialized.
 					editor.dom.setHTML = setHTML;
+
+					// In IE11, focus is lost to parent after initialising
+					// TinyMCE, so we have to set it back.
+					if (
+						IS_IE &&
+						document.activeElement !== this.editorNode &&
+						document.activeElement.contains( this.editorNode )
+					) {
+						this.editorNode.focus();
+					}
 				} );
 
 				editor.on( 'keydown', this.onKeyDown, true );
@@ -266,7 +268,7 @@ export default class TinyMCE extends Component {
 			this.removeInternetExplorerInputFix = null;
 		}
 
-		if ( editorNode && needsInternetExplorerInputFix( editorNode ) ) {
+		if ( IS_IE ) {
 			this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
 		}
 	}

@@ -613,7 +613,7 @@ class ImageEdit extends Component {
 		} );
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -713,8 +713,8 @@ class ImageEdit extends Component {
 								label={ __( 'Link URL' ) }
 								value={ href || '' }
 								onChange={ this.onSetCustomHref }
-								placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
-								disabled={ isLinkURLInputDisabled }
+								placeholder={ ! isLinkURLInputReadOnly ? 'https://' : undefined }
+								readOnly={ isLinkURLInputReadOnly }
 							/>
 							<ToggleControl
 								label={ __( 'Open in New Tab' ) }

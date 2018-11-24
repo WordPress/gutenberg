@@ -1,6 +1,7 @@
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
 export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
+export { clickButton } from './click-button';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { convertBlock } from './convert-block';

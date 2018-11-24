@@ -2571,6 +2571,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the selected block ClientId', () => {
 			const state = {
+				editor: { present: { blocks: { byClientId: { 23: { name: 'fake block' } } } } },
 				blockSelection: { start: 23, end: 23 },
 			};
 
@@ -5042,6 +5043,17 @@ describe( 'selectors', () => {
 
 			expect( getPermalink( state ) ).toBe( 'http://foo.test/bar/baz/' );
 		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalink( state ) ).toBeNull();
+		} );
 	} );
 
 	describe( 'getPermalinkParts', () => {
@@ -5086,6 +5098,17 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
+		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toBeNull();
 		} );
 	} );
 

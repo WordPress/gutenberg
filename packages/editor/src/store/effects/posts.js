@@ -170,10 +170,10 @@ export const requestPostUpdate = async ( action, store ) => {
  * @param {Object} store   Redux Store.
  */
 export const requestPostUpdateSuccess = ( action ) => {
-	const { previousPost, post, isAutosave, postType } = action;
+	const { previousPost, post, postType } = action;
 
 	// Autosaves are neither shown a notice nor redirected.
-	if ( isAutosave ) {
+	if ( get( action.options, [ 'isAutosave' ] ) ) {
 		return;
 	}
 
