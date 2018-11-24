@@ -43,15 +43,16 @@ export const getBlockWidth = ( () => {
 				return;
 			}
 
+			const block = document.createElement( 'div' );
 			const measure = document.createElement( 'div' );
-			measure.className = 'wp-block editor-block-list__block';
-			layout.appendChild( measure );
-			const { clientWidth } = measure;
-			layout.removeChild( measure );
 
-			// 30 = ( 2 * $block-padding ) + ( 2 * $border-width )
-			// See: https://github.com/WordPress/gutenberg/blob/master/assets/stylesheets/_variables.scss
-			width = clientWidth - 30;
+			block.className = 'wp-block editor-block-list__block';
+			measure.className = 'editor-block-list__block-edit';
+			layout.appendChild( block );
+			block.appendChild( measure );
+
+			width = measure.clientWidth;
+			layout.removeChild( block );
 		}
 
 		return width;
