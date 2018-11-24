@@ -527,12 +527,18 @@ function gutenberg_render_block_core_image( $html, $block ) {
 
 	$attr = '';
 	foreach ( $image_attributes as $name => $value ) {
-		// Sanitize for valid HTML 5.0 attribute names
-		//
-		// See: https://www.w3.org/TR/html52/syntax.html#attribute-names .
-		$is_invalid_attribute = preg_match( '/[\\\\u007F-\\\\u009F "\'>\/="\\\\uFDD0-\\\\uFDEF]/', strtolower( $name ) );
+		// Sanitize for valid HTML 5.0 attribute names.
+		// TODO: perhaps add core function to test this.
+		$name = strtolower( $name );
 
-		if ( $is_invalid_attribute ) {
+		if ( strpos( $name, 'data-' ) === 0 ) {
+			$is_invalid_attribute_name = preg_match( '/[\\\\u007F-\\\\u009F "\'>\/=\\\\uFDD0-\\\\uFDEF]/', $name );
+		} else {
+			// List of valid HTML attribute names: https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes.
+			$is_invalid_attribute_name = preg_match( '/[^a-z0-9-]/', $name );
+		}
+
+		if ( $is_invalid_attribute_name ) {
 			continue;
 		}
 
@@ -550,11 +556,10 @@ function gutenberg_render_block_core_image( $html, $block ) {
 	$image_tag = '<img' . $attr . ' />';
 
 	// Replace the img tag.
-	$html = preg_replace( '/<img\s?[^>]+>/', $image_tag, $html );
+	$html = preg_replace( '/<img\s[^>]+>/', $image_tag, $html );
 
 	return $html;
 }
-// Needs WP 5.0-beta4 to work.
 add_filter( 'render_block', 'gutenberg_render_block_core_image', 10, 2 );
 
 /**
