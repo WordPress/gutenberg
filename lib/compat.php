@@ -422,7 +422,7 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta = null
 
 		// Attempt to find the largest image size that may have been added by themes or plugins.
 		if ( ! empty( $image_meta['sizes'] ) ) {
-			foreach( $image_meta['sizes'] as $size ) {
+			foreach ( $image_meta['sizes'] as $size ) {
 				if ( $size['width'] > $image_dimensions[0] && wp_image_matches_ratio( $block_attributes['fileWidth'], $block_attributes['fileHeight'], $size['width'], $size['height'] ) ) {
 					$image_dimensions = array(
 						$size['width'],
