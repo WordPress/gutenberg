@@ -1225,15 +1225,12 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 				);
 			} else {
 				$file = get_theme_file_path( $style );
-				if ( file_exists( get_theme_file_path( $style ) ) ) {
-					$css = file_get_contents( get_theme_file_path( $style ) );
-				} else {
-					$css = '';
+				if ( file_exists( $file ) ) {
+					$styles[] = array(
+						'css'     => file_get_contents( $file ),
+						'baseURL' => get_theme_file_uri( $style ),
+					);
 				}
-				$styles[] = array(
-					'css'     => $css,
-					'baseURL' => get_theme_file_uri( $style ),
-				);
 			}
 		}
 	}
