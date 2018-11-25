@@ -8,7 +8,6 @@ import deepFreeze from 'deep-freeze';
  */
 
 import { applyFormat } from '../apply-format';
-import { ZERO_WIDTH_NO_BREAK_SPACE } from '../special-characters';
 import { getSparseArrayLength } from './helpers';
 
 describe( 'applyFormat', () => {
@@ -61,16 +60,17 @@ describe( 'applyFormat', () => {
 			end: 0,
 		};
 		const expected = {
-			formats: [ [ a2 ], , , , , [ a ], [ a ], [ a ], , , , , , , ],
-			text: `${ ZERO_WIDTH_NO_BREAK_SPACE }one two three`,
-			start: 1,
-			end: 1,
+			...record,
+			formatPlaceholder: {
+				format: a2,
+				index: 0,
+			},
 		};
 		const result = applyFormat( deepFreeze( record ), a2 );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 4 );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
 	} );
 
 	it( 'should apply format on existing format if selection is collapsed', () => {

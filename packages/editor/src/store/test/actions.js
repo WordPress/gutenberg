@@ -7,11 +7,11 @@ import {
 	stopTyping,
 	enterFormattedText,
 	exitFormattedText,
-	fetchReusableBlocks,
-	saveReusableBlock,
-	deleteReusableBlock,
-	convertBlockToStatic,
-	convertBlockToReusable,
+	__experimentalFetchReusableBlocks as fetchReusableBlocks,
+	__experimentalSaveReusableBlock as saveReusableBlock,
+	__experimentalDeleteReusableBlock as deleteReusableBlock,
+	__experimentalConvertBlockToStatic as convertBlockToStatic,
+	__experimentalConvertBlockToReusable as convertBlockToReusable,
 	toggleSelection,
 	setupEditor,
 	resetPost,
@@ -188,6 +188,7 @@ describe( 'actions', () => {
 				index,
 				rootClientId: 'testclientid',
 				time: expect.any( Number ),
+				updateSelection: true,
 			} );
 		} );
 	} );
@@ -204,6 +205,7 @@ describe( 'actions', () => {
 				index,
 				rootClientId: 'testclientid',
 				time: expect.any( Number ),
+				updateSelection: true,
 			} );
 		} );
 	} );

@@ -6,12 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { IconButton } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { ifCondition, compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import Inserter from '../inserter';
 
 class BlockInsertionPoint extends Component {
 	constructor() {
@@ -22,12 +24,12 @@ class BlockInsertionPoint extends Component {
 
 		this.onBlurInserter = this.onBlurInserter.bind( this );
 		this.onFocusInserter = this.onFocusInserter.bind( this );
-		this.onClick = this.onClick.bind( this );
 	}
 
 	onFocusInserter( event ) {
-		// We stop propagation of the focus event to avoid selecting the current block
-		// While we're trying to insert a new block
+		// Stop propagation of the focus event to avoid selecting the current
+		// block while inserting a new block, as it is not relevant to sibling
+		// insertion and conflicts with contextual toolbar placement.
 		event.stopPropagation();
 
 		this.setState( {
@@ -41,32 +43,40 @@ class BlockInsertionPoint extends Component {
 		} );
 	}
 
-	onClick() {
-		const { layout, rootClientId, index, ...props } = this.props;
-		props.insertDefaultBlock( { layout }, rootClientId, index );
-		props.startTyping();
-		this.onBlurInserter();
-		if ( props.onInsert ) {
-			this.props.onInsert();
-		}
-	}
-
 	render() {
 		const { isInserterFocused } = this.state;
-		const { showInsertionPoint, showInserter } = this.props;
+		const {
+			showInsertionPoint,
+			canShowInserter,
+			rootClientId,
+			insertIndex,
+		} = this.props;
 
 		return (
 			<div className="editor-block-list__insertion-point">
-				{ showInsertionPoint && <div className="editor-block-list__insertion-point-indicator" /> }
-				{ showInserter && (
-					<div className={ classnames( 'editor-block-list__insertion-point-inserter', { 'is-visible': isInserterFocused } ) }>
-						<IconButton
-							icon="insert"
-							className="editor-block-list__insertion-point-button"
-							onClick={ this.onClick }
-							label={ __( 'Insert block' ) }
-							onFocus={ this.onFocusInserter }
-							onBlur={ this.onBlurInserter }
+				{ showInsertionPoint && (
+					<div className="editor-block-list__insertion-point-indicator" />
+				) }
+				{ canShowInserter && (
+					<div
+						onFocus={ this.onFocusInserter }
+						onBlur={ this.onBlurInserter }
+						// While ideally it would be enough to capture the
+						// bubbling focus event from the Inserter, due to the
+						// characteristics of click focusing of `button`s in
+						// Firefox and Safari, it is not reliable.
+						//
+						// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+						tabIndex={ -1 }
+						className={
+							classnames( 'editor-block-list__insertion-point-inserter', {
+								'is-visible': isInserterFocused,
+							} )
+						}
+					>
+						<Inserter
+							rootClientId={ rootClientId }
+							index={ insertIndex }
 						/>
 					</div>
 				) }
@@ -74,44 +84,23 @@ class BlockInsertionPoint extends Component {
 		);
 	}
 }
-export default compose(
-	withSelect( ( select, { clientId, rootClientId, canShowInserter } ) => {
-		const {
-			canInsertBlockType,
-			getBlockIndex,
-			getBlockInsertionPoint,
-			getBlock,
-			isBlockInsertionPointVisible,
-			isTyping,
-		} = select( 'core/editor' );
-		const {
-			getDefaultBlockName,
-		} = select( 'core/blocks' );
-		const blockIndex = clientId ? getBlockIndex( clientId, rootClientId ) : -1;
-		const insertIndex = blockIndex;
-		const insertionPoint = getBlockInsertionPoint();
-		const block = clientId ? getBlock( clientId ) : null;
-		const showInsertionPoint = (
-			isBlockInsertionPointVisible() &&
-			insertionPoint.index === insertIndex &&
-			insertionPoint.rootClientId === rootClientId &&
-			( ! block || ! isUnmodifiedDefaultBlock( block ) )
-		);
+export default withSelect( ( select, { clientId, rootClientId } ) => {
+	const {
+		getBlockIndex,
+		getBlockInsertionPoint,
+		getBlock,
+		isBlockInsertionPointVisible,
+	} = select( 'core/editor' );
+	const blockIndex = getBlockIndex( clientId, rootClientId );
+	const insertIndex = blockIndex;
+	const insertionPoint = getBlockInsertionPoint();
+	const block = getBlock( clientId );
+	const showInsertionPoint = (
+		isBlockInsertionPointVisible() &&
+		insertionPoint.index === insertIndex &&
+		insertionPoint.rootClientId === rootClientId &&
+		! isUnmodifiedDefaultBlock( block )
+	);
 
-		const defaultBlockName = getDefaultBlockName();
-		return {
-			canInsertDefaultBlock: canInsertBlockType( defaultBlockName, rootClientId ),
-			showInserter: ! isTyping() && canShowInserter,
-			index: insertIndex,
-			showInsertionPoint,
-		};
-	} ),
-	ifCondition( ( { canInsertDefaultBlock } ) => canInsertDefaultBlock ),
-	withDispatch( ( dispatch ) => {
-		const { insertDefaultBlock, startTyping } = dispatch( 'core/editor' );
-		return {
-			insertDefaultBlock,
-			startTyping,
-		};
-	} )
-)( BlockInsertionPoint );
+	return { showInsertionPoint, insertIndex };
+} )( BlockInsertionPoint );

@@ -26,13 +26,13 @@ exports[`BlockView should match snapshot 1`] = `
   <div
     className="editor-block-compare__action"
   >
-    <[object Object]
+    <ForwardRef(Button)
       isLarge={true}
       onClick={[Function]}
       tabIndex="0"
     >
       action
-    </[object Object]>
+    </ForwardRef(Button)>
   </div>
 </div>
 `;

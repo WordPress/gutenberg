@@ -21,6 +21,7 @@ const embedAttributes = {
 		type: 'string',
 	},
 	caption: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	},
@@ -75,7 +76,7 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 				return {
 					preview: validPreview ? preview : undefined,
 					fetching,
-					supportsResponsive: themeSupports[ 'responsive-embeds' ],
+					themeSupportsResponsive: themeSupports[ 'responsive-embeds' ],
 					cannotEmbed,
 				};
 			} )

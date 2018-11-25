@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "4.2.1",
+	"version": "7.0.1",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,13 +24,13 @@
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"clipboard": "^2.0.1",
@@ -45,12 +45,12 @@
 		"react-dates": "^17.1.1",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
-		"uuid": "^3.1.0"
+		"uuid": "^3.3.2"
 	},
 	"devDependencies": {
 		"@wordpress/token-list": "file:../token-list",
-		"enzyme": "^3.3.0",
-		"react-test-renderer": "^16.4.1"
+		"enzyme": "^3.7.0",
+		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"

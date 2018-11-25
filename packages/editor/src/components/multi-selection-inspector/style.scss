@@ -1,0 +1,27 @@
+.editor-multi-selection-inspector__card {
+	display: flex;
+	align-items: flex-start;
+	margin: -16px;
+	padding: 16px;
+}
+
+.editor-multi-selection-inspector__card-content {
+	flex-grow: 1;
+}
+
+.editor-multi-selection-inspector__card-title {
+	font-weight: 500;
+	margin-bottom: 5px;
+}
+
+.editor-multi-selection-inspector__card-description {
+	font-size: $default-font-size;
+}
+
+.editor-multi-selection-inspector__card .editor-block-icon {
+	margin-left: -2px;
+	margin-right: 10px;
+	padding: 0 3px;
+	width: $icon-button-size;
+	height: $icon-button-size-small;
+}

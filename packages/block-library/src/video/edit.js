@@ -19,10 +19,16 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+
+/**
+ * Internal dependencies
+ */
+import { createUpgradedEmbedBlock } from '../embed/util';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -84,6 +90,14 @@ class VideoEdit extends Component {
 		// Set the block's src from the edit component's state, and switch off
 		// the editing UI.
 		if ( newSrc !== src ) {
+			// Check if there's an embed block that handles this URL.
+			const embedBlock = createUpgradedEmbedBlock(
+				{ attributes: { url: newSrc } }
+			);
+			if ( undefined !== embedBlock ) {
+				this.props.onReplace( embedBlock );
+				return;
+			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
 
@@ -194,30 +208,32 @@ class VideoEdit extends Component {
 								{ value: 'none', label: __( 'None' ) },
 							] }
 						/>
-						<BaseControl
-							className="editor-video-poster-control"
-							label={ __( 'Poster Image' ) }
-						>
-							<MediaUpload
-								title={ __( 'Select Poster Image' ) }
-								onSelect={ this.onSelectPoster }
-								allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
-								render={ ( { open } ) => (
-									<Button
-										isDefault
-										onClick={ open }
-										ref={ this.posterImageButton }
-									>
-										{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+						<MediaUploadCheck>
+							<BaseControl
+								className="editor-video-poster-control"
+								label={ __( 'Poster Image' ) }
+							>
+								<MediaUpload
+									title={ __( 'Select Poster Image' ) }
+									onSelect={ this.onSelectPoster }
+									allowedTypes={ VIDEO_POSTER_ALLOWED_MEDIA_TYPES }
+									render={ ( { open } ) => (
+										<Button
+											isDefault
+											onClick={ open }
+											ref={ this.posterImageButton }
+										>
+											{ ! this.props.attributes.poster ? __( 'Select Poster Image' ) : __( 'Replace image' ) }
+										</Button>
+									) }
+								/>
+								{ !! this.props.attributes.poster &&
+									<Button onClick={ this.onRemovePoster } isLink isDestructive>
+										{ __( 'Remove Poster Image' ) }
 									</Button>
-								) }
-							/>
-							{ !! this.props.attributes.poster &&
-								<Button onClick={ this.onRemovePoster } isLink isDestructive>
-									{ __( 'Remove Poster Image' ) }
-								</Button>
-							}
-						</BaseControl>
+								}
+							</BaseControl>
+						</MediaUploadCheck>
 					</PanelBody>
 				</InspectorControls>
 				<figure className={ className }>

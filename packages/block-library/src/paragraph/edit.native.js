@@ -11,7 +11,10 @@ import { Component } from '@wordpress/element';
 import { parse, createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
-const minHeight = 50;
+/**
+ * Import style
+ */
+import styles from './style.scss';
 
 const name = 'core/paragraph';
 
@@ -39,6 +42,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			insertBlocksAfter,
 			setAttributes,
+			onReplace,
 		} = this.props;
 
 		if ( after !== null ) {
@@ -54,8 +58,7 @@ class ParagraphEdit extends Component {
 
 		const { content } = attributes;
 		if ( before === null ) {
-			// TODO : If before content is omitted, treat as intent to delete block.
-			// onReplace( [] );
+			onReplace( [] );
 		} else if ( content !== before ) {
 			// Only update content if it has in-fact changed. In case that user
 			// has created a new paragraph at end of an existing one, the value
@@ -68,6 +71,7 @@ class ParagraphEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
+			mergeBlocks,
 			style,
 		} = this.props;
 
@@ -76,11 +80,14 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
+		const minHeight = styles.blockText.minHeight;
+
 		return (
 			<View>
 				<RichText
 					tagName="p"
 					value={ content }
+					isSelected={ this.props.isSelected }
 					style={ {
 						...style,
 						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
@@ -95,6 +102,7 @@ class ParagraphEdit extends Component {
 					}
 					}
 					onSplit={ this.splitBlock }
+					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
 						setAttributes( {
 							...this.props.attributes,

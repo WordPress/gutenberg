@@ -9,7 +9,9 @@ import { JSDOM } from 'jsdom';
  */
 import { create } from '../create';
 import { createElement } from '../create-element';
-import { getSparseArrayLength, spec } from './helpers';
+import { registerFormatType } from '../register-format-type';
+import { unregisterFormatType } from '../unregister-format-type';
+import { getSparseArrayLength, spec, specWithRegistration } from './helpers';
 
 const { window } = new JSDOM();
 const { document } = window;
@@ -23,16 +25,56 @@ describe( 'create', () => {
 		require( '../store' );
 	} );
 
-	spec.forEach( ( { description, multilineTag, settings, html, createRange, record } ) => {
+	spec.forEach( ( {
+		description,
+		multilineTag,
+		multilineWrapperTags,
+		settings,
+		html,
+		createRange,
+		record,
+	} ) => {
+		if ( html === undefined ) {
+			return;
+		}
+
 		it( description, () => {
 			const element = createElement( document, html );
 			const range = createRange( element );
-			const createdRecord = create( { element, range, multilineTag, ...settings } );
+			const createdRecord = create( {
+				element,
+				range,
+				multilineTag,
+				multilineWrapperTags,
+				...settings,
+			} );
 			const formatsLength = getSparseArrayLength( record.formats );
 			const createdFormatsLength = getSparseArrayLength( createdRecord.formats );
 
 			expect( createdRecord ).toEqual( record );
 			expect( createdFormatsLength ).toEqual( formatsLength );
+		} );
+	} );
+
+	specWithRegistration.forEach( ( {
+		description,
+		formatName,
+		formatType,
+		html,
+		value: expectedValue,
+	} ) => {
+		it( description, () => {
+			if ( formatName ) {
+				registerFormatType( formatName, formatType );
+			}
+
+			const result = create( { html } );
+
+			if ( formatName ) {
+				unregisterFormatType( formatName );
+			}
+
+			expect( result ).toEqual( expectedValue );
 		} );
 	} );
 

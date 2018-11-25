@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.1.4",
+	"version": "2.2.6",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -45,8 +45,8 @@
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.3.0",
-		"react-test-renderer": "^16.4.1"
+		"enzyme": "^3.7.0",
+		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"

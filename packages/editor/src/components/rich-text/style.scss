@@ -97,6 +97,9 @@
 		& > p {
 			margin-top: 0;
 		}
+
+		// Ensure that if placeholder wraps (mobile/nested contexts) the clickable area is full-height.
+		height: 100%;
 	}
 
 	// Placeholder text.

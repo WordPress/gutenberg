@@ -2,14 +2,13 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { pick, includes } from 'lodash';
+import { get, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
-import { addQueryArgs } from '@wordpress/url';
 // TODO: Ideally this would be the only dispatch in scope. This requires either
 // refactoring editor actions to yielded controls, or replacing direct dispatch
 // on the editor store with action creators (e.g. `REQUEST_POST_UPDATE_START`).
@@ -29,7 +28,6 @@ import {
 	getEditedPostContent,
 	getAutosave,
 	getCurrentPostType,
-	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	isEditedPostNew,
 	POST_UPDATE_TRANSACTION_ID,
@@ -52,12 +50,11 @@ export const requestPostUpdate = async ( action, store ) => {
 	const { dispatch, getState } = store;
 	const state = getState();
 	const post = getCurrentPost( state );
-	const isAutosave = !! action.options.autosave;
+	const isAutosave = !! action.options.isAutosave;
 
 	// Prevent save if not saveable.
-	const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
-
-	if ( ! isSaveable( state ) ) {
+	// We don't check for dirtiness here as this can be overriden in the UI.
+	if ( ! isEditedPostSaveable( state ) ) {
 		return;
 	}
 
@@ -92,7 +89,7 @@ export const requestPostUpdate = async ( action, store ) => {
 	dispatch( {
 		type: 'REQUEST_POST_UPDATE_START',
 		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		isAutosave,
+		options: action.options,
 	} );
 
 	// Optimistically apply updates under the assumption that the post
@@ -111,7 +108,6 @@ export const requestPostUpdate = async ( action, store ) => {
 			...pick( post, [ 'title', 'content', 'excerpt' ] ),
 			...getAutosave( state ),
 			...toSend,
-			parent: post.id,
 		};
 
 		request = apiFetch( {
@@ -152,7 +148,7 @@ export const requestPostUpdate = async ( action, store ) => {
 				type: isRevision ? REVERT : COMMIT,
 				id: POST_UPDATE_TRANSACTION_ID,
 			},
-			isAutosave,
+			options: action.options,
 			postType,
 		} );
 	} catch ( error ) {
@@ -162,6 +158,7 @@ export const requestPostUpdate = async ( action, store ) => {
 			post,
 			edits,
 			error,
+			options: action.options,
 		} );
 	}
 };
@@ -172,21 +169,11 @@ export const requestPostUpdate = async ( action, store ) => {
  * @param {Object} action  action object.
  * @param {Object} store   Redux Store.
  */
-export const requestPostUpdateSuccess = ( action, store ) => {
-	const { previousPost, post, isAutosave, postType } = action;
-	const { dispatch, getState } = store;
-
-	// TEMPORARY: If edits remain after a save completes, the user must be
-	// prompted about unsaved changes. This should be refactored as part of
-	// the `isEditedPostDirty` selector instead.
-	//
-	// See: https://github.com/WordPress/gutenberg/issues/7409
-	if ( Object.keys( getPostEdits( getState() ) ).length ) {
-		dispatch( { type: 'DIRTY_ARTIFICIALLY' } );
-	}
+export const requestPostUpdateSuccess = ( action ) => {
+	const { previousPost, post, postType } = action;
 
 	// Autosaves are neither shown a notice nor redirected.
-	if ( isAutosave ) {
+	if ( get( action.options, [ 'isAutosave' ] ) ) {
 		return;
 	}
 
@@ -195,7 +182,7 @@ export const requestPostUpdateSuccess = ( action, store ) => {
 	const willPublish = includes( publishStatus, post.status );
 
 	let noticeMessage;
-	let shouldShowLink = true;
+	let shouldShowLink = get( postType, [ 'viewable' ], false );
 
 	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
@@ -266,25 +253,6 @@ export const requestPostUpdateFailure = ( action ) => {
 	dataDispatch( 'core/notices' ).createErrorNotice( noticeMessage, {
 		id: SAVE_POST_NOTICE_ID,
 	} );
-
-	if ( error && 'cloudflare_error' === error.code ) {
-		dataDispatch( 'core/notices' ).createErrorNotice(
-			__( 'Cloudflare is blocking REST API requests.' ),
-			{
-				actions: [
-					{
-						label: __( 'Learn More' ),
-						url: addQueryArgs( 'post.php', {
-							post: post.id,
-							action: 'edit',
-							'classic-editor': '',
-							'cloudflare-error': '',
-						} ),
-					},
-				],
-			},
-		);
-	}
 };
 
 /**
@@ -343,8 +311,8 @@ export const refreshPost = async ( action, store ) => {
 	const postTypeSlug = getCurrentPostType( getState() );
 	const postType = await resolveSelector( 'core', 'getPostType', postTypeSlug );
 	const newPost = await apiFetch( {
-		path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
-		data: { context: 'edit' },
+		// Timestamp arg allows caller to bypass browser caching, which is expected for this specific function.
+		path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit&_timestamp=${ Date.now() }`,
 	} );
 	dispatch( resetPost( newPost ) );
 };

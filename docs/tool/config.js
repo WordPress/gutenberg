@@ -15,6 +15,11 @@ module.exports = {
 			selectors: [ path.resolve( root, 'packages/core-data/src/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/core-data/src/actions.js' ) ],
 		},
+		'core/annotations': {
+			title: 'Annotations',
+			selectors: [ path.resolve( root, 'packages/annotations/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/annotations/src/store/actions.js' ) ],
+		},
 		'core/blocks': {
 			title: 'Block Types Data',
 			selectors: [ path.resolve( root, 'packages/blocks/src/store/selectors.js' ) ],
@@ -46,7 +51,7 @@ module.exports = {
 			actions: [ path.resolve( root, 'packages/viewport/src/store/actions.js' ) ],
 		},
 	},
-	dataDocsOutput: path.resolve( __dirname, '../data' ),
+	dataDocsOutput: path.resolve( __dirname, '../designers-developers/developers/data' ),
 
 	packageFileNames: glob( 'packages/*/package.json' )
 		.map( ( fileName ) => fileName.split( '/' )[ 1 ] ),

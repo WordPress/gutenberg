@@ -17,10 +17,32 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-apiFetch( { path: '/wp-json/wp/v2/posts' } ).then( posts => {
+apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
 	console.log( posts );
 } );
 ```
+
+### Options
+
+`apiFetch` supports and passes through all [options of the `fetch` global](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/fetch).
+
+Additionally, the following options are available:
+
+#### `path` (`string`)
+
+Shorthand to be used in place of `url`, appended to the REST API root URL for the current site.
+
+#### `url` (`string`)
+
+Absolute URL to the endpoint from which to fetch.
+
+#### `parse` (`boolean`, default `true`)
+
+Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the parsed JSON result. Disable this behavior by passing `parse` as `false`.
+
+#### `data` (`object`)
+
+Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
 
 ### Middlewares
 

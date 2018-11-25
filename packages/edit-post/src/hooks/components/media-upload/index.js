@@ -67,7 +67,7 @@ const getAttachmentsCollection = ( ids ) => {
 		order: 'ASC',
 		orderby: 'post__in',
 		post__in: ids,
-		per_page: 100,
+		posts_per_page: -1,
 		query: true,
 		type: 'image',
 	} );
@@ -163,6 +163,8 @@ class MediaUpload extends Component {
 	}
 
 	onOpen() {
+		this.updateCollection();
+
 		if ( ! this.props.value ) {
 			return;
 		}
@@ -181,6 +183,22 @@ class MediaUpload extends Component {
 
 		if ( onClose ) {
 			onClose();
+		}
+	}
+
+	updateCollection() {
+		const frameContent = this.frame.content.get();
+		if ( frameContent && frameContent.collection ) {
+			const collection = frameContent.collection;
+
+			// clean all attachments we have in memory.
+			collection.toArray().forEach( ( model ) => model.trigger( 'destroy', model ) );
+
+			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			collection.mirroring._hasMore = true;
+
+			// request items
+			collection.more();
 		}
 	}
 

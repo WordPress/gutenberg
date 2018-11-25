@@ -5,6 +5,8 @@
 	var compose = wp.compose.compose;
 	var withDispatch = wp.data.withDispatch;
 	var withSelect = wp.data.withSelect;
+	var select = wp.data.select;
+	var dispatch = wp.data.dispatch;
 	var PlainText = wp.editor.PlainText;
 	var Fragment = wp.element.Fragment;
 	var el = wp.element.createElement;
