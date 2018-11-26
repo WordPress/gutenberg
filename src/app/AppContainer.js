@@ -24,15 +24,25 @@ type PropsType = {
 	onSelect: string => mixed,
 	onAttributesUpdate: ( string, mixed ) => mixed,
 	initialHtml: string,
+	setupEditor: ( mixed, ?mixed ) => mixed,
 };
 
 class AppContainer extends React.Component<PropsType> {
-	lastHtml: ?string
+	lastHtml: ?string;
 
 	constructor( props: PropsType ) {
 		super( props );
 
-		this.parseBlocksAction( props.initialHtml );
+		const post = props.post || {
+			id: 1,
+			content: {
+				raw: props.initialHtml,
+			},
+			type: 'draft',
+		};
+
+		this.props.setupEditor( post );
+		this.lastHtml = serialize( parse( props.initialHtml ) );
 	}
 
 	onChange = ( clientId, attributes ) => {
@@ -64,7 +74,6 @@ class AppContainer extends React.Component<PropsType> {
 	parseBlocksAction = ( html = '' ) => {
 		const parsed = parse( html );
 		this.props.onResetBlocks( parsed );
-		this.lastHtml = serialize( parsed );
 	};
 
 	serializeToNativeAction = () => {
@@ -122,6 +131,7 @@ export default compose( [
 			removeBlock,
 			resetBlocks,
 			selectBlock,
+			setupEditor,
 			updateBlockAttributes,
 		} = dispatch( 'core/editor' );
 
@@ -138,6 +148,7 @@ export default compose( [
 				selectBlock( clientId );
 			},
 			onAttributesUpdate: updateBlockAttributes,
+			setupEditor,
 		};
 	} ),
 ] )( AppContainer );
