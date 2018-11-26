@@ -141,13 +141,33 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should correctly handle quotes with paragraph and citation', () => {
+	it( 'should correctly handle quotes with paragraph and citation at the end', () => {
 		const filtered = pasteHandler( {
 			HTML: '<blockquote><p>chicken</p><cite>ribs</cite></blockquote>',
 			mode: 'AUTO',
 		} ).map( getBlockContent ).join( '' );
 
 		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><cite>ribs</cite></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should handle a citation before the content', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><cite>ribs</cite><p>ribs</p></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>ribs</p><cite>ribs</cite></blockquote>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should handle a citation in the middle of the content', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<blockquote class="wp-block-quote"><p>chicken</p><p>ribs</p><cite>ribs</cite></blockquote>' );
 		expect( console ).toHaveLogged();
 	} );
 

@@ -100,26 +100,30 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'BLOCKQUOTE' &&
+				isMatch: ( node ) => {
+					return node.nodeName === 'BLOCKQUOTE' &&
 					// The quote block can only handle multiline paragraph
-					// content with an optional last cite child.
+					// content with an optional cite child.
 					Array.from( node.childNodes ).every(
-						( child, index, children ) => {
-							// Child is paragraph.
-							if ( child.nodeName === 'P' ) {
-								return true;
-							}
-							// Is last child and is a cite.
-							if (
-								index === children.length - 1 &&
-								child.nodeName === 'CITE'
-							) {
-								return true;
-							}
-						}
-					)
-				),
+						( () => {
+							let hasCitation = false;
+							return ( child ) => {
+								// Child is a paragraph.
+								if ( child.nodeName === 'P' ) {
+									return true;
+								}
+								// Child is a cite and no other cite child exists before it.
+								if (
+									! hasCitation &&
+									child.nodeName === 'CITE'
+								) {
+									hasCitation = true;
+									return true;
+								}
+							};
+						} )()
+					);
+				},
 				schema: {
 					blockquote: {
 						children: {
