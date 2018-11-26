@@ -6,7 +6,7 @@
 .edit-post-layout {
 	position: relative;
 
-	.components-notice-list {
+	.edit-post-layout__content .components-notice-list {
 		position: sticky;
 		top: $header-height;
 		right: 0;
@@ -16,15 +16,15 @@
 			position: fixed;
 			top: inherit;
 		}
+	}
 
-		.components-notice {
-			margin: 0 0 5px;
-			padding: 6px 12px;
-			min-height: $panel-header-height;
+	.components-notice {
+		margin: 0 0 5px;
+		padding: 6px 12px;
+		min-height: $panel-header-height;
 
-			.components-notice__dismiss {
-				margin: 10px 5px;
-			}
+		.components-notice__dismiss {
+			margin: 10px 5px;
 		}
 	}
 
@@ -53,8 +53,8 @@
 	}
 }
 
-@include editor-left(".components-notice-list");
-@include editor-right(".components-notice-list");
+@include editor-left(".edit-post-layout__content .components-notice-list");
+@include editor-right(".edit-post-layout__content .components-notice-list");
 
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: $border-width solid $light-gray-500;
