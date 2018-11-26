@@ -34,22 +34,6 @@ class AztecView extends React.Component {
                                         );    
   }
 
-  focusTextInput() {   
-    UIManager.dispatchViewManagerCommand(
-                                          ReactNative.findNodeHandle(this),
-                                          UIManager.RCTAztecView.Commands.focusTextInput,
-                                          [],
-                                        );    
-  }
-
-  blurTextInput() {   
-    UIManager.dispatchViewManagerCommand(
-                                          ReactNative.findNodeHandle(this),
-                                          UIManager.RCTAztecView.Commands.blurTextInput,
-                                          [],
-                                        );    
-  }
-
   requestHTMLWithCursor() {
     UIManager.dispatchViewManagerCommand(
                                           ReactNative.findNodeHandle(this),
