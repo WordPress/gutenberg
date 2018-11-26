@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, without } from 'lodash';
+import { filter, invoke, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -174,6 +174,7 @@ describe( 'selectors', () => {
 		setFreeformContentHandlerName( 'core/test-freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
+		invoke( getEditedPostAttribute.mergeCache, [ 'clear' ] );
 	} );
 
 	afterEach( () => {
@@ -601,6 +602,103 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+		} );
+
+		it( 'should merge mergeable properties with current post value', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getEditedPostAttribute( state, 'meta' ) ).toEqual( {
+				a: 1,
+				b: 2,
+			} );
+		} );
+
+		it( 'should return same mergeable value reference if unchanged', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			const before = getEditedPostAttribute( state, 'meta' );
+			const after = getEditedPostAttribute( state, 'meta' );
+
+			expect( before ).toBe( after );
+		} );
+
+		it( 'should return accurate merged value if changed', () => {
+			const beforeState = {
+				currentPost: {
+					meta: {
+						a: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			const afterState = {
+				currentPost: {
+					meta: {
+						a: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 3,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			const before = getEditedPostAttribute( beforeState, 'meta' );
+			const after = getEditedPostAttribute( afterState, 'meta' );
+
+			expect( before ).not.toBe( after );
+			expect( after ).toEqual( {
+				a: 1,
+				b: 3,
+			} );
 		} );
 	} );
 

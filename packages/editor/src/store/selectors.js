@@ -36,9 +36,10 @@ import { removep } from '@wordpress/autop';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Dependencies
+ * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /***
  * Module constants
@@ -297,8 +298,36 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
+	// Fall back to saved post value if not edited.
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
 		return getCurrentPostAttribute( state, attributeName );
+	}
+
+	// Merge properties are objects which contain only the patch edit in state,
+	// and thus must be merged with the current post attribute.
+	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// To avoid creating a new reference on each return, and with guarantee
+		// that a merge property is of type object, use WeakMap to cache the
+		// result for so long as the edit value is referenced (effectively as
+		// long as the merge property has the same edit value). Over `rememo`,
+		// this has the benefit of (a) optimizing as the less common case and
+		// (b) being a more performant cache lookup.
+		let { mergeCache } = getEditedPostAttribute;
+		if ( ! mergeCache ) {
+			mergeCache = getEditedPostAttribute.mergeCache = new WeakMap;
+		}
+
+		if ( ! mergeCache.has( edits[ attributeName ] ) ) {
+			mergeCache.set(
+				edits[ attributeName ],
+				{
+					...edits[ attributeName ],
+					...getCurrentPostAttribute( state, attributeName ),
+				}
+			);
+		}
+
+		return mergeCache.get( edits[ attributeName ] );
 	}
 
 	return edits[ attributeName ];
