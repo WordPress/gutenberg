@@ -15,7 +15,7 @@ function gutenberg_boilerplate_block() {
 	wp_register_script(
 		'gutenberg-boilerplate-es5-step01',
 		plugins_url( 'step-01/block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element' )
+		array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-editor' )
 	);
 
 	register_block_type( 'gutenberg-boilerplate-es5/hello-world-step-01', array(
