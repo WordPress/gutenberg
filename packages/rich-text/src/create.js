@@ -300,7 +300,7 @@ function createFromElement( {
 	const filterStringComplete = ( string ) => {
 		// Reduce any whitespace used for HTML formatting to one space
 		// character, because it will also be displayed as such by the browser.
-		string = string.replace( /[\n\r\t ]+/g, ' ' );
+		string = string.replace( /[\n\r\t]+/g, ' ' );
 
 		if ( filterString ) {
 			string = filterString( string );

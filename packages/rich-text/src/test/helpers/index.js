@@ -47,24 +47,6 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should reduce multiple consecutive spaces to one',
-		html: 'test  test',
-		createRange: ( element ) => ( {
-			startOffset: 5,
-			startContainer: element.firstChild,
-			endOffset: 5,
-			endContainer: element.firstChild,
-		} ),
-		startPath: [ 0, 5 ],
-		endPath: [ 0, 5 ],
-		record: {
-			start: 5,
-			end: 5,
-			formats: [ , , , , , , , , , ],
-			text: 'test test',
-		},
-	},
-	{
 		description: 'should preserve non breaking space',
 		html: 'test\u00a0 test',
 		createRange: ( element ) => ( {

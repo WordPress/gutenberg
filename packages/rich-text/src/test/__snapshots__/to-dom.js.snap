@@ -338,12 +338,6 @@ exports[`recordToDom should preserve non breaking space 1`] = `
 </body>
 `;
 
-exports[`recordToDom should reduce multiple consecutive spaces to one 1`] = `
-<body>
-  test test
-</body>
-`;
-
 exports[`recordToDom should remove br with settings 1`] = `
 <body>
   
