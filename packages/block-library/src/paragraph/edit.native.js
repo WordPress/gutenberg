@@ -23,7 +23,9 @@ class ParagraphEdit extends Component {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
 
-		this.aztecHeight = 0;
+		this.state = {
+			aztecHeight: 0,
+		};
 	}
 
 	/**
@@ -92,7 +94,7 @@ class ParagraphEdit extends Component {
 					isSelected={ this.props.isSelected }
 					style={ {
 						...style,
-						minHeight: Math.max( minHeight, this.aztecHeight ),
+						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
@@ -105,7 +107,7 @@ class ParagraphEdit extends Component {
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
-						this.aztecHeight = event.aztecHeight;
+						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 				/>
