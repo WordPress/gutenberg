@@ -34,8 +34,8 @@ allprojects {
             url "$rootDir/../node_modules/react-native/android"
         }
         maven {
-            // Local Maven repo containing AARs with JSC library built for Android
-            url "$rootDir/../node_modules/jsc-android/dist"
+           // Local Maven repo containing AARs with JSC library built for Android
+           url "$rootDir/../node_modules/jsc-android/dist"
         }
     }
 }
