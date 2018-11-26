@@ -6,6 +6,8 @@ class RCTAztecView: Aztec.TextView {
     @objc var onBackspace: RCTBubblingEventBlock? = nil
     @objc var onChange: RCTBubblingEventBlock? = nil
     @objc var onEnter: RCTBubblingEventBlock? = nil
+    @objc var onFocus: RCTBubblingEventBlock? = nil
+    @objc var onBlur: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
@@ -231,6 +233,14 @@ extension RCTAztecView: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         propagateFormatChanges()
         propagateContentChanges()
+    }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        onFocus?([:])
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        onBlur?([:])
     }
 
 }
