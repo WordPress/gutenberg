@@ -67,16 +67,16 @@ function BlockNavigationList( {
 }
 
 function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, selectBlock } ) {
+	if ( ! rootBlocks || rootBlocks.length === 0 ) {
+		return null;
+	}
+
 	const hasHierarchy = (
 		rootBlock && (
 			rootBlock.clientId !== selectedBlockClientId ||
 			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 )
 		)
 	);
-
-	if ( ! rootBlocks || rootBlocks.length === 0 ) {
-		return null;
-	}
 
 	return (
 		<NavigableMenu
