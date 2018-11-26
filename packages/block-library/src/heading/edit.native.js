@@ -27,7 +27,9 @@ class HeadingEdit extends Component {
 	constructor( props ) {
 		super( props );
 
-		this.aztecHeight = 0;
+		this.state = {
+			aztecHeight: 0,
+		};
 	}
 
 	render() {
@@ -55,7 +57,7 @@ class HeadingEdit extends Component {
 					value={ content }
 					isSelected={ this.props.isSelected }
 					style={ {
-						minHeight: Math.max( minHeight, this.aztecHeight ),
+						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
@@ -78,7 +80,7 @@ class HeadingEdit extends Component {
 							undefined
 					}
 					onContentSizeChange={ ( event ) => {
-						this.aztecHeight = event.aztecHeight;
+						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>
