@@ -62,10 +62,10 @@ if ( ! function_exists( 'render_block_core_block' ) ) {
 if ( ! function_exists( 'render_block_core_categories' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/categories/index.php';
 }
-// Currently merged in core as `gutenberg_render_block_core_latest_comments`,
+// Currently merged in core as `wp_render_block_core_latest_comments`,
 // expected to change soon.
 if ( ! function_exists( 'render_block_core_latest_comments' )
-	&& ! function_exists( 'gutenberg_render_block_core_latest_comments' ) ) {
+	&& ! function_exists( 'wp_render_block_core_latest_comments' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/latest-comments/index.php';
 }
 if ( ! function_exists( 'render_block_core_latest_posts' ) ) {
