@@ -92,6 +92,7 @@ class ParagraphEdit extends Component {
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
+					onFocus={ this.props.onFocus }
 					style={ {
 						...style,
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
