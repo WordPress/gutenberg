@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.View;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
@@ -84,9 +85,9 @@ public class WPAndroidGlueCode {
                 mRnReactNativeGutenbergBridgePackage);
     }
 
-    public void onCreateView(ReactRootView reactRootView, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+    public void onCreateView(View reactRootView, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource) {
-        mReactRootView = reactRootView;
+        mReactRootView = (ReactRootView) reactRootView;
 
         ReactInstanceManagerBuilder builder =
                 ReactInstanceManager.builder()
