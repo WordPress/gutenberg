@@ -608,6 +608,7 @@ describe( 'selectors', () => {
 				currentPost: {
 					meta: {
 						a: 1,
+						b: 1,
 					},
 				},
 				editor: {

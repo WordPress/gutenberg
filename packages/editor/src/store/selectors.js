@@ -310,8 +310,8 @@ export function getEditedPostAttribute( state, attributeName ) {
 		// consider caching in a way which would not impact non-merged property
 		// derivation. Alternatively, introduce a new selector for meta lookup.
 		return {
-			...edits[ attributeName ],
 			...getCurrentPostAttribute( state, attributeName ),
+			...edits[ attributeName ],
 		};
 	}
 
