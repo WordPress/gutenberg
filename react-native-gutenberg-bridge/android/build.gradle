@@ -16,6 +16,9 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.wordpress-mobile.gutenberg-mobile'
 
+// fallback flag value for when lib is compiled individually (e.g. via jitpack)
+project.ext.buildGutenbergFromSource = false
+
 android {
     compileSdkVersion 27
     buildToolsVersion "27.0.3"
