@@ -52,7 +52,7 @@ export function escapeLessThan( value ) {
 }
 
 /**
- * Returns a string with grater-than sign replaced.
+ * Returns a string with greater-than sign replaced.
  *
  * @param {string} value Original string.
  *
@@ -69,6 +69,9 @@ export function escapeGreaterThan( value ) {
  *
  * "[...] the text cannot contain an ambiguous ampersand [...] must not contain
  * any literal U+0022 QUOTATION MARK characters (")"
+ *
+ * Note we also escape the greater than symbol, as this is used by wptexturize to
+ * split HTML strings. This is a WordPress specific fix
  *
  * @param {string} value Attribute value.
  *
