@@ -80,7 +80,7 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
-				<EditorNotices dismissible={ false } className="components-notice-list is-pinned" />
+				<EditorNotices dismissible={ false } className="is-pinned" />
 				<EditorNotices dismissible={ true } />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
