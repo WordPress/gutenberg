@@ -31,6 +31,7 @@ export default class PlainText extends Component {
 				ref={ ( x ) => this._input = x }
 				className={ [ styles[ 'editor-plain-text' ], this.props.className ] }
 				onChangeText={ ( text ) => this.props.onChange( text ) }
+				onFocus={ this.props.onFocus } // always assign onFocus as a props
 				{ ...this.props }
 			/>
 		);
