@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, invoke, without } from 'lodash';
+import { filter, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -174,7 +174,6 @@ describe( 'selectors', () => {
 		setFreeformContentHandlerName( 'core/test-freeform' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
-		invoke( getEditedPostAttribute.mergeCache, [ 'clear' ] );
 	} );
 
 	afterEach( () => {
@@ -185,6 +184,7 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-freeform' );
 
 		setFreeformContentHandlerName( undefined );
+		getEditedPostAttribute.mergeCache = new WeakMap;
 	} );
 
 	describe( 'hasEditorUndo', () => {
