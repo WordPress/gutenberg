@@ -6,15 +6,21 @@
 .edit-post-layout {
 	position: relative;
 
-	.edit-post-layout__content .components-notice-list {
+	.components-notice-list {
 		position: sticky;
 		top: $header-height;
 		right: 0;
 		color: $dark-gray-900;
 
 		@include break-small {
-			position: fixed;
-			top: inherit;
+			top: 0;
+		}
+
+		// Non-dismissible notices.
+		&.is-pinned.is-pinned {
+			position: relative;
+			left: 0;
+			top: 0;
 		}
 	}
 
@@ -28,7 +34,7 @@
 		}
 	}
 
-	// on mobile, toolbars behave differently
+	// On mobile, toolbars behave differently.
 	@include break-small {
 		padding-top: $header-height;
 	}
@@ -38,7 +44,7 @@
 			padding-top: $block-controls-height;
 		}
 
-		// on mobile, toolbars behave differently
+		// On mobile, toolbars behave differently.
 		@include break-small {
 			padding-top: $header-height + $block-toolbar-height;
 

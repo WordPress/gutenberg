@@ -73,7 +73,6 @@ function Layout( {
 			<AutosaveMonitor />
 			<AdminNotices />
 			<Header />
-			<EditorNotices dismissible={ false } />
 			<div
 				className="edit-post-layout__content"
 				role="region"
@@ -81,6 +80,7 @@ function Layout( {
 				aria-label={ __( 'Editor content' ) }
 				tabIndex="-1"
 			>
+				<EditorNotices dismissible={ false } className="components-notice-list is-pinned" />
 				<EditorNotices dismissible={ true } />
 				<PreserveScrollInReorder />
 				<EditorModeKeyboardShortcuts />
