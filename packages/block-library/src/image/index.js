@@ -186,7 +186,7 @@ export const settings = {
 					caption: {
 						shortcode: ( attributes, { shortcode } ) => {
 							const { content } = shortcode;
-							return content.replace( /\s*<img[^>]*>\s/, '' );
+							return content.replace( /\s*(?:<a[^>]*>\s*)?<img[^>]*>(?:\s*<\/a>)?\s*/, '' );
 						},
 					},
 					href: {
