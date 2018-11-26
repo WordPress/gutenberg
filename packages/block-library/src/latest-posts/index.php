@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/latest-posts` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
