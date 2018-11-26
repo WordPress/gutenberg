@@ -76,7 +76,7 @@ project.ext.react = [
     entryFile: "index.js"
 ]
 
-// apply from: "../../node_modules/react-native/react.gradle"
+apply from: "../../node_modules/react-native/react.gradle"
 
 /**
  * Set this to true to create two separate APKs instead of one:
@@ -164,10 +164,9 @@ configurations.all {
 }
 
 dependencies {
-    implementation ('com.github.wordpress-mobile:react-native-svg:5452e615e63e76df557637f5225aa4afbb3e553f')
-    implementation ('com.github.wordpress-mobile:react-native-aztec:67cbd7188d0b2014739aadf39035e3a92bf5b029')
-    implementation ('com.github.wordpress-mobile:react-native-recyclerview-list:4bd48846b581f3d33282521dc03b1e275c973c73')
-    implementation project(':react-native-gutenberg-bridge')
+    implementation project(':react-native-svg')
+    implementation project(':react-native-aztec')
+    implementation project(':react-native-recyclerview-list')
     // compile fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
