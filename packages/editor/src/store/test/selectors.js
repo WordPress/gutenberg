@@ -629,7 +629,7 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'should return same mergeable value reference if unchanged', () => {
+		it( 'should return same mergeable value reference if unchanged edit', () => {
 			const state = {
 				currentPost: {
 					meta: {
@@ -654,13 +654,16 @@ describe( 'selectors', () => {
 			expect( before ).toBe( after );
 		} );
 
-		it( 'should return accurate merged value if changed', () => {
-			const beforeState = {
-				currentPost: {
-					meta: {
-						a: 1,
-					},
+		it( 'should return accurate merged value if changed edit', () => {
+			const currentPost = {
+				meta: {
+					a: 1,
 				},
+			};
+			const initialEdits = {};
+			const beforeState = {
+				currentPost,
+				initialEdits,
 				editor: {
 					present: {
 						edits: {
@@ -670,15 +673,11 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-				initialEdits: {},
 			};
 
 			const afterState = {
-				currentPost: {
-					meta: {
-						a: 1,
-					},
-				},
+				currentPost,
+				initialEdits,
 				editor: {
 					present: {
 						edits: {
@@ -688,7 +687,6 @@ describe( 'selectors', () => {
 						},
 					},
 				},
-				initialEdits: {},
 			};
 
 			const before = getEditedPostAttribute( beforeState, 'meta' );
@@ -697,6 +695,47 @@ describe( 'selectors', () => {
 			expect( before ).not.toBe( after );
 			expect( after ).toEqual( {
 				a: 1,
+				b: 3,
+			} );
+		} );
+
+		it( 'should return accurate merged value if changed current post', () => {
+			const initialEdits = {};
+			const editor = {
+				present: {
+					edits: {
+						meta: {
+							b: 2,
+						},
+					},
+				},
+			};
+			const beforeState = {
+				currentPost: {
+					meta: {
+						a: 1,
+					},
+				},
+				initialEdits,
+				editor,
+			};
+
+			const afterState = {
+				currentPost: {
+					meta: {
+						a: 2,
+					},
+				},
+				initialEdits,
+				editor,
+			};
+
+			const before = getEditedPostAttribute( beforeState, 'meta' );
+			const after = getEditedPostAttribute( afterState, 'meta' );
+
+			expect( before ).not.toBe( after );
+			expect( after ).toEqual( {
+				a: 2,
 				b: 3,
 			} );
 		} );
