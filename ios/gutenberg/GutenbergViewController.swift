@@ -1,5 +1,6 @@
 
 import UIKit
+import RNReactNativeGutenbergBridge
 
 class GutenbergViewController: UIViewController {
     lazy var gutenberg = Gutenberg()
@@ -25,12 +26,11 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-    
     func gutenbergDidProvideHTML(_ html: String, changed: Bool) {
         print("Did receive HTML: \(html) changed: \(changed)")
     }
 
-    func gutenbergDidRequestMediaPicker(callback: @escaping MediaPickerDidPickMediaCallback) {
+    func gutenbergDidRequestMediaPicker(with callback: (String?) -> Void) {
         print("Gutenberg did request media picker, passing a sample url in callback")
         callback("https://cldup.com/cXyG__fTLN.jpg")
     }

@@ -1,37 +1,8 @@
-#import "RNReactNativeGutenbergBridge.h"
+#import <React/RCTViewManager.h>
 
-NSString *const RequestHTMLMessageName = @"requestGetHtml";
+@interface RCT_EXTERN_MODULE(RNReactNativeGutenbergBridge, NSObject)
 
-@implementation RNReactNativeGutenbergBridge
-
-- (dispatch_queue_t)methodQueue
-{
-    return dispatch_get_main_queue();
-}
-
-RCT_EXPORT_MODULE()
-
-- (NSArray<NSString *> *)supportedEvents
-{
-    return @[RequestHTMLMessageName];
-}
-
-//provideToNative_Html
-
-RCT_EXPORT_METHOD(provideToNative_Html:(NSString *)html changed:(BOOL)changed)
-{
-    if (self.delegate) {
-        [self.delegate gutenbergDidProvideHTML:html changed:changed];
-    }
-}
-
-RCT_EXPORT_METHOD(onMediaLibraryPress:(RCTResponseSenderBlock)callback)
-{
-    if (self.delegate) {
-        [self.delegate gutenbergDidRequestMediaPickerWithCallback:^(NSString * _Nullable url) {
-            callback(url ? @[url] : @[[NSNull null]]);
-        }];
-    }
-}
+RCT_EXTERN_METHOD(provideToNative_Html:(NSString *)html changed:(BOOL)changed)
+RCT_EXTERN_METHOD(onMediaLibraryPress:(RCTResponseSenderBlock)callback)
 
 @end
