@@ -42,8 +42,19 @@ repositories {
         // Local Maven repo containing AARs with JSC library built for Android
         url "https://unpkg.com/jsc-android@224109.1.0/dist/"
     }
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
+    if (rootProject.ext.buildGutenbergFromSource) {
+        println "using gutenberg from source"
+        implementation project(':react-native-svg')
+        implementation project(':react-native-aztec')
+        implementation project(':react-native-recyclerview-list')
+    } else {
+        implementation ('com.github.wordpress-mobile:react-native-svg:faed05be8dca2b0df8957c5f72c40eccef12144d')
+        implementation ('com.github.wordpress-mobile:react-native-aztec:67cbd7188d0b2014739aadf39035e3a92bf5b029')
+        implementation ('com.github.wordpress-mobile:react-native-recyclerview-list:a2e8ca550412504c32218fd473c55f696f18f1f7')
+    }
     implementation 'com.facebook.react:react-native:+'
 }
