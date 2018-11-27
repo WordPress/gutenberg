@@ -15,12 +15,24 @@ export default class ErrorResponse extends Error {
 
 		for ( const prop in response ) {
 			if ( response.hasOwnProperty( prop ) ) {
-				Object.defineProperty( this, prop, {
-					value: response[ prop ],
-					configurable: true,
-					enumerable: true,
-					writable: true,
-				} );
+				const descriptor = Object.getOwnPropertyDescriptor( response, prop );
+				const description = {
+					writable: descriptor ? descriptor.writable : true,
+					enumerable: descriptor ? descriptor.enumerable : true,
+					configurable: descriptor ? descriptor.configurable : true,
+				};
+
+				if ( descriptor.get ) {
+					description.get = descriptor.get;
+				} else {
+					description.value = ( descriptor && descriptor.value ) || response[ prop ];
+				}
+
+				if ( descriptor.set ) {
+					description.set = descriptor.set;
+				}
+
+				Object.defineProperty( this, prop, description );
 			}
 		}
 	}
