@@ -46,6 +46,10 @@ const withHistory = ( options ) => ( reducer ) => {
 		options.shouldOverwriteState,
 		( action ) => includes( options.ignoreTypes, action.type ),
 		( action ) => options.isIgnored( action ),
+		( action, previousAction ) => (
+			action.type === 'POP_UNDO_LEVEL' ||
+			( previousAction && previousAction.type === 'POP_UNDO_LEVEL' )
+		),
 	] );
 
 	const initialState = {

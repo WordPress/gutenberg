@@ -480,6 +480,10 @@ export function createUndoLevel() {
 	return { type: 'CREATE_UNDO_LEVEL' };
 }
 
+export function popUndoLevel() {
+	return { type: 'POP_UNDO_LEVEL' };
+}
+
 /**
  * Returns an action object used in signalling that the blocks corresponding to
  * the set of specified client IDs are to be removed.
