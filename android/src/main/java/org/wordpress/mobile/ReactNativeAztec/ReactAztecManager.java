@@ -26,6 +26,7 @@ import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ScrollWatcher;
+import com.facebook.react.views.textinput.ReactTextInputManager;
 
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
@@ -47,7 +48,27 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     private static final int BLUR_TEXT_INPUT = 2;
     private static final int COMMAND_NOTIFY_APPLY_FORMAT = 3;
 
+    // we define the same codes in ReactAztecText as they have for ReactNative's TextInput, so
+    // it's easier to handle focus between Aztec and TextInput instances on the same screen.
+    // see https://github.com/wordpress-mobile/react-native-aztec/pull/79
+    private int mFocusTextInputCommandCode = FOCUS_TEXT_INPUT; // pre-init
+    private int mBlurTextInputCommandCode = BLUR_TEXT_INPUT; // pre-init
+
     private static final String TAG = "ReactAztecText";
+
+    public ReactAztecManager() {
+        initializeFocusAndBlurCommandCodes();
+    }
+
+    private void initializeFocusAndBlurCommandCodes() {
+        // For this, we'd like to keep track of potential command code changes in the future,
+        // so we obtain an instance of ReactTextInputManager and call getCommandsMap in our
+        // constructor to use the very same codes as TextInput does.
+        ReactTextInputManager reactTextInputManager = new ReactTextInputManager();
+        Map<String, Integer> map = reactTextInputManager.getCommandsMap();
+        mFocusTextInputCommandCode = map.get("focusTextInput");
+        mBlurTextInputCommandCode = map.get("blurTextInput");
+    }
 
     @Override
     public String getName() {
@@ -262,30 +283,27 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
                 .put("applyFormat", COMMAND_NOTIFY_APPLY_FORMAT)
-                .put("focusTextInput", FOCUS_TEXT_INPUT)
-                .put("blurTextInput", BLUR_TEXT_INPUT)
+                .put("focusTextInput", mFocusTextInputCommandCode)
+                .put("blurTextInput", mBlurTextInputCommandCode)
                 .build();
     }
 
     @Override
     public void receiveCommand(final ReactAztecText parent, int commandType, @Nullable ReadableArray args) {
         Assertions.assertNotNull(parent);
-        switch (commandType) {
-            case COMMAND_NOTIFY_APPLY_FORMAT: {
-                final String format = args.getString(0);
-                Log.d(TAG, String.format("Apply format: %s", format));
-                parent.applyFormat(format);
-                return;
-            }
-            case FOCUS_TEXT_INPUT:
-                parent.requestFocusFromJS();
-                break;
-            case BLUR_TEXT_INPUT:
-                parent.clearFocusFromJS();
-                break;
-            default:
-                super.receiveCommand(parent, commandType, args);
+        if (commandType == COMMAND_NOTIFY_APPLY_FORMAT) {
+            final String format = args.getString(0);
+            Log.d(TAG, String.format("Apply format: %s", format));
+            parent.applyFormat(format);
+            return;
+        } else if (commandType == mFocusTextInputCommandCode) {
+            parent.requestFocusFromJS();
+            return;
+        } else if (commandType == mBlurTextInputCommandCode) {
+            parent.clearFocusFromJS();
+            return;
         }
+        super.receiveCommand(parent, commandType, args);
     }
 
     @Override
