@@ -11,33 +11,23 @@ class CopyHandler extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'copy', this.onCopy );
+		document.addEventListener( 'copy', this.props.onCopy );
 		document.addEventListener( 'cut', this.onCut );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'copy', this.onCopy );
+		document.removeEventListener( 'copy', this.props.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
-	}
-
-	onCopy( event ) {
-		const serialized = serialize( this.props.getSelectedBlocks() );
-
-		event.clipboardData.setData( 'text/plain', serialized );
-		event.clipboardData.setData( 'text/html', serialized );
-
-		event.preventDefault();
 	}
 
 	onCut( event ) {
 		const { hasMultiSelection, selectedBlockClientIds } = this.props;
 
-		this.onCopy( event );
+		this.props.onCopy( event );
 
 		if ( hasMultiSelection ) {
 			this.props.onRemove( selectedBlockClientIds );
@@ -70,7 +60,7 @@ export default compose( [
 		const { removeBlocks } = dispatch( 'core/editor' );
 
 		return {
-			getSelectedBlocks: function() {
+			onCopy( event ) {
 				const { hasMultiSelection, selectedBlockClientIds } = ownProps;
 
 				if ( selectedBlockClientIds.length === 0 ) {
@@ -82,7 +72,12 @@ export default compose( [
 					return;
 				}
 
-				return serialize( getBlocksByClientId( selectedBlockClientIds ) );
+				const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
+
+				event.clipboardData.setData( 'text/plain', serialized );
+				event.clipboardData.setData( 'text/html', serialized );
+
+				event.preventDefault();
 			},
 			onRemove: removeBlocks,
 		};
