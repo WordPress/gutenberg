@@ -91,6 +91,7 @@ class AppContainer extends React.Component<PropsType> {
 			<MainApp
 				blocks={ this.props.blocks }
 				onChange={ this.onChange }
+				onBlur={ this.props.clearSelectedBlock }
 				focusBlockAction={ this.focusBlockAction }
 				moveBlockUpAction={ this.moveBlockUpAction }
 				moveBlockDownAction={ this.moveBlockDownAction }
