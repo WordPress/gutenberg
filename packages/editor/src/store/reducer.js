@@ -15,8 +15,6 @@ import {
 	isEqual,
 	overSome,
 	get,
-	intersection,
-	union,
 } from 'lodash';
 
 /**
@@ -378,15 +376,23 @@ export const editor = flow( [
 						return state;
 					}
 
-					// Consider as updates only changed values
-					const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
-						if ( value !== result[ key ] ) {
-							result = getMutateSafeObject( state[ action.clientId ].attributes, result );
-							result[ key ] = value;
-						}
+					let nextAttributes;
+					if ( action.transient ) {
+						nextAttributes = omit(
+							state[ action.clientId ].attributes,
+							keys( action.attributes )
+						);
+					} else {
+						// Consider as updates only changed values
+						nextAttributes = reduce( action.attributes, ( result, value, key ) => {
+							if ( value !== result[ key ] ) {
+								result = getMutateSafeObject( state[ action.clientId ].attributes, result );
+								result[ key ] = value;
+							}
 
-						return result;
-					}, state[ action.clientId ].attributes );
+							return result;
+						}, state[ action.clientId ].attributes );
+					}
 
 					// Skip update if nothing has been changed. The reference will
 					// match the original block if `reduce` had no changed values.
@@ -591,42 +597,42 @@ export const editor = flow( [
 
 			return state;
 		},
-
-		transients( state = {}, action ) {
-			if ( action.type === 'UPDATE_BLOCK_ATTRIBUTES' ) {
-				if ( action.transient ) {
-					return {
-						...state,
-						[ action.clientId ]: union(
-							state[ action.clientId ],
-							keys( action.attributes ),
-						),
-					};
-				}
-
-				if ( ! state[ action.clientId ] ) {
-					return state;
-				}
-
-				const nextTransients = without(
-					state[ action.clientId ],
-					...keys( action.attributes ),
-				);
-
-				if ( ! nextTransients.length ) {
-					return omit( state, action.clientId );
-				}
-
-				return {
-					...state,
-					[ action.clientId ]: nextTransients,
-				};
-			}
-
-			return state;
-		},
 	} ),
 } );
+
+export function blockTransients( state = {}, action ) {
+	if ( action.type === 'UPDATE_BLOCK_ATTRIBUTES' ) {
+		if ( action.transient ) {
+			return {
+				...state,
+				[ action.clientId ]: {
+					...state[ action.clientId ],
+					...action.attributes,
+				},
+			};
+		}
+
+		if ( ! state[ action.clientId ] ) {
+			return state;
+		}
+
+		const nextTransients = omit(
+			state[ action.clientId ],
+			...keys( action.attributes ),
+		);
+
+		if ( ! Object.keys( nextTransients ).length ) {
+			return omit( state, action.clientId );
+		}
+
+		return {
+			...state,
+			[ action.clientId ]: nextTransients,
+		};
+	}
+
+	return state;
+}
 
 /**
  * Reducer returning the initial edits state. With matching shape to that of
@@ -1273,6 +1279,7 @@ export function previewLink( state = null, action ) {
 
 export default optimist( combineReducers( {
 	editor,
+	blockTransients,
 	initialEdits,
 	currentPost,
 	isTyping,

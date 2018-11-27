@@ -612,6 +612,10 @@ export function isBlockValid( state, clientId ) {
 	return !! block && block.isValid;
 }
 
+export function getBlockTransients( state, clientId ) {
+	return state.blockTransients[ clientId ];
+}
+
 /**
  * Returns a block given its client ID. This is a parsed copy of the block,
  * containing its `blockName`, `clientId`, and current `attributes` state. This
@@ -651,6 +655,11 @@ export const getBlock = createSelector(
 			}, attributes );
 		}
 
+		const transients = getBlockTransients( state, clientId );
+		if ( transients ) {
+			attributes = { ...attributes, ...transients };
+		}
+
 		return {
 			...block,
 			attributes,
@@ -659,6 +668,7 @@ export const getBlock = createSelector(
 	},
 	( state, clientId ) => [
 		state.editor.present.blocks.byClientId[ clientId ],
+		state.blockTransients[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
 		state.editor.present.edits.meta,
 		state.initialEdits.meta,
@@ -2308,5 +2318,5 @@ export function isPublishSidebarEnabled( state ) {
 }
 
 export function hasPendingBlockOperations( state ) {
-	return Object.keys( state.editor.present.blocks.transients ).length > 0;
+	return Object.keys( state.blockTransients ).length > 0;
 }
