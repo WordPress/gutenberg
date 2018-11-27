@@ -92,7 +92,7 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 class ImageEdit extends Component {
-	constructor( { attributes } ) {
+	constructor() {
 		super( ...arguments );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
@@ -110,13 +110,11 @@ class ImageEdit extends Component {
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.getFilename = this.getFilename.bind( this );
-		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
 
 		this.state = {
 			captionFocused: false,
-			isEditing: ! attributes.url,
 		};
 	}
 
@@ -174,9 +172,6 @@ class ImageEdit extends Component {
 	onUploadError( message ) {
 		const { noticeOperations } = this.props;
 		noticeOperations.createErrorNotice( message );
-		this.setState( {
-			isEditing: true,
-		} );
 	}
 
 	onSelectImage( media ) {
@@ -189,10 +184,6 @@ class ImageEdit extends Component {
 			} );
 			return;
 		}
-
-		this.setState( {
-			isEditing: false,
-		} );
 
 		this.props.setAttributes( {
 			...pickRelevantMediaFiles( media ),
@@ -229,10 +220,6 @@ class ImageEdit extends Component {
 				id: undefined,
 			} );
 		}
-
-		this.setState( {
-			isEditing: false,
-		} );
 	}
 
 	onImageError( url ) {
@@ -335,12 +322,6 @@ class ImageEdit extends Component {
 		];
 	}
 
-	toggleIsEditing() {
-		this.setState( {
-			isEditing: ! this.state.isEditing,
-		} );
-	}
-
 	getImageSizeOptions() {
 		const { imageSizes, image } = this.props;
 		return compact( map( imageSizes, ( { name, slug } ) => {
@@ -356,7 +337,6 @@ class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isEditing } = this.state;
 		const {
 			attributes,
 			setAttributes,
@@ -393,7 +373,7 @@ class ImageEdit extends Component {
 						<IconButton
 							className="components-icon-button components-toolbar__control"
 							label={ __( 'Edit image' ) }
-							onClick={ this.toggleIsEditing }
+							onClick={ () => setAttributes( { url: undefined } ) }
 							icon="edit"
 						/>
 					</Toolbar>
@@ -431,8 +411,7 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( isEditing ) {
-			const src = isExternal ? url : undefined;
+		if ( ! url ) {
 			return (
 				<Fragment>
 					{ controls }
@@ -445,7 +424,6 @@ class ImageEdit extends Component {
 						onError={ this.onUploadError }
 						accept="image/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ { id, src } }
 					/>
 				</Fragment>
 			);
