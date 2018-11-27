@@ -48,6 +48,7 @@ export default class BlockHolder extends React.Component<PropsType> {
 				setAttributes={ ( attrs ) =>
 					this.props.onChange( this.props.clientId, { ...this.props.attributes, ...attrs } )
 				}
+				onFocus={ this.props.onBlockHolderPressed.bind( this, this.props.clientId ) }
 				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.props.insertBlocksAfter }
 				mergeBlocks={ this.props.mergeBlocks }
