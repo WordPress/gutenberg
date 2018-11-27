@@ -43,9 +43,9 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     public static final String REACT_CLASS = "RCTAztecView";
 
-    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 1;
-    private static final int FOCUS_TEXT_INPUT = 2;
-    private static final int BLUR_TEXT_INPUT = 3;
+    private static final int FOCUS_TEXT_INPUT = 1;
+    private static final int BLUR_TEXT_INPUT = 2;
+    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 3;
 
     private static final String TAG = "ReactAztecText";
 
@@ -270,7 +270,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @Override
     public void receiveCommand(final ReactAztecText parent, int commandType, @Nullable ReadableArray args) {
         Assertions.assertNotNull(parent);
-        Assertions.assertNotNull(args);
         switch (commandType) {
             case COMMAND_NOTIFY_APPLY_FORMAT: {
                 final String format = args.getString(0);
