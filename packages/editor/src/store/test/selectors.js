@@ -602,6 +602,32 @@ describe( 'selectors', () => {
 
 			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
 		} );
+
+		it( 'should merge mergeable properties with current post value', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+						b: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getEditedPostAttribute( state, 'meta' ) ).toEqual( {
+				a: 1,
+				b: 2,
+			} );
+		} );
 	} );
 
 	describe( 'getAutosaveAttribute', () => {

@@ -35,16 +35,7 @@ import {
 	INITIAL_EDITS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
-
-/**
- * Set of post properties for which edits should assume a merging behavior,
- * assuming an object value.
- *
- * @type {Set}
- */
-const EDIT_MERGE_PROPERTIES = new Set( [
-	'meta',
-] );
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
