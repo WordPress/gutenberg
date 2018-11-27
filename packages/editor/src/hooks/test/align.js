@@ -201,11 +201,9 @@ describe( 'align', () => {
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
-					block={ {
-						name: 'core/foo',
-						attributes: {
-							align: 'wide',
-						},
+					blockName="core/foo"
+					blockAttributes={ {
+						align: 'wide',
 					} }
 					hasWideEnabled={ false }
 				/>
