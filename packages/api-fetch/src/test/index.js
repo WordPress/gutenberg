@@ -184,7 +184,7 @@ describe( 'apiFetch', () => {
 		} );
 	} );
 
-	it( 'should not use the default fetch handler when using a custom fetch fetch handler', () => {
+	it( 'should not use the default fetch handler when using a custom fetch handler', () => {
 		const customFetchHandler = jest.fn();
 
 		apiFetch.setFetchHandler( customFetchHandler );
