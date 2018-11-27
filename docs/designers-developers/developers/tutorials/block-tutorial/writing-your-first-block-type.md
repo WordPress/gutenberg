@@ -30,6 +30,8 @@ Note the two script dependencies:
 - __`wp-blocks`__ includes block type registration and related functions
 - __`wp-element`__ includes the [WordPress Element abstraction](https://github.com/WordPress/gutenberg/tree/master/packages/element) for describing the structure of your blocks
 
+If you were to use a component from the `wp-editor` package, for example the RichText component, you would also need to add `wp-editor` to the dependency list.
+
 ## Registering the Block
 
 With the script enqueued, let's look at the implementation of the block itself:
