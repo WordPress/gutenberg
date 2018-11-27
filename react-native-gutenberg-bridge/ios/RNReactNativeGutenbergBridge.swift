@@ -2,24 +2,44 @@
 public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     weak var delegate: GutenbergBridgeDelegate?
 
+    // MARK: - Messaging methods
+
+    @objc
+    func provideToNative_Html(_ html: String, changed: Bool) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidProvideHTML(html, changed: changed)
+        }
+    }
+
+    @objc
+    func onMediaLibraryPress(_ callback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaPicker(with: { (url) in
+                callback(optionalArray(from: url))
+            })
+        }
+    }
+}
+
+// MARK: - RCTBridgeModule delegate
+
+extension RNReactNativeGutenbergBridge {
     public override func supportedEvents() -> [String]! {
         return [Gutenberg.EventName.requestHTML]
     }
 
-    @objc
-    func provideToNative_HTML(_ html: String, changed: Bool) {
-        delegate?.gutenbergDidProvideHTML(html, changed: changed)
+    public override static func requiresMainQueueSetup() -> Bool {
+        return true
     }
+}
 
-    @objc
-    func onMediaLibraryPress(_ callback: RCTResponseSenderBlock) {
-        delegate?.gutenbergDidRequestMediaPicker(with: { (url) in
-            guard let url = url else {
-                callback(nil)
-                return
-            }
+// MARK: - Helpers
 
-            callback([url])
-        })
+extension RNReactNativeGutenbergBridge {
+    func optionalArray(from optionalString: String?) -> [String]? {
+        guard let string = optionalString else {
+            return nil
+        }
+        return [string]
     }
 }
