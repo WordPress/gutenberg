@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import ErrorResponse from './error-response';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
 import createPreloadingMiddleware from './middlewares/preloading';
@@ -92,7 +93,7 @@ function apiFetch( options ) {
 			.then( parseResponse )
 			.catch( ( response ) => {
 				if ( ! parse ) {
-					throw response;
+					throw new ErrorResponse( response );
 				}
 
 				const invalidJsonError = {
@@ -101,12 +102,12 @@ function apiFetch( options ) {
 				};
 
 				if ( ! response || ! response.json ) {
-					throw invalidJsonError;
+					throw new ErrorResponse( invalidJsonError );
 				}
 
 				return response.json()
 					.catch( () => {
-						throw invalidJsonError;
+						throw new ErrorResponse( invalidJsonError );
 					} )
 					.then( ( error ) => {
 						const unknownError = {
@@ -114,7 +115,7 @@ function apiFetch( options ) {
 							message: __( 'An unknown error occurred.' ),
 						};
 
-						throw error || unknownError;
+						throw new ErrorResponse( error || unknownError );
 					} );
 			} );
 	};

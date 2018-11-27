@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import apiFetch from '../';
+import ErrorResponse from '../error-response';
 
 /**
  * Mock return value for a successful fetch JSON return value.
@@ -114,7 +115,8 @@ describe( 'apiFetch', () => {
 		} ) );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
-			expect( body ).toEqual( {
+			expect( body ).toBeInstanceOf( ErrorResponse );
+			expect( body ).toMatchObject( {
 				code: 'bad_request',
 				message: 'Bad Request',
 			} );
@@ -127,7 +129,8 @@ describe( 'apiFetch', () => {
 		} ) );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
-			expect( body ).toEqual( {
+			expect( body ).toBeInstanceOf( ErrorResponse );
+			expect( body ).toMatchObject( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
 			} );
@@ -143,7 +146,8 @@ describe( 'apiFetch', () => {
 		} ) );
 
 		return apiFetch( { path: '/random' } ).catch( ( body ) => {
-			expect( body ).toEqual( {
+			expect( body ).toBeInstanceOf( ErrorResponse );
+			expect( body ).toMatchObject( {
 				code: 'invalid_json',
 				message: 'The response is not a valid JSON response.',
 			} );
@@ -178,9 +182,60 @@ describe( 'apiFetch', () => {
 		} ) );
 
 		return apiFetch( { path: '/random', parse: false } ).catch( ( response ) => {
-			expect( response ).toEqual( {
+			expect( response ).toBeInstanceOf( ErrorResponse );
+			expect( response ).toMatchObject( {
 				status: 400,
 			} );
+		} );
+	} );
+
+	it( 'sets a default error message when parse is false', () => {
+		window.fetch.mockReturnValue( Promise.resolve( {
+			status: 400,
+		} ) );
+
+		return apiFetch( { path: '/random', parse: false } ).catch( ( response ) => {
+			expect( response.message ).toEqual( 'An unknown error occurred.' );
+		} );
+	} );
+
+	it( 'maintains the original toString method', () => {
+		const error = {
+			code: 'bad_request',
+			message: 'Bad Request',
+		};
+
+		window.fetch.mockReturnValue( Promise.resolve( {
+			status: 400,
+			json() {
+				return Promise.resolve( error );
+			},
+		} ) );
+
+		return apiFetch( { path: '/random' } ).catch( ( body ) => {
+			expect( body.toString() ).toEqual( error.toString() );
+		} );
+	} );
+
+	it( 'generates a stack trace', () => {
+		window.fetch.mockReturnValue( Promise.resolve( {
+			status: 400,
+		} ) );
+
+		return apiFetch( { path: '/random', parse: false } ).catch( ( response ) => {
+			expect( response ).toHaveProperty( 'stack' );
+		} );
+	} );
+
+	it( 'returns the original response', () => {
+		const response = {
+			status: 400,
+		};
+		window.fetch.mockReturnValue( Promise.resolve( response ) );
+
+		return apiFetch( { path: '/random', parse: false } ).catch( ( error ) => {
+			expect( error ).toHaveProperty( 'getResponse' );
+			expect( error.getResponse() ).toEqual( response );
 		} );
 	} );
 } );
