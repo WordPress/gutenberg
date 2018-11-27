@@ -1,4 +1,11 @@
 import UIKit
+import Aztec
+
+// IMPORTANT: if you're seeing a warning with this import, keep in mind it's marked as a Swift
+// bug.  I wasn't able to get any of the workarounds to work.
+//
+// Ref: https://bugs.swift.org/browse/SR-3801
+import RNTAztecView
 
 @objc
 public class Gutenberg: NSObject {
@@ -16,21 +23,21 @@ public class Gutenberg: NSObject {
     }
 
     private let bridgeModule = RNReactNativeGutenbergBridge()
-    private let initialContent: String?
+    private unowned let dataSource: GutenbergBridgeDataSource
 
     private lazy var bridge: RCTBridge = {
         return RCTBridge(delegate: self, launchOptions: [:])
     }()
 
     private var initialProps: [String: String]? {
-        guard let initialContent = initialContent else {
+        guard let initialContent = dataSource.gutenbergInitialContent() else {
             return nil
         }
         return ["initialData": initialContent]
     }
 
-    public init(with content: String? = nil) {
-        initialContent = content
+    public init(dataSource: GutenbergBridgeDataSource) {
+        self.dataSource = dataSource
     }
 
     public func invalidate() {
@@ -48,7 +55,10 @@ extension Gutenberg: RCTBridgeDelegate {
     }
 
     public func extraModules(for bridge: RCTBridge!) -> [RCTBridgeModule]! {
-        return [bridgeModule]
+        let aztecManager = RCTAztecViewManager()
+        aztecManager.attachmentDelegate = dataSource.aztecAttachmentDelegate()
+
+        return [bridgeModule, aztecManager]
     }
 }
 

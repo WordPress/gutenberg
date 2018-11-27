@@ -1381,12 +1381,14 @@
 				DEVELOPMENT_TEAM = PZYM8XX95Q;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					/usr/include/libxml2,
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../react-native-aztec/ios/**";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1410,12 +1412,14 @@
 				DEVELOPMENT_TEAM = PZYM8XX95Q;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					/usr/include/libxml2,
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../react-native-aztec/ios/**";
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

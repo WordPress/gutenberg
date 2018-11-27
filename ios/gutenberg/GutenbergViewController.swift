@@ -1,9 +1,11 @@
 
 import UIKit
 import RNReactNativeGutenbergBridge
+import Aztec
 
 class GutenbergViewController: UIViewController {
-    lazy var gutenberg = Gutenberg()
+
+    lazy var gutenberg = Gutenberg(dataSource: self)
 
     override func loadView() {
         view = gutenberg.rootView
@@ -33,5 +35,15 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaPicker(with callback: (String?) -> Void) {
         print("Gutenberg did request media picker, passing a sample url in callback")
         callback("https://cldup.com/cXyG__fTLN.jpg")
+    }
+}
+
+extension GutenbergViewController: GutenbergBridgeDataSource {
+    func gutenbergInitialContent() -> String? {
+        return nil
+    }
+
+    func aztecAttachmentDelegate() -> TextViewAttachmentDelegate {
+        return ExampleAttachmentDelegate()
     }
 }
