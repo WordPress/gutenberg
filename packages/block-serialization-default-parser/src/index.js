@@ -2,7 +2,7 @@ let document;
 let offset;
 let output;
 let stack;
-const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:[^}]+|}+(?=})|(?!}\s+-->)[^])*?}\s+)?(\/)?-->/g;
+const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
 
 function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	return {
@@ -189,7 +189,7 @@ function nextToken() {
 	}
 
 	const startedAt = matches.index;
-	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, voidMatch ] = matches;
+	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, /* internal/unused */, voidMatch ] = matches;
 
 	const length = match.length;
 	const isCloser = !! closerMatch;
