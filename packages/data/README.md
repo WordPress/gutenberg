@@ -261,7 +261,7 @@ In the above example, when `HammerPriceDisplay` is rendered into an application,
 
 #### `withDispatch( mapDispatchToProps: Function ): Function`
 
-Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch), the props passed to the original component and the [`select` function](#select).
+Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch), the props passed to the original component and the `registry` object.
 
 ```jsx
 function Button( { onClick, children } ) {
@@ -286,7 +286,7 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 //  <SaleButton discountPercent="20">Start Sale!</SaleButton>
 ```
 
-In the majority of cases, it will be sufficient to use only two first params passed to `mapDispatchToProps` as illustrated in the previous example. However, there might be some very advanced use cases where using `select` function might be used as a tool to optimize the performance of your component. It is useful when you need to fetch some dynamic data from the store at the time when the event is fired, but at the same time, you never use it to render your component. In such scenario, you can avoid using the `withSelect` higher order component to compute such prop, which might lead to unnecessary re-renders of you component caused by its frequent value change. Keep in mind, that `mapDispatchToProps` must return an object with functions only. 
+In the majority of cases, it will be sufficient to use only two first params passed to `mapDispatchToProps` as illustrated in the previous example. However, there might be some very advanced use cases where using the `registry` object might be used as a tool to optimize the performance of your component. Using `select` function from the registry might be useful when you need to fetch some dynamic data from the store at the time when the event is fired, but at the same time, you never use it to render your component. In such scenario, you can avoid using the `withSelect` higher order component to compute such prop, which might lead to unnecessary re-renders of you component caused by its frequent value change. Keep in mind, that `mapDispatchToProps` must return an object with functions only. 
 
 ```jsx
 function Button( { onClick, children } ) {
@@ -295,7 +295,7 @@ function Button( { onClick, children } ) {
 
 const { withDispatch } = wp.data;
 
-const SaleButton = withDispatch( ( dispatch, ownProps, select ) => {
+const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// Stock number changes frequently.
 	const { getStockNumber } = select( 'my-shop' );
 	const { startSale } = dispatch( 'my-shop' );
