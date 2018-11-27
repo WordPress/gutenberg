@@ -17,7 +17,6 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import RangeControl from '../range-control';
 import { NavigableMenu } from '../navigable-container';
-import MenuItem from '../menu-item';
 
 function FontSizePicker( {
 	fallbackFontSize,
@@ -66,7 +65,7 @@ function FontSizePicker( {
 								const isSelected = ( value === size || ( ! value && slug === 'normal' ) );
 
 								return (
-									<MenuItem
+									<Button
 										key={ slug }
 										onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
 										className={ 'is-font-' + slug }
@@ -77,7 +76,7 @@ function FontSizePicker( {
 										<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: size } }>
 											{ name }
 										</span>
-									</MenuItem>
+									</Button>
 								);
 							} ) }
 						</NavigableMenu>
