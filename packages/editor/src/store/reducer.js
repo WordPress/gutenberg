@@ -201,10 +201,6 @@ export function isUpdatingSamePostProperty( action, previousAction ) {
 	);
 }
 
-export function isUpdatingTransient( action ) {
-	return action.isUpdatingTransient;
-}
-
 /**
  * Returns true if, given the currently dispatching action and the previously
  * dispatched action, the two actions are modifying the same property such that
@@ -223,7 +219,6 @@ export function shouldOverwriteState( action, previousAction ) {
 	return overSome( [
 		isUpdatingSameBlockAttribute,
 		isUpdatingSamePostProperty,
-		isUpdatingTransient,
 	] )( action, previousAction );
 }
 
@@ -280,18 +275,6 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
-export const withTransientsHistoryOverride = ( reducer ) => ( state, action ) => {
-	if ( action.type === 'UPDATE_BLOCK_ATTRIBUTES' ) {
-		const { clientId, attributes } = action;
-		const { transients } = state.blocks;
-		if ( intersection( transients[ clientId ], keys( attributes ) ).length ) {
-			action = { ...action, isUpdatingTransient: true };
-		}
-	}
-
-	return reducer( state, action );
-};
-
 /**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
@@ -308,8 +291,6 @@ export const withTransientsHistoryOverride = ( reducer ) => ( state, action ) =>
  */
 export const editor = flow( [
 	combineReducers,
-
-	withTransientsHistoryOverride,
 
 	withInnerBlocksRemoveCascade,
 
