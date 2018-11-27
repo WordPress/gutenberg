@@ -24,7 +24,8 @@
 		"@babel/runtime": "^7.0.0",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"lodash": "^4.17.10"
 	},
 	"publishConfig": {
 		"access": "public"

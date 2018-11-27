@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -136,14 +141,15 @@ function apiFetch( options ) {
 
 	const runMiddleware = ( index ) => ( nextOptions ) => {
 		const nextMiddleware = steps[ index ];
+		let next;
 
 		if ( steps.length > ( index + 1 ) ) {
-			const next = runMiddleware( index + 1 );
-			return nextMiddleware( nextOptions, next );
+			next = runMiddleware( index + 1 );
+		} else {
+			next = noop;
 		}
 
-		// Next middleware is the last one, so no next arg is passed
-		return nextMiddleware( nextOptions );
+		return nextMiddleware( nextOptions, next );
 	};
 
 	return runMiddleware( 0 )( options );
