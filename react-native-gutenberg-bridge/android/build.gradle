@@ -17,6 +17,9 @@ apply plugin: 'com.github.dcendents.android-maven'
 // import the `submoduleGitHash()` function
 apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462f8fef1a/raw/38557f55d0a3be9605c82b1df9ced4c846fd3aea/submoduleGitHash.gradle'
 
+// import the `readReactNativeVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
+
 group='com.github.wordpress-mobile.gutenberg-mobile'
 
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
@@ -37,21 +40,32 @@ android {
     }
 }
 
+def unpkgOrNodeModules(remotePath, localPath) {
+    def url
+    if (rootProject.ext.buildGutenbergFromSource) {
+        url = "${project.buildDir}/../../../node_modules/${localPath}"
+    } else {
+        // if we are the root project, use a remote maven repo so jitpack can build this lib without local RN setup
+        url = "https://unpkg.com/${remotePath}"
+        println "Will use the unpkg.com exposed maven repo at ${url}"
+    }
+    return url
+}
+
 repositories {
     google()
     jcenter()
-    if (!rootProject.ext.buildGutenbergFromSource) {
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url "https://unpkg.com/react-native@0.57.5/android"
-        }
-        maven {
-            // Local Maven repo containing AARs with JSC library built for Android
-            url "https://unpkg.com/jsc-android@224109.1.0/dist/"
-        }
-    } else {
-        // RN maven repo is configured by the parent project, which is wpandroid
+
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries)
+        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        url unpkgOrNodeModules("react-native@${rnVersion}/android", "react-native/android")
     }
+    maven {
+        // Maven repo containing AARs with JSC library built for Android
+        url unpkgOrNodeModules("jsc-android@224109.1.0/dist/", "jsc-android/dist")
+    }
+
     maven { url "https://jitpack.io" }
 }
 
