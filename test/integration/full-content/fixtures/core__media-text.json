@@ -28,6 +28,6 @@
                 "originalContent": "<p class=\"has-large-font-size\">My Content</p>"
             }
         ],
-        "originalContent": "<div class=\"wp-block-media-text alignwide\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"http://localhost/wp-content/uploads/2018/09/1600px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg\" alt=\"\"/>\n\t</figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
+        "originalContent": "<div class=\"wp-block-media-text alignwide\">\n\t<figure class=\"wp-block-media-text__media\">\n\t\t<img src=\"http://localhost/wp-content/uploads/2018/09/1600px-Mount_Everest_as_seen_from_Drukair2_PLW_edit.jpg\" alt=\"\" class=\"wp-image-17985\"/>\n\t</figure>\n\t<div class=\"wp-block-media-text__content\">\n\t\t\n\t</div>\n</div>"
     }
 ]

@@ -12,11 +12,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       path={Array []}
       target="#block-c227357f-e92c-4369-83f5-9cf907fe3610"
     >
-      <Component
-        format="string"
-        tagName="span"
-        value="Heading parent"
-      />
+      Heading parent
     </TableOfContentsItem>
     <TableOfContentsItem
       isValid={true}
@@ -25,11 +21,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       path={Array []}
       target="#block-2fcca4f2-1b36-4c26-84ab-d82d0df58ee6"
     >
-      <Component
-        format="string"
-        tagName="span"
-        value="Heading child"
-      />
+      Heading child
     </TableOfContentsItem>
   </ul>
 </div>
@@ -47,11 +39,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       path={Array []}
       target="#block-a0d34688-bc48-466e-956e-d7117e460a1c"
     >
-      <Component
-        format="string"
-        tagName="span"
-        value="Heading 1"
-      />
+      Heading 1
       <br
         key="incorrect-break-multiple-h1"
       />
@@ -68,11 +56,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       path={Array []}
       target="#block-a0d34688-bc48-466e-956e-d7117e460a1c"
     >
-      <Component
-        format="string"
-        tagName="span"
-        value="Heading 1"
-      />
+      Heading 1
       <br
         key="incorrect-break-multiple-h1"
       />

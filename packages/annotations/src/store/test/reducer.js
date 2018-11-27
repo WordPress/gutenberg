@@ -4,12 +4,12 @@
 import { annotations } from '../reducer';
 
 describe( 'annotations', () => {
-	const initialState = { all: [], byBlockClientId: {} };
+	const initialState = {};
 
 	it( 'returns all annotations and annotation IDs per block', () => {
 		const state = annotations( undefined, {} );
 
-		expect( state ).toEqual( { all: [], byBlockClientId: {} } );
+		expect( state ).toEqual( initialState );
 	} );
 
 	it( 'returns a state with an annotation that has been added', () => {
@@ -23,24 +23,19 @@ describe( 'annotations', () => {
 		} );
 
 		expect( state ).toEqual( {
-			all: [
-				{
-					id: 'annotationId',
-					blockClientId: 'blockClientId',
-					richTextIdentifier: 'identifier',
-					source: 'default',
-					selector: 'block',
-				},
-			],
-			byBlockClientId: {
-				blockClientId: [ 'annotationId' ],
-			},
+			blockClientId: [ {
+				id: 'annotationId',
+				blockClientId: 'blockClientId',
+				richTextIdentifier: 'identifier',
+				source: 'default',
+				selector: 'block',
+			} ],
 		} );
 	} );
 
 	it( 'allows an annotation to be removed', () => {
 		const state = annotations( {
-			all: [
+			blockClientId: [
 				{
 					id: 'annotationId',
 					blockClientId: 'blockClientId',
@@ -49,15 +44,12 @@ describe( 'annotations', () => {
 					selector: 'block',
 				},
 			],
-			byBlockClientId: {
-				blockClientId: [ 'annotationId' ],
-			},
 		}, {
 			type: 'ANNOTATION_REMOVE',
 			annotationId: 'annotationId',
 		} );
 
-		expect( state ).toEqual( { all: [], byBlockClientId: { blockClientId: [] } } );
+		expect( state ).toEqual( { blockClientId: [] } );
 	} );
 
 	it( 'allows an annotation to be removed by its source', () => {
@@ -76,25 +68,20 @@ describe( 'annotations', () => {
 			selector: 'block',
 		};
 		const state = annotations( {
-			all: [
+			blockClientId: [
 				annotation1,
+			],
+			blockClientId2: [
 				annotation2,
 			],
-			byBlockClientId: {
-				blockClientId: [ 'annotationId' ],
-				blockClientId2: [ 'annotationId2' ],
-			},
 		}, {
 			type: 'ANNOTATION_REMOVE_SOURCE',
 			source: 'default',
 		} );
 
 		expect( state ).toEqual( {
-			all: [ annotation2 ],
-			byBlockClientId: {
-				blockClientId: [],
-				blockClientId2: [ 'annotationId2' ],
-			},
+			blockClientId: [],
+			blockClientId2: [ annotation2 ],
 		} );
 	} );
 
@@ -113,7 +100,7 @@ describe( 'annotations', () => {
 		} );
 
 		expect( state ).toEqual( {
-			all: [
+			blockClientId: [
 				{
 					id: 'annotationId',
 					blockClientId: 'blockClientId',
@@ -126,9 +113,45 @@ describe( 'annotations', () => {
 					},
 				},
 			],
-			byBlockClientId: {
-				blockClientId: [ 'annotationId' ],
-			},
+		} );
+	} );
+
+	it( 'moves annotations when said action is dispatched', () => {
+		const state = annotations( {
+			blockClientId: [
+				{
+					id: 'annotationId',
+					blockClientId: 'blockClientId',
+					richTextIdentifier: 'identifier',
+					source: 'default',
+					selector: 'range',
+					range: {
+						start: 0,
+						end: 100,
+					},
+				},
+			],
+		}, {
+			type: 'ANNOTATION_UPDATE_RANGE',
+			annotationId: 'annotationId',
+			start: 50,
+			end: 75,
+		} );
+
+		expect( state ).toEqual( {
+			blockClientId: [
+				{
+					id: 'annotationId',
+					blockClientId: 'blockClientId',
+					richTextIdentifier: 'identifier',
+					source: 'default',
+					selector: 'range',
+					range: {
+						start: 50,
+						end: 75,
+					},
+				},
+			],
 		} );
 	} );
 

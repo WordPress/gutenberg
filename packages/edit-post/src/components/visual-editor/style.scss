@@ -103,12 +103,6 @@
 			// WritingFlow click redirector.
 			outline: 1px solid transparent;
 		}
-
-		@include break-small() {
-			.editor-default-block-appender__content {
-				padding: 0 $block-padding;
-			}
-		}
 	}
 
 	// Ensure that the height of the first appender, and the one between blocks, is the same as text.

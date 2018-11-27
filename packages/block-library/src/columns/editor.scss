@@ -12,16 +12,17 @@
 	}
 }
 
-// Fullwide: show margin left/right to ensure there's room for the side UI
-// This is not a 1:1 preview with the front-end where these margins would presumably be zero
-// @todo this could be revisited, by for example showing this margin only when the parent block was selected first
-// Then at least an unselected columns block would be an accurate preview
-.editor-block-list__block[data-align="full"] .wp-block-columns .editor-block-list__layout {
-	&:first-child {
-		margin-left: $block-side-ui-width + $block-side-ui-clearance;
-	}
-	&:last-child {
-		margin-right: $block-side-ui-width + $block-side-ui-clearance;
+// Fullwide: show margin left/right to ensure there's room for the side UI.
+// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
+// @todo This could be revisited, by for example showing this margin only when the parent block was selected first.
+// Then at least an unselected columns block would be an accurate preview.
+.editor-block-list__block[data-align="full"] .wp-block-columns > .editor-inner-blocks {
+	padding-left: $block-padding;
+	padding-right: $block-padding;
+
+	@include break-small() {
+		padding-left: $block-padding + $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
+		padding-right: $block-padding + $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
 	}
 }
 
@@ -34,10 +35,11 @@
 		// Responsiveness: Allow wrapping on mobile.
 		flex-wrap: wrap;
 
-		@include break-medium() {
+		@include break-small() {
 			flex-wrap: nowrap;
 		}
 
+		// Adjust the individual column block.
 		> [data-type="core/column"] {
 			display: flex;
 			flex-direction: column;
@@ -46,12 +48,23 @@
 			// The Column block is a child of the Columns block and is mostly a passthrough container.
 			// Therefore it shouldn't add additional paddings and margins, so we reset these, and compensate for margins.
 			// @todo In the future, if a passthrough feature lands, it would be good to apply these rules to such an element in a more generic way.
-			margin-top: -$block-padding - $block-padding;
-			margin-bottom: -$block-padding - $block-padding;
+			> .editor-block-list__block-edit > div > .editor-inner-blocks {
+				margin-top: -$block-padding - $block-padding;
+				margin-bottom: -$block-padding - $block-padding;
+			}
 
 			> .editor-block-list__block-edit {
 				margin-top: 0;
 				margin-bottom: 0;
+			}
+
+			// Extend the passthrough concept to the block paddings, which we zero out.
+			> .editor-block-list__block-edit::before {
+				left: 0;
+				right: 0;
+			}
+			> .editor-block-list__block-edit > .editor-block-contextual-toolbar {
+				margin-left: -$border-width;
 			}
 
 			// On mobile, only a single column is shown, so match adjacent block paddings.
@@ -59,34 +72,17 @@
 			padding-right: 0;
 			margin-left: -$block-padding;
 			margin-right: -$block-padding;
-			@include break-small () {
-				padding-left: $block-padding;
-				padding-right: $block-padding;
-				margin-right: inherit;
-				// Every .editor-block-list__block has auto-left/right margins, which centers columns.
-				// Since they aren't centered on the front-end, we explicitly set a zero left margin here.
-				margin-left: 0;
-			}
-
 			@include break-small() {
-				> .editor-block-list__block-edit > .editor-block-contextual-toolbar {
-					top: $block-toolbar-height - $border-width;
-					transform: translateY(-$block-toolbar-height - $border-width);
-					margin-left: -$grid-size-large - $border-width;
-				}
-
-				> .editor-block-list__block-edit::before {
-					top: 0;
-					right: 0;
-					bottom: 0;
-					left: 0;
-				}
-
-				> .editor-block-list__block-edit > .editor-block-list__breadcrumb {
-					top: 0;
-					right: 0;
-				}
+				margin-left: $block-padding;
+				margin-right: $block-padding;
 			}
+
+			// Prevent the columns from growing wider than their distributed sizes.
+			min-width: 0;
+
+			// Prevent long unbroken words from overflowing.
+			word-break: break-word; // For back-compat.
+			overflow-wrap: break-word; // New standard.
 
 			// Responsiveness: Show at most one columns on mobile.
 			flex-basis: 100%;
@@ -101,27 +97,21 @@
 			// This has to match the same padding applied in style.scss.
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 			@include break-small() {
-				> .editor-block-list__block-edit {
-					padding-left: $grid-size-large;
-					padding-right: $grid-size-large;
+				&:nth-child(odd) {
+					margin-right: $grid-size-large * 2;
 				}
-
-				&:nth-child(odd) > .editor-block-list__block-edit {
-					padding-left: 0;
-				}
-
-				&:nth-child(even) > .editor-block-list__block-edit {
-					padding-right: 0;
+				&:nth-child(even) {
+					margin-left: $grid-size-large * 2;
 				}
 			}
 
-			@include break-medium() {
-				&:not(:first-child) > .editor-block-list__block-edit {
-					padding-left: $grid-size-large;
+			@include break-small() {
+				&:not(:first-child) {
+					margin-left: $grid-size-large * 2;
 				}
 
-				&:not(:last-child) > .editor-block-list__block-edit {
-					padding-right: $grid-size-large;
+				&:not(:last-child) {
+					margin-right: $grid-size-large * 2;
 				}
 			}
 		}
@@ -147,6 +137,7 @@
 	}
 }
 
-:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit .editor-inner-blocks {
+// This selector re-enables clicking on any child of a column block.
+:not(.components-disabled) > .wp-block-columns > .editor-inner-blocks > .editor-block-list__layout > [data-type="core/column"] > .editor-block-list__block-edit > * {
 	pointer-events: all;
 }

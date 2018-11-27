@@ -57,10 +57,6 @@ function toFormat( { type, attributes } ) {
 		return attributes ? { type, attributes } : { type };
 	}
 
-	if ( formatType.__experimentalCreatePrepareEditableTree ) {
-		return null;
-	}
-
 	if ( ! attributes ) {
 		return { type: formatType.name };
 	}
