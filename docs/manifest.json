@@ -336,6 +336,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/eslint-config",
+		"slug": "packages-eslint-config",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/eslint-config/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/format-library",
 		"slug": "packages-format-library",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/format-library/README.md",
