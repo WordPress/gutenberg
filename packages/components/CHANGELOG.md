@@ -1,3 +1,9 @@
+## 7.0.3 (Unreleased)
+
+### Polish
+
+- The `Notice` component will now always include the `.components-notice-list` class.
+
 ## 7.0.2 (2018-11-22)
 
 ## 7.0.1 (2018-11-21)
