@@ -1,3 +1,9 @@
+## 3.1.3 (Unreleased)
+
+### Bug Fixes
+
+- Fix saving WYSIWYG Meta Boxes
+
 ## 3.1.2 (2018-11-22)
 
 ## 3.1.1 (2018-11-21)

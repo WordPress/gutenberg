@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { reduce } from 'lodash';
+import tinymce from 'tinymce';
 
 /**
  * WordPress dependencies
@@ -72,6 +73,9 @@ const effects = {
 		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
+		// Saves the wp_editor fields
+		tinymce.triggerSave();
+
 		const state = store.getState();
 
 		// Additional data needed for backwards compatibility.
