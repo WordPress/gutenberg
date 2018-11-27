@@ -1,9 +1,13 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import android.content.Context;
+import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.inputmethod.InputMethodManager;
 
+import com.facebook.infer.annotation.Assertions;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
@@ -24,10 +28,14 @@ import java.util.LinkedList;
 
 public class ReactAztecText extends AztecText {
 
+    private final InputMethodManager mInputMethodManager;
     // This flag is set to true when we set the text of the EditText explicitly. In that case, no
     // *TextChanged events should be triggered. This is less expensive than removing the text
     // listeners and adding them back again after the text change is completed.
     private boolean mIsSettingTextFromJS = false;
+    // This component is controlled, so we want it to get focused only when JS ask it to do so.
+    // Whenever android requests focus (which it does for random reasons), it will be ignored.
+    private boolean mIsJSSettingFocus = false;
     private @Nullable ArrayList<TextWatcher> mListeners;
     private @Nullable TextWatcherDelegator mTextWatcherDelegator;
     private @Nullable ContentSizeWatcher mContentSizeWatcher;
@@ -40,6 +48,8 @@ public class ReactAztecText extends AztecText {
     String lastSentFormattingOptionsEventString = "";
     boolean shouldHandleOnEnter = false;
     boolean shouldHandleOnBackspace = false;
+    boolean shouldHandleOnSelectionChange = false;
+    boolean shouldHandleActiveFormatsChange = false;
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
@@ -59,6 +69,15 @@ public class ReactAztecText extends AztecText {
                 return false;
             }
         });
+        mInputMethodManager = (InputMethodManager)
+                Assertions.assertNotNull(getContext().getSystemService(Context.INPUT_METHOD_SERVICE));
+        this.setOnSelectionChangedListener(new OnSelectionChangedListener() {
+            @Override
+            public void onSelectionChanged(int selStart, int selEnd) {
+                ReactAztecText.this.updateToolbarButtons(selStart, selEnd);
+                ReactAztecText.this.propagateSelectionChanges(selStart, selEnd);
+            }
+        });
     }
 
     @Override
@@ -72,6 +91,50 @@ public class ReactAztecText extends AztecText {
         if (plugin instanceof IToolbarButton && getToolbar() != null ) {
             getToolbar().addButton((IToolbarButton)plugin);
         }
+    }
+
+    // VisibleForTesting from {@link TextInputEventsTestCase}.
+    public void requestFocusFromJS() {
+        mIsJSSettingFocus = true;
+        requestFocus();
+        mIsJSSettingFocus = false;
+    }
+
+    void clearFocusFromJS() {
+        clearFocus();
+    }
+
+    @Override
+    public void clearFocus() {
+        setFocusableInTouchMode(false);
+        super.clearFocus();
+        hideSoftKeyboard();
+    }
+
+    @Override
+    public boolean requestFocus(int direction, Rect previouslyFocusedRect) {
+        // Always return true if we are already focused. This is used by android in certain places,
+        // such as text selection.
+        if (isFocused()) {
+            return true;
+        }
+        //TODO check why it's needed - doesn't seem to work fine with this in it, since each focus call
+        // from the Android FW is skipped here.
+        /*if (!mIsJSSettingFocus) {
+            return false;
+        }*/
+        setFocusableInTouchMode(true);
+        boolean focused = super.requestFocus(direction, previouslyFocusedRect);
+        showSoftKeyboard();
+        return focused;
+    }
+
+    private boolean showSoftKeyboard() {
+        return mInputMethodManager.showSoftInput(this, 0);
+    }
+
+    private void hideSoftKeyboard() {
+        mInputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
     }
 
     public void setScrollWatcher(ScrollWatcher scrollWatcher) {
@@ -109,26 +172,6 @@ public class ReactAztecText extends AztecText {
         setIntrinsicContentSize();
     }
 
-    void setActiveFormatsChange(boolean enabled) {
-        // If it's not enabled set an empty listener on AztecText
-        if (!enabled) {
-            setOnSelectionChangedListener(new OnSelectionChangedListener() {
-                @Override
-                public void onSelectionChanged(int selStart, int selEnd) {
-                    // nope
-                }
-            });
-            return;
-        }
-
-        setOnSelectionChangedListener(new OnSelectionChangedListener() {
-            @Override
-            public void onSelectionChanged(int selStart, int selEnd) {
-               ReactAztecText.this.updateToolbarButtons(selStart, selEnd);
-            }
-        });
-    }
-
     private void updateToolbarButtons(int selStart, int selEnd) {
         ArrayList<ITextFormat> appliedStyles = getAppliedStyles(selStart, selEnd);
         updateToolbarButtons(appliedStyles);
@@ -162,13 +205,27 @@ public class ReactAztecText extends AztecText {
         }
         lastSentFormattingOptionsEventString = newOptionsAsString;
 
+        if (shouldHandleActiveFormatsChange) {
+            ReactContext reactContext = (ReactContext) getContext();
+            EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
+            eventDispatcher.dispatchEvent(
+                    new ReactAztecFormattingChangeEvent(
+                            getId(),
+                            formattingOptions.toArray(new String[formattingOptions.size()])
+                    )
+            );
+        }
+    }
+
+    private void propagateSelectionChanges(int selStart, int selEnd) {
+        if (!shouldHandleOnSelectionChange) {
+            return;
+        }
+        String content = toHtml(false);
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecFormattingChangeEvent(
-                        getId(),
-                        formattingOptions.toArray(new String[formattingOptions.size()])
-                )
+                new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd)
         );
     }
 

@@ -6,8 +6,10 @@ class RCTAztecView: Aztec.TextView {
     @objc var onBackspace: RCTBubblingEventBlock? = nil
     @objc var onChange: RCTBubblingEventBlock? = nil
     @objc var onEnter: RCTBubblingEventBlock? = nil
+    @objc var onFocus: RCTBubblingEventBlock? = nil
+    @objc var onBlur: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
-
+    @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
     
     private var previousContentSize: CGSize = .zero
@@ -120,9 +122,14 @@ class RCTAztecView: Aztec.TextView {
     }
     
     func packCaretDataForRN() -> [AnyHashable: Any] {
+        var start = selectedRange.location
+        var end = selectedRange.location + selectedRange.length
+        if selectionAffinity == .backward {
+            (start, end) = (end, start)
+        }
         return ["text": getHTML(),
-                "selectionStart": selectedRange.location,
-                "selectionEnd": selectedRange.location + selectedRange.length,
+                "selectionStart": start,
+                "selectionEnd": end,
         ]
     }
 
@@ -205,6 +212,14 @@ class RCTAztecView: Aztec.TextView {
         })
         onActiveFormatsChange(["formats": formats])
     }
+
+    func propagateSelectionChanges() {
+        guard let onSelectionChange = onSelectionChange else {
+            return
+        }
+        let caretData = packCaretDataForRN()
+        onSelectionChange(caretData)
+    }
 }
 
 // MARK: UITextView Delegate Methods
@@ -212,11 +227,20 @@ extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
         propagateFormatChanges()
+        propagateSelectionChanges()
     }
 
     func textViewDidChange(_ textView: UITextView) {
         propagateFormatChanges()
         propagateContentChanges()
+    }
+
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        onFocus?([:])
+    }
+
+    func textViewDidEndEditing(_ textView: UITextView) {
+        onBlur?([:])
     }
 
 }

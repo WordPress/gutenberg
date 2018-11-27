@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType} from 'react-native';
+import TextInputState from 'react-native/lib/TextInputState';
 
 class AztecView extends React.Component {
   
@@ -14,11 +15,14 @@ class AztecView extends React.Component {
     maxImagesWidth: PropTypes.number,
     minImagesWidth: PropTypes.number,
     onChange: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     onContentSizeChange: PropTypes.func,
     onEnter: PropTypes.func,
     onBackspace: PropTypes.func,
     onScroll: PropTypes.func,
     onActiveFormatsChange: PropTypes.func,
+    onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
   }
@@ -87,6 +91,37 @@ class AztecView extends React.Component {
     onHTMLContentWithCursor(text, selectionStart, selectionEnd);
   }
 
+  _onFocus = (event) => {
+    TextInputState.focusTextInput(ReactNative.findNodeHandle(this));
+
+    if (!this.props.onFocus) {
+      return;
+    }
+
+    const { onFocus } = this.props;
+    onFocus(event);
+  }
+  
+  _onBlur = (event) => {
+    TextInputState.blurTextInput(ReactNative.findNodeHandle(this));
+
+    if (!this.props.onBlur) {
+      return;
+    }
+
+    const { onBlur } = this.props;
+    onBlur(event);
+  }
+
+  _onSelectionChange = (event) => {
+    if (!this.props.onSelectionChange) {
+      return;
+    }
+    const { selectionStart, selectionEnd, text } = event.nativeEvent;
+    const { onSelectionChange } = this.props;
+    onSelectionChange(selectionStart, selectionEnd, text);
+  }
+
   render() {
     const { onActiveFormatsChange, ...otherProps } = this.props    
     return (
@@ -94,7 +129,10 @@ class AztecView extends React.Component {
         onActiveFormatsChange={ this._onActiveFormatsChange }
         onContentSizeChange = { this._onContentSizeChange }
         onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
+        onSelectionChange = { this._onSelectionChange }
         onEnter = { this._onEnter }
+        onFocus = { this._onFocus }
+        onBlur = { this._onBlur }
         onBackspace = { this._onBackspace }
       />
     );
