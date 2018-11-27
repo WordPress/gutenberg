@@ -18,6 +18,7 @@ type PropsType = BlockType & {
 	showTitle: boolean,
 	onChange: ( clientId: string, attributes: mixed ) => void,
 	onReplace: ( blocks: Array<Object> ) => void,
+	onBlur: void => void,
 	onInlineToolbarButtonPressed: ( button: number, clientId: string ) => void,
 	onBlockHolderPressed: ( clientId: string ) => void,
 	insertBlocksAfter: ( blocks: Array<Object> ) => void,

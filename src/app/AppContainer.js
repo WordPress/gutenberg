@@ -22,6 +22,7 @@ type PropsType = {
 	onRemove: string => mixed,
 	onResetBlocks: Array<BlockType> => mixed,
 	onSelect: string => mixed,
+	clearSelectedBlock: void => void,
 	onAttributesUpdate: ( string, mixed ) => mixed,
 	initialHtml: string,
 	setupEditor: ( mixed, ?mixed ) => mixed,
