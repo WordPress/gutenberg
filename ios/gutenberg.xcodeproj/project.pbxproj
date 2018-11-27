@@ -312,6 +312,13 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNReactNativeGutenbergBridge;
 		};
+		7EA30E0221ADC8540092F894 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F619623252704B46A619C33C /* RNTAztecView.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = F145CFC52087D16A006C159A;
+			remoteInfo = RNTAztecView;
+		};
 		832341B41AAA6A8300B99B32 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */;
@@ -427,8 +434,8 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
-				CF45443564B845C8BDCFBAB6 /* libRNTAztecView.a in Frameworks */,
 				DD2AE937473A49B2B5A0E7B6 /* libRNSVG.a in Frameworks */,
+				CF45443564B845C8BDCFBAB6 /* libRNTAztecView.a in Frameworks */,
 				7E45CC5B218B42E000C0B2AB /* libRNReactNativeGutenbergBridge.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -740,6 +747,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7EA30E0321ADC8540092F894 /* PBXTargetDependency */,
 			);
 			name = gutenberg;
 			productName = "Hello World";
@@ -1295,6 +1303,11 @@
 			target = 2D02E47A1E0B4A5D006451C7 /* gutenberg-tvOS */;
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
 		};
+		7EA30E0321ADC8540092F894 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = RNTAztecView;
+			targetProxy = 7EA30E0221ADC8540092F894 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -1385,10 +1398,14 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
+					"$(SRCROOT)/../react-native-aztec/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../react-native-aztec/ios/**";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/../react-native-aztec/ios/**",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1416,10 +1433,14 @@
 					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
+					"$(SRCROOT)/../react-native-aztec/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../react-native-aztec/ios/**";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/../react-native-aztec/ios/**",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
