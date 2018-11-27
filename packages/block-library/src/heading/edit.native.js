@@ -62,12 +62,11 @@ class HeadingEdit extends Component {
 					style={ {
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
-					onChange={ ( event ) => {
+					onChange={ ( content ) => {
 						// Create a React Tree from the new HTML
-						const newParaBlock = parse( `<!-- wp:heading {"level":${ level }} --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
+						//const newParaBlock = parse( `<!-- wp:heading {"level":${ level }} --><${ tagName }>${ content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
 						setAttributes( {
-							...this.props.attributes,
-							content: newParaBlock.attributes.content,
+							content,
 						} );
 					} }
 					onMerge={ mergeBlocks }
