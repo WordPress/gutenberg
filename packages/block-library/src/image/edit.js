@@ -32,7 +32,7 @@ import {
 	withNotices,
 	ToggleControl,
 } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	RichText,
 	BlockControls,
@@ -125,6 +125,8 @@ class ImageEdit extends Component {
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
+			this.props.popUndoLevel();
+
 			const file = getBlobByURL( url );
 			if ( file ) {
 				this.uploadFile( file );
@@ -725,6 +727,13 @@ export default compose( [
 			maxWidth,
 			isRTL,
 			imageSizes,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { popUndoLevel } = dispatch( 'core/editor' );
+
+		return {
+			popUndoLevel,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
