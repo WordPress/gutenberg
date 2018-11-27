@@ -259,17 +259,14 @@ export default class TinyMCE extends Component {
 			this.props.setRef( editorNode );
 		}
 
-		/**
-		 * A ref function can be used for cleanup because React calls it with
-		 * `null` when unmounting.
-		 */
-		if ( this.removeInternetExplorerInputFix ) {
-			this.removeInternetExplorerInputFix();
-			this.removeInternetExplorerInputFix = null;
-		}
-
 		if ( IS_IE ) {
-			this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+			if ( editorNode ) {
+				// Mounting:
+				this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+			} else {
+				// Unmounting:
+				this.removeInternetExplorerInputFix();
+			}
 		}
 	}
 
