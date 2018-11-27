@@ -46,7 +46,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     private static final int FOCUS_TEXT_INPUT = 1;
     private static final int BLUR_TEXT_INPUT = 2;
-    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 3;
+    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 100;
 
     // we define the same codes in ReactAztecText as they have for ReactNative's TextInput, so
     // it's easier to handle focus between Aztec and TextInput instances on the same screen.
