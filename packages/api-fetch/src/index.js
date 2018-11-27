@@ -44,83 +44,89 @@ function registerMiddleware( middleware ) {
 	middlewares.push( middleware );
 }
 
-function apiFetch( options ) {
-	const raw = ( nextOptions ) => {
-		const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
-		let { body, headers } = nextOptions;
+const defaultFetchHandler = ( nextOptions ) => {
+	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
+	let { body, headers } = nextOptions;
 
-		// Merge explicitly-provided headers with default values.
-		headers = { ...DEFAULT_HEADERS, ...headers };
+	// Merge explicitly-provided headers with default values.
+	headers = { ...DEFAULT_HEADERS, ...headers };
 
-		// The `data` property is a shorthand for sending a JSON body.
-		if ( data ) {
-			body = JSON.stringify( data );
-			headers[ 'Content-Type' ] = 'application/json';
+	// The `data` property is a shorthand for sending a JSON body.
+	if ( data ) {
+		body = JSON.stringify( data );
+		headers[ 'Content-Type' ] = 'application/json';
+	}
+
+	const responsePromise = window.fetch(
+		url || path,
+		{
+			...DEFAULT_OPTIONS,
+			...remainingOptions,
+			body,
+			headers,
+		}
+	);
+	const checkStatus = ( response ) => {
+		if ( response.status >= 200 && response.status < 300 ) {
+			return response;
 		}
 
-		const responsePromise = window.fetch(
-			url || path,
-			{
-				...DEFAULT_OPTIONS,
-				...remainingOptions,
-				body,
-				headers,
-			}
-		);
-		const checkStatus = ( response ) => {
-			if ( response.status >= 200 && response.status < 300 ) {
-				return response;
-			}
-
-			throw response;
-		};
-
-		const parseResponse = ( response ) => {
-			if ( parse ) {
-				if ( response.status === 204 ) {
-					return null;
-				}
-
-				return response.json ? response.json() : Promise.reject( response );
-			}
-
-			return response;
-		};
-
-		return responsePromise
-			.then( checkStatus )
-			.then( parseResponse )
-			.catch( ( response ) => {
-				if ( ! parse ) {
-					throw response;
-				}
-
-				const invalidJsonError = {
-					code: 'invalid_json',
-					message: __( 'The response is not a valid JSON response.' ),
-				};
-
-				if ( ! response || ! response.json ) {
-					throw invalidJsonError;
-				}
-
-				return response.json()
-					.catch( () => {
-						throw invalidJsonError;
-					} )
-					.then( ( error ) => {
-						const unknownError = {
-							code: 'unknown_error',
-							message: __( 'An unknown error occurred.' ),
-						};
-
-						throw error || unknownError;
-					} );
-			} );
+		throw response;
 	};
 
+	const parseResponse = ( response ) => {
+		if ( parse ) {
+			if ( response.status === 204 ) {
+				return null;
+			}
+
+			return response.json ? response.json() : Promise.reject( response );
+		}
+
+		return response;
+	};
+
+	return responsePromise
+		.then( checkStatus )
+		.then( parseResponse )
+		.catch( ( response ) => {
+			if ( ! parse ) {
+				throw response;
+			}
+
+			const invalidJsonError = {
+				code: 'invalid_json',
+				message: __( 'The response is not a valid JSON response.' ),
+			};
+
+			if ( ! response || ! response.json ) {
+				throw invalidJsonError;
+			}
+
+			return response.json()
+				.catch( () => {
+					throw invalidJsonError;
+				} )
+				.then( ( error ) => {
+					const unknownError = {
+						code: 'unknown_error',
+						message: __( 'An unknown error occurred.' ),
+					};
+
+					throw error || unknownError;
+				} );
+		} );
+};
+
+let fetchHandler = defaultFetchHandler;
+
+function setFetchHandler( newFetchHandler ) {
+	fetchHandler = newFetchHandler;
+}
+
+function apiFetch( options ) {
 	const steps = [
-		raw,
+		fetchHandler,
 		fetchAllMiddleware,
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
@@ -130,14 +136,21 @@ function apiFetch( options ) {
 
 	const runMiddleware = ( index ) => ( nextOptions ) => {
 		const nextMiddleware = steps[ index ];
-		const next = runMiddleware( index + 1 );
-		return nextMiddleware( nextOptions, next );
+
+		if ( steps.length > ( index + 1 ) ) {
+			const next = runMiddleware( index + 1 );
+			return nextMiddleware( nextOptions, next );
+		}
+
+		// Next middleware is the last one, so no next arg is passed
+		return nextMiddleware( nextOptions );
 	};
 
 	return runMiddleware( 0 )( options );
 }
 
 apiFetch.use = registerMiddleware;
+apiFetch.setFetchHandler = setFetchHandler;
 
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;

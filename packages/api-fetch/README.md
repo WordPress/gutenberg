@@ -85,4 +85,27 @@ const rootURL = "http://my-wordpress-site/wp-json/";
 apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 ```
 
+### Custom fetch handler
+
+The `api-fetch` package uses `window.fetch` for making the requests but you can use a custom fetch handler by using the `setFetchHandler` method. The custom fetch handler will receive the `options` passed to the `apiFetch` calls.
+
+**Example**
+
+The example below uses a custom fetch handler for making all the requests with [`axios`](https://github.com/axios/axios).
+
+```js
+import apiFetch from '@wordpress/api-fetch';
+import axios from 'axios';
+
+apiFetch.setFetchHandler( ( options ) => {
+	const { url, path, data, method } = options;
+
+	return axios({
+		url: url || path,
+		method,
+		data,
+	});
+} );
+```
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

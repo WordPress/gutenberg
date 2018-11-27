@@ -183,4 +183,16 @@ describe( 'apiFetch', () => {
 			} );
 		} );
 	} );
+
+	it( 'should not use the default fetch handler when using a custom fetch fetch handler', () => {
+		const customFetchHandler = jest.fn();
+
+		apiFetch.setFetchHandler( customFetchHandler );
+
+		apiFetch( { path: '/random' } );
+
+		expect( window.fetch ).not.toHaveBeenCalled();
+
+		expect( customFetchHandler ).toHaveBeenCalledWith( { path: '/random?_locale=user' } );
+	} );
 } );
