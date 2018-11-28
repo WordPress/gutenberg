@@ -145,21 +145,26 @@ function gutenberg_render_block( $source_block ) {
 
 	$global_post = $post;
 	/**
-	 * Filter to process a block structurally before rendering
+	 * Filter to process a block structurally before rendering.
 	 *
 	 * Use this filter if you want to modify a block's attributes or rearrange
 	 * its inner blocks or change its block type - anything which might govern
 	 * the way the block gets rendered in the next step.
 	 *
 	 * @example
-	 * function block_rot13( $prev, $source_block ) {
+	 * function replace_with_translation( $prev, $source_block ) {
 	 *     $block = $prev ?: $source_block;
 	 *
-	 *     return isset( $block['attrs']['do_rot13'] )
-	 *         ? array_merge( $block, array( 'innerContent' => array_map( 'str_rot13', $block['innerContent'] ) ) )
-	 *         : $prev;
+	 *     if ( ! isset( $block['attrs']['translation_id'] ) ) {
+	 *         return $prev;
+	 *     }
+	 *
+	 *     $locale      = get_current_locale();
+	 *     $translation = get_translated_block( $block['attrs']['translation_id'], $locale );
+	 *
+	 *     return $translation ?: $prev;
 	 * }
-	 * add_filter( 'block_pre_render', 'block_rot13' );
+	 * add_filter( 'block_pre_render', 'replace_with_translation' );
 	 *
 	 * @example
 	 * function hide_hidden_inner_blocks( $prev, $source_block ) {
@@ -235,6 +240,72 @@ function gutenberg_render_block( $source_block ) {
 	}
 
 	$global_post = $post;
+	/**
+	 * Filter to process a block textually after rendering.
+	 *
+	 * Use this filter if you want to apply string or HTML transformations
+	 * on a block after it and its inner blocks have already been rendered
+	 * and into HTML. Inner blocks will have been fully rendered into the
+	 * parent block by this point, so if you want to process the inner blocks
+	 * themselves you should look at `block_pre_render`.
+	 *
+	 * This filter is particularly useful if you want to process the output
+	 * from other blocks which might be substantially different from their
+	 * original raw `post_content` content.
+	 *
+	 * @example
+	 * function rot13_block( $output, $block ) {
+	 *     return isset( $block['attrs']['do_rot13'] )
+	 *         ? str_rot13( $output )
+	 *         : $output;
+	 * }
+	 * add_filter( 'block_post_render', 'rot13_block' );
+	 *
+	 * @example
+	 * function add_return_to_top_link( $output ) {
+	 *     return $output . '<a class="return-to-top">Top</a>';
+	 * }
+	 * add_filter( 'block_post_render', 'add_return_to_top_link' );
+	 *
+	 * @example
+	 * class Matcher {
+	 *     public $count = 0;
+	 *     public $pattern;
+	 *
+	 *     function __construct( $pattern ) {
+	 *         $this->pattern = $pattern;
+	 *     }
+	 *
+	 *     function block_post_render( $output ) {
+	 *         if ( 1 !== preg_match( $this->pattern, $output ) ) {
+	 *             return $output;
+	 *         }
+	 *
+	 *         $this->count++;
+	 *
+	 *         return '<div class="matched-block">' . $output . '</div>'
+	 *     }
+	 *
+	 *     function the_content( $html ) {
+	 *         $count = $this->count;
+	 *         $this->count = 0;
+	 *
+	 *         return $count > 0
+	 *             ? $html . '<div>Found ' . $count . ' blocks with a match!</div>'
+	 *             : $html;
+	 *     }
+	 * }
+	 * $matcher = new Matcher( '/new editor/i' );
+	 * add_filter( 'block_post_render', array( $matcher, 'block_post_render' ) );
+	 * add_filter( 'the_content', array( $matcher, 'the_content' ), 10 );
+	 *
+	 * @since 4.6.0
+	 *
+	 * @param string $output rendered HTML from block or previous filters
+	 * @param array $block original block that was rendered
+	 *
+	 * @return string processed HTML to display
+	 */
 	$post_render = apply_filters( 'block_post_render', $output, $block );
 	$post        = $global_post;
 
