@@ -22,7 +22,8 @@ export default class Dashicon extends Component {
 			this.props.icon !== nextProps.icon ||
 			this.props.size !== nextProps.size ||
 			this.props.className !== nextProps.className ||
-			this.props.ariaPressed !== nextProps.ariaPressed
+			this.props.ariaPressed !== nextProps.ariaPressed ||
+			this.props.style !== nextProps.style
 		);
 	}
 

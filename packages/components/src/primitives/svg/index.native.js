@@ -21,13 +21,15 @@ export const SVG = ( props ) => {
 	// Given it carries a string (as it was originally className) but an object is expected for `style`,
 	// we need to check whether `style` exists and is a string, and convert it to an object
 
-	let styleValues = {};
+	let style = {};
 	if ( typeof props.style === 'string' ) {
 		const oneStyle = props.style.split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
-		styleValues = Object.assign( styleValues, ...oneStyle );
+		style = Object.assign( style, ...oneStyle );
+	} else {
+		style = props.style;
 	}
 
-	const safeProps = { ...props, style: styleValues };
+	const safeProps = { ...props, style };
 
 	return (
 		<Svg
