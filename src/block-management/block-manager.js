@@ -25,6 +25,7 @@ const keyboardDidHide = 'keyboardDidHide';
 
 export type BlockListType = {
 	onChange: ( clientId: string, attributes: mixed ) => void,
+	onBlur: void => void,
 	focusBlockAction: string => void,
 	moveBlockUpAction: string => mixed,
 	moveBlockDownAction: string => mixed,
@@ -291,6 +292,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					key={ value.item.clientId }
 					onInlineToolbarButtonPressed={ this.onInlineToolbarButtonPressed }
 					onBlockHolderPressed={ this.props.focusBlockAction }
+					onBlur={ this.props.onBlur }
 					onChange={ this.props.onChange }
 					showTitle={ this.state.inspectBlocks }
 					focused={ value.item.focused }
