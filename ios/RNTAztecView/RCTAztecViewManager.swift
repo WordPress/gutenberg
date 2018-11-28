@@ -21,7 +21,7 @@ public class RCTAztecViewManager: RCTViewManager {
     @objc
     public override func view() -> UIView {
         let view = RCTAztecView(
-            defaultFont: .systemFont(ofSize: 12),
+            defaultFont: defaultFont,
             defaultParagraphStyle: .default,
             defaultMissingImage: UIImage())
 
@@ -43,5 +43,22 @@ public class RCTAztecViewManager: RCTViewManager {
             }
             block(aztecView)
         }
+    }
+
+    private var defaultFont: UIFont {
+        if let font = UIFont(name: "NotoSerif", size: 16) {
+            return font
+        }
+
+        let defaultFont = UIFont.systemFont(ofSize: 16)
+        guard let url = Bundle.main.url(forResource: "NotoSerif-Regular", withExtension: "ttf") else {
+            return defaultFont
+        }
+        CTFontManagerRegisterFontsForURL(url as CFURL, CTFontManagerScope.process, nil)
+        if let font = UIFont(name: "NotoSerif", size: 16) {
+            return font
+        }
+
+        return defaultFont
     }
 }
