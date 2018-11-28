@@ -25,7 +25,10 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
 
 extension RNReactNativeGutenbergBridge {
     public override func supportedEvents() -> [String]! {
-        return [Gutenberg.EventName.requestHTML]
+        return [
+            Gutenberg.EventName.requestHTML,
+            Gutenberg.EventName.toggleHTMLMode
+        ]
     }
 
     public override static func requiresMainQueueSetup() -> Bool {

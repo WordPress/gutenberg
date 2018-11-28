@@ -5,7 +5,7 @@ import Aztec
 
 class GutenbergViewController: UIViewController {
 
-    fileprivate lazy var gutenberg = Gutenberg(dataSource: self)
+    lazy var gutenberg = Gutenberg(dataSource: self)
     fileprivate var htmlMode = false
 
     override func loadView() {
@@ -18,11 +18,11 @@ class GutenbergViewController: UIViewController {
         gutenberg.delegate = self
         navigationController?.navigationBar.isTranslucent = false
     }
-
+    
     @objc func moreButtonPressed(sender: UIBarButtonItem) {
         showMoreSheet()
     }
-
+    
     @objc func saveButtonPressed(sender: UIBarButtonItem) {
         gutenberg.requestHTML()
     }
@@ -52,18 +52,18 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
 //MARK: - Navigation bar
 
 extension GutenbergViewController {
-
+    
     func configureNavigationBar() {
         addSaveButton()
         addMoreButton()
     }
-
+    
     func addSaveButton() {
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .save,
                                                            target: self,
                                                            action: #selector(saveButtonPressed(sender:)))
     }
-
+    
     func addMoreButton() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "...",
                                                             style: .plain,
@@ -75,7 +75,7 @@ extension GutenbergViewController {
 //MARK: - More actions
 
 extension GutenbergViewController {
-
+    
     func showMoreSheet() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -89,10 +89,10 @@ extension GutenbergViewController {
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(cancelAction)
-
+        
         present(alert, animated: true)
     }
-
+    
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()

@@ -6,7 +6,7 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 
-import { Switch, Text, View, FlatList, Keyboard } from 'react-native';
+import { Text, View, FlatList, Keyboard, LayoutChangeEvent } from 'react-native';
 import BlockHolder from './block-holder';
 import { InlineToolbarButton } from './constants';
 import type { BlockType } from '../store/types';
@@ -30,22 +30,22 @@ export type BlockListType = {
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
 	createBlockAction: ( string, BlockType ) => mixed,
-	parseBlocksAction: string => mixed,
 	serializeToNativeAction: void => void,
+	toggleHtmlModeAction: void => void,
 	mergeBlocksAction: ( string, string ) => mixed,
 	blocks: Array<BlockType>,
 	isBlockSelected: string => boolean,
+	showHtml: boolean,
 };
 
 type PropsType = BlockListType;
 type StateType = {
-	showHtml: boolean,
-	inspectBlocks: boolean,
 	blockTypePickerVisible: boolean,
 	blocks: Array<BlockType>,
 	selectedBlockType: string,
 	refresh: boolean,
 	isKeyboardVisible: boolean,
+	rootViewHeight: number;
 };
 
 export default class BlockManager extends React.Component<PropsType, StateType> {
@@ -63,12 +63,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		this.state = {
 			blocks: blocks,
-			showHtml: false,
-			inspectBlocks: false,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
 			refresh: false,
 			isKeyboardVisible: false,
+			rootViewHeight: 0,
 		};
 	}
 
@@ -128,6 +127,11 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				// TODO: implement settings
 				break;
 		}
+	}
+
+	onRootViewLayout = ( event: LayoutChangeEvent ) => {
+		const { height } = event.nativeEvent.layout;
+		this.setState( { rootViewHeight: height } );
 	}
 
 	componentDidMount() {
@@ -202,13 +206,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 			<FlatList
 				style={ styles.list }
 				data={ this.state.blocks }
-				extraData={ { refresh: this.state.refresh, inspectBlocks: this.state.inspectBlocks } }
+				extraData={ { refresh: this.state.refresh } }
 				keyExtractor={ ( item ) => item.clientId }
 				renderItem={ this.renderItem.bind( this ) }
 			/>
 		);
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } }>
+			<KeyboardAvoidingView style={ { flex: 1 } } parentHeight={ this.state.rootViewHeight }>
 				{ list }
 				<BlockToolbar
 					onInsertClick={ () => {
@@ -237,37 +241,13 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 
 		return (
-			<View style={ styles.container }>
-				<View style={ styles.switch }>
-					<Switch
-						activeText={ 'On' }
-						inActiveText={ 'Off' }
-						value={ this.state.showHtml }
-						onValueChange={ this.handleSwitchEditor }
-					/>
-					<Text style={ styles.switchLabel }>View html output</Text>
-					<Switch
-						activeText={ 'On' }
-						inActiveText={ 'Off' }
-						value={ this.state.inspectBlocks }
-						onValueChange={ this.handleInspectBlocksChanged }
-					/>
-					<Text style={ styles.switchLabel }>Inspect blocks</Text>
-				</View>
-				{ this.state.showHtml && this.renderHTML() }
-				{ ! this.state.showHtml && list }
+			<View style={ styles.container } onLayout={ this.onRootViewLayout }>
+				{ this.props.showHtml && this.renderHTML() }
+				{ ! this.props.showHtml && list }
 				{ this.state.blockTypePickerVisible && blockTypePicker }
 			</View>
 		);
 	}
-
-	handleSwitchEditor = ( showHtml: boolean ) => {
-		this.setState( { showHtml } );
-	};
-
-	handleInspectBlocksChanged = ( inspectBlocks: boolean ) => {
-		this.setState( { inspectBlocks } );
-	};
 
 	renderItem( value: { item: BlockType } ) {
 		const insertHere = (
@@ -285,7 +265,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					onInlineToolbarButtonPressed={ this.onInlineToolbarButtonPressed }
 					onBlockHolderPressed={ this.props.focusBlockAction }
 					onChange={ this.props.onChange }
-					showTitle={ this.state.inspectBlocks }
+					showTitle={ false }
 					focused={ value.item.focused }
 					clientId={ value.item.clientId }
 					insertBlocksAfter={ ( blocks ) => this.insertBlocksAfter( value.item.clientId, blocks ) }
