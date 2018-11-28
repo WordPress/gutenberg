@@ -5,7 +5,6 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.View;
 
 import com.facebook.react.ReactInstanceManager;
@@ -187,7 +186,7 @@ public class WPAndroidGlueCode {
 
             return mContentChanged ? (mContentHtml == null ? "" : mContentHtml) : originalContent;
         } else {
-            Log.d("QWER", "context is null");
+            // TODO: Add app logging here
         }
 
         return originalContent;
