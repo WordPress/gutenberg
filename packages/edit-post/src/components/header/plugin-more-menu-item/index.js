@@ -15,12 +15,12 @@ import { withPluginContext } from '@wordpress/plugins';
  */
 import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
-const PluginMoreMenuItem = ( { children, icon, url, onClick = noop } ) => (
+const PluginMoreMenuItem = ( { children, url, onClick = noop, ...props } ) => (
 	<PluginsMoreMenuGroup>
 		{ ( fillProps ) => (
 			<MenuItem
+				{ ...props }
 				href={ url }
-				icon={ icon }
 				onClick={ compose( onClick, fillProps.onClose ) }
 			>
 				{ children }
