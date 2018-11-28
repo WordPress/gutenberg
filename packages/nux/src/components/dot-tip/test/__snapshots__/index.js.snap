@@ -8,6 +8,14 @@ exports[`DotTip should render a button when collapsible 1`] = `
 />
 `;
 
+exports[`DotTip should render a custom label when collapsible 1`] = `
+<button
+  aria-label="Toggle tip"
+  className="nux-dot-tip"
+  onClick={[Function]}
+/>
+`;
+
 exports[`DotTip should render the tip after being clicked when collapsible 1`] = `
 <button
   aria-label="Close tip"

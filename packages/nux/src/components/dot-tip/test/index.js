@@ -38,6 +38,15 @@ describe( 'DotTip', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
+	it( 'should render a custom label when collapsible', () => {
+		const wrapper = shallow(
+			<DotTip isCollapsible label="Toggle tip" isVisible>
+				It looks like you’re writing a letter. Would you like help?
+			</DotTip>
+		);
+		expect( wrapper ).toMatchSnapshot();
+	} );
+
 	it( 'should render the tip after being clicked when collapsible', () => {
 		const wrapper = shallow(
 			<DotTip isCollapsible isVisible>

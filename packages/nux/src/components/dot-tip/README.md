@@ -29,3 +29,27 @@ A string that uniquely identifies the tip. Identifiers should be prefixed with t
 ### children
 
 Any React element or elements can be passed as children. They will be rendered within the tip bubble.
+
+### isCollapsible
+
+Marks a tip as being collapsible. Collapsible tips show a pulsating indicator and nothing else. Clicking on the indicator will expand or collapse the tip.
+
+Defaults to `false`.
+
+- Type: `boolean`
+- Required: No
+
+### label
+
+The ARIA label used to describe the button that opens or closes a collapsible tip.
+
+If a function is provided then it will be invoked with `isOpen` as the argument, allowing one to change the label depeneding on whether the button opens or closes the tip.
+
+```jsx
+<DotTip tipId="acme/add-to-cart" label={ ( isOpen ) => isOpen ? 'Close tip' : 'Open tip' }>
+	Click here to add the product to your shopping cart.
+</DotTip>
+```
+
+- Type: `string` or `Function`
+- Required: No

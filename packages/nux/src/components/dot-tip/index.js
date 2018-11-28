@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -11,6 +16,10 @@ function stopEventPropagation( event ) {
 	// Tips are often nested within buttons. We stop propagation so that clicking
 	// on a tip doesn't result in the button being clicked.
 	event.stopPropagation();
+}
+
+function defaultLabel( isOpen ) {
+	return isOpen ? __( 'Close tip' ) : __( 'Open tip' );
 }
 
 export class DotTip extends Component {
@@ -39,6 +48,7 @@ export class DotTip extends Component {
 			hasNextTip,
 			isCollapsible,
 			isVisible,
+			label = defaultLabel,
 			onDisable,
 			onDismiss,
 		} = this.props;
@@ -84,7 +94,7 @@ export class DotTip extends Component {
 		return isCollapsible ? (
 			<button
 				className={ classes }
-				aria-label={ isOpen ? __( 'Close tip' ) : __( 'Open tip' ) }
+				aria-label={ isFunction( label ) ? label( isOpen ) : label }
 				onClick={ this.toggleIsOpen }
 			>
 				{ popover }
