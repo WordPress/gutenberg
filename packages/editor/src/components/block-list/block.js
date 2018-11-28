@@ -228,8 +228,9 @@ export class BlockListBlock extends Component {
 	}
 
 	mergeBlocks( forward = false ) {
-		const { clientId, previousBlockClientId, nextBlockClientId, onMerge } = this.props;
-
+		const { clientId, getPreviousBlockClientId, getNextBlockClientId, onMerge } = this.props;
+		const previousBlockClientId = getPreviousBlockClientId( clientId );
+		const nextBlockClientId = getNextBlockClientId( clientId );
 		// Do nothing when it's the first block.
 		if (
 			( ! forward && ! previousBlockClientId ) ||
@@ -404,7 +405,6 @@ export class BlockListBlock extends Component {
 						isMultiSelecting,
 						isEmptyDefaultBlock,
 						isMovable,
-						isPreviousBlockADefaultEmptyBlock,
 						isParentOfSelectedBlock,
 						isDraggable,
 						className,
@@ -437,7 +437,7 @@ export class BlockListBlock extends Component {
 					// Insertion point can only be made visible if the block is at the
 					// the extent of a multi-selection, or not in a multi-selection.
 					const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirstMultiSelected ) || ! isPartOfMultiSelection;
-					const canShowInBetweenInserter = ! isEmptyDefaultBlock && ! isPreviousBlockADefaultEmptyBlock;
+					const canShowInBetweenInserter = ! isEmptyDefaultBlock;
 
 					// The wp-block className is important for editor styles.
 					// Generate the wrapper class names handling the different states of the block.
@@ -634,8 +634,6 @@ export class BlockListBlock extends Component {
 const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeViewport } ) => {
 	const {
 		isBlockSelected,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
 		getBlockName,
 		isBlockValid,
 		getBlockAttributes,
@@ -653,17 +651,17 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		hasSelectedInnerBlock,
 		getTemplateLock,
 		getBlockSelectionStart,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
 	} = select( 'core/editor' );
 	const isSelected = isBlockSelected( clientId );
 	const { hasFixedToolbar, focusMode } = getEditorSettings();
-	const previousBlockClientId = getPreviousBlockClientId( clientId );
 	const templateLock = getTemplateLock( rootClientId );
 	const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
 	const name = getBlockName( clientId );
 	const attributes = getBlockAttributes( clientId );
 
 	return {
-		nextBlockClientId: getNextBlockClientId( clientId ),
 		isPartOfMultiSelection: isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 		isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
 		isMultiSelecting: isMultiSelecting(),
@@ -676,10 +674,6 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
 		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
-		isPreviousBlockADefaultEmptyBlock: previousBlockClientId && isUnmodifiedDefaultBlock( {
-			name: getBlockName( previousBlockClientId ),
-			attributes: getBlockAttributes( previousBlockClientId ),
-		} ),
 		isValid: isBlockValid( clientId ),
 		isMovable: 'all' !== templateLock,
 		isLocked: !! templateLock,
@@ -687,12 +681,14 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 		name,
 		attributes,
-		previousBlockClientId,
 		isSelected,
 		isParentOfSelectedBlock,
+
 		// We only care about this value when the shift key is pressed.
 		// We call it dynamically in the event handler to avoid unnecessary re-renders.
 		getBlockSelectionStart,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
 	};
 } );
 
