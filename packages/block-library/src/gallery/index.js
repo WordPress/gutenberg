@@ -99,29 +99,18 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ 'core/image' ],
 				transform: ( attributes ) => {
-					const validImages = filter( attributes, ( { id, url } ) => id && url );
-					// init the align attribute from the first item which may be either the place holder or an image.
+					// Init the align attribute from the first item which may be either the placeholder or an image.
 					let { align } = attributes[ 0 ];
+					// Loop through all the images and check if they have the same align.
+					align = every( attributes, [ 'align', align ] ) ? align : undefined;
 
-					if ( validImages.length > 0 ) {
-						// loop through all the images and check if they have the same align.
-						align = validImages.reduce( ( accumulator, imageAttributes, index ) => {
-							const imageAlign = imageAttributes.align;
+					const validImages = filter( attributes, ( { id, url } ) => id && url );
 
-							if ( accumulator === imageAlign || ( ! index && align ) ) {
-								return imageAlign;
-							}
-							// if there are two different alignments, unset the align attribute.
-							return null;
-						}, align );
-
-						return createBlock( 'core/gallery', {
-							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
-							ids: validImages.map( ( { id } ) => id ),
-							align,
-						} );
-					}
-					return createBlock( 'core/gallery', { align } );
+					return createBlock( 'core/gallery', {
+						images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
+						ids: validImages.map( ( { id } ) => id ),
+						align,
+					} );
 				},
 			},
 			{
