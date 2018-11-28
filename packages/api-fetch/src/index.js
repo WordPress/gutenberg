@@ -134,10 +134,11 @@ function apiFetch( options ) {
 
 	const createRunStep = ( index ) => ( workingOptions ) => {
 		const step = steps[ index ];
-		const next = index === steps.length - 1 ?
-			() => {} :
-			createRunStep( index + 1 );
+		if ( index === steps.length - 1 ) {
+			return step( workingOptions );
+		}
 
+		const next = createRunStep( index + 1 );
 		return step( workingOptions, next );
 	};
 
