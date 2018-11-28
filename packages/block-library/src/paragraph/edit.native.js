@@ -19,9 +19,13 @@ import styles from './style.scss';
 const name = 'core/paragraph';
 
 class ParagraphEdit extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
+
+		this.state = {
+			aztecHeight: 0,
+		};
 	}
 
 	/**
@@ -88,9 +92,11 @@ class ParagraphEdit extends Component {
 					tagName="p"
 					value={ content }
 					isSelected={ this.props.isSelected }
+					onFocus={ this.props.onFocus } // always assign onFocus as a props
+					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					style={ {
 						...style,
-						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
+						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
@@ -99,17 +105,12 @@ class ParagraphEdit extends Component {
 							...this.props.attributes,
 							content: newParaBlock.attributes.content,
 						} );
-					}
-					}
+					} }
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
-						setAttributes( {
-							...this.props.attributes,
-							aztecHeight: event.aztecHeight,
-						} );
-					}
-					}
+						this.setState( { aztecHeight: event.aztecHeight } );
+					} }
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 				/>
 			</View>

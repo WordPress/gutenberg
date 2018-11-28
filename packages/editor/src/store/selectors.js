@@ -36,9 +36,10 @@ import { removep } from '@wordpress/autop';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Dependencies
+ * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /***
  * Module constants
@@ -297,8 +298,21 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
+	// Fall back to saved post value if not edited.
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
 		return getCurrentPostAttribute( state, attributeName );
+	}
+
+	// Merge properties are objects which contain only the patch edit in state,
+	// and thus must be merged with the current post attribute.
+	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// [TODO]: Since this will return a new reference on each invocation,
+		// consider caching in a way which would not impact non-merged property
+		// derivation. Alternatively, introduce a new selector for meta lookup.
+		return {
+			...getCurrentPostAttribute( state, attributeName ),
+			...edits[ attributeName ],
+		};
 	}
 
 	return edits[ attributeName ];

@@ -870,7 +870,7 @@
 		// Hide right border on desktop, where the .components-toolbar instead has a right border.
 		border-right: none;
 
-		// This prevents floats from messing up the position.
+		// This prevents floats from messing up the position of the block toolbar on floats-adjacent blocks when selected.
 		position: absolute;
 		left: 0;
 	}

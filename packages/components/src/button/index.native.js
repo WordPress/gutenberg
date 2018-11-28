@@ -51,7 +51,21 @@ const styles = StyleSheet.create( {
 } );
 
 export default function Button( props ) {
-	const { children, onClick, 'aria-label': ariaLabel, 'aria-pressed': ariaPressed, 'data-subscript': subscript } = props;
+	const {
+		children,
+		onClick,
+		disabled,
+		'aria-disabled': ariaDisabled,
+		'aria-label': ariaLabel,
+		'aria-pressed': ariaPressed,
+		'data-subscript': subscript,
+	} = props;
+
+	const isDisabled = ariaDisabled || disabled;
+	const buttonViewStyle = {
+		opacity: isDisabled ? 0.2 : 1,
+		...( ariaPressed ? styles.buttonActive : styles.buttonInactive ),
+	};
 
 	return (
 		<TouchableOpacity
@@ -60,8 +74,9 @@ export default function Button( props ) {
 			accessibilityLabel={ ariaLabel }
 			onPress={ onClick }
 			style={ styles.container }
+			disabled={ isDisabled }
 		>
-			<View style={ ariaPressed ? styles.buttonActive : styles.buttonInactive }>
+			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>
 					{ children }
 					{ subscript && ( <Text style={ ariaPressed ? styles.subscriptActive : styles.subscriptInactive }>{ subscript }</Text> ) }
