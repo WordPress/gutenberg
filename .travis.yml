@@ -2,6 +2,8 @@ addons:
   artifacts:
     debug: true
     s3_region: "us-west-1"
+    target_paths:
+      - /${TRAVIS_REPO_SLUG}/
 
 env:
   global:
