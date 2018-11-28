@@ -196,5 +196,6 @@ describe( 'apiFetch', () => {
 		expect( customFetchHandler ).toHaveBeenCalledWith( {
 			path: '/random?_locale=user',
 		}, expect.any( Function ) );
+		expect( customFetchHandler.mock.calls[ 0 ][ 1 ] ).not.toThrow();
 	} );
 } );
