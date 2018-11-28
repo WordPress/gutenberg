@@ -198,4 +198,25 @@ describe( 'apiFetch', () => {
 		}, expect.any( Function ) );
 		expect( customFetchHandler.mock.calls[ 0 ][ 1 ] ).not.toThrow();
 	} );
+
+	it( 'should run the last-registered user-defined middleware first', () => {
+		// This could potentially impact other tests in that a lingering
+		// middleware is left. For the purposes of this test, it is sufficient
+		// to ensure that the last-registered middleware receives the original
+		// options object. It also assumes that some built-in middleware would
+		// either mutate or clone the original options if the extra middleware
+		// had been pushed to the stack.
+		expect.assertions( 2 );
+
+		const expectedOptions = {};
+
+		apiFetch.use( ( actualOptions, next ) => {
+			expect( actualOptions ).toBe( expectedOptions );
+			expect( actualOptions ).toEqual( expectedOptions );
+
+			return next( actualOptions );
+		} );
+
+		apiFetch( expectedOptions );
+	} );
 } );
