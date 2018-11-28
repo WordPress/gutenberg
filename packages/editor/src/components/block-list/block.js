@@ -437,7 +437,6 @@ export class BlockListBlock extends Component {
 					// Insertion point can only be made visible if the block is at the
 					// the extent of a multi-selection, or not in a multi-selection.
 					const shouldShowInsertionPoint = ( isPartOfMultiSelection && isFirstMultiSelected ) || ! isPartOfMultiSelection;
-					const canShowInBetweenInserter = ! isEmptyDefaultBlock;
 
 					// The wp-block className is important for editor styles.
 					// Generate the wrapper class names handling the different states of the block.
@@ -522,7 +521,6 @@ export class BlockListBlock extends Component {
 								<BlockInsertionPoint
 									clientId={ clientId }
 									rootClientId={ rootClientId }
-									canShowInserter={ canShowInBetweenInserter }
 								/>
 							) }
 							<BlockDropZone
@@ -684,8 +682,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isSelected,
 		isParentOfSelectedBlock,
 
-		// We only care about this value when the shift key is pressed.
-		// We call it dynamically in the event handler to avoid unnecessary re-renders.
+		// We only care about these selectors when events are triggered.
+		// We call them dynamically in the event handlers to avoid unnecessary re-renders.
 		getBlockSelectionStart,
 		getPreviousBlockClientId,
 		getNextBlockClientId,
