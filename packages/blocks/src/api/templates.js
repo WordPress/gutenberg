@@ -57,11 +57,6 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 	return map( template, ( [ name, attributes, innerBlocksTemplate ], index ) => {
 		const block = blocks[ index ];
 
-		if ( block && block.name === name ) {
-			const innerBlocks = synchronizeBlocksWithTemplate( block.innerBlocks, innerBlocksTemplate );
-			return { ...block, innerBlocks };
-		}
-
 		// To support old templates that were using the "children" format
 		// for the attributes using "html" strings now, we normalize the template attributes
 		// before creating the blocks.
@@ -96,6 +91,11 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			get( blockType, [ 'attributes' ], {} ),
 			attributes
 		);
+
+		if ( block && block.name === name ) {
+			const innerBlocks = synchronizeBlocksWithTemplate( block.innerBlocks, innerBlocksTemplate );
+			return { ...block, attributes: normalizedAttributes, innerBlocks };
+		}
 
 		return createBlock(
 			name,
