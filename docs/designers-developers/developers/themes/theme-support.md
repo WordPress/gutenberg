@@ -204,7 +204,7 @@ Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Edito
 
 In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. Gutenberg, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors. This also allows Gutenberg to leverage your editor style in block variation previews.
 
-For example, if you write `body { ... }` in your editor style, this is rewritten to `.editor-styles-wrapper { ... }`.  This also means that you should _not_ target any of the editor classnames directly.
+For example, if you write `body { ... }` in your editor style, this is rewritten to `.editor-styles-wrapper { ... }`.  This also means that you should _not_ target any of the editor class names directly.
 
 Because it works a little differently, you need to opt-in to this by adding an extra snippet to your theme, in addition to the add_editor_style function:
 
