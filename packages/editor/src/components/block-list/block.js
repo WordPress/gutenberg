@@ -737,8 +737,9 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 } );
 
 export default compose(
+	withFilters( 'editor.BlockListBlock' ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
-	withFilters( 'editor.BlockListBlock' ),
+	withFilters( 'editor.__experimentalBlockListBlock' ),
 )( BlockListBlock );
