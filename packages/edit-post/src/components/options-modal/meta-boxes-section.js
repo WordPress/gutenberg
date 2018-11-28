@@ -27,7 +27,7 @@ export function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sec
 	return (
 		<Section { ...sectionProps }>
 			{ areCustomFieldsRegistered && (
-				<PostTypeSupportCheck supportKeys='custom-fields'>
+				<PostTypeSupportCheck supportKeys="custom-fields">
 					<EnableCustomFieldsOption label={ __( 'Custom Fields' ) } />
 				</PostTypeSupportCheck>
 			) }
