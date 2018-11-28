@@ -137,7 +137,7 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
  * @since 4.6.0 filters blocks structurally before rendering and as text afterwards
  * @global WP_Post $post The post to edit.
  *
- * @param  array $block A single parsed block object.
+ * @param  array $source_block A single parsed block object.
  * @return string String of rendered HTML.
  */
 function gutenberg_render_block( $source_block ) {
@@ -217,9 +217,9 @@ function gutenberg_render_block( $source_block ) {
 	 *
 	 * @return array|null transformed version of block or previous $block if not transformation is needed
 	 */
-	$pre_render  = apply_filters( 'block_pre_render', null, $source_block );
-	$post        = $global_post;
-	$block       = isset( $pre_render ) ? $pre_render : $source_block;
+	$pre_render = apply_filters( 'block_pre_render', null, $source_block );
+	$post       = $global_post;
+	$block      = isset( $pre_render ) ? $pre_render : $source_block;
 
 	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
