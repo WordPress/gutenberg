@@ -45,9 +45,10 @@ matrix:
         - ./.travis/travis-checks-js.sh
     - language: node_js
       node_js: 8
-      env: LANE='node'
+      env:
+        LANE='node'
+        ARTIFACTS_PATHS="./bundle"
       cache:
         yarn: true
       script:
         - yarn bundle
-        - artifacts upload ./bundle
