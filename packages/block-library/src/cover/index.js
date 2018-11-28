@@ -506,6 +506,62 @@ export const settings = {
 				</section>
 			);
 		},
+	}, {
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+		},
+
+		save( { attributes } ) {
+			const {
+				align,
+				backgroundType,
+				contentAlign,
+				customOverlayColor,
+				dimRatio,
+				hasParallax,
+				overlayColor,
+				title,
+				url,
+			} = attributes;
+			const overlayColorClass = getColorClassName( 'background-color', overlayColor );
+			const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
+				backgroundImageStyles( url ) :
+				{};
+			if ( ! overlayColorClass ) {
+				style.backgroundColor = customOverlayColor;
+			}
+
+			const classes = classnames(
+				dimRatioToClass( dimRatio ),
+				overlayColorClass,
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				},
+				align ? `align${ align }` : null,
+			);
+
+			return (
+				<div className={ classes } style={ style }>
+					{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+					/> ) }
+					{ ! RichText.isEmpty( title ) && (
+						<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
+					) }
+				</div>
+			);
+		},
 	} ],
 };
 
