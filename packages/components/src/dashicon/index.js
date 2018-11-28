@@ -14,18 +14,20 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { Path, SVG } from '../primitives';
+import { IconClass } from './icon-class';
 
 export default class Dashicon extends Component {
 	shouldComponentUpdate( nextProps ) {
 		return (
 			this.props.icon !== nextProps.icon ||
 			this.props.size !== nextProps.size ||
-			this.props.className !== nextProps.className
+			this.props.className !== nextProps.className ||
+			this.props.ariaPressed !== nextProps.ariaPressed
 		);
 	}
 
 	render() {
-		const { icon, className, size = 20 } = this.props;
+		const { icon, size = 20 } = this.props;
 		let path;
 
 		switch ( icon ) {
@@ -896,7 +898,7 @@ export default class Dashicon extends Component {
 			return null;
 		}
 
-		const iconClass = [ 'dashicon', 'dashicons-' + icon, className ].filter( Boolean ).join( ' ' );
+		const iconClass = IconClass( this.props );
 
 		return (
 			<SVG

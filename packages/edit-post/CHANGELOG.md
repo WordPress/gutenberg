@@ -1,3 +1,13 @@
+## 3.1.2 (2018-11-22)
+
+## 3.1.1 (2018-11-21)
+
+## 3.1.0 (2018-11-20)
+
+### New Feature
+
+- The new `AdminNotices` component will transparently upgrade any `.notice` elements on the page to the equivalent `@wordpress/notices` module notice state.
+
 ## 3.0.2 (2018-11-15)
 
 ## 3.0.1 (2018-11-12)

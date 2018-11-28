@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isNumber, mapValues } from 'lodash';
+import { get, isNumber, mapValues } from 'lodash';
 
 /**
  * Filters an array based on the predicate, but keeps the reference the same if
@@ -38,7 +38,7 @@ function isValidAnnotationRange( annotation ) {
  *
  * @return {Array} Updated state.
  */
-export function annotations( state = { all: [], byBlockClientId: {} }, action ) {
+export function annotations( state = {}, action ) {
 	switch ( action.type ) {
 		case 'ANNOTATION_ADD':
 			const blockClientId = action.blockClientId;
@@ -55,52 +55,48 @@ export function annotations( state = { all: [], byBlockClientId: {} }, action ) 
 				return state;
 			}
 
-			const previousAnnotationsForBlock = state.byBlockClientId[ blockClientId ] || [];
+			const previousAnnotationsForBlock = get( state, blockClientId, [] );
 
 			return {
-				all: [
-					...state.all,
-					newAnnotation,
-				],
-				byBlockClientId: {
-					...state.byBlockClientId,
-					[ blockClientId ]: [ ...previousAnnotationsForBlock, action.id ],
-				},
+				...state,
+				[ blockClientId ]: [ ...previousAnnotationsForBlock, newAnnotation ],
 			};
 
 		case 'ANNOTATION_REMOVE':
-			return {
-				all: state.all.filter( ( annotation ) => annotation.id !== action.annotationId ),
-
-				// We use filterWithReference to not refresh the reference if a block still has
-				// the same annotations.
-				byBlockClientId: mapValues( state.byBlockClientId, ( annotationForBlock ) => {
-					return filterWithReference( annotationForBlock, ( annotationId ) => {
-						return annotationId !== action.annotationId;
-					} );
-				} ),
-			};
-
-		case 'ANNOTATION_REMOVE_SOURCE':
-			const idsToRemove = [];
-
-			const allAnnotations = state.all.filter( ( annotation ) => {
-				if ( annotation.source === action.source ) {
-					idsToRemove.push( annotation.id );
-					return false;
-				}
-
-				return true;
+			return mapValues( state, ( annotationsForBlock ) => {
+				return filterWithReference( annotationsForBlock, ( annotation ) => {
+					return annotation.id !== action.annotationId;
+				} );
 			} );
 
-			return {
-				all: allAnnotations,
-				byBlockClientId: mapValues( state.byBlockClientId, ( annotationForBlock ) => {
-					return filterWithReference( annotationForBlock, ( annotationId ) => {
-						return ! idsToRemove.includes( annotationId );
-					} );
-				} ),
-			};
+		case 'ANNOTATION_UPDATE_RANGE':
+			return mapValues( state, ( annotationsForBlock ) => {
+				let hasChangedRange = false;
+
+				const newAnnotations = annotationsForBlock.map( ( annotation ) => {
+					if ( annotation.id === action.annotationId ) {
+						hasChangedRange = true;
+						return {
+							...annotation,
+							range: {
+								start: action.start,
+								end: action.end,
+							},
+						};
+					}
+
+					return annotation;
+				} );
+
+				return hasChangedRange ? newAnnotations : annotationsForBlock;
+			} );
+
+		case 'ANNOTATION_REMOVE_SOURCE':
+			return mapValues( state, ( annotationsForBlock ) => {
+				return filterWithReference( annotationsForBlock, ( annotation ) => {
+					return annotation.source !== action.source;
+				} );
+			} );
 	}
 
 	return state;

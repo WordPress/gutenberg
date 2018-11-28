@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Separator can be created by prefixing existing content with number signs and a space 1`] = `
+"<!-- wp:heading {\\"level\\":4} -->
+<h4>4</h4>
+<!-- /wp:heading -->"
+`;
+
+exports[`Separator can be created by prefixing number sign and a space 1`] = `
+"<!-- wp:heading {\\"level\\":3} -->
+<h3>3</h3>
+<!-- /wp:heading -->"
+`;

@@ -286,6 +286,8 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 //  <SaleButton>Start Sale!</SaleButton>
 ```
 
+*Note:* It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
+
 ## Generic Stores
 
 The `@wordpress/data` module offers a more advanced and generic interface for the purposes of integrating other data systems and situations where more direct control over a data system is needed. In this case, a data store will need to be implemented outside of `@wordpress/data` and then plugged in via three functions:
