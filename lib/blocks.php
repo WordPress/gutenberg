@@ -134,7 +134,7 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
  *
  * @since 1.9.0
  * @since 4.4.0 renders full nested tree of blocks before reassembling into HTML string
- * @since 4.6.0 filters blocks structurally before rendering and as text afterwards
+ * @since 4.7.0 filters blocks structurally before rendering and as text afterwards
  * @global WP_Post $post The post to edit.
  *
  * @param  array $source_block A single parsed block object.
@@ -210,7 +210,7 @@ function gutenberg_render_block( $source_block ) {
 	 *     add_filter( 'block_pre_render', 'un_markdownify_block' );
 	 * }
 	 *
-	 * @since 4.6.0
+	 * @since 4.7.0
 	 *
 	 * @param array|null $prev transformed block from previous filter or null
 	 * @param array $source_block original block passed through all filters
@@ -299,7 +299,7 @@ function gutenberg_render_block( $source_block ) {
 	 * add_filter( 'block_post_render', array( $matcher, 'block_post_render' ) );
 	 * add_filter( 'the_content', array( $matcher, 'the_content' ), 10 );
 	 *
-	 * @since 4.6.0
+	 * @since 4.7.0
 	 *
 	 * @param string $output rendered HTML from block or previous filters
 	 * @param array $block original block that was rendered
