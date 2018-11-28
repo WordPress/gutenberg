@@ -10,7 +10,7 @@ import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck } from '@wordpress/editor';
+import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck, PostFeaturedImageCheck, PostTypeSupportCheck } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -51,11 +51,15 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 						/>
 					) }
 				/>
-				<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+				<PostFeaturedImageCheck>
+					<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+				</PostFeaturedImageCheck>
 				<PostExcerptCheck>
 					<EnablePanelOption label={ __( 'Excerpt' ) } panelName="post-excerpt" />
 				</PostExcerptCheck>
-				<EnablePanelOption label={ __( 'Discussion' ) } panelName="discussion-panel" />
+				<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
+					<EnablePanelOption label={ __( 'Discussion' ) } panelName="discussion-panel" />
+				</PostTypeSupportCheck>
 				<PageAttributesCheck>
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>

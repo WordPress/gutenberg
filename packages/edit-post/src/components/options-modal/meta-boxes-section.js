@@ -8,6 +8,7 @@ import { filter, map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
+import { PostTypeSupportCheck } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -25,7 +26,11 @@ export function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sec
 
 	return (
 		<Section { ...sectionProps }>
-			{ areCustomFieldsRegistered && <EnableCustomFieldsOption label={ __( 'Custom Fields' ) } /> }
+			{ areCustomFieldsRegistered && (
+				<PostTypeSupportCheck supportKeys='custom-fields'>
+					<EnableCustomFieldsOption label={ __( 'Custom Fields' ) } />
+				</PostTypeSupportCheck>
+			) }
 			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
 				<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
 			) ) }
