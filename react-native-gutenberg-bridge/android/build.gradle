@@ -7,10 +7,23 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+
+// import the `submoduleGitHash()` function
+apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462f8fef1a/raw/38557f55d0a3be9605c82b1df9ced4c846fd3aea/submoduleGitHash.gradle'
+
+// import the `readReactNativeVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
+
+group='com.github.wordpress-mobile.gutenberg-mobile'
+
+// fallback flag value for when lib is compiled individually (e.g. via jitpack)
+project.ext.buildGutenbergFromSource = false
 
 android {
     compileSdkVersion 27
@@ -27,10 +40,45 @@ android {
     }
 }
 
+def unpkgOrNodeModules(remotePath, localPath) {
+    def url
+    if (rootProject.ext.buildGutenbergFromSource) {
+        url = "${project.buildDir}/../../../node_modules/${localPath}"
+    } else {
+        // if we are the root project, use a remote maven repo so jitpack can build this lib without local RN setup
+        url = "https://unpkg.com/${remotePath}"
+        println "Will use the unpkg.com exposed maven repo at ${url}"
+    }
+    return url
+}
+
 repositories {
-    mavenCentral()
+    google()
+    jcenter()
+
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries)
+        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        url unpkgOrNodeModules("react-native@${rnVersion}/android", "react-native/android")
+    }
+    maven {
+        // Maven repo containing AARs with JSC library built for Android
+        url unpkgOrNodeModules("jsc-android@224109.1.0/dist/", "jsc-android/dist")
+    }
+
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
+    if (rootProject.ext.buildGutenbergFromSource) {
+        println "using gutenberg from source"
+        implementation project(':react-native-svg')
+        implementation project(':react-native-aztec')
+        implementation project(':react-native-recyclerview-list')
+    } else {
+        implementation ('com.github.wordpress-mobile:react-native-svg:faed05be8dca2b0df8957c5f72c40eccef12144d')
+        implementation ('com.github.wordpress-mobile:react-native-aztec:' + submoduleGitHash('../../', 'react-native-aztec'))
+        implementation ('com.github.wordpress-mobile:react-native-recyclerview-list:a2e8ca550412504c32218fd473c55f696f18f1f7')
+    }
     implementation 'com.facebook.react:react-native:+'
 }
