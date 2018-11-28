@@ -483,4 +483,29 @@ describe( 'Links', () => {
 		const popover = await page.$$( '.editor-url-popover' );
 		expect( popover ).toHaveLength( 1 );
 	} );
+
+	it( 'should contain a label when it should open in a new tab', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'This is WordPress' );
+		// Select "WordPress".
+		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressWithModifier( 'primary', 'k' );
+		await waitForAutoFocus();
+		await page.keyboard.type( 'w.org' );
+		// Navigate to the settings toggle.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
+		// Open settings.
+		await page.keyboard.press( 'Space' );
+		// Navigate to the "Open in New Tab" checkbox.
+		await page.keyboard.press( 'Tab' );
+		// Check the checkbox.
+		await page.keyboard.press( 'Space' );
+		// Navigate back to the input field.
+		await page.keyboard.press( 'Tab' );
+		// Submit the form.
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

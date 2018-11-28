@@ -50,3 +50,21 @@ wp_enqueue_script(
 	filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/sidebar.js' ),
 	true
 );
+
+wp_enqueue_script(
+	'gutenberg-test-annotations-sidebar',
+	plugins_url( 'plugins-api/annotations-sidebar.js', __FILE__ ),
+	array(
+		'wp-components',
+		'wp-compose',
+		'wp-data',
+		'wp-edit-post',
+		'wp-editor',
+		'wp-element',
+		'wp-i18n',
+		'wp-plugins',
+		'wp-annotations',
+	),
+	filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/annotations-sidebar.js' ),
+	true
+);

@@ -180,6 +180,7 @@ class MediaUpload extends Component {
 
 	onClose() {
 		const { onClose } = this.props;
+
 		if ( onClose ) {
 			onClose();
 		}
@@ -187,7 +188,7 @@ class MediaUpload extends Component {
 
 	updateCollection() {
 		const frameContent = this.frame.content.get();
-		if ( frameContent ) {
+		if ( frameContent && frameContent.collection ) {
 			const collection = frameContent.collection;
 
 			// clean all attachments we have in memory.

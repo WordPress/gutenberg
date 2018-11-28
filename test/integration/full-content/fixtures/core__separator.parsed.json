@@ -4,13 +4,17 @@
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "\n<hr class=\"wp-block-separator\" />\n",
-        "innerContent": [ "\n<hr class=\"wp-block-separator\" />\n" ]
+        "innerContent": [
+            "\n<hr class=\"wp-block-separator\" />\n"
+        ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "\n",
-        "innerContent": [ "\n" ]
+        "innerContent": [
+            "\n"
+        ]
     }
 ]

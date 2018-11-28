@@ -22,6 +22,7 @@ import {
  */
 import { isReusableBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -34,6 +35,7 @@ import {
 	INITIAL_EDITS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -99,6 +101,28 @@ function getFlattenedBlocks( blocks ) {
 	}
 
 	return flattenedBlocks;
+}
+
+/**
+ * Given a block order map object, returns *all* of the block client IDs that are
+ * a descendant of the given root client ID.
+ *
+ * Calling this with `rootClientId` set to `''` results in a list of client IDs
+ * that are in the post. That is, it excludes blocks like fetched reusable
+ * blocks which are stored into state but not visible.
+ *
+ * @param {Object}  blocksOrder  Object that maps block client IDs to a list of
+ *                               nested block client IDs.
+ * @param {?string} rootClientId The root client ID to search. Defaults to ''.
+ *
+ * @return {Array} List of descendant client IDs.
+ */
+function getNestedBlockClientIds( blocksOrder, rootClientId = '' ) {
+	return reduce( blocksOrder[ rootClientId ], ( result, clientId ) => [
+		...result,
+		clientId,
+		...getNestedBlockClientIds( blocksOrder, clientId ),
+	], [] );
 }
 
 /**
@@ -212,6 +236,35 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 };
 
 /**
+ * Higher-order reducer which targets the combined blocks reducer and handles
+ * the `RESET_BLOCKS` action. When dispatched, this action will replace all
+ * blocks that exist in the post, leaving blocks that exist only in state (e.g.
+ * reusable blocks) alone.
+ *
+ * @param {Function} reducer Original reducer function.
+ *
+ * @return {Function} Enhanced reducer function.
+ */
+const withBlockReset = ( reducer ) => ( state, action ) => {
+	if ( state && action.type === 'RESET_BLOCKS' ) {
+		const visibleClientIds = getNestedBlockClientIds( state.order );
+		return {
+			...state,
+			byClientId: {
+				...omit( state.byClientId, visibleClientIds ),
+				...getFlattenedBlocks( action.blocks ),
+			},
+			order: {
+				...omit( state.order, visibleClientIds ),
+				...mapBlockOrder( action.blocks ),
+			},
+		};
+	}
+
+	return reducer( state, action );
+};
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -244,7 +297,14 @@ export const editor = flow( [
 					// Only assign into result if not already same value
 					if ( value !== state[ key ] ) {
 						result = getMutateSafeObject( state, result );
-						result[ key ] = value;
+
+						if ( EDIT_MERGE_PROPERTIES.has( key ) ) {
+							// Merge properties should assign to current value.
+							result[ key ] = { ...result[ key ], ...value };
+						} else {
+							// Otherwise override.
+							result[ key ] = value;
+						}
 					}
 
 					return result;
@@ -264,7 +324,7 @@ export const editor = flow( [
 					( key ) => getPostRawValue( action.post[ key ] );
 
 				return reduce( state, ( result, value, key ) => {
-					if ( value !== getCanonicalValue( key ) ) {
+					if ( ! isEqual( value, getCanonicalValue( key ) ) ) {
 						return result;
 					}
 
@@ -280,6 +340,8 @@ export const editor = flow( [
 	blocks: flow( [
 		combineReducers,
 
+		withBlockReset,
+
 		// Track whether changes exist, resetting at each post save. Relies on
 		// editor initialization firing post reset as an effect.
 		withChangeDetection( {
@@ -289,7 +351,6 @@ export const editor = flow( [
 	] )( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
 				case 'SETUP_EDITOR_STATE':
 					return getFlattenedBlocks( action.blocks );
 
@@ -392,7 +453,6 @@ export const editor = flow( [
 
 		order( state = {}, action ) {
 			switch ( action.type ) {
-				case 'RESET_BLOCKS':
 				case 'SETUP_EDITOR_STATE':
 					return mapBlockOrder( action.blocks );
 
@@ -735,6 +795,9 @@ export function blockSelection( state = {
 			// If there is replacement block(s), assign first's client ID as
 			// the next selected block. If empty replacement, reset to null.
 			const nextSelectedBlockClientId = get( action.blocks, [ 0, 'clientId' ], null );
+			if ( nextSelectedBlockClientId === state.start && nextSelectedBlockClientId === state.end ) {
+				return state;
+			}
 
 			return {
 				...state,
@@ -899,7 +962,7 @@ export function saving( state = {}, action ) {
 				requesting: true,
 				successful: false,
 				error: null,
-				isAutosave: action.isAutosave,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -907,6 +970,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -914,6 +978,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: false,
 				error: action.error,
+				options: action.options || {},
 			};
 	}
 
@@ -1133,13 +1198,29 @@ export function autosave( state = null, action ) {
 				title,
 				excerpt,
 				content,
-				preview_link: post.preview_link,
 			};
+	}
 
-		case 'REQUEST_POST_UPDATE':
+	return state;
+}
+
+/**
+ * Reducer returning the poost preview link
+ *
+ * @param  {string?} state  The preview link
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {string?} Updated state.
+ */
+export function previewLink( state = null, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_UPDATE_SUCCESS':
+			return action.post.preview_link || addQueryArgs( action.post.link, { preview: true } );
+
+		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.
-			if ( state && action.options.autosave ) {
-				return omit( state, 'preview_link' );
+			if ( state && action.options.isPreview ) {
+				return null;
 			}
 			break;
 	}
@@ -1163,6 +1244,7 @@ export default optimist( combineReducers( {
 	reusableBlocks,
 	template,
 	autosave,
+	previewLink,
 	settings,
 	postSavingLock,
 } ) );

@@ -90,9 +90,9 @@ export const settings = {
 				} ),
 			},
 			{
-				type: 'pattern',
-				regExp: /^>\s/,
-				transform: ( { content } ) => {
+				type: 'prefix',
+				prefix: '>',
+				transform: ( content ) => {
 					return createBlock( 'core/quote', {
 						value: `<p>${ content }</p>`,
 					} );
@@ -100,7 +100,12 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				selector: 'blockquote',
+				isMatch: ( node ) => (
+					node.nodeName === 'BLOCKQUOTE' &&
+					// The quote block can only handle multiline paragraph
+					// content.
+					Array.from( node.childNodes ).every( ( child ) => child.nodeName === 'P' )
+				),
 				schema: {
 					blockquote: {
 						children: {

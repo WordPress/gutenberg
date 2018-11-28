@@ -74,6 +74,18 @@ exports[`List can be created by using an asterisk at the start of a paragraph bl
 <!-- /wp:list -->"
 `;
 
+exports[`List can undo asterisk transform 1`] = `
+"<!-- wp:paragraph -->
+<p>1.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should be immeadiately saved on indentation 1`] = `
+"<!-- wp:list -->
+<ul><li>one<ul><li></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should create paragraph on split at end and merge back with content 1`] = `
 "<!-- wp:list -->
 <ul><li>one</li></ul>

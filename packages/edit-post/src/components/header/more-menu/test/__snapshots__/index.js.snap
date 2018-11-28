@@ -16,9 +16,11 @@ exports[`MoreMenu should match snapshot 1`] = `
         aria-expanded={false}
         icon="ellipsis"
         label="Show more tools & options"
+        labelPosition="bottom"
         onClick={[Function]}
       >
         <Tooltip
+          position="bottom"
           text="Show more tools & options"
         >
           <Button
