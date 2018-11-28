@@ -50,12 +50,20 @@ export default class ClassicEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { clientId, attributes: { content } } = this.props;
-
+		const { clientId, attributes } = this.props;
 		const editor = window.tinymce.get( `editor-${ clientId }` );
+		let { contentRaw } = attributes;
 
-		if ( prevProps.attributes.content !== content ) {
-			editor.setContent( content || '' );
+		// Strip white space before comparing to avoid resetting the editor content when not necessary;
+		contentRaw = contentRaw || '';
+		const newContent = contentRaw.replace( /\s+/g, '' );
+
+		let oldContent = prevProps.attributes.contentRaw || '';
+		oldContent = oldContent.replace( /\s+/g, '' );
+
+		if ( oldContent !== newContent ) {
+			// Use the "raw" editor content as it contains the caret position bookmark.
+			editor.setContent( contentRaw, { format: 'raw' } );
 		}
 	}
 
@@ -84,10 +92,20 @@ export default class ClassicEdit extends Component {
 		}
 
 		editor.on( 'blur', () => {
+			editor.wpClassicBlockBookmark = editor.selection.getBookmark();
+
+			// Keep the "raw" content as it contains the caret position bookmark.
 			setAttributes( {
+				contentRaw: editor.getContent( { format: 'raw' } ),
 				content: editor.getContent(),
 			} );
 			return false;
+		} );
+
+		editor.on( 'beforeSetContent focus', () => {
+			if ( editor.wpClassicBlockBookmark ) {
+				editor.selection.moveToBookmark( editor.wpClassicBlockBookmark );
+			}
 		} );
 
 		editor.on( 'keydown', ( event ) => {
