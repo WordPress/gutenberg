@@ -234,6 +234,8 @@ const MyButtonMoreMenuItem = () => (
 
 #### Props
 
+`PluginMoreMenuItem` supports the following props. Any additional props are passed through to the underlying [MenuItem](../../components/src/menu-item) component.
+
 ##### icon
 
 The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
