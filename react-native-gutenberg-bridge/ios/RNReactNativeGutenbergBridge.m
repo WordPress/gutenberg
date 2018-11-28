@@ -1,6 +1,7 @@
 #import "RNReactNativeGutenbergBridge.h"
 
 NSString *const RequestHTMLMessageName = @"requestGetHtml";
+NSString *const ToggleHTMLModeMessageName = @"toggleHTMLMode";
 
 @implementation RNReactNativeGutenbergBridge
 
@@ -13,7 +14,8 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[RequestHTMLMessageName];
+    return @[RequestHTMLMessageName,
+             ToggleHTMLModeMessageName];
 }
 
 //provideToNative_Html

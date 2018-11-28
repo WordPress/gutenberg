@@ -2,7 +2,7 @@
  * @format */
 
 import React from 'react';
-import { subscribeParentGetHtml } from 'react-native-gutenberg-bridge';
+import { subscribeParentGetHtml, subscribeParentToggleHTMLMode } from 'react-native-gutenberg-bridge';
 
 import BlockManager, { type BlockListType } from '../block-management/block-manager';
 import { SlotFillProvider } from '@wordpress/components';
@@ -14,10 +14,15 @@ type StateType = {};
 
 export default class MainScreen extends React.Component<PropsType, StateType> {
 	subscriptionParentGetHtml: ?EmitterSubscription;
+	subscriptionParentToggleHTMLMode: ?EmitterSubscription;
 
 	componentDidMount() {
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.props.serializeToNativeAction();
+		} );
+
+		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode( () => {
+			this.props.toggleHtmlModeAction();
 		} );
 	}
 

@@ -8,23 +8,38 @@ import { Platform, TextInput, KeyboardAvoidingView } from 'react-native';
 import styles from './html-text-input.scss';
 
 // Gutenberg imports
-import { serialize } from '@wordpress/blocks';
+import { serialize, parse } from '@wordpress/blocks';
+import { withDispatch } from '@wordpress/data';
+import { withInstanceId, compose } from '@wordpress/compose';
 
 type PropsType = {
 	blocks: Array<Object>,
-	parseBlocksAction: string => mixed,
+	onChange: string => mixed,
+	onPersist: string => mixed,
 };
 
 type StateType = {
 	html: string,
+	isDirty: boolean,
 };
 
-export default class HTMLInputView extends React.Component<PropsType, StateType> {
-	state = {
-		html: '',
-	}
+export class HTMLInputView extends React.Component<PropsType, StateType> {
 	isIOS: boolean = Platform.OS === 'ios';
 	textInput: TextInput;
+	edit: string => mixed;
+	stopEditing: () => mixed;
+
+	constructor() {
+		super( ...arguments );
+
+		this.edit = this.edit.bind( this );
+		this.stopEditing = this.stopEditing.bind( this );
+
+		this.state = {
+			html: '',
+			isDirty: false,
+		};
+	}
 
 	componentDidMount() {
 		const html = this.serializeBlocksToHtml();
@@ -36,7 +51,7 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 
 	componentWillUnmount() {
 		//TODO: Blocking main thread
-		this.props.parseBlocksAction( this.state.html );
+		this.stopEditing();
 	}
 
 	shouldComponentUpdate() {
@@ -57,6 +72,18 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 		return serialize( [ block ] ) + '\n\n';
 	}
 
+	edit( html: string ) {
+		this.props.onChange( html );
+		this.setState( { html, isDirty: true } );
+	}
+
+	stopEditing() {
+		if ( this.state.isDirty ) {
+			this.props.onPersist( this.state.html );
+			this.setState( { isDirty: false } );
+		}
+	}
+
 	render() {
 		const behavior = this.isIOS ? 'padding' : null;
 
@@ -69,9 +96,25 @@ export default class HTMLInputView extends React.Component<PropsType, StateType>
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
 					value={ this.isIOS ? null : this.state.html }
-					onChangeText={ ( html ) => this.setState( { html } ) }
+					onChangeText={ this.edit }
+					onBlur={ this.stopEditing }
 				/>
 			</KeyboardAvoidingView>
 		);
 	}
 }
+
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { editPost, resetBlocks } = dispatch( 'core/editor' );
+		return {
+			onChange( content ) {
+				editPost( { content } );
+			},
+			onPersist( content ) {
+				resetBlocks( parse( content ) );
+			},
+		};
+	} ),
+	withInstanceId,
+] )( HTMLInputView );

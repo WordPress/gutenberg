@@ -5,6 +5,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const RequestHTMLMessageName;
+extern NSString * const ToggleHTMLModeMessageName;
 
 @interface RNReactNativeGutenbergBridge : RCTEventEmitter <RCTBridgeModule>
 @property (nonatomic, weak, nullable) id<GutenbergBridgeDelegate> delegate;

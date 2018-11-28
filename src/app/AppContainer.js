@@ -11,21 +11,25 @@ import MainApp from './MainApp';
 import type { BlockType } from '../store/types';
 
 type PropsType = {
-	rootClientId: string,
+	rootClientId: ?string,
 	isBlockSelected: string => boolean,
+	showHtml: boolean,
+	editedPostContent: string,
 	selectedBlockIndex: number,
 	blocks: Array<BlockType>,
-	onInsertBlock: ( BlockType, number, string ) => mixed,
+	onInsertBlock: ( BlockType, number, ?string ) => mixed,
 	onMerge: ( string, string ) => mixed,
-	onMoveDown: string => mixed,
-	onMoveUp: string => mixed,
-	onRemove: string => mixed,
+	onMoveDown: ( string, ?string ) => mixed,
+	onMoveUp: ( string, ?string ) => mixed,
+	onRemove: ( string, ?string ) => mixed,
+	onToggleBlockMode: ?string => mixed,
 	onResetBlocks: Array<BlockType> => mixed,
 	onSelect: string => mixed,
 	clearSelectedBlock: void => void,
 	onAttributesUpdate: ( string, mixed ) => mixed,
 	initialHtml: string,
 	setupEditor: ( mixed, ?mixed ) => mixed,
+	clientId: string,
 };
 
 class AppContainer extends React.Component<PropsType> {
@@ -55,15 +59,15 @@ class AppContainer extends React.Component<PropsType> {
 	};
 
 	moveBlockUpAction = ( clientId ) => {
-		this.props.onMoveUp( clientId );
+		this.props.onMoveUp( clientId, this.props.rootClientId );
 	};
 
 	moveBlockDownAction = ( clientId ) => {
-		this.props.onMoveDown( clientId );
+		this.props.onMoveDown( clientId, this.props.rootClientId );
 	};
 
 	deleteBlockAction = ( clientId ) => {
-		this.props.onRemove( clientId );
+		this.props.onRemove( clientId, this.props.rootClientId );
 	};
 
 	createBlockAction = ( clientId, block ) => {
@@ -78,9 +82,16 @@ class AppContainer extends React.Component<PropsType> {
 	};
 
 	serializeToNativeAction = () => {
+		if ( this.props.showHtml ) {
+			this.parseBlocksAction( this.props.editedPostContent );
+		}
 		const html = serialize( this.props.blocks );
 		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.lastHtml !== html );
 		this.lastHtml = html;
+	};
+
+	toggleHtmlModeAction = () => {
+		this.props.onToggleBlockMode( this.props.rootClientId );
 	};
 
 	mergeBlocksAction = ( blockOneClientId, blockTwoClientId ) => {
@@ -91,14 +102,15 @@ class AppContainer extends React.Component<PropsType> {
 		return (
 			<MainApp
 				blocks={ this.props.blocks }
+				showHtml={ this.props.showHtml }
 				onChange={ this.onChange }
 				focusBlockAction={ this.focusBlockAction }
 				moveBlockUpAction={ this.moveBlockUpAction }
 				moveBlockDownAction={ this.moveBlockDownAction }
 				deleteBlockAction={ this.deleteBlockAction }
 				createBlockAction={ this.createBlockAction }
-				parseBlocksAction={ this.parseBlocksAction }
 				serializeToNativeAction={ this.serializeToNativeAction }
+				toggleHtmlModeAction={ this.toggleHtmlModeAction }
 				mergeBlocksAction={ this.mergeBlocksAction }
 				isBlockSelected={ this.props.isBlockSelected }
 			/>
@@ -107,19 +119,23 @@ class AppContainer extends React.Component<PropsType> {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockIndex,
 			getBlocks,
 			getSelectedBlockClientId,
 			isBlockSelected,
+			getBlockMode,
+			getEditedPostContent,
 		} = select( 'core/editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
 			isBlockSelected,
-			selectedBlockIndex: getBlockIndex( selectedBlockClientId ),
-			blocks: getBlocks(),
+			selectedBlockIndex: getBlockIndex( selectedBlockClientId, rootClientId ),
+			blocks: getBlocks( rootClientId ),
+			showHtml: getBlockMode( rootClientId ) === 'html',
+			editedPostContent: getEditedPostContent(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -134,6 +150,7 @@ export default compose( [
 			selectBlock,
 			setupEditor,
 			updateBlockAttributes,
+			toggleBlockMode,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -144,6 +161,7 @@ export default compose( [
 			onMoveUp: moveBlocksUp,
 			onRemove: removeBlock,
 			onResetBlocks: resetBlocks,
+			onToggleBlockMode: toggleBlockMode,
 			onSelect: ( clientId ) => {
 				clearSelectedBlock();
 				selectBlock( clientId );

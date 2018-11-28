@@ -66,4 +66,9 @@
     [self.gutenbergBridgeModule sendEventWithName:RequestHTMLMessageName body:nil];
 }
 
+- (void)toggleHTMLMode
+{
+    [self.gutenbergBridgeModule sendEventWithName:ToggleHTMLModeMessageName body:nil];
+}
+
 @end
