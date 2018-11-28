@@ -4,6 +4,7 @@ $toggle-border-width: 2px;
 
 .components-form-toggle {
 	position: relative;
+	display: inline-block;
 
 	// On/Off icon indicators.
 	.components-form-toggle__on,
