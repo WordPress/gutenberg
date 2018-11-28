@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import apiFetch from '../';
@@ -198,6 +193,8 @@ describe( 'apiFetch', () => {
 
 		expect( window.fetch ).not.toHaveBeenCalled();
 
-		expect( customFetchHandler ).toHaveBeenCalledWith( { path: '/random?_locale=user' }, noop );
+		expect( customFetchHandler ).toHaveBeenCalledWith( {
+			path: '/random?_locale=user',
+		}, expect.any( Function ) );
 	} );
 } );

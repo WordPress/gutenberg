@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -146,7 +141,7 @@ function apiFetch( options ) {
 		if ( steps.length > ( index + 1 ) ) {
 			next = runMiddleware( index + 1 );
 		} else {
-			next = noop;
+			next = () => {};
 		}
 
 		return nextMiddleware( nextOptions, next );
