@@ -134,6 +134,7 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
  *
  * @since 1.9.0
  * @since 4.4.0 renders full nested tree of blocks before reassembling into HTML string
+ * @since 4.6.0 filters blocks structurally before rendering and as text afterwards
  * @global WP_Post $post The post to edit.
  *
  * @param  array $block A single parsed block object.
@@ -143,6 +144,74 @@ function gutenberg_render_block( $source_block ) {
 	global $post;
 
 	$global_post = $post;
+	/**
+	 * Filter to process a block structurally before rendering
+	 *
+	 * Use this filter if you want to modify a block's attributes or rearrange
+	 * its inner blocks or change its block type - anything which might govern
+	 * the way the block gets rendered in the next step.
+	 *
+	 * @example
+	 * function block_rot13( $prev, $source_block ) {
+	 *     $block = $prev ?: $source_block;
+	 *
+	 *     return isset( $block['attrs']['do_rot13'] )
+	 *         ? array_merge( $block, array( 'innerContent' => array_map( 'str_rot13', $block['innerContent'] ) ) )
+	 *         : $prev;
+	 * }
+	 * add_filter( 'block_pre_render', 'block_rot13' );
+	 *
+	 * @example
+	 * function hide_hidden_inner_blocks( $prev, $source_block ) {
+	 *     if ( 'my-plugin/hider' !== $source_block['blockName'] ) {
+	 *         return $prev;
+	 *     }
+	 *
+	 *     $block                = $prev ?: $source_block;
+	 *     $block['innerBlocks'] = array();
+	 *     $inner_content        = array();
+	 *     $block_index          = 0;
+	 *     $html                 = '';
+	 *     foreach ( $block['innerContent'] as $chunk ) {
+	 *         if ( is_string( $chunk ) ) {
+	 *             $html .= $chunk;
+	 *             continue;
+	 *         }
+	 *
+	 *         if ( ! can_see_block( $inner ) ) {
+	 *             continue;
+	 *         }
+	 *
+	 *         $inner = $block['innerBlocks'][$block_index++];
+	 *         $block['innerBlocks'][] = $inner;
+	 *         if ( ! empty( $html ) ) {
+	 *             $inner_content[] = $html;
+	 *         }
+	 *         $inner_content[] = null;
+	 *     }
+	 *
+	 *     return $block;
+	 * }
+	 * add_filter( 'block_pre_render', 'hide_hidden_inner_blocks' );
+	 *
+	 * @example
+	 * function un_markdownify_block( $prev, $source_block ) {
+	 *     $block = $prev ?: $source_block;
+	 *     return 'my-plugin/markdown' === $block['blockName']
+	 *         ? array_merge( $block, array( 'blockName' => 'core/paragraph' ) )
+	 *         : $prev;
+	 * }
+	 * if ( show_markdown_source() ) {
+	 *     add_filter( 'block_pre_render', 'un_markdownify_block' );
+	 * }
+	 *
+	 * @since 4.6.0
+	 *
+	 * @param array|null $prev transformed block from previous filter or null
+	 * @param array $source_block original block passed through all filters
+	 *
+	 * @return array|null transformed version of block or previous $block if not transformation is needed
+	 */
 	$pre_render  = apply_filters( 'block_pre_render', null, $source_block );
 	$post        = $global_post;
 	$block       = isset( $pre_render ) ? $pre_render : $source_block;
