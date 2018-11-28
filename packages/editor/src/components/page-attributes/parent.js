@@ -41,24 +41,32 @@ export function PageAttributesParent( { parent, postType, items, onUpdateParent 
 	);
 }
 
-const applyWithSelect = withSelect( ( select ) => {
+const applyWithSelect = withSelect( ( select, ownProps ) => {
 	const { getPostType, getEntityRecords } = select( 'core' );
 	const { getCurrentPostId, getEditedPostAttribute } = select( 'core/editor' );
 	const postTypeSlug = getEditedPostAttribute( 'type' );
 	const postType = getPostType( postTypeSlug );
-	const postId = getCurrentPostId();
-	const isHierarchical = get( postType, [ 'hierarchical' ], false );
-	const query = {
-		per_page: -1,
-		exclude: postId,
-		parent_exclude: postId,
-		orderby: 'menu_order',
-		order: 'asc',
-	};
+	let items;
+	if ( ownProps.items ) {
+		items = ownProps.items;
+	} else {
+		const postId = getCurrentPostId();
+		const isHierarchical = get( postType, [ 'hierarchical' ], false );
+		const query = {
+			per_page: -1,
+			exclude: postId,
+			parent_exclude: postId,
+			orderby: 'menu_order',
+			order: 'asc',
+		};
+		items = isHierarchical ?
+			getEntityRecords( 'postType', postTypeSlug, query ) :
+			[];
+	}
 
 	return {
 		parent: getEditedPostAttribute( 'parent' ),
-		items: isHierarchical ? getEntityRecords( 'postType', postTypeSlug, query ) : [],
+		items,
 		postType,
 	};
 } );
