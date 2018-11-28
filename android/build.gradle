@@ -25,6 +25,9 @@ buildscript {
 
 apply plugin: 'com.android.library'
 
+// import the `readReactNativeVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
+
 // The sample build uses multiple directories to
 // keep boilerplate and common code separate from
 // the main sample code.
@@ -69,10 +72,21 @@ android {
     }
 }
 
-
 repositories {
     jcenter()
     google()
+
+    if (project == rootProject) {
+        // if we are the root project, use a remote RN maven repo so jitpack can build this lib without local RN setup
+        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        def unpkgUrl = "https://unpkg.com/react-native@${rnVersion}/android"
+        println "Will use the unpkg.com exposed RN maven repo at ${unpkgUrl}"
+        maven {
+            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+            url unpkgUrl
+        }
+    }
+
     maven { url "https://jitpack.io" }
 }
 
