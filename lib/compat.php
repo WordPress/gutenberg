@@ -473,8 +473,8 @@ function gutenberg_get_image_width_height( $block_attributes, $image_meta = null
  * @return string Filtered Image block HTML.
  */
 function gutenberg_render_block_core_image( $html, $block ) {
-	// Old post or... something's wrong.
-	if ( empty( $html ) || empty( $block['attrs'] ) ) {
+	// Return early if different block or no attributes.
+	if ( empty( $html ) || empty( $block['attrs'] ) || $block['blockName'] !== 'core/image' ) {
 		return $html;
 	}
 
@@ -488,7 +488,7 @@ function gutenberg_render_block_core_image( $html, $block ) {
 	$block_attributes = wp_parse_args( $block['attrs'], $defaults );
 
 	if ( empty( $block_attributes['url'] ) ) {
-		// We don't have enough data to construct new img tag. Fall back to the existing HTML.
+		// Old block format? No enough data to construct new img tag. Fall back to the existing HTML.
 		return $html;
 	}
 
