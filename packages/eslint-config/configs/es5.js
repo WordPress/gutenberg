@@ -4,5 +4,9 @@
  */
 
 module.exports = {
-	rules: require( './rules/es5' ),
+	env: {
+		es6: true,
+	},
+
+	rules: require( './rules/esnext' ),
 };

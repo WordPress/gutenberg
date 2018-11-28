@@ -20,13 +20,7 @@ module.exports = {
 	root: true,
 	extends: [
 		'@wordpress/eslint-config',
-		'plugin:jest/recommended'
-	],
-	env: {
-		'jest/globals': true,
-	},
-	plugins: [
-		'jest',
+		'plugin:jest/recommended',
 	],
 	rules: {
 		'no-restricted-syntax': [
@@ -189,9 +183,13 @@ module.exports = {
 	overrides: [
 		{
 			files: [ 'test/e2e/**/*.js' ],
-			globals: {
-				page: true,
+			env: {
 				browser: true,
+			},
+			globals: {
+				browser: true,
+				page: true,
+				wp: true,
 			},
 		},
 	],
