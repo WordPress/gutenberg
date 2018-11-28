@@ -102,6 +102,13 @@ export default class ClassicEdit extends Component {
 			return false;
 		} );
 
+		editor.on( 'init', () => {
+			// Store the initial "raw" content.
+			setAttributes( {
+				contentRaw: editor.getContent( { format: 'raw' } ),
+			} );
+		} );
+
 		editor.on( 'beforeSetContent focus', () => {
 			if ( editor.wpClassicBlockBookmark ) {
 				editor.selection.moveToBookmark( editor.wpClassicBlockBookmark );
