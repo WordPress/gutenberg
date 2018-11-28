@@ -181,6 +181,81 @@ The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug st
 - Required: No
 - Default: _inherits from the plugin_
 
+### `PluginMoreMenuItem`
+
+Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided.
+The text within the component appears as the menu item label.
+
+_Example:_
+
+{% codetabs %}
+
+{% ES5 %}
+```js
+var __ = wp.i18n.__;
+var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+var el = wp.element.createElement;
+
+function onButtonClick() {
+	alert( 'Button clicked.' );
+}
+
+function MyButtonMoreMenuItem() {
+	return el(
+		PluginMoreMenuItem,
+		{
+			icon: 'smiley',
+			onClick: onButtonClick
+		},
+		__( 'My button title' )
+	)
+}
+```
+
+{% ESNext %}
+```jsx
+const { __ } = wp.i18n;
+const { PluginMoreMenuItem } = wp.editPost;
+
+function onButtonClick() {
+	alert( 'Button clicked.' );
+}
+
+const MyButtonMoreMenuItem = () => (
+	<PluginMoreMenuItem
+		icon="smiley"
+		onClick={ onButtonClick }
+	>
+		{ __( 'My button title' ) }
+	</PluginMoreMenuItem>
+);
+```
+{% end %}
+
+#### Props
+
+##### icon
+
+The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered to the left of the menu item label.
+
+- Type: `String` | `Element`
+- Required: No
+- Default: _inherits from the plugin_
+
+##### onClick
+
+The callback function to be executed when the user clicks the menu item.
+
+- Type: `function`
+- Required: No
+- Default: _function which does nothing_
+
+##### url
+
+When `url` is provided then the menu item is represented as an anchor rather than button. It corresponds to the `href` attribute of the anchor.
+
+- Type: `String`
+- Required: No
 
 ### `PluginSidebarMoreMenuItem`
 
