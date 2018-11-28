@@ -2,7 +2,7 @@
 
 Use radio buttons when you want users to select one option from a set, and you want to show them all the available options at once.
 
-![](radio.png)
+![](https://make.wordpress.org/design/files/2018/11/radio.png)
 Selected and unselected radio buttons
 
 ## Table of contents
@@ -24,11 +24,11 @@ Use radio buttons when you want users to:
 
 If you have a list of available options can be collapsed, consider using a dropdown menu instead — it uses less space.
 
-![](radio-usage-do.png)
+![](https://make.wordpress.org/design/files/2018/11/radio-usage-do.png)
 **Do**
 Use radio buttons when only one item can be selected from a list.
 
-![](radio-usage-dont.png)
+![](https://make.wordpress.org/design/files/2018/11/radio-usage-dont.png)
 **Don’t**
 Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.
 
