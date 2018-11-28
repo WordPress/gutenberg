@@ -1,3 +1,15 @@
+addons:
+  artifacts:
+    debug: true
+    s3_region: "us-west-1"
+    target_paths:
+      - /${TRAVIS_REPO_SLUG}/${TRAVIS_COMMIT}/
+
+env:
+  global:
+  - secure: EUSicS1mBOImgoYHBZJ2ZE0xwNMAkGRYUDetvxcKk0EQrOii1Z/EuYC1IN7mwiI6Ybnm3b2xq51bq/Ro3iQNi+iylA0r20mEjRsSqb8cqy8hXRnl4f7ZI3qUorUvEmsJueve3U2MLu5eYJdSNPbqgdavZDZZxiZIdbHAfA80KMp1RmgeqxkCY9wTfrYEqCtTGEJMJtCHXoDJ0cdYEVDnHQYZrF9SPkkMqmwgfFvHBGcyTPMsRZ9JpggxJltXJFTlHBNn/wLfGPiMsJlNx0oS7SmoZ08W72h2QKBZX5bVZxoNmMeQCZ0FlSHeq8yTGJ5xM8ig6YRzkuK5JiHkTaY9rVQMoU2ozMll9Bb5/A07XDXoutH1/QC1jvvT9eMBhon3uZ7e3qyUiRgCpFWrOW0UXKQqF2hhGWT965mBB5pxWOgGZjxtVIuKpFwMbsPIss44OuzlaFis5YRsKyceBAM+g8gkwxB8r8AT0A6g4jY4fmvrUr0qyaldlcr7LafGvAa73uJHoTUruR2AZQlJmLpO9p5xbuwId8L0alApqoaaR3vPx6LPtl/hTBr+KScs/I8PjdiEaobNi1PT3sNH5KIZEB+WaNZaTkK8gAzwvx7V+V0GaDD/P7L5Qa4mRIsXa1xDxdVM7ne4B5zEK1KCePzbZJuv769IbNgzIqAfELJWmXE=
+  - secure: Axr+U8LHOxmGi8GyeL0pP0+84ucxeET59BUpHgANgro+2jLwoLzpvssguc0RHxftVsQBiz2CFfFBVIR6ol+Hf6yjI310Yqw9znBvJuxO0EbAGclGkWyx8DdoWlCSwz+RgiIfIoa7E6QZWt+CZwFbi3vTFutl6NX5Reu0wdpHZlfLT8xkWP3PP7awgL2g75WsNKNv4A1CvzkF3j/hi6JU/b3QsBMTOCHA1vcdpKhjF8MiS9d7gzdwsTr6MoDGVab/oGVCljiFmIPYTa4+xp/q1MYkSizxBmq1mqjXkn1RrZP25QGqgubfgtiywk8H9kDE8/POPJuoteO2gnz2u9I1AkVrrsxCfU9XJzXXwVfbFxVlyOIfC9gZj5ZI9niOqTdytPUMPOzJw79xUvYMeoS7ydcrm3O8gCs0/fBnSH0KfMq37um8zE8zah90M/8CcJjS5KC8hFO/tZomkUASoTwnJEZh4OdSG8Ys9YnKMKBDCuI8HUR2zlVPrv/8ACO4eSZ4LCaNeXQVWil5NNFgLPzvkElqpywVmQaGY3UD2W2w76AEs5sF4n/naQsi6L6oy61mDP8j+wSooQczx/1enue/hzjxZUles7p3ek0yha6N6fxkt/MyvEYWmw98wQZmsBzEahTGXy9iWfobFu0jUzUPXhSdoMul3Q9fceUSP9f+XV8=
+
 before_script:
   - yarn install
 
@@ -32,3 +44,13 @@ matrix:
         yarn: true
       script:
         - ./.travis/travis-checks-js.sh
+    - language: node_js
+      node_js: 8
+      env:
+        LANE='node'
+        ARTIFACTS_BUCKET='gutenberg-mobile-js-bundle'
+        ARTIFACTS_PATHS="./bundle"
+      cache:
+        yarn: true
+      script:
+        - yarn bundle
