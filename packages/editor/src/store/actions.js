@@ -219,13 +219,15 @@ export function toggleSelection( isSelectionEnabled = true ) {
  *
  * @param {(string|string[])} clientIds Block client ID(s) to replace.
  * @param {(Object|Object[])} blocks    Replacement block(s).
+ * @param {number}            index     Block index to select.
  *
  * @return {Object} Action object.
  */
-export function replaceBlocks( clientIds, blocks ) {
+export function replaceBlocks( clientIds, blocks, index ) {
 	return {
 		type: 'REPLACE_BLOCKS',
 		clientIds: castArray( clientIds ),
+		index,
 		blocks: castArray( blocks ),
 		time: Date.now(),
 	};
