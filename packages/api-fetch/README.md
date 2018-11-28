@@ -100,11 +100,11 @@ import axios from 'axios';
 apiFetch.setFetchHandler( ( options ) => {
 	const { url, path, data, method } = options;
 
-	return axios({
+	return axios( {
 		url: url || path,
 		method,
 		data,
-	});
+	} );
 } );
 ```
 
