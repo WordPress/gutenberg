@@ -166,8 +166,8 @@ export class BlockListBlock extends Component {
 	}
 
 	setAttributes( attributes ) {
-		const { clientId, blockName, onChange } = this.props;
-		const type = getBlockType( blockName );
+		const { clientId, name, onChange } = this.props;
+		const type = getBlockType( name );
 		onChange( clientId, attributes );
 
 		const metaAttributes = reduce( attributes, ( result, value, key ) => {
@@ -408,18 +408,18 @@ export class BlockListBlock extends Component {
 						isParentOfSelectedBlock,
 						isDraggable,
 						className,
-						blockName,
+						name,
 						isValid,
-						blockAttributes,
+						attributes,
 					} = this.props;
 					const isHovered = this.state.isHovered && ! isMultiSelecting;
-					const blockType = getBlockType( blockName );
+					const blockType = getBlockType( name );
 					// translators: %s: Type of block (i.e. Text, Image etc)
 					const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 					// The block as rendered in the editor is composed of general block UI
 					// (mover, toolbar, wrapper) and the display of the block content.
 
-					const isUnregisteredBlock = blockName === getUnregisteredTypeHandlerName();
+					const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 					// If the block is selected and we're typing the block should not appear.
 					// Empty paragraph blocks should always show up as unselected.
@@ -460,7 +460,7 @@ export class BlockListBlock extends Component {
 					if ( blockType.getEditWrapperProps ) {
 						wrapperProps = {
 							...wrapperProps,
-							...blockType.getEditWrapperProps( blockAttributes ),
+							...blockType.getEditWrapperProps( attributes ),
 						};
 					}
 					const blockElementId = `block-${ clientId }`;
@@ -471,9 +471,9 @@ export class BlockListBlock extends Component {
 					// `BlockHTML`, even in HTML mode.
 					let blockEdit = (
 						<BlockEdit
-							name={ blockName }
+							name={ name }
 							isSelected={ isSelected }
-							attributes={ blockAttributes }
+							attributes={ attributes }
 							setAttributes={ this.setAttributes }
 							insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 							onReplace={ isLocked ? undefined : onReplace }
@@ -505,7 +505,7 @@ export class BlockListBlock extends Component {
 							onMouseOverHandled={ this.hideHoverEffects }
 							onMouseLeave={ this.hideHoverEffects }
 							className={ wrapperClassName }
-							data-type={ blockName }
+							data-type={ name }
 							onTouchStart={ this.onTouchStart }
 							onFocus={ this.onFocus }
 							onClick={ this.onClick }
@@ -593,7 +593,7 @@ export class BlockListBlock extends Component {
 												clientId={ clientId }
 											/>,
 											<div key="invalid-preview">
-												{ getSaveElement( blockType, blockAttributes ) }
+												{ getSaveElement( blockType, attributes ) }
 											</div>,
 										] }
 									</BlockCrashBoundary>
@@ -659,8 +659,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 	const previousBlockClientId = getPreviousBlockClientId( clientId );
 	const templateLock = getTemplateLock( rootClientId );
 	const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-	const blockName = getBlockName( clientId );
-	const blockAttributes = getBlockAttributes( clientId );
+	const name = getBlockName( clientId );
+	const attributes = getBlockAttributes( clientId );
 
 	return {
 		nextBlockClientId: getNextBlockClientId( clientId ),
@@ -675,7 +675,7 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		initialPosition: getSelectedBlocksInitialCaretPosition(),
-		isEmptyDefaultBlock: blockName && isUnmodifiedDefaultBlock( { name: blockName, attributes: blockAttributes } ),
+		isEmptyDefaultBlock: name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		isPreviousBlockADefaultEmptyBlock: previousBlockClientId && isUnmodifiedDefaultBlock( {
 			name: getBlockName( previousBlockClientId ),
 			attributes: getBlockAttributes( previousBlockClientId ),
@@ -685,8 +685,8 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId, isLargeV
 		isLocked: !! templateLock,
 		isFocusMode: focusMode && isLargeViewport,
 		hasFixedToolbar: hasFixedToolbar && isLargeViewport,
-		blockName,
-		blockAttributes,
+		name,
+		attributes,
 		previousBlockClientId,
 		isSelected,
 		isParentOfSelectedBlock,
