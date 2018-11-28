@@ -11,11 +11,11 @@ Selected and unselected radio buttons
 2. [Development guidelines](#development-guidelines)
 3. [Related components](#related-components)
 
-# Design guidelines
+## Design guidelines
 
-## Usage
+### Usage
 
-### When to use radio buttons
+#### When to use radio buttons
 
 Use radio buttons when you want users to:
 
@@ -32,7 +32,7 @@ Use radio buttons when only one item can be selected from a list.
 **Don’t**
 Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.
 
-### Defaults
+#### Defaults
 
 When using radio buttons **one should be selected by default** (i.e., when the page loads, in the case of a web application).
 
@@ -48,9 +48,9 @@ When one a choice in a set of radio buttons is the most desirable or frequently 
 
 Designs with a radio button selected by default make a strong suggestion to the user. It can help them make the best decision and increase their confidence. (Use this guidance with caution, and only for good.)
 
-# Development guidelines
+## Development guidelines
 
-## Usage
+### Usage
 
 Render a user interface to select the user type using radio inputs.
 
@@ -74,32 +74,32 @@ const MyRadioControl = withState( {
 ) );
 ```
 
-## Props
+### Props
 
 The component accepts the following props:
 
-### label
+#### label
 
 If this property is added, a label will be generated using label property as the content.
 
 - Type: `String`
 - Required: No
 
-### help
+#### help
 
 If this property is added, a help text will be generated using help property as the content.
 
 - Type: `String`
 - Required: No
 
-### selected
+#### selected
 
 The value property of the currently selected option.
 
 - Type: `Object`
 - Required: No
 
-### options
+#### options
 
 An array of objects containing the following properties:
 * `label`: (string) The label to be shown to the user.
@@ -108,14 +108,14 @@ An array of objects containing the following properties:
 - Type: `Array`
 - Required: No
 
-### onChange
+#### onChange
 
 A function that receives the value of the new option that is being selected as input.
 
 - Type: `function`
 - Required: Yes
 
-# Related components
+## Related components
 
 * To select one or more items from a set, use the `CheckboxControl` component.
 * To toggle a single setting on or off, use the `ToggleControl` component.
