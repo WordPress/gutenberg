@@ -38,10 +38,10 @@ const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
 
-const middlewares = [];
+const userDefinedMiddlewares = [];
 
 function registerMiddleware( middleware ) {
-	middlewares.push( middleware );
+	userDefinedMiddlewares.push( middleware );
 }
 
 const defaultFetchHandler = ( nextOptions ) => {
@@ -125,29 +125,26 @@ function setFetchHandler( newFetchHandler ) {
 }
 
 function apiFetch( options ) {
-	const steps = [
-		fetchHandler,
+	const builtInMiddlewares = [
 		fetchAllMiddleware,
 		httpV1Middleware,
 		namespaceEndpointMiddleware,
 		userLocaleMiddleware,
-		...middlewares,
+	];
+
+	const steps = [
+		fetchHandler,
+		...builtInMiddlewares,
+		...userDefinedMiddlewares,
 	].reverse();
 
-	const runMiddleware = ( index ) => ( nextOptions ) => {
-		const nextMiddleware = steps[ index ];
-		let next;
-
-		if ( steps.length > ( index + 1 ) ) {
-			next = runMiddleware( index + 1 );
-		} else {
-			next = () => {};
-		}
-
-		return nextMiddleware( nextOptions, next );
+	const runStep = ( index ) => ( nextOptions ) => {
+		const nextStep = steps[ index ];
+		const next = runStep( index + 1 );
+		return nextStep( nextOptions, next );
 	};
 
-	return runMiddleware( 0 )( options );
+	return runStep( 0 )( options );
 }
 
 apiFetch.use = registerMiddleware;
