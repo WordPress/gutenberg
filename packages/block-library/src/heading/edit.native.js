@@ -57,6 +57,7 @@ class HeadingEdit extends Component {
 					value={ content }
 					isSelected={ this.props.isSelected }
 					onFocus={ this.props.onFocus } // always assign onFocus as a props
+					onBlur={ this.props.onBlur } // always assign onBlur as a props
 					style={ {
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
