@@ -9,6 +9,7 @@ Array [
   />,
   <div
     class="wp-block-freeform block-library-rich-text__tinymce"
+    contenteditable="true"
     id="editor-undefined"
   />,
 ]
