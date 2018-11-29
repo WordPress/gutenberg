@@ -106,10 +106,6 @@ public class ReactAztecText extends AztecText {
 
     @Override
     public void clearFocus() {
-        // Don't clear focus if we don't have it, or it'll clear the focus for another field
-        if (!isFocused()) {
-            return;
-        }
         setFocusableInTouchMode(false);
         super.clearFocus();
         hideSoftKeyboard();

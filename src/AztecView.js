@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType} from 'react-native';
+import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback} from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 
 class AztecView extends React.Component {
@@ -92,8 +92,6 @@ class AztecView extends React.Component {
   }
 
   _onFocus = (event) => {
-    TextInputState.focusTextInput(ReactNative.findNodeHandle(this));
-
     if (!this.props.onFocus) {
       return;
     }
@@ -122,19 +120,25 @@ class AztecView extends React.Component {
     onSelectionChange(selectionStart, selectionEnd, text);
   }
 
+  _onPress = () => {
+    TextInputState.focusTextInput(ReactNative.findNodeHandle(this));
+  }
+
   render() {
     const { onActiveFormatsChange, ...otherProps } = this.props    
     return (
-      <RCTAztecView {...otherProps} 
-        onActiveFormatsChange={ this._onActiveFormatsChange }
-        onContentSizeChange = { this._onContentSizeChange }
-        onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
-        onSelectionChange = { this._onSelectionChange }
-        onEnter = { this._onEnter }
-        onFocus = { this._onFocus }
-        onBlur = { this._onBlur }
-        onBackspace = { this._onBackspace }
-      />
+      <TouchableWithoutFeedback onPress={ this._onPress }>
+        <RCTAztecView {...otherProps}
+          onActiveFormatsChange={ this._onActiveFormatsChange }
+          onContentSizeChange = { this._onContentSizeChange }
+          onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
+          onSelectionChange = { this._onSelectionChange }
+          onEnter = { this._onEnter }
+          onFocus = { this._onFocus }
+          onBlur = { this._onBlur }
+          onBackspace = { this._onBackspace }
+        />
+      </TouchableWithoutFeedback>
     );
   }
 }
