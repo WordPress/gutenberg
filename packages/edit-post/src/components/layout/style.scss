@@ -59,9 +59,6 @@
 	}
 }
 
-@include editor-left(".edit-post-layout__content .components-notice-list");
-@include editor-right(".edit-post-layout__content .components-notice-list");
-
 .edit-post-layout__metaboxes:not(:empty) {
 	border-top: $border-width solid $light-gray-500;
 	margin-top: 10px;
