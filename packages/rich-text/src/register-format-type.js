@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { mapKeys } from 'lodash';
+import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -9,6 +10,17 @@ import { mapKeys } from 'lodash';
 import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
 
 /**
  * Registers a new format provided a unique name and an object defining its
@@ -119,6 +131,13 @@ export function registerFormatType( name, settings ) {
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
+	const getFunctionStackMemoized = memize( ( previousStack = EMPTY_ARRAY, newFunction ) => {
+		return [
+			...previousStack,
+			newFunction,
+		];
+	} );
+
 	if (
 		settings.__experimentalGetPropsForEditableTreePreparation
 	) {
@@ -133,13 +152,13 @@ export function registerFormatType( name, settings ) {
 					const additionalProps = {};
 
 					if ( settings.__experimentalCreatePrepareEditableTree ) {
-						additionalProps.prepareEditableTree = [
-							...( props.prepareEditableTree || [] ),
+						additionalProps.prepareEditableTree = getFunctionStackMemoized(
+							props.prepareEditableTree,
 							settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], {
 								richTextIdentifier: props.identifier,
 								blockClientId: props.clientId,
-							} ),
-						];
+							} )
+						);
 					}
 
 					if ( settings.__experimentalCreateOnChangeEditableValue ) {
@@ -155,16 +174,16 @@ export function registerFormatType( name, settings ) {
 							return accumulator;
 						}, {} );
 
-						additionalProps.onChangeEditableValue = [
-							...( props.onChangeEditableValue || [] ),
+						additionalProps.onChangeEditableValue = getFunctionStackMemoized(
+							props.onChangeEditableValue,
 							settings.__experimentalCreateOnChangeEditableValue( {
 								...props[ `format_${ name }` ],
 								...dispatchProps,
 							}, {
 								richTextIdentifier: props.identifier,
 								blockClientId: props.clientId,
-							} ),
-						];
+							} )
+						);
 					}
 
 					return <OriginalComponent

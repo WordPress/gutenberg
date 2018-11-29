@@ -5,6 +5,17 @@ import createSelector from 'rememo';
 import { get, flatMap } from 'lodash';
 
 /**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
+/**
  * Returns the annotations for a specific client ID.
  *
  * @param {Object} state Editor state.
@@ -19,12 +30,12 @@ export const __experimentalGetAnnotationsForBlock = createSelector(
 		} );
 	},
 	( state, blockClientId ) => [
-		get( state, blockClientId, [] ),
+		get( state, blockClientId, EMPTY_ARRAY ),
 	]
 );
 
 export const __experimentalGetAllAnnotationsForBlock = function( state, blockClientId ) {
-	return get( state, blockClientId, [] );
+	return get( state, blockClientId, EMPTY_ARRAY );
 };
 
 /**
@@ -54,7 +65,7 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 		} );
 	},
 	( state, blockClientId ) => [
-		get( state, blockClientId, [] ),
+		get( state, blockClientId, EMPTY_ARRAY ),
 	]
 );
 
