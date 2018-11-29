@@ -120,8 +120,12 @@ class AztecView extends React.Component {
     onSelectionChange(selectionStart, selectionEnd, text);
   }
 
-  _onPress = () => {
+  focus = () => {
     TextInputState.focusTextInput(ReactNative.findNodeHandle(this));
+  }
+
+  _onPress = () => {
+    this.focus();
   }
 
   render() {
