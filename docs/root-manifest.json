@@ -1,7 +1,7 @@
 [
     {
         "title": "Gutenberg Handbook",
-        "slug": "docs",
+        "slug": "handbook",
         "markdown_source": "https:\/\/raw.githubusercontent.com\/WordPress\/gutenberg\/master\/docs\/readme.md",
         "parent": null
     },
