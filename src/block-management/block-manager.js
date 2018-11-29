@@ -26,6 +26,7 @@ const keyboardDidShow = 'keyboardDidShow';
 const keyboardDidHide = 'keyboardDidHide';
 
 export type BlockListType = {
+	rootClientId: ?string,
 	onChange: ( clientId: string, attributes: mixed ) => void,
 	focusBlockAction: string => void,
 	moveBlockUpAction: string => mixed,
