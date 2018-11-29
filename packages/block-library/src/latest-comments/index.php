@@ -42,7 +42,7 @@ if ( ! function_exists( 'wp_latest_comments_draft_or_post_title' ) ) {
  *
  * @return string Returns the post content with latest comments added.
  */
-function wp_render_block_core_latest_comments( $attributes = array() ) {
+function render_block_core_latest_comments( $attributes = array() ) {
 	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php.
 	$comments = get_comments(
 		apply_filters(
@@ -179,6 +179,6 @@ register_block_type(
 				'enum' => array( 'center', 'left', 'right', 'wide', 'full', '' ),
 			),
 		),
-		'render_callback' => 'wp_render_block_core_latest_comments',
+		'render_callback' => 'render_block_core_latest_comments',
 	)
 );
