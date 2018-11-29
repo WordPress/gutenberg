@@ -125,6 +125,12 @@ const defaultFetchHandler = ( nextOptions ) => {
 
 let fetchHandler = defaultFetchHandler;
 
+/**
+ * Defines a custom fetch handler for making the requests that will override
+ * the default one using window.fetch
+ *
+ * @param {Function} newFetchHandler The new fetch handler
+ */
 function setFetchHandler( newFetchHandler ) {
 	fetchHandler = newFetchHandler;
 }

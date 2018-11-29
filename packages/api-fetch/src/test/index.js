@@ -205,13 +205,12 @@ describe( 'apiFetch', () => {
 		// options object. It also assumes that some built-in middleware would
 		// either mutate or clone the original options if the extra middleware
 		// had been pushed to the stack.
-		expect.assertions( 2 );
+		expect.assertions( 1 );
 
 		const expectedOptions = {};
 
 		apiFetch.use( ( actualOptions, next ) => {
 			expect( actualOptions ).toBe( expectedOptions );
-			expect( actualOptions ).toEqual( expectedOptions );
 
 			return next( actualOptions );
 		} );
