@@ -288,6 +288,18 @@ export class RichText extends Component {
 		return true;
 	}
 
+	componentDidMount() {
+		if ( this.props.isSelected ) {
+			this._editor.focus();
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isSelected && ! prevProps.isSelected ) {
+			this._editor.focus();
+		}
+	}
+
 	isFormatActive( format ) {
 		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
 	}
