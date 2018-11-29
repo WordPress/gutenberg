@@ -174,6 +174,13 @@ if ( ! function_exists( 'do_blocks' ) ) {
 	 * @return string          Updated post content.
 	 */
 	function do_blocks( $content ) {
+		// If there are blocks in this content, we shouldn't run wpautop() on it later.
+		$priority = has_filter( 'the_content', 'wpautop' );
+		if ( false !== $priority && doing_filter( 'the_content' ) && has_blocks( $content ) ) {
+			remove_filter( 'the_content', 'wpautop', $priority );
+			add_filter( 'the_content', '_restore_wpautop_hook', $priority + 1 );
+		}
+
 		$blocks = gutenberg_parse_blocks( $content );
 		$output = '';
 
@@ -185,6 +192,28 @@ if ( ! function_exists( 'do_blocks' ) ) {
 	}
 
 	add_filter( 'the_content', 'do_blocks', 7 ); // BEFORE do_shortcode() and oembed.
+}
+
+if ( ! function_exists( '_restore_wpautop_hook' ) ) {
+	/**
+	 * If do_blocks() needs to remove wpautop() from the `the_content` filter,
+	 * this re-adds it afterwards, for subsequent `the_content` usage.
+	 *
+	 * @access private
+	 *
+	 * @since 4.6.0
+	 *
+	 * @param string $content The post content running through this filter.
+	 * @return string The unmodified content.
+	 */
+	function _restore_wpautop_hook( $content ) {
+		$current_priority = has_filter( 'the_content', '_restore_wpautop_hook' );
+
+		add_filter( 'the_content', 'wpautop', $current_priority - 1 );
+		remove_filter( 'the_content', '_restore_wpautop_hook', $current_priority );
+
+		return $content;
+	}
 }
 
 if ( ! function_exists( 'strip_dynamic_blocks' ) ) {
