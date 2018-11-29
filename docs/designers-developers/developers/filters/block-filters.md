@@ -204,7 +204,7 @@ var withClientIdClassName = wp.compose.createHigherOrderComponent( function( Blo
 			{},
 			props,
 			{
-				classsName: "block-" + props.clientID,
+				classsName: "block-" + props.clientId,
 			}
 		);
 
@@ -224,7 +224,7 @@ const { createHigherOrderComponent } = wp.compose;
 
 const withClientIdClassName = createHigherOrderComponent( ( BlockListBlock ) => {
 	return ( props ) => {
-		return <BlockListBlock { ...props } className={ "block-" + props.clientID } />;
+		return <BlockListBlock { ...props } className={ "block-" + props.clientId } />;
 	};
 }, 'withClientIdClassName' );
 
