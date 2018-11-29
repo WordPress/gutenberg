@@ -70,11 +70,13 @@ describe( 'reusable blocks effects', () => {
 			const blockPromise = Promise.resolve( [
 				{
 					id: 123,
+					status: 'publish',
 					title: {
 						raw: 'My cool block',
 					},
 					content: {
 						raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+						protected: false,
 					},
 				},
 			] );
@@ -118,11 +120,13 @@ describe( 'reusable blocks effects', () => {
 		it( 'should fetch a single reusable block', async () => {
 			const blockPromise = Promise.resolve( {
 				id: 123,
+				status: 'publish',
 				title: {
 					raw: 'My cool block',
 				},
 				content: {
 					raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+					protected: false,
 				},
 			} );
 			const postTypePromise = Promise.resolve( {
@@ -156,6 +160,42 @@ describe( 'reusable blocks effects', () => {
 					},
 				] )
 			);
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+				id: 123,
+			} );
+		} );
+
+		it( 'should ignore reusable blocks with a trashed post status', async () => {
+			const blockPromise = Promise.resolve( {
+				id: 123,
+				status: 'trash',
+				title: {
+					raw: 'My cool block',
+				},
+				content: {
+					raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+					protected: false,
+				},
+			} );
+			const postTypePromise = Promise.resolve( {
+				slug: 'wp_block', rest_base: 'blocks',
+			} );
+
+			apiFetch.mockImplementation( ( options ) => {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
+					return postTypePromise;
+				}
+
+				return blockPromise;
+			} );
+
+			const dispatch = jest.fn();
+			const store = { getState: noop, dispatch };
+
+			await fetchReusableBlocks( fetchReusableBlocksAction( 123 ), store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
 				id: 123,

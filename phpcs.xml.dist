@@ -18,6 +18,10 @@
 		</properties>
 	</rule>
 
+	<rule ref="WordPress.WP.I18n.MissingArgDomainDefault">
+		<exclude-pattern>packages/block-library/src/*</exclude-pattern>
+	</rule>
+
 	<arg value="ps"/>
 	<arg name="extensions" value="php"/>
 

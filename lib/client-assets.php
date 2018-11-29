@@ -87,6 +87,8 @@ if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 			gutenberg_override_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
 			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
 		}
+
+		gutenberg_override_script( 'wp-tinymce-lists', includes_url( 'js/tinymce/' ) . "plugins/lists/plugin{$suffix}.js", array( 'wp-tinymce' ), $tinymce_version );
 	}
 }
 
@@ -620,12 +622,6 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/moment@2.22.1/' . $moment_script,
 		array()
 	);
-	$tinymce_version = '4.7.11';
-	gutenberg_register_vendor_script(
-		'tinymce-latest-lists',
-		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
-		array( 'wp-tinymce' )
-	);
 	gutenberg_register_vendor_script(
 		'lodash',
 		'https://unpkg.com/lodash@4.17.5/lodash' . $suffix . '.js'
@@ -1055,6 +1051,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'after'
 	);
 
+	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
+	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
+	// are available in Gutenberg. Fixes
+	// https://github.com/WordPress/gutenberg/issues/5667.
+	$user_can_richedit = user_can_richedit();
+	add_filter( 'user_can_richedit', '__return_true' );
+
 	wp_enqueue_script( 'wp-edit-post' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
@@ -1208,10 +1211,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		),
 	);
 
-	/*
-	 * Set a locale specific default font.
-	 * Translators: Use this to specify the CSS font family for the default font
-	 */
+	/* Translators: Use this to specify the CSS font family for the default font */
 	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
 	$styles[]           = array(
 		'css' => "body { font-family: '$locale_font_family' }",
@@ -1224,11 +1224,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'css' => file_get_contents( $style ),
 				);
 			} else {
-				$file     = get_theme_file_path( $style );
-				$styles[] = array(
-					'css'     => file_get_contents( get_theme_file_path( $style ) ),
-					'baseURL' => get_theme_file_uri( $style ),
-				);
+				$file = get_theme_file_path( $style );
+				if ( file_exists( $file ) ) {
+					$styles[] = array(
+						'css'     => file_get_contents( $file ),
+						'baseURL' => get_theme_file_uri( $style ),
+					);
+				}
 			}
 		}
 	}
@@ -1294,6 +1296,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
 		'imageSizes'             => gutenberg_get_available_image_sizes(),
+		'richEditingEnabled'     => $user_can_richedit,
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,

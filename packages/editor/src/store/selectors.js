@@ -36,9 +36,10 @@ import { removep } from '@wordpress/autop';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Dependencies
+ * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /***
  * Module constants
@@ -297,8 +298,21 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
+	// Fall back to saved post value if not edited.
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
 		return getCurrentPostAttribute( state, attributeName );
+	}
+
+	// Merge properties are objects which contain only the patch edit in state,
+	// and thus must be merged with the current post attribute.
+	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// [TODO]: Since this will return a new reference on each invocation,
+		// consider caching in a way which would not impact non-merged property
+		// derivation. Alternatively, introduce a new selector for meta lookup.
+		return {
+			...getCurrentPostAttribute( state, attributeName ),
+			...edits[ attributeName ],
+		};
 	}
 
 	return edits[ attributeName ];
@@ -853,7 +867,10 @@ export function hasSelectedBlock( state ) {
  */
 export function getSelectedBlockClientId( state ) {
 	const { start, end } = state.blockSelection;
-	return start === end && start ? start : null;
+	// We need to check the block exists because the current state.blockSelection reducer
+	// doesn't take into account the UNDO / REDO actions to update selection.
+	// To be removed when that's fixed.
+	return start && start === end && !! state.editor.present.blocks.byClientId[ start ] ? start : null;
 }
 
 /**
@@ -2119,10 +2136,15 @@ export function isPermalinkEditable( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {string} The permalink.
+ * @return {?string} The permalink, or null if the post is not viewable.
  */
 export function getPermalink( state ) {
-	const { prefix, postName, suffix } = getPermalinkParts( state );
+	const permalinkParts = getPermalinkParts( state );
+	if ( ! permalinkParts ) {
+		return null;
+	}
+
+	const { prefix, postName, suffix } = permalinkParts;
 
 	if ( isPermalinkEditable( state ) ) {
 		return prefix + postName + suffix;
@@ -2132,14 +2154,20 @@ export function getPermalink( state ) {
 }
 
 /**
- * Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+ * Returns the permalink for a post, split into it's three parts: the prefix,
+ * the postName, and the suffix.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} The prefix, postName, and suffix for the permalink.
+ * @return {Object} An object containing the prefix, postName, and suffix for
+ *                  the permalink, or null if the post is not viewable.
  */
 export function getPermalinkParts( state ) {
 	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	if ( ! permalinkTemplate ) {
+		return null;
+	}
+
 	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
 
 	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );
