@@ -268,7 +268,7 @@ export class RichText extends Component {
 			this.lastContent = undefined;
 			return true;
 		}
-		// If the component is changed React side (undo/redo/merging/splitting/custom text actions) 
+		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
 		// we need to make sure the native is updated as well
 		if ( nextProps.value &&
 			this.lastContent &&
