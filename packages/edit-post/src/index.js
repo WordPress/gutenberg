@@ -5,7 +5,6 @@ import '@wordpress/core-data';
 import '@wordpress/editor';
 import '@wordpress/nux';
 import '@wordpress/viewport';
-import '@wordpress/notices';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';

@@ -9,15 +9,14 @@ import {
 	createWarningNotice,
 	removeNotice,
 } from '../actions';
-import { DEFAULT_CONTEXT, DEFAULT_STATUS } from '../constants';
+import { DEFAULT_CONTEXT } from '../constants';
 
 describe( 'actions', () => {
 	describe( 'createNotice', () => {
-		const id = 'my-id';
 		const status = 'status';
 		const content = 'my message';
 
-		it( 'yields actions when options is empty', () => {
+		it( 'should yields actions when options is empty', () => {
 			const result = createNotice( status, content );
 
 			expect( result.next().value ).toMatchObject( {
@@ -38,28 +37,8 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'normalizes content to string', () => {
-			const result = createNotice( status, <strong>Hello</strong> );
-
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: expect.any( String ),
-			} );
-
-			expect( result.next().value ).toMatchObject( {
-				type: 'CREATE_NOTICE',
-				context: DEFAULT_CONTEXT,
-				notice: {
-					status,
-					content: expect.any( String ),
-					isDismissible: true,
-					id: expect.any( String ),
-					actions: [],
-				},
-			} );
-		} );
-
-		it( 'yields actions when options passed', () => {
+		it( 'should yields actions when options passed', () => {
+			const id = 'my-id';
 			const context = 'foo';
 			const options = {
 				id,
@@ -81,32 +60,6 @@ describe( 'actions', () => {
 					id,
 					status,
 					content,
-					isDismissible: false,
-					actions: [],
-				},
-			} );
-		} );
-
-		it( 'yields action when speak disabled', () => {
-			const result = createNotice(
-				undefined,
-				'my <strong>message</strong>',
-				{
-					id,
-					__unstableHTML: true,
-					isDismissible: false,
-					speak: false,
-				}
-			);
-
-			expect( result.next().value ).toEqual( {
-				type: 'CREATE_NOTICE',
-				context: DEFAULT_CONTEXT,
-				notice: {
-					id,
-					status: DEFAULT_STATUS,
-					content: 'my <strong>message</strong>',
-					__unstableHTML: true,
 					isDismissible: false,
 					actions: [],
 				},
@@ -153,7 +106,7 @@ describe( 'actions', () => {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
-					status: DEFAULT_STATUS,
+					status: 'info',
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
