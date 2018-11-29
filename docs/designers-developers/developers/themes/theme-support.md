@@ -202,7 +202,9 @@ This flag will make sure users are only able to choose colors from the `editor-c
 
 Gutenberg supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
 
-In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. Gutenberg, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors.
+In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. Gutenberg, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors. This also allows Gutenberg to leverage your editor style in block variation previews.
+
+For example, if you write `body { ... }` in your editor style, this is rewritten to `.editor-styles-wrapper { ... }`.  This also means that you should _not_ target any of the editor class names directly.
 
 Because it works a little differently, you need to opt-in to this by adding an extra snippet to your theme, in addition to the add_editor_style function:
 
@@ -212,6 +214,8 @@ add_theme_support('editor-styles');
 
 You shouldn't need to change your editor styles too much; most themes can add the snippet above and get similar results in the classic editor and inside Gutenberg.
 
+### Dark backgrounds
+
 If your editor style relies on a dark background, you can add the following to adjust the color of the UI to work on dark backgrounds:
 
 ```php
@@ -220,6 +224,16 @@ add_theme_support( 'dark-editor-style' );
 ```
 
 Note you don't need to add `add_theme_support( 'editor-styles' );` twice, but that rule does need to be present for the `dark-editor-style` rule to work.
+
+### Enqueuing the editor style
+
+To make sure your editor style is loaded and parsed correctly, enqueue it using the following method:
+
+```php
+add_editor_style( 'style-editor.css' );
+```
+
+It is enough to paste that in your `functions.php` file, for the style to be loaded and parsed.
 
 ### Basic colors
 

@@ -1761,6 +1761,25 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should not replace the selected block if we keep it when replacing blocks', () => {
+			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
+			const state = blockSelection( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/freeform',
+					},
+					{
+						clientId: 'wings',
+						name: 'core/freeform',
+					} ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
 		it( 'should reset if replacing with empty set', () => {
 			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
