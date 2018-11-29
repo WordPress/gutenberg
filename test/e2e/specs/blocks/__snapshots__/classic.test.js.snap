@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Classic should be inserted 1`] = `"test"`;
+
+exports[`Classic should insert media 1`] = `"test<img class=\\"alignnone size-full wp-image-130\\" src=\\"http://localhost:8889/wp-content/uploads/2018/11/b9682d07-fa29-4fbb-a9ce-f1019cc82ca1.png\\" alt=\\"\\" width=\\"10\\" height=\\"10\\" />"`;
