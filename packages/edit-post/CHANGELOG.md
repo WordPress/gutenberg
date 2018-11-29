@@ -1,3 +1,9 @@
+## 4.0.0 (Unreleased)
+
+### Breaking Change
+
+- Revert: The `AdminNotices` component added in 3.1.0 has been removed.
+
 ## 3.1.2 (2018-11-22)
 
 ## 3.1.1 (2018-11-21)
