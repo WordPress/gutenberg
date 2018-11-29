@@ -82,7 +82,6 @@ class MediaUpload extends Component {
 		gallery = false,
 		title = __( 'Select or Upload Media' ),
 		modalClass,
-		value,
 	} ) {
 		super( ...arguments );
 		this.openModal = this.openModal.bind( this );
@@ -92,21 +91,7 @@ class MediaUpload extends Component {
 		this.onClose = this.onClose.bind( this );
 
 		if ( gallery ) {
-			const currentState = value ? 'gallery-edit' : 'gallery';
-			const GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
-			const attachments = getAttachmentsCollection( value );
-			const selection = new wp.media.model.Selection( attachments.models, {
-				props: attachments.props.toJSON(),
-				multiple,
-			} );
-			this.frame = new GalleryDetailsMediaFrame( {
-				mimeType: allowedTypes,
-				state: currentState,
-				multiple,
-				selection,
-				editing: ( value ) ? true : false,
-			} );
-			wp.media.frame = this.frame;
+			this.buildAndSetGalleryFrame();
 		} else {
 			const frameConfig = {
 				title,
@@ -126,11 +111,54 @@ class MediaUpload extends Component {
 			this.frame.$el.addClass( modalClass );
 		}
 
+		this.initializeListeners();
+	}
+
+	initializeListeners() {
 		// When an image is selected in the media frame...
 		this.frame.on( 'select', this.onSelect );
 		this.frame.on( 'update', this.onUpdate );
 		this.frame.on( 'open', this.onOpen );
 		this.frame.on( 'close', this.onClose );
+	}
+
+	buildAndSetGalleryFrame() {
+		const {
+			allowedTypes,
+			multiple = false,
+			value = null,
+		} = this.props;
+		// If the value did not changed there is no need to rebuild the frame,
+		// we can continue to use the existing one.
+		if ( value === this.lastGalleryValue ) {
+			return;
+		}
+
+		this.lastGalleryValue = value;
+
+		// If a frame already existed remove it.
+		if ( this.frame ) {
+			this.frame.remove();
+		}
+		const currentState = value ? 'gallery-edit' : 'gallery';
+		if ( ! this.GalleryDetailsMediaFrame ) {
+			this.GalleryDetailsMediaFrame = getGalleryDetailsMediaFrame();
+		}
+
+		const attachments = getAttachmentsCollection( value );
+		const selection = new wp.media.model.Selection( attachments.models, {
+			props: attachments.props.toJSON(),
+			multiple,
+		} );
+		this.frame = new this.GalleryDetailsMediaFrame( {
+			mimeType: allowedTypes,
+			state: currentState,
+			multiple,
+			selection,
+			editing: ( value ) ? true : false,
+		} );
+		wp.media.frame = this.frame;
+		this.initializeListeners();
 	}
 
 	componentWillUnmount() {
@@ -176,6 +204,7 @@ class MediaUpload extends Component {
 				selection.add( wp.media.attachment( id ) );
 			} );
 		}
+
 		// load the images so they are available in the media modal.
 		getAttachmentsCollection( castArray( this.props.value ) ).more();
 	}
@@ -205,6 +234,13 @@ class MediaUpload extends Component {
 	}
 
 	openModal() {
+		if (
+			this.props.gallery &&
+			this.props.value &&
+			this.props.value.length > 0
+		) {
+			this.buildAndSetGalleryFrame();
+		}
 		this.frame.open();
 	}
 
