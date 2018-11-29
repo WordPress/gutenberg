@@ -4,34 +4,35 @@
 import { Component } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 import { documentHasSelection } from '@wordpress/dom';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 class CopyHandler extends Component {
 	constructor() {
 		super( ...arguments );
 
+		this.onCopy = this.onCopy.bind( this );
 		this.onCut = this.onCut.bind( this );
 	}
 
 	componentDidMount() {
-		document.addEventListener( 'copy', this.props.onCopy );
+		document.addEventListener( 'copy', this.onCopy );
 		document.addEventListener( 'cut', this.onCut );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'copy', this.props.onCopy );
+		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
 	}
 
+	onCopy( event ) {
+		this.props.onCopy( event.clipboardData );
+		event.preventDefault();
+	}
+
 	onCut( event ) {
-		const { hasMultiSelection, selectedBlockClientIds } = this.props;
-
-		this.props.onCopy( event );
-
-		if ( hasMultiSelection ) {
-			this.props.onRemove( selectedBlockClientIds );
-		}
+		this.props.onCut( event.clipboardData );
+		event.preventDefault();
 	}
 
 	render() {
@@ -40,46 +41,41 @@ class CopyHandler extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
+			getBlocksByClientId,
 			getMultiSelectedBlockClientIds,
 			getSelectedBlockClientId,
 			hasMultiSelection,
 		} = select( 'core/editor' );
+		const { removeBlocks } = dispatch( 'core/editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
 
 		return {
-			hasMultiSelection: hasMultiSelection(),
-			selectedBlockClientIds,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
-		const { getBlocksByClientId } = select( 'core/editor' );
-		const { removeBlocks } = dispatch( 'core/editor' );
-
-		return {
-			onCopy( event ) {
-				const { hasMultiSelection, selectedBlockClientIds } = ownProps;
-
+			onCopy( dataTransfer ) {
 				if ( selectedBlockClientIds.length === 0 ) {
 					return;
 				}
 
 				// Let native copy behaviour take over in input fields.
-				if ( ! hasMultiSelection && documentHasSelection() ) {
+				if ( ! hasMultiSelection() && documentHasSelection() ) {
 					return;
 				}
 
 				const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
 
-				event.clipboardData.setData( 'text/plain', serialized );
-				event.clipboardData.setData( 'text/html', serialized );
-
-				event.preventDefault();
+				dataTransfer.setData( 'text/plain', serialized );
+				dataTransfer.setData( 'text/html', serialized );
 			},
-			onRemove: removeBlocks,
+			onCut( dataTransfer ) {
+				this.onCopy( dataTransfer );
+
+				if ( hasMultiSelection() ) {
+					removeBlocks( selectedBlockClientIds );
+				}
+			},
 		};
 	} ),
 ] )( CopyHandler );
