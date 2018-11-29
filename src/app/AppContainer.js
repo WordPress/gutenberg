@@ -41,7 +41,7 @@ class AppContainer extends React.Component<PropsType> {
 		const post = props.post || {
 			id: 1,
 			content: {
-				raw: props.initialHtml,
+				raw: '',// props.initialHtml,
 			},
 			type: 'draft',
 		};
@@ -101,6 +101,7 @@ class AppContainer extends React.Component<PropsType> {
 	render() {
 		return (
 			<MainApp
+				rootClientId={ this.props.rootClientId }
 				blocks={ this.props.blocks }
 				showHtml={ this.props.showHtml }
 				onChange={ this.onChange }

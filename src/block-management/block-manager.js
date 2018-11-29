@@ -18,6 +18,8 @@ import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 
 // Gutenberg imports
 import { createBlock } from '@wordpress/blocks';
+import { DefaultBlockAppender } from '@wordpress/editor';
+
 import EventEmitter from 'events';
 
 const keyboardDidShow = 'keyboardDidShow';
@@ -211,6 +213,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } parentHeight={ this.state.rootViewHeight }>
+				<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
 				{ list }
 				<BlockToolbar
 					onInsertClick={ () => {

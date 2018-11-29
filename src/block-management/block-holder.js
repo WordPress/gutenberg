@@ -56,7 +56,6 @@ export default class BlockHolder extends React.Component<PropsType> {
 				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.props.insertBlocksAfter }
 				mergeBlocks={ this.props.mergeBlocks }
-				isSelected={ this.props.focused }
 			/>
 		);
 	}
