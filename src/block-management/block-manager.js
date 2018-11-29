@@ -85,7 +85,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		this.setState( { ...this.state, selectedBlockType: itemValue, blockTypePickerVisible: false } );
 
 		// create an empty block of the selected type
-		const newBlock = createBlock( itemValue, { content: 'new test text for a ' + itemValue + ' block' } );
+		const newBlock = createBlock( itemValue );
 
 		this.props.createBlockAction( newBlock.clientId, newBlock );
 
@@ -204,6 +204,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// And fix problems with RecyclerViewList on Android
 		const list = (
 			<FlatList
+				keyboardShouldPersistTaps="always"
 				style={ styles.list }
 				data={ this.state.blocks }
 				extraData={ { refresh: this.state.refresh } }
