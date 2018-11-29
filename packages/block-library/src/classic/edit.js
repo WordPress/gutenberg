@@ -187,7 +187,6 @@ export default class ClassicEdit extends Component {
 				id={ `editor-${ clientId }` }
 				className="wp-block-freeform block-library-rich-text__tinymce"
 				contentEditable="true"
-				// Is there a better way to do this? Add an XSS package?
 				dangerouslySetInnerHTML={ { __html: this.props.attributes.content } }
 				onFocus={ this.initialize }
 			/>,
