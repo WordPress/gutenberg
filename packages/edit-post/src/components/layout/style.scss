@@ -103,6 +103,13 @@
 		@supports (position: sticky) {
 			flex-basis: 100%;
 		}
+
+		// This is an ugly hack that applies a table display to the main editing canvas when the browser is
+		// detected to be in quirks mode. Without this hack in quirks mode, the flexbox rules we use to size
+		// the various elements do not work, causing overlap.
+		.is-quirks-mode & {
+			display: table;
+		}
 	}
 
 	.edit-post-layout__metaboxes {

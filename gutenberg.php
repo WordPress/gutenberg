@@ -567,3 +567,27 @@ function gutenberg_add_responsive_body_class( $classes ) {
 }
 
 add_filter( 'body_class', 'gutenberg_add_responsive_body_class' );
+
+
+/**
+ * Prints JavaScript to detect whether the browser is in standards mode or not.
+ *
+ * @since 4.5
+ */
+function gutenberg_detect_quirks_mode() {
+	?>
+	<script type="text/javascript">
+		document.addEventListener( 'DOMContentLoaded', function() {
+			try {
+				var documentMode = document.compatMode==='CSS1Compat'?'Standards':'Quirks';
+				if (documentMode != 'Standards' ) {
+					console.log( 'You are in ' + documentMode + ' mode.' );
+					document.body.className += ' ' + 'is-quirks-mode';
+				}
+			} catch( e ) { }
+		} );
+	</script>
+	<?php
+}
+add_action( 'admin_print_scripts-post.php', 'gutenberg_detect_quirks_mode' );
+add_action( 'admin_print_scripts-post-new.php', 'gutenberg_detect_quirks_mode' );
