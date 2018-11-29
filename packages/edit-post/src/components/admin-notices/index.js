@@ -79,14 +79,16 @@ export class AdminNotices extends Component {
 		const { createNotice } = this.props;
 		getAdminNotices().forEach( ( element ) => {
 			// Convert and create.
-			const status = getNoticeStatus( element );
-			const content = getNoticeHTML( element );
-			const isDismissible = element.classList.contains( 'is-dismissible' );
-			createNotice( status, content, {
-				speak: false,
-				__unstableHTML: true,
-				isDismissible,
-			} );
+			if ( element.classList.contains( 'wp-pp-notice' ) ) {
+				const status = getNoticeStatus( element );
+				const content = getNoticeHTML( element );
+				const isDismissible = element.classList.contains( 'is-dismissible' );
+				createNotice( status, content, {
+					speak: false,
+					__unstableHTML: true,
+					isDismissible,
+				} );
+			}
 
 			// Remove (now-redundant) admin notice element.
 			element.parentNode.removeChild( element );

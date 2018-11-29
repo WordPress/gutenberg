@@ -15,6 +15,9 @@ describe( 'AdminNotices', () => {
 		// text node) and (b) untrimmed content.
 		document.body.innerHTML = `
 			<div id="wpbody-content">
+				<div class="notice notice-warning inline wp-pp-notice">
+					<p>Need help putting together your new Privacy Policy page?</p>
+				</div>
 				<div class="notice updated is-dismissible">
 					<p>My <strong>notice</strong> text</p>
 					<p>My second line of text</p>
@@ -30,28 +33,19 @@ describe( 'AdminNotices', () => {
 		`;
 	} );
 
-	it( 'should upgrade notices', () => {
+	it( 'should upgrade privacy policy notice', () => {
 		const createNotice = jest.fn();
 
 		renderer.create( <AdminNotices createNotice={ createNotice } /> );
 
-		expect( createNotice ).toHaveBeenCalledTimes( 2 );
+		expect( createNotice ).toHaveBeenCalledTimes( 1 );
 		expect( createNotice.mock.calls[ 0 ] ).toEqual( [
 			'warning',
-			'Warning',
+			'<p>Need help putting together your new Privacy Policy page?</p>',
 			{
 				speak: false,
 				__unstableHTML: true,
 				isDismissible: false,
-			},
-		] );
-		expect( createNotice.mock.calls[ 1 ] ).toEqual( [
-			'success',
-			'<p>My <strong>notice</strong> text</p><p>My second line of text</p>',
-			{
-				speak: false,
-				__unstableHTML: true,
-				isDismissible: true,
 			},
 		] );
 
