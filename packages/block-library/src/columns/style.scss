@@ -18,7 +18,9 @@
 
 	// Beyond mobile, allow 2 columns.
 	@include break-small() {
-		flex-basis: 50%;
+
+		// Size should be half the available width, minus the margins added below
+		flex-basis: calc(50% - #{$grid-size-large * 2});
 		flex-grow: 0;
 	}
 
@@ -31,18 +33,31 @@
 
 	// Add space between columns. Themes can customize this if they wish to work differently.
 	// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
+
+	// 2 columns at this breakpoint, and items beyond the second will wrap.
 	@include break-small() {
-		&:nth-child(odd) {
-			margin-right: $grid-size-large * 2;
-		}
 		&:nth-child(even) {
 			margin-left: $grid-size-large * 2;
 		}
+		&:nth-child(odd) {
+			margin-right: $grid-size-large * 2;
+		}
+	}
 
+	// N columns at this breakpoint.
+	// Reset odd, even margins from small breakpoint.
+	// Add margin to both sides on all inside columns.
+	// Add inner margin only on first and last items.
+	@include break-medium() {
+		&:nth-child(even) {
+			margin-left: initial;
+		}
+		&:nth-child(odd) {
+			margin-right: initial;
+		}
 		&:not(:first-child) {
 			margin-left: $grid-size-large * 2;
 		}
-
 		&:not(:last-child) {
 			margin-right: $grid-size-large * 2;
 		}
