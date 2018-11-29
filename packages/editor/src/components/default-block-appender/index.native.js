@@ -11,6 +11,8 @@ import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+import styles from './style.scss';
+
 export function DefaultBlockAppender( {
 	isLocked,
 	isVisible,
@@ -27,13 +29,15 @@ export function DefaultBlockAppender( {
 		<TouchableWithoutFeedback
 			onPress={ onAppend }
 		>
-			<View style={ { flex: 1 } } pointerEvents="box-only">
-				<TextInput
-					textAlignVertical="top"
-					multiline
-					numberOfLines={ 0 }
-					value={ value }
-				/>
+			<View style={ styles.blockHolder } pointerEvents="box-only">
+				<View style={ styles.blockContainer }>
+					<TextInput
+						textAlignVertical="top"
+						multiline
+						numberOfLines={ 0 }
+						value={ value }
+					/>
+				</View>
 			</View>
 		</TouchableWithoutFeedback>
 	);
