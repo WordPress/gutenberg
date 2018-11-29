@@ -86,9 +86,14 @@ export default class ClassicEdit extends Component {
 		}
 
 		editor.on( 'blur', () => {
+			const bookmark = editor.selection.getBookmark( 2, true );
+
 			setAttributes( {
 				content: editor.getContent(),
 			} );
+
+			editor.once( 'focus', () => editor.selection.moveToBookmark( bookmark ) );
+
 			return false;
 		} );
 
