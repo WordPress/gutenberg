@@ -174,6 +174,15 @@ export class RichText extends Component {
 		return { formats, text, start, end };
 	}
 
+	/**
+	 * Creates a new record from the current editable DOM.
+	 *
+	 * @param {Object} $1       Named arguments.
+	 * @param {Object} $1.cache Wether or not to cache the record based on the
+	 *                          selection.
+	 *
+	 * @return {Object} A new record.
+	 */
 	createRecord( { cache } = {} ) {
 		const range = getSelection().getRangeAt( 0 );
 
