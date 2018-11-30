@@ -93,6 +93,7 @@ export class RichText extends Component {
 
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -127,14 +128,6 @@ export class RichText extends Component {
 
 		this.usedDeprecatedChildrenSource = Array.isArray( value );
 		this.lastHistoryValue = value;
-	}
-
-	componentDidMount() {
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	setRef( node ) {
@@ -354,6 +347,12 @@ export class RichText extends Component {
 		if ( unstableOnFocus ) {
 			unstableOnFocus();
 		}
+
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	onBlur() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	/**
@@ -891,6 +890,7 @@ export class RichText extends Component {
 								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
 								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
 								multilineTag={ this.multilineTag }
 								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
