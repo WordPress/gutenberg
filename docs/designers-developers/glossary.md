@@ -7,13 +7,13 @@
 - **Block Inserter**: Primary interface for selecting from the available blocks, triggered by plus icon buttons on Blocks or in the top-left of the editor interface.
 - **Block name**: A unique identifier for a block type, consisting of a plugin-specific namespace and a short label describing the block's intent. e.g. `core/image`
 - **Block type**: In contrast with the blocks composing a particular post, a block type describes the blueprint by which any block of that type should behave. So while there may be many images within a post, each behaves consistent with a unified image block type definition.
-- **Classic block**:
+- **Classic block**: A block which embeds the TinyMCE editor as a block, TinyMCE was the base of the previous core editor. Older content created prior to the block editor will be loaded in to a single Classic block.
 - **Dynamic block**: A type of block where the content of which may change and cannot be determined at the time of saving a post, instead calculated any time the post is shown on the front of a site. These blocks may save fallback content or no content at all in their JavaScript implementation, instead deferring to a PHP block implementation for runtime rendering.
 - **RichText**: A common component enabling rich content editing including bold, italics, hyperlinks, etc. It is not too much unlike the single editor region of the legacy post editor, and is in fact powered by the same TinyMCE library.
 - **Inspector**: A block settings region shown in place of the post settings when a block is selected. Fields may be shown here to allow the user to customize the selected block.
 - **Post settings**: A sidebar region containing metadata fields for the post, including scheduling, visibility, terms, and featured image.
-- **Reusable block**:
-- **Sidebar**:
+- **Reusable block**: A block that is saved and then can be shared as a reusable, repeatable piece of content.
+- **Sidebar**: The panel on the right which contains the document and block settings. The sidebar is toggled using the Settings gear icon.
 - **Serialization**: The process of converting a block's attributes object into HTML markup, typically occurring when saving the post.
 - **Static block**: A type of block where the content of which is known at the time of saving a post. A static block will be saved with HTML markup directly in post content.
 - **TinyMCE**: [TinyMCE](https://www.tinymce.com/) is a web-based JavaScript WYSIWYG (What You See Is What You Get) editor.
