@@ -174,7 +174,7 @@ export class RichText extends Component {
 		return { formats, text, start, end };
 	}
 
-	createRecord() {
+	createRecord( { cache } = {} ) {
 		const range = getSelection().getRangeAt( 0 );
 
 		// If the range is shallowly equal to the last, return the last
@@ -191,7 +191,7 @@ export class RichText extends Component {
 		// > is not empty.
 		// >
 		// > https://w3c.github.io/selection-api/#dom-selection-getrangeat
-		if ( range === this.createRecord.lastRange ) {
+		if ( cache && range === this.createRecord.lastRange ) {
 			return this.createRecord.lastRecord;
 		}
 
@@ -419,7 +419,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { start, end, formats } = this.createRecord();
+		const { start, end, formats } = this.createRecord( { cache: true } );
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
