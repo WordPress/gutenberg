@@ -1,6 +1,6 @@
-# Eslint Config
+# ESLint Config
 
-[Eslint](https://eslint.org/) config for WordPress development.
+[ESLint](https://eslint.org/) config for WordPress development.
 
 ## Installation
 

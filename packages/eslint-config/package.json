@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/eslint-config",
 	"version": "1.0.0-alpha.0",
-	"description": "Eslint config for WordPress development.",
+	"description": "ESLint config for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
