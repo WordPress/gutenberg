@@ -41,7 +41,7 @@ describe( 'PluginMoreMenuItem', () => {
 			<SlotFillProvider>
 				<PluginMoreMenuItem
 					icon="smiley"
-					url={ url }
+					href={ url }
 				>
 					My plugin link menu item
 				</PluginMoreMenuItem>
