@@ -40,30 +40,33 @@ describe( 'block', () => {
 		expect( completer.options() ).toEqual( [ option1, option3 ] );
 	} );
 
-	it( 'should derive option keywords from block keywords and block title', () => {
+	it( 'should derive option keywords from block category, block keywords and block title', () => {
 		const inserterItemWithTitleAndKeywords = {
 			name: 'core/foo',
 			title: 'foo',
 			keywords: [ 'foo-keyword-1', 'foo-keyword-2' ],
+			category: 'formatting',
 		};
 		const inserterItemWithTitleAndEmptyKeywords = {
 			name: 'core/bar',
 			title: 'bar',
 			// Intentionally empty keyword list
 			keywords: [],
+			category: 'common',
 		};
 		const inserterItemWithTitleAndUndefinedKeywords = {
 			name: 'core/baz',
 			title: 'baz',
+			category: 'widgets',
 			// Intentionally omitted keyword list
 		};
 
 		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndKeywords ) )
-			.toEqual( [ 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
+			.toEqual( [ 'formatting', 'foo-keyword-1', 'foo-keyword-2', 'foo' ] );
 		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndEmptyKeywords ) )
-			.toEqual( [ 'bar' ] );
+			.toEqual( [ 'common', 'bar' ] );
 		expect( blockCompleter.getOptionKeywords( inserterItemWithTitleAndUndefinedKeywords ) )
-			.toEqual( [ 'baz' ] );
+			.toEqual( [ 'widgets', 'baz' ] );
 	} );
 
 	it( 'should render a block option label', () => {
