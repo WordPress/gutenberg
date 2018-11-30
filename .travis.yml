@@ -30,10 +30,14 @@ matrix:
         LANE='node'
         CHECK_TESTS='true'
         TEST_RN_PLATFORM='android'
+        ARTIFACTS_BUCKET='gutenberg-mobile-js-bundle'
+        ARTIFACTS_PATHS="./bundle"
       cache:
         yarn: true
       script:
         - ./.travis/travis-checks-js.sh
+        - yarn bundle:android
+        - rm -Rf bundle/ios # delete the ios bundle since it's not up to date and we don't need to publish to S3
     - language: node_js
       node_js: 8
       env:
@@ -44,14 +48,3 @@ matrix:
         yarn: true
       script:
         - ./.travis/travis-checks-js.sh
-    - language: node_js
-      node_js: 8
-      env:
-        LANE='node'
-        ARTIFACTS_BUCKET='gutenberg-mobile-js-bundle'
-        ARTIFACTS_PATHS="./bundle"
-      cache:
-        yarn: true
-      script:
-        - yarn bundle:android
-        - rm -Rf bundle/ios # delete the ios bundle since it's not up to date and we don't need to publish to S3
