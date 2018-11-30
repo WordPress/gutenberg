@@ -27,7 +27,7 @@
 				{"docs/designers-developers/developers/backwards-compatibility/deprecations.md": []},
 				{"docs/designers-developers/developers/backwards-compatibility/meta-box.md": []}
 			]},
-			{"docs/designers-developers/developers/tutorials/README.md": [
+			{"docs/designers-developers/developers/tutorials/readme.md": [
 				{"docs/designers-developers/developers/tutorials/block-tutorial/intro.md" :[]},
 				{"docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md" :[]},
 				{"docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md" :[]},
