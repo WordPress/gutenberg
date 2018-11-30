@@ -169,10 +169,13 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value );
+		const record = this.formatToValue( this.props.value );
 		const { start, end } = this.state;
 
-		return { formats, text, start, end };
+		record.start = start;
+		record.end = end;
+
+		return record;
 	}
 
 	createRecord() {
