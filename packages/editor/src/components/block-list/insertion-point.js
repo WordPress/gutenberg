@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -85,18 +84,15 @@ export default withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		getBlockIndex,
 		getBlockInsertionPoint,
-		getBlock,
 		isBlockInsertionPointVisible,
 	} = select( 'core/editor' );
 	const blockIndex = getBlockIndex( clientId, rootClientId );
 	const insertIndex = blockIndex;
 	const insertionPoint = getBlockInsertionPoint();
-	const block = getBlock( clientId );
 	const showInsertionPoint = (
 		isBlockInsertionPointVisible() &&
 		insertionPoint.index === insertIndex &&
-		insertionPoint.rootClientId === rootClientId &&
-		! isUnmodifiedDefaultBlock( block )
+		insertionPoint.rootClientId === rootClientId
 	);
 
 	return { showInsertionPoint, insertIndex };
