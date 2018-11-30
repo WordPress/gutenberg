@@ -36,11 +36,6 @@ export function DefaultBlockAppender( {
 						multiline
 						numberOfLines={ 0 }
 						value={ value }
-						onKeyPress={ onAppend }
-						selection={ { start: 0, end: 0 } }
-						/* eslint-disable jsx-a11y/no-autofocus */
-						autoFocus
-						/* eslint-enable jsx-a11y/no-autofocus */
 					/>
 				</View>
 			</View>
