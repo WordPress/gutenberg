@@ -60,7 +60,8 @@ const EmbedPreview = ( props ) => {
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					tagName="figcaption"
-					placeholder={ __( 'Write caption…' ) }
+					placeholder={ __( 'Add caption' ) }
+					aria-label={ __( 'Embed Caption' ) }
 					value={ caption }
 					onChange={ onCaptionChange }
 					inlineToolbar

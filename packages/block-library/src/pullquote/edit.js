@@ -90,8 +90,9 @@ class PullQuoteEdit extends Component {
 							}
 							placeholder={
 								// translators: placeholder text used for the quote
-								__( 'Write quote…' )
+								__( 'Add quote' )
 							}
+							aria-label={ __( 'Quote' ) }
 							wrapperClassName="block-library-pullquote__content"
 						/>
 						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
@@ -99,8 +100,9 @@ class PullQuoteEdit extends Component {
 								value={ citation }
 								placeholder={
 									// translators: placeholder text used for the citation
-									__( 'Write citation…' )
+									__( 'Add quote citation' )
 								}
+								aria-label={ __( 'Quote citation' ) }
 								onChange={
 									( nextCitation ) => setAttributes( {
 										citation: nextCitation,

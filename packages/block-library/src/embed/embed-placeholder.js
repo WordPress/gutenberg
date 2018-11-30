@@ -15,7 +15,7 @@ const EmbedPlaceholder = ( props ) => {
 					value={ value || '' }
 					className="components-placeholder__input"
 					aria-label={ label }
-					placeholder={ __( 'Enter URL to embed here…' ) }
+					placeholder={ __( 'Add URL embed URL: https://…' ) }
 					onChange={ onChange } />
 				<Button
 					isLarge

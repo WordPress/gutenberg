@@ -252,7 +252,8 @@ class VideoEdit extends Component {
 					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
+							placeholder={ __( 'Add video caption' ) }
+							aria-label={ __( 'Video caption' ) }
 							value={ caption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar

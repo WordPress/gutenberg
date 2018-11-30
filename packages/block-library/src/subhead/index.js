@@ -79,7 +79,8 @@ export const settings = {
 					} }
 					style={ { textAlign: align } }
 					className={ className }
-					placeholder={ placeholder || __( 'Write subheading…' ) }
+					placeholder={ placeholder || __( 'Add subheading text' ) }
+					aria-label={ __( 'Subheading' ) }
 				/>
 			</Fragment>
 		);

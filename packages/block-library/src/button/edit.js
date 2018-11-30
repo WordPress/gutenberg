@@ -78,8 +78,8 @@ class ButtonEdit extends Component {
 			<Fragment>
 				<div className={ className } title={ title } ref={ this.bindRef }>
 					<RichText
-						placeholder={ __( 'Add text…' ) }
-						label={ __( 'This is the aria-label' ) }
+						placeholder={ __( 'Add button text' ) }
+						aria-label={ __( 'Button' ) }
 						value={ text }
 						onChange={ ( value ) => setAttributes( { text: value } ) }
 						formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }

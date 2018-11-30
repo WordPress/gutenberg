@@ -77,7 +77,8 @@ export const settings = {
 						} );
 					} }
 					style={ { textAlign: textAlign } }
-					placeholder={ __( 'Write…' ) }
+					placeholder={ __( 'Add verse content' ) }
+					aria-label={ __( 'Verse' ) }
 					wrapperClassName={ className }
 					onMerge={ mergeBlocks }
 				/>

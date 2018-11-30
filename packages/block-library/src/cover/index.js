@@ -367,7 +367,8 @@ export const settings = {
 							<RichText
 								tagName="p"
 								className="wp-block-cover-text"
-								placeholder={ __( 'Write title…' ) }
+								placeholder={ __( 'Add cover image title' ) }
+								aria-label={ __( 'Cover image title' ) }
 								value={ title }
 								onChange={ setTitle }
 								inlineToolbar

@@ -177,7 +177,8 @@ class AudioEdit extends Component {
 					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
+							placeholder={ __( 'Add audio caption' ) }
+							aria-label={ __( 'Caption' ) }
 							value={ caption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }
 							inlineToolbar

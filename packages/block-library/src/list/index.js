@@ -231,7 +231,8 @@ export const settings = {
 				value={ values }
 				wrapperClassName="block-library-list"
 				className={ className }
-				placeholder={ __( 'Write list…' ) }
+				placeholder={ __( 'Add list items' ) }
+				aria-label={ __( 'List' ) }
 				onMerge={ mergeBlocks }
 				unstableOnSplit={
 					insertBlocksAfter ?

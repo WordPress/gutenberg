@@ -74,7 +74,8 @@ export const settings = {
 						content: nextContent,
 					} );
 				} }
-				placeholder={ __( 'Write preformatted text…' ) }
+				placeholder={ __( 'Add preformatted text' ) }
+				aria-label={ __( 'Preformatted text' ) }
 				wrapperClassName={ className }
 				onMerge={ mergeBlocks }
 			/>

@@ -133,7 +133,8 @@ export const settings = {
 											],
 										} );
 									} }
-									placeholder={ __( 'New Column' ) }
+									placeholder={ __( 'New Column, type to add content' ) }
+									aria-label={ __( 'Text Column' ) }
 								/>
 							</div>
 						);

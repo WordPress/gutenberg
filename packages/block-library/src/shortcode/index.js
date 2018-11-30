@@ -71,7 +71,7 @@ export const settings = {
 						className="input-control"
 						id={ inputId }
 						value={ attributes.text }
-						placeholder={ __( 'Write shortcode here…' ) }
+						placeholder={ __( 'Add shortcode' ) }
 						onChange={ ( text ) => setAttributes( { text } ) }
 					/>
 				</div>

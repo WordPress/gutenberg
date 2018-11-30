@@ -14,7 +14,7 @@ export default function CodeEdit( { attributes, setAttributes, className } ) {
 			<PlainText
 				value={ attributes.content }
 				onChange={ ( content ) => setAttributes( { content } ) }
-				placeholder={ __( 'Write code…' ) }
+				placeholder={ __( 'Add code' ) }
 				aria-label={ __( 'Code' ) }
 			/>
 		</div>

@@ -226,8 +226,9 @@ export const settings = {
 						} }
 						placeholder={
 							// translators: placeholder text used for the quote
-							__( 'Write quote…' )
+							__( 'Add quote' )
 						}
+						aria-label={ __( 'Quote' ) }
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
@@ -240,8 +241,9 @@ export const settings = {
 							}
 							placeholder={
 								// translators: placeholder text used for the citation
-								__( 'Write citation…' )
+								__( 'Add quote citation' )
 							}
+							aria-label={ __( 'Quote citation' ) }
 							className="wp-block-quote__citation"
 						/>
 					) }

@@ -876,7 +876,6 @@ export class RichText extends Component {
 								style={ style }
 								defaultValue={ this.valueToEditableHTML( record ) }
 								isPlaceholderVisible={ isPlaceholderVisible }
-								aria-label={ placeholder }
 								aria-autocomplete="list"
 								aria-expanded={ isExpanded }
 								aria-owns={ listBoxId }

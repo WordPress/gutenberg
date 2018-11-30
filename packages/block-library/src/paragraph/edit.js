@@ -246,8 +246,8 @@ class ParagraphBlock extends Component {
 					onMerge={ mergeBlocks }
 					onReplace={ this.onReplace }
 					onRemove={ () => onReplace( [] ) }
-					aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
-					placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
+					aria-label={ content ? __( 'Paragraph' ) : __( 'Empty paragraph block' ) }
+					placeholder={ placeholder || __( 'Add text or type forward slash to choose a new block type' ) }
 				/>
 			</Fragment>
 		);

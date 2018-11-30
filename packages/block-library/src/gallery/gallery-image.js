@@ -141,7 +141,8 @@ class GalleryImage extends Component {
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) ? (
 					<RichText
 						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
+						placeholder={ __( 'Add image caption' ) }
+						aria-label={ __( 'Gallery image caption' ) }
 						value={ caption }
 						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) => setAttributes( { caption: newCaption } ) }

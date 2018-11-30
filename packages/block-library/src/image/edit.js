@@ -683,7 +683,8 @@ class ImageEdit extends Component {
 					{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 						<RichText
 							tagName="figcaption"
-							placeholder={ __( 'Write caption…' ) }
+							placeholder={ __( 'Add image caption' ) }
+							aria-label={ __( 'Image caption' ) }
 							value={ caption }
 							unstableOnFocus={ this.onFocusCaption }
 							onChange={ ( value ) => setAttributes( { caption: value } ) }

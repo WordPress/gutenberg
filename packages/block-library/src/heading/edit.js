@@ -62,7 +62,8 @@ export default function HeadingEdit( {
 				onRemove={ () => onReplace( [] ) }
 				style={ { textAlign: align } }
 				className={ className }
-				placeholder={ placeholder || __( 'Write heading…' ) }
+				placeholder={ placeholder || __( 'Add heading' ) }
+				aria-label={ __( 'Heading' ) }
 			/>
 		</Fragment>
 	);
