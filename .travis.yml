@@ -35,9 +35,11 @@ matrix:
       cache:
         yarn: true
       script:
+        - set -e # make sure Travis stops if any of the script lines error
         - ./.travis/travis-checks-js.sh
         - yarn bundle:android # rebuild the Android JS bundle
         - rm -Rf bundle/ios # delete the ios bundle since it's not up to date and we don't need to publish to S3
+        - set +e
     - language: node_js
       node_js: 8
       env:
