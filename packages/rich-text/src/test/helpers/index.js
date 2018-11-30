@@ -29,8 +29,8 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should ignore line breaks to format HTML',
-		html: '\n\n\r\n',
+		description: 'should replace characters to format HTML with space',
+		html: '\n\n\r\n\t',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -38,12 +38,30 @@ export const spec = [
 			endContainer: element,
 		} ),
 		startPath: [ 0, 0 ],
-		endPath: [ 0, 0 ],
+		endPath: [ 0, 1 ],
 		record: {
 			start: 0,
-			end: 0,
-			formats: [],
-			text: '',
+			end: 1,
+			formats: [ , ],
+			text: ' ',
+		},
+	},
+	{
+		description: 'should preserve non breaking space',
+		html: 'test\u00a0 test',
+		createRange: ( element ) => ( {
+			startOffset: 5,
+			startContainer: element.firstChild,
+			endOffset: 5,
+			endContainer: element.firstChild,
+		} ),
+		startPath: [ 0, 5 ],
+		endPath: [ 0, 5 ],
+		record: {
+			start: 5,
+			end: 5,
+			formats: [ , , , , , , , , , , ],
+			text: 'test\u00a0 test',
 		},
 	},
 	{
