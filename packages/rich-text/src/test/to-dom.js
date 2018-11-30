@@ -9,16 +9,11 @@ import { JSDOM } from 'jsdom';
  */
 
 import { toDom, applyValue } from '../to-dom';
+import { createElement } from '../create-element';
 import { spec } from './helpers';
 
 const { window } = new JSDOM();
 const { document } = window;
-
-function createElement( { implementation }, html ) {
-	const { body } = implementation.createHTMLDocument( '' );
-	body.innerHTML = html;
-	return body;
-}
 
 describe( 'recordToDom', () => {
 	beforeAll( () => {
@@ -71,8 +66,8 @@ describe( 'applyValue', () => {
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
 		it( description, () => {
-			const body = createElement( document, current );
-			const futureBody = createElement( document, future );
+			const body = createElement( document, current ).cloneNode( true );
+			const futureBody = createElement( document, future ).cloneNode( true );
 			const childNodes = Array.from( futureBody.childNodes );
 			applyValue( futureBody, body );
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {
