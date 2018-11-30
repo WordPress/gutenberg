@@ -3,6 +3,7 @@
  */
 
 import { toTree } from './to-tree';
+import { createElement } from './create-element';
 
 /**
  * Browser dependencies
@@ -58,10 +59,17 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-function createEmpty() {
-	const { body } = document.implementation.createHTMLDocument( '' );
-	return body;
-}
+/**
+ * Returns a new instance of a DOM tree upon which RichText operations can be
+ * applied.
+ *
+ * Note: The current implementation will return a shared reference, reset on
+ * each call to `createEmpty`. Therefore, you should not hold a reference to
+ * the value to operate upon asynchronously, as it may have unexpected results.
+ *
+ * @return {WPRichTextTree} RichText tree.
+ */
+const createEmpty = () => createElement( document, '' );
 
 function append( element, child ) {
 	if ( typeof child === 'string' ) {

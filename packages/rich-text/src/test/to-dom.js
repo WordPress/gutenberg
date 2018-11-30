@@ -66,8 +66,8 @@ describe( 'applyValue', () => {
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
 		it( description, () => {
-			const body = createElement( document, current );
-			const futureBody = createElement( document, future );
+			const body = createElement( document, current ).cloneNode( true );
+			const futureBody = createElement( document, future ).cloneNode( true );
 			const childNodes = Array.from( futureBody.childNodes );
 			applyValue( futureBody, body );
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {
