@@ -55,7 +55,7 @@
 <dt>Toolbar</dt>
 <dd>A set of button controls. In the context of a block, usually referring to the toolbar of block controls shown above the selected block.</dd>
 
-<dt>Template:</dt>
-<dd></dd>
+<dt>Template</dt>
+<dd>A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow to specify a default initial state for an editor session. See <a href="developers/block-api/block-templates.md">Templates documentation</a> for more.</dd>
 
 </dl>
