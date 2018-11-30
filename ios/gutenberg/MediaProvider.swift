@@ -25,10 +25,15 @@ class ExampleAttachmentImageProvider: TextViewAttachmentImageProvider {
 
 class ExampleAttachmentDelegate: TextViewAttachmentDelegate {
     func textView(_ textView: TextView, attachment: NSTextAttachment, imageAt url: URL, onSuccess success: @escaping (UIImage) -> Void, onFailure failure: @escaping () -> Void) {
-        DispatchQueue.main.async {
-            let image = UIImage(named: "aztec")!
-            success(image)
-        }
+        URLSession.shared.dataTask(with: url) { (data, response, error) in
+            guard let data = data, let image = UIImage(data: data) else {
+                failure()
+                return
+            }
+            DispatchQueue.main.async {
+                success(image)
+            }
+        }.resume()
     }
 
     func textView(_ textView: TextView, urlFor imageAttachment: ImageAttachment) -> URL? {
