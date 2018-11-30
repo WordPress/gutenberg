@@ -65,36 +65,36 @@ function getDataManifest( parsedNamespaces ) {
 }
 
 function getRootManifest( tocFileName ) {
-	var toc = require( tocFileName );
-	return generateRootManifestFromTOCItems( toc );
+	return generateRootManifestFromTOCItems( require( tocFileName ) );
 }
 
 function generateRootManifestFromTOCItems( items, parent = null ) {
 	let pageItems = [];
 	items.map( ( obj ) => {
-		const fileName = Object.keys( obj )[0];
+		const fileName = Object.keys( obj )[ 0 ];
 		const children = obj[ fileName ];
 
-		let slug = nth( fileName.split( '/' ), -1 ).replace('.md','');
-		if ( 'readme' == slug.toLowerCase() ) {
+		let slug = nth( fileName.split( '/' ), -1 ).replace( '.md', '' );
+		if ( 'readme' === slug.toLowerCase() ) {
 			slug = nth( fileName.split( '/' ), -2 );
 
 			// Special case - the root 'docs' readme needs the 'handbook' slug.
-			if ( parent == null && 'docs' == slug ) {
+			if ( parent === null && 'docs' === slug ) {
 				slug = 'handbook';
 			}
 		}
 		let title = upperFirst( camelCase( slug ) );
 		const markdownSource = fs.readFileSync( fileName, 'utf8' );
-		if ( titleMarkdown = markdownSource.match( /^#\s(.+)$/m ) ) {
-			title = titleMarkdown[1];
+		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
+		if ( titleMarkdown ) {
+			title = titleMarkdown[ 1 ];
 		}
 
 		pageItems.push( {
-			"title": title,
-			"slug": slug,
-			"markdown_source": `${ baseRepoUrl }\/${ fileName }`,
-			"parent": parent
+			title: title,
+			slug: slug,
+			markdown_source: `${ baseRepoUrl }\/${ fileName }`,
+			parent: parent,
 		} );
 		if ( Array.isArray( children ) && children.length ) {
 			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
