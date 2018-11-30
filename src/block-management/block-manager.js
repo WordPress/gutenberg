@@ -276,10 +276,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				<BlockHolder
 					key={ value.item.clientId }
 					onInlineToolbarButtonPressed={ this.onInlineToolbarButtonPressed }
-					onBlockHolderPressed={ this.props.focusBlockAction }
 					onChange={ this.props.onChange }
 					showTitle={ false }
-					focused={ value.item.focused }
 					clientId={ value.item.clientId }
 					canMoveUp={ canMoveUp }
 					canMoveDown={ canMoveDown }
