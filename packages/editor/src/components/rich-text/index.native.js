@@ -268,6 +268,10 @@ export class RichText extends Component {
 			this.lastContent = undefined;
 			return true;
 		}
+
+		// TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
+		// It was removed in https://github.com/WordPress/gutenberg/pull/12417 to fix undo/redo problem.
+
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
 		// we need to make sure the native is updated as well
 		if ( nextProps.value &&
