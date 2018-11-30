@@ -9,11 +9,16 @@ import { JSDOM } from 'jsdom';
  */
 
 import { toDom, applyValue } from '../to-dom';
-import { createElement } from '../create-element';
 import { spec } from './helpers';
 
 const { window } = new JSDOM();
 const { document } = window;
+
+function createElement( { implementation }, html ) {
+	const { body } = implementation.createHTMLDocument( '' );
+	body.innerHTML = html;
+	return body;
+}
 
 describe( 'recordToDom', () => {
 	beforeAll( () => {
