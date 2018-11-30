@@ -2,7 +2,7 @@
 
 exports[`RichText should apply formatting when selection is collapsed 1`] = `
 "<!-- wp:paragraph -->
-<p>Some <strong>bold</strong>.</p>
+<p>Some <strong>bold</strong>.</p>
 <!-- /wp:paragraph -->"
 `;
 
