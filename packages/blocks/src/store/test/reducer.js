@@ -226,4 +226,87 @@ describe( 'categories', () => {
 			{ slug: 'wings', title: 'Wings' },
 		] );
 	} );
+
+	it( 'should add the category icon', () => {
+		const original = deepFreeze( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+		} ] );
+
+		const state = categories( original, {
+			type: 'UPDATE_CATEGORY',
+			slug: 'chicken',
+			category: {
+				icon: 'new-icon',
+			},
+		} );
+
+		expect( state ).toEqual( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+			icon: 'new-icon',
+		} ] );
+	} );
+
+	it( 'should update the category icon', () => {
+		const original = deepFreeze( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+			icon: 'old-icon',
+		}, {
+			slug: 'wings',
+			title: 'Wings',
+			icon: 'old-icon',
+		} ] );
+
+		const state = categories( original, {
+			type: 'UPDATE_CATEGORY',
+			slug: 'chicken',
+			category: {
+				icon: 'new-icon',
+			},
+		} );
+
+		expect( state ).toEqual( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+			icon: 'new-icon',
+		}, {
+			slug: 'wings',
+			title: 'Wings',
+			icon: 'old-icon',
+		} ] );
+	} );
+
+	it( 'should update multiple category properties', () => {
+		const original = deepFreeze( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+			icon: 'old-icon',
+		}, {
+			slug: 'wings',
+			title: 'Wings',
+			icon: 'old-icon',
+		} ] );
+
+		const state = categories( original, {
+			type: 'UPDATE_CATEGORY',
+			slug: 'wings',
+			category: {
+				title: 'New Wings',
+				chicken: 'ribs',
+			},
+		} );
+
+		expect( state ).toEqual( [ {
+			slug: 'chicken',
+			title: 'Chicken',
+			icon: 'old-icon',
+		}, {
+			slug: 'wings',
+			title: 'New Wings',
+			chicken: 'ribs',
+			icon: 'old-icon',
+		} ] );
+	} );
 } );
