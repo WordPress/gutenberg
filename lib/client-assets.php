@@ -66,6 +66,14 @@ function gutenberg_get_script_polyfill( $tests ) {
 	return $polyfill;
 }
 
+
+function gutenberg_script_debug() {
+	return (
+		( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ||
+		file_exists( gutenberg_dir_path() . '.git' )
+	);
+}
+
 if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 	/**
 	 * Registers the main TinyMCE scripts.
@@ -75,11 +83,11 @@ if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 		if ( ! isset( $concatenate_scripts ) ) {
 			script_concat_settings();
 		}
-		$suffix     = SCRIPT_DEBUG ? '' : '.min';
+		$suffix     = gutenberg_script_debug() ? '' : '.min';
 		$compressed = $compress_scripts && $concatenate_scripts && isset( $_SERVER['HTTP_ACCEPT_ENCODING'] )
 			&& false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip' );
 		// Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in production) or
-		// tinymce.min.js (when SCRIPT_DEBUG is true).
+		// tinymce.min.js (when gutenberg_script_debug() is true).
 		$mce_suffix = false !== strpos( get_bloginfo( 'version' ), '-src' ) ? '' : '.min';
 		if ( $compressed ) {
 			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array(), $tinymce_version );
@@ -383,7 +391,7 @@ function gutenberg_register_scripts_and_styles() {
 	$script = 'window.wpEditorL10n = {
 		tinymce: {
 			baseURL: ' . wp_json_encode( includes_url( 'js/tinymce' ) ) . ',
-			suffix: ' . ( SCRIPT_DEBUG ? '""' : '".min"' ) . ',
+			suffix: ' . ( gutenberg_script_debug() ? '""' : '".min"' ) . ',
 			settings: ' . $init_obj . ',
 		}
 	}';
@@ -601,10 +609,10 @@ function gutenberg_preload_api_request( $memo, $path ) {
  * @since 0.1.0
  */
 function gutenberg_register_vendor_scripts() {
-	$suffix = SCRIPT_DEBUG ? '' : '.min';
+	$suffix = gutenberg_script_debug() ? '' : '.min';
 
 	// Vendor Scripts.
-	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+	$react_suffix = ( gutenberg_script_debug() ? '.development' : '.production' ) . $suffix;
 
 	gutenberg_register_vendor_script(
 		'react',
@@ -616,7 +624,7 @@ function gutenberg_register_vendor_scripts() {
 		'https://unpkg.com/react-dom@16.6.3/umd/react-dom' . $react_suffix . '.js',
 		array( 'react' )
 	);
-	$moment_script = SCRIPT_DEBUG ? 'moment.js' : 'min/moment.min.js';
+	$moment_script = gutenberg_script_debug() ? 'moment.js' : 'min/moment.min.js';
 	gutenberg_register_vendor_script(
 		'moment',
 		'https://unpkg.com/moment@2.22.1/' . $moment_script,
