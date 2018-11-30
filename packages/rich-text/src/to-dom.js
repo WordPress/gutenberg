@@ -58,9 +58,28 @@ function getNodeByPath( node, path ) {
 	};
 }
 
+/**
+ * Returns a new instance of a DOM tree upon which RichText operations can be
+ * applied.
+ *
+ * Note: The current implementation will return a shared reference, reset on
+ * each call to `createEmpty`. Therefore, you should not hold a reference to
+ * the value to operate upon asynchronously, as it may have unexpected results.
+ *
+ * @return {WPRichTextTree} RichText tree.
+ */
 function createEmpty() {
-	const { body } = document.implementation.createHTMLDocument( '' );
-	return body;
+	// Because `createHTMLDocument` is an expensive operation, and with this
+	// function being internal to `rich-text` (full control in avoiding a risk
+	// of asynchronous operations on the shared reference), a single document
+	// is reused and reset for each call to the function.
+	if ( createEmpty.body ) {
+		createEmpty.body.innerHTML = '';
+	} else {
+		createEmpty.body = document.implementation.createHTMLDocument( '' ).body;
+	}
+
+	return createEmpty.body;
 }
 
 function append( element, child ) {
