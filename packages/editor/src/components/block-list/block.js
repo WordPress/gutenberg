@@ -1,120 +1,116 @@
 /**
  * External dependencies
  */
-import classnames from "classnames";
-import { get, reduce, size, first, last } from "lodash";
+import classnames from 'classnames';
+import { get, reduce, size, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from "@wordpress/element";
+import { Component, Fragment } from '@wordpress/element';
 import {
 	focus,
 	isTextField,
 	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge
-} from "@wordpress/dom";
-import { BACKSPACE, DELETE, ENTER } from "@wordpress/keycodes";
+	placeCaretAtVerticalEdge,
+} from '@wordpress/dom';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import {
 	getBlockType,
 	getSaveElement,
 	isReusableBlock,
 	isUnmodifiedDefaultBlock,
-	getUnregisteredTypeHandlerName
-} from "@wordpress/blocks";
-import { KeyboardShortcuts, withFilters } from "@wordpress/components";
-import { __, sprintf } from "@wordpress/i18n";
-import { withDispatch, withSelect } from "@wordpress/data";
-import { withViewportMatch } from "@wordpress/viewport";
-import { compose } from "@wordpress/compose";
+	getUnregisteredTypeHandlerName,
+} from '@wordpress/blocks';
+import { KeyboardShortcuts, withFilters } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { withViewportMatch } from '@wordpress/viewport';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import BlockEdit from "../block-edit";
-import BlockMover from "../block-mover";
-import BlockDropZone from "../block-drop-zone";
-import BlockInvalidWarning from "./block-invalid-warning";
-import BlockCrashWarning from "./block-crash-warning";
-import BlockCrashBoundary from "./block-crash-boundary";
-import BlockHtml from "./block-html";
-import BlockBreadcrumb from "./breadcrumb";
-import BlockContextualToolbar from "./block-contextual-toolbar";
-import BlockMultiControls from "./multi-controls";
-import BlockMobileToolbar from "./block-mobile-toolbar";
-import BlockInsertionPoint from "./insertion-point";
-import IgnoreNestedEvents from "../ignore-nested-events";
-import InserterWithShortcuts from "../inserter-with-shortcuts";
-import Inserter from "../inserter";
-import HoverArea from "./hover-area";
-import { isInsideRootBlock } from "../../utils/dom";
+import BlockEdit from '../block-edit';
+import BlockMover from '../block-mover';
+import BlockDropZone from '../block-drop-zone';
+import BlockInvalidWarning from './block-invalid-warning';
+import BlockCrashWarning from './block-crash-warning';
+import BlockCrashBoundary from './block-crash-boundary';
+import BlockHtml from './block-html';
+import BlockBreadcrumb from './breadcrumb';
+import BlockContextualToolbar from './block-contextual-toolbar';
+import BlockMultiControls from './multi-controls';
+import BlockMobileToolbar from './block-mobile-toolbar';
+import BlockInsertionPoint from './insertion-point';
+import IgnoreNestedEvents from '../ignore-nested-events';
+import InserterWithShortcuts from '../inserter-with-shortcuts';
+import Inserter from '../inserter';
+import HoverArea from './hover-area';
+import { isInsideRootBlock } from '../../utils/dom';
 
 export class BlockListBlock extends Component {
 	constructor() {
-		super(...arguments);
+		super( ...arguments );
 
-		this.setBlockListRef = this.setBlockListRef.bind(this);
-		this.bindBlockNode = this.bindBlockNode.bind(this);
-		this.setAttributes = this.setAttributes.bind(this);
-		this.maybeHover = this.maybeHover.bind(this);
-		this.forceFocusedContextualToolbar = this.forceFocusedContextualToolbar.bind(
-			this
-		);
-		this.hideHoverEffects = this.hideHoverEffects.bind(this);
-		this.mergeBlocks = this.mergeBlocks.bind(this);
-		this.insertBlocksAfter = this.insertBlocksAfter.bind(this);
-		this.onFocus = this.onFocus.bind(this);
-		this.preventDrag = this.preventDrag.bind(this);
-		this.onPointerDown = this.onPointerDown.bind(this);
-		this.deleteOrInsertAfterWrapper = this.deleteOrInsertAfterWrapper.bind(
-			this
-		);
-		this.onBlockError = this.onBlockError.bind(this);
-		this.onTouchStart = this.onTouchStart.bind(this);
-		this.onClick = this.onClick.bind(this);
-		this.onDragStart = this.onDragStart.bind(this);
-		this.onDragEnd = this.onDragEnd.bind(this);
-		this.selectOnOpen = this.selectOnOpen.bind(this);
+		this.setBlockListRef = this.setBlockListRef.bind( this );
+		this.bindBlockNode = this.bindBlockNode.bind( this );
+		this.setAttributes = this.setAttributes.bind( this );
+		this.maybeHover = this.maybeHover.bind( this );
+		this.forceFocusedContextualToolbar = this.forceFocusedContextualToolbar.bind( this );
+		this.hideHoverEffects = this.hideHoverEffects.bind( this );
+		this.mergeBlocks = this.mergeBlocks.bind( this );
+		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
+		this.onFocus = this.onFocus.bind( this );
+		this.preventDrag = this.preventDrag.bind( this );
+		this.onPointerDown = this.onPointerDown.bind( this );
+		this.deleteOrInsertAfterWrapper = this.deleteOrInsertAfterWrapper.bind( this );
+		this.onBlockError = this.onBlockError.bind( this );
+		this.onTouchStart = this.onTouchStart.bind( this );
+		this.onClick = this.onClick.bind( this );
+		this.onDragStart = this.onDragStart.bind( this );
+		this.onDragEnd = this.onDragEnd.bind( this );
+		this.selectOnOpen = this.selectOnOpen.bind( this );
 		this.hadTouchStart = false;
 
 		this.state = {
 			error: null,
 			dragging: false,
-			isHovered: false
+			isHovered: false,
 		};
 		this.isForcingContextualToolbar = false;
 	}
 
 	componentDidMount() {
-		if (this.props.isSelected) {
+		if ( this.props.isSelected ) {
 			this.focusTabbable();
 		}
 	}
 
-	componentDidUpdate(prevProps) {
-		if (this.isForcingContextualToolbar) {
+	componentDidUpdate( prevProps ) {
+		if ( this.isForcingContextualToolbar ) {
 			// The forcing of contextual toolbar should only be true during one update,
 			// after the first update normal conditions should apply.
 			this.isForcingContextualToolbar = false;
 		}
-		if (this.props.isTypingWithinBlock || this.props.isSelected) {
+		if ( this.props.isTypingWithinBlock || this.props.isSelected ) {
 			this.hideHoverEffects();
 		}
 
-		if (this.props.isSelected && !prevProps.isSelected) {
-			this.focusTabbable(true);
+		if ( this.props.isSelected && ! prevProps.isSelected ) {
+			this.focusTabbable( true );
 		}
 
 		// When triggering a multi-selection,
 		// move the focus to the wrapper of the first selected block.
-		if (this.props.isFirstMultiSelected && !prevProps.isFirstMultiSelected) {
+		if ( this.props.isFirstMultiSelected && ! prevProps.isFirstMultiSelected ) {
 			this.wrapperNode.focus();
 		}
 	}
 
-	setBlockListRef(node) {
+	setBlockListRef( node ) {
 		this.wrapperNode = node;
-		this.props.blockRef(node, this.props.clientId);
+		this.props.blockRef( node, this.props.clientId );
 
 		// We need to rerender to trigger a rerendering of HoverArea
 		// it depents on this.wrapperNode but we can't keep this.wrapperNode in state
@@ -122,7 +118,7 @@ export class BlockListBlock extends Component {
 		this.forceUpdate();
 	}
 
-	bindBlockNode(node) {
+	bindBlockNode( node ) {
 		this.node = node;
 	}
 
@@ -131,30 +127,30 @@ export class BlockListBlock extends Component {
 	 *
 	 * @param {boolean} ignoreInnerBlocks Should not focus inner blocks.
 	 */
-	focusTabbable(ignoreInnerBlocks) {
+	focusTabbable( ignoreInnerBlocks ) {
 		const { initialPosition } = this.props;
 
 		// Focus is captured by the wrapper node, so while focus transition
 		// should only consider tabbables within editable display, since it
 		// may be the wrapper itself or a side control which triggered the
 		// focus event, don't unnecessary transition to an inner tabbable.
-		if (this.wrapperNode.contains(document.activeElement)) {
+		if ( this.wrapperNode.contains( document.activeElement ) ) {
 			return;
 		}
 
 		// Find all tabbables within node.
 		const textInputs = focus.tabbable
-			.find(this.node)
-			.filter(isTextField)
+			.find( this.node )
+			.filter( isTextField )
 			// Exclude inner blocks
-			.filter(node => !ignoreInnerBlocks || isInsideRootBlock(this.node, node));
+			.filter( ( node ) => ! ignoreInnerBlocks || isInsideRootBlock( this.node, node ) );
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.
 		const isReverse = -1 === initialPosition;
-		const target = (isReverse ? last : first)(textInputs);
+		const target = ( isReverse ? last : first )( textInputs );
 
-		if (!target) {
+		if ( ! target ) {
 			this.wrapperNode.focus();
 			return;
 		}
@@ -162,22 +158,22 @@ export class BlockListBlock extends Component {
 		target.focus();
 
 		// In reverse case, need to explicitly place caret position.
-		if (isReverse) {
-			placeCaretAtHorizontalEdge(target, true);
-			placeCaretAtVerticalEdge(target, true);
+		if ( isReverse ) {
+			placeCaretAtHorizontalEdge( target, true );
+			placeCaretAtVerticalEdge( target, true );
 		}
 	}
 
-	setAttributes(attributes) {
+	setAttributes( attributes ) {
 		const { clientId, name, onChange } = this.props;
-		const type = getBlockType(name);
-		onChange(clientId, attributes);
+		const type = getBlockType( name );
+		onChange( clientId, attributes );
 
 		const metaAttributes = reduce(
 			attributes,
-			(result, value, key) => {
-				if (get(type, ["attributes", key, "source"]) === "meta") {
-					result[type.attributes[key].meta] = value;
+			( result, value, key ) => {
+				if ( get( type, [ 'attributes', key, 'source' ] ) === 'meta' ) {
+					result[ type.attributes[ key ].meta ] = value;
 				}
 
 				return result;
@@ -185,8 +181,8 @@ export class BlockListBlock extends Component {
 			{}
 		);
 
-		if (size(metaAttributes)) {
-			this.props.onMetaChange(metaAttributes);
+		if ( size( metaAttributes ) ) {
+			this.props.onMetaChange( metaAttributes );
 		}
 	}
 
@@ -225,7 +221,7 @@ export class BlockListBlock extends Component {
 			return;
 		}
 
-		this.setState({ isHovered: true });
+		this.setState( { isHovered: true } );
 	}
 
 	/**
@@ -234,37 +230,37 @@ export class BlockListBlock extends Component {
 	 * so to avoid unnecesary renders, the state is only set if hovered.
 	 */
 	hideHoverEffects() {
-		if (this.state.isHovered) {
-			this.setState({ isHovered: false });
+		if ( this.state.isHovered ) {
+			this.setState( { isHovered: false } );
 		}
 	}
 
-	mergeBlocks(forward = false) {
+	mergeBlocks( forward = false ) {
 		const {
 			clientId,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
-			onMerge
+			onMerge,
 		} = this.props;
-		const previousBlockClientId = getPreviousBlockClientId(clientId);
-		const nextBlockClientId = getNextBlockClientId(clientId);
+		const previousBlockClientId = getPreviousBlockClientId( clientId );
+		const nextBlockClientId = getNextBlockClientId( clientId );
 		// Do nothing when it's the first block.
 		if (
-			(!forward && !previousBlockClientId) ||
-			(forward && !nextBlockClientId)
+			( ! forward && ! previousBlockClientId ) ||
+			( forward && ! nextBlockClientId )
 		) {
 			return;
 		}
 
-		if (forward) {
-			onMerge(clientId, nextBlockClientId);
+		if ( forward ) {
+			onMerge( clientId, nextBlockClientId );
 		} else {
-			onMerge(previousBlockClientId, clientId);
+			onMerge( previousBlockClientId, clientId );
 		}
 	}
 
-	insertBlocksAfter(blocks) {
-		this.props.onInsertBlocks(blocks, this.props.order + 1);
+	insertBlocksAfter( blocks ) {
+		this.props.onInsertBlocks( blocks, this.props.order + 1 );
 	}
 
 	/**
@@ -275,7 +271,7 @@ export class BlockListBlock extends Component {
 	 * @return {void}
 	 */
 	onFocus() {
-		if (!this.props.isSelected && !this.props.isPartOfMultiSelection) {
+		if ( ! this.props.isSelected && ! this.props.isPartOfMultiSelection ) {
 			this.props.onSelect();
 		}
 	}
@@ -288,7 +284,7 @@ export class BlockListBlock extends Component {
 	 *
 	 * @return {void}
 	 */
-	preventDrag(event) {
+	preventDrag( event ) {
 		event.preventDefault();
 	}
 
@@ -299,27 +295,27 @@ export class BlockListBlock extends Component {
 	 *
 	 * @return {void}
 	 */
-	onPointerDown(event) {
+	onPointerDown( event ) {
 		// Not the main button.
 		// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-		if (event.button !== 0) {
+		if ( event.button !== 0 ) {
 			return;
 		}
 
-		if (event.shiftKey) {
-			if (!this.props.isSelected) {
+		if ( event.shiftKey ) {
+			if ( ! this.props.isSelected ) {
 				this.props.onShiftSelection();
 				event.preventDefault();
 			}
 		} else {
-			this.props.onSelectionStart(this.props.clientId);
+			this.props.onSelectionStart( this.props.clientId );
 
 			// Allow user to escape out of a multi-selection to a singular
 			// selection of a block via click. This is handled here since
 			// onFocus excludes blocks involved in a multiselection, as
 			// focus can be incurred by starting a multiselection (focus
 			// moved to first block's multi-controls).
-			if (this.props.isPartOfMultiSelection) {
+			if ( this.props.isPartOfMultiSelection ) {
 				this.props.onSelect();
 			}
 		}
@@ -333,18 +329,18 @@ export class BlockListBlock extends Component {
 	 *
 	 * @param {KeyboardEvent} event Keydown event.
 	 */
-	deleteOrInsertAfterWrapper(event) {
+	deleteOrInsertAfterWrapper( event ) {
 		const { keyCode, target } = event;
 
 		if (
-			!this.props.isSelected ||
+			! this.props.isSelected ||
 			target !== this.wrapperNode ||
 			this.props.isLocked
 		) {
 			return;
 		}
 
-		switch (keyCode) {
+		switch ( keyCode ) {
 			case ENTER:
 				// Insert default block after current block if enter and event
 				// not already handled by descendant.
@@ -356,26 +352,26 @@ export class BlockListBlock extends Component {
 			case DELETE:
 				// Remove block on backspace.
 				const { clientId, onRemove } = this.props;
-				onRemove(clientId);
+				onRemove( clientId );
 				event.preventDefault();
 				break;
 		}
 	}
 
-	onBlockError(error) {
-		this.setState({ error });
+	onBlockError( error ) {
+		this.setState( { error } );
 	}
 
 	onDragStart() {
-		this.setState({ dragging: true });
+		this.setState( { dragging: true } );
 	}
 
 	onDragEnd() {
-		this.setState({ dragging: false });
+		this.setState( { dragging: false } );
 	}
 
-	selectOnOpen(open) {
-		if (open && !this.props.isSelected) {
+	selectOnOpen( open ) {
+		if ( open && ! this.props.isSelected ) {
 			this.props.onSelect();
 		}
 	}
@@ -383,13 +379,13 @@ export class BlockListBlock extends Component {
 	forceFocusedContextualToolbar() {
 		this.isForcingContextualToolbar = true;
 		// trigger a re-render
-		this.setState(() => ({}));
+		this.setState( () => ( {} ) );
 	}
 
 	render() {
 		return (
-			<HoverArea container={this.wrapperNode}>
-				{({ hoverArea }) => {
+			<HoverArea container={ this.wrapperNode }>
+				{ ( { hoverArea } ) => {
 					const {
 						order,
 						mode,
@@ -413,12 +409,12 @@ export class BlockListBlock extends Component {
 						className,
 						name,
 						isValid,
-						attributes
+						attributes,
 					} = this.props;
-					const isHovered = this.state.isHovered && !isMultiSelecting;
-					const blockType = getBlockType(name);
+					const isHovered = this.state.isHovered && ! isMultiSelecting;
+					const blockType = getBlockType( name );
 					// translators: %s: Type of block (i.e. Text, Image etc)
-					const blockLabel = sprintf(__("Block: %s"), blockType.title);
+					const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
 					// The block as rendered in the editor is composed of general block UI
 					// (mover, toolbar, wrapper) and the display of the block content.
 
@@ -427,59 +423,59 @@ export class BlockListBlock extends Component {
 					// If the block is selected and we're typing the block should not appear.
 					// Empty paragraph blocks should always show up as unselected.
 					const showEmptyBlockSideInserter =
-						(isSelected || isHovered) && isEmptyDefaultBlock && isValid;
+						( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
 					const showSideInserter =
-						(isSelected || isHovered) && isEmptyDefaultBlock;
+						( isSelected || isHovered ) && isEmptyDefaultBlock;
 					const shouldAppearSelected =
-						!isFocusMode &&
-						!showSideInserter &&
+						! isFocusMode &&
+						! showSideInserter &&
 						isSelected &&
-						!isTypingWithinBlock;
+						! isTypingWithinBlock;
 					const shouldAppearHovered =
-						!isFocusMode &&
-						!hasFixedToolbar &&
+						! isFocusMode &&
+						! hasFixedToolbar &&
 						isHovered &&
-						!isEmptyDefaultBlock;
+						! isEmptyDefaultBlock;
 					// We render block movers and block settings to keep them tabbale even if hidden
 					const shouldRenderMovers =
-						!isFocusMode &&
-						(isSelected || hoverArea === "left") &&
-						!showEmptyBlockSideInserter &&
-						!isMultiSelecting &&
-						!isPartOfMultiSelection &&
-						!isTypingWithinBlock;
+						! isFocusMode &&
+						( isSelected || hoverArea === 'left' ) &&
+						! showEmptyBlockSideInserter &&
+						! isMultiSelecting &&
+						! isPartOfMultiSelection &&
+						! isTypingWithinBlock;
 					const shouldShowBreadcrumb =
-						!isFocusMode && isHovered && !isEmptyDefaultBlock;
+						! isFocusMode && isHovered && ! isEmptyDefaultBlock;
 					const shouldShowContextualToolbar =
-						!hasFixedToolbar &&
-						!showSideInserter &&
-						((isSelected &&
-							(!isTypingWithinBlock || isCaretWithinFormattedText)) ||
-							isFirstMultiSelected);
+						! hasFixedToolbar &&
+						! showSideInserter &&
+						( ( isSelected &&
+							( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
+							isFirstMultiSelected );
 					const shouldShowMobileToolbar = shouldAppearSelected;
 					const { error, dragging } = this.state;
 
 					// Insertion point can only be made visible if the block is at the
 					// the extent of a multi-selection, or not in a multi-selection.
 					const shouldShowInsertionPoint =
-						(isPartOfMultiSelection && isFirstMultiSelected) ||
-						!isPartOfMultiSelection;
+						( isPartOfMultiSelection && isFirstMultiSelected ) ||
+						! isPartOfMultiSelection;
 
 					// The wp-block className is important for editor styles.
 					// Generate the wrapper class names handling the different states of the block.
 					const wrapperClassName = classnames(
-						"wp-block editor-block-list__block",
+						'wp-block editor-block-list__block',
 						{
-							"has-warning": !isValid || !!error || isUnregisteredBlock,
-							"is-selected": shouldAppearSelected,
-							"is-multi-selected": isPartOfMultiSelection,
-							"is-hovered": shouldAppearHovered,
-							"is-reusable": isReusableBlock(blockType),
-							"is-dragging": dragging,
-							"is-typing": isTypingWithinBlock,
-							"is-focused":
-								isFocusMode && (isSelected || isParentOfSelectedBlock),
-							"is-focus-mode": isFocusMode
+							'has-warning': ! isValid || !! error || isUnregisteredBlock,
+							'is-selected': shouldAppearSelected,
+							'is-multi-selected': isPartOfMultiSelection,
+							'is-hovered': shouldAppearHovered,
+							'is-reusable': isReusableBlock( blockType ),
+							'is-dragging': dragging,
+							'is-typing': isTypingWithinBlock,
+							'is-focused':
+								isFocusMode && ( isSelected || isParentOfSelectedBlock ),
+							'is-focus-mode': isFocusMode,
 						},
 						className
 					);
@@ -488,13 +484,13 @@ export class BlockListBlock extends Component {
 
 					// Determine whether the block has props to apply to the wrapper.
 					let wrapperProps = this.props.wrapperProps;
-					if (blockType.getEditWrapperProps) {
+					if ( blockType.getEditWrapperProps ) {
 						wrapperProps = {
 							...wrapperProps,
-							...blockType.getEditWrapperProps(attributes)
+							...blockType.getEditWrapperProps( attributes ),
 						};
 					}
-					const blockElementId = `block-${clientId}`;
+					const blockElementId = `block-${ clientId }`;
 
 					// We wrap the BlockEdit component in a div that hides it when editing in
 					// HTML mode. This allows us to render all of the ancillary pieces
@@ -502,20 +498,20 @@ export class BlockListBlock extends Component {
 					// `BlockHTML`, even in HTML mode.
 					let blockEdit = (
 						<BlockEdit
-							name={name}
-							isSelected={isSelected}
-							attributes={attributes}
-							setAttributes={this.setAttributes}
-							insertBlocksAfter={isLocked ? undefined : this.insertBlocksAfter}
-							onReplace={isLocked ? undefined : onReplace}
-							mergeBlocks={isLocked ? undefined : this.mergeBlocks}
-							clientId={clientId}
-							isSelectionEnabled={this.props.isSelectionEnabled}
-							toggleSelection={this.props.toggleSelection}
+							name={ name }
+							isSelected={ isSelected }
+							attributes={ attributes }
+							setAttributes={ this.setAttributes }
+							insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
+							onReplace={ isLocked ? undefined : onReplace }
+							mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+							clientId={ clientId }
+							isSelectionEnabled={ this.props.isSelectionEnabled }
+							toggleSelection={ this.props.toggleSelection }
 						/>
 					);
-					if (mode !== "visual") {
-						blockEdit = <div style={{ display: "none" }}>{blockEdit}</div>;
+					if ( mode !== 'visual' ) {
+						blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
 					}
 
 					// Disable reasons:
@@ -530,135 +526,135 @@ export class BlockListBlock extends Component {
 
 					return (
 						<IgnoreNestedEvents
-							id={blockElementId}
-							ref={this.setBlockListRef}
-							onMouseOver={this.maybeHover}
-							onMouseOverHandled={this.hideHoverEffects}
-							onMouseLeave={this.hideHoverEffects}
-							className={wrapperClassName}
-							data-type={name}
-							onTouchStart={this.onTouchStart}
-							onFocus={this.onFocus}
-							onClick={this.onClick}
-							onKeyDown={this.deleteOrInsertAfterWrapper}
+							id={ blockElementId }
+							ref={ this.setBlockListRef }
+							onMouseOver={ this.maybeHover }
+							onMouseOverHandled={ this.hideHoverEffects }
+							onMouseLeave={ this.hideHoverEffects }
+							className={ wrapperClassName }
+							data-type={ name }
+							onTouchStart={ this.onTouchStart }
+							onFocus={ this.onFocus }
+							onClick={ this.onClick }
+							onKeyDown={ this.deleteOrInsertAfterWrapper }
 							tabIndex="0"
-							aria-label={blockLabel}
-							childHandledEvents={["onDragStart", "onMouseDown"]}
-							{...wrapperProps}
+							aria-label={ blockLabel }
+							childHandledEvents={ [ 'onDragStart', 'onMouseDown' ] }
+							{ ...wrapperProps }
 						>
-							{shouldShowInsertionPoint && (
+							{ shouldShowInsertionPoint && (
 								<BlockInsertionPoint
-									clientId={clientId}
-									rootClientId={rootClientId}
+									clientId={ clientId }
+									rootClientId={ rootClientId }
 								/>
-							)}
+							) }
 							<BlockDropZone
-								index={order}
-								clientId={clientId}
-								rootClientId={rootClientId}
+								index={ order }
+								clientId={ clientId }
+								rootClientId={ rootClientId }
 							/>
-							{shouldRenderMovers && (
+							{ shouldRenderMovers && (
 								<BlockMover
-									clientIds={clientId}
-									blockElementId={blockElementId}
-									isFirst={isFirst}
-									isLast={isLast}
-									isHidden={!(isHovered || isSelected) || hoverArea !== "left"}
+									clientIds={ clientId }
+									blockElementId={ blockElementId }
+									isFirst={ isFirst }
+									isLast={ isLast }
+									isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
 									isDraggable={
 										isDraggable !== false &&
-										(!isPartOfMultiSelection && isMovable)
+										( ! isPartOfMultiSelection && isMovable )
 									}
-									onDragStart={this.onDragStart}
-									onDragEnd={this.onDragEnd}
+									onDragStart={ this.onDragStart }
+									onDragEnd={ this.onDragEnd }
 								/>
-							)}
-							{isFirstMultiSelected && (
-								<BlockMultiControls rootClientId={rootClientId} />
-							)}
+							) }
+							{ isFirstMultiSelected && (
+								<BlockMultiControls rootClientId={ rootClientId } />
+							) }
 							<div className="editor-block-list__block-edit">
-								{shouldShowBreadcrumb && (
+								{ shouldShowBreadcrumb && (
 									<BlockBreadcrumb
-										clientId={clientId}
+										clientId={ clientId }
 										isHidden={
-											!(isHovered || isSelected) || hoverArea !== "left"
+											! ( isHovered || isSelected ) || hoverArea !== 'left'
 										}
 									/>
-								)}
-								{(shouldShowContextualToolbar ||
-									this.isForcingContextualToolbar) && (
+								) }
+								{ ( shouldShowContextualToolbar ||
+									this.isForcingContextualToolbar ) && (
 									<BlockContextualToolbar
 										// If the toolbar is being shown because of being forced
 										// it should focus the toolbar right after the mount.
-										focusOnMount={this.isForcingContextualToolbar}
+										focusOnMount={ this.isForcingContextualToolbar }
 									/>
-								)}
-								{!shouldShowContextualToolbar &&
+								) }
+								{ ! shouldShowContextualToolbar &&
 									isSelected &&
-									!hasFixedToolbar &&
-									!isEmptyDefaultBlock && (
-										<KeyboardShortcuts
-											bindGlobal
-											eventName="keydown"
-											shortcuts={{
-												"alt+f10": this.forceFocusedContextualToolbar
-											}}
-										/>
-									)}
+									! hasFixedToolbar &&
+									! isEmptyDefaultBlock && (
+									<KeyboardShortcuts
+										bindGlobal
+										eventName="keydown"
+										shortcuts={ {
+											'alt+f10': this.forceFocusedContextualToolbar,
+										} }
+									/>
+								) }
 								<IgnoreNestedEvents
-									ref={this.bindBlockNode}
-									onDragStart={this.preventDrag}
-									onMouseDown={this.onPointerDown}
-									data-block={clientId}
+									ref={ this.bindBlockNode }
+									onDragStart={ this.preventDrag }
+									onMouseDown={ this.onPointerDown }
+									data-block={ clientId }
 								>
-									<BlockCrashBoundary onError={this.onBlockError}>
-										{isValid && blockEdit}
-										{isValid && mode === "html" && (
-											<BlockHtml clientId={clientId} />
-										)}
-										{!isValid && [
+									<BlockCrashBoundary onError={ this.onBlockError }>
+										{ isValid && blockEdit }
+										{ isValid && mode === 'html' && (
+											<BlockHtml clientId={ clientId } />
+										) }
+										{ ! isValid && [
 											<BlockInvalidWarning
 												key="invalid-warning"
-												clientId={clientId}
+												clientId={ clientId }
 											/>,
 											<div key="invalid-preview">
-												{getSaveElement(blockType, attributes)}
-											</div>
-										]}
+												{ getSaveElement( blockType, attributes ) }
+											</div>,
+										] }
 									</BlockCrashBoundary>
-									{shouldShowMobileToolbar && (
-										<BlockMobileToolbar clientId={clientId} />
-									)}
-									{!!error && <BlockCrashWarning />}
+									{ shouldShowMobileToolbar && (
+										<BlockMobileToolbar clientId={ clientId } />
+									) }
+									{ !! error && <BlockCrashWarning /> }
 								</IgnoreNestedEvents>
 							</div>
-							{showEmptyBlockSideInserter && (
+							{ showEmptyBlockSideInserter && (
 								<Fragment>
 									<div className="editor-block-list__side-inserter">
 										<InserterWithShortcuts
-											clientId={clientId}
-											rootClientId={rootClientId}
-											onToggle={this.selectOnOpen}
+											clientId={ clientId }
+											rootClientId={ rootClientId }
+											onToggle={ this.selectOnOpen }
 										/>
 									</div>
 									<div className="editor-block-list__empty-block-inserter">
 										<Inserter
 											position="top right"
-											onToggle={this.selectOnOpen}
+											onToggle={ this.selectOnOpen }
 										/>
 									</div>
 								</Fragment>
-							)}
+							) }
 						</IgnoreNestedEvents>
 					);
 					/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-				}}
+				} }
 			</HoverArea>
 		);
 	}
 }
 
 const applyWithSelect = withSelect(
-	(select, { clientId, rootClientId, isLargeViewport }) => {
+	( select, { clientId, rootClientId, isLargeViewport } ) => {
 		const {
 			isBlockSelected,
 			getBlockName,
@@ -678,34 +674,34 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			getPreviousBlockClientId,
-			getNextBlockClientId
-		} = select("core/editor");
-		const isSelected = isBlockSelected(clientId);
+			getNextBlockClientId,
+		} = select( 'core/editor' );
+		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode } = getEditorSettings();
-		const templateLock = getTemplateLock(rootClientId);
-		const isParentOfSelectedBlock = hasSelectedInnerBlock(clientId, true);
-		const name = getBlockName(clientId);
-		const attributes = getBlockAttributes(clientId);
+		const templateLock = getTemplateLock( rootClientId );
+		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+		const name = getBlockName( clientId );
+		const attributes = getBlockAttributes( clientId );
 
 		return {
 			isPartOfMultiSelection:
-				isBlockMultiSelected(clientId) || isAncestorMultiSelected(clientId),
-			isFirstMultiSelected: isFirstMultiSelectedBlock(clientId),
+				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
+			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
 			isMultiSelecting: isMultiSelecting(),
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 			isTypingWithinBlock:
-				(isSelected || isParentOfSelectedBlock) && isTyping(),
+				( isSelected || isParentOfSelectedBlock ) && isTyping(),
 			isCaretWithinFormattedText: isCaretWithinFormattedText(),
-			order: getBlockIndex(clientId, rootClientId),
-			mode: getBlockMode(clientId),
+			order: getBlockIndex( clientId, rootClientId ),
+			mode: getBlockMode( clientId ),
 			isSelectionEnabled: isSelectionEnabled(),
 			initialPosition: getSelectedBlocksInitialCaretPosition(),
 			isEmptyDefaultBlock:
-				name && isUnmodifiedDefaultBlock({ name, attributes }),
-			isValid: isBlockValid(clientId),
-			isMovable: "all" !== templateLock,
-			isLocked: !!templateLock,
+				name && isUnmodifiedDefaultBlock( { name, attributes } ),
+			isValid: isBlockValid( clientId ),
+			isMovable: 'all' !== templateLock,
+			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
 			name,
@@ -716,13 +712,13 @@ const applyWithSelect = withSelect(
 			// We only care about these selectors when events are triggered.
 			// We call them dynamically in the event handlers to avoid unnecessary re-renders.
 			getPreviousBlockClientId,
-			getNextBlockClientId
+			getNextBlockClientId,
 		};
 	}
 );
 
-const applyWithDispatch = withDispatch((dispatch, ownProps, { select }) => {
-	const { getBlockSelectionStart } = select("core/editor");
+const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
+	const { getBlockSelectionStart } = select( 'core/editor' );
 	const {
 		updateBlockAttributes,
 		selectBlock,
@@ -733,57 +729,57 @@ const applyWithDispatch = withDispatch((dispatch, ownProps, { select }) => {
 		mergeBlocks,
 		replaceBlocks,
 		editPost,
-		toggleSelection
-	} = dispatch("core/editor");
+		toggleSelection,
+	} = dispatch( 'core/editor' );
 
 	return {
-		onChange(clientId, attributes) {
-			updateBlockAttributes(clientId, attributes);
+		onChange( clientId, attributes ) {
+			updateBlockAttributes( clientId, attributes );
 		},
-		onSelect(clientId = ownProps.clientId, initialPosition) {
-			selectBlock(clientId, initialPosition);
+		onSelect( clientId = ownProps.clientId, initialPosition ) {
+			selectBlock( clientId, initialPosition );
 		},
-		onInsertBlocks(blocks, index) {
+		onInsertBlocks( blocks, index ) {
 			const { rootClientId } = ownProps;
-			insertBlocks(blocks, index, rootClientId);
+			insertBlocks( blocks, index, rootClientId );
 		},
 		onInsertDefaultBlockAfter() {
 			const { order, rootClientId } = ownProps;
-			insertDefaultBlock({}, rootClientId, order + 1);
+			insertDefaultBlock( {}, rootClientId, order + 1 );
 		},
-		onRemove(clientId) {
-			removeBlock(clientId);
+		onRemove( clientId ) {
+			removeBlock( clientId );
 		},
-		onMerge(...args) {
-			mergeBlocks(...args);
+		onMerge( ...args ) {
+			mergeBlocks( ...args );
 		},
-		onReplace(blocks) {
-			replaceBlocks([ownProps.clientId], blocks);
+		onReplace( blocks ) {
+			replaceBlocks( [ ownProps.clientId ], blocks );
 		},
-		onMetaChange(meta) {
-			editPost({ meta });
+		onMetaChange( meta ) {
+			editPost( { meta } );
 		},
 		onShiftSelection() {
-			if (!ownProps.isSelectionEnabled) {
+			if ( ! ownProps.isSelectionEnabled ) {
 				return;
 			}
 
-			if (getBlockSelectionStart()) {
-				multiSelect(getBlockSelectionStart(), ownProps.clientId);
+			if ( getBlockSelectionStart() ) {
+				multiSelect( getBlockSelectionStart(), ownProps.clientId );
 			} else {
-				selectBlock(ownProps.clientId);
+				selectBlock( ownProps.clientId );
 			}
 		},
-		toggleSelection(selectionEnabled) {
-			toggleSelection(selectionEnabled);
-		}
+		toggleSelection( selectionEnabled ) {
+			toggleSelection( selectionEnabled );
+		},
 	};
-});
+} );
 
 export default compose(
-	withFilters("editor.BlockListBlock"),
-	withViewportMatch({ isLargeViewport: "medium" }),
+	withFilters( 'editor.BlockListBlock' ),
+	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
-	withFilters("editor.__experimentalBlockListBlock")
-)(BlockListBlock);
+	withFilters( 'editor.__experimentalBlockListBlock' )
+)( BlockListBlock );
