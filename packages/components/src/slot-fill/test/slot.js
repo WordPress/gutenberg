@@ -1,8 +1,9 @@
 /**
  * External dependencies
  */
-import { isEmpty } from 'lodash';
+import { isEmpty, noop } from 'lodash';
 import ReactTestRenderer from 'react-test-renderer';
+import { shallow } from 'enzyme';
 
 /**
  * Internal dependencies
@@ -208,5 +209,28 @@ describe( 'Slot', () => {
 		);
 
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
+	} );
+
+	describe( 'Manage Slots', () => {
+		it( 'should return the named slot', () => {
+			const provider = shallow( <Provider></Provider> );
+			const instance = provider.instance();
+			const slot = { name: 'slot', forceUpdate: noop };
+
+			instance.registerSlot( 'test', slot );
+			expect( instance.getSlot( 'test' ) ).toBe( slot );
+		} );
+
+		it( 'should not allow duplicate slots', () => {
+			const provider = shallow( <Provider></Provider> );
+			const instance = provider.instance();
+			const slot1 = { name: 'slot1', forceUpdate: noop };
+			const slot2 = { name: 'slot2', forceUpdate: noop };
+
+			instance.registerSlot( 'test', slot1 );
+			instance.registerSlot( 'test', slot2 );
+
+			expect( instance.getSlot( 'test' ) ).toBe( slot1 );
+		} );
 	} );
 } );
