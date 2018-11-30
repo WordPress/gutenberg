@@ -44,6 +44,6 @@ describe( 'BlockModeToggle', () => {
 		);
 		const text = wrapper.props.children;
 
-		expect( text ).toEqual( 'Edit Visually' );
+		expect( text ).toEqual( 'Edit visually' );
 	} );
 } );
