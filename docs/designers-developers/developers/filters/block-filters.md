@@ -113,10 +113,6 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.isUnmodifiedDefaultBlock.attributes`
-
-Used internally by the default block (paragraph) to exclude the attributes from the check if the block was modified.
-
 #### `blocks.switchToBlockType.transformedBlock`
 
 Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
@@ -198,19 +194,13 @@ _Example:_
 ```js
 var el = wp.element.createElement;
 
-var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
+var withClientIdClassName = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
 	return function( props ) {
 		var newProps = lodash.assign(
 			{},
 			props,
 			{
-				wrapperProps: lodash.assign(
-					{},
-					props.wrapperProps,
-					{
-						'data-align': props.block.attributes.align
-					}
-				)
+				classsName: "block-" + props.clientId,
 			}
 		);
 
@@ -219,27 +209,22 @@ var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBl
 			newProps
 		);
 	};
-}, 'withAlign' );
+}, 'withClientIdClassName' );
 
-wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
 
 ```
 {% ESNext %}
 ```js
 const { createHigherOrderComponent } = wp.compose;
 
-const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
+const withClientIdClassName = createHigherOrderComponent( ( BlockListBlock ) => {
 	return ( props ) => {
-		const { align } = props.block.attributes;
-
-		let wrapperProps = props.wrapperProps;
-		wrapperProps = { ...wrapperProps, 'data-align': align };
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+		return <BlockListBlock { ...props } className={ "block-" + props.clientId } />;
 	};
-}, 'withDataAlign' );
+}, 'withClientIdClassName' );
 
-wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
 ```
 
 {% end %}
