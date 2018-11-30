@@ -38,7 +38,7 @@ export function DotTip( {
 			focusOnMount="container"
 			getAnchorRect={ getAnchorRect }
 			role="dialog"
-			aria-label={ __( 'Gutenberg tips' ) }
+			aria-label={ __( 'Editor tips' ) }
 			onClick={ onClick }
 		>
 			<p>{ children }</p>
