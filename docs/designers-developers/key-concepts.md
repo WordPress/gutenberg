@@ -4,7 +4,7 @@
 
 Blocks are an abstract unit for organizing and composing content, strung together to create content for a webpage.
 
-Blocks are hiearchical, in that a block can be a child or parent to another block. One example is a two-column Columns block can be the parent block to multiple child blocks in each column.
+Blocks are hierarchical, in that a block can be a child or parent to another block. One example is a two-column Columns block can be the parent block to multiple child blocks in each column.
 
 If it helps, you can think of blocks as a more graceful shortcode, with rich formatting tools for users to compose content. To this point, there is a new Block Grammar. Distilled, the block grammar is an HTML comment, either a self-closing tag or with a begining tag and ending tag. In the main tag, depending on the block type and user customizations, there can be a JSON object. This raw form of the block is referred to as serialized.
 
