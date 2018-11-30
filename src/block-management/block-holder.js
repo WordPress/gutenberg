@@ -18,11 +18,12 @@ import styles from './block-holder.scss';
 import { BlockEdit } from '@wordpress/editor';
 
 type PropsType = BlockType & {
+	isSelected: boolean,
 	showTitle: boolean,
 	onChange: ( clientId: string, attributes: mixed ) => void,
 	onReplace: ( blocks: Array<Object> ) => void,
 	onInlineToolbarButtonPressed: ( button: number, clientId: string ) => void,
-	onBlockHolderPressed: ( clientId: string ) => void,
+	onSelect: void => void,
 	insertBlocksAfter: ( blocks: Array<Object> ) => void,
 	mergeBlocks: ( forward: boolean ) => void,
 	canMoveUp: boolean,

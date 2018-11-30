@@ -41,7 +41,7 @@ class AppContainer extends React.Component<PropsType> {
 		const post = props.post || {
 			id: 1,
 			content: {
-				raw: props.initialHtml,
+				raw: '',// props.initialHtml,
 			},
 			type: 'draft',
 		};
