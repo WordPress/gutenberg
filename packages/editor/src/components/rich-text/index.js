@@ -177,13 +177,16 @@ export class RichText extends Component {
 	/**
 	 * Creates a new record from the current editable DOM.
 	 *
-	 * @param {Object} $1       Named arguments.
-	 * @param {Object} $1.cache Wether or not to cache the record based on the
-	 *                          selection.
+	 * @param {Object} $1          Named arguments.
+	 * @param {Object} $1.useCache Wether or not to use a cached record when the
+	 *                             selection did not change. Recommended to use
+	 *                             e.g. in the `selectionchange` event handler
+	 *                             when nothing other than the selection could
+	 *                             have changed.
 	 *
 	 * @return {Object} A new record.
 	 */
-	createRecord( { cache } = {} ) {
+	createRecord( { useCache } = {} ) {
 		const range = getSelection().getRangeAt( 0 );
 
 		// If the range is shallowly equal to the last, return the last
@@ -200,7 +203,7 @@ export class RichText extends Component {
 		// > is not empty.
 		// >
 		// > https://w3c.github.io/selection-api/#dom-selection-getrangeat
-		if ( cache && range === this.createRecord.lastRange ) {
+		if ( useCache && range === this.createRecord.lastRange ) {
 			return this.createRecord.lastRecord;
 		}
 
@@ -428,7 +431,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		const { start, end, formats } = this.createRecord( { cache: true } );
+		const { start, end, formats } = this.createRecord( { useCache: true } );
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
