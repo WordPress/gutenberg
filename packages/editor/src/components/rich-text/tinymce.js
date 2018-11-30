@@ -111,6 +111,7 @@ export default class TinyMCE extends Component {
 		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.initialize = this.initialize.bind( this );
 	}
 
 	onFocus() {
@@ -167,7 +168,16 @@ export default class TinyMCE extends Component {
 		}
 	}
 
+	/**
+	 * Initializes TinyMCE. Can only be called once per instance.
+	 */
 	initialize() {
+		if ( this.initialize.called ) {
+			return;
+		}
+
+		this.initialize.called = true;
+
 		const { multilineTag } = this.props;
 		const settings = {
 			theme: false,
@@ -332,7 +342,8 @@ export default class TinyMCE extends Component {
 		const {
 			tagName = 'div',
 			style,
-			defaultValue,
+			record,
+			valueToEditableHTML,
 			className,
 			isPlaceholderVisible,
 			onPaste,
@@ -362,7 +373,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: defaultValue },
+			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,

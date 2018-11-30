@@ -68,8 +68,8 @@ export function createBlockCompleter( {
 			);
 		},
 		getOptionKeywords( inserterItem ) {
-			const { title, keywords = [] } = inserterItem;
-			return [ ...keywords, title ];
+			const { title, keywords = [], category } = inserterItem;
+			return [ category, ...keywords, title ];
 		},
 		getOptionLabel( inserterItem ) {
 			const { icon, title } = inserterItem;

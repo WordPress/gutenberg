@@ -1,13 +1,15 @@
 /**
  * External Dependencies
  */
-import { castArray, pick } from 'lodash';
+import { castArray, defaults, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+const { wp } = window;
 
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
@@ -36,7 +38,7 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query( _.defaults( {
+					library: wp.media.query( defaults( {
 						type: 'image',
 					}, this.options.library ) ),
 				} ),
