@@ -53,4 +53,5 @@ matrix:
       cache:
         yarn: true
       script:
-        - yarn bundle
+        - yarn bundle:android
+        - rm -Rf bundle/ios # delete the ios bundle since it's not up to date and we don't need to publish to S3
