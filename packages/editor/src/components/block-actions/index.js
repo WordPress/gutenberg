@@ -70,6 +70,7 @@ export default compose( [
 			multiSelect,
 			removeBlocks,
 			insertDefaultBlock,
+			clearSelectedBlock,
 		} = dispatch( 'core/editor' );
 
 		return {
@@ -79,6 +80,9 @@ export default compose( [
 				}
 
 				const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+
+				clearSelectedBlock();
+
 				insertBlocks(
 					clonedBlocks,
 					lastSelectedIndex + 1,
