@@ -32,6 +32,7 @@ export function DefaultBlockAppender( {
 			<View style={ styles.blockHolder } pointerEvents="box-only">
 				<View style={ styles.blockContainer }>
 					<TextInput
+						style={ styles.textView }
 						textAlignVertical="top"
 						multiline
 						numberOfLines={ 0 }
