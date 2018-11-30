@@ -23,7 +23,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Start writing or press \u2295 to choose a block' );
+	const value = decodeEntities( placeholder ) || __( 'Start writing or press \u2295 to add content' );
 
 	return (
 		<TouchableWithoutFeedback
@@ -36,12 +36,18 @@ export function DefaultBlockAppender( {
 						multiline
 						numberOfLines={ 0 }
 						value={ value }
+						onKeyPress={ onAppend }
+						selection={ { start: 0, end: 0 } }
+						/* eslint-disable jsx-a11y/no-autofocus */
+						autoFocus
+						/* eslint-enable jsx-a11y/no-autofocus */
 					/>
 				</View>
 			</View>
 		</TouchableWithoutFeedback>
 	);
 }
+
 export default compose(
 	withSelect( ( select, ownProps ) => {
 		const { getBlockCount, getEditorSettings, getTemplateLock } = select( 'core/editor' );
