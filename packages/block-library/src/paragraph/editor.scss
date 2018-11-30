@@ -1,0 +1,6 @@
+// Specific to the empty paragraph placeholder:
+// when shown on mobile and in nested contexts, the plus to add blocks shows up on the right.
+// This padding makes sure it doesn't overlap text.
+.editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce.wp-block-paragraph {
+	padding-right: $icon-button-size;
+}

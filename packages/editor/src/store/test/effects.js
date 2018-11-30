@@ -245,6 +245,7 @@ describe( 'effects', () => {
 				item_reverted_to_draft: 'Post reverted to draft.',
 				item_updated: 'Post updated.',
 			},
+			viewable: true,
 		} );
 
 		it( 'should dispatch notices when publishing or scheduling a post', () => {
@@ -261,6 +262,22 @@ describe( 'effects', () => {
 					actions: [
 						{ label: 'View post', url: undefined },
 					],
+				}
+			);
+		} );
+
+		it( 'should dispatch notices when publishing or scheduling an unviewable post', () => {
+			const previousPost = getDraftPost();
+			const post = getPublishedPost();
+			const postType = { ...getPostType(), viewable: false };
+
+			handler( { post, previousPost, postType } );
+
+			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).toHaveBeenCalledWith(
+				'Post published.',
+				{
+					id: SAVE_POST_NOTICE_ID,
+					actions: [],
 				}
 			);
 		} );
@@ -303,7 +320,7 @@ describe( 'effects', () => {
 			const previousPost = getPublishedPost();
 			const post = { ...getPublishedPost(), id: defaultPost.id + 1 };
 
-			handler( { post, previousPost, isAutosave: true } );
+			handler( { post, previousPost, options: { isAutosave: true } } );
 
 			expect( dataDispatch( 'core/notices' ).createSuccessNotice ).not.toHaveBeenCalled();
 		} );

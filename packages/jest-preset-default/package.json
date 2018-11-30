@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "3.0.2",
+	"version": "3.0.3",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 	"main": "index.js",
 	"dependencies": {
 		"@wordpress/jest-console": "file:../jest-console",
-		"babel-jest": "^23.4.2",
+		"babel-jest": "^23.6.0",
 		"enzyme": "^3.7.0",
 		"enzyme-adapter-react-16": "^1.6.0",
 		"jest-enzyme": "^6.0.2"

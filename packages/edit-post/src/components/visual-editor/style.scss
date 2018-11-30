@@ -35,9 +35,17 @@
 			height: 0; // This collapses the container to an invisible element without margin.
 			text-align: center;
 
+			// This float rule takes the toolbar out of the flow, without it having to be absolute positioned.
+			// This is necessary because otherwise the mere presence of the toolbar can push down content.
+			// Pairs with relative rule on line 49.
+			float: left;
+
 			.editor-block-toolbar {
 				max-width: $content-width;
 				width: 100%;
+
+				// Necessary for the toolbar to be centered.
+				// This unsets an absolute position that will otherwise left align the toolbar.
 				position: relative;
 			}
 		}
@@ -47,10 +55,6 @@
 			width: 100%;
 			margin-left: 0;
 			margin-right: 0;
-
-			.editor-block-toolbar {
-				max-width: $content-width - $border-width - $border-width;
-			}
 		}
 	}
 }

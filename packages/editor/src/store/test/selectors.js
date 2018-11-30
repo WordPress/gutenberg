@@ -602,6 +602,32 @@ describe( 'selectors', () => {
 
 			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
 		} );
+
+		it( 'should merge mergeable properties with current post value', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+						b: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getEditedPostAttribute( state, 'meta' ) ).toEqual( {
+				a: 1,
+				b: 2,
+			} );
+		} );
 	} );
 
 	describe( 'getAutosaveAttribute', () => {
@@ -2511,54 +2537,44 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getGlobalBlockCount', () => {
-		it( 'should return the global number of top-level blocks in the post', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
-							},
+		const state = {
+			editor: {
+				present: {
+					blocks: {
+						byClientId: {
+							123: { clientId: 123, name: 'core/heading', attributes: {} },
+							456: { clientId: 456, name: 'core/paragraph', attributes: {} },
+							789: { clientId: 789, name: 'core/paragraph', attributes: {} },
+						},
+						order: {
+							'': [ 123, 456 ],
 						},
 					},
 				},
-			};
+			},
+		};
 
+		it( 'should return the global number of blocks in the post', () => {
 			expect( getGlobalBlockCount( state ) ).toBe( 2 );
 		} );
 
-		it( 'should return the global umber of blocks of a given type', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: { clientId: 123, name: 'core/columns', attributes: {} },
-								456: { clientId: 456, name: 'core/paragraph', attributes: {} },
-								789: { clientId: 789, name: 'core/paragraph', attributes: {} },
-								124: { clientId: 123, name: 'core/heading', attributes: {} },
-							},
-						},
-					},
-				},
-			};
-
-			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 1 );
+		it( 'should return the global number of blocks in the post of a given type', () => {
+			expect( getGlobalBlockCount( state, 'core/paragraph' ) ).toBe( 1 );
 		} );
 
 		it( 'should return 0 if no blocks exist', () => {
-			const state = {
+			const emptyState = {
 				editor: {
 					present: {
 						blocks: {
 							byClientId: {},
+							order: {},
 						},
 					},
 				},
 			};
-			expect( getGlobalBlockCount( state ) ).toBe( 0 );
-			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 0 );
+			expect( getGlobalBlockCount( emptyState ) ).toBe( 0 );
+			expect( getGlobalBlockCount( emptyState, 'core/heading' ) ).toBe( 0 );
 		} );
 	} );
 
@@ -2581,6 +2597,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the selected block ClientId', () => {
 			const state = {
+				editor: { present: { blocks: { byClientId: { 23: { name: 'fake block' } } } } },
 				blockSelection: { start: 23, end: 23 },
 			};
 
@@ -4229,6 +4246,121 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'should not list a reusable block item if it is being inserted inside it self', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1ref: {
+									name: 'core/block',
+									clientId: 'block1ref',
+									attributes: {
+										ref: 1,
+									},
+								},
+								itselfBlock1: { name: 'core/test-block-a' },
+								itselfBlock2: { name: 'core/test-block-b' },
+							},
+							order: {
+								'': [ 'block1ref' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				reusableBlocks: {
+					data: {
+						1: { clientId: 'itselfBlock1', title: 'Reusable Block 1' },
+						2: { clientId: 'itselfBlock2', title: 'Reusable Block 2' },
+					},
+				},
+				currentPost: {},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const items = getInserterItems( state, 'itselfBlock1' );
+			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
+			expect( reusableBlockItems ).toHaveLength( 1 );
+			expect( reusableBlockItems[ 0 ] ).toEqual( {
+				id: 'core/block/2',
+				name: 'core/block',
+				initialAttributes: { ref: 2 },
+				title: 'Reusable Block 2',
+				icon: {
+					src: 'test',
+				},
+				category: 'reusable',
+				keywords: [],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+		} );
+
+		it( 'should not list a reusable block item if it is being inserted inside a descendent', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block2ref: {
+									name: 'core/block',
+									clientId: 'block1ref',
+									attributes: {
+										ref: 2,
+									},
+								},
+								referredBlock1: { name: 'core/test-block-a' },
+								referredBlock2: { name: 'core/test-block-b' },
+								childReferredBlock2: { name: 'core/test-block-a' },
+								grandchildReferredBlock2: { name: 'core/test-block-b' },
+							},
+							order: {
+								'': [ 'block2ref' ],
+								referredBlock2: [ 'childReferredBlock2' ],
+								childReferredBlock2: [ 'grandchildReferredBlock2' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				reusableBlocks: {
+					data: {
+						1: { clientId: 'referredBlock1', title: 'Reusable Block 1' },
+						2: { clientId: 'referredBlock2', title: 'Reusable Block 2' },
+					},
+				},
+				currentPost: {},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const items = getInserterItems( state, 'grandchildReferredBlock2' );
+			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
+			expect( reusableBlockItems ).toHaveLength( 1 );
+			expect( reusableBlockItems[ 0 ] ).toEqual( {
+				id: 'core/block/1',
+				name: 'core/block',
+				initialAttributes: { ref: 1 },
+				title: 'Reusable Block 1',
+				icon: {
+					src: 'test',
+				},
+				category: 'reusable',
+				keywords: [],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+		} );
 		it( 'should order items by descending utility and frecency', () => {
 			const state = {
 				editor: {
@@ -4278,8 +4410,12 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { name: 'core/test-block-a' },
 								block2: { name: 'core/test-block-a' },
+								block3: { name: 'core/test-block-a' },
+								block4: { name: 'core/test-block-a' },
 							},
-							order: {},
+							order: {
+								'': [ 'block3', 'block4' ],
+							},
 						},
 						edits: {},
 					},
@@ -4302,14 +4438,14 @@ describe( 'selectors', () => {
 			const stateSecondBlockRestricted = {
 				...state,
 				blockListSettings: {
-					block2: {
+					block4: {
 						allowedBlocks: [ 'core/test-block-b' ],
 					},
 				},
 			};
 
-			const firstBlockFirstCall = getInserterItems( state, 'block1' );
-			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block1' );
+			const firstBlockFirstCall = getInserterItems( state, 'block3' );
+			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block3' );
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
@@ -4319,8 +4455,8 @@ describe( 'selectors', () => {
 				'core/block/2',
 			] );
 
-			const secondBlockFirstCall = getInserterItems( state, 'block2' );
-			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block2' );
+			const secondBlockFirstCall = getInserterItems( state, 'block4' );
+			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block4' );
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
 				'core/test-freeform',
@@ -4933,6 +5069,17 @@ describe( 'selectors', () => {
 
 			expect( getPermalink( state ) ).toBe( 'http://foo.test/bar/baz/' );
 		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalink( state ) ).toBeNull();
+		} );
 	} );
 
 	describe( 'getPermalinkParts', () => {
@@ -4977,6 +5124,17 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
+		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toBeNull();
 		} );
 	} );
 

@@ -14,12 +14,18 @@ export {
 } from './serializer';
 export {
 	registerBlockType,
+	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	getUnregisteredTypeHandlerName,
 	getBlockType,
 	getBlockTypes,
 	hasBlockSupport,
 	isReusableBlock,
+	setDefaultBlockName,
+	getDefaultBlockName,
 } from './registration';
+export {
+	isUnmodifiedDefaultBlock,
+} from './utils';
 export { getPhrasingContentSchema } from './raw-handling';
 export { default as children } from './children';

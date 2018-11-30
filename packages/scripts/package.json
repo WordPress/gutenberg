@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/scripts",
-	"version": "2.4.3",
+	"version": "2.4.4",
 	"description": "Collection of JS scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,7 +38,7 @@
 		"chalk": "^2.4.1",
 		"cross-spawn": "^5.1.0",
 		"eslint": "^4.19.1",
-		"jest": "^23.4.2",
+		"jest": "^23.6.0",
 		"npm-package-json-lint": "^3.3.1",
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0"

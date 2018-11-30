@@ -6,13 +6,17 @@
         },
         "innerBlocks": [],
         "innerHTML": "\n<figure class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</figure>\n",
-        "innerContent": [ "\n<figure class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</figure>\n" ]
+        "innerContent": [
+            "\n<figure class=\"wp-block-audio alignright\">\n    <audio controls=\"\" src=\"https://media.simplecast.com/episodes/audio/80564/draft-podcast-51-livePublish2.mp3\"></audio>\n</figure>\n"
+        ]
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
         "innerHTML": "\n",
-        "innerContent": [ "\n" ]
+        "innerContent": [
+            "\n"
+        ]
     }
 ]

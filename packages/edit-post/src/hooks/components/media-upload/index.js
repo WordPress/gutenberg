@@ -1,13 +1,15 @@
 /**
  * External Dependencies
  */
-import { castArray, pick } from 'lodash';
+import { castArray, defaults, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+const { wp } = window;
 
 // Getter for the sake of unit tests.
 const getGalleryDetailsMediaFrame = () => {
@@ -36,7 +38,7 @@ const getGalleryDetailsMediaFrame = () => {
 					multiple: 'add',
 					editable: false,
 
-					library: wp.media.query( _.defaults( {
+					library: wp.media.query( defaults( {
 						type: 'image',
 					}, this.options.library ) ),
 				} ),
@@ -163,6 +165,8 @@ class MediaUpload extends Component {
 	}
 
 	onOpen() {
+		this.updateCollection();
+
 		if ( ! this.props.value ) {
 			return;
 		}
@@ -181,6 +185,22 @@ class MediaUpload extends Component {
 
 		if ( onClose ) {
 			onClose();
+		}
+	}
+
+	updateCollection() {
+		const frameContent = this.frame.content.get();
+		if ( frameContent && frameContent.collection ) {
+			const collection = frameContent.collection;
+
+			// clean all attachments we have in memory.
+			collection.toArray().forEach( ( model ) => model.trigger( 'destroy', model ) );
+
+			// reset has more flag, if library had small amount of items all items may have been loaded before.
+			collection.mirroring._hasMore = true;
+
+			// request items
+			collection.more();
 		}
 	}
 

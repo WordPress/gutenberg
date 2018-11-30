@@ -1,7 +1,7 @@
 /**
  * External Dependencies
  */
-import { filter, pick, get } from 'lodash';
+import { filter, pick, map, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -63,10 +63,26 @@ class GalleryEdit extends Component {
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.addFiles = this.addFiles.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+		this.setAttributes = this.setAttributes.bind( this );
 
 		this.state = {
 			selectedImage: null,
 		};
+	}
+
+	setAttributes( attributes ) {
+		if ( attributes.ids ) {
+			throw new Error( 'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes' );
+		}
+
+		if ( attributes.images ) {
+			attributes = {
+				...attributes,
+				ids: map( attributes.images, 'id' ),
+			};
+		}
+
+		this.props.setAttributes( attributes );
 	}
 
 	onSelectImage( index ) {
@@ -84,7 +100,7 @@ class GalleryEdit extends Component {
 			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
 			const { columns } = this.props.attributes;
 			this.setState( { selectedImage: null } );
-			this.props.setAttributes( {
+			this.setAttributes( {
 				images,
 				columns: columns ? Math.min( images.length, columns ) : columns,
 			} );
@@ -92,21 +108,21 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( images ) {
-		this.props.setAttributes( {
+		this.setAttributes( {
 			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
 		} );
 	}
 
 	setLinkTo( value ) {
-		this.props.setAttributes( { linkTo: value } );
+		this.setAttributes( { linkTo: value } );
 	}
 
 	setColumnsNumber( value ) {
-		this.props.setAttributes( { columns: value } );
+		this.setAttributes( { columns: value } );
 	}
 
 	toggleImageCrop() {
-		this.props.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
+		this.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
 	}
 
 	getImageCropHelp( checked ) {
@@ -114,7 +130,8 @@ class GalleryEdit extends Component {
 	}
 
 	setImageAttributes( index, attributes ) {
-		const { attributes: { images }, setAttributes } = this.props;
+		const { attributes: { images } } = this.props;
+		const { setAttributes } = this;
 		if ( ! images[ index ] ) {
 			return;
 		}
@@ -136,7 +153,8 @@ class GalleryEdit extends Component {
 
 	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
-		const { noticeOperations, setAttributes } = this.props;
+		const { noticeOperations } = this.props;
+		const { setAttributes } = this;
 		mediaUpload( {
 			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList: files,

@@ -13,11 +13,6 @@ import TabPanel from '../';
  */
 import { Component } from '@wordpress/element';
 
-/**
- * Mock Functions
- */
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
-
 describe( 'TabPanel', () => {
 	const getElementByClass = ( wrapper, className ) => {
 		return TestUtils.findRenderedDOMComponentWithClass( wrapper, className );
