@@ -50,7 +50,7 @@
 <dd> A type of block where the content of which is known at the time of saving a post. A static block will be saved with HTML markup directly in post content. </dd>
 
 <dt> TinyMCE </dt>
-<dd> [TinyMCE](https://www.tinymce.com/) is a web-based JavaScript WYSIWYG (What You See Is What You Get) editor. </dd>
+<dd> <a href="https://www.tinymce.com/">TinyMCE</a> is a web-based JavaScript WYSIWYG (What You See Is What You Get) editor. </dd>
 
 <dt> Toolbar </dt>
 <dd> A set of button controls. In the context of a block, usually referring to the toolbar of block controls shown above the selected block. </dd>
