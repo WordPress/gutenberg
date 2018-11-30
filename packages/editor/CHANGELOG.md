@@ -1,8 +1,10 @@
-## 9.0.4 (Unreleased)
+## 9.0.5 (Unreleased)
 
 ### Bug Fixes
 
 - `getEditedPostAttribute` now correctly returns the merged result of edits as a partial change when given `'meta'` as the `attributeName`.
+
+## 9.0.4 (2018-11-30)
 
 ## 9.0.3 (2018-11-30)
 
