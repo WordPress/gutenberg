@@ -109,7 +109,6 @@ export class RichText extends Component {
 		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
-		this.isActive = this.isActive.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
@@ -132,10 +131,6 @@ export class RichText extends Component {
 
 	setRef( node ) {
 		this.editableRef = node;
-	}
-
-	isActive() {
-		return this.editableRef === document.activeElement;
 	}
 
 	/**
@@ -391,11 +386,6 @@ export class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
-		// Ensure it's the active element. This is a global event.
-		if ( ! this.isActive() ) {
-			return;
-		}
-
 		const { start, end, formats } = this.createRecord();
 
 		if ( start !== this.state.start || end !== this.state.end ) {
