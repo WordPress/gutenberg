@@ -157,9 +157,9 @@
 	},
 	{
 		"title": "Blocks",
-		"slug": "intro",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/intro.md",
-		"parent": "block-tutorial"
+		"slug": "block-tutorial",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/readme.md",
+		"parent": "tutorials"
 	},
 	{
 		"title": "Writing Your First Block Type",
