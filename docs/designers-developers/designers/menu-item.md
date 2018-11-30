@@ -1,0 +1,151 @@
+# MenuItem
+
+MenuItem is a component which renders a button intended to be used in combination with the DropdownMenu Component.
+
+![An image of a MenuItem being highlighted inside of a DropdownMenu component](https://wordpress.org/gutenberg/files/2018/11/MenuItem.png)
+
+1. MenuItem
+
+
+
+## Table of contents
+
+
+
+1. [Design guidelines](http://#design-guidelines)
+2. [Development guidelines](http://#development-guidelines)
+3. [Related components](http://#related-components)
+
+
+
+##Design guidelines
+
+
+
+###Usage
+
+The MenuItem button should only be used in combination with the DropdownMenu component.
+
+
+
+##Development guidelines
+
+
+
+###Usage
+
+
+
+MenuItem is a component which renders a button intended to be used in combination with the DropdownMenu component.
+
+
+
+```
+import { MenuItem } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
+```
+
+``
+
+```
+const MyMenuItem = withState( {
+    isActive: true,
+} )( ( { isActive, setState } ) => (
+    <MenuItem
+        icon={ isActive ? 'yes' : 'no' }
+        isSelected={ isActive }
+        onClick={ () => setState( state => ( { isActive: ! state.isActive } ) ) }
+    >
+        Toggle
+    </MenuItem>
+) );
+```
+
+
+
+###Props 
+
+MenuItem supports the following props. Any additional props are passed through to the underlying  Button or IconButton component.
+
+
+
+```children```
+
+- Type: WPElement
+
+- Required: No
+
+
+Element to render as child of button.
+
+Element
+
+
+
+```label```
+
+- Type: string
+
+- Required: No
+
+
+String to use as primary button label text, applied as aria-label. Useful in cases where an info prop is passed, where label should be the minimal text of the button, described in further detail by info.
+
+Defaults to the value of children, if children is passed as a string.
+
+
+
+```info```
+
+- Type: string
+
+- Required: No
+
+
+Text to use as description for button text.
+
+Refer to documentation for [label](https://wordpress.org/gutenberg/handbook/components/menu-item/#label).
+
+
+
+```Icon```
+
+- Type: string
+
+- Required: No
+
+
+Refer to documentation for IconButton’s icon prop.
+
+
+
+```shortcut```
+
+- Type: string
+
+- Required: No
+
+
+Refer to documentation for Shortcut’s shortcut prop.
+
+
+
+```role```
+
+- Type: string
+- Require: No
+- Default: 'menuitem'
+
+
+
+[Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use menuitemradio for single select, and menuitemcheckbox for multiselect.
+
+
+
+##Related components
+
+
+
+- The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover after the user has interacted with an element (a button or icon) or when they perform a specific action. 
+- MenuItemsChoice
+- MenuGroup
