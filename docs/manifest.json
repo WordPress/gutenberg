@@ -117,7 +117,7 @@
 		"title": "Components",
 		"slug": "components",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
-		"parent": null
+		"parent": "developers"
 	},
 	{
 		"title": "Theming for Gutenberg",
