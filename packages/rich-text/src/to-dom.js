@@ -3,6 +3,7 @@
  */
 
 import { toTree } from './to-tree';
+import { createElement } from './create-element';
 
 /**
  * Browser dependencies
@@ -68,19 +69,7 @@ function getNodeByPath( node, path ) {
  *
  * @return {WPRichTextTree} RichText tree.
  */
-function createEmpty() {
-	// Because `createHTMLDocument` is an expensive operation, and with this
-	// function being internal to `rich-text` (full control in avoiding a risk
-	// of asynchronous operations on the shared reference), a single document
-	// is reused and reset for each call to the function.
-	if ( createEmpty.body ) {
-		createEmpty.body.innerHTML = '';
-	} else {
-		createEmpty.body = document.implementation.createHTMLDocument( '' ).body;
-	}
-
-	return createEmpty.body;
-}
+const createEmpty = () => createElement( document, '' );
 
 function append( element, child ) {
 	if ( typeof child === 'string' ) {

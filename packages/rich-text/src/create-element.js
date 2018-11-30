@@ -11,6 +11,10 @@
  * @return {HTMLBodyElement} Body element with parsed HTML.
  */
 export function createElement( { implementation }, html ) {
+	// Because `createHTMLDocument` is an expensive operation, and with this
+	// function being internal to `rich-text` (full control in avoiding a risk
+	// of asynchronous operations on the shared reference), a single document
+	// is reused and reset for each call to the function.
 	if ( ! createElement.body ) {
 		createElement.body = implementation.createHTMLDocument( '' ).body;
 	}
