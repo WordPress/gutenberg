@@ -32,11 +32,6 @@ Yields action objects used in signalling that a notice is to be created.
  * options.isDismissible: Whether the notice can
                                                       be dismissed by user.
                                                       Defaults to `true`.
- * options.speak: Whether the notice
-                                                      content should be
-                                                      announced to screen
-                                                      readers. Defaults to
-                                                      `true`.
  * options.actions: User actions to be
                                                       presented with notice.
 

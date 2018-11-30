@@ -124,7 +124,6 @@ return array(
 		'wp-embed',
 		'wp-i18n',
 		'wp-keycodes',
-		'wp-notices',
 		'wp-nux',
 		'wp-plugins',
 		'wp-url',

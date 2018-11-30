@@ -22,16 +22,11 @@ const DEFAULT_NOTICES = [];
  *                                      `info`, `error`, or `warning`. Defaults
  *                                      to `info`.
  * @property {string}  content          Notice message.
- * @property {string}  __unstableHTML   Notice message as raw HTML. Intended to
- *                                      serve primarily for compatibility of
- *                                      server-rendered notices, and SHOULD NOT
- *                                      be used for notices. It is subject to
- *                                      removal without notice.
  * @property {boolean} isDismissible    Whether the notice can be dismissed by
  *                                      user. Defaults to `true`.
  * @property {WPNoticeAction[]} actions User actions to present with notice.
  *
- * @typedef {WPNotice}
+ * @typedef {Notice}
  */
 
 /**
@@ -53,7 +48,7 @@ const DEFAULT_NOTICES = [];
  * @param {Object}  state   Notices state.
  * @param {?string} context Optional grouping context.
  *
- * @return {WPNotice[]} Array of notices.
+ * @return {Notice[]} Array of notices.
  */
 export function getNotices( state, context = DEFAULT_CONTEXT ) {
 	return state[ context ] || DEFAULT_NOTICES;
