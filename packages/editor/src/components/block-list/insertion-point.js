@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
@@ -47,7 +46,6 @@ class BlockInsertionPoint extends Component {
 		const { isInserterFocused } = this.state;
 		const {
 			showInsertionPoint,
-			canShowInserter,
 			rootClientId,
 			insertIndex,
 		} = this.props;
@@ -57,29 +55,27 @@ class BlockInsertionPoint extends Component {
 				{ showInsertionPoint && (
 					<div className="editor-block-list__insertion-point-indicator" />
 				) }
-				{ canShowInserter && (
-					<div
-						onFocus={ this.onFocusInserter }
-						onBlur={ this.onBlurInserter }
-						// While ideally it would be enough to capture the
-						// bubbling focus event from the Inserter, due to the
-						// characteristics of click focusing of `button`s in
-						// Firefox and Safari, it is not reliable.
-						//
-						// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
-						tabIndex={ -1 }
-						className={
-							classnames( 'editor-block-list__insertion-point-inserter', {
-								'is-visible': isInserterFocused,
-							} )
-						}
-					>
-						<Inserter
-							rootClientId={ rootClientId }
-							index={ insertIndex }
-						/>
-					</div>
-				) }
+				<div
+					onFocus={ this.onFocusInserter }
+					onBlur={ this.onBlurInserter }
+					// While ideally it would be enough to capture the
+					// bubbling focus event from the Inserter, due to the
+					// characteristics of click focusing of `button`s in
+					// Firefox and Safari, it is not reliable.
+					//
+					// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
+					tabIndex={ -1 }
+					className={
+						classnames( 'editor-block-list__insertion-point-inserter', {
+							'is-visible': isInserterFocused,
+						} )
+					}
+				>
+					<Inserter
+						rootClientId={ rootClientId }
+						index={ insertIndex }
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -88,18 +84,15 @@ export default withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		getBlockIndex,
 		getBlockInsertionPoint,
-		getBlock,
 		isBlockInsertionPointVisible,
 	} = select( 'core/editor' );
 	const blockIndex = getBlockIndex( clientId, rootClientId );
 	const insertIndex = blockIndex;
 	const insertionPoint = getBlockInsertionPoint();
-	const block = getBlock( clientId );
 	const showInsertionPoint = (
 		isBlockInsertionPointVisible() &&
 		insertionPoint.index === insertIndex &&
-		insertionPoint.rootClientId === rootClientId &&
-		! isUnmodifiedDefaultBlock( block )
+		insertionPoint.rootClientId === rootClientId
 	);
 
 	return { showInsertionPoint, insertIndex };

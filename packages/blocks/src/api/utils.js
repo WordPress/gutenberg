@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { every, has, keys, isEqual, isFunction, isString } from 'lodash';
+import { every, has, isFunction, isString } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
  * WordPress dependencies
  */
-import { applyFilters } from '@wordpress/hooks';
 import { Component, isValidElement } from '@wordpress/element';
 
 /**
@@ -40,14 +39,10 @@ export function isUnmodifiedDefaultBlock( block ) {
 	}
 
 	const newDefaultBlock = createBlock( defaultBlockName );
+	const blockType = getBlockType( defaultBlockName );
 
-	const attributeKeys = applyFilters( 'blocks.isUnmodifiedDefaultBlock.attributes', [
-		...keys( newDefaultBlock.attributes ),
-		...keys( block.attributes ),
-	] );
-
-	return every( attributeKeys, ( key ) =>
-		isEqual( newDefaultBlock.attributes[ key ], block.attributes[ key ] )
+	return every( blockType.attributes, ( value, key ) =>
+		newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
 
