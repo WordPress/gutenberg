@@ -39,7 +39,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 	 */
 	function getNextMergeProps( props ) {
 		return (
-			mapSelectToProps( props.registry.select, props.ownProps ) ||
+			mapSelectToProps( props.registry.select, props.ownProps, props.registry ) ||
 			DEFAULT_MERGE_PROPS
 		);
 	}
