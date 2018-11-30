@@ -342,7 +342,8 @@ export default class TinyMCE extends Component {
 		const {
 			tagName = 'div',
 			style,
-			defaultValue,
+			record,
+			valueToEditableHTML,
 			className,
 			isPlaceholderVisible,
 			onPaste,
@@ -372,7 +373,7 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: defaultValue },
+			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,

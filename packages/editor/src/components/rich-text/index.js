@@ -109,6 +109,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.isActive = this.isActive.bind( this );
+		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -874,7 +875,8 @@ export class RichText extends Component {
 								tagName={ Tagname }
 								onSetup={ this.onSetup }
 								style={ style }
-								defaultValue={ this.valueToEditableHTML( record ) }
+								record={ record }
+								valueToEditableHTML={ this.valueToEditableHTML }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-autocomplete="list"
 								aria-expanded={ isExpanded }
