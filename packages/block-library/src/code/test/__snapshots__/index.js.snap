@@ -7,7 +7,7 @@ exports[`core/code block edit matches snapshot 1`] = `
   <textarea
     aria-label="Code"
     class="editor-plain-text"
-    placeholder="Write code…"
+    placeholder="Add code"
     rows="1"
   />
 </div>

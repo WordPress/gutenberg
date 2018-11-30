@@ -12,7 +12,7 @@ exports[`core/preformatted block edit matches snapshot 1`] = `
         <pre
           aria-autocomplete="list"
           aria-expanded="false"
-          aria-label="Write preformatted text…"
+          aria-label="Preformatted text"
           aria-multiline="true"
           class="editor-rich-text__tinymce"
           contenteditable="true"
@@ -26,7 +26,7 @@ exports[`core/preformatted block edit matches snapshot 1`] = `
         <pre
           class="editor-rich-text__tinymce"
         >
-          Write preformatted text…
+          Add preformatted text
         </pre>
       </div>
     </div>

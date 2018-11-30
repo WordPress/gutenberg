@@ -12,7 +12,7 @@ exports[`core/list block edit matches snapshot 1`] = `
         <ul
           aria-autocomplete="list"
           aria-expanded="false"
-          aria-label="Write list…"
+          aria-label="List"
           aria-multiline="true"
           class="editor-rich-text__tinymce"
           contenteditable="true"
@@ -29,7 +29,7 @@ exports[`core/list block edit matches snapshot 1`] = `
           class="editor-rich-text__tinymce"
         >
           <li>
-            Write list…
+            Add list items
           </li>
         </ul>
       </div>

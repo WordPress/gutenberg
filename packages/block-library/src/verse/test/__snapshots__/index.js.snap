@@ -12,7 +12,7 @@ exports[`core/verse block edit matches snapshot 1`] = `
         <pre
           aria-autocomplete="list"
           aria-expanded="false"
-          aria-label="Write…"
+          aria-label="Verse"
           aria-multiline="true"
           class="editor-rich-text__tinymce"
           contenteditable="true"
@@ -26,7 +26,7 @@ exports[`core/verse block edit matches snapshot 1`] = `
         <pre
           class="editor-rich-text__tinymce"
         >
-          Write…
+          Add verse content
         </pre>
       </div>
     </div>

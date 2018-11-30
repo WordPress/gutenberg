@@ -34,7 +34,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
       <input
         aria-label="Embed URL"
         class="components-placeholder__input"
-        placeholder="Enter URL to embed here…"
+        placeholder="Add URL embed URL: https://…"
         type="url"
         value=""
       />

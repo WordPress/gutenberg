@@ -12,7 +12,7 @@ exports[`core/heading block edit matches snapshot 1`] = `
         <h2
           aria-autocomplete="list"
           aria-expanded="false"
-          aria-label="Write heading…"
+          aria-label="Heading"
           aria-multiline="true"
           class="editor-rich-text__tinymce"
           contenteditable="true"
@@ -26,7 +26,7 @@ exports[`core/heading block edit matches snapshot 1`] = `
         <h2
           class="editor-rich-text__tinymce"
         >
-          Write heading…
+          Add heading
         </h2>
       </div>
     </div>

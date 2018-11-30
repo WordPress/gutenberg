@@ -18,7 +18,7 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
             <p
               aria-autocomplete="list"
               aria-expanded="false"
-              aria-label="New Column"
+              aria-label="Text Column"
               aria-multiline="true"
               class="editor-rich-text__tinymce"
               contenteditable="true"
@@ -32,7 +32,7 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
             <p
               class="editor-rich-text__tinymce"
             >
-              New Column
+              New Column, type to add content
             </p>
           </div>
         </div>
@@ -53,7 +53,7 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
             <p
               aria-autocomplete="list"
               aria-expanded="false"
-              aria-label="New Column"
+              aria-label="Text Column"
               aria-multiline="true"
               class="editor-rich-text__tinymce"
               contenteditable="true"
@@ -67,7 +67,7 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
             <p
               class="editor-rich-text__tinymce"
             >
-              New Column
+              New Column, type to add content
             </p>
           </div>
         </div>

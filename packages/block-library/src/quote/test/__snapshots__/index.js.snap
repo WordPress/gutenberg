@@ -15,7 +15,7 @@ exports[`core/quote block edit matches snapshot 1`] = `
           <div
             aria-autocomplete="list"
             aria-expanded="false"
-            aria-label="Write quote…"
+            aria-label="Quote"
             aria-multiline="true"
             class="editor-rich-text__tinymce"
             contenteditable="true"
@@ -32,7 +32,7 @@ exports[`core/quote block edit matches snapshot 1`] = `
             class="editor-rich-text__tinymce"
           >
             <p>
-              Write quote…
+              Add quote
             </p>
           </div>
         </div>

@@ -17,7 +17,7 @@ exports[`core/button block edit matches snapshot 1`] = `
             <div
               aria-autocomplete="list"
               aria-expanded="false"
-              aria-label="Add text…"
+              aria-label="Button"
               aria-multiline="true"
               class="wp-block-button__link editor-rich-text__tinymce"
               contenteditable="true"
@@ -31,7 +31,7 @@ exports[`core/button block edit matches snapshot 1`] = `
             <div
               class="editor-rich-text__tinymce wp-block-button__link"
             >
-              Add text…
+              Add button text
             </div>
           </div>
         </div>
