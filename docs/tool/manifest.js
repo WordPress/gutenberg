@@ -3,6 +3,8 @@
  */
 const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
 
+const fs = require( 'fs' );
+
 const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
 
 /**
@@ -62,8 +64,48 @@ function getDataManifest( parsedNamespaces ) {
 	} );
 }
 
+function getRootManifest( tocFileName ) {
+	var toc = require( tocFileName );
+	return generateRootManifestFromTOCItems( toc );
+}
+
+function generateRootManifestFromTOCItems( items, parent = null ) {
+	let pageItems = [];
+	items.map( ( obj ) => {
+		const fileName = Object.keys( obj )[0];
+		const children = obj[ fileName ];
+
+		let slug = nth( fileName.split( '/' ), -1 ).replace('.md','');
+		if ( 'readme' == slug.toLowerCase() ) {
+			slug = nth( fileName.split( '/' ), -2 );
+
+			// Special case - the root 'docs' readme needs the 'handbook' slug.
+			if ( parent == null && 'docs' == slug ) {
+				slug = 'handbook';
+			}
+		}
+		let title = upperFirst( camelCase( slug ) );
+		const markdownSource = fs.readFileSync( fileName, 'utf8' );
+		if ( titleMarkdown = markdownSource.match( /^#\s(.+)$/m ) ) {
+			title = titleMarkdown[1];
+		}
+
+		pageItems.push( {
+			"title": title,
+			"slug": slug,
+			"markdown_source": `${ baseRepoUrl }\/${ fileName }`,
+			"parent": parent
+		} );
+		if ( Array.isArray( children ) && children.length ) {
+			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
+		}
+	} );
+	return pageItems;
+}
+
 module.exports = {
 	getPackageManifest,
 	getComponentManifest,
 	getDataManifest,
+	getRootManifest,
 };
