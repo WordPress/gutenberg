@@ -1,9 +1,16 @@
 /** @format */
 
+@import 'colors.scss';
 @import 'block-styles.scss';
 
 .blockHolder {
 	flex: 1 1 auto;
+}
+
+.blockHolderFocused {
+	border-color: $gray-lighten-30;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
 }
 
 .blockContainer {
