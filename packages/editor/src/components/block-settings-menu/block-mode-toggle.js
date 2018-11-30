@@ -20,7 +20,7 @@ export function BlockModeToggle( { blockType, mode, onToggleMode, small = false 
 
 	const label = mode === 'visual' ?
 		__( 'Edit as HTML' ) :
-		__( 'Edit visually' );
+		__( 'Edit Visually' );
 
 	return (
 		<MenuItem

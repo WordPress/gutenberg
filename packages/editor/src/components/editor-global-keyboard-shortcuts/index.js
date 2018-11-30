@@ -122,7 +122,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 				/>
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
-						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, onToggleMode } ) => (
+						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore, onToggleEditor } ) => (
 							<KeyboardShortcuts
 								bindGlobal
 								shortcuts={ {
@@ -143,7 +143,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 
 									// Does not clash with any known browser/native shortcuts, but preventDefault
 									// is used to prevent any obscure unknown shortcuts from triggering.
-									[ shortcuts.toggleEditor.raw ]: flow( preventDefault, onToggleMode ),
+									[ shortcuts.toggleEditor.raw ]: flow( preventDefault, onToggleEditor ),
 								} }
 							/>
 						) }
