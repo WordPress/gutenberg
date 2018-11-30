@@ -13,13 +13,13 @@ import { withState } from '@wordpress/compose';
 
 const MyTextControl = withState( {
 	className: '',
-} )( ( { className, setState } ) => ( 
+} )( ( { className, setState } ) => {
 	<TextControl
 		label="Additional CSS Class"
 		value={ className }
 		onChange={ ( className ) => setState( { className } ) }
 	/>
-) );
+} );
 ```
 
 ## Props
