@@ -2143,6 +2143,17 @@ export function isPublishingPost( state ) {
 }
 
 /**
+ * Returns whether the current page is set as the front page or not.
+ *
+ * @param {Object} state Editor state.
+ *
+ * @return {boolean} Whether or not the page is set as the front page.
+ */
+export function isFrontPage( state ) {
+	return Boolean( getEditedPostAttribute( state, 'is_front_page' ) );
+}
+
+/**
  * Returns whether the permalink is editable or not.
  *
  * @param {Object} state Editor state.

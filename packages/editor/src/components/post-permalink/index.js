@@ -57,7 +57,7 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, postLink, permalinkParts, postSlug, postTitle, postID, isEditable, isPublished } = this.props;
+		const { isNew, postLink, permalinkParts, postSlug, postTitle, postID, isEditable, isPublished, isFrontPage } = this.props;
 
 		if ( isNew || ! postLink ) {
 			return null;
@@ -112,7 +112,7 @@ class PostPermalink extends Component {
 					</Button>
 				}
 
-				{ ! isEditable &&
+				{ ! isEditable && ! isFrontPage &&
 					<Button
 						className="editor-post-permalink__change"
 						isLarge
@@ -137,6 +137,7 @@ export default compose( [
 			getPermalinkParts,
 			getEditedPostAttribute,
 			isCurrentPostPublished,
+			isFrontPage,
 		} = select( 'core/editor' );
 
 		const { id, link } = getCurrentPost();
@@ -147,6 +148,7 @@ export default compose( [
 			permalinkParts: getPermalinkParts(),
 			postSlug: getEditedPostAttribute( 'slug' ),
 			isEditable: isPermalinkEditable(),
+			isFrontPage: isFrontPage(),
 			isPublished: isCurrentPostPublished(),
 			postTitle: getEditedPostAttribute( 'title' ),
 			postID: id,

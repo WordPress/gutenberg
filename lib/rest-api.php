@@ -219,6 +219,7 @@ function gutenberg_add_permalink_template_to_posts( $response, $post, $request )
 
 	$response->data['permalink_template'] = $sample_permalink[0];
 	$response->data['generated_slug']     = $sample_permalink[1];
+	$response->data['is_front_page']      = 'page' === get_option( 'show_on_front' ) && $post->ID === (int) get_option( 'page_on_front' );
 
 	return $response;
 }
