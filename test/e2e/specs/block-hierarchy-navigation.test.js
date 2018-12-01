@@ -102,15 +102,4 @@ describe( 'Navigating the block hierarchy', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
-
-	it( 'should report "No blocks created yet." when post is empty', async () => {
-		await openBlockNavigator();
-
-		const blockNavigationText = await page.$eval(
-			'.editor-block-navigation__paragraph',
-			( navigationParagraph ) => navigationParagraph.textContent
-		);
-
-		expect( blockNavigationText ).toEqual( 'No blocks created yet.' );
-	} );
 } );

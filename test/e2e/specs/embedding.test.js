@@ -1,7 +1,15 @@
 /**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost, isEmbedding, setUpResponseMocking, JSONResponse } from '../support/utils';
+import {
+	clickBlockAppender,
+	newPost,
+	isEmbedding,
+	setUpResponseMocking,
+	JSONResponse,
+	getEditedPostContent,
+	clickButton,
+} from '../support/utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
@@ -82,9 +90,7 @@ const MOCK_RESPONSES = [
 	},
 ];
 
-const addEmbeds = async () => {
-	await newPost();
-
+const addAllEmbeds = async () => {
 	// Valid embed.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
@@ -135,15 +141,12 @@ const addEmbeds = async () => {
 	await page.keyboard.press( 'Enter' );
 };
 
-const setUp = async () => {
-	await setUpResponseMocking( MOCK_RESPONSES );
-	await addEmbeds();
-};
-
 describe( 'Embedding content', () => {
-	beforeEach( setUp );
+	beforeAll( async () => await setUpResponseMocking( MOCK_RESPONSES ) );
+	beforeEach( newPost );
 
 	it( 'should render embeds in the correct state', async () => {
+		await addAllEmbeds();
 		// The successful embeds should be in a correctly classed figure element.
 		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
@@ -156,5 +159,37 @@ describe( 'Embedding content', () => {
 		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
 		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
 		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
+	} );
+
+	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
+		// URL that can't be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.press( 'Enter' );
+
+		await clickButton( 'Convert to link' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should allow the user to try embedding a failed URL again', async () => {
+		// URL that can't be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.press( 'Enter' );
+		// Set up a different mock to make sure that try again actually does make the request again.
+		await setUpResponseMocking(
+			[
+				{
+					match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
+					onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+				},
+			]
+		);
+		await clickButton( 'Try again' );
+		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );
 } );

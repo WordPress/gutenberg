@@ -15,7 +15,7 @@ import { PlainText } from '@wordpress/editor';
 import styles from './editor.scss';
 
 export default function MoreEdit( props ) {
-	const { attributes, setAttributes } = props;
+	const { attributes, setAttributes, onFocus } = props;
 	const { customText } = attributes;
 	const defaultText = __( 'Read more' );
 	const value = customText !== undefined ? customText : defaultText;
@@ -32,6 +32,7 @@ export default function MoreEdit( props ) {
 					onChange={ ( newValue ) => setAttributes( { customText: newValue } ) }
 					placeholder={ defaultText }
 					isSelected={ props.isSelected }
+					onFocus={ onFocus }
 				/>
 				<Text className={ styles[ 'block-library-more__right-marker' ] }>--&gt;</Text>
 			</View>
