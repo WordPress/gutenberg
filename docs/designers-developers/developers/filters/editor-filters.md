@@ -16,3 +16,17 @@ var withImageSize = function( size, mediaId, postId ) {
 wp.hooks.addFilter( 'editor.PostFeaturedImage.imageSize', 'my-plugin/with-image-size', withImageSize );
 ```
 
+### `editor.interstitialMessage`
+
+Filters the interstitial message shown when generating previews.
+
+_Example:_
+
+```js
+var customPreviewMessage = function() {
+    return '<b>Post preview is being generated!</b>';
+};
+
+wp.hooks.addFilter( 'editor.interstitialMessage', 'my-plugin/custom-preview-message', customPreviewMessage );
+```
+
