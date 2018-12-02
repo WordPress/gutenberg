@@ -70,52 +70,54 @@ export const ListEdit = ( { editor, onTagNameChange, tagName, onSyncDOM } ) => (
 			} }
 		/>
 		<BlockFormatControls>
-			<Toolbar
-				controls={ [
-					{
-						icon: 'editor-ul',
-						title: __( 'Convert to unordered list' ),
-						isActive: isActiveListType( editor, 'ul', tagName ),
-						onClick() {
-							if ( isListRootSelected( editor ) ) {
-								onTagNameChange( 'ul' );
-							} else {
-								editor.execCommand( 'InsertUnorderedList' );
+			<div className="list-format-toolbar">
+				<Toolbar
+					controls={ [
+						{
+							icon: 'editor-ul',
+							title: __( 'Convert to unordered list' ),
+							isActive: isActiveListType( editor, 'ul', tagName ),
+							onClick() {
+								if ( isListRootSelected( editor ) ) {
+									onTagNameChange( 'ul' );
+								} else {
+									editor.execCommand( 'InsertUnorderedList' );
+									onSyncDOM();
+								}
+							},
+						},
+						{
+							icon: 'editor-ol',
+							title: __( 'Convert to ordered list' ),
+							isActive: isActiveListType( editor, 'ol', tagName ),
+							onClick() {
+								if ( isListRootSelected( editor ) ) {
+									onTagNameChange( 'ol' );
+								} else {
+									editor.execCommand( 'InsertOrderedList' );
+									onSyncDOM();
+								}
+							},
+						},
+						{
+							icon: 'editor-outdent',
+							title: __( 'Outdent list item' ),
+							onClick() {
+								editor.execCommand( 'Outdent' );
 								onSyncDOM();
-							}
+							},
 						},
-					},
-					{
-						icon: 'editor-ol',
-						title: __( 'Convert to ordered list' ),
-						isActive: isActiveListType( editor, 'ol', tagName ),
-						onClick() {
-							if ( isListRootSelected( editor ) ) {
-								onTagNameChange( 'ol' );
-							} else {
-								editor.execCommand( 'InsertOrderedList' );
+						{
+							icon: 'editor-indent',
+							title: __( 'Indent list item' ),
+							onClick() {
+								editor.execCommand( 'Indent' );
 								onSyncDOM();
-							}
+							},
 						},
-					},
-					{
-						icon: 'editor-outdent',
-						title: __( 'Outdent list item' ),
-						onClick() {
-							editor.execCommand( 'Outdent' );
-							onSyncDOM();
-						},
-					},
-					{
-						icon: 'editor-indent',
-						title: __( 'Indent list item' ),
-						onClick() {
-							editor.execCommand( 'Indent' );
-							onSyncDOM();
-						},
-					},
-				] }
-			/>
+					] }
+				/>
+			</div>
 		</BlockFormatControls>
 	</Fragment>
 );
