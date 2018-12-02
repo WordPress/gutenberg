@@ -1,3 +1,9 @@
+## 3.2.0 (Unpublished)
+
+### Enhancement
+
+- Added various filters to the gettext functions, just like in their PHP counterparts.
+
 ## 3.1.0 (2018-11-15)
 
 ### Enhancements

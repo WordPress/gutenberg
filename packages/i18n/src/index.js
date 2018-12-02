@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { applyFilters } from '@wordpress/hooks';
+
+/**
  * External dependencies
  */
 import Tannin from 'tannin';
@@ -90,7 +95,16 @@ function dcnpgettext( domain = 'default', context, single, plural, number ) {
  * @return {string} Translated text.
  */
 export function __( text, domain ) {
-	return dcnpgettext( domain, undefined, text );
+	const translation = dcnpgettext( domain, undefined, text );
+
+	/**
+	 * Filters text with its translation.
+	 *
+	 * @param {string} translation Translated text.
+	 * @param {string} text        Text to translate.
+	 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+	 */
+	return applyFilters( 'i18n.gettext', translation, text, domain );
 }
 
 /**
@@ -105,7 +119,17 @@ export function __( text, domain ) {
  * @return {string} Translated context string without pipe.
  */
 export function _x( text, context, domain ) {
-	return dcnpgettext( domain, context, text );
+	const translation = dcnpgettext( domain, context, text );
+
+	/**
+	 * Filters text with its translation based on context information.
+	 *
+	 * @param {string} translation Translated text.
+	 * @param {string} text        Text to translate.
+	 * @param {string} context     Context information for the translators.
+	 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+	 */
+	return applyFilters( 'i18n.gettext_with_context', translation, text, context, domain );
 }
 
 /**
@@ -123,7 +147,18 @@ export function _x( text, context, domain ) {
  * @return {string} The translated singular or plural form.
  */
 export function _n( single, plural, number, domain ) {
-	return dcnpgettext( domain, undefined, single, plural, number );
+	const translation = dcnpgettext( domain, undefined, single, plural, number );
+
+	/**
+	 * Filters the singular or plural form of a string.
+	 *
+	 * @param {string} translation Translated text.
+	 * @param {string} single      The text to be used if the number is singular.
+	 * @param {string} plural      The text to be used if the number is plural.
+	 * @param {string} number      The number to compare against to use either the singular or plural form.
+	 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+	 */
+	return applyFilters( 'i18n.ngettext', translation, single, plural, number, domain );
 }
 
 /**
@@ -142,7 +177,19 @@ export function _n( single, plural, number, domain ) {
  * @return {string} The translated singular or plural form.
  */
 export function _nx( single, plural, number, context, domain ) {
-	return dcnpgettext( domain, context, single, plural, number );
+	const translation = dcnpgettext( domain, context, single, plural, number );
+
+	/**
+	 * Filters the singular or plural form of a string with gettext context.
+	 *
+	 * @param {string} translation Translated text.
+	 * @param {string} single      The text to be used if the number is singular.
+	 * @param {string} plural      The text to be used if the number is plural.
+	 * @param {string} number      The number to compare against to use either the singular or plural form.
+	 * @param {string} context     Context information for the translators.
+	 * @param {string} domain      Text domain. Unique identifier for retrieving translated strings.
+	 */
+	return applyFilters( 'i18n.ngettext_with_context', translation, single, plural, number, context, domain );
 }
 
 /**
@@ -150,7 +197,7 @@ export function _nx( single, plural, number, context, domain ) {
  * original format string is returned.
  *
  * @param {string}   format  The format of the string to generate.
- * @param {string[]} ...args Arguments to apply to the format.
+ * @param {string[]} args Arguments to apply to the format.
  *
  * @see http://www.diveintojavascript.com/projects/javascript-sprintf
  *
