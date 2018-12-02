@@ -68,7 +68,7 @@ function FontSizePicker( {
 									<Button
 										key={ slug }
 										onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
-										className={ 'is-font-' + slug }
+										className={ `is-font-${ slug }` }
 										role="menuitemradio"
 										aria-checked={ isSelected }
 									>
