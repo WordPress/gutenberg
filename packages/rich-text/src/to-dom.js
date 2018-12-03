@@ -251,6 +251,15 @@ export function applyValue( future, current ) {
 	}
 }
 
+function isRangeEqual( a, b ) {
+	return (
+		a.startContainer === b.startContainer &&
+		a.startOffset === b.startOffset &&
+		a.endContainer === b.endContainer &&
+		a.endOffset === b.endOffset
+	);
+}
+
 export function applySelection( selection, current ) {
 	const { node: startContainer, offset: startOffset } = getNodeByPath( current, selection.startPath );
 	const { node: endContainer, offset: endOffset } = getNodeByPath( current, selection.endPath );
@@ -281,6 +290,11 @@ export function applySelection( selection, current ) {
 	} else {
 		range.setStart( startContainer, startOffset );
 		range.setEnd( endContainer, endOffset );
+	}
+
+	// If ranges the live range is the same, there's no need to remove and add.
+	if ( isRangeEqual( range, windowSelection.getRangeAt( 0 ) ) ) {
+		return;
 	}
 
 	windowSelection.removeAllRanges();
