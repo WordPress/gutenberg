@@ -38,16 +38,12 @@ export function isUnmodifiedDefaultBlock( block ) {
 		return false;
 	}
 
-	// Invalidate default block cache if default block name changed.
+	// Cache a created default block if no cache exists or the default block
+	// name changed.
 	if (
-		isUnmodifiedDefaultBlock.block &&
+		! isUnmodifiedDefaultBlock.block ||
 		isUnmodifiedDefaultBlock.block.name !== defaultBlockName
 	) {
-		delete isUnmodifiedDefaultBlock.block;
-	}
-
-	// Cache a created default block.
-	if ( ! isUnmodifiedDefaultBlock.block ) {
 		isUnmodifiedDefaultBlock.block = createBlock( defaultBlockName );
 	}
 
