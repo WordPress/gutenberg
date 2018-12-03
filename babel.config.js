@@ -5,7 +5,7 @@ module.exports = function( api ) {
 			'module:metro-react-native-babel-preset',
 		],
 		plugins: [
-			/*'@babel/plugin-transform-async-to-generator',*/ /* <--- commented out to make the wpandroid release build work */
+			'@babel/plugin-proposal-object-rest-spread',
 			'@babel/plugin-proposal-async-generator-functions',
 			'@babel/plugin-transform-runtime',
 			'react-native-classname-to-style',
