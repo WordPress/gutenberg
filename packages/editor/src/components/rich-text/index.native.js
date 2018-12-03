@@ -356,6 +356,7 @@ export class RichText extends Component {
 					}
 					text={ { text: html, eventCount: this.lastEventCount } }
 					onChange={ this.onChange }
+					onFocus={ this.props.onFocus }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }

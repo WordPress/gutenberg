@@ -1211,10 +1211,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		),
 	);
 
-	/*
-	 * Set a locale specific default font.
-	 * Translators: Use this to specify the CSS font family for the default font
-	 */
+	/* Translators: Use this to specify the CSS font family for the default font */
 	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
 	$styles[]           = array(
 		'css' => "body { font-family: '$locale_font_family' }",
@@ -1227,11 +1224,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'css' => file_get_contents( $style ),
 				);
 			} else {
-				$file     = get_theme_file_path( $style );
-				$styles[] = array(
-					'css'     => file_get_contents( get_theme_file_path( $style ) ),
-					'baseURL' => get_theme_file_uri( $style ),
-				);
+				$file = get_theme_file_path( $style );
+				if ( file_exists( $file ) ) {
+					$styles[] = array(
+						'css'     => file_get_contents( $file ),
+						'baseURL' => get_theme_file_uri( $style ),
+					);
+				}
 			}
 		}
 	}

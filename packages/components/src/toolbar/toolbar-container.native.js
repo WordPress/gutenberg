@@ -3,8 +3,12 @@
  */
 import { View } from 'react-native';
 
-export default ( props ) => (
-	<View style={ { flexDirection: 'row' } }>
+import styles from './style.scss';
+
+const ToolbarContainer = ( props ) => (
+	<View style={ styles.container }>
 		{ props.children }
 	</View>
 );
+
+export default ToolbarContainer;
