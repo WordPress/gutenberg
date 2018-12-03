@@ -12,9 +12,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.1.0",
-    "@babel/plugin-transform-react-jsx": "^7.0.0",
-    "@wordpress/babel-plugin-import-jsx-pragma": "^1.1.2",
-    "@wordpress/babel-preset-default": "^3.0.1",
+    "@wordpress/babel-plugin-import-jsx-pragma": "file:gutenberg/packages/babel-plugin-import-jsx-pragma",
+    "@wordpress/babel-preset-default": "file:gutenberg/packages/babel-preset-default",
     "@wordpress/jest-preset-default": "^3.0.2",
     "babel-core": "^7.0.0-bridge.0",
     "babel-eslint": "^8.2.2",
