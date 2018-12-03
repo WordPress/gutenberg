@@ -101,6 +101,7 @@ class AppContainer extends React.Component<PropsType> {
 	render() {
 		return (
 			<MainApp
+				rootClientId={ this.props.rootClientId }
 				blocks={ this.props.blocks }
 				showHtml={ this.props.showHtml }
 				onChange={ this.onChange }
