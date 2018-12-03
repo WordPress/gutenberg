@@ -3,6 +3,8 @@ import React from 'react';
 import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback} from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 
+const AztecManager = UIManager.RCTAztecView;
+
 class AztecView extends React.Component {
   
   static propTypes = {
@@ -27,20 +29,29 @@ class AztecView extends React.Component {
     ...ViewPropTypes, // include the default view properties
   }
 
-  applyFormat(format) {   
+  dispatch(command, params) {
+    params = params || [];
     UIManager.dispatchViewManagerCommand(
                                           ReactNative.findNodeHandle(this),
-                                          UIManager.RCTAztecView.Commands.applyFormat,
-                                          [format],
-                                        );    
+                                          command,
+                                          params,
+    );
+  }
+
+  applyFormat(format) {
+    this.dispatch(AztecManager.Commands.applyFormat, [format])
+  }
+
+  removeLink() {
+    this.dispatch(AztecManager.Commands.removeLink)
+  }
+
+  setLink(url, title) {
+    this.dispatch(AztecManager.Commands.setLink, [url, title])
   }
 
   requestHTMLWithCursor() {
-    UIManager.dispatchViewManagerCommand(
-                                          ReactNative.findNodeHandle(this),
-                                          UIManager.RCTAztecView.Commands.returnHTMLWithCursor,
-                                          [],
-                                        );    
+    this.dispatch(AztecManager.Commands.returnHTMLWithCursor)
   }
 
   _onActiveFormatsChange = (event) => {

@@ -182,6 +182,26 @@ class RCTAztecView: Aztec.TextView {
         default: print("Format not recognized")
         }
     }
+
+    @objc
+    func setLink(with url: String, and title: String?) {
+        guard let url = URL(string: url) else {
+            return
+        }
+        if let title = title {
+            setLink(url, title: title, inRange: selectedRange)
+        } else {
+            setLink(url, inRange: selectedRange)
+        }
+    }
+
+    @objc
+    func removeLink() {
+        guard let expandedRange = linkFullRange(forRange: selectedRange) else {
+            return
+        }
+        removeLink(inRange: expandedRange)
+    }
     
     // MARK: - Event Propagation
     
