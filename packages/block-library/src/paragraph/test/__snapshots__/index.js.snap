@@ -13,7 +13,6 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
         >
           <p
             aria-autocomplete="list"
-            aria-expanded="false"
             aria-label="Empty block; start writing or type forward slash to choose a block"
             aria-multiline="true"
             class="wp-block-paragraph editor-rich-text__tinymce"
