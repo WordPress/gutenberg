@@ -13,6 +13,7 @@
 
 
 .components-icon-button.editor-block-switcher__no-switcher-icon {
+	display: flex;
 	width: $icon-button-size + 6px + 6px;
 	.editor-block-icon {
 		margin-right: auto;
