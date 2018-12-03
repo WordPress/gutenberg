@@ -8,31 +8,14 @@ import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 class CopyHandler extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onCopy = this.onCopy.bind( this );
-		this.onCut = this.onCut.bind( this );
-	}
-
 	componentDidMount() {
-		document.addEventListener( 'copy', this.onCopy );
-		document.addEventListener( 'cut', this.onCut );
+		document.addEventListener( 'copy', this.props.onCopy );
+		document.addEventListener( 'cut', this.props.onCut );
 	}
 
 	componentWillUnmount() {
-		document.removeEventListener( 'copy', this.onCopy );
-		document.removeEventListener( 'cut', this.onCut );
-	}
-
-	onCopy( event ) {
-		this.props.onCopy( event.clipboardData );
-		event.preventDefault();
-	}
-
-	onCut( event ) {
-		this.props.onCut( event.clipboardData );
-		event.preventDefault();
+		document.removeEventListener( 'copy', this.props.onCopy );
+		document.removeEventListener( 'cut', this.props.onCut );
 	}
 
 	render() {
@@ -54,7 +37,7 @@ export default compose( [
 		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
 
 		return {
-			onCopy( dataTransfer ) {
+			onCopy( event ) {
 				if ( selectedBlockClientIds.length === 0 ) {
 					return;
 				}
@@ -66,11 +49,13 @@ export default compose( [
 
 				const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
 
-				dataTransfer.setData( 'text/plain', serialized );
-				dataTransfer.setData( 'text/html', serialized );
+				event.clipboardData.setData( 'text/plain', serialized );
+				event.clipboardData.setData( 'text/html', serialized );
+
+				event.preventDefault();
 			},
-			onCut( dataTransfer ) {
-				this.onCopy( dataTransfer );
+			onCut( event ) {
+				this.onCopy( event );
 
 				if ( hasMultiSelection() ) {
 					removeBlocks( selectedBlockClientIds );
