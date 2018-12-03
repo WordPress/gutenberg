@@ -40,6 +40,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
 import { EDIT_MERGE_PROPERTIES } from './constants';
+import createWeakCache from '../utils/create-weak-cache';
 
 /***
  * Module constants
@@ -65,6 +66,21 @@ const ONE_MINUTE_IN_MS = 60 * 1000;
  * @type {Array}
  */
 const EMPTY_ARRAY = [];
+
+/**
+ * Given a block type object, returns true if an attribute value is sourced
+ * from a meta property, or false otherwise.
+ *
+ * The value is cached weakly by strict object reference to the provided block
+ * type argument.
+ *
+ * @param {WPBlockType} blockType Block type against which to test.
+ *
+ * @return {boolean} Whether block type has an meta-sourced attribute.
+ */
+const hasMetaSourcedAttribute = createWeakCache( ( blockType ) => {
+	return some( blockType.attributes, { source: 'meta' } );
+} );
 
 /**
  * Returns true if any past editor history snapshots exist, or false otherwise.
@@ -649,7 +665,7 @@ export const getBlockAttributes = createSelector(
 		// TODO: Create generic external sourcing pattern, not explicitly
 		// targeting meta attributes.
 		const type = getBlockType( block.name );
-		if ( type ) {
+		if ( type && hasMetaSourcedAttribute( type ) ) {
 			attributes = reduce( type.attributes, ( result, value, key ) => {
 				if ( value.source === 'meta' ) {
 					if ( result === attributes ) {
