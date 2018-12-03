@@ -7,7 +7,7 @@ import {
 	newPost,
 } from '../../support/utils';
 
-describe( 'HTML', () => {
+describe( 'HTML block', () => {
 	beforeEach( async () => {
 		await newPost();
 	} );
