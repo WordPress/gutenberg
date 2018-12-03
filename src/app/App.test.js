@@ -28,11 +28,12 @@ describe( 'App', () => {
 			.forEach( ( blockHolder ) => {
 				if ( 'core/code' === blockHolder.props.name ) {
 					// TODO: hardcoded indices are ugly and error prone. Can we do better here?
-					const blockHolderContainer = blockHolder.children[ 0 ].children[ 0 ].children[ 0 ];
+					const blockHolderContainer = blockHolder.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
 					const contentComponent = blockHolderContainer.children[ 0 ];
 					const inputComponent =
 						contentComponent.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ]
-							.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
+							.children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ].children[ 0 ];
+
 					expect( inputComponent.type ).toBe( 'TextInput' );
 				}
 			} );
