@@ -72,6 +72,13 @@ const effects = {
 		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
+		// Saves the wp_editor fields
+		if ( window.tinymce ) {
+			for ( var i = 0; i < window.tinymce.editors.length; i++ ) {
+				window.tinymce.editors[i].save();
+			}
+		}
+
 		const state = store.getState();
 
 		// Additional data needed for backwards compatibility.
