@@ -58,8 +58,9 @@ class SlotFillProvider extends Component {
 	}
 
 	unregisterSlot( name ) {
-		delete this.slots[ name ];
 		this.forceUpdateFills( name );
+		this.forceUpdateSlot( name );
+		delete this.slots[ name ];
 	}
 
 	unregisterFill( name, instance ) {
