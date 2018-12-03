@@ -85,7 +85,7 @@ function writeInterstitialMessage( targetDocument ) {
 	 *
 	 * @param {String} markup The preview interstitial markup.
 	 */
-	markup = applyFilters( 'editor.interstitialMessage', markup );
+	markup = applyFilters( 'editor.PostPreview.interstitialMarkup', markup );
 
 	targetDocument.write( markup );
 	targetDocument.close();
