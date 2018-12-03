@@ -27,7 +27,7 @@ function doOnClick(){
 }
 
 function MyPluginBlockSettingsMenuItem() {
-	return el(
+	return wp.element.createElement(
 		PluginBlockSettingsMenuItem,
 		{
 			allowedBlockNames: [ 'core/paragraph' ],
@@ -194,14 +194,13 @@ _Example:_
 ```js
 var __ = wp.i18n.__;
 var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
-var el = wp.element.createElement;
 
 function onButtonClick() {
 	alert( 'Button clicked.' );
 }
 
 function MyButtonMoreMenuItem() {
-	return el(
+	return wp.element.createElement(
 		PluginMoreMenuItem,
 		{
 			icon: 'smiley',
@@ -272,10 +271,9 @@ _Example:_
 ```js
 var __ = wp.i18n.__;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
-var el = wp.element.createElement;
 
 function MySidebarMoreMenuItem() {
-	return el(
+	return wp.element.createElement(
 		PluginSidebarMoreMenuItem,
 		{
 			target: 'my-sidebar',
@@ -333,10 +331,9 @@ _Example:_
 ```js
 var __ = wp.i18n.__;
 var PluginPostStatusInfo = wp.editPost.PluginPostStatusInfo;
-var el = wp.element.createElement;
 
 function MyPluginPostStatusInfo() {
-	return el(
+	return wp.element.createElement(
 		PluginPostStatusInfo,
 		{
 			className: 'my-plugin-post-status-info',
@@ -382,10 +379,9 @@ _Example:_
 ```js
 var __ = wp.i18n.__;
 var PluginPrePublishPanel = wp.editPost.PluginPrePublishPanel;
-var el = wp.element.createElement;
 
 function MyPluginPrePublishPanel() {
-	return el(
+	return wp.element.createElement(
 		PluginPrePublishPanel,
 		{
 			className: 'my-plugin-pre-publish-panel',
@@ -451,10 +447,9 @@ _Example:_
 ```js
 var __ = wp.i18n.__;
 var PluginPostPublishPanel = wp.editPost.PluginPostPublishPanel;
-var el = wp.element.createElement;
 
 function MyPluginPostPublishPanel() {
-	return el(
+	return wp.element.createElement(
 		PluginPostPublishPanel,
 		{
 			className: 'my-plugin-post-publish-panel',
