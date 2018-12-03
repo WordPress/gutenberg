@@ -25,11 +25,11 @@
 		}
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-presentational):hover {
 		@include button-style__hover;
 	}
 
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):active {
+	&:not(:disabled):not([aria-disabled="true"]):not(.is-default):not(.is-presentational):active {
 		@include button-style__active;
 	}
 

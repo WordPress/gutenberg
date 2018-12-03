@@ -61,15 +61,11 @@ export class BlockSwitcher extends Component {
 				return null;
 			}
 			return (
-				<Toolbar>
-					<IconButton
-						disabled
-						className="editor-block-switcher__no-switcher-icon"
-						label={ __( 'Block icon' ) }
-					>
+				<div className="components-toolbar" aria-hidden="true">
+					<span className="components-icon-button editor-block-switcher__no-switcher-icon is-presentational">
 						<BlockIcon icon={ blockType.icon } showColors />
-					</IconButton>
-				</Toolbar>
+					</span>
+				</div>
 			);
 		}
 
