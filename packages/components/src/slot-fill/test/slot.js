@@ -215,13 +215,28 @@ describe( 'Slot', () => {
 		it( 'should return the named slot', () => {
 			const provider = shallow( <Provider></Provider> );
 			const instance = provider.instance();
-			const slot = { name: 'slot', forceUpdate: noop };
+			const forceUpdate = jest.fn();
+			const slot = { name: 'slot', forceUpdate };
 
 			instance.registerSlot( 'test', slot );
 			expect( instance.getSlot( 'test' ) ).toBe( slot );
+			expect( forceUpdate ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'should not allow duplicate slots', () => {
+		it( 'should remove the named slot', () => {
+			const provider = shallow( <Provider></Provider> );
+			const instance = provider.instance();
+			const forceUpdate = jest.fn();
+			const slot = { name: 'slot', forceUpdate };
+
+			instance.registerSlot( 'test', slot );
+			instance.unregisterSlot( 'test' );
+
+			expect( instance.getSlot( 'test' ) ).toBe( undefined );
+			expect( forceUpdate ).toHaveBeenCalledTimes( 2 );
+		} );
+
+		it( 'should not allow multiple slots of same name', () => {
 			const provider = shallow( <Provider></Provider> );
 			const instance = provider.instance();
 			const slot1 = { name: 'slot1', forceUpdate: noop };
@@ -231,6 +246,34 @@ describe( 'Slot', () => {
 			instance.registerSlot( 'test', slot2 );
 
 			expect( instance.getSlot( 'test' ) ).toBe( slot1 );
+		} );
+
+		it( 'should allow multiple fills of same name', () => {
+			const provider = shallow( <Provider></Provider> );
+			const instance = provider.instance();
+			const fill1 = { name: 'fill1', forceUpdate: noop };
+			const fill2 = { name: 'fill2', forceUpdate: noop };
+
+			instance.registerFill( 'test', fill1 );
+			instance.registerFill( 'test', fill2 );
+
+			expect( instance.getFills( 'test' ) ).toEqual( [ fill1, fill2 ] );
+		} );
+
+		it( 'should force update of slot and fill when slot is removed', () => {
+			const provider = shallow( <Provider></Provider> );
+			const instance = provider.instance();
+			const forceUpdateFill = jest.fn();
+			const forceUpdateSlot = jest.fn();
+			const slot = { name: 'slot', forceUpdate: forceUpdateSlot };
+			const fill = { name: 'fill', forceUpdate: forceUpdateFill };
+
+			instance.registerSlot( 'test', slot );
+			instance.registerFill( 'test', fill );
+			instance.unregisterSlot( 'test' );
+
+			expect( forceUpdateFill ).toHaveBeenCalledTimes( 1 ); // Slot is unregistered
+			expect( forceUpdateSlot ).toHaveBeenCalledTimes( 3 ); // Slot is registered, fill is registered, slot is unregistered
 		} );
 	} );
 } );
