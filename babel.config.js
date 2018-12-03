@@ -8,7 +8,6 @@ module.exports = function( api ) {
 			'@babel/plugin-proposal-object-rest-spread',
 			'@babel/plugin-proposal-async-generator-functions',
 			'@babel/plugin-transform-runtime',
-			'react-native-classname-to-style',
 			[
 				'react-native-platform-specific-extensions',
 				{
