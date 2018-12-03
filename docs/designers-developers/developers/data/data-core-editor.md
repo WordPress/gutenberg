@@ -1284,6 +1284,18 @@ Returns true if the post is being published, or false otherwise.
 
 Whether post is being published.
 
+### isFrontPage
+
+Returns whether the current page is set as the front page or not.
+
+*Parameters*
+
+ * state: Editor state.
+
+*Returns*
+
+Whether or not the page is set as the front page.
+
 ### isPermalinkEditable
 
 Returns whether the permalink is editable or not.
