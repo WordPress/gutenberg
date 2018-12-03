@@ -7,7 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7E45CD00218B853D00C0B2AB /* Gutenberg.m in Sources */ = {isa = PBXBuildFile; fileRef = 7E45CCFF218B853D00C0B2AB /* Gutenberg.m */; };
+		7EA30CEF21AC8C250092F894 /* Gutenberg.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA30CEE21AC8C250092F894 /* Gutenberg.swift */; };
+		7EA30CF321AC91E20092F894 /* RNReactNativeGutenbergBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA30CF221AC91E20092F894 /* RNReactNativeGutenbergBridge.swift */; };
+		7EA30DA721AD7A100092F894 /* GutenbergBridgeDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA30DA621AD7A100092F894 /* GutenbergBridgeDelegate.swift */; };
+		7EA30DA921AD7A2F0092F894 /* GutenbergBridgeDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EA30DA821AD7A2F0092F894 /* GutenbergBridgeDataSource.swift */; };
 		B3E7B58A1CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */; };
 /* End PBXBuildFile section */
 
@@ -25,10 +28,13 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNReactNativeGutenbergBridge.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNReactNativeGutenbergBridge.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		7E45CCFE218B853D00C0B2AB /* Gutenberg.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Gutenberg.h; sourceTree = "<group>"; };
-		7E45CCFF218B853D00C0B2AB /* Gutenberg.m */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.objc; path = Gutenberg.m; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; wrapsLines = 0; };
-		7EC732A121908BCC00FED2E6 /* GutenbergBridgeDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GutenbergBridgeDelegate.h; sourceTree = "<group>"; };
-		B3E7B5881CC2AC0600A0062D /* RNReactNativeGutenbergBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RNReactNativeGutenbergBridge.h; sourceTree = "<group>"; };
+		7EA30CED21AC8C240092F894 /* RNReactNativeGutenbergBridge-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RNReactNativeGutenbergBridge-Bridging-Header.h"; sourceTree = "<group>"; };
+		7EA30CEE21AC8C250092F894 /* Gutenberg.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Gutenberg.swift; sourceTree = "<group>"; };
+		7EA30CF221AC91E20092F894 /* RNReactNativeGutenbergBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNReactNativeGutenbergBridge.swift; sourceTree = "<group>"; };
+		7EA30D8821AD60CA0092F894 /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EA30D9721AD69370092F894 /* libRNTAztecView.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libRNTAztecView.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		7EA30DA621AD7A100092F894 /* GutenbergBridgeDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GutenbergBridgeDelegate.swift; sourceTree = "<group>"; };
+		7EA30DA821AD7A2F0092F894 /* GutenbergBridgeDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GutenbergBridgeDataSource.swift; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RNReactNativeGutenbergBridge.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -54,13 +60,24 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				7EC732A121908BCC00FED2E6 /* GutenbergBridgeDelegate.h */,
-				B3E7B5881CC2AC0600A0062D /* RNReactNativeGutenbergBridge.h */,
 				B3E7B5891CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m */,
-				7E45CCFE218B853D00C0B2AB /* Gutenberg.h */,
-				7E45CCFF218B853D00C0B2AB /* Gutenberg.m */,
+				7EA30CF221AC91E20092F894 /* RNReactNativeGutenbergBridge.swift */,
+				7EA30DA821AD7A2F0092F894 /* GutenbergBridgeDataSource.swift */,
+				7EA30DA621AD7A100092F894 /* GutenbergBridgeDelegate.swift */,
+				7EA30CEE21AC8C250092F894 /* Gutenberg.swift */,
+				7EA30CED21AC8C240092F894 /* RNReactNativeGutenbergBridge-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
+				7EA30D8721AD60CA0092F894 /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		7EA30D8721AD60CA0092F894 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				7EA30D9721AD69370092F894 /* libRNTAztecView.a */,
+				7EA30D8821AD60CA0092F894 /* libRNTAztecView.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -94,6 +111,7 @@
 				TargetAttributes = {
 					58B511DA1A9E6C8500147676 = {
 						CreatedOnToolsVersion = 6.1.1;
+						LastSwiftMigration = 1010;
 					};
 				};
 			};
@@ -119,8 +137,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7EA30DA921AD7A2F0092F894 /* GutenbergBridgeDataSource.swift in Sources */,
 				B3E7B58A1CC2AC0600A0062D /* RNReactNativeGutenbergBridge.m in Sources */,
-				7E45CD00218B853D00C0B2AB /* Gutenberg.m in Sources */,
+				7EA30CEF21AC8C250092F894 /* Gutenberg.swift in Sources */,
+				7EA30CF321AC91E20092F894 /* RNReactNativeGutenbergBridge.swift in Sources */,
+				7EA30DA721AD7A100092F894 /* GutenbergBridgeDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,7 +185,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -201,7 +222,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -211,32 +232,49 @@
 		58B511F01A9E6C8500147676 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../react-native-aztec/ios/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					/usr/include/libxml2,
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../React/**",
 					"$(SRCROOT)/../../react-native/React/**",
+					"$(SRCROOT)/../../react-native-aztec/example/iOS/example/**",
 				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../react-native-aztec/example/iOS/example/**";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNReactNativeGutenbergBridge;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNReactNativeGutenbergBridge-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Debug;
 		};
 		58B511F11A9E6C8500147676 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				FRAMEWORK_SEARCH_PATHS = "$(SRCROOT)/../../react-native-aztec/ios/**";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
+					/usr/include/libxml2,
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					"$(SRCROOT)/../../../React/**",
 					"$(SRCROOT)/../../react-native/React/**",
+					"$(SRCROOT)/../../react-native-aztec/example/iOS/example/**",
 				);
-				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = "$(SRCROOT)/../../react-native-aztec/example/iOS/example/**";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = RNReactNativeGutenbergBridge;
 				SKIP_INSTALL = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "RNReactNativeGutenbergBridge-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
+				USER_HEADER_SEARCH_PATHS = "";
 			};
 			name = Release;
 		};

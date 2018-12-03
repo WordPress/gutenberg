@@ -11,7 +11,7 @@ Pod::Spec.new do |s|
   s.authors          = 'Automattic'
   s.platform     = :ios, '10.0'
   s.source       = { :git => 'https://github.com/wordpress-mobile/gutenberg-mobile.git' }
-  s.source_files = 'react-native-gutenberg-bridge/ios/*.{h,m}'
+  s.source_files = 'react-native-gutenberg-bridge/ios/*.{h,m,swift}'
   s.requires_arc = true
   s.preserve_paths = 'bundle/ios/*'
 
@@ -24,6 +24,9 @@ Pod::Spec.new do |s|
   s.dependency 'React/RCTText', react_native_version
   s.dependency 'React/RCTActionSheet', react_native_version
   s.dependency 'React/DevSupport', react_native_version
+
+  s.dependency 'WordPress-Aztec-iOS'
+  s.dependency 'RNTAztecView'
 
   s.dependency 'yoga', "#{react_native_version}.React"
 end

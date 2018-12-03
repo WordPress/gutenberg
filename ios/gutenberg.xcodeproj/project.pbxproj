@@ -312,6 +312,13 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNReactNativeGutenbergBridge;
 		};
+		7EA30E0221ADC8540092F894 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F619623252704B46A619C33C /* RNTAztecView.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = F145CFC52087D16A006C159A;
+			remoteInfo = RNTAztecView;
+		};
 		832341B41AAA6A8300B99B32 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */;
@@ -387,6 +394,7 @@
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		7E45CC55218B42C000C0B2AB /* RNReactNativeGutenbergBridge.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RNReactNativeGutenbergBridge.xcodeproj; path = "../react-native-gutenberg-bridge/ios/RNReactNativeGutenbergBridge.xcodeproj"; sourceTree = "<group>"; };
+		7EA30CF021AC8CDA0092F894 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = GutenbergViewController.swift; path = gutenberg/GutenbergViewController.swift; sourceTree = "<group>"; tabWidth = 1; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		9B18D59B9364468890D0E546 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
@@ -413,7 +421,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				F1289ECB2100E4320091E81D /* Aztec.framework in Frameworks */,
-				7E45CC5B218B42E000C0B2AB /* libRNReactNativeGutenbergBridge.a in Frameworks */,
 				ADBDB9381DFEBF1600ED6528 /* libRCTBlob.a in Frameworks */,
 				5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */,
 				146834051AC3E58100842450 /* libReact.a in Frameworks */,
@@ -427,8 +434,9 @@
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
-				CF45443564B845C8BDCFBAB6 /* libRNTAztecView.a in Frameworks */,
 				DD2AE937473A49B2B5A0E7B6 /* libRNSVG.a in Frameworks */,
+				CF45443564B845C8BDCFBAB6 /* libRNTAztecView.a in Frameworks */,
+				7E45CC5B218B42E000C0B2AB /* libRNReactNativeGutenbergBridge.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -579,6 +587,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				7EA30CF021AC8CDA0092F894 /* libxml2.tbd */,
 				F1289ECA2100E4320091E81D /* Aztec.framework */,
 				2D16E6891FA4F8E400B85C8A /* libReact.a */,
 			);
@@ -738,6 +747,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				7EA30E0321ADC8540092F894 /* PBXTargetDependency */,
 			);
 			name = gutenberg;
 			productName = "Hello World";
@@ -1293,6 +1303,11 @@
 			target = 2D02E47A1E0B4A5D006451C7 /* gutenberg-tvOS */;
 			targetProxy = 2D02E4911E0B4A5D006451C7 /* PBXContainerItemProxy */;
 		};
+		7EA30E0321ADC8540092F894 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = RNTAztecView;
+			targetProxy = 7EA30E0221ADC8540092F894 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -1379,13 +1394,18 @@
 				DEVELOPMENT_TEAM = PZYM8XX95Q;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					/usr/include/libxml2,
+					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
+					"$(SRCROOT)/../react-native-aztec/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/../react-native-aztec/ios/**",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1409,13 +1429,18 @@
 				DEVELOPMENT_TEAM = PZYM8XX95Q;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					/usr/include/libxml2,
+					"$(SRCROOT)/../react-native-aztec/example/iOS/example",
 					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 					"$(SRCROOT)/../react-native-gutenberg-bridge/ios/**",
+					"$(SRCROOT)/../react-native-aztec/ios/**",
 				);
 				INFOPLIST_FILE = gutenberg/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(SRCROOT)/../react-native-aztec/ios/**",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
