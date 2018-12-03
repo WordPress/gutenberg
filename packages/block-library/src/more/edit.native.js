@@ -21,11 +21,11 @@ export default function MoreEdit( props ) {
 	const value = customText !== undefined ? customText : defaultText;
 
 	return (
-		<View className={ styles[ 'block-library-more__container' ] }>
-			<View className={ styles[ 'block-library-more__sub-container' ] }>
-				<Text className={ styles[ 'block-library-more__left-marker' ] }>&lt;!--</Text>
+		<View style={ styles[ 'block-library-more__container' ] }>
+			<View style={ styles[ 'block-library-more__sub-container' ] }>
+				<Text style={ styles[ 'block-library-more__left-marker' ] }>&lt;!--</Text>
 				<PlainText
-					className={ styles[ 'block-library-more__plain-text' ] }
+					style={ styles[ 'block-library-more__plain-text' ] }
 					value={ value }
 					multiline={ true }
 					underlineColorAndroid="transparent"
@@ -35,7 +35,7 @@ export default function MoreEdit( props ) {
 					onFocus={ onFocus }
 					onBlur={ onBlur }
 				/>
-				<Text className={ styles[ 'block-library-more__right-marker' ] }>--&gt;</Text>
+				<Text style={ styles[ 'block-library-more__right-marker' ] }>--&gt;</Text>
 			</View>
 		</View> );
 }
