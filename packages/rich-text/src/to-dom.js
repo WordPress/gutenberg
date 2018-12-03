@@ -292,11 +292,15 @@ export function applySelection( selection, current ) {
 		range.setEnd( endContainer, endOffset );
 	}
 
-	// If ranges the live range is the same, there's no need to remove and add.
-	if ( isRangeEqual( range, windowSelection.getRangeAt( 0 ) ) ) {
-		return;
+	if ( windowSelection.rangeCount > 0 ) {
+		// If the to be added range and the live range are the same, there's no
+		// need to remove the live range and add the equivalent range.
+		if ( isRangeEqual( range, windowSelection.getRangeAt( 0 ) ) ) {
+			return;
+		}
+
+		windowSelection.removeAllRanges();
 	}
 
-	windowSelection.removeAllRanges();
 	windowSelection.addRange( range );
 }
