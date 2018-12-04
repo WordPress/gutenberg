@@ -125,7 +125,8 @@ class AztecView extends React.Component {
   }
 
   _onPress = () => {
-    this.focus();
+    this.focus(); // Call to move the focus in RN way (TextInputState)
+    this._onFocus(); // Check if there are listeners set on the focus event
   }
 
   render() {
@@ -138,7 +139,7 @@ class AztecView extends React.Component {
           onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
           onSelectionChange = { this._onSelectionChange }
           onEnter = { this._onEnter }
-          onFocus = { this._onFocus }
+          onFocus = { () => {} } // Do nothing here, the onPress takes care of everything
           onBlur = { this._onBlur }
           onBackspace = { this._onBackspace }
         />
