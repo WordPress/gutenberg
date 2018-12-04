@@ -6,6 +6,7 @@ import { partial, noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
+
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 
@@ -13,18 +14,18 @@ import { withInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import { NavigableMenu } from '../navigable-container';
+import Button from '../button';
 
 const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
-	<button role="tab"
+	<Button role="tab"
 		tabIndex={ selected ? null : -1 }
 		aria-selected={ selected }
 		id={ tabId }
 		onClick={ onClick }
-		type="button"
 		{ ...rest }
 	>
 		{ children }
-	</button>
+	</Button>
 );
 
 class TabPanel extends Component {
