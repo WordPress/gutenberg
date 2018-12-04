@@ -58,7 +58,7 @@ export function escapeLessThan( value ) {
  *
  * @return {string} Escaped string.
  */
-export function escapeGreaterThan( value ) {
+export function __unstableEscapeGreaterThan( value ) {
 	return value.replace( />/g, '&gt;' );
 }
 
@@ -74,7 +74,7 @@ export function escapeGreaterThan( value ) {
  * split HTML strings. This is a WordPress specific fix
  *
  * Note that if a resolution for Trac#45387 comes to fruition, it is no longer
- * necessary for `escapeGreaterThan` to exist in this module.
+ * necessary for `__unstableEscapeGreaterThan` to exist in this module.
  *
  * See: https://core.trac.wordpress.org/ticket/45387
  * @param {string} value Attribute value.
@@ -82,7 +82,7 @@ export function escapeGreaterThan( value ) {
  * @return {string} Escaped attribute value.
  */
 export function escapeAttribute( value ) {
-	return escapeGreaterThan( escapeQuotationMark( escapeAmpersand( value ) ) );
+	return __unstableEscapeGreaterThan( escapeQuotationMark( escapeAmpersand( value ) ) );
 }
 
 /**

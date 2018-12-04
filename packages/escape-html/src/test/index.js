@@ -5,13 +5,13 @@ import {
 	escapeAmpersand,
 	escapeQuotationMark,
 	escapeLessThan,
-	escapeGreaterThan,
+	__unstableEscapeGreaterThan,
 	escapeAttribute,
 	escapeHTML,
 	isValidAttributeName,
 } from '../';
 
-function testEscapeGreaterThan( implementation ) {
+function testUnstableEscapeGreaterThan( implementation ) {
 	it( 'should escape greater than', () => {
 		const result = implementation( 'Chicken > Ribs' );
 		expect( result ).toBe( 'Chicken &gt; Ribs' );
@@ -55,13 +55,13 @@ describe( 'escapeLessThan', () => {
 } );
 
 describe( 'escapeGreaterThan', () => {
-	testEscapeGreaterThan( escapeGreaterThan );
+	testUnstableEscapeGreaterThan( __unstableEscapeGreaterThan );
 } );
 
 describe( 'escapeAttribute', () => {
 	testEscapeAmpersand( escapeAttribute );
 	testEscapeQuotationMark( escapeAttribute );
-	testEscapeGreaterThan( escapeAttribute );
+	testUnstableEscapeGreaterThan( escapeAttribute );
 } );
 
 describe( 'escapeHTML', () => {
