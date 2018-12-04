@@ -10,6 +10,7 @@ import {
 	pickBy,
 	get,
 	isPlainObject,
+	throttle,
 } from 'lodash';
 import memize from 'memize';
 
@@ -68,6 +69,11 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 const { getSelection } = window;
 
+// Throttling interval for keyboard input events.
+// This represents how long the component waits before propagating changes in
+// content to the global state.
+const KEYBOARD_THROTTLE_DELAY = 1000;
+
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
@@ -95,6 +101,9 @@ export class RichText extends Component {
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
+		this.onImmediateChange = this.onImmediateChange.bind( this );
+		this.onThrottledChange =
+			throttle( this.onChange, KEYBOARD_THROTTLE_DELAY, { leading: true } ).bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onPaste = this.onPaste.bind( this );
@@ -272,7 +281,7 @@ export class RichText extends Component {
 
 			// A URL was pasted, turn the selection into a link
 			if ( isURL( pastedText ) ) {
-				this.onChange( applyFormat( record, {
+				this.onImmediateChange( applyFormat( record, {
 					type: 'a',
 					attributes: {
 						href: decodeEntities( pastedText ),
@@ -306,7 +315,7 @@ export class RichText extends Component {
 
 		if ( typeof content === 'string' ) {
 			const recordToInsert = create( { html: content } );
-			this.onChange( insert( record, recordToInsert ) );
+			this.onImmediateChange( insert( record, recordToInsert ) );
 		} else if ( this.onSplit ) {
 			if ( ! content.length ) {
 				return;
@@ -367,7 +376,7 @@ export class RichText extends Component {
 		const record = this.createRecord();
 		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
 
-		this.onChange( transformed, {
+		this.onThrottledChange( transformed, {
 			withoutHistory: true,
 		} );
 
@@ -379,7 +388,7 @@ export class RichText extends Component {
 	onCompositionEnd() {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
-		this.onChange( this.createRecord() );
+		this.onImmediateChange( this.createRecord() );
 	}
 
 	/**
@@ -413,6 +422,36 @@ export class RichText extends Component {
 	}
 
 	/**
+	 * Sync the value to global state immediately.
+	 * The node tree and selection will also be updated if differences are found.
+	 *
+	 * @param {Object}  record            The record to sync and apply.
+	 * @param {Object}  $2                Named options.
+	 * @param {boolean} $2.withoutHistory If true, no undo level will be
+	 *                                    created.
+	 */
+	onImmediateChange( ...args ) {
+		if ( this.onThrottledChange ) {
+			this.onThrottledChange( ...args );
+			this.flushChanges();
+		} else {
+			// Error handling for any potential invocations during startup.
+			this.onChange( ...args );
+		}
+	}
+
+	/**
+	 * Immediately flush any pending changes coming from `onThrottledChange`.
+	 * This bypasses the throttling and performs the changes immediately based on
+	 * the last set of parameters that `onThrottledChange` was called with.
+	 */
+	flushChanges() {
+		if ( this.onThrottledChange && this.onThrottledChange.flush ) {
+			this.onThrottledChange.flush();
+		}
+	}
+
+	/**
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
 	 *
@@ -443,6 +482,7 @@ export class RichText extends Component {
 			return;
 		}
 
+		this.flushChanges();
 		this.props.onCreateUndoLevel();
 		this.lastHistoryValue = this.savedContent;
 	}
@@ -512,7 +552,7 @@ export class RichText extends Component {
 
 			// Always handle full content deletion ourselves.
 			if ( start === 0 && end !== 0 && end === value.text.length ) {
-				this.onChange( remove( value ) );
+				this.onImmediateChange( remove( value ) );
 				event.preventDefault();
 				return;
 			}
@@ -540,7 +580,7 @@ export class RichText extends Component {
 				}
 
 				if ( newValue ) {
-					this.onChange( newValue );
+					this.onImmediateChange( newValue );
 					event.preventDefault();
 				}
 			}
@@ -569,7 +609,7 @@ export class RichText extends Component {
 				if ( this.onSplit && isEmptyLine( record ) ) {
 					this.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
-					this.onChange( insertLineSeparator( record ) );
+					this.onImmediateChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.onSplit ) {
 				const text = getTextContent( record );
@@ -586,7 +626,7 @@ export class RichText extends Component {
 					toInsert = '\n\n';
 				}
 
-				this.onChange( insert( record, toInsert ) );
+				this.onImmediateChange( insert( record, toInsert ) );
 			} else {
 				this.splitContent();
 			}
@@ -639,6 +679,10 @@ export class RichText extends Component {
 		}
 
 		this.onSplit( before, after, ...blocks );
+	}
+
+	componentWillUnmount() {
+		this.flushChanges();
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -839,7 +883,7 @@ export class RichText extends Component {
 						editor={ this.editor }
 						onTagNameChange={ onTagNameChange }
 						tagName={ Tagname }
-						onSyncDOM={ () => this.onChange( this.createRecord() ) }
+						onSyncDOM={ () => this.onImmediateChange( this.createRecord() ) }
 					/>
 				) }
 				{ isSelected && ! inlineToolbar && (
@@ -856,7 +900,7 @@ export class RichText extends Component {
 					onReplace={ this.props.onReplace }
 					completers={ autocompleters }
 					record={ record }
-					onChange={ this.onChange }
+					onChange={ this.onImmediateChange }
 				>
 					{ ( { listBoxId, activeId } ) => (
 						<Fragment>
@@ -892,7 +936,7 @@ export class RichText extends Component {
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
 								</Tagname>
 							}
-							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
+							{ isSelected && <FormatEdit value={ record } onChange={ this.onImmediateChange } /> }
 						</Fragment>
 					) }
 				</Autocomplete>
