@@ -10,7 +10,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="0"
       level="H2"
       path={Array []}
-      target="'#block-97a79701-9cef-49b2-af29-b6906c66ac4b"
+      target="'#block-4831ae77-9be2-4794-9510-b4d6db6cd5ea"
     >
       Heading parent
     </TableOfContentsItem>
@@ -19,7 +19,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="1"
       level="H3"
       path={Array []}
-      target="'#block-b08cbcd6-452d-45ec-ad30-80ee9d56631d"
+      target="'#block-e0ef6a1e-3bce-46d4-93cb-2955d6913591"
     >
       Heading child
     </TableOfContentsItem>
@@ -37,7 +37,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       key="0"
       level="H1"
       path={Array []}
-      target="'#block-5fcd0825-155b-4694-971f-b3c75bcc6b5b"
+      target="'#block-b56e0f74-0285-4453-8b43-e524cd0bf933"
     >
       Heading 1
       <br
@@ -54,7 +54,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       key="1"
       level="H1"
       path={Array []}
-      target="'#block-5fcd0825-155b-4694-971f-b3c75bcc6b5b"
+      target="'#block-b56e0f74-0285-4453-8b43-e524cd0bf933"
     >
       Heading 1
       <br
