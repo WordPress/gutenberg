@@ -91,6 +91,13 @@ fi
 echo -e $(status_message "Activating Gutenberg...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin activate gutenberg --quiet
 
+if [ "$POPULAR_PLUGINS" = "true" ]; then
+	echo -e $(status_message "Activating popular plugins...")
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI plugin install wordpress-seo --activate --quiet
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI plugin install jetpack --activate --quiet
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI plugin install advanced-custom-fields --activate --quiet
+fi
+
 # Install a dummy favicon to avoid 404 errors.
 echo -e $(status_message "Installing a dummy favicon...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER touch /var/www/html/favicon.ico
