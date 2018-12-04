@@ -858,7 +858,7 @@ export class RichText extends Component {
 					record={ record }
 					onChange={ this.onChange }
 				>
-					{ ( { isExpanded, listBoxId, activeId } ) => (
+					{ ( { listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE
 								tagName={ Tagname }
@@ -869,7 +869,6 @@ export class RichText extends Component {
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
-								aria-expanded={ isExpanded }
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
 								{ ...ariaProps }
