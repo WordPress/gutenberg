@@ -567,25 +567,3 @@ function gutenberg_add_responsive_body_class( $classes ) {
 }
 
 add_filter( 'body_class', 'gutenberg_add_responsive_body_class' );
-
-/**
- * Prints JavaScript to detect whether the browser is in standards mode or not.
- *
- * @since 4.6
- */
-function gutenberg_detect_quirks_mode() {
-	?>
-	<script type="text/javascript">
-		document.addEventListener( 'DOMContentLoaded', function() {
-			try {
-				var documentMode = document.compatMode==='CSS1Compat'?'Standards':'Quirks';
-				if (documentMode != 'Standards' ) {
-					console.log( '[Warning] Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site\'s PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins.' );
-				}
-			} catch( e ) { }
-		} );
-	</script>
-	<?php
-}
-add_action( 'admin_print_scripts-post.php', 'gutenberg_detect_quirks_mode' );
-add_action( 'admin_print_scripts-post-new.php', 'gutenberg_detect_quirks_mode' );
