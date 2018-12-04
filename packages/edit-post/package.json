@@ -40,8 +40,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.10",
-		"refx": "^3.0.0",
-		"tinymce": "^4.7.2"
+		"refx": "^3.0.0"
 	},
 	"devDependencies": {
 		"deep-freeze": "^0.0.1",
