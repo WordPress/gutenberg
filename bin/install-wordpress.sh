@@ -89,6 +89,7 @@ fi
 
 # Ensure plugins can be installed.
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 777 /var/www/html/wp-content/plugins
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER mkdir -p /var/www/html/wp-content/upgrade
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 777 /var/www/html/wp-content/upgrade
 
 # Activate Gutenberg.
