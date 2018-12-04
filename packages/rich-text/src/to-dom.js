@@ -226,21 +226,17 @@ export function apply( {
 
 export function applyValue( future, current ) {
 	let i = 0;
+	let futureChild;
 
-	while ( future.firstChild ) {
+	while ( ( futureChild = future.firstChild ) ) {
 		const currentChild = current.childNodes[ i ];
-		const futureNodeType = future.firstChild.nodeType;
 
 		if ( ! currentChild ) {
-			current.appendChild( future.firstChild );
-		} else if (
-			futureNodeType !== currentChild.nodeType ||
-			futureNodeType !== TEXT_NODE ||
-			future.firstChild.nodeValue !== currentChild.nodeValue
-		) {
-			current.replaceChild( future.firstChild, currentChild );
+			current.appendChild( futureChild );
+		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
+			current.replaceChild( futureChild, currentChild );
 		} else {
-			future.removeChild( future.firstChild );
+			future.removeChild( futureChild );
 		}
 
 		i++;
