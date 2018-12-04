@@ -67,7 +67,7 @@ function Toolbar( { controls = [], children, className, isCollapsed, icon, label
 	}
 
 	return (
-		<ToolbarContainer className={ className }>
+		<ToolbarContainer className={ classnames( 'components-toolbar', className ) }>
 			{ flatMap( controlSets, ( controlSet, indexOfSet ) => (
 				controlSet.map( ( control, indexOfControl ) => (
 					<ToolbarButton
