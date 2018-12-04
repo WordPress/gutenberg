@@ -6,7 +6,6 @@ import { partial, noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-
 import { Component } from '@wordpress/element';
 import { withInstanceId } from '@wordpress/compose';
 
