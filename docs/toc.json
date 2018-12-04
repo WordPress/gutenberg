@@ -17,14 +17,26 @@
 				{"docs/designers-developers/developers/filters/parser-filters.md": []},
 				{"docs/designers-developers/developers/filters/autocomplete-filters.md": []}
 			]},
+			{"docs/designers-developers/developers/internationalization.md": []},
 			{"docs/designers-developers/developers/data/README.md": "{{data}}"},
 			{"docs/designers-developers/developers/packages.md": "{{packages}}"},
+			{"packages/components/README.md": "{{components}}"},
 			{"docs/designers-developers/developers/themes/README.md": [
 				{"docs/designers-developers/developers/themes/theme-support.md": []}
 			]},
 			{"docs/designers-developers/developers/backwards-compatibility/README.md": [
 				{"docs/designers-developers/developers/backwards-compatibility/deprecations.md": []},
 				{"docs/designers-developers/developers/backwards-compatibility/meta-box.md": []}
+			]},
+			{"docs/designers-developers/developers/tutorials/readme.md": [
+				{"docs/designers-developers/developers/tutorials/block-tutorial/readme.md" :[
+					{"docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/generate-blocks-with-wp-cli.md" :[]}
+				]}
 			]}
 		]},
 		{"docs/designers-developers/designers/README.md": [
