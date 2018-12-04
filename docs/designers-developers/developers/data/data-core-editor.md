@@ -1578,6 +1578,7 @@ one or more replacement blocks.
 
  * clientIds: Block client ID(s) to replace.
  * blocks: Replacement block(s).
+ * index: Block index to select.
 
 ### replaceBlock
 
