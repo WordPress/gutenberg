@@ -73,6 +73,10 @@ export function escapeGreaterThan( value ) {
  * Note we also escape the greater than symbol, as this is used by wptexturize to
  * split HTML strings. This is a WordPress specific fix
  *
+ * Note that if a resolution for Trac#45387 comes to fruition, it is no longer
+ * necessary for `escapeGreaterThan` to exist in this module.
+ *
+ * See: https://core.trac.wordpress.org/ticket/45387
  * @param {string} value Attribute value.
  *
  * @return {string} Escaped attribute value.
