@@ -16,13 +16,12 @@ For years, WordPress has been providing the necessary tools and functions to int
 - `_n( '%s Comment', '%s Comments', $number, 'my-text-domain' )`: Translate and retrieve the singular or plural form based on the supplied number.  
   Usually used in combination with `sprintf()` and `number_format_i18n()`.
 
-
 ## JavaScript
 
 Historically, `wp_localize_script()` has been used to put server-side PHP data into a properly-escaped native JavaScript object.
 
 The new editor introduces a new approach to translating strings for the editor through a new package called `@wordpress/i18n`.
- 
+
 The new script package is registered with WordPress as `wp-i18n` and should be declared as a dependency during `wp_register_script()` and imported as a global off the Window object as `wp.i18n`.
 
 Depending on your developer workflow, you might want to use `wp i18n make-pot` or a build tool for Babel called `@wordpress/babel-plugin-makepot` to create the necessary translation file. The latter which requires use of Babel to compile code to extract the i18n methods.
