@@ -10,7 +10,7 @@ import { __, _x } from '@wordpress/i18n';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
-import { RichText, PlainText } from '@wordpress/editor';
+import { RichText } from '@wordpress/editor';
 import { SVG, Path } from '@wordpress/components';
 import { RawHTML } from '@wordpress/element';
 
