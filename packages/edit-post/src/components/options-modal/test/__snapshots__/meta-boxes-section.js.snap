@@ -4,13 +4,9 @@ exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
 <Section
   title="Advanced Panels"
 >
-  <WithSelect(PostTypeSupportCheck)
-    supportKeys="custom-fields"
-  >
-    <WithSelect(EnableCustomFieldsOption)
-      label="Custom Fields"
-    />
-  </WithSelect(PostTypeSupportCheck)>
+  <WithSelect(EnableCustomFieldsOption)
+    label="Custom Fields"
+  />
 </Section>
 `;
 
@@ -18,13 +14,9 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
 <Section
   title="Advanced Panels"
 >
-  <WithSelect(PostTypeSupportCheck)
-    supportKeys="custom-fields"
-  >
-    <WithSelect(EnableCustomFieldsOption)
-      label="Custom Fields"
-    />
-  </WithSelect(PostTypeSupportCheck)>
+  <WithSelect(EnableCustomFieldsOption)
+    label="Custom Fields"
+  />
   <WithSelect(IfCondition(WithDispatch(BaseOption)))
     key="test1"
     label="Meta Box 1"

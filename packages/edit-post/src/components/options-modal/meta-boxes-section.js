@@ -26,11 +26,7 @@ export function MetaBoxesSection( { areCustomFieldsRegistered, metaBoxes, ...sec
 
 	return (
 		<Section { ...sectionProps }>
-			{ areCustomFieldsRegistered && (
-				<PostTypeSupportCheck supportKeys="custom-fields">
-					<EnableCustomFieldsOption label={ __( 'Custom Fields' ) } />
-				</PostTypeSupportCheck>
-			) }
+			{ areCustomFieldsRegistered && <EnableCustomFieldsOption label={ __( 'Custom Fields' ) } /> }
 			{ map( thirdPartyMetaBoxes, ( { id, title } ) => (
 				<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
 			) ) }
