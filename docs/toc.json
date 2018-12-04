@@ -67,5 +67,7 @@
 		{"docs/contributors/repository-management.md": []},
 		{"docs/contributors/scripts.md": []},
 		{"docs/contributors/testing-overview.md": []}
-	]}
+	]},
+	{"docs/users/readme.md": []},
+	
 ]
