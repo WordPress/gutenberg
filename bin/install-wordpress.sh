@@ -91,7 +91,7 @@ fi
 echo -e $(status_message "Activating Gutenberg...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin activate gutenberg --quiet
 
-if [ "$POPULAR_PLUGINS" = "true" ]; then
+if [ "$POPULAR_PLUGINS" == "true" ]; then
 	echo -e $(status_message "Activating popular plugins...")
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install wordpress-seo --activate --quiet
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install jetpack --activate --quiet
