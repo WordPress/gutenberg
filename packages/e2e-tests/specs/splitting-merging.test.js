@@ -29,6 +29,9 @@ describe( 'splitting and merging blocks', () => {
 
 		// Press Backspace to merge paragraph blocks
 		await page.keyboard.press( 'Backspace' );
+		// At the moment, caret position is restored on the next call stack.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 0 );
 
 		// Ensure that caret position is correctly placed at the between point.
 		await page.keyboard.type( 'Between' );
@@ -60,6 +63,9 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.type( 'Foo' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
+		// At the moment, caret position is restored on the next call stack.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 0 );
 
 		// Replace contents of first paragraph with "Bar".
 		await pressKeyTimes( 'Backspace', 4 );
