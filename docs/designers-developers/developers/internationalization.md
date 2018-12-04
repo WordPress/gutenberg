@@ -11,8 +11,8 @@ For years, WordPress has been providing the necessary tools and functions to int
 - `__( 'Hello World', 'my-text-domain' )`: Translate a certain string.
 - `_x( 'Block', 'noun', 'my-text-domain' )`: Translate a certain string with some additional context.
 - `_e( 'Hello World', 'my-text-domain' )`: Translate and print a certain string.
-- `esc_html__( 'Hello World', 'my-text-domain' )`: Translate a certain string and escape it for safe use in HTML output
-- `esc_html_e( $string_to_translate, 'my-text-domain' )`: Translate a certain string, escape it for safe use in HTML output, and print it.
+- `esc_html__( 'Hello World', 'my-text-domain' )`: Translate a certain string and escape it for safe use in HTML output.
+- `esc_html_e( 'Hello World', 'my-text-domain' )`: Translate a certain string, escape it for safe use in HTML output, and print it.
 - `_n( '%s Comment', '%s Comments', $number, 'my-text-domain' )`: Translate and retrieve the singular or plural form based on the supplied number.  
   Usually used in combination with `sprintf()` and `number_format_i18n()`.
 
@@ -24,7 +24,7 @@ The new editor introduces a new approach to translating strings for the editor t
 
 The new script package is registered with WordPress as `wp-i18n` and should be declared as a dependency during `wp_register_script()` and imported as a global off the Window object as `wp.i18n`.
 
-Depending on your developer workflow, you might want to use `wp i18n make-pot` or a build tool for Babel called `@wordpress/babel-plugin-makepot` to create the necessary translation file. The latter which requires use of Babel to compile code to extract the i18n methods.
+Depending on your developer workflow, you might want to use WP-CLI's `wp i18n make-pot` command or a build tool for Babel called `@wordpress/babel-plugin-makepot` to create the necessary translation file. The latter which requires use of Babel to compile code to extract the i18n methods.
 
 ### Common methods in wp.i18n (may look similar)
 
