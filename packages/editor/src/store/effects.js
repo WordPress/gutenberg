@@ -185,7 +185,9 @@ export default {
 		);
 
 		dispatch( selectBlock( blockA.clientId, -1 ) );
-		dispatch( replaceBlocks(
+
+		// We need to wait for focus to be set to the end of the previous block.
+		setTimeout( () => dispatch( replaceBlocks(
 			[ blockA.clientId, blockB.clientId ],
 			[
 				{
@@ -197,7 +199,7 @@ export default {
 				},
 				...blocksWithTheSameType.slice( 1 ),
 			]
-		) );
+		) ) );
 	},
 	SETUP_EDITOR( action, store ) {
 		const { post, edits } = action;

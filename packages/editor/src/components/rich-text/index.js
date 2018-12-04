@@ -747,7 +747,7 @@ export class RichText extends Component {
 		onReplace( blocks, index );
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate( prevProps, prevState ) {
 		const { tagName, value, isSelected } = this.props;
 
 		if (
@@ -768,10 +768,8 @@ export class RichText extends Component {
 			const record = this.formatToValue( value );
 
 			if ( isSelected ) {
-				const prevRecord = this.formatToValue( prevProps.value );
-				const length = getTextContent( prevRecord ).length;
-				record.start = length;
-				record.end = length;
+				record.start = prevState.start;
+				record.end = prevState.end;
 			}
 
 			this.applyRecord( record );
