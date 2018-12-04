@@ -24,6 +24,7 @@ class AztecView extends React.Component {
     onBackspace: PropTypes.func,
     onScroll: PropTypes.func,
     onActiveFormatsChange: PropTypes.func,
+    onActiveFormatAttributesChange: PropTypes.func,
     onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
@@ -61,6 +62,15 @@ class AztecView extends React.Component {
     const formats = event.nativeEvent.formats;
     const { onActiveFormatsChange } = this.props;
     onActiveFormatsChange(formats);
+  }
+
+  _onActiveFormatAttributesChange = (event) => {
+    if (!this.props.onActiveFormatAttributesChange) {
+      return;
+    }
+    const attributes = event.nativeEvent.attributes;
+    const { onActiveFormatAttributesChange } = this.props;
+    onActiveFormatAttributesChange(attributes);
   }
 
   _onContentSizeChange = (event) => {
@@ -145,6 +155,7 @@ class AztecView extends React.Component {
       <TouchableWithoutFeedback onPress={ this._onPress }>
         <RCTAztecView {...otherProps}
           onActiveFormatsChange={ this._onActiveFormatsChange }
+          onActiveFormatAttributesChange={ this._onActiveFormatAttributesChange }
           onContentSizeChange = { this._onContentSizeChange }
           onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
           onSelectionChange = { this._onSelectionChange }
