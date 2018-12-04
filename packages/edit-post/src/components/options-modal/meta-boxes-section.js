@@ -8,7 +8,6 @@ import { filter, map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-import { PostTypeSupportCheck } from '@wordpress/editor';
 
 /**
  * Internal dependencies
