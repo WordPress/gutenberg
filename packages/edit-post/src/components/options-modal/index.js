@@ -25,7 +25,7 @@ import MetaBoxesSection from './meta-boxes-section';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, isPermalinkEditable, closeModal } ) {
+export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -42,7 +42,7 @@ export function OptionsModal( { isModalActive, isPermalinkEditable, closeModal }
 				<EnableTipsOption label={ __( 'Enable Tips' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
-				{ isPermalinkEditable && (
+				{ isViewable && (
 					<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
 				) }
 				<PostTaxonomies
@@ -72,10 +72,16 @@ export function OptionsModal( { isModalActive, isPermalinkEditable, closeModal }
 }
 
 export default compose(
-	withSelect( ( select ) => ( {
-		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
-		isPermalinkEditable: select( 'core/editor' ).isPermalinkEditable(),
-	} ) ),
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
+		return {
+			isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
+			isViewable: get( postType, [ 'viewable' ], false ),
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		return {
 			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
