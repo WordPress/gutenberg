@@ -29,7 +29,7 @@ p {
 		font-style: normal;
 	}
 
-	&.has-drop-cap::after {
+	&.has-drop-cap:not(:focus)::after {
 		content: "";
 		display: table;
 		clear: both;
