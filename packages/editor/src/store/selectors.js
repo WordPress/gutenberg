@@ -729,14 +729,7 @@ export const getBlocks = createSelector(
 			( clientId ) => getBlock( state, clientId )
 		);
 	},
-	( state, rootClientId ) => {
-		if ( ! rootClientId ) {
-			return [
-				state.editor.present.blocks,
-			];
-		}
-		return getBlock.getDependants( state, rootClientId );
-	}
+	( state ) => [ state.editor.present.blocks ]
 );
 
 /**
