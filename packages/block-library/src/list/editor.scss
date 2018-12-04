@@ -3,4 +3,8 @@
 .block-library-list .editor-rich-text__tinymce ol {
 	padding-left: 1.3em;
 	margin-left: 1.3em;
+	li {
+		margin-bottom: 0;
+		line-height: 2;
+	}
 }
