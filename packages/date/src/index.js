@@ -2,8 +2,10 @@
  * External dependencies
  */
 import momentLib from 'moment';
-import 'moment-timezone';
+import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
+
+const WP_ZONE = 'WP';
 
 // Changes made here will likely need to be made in `lib/client-assets.php` as
 // well because it uses the `setSettings()` function to change these settings.
@@ -92,8 +94,8 @@ export function __experimentalGetSettings() {
 function setupWPTimezone() {
 	// Create WP timezone based off dateSettings.
 	momentLib.tz.add( momentLib.tz.pack( {
-		name: 'WP',
-		abbrs: [ 'WP' ],
+		name: WP_ZONE,
+		abbrs: [ WP_ZONE ],
 		untils: [ null ],
 		offsets: [ -settings.timezone.offset * 60 || 0 ],
 	} ) );
@@ -371,8 +373,8 @@ export function dateI18n( dateFormat, dateValue = new Date(), gmt = false ) {
  * @return {boolean} Is in the future.
  */
 export function isInTheFuture( dateValue ) {
-	const now = momentLib.tz( 'WP' );
-	const momentObject = momentLib.tz( dateValue, 'WP' );
+	const now = momentLib.tz( WP_ZONE );
+	const momentObject = momentLib.tz( dateValue, WP_ZONE );
 
 	return momentObject.isAfter( now );
 }
@@ -386,10 +388,10 @@ export function isInTheFuture( dateValue ) {
  */
 export function getDate( dateString ) {
 	if ( ! dateString ) {
-		return momentLib.tz( 'WP' ).toDate();
+		return momentLib.tz( WP_ZONE ).toDate();
 	}
 
-	return momentLib.tz( dateString, 'WP' ).toDate();
+	return momentLib.tz( dateString, WP_ZONE ).toDate();
 }
 
 setupWPTimezone();

@@ -15,7 +15,6 @@ import {
 	map,
 	orderBy,
 	reduce,
-	size,
 	some,
 } from 'lodash';
 import createSelector from 'rememo';
@@ -34,11 +33,13 @@ import {
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { removep } from '@wordpress/autop';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Dependencies
+ * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /***
  * Module constants
@@ -297,8 +298,21 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
+	// Fall back to saved post value if not edited.
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
 		return getCurrentPostAttribute( state, attributeName );
+	}
+
+	// Merge properties are objects which contain only the patch edit in state,
+	// and thus must be merged with the current post attribute.
+	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// [TODO]: Since this will return a new reference on each invocation,
+		// consider caching in a way which would not impact non-merged property
+		// derivation. Alternatively, introduce a new selector for meta lookup.
+		return {
+			...getCurrentPostAttribute( state, attributeName ),
+			...edits[ attributeName ],
+		};
 	}
 
 	return edits[ attributeName ];
@@ -613,17 +627,15 @@ export function isBlockValid( state, clientId ) {
 }
 
 /**
- * Returns a block given its client ID. This is a parsed copy of the block,
- * containing its `blockName`, `clientId`, and current `attributes` state. This
- * is not the block's registration settings, which must be retrieved from the
- * blocks module registration store.
+ * Returns a block's attributes given its client ID, or null if no block exists with
+ * the client ID.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
  *
- * @return {Object} Parsed block object.
+ * @return {Object?} Block attributes.
  */
-export const getBlock = createSelector(
+export const getBlockAttributes = createSelector(
 	( state, clientId ) => {
 		const block = state.editor.present.blocks.byClientId[ clientId ];
 		if ( ! block ) {
@@ -651,18 +663,44 @@ export const getBlock = createSelector(
 			}, attributes );
 		}
 
+		return attributes;
+	},
+	( state, clientId ) => [
+		state.editor.present.blocks.byClientId[ clientId ],
+		state.editor.present.edits.meta,
+		state.initialEdits.meta,
+		state.currentPost.meta,
+	]
+);
+
+/**
+ * Returns a block given its client ID. This is a parsed copy of the block,
+ * containing its `blockName`, `clientId`, and current `attributes` state. This
+ * is not the block's registration settings, which must be retrieved from the
+ * blocks module registration store.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object} Parsed block object.
+ */
+export const getBlock = createSelector(
+	( state, clientId ) => {
+		const block = state.editor.present.blocks.byClientId[ clientId ];
+		if ( ! block ) {
+			return null;
+		}
+
 		return {
 			...block,
-			attributes,
+			attributes: getBlockAttributes( state, clientId ),
 			innerBlocks: getBlocks( state, clientId ),
 		};
 	},
 	( state, clientId ) => [
 		state.editor.present.blocks.byClientId[ clientId ],
 		getBlockDependantsCacheBust( state, clientId ),
-		state.editor.present.edits.meta,
-		state.initialEdits.meta,
-		state.currentPost.meta,
+		...getBlockAttributes.getDependants( state, clientId ),
 	]
 );
 
@@ -739,16 +777,17 @@ export const getClientIdsWithDescendants = createSelector(
  */
 export const getGlobalBlockCount = createSelector(
 	( state, blockName ) => {
+		const clientIds = getClientIdsWithDescendants( state );
 		if ( ! blockName ) {
-			return size( state.editor.present.blocks.byClientId );
+			return clientIds.length;
 		}
-		return reduce(
-			state.editor.present.blocks.byClientId,
-			( count, block ) => block.name === blockName ? count + 1 : count,
-			0
-		);
+		return reduce( clientIds, ( count, clientId ) => {
+			const block = state.editor.present.blocks.byClientId[ clientId ];
+			return block.name === blockName ? count + 1 : count;
+		}, 0 );
 	},
 	( state ) => [
+		state.editor.present.blocks.order,
 		state.editor.present.blocks.byClientId,
 	]
 );
@@ -852,7 +891,10 @@ export function hasSelectedBlock( state ) {
  */
 export function getSelectedBlockClientId( state ) {
 	const { start, end } = state.blockSelection;
-	return start === end && start ? start : null;
+	// We need to check the block exists because the current state.blockSelection reducer
+	// doesn't take into account the UNDO / REDO actions to update selection.
+	// To be removed when that's fixed.
+	return start && start === end && !! state.editor.present.blocks.byClientId[ start ] ? start : null;
 }
 
 /**
@@ -1116,6 +1158,29 @@ export function getFirstMultiSelectedBlockClientId( state ) {
 export function getLastMultiSelectedBlockClientId( state ) {
 	return last( getMultiSelectedBlockClientIds( state ) ) || null;
 }
+
+/**
+ * Checks if possibleAncestorId is an ancestor of possibleDescendentId.
+ *
+ * @param {Object} state                Editor state.
+ * @param {string} possibleAncestorId   Possible ancestor client ID.
+ * @param {string} possibleDescendentId Possible descent client ID.
+ *
+ * @return {boolean} True if possibleAncestorId is an ancestor
+ *                   of possibleDescendentId, and false otherwise.
+ */
+const isAncestorOf = createSelector(
+	( state, possibleAncestorId, possibleDescendentId ) => {
+		let idToCheck = possibleDescendentId;
+		while ( possibleAncestorId !== idToCheck && idToCheck ) {
+			idToCheck = getBlockRootClientId( state, idToCheck );
+		}
+		return possibleAncestorId === idToCheck;
+	},
+	( state ) => [
+		state.editor.present.blocks,
+	],
+);
 
 /**
  * Returns true if a multi-selection exists, and the block corresponding to the
@@ -1495,7 +1560,35 @@ export function didPostSaveRequestFail( state ) {
  * @return {boolean} Whether the post is autosaving.
  */
 export function isAutosavingPost( state ) {
-	return isSavingPost( state ) && state.saving.isAutosave;
+	return isSavingPost( state ) && !! state.saving.options.isAutosave;
+}
+
+/**
+ * Returns true if the post is being previewed, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the post is being previewed.
+ */
+export function isPreviewingPost( state ) {
+	return isSavingPost( state ) && !! state.saving.options.isPreview;
+}
+
+/**
+ * Returns the post preview link
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string?} Preview Link.
+ */
+export function getEditedPostPreviewLink( state ) {
+	const featuredImageId = getEditedPostAttribute( state, 'featured_media' );
+	const previewLink = state.previewLink;
+	if ( previewLink && featuredImageId ) {
+		return addQueryArgs( previewLink, { _thumbnail_id: featuredImageId } );
+	}
+
+	return previewLink;
 }
 
 /**
@@ -1744,6 +1837,10 @@ const canIncludeReusableBlockInInserter = ( state, reusableBlock, rootClientId )
 	}
 
 	if ( ! canInsertBlockTypeUnmemoized( state, referencedBlockName, rootClientId ) ) {
+		return false;
+	}
+
+	if ( isAncestorOf( state, reusableBlock.clientId, rootClientId ) ) {
 		return false;
 	}
 
@@ -2063,10 +2160,15 @@ export function isPermalinkEditable( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {string} The permalink.
+ * @return {?string} The permalink, or null if the post is not viewable.
  */
 export function getPermalink( state ) {
-	const { prefix, postName, suffix } = getPermalinkParts( state );
+	const permalinkParts = getPermalinkParts( state );
+	if ( ! permalinkParts ) {
+		return null;
+	}
+
+	const { prefix, postName, suffix } = permalinkParts;
 
 	if ( isPermalinkEditable( state ) ) {
 		return prefix + postName + suffix;
@@ -2076,14 +2178,20 @@ export function getPermalink( state ) {
 }
 
 /**
- * Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+ * Returns the permalink for a post, split into it's three parts: the prefix,
+ * the postName, and the suffix.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} The prefix, postName, and suffix for the permalink.
+ * @return {Object} An object containing the prefix, postName, and suffix for
+ *                  the permalink, or null if the post is not viewable.
  */
 export function getPermalinkParts( state ) {
 	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	if ( ! permalinkTemplate ) {
+		return null;
+	}
+
 	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
 
 	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );

@@ -58,6 +58,24 @@ export function __experimentalRemoveAnnotation( annotationId ) {
 }
 
 /**
+ * Updates the range of an annotation.
+ *
+ * @param {string} annotationId ID of the annotation to update.
+ * @param {number} start The start of the new range.
+ * @param {number} end The end of the new range.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalUpdateAnnotationRange( annotationId, start, end ) {
+	return {
+		type: 'ANNOTATION_UPDATE_RANGE',
+		annotationId,
+		start,
+		end,
+	};
+}
+
+/**
  * Removes all annotations of a specific source.
  *
  * @param {string} source The source to remove.

@@ -84,13 +84,14 @@ function htmlToBlocks( { html, rawTransforms } ) {
 		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) => isMatch( node ) );
 
 		if ( ! rawTransform ) {
-			console.warn(
-				'A block registered a raw transformation schema for `' + node.nodeName + '` but did not match it. ' +
-				'Make sure there is a `selector` or `isMatch` property that can match the schema.\n' +
-				'Sanitized HTML: `' + node.outerHTML + '`'
+			return createBlock(
+				// Should not be hardcoded.
+				'core/html',
+				getBlockAttributes(
+					'core/html',
+					node.outerHTML
+				)
 			);
-
-			return;
 		}
 
 		const { transform, blockName } = rawTransform;
@@ -269,6 +270,8 @@ export function rawHandler( { HTML = '' } ) {
 		// from raw HTML. These filters move around some content or add
 		// additional tags, they do not remove any content.
 		const filters = [
+			// Needed to adjust invalid lists.
+			listReducer,
 			// Needed to create more and nextpage blocks.
 			specialCommentConverter,
 			// Needed to create media blocks.

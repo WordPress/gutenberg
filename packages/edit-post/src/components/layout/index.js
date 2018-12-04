@@ -49,6 +49,7 @@ function Layout( {
 	hasActiveMetaboxes,
 	isSaving,
 	isMobileViewport,
+	isRichEditingEnabled,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -82,8 +83,8 @@ function Layout( {
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
 				<OptionsModal />
-				{ mode === 'text' && <TextEditor /> }
-				{ mode === 'visual' && <VisualEditor /> }
+				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
@@ -135,6 +136,7 @@ export default compose(
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );

@@ -5,6 +5,8 @@ import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
+const { wp } = window;
+
 function isTmceEmpty( editor ) {
 	// When tinyMce is empty the content seems to be:
 	// <p><br data-mce-bogus="1"></p>
@@ -78,13 +80,6 @@ export default class ClassicEdit extends Component {
 		const { ref } = this;
 
 		this.editor = editor;
-
-		// Disable TinyMCE's keyboard shortcut help.
-		editor.on( 'BeforeExecCommand', ( event ) => {
-			if ( event.command === 'WP_Help' ) {
-				event.preventDefault();
-			}
-		} );
 
 		if ( content ) {
 			editor.on( 'loadContent', () => editor.setContent( content ) );

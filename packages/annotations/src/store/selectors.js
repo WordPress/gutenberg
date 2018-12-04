@@ -2,6 +2,18 @@
  * External dependencies
  */
 import createSelector from 'rememo';
+import { get, flatMap } from 'lodash';
+
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
 
 /**
  * Returns the annotations for a specific client ID.
@@ -13,14 +25,18 @@ import createSelector from 'rememo';
  */
 export const __experimentalGetAnnotationsForBlock = createSelector(
 	( state, blockClientId ) => {
-		return state.all.filter( ( annotation ) => {
-			return annotation.selector === 'block' && annotation.blockClientId === blockClientId;
+		return get( state, blockClientId, [] ).filter( ( annotation ) => {
+			return annotation.selector === 'block';
 		} );
 	},
 	( state, blockClientId ) => [
-		state.byBlockClientId[ blockClientId ],
+		get( state, blockClientId, EMPTY_ARRAY ),
 	]
 );
+
+export const __experimentalGetAllAnnotationsForBlock = function( state, blockClientId ) {
+	return get( state, blockClientId, EMPTY_ARRAY );
+};
 
 /**
  * Returns the annotations that apply to the given RichText instance.
@@ -36,9 +52,8 @@ export const __experimentalGetAnnotationsForBlock = createSelector(
  */
 export const __experimentalGetAnnotationsForRichText = createSelector(
 	( state, blockClientId, richTextIdentifier ) => {
-		return state.all.filter( ( annotation ) => {
+		return get( state, blockClientId, [] ).filter( ( annotation ) => {
 			return annotation.selector === 'range' &&
-				annotation.blockClientId === blockClientId &&
 				richTextIdentifier === annotation.richTextIdentifier;
 		} ).map( ( annotation ) => {
 			const { range, ...other } = annotation;
@@ -50,7 +65,7 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
 		} );
 	},
 	( state, blockClientId ) => [
-		state.byBlockClientId[ blockClientId ],
+		get( state, blockClientId, EMPTY_ARRAY ),
 	]
 );
 
@@ -61,5 +76,7 @@ export const __experimentalGetAnnotationsForRichText = createSelector(
  * @return {Array} All annotations currently applied.
  */
 export function __experimentalGetAnnotations( state ) {
-	return state.all;
+	return flatMap( state, ( annotations ) => {
+		return annotations;
+	} );
 }

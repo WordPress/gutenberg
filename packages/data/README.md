@@ -229,7 +229,7 @@ A higher-order component is a function which accepts a [component](https://githu
 
 #### `withSelect( mapSelectToProps: Function ): Function`
 
-Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select) and the props passed to the original component.
+Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select), the props passed to the original component and the `registry` object.
 
 _Example:_
 
@@ -261,7 +261,7 @@ In the above example, when `HammerPriceDisplay` is rendered into an application,
 
 #### `withDispatch( mapDispatchToProps: Function ): Function`
 
-Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch) and the props passed to the original component.
+Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch), the props passed to the original component and the `registry` object.
 
 ```jsx
 function Button( { onClick, children } ) {
@@ -272,7 +272,7 @@ const { withDispatch } = wp.data;
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 	const { startSale } = dispatch( 'my-shop' );
-	const { discountPercent = 20 } = ownProps;
+	const { discountPercent } = ownProps;
 
 	return {
 		onClick() {
@@ -283,8 +283,37 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 
 // Rendered in the application:
 //
+//  <SaleButton discountPercent="20">Start Sale!</SaleButton>
+```
+
+In the majority of cases, it will be sufficient to use only two first params passed to `mapDispatchToProps` as illustrated in the previous example. However, there might be some very advanced use cases where using the `registry` object might be used as a tool to optimize the performance of your component. Using `select` function from the registry might be useful when you need to fetch some dynamic data from the store at the time when the event is fired, but at the same time, you never use it to render your component. In such scenario, you can avoid using the `withSelect` higher order component to compute such prop, which might lead to unnecessary re-renders of you component caused by its frequent value change. Keep in mind, that `mapDispatchToProps` must return an object with functions only. 
+
+```jsx
+function Button( { onClick, children } ) {
+	return <button type="button" onClick={ onClick }>{ children }</button>;
+}
+
+const { withDispatch } = wp.data;
+
+const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
+	// Stock number changes frequently.
+	const { getStockNumber } = select( 'my-shop' );
+	const { startSale } = dispatch( 'my-shop' );
+	
+	return {
+		onClick() {
+			const dicountPercent = getStockNumber() > 50 ? 10 : 20;
+			startSale( discountPercent );
+		},
+	};
+} )( Button );
+
+// Rendered in the application:
+//
 //  <SaleButton>Start Sale!</SaleButton>
 ```
+
+*Note:* It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
 
 ## Generic Stores
 

@@ -3,27 +3,22 @@
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { MenuItem } from '@wordpress/components';
 import { withPluginContext } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
-import PluginsMoreMenuGroup from '../plugins-more-menu-group';
+import PluginMoreMenuItem from '../plugin-more-menu-item';
 
 const PluginSidebarMoreMenuItem = ( { children, icon, isSelected, onClick } ) => (
-	<PluginsMoreMenuGroup>
-		{ ( fillProps ) => (
-			<MenuItem
-				icon={ isSelected ? 'yes' : icon }
-				isSelected={ isSelected }
-				role="menuitemcheckbox"
-				onClick={ compose( onClick, fillProps.onClose ) }
-			>
-				{ children }
-			</MenuItem>
-		) }
-	</PluginsMoreMenuGroup>
+	<PluginMoreMenuItem
+		icon={ isSelected ? 'yes' : icon }
+		isSelected={ isSelected }
+		role="menuitemcheckbox"
+		onClick={ onClick }
+	>
+		{ children }
+	</PluginMoreMenuItem>
 );
 
 export default compose(
