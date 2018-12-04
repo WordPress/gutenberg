@@ -125,7 +125,8 @@ class AztecView extends React.Component {
   }
 
   _onPress = () => {
-    this.focus();
+    this.focus(); // Call to move the focus in RN way (TextInputState)
+    this._onFocus(); // Check if there are listeners set on the focus event
   }
 
   render() {
@@ -138,7 +139,10 @@ class AztecView extends React.Component {
           onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
           onSelectionChange = { this._onSelectionChange }
           onEnter = { this._onEnter }
-          onFocus = { this._onFocus }
+          // IMPORTANT: the onFocus events are thrown away as these are handled by onPress() in the upper level.
+          // It's necessary to do this otherwise onFocus may be set by `{...otherProps}` and thus the onPress + onFocus
+          // combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
+          onFocus = { () => {} } 
           onBlur = { this._onBlur }
           onBackspace = { this._onBackspace }
         />
