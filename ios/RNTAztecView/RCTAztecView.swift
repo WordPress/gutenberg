@@ -198,9 +198,9 @@ class RCTAztecView: Aztec.TextView {
         }
         let identifiers: Set<FormattingIdentifier>
         if selectedRange.length > 0 {
-            identifiers = formatIdentifiersSpanningRange(selectedRange)
+            identifiers = formattingIdentifiersSpanningRange(selectedRange)
         } else {
-            identifiers = formatIdentifiersForTypingAttributes()
+            identifiers = formattingIdentifiersForTypingAttributes()
         }
         let formats = identifiers.compactMap( { (identifier) -> String? in
             switch identifier {
