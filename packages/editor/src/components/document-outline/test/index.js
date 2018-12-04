@@ -90,7 +90,10 @@ describe( 'DocumentOutline', () => {
 
 	describe( 'header blocks present', () => {
 		it( 'should match snapshot', () => {
-			const blocks = [ headingParent, headingChild ];
+			const blocks = [ headingParent, headingChild ].map( ( block, index ) => {
+				// Set client IDs to a predictable value.
+				return { ...block, clientId: `clientId_${ index }` };
+			} );
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper ).toMatchSnapshot();
@@ -111,7 +114,10 @@ describe( 'DocumentOutline', () => {
 		} );
 
 		it( 'should render warnings for multiple h1 headings', () => {
-			const blocks = [ headingH1, paragraph, headingH1, paragraph ];
+			const blocks = [ headingH1, paragraph, headingH1, paragraph ].map( ( block, index ) => {
+				// Set client IDs to a predictable value.
+				return { ...block, clientId: `clientId_${ index }` };
+			} );
 			const wrapper = shallow( <DocumentOutline blocks={ blocks } /> );
 
 			expect( wrapper ).toMatchSnapshot();
