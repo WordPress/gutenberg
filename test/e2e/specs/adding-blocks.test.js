@@ -23,13 +23,13 @@ describe( 'adding blocks', () => {
 	async function clickBelow( elementHandle ) {
 		const box = await elementHandle.boundingBox();
 		const x = box.x + ( box.width / 2 );
-		const y = box.y + box.height + 100;
+		const y = box.y + box.height + 15;
 		return page.mouse.click( x, y );
 	}
 
 	it( 'Should insert content using the placeholder and the regular inserter', async () => {
 		// Click below editor to focus last field (block appender)
-		await clickBelow( await page.$( '.editor-default-block-appender' ) );
+		await clickBelow( await page.$( '.editor-writing-flow' ) );
 		expect( await page.$( '[data-type="core/paragraph"]' ) ).not.toBeNull();
 		await page.keyboard.type( 'Paragraph block' );
 
