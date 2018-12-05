@@ -87,11 +87,7 @@ describe( 'RichText', () => {
 			};
 
 			const mutationObserver = new MutationObserver( ( records ) => {
-				if ( called ) {
-					throw new Error( 'Typing should only mutate once.' );
-				}
-
-				if ( records.length > 1 ) {
+				if ( called || records.length > 1 ) {
 					throw new Error( 'Typing should only mutate once.' );
 				}
 
