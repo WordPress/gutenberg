@@ -11,8 +11,8 @@ class CopyHandler extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onCopy = this.onCopy.bind( this );
-		this.onCut = this.onCut.bind( this );
+		this.onCopy = ( event ) => this.props.onCopy( event );
+		this.onCut = ( event ) => this.props.onCut( event );
 	}
 
 	componentDidMount() {
@@ -23,16 +23,6 @@ class CopyHandler extends Component {
 	componentWillUnmount() {
 		document.removeEventListener( 'copy', this.onCopy );
 		document.removeEventListener( 'cut', this.onCut );
-	}
-
-	onCopy( event ) {
-		this.props.onCopy( event.clipboardData );
-		event.preventDefault();
-	}
-
-	onCut( event ) {
-		this.props.onCut( event.clipboardData );
-		event.preventDefault();
 	}
 
 	render() {
@@ -50,29 +40,38 @@ export default compose( [
 		} = select( 'core/editor' );
 		const { removeBlocks } = dispatch( 'core/editor' );
 
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
+		const onCopy = ( event ) => {
+			const selectedBlockClientIds = getSelectedBlockClientId() ?
+				[ getSelectedBlockClientId() ] :
+				getMultiSelectedBlockClientIds();
+
+			if ( selectedBlockClientIds.length === 0 ) {
+				return;
+			}
+
+			// Let native copy behaviour take over in input fields.
+			if ( ! hasMultiSelection() && documentHasSelection() ) {
+				return;
+			}
+
+			const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
+
+			event.clipboardData.setData( 'text/plain', serialized );
+			event.clipboardData.setData( 'text/html', serialized );
+
+			event.preventDefault();
+		};
 
 		return {
-			onCopy( dataTransfer ) {
-				if ( selectedBlockClientIds.length === 0 ) {
-					return;
-				}
-
-				// Let native copy behaviour take over in input fields.
-				if ( ! hasMultiSelection() && documentHasSelection() ) {
-					return;
-				}
-
-				const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
-
-				dataTransfer.setData( 'text/plain', serialized );
-				dataTransfer.setData( 'text/html', serialized );
-			},
-			onCut( dataTransfer ) {
-				this.onCopy( dataTransfer );
+			onCopy,
+			onCut( event ) {
+				onCopy( event );
 
 				if ( hasMultiSelection() ) {
+					const selectedBlockClientIds = getSelectedBlockClientId() ?
+						[ getSelectedBlockClientId() ] :
+						getMultiSelectedBlockClientIds();
+
 					removeBlocks( selectedBlockClientIds );
 				}
 			},

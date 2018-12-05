@@ -33,7 +33,6 @@ const enhance = compose(
 	 * @return {Component} Enhanced component with merged state data props.
 	 */
 	withSelect( ( select, block ) => {
-		const blocks = select( 'core/editor' ).getBlocks();
 		const multiple = hasBlockSupport( block.name, 'multiple', true );
 
 		// For block types with `multiple` support, there is no "original
@@ -44,6 +43,7 @@ const enhance = compose(
 
 		// Otherwise, only pass `originalBlockClientId` if it refers to a different
 		// block from the current one.
+		const blocks = select( 'core/editor' ).getBlocks();
 		const firstOfSameType = find( blocks, ( { name } ) => block.name === name );
 		const isInvalid = firstOfSameType && firstOfSameType.clientId !== block.clientId;
 		return {
