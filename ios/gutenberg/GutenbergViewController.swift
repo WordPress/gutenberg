@@ -79,20 +79,48 @@ extension GutenbergViewController {
     func showMoreSheet() {
         let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
-        let toggleHTMLModeAction = UIAlertAction(
-            title: htmlMode ? "Switch To Visual" : "Switch to HTML",
-            style: .default,
-            handler: { [unowned self] action in
-                self.toggleHTMLMode(action)
-            }
-        )
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
+        alert.addAction(updateHtmlAction)
         alert.addAction(cancelAction)
 
         present(alert, animated: true)
     }
-
+    
+    var toggleHTMLModeAction: UIAlertAction {
+        return UIAlertAction(
+            title: htmlMode ? "Switch To Visual" : "Switch to HTML",
+            style: .default,
+            handler: { [unowned self] action in
+                self.toggleHTMLMode(action)
+        })
+    }
+    
+    var updateHtmlAction: UIAlertAction {
+        return UIAlertAction(
+            title: "Update HTML",
+            style: .default,
+            handler: { [unowned self] action in
+                let alert = self.alertWithTextInput(using: { [unowned self] (htmlInput) in
+                    if let input = htmlInput {
+                        self.gutenberg.updateHtml(input)
+                    }
+                })
+                self.present(alert, animated: true, completion: nil)
+        })
+    }
+    
+    func alertWithTextInput(using handler: ((String?) -> Void)?) -> UIAlertController {
+        let alert = UIAlertController(title: "Enter HTML", message: nil, preferredStyle: .alert)
+        alert.addTextField()
+        let submitAction = UIAlertAction(title: "Submit", style: .default) { [unowned alert] (action) in
+            handler?(alert.textFields?.first?.text)
+        }
+        alert.addAction(submitAction)
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        return alert
+    }
+    
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()

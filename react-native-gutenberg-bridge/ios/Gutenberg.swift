@@ -51,6 +51,10 @@ public class Gutenberg: NSObject {
     public func toggleHTMLMode() {
         bridgeModule.sendEvent(withName: EventName.toggleHTMLMode, body: nil)
     }
+    
+    public func updateHtml(_ html: String) {
+        bridgeModule.sendEvent(withName: EventName.updateHtml, body: [ "html": html ])
+    }
 }
 
 extension Gutenberg: RCTBridgeDelegate {
@@ -70,5 +74,6 @@ extension Gutenberg {
     enum EventName {
         static let requestHTML = "requestGetHtml"
         static let toggleHTMLMode = "toggleHTMLMode"
+        static let updateHtml = "updateHtml"
     }
 }

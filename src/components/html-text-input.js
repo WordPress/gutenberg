@@ -8,19 +8,19 @@ import { Platform, TextInput, KeyboardAvoidingView } from 'react-native';
 import styles from './html-text-input.scss';
 
 // Gutenberg imports
-import { serialize, parse } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { parse } from '@wordpress/blocks';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
 type PropsType = {
-	blocks: Array<Object>,
 	onChange: string => mixed,
 	onPersist: string => mixed,
+	value: string,
 };
 
 type StateType = {
-	html: string,
 	isDirty: boolean,
+	value: string,
 };
 
 export class HTMLInputView extends React.Component<PropsType, StateType> {
@@ -36,17 +36,20 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		this.stopEditing = this.stopEditing.bind( this );
 
 		this.state = {
-			html: '',
 			isDirty: false,
+			value: '',
 		};
 	}
 
-	componentDidMount() {
-		const html = this.serializeBlocksToHtml();
-		this.setState( { html } );
-		if ( this.isIOS ) {
-			this.textInput.setNativeProps( { text: html } );
+	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
+		if ( state.isDirty ) {
+			return null;
 		}
+
+		return {
+			value: props.value,
+			isDirty: false,
+		};
 	}
 
 	componentWillUnmount() {
@@ -54,32 +57,14 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		this.stopEditing();
 	}
 
-	shouldComponentUpdate() {
-		return ! this.isIOS;
-	}
-
-	serializeBlocksToHtml() {
-		return this.props.blocks
-			.map( this.serializeBlock )
-			.join( '' );
-	}
-
-	serializeBlock( block: Object ) {
-		if ( block.name === 'aztec' ) {
-			return '<aztec>' + block.attributes.content + '</aztec>\n\n';
-		}
-
-		return serialize( [ block ] ) + '\n\n';
-	}
-
 	edit( html: string ) {
 		this.props.onChange( html );
-		this.setState( { html, isDirty: true } );
+		this.setState( { value: html, isDirty: true } );
 	}
 
 	stopEditing() {
 		if ( this.state.isDirty ) {
-			this.props.onPersist( this.state.html );
+			this.props.onPersist( this.state.value );
 			this.setState( { isDirty: false } );
 		}
 	}
@@ -90,12 +75,13 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 		return (
 			<KeyboardAvoidingView style={ styles.container } behavior={ behavior }>
 				<TextInput
+					autoCorrect={ false }
 					ref={ ( textInput ) => this.textInput = textInput }
 					textAlignVertical="top"
 					multiline
 					numberOfLines={ 0 }
 					style={ styles.htmlView }
-					value={ this.isIOS ? null : this.state.html }
+					value={ this.state.value }
 					onChangeText={ this.edit }
 					onBlur={ this.stopEditing }
 				/>
@@ -105,6 +91,15 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 }
 
 export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getEditedPostContent,
+		} = select( 'core/editor' );
+
+		return {
+			value: getEditedPostContent(),
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { editPost, resetBlocks } = dispatch( 'core/editor' );
 		return {
