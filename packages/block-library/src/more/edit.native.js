@@ -19,7 +19,7 @@ export default class MoreEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChangeInput = this.onChangeInput.bind( this );
-		
+
 		this.state = {
 			defaultText: __( 'Read more' ),
 		};
@@ -31,12 +31,11 @@ export default class MoreEdit extends Component {
 			defaultText: '',
 		} );
 		const value = newValue.length === 0 ? undefined : newValue;
-		console.log(value);
 		this.props.setAttributes( { customText: value } );
 	}
 
 	render() {
-		const { attributes, setAttributes, onFocus, onBlur } = this.props;
+		const { attributes, onFocus, onBlur } = this.props;
 		const { customText } = attributes;
 		const defaultText = __( 'Read more' );
 		const value = customText !== undefined ? customText : defaultText;
