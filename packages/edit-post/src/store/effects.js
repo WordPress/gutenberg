@@ -108,7 +108,7 @@ const effects = {
 		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
-		// Todo: improve error handling.
+		// TODO: improve error handling.
 		apiFetch( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
