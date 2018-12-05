@@ -21,7 +21,7 @@ describe( 'adding inline tokens', () => {
 		await newPost();
 	} );
 
-	it.skip( 'should insert inline image', async () => {
+	it( 'should insert inline image', async () => {
 		// Create a paragraph.
 		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
