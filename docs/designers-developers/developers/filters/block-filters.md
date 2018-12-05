@@ -237,8 +237,9 @@ Adding blocks is easy enough, removing them is as easy. Plugin or theme authors 
 
 ```js
 // my-plugin.js
-
-wp.blocks.unregisterBlockType( 'core/verse' );
+_wpLoadBlockEditor.then( function() {
+	wp.blocks.unregisterBlockType( 'core/verse' );
+});
 ```
 
 and load this script in the Editor
@@ -251,7 +252,7 @@ function my_plugin_blacklist_blocks() {
 	wp_enqueue_script(
 		'my-plugin-blacklist-blocks',
 		plugins_url( 'my-plugin.js', __FILE__ ),
-		array( 'wp-blocks' )
+		array( 'wp-edit-post' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
