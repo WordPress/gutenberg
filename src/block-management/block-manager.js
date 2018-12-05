@@ -33,6 +33,7 @@ export type BlockListType = {
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
 	createBlockAction: ( string, BlockType ) => mixed,
+	replaceBlockAction: ( string, BlockType ) => mixed,
 	serializeToNativeAction: void => void,
 	toggleHtmlModeAction: void => void,
 	mergeBlocksAction: ( string, string ) => mixed,
@@ -90,8 +91,15 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
 
-		this.props.createBlockAction( newBlock.clientId, newBlock );
-
+		// now determine whether we need to replace the currently selected block (if it's empty)
+		// or just add a new block as usual
+		const focusedItemIndex = this.state.blocks.findIndex( ( block ) => block.focused );
+		if ( focusedItemIndex !== -1 && this.isEmptyBlock( this.state.blocks[ focusedItemIndex ] ) ) {
+				// do replace here
+				this.props.replaceBlockAction( this.state.blocks[ focusedItemIndex ].clientId, newBlock );
+			} else {
+			this.props.createBlockAction( newBlock.clientId, newBlock );
+		}
 		// now set the focus
 		this.props.focusBlockAction( newBlock.clientId );
 	}
@@ -193,10 +201,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 	};
 
-	onReplace( clientId: string, blocks: Array<Object> ) {
-		// Insert the optional blocks and then remove the block indentified by clientId
-		this.insertBlocksAfter( clientId, blocks );
-		this.props.deleteBlockAction( clientId );
+	onReplace( clientId: string, block: BlockType ) {
+		this.props.replaceBlockAction( newBlock.clientId, newBlock );
 	}
 
 	renderList() {
@@ -259,6 +265,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		return index === this.state.blocks.length - 1;
 	}
 
+	isEmptyBlock( block: BlockType ) {
+		const content = block.attributes.content;
+		const innerBlocks = block.innerBlocks;
+		return ( content === undefined || content === "" ) && ( innerBlocks.length === 0 );
+	}
+
 	renderItem( value: { item: BlockType, index: number } ) {
 		const insertHere = (
 			<View style={ styles.containerStyleAddHere } >
@@ -283,7 +295,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					canMoveDown={ canMoveDown }
 					insertBlocksAfter={ ( blocks ) => this.insertBlocksAfter( value.item.clientId, blocks ) }
 					mergeBlocks={ this.mergeBlocks }
-					onReplace={ ( blocks ) => this.onReplace( value.item.clientId, blocks ) }
+					onReplace={ ( block ) => this.onReplace( value.item.clientId, block ) }
 					{ ...value.item }
 				/>
 				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
