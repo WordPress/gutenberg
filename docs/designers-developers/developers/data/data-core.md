@@ -148,6 +148,23 @@ Return Upload Permissions.
 
 Upload Permissions.
 
+### canUser
+
+Returns whether the current user can perform the given action on the given
+REST resource.
+
+*Parameters*
+
+ * state: Data state.
+ * action: Action to check. One of: 'create', 'read', 'update',
+                          'delete'.
+ * resource: REST resource to check, e.g. 'media' or 'posts'.
+ * id: ID of the rest resource to check.
+
+*Returns*
+
+Whether or not the user can perform the action.
+
 ## Actions
 
 ### receiveUserQuery
@@ -214,3 +231,13 @@ Returns an action object used in signalling that Upload permissions have been re
 *Parameters*
 
  * hasUploadPermissions: Does the user have permission to upload files?
+
+### receiveUserPermissions
+
+Returns an action object used in signalling that the current user has
+permission to perform an action on a REST resource.
+
+*Parameters*
+
+ * key: A key that represents the action and REST resource.
+ * isAllowed: Whether or not the user can perform the action.

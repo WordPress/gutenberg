@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews, hasUploadPermissions } from '../reducer';
+import { terms, entities, embedPreviews, userPermissions } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -118,21 +118,25 @@ describe( 'embedPreviews()', () => {
 	} );
 } );
 
-describe( 'hasUploadPermissions()', () => {
-	it( 'returns true by default', () => {
-		const state = hasUploadPermissions( undefined, {} );
-
-		expect( state ).toEqual( true );
+describe( 'userPermissions()', () => {
+	it( 'defaults to an empty object', () => {
+		const state = userPermissions( undefined, {} );
+		expect( state ).toEqual( {} );
 	} );
 
-	it( 'returns with updated upload permissions value', () => {
-		const originalState = true;
-
-		const state = hasUploadPermissions( originalState, {
-			type: 'RECEIVE_UPLOAD_PERMISSIONS',
-			hasUploadPermissions: false,
+	it( 'updates state with whether an action is allowed', () => {
+		const original = deepFreeze( {
+			'create/media': false,
 		} );
 
-		expect( state ).toEqual( false );
+		const state = userPermissions( original, {
+			type: 'RECEIVE_USER_PERMISSIONS',
+			key: 'create/media',
+			isAllowed: true,
+		} );
+
+		expect( state ).toEqual( {
+			'create/media': true,
+		} );
 	} );
 } );

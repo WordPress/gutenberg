@@ -16,6 +16,7 @@ import { compose } from '@wordpress/compose';
 export function ReusableBlockConvertButton( {
 	isVisible,
 	isStaticBlock,
+	canCreateBlocks,
 	onConvertToStatic,
 	onConvertToReusable,
 } ) {
@@ -29,6 +30,7 @@ export function ReusableBlockConvertButton( {
 				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
+					disabled={ ! canCreateBlocks }
 					onClick={ onConvertToReusable }
 				>
 					{ __( 'Add to Reusable Blocks' ) }
@@ -54,6 +56,7 @@ export default compose( [
 			canInsertBlockType,
 			__experimentalGetReusableBlock: getReusableBlock,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
 
 		const blocks = getBlocksByClientId( clientIds );
 
@@ -80,6 +83,7 @@ export default compose( [
 				! isReusableBlock( blocks[ 0 ] ) ||
 				! getReusableBlock( blocks[ 0 ].attributes.ref )
 			),
+			canCreateBlocks: canUser( 'create', 'blocks' ),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {

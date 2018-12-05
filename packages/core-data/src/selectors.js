@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter } from 'lodash';
+import { map, find, get, filter, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -178,5 +178,22 @@ export function isPreviewEmbedFallback( state, url ) {
  * @return {boolean} Upload Permissions.
  */
 export function hasUploadPermissions( state ) {
-	return state.hasUploadPermissions;
+	return canUser( state, 'create', 'media' );
+}
+
+/**
+ * Returns whether the current user can perform the given action on the given
+ * REST resource.
+ *
+ * @param {Object}  state    Data state.
+ * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
+ *                           'delete'.
+ * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param {?string} id       ID of the rest resource to check.
+ *
+ * @return {boolean} Whether or not the user can perform the action.
+ */
+export function canUser( state, action, resource, id ) {
+	const key = compact( [ action, resource, id ] ).join( '/' );
+	return get( state, [ 'userPermissions', key ], true );
 }

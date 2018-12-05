@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, includes, get, hasIn } from 'lodash';
+import { find, includes, get, hasIn, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,7 +16,7 @@ import {
 	receiveEntityRecords,
 	receiveThemeSupports,
 	receiveEmbedPreview,
-	receiveUploadPermissions,
+	receiveUserPermissions,
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch } from './controls';
@@ -103,7 +103,46 @@ export function* getEmbedPreview( url ) {
  * Requests Upload Permissions from the REST API.
  */
 export function* hasUploadPermissions() {
-	const response = yield apiFetch( { path: '/wp/v2/media', method: 'OPTIONS', parse: false } );
+	yield* canUser( 'create', 'media' );
+}
+
+/**
+ * Checks whether the current user can perform the given action on the given
+ * REST resource.
+ *
+ * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
+ *                           'delete'.
+ * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
+ * @param {?string} id       ID of the rest resource to check.
+ */
+export function* canUser( action, resource, id ) {
+	const methods = {
+		create: 'POST',
+		read: 'GET',
+		update: 'PUT',
+		delete: 'DELETE',
+	};
+
+	const method = methods[ action ];
+	if ( ! method ) {
+		throw new Error( `'${ action }' is not a valid action` );
+	}
+
+	const path = id ? `/wp/v2/${ resource }/${ id }` : `/wp/v2/${ resource }`;
+
+	let response;
+	try {
+		response = yield apiFetch( {
+			path,
+			// Ideally this would always be an OPTIONS request, but unfortunately there's
+			// a bug in the REST API which causes the Allow header to not be sent on
+			// OPTIONS requests to /posts/:id routes.
+			method: id ? 'GET' : 'OPTIONS',
+			parse: false,
+		} );
+	} catch ( error ) {
+		return;
+	}
 
 	let allowHeader;
 	if ( hasIn( response, [ 'headers', 'get' ] ) ) {
@@ -116,5 +155,7 @@ export function* hasUploadPermissions() {
 		allowHeader = get( response, [ 'headers', 'Allow' ], '' );
 	}
 
-	yield receiveUploadPermissions( includes( allowHeader, 'POST' ) );
+	const key = compact( [ action, resource, id ] ).join( '/' );
+	const isAllowed = includes( allowHeader, method );
+	yield receiveUserPermissions( key, isAllowed );
 }

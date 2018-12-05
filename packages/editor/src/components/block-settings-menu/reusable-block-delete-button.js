@@ -12,8 +12,8 @@ import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function ReusableBlockDeleteButton( { reusableBlock, onDelete } ) {
-	if ( ! reusableBlock ) {
+export function ReusableBlockDeleteButton( { id, isDisabled, onDelete } ) {
+	if ( ! id ) {
 		return null;
 	}
 
@@ -21,8 +21,8 @@ export function ReusableBlockDeleteButton( { reusableBlock, onDelete } ) {
 		<MenuItem
 			className="editor-block-settings-menu__control"
 			icon="no"
-			disabled={ reusableBlock.isTemporary }
-			onClick={ () => onDelete( reusableBlock.id ) }
+			disabled={ isDisabled }
+			onClick={ () => onDelete( id ) }
 		>
 			{ __( 'Remove from Reusable Blocks' ) }
 		</MenuItem>
@@ -35,9 +35,16 @@ export default compose( [
 			getBlock,
 			__experimentalGetReusableBlock: getReusableBlock,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
+
 		const block = getBlock( clientId );
+
+		const id = block && isReusableBlock( block ) ? block.attributes.ref : null;
 		return {
-			reusableBlock: block && isReusableBlock( block ) ? getReusableBlock( block.attributes.ref ) : null,
+			id,
+			isDisabled: !! id && (
+				getReusableBlock( id ).isTemporary || ! canUser( 'delete', 'blocks', id )
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, { onToggle = noop } ) => {

@@ -20,7 +20,8 @@ describe( 'ReusableBlockDeleteButton', () => {
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
 				role="menuitem"
-				reusableBlock={ { id: 123 } }
+				id={ 123 }
+				isDisabled={ false }
 				onDelete={ noop }
 			/>
 		);
@@ -32,7 +33,8 @@ describe( 'ReusableBlockDeleteButton', () => {
 		const onDelete = jest.fn();
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
-				reusableBlock={ { id: 123 } }
+				id={ 123 }
+				isDisabled={ false }
 				onDelete={ onDelete }
 			/>
 		);
