@@ -67,4 +67,57 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should only mutate text data on input', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+		await pressWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '3' );
+
+		await page.evaluate( () => {
+			let called;
+			const { body } = document;
+			const config = {
+				attributes: true,
+				childList: true,
+				characterData: true,
+				subtree: true,
+			};
+
+			const mutationObserver = new MutationObserver( ( records ) => {
+				if ( called ) {
+					throw new Error( 'Typing should only mutate once.' );
+				}
+
+				if ( records.length > 1 ) {
+					throw new Error( 'Typing should only mutate once.' );
+				}
+
+				records.forEach( ( record ) => {
+					if ( record.type !== 'characterData' ) {
+						throw new Error(
+							`Typing mutated more than character data: ${ record.type }`
+						);
+					}
+				} );
+
+				called = true;
+			} );
+
+			mutationObserver.observe( body, config );
+
+			document.addEventListener( 'selectionchange', () => {
+				// One selection change event is fine.
+				document.addEventListener( 'selectionchange', () => {
+					throw new Error( 'Typing should only emit one selection change event.' );
+				}, { once: true } );
+			}, { once: true } );
+		} );
+
+		await page.keyboard.type( '4' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
