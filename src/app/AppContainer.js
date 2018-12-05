@@ -18,7 +18,7 @@ type PropsType = {
 	selectedBlockIndex: number,
 	blocks: Array<BlockType>,
 	onInsertBlock: ( BlockType, number, ?string ) => mixed,
-	onReplaceBlock: ( BlockType, number, ?string ) => mixed,
+	onReplaceBlock: ( string, BlockType ) => mixed,
 	onMerge: ( string, string ) => mixed,
 	onMoveDown: ( string, ?string ) => mixed,
 	onMoveUp: ( string, ?string ) => mixed,

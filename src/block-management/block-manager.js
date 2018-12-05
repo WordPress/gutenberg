@@ -95,9 +95,9 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// or just add a new block as usual
 		const focusedItemIndex = this.state.blocks.findIndex( ( block ) => block.focused );
 		if ( focusedItemIndex !== -1 && this.isEmptyBlock( this.state.blocks[ focusedItemIndex ] ) ) {
-				// do replace here
-				this.props.replaceBlockAction( this.state.blocks[ focusedItemIndex ].clientId, newBlock );
-			} else {
+			// do replace here
+			this.props.replaceBlockAction( this.state.blocks[ focusedItemIndex ].clientId, newBlock );
+		} else {
 			this.props.createBlockAction( newBlock.clientId, newBlock );
 		}
 		// now set the focus
@@ -202,7 +202,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	};
 
 	onReplace( clientId: string, block: BlockType ) {
-		this.props.replaceBlockAction( newBlock.clientId, newBlock );
+		this.props.replaceBlockAction( clientId, block );
 	}
 
 	renderList() {
@@ -268,7 +268,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	isEmptyBlock( block: BlockType ) {
 		const content = block.attributes.content;
 		const innerBlocks = block.innerBlocks;
-		return ( content === undefined || content === "" ) && ( innerBlocks.length === 0 );
+		return ( content === undefined || content === '' ) && ( innerBlocks.length === 0 );
 	}
 
 	renderItem( value: { item: BlockType, index: number } ) {
