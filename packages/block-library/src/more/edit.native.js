@@ -57,6 +57,7 @@ export default class MoreEdit extends Component {
 					/>
 					<Text style={ styles[ 'block-library-more__right-marker' ] }>--&gt;</Text>
 				</View>
-			</View> );
+			</View>
+		);
 	}
 }
