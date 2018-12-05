@@ -66,6 +66,7 @@ describe( 'Classic', () => {
 		// Move focus away.
 		await pressWithModifier( 'shift', 'Tab' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		const regExp = new RegExp( `test<img class="alignnone size-full wp-image-\\d+" src="[^"]+\\/${ filename }\\.png" alt="" width="10" height="10" \\/>` );
+		expect( await getEditedPostContent() ).toMatch( regExp );
 	} );
 } );

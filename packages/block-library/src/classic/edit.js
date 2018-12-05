@@ -78,6 +78,7 @@ export default class ClassicEdit extends Component {
 	onSetup( editor ) {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
+		let bookmark;
 
 		this.editor = editor;
 
@@ -86,15 +87,23 @@ export default class ClassicEdit extends Component {
 		}
 
 		editor.on( 'blur', () => {
-			const bookmark = editor.selection.getBookmark( 2, true );
+			bookmark = editor.selection.getBookmark( 2, true );
 
 			setAttributes( {
 				content: editor.getContent(),
 			} );
 
-			editor.once( 'focus', () => editor.selection.moveToBookmark( bookmark ) );
+			editor.once( 'focus', () => {
+				if ( bookmark ) {
+					editor.selection.moveToBookmark( bookmark );
+				}
+			} );
 
 			return false;
+		} );
+
+		editor.on( 'mousedown touchstart', () => {
+			bookmark = null;
 		} );
 
 		editor.on( 'keydown', ( event ) => {
