@@ -3,16 +3,22 @@ buildscript {
     repositories {
         jcenter()
         google()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
+        classpath "gradle.plugin.io.github.http-builder-ng:http-plugin:0.1.1"
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
+
+apply plugin: "io.github.http-builder-ng.http-plugin"
 
 // import the `submoduleGitHash()` function
 apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462f8fef1a/raw/38557f55d0a3be9605c82b1df9ced4c846fd3aea/submoduleGitHash.gradle'
@@ -69,6 +75,33 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
+def sleepOnJitpack() {
+    println 'going to sleep'
+    sleep(5000)
+    println 'The event notification was successful'
+}
+
+static def jitpackArtifactUrl(hash) {
+    return "https://jitpack.io/com/github/wordpress-mobile/react-native-aztec/${hash}/react-native-aztec-${hash}.aar"
+}
+
+task patience(type:io.github.httpbuilderng.http.HttpTask) {
+    config {
+        def url = jitpackArtifactUrl(project.ext.hash)
+//        println url
+        request.uri = url
+    }
+    get {
+        request.contentType = 'application/octet-stream'
+        response.when(200) {
+            sleepOnJitpack()
+        }
+        response.success {
+            println 'Jitpack is ready'
+        }
+    }
+}
+
 dependencies {
     if (rootProject.ext.buildGutenbergFromSource) {
         println "using gutenberg from source"
@@ -77,6 +110,10 @@ dependencies {
         implementation project(':react-native-recyclerview-list')
     } else {
         implementation ('com.github.wordpress-mobile:react-native-svg:faed05be8dca2b0df8957c5f72c40eccef12144d')
+
+        project.ext.hash = submoduleGitHash('../../', 'react-native-aztec')
+        tasks.patience.execute()
+
         implementation ('com.github.wordpress-mobile:react-native-aztec:' + submoduleGitHash('../../', 'react-native-aztec'))
         implementation ('com.github.wordpress-mobile:react-native-recyclerview-list:a2e8ca550412504c32218fd473c55f696f18f1f7')
     }
