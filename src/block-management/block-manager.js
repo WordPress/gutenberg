@@ -94,9 +94,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		// now determine whether we need to replace the currently selected block (if it's empty)
 		// or just add a new block as usual
 		const focusedItemIndex = this.state.blocks.findIndex( ( block ) => block.focused );
-		if ( focusedItemIndex !== -1 &&
-			this.isEmptyBlock( this.state.blocks[ focusedItemIndex ] ) &&
-			this.isCandidateForReplaceBlock( this.state.blocks[ focusedItemIndex ] ) ) {
+		if ( this.isReplaceable( focusedItemIndex ) ) {
 			// do replace here
 			this.props.replaceBlockAction( this.state.blocks[ focusedItemIndex ].clientId, newBlock );
 		} else {
@@ -247,6 +245,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				onValueSelected={ ( itemValue ) => {
 					this.onBlockTypeSelected( itemValue );
 				} }
+				isReplacement={ this.isReplaceable( this.state.blocks.findIndex( ( block ) => block.focused ) ) }
 			/>
 		);
 
@@ -275,6 +274,12 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	isCandidateForReplaceBlock( block: BlockType ) {
 		return ( block.name === 'core/paragraph' || block.name === 'core/heading' || block.name === 'core/code' );
+	}
+
+	isReplaceable( focusedItemIndex: number ) {
+		return focusedItemIndex !== -1 &&
+			this.isEmptyBlock( this.state.blocks[ focusedItemIndex ] ) &&
+				this.isCandidateForReplaceBlock( this.state.blocks[ focusedItemIndex ] );
 	}
 
 	renderItem( value: { item: BlockType, index: number } ) {
