@@ -33,7 +33,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("Did receive HTML: \(html) changed: \(changed)")
     }
 
-    func gutenbergDidRequestMediaPicker(with callback: (String?) -> Void) {
+    func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback) {
         print("Gutenberg did request media picker, passing a sample url in callback")
         callback("https://cldup.com/cXyG__fTLN.jpg")
     }
