@@ -61,8 +61,8 @@ export class BlockSwitcher extends Component {
 				return null;
 			}
 			return (
-				<div className="components-toolbar" aria-hidden="true">
-					<span className="components-icon-button editor-block-switcher__no-switcher-icon is-presentational">
+				<div className="components-block-switcher" aria-hidden="true">
+					<span className="components-block-switcher__icon">
 						<BlockIcon icon={ blockType.icon } showColors />
 					</span>
 				</div>

@@ -3,16 +3,25 @@
 	height: $icon-button-size;
 }
 
+.components-block-switcher {
+	background-color: $white;
+	border: 1px solid $light-gray-500;
+	border-left: 0;
+}
+
 .components-icon-button.editor-block-switcher__toggle,
-.components-icon-button.editor-block-switcher__no-switcher-icon {
-	margin: 0;
+.components-icon-button.editor-block-switcher__no-switcher-icon,
+.components-block-switcher__icon {
 	display: block;
 	height: $icon-button-size;
 	padding: 3px;
+	margin: 0;
 }
 
 
-.components-icon-button.editor-block-switcher__no-switcher-icon {
+.components-icon-button.editor-block-switcher__no-switcher-icon,
+.components-block-switcher__icon {
+	align-items: center;
 	display: flex;
 	width: $icon-button-size + 6px + 6px;
 	.editor-block-icon {
