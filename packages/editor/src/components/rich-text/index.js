@@ -93,6 +93,7 @@ export class RichText extends Component {
 
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -108,7 +109,6 @@ export class RichText extends Component {
 		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
-		this.isActive = this.isActive.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
@@ -129,20 +129,8 @@ export class RichText extends Component {
 		this.lastHistoryValue = value;
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	componentWillUnmount() {
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
 	setRef( node ) {
 		this.editableRef = node;
-	}
-
-	isActive() {
-		return this.editableRef === document.activeElement;
 	}
 
 	/**
@@ -354,6 +342,12 @@ export class RichText extends Component {
 		if ( unstableOnFocus ) {
 			unstableOnFocus();
 		}
+
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	onBlur() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	/**
@@ -392,11 +386,6 @@ export class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
-		// Ensure it's the active element. This is a global event.
-		if ( ! this.isActive() ) {
-			return;
-		}
-
 		const { start, end, formats } = this.createRecord();
 
 		if ( start !== this.state.start || end !== this.state.end ) {
@@ -869,7 +858,7 @@ export class RichText extends Component {
 					record={ record }
 					onChange={ this.onChange }
 				>
-					{ ( { isExpanded, listBoxId, activeId } ) => (
+					{ ( { listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE
 								tagName={ Tagname }
@@ -879,7 +868,6 @@ export class RichText extends Component {
 								valueToEditableHTML={ this.valueToEditableHTML }
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-autocomplete="list"
-								aria-expanded={ isExpanded }
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
 								{ ...ariaProps }
@@ -890,6 +878,7 @@ export class RichText extends Component {
 								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
 								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
 								multilineTag={ this.multilineTag }
 								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
