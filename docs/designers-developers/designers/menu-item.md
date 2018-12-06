@@ -1,6 +1,6 @@
 # MenuItem
 
-MenuItem is a component which renders a button intended to be used in combination with the DropdownMenu component.
+`MenuItem` is a component which renders a button intended to be used in combination with the `MenuGroup` component.
 
 ![An image of a MenuItem being highlighted inside of a DropdownMenu component](https://wordpress.org/gutenberg/files/2018/11/MenuItem.png)
 
@@ -22,13 +22,13 @@ MenuItem is a component which renders a button intended to be used in combinatio
 
 ###Usage
 
-The MenuItem button should only be used in combination with the DropdownMenu component.
+A `MenuGroup` contiaining `MenuItem`s can be used within a `Dropdown`. A `MenuGroup` can also have other `MenuGroup`s within it so menus can be nested.
 
 ## Development guidelines
 
 ###Usage
 
-MenuItem is a component which renders a button intended to be used in combination with the DropdownMenu component.
+`MenuItem` is a component which renders a button intended to be used in combination with the `MenuGroup` component.
 
 ```
 import { MenuItem } from '@wordpress/components';
@@ -51,7 +51,7 @@ const MyMenuItem = withState( {
 
 ###Props 
 
-MenuItem supports the following props. Any additional props are passed through to the underlying  Button or IconButton component.
+`MenuItem` supports the following props. Any additional props are passed through to the underlying  `Button` or `IconButton` component.
 
 ```children```
 
@@ -109,10 +109,9 @@ Refer to documentation for Shortcut’s shortcut prop.
 - Require: No
 - Default: 'menuitem'
 
-[Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use menuitemradio for single select, and menuitemcheckbox for multiselect.
+[Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use `MenuItemRadio` for single select, and `MenuItemCheckbox` for multiselect.
 
 ## Related components
 
-- The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover after the user has interacted with an element (a button or icon) or when they perform a specific action. 
-- MenuItemsChoice
-- MenuGroup
+- The `DropdownMenu` displays a list of actions (each contained in a `MenuItem`, `MenuItemsChoice`, or `MenuGroup`) in a compact way. It appears in a `Popover` after the user has interacted with an element (a button or icon) or when they perform a specific action. 
+- `MenuItemsChoice`
