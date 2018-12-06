@@ -33,7 +33,7 @@ function getParentFormats( { text, formats }, startIndex, formatCount ) {
 	return [];
 }
 
-export function removeLineFormat( value ) {
+export function outdentListItems( value ) {
 	const { text, formats, start, end } = value;
 	const lineIndex = getLineIndex( value );
 	const lineFormats = formats[ lineIndex ];

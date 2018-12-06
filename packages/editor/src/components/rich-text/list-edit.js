@@ -6,8 +6,8 @@ import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import {
-	applyLineFormat,
-	removeLineFormat,
+	indentListItems,
+	outdentListItems,
 } from '@wordpress/rich-text';
 
 /**
@@ -52,28 +52,28 @@ export const ListEdit = ( {
 			type="primary"
 			character="["
 			onUse={ () => {
-				onChange( removeLineFormat( value ) );
+				onChange( outdentListItems( value ) );
 			} }
 		/>
 		<RichTextShortcut
 			type="primary"
 			character="]"
 			onUse={ () => {
-				onChange( applyLineFormat( value, { type: tagName } ) );
+				onChange( indentListItems( value, { type: tagName } ) );
 			} }
 		/>
 		<RichTextShortcut
 			type="primary"
 			character="m"
 			onUse={ () => {
-				onChange( applyLineFormat( value, { type: tagName } ) );
+				onChange( indentListItems( value, { type: tagName } ) );
 			} }
 		/>
 		<RichTextShortcut
 			type="primaryShift"
 			character="m"
 			onUse={ () => {
-				onChange( removeLineFormat( value ) );
+				onChange( outdentListItems( value ) );
 			} }
 		/>
 		<BlockFormatControls>
@@ -109,14 +109,14 @@ export const ListEdit = ( {
 						icon: 'editor-outdent',
 						title: __( 'Outdent list item' ),
 						onClick: () => {
-							onChange( removeLineFormat( value ) );
+							onChange( outdentListItems( value ) );
 						},
 					},
 					{
 						icon: 'editor-indent',
 						title: __( 'Indent list item' ),
 						onClick: () => {
-							onChange( applyLineFormat( value, { type: tagName } ) );
+							onChange( indentListItems( value, { type: tagName } ) );
 						},
 					},
 				].filter( Boolean ) }

@@ -1,7 +1,6 @@
 import './store';
 
 export { applyFormat } from './apply-format';
-export { applyLineFormat } from './apply-line-format';
 export { charAt } from './char-at';
 export { concat } from './concat';
 export { create } from './create';
@@ -14,7 +13,6 @@ export { isEmpty, isEmptyLine } from './is-empty';
 export { join } from './join';
 export { registerFormatType } from './register-format-type';
 export { removeFormat } from './remove-format';
-export { removeLineFormat } from './remove-line-format';
 export { remove } from './remove';
 export { replace } from './replace';
 export { insert } from './insert';
@@ -27,3 +25,5 @@ export { toHTMLString } from './to-html-string';
 export { toggleFormat } from './toggle-format';
 export { LINE_SEPARATOR } from './special-characters';
 export { unregisterFormatType } from './unregister-format-type';
+export { indentListItems } from './indent-list-items';
+export { outdentListItems } from './outdent-list-items';

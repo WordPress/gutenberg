@@ -41,7 +41,7 @@ function getTargetFormats(
 	return [];
 }
 
-export function applyLineFormat( value, rootFormat ) {
+export function indentListItems( value, rootFormat ) {
 	const lineIndex = getLineIndex( value );
 
 	if ( lineIndex === undefined ) {
