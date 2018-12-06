@@ -39,7 +39,7 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter } ) {
 				<DotTip
 					tipId="core/editor.inserter"
 					isCollapsible
-					label={ ( isOpen ) => isOpen ? __( 'Close tip for ‘Add block’' ) : __( 'Open tip for ‘Add block’' ) }
+					label={ ( isOpen ) => isOpen ? __( 'Close tip for “Add block”' ) : __( 'Open tip for “Add block”' ) }
 					className="edit-post-header-toolbar__inserter-button-tip"
 				>
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
