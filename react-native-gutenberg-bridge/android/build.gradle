@@ -103,8 +103,7 @@ def blockOnJitpack(group, module, hash) {
                     httpURLConnection.setReadTimeout(timeout)
                 }
             }
-            get {
-                request.contentType = 'application/octet-stream'
+            head {
                 response.exception { Exception t ->
                     if (t instanceof SocketTimeoutException) {
                         if (backoffCount >= backoffLimit) {
