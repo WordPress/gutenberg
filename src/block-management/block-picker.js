@@ -2,6 +2,12 @@
  * @format
  * @flow
  */
+
+ /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 import React, { Component } from 'react';
 import { FlatList, Text, TouchableHighlight, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -33,8 +39,8 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 	}
 
 	render() {
-		const titleForAdd = 'ADD BLOCK';
-		const titleForReplace = 'REPLACE BLOCK';
+		const titleForAdd = __( 'ADD BLOCK' );
+		const titleForReplace = __( 'REPLACE BLOCK' );
 		return (
 			<Modal
 				transparent={ true }
