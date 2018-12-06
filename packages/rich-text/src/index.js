@@ -1,6 +1,7 @@
 import './store';
 
 export { applyFormat } from './apply-format';
+export { applyLineFormat } from './apply-line-format';
 export { charAt } from './char-at';
 export { concat } from './concat';
 export { create } from './create';
