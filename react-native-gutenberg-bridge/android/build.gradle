@@ -21,7 +21,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: "io.github.http-builder-ng.http-plugin"
 
 // import the `submoduleGitHash()` function
-apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462f8fef1a/raw/38557f55d0a3be9605c82b1df9ced4c846fd3aea/submoduleGitHash.gradle'
+apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462f8fef1a/raw/3b91756fca76e4c2a9b573313e186c47842e1f7d/submoduleGitHash.gradle'
 
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
@@ -75,29 +75,80 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-def sleepOnJitpack() {
-    println 'going to sleep'
-    sleep(5000)
-    println 'The event notification was successful'
+//def sleepOnJitpack() {
+//    println 'going to sleep'
+//    sleep(5000)
+//    println 'sleep ended'
+//}
+
+static def jitpackArtifactUrl(module, hash) {
+    return "https://jitpack.io/com/github/wordpress-mobile/${module}/${hash}/${module}-${hash}.pom"
 }
 
-static def jitpackArtifactUrl(hash) {
-    return "https://jitpack.io/com/github/wordpress-mobile/react-native-aztec/${hash}/react-native-aztec-${hash}.aar"
+import io.github.httpbuilderng.http.HttpTask
+
+def getTaskName(backoffCount, module, hash) {
+    return "blockOnJitpack-${backoffCount}-${module}-${hash}";
 }
 
-task patience(type:io.github.httpbuilderng.http.HttpTask) {
-    config {
-        def url = jitpackArtifactUrl(project.ext.hash)
-//        println url
-        request.uri = url
-    }
-    get {
-        request.contentType = 'application/octet-stream'
-        response.when(200) {
-            sleepOnJitpack()
+def blockOnJitpack(group, module, hash) {
+    def backoffLimit = 7
+    (0..backoffLimit).each { backoffCount ->
+        def taskName = getTaskName(backoffCount, module, hash)
+        def task = tasks.create(name: taskName, type: HttpTask) { thisTask ->
+            thisTask.ext.doBackoff = false
+
+            config {
+                def timeout = (2**backoffCount) * 5 * 1000; // exponential timeout
+//                println("Timeout set to ${timeout}ms")
+
+                def url = jitpackArtifactUrl(module, hash)
+                request.uri = url
+
+                client.clientCustomizer { HttpURLConnection httpURLConnection ->
+                    httpURLConnection.setConnectTimeout(timeout)
+                    httpURLConnection.setReadTimeout(timeout)
+                }
+            }
+            get {
+                request.contentType = 'application/octet-stream'
+                //        response.when(200) {
+                //            sleepOnJitpack()
+                //        }
+                response.exception { Exception t ->
+                    if (t instanceof SocketTimeoutException) {
+                        if (backoffCount >= backoffLimit) {
+                            throw new Exception("Exhausted waiting for Jipack on ${group}:${module}:${hash}")
+                        }
+
+                        def newBackoffCount = backoffCount + 1
+                        thisTask.ext.doBackoff = true
+                        println "Timed out. Engaging backoff count ${newBackoffCount}"
+                    } else {
+                        println "Oops, an exception was thrown!"
+                        t.printStackTrace()
+                        throw new RuntimeException(t)
+                    }
+                }
+//                response.success { fromServer ->
+//                    def statusCode = fromServer.statusCode
+//                    println "got success ${statusCode}"
+//                    sleepOnJitpack()
+//                    println 'Jitpack is ready'
+//                }
+                response.failure { fromServer ->
+                    def statusCode = fromServer.statusCode
+                    println "got failure ${statusCode}"
+                    println fs
+                }
+            }
         }
-        response.success {
-            println 'Jitpack is ready'
+
+        preBuild.dependsOn(task)
+
+        if (backoffCount > 0) {
+            def prevTaskName = getTaskName(backoffCount - 1, module, hash)
+            task.onlyIf { tasks[prevTaskName].ext.doBackoff }
         }
     }
 }
@@ -111,8 +162,9 @@ dependencies {
     } else {
         implementation ('com.github.wordpress-mobile:react-native-svg:faed05be8dca2b0df8957c5f72c40eccef12144d')
 
-        project.ext.hash = submoduleGitHash('../../', 'react-native-aztec')
-        tasks.patience.execute()
+        def module = 'react-native-aztec';
+        def hash = submoduleGitHash('../../', 'react-native-aztec')
+        blockOnJitpack('com.github.wordpress-mobile', module, hash)
 
         implementation ('com.github.wordpress-mobile:react-native-aztec:' + submoduleGitHash('../../', 'react-native-aztec'))
         implementation ('com.github.wordpress-mobile:react-native-recyclerview-list:a2e8ca550412504c32218fd473c55f696f18f1f7')
