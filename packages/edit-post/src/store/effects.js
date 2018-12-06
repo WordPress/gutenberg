@@ -73,8 +73,8 @@ const effects = {
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		// Saves the wp_editor fields
-		if ( typeof( tinyMCE ) !== 'undefined' ) {
-			tinyMCE.triggerSave();
+		if ( typeof( window.tinyMCE ) !== 'undefined' ) {
+			window.tinyMCE.triggerSave();
 		}
 
 		const state = store.getState();
