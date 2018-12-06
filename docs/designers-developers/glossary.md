@@ -44,7 +44,7 @@
 <dd>The panel on the right which contains the document and block settings. The sidebar is toggled using the Settings gear icon.</dd>
 
 <dt>Serialization</dt>
-<dd>The process of converting a block's attributes object into HTML markup, this occurs each time a block is edited.</dd>
+<dd>The process of converting a block's attributes object into HTML markup, which occurs each time a block is edited.</dd>
 
 <dt>Static block</dt>
 <dd>A type of block where the content of which is known at the time of saving a post. A static block will be saved with HTML markup directly in post content.</dd>
