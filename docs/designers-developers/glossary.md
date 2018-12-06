@@ -17,7 +17,7 @@
 <dd>Primary interface for selecting from the available blocks, triggered by plus icon buttons on Blocks or in the top-left of the editor interface.</dd>
 
 <dt>Block name</dt>
-<dd>A unique identifier for a block type, consisting of a plugin-specific namespace and a short label describing the block's intent. e.g. `core/image`</dd>
+<dd>A unique identifier for a block type, consisting of a plugin-specific namespace and a short label describing the block's intent. e.g. <code>core/image</code></dd>
 
 <dt>Block type</dt>
 <dd>In contrast with the blocks composing a particular post, a block type describes the blueprint by which any block of that type should behave. So while there may be many images within a post, each behaves consistent with a unified image block type definition.</dd>
@@ -44,7 +44,7 @@
 <dd>The panel on the right which contains the document and block settings. The sidebar is toggled using the Settings gear icon.</dd>
 
 <dt>Serialization</dt>
-<dd>The process of converting a block's attributes object into HTML markup, typically occurring when saving the post.</dd>
+<dd>The process of converting a block's attributes object into HTML markup, this occurs each time a block is edited.</dd>
 
 <dt>Static block</dt>
 <dd>A type of block where the content of which is known at the time of saving a post. A static block will be saved with HTML markup directly in post content.</dd>
@@ -56,6 +56,6 @@
 <dd>A set of button controls. In the context of a block, usually referring to the toolbar of block controls shown above the selected block.</dd>
 
 <dt>Template</dt>
-<dd>A block template is defined as a list of block items. Such blocks can have predefined attributes, placeholder content, and be static or dynamic. Block templates allow to specify a default initial state for an editor session. See <a href="developers/block-api/block-templates.md">Templates documentation</a> for more.</dd>
+<dd> A template is a pre-defined arrangement of blocks, possibly with predefined attributes or placeholder content. You can provide a template for a post type, to give users a starting point when creating a new piece of content, or inside a custom block with the <code>InnerBlocks</code> component. See the templates documentation for more information. See <a href="../../developers/block-api/block-templates.md">templates documentation</a> for more information.</dd>
 
 </dl>
