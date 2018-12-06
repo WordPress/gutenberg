@@ -73,10 +73,10 @@ const effects = {
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
 		// Saves the wp_editor fields
-		if( tinyMCE ) {
+		if ( typeof( tinyMCE ) !== 'undefined' ) {
 			tinyMCE.triggerSave();
 		}
-		
+
 		const state = store.getState();
 
 		// Additional data needed for backwards compatibility.
