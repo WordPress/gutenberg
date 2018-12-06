@@ -1,0 +1,27 @@
+{
+	"name": "@wordpress/build-config",
+	"version": "1.0.0",
+	"description": "WordPress JavaScript build configuration.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"build",
+		"config"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/build-config/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=8"
+	},
+	"main": "index.js",
+	"publishConfig": {
+		"access": "public"
+	}
+}
