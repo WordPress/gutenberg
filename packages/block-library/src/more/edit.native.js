@@ -8,6 +8,10 @@ import { View, Text } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import {
+	getDefaultBlockName,
+	createBlock,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -26,6 +30,15 @@ export default class MoreEdit extends Component {
 	}
 
 	onChangeInput( newValue ) {
+		// Detect Enter.key and add new empty block after.
+		// Note: This is detected after the fact, and the newline could be visible on the block
+		// for a very small time. This is OK for the alpha, we will revisit the logic later.
+		// See https://github.com/wordpress-mobile/gutenberg-mobile/issues/324
+		if ( newValue.indexOf( '\n' ) !== -1 ) {
+			const { insertBlocksAfter } = this.props;
+			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
+			return;
+		}
 		// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
 		this.setState( {
 			defaultText: '',
