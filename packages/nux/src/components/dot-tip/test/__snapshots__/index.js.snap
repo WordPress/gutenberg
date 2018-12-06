@@ -1,53 +1,65 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DotTip should render a button when collapsible 1`] = `
-<button
-  aria-label="Open tip"
-  className="nux-dot-tip"
-  onClick={[Function]}
-/>
+<Tooltip
+  text="Open tip"
+>
+  <button
+    aria-label="Open tip"
+    className="nux-dot-tip"
+    onClick={[Function]}
+  />
+</Tooltip>
 `;
 
 exports[`DotTip should render a custom label when collapsible 1`] = `
-<button
-  aria-label="Open tip for “Writing a Letter”"
-  className="nux-dot-tip"
-  onClick={[Function]}
-/>
+<Tooltip
+  text="Open tip for “Writing a Letter”"
+>
+  <button
+    aria-label="Open tip for “Writing a Letter”"
+    className="nux-dot-tip"
+    onClick={[Function]}
+  />
+</Tooltip>
 `;
 
 exports[`DotTip should render the tip after being clicked when collapsible 1`] = `
-<button
-  aria-label="Close tip"
-  className="nux-dot-tip"
-  onClick={[Function]}
+<Tooltip
+  text="Close tip"
 >
-  <Popover
-    aria-label="Editor tips"
-    className="nux-dot-tip__popover"
-    focusOnMount="container"
-    noArrow={true}
+  <button
+    aria-label="Close tip"
+    className="nux-dot-tip"
     onClick={[Function]}
-    position="middle right"
-    role="dialog"
   >
-    <p>
-      It looks like you’re writing a letter. Would you like help?
-    </p>
-    <p>
-      <Button
-        isLink={true}
-      >
-        Got it
-      </Button>
-    </p>
-    <IconButton
-      className="nux-dot-tip__disable"
-      icon="no-alt"
-      label="Disable tips"
-    />
-  </Popover>
-</button>
+    <Popover
+      aria-label="Editor tips"
+      className="nux-dot-tip__popover"
+      focusOnMount="container"
+      noArrow={true}
+      onClick={[Function]}
+      position="middle right"
+      role="dialog"
+    >
+      <p>
+        It looks like you’re writing a letter. Would you like help?
+      </p>
+      <p>
+        <Button
+          isLink={true}
+        >
+          Got it
+        </Button>
+      </p>
+      <IconButton
+        className="nux-dot-tip__disable"
+        icon="no-alt"
+        label="Disable tips"
+      />
+    </Popover>
+  </button>
+</Tooltip>
 `;
 
 exports[`DotTip should render the tip when non-collapsible 1`] = `

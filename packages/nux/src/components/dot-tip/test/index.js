@@ -40,7 +40,7 @@ describe( 'DotTip', () => {
 
 	it( 'should render a custom label when collapsible', () => {
 		const wrapper = shallow(
-			<DotTip isCollapsible label="Writing a Letter" isVisible>
+			<DotTip isCollapsible title="Writing a Letter" isVisible>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);
@@ -55,7 +55,7 @@ describe( 'DotTip', () => {
 		);
 
 		const stopPropagation = jest.fn();
-		wrapper.simulate( 'click', { stopPropagation } );
+		wrapper.find( 'button' ).simulate( 'click', { stopPropagation } );
 		wrapper.update();
 
 		expect( wrapper ).toMatchSnapshot();

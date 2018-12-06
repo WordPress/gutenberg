@@ -8,6 +8,7 @@ import {
 	IconButton,
 	KeyboardShortcuts,
 	Popover,
+	Tooltip,
 	withSpokenMessages,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -17,15 +18,6 @@ function stopEventPropagation( event ) {
 	// Tips are often nested within buttons. We stop propagation so that clicking
 	// on a tip doesn't result in the button being clicked.
 	event.stopPropagation();
-}
-
-function buildLabel( isOpen, label ) {
-	if ( label ) {
-		return isOpen ?
-			sprintf( __( 'Close tip for “%s”' ), label ) :
-			sprintf( __( 'Open tip for “%s”' ), label );
-	}
-	return isOpen ? __( 'Close tip' ) : __( 'Open tip' );
 }
 
 export class DotTip extends Component {
@@ -40,11 +32,11 @@ export class DotTip extends Component {
 	}
 
 	componentDidMount() {
-		const { isCollapsible, shortcut, label, debouncedSpeak } = this.props;
+		const { isCollapsible, shortcut, title, debouncedSpeak } = this.props;
 
-		if ( isCollapsible && shortcut && shortcut.raw && shortcut.ariaLabel && label ) {
+		if ( isCollapsible && shortcut && shortcut.raw && shortcut.ariaLabel && title ) {
 			debouncedSpeak(
-				sprintf( __( 'Press “%s” to open the tip for “%s”.' ), shortcut.ariaLabel, label )
+				sprintf( __( 'Press “%s” to open the tip for “%s”.' ), shortcut.ariaLabel, title )
 			);
 		}
 	}
@@ -64,7 +56,7 @@ export class DotTip extends Component {
 			hasNextTip,
 			isCollapsible,
 			isVisible,
-			label,
+			title,
 			onDisable,
 			onDismiss,
 			shortcut,
@@ -78,6 +70,15 @@ export class DotTip extends Component {
 		let classes = 'nux-dot-tip';
 		if ( className ) {
 			classes += ` ${ className }`;
+		}
+
+		let label;
+		if ( title ) {
+			label = isOpen ?
+				sprintf( __( 'Close tip for “%s”' ), title ) :
+				sprintf( __( 'Open tip for “%s”' ), title );
+		} else {
+			label = isOpen ? __( 'Close tip' ) : __( 'Open tip' );
 		}
 
 		let popover = null;
@@ -109,21 +110,18 @@ export class DotTip extends Component {
 		}
 
 		return isCollapsible ? (
-			<button
-				className={ classes }
-				aria-label={ buildLabel( isOpen, label ) }
-				onClick={ this.toggleIsOpen }
-			>
-				{ shortcut &&
-					shortcut.raw && (
-					<KeyboardShortcuts
-						shortcuts={ {
-							[ shortcut.raw ]: this.toggleIsOpen,
-						} }
-					/>
-				) }
-				{ popover }
-			</button>
+			<Tooltip text={ label } shortcut={ shortcut && shortcut.display }>
+				<button className={ classes } aria-label={ label } onClick={ this.toggleIsOpen }>
+					{ shortcut && shortcut.raw && (
+						<KeyboardShortcuts
+							shortcuts={ {
+								[ shortcut.raw ]: this.toggleIsOpen,
+							} }
+						/>
+					) }
+					{ popover }
+				</button>
+			</Tooltip>
 		) : (
 			<div className={ classes }>{ popover }</div>
 		);

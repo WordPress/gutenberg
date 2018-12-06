@@ -15,7 +15,7 @@ import {
 	NavigableToolbar,
 	BlockNavigationDropdown,
 } from '@wordpress/editor';
-import { rawShortcut, shortcutAriaLabel } from '@wordpress/keycodes';
+import { rawShortcut, displayShortcut, shortcutAriaLabel } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -41,9 +41,10 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter } ) {
 					tipId="core/editor.inserter"
 					className="edit-post-header-toolbar__inserter-button-tip"
 					isCollapsible
-					label="Add block"
+					title="Add block"
 					shortcut={ {
 						raw: rawShortcut.access( 't' ),
+						display: displayShortcut.access( 't' ),
 						ariaLabel: shortcutAriaLabel.access( 't' ),
 					} }
 				>
