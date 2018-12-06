@@ -15,6 +15,7 @@ import {
 	NavigableToolbar,
 	BlockNavigationDropdown,
 } from '@wordpress/editor';
+import { rawShortcut, shortcutAriaLabel } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -38,9 +39,13 @@ function HeaderToolbar( { hasFixedToolbar, isLargeViewport, showInserter } ) {
 				<Inserter disabled={ ! showInserter } position="bottom right" />
 				<DotTip
 					tipId="core/editor.inserter"
-					isCollapsible
-					label={ ( isOpen ) => isOpen ? __( 'Close tip for “Add block”' ) : __( 'Open tip for “Add block”' ) }
 					className="edit-post-header-toolbar__inserter-button-tip"
+					isCollapsible
+					label="Add block"
+					shortcut={ {
+						raw: rawShortcut.access( 't' ),
+						ariaLabel: shortcutAriaLabel.access( 't' ),
+					} }
 				>
 					{ __( 'Welcome to the wonderful world of blocks! Click the “+” (“Add block”) button to add a new block. There are blocks available for all kinds of content: you can insert text, headings, images, lists, and lots more!' ) }
 				</DotTip>

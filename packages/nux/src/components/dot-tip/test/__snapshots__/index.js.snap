@@ -10,7 +10,7 @@ exports[`DotTip should render a button when collapsible 1`] = `
 
 exports[`DotTip should render a custom label when collapsible 1`] = `
 <button
-  aria-label="Toggle tip"
+  aria-label="Open tip for “Writing a Letter”"
   className="nux-dot-tip"
   onClick={[Function]}
 />

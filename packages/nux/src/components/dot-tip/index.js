@@ -1,15 +1,16 @@
 /**
- * External dependencies
- */
-import { isFunction } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { Popover, Button, IconButton } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import {
+	Button,
+	IconButton,
+	KeyboardShortcuts,
+	Popover,
+	withSpokenMessages,
+} from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 function stopEventPropagation( event ) {
@@ -18,7 +19,12 @@ function stopEventPropagation( event ) {
 	event.stopPropagation();
 }
 
-function defaultLabel( isOpen ) {
+function buildLabel( isOpen, label ) {
+	if ( label ) {
+		return isOpen ?
+			sprintf( __( 'Close tip for “%s”' ), label ) :
+			sprintf( __( 'Open tip for “%s”' ), label );
+	}
 	return isOpen ? __( 'Close tip' ) : __( 'Open tip' );
 }
 
@@ -31,6 +37,16 @@ export class DotTip extends Component {
 		this.state = {
 			isOpen: ! isCollapsible,
 		};
+	}
+
+	componentDidMount() {
+		const { isCollapsible, shortcut, label, debouncedSpeak } = this.props;
+
+		if ( isCollapsible && shortcut && shortcut.raw && shortcut.ariaLabel && label ) {
+			debouncedSpeak(
+				sprintf( __( 'Press “%s” to open the tip for “%s”.' ), shortcut.ariaLabel, label )
+			);
+		}
 	}
 
 	toggleIsOpen( event ) {
@@ -48,9 +64,10 @@ export class DotTip extends Component {
 			hasNextTip,
 			isCollapsible,
 			isVisible,
-			label = defaultLabel,
+			label,
 			onDisable,
 			onDismiss,
+			shortcut,
 		} = this.props;
 		const { isOpen } = this.state;
 
@@ -94,9 +111,17 @@ export class DotTip extends Component {
 		return isCollapsible ? (
 			<button
 				className={ classes }
-				aria-label={ isFunction( label ) ? label( isOpen ) : label }
+				aria-label={ buildLabel( isOpen, label ) }
 				onClick={ this.toggleIsOpen }
 			>
+				{ shortcut &&
+					shortcut.raw && (
+					<KeyboardShortcuts
+						shortcuts={ {
+							[ shortcut.raw ]: this.toggleIsOpen,
+						} }
+					/>
+				) }
 				{ popover }
 			</button>
 		) : (
@@ -124,5 +149,6 @@ export default compose(
 				disableTips();
 			},
 		};
-	} )
+	} ),
+	withSpokenMessages
 )( DotTip );

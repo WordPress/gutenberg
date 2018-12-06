@@ -40,7 +40,7 @@ describe( 'DotTip', () => {
 
 	it( 'should render a custom label when collapsible', () => {
 		const wrapper = shallow(
-			<DotTip isCollapsible label="Toggle tip" isVisible>
+			<DotTip isCollapsible label="Writing a Letter" isVisible>
 				It looks like you’re writing a letter. Would you like help?
 			</DotTip>
 		);

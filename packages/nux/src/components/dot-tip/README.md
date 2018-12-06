@@ -41,15 +41,30 @@ Defaults to `false`.
 
 ### label
 
-The ARIA label used to describe the button that opens or closes a collapsible tip.
-
-If a function is provided then it will be invoked with `isOpen` as the argument, allowing one to change the label depeneding on whether the button opens or closes the tip.
+A short string which describes the tip. This is used to label the button which expands or collapses the tip if it is collapsible.
 
 ```jsx
-<DotTip tipId="acme/add-to-cart" label={ ( isOpen ) => isOpen ? 'Close tip' : 'Open tip' }>
+<DotTip tipId="acme/add-to-cart" label="Add to Cart">
 	Click here to add the product to your shopping cart.
 </DotTip>
 ```
 
-- Type: `string` or `Function`
+- Type: `string`
+- Required: No
+
+### shortcut
+
+An object which, if specified, configures a keyboard shortcut which will expand or collapse the tip if it is collapsible.
+
+The object must contain a `raw` property which is the keyboard shortcut to bind to.
+
+Optionally, the object can contain an `ariaLabel` property which is a textual description of the shortcut used for screen readers.
+
+```jsx
+<DotTip tipId="acme/add-to-cart" shortcut={ { raw: 'ctrl+alt+t' } }>
+	Click here to add the product to your shopping cart.
+</DotTip>
+```
+
+- Type: `Object`
 - Required: No
