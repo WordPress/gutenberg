@@ -50,8 +50,6 @@ export function applyLineFormat( value, format, rootFormat ) {
 
 	const { text, formats, start, end } = value;
 	const formatsAtLineIndex = formats[ lineIndex ] || [];
-	const targetFormatCount = formatsAtLineIndex.length;
-	const targetFormats = getTargetFormats( value, lineIndex, targetFormatCount );
 	const previousLineIndex = getLineIndex( value, lineIndex );
 	const formatsAtPreviousLineIndex = formats[ previousLineIndex ] || [];
 
@@ -60,6 +58,8 @@ export function applyLineFormat( value, format, rootFormat ) {
 	}
 
 	const newFormats = formats.slice();
+	const targetFormatCount = formatsAtLineIndex.length;
+	const targetFormats = getTargetFormats( value, lineIndex, targetFormatCount );
 
 	for ( let index = lineIndex; index < end; index++ ) {
 		if ( text[ index ] !== LINE_SEPARATOR ) {
@@ -74,7 +74,9 @@ export function applyLineFormat( value, format, rootFormat ) {
 				( newFormats[ index ] || [] ).slice( targetFormats.length )
 			);
 		} else {
-			newFormats[ index ] = targetFormats;
+			newFormats[ index ] = targetFormats.concat(
+				( newFormats[ index ] || [] ).slice( targetFormats.length - 1 )
+			);
 		}
 	}
 
