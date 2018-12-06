@@ -61,6 +61,7 @@
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
+		"@wordpress/build-config": "file:packages/build-config",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
 		"@wordpress/eslint-config": "file:packages/eslint-config",
 		"@wordpress/jest-console": "file:packages/jest-console",
