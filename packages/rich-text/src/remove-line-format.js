@@ -23,12 +23,14 @@ function getParentFormats( { text, formats }, startIndex, formatCount ) {
 			continue;
 		}
 
-		const currentFormatCount = formats[ index ] ? formats[ index ].length : 0;
+		const formatsAtIndex = formats[ index ] || [];
 
-		if ( currentFormatCount === formatCount - 1 ) {
-			return formats[ index ];
+		if ( formatsAtIndex.length === formatCount - 1 ) {
+			return formatsAtIndex;
 		}
 	}
+
+	return [];
 }
 
 export function removeLineFormat( value ) {
@@ -41,11 +43,20 @@ export function removeLineFormat( value ) {
 	}
 
 	const newFormats = formats.slice( 0 );
+	const parentFormats = getParentFormats( value, lineIndex, lineFormats.length );
 
-	newFormats[ lineIndex ] = getParentFormats( value, lineIndex, lineFormats.length );
+	for ( let index = lineIndex; index < end; index++ ) {
+		if ( text[ index ] !== LINE_SEPARATOR ) {
+			continue;
+		}
 
-	if ( newFormats[ lineIndex ] === undefined ) {
-		delete newFormats[ lineIndex ];
+		const trailingFormats = newFormats[ index ].slice( parentFormats.length + 1 );
+
+		newFormats[ index ] = parentFormats.concat( trailingFormats );
+
+		if ( newFormats[ index ].length === 0 ) {
+			delete newFormats[ lineIndex ];
+		}
 	}
 
 	return normaliseFormats( {
