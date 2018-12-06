@@ -23,6 +23,9 @@ apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
+// import the `waitJitpack()` function
+apply from: 'https://gist.githubusercontent.com/hypest/f526fe0775dedce0ce0133f1400d22a4/raw/0008b271a0d28fc79957fd3c2a027f57e98f796a/wait-jitpack.gradle'
+
 group='com.github.wordpress-mobile.gutenberg-mobile'
 
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
@@ -70,45 +73,6 @@ repositories {
     }
 
     maven { url "https://jitpack.io" }
-}
-
-def waitJitpack(group, module, hash) {
-    preBuild.dependsOn(tasks.create(name: "waitJitpack-${module}-${hash}") { thisTask ->
-        def url = "https://jitpack.io/${group.replace('.', '/')}/${module}/${hash}/${module}-${hash}.pom"
-
-        def backoffLimit = 7
-        for (def backoffCount : (0..backoffLimit)) {
-            def connection = new URL(url).openConnection() as HttpURLConnection
-
-            def timeout = (2**backoffCount) * 5 * 1000; // exponential timeout
-            connection.setConnectTimeout(timeout)
-            connection.setReadTimeout(timeout)
-
-            connection.setRequestMethod("HEAD");
-            connection.setInstanceFollowRedirects(true)
-
-            try {
-                def responseCode = connection.getResponseCode();
-                if (responseCode >= 200 && responseCode <= 299) {
-                    // success. Just bail
-                    return
-                } else {
-                    def responseMessage = connection.getResponseCode();
-                    throw new RuntimeException("Failed reaching Jitpack for ${group}:${module}:${hash}: ${responseMessage}")
-                }
-            } catch (SocketTimeoutException ignored) {
-                if (backoffCount == backoffLimit) {
-                    throw new Exception("Exhausted waiting for Jipack on ${group}:${module}:${hash}")
-                }
-
-                println "Retrying JitPack ${backoffCount+1}/${backoffLimit+1} for ${group}:${module}:${hash}"
-            } catch (Exception e) {
-                throw e
-            }
-        }
-    })
-
-    return "${group}:${module}:${hash}"
 }
 
 dependencies {
