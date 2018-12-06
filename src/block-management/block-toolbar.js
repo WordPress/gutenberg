@@ -4,7 +4,7 @@
  */
 
 import React, { Component } from 'react';
-import { View } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
@@ -37,34 +37,41 @@ export class BlockToolbar extends Component<PropsType> {
 
 		return (
 			<View style={ styles.container }>
-				<Toolbar>
-					<ToolbarButton
-						label={ __( 'Add block' ) }
-						icon="insert"
-						onClick={ onInsertClick }
-					/>
-					<ToolbarButton
-						label={ __( 'Undo' ) }
-						icon="undo"
-						isDisabled={ ! hasUndo }
-						onClick={ undo }
-					/>
-					<ToolbarButton
-						label={ __( 'Redo' ) }
-						icon="redo"
-						isDisabled={ ! hasRedo }
-						onClick={ redo }
-					/>
-				</Toolbar>
-				{ showKeyboardHideButton && ( <Toolbar>
-					<ToolbarButton
-						label={ __( 'Keyboard hide' ) }
-						icon="arrow-down"
-						onClick={ onKeyboardHide }
-					/>
-				</Toolbar> ) }
-				<BlockControls.Slot />
-				<BlockFormatControls.Slot />
+				<ScrollView
+					horizontal={ true }
+					showsHorizontalScrollIndicator={ false }
+					keyboardShouldPersistTaps={ 'always' }
+					alwaysBounceHorizontal={ false }
+				>
+					<Toolbar>
+						<ToolbarButton
+							label={ __( 'Add block' ) }
+							icon="insert"
+							onClick={ onInsertClick }
+						/>
+						<ToolbarButton
+							label={ __( 'Undo' ) }
+							icon="undo"
+							isDisabled={ ! hasUndo }
+							onClick={ undo }
+						/>
+						<ToolbarButton
+							label={ __( 'Redo' ) }
+							icon="redo"
+							isDisabled={ ! hasRedo }
+							onClick={ redo }
+						/>
+					</Toolbar>
+					{ showKeyboardHideButton && ( <Toolbar>
+						<ToolbarButton
+							label={ __( 'Keyboard hide' ) }
+							icon="arrow-down"
+							onClick={ onKeyboardHide }
+						/>
+					</Toolbar> ) }
+					<BlockControls.Slot />
+					<BlockFormatControls.Slot />
+				</ScrollView>
 			</View>
 		);
 	}

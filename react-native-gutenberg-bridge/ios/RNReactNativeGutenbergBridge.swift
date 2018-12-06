@@ -27,7 +27,8 @@ extension RNReactNativeGutenbergBridge {
     public override func supportedEvents() -> [String]! {
         return [
             Gutenberg.EventName.requestHTML,
-            Gutenberg.EventName.toggleHTMLMode
+            Gutenberg.EventName.toggleHTMLMode,
+            Gutenberg.EventName.updateHtml
         ]
     }
 

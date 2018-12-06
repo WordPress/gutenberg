@@ -14,4 +14,8 @@ export function subscribeParentToggleHTMLMode( callback ) {
 	return gutenbergBridgeEvents.addListener( 'toggleHTMLMode', callback );
 }
 
+export function subscribeUpdateHtml( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
+}
+
 export default RNReactNativeGutenbergBridge;

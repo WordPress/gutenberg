@@ -99,6 +99,10 @@ class AppContainer extends React.Component<PropsType> {
 		this.props.onToggleBlockMode( this.props.rootClientId );
 	};
 
+	updateHtmlAction = ( html: string ) => {
+		this.parseBlocksAction( html );
+	};
+
 	mergeBlocksAction = ( blockOneClientId, blockTwoClientId ) => {
 		this.props.onMerge( blockOneClientId, blockTwoClientId );
 	};
@@ -118,6 +122,7 @@ class AppContainer extends React.Component<PropsType> {
 				replaceBlockAction={ this.replaceBlockAction }
 				serializeToNativeAction={ this.serializeToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
+				updateHtmlAction={ this.updateHtmlAction }
 				mergeBlocksAction={ this.mergeBlocksAction }
 				isBlockSelected={ this.props.isBlockSelected }
 			/>
