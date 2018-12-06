@@ -6,10 +6,8 @@ import { Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import {
-	LINE_SEPARATOR,
-	slice,
-	normaliseFormats,
 	applyLineFormat,
+	removeLineFormat,
 } from '@wordpress/rich-text';
 
 /**
@@ -41,34 +39,6 @@ function isActiveListType( editor, tagName, rootTagName ) {
 	return list.nodeName.toLowerCase() === tagName;
 }
 
-function getLineIndex( value ) {
-	const beforeValue = slice( value, 0, value.start );
-	return beforeValue.text.lastIndexOf( LINE_SEPARATOR );
-}
-
-function outdentLineFormat( value ) {
-	const index = getLineIndex( value );
-	const { text, formats, start, end } = value;
-	const newFormats = formats.slice( 0 );
-
-	if ( ! newFormats[ index ] ) {
-		return value;
-	}
-
-	newFormats[ index ].pop();
-
-	if ( newFormats[ index ].length === 0 ) {
-		delete newFormats[ index ];
-	}
-
-	return normaliseFormats( {
-		text,
-		formats: newFormats,
-		start,
-		end,
-	} );
-}
-
 export const ListEdit = ( {
 	editor,
 	onTagNameChange,
@@ -82,32 +52,28 @@ export const ListEdit = ( {
 			type="primary"
 			character="["
 			onUse={ () => {
-				editor.execCommand( 'Outdent' );
-				onSyncDOM();
+				onChange( removeLineFormat( value ) );
 			} }
 		/>
 		<RichTextShortcut
 			type="primary"
 			character="]"
 			onUse={ () => {
-				editor.execCommand( 'Indent' );
-				onSyncDOM();
+				onChange( applyLineFormat( value, { type: 'ul' }, { type: tagName } ) );
 			} }
 		/>
 		<RichTextShortcut
 			type="primary"
 			character="m"
 			onUse={ () => {
-				editor.execCommand( 'Indent' );
-				onSyncDOM();
+				onChange( applyLineFormat( value, { type: 'ul' }, { type: tagName } ) );
 			} }
 		/>
 		<RichTextShortcut
 			type="primaryShift"
 			character="m"
 			onUse={ () => {
-				editor.execCommand( 'Outdent' );
-				onSyncDOM();
+				onChange( removeLineFormat( value ) );
 			} }
 		/>
 		<BlockFormatControls>
@@ -143,7 +109,7 @@ export const ListEdit = ( {
 						icon: 'editor-outdent',
 						title: __( 'Outdent list item' ),
 						onClick: () => {
-							onChange( outdentLineFormat( value ) );
+							onChange( removeLineFormat( value ) );
 						},
 					},
 					{

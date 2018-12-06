@@ -14,6 +14,7 @@ export { isEmpty, isEmptyLine } from './is-empty';
 export { join } from './join';
 export { registerFormatType } from './register-format-type';
 export { removeFormat } from './remove-format';
+export { removeLineFormat } from './remove-line-format';
 export { remove } from './remove';
 export { replace } from './replace';
 export { insert } from './insert';
