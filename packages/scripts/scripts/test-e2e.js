@@ -32,13 +32,14 @@ if ( ! hasProjectFile( 'jest-puppeteer.config.js' ) && ! process.env.JEST_PUPPET
 	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot( 'puppeteer.config.js' );
 }
 
+const config = ! hasJestConfig() ?
+	[ '--config', JSON.stringify( fromConfigRoot( 'jest-e2e.config.js' ) ) ] :
+	[];
+
 const hasRunInBand = hasCliArg( '--runInBand' ) ||
 	hasCliArg( '-i' );
+const runInBand = hasRunInBand ?
+	[ '--runInBand' ] :
+	[];
 
-jest.run(
-	[].concat(
-		! hasJestConfig() && [ '--config', JSON.stringify( fromConfigRoot( 'jest-e2e.config' ) ) ],
-		! hasRunInBand && '--runInBand',
-		getCliArgs()
-	).filter( Boolean )
-);
+jest.run( [ ...config, ...runInBand, ...getCliArgs() ] );
