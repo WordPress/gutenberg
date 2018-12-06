@@ -41,7 +41,7 @@ function getTargetFormats(
 	return [];
 }
 
-export function applyLineFormat( value, format, rootFormat ) {
+export function applyLineFormat( value, rootFormat ) {
 	const lineIndex = getLineIndex( value );
 
 	if ( lineIndex === undefined ) {

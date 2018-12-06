@@ -22,7 +22,7 @@ describe( 'applyFormat', () => {
 			start: 1,
 			end: 1,
 		};
-		const result = applyLineFormat( deepFreeze( record ), ul, ul );
+		const result = applyLineFormat( deepFreeze( record ), ul );
 
 		expect( result ).toEqual( record );
 		expect( result ).toBe( record );
@@ -42,7 +42,7 @@ describe( 'applyFormat', () => {
 			start: 2,
 			end: 2,
 		};
-		const result = applyLineFormat( deepFreeze( record ), ul, ul );
+		const result = applyLineFormat( deepFreeze( record ), ul );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -56,7 +56,7 @@ describe( 'applyFormat', () => {
 			start: 2,
 			end: 2,
 		};
-		const result = applyLineFormat( deepFreeze( record ), ul, ul );
+		const result = applyLineFormat( deepFreeze( record ), ul );
 
 		expect( result ).toEqual( record );
 		expect( result ).toBe( record );
@@ -76,7 +76,7 @@ describe( 'applyFormat', () => {
 			start: 3,
 			end: 3,
 		};
-		const result = applyLineFormat( deepFreeze( record ), ul, ul );
+		const result = applyLineFormat( deepFreeze( record ), ul );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -96,7 +96,7 @@ describe( 'applyFormat', () => {
 			start: 5,
 			end: 5,
 		};
-		const result = applyLineFormat( deepFreeze( record ), ul, ul );
+		const result = applyLineFormat( deepFreeze( record ), ul );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
@@ -116,7 +116,7 @@ describe( 'applyFormat', () => {
 			start: 2,
 			end: 5,
 		};
-		const result = applyLineFormat( deepFreeze( record ), ul, ul );
+		const result = applyLineFormat( deepFreeze( record ), ul );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );

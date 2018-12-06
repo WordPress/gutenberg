@@ -59,14 +59,14 @@ export const ListEdit = ( {
 			type="primary"
 			character="]"
 			onUse={ () => {
-				onChange( applyLineFormat( value, { type: 'ul' }, { type: tagName } ) );
+				onChange( applyLineFormat( value, { type: tagName } ) );
 			} }
 		/>
 		<RichTextShortcut
 			type="primary"
 			character="m"
 			onUse={ () => {
-				onChange( applyLineFormat( value, { type: 'ul' }, { type: tagName } ) );
+				onChange( applyLineFormat( value, { type: tagName } ) );
 			} }
 		/>
 		<RichTextShortcut
@@ -116,7 +116,7 @@ export const ListEdit = ( {
 						icon: 'editor-indent',
 						title: __( 'Indent list item' ),
 						onClick: () => {
-							onChange( applyLineFormat( value, { type: 'ul' }, { type: tagName } ) );
+							onChange( applyLineFormat( value, { type: tagName } ) );
 						},
 					},
 				].filter( Boolean ) }
