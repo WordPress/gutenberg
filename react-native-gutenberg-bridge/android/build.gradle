@@ -111,6 +111,8 @@ def blockOnJitpack(group, module, hash) {
             }
         }
     })
+
+    return "${group}:${module}:${hash}"
 }
 
 dependencies {
@@ -121,12 +123,7 @@ dependencies {
         implementation project(':react-native-recyclerview-list')
     } else {
         implementation ('com.github.wordpress-mobile:react-native-svg:faed05be8dca2b0df8957c5f72c40eccef12144d')
-
-        def module = 'react-native-aztec';
-        def hash = submoduleGitHash('../../', 'react-native-aztec')
-        blockOnJitpack('com.github.wordpress-mobile', module, hash)
-
-        implementation ('com.github.wordpress-mobile:react-native-aztec:' + submoduleGitHash('../../', 'react-native-aztec'))
+        implementation (blockOnJitpack('com.github.wordpress-mobile', 'react-native-aztec', submoduleGitHash('../../', 'react-native-aztec')))
         implementation ('com.github.wordpress-mobile:react-native-recyclerview-list:a2e8ca550412504c32218fd473c55f696f18f1f7')
     }
     implementation 'com.facebook.react:react-native:+'
