@@ -18,7 +18,6 @@ type PropsType = {
 	selectedBlockIndex: number,
 	blocks: Array<BlockType>,
 	onInsertBlock: ( BlockType, number, ?string ) => mixed,
-	onReplaceBlock: ( string, BlockType ) => mixed,
 	onMerge: ( string, string ) => mixed,
 	onMoveDown: ( string, ?string ) => mixed,
 	onMoveUp: ( string, ?string ) => mixed,
@@ -77,10 +76,6 @@ class AppContainer extends React.Component<PropsType> {
 		this.props.onInsertBlock( block, insertionIndex, this.props.rootClientId );
 	};
 
-	replaceBlockAction = ( clientId, block ) => {
-		this.props.onReplaceBlock( clientId, block );
-	};
-
 	parseBlocksAction = ( html = '' ) => {
 		const parsed = parse( html );
 		this.props.onResetBlocks( parsed );
@@ -119,7 +114,6 @@ class AppContainer extends React.Component<PropsType> {
 				moveBlockDownAction={ this.moveBlockDownAction }
 				deleteBlockAction={ this.deleteBlockAction }
 				createBlockAction={ this.createBlockAction }
-				replaceBlockAction={ this.replaceBlockAction }
 				serializeToNativeAction={ this.serializeToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
 				updateHtmlAction={ this.updateHtmlAction }
@@ -154,7 +148,6 @@ export default compose( [
 		const {
 			clearSelectedBlock,
 			insertBlock,
-			replaceBlock,
 			mergeBlocks,
 			moveBlocksDown,
 			moveBlocksUp,
@@ -169,7 +162,6 @@ export default compose( [
 		return {
 			clearSelectedBlock,
 			onInsertBlock: insertBlock,
-			onReplaceBlock: replaceBlock,
 			onMerge: mergeBlocks,
 			onMoveDown: moveBlocksDown,
 			onMoveUp: moveBlocksUp,
