@@ -17,6 +17,8 @@ import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 
 // Gutenberg imports
+import { withDispatch, withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender } from '@wordpress/editor';
 
@@ -33,6 +35,9 @@ export type BlockListType = {
 	moveBlockDownAction: string => mixed,
 	deleteBlockAction: string => mixed,
 	createBlockAction: ( string, BlockType ) => mixed,
+	replaceBlock: ( string, BlockType ) => mixed,
+	selectedBlock: ?BlockType,
+	selectedBlockClientId: string,
 	serializeToNativeAction: void => void,
 	toggleHtmlModeAction: void => void,
 	updateHtmlAction: string => void,
@@ -52,7 +57,7 @@ type StateType = {
 	rootViewHeight: number;
 };
 
-export default class BlockManager extends React.Component<PropsType, StateType> {
+export class BlockManager extends React.Component<PropsType, StateType> {
 	keyboardDidShowListener: EventEmitter;
 	keyboardDidHideListener: EventEmitter;
 
@@ -86,13 +91,19 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 	}
 
 	onBlockTypeSelected( itemValue: string ) {
-		this.setState( { ...this.state, selectedBlockType: itemValue, blockTypePickerVisible: false } );
+		this.setState( { selectedBlockType: itemValue, blockTypePickerVisible: false } );
 
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
 
-		this.props.createBlockAction( newBlock.clientId, newBlock );
-
+		// now determine whether we need to replace the currently selected block (if it's empty)
+		// or just add a new block as usual
+		if ( this.isReplaceable( this.props.selectedBlock ) ) {
+			// do replace here
+			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
+		} else {
+			this.props.createBlockAction( newBlock.clientId, newBlock );
+		}
 		// now set the focus
 		this.props.focusBlockAction( newBlock.clientId );
 	}
@@ -106,7 +117,6 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 		if ( ! isEqual( state.blocks, blocks ) ) {
 			return {
-				...state,
 				blocks,
 				refresh: ! state.refresh,
 			};
@@ -194,10 +204,8 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		}
 	};
 
-	onReplace( clientId: string, blocks: Array<Object> ) {
-		// Insert the optional blocks and then remove the block indentified by clientId
-		this.insertBlocksAfter( clientId, blocks );
-		this.props.deleteBlockAction( clientId );
+	onReplace( clientId: string, block: BlockType ) {
+		this.props.replaceBlock( clientId, block );
 	}
 
 	renderList() {
@@ -240,6 +248,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 				onValueSelected={ ( itemValue ) => {
 					this.onBlockTypeSelected( itemValue );
 				} }
+				isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
 			/>
 		);
 
@@ -258,6 +267,23 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 
 	isLastBlock( index: number ) {
 		return index === this.state.blocks.length - 1;
+	}
+
+	isEmptyBlock( block: BlockType ) {
+		const content = block.attributes.content;
+		const innerBlocks = block.innerBlocks;
+		return ( content === undefined || content === '' ) && ( innerBlocks.length === 0 );
+	}
+
+	isCandidateForReplaceBlock( block: BlockType ) {
+		return ( block.name === 'core/paragraph' || block.name === 'core/heading' || block.name === 'core/code' );
+	}
+
+	isReplaceable( block: ?BlockType ) {
+		if ( ! block ) {
+			return false;
+		}
+		return this.isEmptyBlock( block ) && this.isCandidateForReplaceBlock( block );
 	}
 
 	renderItem( value: { item: BlockType, index: number } ) {
@@ -284,7 +310,7 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 					canMoveDown={ canMoveDown }
 					insertBlocksAfter={ ( blocks ) => this.insertBlocksAfter( value.item.clientId, blocks ) }
 					mergeBlocks={ this.mergeBlocks }
-					onReplace={ ( blocks ) => this.onReplace( value.item.clientId, blocks ) }
+					onReplace={ ( block ) => this.onReplace( value.item.clientId, block ) }
 					{ ...value.item }
 				/>
 				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
@@ -298,3 +324,26 @@ export default class BlockManager extends React.Component<PropsType, StateType> 
 		);
 	}
 }
+
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			getSelectedBlock,
+			getSelectedBlockClientId,
+		} = select( 'core/editor' );
+
+		return {
+			selectedBlock: getSelectedBlock(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			replaceBlock,
+		} = dispatch( 'core/editor' );
+
+		return {
+			replaceBlock,
+		};
+	} ),
+] )( BlockManager );
