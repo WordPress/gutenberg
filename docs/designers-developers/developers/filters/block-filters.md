@@ -4,7 +4,7 @@ To modify the behavior of existing blocks, Gutenberg exposes several APIs:
 
 ### Block Style Variations
 
-Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used providing an alternative styling for the block if the style variation is selected.
 
 _Example:_
 
@@ -115,7 +115,7 @@ wp.hooks.addFilter(
 
 #### `blocks.switchToBlockType.transformedBlock`
 
-Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
+Used to filters an individual transform result from block transformation. All of the original blocks are passed since transformations are many-to-many, not one-to-one.
 
 #### `blocks.getBlockAttributes`
 
@@ -322,9 +322,9 @@ function my_plugin_block_categories( $categories, $post ) {
 add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
 
-You can also display an icon with your block category by setting an `icon` attribute.The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
+You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
 
-It is possible to set an SVG as the icon of the category if a custom icon is needed.To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
+It is possible to set an SVG as the icon of the category if a custom icon is needed. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
 
 To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
 ```js
