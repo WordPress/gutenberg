@@ -11,14 +11,11 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
-        classpath "gradle.plugin.io.github.http-builder-ng:http-plugin:0.1.1"
     }
 }
 
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
-
-apply plugin: "io.github.http-builder-ng.http-plugin"
 
 // import the `submoduleGitHash()` function
 apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462f8fef1a/raw/3b91756fca76e4c2a9b573313e186c47842e1f7d/submoduleGitHash.gradle'
@@ -79,61 +76,42 @@ static def jitpackArtifactUrl(module, hash) {
     return "https://jitpack.io/com/github/wordpress-mobile/${module}/${hash}/${module}-${hash}.pom"
 }
 
-import io.github.httpbuilderng.http.HttpTask
-
-static def getTaskName(backoffCount, module, hash) {
-    return "blockOnJitpack-${backoffCount}-${module}-${hash}";
-}
-
 def blockOnJitpack(group, module, hash) {
-    def backoffLimit = 7
-    (0..backoffLimit).each { backoffCount ->
-        def taskName = getTaskName(backoffCount, module, hash)
-        def task = tasks.create(name: taskName, type: HttpTask) { thisTask ->
-            thisTask.ext.doBackoff = false
+    preBuild.dependsOn(tasks.create(name: "blockOnJitpack-${module}-${hash}") { thisTask ->
+        def url = jitpackArtifactUrl(module, hash)
+        println url
 
-            config {
-                def timeout = (2**backoffCount) * 5 * 1000; // exponential timeout
+        def backoffLimit = 7
+        for (def backoffCount : (0..backoffLimit)) {
+            def connection = new URL(url).openConnection() as HttpURLConnection
 
-                def url = jitpackArtifactUrl(module, hash)
-                request.uri = url
+            def timeout = (2**backoffCount) * 5 * 1000; // exponential timeout
+            connection.setConnectTimeout(timeout)
+            connection.setReadTimeout(timeout)
 
-                client.clientCustomizer { HttpURLConnection httpURLConnection ->
-                    httpURLConnection.setConnectTimeout(timeout)
-                    httpURLConnection.setReadTimeout(timeout)
+            connection.setRequestMethod("HEAD");
+            connection.setInstanceFollowRedirects(true)
+
+            try {
+                def responseCode = connection.getResponseCode();
+                if (responseCode >= 200 && responseCode <= 299) {
+                    // success. Just bail
+                    return
+                } else {
+                    def responseMessage = connection.getResponseCode();
+                    throw new RuntimeException("Failed reaching Jitpack for ${group}:${module}:${hash}: ${responseMessage}")
                 }
-            }
-            head {
-                response.exception { Exception t ->
-                    if (t instanceof SocketTimeoutException) {
-                        if (backoffCount >= backoffLimit) {
-                            throw new Exception("Exhausted waiting for Jipack on ${group}:${module}:${hash}")
-                        }
+            } catch (SocketTimeoutException ignored) {
+                if (backoffCount == backoffLimit) {
+                    throw new Exception("Exhausted waiting for Jipack on ${group}:${module}:${hash}")
+                }
 
-                        def newBackoffCount = backoffCount + 1
-                        thisTask.ext.doBackoff = true
-                        println "Timed out. Engaging backoff count ${newBackoffCount}"
-                    } else {
-                        println "Oops, an exception was thrown!"
-                        t.printStackTrace()
-                        throw new RuntimeException(t)
-                    }
-                }
-                response.failure { fromServer ->
-                    def statusCode = fromServer.statusCode
-                    println "got failure ${statusCode}"
-                    println fs
-                }
+                println "Retrying reaching ${group}:${module}:${hash} on Jitpack"
+            } catch (Exception e) {
+                throw e
             }
         }
-
-        preBuild.dependsOn(task)
-
-        if (backoffCount > 0) {
-            def prevTaskName = getTaskName(backoffCount - 1, module, hash)
-            task.onlyIf { tasks[prevTaskName].ext.doBackoff }
-        }
-    }
+    })
 }
 
 dependencies {
