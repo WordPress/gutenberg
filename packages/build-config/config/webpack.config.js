@@ -18,13 +18,6 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 
 /**
- * Internal dependencies
- */
-const { dependencies } = require( './package' );
-
-const WORDPRESS_NAMESPACE = '@wordpress/';
-
-/**
  * Given a string, returns a new string with dash separators converted to
  * camelCase equivalent. This is not as aggressive as `_.camelCase` in
  * converting to uppercase, where Lodash will also capitalize letters
@@ -41,28 +34,52 @@ function camelCaseDash( string ) {
 	);
 }
 
-const gutenbergPackages = Object.keys( dependencies )
-	.filter( ( packageName ) => packageName.startsWith( WORDPRESS_NAMESPACE ) )
-	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
+/**
+ * Converts @wordpress require into window reference
+ *
+ * Note this isn't the same as camel case because of the
+ * way that numbers don't trigger the capitalized next letter
+ *
+ * @example
+ * wordpressRequire( '@wordpress/api-fetch' ) = 'wp.apiFetch'
+ * wordpressRequire( '@wordpress/i18n' ) = 'wp.i18n'
+ *
+ * @param {string} request import name
+ * @return {string} global variable reference for import
+ */
+const wordpressRequire = ( request ) => {
+	// @wordpress/components -> [ @wordpress, components ]
+	const [ , name ] = request.split( '/' );
 
-const externals = {
-	react: 'React',
-	'react-dom': 'ReactDOM',
-	tinymce: 'tinymce',
-	moment: 'moment',
-	jquery: 'jQuery',
-	lodash: 'lodash',
-	'lodash-es': 'lodash',
+	// components -> wp.components
+	return `wp.${ name.replace( /-([a-z])/g, ( match, letter ) => letter.toUpperCase() ) }`;
 };
 
-gutenbergPackages.forEach( ( name ) => {
-	externals[ WORDPRESS_NAMESPACE + name ] = {
-		this: [ 'wp', camelCaseDash( name ) ],
-	};
-} );
+const wordpressExternals = ( context, request, callback ) =>
+	/^@wordpress\//.test( request ) ?
+		callback( null, `root ${ wordpressRequire( request ) }` ) :
+		callback();
+
+const externals = [
+	{
+		react: 'React',
+		'react-dom': 'ReactDOM',
+		tinymce: 'tinymce',
+		moment: 'moment',
+		jquery: 'jQuery',
+		lodash: 'lodash',
+		'lodash-es': 'lodash',
+		electron: 'electron',
+		wp: 'wp',
+	},
+	wordpressExternals,
+];
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
+
+// @todo Move definition of this var and handling of it to Gutenberg root
+const gutenbergPackages = [ 'element' ];
 
 const config = {
 	mode,
