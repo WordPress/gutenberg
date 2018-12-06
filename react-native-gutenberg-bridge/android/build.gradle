@@ -79,7 +79,6 @@ static def jitpackArtifactUrl(module, hash) {
 def blockOnJitpack(group, module, hash) {
     preBuild.dependsOn(tasks.create(name: "blockOnJitpack-${module}-${hash}") { thisTask ->
         def url = jitpackArtifactUrl(module, hash)
-        println url
 
         def backoffLimit = 7
         for (def backoffCount : (0..backoffLimit)) {
@@ -106,7 +105,7 @@ def blockOnJitpack(group, module, hash) {
                     throw new Exception("Exhausted waiting for Jipack on ${group}:${module}:${hash}")
                 }
 
-                println "Retrying reaching ${group}:${module}:${hash} on Jitpack"
+                println "Retrying JitPack ${backoffCount+1}/${backoffLimit+1} for ${group}:${module}:${hash}"
             } catch (Exception e) {
                 throw e
             }
