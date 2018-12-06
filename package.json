@@ -10,10 +10,6 @@
 		"WordPress",
 		"editor"
 	],
-	"engines": {
-		"node": ">=8.0.0",
-		"npm": ">=6.0.0"
-	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
@@ -72,7 +68,6 @@
 		"autoprefixer": "8.2.0",
 		"babel-loader": "8.0.0",
 		"chalk": "2.4.1",
-		"check-node-version": "3.1.1",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "4.5.2",
 		"core-js": "2.5.7",
@@ -145,7 +140,7 @@
 		"prebuild:packages": "npm run clean:packages && lerna run build && cross-env INCLUDE_PACKAGES=babel-plugin-import-jsx-pragma,postcss-themes,jest-console SKIP_JSX_PRAGMA_TRANSFORM=1 node ./bin/packages/build.js",
 		"build:packages": "cross-env EXCLUDE_PACKAGES=babel-plugin-import-jsx-pragma,jest-console,postcss-themes node ./bin/packages/build.js",
 		"build": "npm run build:packages && cross-env NODE_ENV=production webpack",
-		"check-engines": "check-node-version --package",
+		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
