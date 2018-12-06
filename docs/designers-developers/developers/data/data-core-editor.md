@@ -411,6 +411,20 @@ Returns whether a block is valid or not.
 
 Is Valid.
 
+### getBlockAttributes
+
+Returns a block's attributes given its client ID, or null if no block exists with
+the client ID.
+
+*Parameters*
+
+ * state: Editor state.
+ * clientId: Block client ID.
+
+*Returns*
+
+Block attributes.
+
 ### getBlock
 
 Returns a block given its client ID. This is a parsed copy of the block,
@@ -1292,11 +1306,12 @@ Returns the permalink for the post.
 
 *Returns*
 
-The permalink.
+The permalink, or null if the post is not viewable.
 
 ### getPermalinkParts
 
-Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+Returns the permalink for a post, split into it's three parts: the prefix,
+the postName, and the suffix.
 
 *Parameters*
 
@@ -1304,7 +1319,8 @@ Returns the permalink for a post, split into it's three parts: the prefix, the p
 
 *Returns*
 
-The prefix, postName, and suffix for the permalink.
+An object containing the prefix, postName, and suffix for
+                 the permalink, or null if the post is not viewable.
 
 ### inSomeHistory
 

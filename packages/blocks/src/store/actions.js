@@ -120,3 +120,19 @@ export function setCategories( categories ) {
 		categories,
 	};
 }
+
+/**
+ * Returns an action object used to update a category.
+ *
+ * @param {string} slug     Block category slug.
+ * @param {Object} category Object containing the category properties that should be updated.
+ *
+ * @return {Object} Action object.
+ */
+export function updateCategory( slug, category ) {
+	return {
+		type: 'UPDATE_CATEGORY',
+		slug,
+		category,
+	};
+}

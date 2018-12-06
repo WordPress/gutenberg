@@ -74,7 +74,8 @@
 }
 
 .components-popover:not(.is-mobile).editor-block-switcher__popover .components-popover__content {
-	min-width: 320px;
+	min-width: 300px;
+	max-width: 340px;
 }
 
 .editor-block-switcher__popover .components-popover__content {

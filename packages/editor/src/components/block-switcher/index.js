@@ -47,7 +47,7 @@ export class BlockSwitcher extends Component {
 		const possibleBlockTransformations = orderBy(
 			filter(
 				getPossibleBlockTransformations( blocks ),
-				( block ) => !! itemsByName[ block.name ]
+				( block ) => block && !! itemsByName[ block.name ]
 			),
 			( block ) => itemsByName[ block.name ].frecency,
 			'desc'

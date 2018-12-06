@@ -602,6 +602,32 @@ describe( 'selectors', () => {
 
 			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
 		} );
+
+		it( 'should merge mergeable properties with current post value', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+						b: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getEditedPostAttribute( state, 'meta' ) ).toEqual( {
+				a: 1,
+				b: 2,
+			} );
+		} );
 	} );
 
 	describe( 'getAutosaveAttribute', () => {
@@ -2571,6 +2597,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the selected block ClientId', () => {
 			const state = {
+				editor: { present: { blocks: { byClientId: { 23: { name: 'fake block' } } } } },
 				blockSelection: { start: 23, end: 23 },
 			};
 
@@ -5042,6 +5069,17 @@ describe( 'selectors', () => {
 
 			expect( getPermalink( state ) ).toBe( 'http://foo.test/bar/baz/' );
 		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalink( state ) ).toBeNull();
+		} );
 	} );
 
 	describe( 'getPermalinkParts', () => {
@@ -5086,6 +5124,17 @@ describe( 'selectors', () => {
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
+		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toBeNull();
 		} );
 	} );
 

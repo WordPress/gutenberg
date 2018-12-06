@@ -1,0 +1,27 @@
+{
+	"name": "@wordpress/eslint-config",
+	"version": "1.0.0-alpha.0",
+	"description": "ESLint config for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"eslint"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/eslint-config/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"dependencies": {
+		"babel-eslint": "^8.0.3",
+		"eslint-plugin-jsx-a11y": "6.0.2",
+		"eslint-plugin-react": "7.7.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

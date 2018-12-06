@@ -1,6 +1,7 @@
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
 export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
+export { clickButton } from './click-button';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { convertBlock } from './convert-block';
@@ -10,8 +11,10 @@ export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
 export { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
 export { getAllBlocks } from './get-all-blocks';
+export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getEditedPostContent } from './get-edited-post-content';
 export { getUrl } from './get-url';
+export { hasBlockSwitcher } from './has-block-switcher';
 export { insertBlock } from './insert-block';
 export { isEmbedding } from './is-embedding';
 export { JSONResponse } from './json-response';
