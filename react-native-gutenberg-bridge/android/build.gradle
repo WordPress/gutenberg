@@ -75,19 +75,13 @@ repositories {
     maven { url "https://jitpack.io" }
 }
 
-//def sleepOnJitpack() {
-//    println 'going to sleep'
-//    sleep(5000)
-//    println 'sleep ended'
-//}
-
 static def jitpackArtifactUrl(module, hash) {
     return "https://jitpack.io/com/github/wordpress-mobile/${module}/${hash}/${module}-${hash}.pom"
 }
 
 import io.github.httpbuilderng.http.HttpTask
 
-def getTaskName(backoffCount, module, hash) {
+static def getTaskName(backoffCount, module, hash) {
     return "blockOnJitpack-${backoffCount}-${module}-${hash}";
 }
 
@@ -100,7 +94,6 @@ def blockOnJitpack(group, module, hash) {
 
             config {
                 def timeout = (2**backoffCount) * 5 * 1000; // exponential timeout
-//                println("Timeout set to ${timeout}ms")
 
                 def url = jitpackArtifactUrl(module, hash)
                 request.uri = url
@@ -112,9 +105,6 @@ def blockOnJitpack(group, module, hash) {
             }
             get {
                 request.contentType = 'application/octet-stream'
-                //        response.when(200) {
-                //            sleepOnJitpack()
-                //        }
                 response.exception { Exception t ->
                     if (t instanceof SocketTimeoutException) {
                         if (backoffCount >= backoffLimit) {
@@ -130,12 +120,6 @@ def blockOnJitpack(group, module, hash) {
                         throw new RuntimeException(t)
                     }
                 }
-//                response.success { fromServer ->
-//                    def statusCode = fromServer.statusCode
-//                    println "got success ${statusCode}"
-//                    sleepOnJitpack()
-//                    println 'Jitpack is ready'
-//                }
                 response.failure { fromServer ->
                     def statusCode = fromServer.statusCode
                     println "got failure ${statusCode}"
