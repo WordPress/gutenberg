@@ -8,6 +8,7 @@ import { Fragment } from '@wordpress/element';
 import {
 	indentListItems,
 	outdentListItems,
+	changeListType,
 } from '@wordpress/rich-text';
 
 /**
@@ -17,20 +18,48 @@ import {
 import { RichTextShortcut } from './shortcut';
 import BlockFormatControls from '../block-format-controls';
 
-function isListRootSelected( editor ) {
-	return (
-		! editor.selection ||
-		editor.selection.getNode().closest( 'ol,ul' ) === editor.getBody()
-	);
+function isListRootSelected() {
+	const selection = window.getSelection();
+
+	if ( selection.rangeCount === 0 ) {
+		return true;
+	}
+
+	let { startContainer } = selection.getRangeAt( 0 );
+
+	if ( startContainer.nodeType === window.Node.TEXT_NODE ) {
+		startContainer = startContainer.parentNode;
+	}
+
+	const rootNode = startContainer.closest( '*[contenteditable]' );
+
+	if ( ! rootNode || ! rootNode.contains( startContainer ) ) {
+		return true;
+	}
+
+	return startContainer.closest( 'ol,ul' ) === rootNode;
 }
 
-function isActiveListType( editor, tagName, rootTagName ) {
-	if ( document.activeElement !== editor.getBody() ) {
+function isActiveListType( tagName, rootTagName ) {
+	const selection = window.getSelection();
+
+	if ( selection.rangeCount === 0 ) {
 		return tagName === rootTagName;
 	}
 
-	const listItem = editor.selection.getNode();
-	const list = listItem.closest( 'ol,ul' );
+	let { startContainer } = selection.getRangeAt( 0 );
+
+	if ( startContainer.nodeType === window.Node.TEXT_NODE ) {
+		startContainer = startContainer.parentNode;
+	}
+
+	const rootNode = startContainer.closest( '*[contenteditable]' );
+
+	if ( ! rootNode || ! rootNode.contains( startContainer ) ) {
+		return tagName === rootTagName;
+	}
+
+	const list = startContainer.closest( 'ol,ul' );
 
 	if ( ! list ) {
 		return;
@@ -40,10 +69,8 @@ function isActiveListType( editor, tagName, rootTagName ) {
 }
 
 export const ListEdit = ( {
-	editor,
 	onTagNameChange,
 	tagName,
-	onSyncDOM,
 	value,
 	onChange,
 } ) => (
@@ -82,26 +109,24 @@ export const ListEdit = ( {
 					onTagNameChange && {
 						icon: 'editor-ul',
 						title: __( 'Convert to unordered list' ),
-						isActive: isActiveListType( editor, 'ul', tagName ),
+						isActive: isActiveListType( 'ul', tagName ),
 						onClick() {
-							if ( isListRootSelected( editor ) ) {
+							onChange( changeListType( value, { type: 'ul' } ) );
+
+							if ( isListRootSelected() ) {
 								onTagNameChange( 'ul' );
-							} else {
-								editor.execCommand( 'InsertUnorderedList' );
-								onSyncDOM();
 							}
 						},
 					},
 					onTagNameChange && {
 						icon: 'editor-ol',
 						title: __( 'Convert to ordered list' ),
-						isActive: isActiveListType( editor, 'ol', tagName ),
+						isActive: isActiveListType( 'ol', tagName ),
 						onClick() {
-							if ( isListRootSelected( editor ) ) {
+							onChange( changeListType( value, { type: 'ol' } ) );
+
+							if ( isListRootSelected() ) {
 								onTagNameChange( 'ol' );
-							} else {
-								editor.execCommand( 'InsertOrderedList' );
-								onSyncDOM();
 							}
 						},
 					},

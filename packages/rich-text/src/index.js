@@ -27,3 +27,4 @@ export { LINE_SEPARATOR } from './special-characters';
 export { unregisterFormatType } from './unregister-format-type';
 export { indentListItems } from './indent-list-items';
 export { outdentListItems } from './outdent-list-items';
+export { changeListType } from './change-list-type';
