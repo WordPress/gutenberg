@@ -55,7 +55,9 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 				<View style={ styles.modalContent }>
 					<View style={ styles.shortLineStyle } />
 					<View>
-						<Text style={ styles.title }>{ ! this.props.isReplacement && titleForAdd }{ this.props.isReplacement && titleForReplace }</Text>
+						<Text style={ styles.title }>
+							{ this.props.isReplacement ? titleForReplace : titleForAdd }
+						</Text>
 					</View>
 					<View style={ styles.lineStyle } />
 					<FlatList
