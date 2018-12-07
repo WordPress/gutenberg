@@ -172,6 +172,7 @@ Removes one or more query string arguments from the given URL.
 ```js
 const badUri = safeDecodeURI( '%z' ); // does not throw an Error, simply returns '%z'
 ```
+
 Safely decodes a URI with `decodeURI`. Returns the URI unmodified if `decodeURI` throws an error.
 
 ### filterURLForDisplay
