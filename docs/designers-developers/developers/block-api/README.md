@@ -4,7 +4,7 @@ Blocks are the fundamental element of the Gutenberg editor. They are the primary
 
 ## Registering a block
 
-All blocks must be registered before they can be used in the editor. You can learn about block registration, and the available options, in the [block registration](block-api/block-registration.md) documentation.
+All blocks must be registered before they can be used in the editor. You can learn about block registration, and the available options, in the [block registration](block-api/block-registration) documentation.
 
 ## Block `edit` and `save`
 
