@@ -47,7 +47,6 @@ type StateType = {
 	blockTypePickerVisible: boolean,
 	blocks: Array<BlockType>,
 	selectedBlockType: string,
-	refresh: boolean,
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;
 };
@@ -59,17 +58,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	constructor( props: PropsType ) {
 		super( props );
 
-		const blocks = props.blocks.map( ( block ) => {
-			const newBlock = { ...block };
-			newBlock.focused = props.isBlockSelected( block.clientId );
-			return newBlock;
-		} );
-
 		this.state = {
-			blocks: blocks,
 			blockTypePickerVisible: false,
 			selectedBlockType: 'core/paragraph', // just any valid type to start from
-			refresh: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
 		};
@@ -106,24 +97,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		this.props.focusBlock( newBlock.clientId );
 	};
 
-	static getDerivedStateFromProps( props: PropsType, state: StateType ) {
-		const blocks = props.blocks.map( ( block ) => {
-			const newBlock = { ...block };
-			newBlock.focused = props.isBlockSelected( block.clientId );
-			return newBlock;
-		} );
-
-		if ( ! isEqual( state.blocks, blocks ) ) {
-			return {
-				blocks,
-				refresh: ! state.refresh,
-			};
-		}
-
-		// no state change necessary
-		return null;
-	}
-
 	onRootViewLayout = ( event: LayoutChangeEvent ) => {
 		const { height } = event.nativeEvent.layout;
 		this.setState( { rootViewHeight: height } );
@@ -154,8 +127,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			<FlatList
 				keyboardShouldPersistTaps="always"
 				style={ styles.list }
-				data={ this.state.blocks }
-				extraData={ { refresh: this.state.refresh } }
+				data={ this.props.blocks }
 				keyExtractor={ ( item ) => item.clientId }
 				renderItem={ this.renderItem }
 			/>

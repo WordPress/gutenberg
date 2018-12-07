@@ -9,7 +9,6 @@ export type BlockType = {
 	isValid: boolean,
 	attributes: Object,
 	innerBlocks: Array<BlockType>,
-	focused: boolean,
 };
 
 export type StateType = {
