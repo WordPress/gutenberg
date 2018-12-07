@@ -19,24 +19,12 @@ import { getBlockTypes } from '@wordpress/blocks';
 type PropsType = {
 	style?: StyleSheet,
 	isReplacement: boolean,
-	onValueSelected: ( itemValue: string, itemIndex: number ) => void,
+	onValueSelected: ( itemValue: string ) => void,
 	onDismiss: () => void,
 };
 
-// TODO: not used for now - will hold currently selected Block Type, probably makes sense for the inspector
-type StateType = {
-	selectedIndex: number,
-};
-
-export default class BlockPicker extends Component<PropsType, StateType> {
+export default class BlockPicker extends Component<PropsType> {
 	availableBlockTypes = getBlockTypes().filter( ( { name } ) => name !== unsupportedBlockName );
-
-	constructor( props: PropsType ) {
-		super( props );
-		this.state = {
-			selectedIndex: 0,
-		};
-	}
 
 	render() {
 		const titleForAdd = __( 'ADD BLOCK' );
@@ -70,7 +58,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 								style={ styles.touchableArea }
 								underlayColor={ 'transparent' }
 								activeOpacity={ .5 }
-								onPress={ this.props.onValueSelected.bind( this, item.name ) }>
+								onPress={ () => this.props.onValueSelected( item.name ) }>
 								<View style={ styles.modalItem }>
 									<View style={ styles.modalIcon }>
 										{ item.icon.src }
