@@ -33,13 +33,13 @@ export default class BlockPicker extends Component<PropsType> {
 			<Modal
 				transparent={ true }
 				isVisible={ true }
-				onSwipe={ this.props.onDismiss.bind( this ) }
-				onBackButtonPress={ this.props.onDismiss.bind( this ) }
+				onSwipe={ this.props.onDismiss }
+				onBackButtonPress={ this.props.onDismiss }
 				swipeDirection="down"
 				style={ [ styles.bottomModal, this.props.style ] }
 				backdropColor={ 'lightgrey' }
 				backdropOpacity={ 0.4 }
-				onBackdropPress={ this.props.onDismiss.bind( this ) }>
+				onBackdropPress={ this.props.onDismiss }>
 				<View style={ styles.modalContent }>
 					<View style={ styles.shortLineStyle } />
 					<View>
