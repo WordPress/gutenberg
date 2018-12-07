@@ -33,7 +33,7 @@ if ( ! hasProjectFile( 'jest-puppeteer.config.js' ) && ! process.env.JEST_PUPPET
 }
 
 const config = ! hasJestConfig() ?
-	[ '--config', JSON.stringify( fromConfigRoot( 'jest-e2e.config.js' ) ) ] :
+	[ '--config', JSON.stringify( require( fromConfigRoot( 'jest-e2e.config.js' ) ) ) ] :
 	[];
 
 const hasRunInBand = hasCliArg( '--runInBand' ) ||

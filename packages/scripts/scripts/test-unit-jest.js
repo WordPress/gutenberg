@@ -24,7 +24,7 @@ const {
 } = require( '../utils' );
 
 const config = ! hasJestConfig() ?
-	[ '--config', JSON.stringify( fromConfigRoot( 'jest-unit.config.js' ) ) ] :
+	[ '--config', JSON.stringify( require( fromConfigRoot( 'jest-unit.config.js' ) ) ) ] :
 	[];
 
 jest.run( [ ...config, ...getCliArgs() ] );
