@@ -123,9 +123,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					onInsertClick={ () => {
 						this.showBlockTypePicker( true );
 					} }
-					onKeyboardHide={ () => {
-						this.onKeyboardHide();
-					} }
 					showKeyboardHideButton={ this.state.isKeyboardVisible }
 				/>
 			</KeyboardAvoidingView>

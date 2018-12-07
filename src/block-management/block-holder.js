@@ -19,11 +19,12 @@ import { BlockEdit } from '@wordpress/editor';
 
 type PropsType = BlockType & {
 	clientId: string,
+	rootClientId: string,
 	isSelected: boolean,
 	isFirstBlock: boolean,
 	isLastBlock: boolean,
 	showTitle: boolean,
-	getBlockIndex: ( clientId: string, rootClientId: string ) => string,
+	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
 	getNextBlockClientId: ( clientId: string ) => string,
 	onChange: ( clientId: string, attributes: mixed ) => void,

@@ -34,7 +34,6 @@ export class BlockToolbar extends Component<PropsType> {
 			redo,
 			undo,
 			onInsertClick,
-			onKeyboardHide,
 			showKeyboardHideButton,
 		} = this.props;
 
