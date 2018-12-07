@@ -79,7 +79,7 @@ const config = {
 	mode,
 	output: {
 		filename: './build/[basename]/index.js',
-		path: __dirname,
+		path: process.cwd(),
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'this',
 	},
