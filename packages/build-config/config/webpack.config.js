@@ -3,8 +3,6 @@
  */
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
-const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const postcss = require( 'postcss' );
 
 const { get } = require( 'lodash' );
 const { basename } = require( 'path' );
@@ -78,16 +76,8 @@ const externals = [
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 
-// @todo Move definition of this var and handling of it to Gutenberg root
-const gutenbergPackages = [ 'element' ];
-
 const config = {
 	mode,
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		const name = camelCaseDash( packageName );
-		memo[ name ] = `./packages/${ packageName }`;
-		return memo;
-	}, {} ),
 	output: {
 		filename: './build/[basename]/index.js',
 		path: __dirname,
@@ -157,29 +147,6 @@ const config = {
 			'redux-routine',
 			'token-list',
 		].map( camelCaseDash ) ),
-		new CopyWebpackPlugin(
-			gutenbergPackages.map( ( packageName ) => ( {
-				from: `./packages/${ packageName }/build-style/*.css`,
-				to: `./build/${ packageName }/`,
-				flatten: true,
-				transform: ( content ) => {
-					if ( config.mode === 'production' ) {
-						return postcss( [
-							require( 'cssnano' )( {
-								preset: [ 'default', {
-									discardComments: {
-										removeAll: true,
-									},
-								} ],
-							} ),
-						] )
-							.process( content, { from: 'src/app.css', to: 'dest/app.css' } )
-							.then( ( result ) => result.css );
-					}
-					return content;
-				},
-			} ) )
-		),
 		// GUTENBERG_BUNDLE_ANALYZER global variable enables utility that represents bundle content
 		// as convenient interactive zoomable treemap.
 		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
