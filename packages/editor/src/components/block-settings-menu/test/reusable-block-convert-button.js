@@ -27,15 +27,13 @@ describe( 'ReusableBlockConvertButton', () => {
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockConvertButton
 				isVisible
-				isStaticBlock
-				canCreateBlocks
+				isReusable={ false }
 				onConvertToReusable={ onConvert }
 			/>
 		);
 		expect( wrapper.props.children[ 1 ] ).toBeFalsy();
 		const button = wrapper.props.children[ 0 ];
 		expect( button.props.children ).toBe( 'Add to Reusable Blocks' );
-		expect( button.props.disabled ).toBe( false );
 		button.props.onClick();
 		expect( onConvert ).toHaveBeenCalled();
 	} );
@@ -45,7 +43,7 @@ describe( 'ReusableBlockConvertButton', () => {
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockConvertButton
 				isVisible
-				isStaticBlock={ false }
+				isReusable
 				onConvertToStatic={ onConvert }
 			/>
 		);

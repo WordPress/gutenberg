@@ -15,8 +15,7 @@ import { compose } from '@wordpress/compose';
 
 export function ReusableBlockConvertButton( {
 	isVisible,
-	isStaticBlock,
-	canCreateBlocks,
+	isReusable,
 	onConvertToStatic,
 	onConvertToReusable,
 } ) {
@@ -26,17 +25,16 @@ export function ReusableBlockConvertButton( {
 
 	return (
 		<Fragment>
-			{ isStaticBlock && (
+			{ ! isReusable && (
 				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
-					disabled={ ! canCreateBlocks }
 					onClick={ onConvertToReusable }
 				>
 					{ __( 'Add to Reusable Blocks' ) }
 				</MenuItem>
 			) }
-			{ ! isStaticBlock && (
+			{ isReusable && (
 				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -60,30 +58,35 @@ export default compose( [
 
 		const blocks = getBlocksByClientId( clientIds );
 
-		const isVisible = (
-			// Hide 'Add to Reusable Blocks' when Reusable Blocks are disabled, i.e. when
-			// core/block is not in the allowed_block_types filter.
-			canInsertBlockType( 'core/block' ) &&
-
-			every( blocks, ( block ) => (
-				// Guard against the case where a regular block has *just* been converted to a
-				// reusable block and doesn't yet exist in the editor store.
-				!! block &&
-				// Only show the option to covert to reusable blocks on valid blocks.
-				block.isValid &&
-				// Make sure the block supports being converted into a reusable block (by default that is the case).
-				hasBlockSupport( block.name, 'reusable', true )
-			) )
+		const isReusable = (
+			blocks.length === 1 &&
+			blocks[ 0 ] &&
+			isReusableBlock( blocks[ 0 ] ) &&
+			!! getReusableBlock( blocks[ 0 ].attributes.ref )
 		);
 
 		return {
-			isVisible,
-			isStaticBlock: isVisible && (
-				blocks.length !== 1 ||
-				! isReusableBlock( blocks[ 0 ] ) ||
-				! getReusableBlock( blocks[ 0 ].attributes.ref )
+			// Show 'Convert to Regular Block' when selected block is a reusable block
+			isVisible: isReusable || (
+				// Hide 'Add to Reusable Blocks' when reusable blocks are disabled
+				canInsertBlockType( 'core/block' ) &&
+
+				every( blocks, ( block ) => (
+					// Guard against the case where a regular block has *just* been converted
+					!! block &&
+
+					// Hide 'Add to Reusable Blocks' on invalid blocks
+					block.isValid &&
+
+					// Hide 'Add to Reusable Blocks' when block doesn't support being made reusable
+					hasBlockSupport( block.name, 'reusable', true )
+				) ) &&
+
+				// Hide 'Add to Reusable Blocks' when current doesn't have permission to do that
+				canUser( 'create', 'blocks' )
 			),
-			canCreateBlocks: canUser( 'create', 'blocks' ),
+
+			isReusable,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {

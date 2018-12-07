@@ -16,11 +16,19 @@ describe( 'ReusableBlockDeleteButton', () => {
 		return renderer.getRenderOutput();
 	}
 
+	it( 'should not render when isVisible is false', () => {
+		const wrapper = getShallowRenderOutput(
+			<ReusableBlockDeleteButton isVisible={ false } />
+		);
+
+		expect( wrapper ).toBe( null );
+	} );
+
 	it( 'matches the snapshot', () => {
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
 				role="menuitem"
-				id={ 123 }
+				isVisible
 				isDisabled={ false }
 				onDelete={ noop }
 			/>
@@ -33,13 +41,13 @@ describe( 'ReusableBlockDeleteButton', () => {
 		const onDelete = jest.fn();
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
-				id={ 123 }
+				isVisible
 				isDisabled={ false }
 				onDelete={ onDelete }
 			/>
 		);
 
 		wrapper.props.onClick();
-		expect( onDelete ).toHaveBeenCalledWith( 123 );
+		expect( onDelete ).toHaveBeenCalled();
 	} );
 } );

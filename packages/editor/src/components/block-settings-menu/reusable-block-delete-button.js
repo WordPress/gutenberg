@@ -12,8 +12,8 @@ import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function ReusableBlockDeleteButton( { id, isDisabled, onDelete } ) {
-	if ( ! id ) {
+export function ReusableBlockDeleteButton( { isVisible, isDisabled, onDelete } ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 
@@ -22,7 +22,7 @@ export function ReusableBlockDeleteButton( { id, isDisabled, onDelete } ) {
 			className="editor-block-settings-menu__control"
 			icon="no"
 			disabled={ isDisabled }
-			onClick={ () => onDelete( id ) }
+			onClick={ () => onDelete() }
 		>
 			{ __( 'Remove from Reusable Blocks' ) }
 		</MenuItem>
@@ -39,21 +39,23 @@ export default compose( [
 
 		const block = getBlock( clientId );
 
-		const id = block && isReusableBlock( block ) ? block.attributes.ref : null;
+		const reusableBlock = block && isReusableBlock( block ) ?
+			getReusableBlock( block.attributes.ref ) :
+			null;
+
 		return {
-			id,
-			isDisabled: !! id && (
-				getReusableBlock( id ).isTemporary || ! canUser( 'delete', 'blocks', id )
-			),
+			isVisible: !! reusableBlock && canUser( 'delete', 'blocks', reusableBlock.id ),
+			isDisabled: reusableBlock && reusableBlock.isTemporary,
 		};
 	} ),
-	withDispatch( ( dispatch, { onToggle = noop } ) => {
+	withDispatch( ( dispatch, { clientId, onToggle = noop }, { select } ) => {
 		const {
 			__experimentalDeleteReusableBlock: deleteReusableBlock,
 		} = dispatch( 'core/editor' );
+		const { getBlock } = select( 'core/editor' );
 
 		return {
-			onDelete( id ) {
+			onDelete() {
 				// TODO: Make this a <Confirm /> component or similar
 				// eslint-disable-next-line no-alert
 				const hasConfirmed = window.confirm( __(
@@ -62,7 +64,8 @@ export default compose( [
 				) );
 
 				if ( hasConfirmed ) {
-					deleteReusableBlock( id );
+					const block = getBlock( clientId );
+					deleteReusableBlock( block.attributes.ref );
 					onToggle();
 				}
 			},
