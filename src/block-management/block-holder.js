@@ -36,8 +36,6 @@ type PropsType = BlockType & {
 	moveBlocksDown: ( clientId: string ) => void,
 	removeBlock: ( clientId: string ) => void,
 	replaceBlock: ( clientId: string ) => void,
-	canMoveUp: boolean,
-	canMoveDown: boolean,
 };
 
 export class BlockHolder extends React.Component<PropsType> {
