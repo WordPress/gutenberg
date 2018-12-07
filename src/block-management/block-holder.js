@@ -19,11 +19,11 @@ import { BlockEdit } from '@wordpress/editor';
 
 type PropsType = BlockType & {
 	clientId: string,
-	order: number,
 	isSelected: boolean,
 	isFirstBlock: boolean,
 	isLastBlock: boolean,
 	showTitle: boolean,
+	getBlockIndex: ( clientId: string, rootClientId: string ) => string,
 	getPreviousBlockClientId: ( clientId: string ) => string,
 	getNextBlockClientId: ( clientId: string ) => string,
 	onChange: ( clientId: string, attributes: mixed ) => void,
@@ -58,7 +58,8 @@ export class BlockHolder extends React.Component<PropsType> {
 	};
 
 	insertBlocksAfter = ( blocks: Array<Object> ) => {
-		this.props.onInsertBlocks( blocks, this.props.order + 1 );
+		const order = this.props.getBlockIndex( this.props.clientId, this.props.rootClientId );
+		this.props.onInsertBlocks( blocks, order + 1 );
 
 		if ( blocks[ 0 ] ) {
 			// focus on the first block inserted
@@ -146,7 +147,7 @@ export class BlockHolder extends React.Component<PropsType> {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId } ) => {
+	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockAttributes,
 			getBlockName,
@@ -158,19 +159,19 @@ export default compose( [
 		} = select( 'core/editor' );
 		const name = getBlockName( clientId );
 		const attributes = getBlockAttributes( clientId );
-		const order = getBlockIndex( clientId );
+		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
 		const isFirstBlock = order === 0;
 		const isLastBlock = order === getBlocks().length - 1;
 
 		return {
 			attributes,
+			getBlockIndex,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 			isFirstBlock,
 			isLastBlock,
 			isSelected,
-			order,
 			name,
 		};
 	} ),
