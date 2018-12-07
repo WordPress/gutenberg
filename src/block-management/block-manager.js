@@ -38,7 +38,6 @@ type PropsType = {
 
 type StateType = {
 	blockTypePickerVisible: boolean,
-	selectedBlockType: string,
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;
 };
@@ -49,7 +48,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 		this.state = {
 			blockTypePickerVisible: false,
-			selectedBlockType: 'core/paragraph', // just any valid type to start from
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
 		};
@@ -62,7 +60,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	onBlockTypeSelected = ( itemValue: string ) => {
-		this.setState( { selectedBlockType: itemValue, blockTypePickerVisible: false } );
+		this.setState( { blockTypePickerVisible: false } );
 
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
