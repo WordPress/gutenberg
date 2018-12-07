@@ -4,7 +4,7 @@ To modify the behavior of existing blocks, Gutenberg exposes several APIs:
 
 ### Block Style Variations
 
-Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used providing an alternative styling for the block if the style variation is selected.
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
 
 _Example:_
 
