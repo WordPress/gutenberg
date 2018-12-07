@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "1.0.4",
+	"version": "1.1.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -16,10 +16,6 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"files": [
-		"build",
-		"build-module"
-	],
 	"main": "build/index.js",
 	"react-native": "src/index",
 	"dependencies": {

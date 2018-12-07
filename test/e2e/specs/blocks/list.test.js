@@ -46,6 +46,14 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'can undo asterisk transform', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1. ' );
+		await pressWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be created by typing "/list"', async () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();
@@ -80,7 +88,7 @@ describe( 'List', () => {
 	it( 'can be created by converting a paragraph with line breaks', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'one' );
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'two' );
 		await convertBlock( 'List' );
 
@@ -183,6 +191,15 @@ describe( 'List', () => {
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'three' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should be immeadiately saved on indentation', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'one' );
+		await page.keyboard.press( 'Enter' );
+		await pressWithModifier( 'primary', 'm' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -317,13 +317,6 @@ exports[`recordToDom should ignore formats at line separator 1`] = `
 </body>
 `;
 
-exports[`recordToDom should ignore line breaks to format HTML 1`] = `
-<body>
-  
-  <br />
-</body>
-`;
-
 exports[`recordToDom should preserve emoji 1`] = `
 <body>
   🍒
@@ -336,6 +329,12 @@ exports[`recordToDom should preserve emoji in formatting 1`] = `
     🍒
   </em>
   
+</body>
+`;
+
+exports[`recordToDom should preserve non breaking space 1`] = `
+<body>
+  test  test
 </body>
 `;
 
@@ -356,6 +355,12 @@ exports[`recordToDom should remove with settings 1`] = `
 <body>
   
   <br />
+</body>
+`;
+
+exports[`recordToDom should replace characters to format HTML with space 1`] = `
+<body>
+   
 </body>
 `;
 

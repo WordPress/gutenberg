@@ -5,6 +5,7 @@ import '@wordpress/core-data';
 import '@wordpress/editor';
 import '@wordpress/nux';
 import '@wordpress/viewport';
+import '@wordpress/notices';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
@@ -87,6 +88,7 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
+export { default as PluginMoreMenuItem } from './components/header/plugin-more-menu-item';
 export { default as PluginPostPublishPanel } from './components/sidebar/plugin-post-publish-panel';
 export { default as PluginPostStatusInfo } from './components/sidebar/plugin-post-status-info';
 export { default as PluginPrePublishPanel } from './components/sidebar/plugin-pre-publish-panel';

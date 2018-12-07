@@ -430,8 +430,8 @@
 
 	// Full-wide
 	&[data-align="full"] {
-		// Position hover label on the right
-		> .editor-block-list__block-edit .editor-block-list__breadcrumb {
+		// Position hover label on the right for the top level block.
+		> .editor-block-list__block-edit > .editor-block-list__breadcrumb {
 			right: 0;
 		}
 
@@ -686,7 +686,8 @@
 // Don't show the sibling inserter before the selected block.
 .edit-post-layout:not(.has-fixed-toolbar) {
 	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .editor-block-list__insertion-point-inserter {
+	.is-selected > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter,
+	.is-focused > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter {
 		opacity: 0;
 		pointer-events: none;
 
@@ -807,12 +808,6 @@
 		margin-left: $block-padding + $border-width;
 	}
 
-	// Don't do it for wide elements, this causes a horizontal scrollbar.
-	&[data-align="full"] .editor-block-contextual-toolbar {
-		margin-left: -$block-padding - $block-side-ui-width;
-		margin-right: -$block-padding - $block-side-ui-width;
-	}
-
 	// Reset pointer-events on children.
 	.editor-block-contextual-toolbar > * {
 		pointer-events: auto;
@@ -875,7 +870,7 @@
 		// Hide right border on desktop, where the .components-toolbar instead has a right border.
 		border-right: none;
 
-		// This prevents floats from messing up the position.
+		// This prevents floats from messing up the position of the block toolbar on floats-adjacent blocks when selected.
 		position: absolute;
 		left: 0;
 	}
@@ -911,11 +906,6 @@
 			opacity: 0;
 			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
-	}
-
-	&.is-light .components-toolbar {
-		background: rgba($white, 0.5);
-		color: $dark-gray-700;
 	}
 
 	// Position the breadcrumb closer on mobile.

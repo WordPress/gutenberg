@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, map, uniqueId } from 'lodash';
+import { compact, map, uniqueId } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -24,7 +24,6 @@ import { dispatch as dataDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { resolveSelector } from './utils';
 import {
 	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
 	removeBlocks,
@@ -57,35 +56,40 @@ export const fetchReusableBlocks = async ( action, store ) => {
 
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
 
-	let result;
-	if ( id ) {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }?context=edit` } );
-	} else {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1&context=edit` } );
-	}
-
 	try {
-		const reusableBlockOrBlocks = await result;
-		dispatch( receiveReusableBlocksAction( map(
-			castArray( reusableBlockOrBlocks ),
-			( post ) => {
-				const parsedBlocks = parse( post.content.raw );
-				return {
-					reusableBlock: {
-						id: post.id,
-						title: getPostRawValue( post.title ),
-					},
-					parsedBlock: parsedBlocks.length === 1 ?
-						parsedBlocks[ 0 ] :
-						createBlock( 'core/template', {}, parsedBlocks ),
-				};
+		let posts;
+
+		if ( id ) {
+			posts = [ await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } ) ];
+		} else {
+			posts = await apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
+		}
+
+		const results = compact( map( posts, ( post ) => {
+			if ( post.status !== 'publish' || post.content.protected ) {
+				return null;
 			}
-		) ) );
+
+			const parsedBlocks = parse( post.content.raw );
+			return {
+				reusableBlock: {
+					id: post.id,
+					title: getPostRawValue( post.title ),
+				},
+				parsedBlock: parsedBlocks.length === 1 ?
+					parsedBlocks[ 0 ] :
+					createBlock( 'core/template', {}, parsedBlocks ),
+			};
+		} ) );
+
+		if ( results.length ) {
+			dispatch( receiveReusableBlocksAction( results ) );
+		}
 
 		dispatch( {
 			type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
@@ -109,7 +113,7 @@ export const fetchReusableBlocks = async ( action, store ) => {
 export const saveReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}
@@ -153,7 +157,7 @@ export const saveReusableBlocks = async ( action, store ) => {
 export const deleteReusableBlocks = async ( action, store ) => {
 	// TODO: these are potentially undefined, this fix is in place
 	// until there is a filter to not use reusable blocks if undefined
-	const postType = await resolveSelector( 'core', 'getPostType', 'wp_block' );
+	const postType = await apiFetch( { path: '/wp/v2/types/wp_block' } );
 	if ( ! postType ) {
 		return;
 	}

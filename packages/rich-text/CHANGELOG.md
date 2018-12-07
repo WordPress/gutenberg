@@ -1,3 +1,19 @@
+## 3.0.3 (Unreleased)
+
+### Internal
+
+- Internal performance optimizations to avoid excessive expensive creation of DOM documents.
+
+## 3.0.2 (2018-11-21)
+
+## 3.0.1 (2018-11-20)
+
+## 3.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- `toHTMLString` always expects an object instead of multiple arguments.
+
 ## 2.0.4 (2018-11-09)
 
 ## 2.0.3 (2018-11-09)

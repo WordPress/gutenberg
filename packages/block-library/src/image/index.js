@@ -52,6 +52,18 @@ const blockAttributes = {
 		selector: 'figure > a',
 		attribute: 'href',
 	},
+	rel: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'rel',
+	},
+	linkClass: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'class',
+	},
 	id: {
 		type: 'number',
 	},
@@ -89,7 +101,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'href', 'target' ],
+				attributes: [ 'href', 'rel', 'target' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -132,7 +144,9 @@ export const settings = {
 					const anchorElement = node.querySelector( 'a' );
 					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
-					const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href } );
+					const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
+					const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
+					const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -181,6 +195,18 @@ export const settings = {
 						attribute: 'href',
 						selector: 'a',
 					},
+					rel: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'rel',
+						selector: 'a',
+					},
+					linkClass: {
+						type: 'string',
+						source: 'attribute',
+						attribute: 'class',
+						selector: 'a',
+					},
 					id: {
 						type: 'number',
 						shortcode: ( { named: { id } } ) => {
@@ -212,7 +238,19 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id, linkTarget } = attributes;
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			id,
+			linkTarget,
+		} = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -231,7 +269,16 @@ export const settings = {
 
 		const figure = (
 			<Fragment>
-				{ href ? <a href={ href } target={ linkTarget } rel={ linkTarget === '_blank' ? 'noreferrer noopener' : undefined }>{ image }</a> : image }
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ rel }
+					>
+						{ image }
+					</a>
+				) : image }
 				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);

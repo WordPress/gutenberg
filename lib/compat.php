@@ -100,24 +100,6 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
 
 /**
- * As a substitute for the default content `wpautop` filter, applies autop
- * behavior only for posts where content does not contain blocks.
- *
- * @param  string $content Post content.
- * @return string          Paragraph-converted text if non-block content.
- */
-function gutenberg_wpautop( $content ) {
-	if ( has_blocks( $content ) ) {
-		return $content;
-	}
-
-	return wpautop( $content );
-}
-remove_filter( 'the_content', 'wpautop' );
-add_filter( 'the_content', 'gutenberg_wpautop', 6 );
-
-
-/**
  * Check if we need to load the block warning in the Classic Editor.
  *
  * @since 3.4.0
@@ -304,3 +286,22 @@ function gutenberg_warn_classic_about_blocks() {
 		</script>
 	<?php
 }
+
+/**
+ * Display the privacy policy help notice.
+ *
+ * In Gutenberg, the `edit_form_after_title` hook is not supported. Because
+ * WordPress Core uses this hook to display this notice, it never displays.
+ * Outputting the notice on the `admin_notices` hook allows Gutenberg to
+ * consume the notice and display it with the Notices API.
+ *
+ * @since 4.5.0
+ */
+function gutenberg_show_privacy_policy_help_text() {
+	if ( is_gutenberg_page() && has_action( 'edit_form_after_title', array( 'WP_Privacy_Policy_Content', 'notice' ) ) ) {
+		remove_action( 'edit_form_after_title', array( 'WP_Privacy_Policy_Content', 'notice' ) );
+
+		WP_Privacy_Policy_Content::notice( get_post() );
+	}
+}
+add_action( 'admin_notices', 'gutenberg_show_privacy_policy_help_text' );

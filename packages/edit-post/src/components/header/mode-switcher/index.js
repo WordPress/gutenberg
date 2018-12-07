@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { MenuItemsChoice, MenuGroup } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, ifCondition } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -49,8 +49,10 @@ function ModeSwitcher( { onSwitch, mode } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		mode: select( 'core/edit-post' ).getEditorMode(),
 	} ) ),
+	ifCondition( ( { isRichEditingEnabled } ) => isRichEditingEnabled ),
 	withDispatch( ( dispatch, ownProps ) => ( {
 		onSwitch( mode ) {
 			dispatch( 'core/edit-post' ).switchEditorMode( mode );

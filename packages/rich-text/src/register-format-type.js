@@ -1,8 +1,26 @@
 /**
+ * External dependencies
+ */
+import { mapKeys } from 'lodash';
+import memize from 'memize';
+
+/**
  * WordPress dependencies
  */
-import { select, dispatch, withSelect } from '@wordpress/data';
+import { select, dispatch, withSelect, withDispatch } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
+import { compose } from '@wordpress/compose';
+
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
 
 /**
  * Registers a new format provided a unique name and an object defining its
@@ -113,31 +131,97 @@ export function registerFormatType( name, settings ) {
 
 	dispatch( 'core/rich-text' ).addFormatTypes( settings );
 
+	const getFunctionStackMemoized = memize( ( previousStack = EMPTY_ARRAY, newFunction ) => {
+		return [
+			...previousStack,
+			newFunction,
+		];
+	} );
+
 	if (
-		settings.__experimentalCreatePrepareEditableTree &&
 		settings.__experimentalGetPropsForEditableTreePreparation
 	) {
 		addFilter( 'experimentalRichText', name, ( OriginalComponent ) => {
-			return withSelect( ( sel, { clientId, identifier } ) => ( {
-				[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
-					sel,
-					{
-						richTextIdentifier: identifier,
-						blockClientId: clientId,
+			let Component = OriginalComponent;
+			if (
+				settings.__experimentalCreatePrepareEditableTree ||
+				settings.__experimentalCreateFormatToValue ||
+				settings.__experimentalCreateValueToFormat
+			) {
+				Component = ( props ) => {
+					const additionalProps = {};
+
+					if ( settings.__experimentalCreatePrepareEditableTree ) {
+						additionalProps.prepareEditableTree = getFunctionStackMemoized(
+							props.prepareEditableTree,
+							settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], {
+								richTextIdentifier: props.identifier,
+								blockClientId: props.clientId,
+							} )
+						);
 					}
-				),
-			} ) )( ( props ) => (
-				<OriginalComponent
-					{ ...props }
-					prepareEditableTree={ [
-						...( props.prepareEditableTree || [] ),
-						settings.__experimentalCreatePrepareEditableTree( props[ `format_${ name }` ], 	{
-							richTextIdentifier: props.identifier,
-							blockClientId: props.clientId,
-						} ),
-					] }
-				/>
-			) );
+
+					if ( settings.__experimentalCreateOnChangeEditableValue ) {
+						const dispatchProps = Object.keys( props ).reduce( ( accumulator, propKey ) => {
+							const propValue = props[ propKey ];
+							const keyPrefix = `format_${ name }_dispatch_`;
+							if ( propKey.startsWith( keyPrefix ) ) {
+								const realKey = propKey.replace( keyPrefix, '' );
+
+								accumulator[ realKey ] = propValue;
+							}
+
+							return accumulator;
+						}, {} );
+
+						additionalProps.onChangeEditableValue = getFunctionStackMemoized(
+							props.onChangeEditableValue,
+							settings.__experimentalCreateOnChangeEditableValue( {
+								...props[ `format_${ name }` ],
+								...dispatchProps,
+							}, {
+								richTextIdentifier: props.identifier,
+								blockClientId: props.clientId,
+							} )
+						);
+					}
+
+					return <OriginalComponent
+						{ ...props }
+						{ ...additionalProps }
+					/>;
+				};
+			}
+
+			const hocs = [
+				withSelect( ( sel, { clientId, identifier } ) => ( {
+					[ `format_${ name }` ]: settings.__experimentalGetPropsForEditableTreePreparation(
+						sel,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					),
+				} ) ),
+			];
+
+			if ( settings.__experimentalGetPropsForEditableTreeChangeHandler ) {
+				hocs.push( withDispatch( ( disp, { clientId, identifier } ) => {
+					const dispatchProps = settings.__experimentalGetPropsForEditableTreeChangeHandler(
+						disp,
+						{
+							richTextIdentifier: identifier,
+							blockClientId: clientId,
+						}
+					);
+
+					return mapKeys( dispatchProps, ( value, key ) => {
+						return `format_${ name }_dispatch_${ key }`;
+					} );
+				} ) );
+			}
+
+			return compose( hocs )( Component );
 		} );
 	}
 

@@ -117,3 +117,8 @@ This list is manually curated to include valuable contributions by volunteers th
 | @amdrew | @sumobi |
 | @MaedahBatool | @MaedahBatool |
 | @luehrsen | @luehrsen |
+| @getsource | @mikeschroder |
+| @greatislander | @greatislander |
+| @sharazghouri | @sharaz |
+| @jakeparis | @jakeparis |
+| @designsimply | @designsimply |

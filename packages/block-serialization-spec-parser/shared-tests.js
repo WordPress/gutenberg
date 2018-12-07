@@ -155,6 +155,15 @@ export const jsTester = ( parse ) => () => {
 			expect( () => parsed = parse( `<!-- wp:fake {"a":"${ as }"} /-->` )[ 0 ] ).not.toThrow();
 			expect( parsed.attrs.a ).toHaveLength( length );
 		} );
+
+		describe( 'invalid block comment syntax', () => {
+			test( 'extra space after void closer', () => {
+				let parsed;
+
+				expect( () => parsed = parse( '<!-- wp:block / -->' )[ 0 ] ).not.toThrow();
+				expect( parsed.blockName ).toBeNull();
+			} );
+		} );
 	} );
 };
 

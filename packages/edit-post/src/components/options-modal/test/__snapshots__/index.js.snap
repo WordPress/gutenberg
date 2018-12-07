@@ -25,25 +25,29 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   <Section
     title="Document Panels"
   >
+    <WithSelect(IfCondition(WithDispatch(BaseOption)))
+      label="Permalink"
+      panelName="post-link"
+    />
     <WithSelect(PostTaxonomies)
       taxonomyWrapper={[Function]}
     />
-    <WithSelect(WithDispatch(BaseOption))
+    <WithSelect(IfCondition(WithDispatch(BaseOption)))
       label="Featured Image"
       panelName="featured-image"
     />
     <PostExcerptCheck>
-      <WithSelect(WithDispatch(BaseOption))
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
         label="Excerpt"
         panelName="post-excerpt"
       />
     </PostExcerptCheck>
-    <WithSelect(WithDispatch(BaseOption))
+    <WithSelect(IfCondition(WithDispatch(BaseOption)))
       label="Discussion"
       panelName="discussion-panel"
     />
     <WithSelect(PageAttributesCheck)>
-      <WithSelect(WithDispatch(BaseOption))
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
         label="Page Attributes"
         panelName="page-attributes"
       />

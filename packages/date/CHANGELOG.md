@@ -1,3 +1,10 @@
+## 3.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- `getSettings` has been removed. Please use `__experimentalGetSettings` instead.
+- `moment` has been removed from the public API for the date module.
+
 ## 2.2.1 (2018-11-09)
 
 ## 2.2.0 (2018-11-09)

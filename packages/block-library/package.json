@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.2.3",
+	"version": "2.2.9",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -38,9 +38,6 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.10",
 		"memize": "^1.0.5",
-		"moment": "^2.22.1",
-		"querystring": "^0.2.0",
-		"querystringify": "^1.0.0",
 		"url": "^0.11.0"
 	},
 	"devDependencies": {

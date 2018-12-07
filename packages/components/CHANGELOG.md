@@ -1,3 +1,17 @@
+## 7.0.3 (2018-11-30)
+
+## 7.0.2 (2018-11-22)
+
+## 7.0.1 (2018-11-21)
+
+## 7.0.0 (2018-11-20)
+
+### Breaking Change
+
+- `Dropdown.refresh()` has been removed. The contained `Popover` is now automatically refreshed.
+
+## 6.0.2 (2018-11-15)
+
 ## 6.0.1 (2018-11-12)
 
 ### Bug Fixes

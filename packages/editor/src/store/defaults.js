@@ -11,14 +11,15 @@ export const PREFERENCES_DEFAULTS = {
 /**
  * The default editor settings
  *
- *  alignWide       boolean        Enable/Disable Wide/Full Alignments
- *  colors          Array          Palette colors
- *  fontSizes       Array          Available font sizes
- *  imageSizes      Array          Available image sizes
- *  maxWidth        number         Max width to constraint resizing
- *  blockTypes      boolean|Array  Allowed block types
- *  hasFixedToolbar boolean        Whether or not the editor toolbar is fixed
- *  focusMode       boolean        Whether the focus mode is enabled or not
+ *  alignWide          boolean        Enable/Disable Wide/Full Alignments
+ *  colors             Array          Palette colors
+ *  fontSizes          Array          Available font sizes
+ *  imageSizes         Array          Available image sizes
+ *  maxWidth           number         Max width to constraint resizing
+ *  blockTypes         boolean|Array  Allowed block types
+ *  hasFixedToolbar    boolean        Whether or not the editor toolbar is fixed
+ *  focusMode          boolean        Whether the focus mode is enabled or not
+ *  richEditingEnabled boolean        Whether rich editing is enabled or not
  */
 export const EDITOR_SETTINGS_DEFAULTS = {
 	alignWide: false,
@@ -126,6 +127,9 @@ export const EDITOR_SETTINGS_DEFAULTS = {
 
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
+
+	// Whether richs editing is enabled or not.
+	richEditingEnabled: true,
 };
 
 /**
