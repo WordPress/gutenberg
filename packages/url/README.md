@@ -181,6 +181,6 @@ Safely decodes a URI with `decodeURI`. Returns the URI unmodified if `decodeURI`
 const displayUrl = filterURLForDisplay( 'https://www.wordpress.org/gutenberg/' ); // wordpress.org/gutenberg
 ```
 
-Returns a URL for display, without protocol, www subdomain or trailing slash.
+Returns a URL for display, without protocol, www subdomain, or trailing slash.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
