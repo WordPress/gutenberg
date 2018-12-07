@@ -176,9 +176,11 @@ class ImageEdit extends Component {
 			} );
 			return;
 		}
+
 		this.setState( {
 			isEditing: false,
 		} );
+
 		this.props.setAttributes( {
 			...pickRelevantMediaFiles( media ),
 			width: undefined,
