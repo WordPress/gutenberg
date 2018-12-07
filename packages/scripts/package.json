@@ -32,7 +32,6 @@
 	},
 	"dependencies": {
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
-		"@wordpress/build-config": "file:../build-config",
 		"@wordpress/eslint-plugin": "file:../eslint-plugin",
 		"@wordpress/jest-preset-default": "file:../jest-preset-default",
 		"@wordpress/npm-package-json-lint-config": "file:../npm-package-json-lint-config",
@@ -44,7 +43,6 @@
 		"jest-puppeteer": "3.2.1",
 		"npm-package-json-lint": "^3.3.1",
 		"puppeteer": "1.6.1",
-		"react-dev-utils": "^6.1.1",
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0",
 		"stylelint": "^9.10.1",
