@@ -4,7 +4,6 @@
  */
 
 import React from 'react';
-import { isEqual } from 'lodash';
 
 import { Text, View, FlatList, Keyboard, LayoutChangeEvent } from 'react-native';
 import BlockHolder from './block-holder';
@@ -26,7 +25,7 @@ import EventEmitter from 'events';
 const keyboardDidShow = 'keyboardDidShow';
 const keyboardDidHide = 'keyboardDidHide';
 
-export type BlockListType = {
+type PropsType = {
 	focusBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	rootClientId: ?string,
@@ -42,10 +41,8 @@ export type BlockListType = {
 	showHtml: boolean,
 };
 
-type PropsType = BlockListType;
 type StateType = {
 	blockTypePickerVisible: boolean,
-	blocks: Array<BlockType>,
 	selectedBlockType: string,
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;

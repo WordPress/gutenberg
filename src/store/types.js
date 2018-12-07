@@ -14,6 +14,5 @@ export type BlockType = {
 export type StateType = {
 	blocks: Array<BlockType>,
 	initialHtmlHash: string,
-	refresh: boolean,
 	fullparse: boolean,
 };
