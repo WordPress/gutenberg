@@ -6,6 +6,22 @@ process.env.NODE_ENV = 'production';
 const webpack = require( 'webpack' );
 const formatWebpackMessages = require( 'react-dev-utils/formatWebpackMessages' );
 
+webpackConfig.module.rules.forEach(
+	( rule ) => {
+		if ( 'babel-loader' === rule.use ) {
+			delete rule.use;
+
+			rule.loader = 'babel-loader';
+
+			rule.options = {
+				presets: [
+					'@wordpress/babel-preset-default',
+				],
+			};
+		}
+	}
+);
+
 const compiler = webpack( webpackConfig );
 
 compiler.run(
