@@ -185,6 +185,11 @@ export function hasUploadPermissions( state ) {
  * Returns whether the current user can perform the given action on the given
  * REST resource.
  *
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
+ *
+ * https://developer.wordpress.org/rest-api/reference/
+ *
  * @param {Object}  state    Data state.
  * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
  *                           'delete'.

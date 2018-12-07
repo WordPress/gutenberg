@@ -153,6 +153,11 @@ Upload Permissions.
 Returns whether the current user can perform the given action on the given
 REST resource.
 
+Calling this may trigger an OPTIONS request to the REST API via the
+`canUser()` resolver.
+
+https://developer.wordpress.org/rest-api/reference/
+
 *Parameters*
 
  * state: Data state.
