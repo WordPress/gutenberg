@@ -20,11 +20,6 @@ import { compose } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender } from '@wordpress/editor';
 
-import EventEmitter from 'events';
-
-const keyboardDidShow = 'keyboardDidShow';
-const keyboardDidHide = 'keyboardDidHide';
-
 type PropsType = {
 	focusBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
@@ -49,9 +44,6 @@ type StateType = {
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
-	keyboardDidShowListener: EventEmitter;
-	keyboardDidHideListener: EventEmitter;
-
 	constructor( props: PropsType ) {
 		super( props );
 
@@ -67,10 +59,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	// once we move the action to the toolbar
 	showBlockTypePicker( show: boolean ) {
 		this.setState( { blockTypePickerVisible: show } );
-	}
-
-	onKeyboardHide() {
-		Keyboard.dismiss();
 	}
 
 	onBlockTypeSelected = ( itemValue: string ) => {
@@ -99,16 +87,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		this.setState( { rootViewHeight: height } );
 	};
 
-	componentDidMount() {
-		this.keyboardDidShowListener = Keyboard.addListener( keyboardDidShow, this.keyboardDidShow );
-		this.keyboardDidHideListener = Keyboard.addListener( keyboardDidHide, this.keyboardDidHide );
-	}
-
-	componentWillUnmount() {
-		Keyboard.removeListener( keyboardDidShow, this.keyboardDidShow );
-		Keyboard.removeListener( keyboardDidHide, this.keyboardDidHide );
-	}
-
 	keyboardDidShow = () => {
 		this.setState( { isKeyboardVisible: true } );
 	};
@@ -116,6 +94,16 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	keyboardDidHide = () => {
 		this.setState( { isKeyboardVisible: false } );
 	};
+
+	componentDidMount() {
+		Keyboard.addListener( 'keyboardDidShow', this.keyboardDidShow );
+		Keyboard.addListener( 'keyboardDidHide', this.keyboardDidHide );
+	}
+
+	componentWillUnmount() {
+		Keyboard.removeListener( 'keyboardDidShow', this.keyboardDidShow );
+		Keyboard.removeListener( 'keyboardDidHide', this.keyboardDidHide );
+	}
 
 	renderList() {
 		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS

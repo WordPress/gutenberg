@@ -4,7 +4,7 @@
  */
 
 import React, { Component } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Keyboard } from 'react-native';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
@@ -15,7 +15,6 @@ import styles from './block-toolbar.scss';
 
 type PropsType = {
 	onInsertClick: void => void,
-	onKeyboardHide: void => void,
 	showKeyboardHideButton: boolean,
 	hasRedo: boolean,
 	hasUndo: boolean,
@@ -24,6 +23,10 @@ type PropsType = {
 };
 
 export class BlockToolbar extends Component<PropsType> {
+	onKeyboardHide = () => {
+		Keyboard.dismiss();
+	};
+
 	render() {
 		const {
 			hasRedo,
@@ -66,7 +69,7 @@ export class BlockToolbar extends Component<PropsType> {
 						<ToolbarButton
 							label={ __( 'Keyboard hide' ) }
 							icon="arrow-down"
-							onClick={ onKeyboardHide }
+							onClick={ this.onKeyboardHide }
 						/>
 					</Toolbar> ) }
 					<BlockControls.Slot />
