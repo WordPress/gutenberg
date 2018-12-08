@@ -59,7 +59,7 @@ The Gutenberg Handbook shows examples in two syntaxes ES5 and ESNext, note ESNex
 
 The ESNext syntax is compatible with most modern browsers, but unfortunately not IE11. Additionally, the ESNext code examples include JSX syntax, which requires a build step using webpack to transform into code that can be run in your browser.
 
-For this tutorial, all examples will be in straight ES5 code that can be run straight in your browser and does not require an additional build step.
+For this tutorial, all examples are written as the ES5 variation of JavaScript that can be run straight in your browser and does not require an additional build step.
 
 
 ## Extending the Block Editor
@@ -68,7 +68,7 @@ This puts all the initial pieces in place for you to start extending the Block E
 
 Let's look at using the [Block Style Variation example](../../../../../docs/designers-developers/developers/filters/block-filters/#block-style-variations).
 
-Update the file `myguten.js` with:
+Replace the existing `console.log()` code in your `myguten.js` file with:
 
 ```js
 wp.blocks.registerBlockStyle( 'core/quote', {
@@ -77,15 +77,13 @@ wp.blocks.registerBlockStyle( 'core/quote', {
 } );
 ```
 
-You can remove the previous `console.log` if you like.
+After you add the `wp.blocks.registerBlockStyle` code, save the `myguten.js` file, and then create a new post in the Block Editor.
 
-After you add the code, save the file, and start a new post in the Block Editor.
+Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed. You can go back to the JavaScript and change the label to "Fancy Pants" and reload, and you will see the new label.
 
-Add a quote block, and in the right sidebar under Styles, you should see your new Fancy Quote style listed. You can go back to the JavaScript and change the label to "Fancy Pants" and reload, and you should see the new label.
+Previewing or Publishing the post, you will not see a visible change. However, if you look at the source, you will see `is-style-fancy-quote` class name attached to your quote.
 
-Previewing or Publishing the post, you will not see a visible change. However, if you look at the source, you should see `is-style-fancy-quote` class name attached to your quote.
-
-You could create a `style.css` file with:
+Go ahead and create a `style.css` file with:
 
 ```css
 .is-style-fancy-quote {
@@ -100,9 +98,9 @@ and enqueue the CSS by adding the following to your `myguten-plugin.php`:
 function myguten_stylesheet() {
 	wp_enqueue_style( 'myguten-style', plugins_url( 'style.css', __FILE__ ) );
 }
-add_action( 'wp_enqueue_scripts', 'myguten_stylesheet' );
+add_action( 'enqueue_block_assets', 'myguten_stylesheet' );
 ```
 
-And then when you view the page, you should see it in a very large font.
+And then when you view the page, you will see it in a very large font.
 
 
