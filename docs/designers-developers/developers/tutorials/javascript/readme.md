@@ -35,7 +35,7 @@ function myguten_enqueue( $hook ) {
 		array( 'wp-blocks', 'wp-element' )
 	);
 }
-add_action( 'admin_enqueue_scripts', 'myguten_enqueue' );
+add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 ```
 
 Create a file called `myguten.js` and add:
