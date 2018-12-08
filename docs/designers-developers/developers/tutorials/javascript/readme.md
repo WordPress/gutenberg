@@ -6,18 +6,18 @@ The purpose of this tutorial is to step through getting started with JavaScript 
 
 ## Plugins Background
 
-The primary means of extending WordPress remains the plugin, see [Plugin Basics](https://developer.wordpress.org/plugins/the-basics/) for more. The quick start is create a new directory in `wp-content/plugins/` to hold your plugin code, call it `my-plugin`.
+The primary means of extending WordPress remains the plugin, see [Plugin Basics](https://developer.wordpress.org/plugins/the-basics/) for more. The quick start is create a new directory in `wp-content/plugins/` to hold your plugin code, call it `myguten-plugin`.
 
-Inside of this new directory, create a file called `my-plugin.php` which will be the server-side code the runs when your plugin is active. For now you can just place the following in that file:
+Inside of this new directory, create a file called `myguten-plugin.php` which will be the server-side code the runs when your plugin is active. For now you can place the following in that file:
 
 ```php
 <?php
 /*
-Plugin Name: My Plugin
+Plugin Name: My Guten Plugin
 */
 ```
 
-So you should have a directory `wp-content/plugins/my-plugin/` which has the single file `my-plugin.php`. Once that is in place, you can go to your plugins list in `wp-admin` and you should see your plugin listed.
+So you should have a directory `wp-content/plugins/myguten-plugin/` which has the single file `myguten-plugin.php`. Once that is in place, you can go to your plugins list in `wp-admin` and you should see your plugin listed.
 
 Click **Activate** and your plugin will load with WordPress.
 
@@ -26,19 +26,19 @@ Click **Activate** and your plugin will load with WordPress.
 
 Now with the plugin in place, we can add our code that loads the JavaScript we want to use. This follows the standard WordPress methodology of enqueuing your scripts, see [Including CSS & JavaScript](https://developer.wordpress.org/themes/basics/including-css-javascript/) for more details.
 
-Add the following code to your `my-plugin.php` file:
+Add the following code to your `myguten-plugin.php` file:
 
 ```php
-function my_enqueue( $hook ) {
-	wp_enqueue_script( 'my-plugin',
-		plugins_url( 'my-plugin.js', __FILE__ ),
+function myguten_enqueue( $hook ) {
+	wp_enqueue_script( 'myguten-script',
+		plugins_url( 'myguten.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
 	);
 }
-add_action( 'admin_enqueue_scripts', 'my_enqueue' );
+add_action( 'admin_enqueue_scripts', 'myguten_enqueue' );
 ```
 
-Create a file called `my-plugin.js` and add:
+Create a file called `myguten.js` and add:
 
 ```js
 console.log( "I'm loaded!" );
@@ -48,7 +48,7 @@ Now go to any page within `/wp-admin/` and check your browser Developer Tools, a
 
 The script enqueuing used the `admin_enqueue_scripts` hook which only loads the JavaScript within the wp-admin section. So if you navigate to any front-end page or article on your site, you will not see the message.
 
-**Note:** The last argument in the `wp_enqueue_script()` function is an array of dependencies, all of the Gutenberg packages are registered and can be loaded by specifying in the array, blocks and elements are shown as two common examples.
+**Note:** The last argument in the `wp_enqueue_script()` function is an array of dependencies, all of the Gutenberg packages are registered and can be loaded by specifying them in the array, blocks and elements are shown as two common examples.
 
 Recap at this point, we have a plugin which loads JavaScript, we're off to a good start.
 
@@ -68,7 +68,7 @@ This puts all the initial pieces in place for you to start extending the Block E
 
 Let's look at using the [Block Style Variation example](../../../../../docs/designers-developers/developers/filters/block-filters/#block-style-variations).
 
-Update the file `my-plugin.js` with:
+Update the file `myguten.js` with:
 
 ```js
 wp.blocks.registerBlockStyle( 'core/quote', {
@@ -94,16 +94,15 @@ You could create a `style.css` file with:
 
 ```
 
-and enqueue the CSS by adding the following to your `my-plugin.php`:
+and enqueue the CSS by adding the following to your `myguten-plugin.php`:
 
 ```php
-function my_stylesheet() {
-	wp_enqueue_style( 'my-style', plugins_url( 'style.css', __FILE__ ) );
+function myguten_stylesheet() {
+	wp_enqueue_style( 'myguten-style', plugins_url( 'style.css', __FILE__ ) );
 }
-add_action( 'wp_enqueue_scripts', 'my_stylesheet' );
+add_action( 'wp_enqueue_scripts', 'myguten_stylesheet' );
 ```
 
 And then when you view the page, you should see it in a very large font.
-
 
 
