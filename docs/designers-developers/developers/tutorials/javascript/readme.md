@@ -29,13 +29,13 @@ Now with the plugin in place, we can add our code that loads the JavaScript we w
 Add the following code to your `my-plugin.php` file:
 
 ```php
-add_action( 'admin_enqueue_scripts', 'my_enqueue' );
 function my_enqueue( $hook ) {
 	wp_enqueue_script( 'my-plugin',
 		plugins_url( 'my-plugin.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
 	);
 }
+add_action( 'admin_enqueue_scripts', 'my_enqueue' );
 ```
 
 Create a file called `my-plugin.js` and add:
@@ -97,10 +97,10 @@ You could create a `style.css` file with:
 and enqueue the CSS by adding the following to your `my-plugin.php`:
 
 ```php
-	function my_stylesheet() {
-		wp_enqueue_style( 'my-style', plugins_url( 'style.css', __FILE__ ) );
-	}
-	add_action( 'wp_enqueue_scripts', 'my_stylesheet' );
+function my_stylesheet() {
+	wp_enqueue_style( 'my-style', plugins_url( 'style.css', __FILE__ ) );
+}
+add_action( 'wp_enqueue_scripts', 'my_stylesheet' );
 ```
 
 And then when you view the page, you should see it in a very large font.
