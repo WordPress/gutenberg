@@ -29,7 +29,7 @@ Now with the plugin in place, we can add our code that loads the JavaScript we w
 Add the following code to your `myguten-plugin.php` file:
 
 ```php
-function myguten_enqueue( $hook ) {
+function myguten_enqueue() {
 	wp_enqueue_script( 'myguten-script',
 		plugins_url( 'myguten.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element' )
@@ -44,9 +44,9 @@ Create a file called `myguten.js` and add:
 console.log( "I'm loaded!" );
 ```
 
-Now go to any page within `/wp-admin/` and check your browser Developer Tools, and you should see the message in your console log. See [Mozilla's What are browser developer tools?](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools) if you need more information, the area to become most familiar with is [The JavaScript console](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools#The_JavaScript_console).
+Now start a new post in the block editor, and check your browser Developer Tools. You should see the message in your console log. See [Mozilla's What are browser developer tools?](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools) if you need more information, the area to become most familiar with is [The JavaScript console](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools#The_JavaScript_console).
 
-The script enqueuing used the `admin_enqueue_scripts` hook which only loads the JavaScript within the wp-admin section. So if you navigate to any front-end page or article on your site, you will not see the message.
+The script enqueuing uses the `enqueue_block_editor_assets` hook which only loads the JavaScript when the block editor loads. So if you navigate to any front-end page or article on your site, you will not see the message.
 
 **Note:** The last argument in the `wp_enqueue_script()` function is an array of dependencies, all of the Gutenberg packages are registered and can be loaded by specifying them in the array, blocks and elements are shown as two common examples.
 
