@@ -35,7 +35,7 @@
 	position: relative;
 }
 .components-color-picker__body {
-	padding: 16px 16px 12px;
+	padding: 16px 0 12px;
 }
 .components-color-picker__controls {
 	display: flex;
@@ -198,6 +198,9 @@
 
 	fieldset {
 		flex: 1;
+	}
+	.components-color-picker__inputs-fields .components-text-control__input {
+		padding: 2px;
 	}
 }
 .components-color-picker__inputs-fields {
