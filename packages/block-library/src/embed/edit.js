@@ -72,7 +72,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 			if ( event ) {
 				event.preventDefault();
 			}
-			const { url } = this.state;
+			let { url } = this.state;
+			url = url.replace( /\/$/, '' );
 			const { setAttributes } = this.props;
 			this.setState( { editingURL: false } );
 			setAttributes( { url } );
