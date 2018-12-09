@@ -247,6 +247,16 @@ export function applyValue( future, current ) {
 	}
 }
 
+/**
+ * Returns true if two ranges are equal, or false otherwise. Ranges are
+ * considered equal if their start and end occur in the same container and
+ * offset.
+ *
+ * @param {Range} a First range object to test.
+ * @param {Range} b First range object to test.
+ *
+ * @return {boolean} Whether the two ranges are equal.
+ */
 function isRangeEqual( a, b ) {
 	return (
 		a.startContainer === b.startContainer &&
