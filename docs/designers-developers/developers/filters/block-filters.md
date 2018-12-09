@@ -67,6 +67,40 @@ A filter that applies to the result of a block's `save` function. This filter is
 
 The filter's callback receives an element, a block type and the block attributes as arguments. It should return an element.
 
+This example below wraps the existing save element inside of a wrapper element.
+
+_Example:_
+
+Adding a wrapper to core quote blocks
+
+{% codetabs %}
+{% ES5 %}
+```js
+var createElement = wp.element.createElement;
+const quoteSaveFilter = (el, type, attributes) => {
+  if (type.name === "core/quote") {
+    const newEl = createElement("div", {className: "MYWRAPPER"}, el);    
+    return newEl;
+  }
+  return el;
+};
+
+wp.hooks.addFilter("blocks.getSaveElement", "my-plugin/quote-save", quoteSaveFilter);
+```
+{% ESNext %}
+```js
+const quoteSaveFilter = (el, type, attributes) => {
+  if (type.name === "core/quote") {
+    const newEl = <div className="MYWRAPPER">{el}</div>;
+    return newEl;
+  }
+  return el;
+};
+
+addFilter("blocks.getSaveElement", "my-plugin/quote-save", quoteSaveFilter);
+```
+{% end %}
+
 #### `blocks.getSaveContent.extraProps`
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
@@ -335,5 +369,4 @@ To set an SVG icon for the category shown in the previous example, add the follo
 	var svgIcon = el( SVG, { width: 20, height: 20, viewBox: '0 0 20 20'}, circle);
 	wp.blocks.updateCategory( 'my-category', { icon: svgIcon } );
 } )();
-``` 
-
+```
