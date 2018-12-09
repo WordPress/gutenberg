@@ -164,8 +164,8 @@ class InlineLinkUI extends Component {
 		}
 	}
 
-	onChangeInputValue( inputValue ) {
-		this.setState( { inputValue } );
+	onChangeInputValue( inputValue, post ) {
+		this.setState( { inputValue, post } );
 	}
 
 	setLinkTarget( opensInNewWindow ) {
@@ -192,9 +192,10 @@ class InlineLinkUI extends Component {
 
 	submitLink( event ) {
 		const { isActive, value, onChange, speak } = this.props;
-		const { inputValue, opensInNewWindow } = this.state;
+		const { inputValue, opensInNewWindow, post } = this.state;
 		const url = prependHTTP( inputValue );
 		const selectedText = getTextContent( slice( value ) );
+
 		const format = createLinkFormat( {
 			url,
 			opensInNewWindow,
@@ -204,7 +205,8 @@ class InlineLinkUI extends Component {
 		event.preventDefault();
 
 		if ( isCollapsed( value ) && ! isActive ) {
-			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
+			const linkText = ( post && post.title ) || url;
+			const toInsert = applyFormat( create( { text: linkText } ), format, 0, linkText.length );
 			onChange( insert( value, toInsert ) );
 		} else {
 			onChange( applyFormat( value, format ) );
