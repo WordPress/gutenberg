@@ -172,4 +172,9 @@ describe( 'rawHandler', () => {
 		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-link.html' ) );
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
+
+	it( 'should convert a caption shortcode with caption', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-caption-link.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
 } );
