@@ -2,10 +2,17 @@
  * Internal dependencies
  */
 import { newPost } from '../support/utils';
+import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'new editor state', () => {
 	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-plugin-post-formats-support' );
 		await newPost();
+	} );
+
+	afterAll( async () => {
+		await newPost();
+		await deactivatePlugin( 'gutenberg-test-plugin-post-formats-support' );
 	} );
 
 	it( 'should show the New Post page in Gutenberg', async () => {
