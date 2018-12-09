@@ -73,7 +73,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 							onChange={ ( nextValue ) => {
 								nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 								props.setAttributes( {
-									anchor: nextValue,
+									anchor: nextValue === '' ? null : nextValue,
 								} );
 							} } />
 					</InspectorAdvancedControls>
