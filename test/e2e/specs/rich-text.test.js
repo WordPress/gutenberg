@@ -10,16 +10,8 @@ import {
 } from '../support/utils';
 
 describe( 'RichText', () => {
-	let unsubscribes;
-
 	beforeEach( async () => {
-		unsubscribes = [];
-
 		await newPost();
-	} );
-
-	afterEach( () => {
-		unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
 	} );
 
 	it( 'should handle change in tag name gracefully', async () => {
@@ -77,8 +69,6 @@ describe( 'RichText', () => {
 	} );
 
 	it( 'should only mutate text data on input', async () => {
-		expect.assertions( 2 );
-
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await pressWithModifier( 'primary', 'b' );
@@ -113,16 +103,10 @@ describe( 'RichText', () => {
 			} );
 
 			mutationObserver.observe( body, config );
-			unsubscribes.push( () => mutationObserver.disconnect() );
+
+			window.unsubscribes = [ () => mutationObserver.disconnect() ];
 
 			document.addEventListener( 'selectionchange', () => {
-				// One selection change event is fine. This assertion exists
-				// to satisfy the `expect.assertions` expected calls. It's
-				// acceptable that the `selectionchange` listener not be
-				// removed given that the test must fail if it never reaches
-				// this point.
-				expect( true ).toBe( true );
-
 				function throwMultipleSelectionChange() {
 					throw new Error( 'Typing should only emit one selection change event.' );
 				}
@@ -133,13 +117,24 @@ describe( 'RichText', () => {
 					{ once: true }
 				);
 
-				unsubscribes.push( () => {
+				window.unsubscribes.push( () => {
 					document.removeEventListener( 'selectionchange', throwMultipleSelectionChange );
 				} );
 			}, { once: true } );
 		} );
 
 		await page.keyboard.type( '4' );
+
+		await page.evaluate( () => {
+			// The selection change event should be called once. If there's only
+			// one item in `window.unsubscribes`, it means that only one
+			// function is present to disconnect the `mutationObserver`.
+			if ( window.unsubscribes.length === 1 ) {
+				throw new Error( 'The selection change event listener was never called.' );
+			}
+
+			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
+		} );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
