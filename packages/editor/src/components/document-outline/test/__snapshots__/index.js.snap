@@ -10,7 +10,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="0"
       level="H2"
       path={Array []}
-      target="'#block-clientId_0"
+      target="#block-clientId_0"
     >
       Heading parent
     </TableOfContentsItem>
@@ -19,7 +19,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="1"
       level="H3"
       path={Array []}
-      target="'#block-clientId_1"
+      target="#block-clientId_1"
     >
       Heading child
     </TableOfContentsItem>
@@ -37,7 +37,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       key="0"
       level="H1"
       path={Array []}
-      target="'#block-clientId_0"
+      target="#block-clientId_0"
     >
       Heading 1
       <br
@@ -54,7 +54,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       key="1"
       level="H1"
       path={Array []}
-      target="'#block-clientId_2"
+      target="#block-clientId_2"
     >
       Heading 1
       <br
