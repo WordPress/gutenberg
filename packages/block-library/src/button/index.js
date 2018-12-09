@@ -49,6 +49,18 @@ const blockAttributes = {
 	customTextColor: {
 		type: 'string',
 	},
+	linkTarget: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'target',
+	},
+	rel: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'a',
+		attribute: 'rel',
+	},
 };
 
 export const name = 'core/button';
@@ -94,6 +106,8 @@ export const settings = {
 			textColor,
 			customBackgroundColor,
 			customTextColor,
+			linkTarget,
+			rel,
 		} = attributes;
 
 		const textClass = getColorClassName( 'color', textColor );
@@ -120,12 +134,63 @@ export const settings = {
 					title={ title }
 					style={ buttonStyle }
 					value={ text }
+					target={ linkTarget }
+					rel={ rel }
 				/>
 			</div>
 		);
 	},
 
 	deprecated: [ {
+		attributes: {
+			...pick( blockAttributes, [ 'url', 'title', 'text' ] ),
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			customBackgroundColor: {
+				type: 'string',
+			},
+			customTextColor: {
+				type: 'string',
+			},
+		},
+
+		save( { attributes } ) {
+			const { url, text, title, backgroundColor, textColor, customBackgroundColor, customTextColor } = attributes;
+
+			const textClass = getColorClassName( 'color', textColor );
+			const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+
+			const buttonClasses = classnames( 'wp-block-button__link', {
+				'has-text-color': textColor || customTextColor,
+				[ textClass ]: textClass,
+				'has-background': backgroundColor || customBackgroundColor,
+				[ backgroundClass ]: backgroundClass,
+			} );
+
+			const buttonStyle = {
+				backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+				color: textClass ? undefined : customTextColor,
+			};
+
+			return (
+				<div>
+					<RichText.Content
+						tagName="a"
+						className={ buttonClasses }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+					/>
+				</div>
+			);
+		},
+	},
+	{
 		attributes: {
 			...pick( blockAttributes, [ 'url', 'title', 'text' ] ),
 			color: {
