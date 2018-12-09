@@ -94,6 +94,8 @@ registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
 ```
 {% end %}
 
+Note that internationalization is an important consideration for WordPress development. While the examples in this documentation do not include internationalization, the [accompanying WordPress example block plugin](https://github.com/WordPress/gutenberg-examples) includes the code necessary to support internationalization.
+
 When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](../../../../../docs/designers-developers/developers/block-api/block-attributes.md) to find the desired value from the markup of the block.
 
 In the code snippet above, when loading the editor, we will extract the `content` value as the HTML of the paragraph element in the saved post's markup.

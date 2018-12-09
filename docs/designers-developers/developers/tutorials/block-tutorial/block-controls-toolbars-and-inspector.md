@@ -165,6 +165,8 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 ```
 {% end %}
 
+Note that internationalization is an important consideration for WordPress development. While the examples in this documentation do not include internationalization, the [accompanying WordPress example block plugin](https://github.com/WordPress/gutenberg-examples) includes the code necessary to support internationalization.
+
 Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
 
 ## Inspector

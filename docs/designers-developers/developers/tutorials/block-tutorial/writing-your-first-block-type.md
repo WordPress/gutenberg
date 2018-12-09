@@ -118,6 +118,8 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 ```
 {% end %}
 
+Note that internationalization is an important consideration for WordPress development. While the examples in this documentation do not include internationalization, the [accompanying WordPress example block plugin](https://github.com/WordPress/gutenberg-examples) includes the code necessary to support internationalization.
+
 Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](https://wordpress.org/gutenberg/handbook/block-api/#icon-optional).
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.
