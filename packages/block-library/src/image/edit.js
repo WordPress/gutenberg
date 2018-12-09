@@ -1,3 +1,4 @@
+/* global React */
 /**
  * External dependencies
  */
@@ -113,6 +114,7 @@ class ImageEdit extends Component {
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.onImageError = this.onImageError.bind( this );
+		this.myRef = React.createRef();
 
 		this.state = {
 			captionFocused: false,
@@ -152,6 +154,16 @@ class ImageEdit extends Component {
 				captionFocused: false,
 			} );
 		}
+
+		if ( this.state.autoFocus && this.myRef.current ) {
+			this.setState( {
+				autoFocus: false,
+			} );
+			const caption = this.myRef.current.querySelector( 'figcaption' );
+			if ( caption ) {
+				caption.focus();
+			}
+		}
 	}
 
 	onUploadError( message ) {
@@ -175,6 +187,7 @@ class ImageEdit extends Component {
 
 		this.setState( {
 			isEditing: false,
+			autoFocus: true,
 		} );
 
 		this.props.setAttributes( {
@@ -557,7 +570,7 @@ class ImageEdit extends Component {
 		return (
 			<Fragment>
 				{ controls }
-				<figure className={ classes }>
+				<figure className={ classes } ref={ this.myRef }>
 					<ImageSize src={ url } dirtynessTrigger={ align }>
 						{ ( sizes ) => {
 							const {
