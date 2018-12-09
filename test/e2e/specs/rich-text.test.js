@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 	insertBlock,
 	clickBlockAppender,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'RichText', () => {
@@ -55,6 +61,10 @@ describe( 'RichText', () => {
 		await page.keyboard.type( '.' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should transform backtick to code', async () => {
@@ -66,5 +76,9 @@ describe( 'RichText', () => {
 		await pressWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

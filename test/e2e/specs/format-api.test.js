@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -37,5 +43,9 @@ describe( 'Using Format API', () => {
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.click( '[aria-label="Custom Link"]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

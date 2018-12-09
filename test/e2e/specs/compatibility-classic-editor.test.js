@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost, insertBlock, publishPost } from '../support/utils';
+import { newPost, insertBlock, publishPost, logA11yResults } from '../support/utils';
 
 describe( 'Compatibility with Classic Editor', () => {
 	beforeEach( async () => {
@@ -26,5 +31,9 @@ describe( 'Compatibility with Classic Editor', () => {
 		await page.waitForSelector( '.entry-content' );
 		const content = await page.$eval( '.entry-content', ( element ) => element.innerHTML.trim() );
 		expect( content ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.entry-content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

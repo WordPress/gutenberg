@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 	pressWithModifier,
 	pressTimes,
 	insertBlock,
+	logA11yResults,
 } from '../support/utils';
 
 /**
@@ -52,6 +58,10 @@ describe( 'Links', () => {
 
 		// The link should have been inserted
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'can be created by selecting text and using keyboard shortcuts', async () => {

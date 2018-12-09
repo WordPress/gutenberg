@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 	getEditedPostContent,
 	pressTimes,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
@@ -50,6 +56,10 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.type( 'BeforeSecond:' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should merge into inline boundary position', async () => {

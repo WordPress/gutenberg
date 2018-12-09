@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	pressTimes,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
@@ -103,6 +109,10 @@ describe( 'adding blocks', () => {
 		await codeEditorButton.click( 'button' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/9583
@@ -142,5 +152,9 @@ describe( 'adding blocks', () => {
 		// Expect focus to have transferred back to the inserter toggle button.
 		activeElementClassList = await page.evaluate( () => document.activeElement.classList );
 		expect( Object.values( activeElementClassList ) ).toContain( 'editor-inserter__toggle' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

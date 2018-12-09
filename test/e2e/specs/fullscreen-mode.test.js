@@ -1,9 +1,15 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
 	newPost,
 	clickOnMoreMenuItem,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'Fullscreen Mode', () => {
@@ -23,5 +29,9 @@ describe( 'Fullscreen Mode', () => {
 		const fullscreenToolbar = await page.$( '.edit-post-fullscreen-mode-close__toolbar' );
 
 		expect( fullscreenToolbar ).not.toBeNull();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

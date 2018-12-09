@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 	setPostContent,
 	getAllBlocks,
 	selectBlockByClientId,
+	logA11yResults,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -111,6 +117,10 @@ describe( 'Align Hook Works As Expected', () => {
 				// verify no alignment button is in pressed state after parsing the block.
 				pressedButtons = await page.$$( BUTTON_PRESSED_SELECTOR );
 				expect( pressedButtons ).toHaveLength( 0 );
+
+				const axe = new AxePuppeteer( page );
+				axe.include( '.editor-block-toolbar' );
+				logA11yResults( await axe.analyze() );
 			}
 		);
 	};

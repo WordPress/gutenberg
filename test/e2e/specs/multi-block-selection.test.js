@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	insertBlock,
 	newPost,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
@@ -75,6 +81,10 @@ describe( 'Multi-block selection', () => {
 		await pressWithModifier( 'primary', 'a' );
 		await pressWithModifier( 'primary', 'a' );
 		await expectMultiSelected( blocks, true );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'Should select/unselect multiple blocks using Shift + Arrows', async () => {

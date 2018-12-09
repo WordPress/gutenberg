@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	insertBlock,
 	getEditedPostContent,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -26,6 +32,11 @@ describe( 'Deprecated Node Matcher', () => {
 		await insertBlock( 'Deprecated Node Matcher' );
 		await page.keyboard.type( 'test' );
 		await page.keyboard.press( 'Enter' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -39,5 +50,9 @@ describe( 'Deprecated Node Matcher', () => {
 		await page.keyboard.up( 'Shift' );
 		await pressWithModifier( 'primary', 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	newPost,
 	openDocumentSettingsSidebar,
 	publishPost,
+	logA11yResults,
 } from '../support/utils';
 
 // This tests are not together with the remaining sidebar tests,
@@ -30,6 +36,9 @@ describe( 'Sidebar Permalink Panel', () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
 			removeEditorPanel( 'post-link' );
 		} );
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
 	} );
 } );

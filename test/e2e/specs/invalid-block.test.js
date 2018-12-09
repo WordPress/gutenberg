@@ -1,9 +1,15 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
 	newPost,
 	clickBlockAppender,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'invalid blocks', () => {
@@ -32,6 +38,10 @@ describe( 'invalid blocks', () => {
 		await page.click( '.editor-post-save-draft' );
 		expect( console ).toHaveErrored();
 		expect( console ).toHaveWarned();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 
 		// Click on the 'resolve' button
 		await page.click( '.editor-warning__actions button' );

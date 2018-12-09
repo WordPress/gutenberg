@@ -1,9 +1,15 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
 	clickBlockAppender,
 	newPost,
+	logA11yResults,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -24,6 +30,10 @@ describe( 'Using Hooks API', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		expect( await page.$( '.edit-post-sidebar .e2e-reset-block-button' ) ).not.toBeNull();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'Pressing reset block button resets the block', async () => {
@@ -34,5 +44,9 @@ describe( 'Using Hooks API', () => {
 		await page.click( '.edit-post-sidebar .e2e-reset-block-button' );
 		const newParagraphContent = await page.$eval( 'div[data-type="core/paragraph"] p', ( element ) => element.textContent );
 		expect( newParagraphContent ).toEqual( '' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

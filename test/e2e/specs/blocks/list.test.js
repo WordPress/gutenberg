@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -9,6 +14,7 @@ import {
 	convertBlock,
 	pressWithModifier,
 	insertBlock,
+	logA11yResults,
 } from '../../support/utils';
 
 describe( 'List', () => {
@@ -26,6 +32,10 @@ describe( 'List', () => {
 		await page.keyboard.type( 'Another list item' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'can be created by typing an asterisk in front of text of a paragraph block', async () => {

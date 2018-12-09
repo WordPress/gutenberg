@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'undo', () => {
@@ -62,5 +68,9 @@ describe( 'undo', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 		// After undoing every action, there should be no more undo history.
 		expect( await page.$( '.editor-history__undo[aria-disabled="true"]' ) ).not.toBeNull();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

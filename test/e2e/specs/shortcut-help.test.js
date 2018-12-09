@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	clickOnMoreMenuItem,
 	clickOnCloseModalButton,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'keyboard shortcut help modal', () => {
@@ -29,6 +35,10 @@ describe( 'keyboard shortcut help modal', () => {
 		await pressWithModifier( 'access', 'h' );
 		const shortcutHelpModalElements = await page.$$( '.edit-post-keyboard-shortcut-help' );
 		expect( shortcutHelpModalElements ).toHaveLength( 1 );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-keyboard-shortcut-help' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'closes the shortcut help modal when the shortcut key (access+h) is pressed again', async () => {

@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	newPost,
 	insertBlock,
 	convertBlock,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'Code block', () => {
@@ -29,5 +35,9 @@ describe( 'Code block', () => {
 		// The content should now be a Preformatted block with no data loss.
 		const convertedPostContent = await getEditedPostContent();
 		expect( convertedPostContent ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

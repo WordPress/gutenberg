@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost, switchToEditor } from '../support/utils';
+import { clickBlockAppender, newPost, switchToEditor, logA11yResults } from '../support/utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
 	beforeEach( async () => {
@@ -40,6 +45,10 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// This block should be in "visual" mode by default.
 		visualBlock = await page.$$( '.editor-block-list__layout .editor-block-list__block .editor-rich-text' );
 		expect( visualBlock ).toHaveLength( 1 );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should display sidebar in HTML mode', async () => {
@@ -109,5 +118,9 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// The inserter is disabled
 		const disabledInserter = await page.$( '.editor-inserter > button:disabled' );
 		expect( disabledInserter ).not.toBeNull();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

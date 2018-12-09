@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 	newPost,
 	saveDraft,
 	toggleOption,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'New User Experience (NUX)', () => {
@@ -47,6 +53,10 @@ describe( 'New User Experience (NUX)', () => {
 
 		const secondTipText = await page.$eval( '.nux-dot-tip', ( element ) => element.innerText );
 		expect( secondTipText ).toContain( 'You’ll find more settings for your page and blocks in the sidebar.' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.nux-dot-tip' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should show "Got it" once all tips have been displayed', async () => {
@@ -109,6 +119,10 @@ describe( 'New User Experience (NUX)', () => {
 		// Tips should be enabled in localStorage as well.
 		areTipsEnabled = await getTipsEnabled( page );
 		expect( areTipsEnabled ).toEqual( true );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.nux-dot-tip' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	// TODO: This test should be enabled once

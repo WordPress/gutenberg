@@ -3,6 +3,7 @@
  */
 import { last } from 'lodash';
 import { parse } from 'url';
+import AxePuppeteer from 'axe-puppeteer';
 
 /**
  * Internal dependencies
@@ -12,6 +13,7 @@ import {
 	getUrl,
 	publishPost,
 	saveDraft,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'Preview', () => {
@@ -125,6 +127,10 @@ describe( 'Preview', () => {
 		// Title in preview should match updated input.
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World! And more.' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 
 		await previewPage.close();
 	} );

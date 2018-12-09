@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	newPost,
 	insertBlock,
 	searchForBlock,
+	logA11yResults,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -140,6 +146,10 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 			);
 			expect( await getBackgroundColor( INSPECTOR_ICON_SELECTOR ) ).toEqual( 'rgb(1, 0, 0)' );
 			expect( await getColor( INSPECTOR_ICON_SELECTOR ) ).toEqual( 'rgb(248, 249, 249)' );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-layout__content' );
+			logA11yResults( await axe.analyze() );
 		} );
 	} );
 } );

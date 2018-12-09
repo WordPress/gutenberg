@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 	pressWithModifier,
 	searchForBlock,
 	getEditedPostContent,
+	logA11yResults,
 } from '../support/utils';
 
 function waitForAndAcceptDialog() {
@@ -74,6 +80,10 @@ describe( 'Reusable Blocks', () => {
 			( element ) => element.innerText
 		);
 		expect( title ).toBe( 'Greeting block' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'can be created with no title', async () => {

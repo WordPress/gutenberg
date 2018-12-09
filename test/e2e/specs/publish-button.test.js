@@ -1,8 +1,14 @@
+/**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
 import {
 	arePrePublishChecksEnabled,
 	disablePrePublishChecks,
 	enablePrePublishChecks,
 	newPost,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'PostPublishButton', () => {
@@ -24,6 +30,10 @@ describe( 'PostPublishButton', () => {
 	it( 'should be disabled when post is not saveable', async () => {
 		const publishButton = await page.$( '.editor-post-publish-button[aria-disabled="true"]' );
 		expect( publishButton ).not.toBeNull();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should be disabled when post is being saved', async () => {

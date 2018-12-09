@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { newPost, logA11yResults } from '../support/utils';
 
 describe( 'preferences', () => {
 	beforeAll( async () => {
@@ -35,6 +40,10 @@ describe( 'preferences', () => {
 		// Change to "Block" tab.
 		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block"]' );
 		expect( await getActiveSidebarTabText() ).toBe( 'Block' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 
 		// Regression test: Reload resets to document tab.
 		//

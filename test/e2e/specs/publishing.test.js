@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -9,6 +14,7 @@ import {
 	disablePrePublishChecks,
 	arePrePublishChecksEnabled,
 	setViewport,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
@@ -71,6 +77,10 @@ describe( 'Publishing', () => {
 				expect( await page.$( '.editor-post-publish-button' ) ).not.toBeNull();
 
 				await publishPostWithoutPrePublishChecks();
+
+				const axe = new AxePuppeteer( page );
+				axe.include( '.edit-post-layout__content' );
+				logA11yResults( await axe.analyze() );
 
 				// The post-publishing panel should have been not shown.
 				expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();

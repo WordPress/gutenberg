@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { findSidebarPanelWithTitle, newPost, getEditedPostContent, openDocumentSettingsSidebar } from '../support/utils';
+import { findSidebarPanelWithTitle, newPost, getEditedPostContent, openDocumentSettingsSidebar, logA11yResults } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'new editor filtered state', () => {
@@ -40,5 +45,9 @@ describe( 'new editor filtered state', () => {
 		expect( title ).toBe( 'My default title' );
 		expect( content ).toBe( 'My default content' );
 		expect( excerpt ).toBe( 'My default excerpt' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

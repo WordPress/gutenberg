@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 	newPost,
 	pressTimes,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
@@ -73,6 +79,10 @@ describe( 'adding blocks', () => {
 		expect( activeElementText ).toBe( 'First paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should navigate around inline boundaries', async () => {

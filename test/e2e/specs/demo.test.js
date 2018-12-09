@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { visitAdmin, matchURL, setUpResponseMocking, mockOrTransform } from '../support/utils';
+import { visitAdmin, matchURL, setUpResponseMocking, mockOrTransform, logA11yResults } from '../support/utils';
 
 const MOCK_VIMEO_RESPONSE = {
 	url: 'https://vimeo.com/22439234',
@@ -32,10 +37,15 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'content should load without making the post dirty', async () => {
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
+
 		const isDirty = await page.evaluate( () => {
 			const { select } = window.wp.data;
 			return select( 'core/editor' ).isEditedPostDirty();
 		} );
+
 		expect( isDirty ).toBeFalsy();
 	} );
 

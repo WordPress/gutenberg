@@ -18,6 +18,7 @@ export { hasBlockSwitcher } from './has-block-switcher';
 export { insertBlock } from './insert-block';
 export { isEmbedding } from './is-embedding';
 export { JSONResponse } from './json-response';
+export { logA11yResults } from './log-a11y-results';
 export { matchURL } from './match-url';
 export { mockOrTransform } from './mock-or-transform';
 export { newPost } from './new-post';

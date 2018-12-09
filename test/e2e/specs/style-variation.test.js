@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost, insertBlock, getEditedPostContent } from '../support/utils';
+import { newPost, insertBlock, getEditedPostContent, logA11yResults } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
@@ -26,5 +31,9 @@ describe( 'adding blocks', () => {
 		// Check the content
 		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

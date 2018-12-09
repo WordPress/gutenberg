@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { forEach } from 'lodash';
+import AxePuppeteer from 'axe-puppeteer';
 
 /**
  * Internal dependencies
  */
-import { newPost, pressWithModifier } from '../support/utils';
+import { newPost, pressWithModifier, logA11yResults } from '../support/utils';
 
 describe( 'block toolbar', () => {
 	forEach( {
@@ -50,6 +51,10 @@ describe( 'block toolbar', () => {
 				// Downward
 				await page.keyboard.press( 'Escape' );
 				expect( await isInRichTextEditable() ).toBe( true );
+
+				const axe = new AxePuppeteer( page );
+				axe.include( '.editor-block-toolbar' );
+				logA11yResults( await axe.analyze() );
 			} );
 		} );
 	} );

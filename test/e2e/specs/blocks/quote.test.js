@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 	pressTimes,
 	convertBlock,
 	insertBlock,
+	logA11yResults,
 } from '../../support/utils';
 
 describe( 'Quote', () => {
@@ -25,6 +31,10 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'Another paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'can be created by typing > in front of text of a paragraph block', async () => {

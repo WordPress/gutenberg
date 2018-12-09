@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 	getEditedPostContent,
 	pressTimes,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 async function openBlockNavigator() {
@@ -48,6 +54,10 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should navigate block hierarchy using only the keyboard', async () => {
@@ -80,6 +90,10 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should appear and function even without nested blocks', async () => {
@@ -101,5 +115,9 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

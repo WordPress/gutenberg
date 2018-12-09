@@ -1,9 +1,15 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
 	clickOnMoreMenuItem,
 	newPost,
+	logA11yResults,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -111,6 +117,10 @@ describe( 'Using Plugins API', () => {
 
 			// There should be no <mark> tags in the raw content.
 			expect( html ).toBe( '&lt;p&gt;Paragraph to annotate&lt;/p&gt;' );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-layout__content' );
+			logA11yResults( await axe.analyze() );
 		} );
 
 		it( 'Keeps the cursor in the same location when applying annotation', async () => {
@@ -129,6 +139,10 @@ describe( 'Using Plugins API', () => {
 			}, htmlContent[ 0 ] );
 
 			expect( html ).toBe( 'ABCD' );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-layout__content' );
+			logA11yResults( await axe.analyze() );
 		} );
 
 		it( 'Moves when typing before it', async () => {
@@ -149,6 +163,10 @@ describe( 'Using Plugins API', () => {
 			await removeAnnotations();
 			const blockText = await getRichTextInnerHTML();
 			expect( blockText ).toBe( 'A1BC' );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-layout__content' );
+			logA11yResults( await axe.analyze() );
 		} );
 
 		it( 'Grows when typing inside it', async () => {
@@ -168,6 +186,10 @@ describe( 'Using Plugins API', () => {
 			await removeAnnotations();
 			const blockText = await getRichTextInnerHTML();
 			expect( blockText ).toBe( 'AB2C' );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-layout__content' );
+			logA11yResults( await axe.analyze() );
 		} );
 	} );
 } );

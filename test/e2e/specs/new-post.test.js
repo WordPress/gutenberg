@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { newPost, logA11yResults } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'new editor state', () => {
@@ -27,6 +32,10 @@ describe( 'new editor state', () => {
 		// Should display the Post Formats UI.
 		const postFormatsUi = await page.$( '.editor-post-format' );
 		expect( postFormatsUi ).not.toBeNull();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.editor-post-format' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should have no history', async () => {

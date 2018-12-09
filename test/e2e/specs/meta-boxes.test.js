@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost, insertBlock, publishPost } from '../support/utils';
+import { newPost, insertBlock, publishPost, logA11yResults } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Meta boxes', () => {
@@ -34,6 +39,10 @@ describe( 'Meta boxes', () => {
 			page.keyboard.press( 'S' ),
 			page.keyboard.up( 'Meta' ),
 		] );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async () => {
@@ -57,5 +66,9 @@ describe( 'Meta boxes', () => {
 
 		// Check the the dynamic block appears.
 		await page.waitForSelector( '.wp-block-latest-posts' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.wp-block-latest-posts' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

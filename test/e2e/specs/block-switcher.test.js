@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -7,6 +12,7 @@ import {
 	newPost,
 	insertBlock,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
@@ -30,6 +36,10 @@ describe( 'adding blocks', () => {
 			'Paragraph',
 			'Quote',
 		] );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'Should show the expected block transforms on the list block when the quote block is removed', async () => {
@@ -52,6 +62,10 @@ describe( 'adding blocks', () => {
 		).toEqual( [
 			'Paragraph',
 		] );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'Should not show the block switcher if all the blocks the list block transforms into are removed', async () => {
@@ -74,5 +88,9 @@ describe( 'adding blocks', () => {
 		expect(
 			await getAvailableBlockTransforms()
 		).toHaveLength( 0 );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

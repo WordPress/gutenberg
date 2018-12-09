@@ -2,11 +2,12 @@
  * Node dependencies
  */
 import path from 'path';
+import AxePuppeteer from 'axe-puppeteer';
 
 /**
  * Internal dependencies
  */
-import { visitAdmin } from '../support/utils';
+import { visitAdmin, logA11yResults } from '../support/utils';
 
 describe( 'Managing reusable blocks', () => {
 	beforeAll( async () => {
@@ -30,6 +31,11 @@ describe( 'Managing reusable blocks', () => {
 
 		// Wait for the success notice
 		await page.waitForSelector( '.notice-success' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.notice-success' );
+		logA11yResults( await axe.analyze() );
+
 		const noticeContent = await page.$eval( '.notice-success', ( element ) => element.textContent );
 		expect( noticeContent ).toEqual( 'Reusable block imported successfully!' );
 

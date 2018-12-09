@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { newPost, logA11yResults } from '../support/utils';
 
 describe( 'popovers', () => {
 	beforeEach( async () => {
@@ -21,6 +26,10 @@ describe( 'popovers', () => {
 			// Toggle closed.
 			await page.click( '.edit-post-more-menu > button' );
 			expect( await isMoreMenuOpen() ).toBe( false );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-more-menu' );
+			logA11yResults( await axe.analyze() );
 		} );
 	} );
 } );

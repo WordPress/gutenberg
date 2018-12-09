@@ -1,10 +1,16 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
 	setViewport,
 	newPost,
 	openDocumentSettingsSidebar,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'Post visibility', () => {
@@ -26,6 +32,10 @@ describe( 'Post visibility', () => {
 			} );
 
 			expect( currentStatus ).toBe( 'private' );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-layout__content' );
+			logA11yResults( await axe.analyze() );
 		} );
 	} );
 } );

@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { newPost, logA11yResults } from '../support/utils';
 
 describe( 'Datepicker', () => {
 	beforeEach( async () => {
@@ -20,6 +25,10 @@ describe( 'Datepicker', () => {
 	it( 'should show the publishing date if the date is in the past', async () => {
 		// Open the datepicker.
 		await page.click( '.edit-post-post-schedule__toggle' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.components-datetime__date' );
+		logA11yResults( await axe.analyze() );
 
 		// Change the publishing date to a year in the past.
 		await page.click( '.components-datetime__time-field-year' );

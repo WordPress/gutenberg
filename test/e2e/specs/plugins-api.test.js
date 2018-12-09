@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 	newPost,
 	openPublishPanel,
 	publishPost,
+	logA11yResults,
 } from '../support/utils';
 import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
@@ -52,6 +58,10 @@ describe( 'Using Plugins API', () => {
 
 			const pluginPublishPanelText = await page.$eval( '.editor-post-publish-panel .my-publish-panel-plugin__post', ( el ) => el.innerText );
 			expect( pluginPublishPanelText ).toMatch( 'My post publish panel' );
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.editor-post-publish-panel' );
+			logA11yResults( await axe.analyze() );
 		} );
 	} );
 
@@ -61,6 +71,10 @@ describe( 'Using Plugins API', () => {
 
 			const pluginSidebarContent = await page.$eval( '.edit-post-sidebar', ( el ) => el.innerHTML );
 			expect( pluginSidebarContent ).toMatchSnapshot();
+
+			const axe = new AxePuppeteer( page );
+			axe.include( '.edit-post-sidebar' );
+			logA11yResults( await axe.analyze() );
 		} );
 
 		it( 'Should close plugins sidebar using More Menu item', async () => {

@@ -1,3 +1,8 @@
+/**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
 import {
 	arePrePublishChecksEnabled,
 	disablePrePublishChecks,
@@ -6,6 +11,7 @@ import {
 	openPublishPanel,
 	pressWithModifier,
 	publishPost,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'PostPublishPanel', () => {
@@ -58,5 +64,9 @@ describe( 'PostPublishPanel', () => {
 			return Object.values( focusedElement.classList );
 		} );
 		expect( focusedElementClassList ).toContain( 'components-checkbox-control__input' );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

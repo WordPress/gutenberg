@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
+	logA11yResults,
 } from '../support/utils';
 
 const addThreeParagraphsToNewPost = async () => {
@@ -27,6 +33,12 @@ const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
 
 describe( 'block deletion -', () => {
 	beforeEach( addThreeParagraphsToNewPost );
+
+	afterEach( async () => {
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
+	} );
 
 	describe( 'deleting the third block using the Remove Block menu item', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {

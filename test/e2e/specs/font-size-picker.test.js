@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,6 +11,7 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressTimes,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'Font Size Picker', () => {
@@ -25,6 +31,10 @@ describe( 'Font Size Picker', () => {
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.components-font-size-picker__buttons' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should apply a named font size using the font size input', async () => {
@@ -110,5 +120,9 @@ describe( 'Font Size Picker', () => {
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
 		expect( content ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.components-font-size-picker__buttons' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

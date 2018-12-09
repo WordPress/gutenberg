@@ -1,7 +1,12 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { newPost, logA11yResults } from '../support/utils';
 
 describe( 'block mover', () => {
 	beforeEach( async () => {
@@ -21,6 +26,10 @@ describe( 'block mover', () => {
 		const blockMover = await page.$$( '.editor-block-mover' );
 		// There should be a block mover.
 		expect( blockMover ).toHaveLength( 1 );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.editor-block-mover' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should hide block mover when only one block exists', async () => {

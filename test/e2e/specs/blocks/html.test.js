@@ -1,10 +1,16 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
 	clickBlockAppender,
 	getEditedPostContent,
 	newPost,
+	logA11yResults,
 } from '../../support/utils';
 
 describe( 'HTML block', () => {
@@ -22,5 +28,9 @@ describe( 'HTML block', () => {
 		await page.keyboard.type( '<var>a</var><sup>2</sup> + <var>b</var><sup>2</sup> = <var>c</var><sup>2</sup> </p>' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

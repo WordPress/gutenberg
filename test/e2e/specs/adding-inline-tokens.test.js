@@ -5,6 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import os from 'os';
 import uuid from 'uuid/v4';
+import AxePuppeteer from 'axe-puppeteer';
 
 /**
  * Internal dependencies
@@ -14,6 +15,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	newPost,
+	logA11yResults,
 } from '../support/utils';
 
 describe( 'adding inline tokens', () => {
@@ -46,5 +48,9 @@ describe( 'adding inline tokens', () => {
 		// Check the content.
 		const regex = new RegExp( `<!-- wp:paragraph -->\\s*<p>a <img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ filename }\\.png" alt=""\\/?><\\/p>\\s*<!-- \\/wp:paragraph -->` );
 		expect( await getEditedPostContent() ).toMatch( regex );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.media-modal' );
+		logA11yResults( await axe.analyze() );
 	} );
 } );

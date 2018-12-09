@@ -1,4 +1,9 @@
 /**
+ * Node dependencies
+ */
+import AxePuppeteer from 'axe-puppeteer';
+
+/**
  * Internal dependencies
  */
 import {
@@ -8,6 +13,7 @@ import {
 	openDocumentSettingsSidebar,
 	pressWithModifier,
 	setViewport,
+	logA11yResults,
 } from '../support/utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
@@ -41,6 +47,10 @@ describe( 'Sidebar', () => {
 		// the active sidebar tab should be visible
 		expect( width ).toBeGreaterThan( 10 );
 		expect( height ).toBeGreaterThan( 10 );
+
+		const axe = new AxePuppeteer( page );
+		axe.include( '.edit-post-layout__content' );
+		logA11yResults( await axe.analyze() );
 	} );
 
 	it( 'should have the sidebar closed by default on mobile', async () => {
