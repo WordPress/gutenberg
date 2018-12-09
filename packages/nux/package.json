@@ -29,9 +29,6 @@
 		"lodash": "^4.17.10",
 		"rememo": "^3.0.0"
 	},
-	"devDependencies": {
-		"enzyme": "^3.7.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

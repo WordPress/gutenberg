@@ -41,10 +41,6 @@
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
 	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"sprintf-js": "^1.1.1"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

@@ -27,10 +27,6 @@
 		"lodash": "^4.17.10",
 		"webpack-sources": "^1.1.0"
 	},
-	"devDependencies": {
-		"rimraf": "^2.6.2",
-		"webpack": "^4.8.3"
-	},
 	"peerDependencies": {
 		"webpack": "^4.0.0"
 	},

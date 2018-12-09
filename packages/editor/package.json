@@ -59,12 +59,6 @@
 		"tinymce": "^4.7.2",
 		"traverse": "^0.6.6"
 	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.7.0",
-		"react-dom": "^16.6.3",
-		"react-test-renderer": "^16.6.3"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
