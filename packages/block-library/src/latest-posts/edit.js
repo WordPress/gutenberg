@@ -176,7 +176,7 @@ class LatestPostsEdit extends Component {
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
-								<time dateTime={ format( 'c', post.date_gmt ) } className={ `${ this.props.className }__post-date` }>
+								<time dateTime={ format( 'c', post.date_gmt ) } className="wp-block-latest-posts__post-date">
 									{ dateI18n( dateFormat, post.date_gmt ) }
 								</time>
 							}
