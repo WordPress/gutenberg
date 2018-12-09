@@ -13,7 +13,7 @@ const TableOfContentsItem = ( {
 	isValid,
 	level,
 	path = [],
-	target,
+	href,
 	close,
 } ) => (
 	<li
@@ -26,7 +26,7 @@ const TableOfContentsItem = ( {
 		) }
 	>
 		<a
-			href={ target }
+			href={ href }
 			className="document-outline__button"
 			onClick={ close }
 		>
