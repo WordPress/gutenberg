@@ -21,7 +21,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 
 export const common = [
@@ -41,7 +41,7 @@ export const common = [
 			title: 'YouTube',
 			icon: embedYouTubeIcon,
 			keywords: [ __( 'music' ), __( 'video' ) ],
-			description: __( 'Embed a YouTube video.' ),
+			description: sprintf( __( 'Embed a video from %s.' ), __( 'YouTube' ) ),
 		},
 		patterns: [ /^https?:\/\/((m|www)\.)?youtube\.com\/.+/i, /^https?:\/\/youtu\.be\/.+/i ],
 	},
@@ -80,7 +80,7 @@ export const common = [
 			title: 'SoundCloud',
 			icon: embedAudioIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
-			description: __( 'Embed SoundCloud content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), __( 'SoundCloud' ) ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?soundcloud\.com\/.+/i ],
 	},
@@ -90,7 +90,7 @@ export const common = [
 			title: 'Spotify',
 			icon: embedSpotifyIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
-			description: __( 'Embed Spotify content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), __( 'Spotify' ) ),
 		},
 		patterns: [ /^https?:\/\/(open|play)\.spotify\.com\/.+/i ],
 	},
@@ -100,7 +100,7 @@ export const common = [
 			title: 'Flickr',
 			icon: embedFlickrIcon,
 			keywords: [ __( 'image' ) ],
-			description: __( 'Embed Flickr content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), __( 'Flickr' ) ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?flickr\.com\/.+/i, /^https?:\/\/flic\.kr\/.+/i ],
 	},
@@ -110,7 +110,7 @@ export const common = [
 			title: 'Vimeo',
 			icon: embedVimeoIcon,
 			keywords: [ __( 'video' ) ],
-			description: __( 'Embed a Vimeo video.' ),
+			description: sprintf( __( 'Embed a video from %s.' ), __( 'Vimeo' ) ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?vimeo\.com\/.+/i ],
 	},
@@ -122,7 +122,7 @@ export const others = [
 		settings: {
 			title: 'Animoto',
 			icon: embedVideoIcon,
-			description: __( 'Embed an Animoto video.' ),
+			description: sprintf( __( 'Embed a video from %s.' ), 'Animoto' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?(animoto|video214)\.com\/.+/i ],
 	},
@@ -131,7 +131,7 @@ export const others = [
 		settings: {
 			title: 'Cloudup',
 			icon: embedContentIcon,
-			description: __( 'Embed Cloudup content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Cloudup' ),
 		},
 		patterns: [ /^https?:\/\/cloudup\.com\/.+/i ],
 	},
@@ -140,7 +140,7 @@ export const others = [
 		settings: {
 			title: 'CollegeHumor',
 			icon: embedVideoIcon,
-			description: __( 'Embed CollegeHumor content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'CollegeHumor' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
 	},
@@ -149,7 +149,7 @@ export const others = [
 		settings: {
 			title: 'Dailymotion',
 			icon: embedVideoIcon,
-			description: __( 'Embed a Dailymotion video.' ),
+			description: sprintf( __( 'Embed a video from %s.' ), 'Dailymotion' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
 	},
@@ -158,7 +158,7 @@ export const others = [
 		settings: {
 			title: 'Funny or Die',
 			icon: embedVideoIcon,
-			description: __( 'Embed Funny or Die content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Funny or Die' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?funnyordie\.com\/.+/i ],
 	},
@@ -167,7 +167,7 @@ export const others = [
 		settings: {
 			title: 'Hulu',
 			icon: embedVideoIcon,
-			description: __( 'Embed Hulu content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Hulu' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?hulu\.com\/.+/i ],
 	},
@@ -176,7 +176,7 @@ export const others = [
 		settings: {
 			title: 'Imgur',
 			icon: embedPhotoIcon,
-			description: __( 'Embed Imgur content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Imgur' ),
 		},
 		patterns: [ /^https?:\/\/(.+\.)?imgur\.com\/.+/i ],
 	},
@@ -185,7 +185,7 @@ export const others = [
 		settings: {
 			title: 'Issuu',
 			icon: embedContentIcon,
-			description: __( 'Embed Issuu content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Issuu' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?issuu\.com\/.+/i ],
 	},
@@ -194,7 +194,7 @@ export const others = [
 		settings: {
 			title: 'Kickstarter',
 			icon: embedContentIcon,
-			description: __( 'Embed Kickstarter content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Kickstarter' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?kickstarter\.com\/.+/i, /^https?:\/\/kck\.st\/.+/i ],
 	},
@@ -203,7 +203,7 @@ export const others = [
 		settings: {
 			title: 'Meetup.com',
 			icon: embedContentIcon,
-			description: __( 'Embed Meetup.com content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Meetup.com' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?meetu(\.ps|p\.com)\/.+/i ],
 	},
@@ -213,7 +213,7 @@ export const others = [
 			title: 'Mixcloud',
 			icon: embedAudioIcon,
 			keywords: [ __( 'music' ), __( 'audio' ) ],
-			description: __( 'Embed Mixcloud content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Mixcloud' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 	},
@@ -231,7 +231,7 @@ export const others = [
 		settings: {
 			title: 'Polldaddy',
 			icon: embedContentIcon,
-			description: __( 'Embed Polldaddy content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Polldaddy' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?polldaddy\.com\/.+/i ],
 	},
@@ -249,7 +249,7 @@ export const others = [
 		settings: {
 			title: 'ReverbNation',
 			icon: embedAudioIcon,
-			description: __( 'Embed ReverbNation content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'ReverbNation' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?reverbnation\.com\/.+/i ],
 	},
@@ -258,7 +258,7 @@ export const others = [
 		settings: {
 			title: 'Screencast',
 			icon: embedVideoIcon,
-			description: __( 'Embed Screencast content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Screencast' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?screencast\.com\/.+/i ],
 	},
@@ -267,7 +267,7 @@ export const others = [
 		settings: {
 			title: 'Scribd',
 			icon: embedContentIcon,
-			description: __( 'Embed Scribd content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Scribd' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?scribd\.com\/.+/i ],
 	},
@@ -276,7 +276,7 @@ export const others = [
 		settings: {
 			title: 'Slideshare',
 			icon: embedContentIcon,
-			description: __( 'Embed Slideshare content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Slideshare' ),
 		},
 		patterns: [ /^https?:\/\/(.+?\.)?slideshare\.net\/.+/i ],
 	},
@@ -285,7 +285,7 @@ export const others = [
 		settings: {
 			title: 'SmugMug',
 			icon: embedPhotoIcon,
-			description: __( 'Embed SmugMug content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'SmugMug' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?smugmug\.com\/.+/i ],
 	},
@@ -315,7 +315,7 @@ export const others = [
 					} );
 				},
 			} ],
-			description: __( 'Embed Speaker Deck content.' ),
+			description: sprintf( __( 'Embed content from %s.' ), 'Speaker Deck' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?speakerdeck\.com\/.+/i ],
 	},
@@ -324,7 +324,7 @@ export const others = [
 		settings: {
 			title: 'TED',
 			icon: embedVideoIcon,
-			description: __( 'Embed a TED video.' ),
+			description: sprintf( __( 'Embed a video from %s.' ), 'TED' ),
 		},
 		patterns: [ /^https?:\/\/(www\.|embed\.)?ted\.com\/.+/i ],
 	},
@@ -343,7 +343,7 @@ export const others = [
 			title: 'VideoPress',
 			icon: embedVideoIcon,
 			keywords: [ __( 'video' ) ],
-			description: __( 'Embed a VideoPress video.' ),
+			description: sprintf( __( 'Embed a video from %s.' ), 'VideoPress' ),
 		},
 		patterns: [ /^https?:\/\/videopress\.com\/.+/i ],
 	},
@@ -352,7 +352,7 @@ export const others = [
 		settings: {
 			title: 'WordPress.tv',
 			icon: embedVideoIcon,
-			description: __( 'Embed a WordPress.tv video.' ),
+			description: sprintf( __( 'Embed a video from %s.' ), 'WordPress.tv' ),
 		},
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
 	},
