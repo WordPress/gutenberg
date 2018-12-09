@@ -11,81 +11,73 @@ One challenge of maintaining the representation of a block as a JavaScript objec
 {% codetabs %}
 {% ES5 %}
 ```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	RichText = wp.editor.RichText;
+( function( blocks, editor, element ) {
+	var el = element.createElement;
+	var RichText = editor.RichText;
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-03', {
-	title: 'Hello World (Step 3)',
+	blocks.registerBlockType( 'gutenberg-examples/example-03-editable', {
+		title: 'Example: Editable',
+		icon: 'universal-access-alt',
+		category: 'layout',
 
-	icon: 'universal-access-alt',
+		attributes: {
+			content: {
+				type: 'array',
+				source: 'children',
+				selector: 'p',
+			},
+		},
 
-	category: 'layout',
-
-	attributes: {
-		content: {
-			type: 'string',
-			source: 'html',
-			selector: 'p',
-		}
-	},
-
-	edit: function( props ) {
-		var content = props.attributes.content;
-
-		function onChangeContent( newContent ) {
-			props.setAttributes( { content: newContent } );
-		}
-
-		return el(
-			RichText,
-			{
-				tagName: 'p',
-				className: props.className,
-				onChange: onChangeContent,
-				value: content,
+		edit: function( props ) {
+			var content = props.attributes.content;
+			function onChangeContent( newContent ) {
+				props.setAttributes( { content: newContent } );
 			}
-		);
-	},
 
-	save: function( props ) {
-		var content = props.attributes.content;
+			return el(
+				RichText,
+				{
+					tagName: 'p',
+					className: props.className,
+					onChange: onChangeContent,
+					value: content,
+				}
+			);
+		},
 
-		return el( RichText.Content, {
-			tagName: 'p',
-			className: props.className,
-			value: content
-		} );
-	},
-} );
+		save: function( props ) {
+			return el( RichText.Content, {
+				tagName: 'p', value: props.attributes.content,
+			} );
+		},
+	} );
+}(
+	window.wp.blocks,
+	window.wp.editor,
+	window.wp.element
+) );
 ```
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
 const { RichText } = wp.editor;
 
-registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
-	title: 'Hello World (Step 3)',
-
+registerBlockType( 'gutenberg-examples/example-03-editable-esnext', {
+	title: 'Example: Editable (esnext)',
 	icon: 'universal-access-alt',
-
 	category: 'layout',
-
 	attributes: {
 		content: {
-			type: 'string',
-			source: 'html',
+			type: 'array',
+			source: 'children',
 			selector: 'p',
 		},
 	},
-
-	edit( { attributes, className, setAttributes } ) {
-		const { content } = attributes;
-
-		function onChangeContent( newContent ) {
+	edit: ( props ) => {
+		const { attributes: { content }, setAttributes, className } = props;
+		const onChangeContent = ( newContent ) => {
 			setAttributes( { content: newContent } );
-		}
-
+		};
 		return (
 			<RichText
 				tagName="p"
@@ -95,16 +87,8 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 			/>
 		);
 	},
-
-	save( { attributes } ) {
-		const { content } = attributes;
-
-		return (
-			<RichText.Content
-				tagName="p"
-				value={ content }
-			/>
-		);
+	save: ( props ) => {
+		return <RichText.Content tagName="p" value={ props.attributes.content } />;
 	},
 } );
 ```
