@@ -185,8 +185,12 @@ export const settings = {
 					},
 					caption: {
 						shortcode: ( attributes, { shortcode } ) => {
-							const { content } = shortcode;
-							return content.replace( /\s*(?:<a[^>]*>\s*)?<img[^>]*>(?:\s*<\/a>)?\s*/, '' );
+							const { body } = document.implementation.createHTMLDocument( '' );
+
+							body.innerHTML = shortcode.content;
+							body.removeChild( body.firstElementChild );
+
+							return body.innerHTML.trim();
 						},
 					},
 					href: {
