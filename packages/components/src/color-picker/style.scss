@@ -199,7 +199,7 @@
 	fieldset {
 		flex: 1;
 	}
-	.components-color-picker__inputs-fields .components-text-control__input {
+	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
 		padding: 2px;
 	}
 }
