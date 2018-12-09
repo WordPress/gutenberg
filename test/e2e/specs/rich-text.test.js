@@ -10,8 +10,16 @@ import {
 } from '../support/utils';
 
 describe( 'RichText', () => {
+	let unsubscribes;
+
 	beforeEach( async () => {
+		unsubscribes = [];
+
 		await newPost();
+	} );
+
+	afterEach( () => {
+		unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
 	} );
 
 	it( 'should handle change in tag name gracefully', async () => {
@@ -69,6 +77,8 @@ describe( 'RichText', () => {
 	} );
 
 	it( 'should only mutate text data on input', async () => {
+		expect.assertions( 2 );
+
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await pressWithModifier( 'primary', 'b' );
@@ -103,12 +113,29 @@ describe( 'RichText', () => {
 			} );
 
 			mutationObserver.observe( body, config );
+			unsubscribes.push( () => mutationObserver.disconnect() );
 
 			document.addEventListener( 'selectionchange', () => {
-				// One selection change event is fine.
-				document.addEventListener( 'selectionchange', () => {
+				// One selection change event is fine. This assertion exists
+				// to satisfy the `expect.assertions` expected calls. It's
+				// acceptable that the `selectionchange` listener not be
+				// removed given that the test must fail if it never reaches
+				// this point.
+				expect( true ).toBe( true );
+
+				function throwMultipleSelectionChange() {
 					throw new Error( 'Typing should only emit one selection change event.' );
-				}, { once: true } );
+				}
+
+				document.addEventListener(
+					'selectionchange',
+					throwMultipleSelectionChange,
+					{ once: true }
+				);
+
+				unsubscribes.push( () => {
+					document.removeEventListener( 'selectionchange', throwMultipleSelectionChange );
+				} );
 			}, { once: true } );
 		} );
 
