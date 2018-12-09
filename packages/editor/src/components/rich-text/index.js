@@ -134,12 +134,9 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles the onSetup event for the TinyMCE component.
+	 * Sets a reference to the TinyMCE editor instance.
 	 *
-	 * Will setup event handlers for the TinyMCE instance.
-	 * An `onSetup` function in the props will be called if it is present.
-	 *
-	 * @param {tinymce} editor The editor instance as passed by TinyMCE.
+	 * @param {Editor} editor The editor instance as passed by TinyMCE.
 	 */
 	onSetup( editor ) {
 		this.editor = editor;
@@ -858,7 +855,7 @@ export class RichText extends Component {
 					record={ record }
 					onChange={ this.onChange }
 				>
-					{ ( { isExpanded, listBoxId, activeId } ) => (
+					{ ( { listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE
 								tagName={ Tagname }
@@ -869,7 +866,6 @@ export class RichText extends Component {
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
-								aria-expanded={ isExpanded }
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
 								{ ...ariaProps }

@@ -56,6 +56,6 @@ module.exports = {
 	packageFileNames: glob( 'packages/*/package.json' )
 		.map( ( fileName ) => fileName.split( '/' )[ 1 ] ),
 
-	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
+	tocFileName: path.resolve( __dirname, '../toc.json' ),
 	manifestOutput: path.resolve( __dirname, '../manifest.json' ),
 };

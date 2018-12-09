@@ -4,7 +4,7 @@ The new Blocks include baseline support in all themes, enhancements to opt-in to
 
 There are a few new concepts to consider when building themes:
 
-- **Editor Color Palette** - A default set of colors is provided, but themes and register their own and optionally lock users into picking from the defined palette.
+- **Editor Color Palette** - A default set of colors is provided, but themes can register their own and optionally lock users into picking from the defined palette.
 - **Editor Text Size Palette** - A default set of sizes is provided, but themes and register their own and optionally lock users into picking from preselected sizes.
 - **Responsive Embeds** - Themes must opt-in to responsive embeds.
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.

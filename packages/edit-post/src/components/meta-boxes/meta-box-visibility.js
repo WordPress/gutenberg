@@ -17,9 +17,16 @@ class MetaBoxVisibility extends Component {
 
 	updateDOM() {
 		const { id, isVisible } = this.props;
+
 		const element = document.getElementById( id );
-		if ( element ) {
-			element.style.display = isVisible ? '' : 'none';
+		if ( ! element ) {
+			return;
+		}
+
+		if ( isVisible ) {
+			element.classList.remove( 'is-hidden' );
+		} else {
+			element.classList.add( 'is-hidden' );
 		}
 	}
 
