@@ -8,22 +8,43 @@ Blocks containing static content are implemented entirely in JavaScript using th
 
 While the block's editor behaviors are implemented in JavaScript, you'll need to register your block server-side to ensure that the script is enqueued when the editor loads. Register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings. The `editor_`-prefixed handles will only be enqueued in the context of the editor, while `script` and `style` will be enqueued both in the editor and when viewing a post on the front of your site.
 
+{% codetabs %}
+{% ES5 %}
 ```php
-<?php
+function gutenberg_examples_01_register_block() {
 
-function gutenberg_boilerplate_block() {
 	wp_register_script(
-		'gutenberg-boilerplate-es5-step01',
-		plugins_url( 'step-01/block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element' )
+		'gutenberg-examples-01',
+		plugins_url( 'block.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'block.js' )
 	);
 
-	register_block_type( 'gutenberg-boilerplate-es5/hello-world-step-01', array(
-		'editor_script' => 'gutenberg-boilerplate-es5-step01',
+	register_block_type( 'gutenberg-examples/example-01-basic', array(
+		'editor_script' => 'gutenberg-examples-01',
 	) );
 }
-add_action( 'init', 'gutenberg_boilerplate_block' );
+add_action( 'init', 'gutenberg_examples_01_register_block' );
 ```
+{% ESNext %}
+```php
+function gutenberg_examples_01_esnext_register_block() {
+
+	wp_register_script(
+		'gutenberg-examples-01-esnext',
+		plugins_url( 'block.build.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-element' ),
+		filemtime( plugin_dir_path( __FILE__ ) . 'block.build.js' )
+	);
+
+	register_block_type( 'gutenberg-examples/example-01-basic-esnext', array(
+		'editor_script' => 'gutenberg-examples-01-esnext',
+	) );
+
+}
+add_action( 'init', 'gutenberg_examples_01_esnext_register_block' );
+```
+{% end %}
 
 Note the two script dependencies:
 
@@ -39,44 +60,59 @@ With the script enqueued, let's look at the implementation of the block itself:
 {% codetabs %}
 {% ES5 %}
 ```js
-var el = wp.element.createElement,
-	registerBlockType = wp.blocks.registerBlockType,
-	blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
+( function( blocks, element ) {
+	var el = element.createElement;
 
-registerBlockType( 'gutenberg-boilerplate-es5/hello-world-step-01', {
-	title: 'Hello World (Step 1)',
+	var blockStyle = {
+		backgroundColor: '#900',
+		color: '#fff',
+		padding: '20px',
+	};
 
-	icon: 'universal-access-alt',
+	blocks.registerBlockType( 'gutenberg-examples/example-01-basic', {
+		title: 'Example: Basic',
+		icon: 'universal-access-alt',
+		category: 'layout',
+		edit: function() {
+			return el(
+				'p',
+				{ style: blockStyle },
+				'Hello World, step 1 (from the editor).'
+			);
+		},
+		save: function() {
+			return el(
+				'p',
+				{ style: blockStyle },
+				'Hello World, step 1 (from the frontend).'
+			);
+		},
+	} );
+}(
+	window.wp.blocks,
+	window.wp.element
+) );
 
-	category: 'layout',
-
-	edit: function() {
-		return el( 'p', { style: blockStyle }, 'Hello editor.' );
-	},
-
-	save: function() {
-		return el( 'p', { style: blockStyle }, 'Hello saved content.' );
-	},
-} );
 ```
 {% ESNext %}
 ```js
 const { registerBlockType } = wp.blocks;
-const blockStyle = { backgroundColor: '#900', color: '#fff', padding: '20px' };
 
-registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
-	title: 'Hello World (Step 1)',
+const blockStyle = {
+	backgroundColor: '#900',
+	color: '#fff',
+	padding: '20px',
+};
 
+registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
+	title: 'Example: Basic (esnext)',
 	icon: 'universal-access-alt',
-
 	category: 'layout',
-
 	edit() {
-		return <p style={ blockStyle }>Hello editor.</p>;
+		return <div style={ blockStyle }>Basic example with JSX! (editor)</div>;
 	},
-
 	save() {
-		return <p style={ blockStyle }>Hello saved content.</p>;
+		return <div style={ blockStyle }>Basic example with JSX! (front)</div>;
 	},
 } );
 ```
