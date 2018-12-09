@@ -44,6 +44,8 @@ describe( 'adding blocks', () => {
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
+		// We need to arrow up key presses in the paragraph block because it shows up in two lines.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
@@ -52,6 +54,7 @@ describe( 'adding blocks', () => {
 		// Arrow up from first text field in nested context focuses column and
 		// columns wrappers before escaping out.
 		let activeElementBlockType;
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementBlockType = await page.evaluate( () => (
 			document.activeElement.getAttribute( 'data-type' )
