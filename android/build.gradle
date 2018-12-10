@@ -81,11 +81,11 @@ repositories {
     if (project == rootProject) {
         // if we are the root project, use a remote RN maven repo so jitpack can build this lib without local RN setup
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
-        def unpkgUrl = "https://unpkg.com/react-native@${rnVersion}/android"
-        println "Will use the unpkg.com exposed RN maven repo at ${unpkgUrl}"
+        def npmCdnUrl = "https://cdn.jsdelivr.net/npm/react-native@${rnVersion}/android"
+        println "Will use the jsdelivr.net exposed RN maven repo at ${npmCdnUrl}"
         maven {
             // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url unpkgUrl
+            url npmCdnUrl
         }
     }
 }
