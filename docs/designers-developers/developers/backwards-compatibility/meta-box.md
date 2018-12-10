@@ -82,3 +82,5 @@ Most PHP meta boxes should continue to work in Gutenberg, but some meta boxes th
 - Plugins relying on selectors that target the post title, post content fields, and other metaboxes (of the old editor).
 - Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in Gutenberg.
 - Plugins making updates to their DOM on "submit" or on "save".
+
+Please also note that if your plugin triggers a PHP warning or notice to be output on the page, this will cause the HTML document type (`<!DOCTYPE html>`) to be output incorrectly. This will cause the browser to render using "Quirks Mode", which is a compatibility layer that gets enabled when the browser doesn't know what type of document it is parsing. The block editor is not meant to work in this mode, but it can _appear_ to be working just fine. If you encounter issues such as *meta boxes overlaying the editor* or other layout issues, please check the raw page source of your document to see that the document type definition is the first thing output on the page. There will also be a warning in the JavaScript console, noting the issue.
