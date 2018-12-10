@@ -47,18 +47,20 @@ export default class MoreEdit extends Component {
 		this.props.setAttributes( { customText: value } );
 	}
 
-	render() {
+    renderLine(key) {
+        return <View key={key} style={ styles[ 'block-library-more__line' ] } />
+    }
+
+    renderText(key: number) {
 		const { attributes, onFocus, onBlur } = this.props;
 		const { customText } = attributes;
 		const defaultText = __( 'Read more' );
 		const value = customText !== undefined ? customText : defaultText;
 
-		return (
-			<View style={ styles[ 'block-library-more__container' ] }>
-				<View style={ styles[ 'block-library-more__sub-container' ] }>
-					<Text style={ styles[ 'block-library-more__left-marker' ] }>&lt;!--</Text>
+        return (
+            <View key={key} >
 					<PlainText
-						style={ styles[ 'block-library-more__plain-text' ] }
+						style={ styles[ 'block-library-more__text' ] }
 						value={ value }
 						multiline={ true }
 						underlineColorAndroid="transparent"
@@ -68,8 +70,22 @@ export default class MoreEdit extends Component {
 						onFocus={ onFocus }
 						onBlur={ onBlur }
 					/>
-					<Text style={ styles[ 'block-library-more__right-marker' ] }>--&gt;</Text>
-				</View>
+            </View>
+        )
+    }
+
+	renderInner() {
+        return [
+            this.renderLine(1),
+            this.renderText(2),
+            this.renderLine(3)
+        ]
+	}
+	
+	render() {
+		return (
+			<View style={ styles[ 'block-library-more__container' ]}>
+				{ this.renderInner() }
 			</View>
 		);
 	}
