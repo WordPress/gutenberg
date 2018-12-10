@@ -30,9 +30,6 @@ type PropsType = {
 	selectedBlock: ?BlockType,
 	selectedBlockClientId: string,
 	selectedBlockOrder: number,
-	serializeToNativeAction: void => void,
-	toggleHtmlModeAction: void => void,
-	updateHtmlAction: string => void,
 	isBlockSelected: string => boolean,
 	showHtml: boolean,
 };
@@ -225,7 +222,6 @@ export default compose( [
 		} = dispatch( 'core/editor' );
 
 		return {
-			clearSelectedBlock,
 			insertBlock,
 			focusBlock: ( clientId ) => {
 				clearSelectedBlock();
