@@ -461,6 +461,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'wp-components',
 			'wp-editor',
+			'wp-block-library',
 			// Always include visual styles so the editor never appears broken.
 			'wp-block-library-theme',
 		),

@@ -111,6 +111,7 @@ export default class TinyMCE extends Component {
 		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.initialize = this.initialize.bind( this );
 	}
 
 	onFocus() {
@@ -167,7 +168,16 @@ export default class TinyMCE extends Component {
 		}
 	}
 
+	/**
+	 * Initializes TinyMCE. Can only be called once per instance.
+	 */
 	initialize() {
+		if ( this.initialize.called ) {
+			return;
+		}
+
+		this.initialize.called = true;
+
 		const { multilineTag } = this.props;
 		const settings = {
 			theme: false,
@@ -259,17 +269,14 @@ export default class TinyMCE extends Component {
 			this.props.setRef( editorNode );
 		}
 
-		/**
-		 * A ref function can be used for cleanup because React calls it with
-		 * `null` when unmounting.
-		 */
-		if ( this.removeInternetExplorerInputFix ) {
-			this.removeInternetExplorerInputFix();
-			this.removeInternetExplorerInputFix = null;
-		}
-
 		if ( IS_IE ) {
-			this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+			if ( editorNode ) {
+				// Mounting:
+				this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+			} else {
+				// Unmounting:
+				this.removeInternetExplorerInputFix();
+			}
 		}
 	}
 
@@ -335,13 +342,15 @@ export default class TinyMCE extends Component {
 		const {
 			tagName = 'div',
 			style,
-			defaultValue,
+			record,
+			valueToEditableHTML,
 			className,
 			isPlaceholderVisible,
 			onPaste,
 			onInput,
 			onKeyDown,
 			onCompositionEnd,
+			onBlur,
 		} = this.props;
 
 		/*
@@ -365,10 +374,11 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: defaultValue },
+			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,
+			onBlur,
 			onKeyDown,
 			onCompositionEnd,
 		} );

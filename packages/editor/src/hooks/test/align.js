@@ -175,12 +175,10 @@ describe( 'align', () => {
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
-					block={ {
-						name: 'core/foo',
-						attributes: {
-							align: 'wide',
-						},
+					attributes={ {
+						align: 'wide',
 					} }
+					name="core/foo"
 				/>
 			);
 			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( {
@@ -203,11 +201,9 @@ describe( 'align', () => {
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
-					block={ {
-						name: 'core/foo',
-						attributes: {
-							align: 'wide',
-						},
+					name="core/foo"
+					attributes={ {
+						align: 'wide',
 					} }
 					hasWideEnabled={ false }
 				/>
@@ -230,11 +226,9 @@ describe( 'align', () => {
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
-					block={ {
-						name: 'core/foo',
-						attributes: {
-							align: 'wide',
-						},
+					name="core/foo"
+					attributes={ {
+						align: 'wide',
 					} }
 				/>
 			);

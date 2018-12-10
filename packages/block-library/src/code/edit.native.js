@@ -21,7 +21,7 @@ import styles from './theme.scss';
 // Note: styling is applied directly to the (nested) PlainText component. Web-side components
 // apply it to the container 'div' but we don't have a proper proposal for cascading styling yet.
 export default function CodeEdit( props ) {
-	const { attributes, setAttributes, style, onFocus } = props;
+	const { attributes, setAttributes, style, onFocus, onBlur } = props;
 
 	return (
 		<View>
@@ -35,6 +35,7 @@ export default function CodeEdit( props ) {
 				aria-label={ __( 'Code' ) }
 				isSelected={ props.isSelected }
 				onFocus={ onFocus }
+				onBlur={ onBlur }
 			/>
 		</View>
 	);

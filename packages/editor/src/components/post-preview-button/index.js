@@ -80,6 +80,7 @@ function writeInterstitialMessage( targetDocument ) {
 	`;
 
 	targetDocument.write( markup );
+	targetDocument.title = __( 'Generating preview…' );
 	targetDocument.close();
 }
 
