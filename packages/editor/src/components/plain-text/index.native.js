@@ -21,6 +21,12 @@ export default class PlainText extends Component {
 		}
 	}
 
+	componentDidUpdate( prevProps ) {
+		if ( ! this.props.isSelected && prevProps.isSelected ) {
+			this._input.blur();
+		}
+	}
+
 	focus() {
 		this._input.focus();
 	}
