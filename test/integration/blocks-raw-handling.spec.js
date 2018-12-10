@@ -181,6 +181,26 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should convert to paragraph quotes with more than one cite', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><cite>ribs</cite><cite>ribs</cite></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<p>ribsribs</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert to paragraph quotes with more than one cite and at least one paragraph', () => {
+		const filtered = pasteHandler( {
+			HTML: '<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
+			mode: 'AUTO',
+		} ).map( getBlockContent ).join( '' );
+
+		expect( filtered ).toBe( '<p>chickenribsribs</p>' );
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
