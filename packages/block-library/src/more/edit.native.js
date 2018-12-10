@@ -51,7 +51,7 @@ export default class MoreEdit extends Component {
         return <View key={key} style={ styles[ 'block-library-more__line' ] } />
     }
 
-    renderText(key: number) {
+    renderText(key) {
 		const { attributes, onFocus, onBlur } = this.props;
 		const { customText } = attributes;
 		const defaultText = __( 'Read more' );
