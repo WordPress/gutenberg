@@ -59,6 +59,8 @@ repositories {
     google()
     jcenter()
 
+    maven { url "https://jitpack.io" }
+
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries)
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
@@ -68,8 +70,6 @@ repositories {
         // Maven repo containing AARs with JSC library built for Android
         url unpkgOrNodeModules("jsc-android@224109.1.0/dist/", "jsc-android/dist")
     }
-
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
