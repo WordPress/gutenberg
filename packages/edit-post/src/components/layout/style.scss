@@ -142,7 +142,7 @@
 	}
 
 	.edit-post-visual-editor {
-		flex-grow: 1;
+		flex: 1 0 auto;
 
 		// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
 		// But it works as expected without it.
