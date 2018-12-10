@@ -24,9 +24,9 @@
 			{"docs/designers-developers/developers/themes/README.md": [
 				{"docs/designers-developers/developers/themes/theme-support.md": []}
 			]},
-			{"docs/designers-developers/developers/backwards-compatibility/README.md": [
-				{"docs/designers-developers/developers/backwards-compatibility/deprecations.md": []},
-				{"docs/designers-developers/developers/backwards-compatibility/meta-box.md": []}
+			{"docs/designers-developers/developers/backward-compatibility/README.md": [
+				{"docs/designers-developers/developers/backward-compatibility/deprecations.md": []},
+				{"docs/designers-developers/developers/backward-compatibility/meta-box.md": []}
 			]},
 			{"docs/designers-developers/developers/tutorials/readme.md": [
 				{"docs/designers-developers/developers/tutorials/block-tutorial/readme.md" :[

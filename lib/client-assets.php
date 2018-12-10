@@ -391,7 +391,7 @@ function gutenberg_register_scripts_and_styles() {
 	wp_add_inline_script( 'wp-block-library', $script, 'before' );
 
 	// Editor Styles.
-	// This empty stylesheet is defined to ensure backwards compatibility.
+	// This empty stylesheet is defined to ensure backward compatibility.
 	gutenberg_override_style( 'wp-blocks', false );
 	$fonts_url = '';
 
