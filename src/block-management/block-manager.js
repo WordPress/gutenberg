@@ -21,6 +21,8 @@ import { createBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender } from '@wordpress/editor';
 
 type PropsType = {
+	blockClientIds: Array<string>,
+	blockCount: number,
 	focusBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	rootClientId: ?string,
@@ -31,7 +33,6 @@ type PropsType = {
 	serializeToNativeAction: void => void,
 	toggleHtmlModeAction: void => void,
 	updateHtmlAction: string => void,
-	blocks: Array<BlockType>,
 	isBlockSelected: string => boolean,
 	showHtml: boolean,
 };
@@ -72,7 +73,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			this.props.replaceBlock( this.props.selectedBlockClientId, newBlock );
 		} else {
 			const indexAfterSelected = this.props.selectedBlockOrder + 1;
-			const insertionIndex = indexAfterSelected || this.props.blocks.length;
+			const insertionIndex = indexAfterSelected || this.props.blockCount;
 			this.props.insertBlock( newBlock, insertionIndex );
 		}
 
@@ -110,8 +111,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			<FlatList
 				keyboardShouldPersistTaps="always"
 				style={ styles.list }
-				data={ this.props.blocks }
-				keyExtractor={ ( item ) => item.clientId }
+				data={ this.props.blockClientIds }
+				keyExtractor={ ( item ) => item }
 				renderItem={ this.renderItem }
 			/>
 		);
@@ -165,9 +166,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return this.isEmptyBlock( block ) && this.isCandidateForReplaceBlock( block );
 	}
 
-	renderItem = ( value: { item: BlockType, index: number } ) => {
-		const clientId = value.item.clientId;
-
+	renderItem = ( clientId: string ) => {
 		return (
 			<View>
 				<BlockHolder
@@ -195,10 +194,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
+			getBlockCount,
 			getBlockIndex,
-			getBlocks,
+			getBlockOrder,
 			getSelectedBlock,
 			getSelectedBlockClientId,
 			isBlockSelected,
@@ -207,11 +207,12 @@ export default compose( [
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
+			blockClientIds: getBlockOrder( rootClientId ),
+			blockCount: getBlockCount( rootClientId ),
 			isBlockSelected,
 			selectedBlock: getSelectedBlock(),
-			selectedBlockClientId: getSelectedBlockClientId(),
+			selectedBlockClientId,
 			selectedBlockOrder: getBlockIndex( selectedBlockClientId ),
-			blocks: getBlocks(),
 			showHtml: getBlockMode() === 'html',
 		};
 	} ),
