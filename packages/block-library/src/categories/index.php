@@ -31,7 +31,7 @@ function render_block_core_categories( $attributes ) {
 		$wrapper_markup           = '<div class="%1$s">%2$s</div>';
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
-		$title                    = __( 'Categories', 'gutenberg' );
+		$title                    = __( 'Categories');
 
 		if ( ! is_admin() ) {
 			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
