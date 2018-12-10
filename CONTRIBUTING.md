@@ -168,7 +168,7 @@ The developer who proposes a change (pull request) is responsible to choose the 
 
 - Major version X (X.y.z | X > 0) should be changed with any backward incompatible/"breaking" change. This will usually occur at the final stage of deprecating and removing of a feature.
 - Minor version Y (x.Y.z | x > 0) should be changed when you add functionality or change functionality in a backward compatible manner. It must be incremented if any public API functionality is marked as deprecated.
-- Patch version Z (x.y.Z | x > 0) should be incremented when you make backward  compatible bug fixes.
+- Patch version Z (x.y.Z | x > 0) should be incremented when you make backward compatible bug fixes.
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
 
