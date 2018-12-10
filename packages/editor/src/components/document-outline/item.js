@@ -14,7 +14,7 @@ const TableOfContentsItem = ( {
 	level,
 	path = [],
 	href,
-	close,
+	closeOutline,
 } ) => (
 	<li
 		className={ classnames(
@@ -28,7 +28,7 @@ const TableOfContentsItem = ( {
 		<a
 			href={ href }
 			className="document-outline__button"
-			onClick={ close }
+			onClick={ closeOutline }
 		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			{

@@ -86,7 +86,7 @@ export const DocumentOutline = ( { blocks = [], title, close, isTitleSupported }
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						close={ close }
+						closeOutline={ close }
 						href={ `#${ titleNode.id }` }
 					>
 						{ title }
@@ -111,7 +111,7 @@ export const DocumentOutline = ( { blocks = [], title, close, isTitleSupported }
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							path={ item.path }
-							close={ close }
+							closeOutline={ close }
 							href={ `#block-${ item.clientId }` }
 						>
 							{ item.isEmpty ?
