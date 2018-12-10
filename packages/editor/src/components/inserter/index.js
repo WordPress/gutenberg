@@ -16,6 +16,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen } ) => (
 	<IconButton
 		icon="insert"
 		label={ __( 'Add block' ) }
+		labelPosition="bottom"
 		onClick={ onToggle }
 		className="editor-inserter__toggle"
 		aria-haspopup="true"

@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 4.4.0
+ * Version: 4.7.0-rc.1
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -199,13 +199,6 @@ function gutenberg_pre_init() {
 
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
-
-/**
- * Enable Gutenberg based on user_can_richedit setting.
- * Set gutenberg_can_edit_post based on user setting for disable visual editor.
- */
-add_filter( 'gutenberg_can_edit_post_type', 'user_can_richedit', 5 );
-add_filter( 'gutenberg_can_edit_post', 'user_can_richedit', 5 );
 
 /**
  * Initialize Gutenberg.

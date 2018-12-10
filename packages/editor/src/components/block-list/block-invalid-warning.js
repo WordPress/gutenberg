@@ -9,7 +9,8 @@ import {
 	createBlock,
 	rawHandler,
 } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -96,18 +97,23 @@ const blockToBlocks = ( block ) => rawHandler( {
 	HTML: block.originalContent,
 } );
 
-export default withDispatch( ( dispatch, { block } ) => {
-	const { replaceBlock } = dispatch( 'core/editor' );
+export default compose( [
+	withSelect( ( select, { clientId } ) => ( {
+		block: select( 'core/editor' ).getBlock( clientId ),
+	} ) ),
+	withDispatch( ( dispatch, { block } ) => {
+		const { replaceBlock } = dispatch( 'core/editor' );
 
-	return {
-		convertToClassic() {
-			replaceBlock( block.clientId, blockToClassic( block ) );
-		},
-		convertToHTML() {
-			replaceBlock( block.clientId, blockToHTML( block ) );
-		},
-		convertToBlocks() {
-			replaceBlock( block.clientId, blockToBlocks( block ) );
-		},
-	};
-} )( BlockInvalidWarning );
+		return {
+			convertToClassic() {
+				replaceBlock( block.clientId, blockToClassic( block ) );
+			},
+			convertToHTML() {
+				replaceBlock( block.clientId, blockToHTML( block ) );
+			},
+			convertToBlocks() {
+				replaceBlock( block.clientId, blockToBlocks( block ) );
+			},
+		};
+	} ),
+] )( BlockInvalidWarning );

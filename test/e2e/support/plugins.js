@@ -11,7 +11,7 @@ import { visitAdmin, switchToAdminUser, switchToTestUser } from './utils';
  */
 export async function installPlugin( slug, searchTerm ) {
 	await switchToAdminUser();
-	await visitAdmin( 'plugin-install.php?s=' + encodeURIComponent( searchTerm || slug ) + '&tab=search&type=term' );
+	await visitAdmin( 'plugin-install.php', 's=' + encodeURIComponent( searchTerm || slug ) + '&tab=search&type=term' );
 	await page.click( '.install-now[data-slug="' + slug + '"]' );
 	await page.waitForSelector( '.activate-now[data-slug="' + slug + '"]' );
 	await switchToTestUser();

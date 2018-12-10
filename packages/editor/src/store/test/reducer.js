@@ -1761,6 +1761,25 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should not replace the selected block if we keep it when replacing blocks', () => {
+			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
+			const state = blockSelection( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/freeform',
+					},
+					{
+						clientId: 'wings',
+						name: 'core/freeform',
+					} ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
 		it( 'should reset if replacing with empty set', () => {
 			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
@@ -1943,6 +1962,7 @@ describe( 'state', () => {
 				requesting: true,
 				successful: false,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1954,6 +1974,7 @@ describe( 'state', () => {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1972,6 +1993,7 @@ describe( 'state', () => {
 					code: 'pretend_error',
 					message: 'update failed',
 				},
+				options: {},
 			} );
 		} );
 	} );
@@ -2419,7 +2441,6 @@ describe( 'state', () => {
 						raw: 'The Excerpt',
 					},
 					status: 'draft',
-					preview_link: 'https://wordpress.org/?p=1&preview=true',
 				},
 			} );
 
@@ -2427,7 +2448,6 @@ describe( 'state', () => {
 				title: 'The Title',
 				content: 'The Content',
 				excerpt: 'The Excerpt',
-				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
 		} );
 	} );

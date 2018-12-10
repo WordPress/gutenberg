@@ -163,3 +163,17 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
 
 	return existingClassNames;
 }
+
+/**
+ * Fallback behaviour for unembeddable URLs.
+ * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
+ *
+ * @param {string}   url       The URL that could not be embedded.
+ * @param {function} onReplace Function to call with the created fallback block.
+ */
+export function fallback( url, onReplace ) {
+	const link = <a href={ url }>{ url }</a>;
+	onReplace(
+		createBlock( 'core/paragraph', { content: renderToString( link ) } )
+	);
+}

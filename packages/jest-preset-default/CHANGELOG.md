@@ -1,3 +1,5 @@
+## 3.0.3 (2018-11-20)
+
 ## 3.0.2 (2018-11-09)
 
 ## 3.0.1 (2018-11-09)
@@ -22,11 +24,11 @@
 
 ### Polish
 
-- Fix: Standardized `package.json` format  ([#119](https://github.com/WordPress/packages/pull/119))
+- Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 1.0.5 (2018-03-22)
 
 ### Polish
 
--  Docs: Wrap filename in backticks ([#89](https://github.com/WordPress/packages/pull/89))
--  Add `jest-preset` keyword to `jest-preset-default` package ([#92](https://github.com/WordPress/packages/pull/92))
+- Docs: Wrap filename in backticks ([#89](https://github.com/WordPress/packages/pull/89))
+- Add `jest-preset` keyword to `jest-preset-default` package ([#92](https://github.com/WordPress/packages/pull/92))

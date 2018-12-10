@@ -9,12 +9,15 @@ import { countBy, flatMap, get } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	create,
+	getTextContent,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import DocumentOutlineItem from './item';
-import RichText from './../rich-text';
 
 /**
  * Module constants
@@ -120,10 +123,9 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 						>
 							{ item.isEmpty ?
 								emptyHeadingContent :
-								<RichText.Content
-									tagName="span"
-									value={ item.attributes.content }
-								/>
+								getTextContent(
+									create( { html: item.attributes.content } )
+								)
 							}
 							{ isIncorrectLevel && incorrectLevelContent }
 							{ item.level === 1 && hasMultipleH1 && multipleH1Headings }

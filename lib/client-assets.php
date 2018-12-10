@@ -87,6 +87,8 @@ if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 			gutenberg_override_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
 			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
 		}
+
+		gutenberg_override_script( 'wp-tinymce-lists', includes_url( 'js/tinymce/' ) . "plugins/lists/plugin{$suffix}.js", array( 'wp-tinymce' ), $tinymce_version );
 	}
 }
 
@@ -167,16 +169,16 @@ function gutenberg_register_scripts_and_styles() {
 
 	register_tinymce_scripts();
 
-	wp_script_add_data(
+	wp_add_inline_script(
 		'wp-polyfill',
-		'data',
 		gutenberg_get_script_polyfill(
 			array(
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
 				'window.FormData && window.FormData.prototype.keys' => 'wp-polyfill-formdata',
 				'Element.prototype.matches && Element.prototype.closest' => 'wp-polyfill-element-closest',
-			)
+			),
+			'after'
 		)
 	);
 
@@ -250,108 +252,143 @@ function gutenberg_register_scripts_and_styles() {
 		),
 		'after'
 	);
+	wp_add_inline_script(
+		'moment',
+		sprintf(
+			"moment.locale( '%s', %s );",
+			get_user_locale(),
+			wp_json_encode(
+				array(
+					'months'         => array_values( $wp_locale->month ),
+					'monthsShort'    => array_values( $wp_locale->month_abbrev ),
+					'weekdays'       => array_values( $wp_locale->weekday ),
+					'weekdaysShort'  => array_values( $wp_locale->weekday_abbrev ),
+					'week'           => array(
+						'dow' => (int) get_option( 'start_of_week', 0 ),
+					),
+					'longDateFormat' => array(
+						'LT'   => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+						'LTS'  => null,
+						'L'    => null,
+						'LL'   => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+						'LLL'  => __( 'F j, Y g:i a', 'default' ),
+						'LLLL' => null,
+					),
+				)
+			)
+		),
+		'after'
+	);
 	// Loading the old editor and its config to ensure the classic block works as expected.
 	wp_add_inline_script(
 		'editor',
 		'window.wp.oldEditor = window.wp.editor;',
 		'after'
 	);
-	$tinymce_settings = apply_filters(
-		'tiny_mce_before_init',
-		array(
-			'plugins'          => implode(
-				',',
-				array_unique(
-					apply_filters(
-						'tiny_mce_plugins',
-						array(
-							'charmap',
-							'colorpicker',
-							'hr',
-							'lists',
-							'media',
-							'paste',
-							'tabfocus',
-							'textcolor',
-							'fullscreen',
-							'wordpress',
-							'wpautoresize',
-							'wpeditimage',
-							'wpemoji',
-							'wpgallery',
-							'wplink',
-							'wpdialogs',
-							'wptextpattern',
-							'wpview',
-						)
-					)
-				)
-			),
-			'toolbar1'         => implode(
-				',',
-				apply_filters(
-					'mce_buttons',
-					array(
-						'formatselect',
-						'bold',
-						'italic',
-						'bullist',
-						'numlist',
-						'blockquote',
-						'alignleft',
-						'aligncenter',
-						'alignright',
-						'link',
-						'unlink',
-						'wp_more',
-						'spellchecker',
-						'wp_add_media',
-						'kitchensink',
-					),
-					'editor'
-				)
-			),
-			'toolbar2'         => implode(
-				',',
-				apply_filters(
-					'mce_buttons_2',
-					array(
-						'strikethrough',
-						'hr',
-						'forecolor',
-						'pastetext',
-						'removeformat',
-						'charmap',
-						'outdent',
-						'indent',
-						'undo',
-						'redo',
-						'wp_help',
-					),
-					'editor'
-				)
-			),
-			'toolbar3'         => implode( ',', apply_filters( 'mce_buttons_3', array(), 'editor' ) ),
-			'toolbar4'         => implode( ',', apply_filters( 'mce_buttons_4', array(), 'editor' ) ),
-			'external_plugins' => apply_filters( 'mce_external_plugins', array() ),
-		),
-		'editor'
+
+	$tinymce_plugins = array(
+		'charmap',
+		'colorpicker',
+		'hr',
+		'lists',
+		'media',
+		'paste',
+		'tabfocus',
+		'textcolor',
+		'fullscreen',
+		'wordpress',
+		'wpautoresize',
+		'wpeditimage',
+		'wpemoji',
+		'wpgallery',
+		'wplink',
+		'wpdialogs',
+		'wptextpattern',
+		'wpview',
 	);
-	if ( isset( $tinymce_settings['style_formats'] ) && is_string( $tinymce_settings['style_formats'] ) ) {
-		// Decode the options as we used to recommende json_encoding the TinyMCE settings.
-		$tinymce_settings['style_formats'] = json_decode( $tinymce_settings['style_formats'] );
+	$tinymce_plugins = apply_filters( 'tiny_mce_plugins', $tinymce_plugins, 'classic-block' );
+	$tinymce_plugins = array_unique( $tinymce_plugins );
+
+	$toolbar1 = array(
+		'formatselect',
+		'bold',
+		'italic',
+		'bullist',
+		'numlist',
+		'blockquote',
+		'alignleft',
+		'aligncenter',
+		'alignright',
+		'link',
+		'unlink',
+		'wp_more',
+		'spellchecker',
+		'wp_add_media',
+		'kitchensink',
+	);
+	$toolbar1 = apply_filters( 'mce_buttons', $toolbar1, 'classic-block' );
+
+	$toolbar2 = array(
+		'strikethrough',
+		'hr',
+		'forecolor',
+		'pastetext',
+		'removeformat',
+		'charmap',
+		'outdent',
+		'indent',
+		'undo',
+		'redo',
+		'wp_help',
+	);
+	$toolbar2 = apply_filters( 'mce_buttons_2', $toolbar2, 'classic-block' );
+
+	$toolbar3 = apply_filters( 'mce_buttons_3', array(), 'classic-block' );
+	$toolbar4 = apply_filters( 'mce_buttons_4', array(), 'classic-block' );
+
+	$external_plugins = apply_filters( 'mce_external_plugins', array(), 'classic-block' );
+
+	$tinymce_settings = array(
+		'plugins'              => implode( ',', $tinymce_plugins ),
+		'toolbar1'             => implode( ',', $toolbar1 ),
+		'toolbar2'             => implode( ',', $toolbar2 ),
+		'toolbar3'             => implode( ',', $toolbar3 ),
+		'toolbar4'             => implode( ',', $toolbar4 ),
+		'external_plugins'     => wp_json_encode( $external_plugins ),
+		'classic_block_editor' => true,
+	);
+	$tinymce_settings = apply_filters( 'tiny_mce_before_init', $tinymce_settings, 'classic-block' );
+
+	// Do "by hand" translation from PHP array to js object.
+	// Prevents breakage in some custom settings.
+	$init_obj = '';
+	foreach ( $tinymce_settings as $key => $value ) {
+		if ( is_bool( $value ) ) {
+			$val       = $value ? 'true' : 'false';
+			$init_obj .= $key . ':' . $val . ',';
+			continue;
+		} elseif ( ! empty( $value ) && is_string( $value ) && (
+			( '{' == $value{0} && '}' == $value{strlen( $value ) - 1} ) ||
+			( '[' == $value{0} && ']' == $value{strlen( $value ) - 1} ) ||
+			preg_match( '/^\(?function ?\(/', $value ) ) ) {
+
+			$init_obj .= $key . ':' . $value . ',';
+			continue;
+		}
+		$init_obj .= $key . ':"' . $value . '",';
 	}
-	wp_localize_script(
-		'wp-block-library',
-		'wpEditorL10n',
-		array(
-			'tinymce' => array(
-				'baseURL'  => includes_url( 'js/tinymce' ),
-				'suffix'   => SCRIPT_DEBUG ? '' : '.min',
-				'settings' => $tinymce_settings,
-			),
-		)
-	);
+
+	$init_obj = '{' . trim( $init_obj, ' ,' ) . '}';
+
+	$script = 'window.wpEditorL10n = {
+		tinymce: {
+			baseURL: ' . wp_json_encode( includes_url( 'js/tinymce' ) ) . ',
+			suffix: ' . ( SCRIPT_DEBUG ? '""' : '".min"' ) . ',
+			settings: ' . $init_obj . ',
+		}
+	}';
+
+	wp_add_inline_script( 'wp-block-library', $script, 'before' );
 
 	// Editor Styles.
 	// This empty stylesheet is defined to ensure backwards compatibility.
@@ -424,6 +461,7 @@ function gutenberg_register_scripts_and_styles() {
 		array(
 			'wp-components',
 			'wp-editor',
+			'wp-block-library',
 			// Always include visual styles so the editor never appears broken.
 			'wp-block-library-theme',
 		),
@@ -584,12 +622,6 @@ function gutenberg_register_vendor_scripts() {
 		'moment',
 		'https://unpkg.com/moment@2.22.1/' . $moment_script,
 		array()
-	);
-	$tinymce_version = '4.7.11';
-	gutenberg_register_vendor_script(
-		'tinymce-latest-lists',
-		'https://unpkg.com/tinymce@' . $tinymce_version . '/plugins/lists/plugin' . $suffix . '.js',
-		array( 'wp-tinymce' )
 	);
 	gutenberg_register_vendor_script(
 		'lodash',
@@ -1020,6 +1052,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'after'
 	);
 
+	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
+	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
+	// are available in Gutenberg. Fixes
+	// https://github.com/WordPress/gutenberg/issues/5667.
+	$user_can_richedit = user_can_richedit();
+	add_filter( 'user_can_richedit', '__return_true' );
+
 	wp_enqueue_script( 'wp-edit-post' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
@@ -1173,10 +1212,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		),
 	);
 
-	/*
-	 * Set a locale specific default font.
-	 * Translators: Use this to specify the CSS font family for the default font
-	 */
+	/* Translators: Use this to specify the CSS font family for the default font */
 	$locale_font_family = esc_html_x( 'Noto Serif', 'CSS Font Family for Editor Font', 'gutenberg' );
 	$styles[]           = array(
 		'css' => "body { font-family: '$locale_font_family' }",
@@ -1189,11 +1225,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 					'css' => file_get_contents( $style ),
 				);
 			} else {
-				$file     = get_theme_file_path( $style );
-				$styles[] = array(
-					'css'     => file_get_contents( get_theme_file_path( $style ) ),
-					'baseURL' => get_theme_file_uri( $style ),
-				);
+				$file = get_theme_file_path( $style );
+				if ( file_exists( $file ) ) {
+					$styles[] = array(
+						'css'     => file_get_contents( $file ),
+						'baseURL' => get_theme_file_uri( $style ),
+					);
+				}
 			}
 		}
 	}
@@ -1259,6 +1297,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
 		'imageSizes'             => gutenberg_get_available_image_sizes(),
+		'richEditingEnabled'     => $user_can_richedit,
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,

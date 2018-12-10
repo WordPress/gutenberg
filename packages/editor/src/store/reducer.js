@@ -22,6 +22,7 @@ import {
  */
 import { isReusableBlock } from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -34,16 +35,7 @@ import {
 	INITIAL_EDITS_DEFAULTS,
 } from './defaults';
 import { insertAt, moveTo } from './array';
-
-/**
- * Set of post properties for which edits should assume a merging behavior,
- * assuming an object value.
- *
- * @type {Set}
- */
-const EDIT_MERGE_PROPERTIES = new Set( [
-	'meta',
-] );
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -803,6 +795,9 @@ export function blockSelection( state = {
 			// If there is replacement block(s), assign first's client ID as
 			// the next selected block. If empty replacement, reset to null.
 			const nextSelectedBlockClientId = get( action.blocks, [ 0, 'clientId' ], null );
+			if ( nextSelectedBlockClientId === state.start && nextSelectedBlockClientId === state.end ) {
+				return state;
+			}
 
 			return {
 				...state,
@@ -967,7 +962,7 @@ export function saving( state = {}, action ) {
 				requesting: true,
 				successful: false,
 				error: null,
-				isAutosave: action.isAutosave,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_SUCCESS':
@@ -975,6 +970,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: action.options || {},
 			};
 
 		case 'REQUEST_POST_UPDATE_FAILURE':
@@ -982,6 +978,7 @@ export function saving( state = {}, action ) {
 				requesting: false,
 				successful: false,
 				error: action.error,
+				options: action.options || {},
 			};
 	}
 
@@ -1201,13 +1198,29 @@ export function autosave( state = null, action ) {
 				title,
 				excerpt,
 				content,
-				preview_link: post.preview_link,
 			};
+	}
 
-		case 'REQUEST_POST_UPDATE':
+	return state;
+}
+
+/**
+ * Reducer returning the poost preview link
+ *
+ * @param  {string?} state  The preview link
+ * @param  {Object} action Dispatched action.
+ *
+ * @return {string?} Updated state.
+ */
+export function previewLink( state = null, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_POST_UPDATE_SUCCESS':
+			return action.post.preview_link || addQueryArgs( action.post.link, { preview: true } );
+
+		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.
-			if ( state && action.options.autosave ) {
-				return omit( state, 'preview_link' );
+			if ( state && action.options.isPreview ) {
+				return null;
 			}
 			break;
 	}
@@ -1231,6 +1244,7 @@ export default optimist( combineReducers( {
 	reusableBlocks,
 	template,
 	autosave,
+	previewLink,
 	settings,
 	postSavingLock,
 } ) );

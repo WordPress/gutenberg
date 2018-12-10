@@ -49,6 +49,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { createUpgradedEmbedBlock } from '../embed/util';
 import ImageSize from './image-size';
 
 /**
@@ -111,6 +112,7 @@ class ImageEdit extends Component {
 		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
+		this.onImageError = this.onImageError.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -119,7 +121,7 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, setAttributes, noticeOperations } = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -132,6 +134,10 @@ class ImageEdit extends Component {
 						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
+					onError: ( message ) => {
+						noticeOperations.createErrorNotice( message );
+						this.setState( { isEditing: true } );
+					},
 				} );
 			}
 		}
@@ -214,6 +220,16 @@ class ImageEdit extends Component {
 		this.setState( {
 			isEditing: false,
 		} );
+	}
+
+	onImageError( url ) {
+		// Check if there's an embed block that handles this URL.
+		const embedBlock = createUpgradedEmbedBlock(
+			{ attributes: { url } }
+		);
+		if ( undefined !== embedBlock ) {
+			this.props.onReplace( embedBlock );
+		}
 	}
 
 	onSetCustomHref( value ) {
@@ -402,7 +418,7 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( isEditing ) {
+		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
 			return (
 				<Fragment>
@@ -429,7 +445,7 @@ class ImageEdit extends Component {
 		} );
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -517,8 +533,8 @@ class ImageEdit extends Component {
 								label={ __( 'Link URL' ) }
 								value={ href || '' }
 								onChange={ this.onSetCustomHref }
-								placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
-								disabled={ isLinkURLInputDisabled }
+								placeholder={ ! isLinkURLInputReadOnly ? 'https://' : undefined }
+								readOnly={ isLinkURLInputReadOnly }
 							/>
 							<ToggleControl
 								label={ __( 'Open in New Tab' ) }
@@ -570,7 +586,7 @@ class ImageEdit extends Component {
 								// should direct focus to block.
 								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 								<Fragment>
-									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } />
+									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
 									{ isBlobURL( url ) && <Spinner /> }
 								</Fragment>
 								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */

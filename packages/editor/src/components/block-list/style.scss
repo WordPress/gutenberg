@@ -870,7 +870,7 @@
 		// Hide right border on desktop, where the .components-toolbar instead has a right border.
 		border-right: none;
 
-		// This prevents floats from messing up the position.
+		// This prevents floats from messing up the position of the block toolbar on floats-adjacent blocks when selected.
 		position: absolute;
 		left: 0;
 	}
@@ -906,11 +906,6 @@
 			opacity: 0;
 			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
-	}
-
-	&.is-light .components-toolbar {
-		background: rgba($white, 0.5);
-		color: $dark-gray-700;
 	}
 
 	// Position the breadcrumb closer on mobile.
