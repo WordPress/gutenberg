@@ -30,7 +30,7 @@ _Example:_
 
 ### `check-engines`
 
-Check if the current `node`, `npm` (or `yarn`) versions match the given semver version ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the default configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
+Check if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the default configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
 
 _Example:_
 
