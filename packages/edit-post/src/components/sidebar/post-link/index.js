@@ -116,6 +116,7 @@ export default compose( [
 			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		const {
+			isEditorPanelEnabled,
 			isEditorPanelOpened,
 		} = select( 'core/edit-post' );
 		const {
@@ -132,14 +133,15 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			permalinkParts: getPermalinkParts(),
+			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
 			postTitle: getEditedPostAttribute( 'title' ),
 			postSlug: getEditedPostAttribute( 'slug' ),
 			postID: id,
 		};
 	} ),
-	ifCondition( ( { isNew, postLink, isViewable } ) => {
-		return ! isNew && postLink && isViewable;
+	ifCondition( ( { isEnabled, isNew, postLink, isViewable } ) => {
+		return isEnabled && ! isNew && postLink && isViewable;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
