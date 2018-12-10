@@ -269,17 +269,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return index === this.state.blocks.length - 1;
 	}
 
-	isEmptyBlock( block: BlockType ) {
-		const content = block.attributes.content;
-		const innerBlocks = block.innerBlocks;
-		return ( content === undefined || content === '' ) && ( innerBlocks.length === 0 );
-	}
-
 	isReplaceable( block: ?BlockType ) {
 		if ( ! block ) {
 			return false;
 		}
-		return this.isEmptyBlock( block ) && isUnmodifiedDefaultBlock( block );
+		return isUnmodifiedDefaultBlock( block );
 	}
 
 	renderItem( value: { item: BlockType, index: number } ) {
