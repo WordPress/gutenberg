@@ -85,7 +85,7 @@ _Example:_
 ```
 
 This is how you execute the script with presented setup:
-* `npm run lint:js` - lints JavaScripts files in the whole project's directory.
+* `npm run lint:js` - lints JavaScript files in the entire project's directories.
 
 ### `lint-pkg-json`
 
