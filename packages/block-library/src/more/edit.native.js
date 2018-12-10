@@ -47,38 +47,38 @@ export default class MoreEdit extends Component {
 		this.props.setAttributes( { customText: value } );
 	}
 
-	renderLine(key) {
-		return <View key={key} style={ styles[ 'block-library-more__line' ] } />
+	renderLine( key ) {
+		return <View key={ key } style={ styles[ 'block-library-more__line' ] } />
 	}
 
-	renderText(key) {
+	renderText( key ) {
 		const { attributes, onFocus, onBlur } = this.props;
 		const { customText } = attributes;
 		const defaultText = __( 'Read more' );
 		const value = customText !== undefined ? customText : defaultText;
 
-        return (
-            <View key={key} >
-					<PlainText
-						style={ styles[ 'block-library-more__text' ] }
-						value={ value }
-						multiline={ true }
-						underlineColorAndroid="transparent"
-						onChange={ this.onChangeInput }
-						placeholder={ defaultText }
-						isSelected={ this.props.isSelected }
-						onFocus={ onFocus }
-						onBlur={ onBlur }
-					/>
-            </View>
+		return (
+			<View key={ key } >
+				<PlainText
+					style={ styles[ 'block-library-more__text' ] }
+					value={ value }
+					multiline={ true }
+					underlineColorAndroid="transparent"
+					onChange={ this.onChangeInput }
+					placeholder={ defaultText }
+					isSelected={ this.props.isSelected }
+					onFocus={ onFocus }
+					onBlur={ onBlur }
+				/>
+			</View>
 		)
 	}
 
 	renderInner() {
-        return [
-            this.renderLine(1),
-            this.renderText(2),
-            this.renderLine(3)
+		return [
+			this.renderLine(1),
+			this.renderText(2),
+			this.renderLine(3)
 		]
 	}
 	
