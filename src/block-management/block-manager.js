@@ -102,21 +102,16 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderList() {
-		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
-		// And fix problems with RecyclerViewList on Android
-		const list = (
-			<FlatList
-				keyboardShouldPersistTaps="always"
-				style={ styles.list }
-				data={ this.props.blockClientIds }
-				keyExtractor={ ( item ) => item }
-				renderItem={ this.renderItem }
-			/>
-		);
 		return (
 			<KeyboardAvoidingView style={ { flex: 1 } } parentHeight={ this.state.rootViewHeight }>
 				<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
-				{ list }
+				<FlatList
+					keyboardShouldPersistTaps="always"
+					style={ styles.list }
+					data={ this.props.blockClientIds }
+					keyExtractor={ ( item ) => item }
+					renderItem={ this.renderItem }
+				/>
 				<BlockToolbar
 					onInsertClick={ () => {
 						this.showBlockTypePicker( true );
@@ -163,7 +158,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return this.isEmptyBlock( block ) && this.isCandidateForReplaceBlock( block );
 	}
 
-	renderItem = ( clientId: string ) => {
+	renderItem = ( value: { item: string, index: number } ) => {
+		const clientId = value.item;
+
 		return (
 			<View>
 				<BlockHolder

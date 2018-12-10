@@ -135,6 +135,7 @@ export class BlockHolder extends React.Component<PropsType> {
 	render() {
 		const { isSelected } = this.props;
 
+		console.log( 'render block holder', this.props.clientId );
 		return (
 			<TouchableWithoutFeedback onPress={ this.onFocus } >
 				<View style={ [ styles.blockHolder, isSelected && styles.blockHolderFocused ] }>
