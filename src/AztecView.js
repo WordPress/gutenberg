@@ -120,6 +120,10 @@ class AztecView extends React.Component {
     onSelectionChange(selectionStart, selectionEnd, text);
   }
 
+  blur = () => {
+    TextInputState.blurTextInput(ReactNative.findNodeHandle(this));
+  }
+
   focus = () => {
     TextInputState.focusTextInput(ReactNative.findNodeHandle(this));
   }
