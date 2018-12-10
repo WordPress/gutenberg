@@ -48,8 +48,8 @@ export default class MoreEdit extends Component {
 	}
 
 	renderLine(key) {
-        return <View key={key} style={ styles[ 'block-library-more__line' ] } />
-    }
+		return <View key={key} style={ styles[ 'block-library-more__line' ] } />
+	}
 
 	renderText(key) {
 		const { attributes, onFocus, onBlur } = this.props;
@@ -71,8 +71,8 @@ export default class MoreEdit extends Component {
 						onBlur={ onBlur }
 					/>
             </View>
-        )
-    }
+		)
+	}
 
 	renderInner() {
         return [
