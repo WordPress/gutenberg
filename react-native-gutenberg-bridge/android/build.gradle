@@ -43,14 +43,14 @@ android {
     }
 }
 
-def unpkgOrNodeModules(remotePath, localPath) {
+def cdnOrNodeModules(remotePath, localPath) {
     def url
     if (rootProject.ext.buildGutenbergFromSource) {
         url = "${project.buildDir}/../../../node_modules/${localPath}"
     } else {
         // if we are the root project, use a remote maven repo so jitpack can build this lib without local RN setup
-        url = "https://unpkg.com/${remotePath}"
-        println "Will use the unpkg.com exposed maven repo at ${url}"
+        url = "https://cdn.jsdelivr.net/npm/${remotePath}"
+        println "Will use the jsdelivr.net exposed maven repo at ${url}"
     }
     return url
 }
@@ -64,11 +64,11 @@ repositories {
     maven {
         // All of React Native (JS, Obj-C sources, Android binaries)
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
-        url unpkgOrNodeModules("react-native@${rnVersion}/android", "react-native/android")
+        url cdnOrNodeModules("react-native@${rnVersion}/android", "react-native/android")
     }
     maven {
         // Maven repo containing AARs with JSC library built for Android
-        url unpkgOrNodeModules("jsc-android@224109.1.0/dist/", "jsc-android/dist")
+        url cdnOrNodeModules("jsc-android@224109.1.0/dist/", "jsc-android/dist")
     }
 }
 
