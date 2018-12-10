@@ -7,7 +7,7 @@
 This repo is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in WordPress Core</a>. `Gutenberg` is the project name.
 
 ## Getting started
-- **Download:** If you want to use the latest release with your WordPress site, <a href="https://wordpress.org/plugins/gutenberg/">download the latest release from the WordPress.org plugins repository</a>. 
+- **Download:** If you want to use the latest release with your WordPress site, <a href="https://wordpress.org/plugins/gutenberg/">download the latest release from the WordPress.org plugins repository</a>.
 - **Discuss:** Conversations and discussions take place in <a href="https://wordpress.slack.com/messages/C02QB2JS7">`#core-editor` channel on the Making WordPress Slack</a>.
 - **Contribute:** Development of Gutenberg happens in this GitHub repo. Get started by <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">reading the contributing guidelines</a>.
 - **Learn:** <a href="https://wordpress.org/gutenberg/">Discover more about the project on WordPress.org</a>.
@@ -44,7 +44,7 @@ Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/r
 
 ## Compatibility
 
-Posts are backwards compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding a good solution for highly-tailored existing sites.
+Posts are backward compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding a good solution for highly-tailored existing sites.
 
 ## The stages of Gutenberg
 
