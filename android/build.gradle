@@ -76,6 +76,8 @@ repositories {
     jcenter()
     google()
 
+    maven { url "https://jitpack.io" }
+
     if (project == rootProject) {
         // if we are the root project, use a remote RN maven repo so jitpack can build this lib without local RN setup
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
@@ -86,8 +88,6 @@ repositories {
             url unpkgUrl
         }
     }
-
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
