@@ -3,7 +3,7 @@
 
 The Gutenberg Handbook shows JavaScript examples in two syntaxes ES5 and ESNext. These are version names for the JavaScript language standard definitions. You may also see elsewhere the versions ES6, or ECMAScript 2015 mentioned. Ses the [ECMAScript](https://en.wikipedia.org/wiki/ECMAScript) Wikipedia article for all the details.
 
-ES5 code is compatible with WordPress's minimum [target for browser compatibility](https://make.wordpress.org/core/2017/04/23/target-browser-coverage/).
+ES5 code is compatible with WordPress's minimum [target for browser support](https://make.wordpress.org/core/handbook/best-practices/browser-support/).
 
 For this tutorial, all examples are written compatible to ES5 definition of JavaScript. This code can be run straight in your browser and does not require an additional build step.
 
