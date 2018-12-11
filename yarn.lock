@@ -7294,10 +7294,9 @@ react-native-sass-transformer@^1.1.1:
     css-to-react-native-transform "^1.7.0"
     semver "^5.5.0"
 
-react-native-svg@8.0.8:
-  version "8.0.8"
-  resolved "https://registry.yarnpkg.com/react-native-svg/-/react-native-svg-8.0.8.tgz#5d4c636751d9db2d98a9b3cfc4ef45c4eac65d60"
-  integrity sha512-a5q7896HJztH3XBa4MouuBcwhOvDsJXRZB/PPvEMvc4NhudIDXDUKpwd9V7Hm6beDjg5CjFIdE/c92jnVo+0CA==
+"react-native-svg@git+https://github.com/wordpress-mobile/react-native-svg.git#2b76859a986d35d741c9160aaad54aa46f268c6e":
+  version "8.0.9"
+  resolved "git+https://github.com/wordpress-mobile/react-native-svg.git#2b76859a986d35d741c9160aaad54aa46f268c6e"
   dependencies:
     color "^2.0.1"
     lodash "^4.16.6"
