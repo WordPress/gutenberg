@@ -2,7 +2,7 @@
 
 ServerSideRender is a component used for server-side rendering a preview of dynamic blocks to display in the editor. Server-side rendering in a block's `edit` function should be limited to blocks that are heavily dependent on existing PHP rendering logic that is heavily intertwined with data, particularly when there are no endpoints available.
 
-ServerSideRender may also be used when a legacy block is provided as a backwards compatibility measure, rather than needing to re-write the deprecated code that the block may depend on.
+ServerSideRender may also be used when a legacy block is provided as a backward compatibility measure, rather than needing to re-write the deprecated code that the block may depend on.
 
 ServerSideRender should be regarded as a fallback or legacy mechanism, it is not appropriate for developing new features against.
 
@@ -20,7 +20,7 @@ const MyServerSideRender = () => (
 		block="core/archives"
 		attributes={ {
 			showPostCounts: true,
-			displayAsDropdown: false, 
+			displayAsDropdown: false,
 		} }
 	/>
 );
