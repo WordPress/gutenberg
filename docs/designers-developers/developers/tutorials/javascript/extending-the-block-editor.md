@@ -65,3 +65,4 @@ add_action( 'enqueue_block_assets', 'myguten_stylesheet' );
 
 Now a quote block with your fancy quote style applied, when you viewed in the editor and published, you will see it in a beautiful tomato color.
 
+![Fancy Quote with Style](../../../../../docs/designers-developers/developers/tutorials/javascript/fancy-quote-with-style.png)
