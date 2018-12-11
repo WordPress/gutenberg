@@ -20,6 +20,9 @@ apply from: 'https://gist.githubusercontent.com/hypest/e06f6097065728b6db7b7c462
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
+// import the `readHashedVersion()` function
+apply from: 'https://gist.githubusercontent.com/hypest/ceaf20a8e7d9b8404e4a5ff2e6c36650/raw/e1460a128e4b9863963410d719c7d44c3adefd02/readHashedVersion.gradle'
+
 // import the `waitJitpack()` function
 apply from: 'https://gist.githubusercontent.com/hypest/f526fe0775dedce0ce0133f1400d22a4/raw/0008b271a0d28fc79957fd3c2a027f57e98f796a/wait-jitpack.gradle'
 
@@ -79,7 +82,7 @@ dependencies {
         implementation project(':react-native-aztec')
         implementation project(':react-native-recyclerview-list')
     } else {
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', 'faed05be8dca2b0df8957c5f72c40eccef12144d'))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-aztec', submoduleGitHash('../../', 'react-native-aztec')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'a2e8ca550412504c32218fd473c55f696f18f1f7'))
     }
