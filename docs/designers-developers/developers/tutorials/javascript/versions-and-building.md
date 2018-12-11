@@ -9,6 +9,6 @@ For this tutorial, all examples are written compatible to ES5 definition of Java
 
 The ESNext version is dynamic and refers to the next language definitions, which will always be ahead of browser support. An extra build step is required to transform the code to a syntax that works in all browsers. Webpack and babel are the tools that perform this transformation step.
 
-Additionally, the ESNext code examples in the Gutenberg handbook include JSX syntax, which is easier to read and write, but likewise requires the build step using webpack and babel to transform into compatible code.
+Additionally, the ESNext code examples in the Gutenberg handbook include [JSX syntax](https://reactjs.org/docs/introducing-jsx.html), which is easier to read and write, but likewise requires the build step using webpack and babel to transform into compatible code.
 
 
