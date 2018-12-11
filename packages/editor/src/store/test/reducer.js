@@ -2528,6 +2528,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'returns same state if save success without preview link or post link', () => {
+			// Bug: This can occur for post types which are defined as
+			// `publicly_queryable => false` (non-viewable).
+			//
+			// See: https://github.com/WordPress/gutenberg/issues/12677
 			const state = previewLink( null, {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: {
