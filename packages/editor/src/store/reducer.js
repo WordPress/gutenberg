@@ -1205,17 +1205,24 @@ export function autosave( state = null, action ) {
 }
 
 /**
- * Reducer returning the poost preview link
+ * Reducer returning the post preview link.
  *
- * @param  {string?} state  The preview link
- * @param  {Object} action Dispatched action.
+ * @param {string?} state  The preview link
+ * @param {Object}  action Dispatched action.
  *
  * @return {string?} Updated state.
  */
 export function previewLink( state = null, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE_SUCCESS':
-			return action.post.preview_link || addQueryArgs( action.post.link, { preview: true } );
+			const { preview_link: previewLink, link } = action.post;
+			if ( previewLink ) {
+				return previewLink;
+			} else if ( link ) {
+				return addQueryArgs( link, { preview: true } );
+			}
+
+			return state;
 
 		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.
