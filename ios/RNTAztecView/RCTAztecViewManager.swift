@@ -19,6 +19,20 @@ public class RCTAztecViewManager: RCTViewManager {
     }
 
     @objc
+    func removeLink(_ node: NSNumber) {
+        executeBlock({ (aztecView) in
+            aztecView.removeLink()
+        }, onNode: node)
+    }
+
+    @objc
+    func setLink(_ node: NSNumber, url: String, title: String?) {
+        executeBlock({ (aztecView) in
+            aztecView.setLink(with: url, and: title)
+        }, onNode: node)
+    }
+
+    @objc
     public override func view() -> UIView {
         let view = RCTAztecView(
             defaultFont: defaultFont,

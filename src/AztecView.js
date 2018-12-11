@@ -3,6 +3,8 @@ import React from 'react';
 import ReactNative, {requireNativeComponent, ViewPropTypes, UIManager, ColorPropType, TouchableWithoutFeedback} from 'react-native';
 import TextInputState from 'react-native/lib/TextInputState';
 
+const AztecManager = UIManager.RCTAztecView;
+
 class AztecView extends React.Component {
   
   static propTypes = {
@@ -22,25 +24,35 @@ class AztecView extends React.Component {
     onBackspace: PropTypes.func,
     onScroll: PropTypes.func,
     onActiveFormatsChange: PropTypes.func,
+    onActiveFormatAttributesChange: PropTypes.func,
     onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
     ...ViewPropTypes, // include the default view properties
   }
 
-  applyFormat(format) {   
+  dispatch(command, params) {
+    params = params || [];
     UIManager.dispatchViewManagerCommand(
                                           ReactNative.findNodeHandle(this),
-                                          UIManager.RCTAztecView.Commands.applyFormat,
-                                          [format],
-                                        );    
+                                          command,
+                                          params,
+    );
+  }
+
+  applyFormat(format) {
+    this.dispatch(AztecManager.Commands.applyFormat, [format])
+  }
+
+  removeLink() {
+    this.dispatch(AztecManager.Commands.removeLink)
+  }
+
+  setLink(url, title) {
+    this.dispatch(AztecManager.Commands.setLink, [url, title])
   }
 
   requestHTMLWithCursor() {
-    UIManager.dispatchViewManagerCommand(
-                                          ReactNative.findNodeHandle(this),
-                                          UIManager.RCTAztecView.Commands.returnHTMLWithCursor,
-                                          [],
-                                        );    
+    this.dispatch(AztecManager.Commands.returnHTMLWithCursor)
   }
 
   _onActiveFormatsChange = (event) => {
@@ -50,6 +62,15 @@ class AztecView extends React.Component {
     const formats = event.nativeEvent.formats;
     const { onActiveFormatsChange } = this.props;
     onActiveFormatsChange(formats);
+  }
+
+  _onActiveFormatAttributesChange = (event) => {
+    if (!this.props.onActiveFormatAttributesChange) {
+      return;
+    }
+    const attributes = event.nativeEvent.attributes;
+    const { onActiveFormatAttributesChange } = this.props;
+    onActiveFormatAttributesChange(attributes);
   }
 
   _onContentSizeChange = (event) => {
@@ -139,6 +160,7 @@ class AztecView extends React.Component {
       <TouchableWithoutFeedback onPress={ this._onPress }>
         <RCTAztecView {...otherProps}
           onActiveFormatsChange={ this._onActiveFormatsChange }
+          onActiveFormatAttributesChange={ this._onActiveFormatAttributesChange }
           onContentSizeChange = { this._onContentSizeChange }
           onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
           onSelectionChange = { this._onSelectionChange }
