@@ -7,7 +7,7 @@ ES5 code is compatible with WordPress's minimum [target for browser compatibilit
 
 For this tutorial, all examples are written compatible to ES5 definition of JavaScript. This code can be run straight in your browser and does not require an additional build step.
 
-The ESNext version is dynamic and refers to the next language defintions, which will always be ahead of browser support. An extra build step is required to transform the code to a syntax that works in all browsers. Webpack is the tool that performs this transformation step.
+The ESNext version is dynamic and refers to the next language definitions, which will always be ahead of browser support. An extra build step is required to transform the code to a syntax that works in all browsers. Webpack and babel are the tools that perform this transformation step.
 
 Additionally, the ESNext code examples in the Gutenberg handbook include JSX syntax, which is easier to read and write, but likewise requires the build step using webpack and babel to transform into compatible code.
 
