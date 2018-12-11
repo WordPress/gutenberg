@@ -367,23 +367,25 @@ describe( 'block parser', () => {
 
 	describe( 'getMigratedBlock', () => {
 		it( 'should return the original block if it has no deprecated versions', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock ).toBe( block );
 		} );
 
 		it( 'should return the original block if no valid deprecated version found', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
@@ -398,7 +400,7 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock ).toBe( block );
 			expect( console ).toHaveErrored();
@@ -406,12 +408,14 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should return with attributes parsed by the deprecated version', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span>Bananas</span>',
 				isValid: false,
 			} );
+
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
 				save: ( props ) => <div>{ props.attributes.fruit }</div>,
@@ -429,15 +433,16 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should be able to migrate attributes and innerBlocks', () => {
+			const parsedAttributes = {};
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {},
+				attributes: parsedAttributes,
 				originalContent: '<span>Bananas</span>',
 				isValid: false,
 			} );
@@ -467,7 +472,7 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { newFruit: 'Bananas' } );
 			expect( migratedBlock.innerBlocks ).toHaveLength( 1 );
@@ -476,11 +481,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should ignore valid uneligible blocks', () => {
+			const parsedAttributes = { fruit: 'Bananas' };
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {
-					fruit: 'Bananas',
-				},
+				attributes: parsedAttributes,
 				originalContent: 'Bananas',
 				isValid: true,
 			} );
@@ -499,17 +503,16 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 
 		it( 'should allow opt-in eligibility of valid block', () => {
+			const parsedAttributes = { fruit: 'Bananas' };
 			const block = deepFreeze( {
 				name: 'core/test-block',
-				attributes: {
-					fruit: 'Bananas',
-				},
+				attributes: parsedAttributes,
 				originalContent: 'Bananas',
 				isValid: true,
 			} );
@@ -529,9 +532,52 @@ describe( 'block parser', () => {
 				],
 			} );
 
-			const migratedBlock = getMigratedBlock( block );
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
 			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas!' } );
+		} );
+
+		it( 'allows a default attribute to be deprecated', () => {
+			// The block's default fruit attribute has been changed from 'Bananas' to 'Oranges'.
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						default: 'Oranges',
+					},
+				},
+				deprecated: [
+					{
+						attributes: {
+							fruit: {
+								type: 'number',
+								default: 'Bananas',
+							},
+						},
+						save: defaultBlockSettings.save,
+					},
+				],
+			} );
+
+			// Because the fruits attribute is not sourced, when the block content was parsed no value for the
+			// fruit attribute was found.
+			const parsedAttributes = {};
+
+			// When the block was created, it was given the new default value for the fruit attribute of 'Oranges'.
+			// This is because unchanged default values are not saved to the comment delimeter attributes.
+			// Validation failed because this block was saved when the old default was 'Bananas' as reflected by the originalContent.
+			const block = deepFreeze( {
+				name: 'core/test-block',
+				attributes: { fruit: 'Oranges' },
+				originalContent: 'Bananas',
+				isValid: false,
+			} );
+
+			// The migrated block successfully falls back to the old value of 'Bananas', allowing the block to
+			// continue to be used.
+			const migratedBlock = getMigratedBlock( block, parsedAttributes );
+			expect( migratedBlock.attributes ).toEqual( { fruit: 'Bananas' } );
 		} );
 	} );
 
