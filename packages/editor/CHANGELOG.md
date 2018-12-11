@@ -3,6 +3,7 @@
 ### Bug Fixes
 
 - `getEditedPostAttribute` now correctly returns the merged result of edits as a partial change when given `'meta'` as the `attributeName`.
+- Fixes an error and unrecoverable state which occurs on autosave completion for a `'publicly_queryable' => false` post type.
 
 ## 9.0.4 (2018-11-30)
 
