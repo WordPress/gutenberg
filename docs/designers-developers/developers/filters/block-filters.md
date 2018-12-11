@@ -115,7 +115,7 @@ wp.hooks.addFilter(
 
 #### `blocks.switchToBlockType.transformedBlock`
 
-Used to filters an individual transform result from block transformation. All of the original blocks are passed since transformations are many-to-many, not one-to-one.
+Used to filter an individual transform result from block transformation. All of the original blocks are passed since transformations are many-to-many, not one-to-one.
 
 #### `blocks.getBlockAttributes`
 
