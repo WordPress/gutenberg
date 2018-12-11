@@ -79,7 +79,7 @@ dependencies {
         implementation project(':react-native-aztec')
         implementation project(':react-native-recyclerview-list')
     } else {
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', 'faed05be8dca2b0df8957c5f72c40eccef12144d'))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', '2b76859a986d35d741c9160aaad54aa46f268c6e'))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-aztec', submoduleGitHash('../../', 'react-native-aztec')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'a2e8ca550412504c32218fd473c55f696f18f1f7'))
     }
