@@ -8,7 +8,7 @@ Inside of this new directory, create a file called `myguten-plugin.php` which wi
 ```php
 <?php
 /*
-Plugin Name: My Guten Plugin
+Plugin Name: Fancy Quote
 */
 ```
 
