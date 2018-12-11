@@ -47,18 +47,18 @@ export default class MoreEdit extends Component {
 		this.props.setAttributes( { customText: value } );
 	}
 
-	renderLine( key ) {
-		return <View key={ key } style={ styles[ 'block-library-more__line' ] } />
+	renderLine() {
+		return <View style={ styles[ 'block-library-more__line' ] } />
 	}
 
-	renderText( key ) {
+	renderText() {
 		const { attributes, onFocus, onBlur } = this.props;
 		const { customText } = attributes;
 		const defaultText = __( 'Read more' );
 		const value = customText !== undefined ? customText : defaultText;
 
 		return (
-			<View key={ key } >
+			<View>
 				<PlainText
 					style={ styles[ 'block-library-more__text' ] }
 					value={ value }
@@ -74,18 +74,12 @@ export default class MoreEdit extends Component {
 		)
 	}
 
-	renderInner() {
-		return [
-			this.renderLine(1),
-			this.renderText(2),
-			this.renderLine(3)
-		]
-	}
-	
 	render() {
 		return (
 			<View style={ styles[ 'block-library-more__container' ]}>
-				{ this.renderInner() }
+				{ this.renderLine() }
+				{ this.renderText() }
+				{ this.renderLine() }
 			</View>
 		);
 	}
