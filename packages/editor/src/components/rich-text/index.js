@@ -215,7 +215,6 @@ export class RichText extends Component {
 		items = isNil( items ) ? [] : items;
 		files = isNil( files ) ? [] : files;
 
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		let plainText = '';
 		let html = '';
 
@@ -244,6 +243,7 @@ export class RichText extends Component {
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = pasteHandler( {
@@ -605,12 +605,11 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		const record = this.createRecord();
-
 		if ( ! this.onSplit ) {
 			return;
 		}
 
+		const record = this.createRecord();
 		let [ before, after ] = split( record );
 
 		// In case split occurs at the trailing or leading edge of the field,

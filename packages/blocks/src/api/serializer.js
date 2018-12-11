@@ -261,9 +261,7 @@ export function getCommentDelimitedContent( rawBlockName, attributes, content ) 
  */
 export function serializeBlock( block ) {
 	const blockName = block.name;
-	const blockType = getBlockType( blockName );
 	const saveContent = getBlockContent( block );
-	const saveAttributes = getCommentAttributes( blockType, block.attributes );
 
 	switch ( blockName ) {
 		case getFreeformContentHandlerName():
@@ -271,6 +269,8 @@ export function serializeBlock( block ) {
 			return saveContent;
 
 		default:
+			const blockType = getBlockType( blockName );
+			const saveAttributes = getCommentAttributes( blockType, block.attributes );
 			return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 	}
 }
