@@ -47,29 +47,39 @@ export default class MoreEdit extends Component {
 		this.props.setAttributes( { customText: value } );
 	}
 
-	render() {
+	renderLine() {
+		return <View style={ styles[ 'block-library-more__line' ] } />
+	}
+
+	renderText() {
 		const { attributes, onFocus, onBlur } = this.props;
 		const { customText } = attributes;
 		const defaultText = __( 'Read more' );
 		const value = customText !== undefined ? customText : defaultText;
 
 		return (
-			<View style={ styles[ 'block-library-more__container' ] }>
-				<View style={ styles[ 'block-library-more__sub-container' ] }>
-					<Text style={ styles[ 'block-library-more__left-marker' ] }>&lt;!--</Text>
-					<PlainText
-						style={ styles[ 'block-library-more__plain-text' ] }
-						value={ value }
-						multiline={ true }
-						underlineColorAndroid="transparent"
-						onChange={ this.onChangeInput }
-						placeholder={ defaultText }
-						isSelected={ this.props.isSelected }
-						onFocus={ onFocus }
-						onBlur={ onBlur }
-					/>
-					<Text style={ styles[ 'block-library-more__right-marker' ] }>--&gt;</Text>
-				</View>
+			<View>
+				<PlainText
+					style={ styles[ 'block-library-more__text' ] }
+					value={ value }
+					multiline={ true }
+					underlineColorAndroid="transparent"
+					onChange={ this.onChangeInput }
+					placeholder={ defaultText }
+					isSelected={ this.props.isSelected }
+					onFocus={ onFocus }
+					onBlur={ onBlur }
+				/>
+			</View>
+		)
+	}
+
+	render() {
+		return (
+			<View style={ styles[ 'block-library-more__container' ]}>
+				{ this.renderLine() }
+				{ this.renderText() }
+				{ this.renderLine() }
 			</View>
 		);
 	}
