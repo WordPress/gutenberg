@@ -20,6 +20,7 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -285,6 +286,8 @@ export function findTransform( transforms, predicate ) {
  * @return {Array} Block transforms for direction.
  */
 export function getBlockTransforms( direction, blockTypeOrName ) {
+	const { canInsertBlockType } = select( 'core/editor' );
+
 	// When retrieving transforms for all block types, recurse into self.
 	if ( blockTypeOrName === undefined ) {
 		return flatMap(
@@ -296,7 +299,7 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 	// Validate that block type exists and has array of direction.
 	const blockType = normalizeBlockType( blockTypeOrName );
 	const { name: blockName, transforms } = blockType || {};
-	if ( ! transforms || ! Array.isArray( transforms[ direction ] ) ) {
+	if ( ! canInsertBlockType( blockName ) || ! transforms || ! Array.isArray( transforms[ direction ] ) ) {
 		return [];
 	}
 
