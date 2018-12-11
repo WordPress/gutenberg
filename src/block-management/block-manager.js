@@ -19,7 +19,7 @@ import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 // Gutenberg imports
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender } from '@wordpress/editor';
 
 import EventEmitter from 'events';
@@ -269,21 +269,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return index === this.state.blocks.length - 1;
 	}
 
-	isEmptyBlock( block: BlockType ) {
-		const content = block.attributes.content;
-		const innerBlocks = block.innerBlocks;
-		return ( content === undefined || content === '' ) && ( innerBlocks.length === 0 );
-	}
-
-	isCandidateForReplaceBlock( block: BlockType ) {
-		return ( block.name === 'core/paragraph' || block.name === 'core/heading' || block.name === 'core/code' );
-	}
-
 	isReplaceable( block: ?BlockType ) {
 		if ( ! block ) {
 			return false;
 		}
-		return this.isEmptyBlock( block ) && this.isCandidateForReplaceBlock( block );
+		return isUnmodifiedDefaultBlock( block );
 	}
 
 	renderItem( value: { item: BlockType, index: number } ) {
