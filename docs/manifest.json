@@ -132,22 +132,22 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Backwards Compatibility",
-		"slug": "backwards-compatibility",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backwards-compatibility/README.md",
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backward-compatibility/README.md",
 		"parent": "developers"
 	},
 	{
 		"title": "Deprecations",
 		"slug": "deprecations",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backwards-compatibility/deprecations.md",
-		"parent": "backwards-compatibility"
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backward-compatibility/deprecations.md",
+		"parent": "backward-compatibility"
 	},
 	{
 		"title": "Meta Boxes",
 		"slug": "meta-box",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backwards-compatibility/meta-box.md",
-		"parent": "backwards-compatibility"
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backward-compatibility/meta-box.md",
+		"parent": "backward-compatibility"
 	},
 	{
 		"title": "Tutorials",

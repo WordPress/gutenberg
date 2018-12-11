@@ -1,5 +1,6 @@
 {
 	"name": "@wordpress/eslint-config",
+	"private": true,
 	"version": "1.0.0-alpha.0",
 	"description": "ESLint config for WordPress development.",
 	"author": "The WordPress Contributors",

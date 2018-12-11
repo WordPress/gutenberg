@@ -7,7 +7,7 @@ import { get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
@@ -32,7 +32,7 @@ import MediaContainer from './media-container';
  */
 const ALLOWED_BLOCKS = [ 'core/button', 'core/paragraph', 'core/heading', 'core/list' ];
 const TEMPLATE = [
-	[ 'core/paragraph', { fontSize: 'large', placeholder: 'Content…' } ],
+	[ 'core/paragraph', { fontSize: 'large', placeholder: _x( 'Content…', 'content placeholder' ) } ],
 ];
 
 class MediaTextEdit extends Component {
