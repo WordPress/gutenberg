@@ -25,8 +25,8 @@ import com.facebook.react.views.text.DefaultStyleValuesUtil;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
-import com.facebook.react.views.textinput.ScrollWatcher;
 import com.facebook.react.views.textinput.ReactTextInputManager;
+import com.facebook.react.views.textinput.ScrollWatcher;
 
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
@@ -105,11 +105,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onActiveFormatsChange")))
                 .put(
-                        "topSelectionChange",
-                        MapBuilder.of(
-                                "phasedRegistrationNames",
-                                MapBuilder.of("bubbled", "onSelectionChange")))
-                .put(
                         "topEndEditing",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
@@ -145,6 +140,15 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onKeyPress", "captured", "onKeyPressCapture")))*/
                 .build();
+    }
+
+    @Nullable
+    @Override
+    public Map getExportedCustomDirectEventTypeConstants() {
+        return MapBuilder.of(
+                "topSelectionChange",
+                MapBuilder.of("registrationName", "onSelectionChange")
+                );
     }
 
     @ReactProp(name = "text")
