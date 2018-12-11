@@ -26,7 +26,7 @@ You can also filter certain aspects of the editor; this is documented on the [Ed
 
 **Porting PHP meta boxes to blocks and Gutenberg plugins is highly encouraged!**
 
-Discover how [Meta Box](../../../docs/designers-developers/developers/backwards-compatibility/meta-box.md) support works in Gutenberg.
+Discover how [Meta Box](../../../docs/designers-developers/developers/backward-compatibility/meta-box.md) support works in Gutenberg.
 
 ## Theme Support
 

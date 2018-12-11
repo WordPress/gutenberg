@@ -5,6 +5,7 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	newPost,
+	pressTimes,
 } from '../support/utils';
 
 describe( 'Font Size Picker', () => {
@@ -32,7 +33,8 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph to be made "small"' );
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		await page.keyboard.type( '13' );
+		// This should be the "small" font-size of the current theme.
+		await page.keyboard.type( '19.5' );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();
@@ -58,7 +60,8 @@ describe( 'Font Size Picker', () => {
 		await page.keyboard.type( 'Paragraph with font size reset using button' );
 
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		await page.keyboard.type( '13' );
+		// This should be the default font-size of the current theme.
+		await page.keyboard.type( '22' );
 
 		// Blur the range control
 		await page.click( '.components-base-control__label' );
@@ -80,9 +83,10 @@ describe( 'Font Size Picker', () => {
 		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
 		await changeSizeButton.click();
 
+		// Clear the custom font size input.
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.press( 'Backspace' );
+		await pressTimes( 'ArrowRight', 4 );
+		await pressTimes( 'Backspace', 4 );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();

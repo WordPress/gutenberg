@@ -38,7 +38,16 @@ export function isUnmodifiedDefaultBlock( block ) {
 		return false;
 	}
 
-	const newDefaultBlock = createBlock( defaultBlockName );
+	// Cache a created default block if no cache exists or the default block
+	// name changed.
+	if (
+		! isUnmodifiedDefaultBlock.block ||
+		isUnmodifiedDefaultBlock.block.name !== defaultBlockName
+	) {
+		isUnmodifiedDefaultBlock.block = createBlock( defaultBlockName );
+	}
+
+	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
 	return every( blockType.attributes, ( value, key ) =>
