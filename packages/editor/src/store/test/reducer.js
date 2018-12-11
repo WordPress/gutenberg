@@ -2509,8 +2509,8 @@ describe( 'state', () => {
 			const state = previewLink( null, {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: {
-					preview_link: 'https://example.com/?p=2611&preview=true'
-				}
+					preview_link: 'https://example.com/?p=2611&preview=true',
+				},
 			} );
 
 			expect( state ).toBe( 'https://example.com/?p=2611&preview=true' );
@@ -2520,8 +2520,8 @@ describe( 'state', () => {
 			const state = previewLink( null, {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: {
-					link: 'https://example.com/sample-post/'
-				}
+					link: 'https://example.com/sample-post/',
+				},
 			} );
 
 			expect( state ).toBe( 'https://example.com/sample-post/?preview=true' );
@@ -2532,7 +2532,7 @@ describe( 'state', () => {
 				type: 'REQUEST_POST_UPDATE_SUCCESS',
 				post: {
 					preview_link: '',
-				}
+				},
 			} );
 
 			expect( state ).toBe( null );

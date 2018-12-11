@@ -1215,11 +1215,10 @@ export function autosave( state = null, action ) {
 export function previewLink( state = null, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE_SUCCESS':
-			const { preview_link: previewLink, link } = action.post;
-			if ( previewLink ) {
-				return previewLink;
-			} else if ( link ) {
-				return addQueryArgs( link, { preview: true } );
+			if ( action.post.preview_link ) {
+				return action.post.preview_link;
+			} else if ( action.post.link ) {
+				return addQueryArgs( action.post.link, { preview: true } );
 			}
 
 			return state;
