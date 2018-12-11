@@ -44,20 +44,20 @@
 		}
 	}
 
-	// N columns at this breakpoint.
-	// Reset odd, even margins from small breakpoint.
-	// Add margin to both sides on all inside columns.
-	// Add inner margin only on first and last items.
+	// All columns fit in one row at this breakpoint.
 	@include break-medium() {
+		// Reset odd, even margins from small breakpoint.
 		&:nth-child(even) {
 			margin-left: initial;
 		}
 		&:nth-child(odd) {
 			margin-right: initial;
 		}
+		// Add left margin to all but first item
 		&:not(:first-child) {
 			margin-left: $grid-size-large * 2;
 		}
+		// add right margin to all but last item
 		&:not(:last-child) {
 			margin-right: $grid-size-large * 2;
 		}
