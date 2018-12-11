@@ -30,19 +30,19 @@ class PostLockedModal extends Component {
 	}
 
 	componentDidMount() {
-		const hookNamePrefix = this.getHookNamePrefix();
+		const hookName = this.getHookName();
 
 		// Details on these events on the Heartbeat API docs
 		// https://developer.wordpress.org/plugins/javascript/heartbeat-api/
-		addAction( 'heartbeat.send', hookNamePrefix + '-send', this.sendPostLock );
-		addAction( 'heartbeat.tick', hookNamePrefix + '-tick', this.receivePostLock );
+		addAction( 'heartbeat.send', hookName, this.sendPostLock );
+		addAction( 'heartbeat.tick', hookName, this.receivePostLock );
 	}
 
 	componentWillUnmount() {
-		const hookNamePrefix = this.getHookNamePrefix();
+		const hookName = this.getHookName();
 
-		removeAction( 'heartbeat.send', hookNamePrefix + '-send' );
-		removeAction( 'heartbeat.tick', hookNamePrefix + '-tick' );
+		removeAction( 'heartbeat.send', hookName );
+		removeAction( 'heartbeat.tick', hookName );
 	}
 
 	/**
@@ -51,9 +51,9 @@ class PostLockedModal extends Component {
 	 *
 	 * @return {string} Hook name prefix.
 	 */
-	getHookNamePrefix() {
+	getHookName() {
 		const { instanceId } = this.props;
-		return 'core/editor/post-locked-modal-' + instanceId + '-heartbeat';
+		return 'core/editor/post-locked-modal-' + instanceId;
 	}
 
 	/**
