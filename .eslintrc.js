@@ -19,7 +19,7 @@ const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.
 module.exports = {
 	root: true,
 	extends: [
-		'@wordpress/eslint-config',
+		'plugin:@wordpress/eslint-plugin/recommended',
 		'plugin:jest/recommended',
 	],
 	rules: {
