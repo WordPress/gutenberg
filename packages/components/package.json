@@ -47,11 +47,6 @@
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
 	},
-	"devDependencies": {
-		"@wordpress/token-list": "file:../token-list",
-		"enzyme": "^3.7.0",
-		"react-test-renderer": "^16.6.3"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

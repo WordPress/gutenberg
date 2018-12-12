@@ -28,10 +28,6 @@
 	"dependencies": {
 		"@babel/runtime": "^7.0.0"
 	},
-	"devDependencies": {
-		"@babel/core": "^7.0.0",
-		"@babel/plugin-syntax-jsx": "^7.0.0"
-	},
 	"peerDependencies": {
 		"@babel/core": "^7.0.0"
 	},
