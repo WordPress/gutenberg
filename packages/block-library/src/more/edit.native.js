@@ -54,7 +54,7 @@ export default class MoreEdit extends Component {
 	renderText() {
 		const { attributes, onFocus, onBlur } = this.props;
 		const { customText } = attributes;
-		const defaultText = __( 'Read more' );
+		const { defaultText } = this.state;
 		const value = customText !== undefined ? customText : defaultText;
 
 		return (
