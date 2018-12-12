@@ -239,7 +239,7 @@ Adding blocks is easy enough, removing them is as easy. Plugin or theme authors 
 // my-plugin.js
 wp.domReady( function() {
 	wp.blocks.unregisterBlockType( 'core/verse' );
-});
+} );
 ```
 
 and load this script in the Editor
