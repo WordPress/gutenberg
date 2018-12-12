@@ -239,7 +239,7 @@ class RCTAztecView: Aztec.TextView {
         } else {
             identifiers = formattingIdentifiersForTypingAttributes()
         }
-        let formats = identifiers.compactMap { self.formatStringMap[$0] }
+        let formats = identifiers.compactMap { formatStringMap[$0] }
         onActiveFormatsChange(["formats": formats])
     }
 
