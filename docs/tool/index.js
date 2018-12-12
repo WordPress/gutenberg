@@ -9,12 +9,12 @@ const fs = require( 'fs' );
 const config = require( './config' );
 const parser = require( './parser' );
 const generator = require( './generator' );
-const { getPackageManifest, getComponentManifest, getDataManifest } = require( './manifest' );
+const { getPackageManifest, getComponentManifest, getDataManifest, getRootManifest } = require( './manifest' );
 
 const parsedModules = parser( config.dataNamespaces );
 generator( parsedModules, config.dataDocsOutput );
 
-const rootManifest = require( config.rootManifest );
+const rootManifest = getRootManifest( config.tocFileName );
 const packageManifest = getPackageManifest( config.packageFileNames );
 const componentManifest = getComponentManifest( config.componentPaths );
 const dataManifest = getDataManifest( parsedModules );

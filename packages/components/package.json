@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/components",
-	"version": "7.0.3",
+	"version": "7.0.4",
 	"description": "UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -46,11 +46,6 @@
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
-	},
-	"devDependencies": {
-		"@wordpress/token-list": "file:../token-list",
-		"enzyme": "^3.7.0",
-		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"

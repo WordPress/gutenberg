@@ -141,12 +141,11 @@ export const withToolbarControls = createHigherOrderComponent(
 // Exported just for testing purposes, not exported outside the module.
 export const insideSelectWithDataAlign = ( BlockListBlock ) => (
 	( props ) => {
-		const { block, hasWideEnabled } = props;
-		const { name: blockName } = block;
-		const { align } = block.attributes;
+		const { name, attributes, hasWideEnabled } = props;
+		const { align } = attributes;
 		const validAlignments = getValidAlignments(
-			getBlockSupport( blockName, 'align' ),
-			hasBlockSupport( blockName, 'alignWide', true ),
+			getBlockSupport( name, 'align' ),
+			hasBlockSupport( name, 'alignWide', true ),
 			hasWideEnabled
 		);
 
@@ -207,7 +206,7 @@ export function addAssignedAlign( props, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
-addFilter( 'editor.BlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
+addFilter( 'editor.__experimentalBlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
 addFilter( 'editor.BlockEdit', 'core/editor/align/with-toolbar-controls', withToolbarControls );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
 

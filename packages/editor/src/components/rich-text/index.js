@@ -93,6 +93,7 @@ export class RichText extends Component {
 
 		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
 		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
@@ -108,7 +109,6 @@ export class RichText extends Component {
 		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
-		this.isActive = this.isActive.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
@@ -129,10 +129,6 @@ export class RichText extends Component {
 		this.lastHistoryValue = value;
 	}
 
-	componentDidMount() {
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
 	componentWillUnmount() {
 		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
@@ -141,17 +137,10 @@ export class RichText extends Component {
 		this.editableRef = node;
 	}
 
-	isActive() {
-		return this.editableRef === document.activeElement;
-	}
-
 	/**
-	 * Handles the onSetup event for the TinyMCE component.
+	 * Sets a reference to the TinyMCE editor instance.
 	 *
-	 * Will setup event handlers for the TinyMCE instance.
-	 * An `onSetup` function in the props will be called if it is present.
-	 *
-	 * @param {tinymce} editor The editor instance as passed by TinyMCE.
+	 * @param {Editor} editor The editor instance as passed by TinyMCE.
 	 */
 	onSetup( editor ) {
 		this.editor = editor;
@@ -354,6 +343,12 @@ export class RichText extends Component {
 		if ( unstableOnFocus ) {
 			unstableOnFocus();
 		}
+
+		document.addEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
+	onBlur() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
 	/**
@@ -392,11 +387,6 @@ export class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
-		// Ensure it's the active element. This is a global event.
-		if ( ! this.isActive() ) {
-			return;
-		}
-
 		const { start, end, formats } = this.createRecord();
 
 		if ( start !== this.state.start || end !== this.state.end ) {
@@ -702,9 +692,12 @@ export class RichText extends Component {
 		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
 
-			// Maintain the previous selection:
-			record.start = this.state.start;
-			record.end = this.state.end;
+			// Maintain the previous selection if the instance is currently
+			// selected.
+			if ( isSelected ) {
+				record.start = this.state.start;
+				record.end = this.state.end;
+			}
 
 			this.applyRecord( record );
 		}
@@ -869,7 +862,7 @@ export class RichText extends Component {
 					record={ record }
 					onChange={ this.onChange }
 				>
-					{ ( { isExpanded, listBoxId, activeId } ) => (
+					{ ( { listBoxId, activeId } ) => (
 						<Fragment>
 							<TinyMCE
 								tagName={ Tagname }
@@ -880,7 +873,6 @@ export class RichText extends Component {
 								isPlaceholderVisible={ isPlaceholderVisible }
 								aria-label={ placeholder }
 								aria-autocomplete="list"
-								aria-expanded={ isExpanded }
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
 								{ ...ariaProps }
@@ -891,6 +883,7 @@ export class RichText extends Component {
 								onCompositionEnd={ this.onCompositionEnd }
 								onKeyDown={ this.onKeyDown }
 								onFocus={ this.onFocus }
+								onBlur={ this.onBlur }
 								multilineTag={ this.multilineTag }
 								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
