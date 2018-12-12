@@ -252,7 +252,7 @@ function my_plugin_blacklist_blocks() {
 	wp_enqueue_script(
 		'my-plugin-blacklist-blocks',
 		plugins_url( 'my-plugin.js', __FILE__ ),
-		array( 'wp-edit-post' )
+		array( 'wp-blocks', 'wp-dom-ready' )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'my_plugin_blacklist_blocks' );
