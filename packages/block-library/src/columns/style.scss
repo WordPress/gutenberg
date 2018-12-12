@@ -53,11 +53,11 @@
 		&:nth-child(odd) {
 			margin-right: initial;
 		}
-		// Add left margin to all but first item
+		// Add left margin to all but first column
 		&:not(:first-child) {
 			margin-left: $grid-size-large * 2;
 		}
-		// add right margin to all but last item
+		// add right margin to all but last column
 		&:not(:last-child) {
 			margin-right: $grid-size-large * 2;
 		}
