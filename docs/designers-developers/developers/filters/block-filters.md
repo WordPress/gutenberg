@@ -77,27 +77,27 @@ Adding a wrapper to core quote blocks
 {% ES5 %}
 ```js
 var createElement = wp.element.createElement;
-const quoteSaveFilter = (el, type, attributes) => {
-  if (type.name === "core/quote") {
-    const newEl = createElement("div", {className: "MYWRAPPER"}, el);    
+var quoteSaveFilter = ( el, type, attributes ) => {
+  if ( type.name === "core/quote" ) {
+    var newEl = createElement( "div", { className: "MYWRAPPER" }, el );    
     return newEl;
   }
   return el;
 };
 
-wp.hooks.addFilter("blocks.getSaveElement", "my-plugin/quote-save", quoteSaveFilter);
+wp.hooks.addFilter( "blocks.getSaveElement", "my-plugin/quote-save", quoteSaveFilter );
 ```
 {% ESNext %}
 ```js
-const quoteSaveFilter = (el, type, attributes) => {
-  if (type.name === "core/quote") {
+const quoteSaveFilter = ( el, type, attributes ) => {
+  if ( type.name === "core/quote" ) {
     const newEl = <div className="MYWRAPPER">{el}</div>;
     return newEl;
   }
   return el;
 };
 
-addFilter("blocks.getSaveElement", "my-plugin/quote-save", quoteSaveFilter);
+addFilter( "blocks.getSaveElement", "my-plugin/quote-save", quoteSaveFilter );
 ```
 {% end %}
 
