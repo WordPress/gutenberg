@@ -14,7 +14,7 @@ function myguten_enqueue() {
 add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 ```
 
-The script enqueuing uses the `enqueue_block_editor_assets` hook which loads the JavaScript file `myguten.js` when the block editor loads.
+The `enqueue_block_editor_assets` hook is used, which is called when the block editor loads, and will enqueue the JavaScript file `myguten.js`.
 
 Create a file called `myguten.js` and add:
 
@@ -25,7 +25,7 @@ console.log( "I'm loaded!" );
 Now start a new post in the block editor, and check your browser Developer Tools. You should see the message in your console log. See [Mozilla's What are browser developer tools?](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools) if you need more information, the area to become most familiar with is [The JavaScript console](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools#The_JavaScript_console).
 
 
-**Note for Theme Developers:**  The above method of enqueing is used for plugins, if you are extending Gutenberg for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
+**Note for Theme Developers:**  The above method of enqueing is used for plugins, if you are extending the Block Editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
 
 ```php
 function myguten_enqueue() {
@@ -40,5 +40,4 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 
 At this point, you have a plugin in the directory `wp-content/plugins/myguten-plugin` with two files. The PHP server-side code in `myguten-plugin.php`, and the JavaScript which runs in the browser in `myguten.js`.
 
-
-
+This puts all the initial pieces in place for you to start extending the Block Editor.

@@ -11,4 +11,3 @@ The ESNext version is dynamic and refers to the next language definitions, which
 
 Additionally, the ESNext code examples in the Gutenberg handbook include [JSX syntax](https://reactjs.org/docs/introducing-jsx.html), which is easier to read and write, but likewise requires the build step using webpack and babel to transform into compatible code.
 
-
