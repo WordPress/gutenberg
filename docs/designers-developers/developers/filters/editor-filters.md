@@ -16,17 +16,3 @@ var withImageSize = function( size, mediaId, postId ) {
 wp.hooks.addFilter( 'editor.PostFeaturedImage.imageSize', 'my-plugin/with-image-size', withImageSize );
 ```
 
-
-### `editor.PostAuthor.component`
-
-Used to specify a different component for PostAuthor, this is the author list in the sidebar.
-
-If you simply want to disable the PostAuthor field for a post type, you can use [remove_post_type_support](https://developer.wordpress.org/reference/functions/remove_post_type_support/) to disable the component by post type.
-
-_Example:_
-
-```js
-const myAuthorComponent = wp.element( 'div', {}, 'My Authors Content' );
-wp.hooks.addFilter( 'editor.PostAuthor.component', 'my_callback', function() { return myAuthorComponent; } );
-```
-
