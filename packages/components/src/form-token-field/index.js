@@ -530,6 +530,7 @@ class FormTokenField extends Component {
 			label = __( 'Add item' ),
 			instanceId,
 			className,
+			help,
 		} = this.props;
 		const { isExpanded } = this.state;
 		const classes = classnames( className, 'components-form-token-field__input-container', {
@@ -550,6 +551,14 @@ class FormTokenField extends Component {
 				onFocus: this.onFocus,
 			} );
 		}
+
+		const howTo = !! help ? {
+			className: 'components-form-token-field__help',
+			text: help,
+		} : {
+			className: 'screen-reader-text',
+			text: __( 'Separate with commas' ),
+		};
 
 		// Disable reason: There is no appropriate role which describes the
 		// input container intended accessible usability.
@@ -583,8 +592,8 @@ class FormTokenField extends Component {
 						/>
 					) }
 				</div>
-				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className="screen-reader-text">
-					{ __( 'Separate with commas' ) }
+				<div id={ `components-form-token-suggestions-howto-${ instanceId }` } className={ howTo.className }>
+					{ howTo.text }
 				</div>
 			</div>
 		);
@@ -608,6 +617,7 @@ FormTokenField.defaultProps = {
 		removed: __( 'Item removed.' ),
 		remove: __( 'Remove item' ),
 	},
+	help: '',
 };
 
 export default withSpokenMessages( withInstanceId( FormTokenField ) );

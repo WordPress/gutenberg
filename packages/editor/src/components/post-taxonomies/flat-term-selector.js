@@ -185,6 +185,11 @@ class FlatTermSelector extends Component {
 		const termAddedLabel = sprintf( _x( '%s added', 'term' ), singularName );
 		const termRemovedLabel = sprintf( _x( '%s removed', 'term' ), singularName );
 		const removeTermLabel = sprintf( _x( 'Remove %s', 'term' ), singularName );
+		const help = get(
+			taxonomy,
+			[ 'labels', 'separate_items_with_commas' ],
+			_x( 'Separate terms with commas', 'how to separate term items' )
+		);
 
 		return (
 			<FormTokenField
@@ -201,6 +206,7 @@ class FlatTermSelector extends Component {
 					removed: termRemovedLabel,
 					remove: removeTermLabel,
 				} }
+				help={ help }
 			/>
 		);
 	}
