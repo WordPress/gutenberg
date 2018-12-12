@@ -42,10 +42,6 @@
 		"lodash": "^4.17.10",
 		"refx": "^3.0.0"
 	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.7.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

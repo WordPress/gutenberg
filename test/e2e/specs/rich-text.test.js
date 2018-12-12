@@ -81,4 +81,75 @@ describe( 'RichText', () => {
 		axe.include( '.edit-post-layout__content' );
 		logA11yResults( await axe.analyze() );
 	} );
+
+	it( 'should only mutate text data on input', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '2' );
+		await pressWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '3' );
+
+		await page.evaluate( () => {
+			let called;
+			const { body } = document;
+			const config = {
+				attributes: true,
+				childList: true,
+				characterData: true,
+				subtree: true,
+			};
+
+			const mutationObserver = new MutationObserver( ( records ) => {
+				if ( called || records.length > 1 ) {
+					throw new Error( 'Typing should only mutate once.' );
+				}
+
+				records.forEach( ( record ) => {
+					if ( record.type !== 'characterData' ) {
+						throw new Error(
+							`Typing mutated more than character data: ${ record.type }`
+						);
+					}
+				} );
+
+				called = true;
+			} );
+
+			mutationObserver.observe( body, config );
+
+			window.unsubscribes = [ () => mutationObserver.disconnect() ];
+
+			document.addEventListener( 'selectionchange', () => {
+				function throwMultipleSelectionChange() {
+					throw new Error( 'Typing should only emit one selection change event.' );
+				}
+
+				document.addEventListener(
+					'selectionchange',
+					throwMultipleSelectionChange,
+					{ once: true }
+				);
+
+				window.unsubscribes.push( () => {
+					document.removeEventListener( 'selectionchange', throwMultipleSelectionChange );
+				} );
+			}, { once: true } );
+		} );
+
+		await page.keyboard.type( '4' );
+
+		await page.evaluate( () => {
+			// The selection change event should be called once. If there's only
+			// one item in `window.unsubscribes`, it means that only one
+			// function is present to disconnect the `mutationObserver`.
+			if ( window.unsubscribes.length === 1 ) {
+				throw new Error( 'The selection change event listener was never called.' );
+			}
+
+			window.unsubscribes.forEach( ( unsubscribe ) => unsubscribe() );
+		} );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
