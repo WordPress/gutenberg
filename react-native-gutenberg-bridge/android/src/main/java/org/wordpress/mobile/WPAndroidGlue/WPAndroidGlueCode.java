@@ -41,6 +41,7 @@ public class WPAndroidGlueCode {
     private CountDownLatch mGetContentCountDownLatch;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
+    private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -84,7 +85,8 @@ public class WPAndroidGlueCode {
                 mRnReactNativeGutenbergBridgePackage);
     }
 
-    public void onCreateView(View reactRootView, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+    public void onCreateView(View reactRootView, boolean htmlModeEnabled,
+                             OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource) {
         mReactRootView = (ReactRootView) reactRootView;
 
@@ -110,6 +112,7 @@ public class WPAndroidGlueCode {
             initialProps = new Bundle();
         }
         initialProps.putString(PROP_NAME_INITIAL_DATA, "");
+        initialProps.putBoolean(PROP_NAME_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled);
 
 
         // The string here (e.g. "MyReactNativeApp") has to match
