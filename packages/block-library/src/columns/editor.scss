@@ -97,21 +97,15 @@
 			// This has to match the same padding applied in style.scss.
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 			@include break-small() {
-				&:nth-child(odd) {
-					margin-right: $grid-size-large * 2;
-				}
-				&:nth-child(even) {
-					margin-left: $grid-size-large * 2;
-				}
-			}
+				margin-right: $grid-size-large * 2;
+				margin-left: $grid-size-large * 2;
 
-			@include break-small() {
-				&:not(:first-child) {
-					margin-left: $grid-size-large * 2;
+				&:first-child {
+					margin-left: 0;
 				}
 
-				&:not(:last-child) {
-					margin-right: $grid-size-large * 2;
+				&:last-child {
+					margin-right: 0;
 				}
 			}
 		}
