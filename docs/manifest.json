@@ -498,9 +498,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/eslint-config",
-		"slug": "packages-eslint-config",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/eslint-config/README.md",
+		"title": "@wordpress/eslint-plugin",
+		"slug": "packages-eslint-plugin",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/eslint-plugin/README.md",
 		"parent": "packages"
 	},
 	{
