@@ -201,5 +201,9 @@ public class WPAndroidGlueCode {
             mPendingMediaSelectedCallback = null;
         }
     }
+
+    public void toggleEditorMode() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+    }
 }
 

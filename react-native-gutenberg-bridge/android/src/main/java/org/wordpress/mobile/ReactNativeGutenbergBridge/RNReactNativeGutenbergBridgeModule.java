@@ -48,4 +48,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             }
         });
     }
+
+    public void toggleEditorMode() {
+        emitToJS("toggleHTMLMode", null);
+    }
 }
