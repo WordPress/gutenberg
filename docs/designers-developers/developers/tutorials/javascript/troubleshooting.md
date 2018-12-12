@@ -11,6 +11,23 @@ Check the JavaScript console for any errors. Here is an example, which shows a s
 ![console error](../../../../../docs/designers-developers/developers/tutorials/javascript/console-error.png)
 
 
+### Confirm all dependencies are loaded
+
+The console log will show an error if a dependency your JavaScript code uses has not been declared and loaded in the browser. In the example, if `myguten.js` script is enqueued without declaring the `wp-block` dependency, the console log will show:
+
+<img src="../../../../../docs/designers-developers/developers/tutorials/javascript/error-blocks-undefined.png" width=448 title="error wp.blocks is undefined"/>
+
+
+You can correct by checking your `wp_enqueue_script` function includes all packages listed that are used:
+
+```js
+wp_enqueue_script( 'myguten-script',
+	plugins_url( 'myguten.js', __FILE__ ),
+	array( 'wp-blocks' )
+);
+```
+
+
 ### Confirm JavaScript is Loading
 
 If you are not seeing your changes, another place to check is to confirm your JavaScript file is being enqueued. You can look at the page source, right-click View Page Source, and look for the `<script>` tag that loads your file. In our example, you would searching for `myguten.js` and confirm it is being loaded.
