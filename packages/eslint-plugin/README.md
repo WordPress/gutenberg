@@ -28,7 +28,6 @@ The `recommended` preset will include rules governing an ES2015+ environment, an
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
-- `custom`
 - `es5`
 - `esnext`
 - `jsx-a11y`
