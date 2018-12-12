@@ -121,7 +121,7 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, setAttributes, noticeOperations } = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -134,6 +134,10 @@ class ImageEdit extends Component {
 						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
+					onError: ( message ) => {
+						noticeOperations.createErrorNotice( message );
+						this.setState( { isEditing: true } );
+					},
 				} );
 			}
 		}
@@ -414,7 +418,7 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( isEditing ) {
+		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
 			return (
 				<Fragment>

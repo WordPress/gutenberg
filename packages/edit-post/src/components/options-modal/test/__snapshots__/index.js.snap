@@ -25,6 +25,10 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
   <Section
     title="Document Panels"
   >
+    <WithSelect(IfCondition(WithDispatch(BaseOption)))
+      label="Permalink"
+      panelName="post-link"
+    />
     <WithSelect(PostTaxonomies)
       taxonomyWrapper={[Function]}
     />

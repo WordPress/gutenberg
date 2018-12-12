@@ -1,5 +1,7 @@
 # Frequently Asked Questions
 
+This initial set of questions were created when the Gutenberg project was relatively new, for a more recent set of questions, please see Matt's November 2018 post [WordPress 5.0: A Gutenberg FAQ](https://ma.tt/2018/11/a-gutenberg-faq/).
+
 ## What is Gutenberg?
 
 “Gutenberg” is the name of the project to create a new editor experience for WordPress. The goal is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
@@ -12,15 +14,13 @@ Key takeaways include the following points:
 - By embracing blocks as an interaction paradigm, we can unify multiple different interfaces into one. Instead of learning how to write shortcodes and custom HTML, or pasting URLs to embed media, there's a common, reliable flow for inserting any kind of content.
 - “Mystery meat” refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
 
-Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg) under the WordPress organization, and you can try [a beta version today—it's available in the plugin repository](https://wordpress.org/plugins/gutenberg/). It's important to keep in mind that Gutenberg is not yet fully functional, feature complete, or production ready. But we'd love your help to make that a reality.
+Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg) under the WordPress organization, and you can use it today — [available in the plugin repository](https://wordpress.org/plugins/gutenberg/).
 
 ## When will Gutenberg be merged into WordPress?
 
-We are hoping that Gutenberg will be sufficiently polished, tested, iterated, and proven enough to be [merged into WordPress 5.0](https://ma.tt/2017/06/4-8-and-whats-coming/), with an estimated release date of 2018.
+Gutenberg will be merged into WordPress 5.0, and will be released at the end of 2018, or early 2019. Please follow [WordPress.org News](https://wordpress.org/news/) for the latest information.
 
 The editor focus started in early 2017 with the first three months spent designing, planning, prototyping, and testing prototypes, to help us inform how to approach this project. The actual plugin, which you can install from the repository, was launched during WordCamp Europe in June.
-
-There is still plenty of work to do, but we are moving fast. New updates tend to be released on a weekly basis. Please help us by giving feedback, surfacing issues, testing, or even contributing, so we can be ready in time for WordPress 5.0.
 
 ## What are “blocks” and why are we using them?
 
@@ -251,7 +251,7 @@ Our [list of supported browsers can be found in the Make WordPress handbook](htt
 
 ## How do I make my own block?
 
-The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](../../docs/designers-developers/developers/tutorials/block-tutorial/intro.md) section to get started.
+The API for creating blocks is a crucial aspect of the project. We are working on improved documentation and tutorials. Check out the [Creating Block Types](../../docs/designers-developers/developers/tutorials/block-tutorial/readme.md) section to get started.
 
 ## Does Gutenberg involve editing posts/pages in the front-end?
 
@@ -273,9 +273,7 @@ Indeed. There are multiple ways in which custom post types can leverage Gutenber
 
 ## Will there be columns?
 
-Our primary goal is on a solid block foundation before exploring column support.
-
-*See:* [Issue #219](https://github.com/WordPress/gutenberg/issues/219)
+Yes, a columns block is available in Gutenberg.
 
 ## Will there be nested blocks?
 
@@ -285,7 +283,7 @@ See also [Issue #428](https://github.com/WordPress/gutenberg/issues/428)
 
 ## Will drag and drop be used for rearranging blocks?
 
-A key value for Gutenberg has been to see drag and drop as an _additive enhancement_. When explicit actions (_click_ or _tab_ + _space_) exist can we add drag and drop as an enhancement on top of it. So yes, we expect drag and drop to be part of Gutenberg, even if it isn't today.
+Yes, you can drag and drop blocks to rearrange their order.
 
 ## Can themes _style_ blocks?
 
@@ -322,9 +320,10 @@ We realize it's a big change. We also think there will be many new opportunities
 
 ## Will I be able to opt out of Gutenberg for my site?
 
-We are looking at ways to make Gutenberg configurable for many use cases, including disabling different aspects (like blocks, panels, etc.).
+There is a “Classic” block, which is virtually the same as the current editor, except in block form. 
 
-There is also be a “Classic” block, which is virtually the same as the current editor, except in block form. There’s also likely to be a very popular plugin in the repository to replace Gutenberg with the classic editor.
+There is also the [Classic Editor Plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor Plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
+
 
 ## How will custom TinyMCE buttons work in Gutenberg?
 
@@ -366,7 +365,8 @@ var blocks = wp.blocks.parse( postContent );
 In PHP:
 
 ```php
-$blocks = gutenberg_parse_blocks( $post_content );
+$blocks = gutenberg_parse_blocks( $post_content ); // plugin
+$blocks = parse_blocks( $post_content ); // WordPress 5.0
 ```
 
 ## Why should I start using this once released?

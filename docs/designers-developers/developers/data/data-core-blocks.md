@@ -225,3 +225,12 @@ Returns an action object used to set block categories.
 *Parameters*
 
  * categories: Block categories.
+
+### updateCategory
+
+Returns an action object used to update a category.
+
+*Parameters*
+
+ * slug: Block category slug.
+ * category: Object containing the category properties that should be updated.
