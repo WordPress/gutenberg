@@ -21,7 +21,7 @@ import {
 	split,
 	toHTMLString,
 } from '@wordpress/rich-text';
-import { BACKSPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { children } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
@@ -69,6 +69,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
+		this.onDelete = this.onDelete.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
@@ -233,6 +234,35 @@ export class RichText extends Component {
 		}
 	}
 
+	// eslint-disable-next-line no-unused-vars
+	onDelete( event ) {
+
+		console.log("OnDelete!");
+		const { onMerge, onRemove } = this.props;
+		if ( ! onMerge && ! onRemove ) {
+			return;
+		}
+
+		const keyCode = DELETE; // TODO : should we differentiate BACKSPACE and DELETE?
+		const isReverse = keyCode === DELETE;
+
+		console.log(isReverse);
+
+		const empty = this.isEmpty();
+
+		if ( onMerge ) {
+			onMerge( isReverse );
+		}
+
+		// Only handle remove on Backspace. This serves dual-purpose of being
+		// an intentional user interaction distinguishing between Backspace and
+		// Delete to remove the empty field, but also to avoid merge & remove
+		// causing destruction of two fields (merge, then removed merged).
+		if ( onRemove && empty && isReverse ) {
+			onRemove( isReverse );
+		}
+	}
+
 	isEmpty() {
 		return isEmpty( this.formatToValue( this.props.value ) );
 	}
@@ -369,6 +399,7 @@ export class RichText extends Component {
 					onBlur={ this.props.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
+					onDelete={ this.onDelete }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
 					isSelected={ this.props.isSelected }
