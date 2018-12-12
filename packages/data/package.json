@@ -32,11 +32,6 @@
 		"redux": "^4.0.0",
 		"turbo-combine-reducers": "^1.0.2"
 	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.7.0",
-		"react-test-renderer": "^16.6.3"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

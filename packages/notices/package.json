@@ -24,9 +24,6 @@
 		"@wordpress/data": "file:../data",
 		"lodash": "^4.17.10"
 	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
