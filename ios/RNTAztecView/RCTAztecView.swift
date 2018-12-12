@@ -21,7 +21,7 @@ class RCTAztecView: Aztec.TextView {
     }()
 
     private let formatStringMap: [FormattingIdentifier: String] = [
-        .bold: "Bold",
+        .bold: "bold",
         .italic: "italic",
         .strikethrough: "strikethrough",
         .link: "link",
@@ -239,7 +239,7 @@ class RCTAztecView: Aztec.TextView {
         } else {
             identifiers = formattingIdentifiersForTypingAttributes()
         }
-        let formats = identifiers.compactMap(formatString)
+        let formats = identifiers.compactMap { self.formatStringMap[$0] }
         onActiveFormatsChange(["formats": formats])
     }
 
@@ -248,10 +248,6 @@ class RCTAztecView: Aztec.TextView {
             "link": linkAttributes()
         ]
         onActiveFormatAttributesChange?(["attributes": attributes])
-    }
-
-    private func formatString(from identifier: FormattingIdentifier) -> String? {
-        return formatStringMap[identifier]
     }
 
     func propagateSelectionChanges() {
