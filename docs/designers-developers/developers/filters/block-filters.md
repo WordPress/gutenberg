@@ -237,7 +237,7 @@ Adding blocks is easy enough, removing them is as easy. Plugin or theme authors 
 
 ```js
 // my-plugin.js
-_wpLoadBlockEditor.then( function() {
+wp.domReady( function() {
 	wp.blocks.unregisterBlockType( 'core/verse' );
 });
 ```
