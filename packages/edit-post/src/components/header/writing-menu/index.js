@@ -13,6 +13,8 @@ import FeatureToggle from '../feature-toggle';
 function WritingMenu( { onClose } ) {
 	return (
 		<MenuGroup
+			role={ 'group' }
+			useEventToOffset={ false }
 			label={ _x( 'View', 'noun' ) }
 		>
 			<FeatureToggle

@@ -17,6 +17,7 @@ import NavigableContainer from './container';
 export function NavigableMenu( {
 	role = 'menu',
 	orientation = 'vertical',
+	useEventToOffset = true,
 	...rest
 }, ref ) {
 	const eventToOffset = ( evt ) => {
@@ -49,7 +50,7 @@ export function NavigableMenu( {
 			onlyBrowserTabstops={ false }
 			role={ role }
 			aria-orientation={ role === 'presentation' ? null : orientation }
-			eventToOffset={ eventToOffset }
+			eventToOffset={ useEventToOffset ? eventToOffset : null }
 			{ ...rest }
 		/>
 	);
