@@ -14,4 +14,14 @@ public protocol GutenbergBridgeDelegate: class {
     /// - Parameter callback: A callbak block to be called with the selected
     ///                       image Url or nil to signal that the action was canceled.
     func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback)
+
+    /// Informs the delegate that the Gutenberg module has finished loading.
+    ///
+    func gutenbergDidLoad()
+}
+
+// MARK: - Default / optional methods.
+
+extension GutenbergBridgeDelegate {
+    func gutenbergDidLoad() {}
 }
