@@ -1,4 +1,4 @@
-## 3.1.5 (Unreleased)
+## 3.1.5 (2018-12-12)
 
 ### Bug Fixes
  - Fix saving WYSIWYG Meta Boxes
