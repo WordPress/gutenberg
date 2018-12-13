@@ -1,3 +1,7 @@
+## 2.6.0 (Unreleased)
+
+- Update default config provided for `lint-js` script.
+
 ## 2.5.0 (Unreleased)
 
 ### New Feature

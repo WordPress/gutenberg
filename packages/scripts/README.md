@@ -48,7 +48,7 @@ This is how you execute the script with presented setup:
 
 ### `wp-scripts lint-js`
 
-Helps enforce coding style guidelines for your JavaScript files. It uses [eslint](https://eslint.org/) with no rules provided (we plan to add zero config support in the near future). You can specify your own rules as described in [eslint docs](https://eslint.org/docs/rules/).
+Helps enforce coding style guidelines for your JavaScript files. It uses [eslint](https://eslint.org/) with the set of default rules provided. You can override them with your own rules as described in [eslint docs](https://eslint.org/docs/rules/).
 
 _Example:_
 
