@@ -19,6 +19,10 @@ export function MenuGroup( {
 	className = '',
 	instanceId,
 	label,
+	role = 'menu',
+	labelRole = ( role === 'group' ) ? { role: 'presentation' } : {},
+	useEventToOffset = true,
+	isScreenReaderLabel = false,
 } ) {
 	if ( ! Children.count( children ) ) {
 		return null;
@@ -33,9 +37,14 @@ export function MenuGroup( {
 	return (
 		<div className={ classNames }>
 			{ label &&
-				<div className="components-menu-group__label" id={ labelId }>{ label }</div>
+				<div
+					className={ `components-menu-group__label ${ ( isScreenReaderLabel ) ? 'screen-reader-text' : '' }` }
+					{ ...labelRole }
+					id={ labelId }>
+					{ label }
+				</div>
 			}
-			<NavigableMenu orientation="vertical" aria-labelledby={ labelId }>
+			<NavigableMenu orientation="vertical" aria-labelledby={ labelId } role={ role } useEventToOffset={ useEventToOffset }>
 				{ children }
 			</NavigableMenu>
 		</div>

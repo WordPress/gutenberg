@@ -33,11 +33,12 @@ const MoreMenu = () => (
 		) }
 		renderContent={ ( { onClose } ) => (
 			<Fragment>
-				<WritingMenu onClose={ onClose } />
-				<ModeSwitcher onSelect={ onClose } />
-				<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
-				<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
 				<MenuGroup>
+					<WritingMenu onClose={ onClose } />
+					<ModeSwitcher onSelect={ onClose } />
+					<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
+					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
+
 					<OptionsMenuItem onSelect={ onClose } />
 				</MenuGroup>
 			</Fragment>

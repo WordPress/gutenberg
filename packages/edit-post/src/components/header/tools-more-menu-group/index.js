@@ -14,7 +14,11 @@ const { Fill: ToolsMoreMenuGroup, Slot } = createSlotFill( 'ToolsMoreMenuGroup' 
 ToolsMoreMenuGroup.Slot = ( { fillProps } ) => (
 	<Slot fillProps={ fillProps }>
 		{ ( fills ) => ! isEmpty( fills ) && (
-			<MenuGroup label={ __( 'Tools' ) }>
+			<MenuGroup
+				role={ 'group' }
+				useEventToOffset={ false }
+				label={ __( 'Tools' ) }
+				>
 				{ fills }
 			</MenuGroup>
 		) }
