@@ -927,6 +927,16 @@
   resolved "https://registry.yarnpkg.com/@wordpress/browserslist-config/-/browserslist-config-2.2.2.tgz#8bc88e9e3b363ba9d64207b811d5daaaecee3ee6"
   integrity sha512-RZ9XeDeXTc/l3RdSnfYYwcsylFPouV+2ZpQQaAgALSXthMWJT2wU61zD4mH9aMI5Oo6Z8OUVI2vOZM/7HObPxw==
 
+"@wordpress/eslint-plugin@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@wordpress/eslint-plugin/-/eslint-plugin-1.0.0.tgz#8fda30d937fc889470b6a26a03268777c1490625"
+  integrity sha512-xEy3HKO37DZHx7MIWx/NMQC3+PwkFCdvmayIAjkOm9OwxweZ2DiyT1vlB+Jpk6riCo+ReYqigL3dis3U8f0n+w==
+  dependencies:
+    babel-eslint "^8.0.3"
+    eslint-plugin-jsx-a11y "6.0.2"
+    eslint-plugin-react "7.7.0"
+    requireindex "^1.2.0"
+
 "@wordpress/jest-console@^2.0.6":
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/@wordpress/jest-console/-/jest-console-2.0.6.tgz#df4315ee4ae7ebeae65e9d113e27b2558ceb6f8f"
@@ -1140,6 +1150,14 @@ argparse@^1.0.7:
   dependencies:
     sprintf-js "~1.0.2"
 
+aria-query@^0.7.0:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/aria-query/-/aria-query-0.7.1.tgz#26cbb5aff64144b0a825be1846e0b16cfa00b11e"
+  integrity sha1-Jsu1r/ZBRLCoJb4YRuCxbPoAsR4=
+  dependencies:
+    ast-types-flow "0.0.7"
+    commander "^2.11.0"
+
 aria-query@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/aria-query/-/aria-query-3.0.0.tgz#65b3fcc1ca1155a8c9ae64d6eee297f15d5133cc"
@@ -1352,6 +1370,13 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.8.0.tgz#f0e003d9ca9e7f59c7a508945d7b2ef9a04a542f"
   integrity sha512-ReZxvNHIOv88FlT7rxcXIIC0fPt4KZqZbOlivyWtXLt8ESx84zd3kMC6iK5jVeS2qt+g7ftS7ye4fi06X5rtRQ==
 
+axobject-query@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/axobject-query/-/axobject-query-0.1.0.tgz#62f59dbc59c9f9242759ca349960e7a2fe3c36c0"
+  integrity sha1-YvWdvFnJ+SQnWco0mWDnov48NsA=
+  dependencies:
+    ast-types-flow "0.0.7"
+
 axobject-query@^2.0.1:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/axobject-query/-/axobject-query-2.0.2.tgz#ea187abe5b9002b377f925d8bf7d1c561adf38f9"
@@ -1407,7 +1432,7 @@ babel-core@^7.0.0-bridge.0:
   resolved "https://registry.yarnpkg.com/babel-core/-/babel-core-7.0.0-bridge.0.tgz#95a492ddd90f9b4e9a4a1da14eb335b87b634ece"
   integrity sha512-poPX9mZH/5CSanm50Q+1toVci6pv5KSRv/5TWCwtzQS5XEwn40BcCrgIeMFWP9CKKIniKXNxoIOnOq4VVlGXhg==
 
-babel-eslint@^8.2.2:
+babel-eslint@^8.0.3, babel-eslint@^8.2.2:
   version "8.2.6"
   resolved "https://registry.yarnpkg.com/babel-eslint/-/babel-eslint-8.2.6.tgz#6270d0c73205628067c0f7ae1693a9e797acefd9"
   integrity sha512-aCdHjhzcILdP8c9lej7hvXKvQieyRt20SF102SIGyY4cUIiw6UaAtK4j2o3dXX74jEmy0TJ0CEhv4fTIM3SzcA==
@@ -2540,7 +2565,7 @@ currently-unhandled@^0.4.1:
   dependencies:
     array-find-index "^1.0.1"
 
-damerau-levenshtein@^1.0.4:
+damerau-levenshtein@^1.0.0, damerau-levenshtein@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/damerau-levenshtein/-/damerau-levenshtein-1.0.4.tgz#03191c432cb6eea168bb77f3a55ffdccb8978514"
   integrity sha1-AxkcQyy27qFou3fzpV/9zLiXhRQ=
@@ -2747,7 +2772,7 @@ dlv@^1.1.0:
   resolved "https://registry.yarnpkg.com/dlv/-/dlv-1.1.2.tgz#270f6737b30d25b6657a7e962c784403f85137e5"
   integrity sha512-xxD4VSH67GbRvSGUrckvha94RD7hjgOH7rqGxiytLpkaeMvixOHFZTGFK6EkIm3T761OVHT8ABHmGkq9gXgu6Q==
 
-doctrine@^2.1.0:
+doctrine@^2.0.2, doctrine@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/doctrine/-/doctrine-2.1.0.tgz#5cd01fc101621b42c4cd7f5d1a66243716d3f39d"
   integrity sha512-35mSku4ZXK0vfCuHEDAwt55dg2jNajHZ1odvF+8SSr82EsZY4QmXfuWso8oEd8zRhVObSN18aM0CjSdoBX7zIw==
@@ -2881,7 +2906,7 @@ elliptic@^6.0.0:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
-emoji-regex@6.5.1, emoji-regex@^6.5.1:
+emoji-regex@6.5.1, emoji-regex@^6.1.0, emoji-regex@^6.5.1:
   version "6.5.1"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-6.5.1.tgz#9baea929b155565c11ea41c6626eaa65cef992c2"
   integrity sha512-PAHp6TxrCy7MGMFidro8uikr+zlJJKJ/Q6mm2ExZ7HwkyR9lSVFfE3kt36qcwa24BQL7y0G9axycGjK1A/0uNQ==
@@ -3085,6 +3110,19 @@ eslint-plugin-jsdoc@~3.5.0:
     comment-parser "^0.4.2"
     lodash "^4.17.4"
 
+eslint-plugin-jsx-a11y@6.0.2:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsx-a11y/-/eslint-plugin-jsx-a11y-6.0.2.tgz#659277a758b036c305a7e4a13057c301cd3be73f"
+  integrity sha1-ZZJ3p1iwNsMFp+ShMFfDAc075z8=
+  dependencies:
+    aria-query "^0.7.0"
+    array-includes "^3.0.3"
+    ast-types-flow "0.0.7"
+    axobject-query "^0.1.0"
+    damerau-levenshtein "^1.0.0"
+    emoji-regex "^6.1.0"
+    jsx-ast-utils "^1.4.0"
+
 eslint-plugin-jsx-a11y@^6.0.3:
   version "6.1.2"
   resolved "https://registry.yarnpkg.com/eslint-plugin-jsx-a11y/-/eslint-plugin-jsx-a11y-6.1.2.tgz#69bca4890b36dcf0fe16dd2129d2d88b98f33f88"
@@ -3120,6 +3158,16 @@ eslint-plugin-react-native@^3.2.1:
   integrity sha512-L0qwiBQbG3MVMQk4XVCyyX+9nqJjr9YUmqpJ98Gb+uAmD+xlxT33rDL9ZBQgzMzBxDcUW6WiPcll8j9uXpyLyQ==
   dependencies:
     eslint-plugin-react-native-globals "^0.1.1"
+
+eslint-plugin-react@7.7.0:
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-react/-/eslint-plugin-react-7.7.0.tgz#f606c719dbd8a1a2b3d25c16299813878cca0160"
+  integrity sha512-KC7Snr4YsWZD5flu6A5c0AcIZidzW3Exbqp7OT67OaD2AppJtlBr/GuPrW/vaQM/yfZotEvKAdrxrO+v8vwYJA==
+  dependencies:
+    doctrine "^2.0.2"
+    has "^1.0.1"
+    jsx-ast-utils "^2.0.1"
+    prop-types "^15.6.0"
 
 eslint-plugin-react@^7.7.0:
   version "7.11.1"
@@ -5250,6 +5298,11 @@ jstransform@^11.0.3:
     esprima-fb "^15001.1.0-dev-harmony-fb"
     object-assign "^2.0.0"
     source-map "^0.4.2"
+
+jsx-ast-utils@^1.4.0:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/jsx-ast-utils/-/jsx-ast-utils-1.4.1.tgz#3867213e8dd79bf1e8f2300c0cfc1efb182c0df1"
+  integrity sha1-OGchPo3Xm/Ho8jAMDPwe+xgsDfE=
 
 jsx-ast-utils@^2.0.1:
   version "2.0.1"
@@ -7780,7 +7833,7 @@ require-uncached@^1.0.3:
     caller-path "^0.1.0"
     resolve-from "^1.0.0"
 
-requireindex@^1.1.0:
+requireindex@^1.1.0, requireindex@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/requireindex/-/requireindex-1.2.0.tgz#3463cdb22ee151902635aa6c9535d4de9c2ef1ef"
   integrity sha512-L9jEkOi3ASd9PYit2cwRfyppc9NoABujTP8/5gFcbERmo5jUoAKovIC3fsF17pkTnGsrByysqX+Kxd2OTNI1ww==

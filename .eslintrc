@@ -11,13 +11,18 @@
     "flowtype"
   ],
   "extends": [
-    "./gutenberg/packages/eslint-config/index.js",
+    "plugin:@wordpress/eslint-plugin/recommended",
     "plugin:flowtype/recommended"
   ],
   "settings": {
     "flowtype": {
       "onlyFilesWithFlowAnnotation": true
-    }
+    },
+    "react": {
+      "pragma": "React",
+      "version": "16.6.1",
+      "flowVersion": "0.67.1"
+    },
   },
   "rules": {}
 }
