@@ -104,7 +104,7 @@ class RCTAztecView: Aztec.TextView {
     }
     
     private func interceptBackspace() -> Bool {
-        guard selectedRange.location == 0,
+        guard selectedRange.location == 0 && selectedRange.length == 0,
             let onBackspace = onBackspace else {
                 return false
         }
