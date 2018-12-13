@@ -19,9 +19,3 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidLoad()
 }
-
-// MARK: - Default / optional methods.
-
-extension GutenbergBridgeDelegate {
-    func gutenbergDidLoad() {}
-}
