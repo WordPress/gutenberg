@@ -80,14 +80,14 @@ edit( { attributes, setAttributes, className, isSelected } ) {
 }
 ```
 
-When calling `setAttributes`, it's important that attributes are not mutated in the process of updating them. This is considered bad practice, the core of Gutenberg has been written with the same philosophies as Redux and state is treated as immutable data. It can also cause bugs. Objects and arrays are passed as references in JavaScript, so mutating them can affect other bindings to those references, for example an attribute's default value.
+When using attributes that are objects or arrays it's a good idea to copy or clone the attribute prior to updating it:
 
 ```js
 // Good - here a new array is created from the old list attribute and a new list item:
 const { list } = attributes;
 const addListItem = ( newListItem ) => setAttributes( { list: [ ...list, newListItem ] } );
 
-// Bad - here the list from the existing attributes is mutated to add the new list item:
+// Bad - here the list from the existing attribute is modified directly to add the new list item:
 const { list } = attributes;
 const addListItem = ( newListItem ) => {
 	list.push( newListItem );
@@ -96,6 +96,7 @@ const addListItem = ( newListItem ) => {
 
 ```
 
+Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, Gutenberg follows the philisophy of the Redux library that state should be immutable—data should not be changed directly, but instead a new version of the data created containing the changes.
 
 ## Save
 
