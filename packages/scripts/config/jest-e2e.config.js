@@ -10,6 +10,11 @@ const { hasBabelConfig } = require( '../utils' );
 
 const jestE2EConfig = {
 	preset: 'jest-puppeteer',
+	testMatch: [
+		'**/__tests__/**/*.js',
+		'**/?(*.)(spec|test).js',
+		'**/test/*.js',
+	],
 };
 
 if ( ! hasBabelConfig() ) {
