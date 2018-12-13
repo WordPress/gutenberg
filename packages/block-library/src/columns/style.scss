@@ -26,20 +26,21 @@
 	@include break-small() {
 
 		// Beyond mobile, allow 2 columns.
-		flex-basis: 50%;
+		flex-basis: calc(50% - #{$grid-size-large});
 		flex-grow: 0;
 
-		// Add space between columns. Themes can customize this if they wish to work differently.
+		// Add space between the 2 columns. Themes can customize this if they wish to work differently.
 		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
-		margin-right: $grid-size-large * 2;
-		margin-left: $grid-size-large * 2;
-
-		&:first-child {
-			margin-left: 0;
+		&:nth-child(even) {
+			margin-left: $grid-size-large * 2;
 		}
+	}
+	
+	@include break-medium() {
 
-		&:last-child {
-			margin-right: 0;
+		// When columns are in a single row, add space before all except the first.
+		&:not(:first-child) {
+			margin-left: $grid-size-large * 2;
 		}
 	}
 }
