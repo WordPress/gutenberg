@@ -17,8 +17,7 @@ ToolsMoreMenuGroup.Slot = ( { fillProps } ) => (
 			<MenuGroup
 				role={ 'group' }
 				useEventToOffset={ false }
-				label={ __( 'Tools' ) }
-				>
+				label={ __( 'Tools' ) }>
 				{ fills }
 			</MenuGroup>
 		) }
