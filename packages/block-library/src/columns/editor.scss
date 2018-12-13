@@ -35,7 +35,7 @@
 		// Responsiveness: Allow wrapping on mobile.
 		flex-wrap: wrap;
 
-		@include break-small() {
+		@include break-medium() {
 			flex-wrap: nowrap;
 		}
 
@@ -89,7 +89,7 @@
 
 			// Beyond mobile, allow 2 columns.
 			@include break-small() {
-				flex-basis: calc(50% - #{$grid-size-large});
+				flex-basis: calc(50% - #{$grid-size-large} - #{$block-padding * 1.5});
 				flex-grow: 0;
 			}
 
