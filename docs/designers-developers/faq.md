@@ -327,7 +327,7 @@ There is also the [Classic Editor Plugin](https://wordpress.org/plugins/classic-
 
 ## How will custom TinyMCE buttons work in Gutenberg?
 
-Custom TinyMCE buttons will still work in the “Classic” block, which is a block version of the classic editor you know today.
+Custom TinyMCE buttons will still work in the “Classic” block, which is a block version of the Classic Editor you know today.
 
 (Gutenberg comes with a new universal inserter tool, which gives you access to every block available, searchable, sorted by recency and categories. This inserter tool levels the playing field for every plugin that adds content to the editor, and provides a single interface to learn how to use.)
 

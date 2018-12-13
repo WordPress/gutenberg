@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 function gutenberg_meta_box_save() {
 	/**
-	 * Needs classic editor to be active.
+	 * Needs Classic Editor to be active.
 	 *
 	 * @see https://github.com/WordPress/gutenberg/commit/bdf94e65ac0c10b3ce5d8e214f0c9e1081997d9b
 	 */

@@ -70,7 +70,7 @@ function _gutenberg_utf8_split( $str ) {
 }
 
 /**
- * Disables wpautop behavior in classic editor when post contains blocks, to
+ * Disables wpautop behavior in Classic Editor when post contains blocks, to
  * prevent removep from invalidating paragraph blocks.
  *
  * @param  array  $settings  Original editor settings.

@@ -412,7 +412,7 @@ export function createBlockWithFallback( blockNode ) {
 		name = 'core/paragraph';
 	}
 
-	// Fallback content may be upgraded from classic editor expecting implicit
+	// Fallback content may be upgraded from Classic Editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
 	if ( name === freeformContentFallbackBlock ) {

@@ -35,7 +35,7 @@ function the_gutenberg_project() {
 		if ( is_plugin_active( 'gutenberg/gutenberg.php' ) ) {
 			$current_url = esc_url( add_query_arg( 'classic-editor', true, $_SERVER['REQUEST_URI'] ) );
 			printf(
-				// Translators: link is to current page specify classic editor.
+				// Translators: link is to current page specify Classic Editor.
 				__( 'The Block Editor requires JavaScript. You can use the <a href="%s">Classic Editor</a>.', 'gutenberg' ),
 				$current_url
 			);
@@ -283,7 +283,7 @@ add_action( 'admin_init', 'gutenberg_add_edit_link_filters' );
 
 /**
  * Registers an additional link in the post/page screens to edit any post/page in
- * the Classic editor.
+ * the Classic Editor.
  *
  * @since 1.5.0
  *
@@ -335,7 +335,7 @@ function gutenberg_add_edit_link( $actions, $post ) {
 			esc_attr(
 				sprintf(
 					/* translators: %s: post title */
-					__( 'Edit &#8220;%s&#8221; in the classic editor', 'gutenberg' ),
+					__( 'Edit &#8220;%s&#8221; in the Classic Editor', 'gutenberg' ),
 					$title
 				)
 			),

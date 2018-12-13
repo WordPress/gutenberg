@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Collect information about meta_boxes registered for the current post.
  *
- * Redirects to classic editor if a meta box is incompatible.
+ * Redirects to Classic Editor if a meta box is incompatible.
  *
  * @since 1.5.0
  */
@@ -196,7 +196,7 @@ function gutenberg_collect_meta_box_data() {
 	 */
 	$_meta_boxes_copy = apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );
 
-	// Redirect to classic editor if a meta box is incompatible.
+	// Redirect to Classic Editor if a meta box is incompatible.
 	foreach ( $locations as $location ) {
 		if ( ! isset( $_meta_boxes_copy[ $post->post_type ][ $location ] ) ) {
 			continue;
@@ -564,7 +564,7 @@ function gutenberg_bulk_post_updated_messages( $messages, $bulk_counts ) {
 add_filter( 'bulk_post_updated_messages', 'gutenberg_bulk_post_updated_messages', 10, 2 );
 
 /**
- * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
+ * Injects a hidden input in the edit form to propagate the information that Classic Editor is selected.
  *
  * @since 1.5.2
  */
@@ -576,7 +576,7 @@ function gutenberg_remember_classic_editor_when_saving_posts() {
 add_action( 'edit_form_top', 'gutenberg_remember_classic_editor_when_saving_posts' );
 
 /**
- * Appends a query argument to the redirect url to make sure it gets redirected to the classic editor.
+ * Appends a query argument to the redirect url to make sure it gets redirected to the Classic Editor.
  *
  * @since 1.5.2
  *
