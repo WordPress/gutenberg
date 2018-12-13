@@ -94,7 +94,7 @@ function gutentag_enqueue() {
 add_action( 'enqueue_block_editor_assets', 'gutentag_enqueue' );
 ```
 
-You can now edit a draft post and add a Meta Block to the post. You will see your field which you can type a value you in. When you save the post, either as a draft or published, the post meta value will be saved too. You can see this if you save and reload your draft, the form will still be filled in on reload.
+You can now edit a draft post and add a Meta Block to the post. You will see your field which you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can see this if you save and reload your draft, the form will still be filled in on reload.
 
 ![Meta Block](../../../../../docs/designers-developers/developers/tutorials/metabox/meta-block.png)
 
