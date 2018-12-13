@@ -237,7 +237,9 @@ Adding blocks is easy enough, removing them is as easy. Plugin or theme authors 
 
 ```js
 // my-plugin.js
-wp.domReady( function() {
+window._wpLoadGutenbergEditor.then( function() {
+  wp.blocks.unregisterBlockType( "core/verse" );
+});
 	wp.blocks.unregisterBlockType( 'core/verse' );
 } );
 ```
