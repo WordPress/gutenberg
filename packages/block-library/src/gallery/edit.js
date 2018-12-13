@@ -8,6 +8,7 @@ import { filter, pick, map, get } from 'lodash';
  */
 import { Component, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 import {
 	IconButton,
 	DropZone,
@@ -32,7 +33,20 @@ import {
  */
 import GalleryImage from './gallery-image';
 
-const MAX_COLUMNS = 8;
+/**
+ * Filters the minimum number of allowed columns of the core/gallery block.
+ *
+ * @param {Number} number The column count. Defaults to 2.
+ */
+const MIN_COLUMNS = applyFilters( 'blocks.gallery.minColumns', 2 );
+
+/**
+ * Filters the maximum number of allowed columns of the core/gallery block.
+ *
+ * @param {Number} number The column count. Defaults to 6.
+ */
+const MAX_COLUMNS = applyFilters( 'blocks.gallery.maxColumns', 6 );
+
 const linkOptions = [
 	{ value: 'attachment', label: __( 'Attachment Page' ) },
 	{ value: 'media', label: __( 'Media File' ) },
@@ -243,8 +257,8 @@ class GalleryEdit extends Component {
 							label={ __( 'Columns' ) }
 							value={ columns }
 							onChange={ this.setColumnsNumber }
-							min={ 1 }
-							max={ Math.min( MAX_COLUMNS, images.length ) }
+							min={ Math.max( parseInt( MIN_COLUMNS, 10 ), 1 ) }
+							max={ Math.min( parseInt( MAX_COLUMNS, 10 ), images.length ) }
 						/> }
 						<ToggleControl
 							label={ __( 'Crop Images' ) }

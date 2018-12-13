@@ -11,6 +11,7 @@ import memoize from 'memize';
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl, G, SVG, Path } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
@@ -65,6 +66,27 @@ function getDeprecatedLayoutColumn( originalContent ) {
 	}
 }
 
+/**
+ * Filters the default number of columns of the core/columns block.
+ *
+ * @param {Number} number The column count. Defaults to 2.
+ */
+const DEFAULT_COLUMNS = applyFilters( 'blocks.columns.defaultColumns', 2 );
+
+/**
+ * Filters the minimum number of allowed columns of the core/columns block.
+ *
+ * @param {Number} number The column count. Defaults to 2.
+ */
+const MIN_COLUMNS = applyFilters( 'blocks.columns.minColumns', 2 );
+
+/**
+ * Filters the maximum number of allowed columns of the core/columns block.
+ *
+ * @param {Number} number The column count. Defaults to 6.
+ */
+const MAX_COLUMNS = applyFilters( 'blocks.columns.maxColumns', 6 );
+
 export const name = 'core/columns';
 
 export const settings = {
@@ -77,7 +99,7 @@ export const settings = {
 	attributes: {
 		columns: {
 			type: 'number',
-			default: 2,
+			default: parseInt( DEFAULT_COLUMNS, 10 ),
 		},
 	},
 
@@ -170,8 +192,8 @@ export const settings = {
 									columns: nextColumns,
 								} );
 							} }
-							min={ 2 }
-							max={ 6 }
+							min={ Math.max( parseInt( MIN_COLUMNS, 10 ), 1 ) }
+							max={ parseInt( MAX_COLUMNS, 10 ) }
 						/>
 					</PanelBody>
 				</InspectorControls>
