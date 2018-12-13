@@ -11,7 +11,7 @@
     "flowtype"
   ],
   "extends": [
-    "./gutengerg/packages/eslint-plugin/recommended",
+    "plugin:@wordpress/eslint-plugin/recommended",
     "plugin:flowtype/recommended"
   ],
   "settings": {
