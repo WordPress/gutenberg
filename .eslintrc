@@ -11,7 +11,7 @@
     "flowtype"
   ],
   "extends": [
-    "./gutenberg/packages/eslint-config/index.js",
+    "./gutengerg/packages/eslint-plugin/recommended",
     "plugin:flowtype/recommended"
   ],
   "settings": {
