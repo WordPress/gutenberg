@@ -145,6 +145,24 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?collegehumor\.com\/.+/i ],
 	},
 	{
+		name: 'core-embed/crowdsignal',
+		settings: {
+			title: 'Crowdsignal',
+			icon: embedContentIcon,
+			transform: [ {
+				type: 'block',
+				blocks: [ 'core-embed/polldaddy' ],
+				transform: ( content ) => {
+					return createBlock( 'core-embed/crowdsignal', {
+						content,
+					} );
+				},
+			} ],
+			description: __( 'Embed Crowdsignal content.' ),
+		},
+		patterns: [ /^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i ],
+	},
+	{
 		name: 'core-embed/dailymotion',
 		settings: {
 			title: 'Dailymotion',
@@ -209,13 +227,14 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
 	},
 	{
+		// Deprecated in favour of the core-embed/crowdsignal block
 		name: 'core-embed/polldaddy',
 		settings: {
 			title: 'Polldaddy',
 			icon: embedContentIcon,
 			description: __( 'Embed Polldaddy content.' ),
 		},
-		patterns: [ /^https?:\/\/(www\.)?polldaddy\.com\/.+/i ],
+		patterns: [],
 	},
 	{
 		name: 'core-embed/reddit',
