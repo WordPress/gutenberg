@@ -5,8 +5,9 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
   className="components-menu-group"
 >
   <div
-    className="components-menu-group__label"
+    className="components-menu-group__label "
     id="components-menu-group-label-0"
+    role="presentation"
   >
     Plugins
   </div>
@@ -14,7 +15,7 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
     aria-labelledby="components-menu-group-label-0"
     aria-orientation="vertical"
     onKeyDown={[Function]}
-    role="menu"
+    role="group"
   >
     <button
       aria-label="My plugin button menu item"
