@@ -11,8 +11,7 @@ export function OptionsMenuItem( { openModal, onSelect } ) {
 			role={ 'group' }
 			useEventToOffset={ false }
 			label={ __( 'Options' ) }
-			isScreenReaderLabel={ true }
-			>
+			isScreenReaderLabel={ true }>
 			<MenuItem
 				onClick={ () => {
 					onSelect();
