@@ -41,6 +41,6 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 
 ### Recap
 
-At this point, you have a plugin in the directory `wp-content/plugins/myguten-plugin` with two files. The PHP server-side code in `myguten-plugin.php`, and the JavaScript which runs in the browser in `myguten.js`.
+At this point, you have a plugin in the directory `wp-content/plugins/myguten-plugin` with two files: the PHP server-side code in `myguten-plugin.php`, and the JavaScript which runs in the browser in `myguten.js`.
 
 This puts all the initial pieces in place for you to start extending the Block Editor.
