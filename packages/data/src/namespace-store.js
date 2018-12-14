@@ -54,7 +54,7 @@ export default function createNamespace( key, options, registry ) {
 			lastState = state;
 
 			if ( hasChanged ) {
-				listener();
+				listener( key );
 			}
 		} );
 	};

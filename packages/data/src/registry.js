@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	castArray,
 	without,
 	mapValues,
 } from 'lodash';
@@ -11,6 +12,16 @@ import {
  */
 import createNamespace from './namespace-store.js';
 import dataStore from './store';
+
+/**
+ * Given an array of functions, invokes each function in the array with an
+ * empty argument set.
+ *
+ * @param {Function[]} fns Functions to invoke.
+ */
+function invokeForEach( fns ) {
+	fns.forEach( ( fn ) => fn() );
+}
 
 /**
  * An isolated orchestrator of store registrations.
@@ -40,27 +51,72 @@ import dataStore from './store';
  */
 export function createRegistry( storeConfigs = {} ) {
 	const stores = {};
-	let listeners = [];
+	let globalListeners = [];
+	const listenersByKey = {};
 
 	/**
 	 * Global listener called for each store's update.
+	 *
+	 * @param {?string} reducerKey Key of reducer which changed, if provided by
+	 *                             the registry implementation.
 	 */
-	function globalListener() {
-		listeners.forEach( ( listener ) => listener() );
+	function onStoreChange( reducerKey ) {
+		invokeForEach( globalListeners );
+
+		if ( reducerKey ) {
+			if ( listenersByKey[ reducerKey ] ) {
+				invokeForEach( listenersByKey[ reducerKey ] );
+			}
+		} else {
+			// For backwards compatibility with non-namespace-store, reducerKey
+			// is optional. If omitted, call every listenersByKey.
+			for ( const [ , listeners ] of Object.entries( listenersByKey ) ) {
+				invokeForEach( listeners );
+			}
+		}
 	}
 
 	/**
 	 * Subscribe to changes to any data.
 	 *
-	 * @param {Function}   listener Listener function.
+	 * @param {Function}               listener    Listener function.
+	 * @param {(string|Array<string>)} reducerKeys Subset of reducer keys on
+	 *                                             which subscribe function
+	 *                                             should be called.
 	 *
-	 * @return {Function}           Unsubscribe function.
+	 * @return {Function} Unsubscribe function.
 	 */
-	const subscribe = ( listener ) => {
-		listeners.push( listener );
+	const subscribe = ( listener, reducerKeys ) => {
+		if ( reducerKeys ) {
+			// Overload to support string argument of `reducerKeys`.
+			reducerKeys = castArray( reducerKeys );
+
+			reducerKeys.forEach( ( reducerKey ) => {
+				if ( ! listenersByKey[ reducerKey ] ) {
+					listenersByKey[ reducerKey ] = [];
+				}
+
+				listenersByKey[ reducerKey ].push( listener );
+			} );
+
+			return () => {
+				reducerKeys.forEach( ( reducerKey ) => {
+					listenersByKey[ reducerKey ] = without(
+						listenersByKey[ reducerKey ],
+						listener
+					);
+
+					if ( ! listenersByKey[ reducerKey ].length ) {
+						delete listenersByKey[ reducerKey ];
+					}
+				} );
+			};
+		}
+
+		globalListeners.push( listener );
 
 		return () => {
-			listeners = without( listeners, listener );
+			globalListeners = without( globalListeners, listener );
 		};
 	};
 
@@ -122,7 +178,7 @@ export function createRegistry( storeConfigs = {} ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
 		stores[ key ] = config;
-		config.subscribe( globalListener );
+		config.subscribe( onStoreChange );
 	}
 
 	let registry = {
