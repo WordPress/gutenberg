@@ -1,3 +1,7 @@
+
+/// Classes conforming this protocol are meant to do formatting work over an specific block.
+/// It is useful when we need to force an specific typing format that Aztec is not showing by default.
+///
 protocol BlockFormatHandler {
 
     /// Create an instance of a block formatter handler for the given block.
