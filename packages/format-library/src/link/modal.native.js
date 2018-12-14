@@ -61,7 +61,7 @@ class ModalLinkUI extends Component {
 		} );
 
 		if ( isCollapsed( value ) && ! isActive ) {
-			const toInsert = applyFormat( create( { text: url } ), format, 0, url.length );
+			const toInsert = applyFormat( create( { text } ), format, 0, text.length );
 			onChange( insert( value, toInsert ) );
 		} else {
 			onChange( applyFormat( value, format ) );
