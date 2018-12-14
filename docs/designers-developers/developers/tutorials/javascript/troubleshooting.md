@@ -25,7 +25,8 @@ The console log will show an error if a dependency your JavaScript code uses has
 You can correct by checking your `wp_enqueue_script` function includes all packages listed that are used:
 
 ```js
-wp_enqueue_script( 'myguten-script',
+wp_enqueue_script(
+	'myguten-script',
 	plugins_url( 'myguten.js', __FILE__ ),
 	array( 'wp-blocks' )
 );
