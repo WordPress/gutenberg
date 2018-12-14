@@ -8,9 +8,9 @@ A RangeControl for volume
 
 ## Table of contents
 
-1. [Design guidelines](http://#design-guidelines)
-2. [Development guidelines](http://#development-guidelines)
-3. [Related components](http://#related-components)
+1. [Design guidelines](#design-guidelines)
+2. [Development guidelines](#development-guidelines)
+3. [Related components](#related-components)
 
 ## Design guidelines
 
@@ -18,7 +18,7 @@ A RangeControl for volume
 
 ![](https://make.wordpress.org/design/files/2018/12/rangecontrol-anatomy.png)
 
-A RangeControls can contain the following elements:
+A RangeControl can contain the following elements:
 
 1. **Track**: The track shows the range available for user selection. For left-to-right (LTR) languages, the smallest value appears on the far left, and the largest value on the far right. For right-to-left (RTL) languages this orientation is reversed, with the smallest value on the far right and the largest value on the far left.
 2. **Thumb**: The thumb slides along the track, displaying the selected value through its position.
