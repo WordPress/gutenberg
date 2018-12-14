@@ -15,6 +15,7 @@ import {
 	isCollapsed,
 	applyFormat,
 	getTextContent,
+	remove,
 	slice,
 } from '@wordpress/rich-text';
 
@@ -63,6 +64,9 @@ class ModalLinkUI extends Component {
 		if ( isCollapsed( value ) && ! isActive ) {
 			const toInsert = applyFormat( create( { text } ), format, 0, text.length );
 			onChange( insert( value, toInsert ) );
+		} else if ( text !== getTextContent( slice( value ) ) ) {
+			const toInsert = applyFormat( create( { text } ), format, 0, text.length );
+			onChange( insert( value, toInsert, value.start, value.end ) );
 		} else {
 			onChange( applyFormat( value, format ) );
 		}
