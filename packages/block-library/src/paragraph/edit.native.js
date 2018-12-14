@@ -99,11 +99,9 @@ class ParagraphEdit extends Component {
 						...style,
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
-					onChange={ ( content ) => {
-						// Create a React Tree from the new HTML
-						//const newParaBlock = parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
+					onChange={ ( nextContent ) => {
 						setAttributes( {
-							content,
+							content: nextContent,
 						} );
 					} }
 					onSplit={ this.splitBlock }
