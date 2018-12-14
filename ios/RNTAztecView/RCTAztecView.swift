@@ -12,6 +12,20 @@ class RCTAztecView: Aztec.TextView {
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
     @objc var onActiveFormatAttributesChange: RCTBubblingEventBlock? = nil
+    @objc var blockType: NSDictionary? = nil {
+        didSet {
+            guard let block = blockType, let tag = block["tag"] as? String else {
+                return
+            }
+            blockModel = BlockModel(tag: tag)
+        }
+    }
+
+    var blockModel = BlockModel(tag: "") {
+        didSet {
+            handleBlockTypeChangeIfNeeded(with: blockModel)
+        }
+    }
 
     private var previousContentSize: CGSize = .zero
 
@@ -219,6 +233,18 @@ class RCTAztecView: Aztec.TextView {
         }
         return attributes
     }
+
+    func handleBlockTypeChangeIfNeeded(with block: BlockModel) {
+        if let formatHandler = HeadingBlockFormatHandler(block: block) {
+            formatHandler.reformatContent(with: block, textView: self)
+        }
+    }
+
+    func forceTypingAttributesIfNeeded() {
+        if let formatHandler = HeadingBlockFormatHandler(block: blockModel) {
+            formatHandler.forceTypingFormat(with: blockModel, textView: self)
+        }
+    }
     
     // MARK: - Event Propagation
     
@@ -273,6 +299,7 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
+        forceTypingAttributesIfNeeded()
         propagateFormatChanges()
         propagateContentChanges()
     }

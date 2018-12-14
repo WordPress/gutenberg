@@ -27,6 +27,7 @@ class AztecView extends React.Component {
     onActiveFormatAttributesChange: PropTypes.func,
     onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
+    blockType: PropTypes.object,
     ...ViewPropTypes, // include the default view properties
   }
 
