@@ -22,9 +22,6 @@
 	"dependencies": {
 		"@babel/runtime": "^7.0.0"
 	},
-	"devDependencies": {
-		"benchmark": "^2.1.4"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

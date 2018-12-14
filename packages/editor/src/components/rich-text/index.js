@@ -129,6 +129,10 @@ export class RichText extends Component {
 		this.lastHistoryValue = value;
 	}
 
+	componentWillUnmount() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+	}
+
 	setRef( node ) {
 		this.editableRef = node;
 	}

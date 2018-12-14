@@ -26,11 +26,6 @@
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"lodash": "^4.17.10"
 	},
-	"devDependencies": {
-		"enzyme": "^3.7.0",
-		"react-dom": "^16.6.3",
-		"react-test-renderer": "^16.6.3"
-	},
 	"publishConfig": {
 		"access": "public"
 	}
