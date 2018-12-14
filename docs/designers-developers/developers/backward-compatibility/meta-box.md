@@ -21,18 +21,18 @@ WordPress will fall back to the Classic editor, where the meta box will continue
 
 Explicitly setting `__block_editor_compatible_meta_box` to `true` will cause WordPress to stay in Gutenberg (assuming another meta box doesn't cause a fallback).
 
-After a meta box is converted to a block, it can be declared as existing for backwards compatibility:
+After a meta box is converted to a block, it can be declared as existing for backward compatibility:
 
 ```php
 add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 	null, 'normal', 'high',
 	array(
-		'__back_compat_meta_box' => false,
+		'__back_compat_meta_box' => true,
 	)
 );
 ```
 
-When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backwards compatibility purposes. It will continue to display correctly in the Classic editor, should some other meta box cause a fallback.
+When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor, should some other meta box cause a fallback.
 
 ### Meta Box Data Collection
 
@@ -42,7 +42,7 @@ See `lib/register.php gutenberg_trick_plugins_into_registering_meta_boxes()`
 
 `gutenberg_collect_meta_box_data()` is hooked in later on `admin_head`. It will run through the functions and hooks that `post.php` runs to register meta boxes; namely `add_meta_boxes`, `add_meta_boxes_{$post->post_type}`, and `do_meta_boxes`.
 
-A copy of the global `$wp_meta_boxes` is made then filtered through `apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );`, which will strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backwards compatibility purposes.
+A copy of the global `$wp_meta_boxes` is made then filtered through `apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );`, which will strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backward compatibility purposes.
 
 Then each location for this particular type of meta box is checked for whether it is active. If it is not empty a value of true is stored, if it is empty a value of false is stored. This meta box location data is then dispatched by the editor Redux store in `INITIALIZE_META_BOX_STATE`.
 

@@ -27,7 +27,9 @@
 	"main": "build/index.js",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0",
-		"postcss": "^6.0.16"
+		"autoprefixer": "^8.2.0",
+		"postcss": "^6.0.16",
+		"postcss-color-function": "^4.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

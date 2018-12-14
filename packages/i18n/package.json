@@ -30,9 +30,6 @@
 		"sprintf-js": "^1.1.1",
 		"tannin": "^1.0.1"
 	},
-	"devDependencies": {
-		"benchmark": "^2.1.4"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

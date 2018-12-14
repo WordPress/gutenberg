@@ -79,7 +79,7 @@ const effects = {
 
 		const state = store.getState();
 
-		// Additional data needed for backwards compatibility.
+		// Additional data needed for backward compatibility.
 		// If we do not provide this data, the post will be overridden with the default values.
 		const post = select( 'core/editor' ).getCurrentPost( state );
 		const additionalData = [
