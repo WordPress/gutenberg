@@ -9,20 +9,19 @@ import { withInstanceId } from '@wordpress/compose';
 
 class URLInput extends Component {
 	render() {
-		const { value = '', autoFocus = true } = this.props;
+		const { value = '', autoFocus = true, ...extraProps } = this.props;
 		/* eslint-disable jsx-a11y/no-autofocus */
 		return (
-			<View>
-				<TextInput
-					autoFocus={ autoFocus }
-					editable
-					selectTextOnFocus
-					textContentType="URL"
-					value={ value }
-					onChangeText={ this.props.onChange }
-					placeholder={ __( 'Paste URL or type to search' ) }
-				/>
-			</View>
+			<TextInput
+				autoFocus={ autoFocus }
+				editable
+				selectTextOnFocus
+				textContentType="URL"
+				value={ value }
+				onChangeText={ this.props.onChange }
+				placeholder={ __( 'Paste URL' ) }
+				{ ...extraProps }
+			/>
 		);
 		/* eslint-enable jsx-a11y/no-autofocus */
 	}

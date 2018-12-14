@@ -8,6 +8,33 @@
 	background-color: $white;
 	padding: 22px;
 	justify-content: center;
-	align-items: center;
-	border-radius: 4px;
+	border-radius: 8px;
+}
+
+.head {
+	width: 100%;
+	height: auto;
+	flex-direction: row;
+	align-content: center;
+	justify-content: space-between;
+}
+
+.title {
+	font-size: 18px;
+}
+
+.inlineInput {
+	flex-direction: row;
+	width: 100%;
+	justify-content: space-between;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-top: 1px solid $light-gray-500;
+}
+
+.inlineInputText {
+	padding: 5px 10px 5px 0;
+	color: $dark-gray-600;
+	font-size: 14px;
+	font-weight: bold;
 }

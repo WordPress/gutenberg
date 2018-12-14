@@ -18,6 +18,7 @@ import {
 	getFragment,
 	isValidFragment,
 } from '@wordpress/url';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Check for issues with the provided href.

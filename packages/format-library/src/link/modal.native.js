@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Button, Switch, Text, TextInput, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
@@ -23,14 +23,17 @@ import { createLinkFormat, isValidHref } from './utils';
 import styles from './modal.scss';
 
 class ModalLinkUI extends Component {
-	constructor() {
+	constructor( props ) {
 		super( ...arguments );
 
 		this.submitLink = this.submitLink.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
+		this.onChangeText = this.onChangeText.bind( this );
+		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind( this );
 
 		this.state = {
 			inputValue: '',
+			text: getTextContent( slice( props.value ) ),
 			opensInNewWindow: false,
 		};
 	}
@@ -39,15 +42,22 @@ class ModalLinkUI extends Component {
 		this.setState( { inputValue } );
 	}
 
+	onChangeText( text ) {
+		this.setState( { text } );
+	}
+
+	onChangeOpensInNewWindow( opensInNewWindow ) {
+		this.setState( { opensInNewWindow } );
+	}
+
 	submitLink() {
 		const { isActive, value, onChange, speak } = this.props;
-		const { inputValue, opensInNewWindow } = this.state;
+		const { inputValue, opensInNewWindow, text } = this.state;
 		const url = prependHTTP( inputValue );
-		const selectedText = getTextContent( slice( value ) );
 		const format = createLinkFormat( {
 			url,
 			opensInNewWindow,
-			text: selectedText,
+			text,
 		} );
 
 		if ( isCollapsed( value ) && ! isActive ) {
@@ -69,7 +79,7 @@ class ModalLinkUI extends Component {
 	}
 
 	render() {
-		const { value, isVisible } = this.props;
+		const { isVisible } = this.props;
 
 		return (
 			<Modal
@@ -79,13 +89,59 @@ class ModalLinkUI extends Component {
 				animationOutTiming={ 500 }
 				backdropTransitionInTiming={ 500 }
 				backdropTransitionOutTiming={ 500 }
-				onBackdropPress={ this.submitLink }
-				onSwipe={ this.submitLink }
+				onBackdropPress={ this.props.onClose }
+				onSwipe={ this.props.onClose }
 				swipeDirection="down"
 			>
 				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
-					<URLInput value={ this.state.inputValue } onChange={ this.onChangeInputValue } />
-					<Text>{ value.text }</Text>
+					<View style={ styles.head }>
+						<Button
+							color="red"
+							title={ __( 'Remove' ) }
+							accessibilityLabel={ __( 'Remove the link' ) }
+							onPress={ this.props.onRemove }
+						/>
+						<View>
+							<Text style={ styles.title }>
+								{ __( 'Link Settings' ) }
+							</Text>
+						</View>
+						<Button
+							color="blue"
+							title={ __( 'Done' ) }
+							accessibilityLabel={ __( 'Finish editing the link' ) }
+							onPress={ this.submitLink }
+						/>
+					</View>
+					<View style={ styles.inlineInput }>
+						<Text style={ styles.inlineInputText }>
+							{ __( 'URL' ) }
+						</Text>
+						<URLInput
+							containerStyle={ { flexGrow: 1 } }
+							value={ this.state.inputValue }
+							onChange={ this.onChangeInputValue }
+						/>
+					</View>
+					<View style={ styles.inlineInput }>
+						<Text style={ styles.inlineInputText }>
+							{ __( 'Link Text' ) }
+						</Text>
+						<TextInput
+							containerStyle={ { flexGrow: 1 } }
+							value={ this.state.text }
+							onChangeText={ this.onChangeText }
+						/>
+					</View>
+					<View style={ styles.inlineInput }>
+						<Text style={ styles.inlineInputText }>
+							{ __( 'Open in a new window' ) }
+						</Text>
+						<Switch
+							value={ this.state.opensInNewWindow }
+							onValueChange={ this.onChangeOpensInNewWindow }
+						/>
+					</View>
 				</View>
 			</Modal>
 		);
