@@ -33,7 +33,7 @@ class ModalLinkUI extends Component {
 		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind( this );
 
 		this.state = {
-			inputValue: '',
+			inputValue: props.activeAttributes.url || '',
 			text: getTextContent( slice( props.value ) ),
 			opensInNewWindow: false,
 		};
