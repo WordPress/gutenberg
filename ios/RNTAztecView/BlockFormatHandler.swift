@@ -7,9 +7,5 @@ protocol BlockFormatHandler {
 
     /// Set the typing format to an specific one.
     ///
-    func forceTypingFormat(with block: BlockModel, textView: RCTAztecView)
-
-    /// Change format of all the textview's content.
-    ///
-    func reformatContent(with block: BlockModel, textView: RCTAztecView)
+    func forceTypingFormat(on textView: RCTAztecView)
 }

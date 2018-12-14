@@ -10,24 +10,10 @@ struct HeadingBlockFormatHandler: BlockFormatHandler {
         self.level = level
     }
 
-    func forceTypingFormat(with block: BlockModel, textView: RCTAztecView) {
+    func forceTypingFormat(on textView: RCTAztecView) {
         let attributes = textView.typingAttributesSwifted
         let formatter = HeaderFormatter(headerLevel: level)
         textView.typingAttributesSwifted = formatter.apply(to: attributes, andStore: nil)
-    }
-
-    func reformatContent(with block: BlockModel, textView: RCTAztecView) {
-        resetTextViewContentWithoutHTMLTags(textView)
-        textView.toggleHeader(level, range: contentRange(of: textView))
-    }
-
-    private func resetTextViewContentWithoutHTMLTags(_ textView: RCTAztecView) {
-        let content = textView.text ?? ""
-        textView.setHTML(content) // needed to remove extra <p> tags.
-    }
-
-    private func contentRange(of textView: RCTAztecView) -> NSRange {
-        return NSRange(location: 0, length: textView.text.utf16.count)
     }
 
     private static func headerLevel(from levelString: String) -> Header.HeaderType? {

@@ -21,11 +21,7 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    var blockModel = BlockModel(tag: "") {
-        didSet {
-            handleBlockTypeChangeIfNeeded(with: blockModel)
-        }
-    }
+    var blockModel = BlockModel(tag: "")
 
     private var previousContentSize: CGSize = .zero
 
@@ -164,7 +160,7 @@ class RCTAztecView: Aztec.TextView {
         }
         
         let html = contents["text"] as? String ?? ""
-        
+
         setHTML(html)
         updatePlaceholderVisibility()
     }
@@ -234,15 +230,9 @@ class RCTAztecView: Aztec.TextView {
         return attributes
     }
 
-    func handleBlockTypeChangeIfNeeded(with block: BlockModel) {
-        if let formatHandler = HeadingBlockFormatHandler(block: block) {
-            formatHandler.reformatContent(with: block, textView: self)
-        }
-    }
-
     func forceTypingAttributesIfNeeded() {
         if let formatHandler = HeadingBlockFormatHandler(block: blockModel) {
-            formatHandler.forceTypingFormat(with: blockModel, textView: self)
+            formatHandler.forceTypingFormat(on: self)
         }
     }
     
@@ -311,6 +301,4 @@ extension RCTAztecView: UITextViewDelegate {
     func textViewDidEndEditing(_ textView: UITextView) {
         onBlur?([:])
     }
-
 }
-
