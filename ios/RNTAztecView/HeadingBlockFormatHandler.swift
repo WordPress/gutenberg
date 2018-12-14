@@ -11,9 +11,18 @@ struct HeadingBlockFormatHandler: BlockFormatHandler {
     }
 
     func forceTypingFormat(on textView: RCTAztecView) {
+        textView.text = ensureNonEmptyString(textView.text)
         let attributes = textView.typingAttributesSwifted
         let formatter = HeaderFormatter(headerLevel: level)
         textView.typingAttributesSwifted = formatter.apply(to: attributes, andStore: nil)
+    }
+
+    private func ensureNonEmptyString(_ content: String) -> String {
+        let zeroWithSpace = String(Character.Name.zeroWidthSpace.rawValue)
+        guard content.isEmpty else {
+            return content.replacingOccurrences(of: zeroWithSpace, with: "")
+        }
+        return content.appending(zeroWithSpace)
     }
 
     private static func headerLevel(from levelString: String) -> Header.HeaderType? {
