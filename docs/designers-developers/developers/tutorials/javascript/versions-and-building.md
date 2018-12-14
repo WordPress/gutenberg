@@ -1,5 +1,4 @@
-
-## JavaScript versions and build step
+# JavaScript versions and build step
 
 The Gutenberg Handbook shows JavaScript examples in two syntaxes ES5 and ESNext. These are version names for the JavaScript language standard definitions. You may also see elsewhere the versions ES6, or ECMAScript 2015 mentioned. Ses the [ECMAScript](https://en.wikipedia.org/wiki/ECMAScript) Wikipedia article for all the details.
 

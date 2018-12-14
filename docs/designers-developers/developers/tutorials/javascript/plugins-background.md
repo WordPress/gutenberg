@@ -1,5 +1,4 @@
-
-## Plugins Background
+# Plugins Background
 
 The primary means of extending WordPress remains the plugin, see [Plugin Basics](https://developer.wordpress.org/plugins/the-basics/) for more details on developing plugins for WordPress. The quick start is to create a new directory in `wp-content/plugins/` to hold your plugin code, for this example you can call it `myguten-plugin`.
 

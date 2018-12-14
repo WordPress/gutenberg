@@ -1,4 +1,3 @@
-
 # Getting Started with JavaScript
 
 The purpose of this tutorial is to step through getting started with JavaScript and WordPress, specifically around the new Block Editor. The Gutenberg Handbook documentation contains information on the APIs available for working with the block editor. The goal of this tutorial is get you comfortable on how to use the API reference and snippets of code found within.

@@ -1,5 +1,4 @@
-
-## Loading JavaScript
+# Loading JavaScript
 
 With the plugin in place, you can add the code that loads the JavaScript. This methodology follows the standard WordPress procedure of enqueuing scripts, see [enqueuing section of the Plugin Handbook](https://developer.wordpress.org/plugins/javascript/enqueuing/).
 

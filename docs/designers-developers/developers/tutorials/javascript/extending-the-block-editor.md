@@ -1,5 +1,4 @@
-
-## Extending the Block Editor
+# Extending the Block Editor
 
 Let's look at using the [Block Style Variation example](../../../../../docs/designers-developers/developers/filters/block-filters.md#block-style-variations) to extend the editor. This example allows you to add your own custom CSS class name to any core block type.
 
