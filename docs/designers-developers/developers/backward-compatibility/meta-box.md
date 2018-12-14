@@ -21,18 +21,18 @@ WordPress will fall back to the Classic editor, where the meta box will continue
 
 Explicitly setting `__block_editor_compatible_meta_box` to `true` will cause WordPress to stay in Gutenberg (assuming another meta box doesn't cause a fallback).
 
-After a meta box is converted to a block, it can be declared as existing for backwards compatibility:
+After a meta box is converted to a block, it can be declared as existing for backward compatibility:
 
 ```php
 add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 	null, 'normal', 'high',
 	array(
-		'__back_compat_meta_box' => false,
+		'__back_compat_meta_box' => true,
 	)
 );
 ```
 
-When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backwards compatibility purposes. It will continue to display correctly in the Classic editor, should some other meta box cause a fallback.
+When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor, should some other meta box cause a fallback.
 
 ### Meta Box Data Collection
 
@@ -42,7 +42,7 @@ See `lib/register.php gutenberg_trick_plugins_into_registering_meta_boxes()`
 
 `gutenberg_collect_meta_box_data()` is hooked in later on `admin_head`. It will run through the functions and hooks that `post.php` runs to register meta boxes; namely `add_meta_boxes`, `add_meta_boxes_{$post->post_type}`, and `do_meta_boxes`.
 
-A copy of the global `$wp_meta_boxes` is made then filtered through `apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );`, which will strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backwards compatibility purposes.
+A copy of the global `$wp_meta_boxes` is made then filtered through `apply_filters( 'filter_gutenberg_meta_boxes', $_meta_boxes_copy );`, which will strip out any core meta boxes, standard custom taxonomy meta boxes, and any meta boxes that have declared themselves as only existing for backward compatibility purposes.
 
 Then each location for this particular type of meta box is checked for whether it is active. If it is not empty a value of true is stored, if it is empty a value of false is stored. This meta box location data is then dispatched by the editor Redux store in `INITIALIZE_META_BOX_STATE`.
 
@@ -82,3 +82,5 @@ Most PHP meta boxes should continue to work in Gutenberg, but some meta boxes th
 - Plugins relying on selectors that target the post title, post content fields, and other metaboxes (of the old editor).
 - Plugins relying on TinyMCE's API because there's no longer a single TinyMCE instance to talk to in Gutenberg.
 - Plugins making updates to their DOM on "submit" or on "save".
+
+Please also note that if your plugin triggers a PHP warning or notice to be output on the page, this will cause the HTML document type (`<!DOCTYPE html>`) to be output incorrectly. This will cause the browser to render using "Quirks Mode", which is a compatibility layer that gets enabled when the browser doesn't know what type of document it is parsing. The block editor is not meant to work in this mode, but it can _appear_ to be working just fine. If you encounter issues such as *meta boxes overlaying the editor* or other layout issues, please check the raw page source of your document to see that the document type definition is the first thing output on the page. There will also be a warning in the JavaScript console, noting the issue.

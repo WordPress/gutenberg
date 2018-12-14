@@ -120,4 +120,7 @@ This list is manually curated to include valuable contributions by volunteers th
 | @getsource | @mikeschroder |
 | @greatislander | @greatislander |
 | @sharazghouri | @sharaz |
-| @jakeparis | |
+| @jakeparis | @jakeparis |
+| @designsimply | @designsimply |
+| @aldavigdis | @aldavigdis |
+| @miya0001 | @miyauchi |

@@ -100,23 +100,6 @@ function gutenberg_add_rest_nonce_to_heartbeat_response_headers( $response ) {
 add_filter( 'wp_refresh_nonces', 'gutenberg_add_rest_nonce_to_heartbeat_response_headers' );
 
 /**
- * As a substitute for the default content `wpautop` filter, applies autop
- * behavior only for posts where content does not contain blocks.
- *
- * @param  string $content Post content.
- * @return string          Paragraph-converted text if non-block content.
- */
-function gutenberg_wpautop( $content ) {
-	if ( has_blocks( $content ) ) {
-		return $content;
-	}
-
-	return wpautop( $content );
-}
-remove_filter( 'the_content', 'wpautop' );
-add_filter( 'the_content', 'gutenberg_wpautop', 6 );
-
-/**
  * Check if we need to load the block warning in the Classic Editor.
  *
  * @since 3.4.0

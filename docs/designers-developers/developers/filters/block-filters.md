@@ -113,13 +113,9 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.isUnmodifiedDefaultBlock.attributes`
-
-Used internally by the default block (paragraph) to exclude the attributes from the check if the block was modified.
-
 #### `blocks.switchToBlockType.transformedBlock`
 
-Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
+Used to filter an individual transform result from block transformation. All of the original blocks are passed since transformations are many-to-many, not one-to-one.
 
 #### `blocks.getBlockAttributes`
 
@@ -198,19 +194,13 @@ _Example:_
 ```js
 var el = wp.element.createElement;
 
-var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
+var withClientIdClassName = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
 	return function( props ) {
 		var newProps = lodash.assign(
 			{},
 			props,
 			{
-				wrapperProps: lodash.assign(
-					{},
-					props.wrapperProps,
-					{
-						'data-align': props.block.attributes.align
-					}
-				)
+				classsName: "block-" + props.clientId,
 			}
 		);
 
@@ -219,27 +209,22 @@ var withDataAlign = wp.compose.createHigherOrderComponent( function( BlockListBl
 			newProps
 		);
 	};
-}, 'withAlign' );
+}, 'withClientIdClassName' );
 
-wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
 
 ```
 {% ESNext %}
 ```js
 const { createHigherOrderComponent } = wp.compose;
 
-const withDataAlign = createHigherOrderComponent( ( BlockListBlock ) => {
+const withClientIdClassName = createHigherOrderComponent( ( BlockListBlock ) => {
 	return ( props ) => {
-		const { align } = props.block.attributes;
-
-		let wrapperProps = props.wrapperProps;
-		wrapperProps = { ...wrapperProps, 'data-align': align };
-
-		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+		return <BlockListBlock { ...props } className={ "block-" + props.clientId } />;
 	};
-}, 'withDataAlign' );
+}, 'withClientIdClassName' );
 
-wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-data-align', withDataAlign );
+wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
 ```
 
 {% end %}
@@ -329,7 +314,7 @@ function my_plugin_block_categories( $categories, $post ) {
 			array(
 				'slug' => 'my-category',
 				'title' => __( 'My category', 'my-plugin' ),
-				'icon'  => '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>',
+				'icon'  => 'wordpress',
 			),
 		)
 	);
@@ -337,4 +322,18 @@ function my_plugin_block_categories( $categories, $post ) {
 add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
 
-You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
+
+It is possible to set an SVG as the icon of the category if a custom icon is needed. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
+
+To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
+```js
+( function() {
+	var el = wp.element.createElement;
+	var SVG = wp.components.SVG;
+	var circle = el( 'circle', { cx: 10, cy: 10, r: 10, fill: 'red', stroke: 'blue', strokeWidth: '10' } );
+	var svgIcon = el( SVG, { width: 20, height: 20, viewBox: '0 0 20 20'}, circle);
+	wp.blocks.updateCategory( 'my-category', { icon: svgIcon } );
+} )();
+``` 
+

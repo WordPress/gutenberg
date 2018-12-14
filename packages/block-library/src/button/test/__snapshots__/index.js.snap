@@ -16,7 +16,6 @@ exports[`core/button block edit matches snapshot 1`] = `
           >
             <div
               aria-autocomplete="list"
-              aria-expanded="false"
               aria-label="Add text…"
               aria-multiline="true"
               class="wp-block-button__link editor-rich-text__tinymce"

@@ -11,6 +11,7 @@ import {
 	newPost,
 	getUrl,
 	publishPost,
+	saveDraft,
 } from '../support/utils';
 
 describe( 'Preview', () => {
@@ -124,6 +125,43 @@ describe( 'Preview', () => {
 		// Title in preview should match updated input.
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World! And more.' );
+
+		await previewPage.close();
+	} );
+
+	it( 'Should not revert title during a preview right after a save draft', async () => {
+		const editorPage = page;
+
+		// Type aaaaa in the title filed.
+		await editorPage.type( '.editor-post-title__input', 'aaaaa' );
+		await editorPage.keyboard.press( 'Tab' );
+
+		// Save the post as a draft.
+		await editorPage.waitForSelector( '.editor-post-save-draft' );
+		await saveDraft();
+
+		// Open the preview page.
+		const previewPage = await openPreviewPage( editorPage );
+
+		// Title in preview should match input.
+		let previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		expect( previewTitle ).toBe( 'aaaaa' );
+
+		// Return to editor.
+		await editorPage.bringToFront();
+
+		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
+		await editorPage.type( '.editor-post-title__input', 'bbbbb' );
+		await editorPage.keyboard.press( 'Tab' );
+
+		// Save draft and open the preview page right after.
+		await editorPage.waitForSelector( '.editor-post-save-draft' );
+		await saveDraft();
+		await waitForPreviewNavigation( previewPage );
+
+		// Title in preview should match updated input.
+		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		expect( previewTitle ).toBe( 'aaaaabbbbb' );
 
 		await previewPage.close();
 	} );

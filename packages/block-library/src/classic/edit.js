@@ -5,6 +5,8 @@ import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
+const { wp } = window;
+
 function isTmceEmpty( editor ) {
 	// When tinyMce is empty the content seems to be:
 	// <p><br data-mce-bogus="1"></p>
@@ -76,6 +78,7 @@ export default class ClassicEdit extends Component {
 	onSetup( editor ) {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
+		let bookmark;
 
 		this.editor = editor;
 
@@ -84,10 +87,23 @@ export default class ClassicEdit extends Component {
 		}
 
 		editor.on( 'blur', () => {
+			bookmark = editor.selection.getBookmark( 2, true );
+
 			setAttributes( {
 				content: editor.getContent(),
 			} );
+
+			editor.once( 'focus', () => {
+				if ( bookmark ) {
+					editor.selection.moveToBookmark( bookmark );
+				}
+			} );
+
 			return false;
+		} );
+
+		editor.on( 'mousedown touchstart', () => {
+			bookmark = null;
 		} );
 
 		editor.on( 'keydown', ( event ) => {
