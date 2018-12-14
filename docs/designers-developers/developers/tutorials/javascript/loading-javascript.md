@@ -28,7 +28,7 @@ We'll check the JavaScript console in your browser's Developer Tools, to see if 
 If your code is registered and enqueued correctly, you should see a message in your console:
 
 
-**Note for Theme Developers:**  The above method of enqueing is used for plugins, if you are extending the Block Editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
+**Note for Theme Developers:**  The above method of enqueing is used for plugins. If you are extending the Block Editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
 
 ```php
 function myguten_enqueue() {
