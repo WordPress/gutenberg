@@ -64,13 +64,16 @@ export const link = {
 		}
 
 		render() {
-			const { isActive, value } = this.props;
+			const { isActive, activeAttributes, value, onChange } = this.props;
 
 			return (
 				<Fragment>
 					<ModalLinkUI
+						isActive={ isActive }
+						activeAttributes={ activeAttributes }
 						isVisible={ this.state.addingLink }
 						onClose={ this.stopAddingLink }
+						onChange={ onChange }
 						value={ value }
 					/>
 					<RichTextToolbarButton
