@@ -292,8 +292,6 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
-		} else if ( ! this.props.isSelected && prevProps.isSelected ) {
-			this._editor.blur();
 		}
 	}
 
