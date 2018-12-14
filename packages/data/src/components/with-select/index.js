@@ -33,15 +33,42 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 	/**
 	 * Given a props object, returns the next merge props by mapSelectToProps.
 	 *
-	 * @param {Object} props Props to pass as argument to mapSelectToProps.
+	 * @param {Function}       select   Selector getter function.
+	 * @param {Object}         ownProps The incoming props to the component.
+	 * @param {WPDataRegistry} registry Contextual data registry.
 	 *
 	 * @return {Object} Props to merge into rendered wrapped element.
 	 */
-	function getNextMergeProps( props ) {
+	function getNextMergeProps( select, ownProps, registry ) {
 		return (
-			mapSelectToProps( props.registry.select, props.ownProps, props.registry ) ||
+			mapSelectToProps( select, ownProps, registry ) ||
 			DEFAULT_MERGE_PROPS
 		);
+	}
+
+	/**
+	 * Given a select function, returns an enhanced function which returns the
+	 * same result, but also observes the unique set of reducer keys with which
+	 * the function has been called. The keys can be retrieved by calling the
+	 * `getReducerKeys` function on the returned enhanced function.
+	 *
+	 * @param {Function} select Original select function.
+	 *
+	 * @return {Function} Enhanced select function.
+	 */
+	function createObservedSelect( select ) {
+		const reducerKeys = {};
+
+		function observedSelect( reducerKey ) {
+			reducerKeys[ reducerKey ] = true;
+			return select( reducerKey );
+		}
+
+		observedSelect.getReducerKeys = function() {
+			return Object.keys( reducerKeys );
+		};
+
+		return observedSelect;
 	}
 
 	class ComponentWithSelect extends Component {
@@ -50,9 +77,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 
 			this.onStoreChange = this.onStoreChange.bind( this );
 
-			this.subscribe( props.registry );
-
-			this.mergeProps = getNextMergeProps( props );
+			this.subscribe( props );
 		}
 
 		componentDidMount() {
@@ -77,7 +102,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			const hasRegistryChanged = nextProps.registry !== this.props.registry;
 			if ( hasRegistryChanged ) {
 				this.unsubscribe();
-				this.subscribe( nextProps.registry );
+				this.subscribe( nextProps );
 			}
 
 			// Treat a registry change as equivalent to `ownProps`, to reflect
@@ -94,7 +119,8 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			}
 
 			if ( hasPropsChanged ) {
-				const nextMergeProps = getNextMergeProps( nextProps );
+				const { registry, ownProps } = nextProps;
+				const nextMergeProps = getNextMergeProps( registry.select, ownProps, registry );
 				if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
 					// If merge props change as a result of the incoming props,
 					// they should be reflected as such in the upcoming render.
@@ -119,7 +145,8 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 				return;
 			}
 
-			const nextMergeProps = getNextMergeProps( this.props );
+			const { registry, ownProps } = this.props;
+			const nextMergeProps = getNextMergeProps( registry.select, ownProps, registry );
 			if ( isShallowEqual( this.mergeProps, nextMergeProps ) ) {
 				return;
 			}
@@ -136,8 +163,14 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			this.setState( {} );
 		}
 
-		subscribe( registry ) {
-			this.unsubscribe = registry.subscribe( this.onStoreChange );
+		subscribe( props ) {
+			const { registry, ownProps } = props;
+
+			const observedSelect = createObservedSelect( registry.select );
+
+			this.mergeProps = getNextMergeProps( observedSelect, ownProps, registry );
+
+			this.unsubscribe = registry.subscribe( this.onStoreChange, observedSelect.getReducerKeys() );
 		}
 
 		render() {
