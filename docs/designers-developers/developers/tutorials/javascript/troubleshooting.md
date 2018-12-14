@@ -8,7 +8,7 @@ The console log is a JavaScript developer's best friend. It is a good practice t
 
 Your first step in debugging should be to check the JavaScript console for any errors. Here is an example, which shows a syntax error on line 6.
 
-![console error](../../../../../docs/designers-developers/assets/js-tutorial-console-log-error.png)
+![console error](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-console-log-error.png)
 
 ## Confirm JavaScript is Loading
 
@@ -20,7 +20,7 @@ If you do not see the file being loaded, doublecheck the enqueue function is cor
 
 The console log will show an error if a dependency your JavaScript code uses has not been declared and loaded in the browser. In the example, if `myguten.js` script is enqueued without declaring the `wp-blocks` dependency, the console log will show:
 
-<img src="../../../../../docs/designers-developers/assets/js-tutorial-error-blocks-undefined.png" width=448 title="error wp.blocks is undefined"/>
+<img src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/js-tutorial-error-blocks-undefined.png" width=448 title="error wp.blocks is undefined"/>
 
 You can correct by checking your `wp_enqueue_script` function includes all packages listed that are used:
 
