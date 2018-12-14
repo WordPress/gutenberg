@@ -11,6 +11,6 @@ Plugin Name: Fancy Quote
 */
 ```
 
-So you should have a directory `wp-content/plugins/myguten-plugin/` which has the single file `myguten-plugin.php`. Once that is in place, go to your plugins list in `wp-admin` and you should see your plugin listed.
+To summarize, you should have a directory `wp-content/plugins/myguten-plugin/` which has the single file `myguten-plugin.php`. Once that is in place, go to your plugins list in `wp-admin` and you should see your plugin listed.
 
 Click **Activate** and your plugin will load with WordPress.
