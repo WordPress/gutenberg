@@ -21,7 +21,11 @@ Create a file called `myguten.js` and add:
 console.log( "I'm loaded!" );
 ```
 
-Now start a new post in the block editor, and check your browser Developer Tools. You should see the message in your console log. See [Mozilla's What are browser developer tools?](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools) if you need more information, the area to become most familiar with is [The JavaScript console](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools#The_JavaScript_console).
+Next, create a new post in the block editor.
+
+We'll check the JavaScript console in your browser's Developer Tools, to see if the message is displayed. If you're not sure what developer tools are, Mozilla's ["What are browser developer tools?"](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools) documentation provides more information, including more background on the [JavaScript console](https://developer.mozilla.org/en-US/docs/Learn/Common_questions/What_are_browser_developer_tools#The_JavaScript_console).
+
+If your code is registered and enqueued correctly, you should see a message in your console:
 
 
 **Note for Theme Developers:**  The above method of enqueing is used for plugins, if you are extending the Block Editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
