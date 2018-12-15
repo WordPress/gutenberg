@@ -204,19 +204,19 @@
 		"parent": "tutorials"
 	},
 	{
-		"title": "PluginsBackground",
+		"title": "Plugins Background",
 		"slug": "plugins-background",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/plugins-background.md",
 		"parent": "javascript"
 	},
 	{
-		"title": "LoadingJavascript",
+		"title": "Loading JavaScript",
 		"slug": "loading-javascript",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md",
 		"parent": "javascript"
 	},
 	{
-		"title": "ExtendingTheBlockEditor",
+		"title": "Extending the Block Editor",
 		"slug": "extending-the-block-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md",
 		"parent": "javascript"
@@ -228,7 +228,7 @@
 		"parent": "javascript"
 	},
 	{
-		"title": "VersionsAndBuilding",
+		"title": "JavaScript versions and build step",
 		"slug": "versions-and-building",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md",
 		"parent": "javascript"
