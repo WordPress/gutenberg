@@ -69,7 +69,7 @@ function Header( {
 						shortcut={ shortcuts.toggleSidebar }
 					/>
 					<DotTip tipId="core/editor.settings">
-						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click "Settings" allows toggling the sidebar.' ) }
+						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” allows toggling the sidebar.' ) }
 					</DotTip>
 				</div>
 				<PinnedPlugins.Slot />
