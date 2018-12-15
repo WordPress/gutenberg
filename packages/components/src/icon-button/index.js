@@ -22,7 +22,9 @@ class IconButton extends Component {
 	render() {
 		const { icon, children, label, className, tooltip, shortcut, labelPosition, ...additionalProps } = this.props;
 		const { 'aria-pressed': ariaPressed } = this.props;
-		const classes = classnames( 'components-icon-button', className );
+		const classes = classnames( 'components-icon-button', className, {
+			'has-text': children,
+		} );
 		const tooltipText = tooltip || label;
 
 		// Should show the tooltip if...
