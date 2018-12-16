@@ -112,7 +112,7 @@ This project is set up to use [jest](https://facebook.github.io/jest/) for tests
 
 ## Static analysis and code style
 
-The project includes a linter (`eslint`) to perform codestyle and static analysis of the code. The configuration used it the same as [the one in the Gutenerg project](https://github.com/WordPress/gutenberg/blob/master/eslint/config.js). To perform the check, run:
+The project includes a linter (`eslint`) to perform codestyle and static analysis of the code. The configuration used is the same as [the one in the Gutenberg project](https://github.com/WordPress/gutenberg/blob/master/eslint/config.js). To perform the check, run:
 
 ```
 yarn lint
@@ -125,7 +125,7 @@ In parallel to `eslint` the project uses `Prettier` for codestyling. Run:
 ```
 yarn prettier
 ```
-to enforce the style. This will modify the source files to make them comform to the rules.
+to enforce the style. This will modify the source files to make them conform to the rules.
 
 `Flow` is used as a static type checker for JavaScript code. Flow checks JavaScript code for errors through static type annotations. These types allow you to tell Flow how you want your code to work, and Flow will make sure it does work that way. To perform the check run:
 
