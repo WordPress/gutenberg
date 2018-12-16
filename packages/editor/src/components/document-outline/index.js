@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { countBy, flatMap, get } from 'lodash';
+import { countBy, flatMap, get, delay } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -111,7 +111,14 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 							level={ `H${ item.level }` }
 							isValid={ isValid }
 							path={ item.path }
-							onSelect={ onSelect }
+							onSelect={ () => {
+								// Block links are only valid for the current session - remove hash after following.
+								delay( () => {
+									const { location } = window;
+									window.history.pushState( '', document.title, location.pathname + location.search );
+								}, 50 );
+								onSelect();
+							} }
 							href={ `#block-${ item.clientId }` }
 						>
 							{ item.isEmpty ?
