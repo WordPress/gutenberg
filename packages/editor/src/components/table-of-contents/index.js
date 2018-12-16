@@ -26,7 +26,7 @@ function TableOfContents( { hasBlocks } ) {
 					aria-disabled={ ! hasBlocks }
 				/>
 			) }
-			renderContent={ ( { onClose } ) => <TableOfContentsPanel close={ onClose } /> }
+			renderContent={ ( { onRequestClose } ) => <TableOfContentsPanel onRequestClose={ onRequestClose } /> }
 		/>
 	);
 }
