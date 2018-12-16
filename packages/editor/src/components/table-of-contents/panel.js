@@ -49,7 +49,7 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, o
 					<span className="table-of-contents__title">
 						{ __( 'Document Outline' ) }
 					</span>
-					<DocumentOutline onRequestClose={ onRequestClose } />
+					<DocumentOutline onSelect={ onRequestClose } />
 				</Fragment>
 			) }
 		</Fragment>
