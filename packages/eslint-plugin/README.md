@@ -47,7 +47,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 #### Legacy
 
-An ESLint equivalent of WordPress' `.jshintrc` JSHint configuration is also available by defining your own project's `.eslintrc` file as:
+If you are using WordPress' `.jshintrc` JSHint configuration and you would like to take the first step to migrate to an ESLint equivalent it is also possible to define your own project's `.eslintrc` file as:
 
 ```json
 {
