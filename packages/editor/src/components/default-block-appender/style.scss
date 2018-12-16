@@ -30,14 +30,6 @@
 	.editor-inserter-with-shortcuts {
 		opacity: 0.5;
 		transition: opacity 0.2s;
-
-		.components-icon-button:not(:hover) {
-			// Use opacity to work in various editor styles.
-			color: $dark-opacity-500;
-			.is-dark-theme & {
-				color: $light-opacity-500;
-			}
-		}
 	}
 
 	// Don't show the inserter until mousing over.
