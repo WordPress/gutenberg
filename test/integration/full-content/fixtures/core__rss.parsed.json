@@ -11,12 +11,16 @@
             "excerptLength": 20
         },
         "innerBlocks": [],
-        "innerHTML": ""
+        "innerHTML": "",
+        "innerContent": []
     },
     {
         "blockName": null,
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "\n"
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
     }
 ]
