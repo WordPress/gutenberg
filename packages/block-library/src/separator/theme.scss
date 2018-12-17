@@ -1,5 +1,6 @@
 .wp-block-separator {
 	border: none;
+	padding: 10px;
 	border-bottom: 2px solid $dark-gray-100;
 	margin: 1.65em auto;
 
@@ -7,4 +8,9 @@
 	&:not(.is-style-wide):not(.is-style-dots) {
 		max-width: 100px;
 	}
+}
+
+/* Allows users to understand the clickable area (height) since it is small */
+.wp-block-separator:hover {
+    cursor: pointer;
 }
