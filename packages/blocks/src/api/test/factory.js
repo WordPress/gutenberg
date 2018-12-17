@@ -15,7 +15,12 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '../factory';
-import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
+import {
+	getBlockType,
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+} from '../registration';
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -35,7 +40,6 @@ describe( 'block factory', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -92,7 +96,6 @@ describe( 'block factory', () => {
 
 			const block = createBlock( 'core/test-block' );
 
-			expect( console ).toHaveWarned();
 			expect( block.attributes ).toEqual( {
 				content: [],
 			} );
@@ -141,7 +144,7 @@ describe( 'block factory', () => {
 				...defaultBlockSettings,
 				attributes: {
 					content: {
-						source: 'rich-text',
+						source: 'html',
 					},
 				},
 			} );
@@ -151,10 +154,7 @@ describe( 'block factory', () => {
 			} );
 
 			expect( block.attributes ).toEqual( {
-				content: {
-					formats: [ , , , , ],
-					text: 'test',
-				},
+				content: 'test',
 			} );
 		} );
 	} );
@@ -1178,6 +1178,20 @@ describe( 'block factory', () => {
 
 		it( 'should return single block type transforms of direction', () => {
 			const transforms = getBlockTransforms( 'from', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+			] );
+		} );
+
+		it( 'should return single block type transforms when passed as an object', () => {
+			const transforms = getBlockTransforms(
+				'from',
+				getBlockType( 'core/transform-from-text-block-1' )
+			);
 
 			expect( transforms ).toEqual( [
 				{

@@ -229,7 +229,7 @@ A higher-order component is a function which accepts a [component](https://githu
 
 #### `withSelect( mapSelectToProps: Function ): Function`
 
-Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select) and the props passed to the original component.
+Use `withSelect` to inject state-derived props into a component. Passed a function which returns an object mapping prop names to the subscribed data source, a higher-order component function is returned. The higher-order component can be used to enhance a presentational component, updating it automatically when state changes. The mapping function is passed the [`select` function](#select), the props passed to the original component and the `registry` object.
 
 _Example:_
 
@@ -261,7 +261,7 @@ In the above example, when `HammerPriceDisplay` is rendered into an application,
 
 #### `withDispatch( mapDispatchToProps: Function ): Function`
 
-Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch) and the props passed to the original component.
+Use `withDispatch` to inject dispatching action props into your component. Passed a function which returns an object mapping prop names to action dispatchers, a higher-order component function is returned. The higher-order component can be used to enhance a component. For example, you can define callback behaviors as props for responding to user interactions. The mapping function is passed the [`dispatch` function](#dispatch), the props passed to the original component and the `registry` object.
 
 ```jsx
 function Button( { onClick, children } ) {
@@ -272,7 +272,7 @@ const { withDispatch } = wp.data;
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 	const { startSale } = dispatch( 'my-shop' );
-	const { discountPercent = 20 } = ownProps;
+	const { discountPercent } = ownProps;
 
 	return {
 		onClick() {
@@ -283,8 +283,124 @@ const SaleButton = withDispatch( ( dispatch, ownProps ) => {
 
 // Rendered in the application:
 //
+//  <SaleButton discountPercent="20">Start Sale!</SaleButton>
+```
+
+In the majority of cases, it will be sufficient to use only two first params passed to `mapDispatchToProps` as illustrated in the previous example. However, there might be some very advanced use cases where using the `registry` object might be used as a tool to optimize the performance of your component. Using `select` function from the registry might be useful when you need to fetch some dynamic data from the store at the time when the event is fired, but at the same time, you never use it to render your component. In such scenario, you can avoid using the `withSelect` higher order component to compute such prop, which might lead to unnecessary re-renders of you component caused by its frequent value change. Keep in mind, that `mapDispatchToProps` must return an object with functions only. 
+
+```jsx
+function Button( { onClick, children } ) {
+	return <button type="button" onClick={ onClick }>{ children }</button>;
+}
+
+const { withDispatch } = wp.data;
+
+const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
+	// Stock number changes frequently.
+	const { getStockNumber } = select( 'my-shop' );
+	const { startSale } = dispatch( 'my-shop' );
+	
+	return {
+		onClick() {
+			const dicountPercent = getStockNumber() > 50 ? 10 : 20;
+			startSale( discountPercent );
+		},
+	};
+} )( Button );
+
+// Rendered in the application:
+//
 //  <SaleButton>Start Sale!</SaleButton>
 ```
+
+*Note:* It is important that the `mapDispatchToProps` function always returns an object with the same keys. For example, it should not contain conditions under which a different value would be returned.
+
+## Generic Stores
+
+The `@wordpress/data` module offers a more advanced and generic interface for the purposes of integrating other data systems and situations where more direct control over a data system is needed. In this case, a data store will need to be implemented outside of `@wordpress/data` and then plugged in via three functions:
+
+- `getSelectors()`: Returns an object of selector functions, pre-mapped to the store.
+- `getActions()`: Returns an object of action functions, pre-mapped to the store.
+- `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
+   - Behaves as Redux [`subscribe`](https://redux.js.org/api-reference/store#subscribe(listener))
+   with the following differences:
+      - Doesn't have to implement an unsubscribe, since the registry never uses it.
+	  - Only has to support one listener (the registry).
+
+By implementing the above interface for your custom store, you gain the benefits of using the registry and the `withSelect` and `withDispatch` higher order components in your application code. This provides seamless integration with existing and alternative data systems.
+
+Integrating an existing redux store with its own reducers, store enhancers and middleware can be accomplished as follows:
+
+_Example:_
+
+```js
+import existingSelectors from './existing-app/selectors';
+import existingActions from './existing-app/actions';
+import createStore from './existing-app/store';
+
+const reduxStore = createStore();
+
+const mappedSelectors = existingSelectors.map( ( selector ) => {
+	return ( ...args ) => selector( reduxStore.getState(), ...args );
+} );
+
+const mappedActions = existingActions.map( ( action ) => {
+	return actions.map( ( action ) => {
+		return ( ...args ) => reduxStore.dispatch( action( ...args ) );
+	} );
+} );
+
+const genericStore = {
+	getSelectors() {
+		return mappedSelectors;
+	},
+	getActions() {
+		return mappedActions;
+	},
+	subscribe: reduxStore.subscribe;
+};
+
+registry.registerGenericStore( 'existing-app', genericStore );
+```
+
+It is also possible to implement a completely custom store from scratch:
+
+_Example:_
+
+```js
+function createCustomStore() {
+	let storeChanged = () => {};
+	const prices = { hammer: 7.50 };
+
+	const selectors = {
+		getPrice( itemName ): {
+			return prices[ itemName ];
+		},
+	};
+
+	const actions = {
+		setPrice( itemName, price ): {
+			prices[ itemName ] = price;
+			storeChanged();
+		},
+	};
+
+	return {
+		getSelectors() {
+			return selectors;
+		},
+		getActions() {
+			return actions;
+		},
+		subscribe( listener ) {
+			storeChanged = listener;
+		}
+	};
+}
+
+registry.registerGenericStore( 'custom-data', createCustomStore() );
+```
+
 
 ## Comparison with Redux
 

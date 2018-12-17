@@ -13,3 +13,27 @@ exports[`undo Should undo to expected level intervals 1`] = `
 <p>test</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`undo should undo typing after a pause 1`] = `
+"<!-- wp:paragraph -->
+<p>before pause after pause</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`undo should undo typing after a pause 2`] = `
+"<!-- wp:paragraph -->
+<p>before pause</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`undo should undo typing after non input change 1`] = `
+"<!-- wp:paragraph -->
+<p>before keyboard <strong>after keyboard</strong></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`undo should undo typing after non input change 2`] = `
+"<!-- wp:paragraph -->
+<p>before keyboard </p>
+<!-- /wp:paragraph -->"
+`;

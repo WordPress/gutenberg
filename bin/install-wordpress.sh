@@ -54,6 +54,13 @@ echo -e $(status_message "Installing WordPress...")
 # prevents permissions errors. See: https://github.com/WordPress/gutenberg/pull/8427#issuecomment-410232369
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=http://localhost:$HOST_PORT >/dev/null
 
+if [ "$E2E_ROLE" = "author" ]; then
+	# Create an additional author user for testsing.
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI user create author author@example.com --role=author --user_pass=authpass
+	# Assign the existing Hello World post to the author.
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI post update 1 --post_author=2 
+fi
+
 if [ "$WP_VERSION" == "latest" ]; then
 	# Check for WordPress updates, to make sure we're running the very latest version.
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core update >/dev/null
@@ -69,3 +76,10 @@ fi
 # Activate Gutenberg.
 echo -e $(status_message "Activating Gutenberg...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI plugin activate gutenberg >/dev/null
+
+# Make sure the uploads folder exist and we have permissions to add files there.
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER mkdir -p /var/www/html/wp-content/uploads
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod -v 767 /var/www/html/wp-content/uploads
+
+# Install a dummy favicon to avoid 404 errors.
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER touch /var/www/html/favicon.ico

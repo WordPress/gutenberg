@@ -6,6 +6,7 @@ export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
 export { default as BlockControls } from './block-controls';
 export { default as BlockEdit } from './block-edit';
 export { default as BlockFormatControls } from './block-format-controls';
+export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { default as BlockIcon } from './block-icon';
 export { default as ColorPalette } from './color-palette';
 export { default as withColorContext } from './color-palette/with-color-context';
@@ -15,15 +16,21 @@ export * from './font-sizes';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as PanelColor } from './panel-color';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
-export { default as RichText } from './rich-text';
+export {
+	default as RichText,
+	RichTextShortcut,
+	RichTextToolbarButton,
+	RichTextInserterItem,
+} from './rich-text';
 export { default as ServerSideRender } from './server-side-render';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
+export { default as MediaUploadCheck } from './media-upload/check';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
+export { default as URLPopover } from './url-popover';
 
 // Post Related Components
 export { default as AutosaveMonitor } from './autosave-monitor';
@@ -56,7 +63,6 @@ export { default as PostPreviewButton } from './post-preview-button';
 export { default as PostPublishButton } from './post-publish-button';
 export { default as PostPublishButtonLabel } from './post-publish-button/label';
 export { default as PostPublishPanel } from './post-publish-panel';
-export { default as PostPublishPanelToggle } from './post-publish-panel/toggle';
 export { default as PostSavedState } from './post-saved-state';
 export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleCheck } from './post-schedule/check';

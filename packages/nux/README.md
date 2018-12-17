@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## DotTip
 
-`DotTip` is a React component that renders a single _tip_ on the screen. The tip will point to the React element that `DotTip` is nested within. Each tip is uniquely identified by a string passed to `id`.
+`DotTip` is a React component that renders a single _tip_ on the screen. The tip will point to the React element that `DotTip` is nested within. Each tip is uniquely identified by a string passed to `tipId`.
 
 See [the component's README][dot-tip-readme] for more information.
 
@@ -27,7 +27,7 @@ See [the component's README][dot-tip-readme] for more information.
 ```jsx
 <button onClick={ ... }>
 	Add to Cart
-	<DotTip id="acme/add-to-cart">
+	<DotTip tipId="acme/add-to-cart">
 		Click here to add the product to your shopping cart.
 	</DotTip>
 </button>

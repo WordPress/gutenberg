@@ -1,15 +1,9 @@
 /**
- * External dependencies
- */
-import { stubFalse } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 class UnsavedChangesWarning extends Component {
 	constructor() {
@@ -33,18 +27,9 @@ class UnsavedChangesWarning extends Component {
 	 * @return {?string} Warning prompt message, if unsaved changes exist.
 	 */
 	warnIfUnsavedChanges( event ) {
-		const { isDirty, forceIsDirty = stubFalse } = this.props;
+		const { isDirty } = this.props;
 
-		// For deprecation, infer explicitly provided if not assigned to
-		// fallback value.
-		if ( forceIsDirty !== stubFalse ) {
-			deprecated( 'UnsavedChangesWarning forceIsDirty prop', {
-				plugin: 'Gutenberg',
-				version: '4.2',
-			} );
-		}
-
-		if ( isDirty || forceIsDirty() ) {
+		if ( isDirty ) {
 			event.returnValue = __( 'You have unsaved changes. If you proceed, they will be lost.' );
 			return event.returnValue;
 		}

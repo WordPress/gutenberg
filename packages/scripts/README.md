@@ -19,6 +19,7 @@ _Example:_
 ```json
 {
 	"scripts": {
+		"check-engines": "wp-scripts check-engines",
 		"lint:pkg-json": "wp-scripts lint-pkg-json .",
 		"test": "wp-scripts test-unit-js"
 	}
@@ -27,9 +28,44 @@ _Example:_
 
 ## Available Scripts
 
+### `check-engines`
+
+Check if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the default configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"check-engines": "wp-scripts check-engines"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+* `npm run check-engines` - checks installed version of `node` and `npm`.
+
+
+### `wp-scripts lint-js`
+
+Helps enforce coding style guidelines for your JavaScript files. It uses [eslint](https://eslint.org/) with no rules provided (we plan to add zero config support in the near future). You can specify your own rules as described in [eslint docs](https://eslint.org/docs/rules/).
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"lint:js": "wp-scripts lint-js ."
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+* `npm run lint:js` - lints JavaScripts files in the whole project's.
+
 ### `wp-scripts lint-pkg-json`
 
-Helps enforce standards for your package.json file. It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of default rules provided. You can override them with your own rules as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki).
+Helps enforce standards for your package.json files. It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of default rules provided. You can override them with your own rules as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki).
 
 _Example:_
 
@@ -42,7 +78,7 @@ _Example:_
 ```
 
 This is how you execute those scripts using the presented setup:
-* `npm run lint:pkg-jsont` - lints `package.json` file in the project's root folder.
+* `npm run lint:pkg-json` - lints `package.json` file in the project's root folder.
 
 ### `wp-scripts test-unit-js`
 

@@ -1,10 +1,15 @@
 .wp-block-embed {
 	margin: 0;
+
 	// Necessary because we use responsive trickery to set width/height,
 	// therefore the video doesn't intrinsically clear floats like an image does.
 	clear: both;
+
 	// Apply a min-width, or the embed can collapse when floated.
-	min-width: $break-mobile / 2;
+	// Instagram widgets have a min-width of 326px, so go a bit beyond that.
+	@include break-small() {
+		min-width: 360px;
+	}
 
 	&.is-loading {
 		display: flex;
@@ -19,5 +24,10 @@
 			font-family: $default-font;
 			font-size: $default-font-size;
 		}
+	}
+
+	// Stops long URLs from breaking out of the no preview available screen
+	.components-placeholder__error {
+		word-break: break-word;
 	}
 }

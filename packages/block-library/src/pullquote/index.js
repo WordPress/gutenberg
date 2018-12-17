@@ -7,7 +7,7 @@ import { get, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	getColorClassName,
 	RichText,
@@ -16,6 +16,7 @@ import {
 import {
 	select,
 } from '@wordpress/data';
+import { Path, Polygon, SVG } from '@wordpress/components';
 
 import {
 	default as edit,
@@ -25,13 +26,16 @@ import {
 
 const blockAttributes = {
 	value: {
-		source: 'rich-text',
+		type: 'string',
+		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 	},
 	citation: {
-		source: 'rich-text',
+		type: 'string',
+		source: 'html',
 		selector: 'cite',
+		default: '',
 	},
 	mainColor: {
 		type: 'string',
@@ -53,16 +57,16 @@ export const settings = {
 
 	title: __( 'Pullquote' ),
 
-	description: __( 'Highlight a quote from your post or page by displaying it as a graphic element.' ),
+	description: __( 'Give special visual emphasis to a quote from your text.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M0,0h24v24H0V0z" fill="none" /><polygon points="21 18 2 18 2 20 21 20" /><path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" /><polygon points="21 4 2 4 2 6 21 6" /></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path d="M0,0h24v24H0V0z" fill="none" /><Polygon points="21 18 2 18 2 20 21 20" /><Path d="m19 10v4h-15v-4h15m1-2h-17c-0.55 0-1 0.45-1 1v6c0 0.55 0.45 1 1 1h17c0.55 0 1-0.45 1-1v-6c0-0.55-0.45-1-1-1z" /><Polygon points="21 4 2 4 2 6 21 6" /></SVG>,
 
 	category: 'formatting',
 
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: __( 'Regular' ), isDefault: true },
+		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
 	],
 
@@ -108,7 +112,7 @@ export const settings = {
 		return (
 			<figure className={ figureClass } style={ figureStyles }>
 				<blockquote className={ blockquoteClasses } style={ blockquoteStyle } >
-					<RichText.Content value={ value } multiline="p" />
+					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			</figure>
@@ -123,7 +127,7 @@ export const settings = {
 			const { value, citation } = attributes;
 			return (
 				<blockquote>
-					<RichText.Content value={ value } multiline="p" />
+					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="cite" value={ citation } /> }
 				</blockquote>
 			);
@@ -132,7 +136,8 @@ export const settings = {
 		attributes: {
 			...blockAttributes,
 			citation: {
-				source: 'rich-text',
+				type: 'string',
+				source: 'html',
 				selector: 'footer',
 			},
 			align: {
@@ -146,7 +151,7 @@ export const settings = {
 
 			return (
 				<blockquote className={ `align${ align }` }>
-					<RichText.Content value={ value } />
+					<RichText.Content value={ value } multiline />
 					{ ! RichText.isEmpty( citation ) && <RichText.Content tagName="footer" value={ citation } /> }
 				</blockquote>
 			);

@@ -9,7 +9,7 @@
 	label {
 		display: flex;
 		align-items: center;
-		margin-right: $item-spacing;
+		margin-right: $grid-size;
 		white-space: nowrap;
 		font-weight: 600;
 		flex-shrink: 0;
@@ -20,6 +20,6 @@
 	}
 
 	.dashicon {
-		margin-right: $item-spacing;
+		margin-right: $grid-size;
 	}
 }

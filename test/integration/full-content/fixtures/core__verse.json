@@ -4,49 +4,7 @@
         "name": "core/verse",
         "isValid": true,
         "attributes": {
-            "content": {
-                "formats": [
-                    null,
-                    null,
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ],
-                "text": "A verse…\nAnd more!"
-            }
+            "content": "A <em>verse</em>…<br>And more!"
         },
         "innerBlocks": [],
         "originalContent": "<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>"

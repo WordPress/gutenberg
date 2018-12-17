@@ -1,38 +1,89 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`] = `
-<Chrome
-  color="#f00"
-  disableAlpha={true}
-  hex="#ff0000"
-  hsl={
-    Object {
-      "a": 1,
-      "h": 0,
-      "l": 0.5,
-      "s": 1,
-    }
-  }
-  hsv={
-    Object {
-      "a": 1,
-      "h": 0,
-      "s": 1,
-      "v": 1,
-    }
-  }
-  oldHue={0}
-  onChange={[Function]}
-  onChangeComplete={[Function]}
-  rgb={
-    Object {
-      "a": 1,
-      "b": 0,
-      "g": 0,
-      "r": 255,
-    }
-  }
-/>
+<div
+  className="components-color-picker is-alpha-disabled"
+>
+  <div
+    className="components-color-picker__saturation"
+  >
+    <WithInstanceId(Saturation)
+      hsl={
+        Object {
+          "a": 1,
+          "h": 0,
+          "l": 50,
+          "s": 100,
+        }
+      }
+      hsv={
+        Object {
+          "a": 1,
+          "h": 0,
+          "s": 100,
+          "v": 100,
+        }
+      }
+      onChange={[Function]}
+    />
+  </div>
+  <div
+    className="components-color-picker__body"
+  >
+    <div
+      className="components-color-picker__controls"
+    >
+      <div
+        className="components-color-picker__swatch"
+      >
+        <div
+          className="components-color-picker__active"
+          style={
+            Object {
+              "backgroundColor": "rgb(255, 0, 0)",
+            }
+          }
+        />
+      </div>
+      <div
+        className="components-color-picker__toggles"
+      >
+        <WithInstanceId(Hue)
+          hsl={
+            Object {
+              "a": 1,
+              "h": 0,
+              "l": 50,
+              "s": 100,
+            }
+          }
+          onChange={[Function]}
+        />
+      </div>
+    </div>
+    <Inputs
+      disableAlpha={true}
+      hex="#ff0000"
+      hsl={
+        Object {
+          "a": 1,
+          "h": 0,
+          "l": 50,
+          "s": 100,
+        }
+      }
+      onChange={[Function]}
+      rgb={
+        Object {
+          "a": 1,
+          "b": 0,
+          "g": 0,
+          "r": 255,
+        }
+      }
+    />
+  </div>
+</div>
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `

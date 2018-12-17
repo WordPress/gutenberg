@@ -11,14 +11,17 @@ exports[`core/verse block edit matches snapshot 1`] = `
       >
         <pre
           aria-autocomplete="list"
-          aria-expanded="false"
           aria-label="Write…"
           aria-multiline="true"
           class="editor-rich-text__tinymce"
           contenteditable="true"
           data-is-placeholder-visible="true"
           role="textbox"
-        />
+        >
+          <br
+            data-mce-bogus="1"
+          />
+        </pre>
         <pre
           class="editor-rich-text__tinymce"
         >
