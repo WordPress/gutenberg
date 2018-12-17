@@ -200,7 +200,7 @@ var withClientIdClassName = wp.compose.createHigherOrderComponent( function( Blo
 			{},
 			props,
 			{
-				classsName: "block-" + props.clientId,
+				className: "block-" + props.clientId,
 			}
 		);
 
@@ -335,5 +335,5 @@ To set an SVG icon for the category shown in the previous example, add the follo
 	var svgIcon = el( SVG, { width: 20, height: 20, viewBox: '0 0 20 20'}, circle);
 	wp.blocks.updateCategory( 'my-category', { icon: svgIcon } );
 } )();
-``` 
+```
 
