@@ -21,7 +21,11 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    var blockModel = BlockModel(tag: "")
+    var blockModel = BlockModel(tag: "") {
+        didSet {
+            forceTypingAttributesIfNeeded()
+        }
+    }
 
     private var previousContentSize: CGSize = .zero
 
