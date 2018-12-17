@@ -657,9 +657,6 @@ const applyWithSelect = withSelect(
 	( select, { clientId, rootClientId, isLargeViewport } ) => {
 		const {
 			isBlockSelected,
-			getBlockName,
-			isBlockValid,
-			getBlockAttributes,
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
@@ -675,13 +672,14 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/editor' );
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode } = getEditorSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-		const name = getBlockName( clientId );
-		const attributes = getBlockAttributes( clientId );
+		const { name, attributes, isValid } = block;
 
 		return {
 			isPartOfMultiSelection:
@@ -699,7 +697,6 @@ const applyWithSelect = withSelect(
 			initialPosition: getSelectedBlocksInitialCaretPosition(),
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isValid: isBlockValid( clientId ),
 			isMovable: 'all' !== templateLock,
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
@@ -708,10 +705,11 @@ const applyWithSelect = withSelect(
 			// Users of the editor.BlockListBlock filter used to be able to access the block prop
 			// Ideally these blocks would rely on the clientId prop only.
 			// This is kept for backward compatibility reasons.
-			block: getBlock( name, attributes ),
+			block,
 
 			name,
 			attributes,
+			isValid,
 			isSelected,
 			isParentOfSelectedBlock,
 
@@ -781,30 +779,6 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		},
 	};
 } );
-
-/**
- * Function that returns a new block object instance only if the name or attributes change.
- *
- * @param {string} name       Block name.
- * @param {Object} attributes Block attributes
- *
- * @return {Object} Block object.
- */
-const getBlock = ( name, attributes ) => {
-	let nameCache = getBlock.cache.get( name );
-	if ( ! nameCache ) {
-		nameCache = new WeakMap();
-		getBlock.cache.set( name, nameCache );
-	}
-	let block = nameCache.get( attributes );
-	if ( ! block ) {
-		block = { name, attributes };
-		nameCache.set( attributes, block );
-	}
-
-	return block;
-};
-getBlock.cache = new Map();
 
 export default compose(
 	withViewportMatch( { isLargeViewport: 'medium' } ),
