@@ -67,7 +67,7 @@
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
-		"accessible-autocomplete": "1.6.1",
+		"accessible-autocomplete": "1.6.2",
 		"autoprefixer": "8.2.0",
 		"babel-loader": "8.0.0",
 		"benchmark": "2.1.4",

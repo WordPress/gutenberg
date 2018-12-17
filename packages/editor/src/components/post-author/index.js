@@ -25,6 +25,15 @@ export class PostAuthor extends Component {
 
 		this.setAuthorId = this.setAuthorId.bind( this );
 		this.suggestAuthor = this.suggestAuthor.bind( this );
+		this.getCurrentAuthor = this.getCurrentAuthor.bind( this );
+		this.state = {
+			postAuthor: false,
+		};
+	}
+
+	componentDidMount() {
+		const { postAuthorId } = this.props;
+		this.getCurrentAuthor( postAuthorId );
 	}
 
 	suggestAuthor( query, populateResults ) {
@@ -35,6 +44,15 @@ export class PostAuthor extends Component {
 		apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
 			this.authors = results;
 			populateResults( results.map( ( author ) => ( author.name ) ) );
+		} );
+	}
+
+	getCurrentAuthor( authorId ) {
+		if ( ! authorId ) {
+			return;
+		}
+		apiFetch( { path: '/wp/v2/users/' + encodeURIComponent( authorId ) } ).then( ( results ) => {
+			this.setState( { postAuthor: results } );
 		} );
 	}
 
@@ -54,10 +72,10 @@ export class PostAuthor extends Component {
 	}
 
 	render() {
-		const { postAuthorId, postAuthor, instanceId, authors } = this.props;
-		const selectId = 'post-author-selector-' + instanceId;
+		const { postAuthor } = this.state;
+		const { postAuthorId, instanceId, authors } = this.props;
+		const selectId = `post-author-selector-${ instanceId }`;
 		let selector;
-
 		if ( ! postAuthor ) {
 			return null;
 		}
@@ -81,8 +99,8 @@ export class PostAuthor extends Component {
 					id={ selectId }
 					minLength={ 2 }
 					showAllValues={ true }
-					defaultValue={ postAuthor && postAuthor[ 0 ] ? postAuthor[ 0 ].name : '' }
 					autoselect={ true }
+					defaultValue={ postAuthor ? postAuthor.name : '' }
 					displayMenu="overlay"
 					onConfirm={ this.setAuthorId }
 					source={ debounce( this.suggestAuthor, 300 ) }
@@ -105,7 +123,7 @@ export class PostAuthor extends Component {
 		return (
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				{ postAuthor[ 0 ] && selector }
+				{ postAuthor && selector }
 			</PostAuthorCheck>
 		);
 		/* eslint-enable jsx-a11y/no-onchange */
@@ -116,9 +134,6 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			postAuthorId: select( 'core/editor' ).getEditedPostAttribute( 'author' ),
-			postAuthor: select( 'core' ).getAuthor(
-				select( 'core/editor' ).getEditedPostAttribute( 'author' )
-			),
 			authors: select( 'core' ).getAuthors(),
 		};
 	} ),

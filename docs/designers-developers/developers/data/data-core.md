@@ -24,18 +24,6 @@ Returns all available authors.
 
 Authors list.
 
-### getAuthor
-
-Returns all available authors.
-
-*Parameters*
-
- * state: Data state.
-
-*Returns*
-
-Authors list.
-
 ### getUserQueryResults
 
 Returns all the users returned by a query ID.
