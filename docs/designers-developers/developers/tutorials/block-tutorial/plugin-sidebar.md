@@ -3,7 +3,7 @@
 ```php
 <?php
 
-/**
+/*
 Plugin Name: My plugin sidebar
  */
 function sidebar_plugin_script_register() {
