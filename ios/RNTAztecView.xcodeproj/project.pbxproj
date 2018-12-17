@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7ECFA93C21C39B5000FC131B /* HeadingBlockFormatHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECFA93B21C39B5000FC131B /* HeadingBlockFormatHandler.swift */; };
+		7ECFA94021C39BA000FC131B /* BlockFormatHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */; };
+		7ECFA94221C39BBB00FC131B /* BlockModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECFA94121C39BBB00FC131B /* BlockModel.swift */; };
 		F121467D20ED2F81003DD17B /* RCTAztecViewManager.m in Sources */ = {isa = PBXBuildFile; fileRef = F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */; };
 		F13BF4A020ECF5450047D3F9 /* RCTAztecViewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */; };
 		F166A38020EE6DF3008E7C9F /* Aztec.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F166A37B20EE6DD7008E7C9F /* Aztec.framework */; };
@@ -50,6 +53,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7ECFA93B21C39B5000FC131B /* HeadingBlockFormatHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeadingBlockFormatHandler.swift; sourceTree = "<group>"; };
+		7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockFormatHandler.swift; sourceTree = "<group>"; };
+		7ECFA94121C39BBB00FC131B /* BlockModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockModel.swift; sourceTree = "<group>"; };
 		F1017BCE20ED1B1A002B1024 /* libReact.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReact.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCTAztecViewManager.m; sourceTree = "<group>"; };
 		F13BF49E20ECF5440047D3F9 /* RCTAztecView-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "RCTAztecView-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -96,6 +102,9 @@
 				F121467C20ED2F81003DD17B /* RCTAztecViewManager.m */,
 				F13BF49F20ECF5450047D3F9 /* RCTAztecViewManager.swift */,
 				F1A879CF20EE90C000FABD31 /* RCTAztecView.swift */,
+				7ECFA94121C39BBB00FC131B /* BlockModel.swift */,
+				7ECFA93B21C39B5000FC131B /* HeadingBlockFormatHandler.swift */,
+				7ECFA93F21C39BA000FC131B /* BlockFormatHandler.swift */,
 			);
 			path = RNTAztecView;
 			sourceTree = "<group>";
@@ -207,9 +216,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7ECFA94021C39BA000FC131B /* BlockFormatHandler.swift in Sources */,
+				7ECFA93C21C39B5000FC131B /* HeadingBlockFormatHandler.swift in Sources */,
 				F13BF4A020ECF5450047D3F9 /* RCTAztecViewManager.swift in Sources */,
 				F1A879D020EE90C000FABD31 /* RCTAztecView.swift in Sources */,
 				F121467D20ED2F81003DD17B /* RCTAztecViewManager.m in Sources */,
+				7ECFA94221C39BBB00FC131B /* BlockModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
