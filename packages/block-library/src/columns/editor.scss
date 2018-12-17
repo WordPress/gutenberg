@@ -102,32 +102,32 @@
 			// 2 columns at this breakpoint, and items beyond the second will wrap.
 			@include break-small() {
 				&:nth-child(odd) {
-					margin-right: $grid-size-large * 2;
+					margin-right: $grid-size-large * 2 + $block-padding;
 				}
 
 				&:nth-child(even) {
-					margin-left: $grid-size-large * 2;
+					margin-left: $grid-size-large * 2 + $block-padding;
 				}
 			}
 
 			@include break-medium() {
 				// Reset odd, even margins from small breakpoint.
 				&:nth-child(even) {
-					margin-left: initial;
+					margin-left: $block-padding;
 				}
 
 				&:nth-child(odd) {
-					margin-right: initial;
+					margin-right: $block-padding;
 				}
 
-				// Add left margin to all but first column
+				// Add left margin to all but first column.
 				&:not(:first-child) {
-					margin-left: $grid-size-large * 2;
+					margin-left: ($grid-size-large * 2) + $block-padding;
 				}
 
 				// Add right margin to all but last column.
 				&:not(:last-child) {
-					margin-right: $grid-size-large * 2;
+					margin-right: ($grid-size-large * 2) + $block-padding;
 				}
 			}
 		}
