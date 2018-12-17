@@ -32,7 +32,13 @@ export class PostAuthor extends Component {
 	}
 
 	componentDidMount() {
-		const { postAuthorId, authors } = this.props;
+		const { postAuthorId, authors, postAuthor } = this.props;
+
+		// If the postAuthor is provided, use it directly.
+		if ( postAuthor ) {
+			this.setState( { postAuthor } );
+		}
+
 		const authorInAuthors = findWhere( authors, { id: postAuthorId } );
 
 		// Set or fetch the current author.
