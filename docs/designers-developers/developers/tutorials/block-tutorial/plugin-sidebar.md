@@ -5,7 +5,7 @@
 
 /*
 Plugin Name: My plugin sidebar
- */
+*/
 function sidebar_plugin_script_register() {
 	wp_register_script(
 		'sidebar-plugin-block',
