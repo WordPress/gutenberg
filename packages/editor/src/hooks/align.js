@@ -206,7 +206,7 @@ export function addAssignedAlign( props, blockType, attributes ) {
 }
 
 addFilter( 'blocks.registerBlockType', 'core/align/addAttribute', addAttribute );
-addFilter( 'editor.__experimentalBlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
+addFilter( 'editor.BlockListBlock', 'core/editor/align/with-data-align', withDataAlign );
 addFilter( 'editor.BlockEdit', 'core/editor/align/with-toolbar-controls', withToolbarControls );
 addFilter( 'blocks.getSaveContent.extraProps', 'core/align/addAssignedAlign', addAssignedAlign );
 
