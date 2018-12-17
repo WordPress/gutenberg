@@ -6,7 +6,7 @@ This is the mobile version of Gutenberg, targeting Android and iOS. It's a React
 
 ## Getting Started
 
-### Prerequisities
+### Prerequisites
 
 For a developer experience closer to the one the project maintainers current have, make sure you have the following tools installed:
 
