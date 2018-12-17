@@ -13,6 +13,7 @@ import type { BlockType } from '../store/types';
 type PropsType = {
 	rootClientId: ?string,
 	isBlockSelected: string => boolean,
+	initialHtmlModeEnabled: boolean,
 	showHtml: boolean,
 	editedPostContent: string,
 	selectedBlockIndex: number,
@@ -48,6 +49,11 @@ class AppContainer extends React.Component<PropsType> {
 
 		this.props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
+
+		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
+			// enable html mode if the initial mode the parent wants it but we're not already in it
+			this.toggleHtmlModeAction();
+		}
 	}
 
 	onChange = ( clientId, attributes ) => {
