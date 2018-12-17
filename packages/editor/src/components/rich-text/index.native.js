@@ -28,7 +28,6 @@ import { children } from '@wordpress/blocks';
  */
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import { withBlockEditContext } from '../block-edit/context';
 
 const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
@@ -44,7 +43,6 @@ export class RichText extends Component {
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.isEmpty = this.isEmpty.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.state = {};
 	}
@@ -325,28 +323,6 @@ RichText.defaultProps = {
 
 const RichTextContainer = compose( [
 	withInstanceId,
-	withBlockEditContext( ( context, ownProps ) => {
-		// When explicitly set as not selected, do nothing.
-		if ( ownProps.isSelected === false ) {
-			return {
-				clientId: context.clientId,
-			};
-		}
-		// When explicitly set as selected, use the value stored in the context instead.
-		if ( ownProps.isSelected === true ) {
-			return {
-				isSelected: context.isSelected,
-				clientId: context.clientId,
-			};
-		}
-
-		// Ensures that only one RichText component can be focused.
-		return {
-			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
-			setFocusedElement: context.setFocusedElement,
-			clientId: context.clientId,
-		};
-	} ),
 ] )( RichText );
 
 RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
