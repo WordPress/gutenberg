@@ -130,10 +130,10 @@
 	// Selected style
 	&.is-selected > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
-		outline: $border-width solid $dark-opacity-200;
+		outline: $border-width solid $dark-opacity-light-500;
 
 		.is-dark-theme & {
-			outline-color: $light-opacity-300;
+			outline-color: $light-opacity-light-500;
 		}
 	}
 
