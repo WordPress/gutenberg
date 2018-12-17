@@ -17,7 +17,7 @@ ol {
 
 	li {
 		// This overrides a bottom margin globally applied to list items in wp-admin.
-		margin-bottom: 0.5em;
+		margin-bottom: initial;
 	}
 }
 
@@ -32,9 +32,6 @@ ol {
 ul ul,
 ol ul {
 	list-style-type: circle;
-
-	// This, combined with the margin applied on line 20, ensures there are no "jumps" when you indent a list item.
-	margin-top: 0.5em;
 }
 
 .mce-content-body {
