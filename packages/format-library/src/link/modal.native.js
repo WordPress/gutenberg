@@ -15,7 +15,6 @@ import {
 	isCollapsed,
 	applyFormat,
 	getTextContent,
-	remove,
 	slice,
 } from '@wordpress/rich-text';
 
@@ -31,6 +30,7 @@ class ModalLinkUI extends Component {
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
 		this.onChangeText = this.onChangeText.bind( this );
 		this.onChangeOpensInNewWindow = this.onChangeOpensInNewWindow.bind( this );
+		this.removeLink = this.removeLink.bind( this );
 
 		this.state = {
 			inputValue: props.activeAttributes.url || '',
@@ -82,6 +82,11 @@ class ModalLinkUI extends Component {
 		this.props.onClose();
 	}
 
+	removeLink() {
+		this.props.onRemove();
+		this.props.onClose();
+	}
+
 	render() {
 		const { isVisible } = this.props;
 
@@ -98,53 +103,57 @@ class ModalLinkUI extends Component {
 				swipeDirection="down"
 			>
 				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
+					<View style={ styles.dragIndicator }/>
 					<View style={ styles.head }>
 						<Button
 							color="red"
 							title={ __( 'Remove' ) }
 							accessibilityLabel={ __( 'Remove the link' ) }
-							onPress={ this.props.onRemove }
+							onPress={ this.removeLink }
 						/>
-						<View>
-							<Text style={ styles.title }>
-								{ __( 'Link Settings' ) }
-							</Text>
-						</View>
+						<Text style={ styles.title }>
+							{ __( 'Link Settings' ) }
+						</Text>
 						<Button
-							color="blue"
+							color="#0087be"
 							title={ __( 'Done' ) }
 							accessibilityLabel={ __( 'Finish editing the link' ) }
 							onPress={ this.submitLink }
 						/>
 					</View>
+					<View style={ styles.separator }/>
 					<View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputText }>
+						<Text style={ styles.inlineInputLabel }>
 							{ __( 'URL' ) }
 						</Text>
 						<URLInput
-							containerStyle={ { flexGrow: 1 } }
+							style={ styles.inlineInputValue }
 							value={ this.state.inputValue }
 							onChange={ this.onChangeInputValue }
 						/>
 					</View>
+					<View style={ styles.separator }/>
 					<View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputText }>
+						<Text style={ styles.inlineInputLabel }>
 							{ __( 'Link Text' ) }
 						</Text>
 						<TextInput
-							containerStyle={ { flexGrow: 1 } }
+							style={ styles.inlineInputValue }
 							value={ this.state.text }
 							onChangeText={ this.onChangeText }
 						/>
 					</View>
+					<View style={ styles.separator }/>
 					<View style={ styles.inlineInput }>
-						<Text style={ styles.inlineInputText }>
+						<Text style={ styles.inlineInputLabel }>
 							{ __( 'Open in a new window' ) }
 						</Text>
-						<Switch
-							value={ this.state.opensInNewWindow }
-							onValueChange={ this.onChangeOpensInNewWindow }
-						/>
+						<View style={ { ...styles.inlineInputValue, alignItems: 'flex-end' } }>
+							<Switch
+								value={ this.state.opensInNewWindow }
+								onValueChange={ this.onChangeOpensInNewWindow }
+							/>
+						</View>
 					</View>
 				</View>
 			</Modal>
