@@ -3,7 +3,6 @@
  */
 import classnames from 'classnames';
 import { get, reduce, size, first, last } from 'lodash';
-import memize from 'memize';
 
 /**
  * WordPress dependencies
@@ -783,15 +782,31 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	};
 } );
 
-const getBlock = memize( ( name, attributes ) => {
-	return {
-		name,
-		attributes,
-	};
-} );
+/**
+ * Function that returns a new block object instance only if the name or attributes change.
+ *
+ * @param {string} name       Block name.
+ * @param {Object} attributes Block attributes
+ *
+ * @return {Object} Block object.
+ */
+const getBlock = ( name, attributes ) => {
+	let nameCache = getBlock.cache.get( name );
+	if ( ! nameCache ) {
+		nameCache = new WeakMap();
+		getBlock.cache.set( name, nameCache );
+	}
+	let block = nameCache.get( attributes );
+	if ( ! block ) {
+		block = { name, attributes };
+		nameCache.set( attributes, block );
+	}
+
+	return block;
+};
+getBlock.cache = new Map();
 
 export default compose(
-	withFilters( 'editor.BlockListBlock' ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
