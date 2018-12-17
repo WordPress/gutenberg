@@ -5,10 +5,7 @@
         "isValid": true,
         "attributes": {
             "autoplay": false,
-            "caption": {
-                "formats": [],
-                "text": ""
-            },
+            "caption": "",
             "controls": true,
             "loop": false,
             "muted": false,

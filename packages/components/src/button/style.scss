@@ -14,7 +14,7 @@
 		height: 28px;
 		border-radius: 3px;
 		white-space: nowrap;
-		border-width: 1px;
+		border-width: $border-width;
 		border-style: solid;
 	}
 
@@ -31,6 +31,7 @@
 			border-color: #999;
 			box-shadow: inset 0 -1px 0 #999;
 			color: #23282d;
+			text-decoration: none;
 		}
 
 		&:focus:enabled {
@@ -40,6 +41,8 @@
 			box-shadow:
 				inset 0 -1px 0 #999,
 				0 0 0 2px $blue-medium-200;
+			text-decoration: none;
+
 		}
 
 		&:active:enabled {
@@ -190,6 +193,35 @@
 		line-height: 22px;
 		padding: 0 8px 1px;
 		font-size: 11px;
+	}
+
+	// Buttons that are text-based.
+	&.is-tertiary {
+		color: theme(outlines);
+
+		// Matches default button in hit area. See line 11.
+		padding: 0 10px;
+		line-height: 26px;
+		height: 28px;
+
+		.dashicon {
+			display: inline-block;
+			flex: 0 0 auto;
+		}
+
+		// Ensure that even SVG icons that don't include the .dashicon class are colored.
+		svg {
+			fill: currentColor;
+			outline: none;
+		}
+
+		&:active:focus:enabled {
+			box-shadow: none;
+		}
+
+		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
+			color: color(theme(outlines) shade(25%));
+		}
 	}
 }
 

@@ -1,0 +1,23 @@
+[
+    {
+        "blockName": "unregistered/example",
+        "attrs": {
+            "attr1": "One",
+            "attr2": "Two"
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<p>Testing missing block with some</p>\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n",
+        "innerContent": [
+            "\n<p>Testing missing block with some</p>\n<div class=\"wp-some-class\">\n\tHTML <span style=\"color: red;\">content</span>\n</div>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

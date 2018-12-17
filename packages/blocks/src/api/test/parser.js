@@ -5,11 +5,6 @@ import { attr } from 'hpq';
 import deepFreeze from 'deep-freeze';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Internal dependencies
  */
 import {
@@ -28,12 +23,11 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
-	setUnknownTypeHandlerName,
+	setFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
 } from '../registration';
 import { createBlock } from '../factory';
 import serialize from '../serializer';
-
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
@@ -65,7 +59,8 @@ describe( 'block parser', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
+		setFreeformContentHandlerName( undefined );
+		setUnregisteredTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -295,10 +290,7 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'getBlockAttributes()', () => {
-		it( 'should parse as coerced value (deprecated)', () => {
-			// TODO: When removing this deprecation, ensure to complement with
-			// enhancement to the intended rejection of a numeric type on an
-			// ambiguous string source.
+		it( 'should reject the value with a wrong type', () => {
 			const blockType = {
 				attributes: {
 					number: {
@@ -313,9 +305,8 @@ describe( 'block parser', () => {
 			const innerHTML = '<div data-number="10">Ribs</div>';
 
 			expect( getBlockAttributes( blockType, innerHTML, {} ) ).toEqual( {
-				number: 10,
+				number: undefined,
 			} );
-			expect( deprecated ).toHaveBeenCalled();
 		} );
 
 		it( 'should merge attributes with the parsed and default attributes', () => {
@@ -350,6 +341,26 @@ describe( 'block parser', () => {
 				align: null,
 				topic: 'none',
 				undefAmbiguousStringWithDefault: 'ok',
+			} );
+		} );
+
+		it( 'should work when block type is passed as string', () => {
+			registerBlockType( 'core/meal', {
+				title: 'Meal',
+				category: 'widgets',
+				attributes: {
+					content: {
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: () => {},
+			} );
+
+			const innerHTML = '<div data-number="10">Ribs</div>';
+
+			expect( getBlockAttributes( 'core/meal', innerHTML ) ).toEqual( {
+				content: 'Ribs',
 			} );
 		} );
 	} );
@@ -548,27 +559,27 @@ describe( 'block parser', () => {
 			expect( block.attributes ).toEqual( {} );
 		} );
 
-		it( 'should fall back to the unknown type handler for unknown blocks if present', () => {
-			registerBlockType( 'core/unknown-block', unknownBlockSettings );
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+		it( 'should fall back to the unregistered type handler for unregistered blocks if present', () => {
+			registerBlockType( 'core/unregistered-block', unknownBlockSettings );
+			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
 
 			const block = createBlockWithFallback( {
 				blockName: 'core/test-block',
 				innerHTML: 'Bananas',
 				attrs: { fruit: 'Bananas' },
 			} );
-			expect( block.name ).toBe( 'core/unknown-block' );
+			expect( block.name ).toBe( 'core/unregistered-block' );
 			expect( block.attributes.content ).toContain( 'wp:test-block' );
 		} );
 
-		it( 'should fall back to the unknown type handler if block type not specified', () => {
-			registerBlockType( 'core/unknown-block', unknownBlockSettings );
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+		it( 'should fall back to the freeform content handler if block type not specified', () => {
+			registerBlockType( 'core/freeform-block', unknownBlockSettings );
+			setFreeformContentHandlerName( 'core/freeform-block' );
 
 			const block = createBlockWithFallback( {
 				innerHTML: 'content',
 			} );
-			expect( block.name ).toEqual( 'core/unknown-block' );
+			expect( block.name ).toEqual( 'core/freeform-block' );
 			expect( block.attributes ).toEqual( { content: '<p>content</p>' } );
 		} );
 
@@ -706,7 +717,8 @@ describe( 'block parser', () => {
 		it( 'should ignore blocks with a bad namespace', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
+			setUnregisteredTypeHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
@@ -721,7 +733,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
@@ -741,7 +753,7 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 			registerBlockType( 'core/unknown-block', unknownBlockSettings );
 
-			setUnknownTypeHandlerName( 'core/unknown-block' );
+			setFreeformContentHandlerName( 'core/unknown-block' );
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +

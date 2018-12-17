@@ -7,7 +7,6 @@ import { mount, shallow } from 'enzyme';
  * WordPress dependencies
  */
 import { createBlock, registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -51,15 +50,15 @@ describe( 'DocumentOutline', () => {
 
 		paragraph = createBlock( 'core/paragraph' );
 		headingH1 = createBlock( 'core/heading', {
-			content: create( { text: 'Heading 1' } ),
+			content: 'Heading 1',
 			level: 1,
 		} );
 		headingParent = createBlock( 'core/heading', {
-			content: create( { text: 'Heading parent' } ),
+			content: 'Heading parent',
 			level: 2,
 		} );
 		headingChild = createBlock( 'core/heading', {
-			content: create( { text: 'Heading child' } ),
+			content: 'Heading child',
 			level: 3,
 		} );
 

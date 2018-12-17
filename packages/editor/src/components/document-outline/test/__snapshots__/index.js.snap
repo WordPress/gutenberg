@@ -12,31 +12,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       onClick={[Function]}
       path={Array []}
     >
-      <Component
-        format="rich-text"
-        tagName="span"
-        value={
-          Object {
-            "formats": Array [
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-            ],
-            "text": "Heading parent",
-          }
-        }
-      />
+      Heading parent
     </TableOfContentsItem>
     <TableOfContentsItem
       isValid={true}
@@ -45,30 +21,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       onClick={[Function]}
       path={Array []}
     >
-      <Component
-        format="rich-text"
-        tagName="span"
-        value={
-          Object {
-            "formats": Array [
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-            ],
-            "text": "Heading child",
-          }
-        }
-      />
+      Heading child
     </TableOfContentsItem>
   </ul>
 </div>
@@ -86,26 +39,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       onClick={[Function]}
       path={Array []}
     >
-      <Component
-        format="rich-text"
-        tagName="span"
-        value={
-          Object {
-            "formats": Array [
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-            ],
-            "text": "Heading 1",
-          }
-        }
-      />
+      Heading 1
       <br
         key="incorrect-break-multiple-h1"
       />
@@ -122,26 +56,7 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       onClick={[Function]}
       path={Array []}
     >
-      <Component
-        format="rich-text"
-        tagName="span"
-        value={
-          Object {
-            "formats": Array [
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-              undefined,
-            ],
-            "text": "Heading 1",
-          }
-        }
-      />
+      Heading 1
       <br
         key="incorrect-break-multiple-h1"
       />

@@ -10,16 +10,20 @@ import { flow, castArray, mapValues, omit, stubFalse } from 'lodash';
 import { autop } from '@wordpress/autop';
 import { applyFilters } from '@wordpress/hooks';
 import { parse as defaultParse } from '@wordpress/block-serialization-default-parser';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { getBlockType, getUnknownTypeHandlerName } from './registration';
+import {
+	getBlockType,
+	getFreeformContentHandlerName,
+	getUnregisteredTypeHandlerName,
+} from './registration';
 import { createBlock } from './factory';
-import { isValidBlock } from './validation';
+import { isValidBlockContent } from './validation';
 import { getCommentDelimitedContent } from './serializer';
-import { attr, html, text, query, node, children, prop, richText } from './matchers';
+import { attr, html, text, query, node, children, prop } from './matchers';
+import { normalizeBlockType } from './utils';
 
 /**
  * Sources which are guaranteed to return a string value.
@@ -191,15 +195,13 @@ export function matcherFromSource( sourceConfig ) {
 
 			return matcher;
 		case 'html':
-			return html( sourceConfig.selector );
+			return html( sourceConfig.selector, sourceConfig.multiline );
 		case 'text':
 			return text( sourceConfig.selector );
 		case 'children':
 			return children( sourceConfig.selector );
 		case 'node':
 			return node( sourceConfig.selector );
-		case 'rich-text':
-			return richText( sourceConfig.selector, sourceConfig.multiline );
 		case 'query':
 			const subMatchers = mapValues( sourceConfig.query, matcherFromSource );
 			return query( sourceConfig.selector, subMatchers );
@@ -240,7 +242,7 @@ export function parseWithAttributeSchema( innerHTML, attributeSchema ) {
  * @return {*} Attribute value.
  */
 export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, commentAttributes ) {
-	let { type } = attributeSchema;
+	const { type } = attributeSchema;
 	let value;
 
 	switch ( attributeSchema.source ) {
@@ -258,30 +260,12 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 		case 'tag':
 			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 			break;
-		case 'rich-text':
-			type = 'object';
-			value = parseWithAttributeSchema( innerHTML, attributeSchema );
 	}
 
-	if ( value !== undefined ) {
-		if ( isAmbiguousStringSource( attributeSchema ) ) {
-			if ( ! isOfTypes( value, castArray( type ) ) ) {
-				deprecated( 'Attribute type coercion', {
-					plugin: 'Gutenberg',
-					version: '4.2',
-					hint: (
-						'Omit the source to preserve type via serialized ' +
-						'comment demarcation.'
-					),
-				} );
-
-				value = asType( value, type );
-			}
-		} else if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
-			// Reject the value if it is not valid of type. Reverting to the
-			// undefined value ensures the default is restored, if applicable.
-			value = undefined;
-		}
+	if ( type !== undefined && ! isOfTypes( value, castArray( type ) ) ) {
+		// Reject the value if it is not valid of type. Reverting to the
+		// undefined value ensures the default is restored, if applicable.
+		value = undefined;
 	}
 
 	if ( value === undefined ) {
@@ -294,13 +278,14 @@ export function getBlockAttribute( attributeKey, attributeSchema, innerHTML, com
 /**
  * Returns the block attributes of a registered block node given its type.
  *
- * @param {?Object} blockType  Block type.
- * @param {string}  innerHTML  Raw block content.
- * @param {?Object} attributes Known block attributes (from delimiters).
+ * @param {string|Object} blockTypeOrName Block type or name.
+ * @param {string}        innerHTML       Raw block content.
+ * @param {?Object}       attributes      Known block attributes (from delimiters).
  *
  * @return {Object} All block attributes.
  */
-export function getBlockAttributes( blockType, innerHTML, attributes ) {
+export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
 	const blockAttributes = mapValues( blockType.attributes, ( attributeSchema, attributeKey ) => {
 		return getBlockAttribute( attributeKey, attributeSchema, innerHTML, attributes );
 	} );
@@ -357,10 +342,10 @@ export function getMigratedBlock( block ) {
 		);
 
 		// Ignore the deprecation if it produces a block which is not valid.
-		const isValid = isValidBlock(
-			originalContent,
+		const isValid = isValidBlockContent(
 			deprecatedBlockType,
-			migratedAttributes
+			migratedAttributes,
+			originalContent
 		);
 
 		if ( ! isValid ) {
@@ -399,54 +384,69 @@ export function getMigratedBlock( block ) {
  * @return {?Object} An initialized block object (if possible).
  */
 export function createBlockWithFallback( blockNode ) {
+	const { blockName: originalName } = blockNode;
 	let {
-		blockName: name,
 		attrs: attributes,
 		innerBlocks = [],
 		innerHTML,
 	} = blockNode;
+	const freeformContentFallbackBlock = getFreeformContentHandlerName();
+	const unregisteredFallbackBlock = getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
 
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
 	innerHTML = innerHTML.trim();
 
-	// Use type from block content, otherwise find unknown handler.
-	name = name || getUnknownTypeHandlerName();
+	// Use type from block content if available. Otherwise, default to the
+	// freeform content fallback.
+	let name = originalName || freeformContentFallbackBlock;
+
+	// Convert 'core/cover-image' block in existing content to 'core/cover'.
+	if ( 'core/cover-image' === name ) {
+		name = 'core/cover';
+	}
 
 	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
 	if ( 'core/text' === name || 'core/cover-text' === name ) {
 		name = 'core/paragraph';
 	}
 
-	// Try finding the type for known block name, else fall back again.
-	let blockType = getBlockType( name );
-
-	const fallbackBlock = getUnknownTypeHandlerName();
-
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
 	// meaning there are no negative consequences to repeated autop calls.
-	if ( name === fallbackBlock ) {
+	if ( name === freeformContentFallbackBlock ) {
 		innerHTML = autop( innerHTML ).trim();
 	}
 
+	// Try finding the type for known block name, else fall back again.
+	let blockType = getBlockType( name );
+
 	if ( ! blockType ) {
+		// Preserve undelimited content for use by the unregistered type handler.
+		const originalUndelimitedContent = innerHTML;
+
 		// If detected as a block which is not registered, preserve comment
-		// delimiters in content of unknown type handler.
+		// delimiters in content of unregistered type handler.
 		if ( name ) {
 			innerHTML = getCommentDelimitedContent( name, attributes, innerHTML );
 		}
 
-		name = fallbackBlock;
+		name = unregisteredFallbackBlock;
+		attributes = { originalName, originalUndelimitedContent };
 		blockType = getBlockType( name );
 	}
 
 	// Coerce inner blocks from parsed form to canonical form.
 	innerBlocks = innerBlocks.map( createBlockWithFallback );
 
-	// Include in set only if type were determined.
-	if ( ! blockType || ( ! innerHTML && name === fallbackBlock ) ) {
+	const isFallbackBlock = (
+		name === freeformContentFallbackBlock ||
+		name === unregisteredFallbackBlock
+	);
+
+	// Include in set only if type was determined.
+	if ( ! blockType || ( ! innerHTML && isFallbackBlock ) ) {
 		return;
 	}
 
@@ -460,8 +460,8 @@ export function createBlockWithFallback( blockNode ) {
 	// provided there are no changes in attributes. The validation procedure thus compares the
 	// provided source value with the serialized output before there are any modifications to
 	// the block. When both match, the block is marked as valid.
-	if ( name !== fallbackBlock ) {
-		block.isValid = isValidBlock( innerHTML, blockType, block.attributes );
+	if ( ! isFallbackBlock ) {
+		block.isValid = isValidBlockContent( blockType, block.attributes, innerHTML );
 	}
 
 	// Preserve original content for future use in case the block is parsed as

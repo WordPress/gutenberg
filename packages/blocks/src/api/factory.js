@@ -20,31 +20,30 @@ import {
  * WordPress dependencies
  */
 import { createHooks, applyFilters } from '@wordpress/hooks';
-import { create } from '@wordpress/rich-text';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import { getBlockType, getBlockTypes } from './registration';
+import { normalizeBlockType } from './utils';
 
 /**
  * Returns a block object given its type and attributes.
  *
- * @param {string} name            Block name.
- * @param {Object} blockAttributes Block attributes.
- * @param {?Array} innerBlocks     Nested blocks.
+ * @param {string} name        Block name.
+ * @param {Object} attributes  Block attributes.
+ * @param {?Array} innerBlocks Nested blocks.
  *
  * @return {Object} Block object.
  */
-export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
+export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
 	// Ensure attributes contains only values defined by block type, and merge
 	// default values for missing attributes.
-	const attributes = reduce( blockType.attributes, ( result, schema, key ) => {
-		const value = blockAttributes[ key ];
+	const sanitizedAttributes = reduce( blockType.attributes, ( result, schema, key ) => {
+		const value = attributes[ key ];
 
 		if ( undefined !== value ) {
 			result[ key ] = value;
@@ -52,22 +51,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 			result[ key ] = schema.default;
 		}
 
-		if ( schema.source === 'rich-text' ) {
-			// Ensure value passed is always a rich text value.
-			if ( typeof result[ key ] === 'string' ) {
-				result[ key ] = create( { text: result[ key ] } );
-			} else if ( ! result[ key ] || ! result[ key ].text ) {
-				result[ key ] = create();
-			}
-		}
-
 		if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
-			deprecated( `${ schema.source } source`, {
-				alternative: 'rich-text source',
-				plugin: 'Gutenberg',
-				version: '4.4',
-			} );
-
 			// Ensure value passed is always an array, which we're expecting in
 			// the RichText component to handle the deprecated value.
 			if ( typeof result[ key ] === 'string' ) {
@@ -88,7 +72,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
 		clientId,
 		name,
 		isValid: true,
-		attributes,
+		attributes: sanitizedAttributes,
 		innerBlocks,
 	};
 }
@@ -97,7 +81,7 @@ export function createBlock( name, blockAttributes = {}, innerBlocks = [] ) {
  * Given a block object, returns a copy of the block object, optionally merging
  * new attributes and/or replacing its inner blocks.
  *
- * @param {Object} block              Block object.
+ * @param {Object} block              Block instance.
  * @param {Object} mergeAttributes    Block attributes.
  * @param {?Array} newInnerBlocks     Nested blocks.
  *
@@ -125,7 +109,6 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
  * @param {Object} transform The transform object to validate.
  * @param {string} direction Is this a 'from' or 'to' transform.
  * @param {Array} blocks The blocks to transform from.
- * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {boolean} Is the transform possible?
  */
@@ -170,7 +153,6 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
  * 'from' transforms on other blocks.
  *
  * @param {Array}  blocks  The blocks to transform from.
- * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {Array} Block types that the blocks can be transformed into.
  */
@@ -202,7 +184,6 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
  * the source block's own 'to' transforms.
  *
  * @param {Array} blocks The blocks to transform from.
- * @param {boolean} isMultiBlock Have multiple blocks been selected?
  *
  * @return {Array} Block types that the source can be transformed into.
  */
@@ -299,13 +280,13 @@ export function findTransform( transforms, predicate ) {
  * transform object includes `blockName` as a property.
  *
  * @param {string}  direction Transform direction ("to", "from").
- * @param {?string} blockName Optional block name.
+ * @param {string|Object} blockTypeOrName  Block type or name.
  *
  * @return {Array} Block transforms for direction.
  */
-export function getBlockTransforms( direction, blockName ) {
+export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
-	if ( blockName === undefined ) {
+	if ( blockTypeOrName === undefined ) {
 		return flatMap(
 			getBlockTypes(),
 			( { name } ) => getBlockTransforms( direction, name )
@@ -313,7 +294,8 @@ export function getBlockTransforms( direction, blockName ) {
 	}
 
 	// Validate that block type exists and has array of direction.
-	const { transforms } = getBlockType( blockName ) || {};
+	const blockType = normalizeBlockType( blockTypeOrName );
+	const { name: blockName, transforms } = blockType || {};
 	if ( ! transforms || ! Array.isArray( transforms[ direction ] ) ) {
 		return [];
 	}

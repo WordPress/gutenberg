@@ -1,0 +1,35 @@
+/* Text Editor specific */
+.components-panel__header.edit-post-sidebar-header__small {
+	background: $white;
+	padding-right: $grid-size-small;
+
+	.edit-post-sidebar__title {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		width: 100%;
+	}
+
+	@include break-medium() {
+		display: none;
+	}
+}
+
+.components-panel__header.edit-post-sidebar-header {
+	padding-right: $grid-size-small;
+
+	background: $light-gray-200;
+
+	.components-icon-button {
+		display: none;
+		margin-left: auto;
+
+		~ .components-icon-button {
+			margin-left: 0;
+		}
+
+		@include break-medium() {
+			display: flex;
+		}
+	}
+}

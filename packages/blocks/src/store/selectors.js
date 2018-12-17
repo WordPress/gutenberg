@@ -31,6 +31,18 @@ export function getBlockType( state, name ) {
 }
 
 /**
+ * Returns block styles by block name.
+ *
+ * @param {Object} state Data state.
+ * @param {string} name  Block type name.
+ *
+ * @return {Array?} Block Styles.
+ */
+export function getBlockStyles( state, name ) {
+	return state.blockStyles[ name ];
+}
+
+/**
  * Returns all the available categories.
  *
  * @param {Object} state Data state.
@@ -53,14 +65,25 @@ export function getDefaultBlockName( state ) {
 }
 
 /**
- * Returns the name of the fallback block name.
+ * Returns the name of the block for handling non-block content.
  *
  * @param {Object} state Data state.
  *
- * @return {string?} Fallback block name.
+ * @return {string?} Name of the block for handling non-block content.
  */
-export function getFallbackBlockName( state ) {
-	return state.fallbackBlockName;
+export function getFreeformFallbackBlockName( state ) {
+	return state.freeformFallbackBlockName;
+}
+
+/**
+ * Returns the name of the block for handling unregistered blocks.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling unregistered blocks.
+ */
+export function getUnregisteredFallbackBlockName( state ) {
+	return state.unregisteredFallbackBlockName;
 }
 
 /**

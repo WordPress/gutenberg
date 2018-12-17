@@ -7,7 +7,6 @@ import {
 	pressWithModifier,
 	searchForBlock,
 	getEditedPostContent,
-	META_KEY,
 } from '../support/utils';
 
 function waitForAndAcceptDialog() {
@@ -130,7 +129,6 @@ describe( 'Reusable Blocks', () => {
 		// Tab three times to navigate to the block's content
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
 
 		// Change the block's content
 		await page.keyboard.type( 'Oh! ' );
@@ -190,8 +188,13 @@ describe( 'Reusable Blocks', () => {
 
 		// Delete the block and accept the confirmation dialog
 		await page.click( 'button[aria-label="More options"]' );
-		const convertButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
-		await Promise.all( [ waitForAndAcceptDialog(), convertButton.click() ] );
+		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
+		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
+
+		// Wait for deletion to finish
+		await page.waitForXPath(
+			'//*[contains(@class, "components-notice") and contains(@class, "is-success")]/*[text()="Block deleted."]'
+		);
 
 		// Check that we have an empty post again
 		expect( await getEditedPostContent() ).toBe( '' );
@@ -216,8 +219,8 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Select all the blocks
-		await pressWithModifier( META_KEY, 'a' );
-		await pressWithModifier( META_KEY, 'a' );
+		await pressWithModifier( 'primary', 'a' );
+		await pressWithModifier( 'primary', 'a' );
 
 		// Trigger isTyping = false
 		await page.mouse.move( 200, 300, { steps: 10 } );

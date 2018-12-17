@@ -18,9 +18,9 @@ import {
  * Internal dependencies
  */
 import {
-	getBlockValidAlignments,
+	getValidAlignments,
 	withToolbarControls,
-	withDataAlign,
+	insideSelectWithDataAlign,
 	addAssignedAlign,
 } from '../align';
 
@@ -58,49 +58,61 @@ describe( 'align', () => {
 		} );
 	} );
 
-	describe( 'getBlockValidAlignments()', () => {
+	describe( 'getValidAlignments()', () => {
 		it( 'should return an empty array if block does not define align support', () => {
-			registerBlockType( 'core/foo', blockSettings );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
-
-			expect( validAlignments ).toEqual( [] );
+			expect( getValidAlignments() ).toEqual( [] );
 		} );
 
-		it( 'should return all custom align set', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: [ 'left', 'right' ],
-				},
-			} );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
-
-			expect( validAlignments ).toEqual( [ 'left', 'right' ] );
+		it( 'should return all custom aligns set', () => {
+			expect(
+				getValidAlignments( [ 'left', 'right' ] )
+			).toEqual(
+				[ 'left', 'right' ]
+			);
 		} );
 
-		it( 'should return all aligns if block defines align support', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-				},
-			} );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
-
-			expect( validAlignments ).toEqual( [ 'left', 'center', 'right', 'wide', 'full' ] );
+		it( 'should return all aligns if block defines align support as true', () => {
+			expect(
+				getValidAlignments( true )
+			).toEqual(
+				[ 'left', 'center', 'right', 'wide', 'full' ]
+			);
 		} );
 
-		it( 'should return all aligns except wide if wide align explicitly false', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-					alignWide: false,
-				},
-			} );
-			const validAlignments = getBlockValidAlignments( 'core/foo' );
+		it( 'should return all aligns except wide if wide align explicitly false on the block', () => {
+			expect(
+				getValidAlignments( true, false, true )
+			).toEqual( [ 'left', 'center', 'right' ] );
 
-			expect( validAlignments ).toEqual( [ 'left', 'center', 'right' ] );
+			expect(
+				getValidAlignments( true, false, false )
+			).toEqual( [ 'left', 'center', 'right' ] );
+		} );
+
+		it( 'should return all aligns except wide if wide align is not supported by the theme', () => {
+			expect(
+				getValidAlignments( true, true, false )
+			).toEqual( [ 'left', 'center', 'right' ] );
+
+			expect(
+				getValidAlignments( true, false, false )
+			).toEqual( [ 'left', 'center', 'right' ] );
+		} );
+
+		it( 'should not remove wide aligns if they are not supported by the block and were set using an array in supports align', () => {
+			expect(
+				getValidAlignments( [ 'left', 'right', 'wide', 'full' ], false, true )
+			).toEqual( [ 'left', 'right', 'wide', 'full' ] );
+		} );
+
+		it( 'should remove wide aligns if they are not supported by the theme and were set using an array in supports align', () => {
+			expect(
+				getValidAlignments( [ 'left', 'right', 'wide', 'full' ], true, false )
+			).toEqual( [ 'left', 'right' ] );
+
+			expect(
+				getValidAlignments( [ 'left', 'right', 'wide', 'full' ], false, false )
+			).toEqual( [ 'left', 'right' ] );
 		} );
 	} );
 
@@ -153,27 +165,50 @@ describe( 'align', () => {
 				...blockSettings,
 				supports: {
 					align: true,
-					alignWide: false,
+					alignWide: true,
 				},
 			} );
 
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
-					block={ {
-						name: 'core/foo',
-						attributes: {
-							align: 'left',
-						},
+					attributes={ {
+						align: 'wide',
 					} }
+					name="core/foo"
 				/>
 			);
 			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( {
-				'data-align': 'left',
+				'data-align': 'wide',
 			} );
+		} );
+
+		it( 'should not render wide/full wrapper props if wide controls are not enabled', () => {
+			registerBlockType( 'core/foo', {
+				...blockSettings,
+				supports: {
+					align: true,
+					alignWide: true,
+				},
+			} );
+
+			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
+				<div { ...wrapperProps } />
+			) );
+
+			const wrapper = renderer.create(
+				<EnhancedComponent
+					name="core/foo"
+					attributes={ {
+						align: 'wide',
+					} }
+					hasWideEnabled={ false }
+				/>
+			);
+			expect( wrapper.toTree().rendered.props.wrapperProps ).toEqual( undefined );
 		} );
 
 		it( 'should not render invalid align', () => {
@@ -185,17 +220,15 @@ describe( 'align', () => {
 				},
 			} );
 
-			const EnhancedComponent = withDataAlign( ( { wrapperProps } ) => (
+			const EnhancedComponent = insideSelectWithDataAlign( ( { wrapperProps } ) => (
 				<div { ...wrapperProps } />
 			) );
 
 			const wrapper = renderer.create(
 				<EnhancedComponent
-					block={ {
-						name: 'core/foo',
-						attributes: {
-							align: 'wide',
-						},
+					name="core/foo"
+					attributes={ {
+						align: 'wide',
 					} }
 				/>
 			);

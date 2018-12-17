@@ -4,57 +4,7 @@
         "name": "core/subhead",
         "isValid": true,
         "attributes": {
-            "content": {
-                "formats": [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    null
-                ],
-                "text": "This is a subhead."
-            }
+            "content": "This is a <em>subhead</em>."
         },
         "innerBlocks": [],
         "originalContent": "<p class=\"wp-block-subhead\">This is a <em>subhead</em>.</p>"

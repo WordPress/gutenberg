@@ -17,7 +17,6 @@ import {
 	RichText,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
-import { create } from '@wordpress/rich-text';
 
 export const name = 'core/text-columns';
 
@@ -42,17 +41,11 @@ export const settings = {
 			selector: 'p',
 			query: {
 				children: {
-					source: 'rich-text',
+					type: 'string',
+					source: 'html',
 				},
 			},
-			default: [
-				{
-					children: create(),
-				},
-				{
-					children: create(),
-				},
-			],
+			default: [ {}, {} ],
 		},
 		columns: {
 			type: 'number',

@@ -117,13 +117,15 @@ describe( 'full post content fixture', () => {
 
 			const blocksActual = parse( content );
 
-			// Block validation logs during deprecation migration. Since this
-			// is expected for deprecated blocks, match on filename and allow.
+			// Block validation may log errors during deprecation migration,
+			// unless explicitly handled from a valid block via isEligible.
+			// Match on filename for deprecated blocks fixtures to allow.
 			const isDeprecated = /__deprecated([-_]|$)/.test( f );
 			if ( isDeprecated ) {
-				// eslint-disable-next-line no-console
+				/* eslint-disable no-console */
 				console.warn.mockReset();
-				expect( console ).toHaveErrored();
+				console.error.mockReset();
+				/* eslint-enable no-console */
 			}
 
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );

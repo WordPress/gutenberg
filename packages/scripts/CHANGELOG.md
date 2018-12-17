@@ -1,3 +1,23 @@
+## 2.5.0 (Unreleased)
+
+### New Feature
+
+- Added support for `check-engines` script ([#12721](https://github.com/WordPress/gutenberg/pull/12721))
+
+## 2.4.4 (2018-11-20)
+
+## 2.4.3 (2018-11-09)
+
+## 2.4.2 (2018-11-09)
+
+## 2.4.1 (2018-11-03)
+
+## 2.4.0 (2018-10-16)
+
+### New Feature
+
+- Added support for `lint-js` script ([#10504](https://github.com/WordPress/gutenberg/pull/10504))
+
 ## 2.3.0 (2018-09-30)
 
 ### Improvements

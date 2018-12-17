@@ -10,7 +10,7 @@ import { isEqual } from 'lodash';
  */
 import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
-import { getBlockAttributes, getBlockContent, getBlockType, isValidBlock, getSaveContent } from '@wordpress/blocks';
+import { getBlockAttributes, getBlockContent, getBlockType, isValidBlockContent, getSaveContent } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 export class BlockHTML extends Component {
@@ -38,7 +38,7 @@ export class BlockHTML extends Component {
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
 		const content = html ? html : getSaveContent( blockType, attributes );
-		const isValid = html ? isValidBlock( content, blockType, attributes ) : true;
+		const isValid = html ? isValidBlockContent( blockType, attributes, content ) : true;
 
 		this.props.onChange( this.props.clientId, attributes, content, isValid );
 

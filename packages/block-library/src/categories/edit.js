@@ -1,11 +1,16 @@
 /**
+ * External dependencies
+ */
+import { times, unescape } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Component, Fragment } from '@wordpress/element';
 import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { times, unescape } from 'lodash';
+import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	InspectorControls,
 	BlockControls,
@@ -106,14 +111,19 @@ class CategoriesEdit extends Component {
 	}
 
 	renderCategoryDropdown() {
-		const { showHierarchy } = this.props.attributes;
+		const { showHierarchy, instanceId, className } = this.props;
 		const parentId = showHierarchy ? 0 : null;
 		const categories = this.getCategories( parentId );
-
+		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
-			<select className={ `${ this.props.className }__dropdown` }>
-				{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
-			</select>
+			<Fragment>
+				<label htmlFor={ selectId } className="screen-reader-text">
+					{ __( 'Categories' ) }
+				</label>
+				<select id={ selectId } className={ `${ className }__dropdown` }>
+					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
+				</select>
+			</Fragment>
 		);
 	}
 
@@ -201,14 +211,16 @@ class CategoriesEdit extends Component {
 		);
 	}
 }
+export default compose(
+	withSelect( ( select ) => {
+		const { getEntityRecords } = select( 'core' );
+		const { isResolving } = select( 'core/data' );
+		const query = { per_page: -1 };
 
-export default withSelect( ( select ) => {
-	const { getEntityRecords } = select( 'core' );
-	const { isResolving } = select( 'core/data' );
-	const query = { per_page: -1 };
-
-	return {
-		categories: getEntityRecords( 'taxonomy', 'category', query ),
-		isRequesting: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', 'category', query ] ),
-	};
-} )( CategoriesEdit );
+		return {
+			categories: getEntityRecords( 'taxonomy', 'category', query ),
+			isRequesting: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', 'category', query ] ),
+		};
+	} ),
+	withInstanceId
+)( CategoriesEdit );

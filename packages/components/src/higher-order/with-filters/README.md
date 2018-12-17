@@ -7,25 +7,60 @@ Wrapping a component with `withFilters` provides a filtering capability controll
 ## Usage
 
 ```jsx
-import { withFilters } from '@wordpress/components';
+import { Fragment, withFilters } from '@wordpress/components';
 import { addFilter } from '@wordpress/hooks';
 
-const ComposedComponent = () => <div>Composed component</div>;
+const MyComponent = ( { title } ) => <h1>{ title }</h1>;
+
+const ComponentToAppend = () => <div>Appended component</div>;
+
+function withComponentApended( FilteredComponent ) {
+	return ( props ) => (
+		<Fragment>
+			<FilteredComponent { ...props } />
+			<ComponentToAppend />
+		</Fragment>
+	);
+}
 
 addFilter(
 	'MyHookName',
-	'example/filtered-component',
-	( FilteredComponent ) => () => (
-		<div>
-			<FilteredComponent />
-			<ComposedComponent />
-		</div>
-	)
+	'my-plugin/with-component-appended',
+	withComponentApended
 );
 
-const MyComponentWithFilters = withFilters( 'MyHookName' )( 
-	() => <div>My component</div> 
-);
+const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
 ```
 
 `withFilters` expects a string argument which provides a hook name. It returns a function which can then be used in composing your component. The hook name allows plugin developers to customize or completely override the component passed to this higher-order component using `wp.hooks.addFilter` method.
+
+It is also possible to override props by implementing a higher-order component which works as follows:
+
+```jsx
+import { Fragment, withFilters } from '@wordpress/components';
+import { addFilter } from '@wordpress/hooks';
+
+const MyComponent = ( { hint, title } ) => (
+	<Fragment>
+		<h1>{ title }</h1>
+		<p>{ hint }</p>
+	</Fragment> 
+);
+
+function withHintOverriden( FilteredComponent ) {
+	return ( props ) => (
+		<FilteredComponent
+			{ ...props }
+			hint="Overriden hint"
+		/>
+	);
+ }
+
+addFilter(
+	'MyHookName',
+	'my-plugin/with-hint-overriden',
+	withHintOverriden
+);
+
+const MyComponentWithFilters = withFilters( 'MyHookName' )( MyComponent );
+```

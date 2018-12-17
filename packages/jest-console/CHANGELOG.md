@@ -1,3 +1,5 @@
+## 2.0.7 (2018-11-20)
+
 ## 2.0.5 (2018-09-30)
 
 ### Bug Fixes
@@ -19,7 +21,7 @@
 
 ### Polish
 
-- Fix: Standardized `package.json` format  ([#119](https://github.com/WordPress/packages/pull/119))
+- Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 1.0.6 (2018-02-28)
 
