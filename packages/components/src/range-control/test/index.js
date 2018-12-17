@@ -81,4 +81,138 @@ describe( 'RangeControl', () => {
 			expect( icons[ 1 ].props.icon ).toBe( 'format-video' );
 		} );
 	} );
+
+	describe( 'validation', () => {
+		it( 'does not calls onChange if the new value is lower than minimum', () => {
+			// Mount: With shallow, cannot find input child of BaseControl
+			const onChange = jest.fn();
+			const wrapper = getWrapper( { onChange, min: 11, value: 12 } );
+
+			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__number'
+			);
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '10' },
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not calls onChange if the new value is greater than maximum', () => {
+			// Mount: With shallow, cannot find input child of BaseControl
+			const onChange = jest.fn();
+			const wrapper = getWrapper( { onChange, max: 20, value: 12 } );
+
+			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__number'
+			);
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '21' },
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'calls onChange after invalid inputs if the new input is valid', () => {
+			// Mount: With shallow, cannot find input child of BaseControl
+			const onChange = jest.fn();
+			const wrapper = getWrapper( { onChange, min: 11, max: 20, value: 12 } );
+
+			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__number'
+			);
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '10' },
+				}
+			);
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '21' },
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '14' },
+				}
+			);
+
+			expect( onChange ).toHaveBeenCalledWith( 14 );
+		} );
+
+		it( 'validates when provided a max or min of zero', () => {
+			const onChange = jest.fn();
+			const wrapper = getWrapper( { onChange, min: -100, max: 0, value: 0 } );
+
+			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__number'
+			);
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '1' },
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'validates when min and max are negative', () => {
+			const onChange = jest.fn();
+			const wrapper = getWrapper( { onChange, min: -100, max: -50, value: -60 } );
+
+			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
+				wrapper,
+				'components-range-control__number'
+			);
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '-101' },
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '-49' },
+				}
+			);
+
+			expect( onChange ).not.toHaveBeenCalled();
+
+			TestUtils.Simulate.change(
+				numberInputElement(),
+				{
+					target: { value: '-50' },
+				}
+			);
+
+			expect( onChange ).toHaveBeenCalled();
+		} );
+	} );
 } );

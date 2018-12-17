@@ -169,6 +169,21 @@ If allowReset is true, when onChange is called without any parameter passed it s
 - Type: `function`
 - Required: Yes
 
+#### min
+
+The minimum value accepted. If smaller values are inserted onChange will not be called and the value gets reverted when blur event fires.
+
+- Type: `Number`
+- Required: No
+
+
+#### max
+
+The maximum value accepted. If higher values are inserted onChange will not be called and the value gets reverted when blur event fires.
+
+- Type: `Number`
+- Required: No
+
 ## Related components
 
 - To collect a numerical input in a text field, use the `TextControl` component.
