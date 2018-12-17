@@ -29,6 +29,15 @@ import {
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
 /**
+ * The default number of columns.
+ * When columns attribute is not set this value should be used.
+ *
+ * @constant
+ * @type {number}
+*/
+const DEFAULT_NUMBER_OF_COLUMNS = 2;
+
+/**
  * Returns the layouts configuration for a given number of columns.
  *
  * @param {number} columns Number of columns.
@@ -77,7 +86,7 @@ export const settings = {
 	attributes: {
 		columns: {
 			type: 'number',
-			default: 2,
+			default: DEFAULT_NUMBER_OF_COLUMNS,
 		},
 	},
 
@@ -167,7 +176,7 @@ export const settings = {
 							value={ columns }
 							onChange={ ( nextColumns ) => {
 								setAttributes( {
-									columns: nextColumns,
+									columns: nextColumns || DEFAULT_NUMBER_OF_COLUMNS,
 								} );
 							} }
 							min={ 2 }
