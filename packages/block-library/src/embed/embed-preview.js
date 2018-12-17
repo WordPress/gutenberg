@@ -28,10 +28,11 @@ const EmbedPreview = ( props ) => {
 	const { scripts } = preview;
 
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-	const parsedUrl = parse( url );
-	const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
+	const parsedHost = parse( url ).host.split( '.' );
+	const parsedHostBaseUrl = parsedHost.splice( parsedHost.length - 2, parsedHost.length - 1 ).join( '.' );
+	const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedHostBaseUrl );
 	// translators: %s: host providing embed content e.g: www.youtube.com
-	const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+	const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedHostBaseUrl );
 	const sandboxClassnames = classnames( type, className, 'wp-block-embed__wrapper' );
 
 	const embedWrapper = 'wp-embed' === type ? (
