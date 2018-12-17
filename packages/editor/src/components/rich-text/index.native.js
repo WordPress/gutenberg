@@ -370,6 +370,7 @@ export class RichText extends Component {
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
 					isSelected={ this.props.isSelected }
+					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
