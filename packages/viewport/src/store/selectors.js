@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { takeRight } from 'lodash';
-
-/**
  * Returns true if the viewport matches the given query, or false otherwise.
  *
  * @param {Object} state Viewport state object.
@@ -20,9 +15,10 @@ import { takeRight } from 'lodash';
  * @return {boolean} Whether viewport matches query.
  */
 export function isViewportMatch( state, query ) {
-	// Pad to _at least_ two elements to take from the right, effectively
-	// defaulting the left-most value.
-	const key = takeRight( [ '>=', ...query.split( ' ' ) ], 2 ).join( ' ' );
+	// Default to `>=` if no operator is present.
+	if ( query.indexOf( ' ' ) === -1 ) {
+		query = '>= ' + query;
+	}
 
-	return !! state[ key ];
+	return !! state[ query ];
 }

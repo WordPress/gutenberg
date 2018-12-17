@@ -132,22 +132,22 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Backwards Compatibility",
-		"slug": "backwards-compatibility",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backwards-compatibility/README.md",
+		"title": "Backward Compatibility",
+		"slug": "backward-compatibility",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backward-compatibility/README.md",
 		"parent": "developers"
 	},
 	{
 		"title": "Deprecations",
 		"slug": "deprecations",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backwards-compatibility/deprecations.md",
-		"parent": "backwards-compatibility"
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backward-compatibility/deprecations.md",
+		"parent": "backward-compatibility"
 	},
 	{
 		"title": "Meta Boxes",
 		"slug": "meta-box",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backwards-compatibility/meta-box.md",
-		"parent": "backwards-compatibility"
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/backward-compatibility/meta-box.md",
+		"parent": "backward-compatibility"
 	},
 	{
 		"title": "Tutorials",
@@ -196,6 +196,42 @@
 		"slug": "generate-blocks-with-wp-cli",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/block-tutorial/generate-blocks-with-wp-cli.md",
 		"parent": "block-tutorial"
+	},
+	{
+		"title": "Getting Started with JavaScript",
+		"slug": "javascript",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Plugins Background",
+		"slug": "plugins-background",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/plugins-background.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Loading JavaScript",
+		"slug": "loading-javascript",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/loading-javascript.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Extending the Block Editor",
+		"slug": "extending-the-block-editor",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "Troubleshooting",
+		"slug": "troubleshooting",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/troubleshooting.md",
+		"parent": "javascript"
+	},
+	{
+		"title": "JavaScript versions and build step",
+		"slug": "versions-and-building",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md",
+		"parent": "javascript"
 	},
 	{
 		"title": "Designer Documentation",
@@ -498,9 +534,9 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/eslint-config",
-		"slug": "packages-eslint-config",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/eslint-config/README.md",
+		"title": "@wordpress/eslint-plugin",
+		"slug": "packages-eslint-plugin",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/eslint-plugin/README.md",
 		"parent": "packages"
 	},
 	{

@@ -657,9 +657,6 @@ const applyWithSelect = withSelect(
 	( select, { clientId, rootClientId, isLargeViewport } ) => {
 		const {
 			isBlockSelected,
-			getBlockName,
-			isBlockValid,
-			getBlockAttributes,
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
@@ -675,13 +672,14 @@ const applyWithSelect = withSelect(
 			getTemplateLock,
 			getPreviousBlockClientId,
 			getNextBlockClientId,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/editor' );
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode } = getEditorSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-		const name = getBlockName( clientId );
-		const attributes = getBlockAttributes( clientId );
+		const { name, attributes, isValid } = block;
 
 		return {
 			isPartOfMultiSelection:
@@ -699,13 +697,19 @@ const applyWithSelect = withSelect(
 			initialPosition: getSelectedBlocksInitialCaretPosition(),
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isValid: isBlockValid( clientId ),
 			isMovable: 'all' !== templateLock,
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
+
+			// Users of the editor.BlockListBlock filter used to be able to access the block prop
+			// Ideally these blocks would rely on the clientId prop only.
+			// This is kept for backward compatibility reasons.
+			block,
+
 			name,
 			attributes,
+			isValid,
 			isSelected,
 			isParentOfSelectedBlock,
 
@@ -777,9 +781,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 } );
 
 export default compose(
-	withFilters( 'editor.BlockListBlock' ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
-	withFilters( 'editor.__experimentalBlockListBlock' )
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

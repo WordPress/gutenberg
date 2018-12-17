@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-serialization-spec-parser",
-	"version": "2.0.1",
+	"version": "2.0.2",
 	"description": "Block serialization specification parser for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -17,9 +17,6 @@
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
-	},
-	"devDependencies": {
-		"pegjs": "0.10.0"
 	},
 	"publishConfig": {
 		"access": "public"
