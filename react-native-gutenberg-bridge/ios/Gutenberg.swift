@@ -22,6 +22,10 @@ public class Gutenberg: NSObject {
         }
     }
 
+    public var isLoaded: Bool {
+        return !bridge.isLoading
+    }
+
     private let bridgeModule = RNReactNativeGutenbergBridge()
     private unowned let dataSource: GutenbergBridgeDataSource
 

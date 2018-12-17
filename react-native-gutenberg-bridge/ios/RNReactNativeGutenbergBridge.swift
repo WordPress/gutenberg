@@ -1,6 +1,7 @@
 @objc (RNReactNativeGutenbergBridge)
 public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     weak var delegate: GutenbergBridgeDelegate?
+    private var isJSLoading = true
 
     // MARK: - Messaging methods
 
@@ -34,6 +35,15 @@ extension RNReactNativeGutenbergBridge {
 
     public override static func requiresMainQueueSetup() -> Bool {
         return true
+    }
+
+    public override func batchDidComplete() {
+        if isJSLoading {
+            isJSLoading = false
+            DispatchQueue.main.async {
+                self.delegate?.gutenbergDidLoad()
+            }
+        }
     }
 }
 

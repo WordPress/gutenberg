@@ -6,7 +6,7 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 
-import { Text, View, FlatList, Keyboard, LayoutChangeEvent } from 'react-native';
+import { Text, View, FlatList, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
 import BlockHolder from './block-holder';
 import { InlineToolbarActions } from './inline-toolbar';
 import type { BlockType } from '../store/types';
@@ -253,11 +253,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		);
 
 		return (
-			<View style={ styles.container } onLayout={ this.onRootViewLayout }>
+			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
 				{ this.props.showHtml && this.renderHTML() }
 				{ ! this.props.showHtml && list }
 				{ this.state.blockTypePickerVisible && blockTypePicker }
-			</View>
+			</SafeAreaView>
 		);
 	}
 

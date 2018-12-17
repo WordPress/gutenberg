@@ -29,6 +29,10 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+    func gutenbergDidLoad() {
+
+    }
+
     func gutenbergDidProvideHTML(_ html: String, changed: Bool) {
         print("Did receive HTML: \(html) changed: \(changed)")
     }

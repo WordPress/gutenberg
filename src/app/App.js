@@ -20,14 +20,15 @@ setUnregisteredTypeHandlerName( UnsupportedBlock.name );
 
 type PropsType = {
 	initialData: string,
+	initialHtmlModeEnabled: boolean,
 };
 
-const AppProvider = ( { initialData }: PropsType ) => {
+const AppProvider = ( { initialData, initialHtmlModeEnabled }: PropsType ) => {
 	if ( initialData === undefined ) {
 		initialData = initialHtml;
 	}
 	return (
-		<AppContainer initialHtml={ initialData } />
+		<AppContainer initialHtml={ initialData } initialHtmlModeEnabled={ initialHtmlModeEnabled } />
 	);
 };
 
