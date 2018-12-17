@@ -198,7 +198,11 @@ export class RichText extends Component {
 	}
 
 	onSelectionChange( start, end ) {
-		this.setState( { start, end } );
+		// `end` can be less than `start` on iOS
+		// Let's fix that here so `rich-text/slice` can work properly
+		const realStart = Math.min( start, end );
+		const realEnd = Math.max( start, end );
+		this.setState( { start: realStart, end: realEnd } );
 	}
 
 	isEmpty() {
