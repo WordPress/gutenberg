@@ -232,7 +232,7 @@ export class RichText extends Component {
 		return value;
 	}
 
-	shouldComponentUpdate( nextProps, nextState ) {
+	shouldComponentUpdate( nextProps ) {
 		if ( nextProps.tagName !== this.props.tagName || nextProps.isSelected !== this.props.isSelected ) {
 			this.lastEventCount = undefined;
 			this.lastContent = undefined;
