@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TextInput } from 'react-native';
+import { TextInput, Platform } from 'react-native';
 
 /**
  * WordPress dependencies

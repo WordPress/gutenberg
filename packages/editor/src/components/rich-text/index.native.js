@@ -2,7 +2,7 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import {
 	forEach,
 	merge,
