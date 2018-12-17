@@ -655,10 +655,12 @@ export class BlockListBlock extends Component {
 }
 
 const applyWithSelect = withSelect(
-	( select, { clientId, rootClientId, isLargeViewport, block } ) => {
+	( select, { clientId, rootClientId, isLargeViewport } ) => {
 		const {
 			isBlockSelected,
+			getBlockName,
 			isBlockValid,
+			getBlockAttributes,
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
@@ -675,11 +677,12 @@ const applyWithSelect = withSelect(
 			getPreviousBlockClientId,
 			getNextBlockClientId,
 		} = select( 'core/editor' );
-		const { name, attributes } = block;
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode } = getEditorSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
+		const name = getBlockName( clientId );
+		const attributes = getBlockAttributes( clientId );
 
 		return {
 			isPartOfMultiSelection:
@@ -702,6 +705,12 @@ const applyWithSelect = withSelect(
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
+
+			// Users of the editor.BlockListBlock filter used to be able to access the block prop
+			// Ideally these blocks would rely on the clientId prop only.
+			// This is kept for backward compatibility reasons.
+			block: getBlock( name, attributes ),
+
 			name,
 			attributes,
 			isSelected,
@@ -782,20 +791,9 @@ const getBlock = memize( ( name, attributes ) => {
 } );
 
 export default compose(
-	// This withSelect is only necessary for backward compatibility
-	// Users of the editor.BlockListBlock filter used to be able to access the block prop
-	// Ideally these blocks would rely on the clientId prop only.
-	withSelect( ( select, { clientId } ) => {
-		const { getBlockName, getBlockAttributes } = select( 'core/editor' );
-		const name = getBlockName( clientId );
-		const attributes = getBlockAttributes( clientId );
-		return {
-			block: getBlock( name, attributes ),
-		};
-	} ),
 	withFilters( 'editor.BlockListBlock' ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
-	withFilters( 'editor.__experimentalBlockListBlock' )
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );
