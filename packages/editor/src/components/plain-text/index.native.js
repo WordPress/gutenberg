@@ -14,6 +14,8 @@ import { Component } from '@wordpress/element';
 import styles from './style.scss';
 
 export default class PlainText extends Component {
+	isIOS: boolean = Platform.OS === 'ios';
+
 	componentDidMount() {
 		// if isSelected is true, we should request the focus on this TextInput
 		if ( ( this._input.isFocused() === false ) && ( this._input.props.isSelected === true ) ) {
@@ -22,7 +24,7 @@ export default class PlainText extends Component {
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( ! this.props.isSelected && prevProps.isSelected ) {
+		if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
 			this._input.blur();
 		}
 	}
