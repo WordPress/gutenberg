@@ -1,3 +1,9 @@
+## 9.0.6 (Unreleased)
+
+### Bug Fixes
+
+- Restore the `block` prop in the `BlockListBlock` filter.
+
 ## 9.0.5 (2018-12-12)
 
 ### Bug Fixes
