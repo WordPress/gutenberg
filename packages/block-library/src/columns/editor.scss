@@ -89,8 +89,8 @@
 
 			// Beyond mobile, allow 2 columns.
 			@include break-small() {
-				// Size should be half the available width, minus the margins added below
-				// In the editor, we also need to account for additional block padding
+				// Size should be half the available width, minus the margins added below.
+				// In the editor, we also need to account for additional block padding.
 				flex-basis: calc(50% - #{$grid-size-large * 2} - #{$block-padding * 2});
 				flex-grow: 0;
 			}
@@ -104,6 +104,7 @@
 				&:nth-child(odd) {
 					margin-right: $grid-size-large * 2;
 				}
+
 				&:nth-child(even) {
 					margin-left: $grid-size-large * 2;
 				}
@@ -114,14 +115,17 @@
 				&:nth-child(even) {
 					margin-left: initial;
 				}
+
 				&:nth-child(odd) {
 					margin-right: initial;
 				}
+
 				// Add left margin to all but first column
 				&:not(:first-child) {
 					margin-left: $grid-size-large * 2;
 				}
-				// add right margin to all but last column
+
+				// Add right margin to all but last column.
 				&:not(:last-child) {
 					margin-right: $grid-size-large * 2;
 				}
