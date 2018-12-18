@@ -124,6 +124,7 @@ add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 
 ## Step 3: an input that updates its content
 
+```js
 ( function( wp ) {
 	var el = wp.element.createElement;
 	var Component = wp.element.Component;
@@ -163,6 +164,7 @@ add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 		}
 	} );
 } )( window.wp );
+```
 
 ## Step 4: connect to post meta
 
