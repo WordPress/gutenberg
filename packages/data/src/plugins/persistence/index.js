@@ -38,7 +38,7 @@ const DEFAULT_STORAGE_KEY = 'WP_DATA';
  * Higher-order reducer to provides an initial value when state is undefined.
  *
  * @param {Function} reducer      Original reducer.
- * @param {*}         initialState Value to use as initial state.
+ * @param {*}        initialState Value to use as initial state.
  *
  * @return {Function} Enhanced reducer.
  */
@@ -47,6 +47,23 @@ export function withInitialState( reducer, initialState ) {
 		return reducer( state, action );
 	};
 }
+
+/**
+ * Higher-order reducer which invokes the original reducer only if state is
+ * inequal from that of the action's `nextState` property, otherwise returning
+ * the original state reference.
+ *
+ * @param {Function} reducer Original reducer.
+ *
+ * @return {Function} Enhanced reducer.
+ */
+export const withLazySameState = ( reducer ) => ( state, action ) => {
+	if ( action.nextState === state ) {
+		return state;
+	}
+
+	return reducer( state, action );
+};
 
 /**
  * Creates a persistence interface, exposing getter and setter methods (`get`
@@ -137,7 +154,7 @@ export default function( registry, pluginOptions ) {
 				[ key ]: ( state, action ) => action.nextState[ key ],
 			} ), {} );
 
-			getPersistedState = combineReducers( reducers );
+			getPersistedState = withLazySameState( combineReducers( reducers ) );
 		} else {
 			getPersistedState = ( state, action ) => action.nextState;
 		}
