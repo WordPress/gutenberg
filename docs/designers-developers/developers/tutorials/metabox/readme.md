@@ -1,19 +1,19 @@
-
 # Meta Boxes
 
-A previous method to extend the editor was custom meta boxes. The new block editor has numerous new ways to extend the editor that offer a better experience it is encouraged to port custom meta boxes. For more information for existing meta boxes, see [this backward compatibility article](../../../../../docs/designers-developers/developers/backward-compatibility/meta-box.md).
+Prior to the block editor, custom meta boxes were used to extend the editor. The new editor enables new ways to extend giving more power to the developer, and a better experience for the authors. Porting older custom meta boxes to one of these new methods is encouraged, to create a more unified and consistent experience for those using the editor.
 
+The new block editor does support most existing meta boxes, see [this backward compatibility article](../../../../../docs/designers-developers/developers/backward-compatibility/meta-box.md) for more support details .
 
-Here are tutorials for two methods for creating similar functionality in the Block Editor.
+Here are two mini-tutorials for creating similar functionality to meta boxe in the Block Editor.
 
-### Use Blocks to Store Meta
+## Use Blocks to Store Meta
 
 The first method is to use Blocks to store extra data with a post. The data is stored in a post meta field, similar to how meta boxes store information.
 
 * [Store Post Meta with a Block](../../../../../docs/designers-developers/developers/tutorials/metabox/block-post-meta.md)
 
 
-### Sidebar Plugin
+## Sidebar Plugin
 
 
 **TODO** This tutorial needs to be written.

@@ -1,5 +1,4 @@
-
-### Create Plugin
+# Create Plugin
 
 To extend the editor, you first need to create a plugin to hold your code. Go ahead and create a new directory in `wp-content/plugins/` called `myguten-meta-block`. Inside the directory create the file `myguten-meta-block.php` with the contents:
 
