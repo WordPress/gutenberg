@@ -74,7 +74,7 @@ dependencies {
     } else {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-aztec', submoduleGitHash('../../', 'react-native-aztec')))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'dc8284f995576b3e6289bc4fc33134c962a0902b'))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'f845b3c2c4411b8e97db23724bf1a535530c5435'))
     }
 
     def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
