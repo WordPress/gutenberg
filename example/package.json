@@ -18,8 +18,8 @@
     "clean:install": "yarn clean && yarn install"
   },
   "dependencies": {
-    "react": "16.5.0",
-	"react-native": "0.57.1"
+    "react": "16.6.1",
+	"react-native": "0.57.5"
   },
   "devDependencies": {
 	"metro-react-native-babel-preset": "^0.45.5",
