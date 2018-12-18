@@ -17,7 +17,7 @@ import PostAuthorCheck from './check';
  */
 import Autocomplete from 'accessible-autocomplete/react';
 
-import { findWhere, debounce } from 'underscore';
+import { findWhere, debounce } from 'lodash';
 
 export class PostAuthor extends Component {
 	constructor() {
