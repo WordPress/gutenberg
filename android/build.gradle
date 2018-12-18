@@ -91,10 +91,10 @@ repositories {
 }
 
 dependencies {
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:fbf294b88d17996aff9e3d62a293d2638818dd0a')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:fbf294b88d17996aff9e3d62a293d2638818dd0a')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:fbf294b88d17996aff9e3d62a293d2638818dd0a')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:fbf294b88d17996aff9e3d62a293d2638818dd0a')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:254feae6f05587a1b1614ba1527038c25d75ee4a')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:254feae6f05587a1b1614ba1527038c25d75ee4a')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:254feae6f05587a1b1614ba1527038c25d75ee4a')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:254feae6f05587a1b1614ba1527038c25d75ee4a')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
