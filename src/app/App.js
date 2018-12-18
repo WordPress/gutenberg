@@ -25,13 +25,16 @@ type PropsType = {
 };
 
 class AppProvider extends React.Component<PropsType> {
-
 	componentDidMount() {
-		RNReactNativeGutenbergBridge.moduleDidMount();
+		// At this points (apparently) component setup haven't finished yet.
+		// Giving it one extra milisecond does the trick.
+		setTimeout( () => {
+			RNReactNativeGutenbergBridge.moduleDidMount();
+		}, 1 );
 	}
 
 	render() {
-		var { initialData } = this.props;
+		let { initialData } = this.props;
 
 		if ( initialData === undefined ) {
 			initialData = initialHtml;
@@ -41,6 +44,6 @@ class AppProvider extends React.Component<PropsType> {
 			<AppContainer initialHtml={ initialData } initialHtmlModeEnabled={ this.props.initialHtmlModeEnabled } />
 		);
 	}
-};
+}
 
 export default AppProvider;
