@@ -30,17 +30,6 @@ export function* getAuthors() {
 }
 
 /**
- * Request a single author from the REST API.
- *
- * @param {Object} state  State tree.
- * @param {string} id     Author id.
- */
-export function* getAuthor( state, id = '' ) {
-	const users = yield apiFetch( { path: `/wp/v2/users/${ id }?who=authors&per_page=100` } );
-	yield receiveUserQuery( 'author', users );
-}
-
-/**
  * Requests an entity's record from the REST API.
  *
  * @param {string} kind   Entity kind.
