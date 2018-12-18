@@ -38,7 +38,7 @@ const config = ! hasJestConfig() ?
 
 const hasRunInBand = hasCliArg( '--runInBand' ) ||
 	hasCliArg( '-i' );
-const runInBand = hasRunInBand ?
+const runInBand = ! hasRunInBand ?
 	[ '--runInBand' ] :
 	[];
 
