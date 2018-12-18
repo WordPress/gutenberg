@@ -8,7 +8,6 @@ import React from 'react';
 // Gutenberg imports
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { registerBlockType, setUnregisteredTypeHandlerName } from '@wordpress/blocks';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 import AppContainer from './AppContainer';
 import initialHtml from './initial-html';
@@ -24,26 +23,13 @@ type PropsType = {
 	initialHtmlModeEnabled: boolean,
 };
 
-class AppProvider extends React.Component<PropsType> {
-	componentDidMount() {
-		// At this points (apparently) component setup haven't finished yet.
-		// Giving it one extra milisecond does the trick.
-		setTimeout( () => {
-			RNReactNativeGutenbergBridge.moduleDidMount();
-		}, 1 );
+const AppProvider = ( { initialData, initialHtmlModeEnabled }: PropsType ) => {
+	if ( initialData === undefined ) {
+		initialData = initialHtml;
 	}
-
-	render() {
-		let { initialData } = this.props;
-
-		if ( initialData === undefined ) {
-			initialData = initialHtml;
-		}
-
-		return (
-			<AppContainer initialHtml={ initialData } initialHtmlModeEnabled={ this.props.initialHtmlModeEnabled } />
-		);
-	}
-}
+	return (
+		<AppContainer initialHtml={ initialData } initialHtmlModeEnabled={ initialHtmlModeEnabled } />
+	);
+};
 
 export default AppProvider;
