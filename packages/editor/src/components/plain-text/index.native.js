@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TextInput } from 'react-native';
+import { TextInput, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -14,10 +14,18 @@ import { Component } from '@wordpress/element';
 import styles from './style.scss';
 
 export default class PlainText extends Component {
+	isIOS: boolean = Platform.OS === 'ios';
+
 	componentDidMount() {
 		// if isSelected is true, we should request the focus on this TextInput
 		if ( ( this._input.isFocused() === false ) && ( this._input.props.isSelected === true ) ) {
 			this.focus();
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+			this._input.blur();
 		}
 	}
 

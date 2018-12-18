@@ -2,7 +2,7 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import {
 	forEach,
 	merge,
@@ -64,6 +64,8 @@ export function getFormatValue( formatName ) {
 }
 
 export class RichText extends Component {
+	isIOS: boolean = Platform.OS === 'ios';
+
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
@@ -292,6 +294,8 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
+		} else if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+			this._editor.blur();
 		}
 	}
 
