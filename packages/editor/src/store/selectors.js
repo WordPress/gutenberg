@@ -704,6 +704,24 @@ export const getBlock = createSelector(
 	]
 );
 
+export const __unstableGetBlockWithoutInnerBlocks = createSelector(
+	( state, clientId ) => {
+		const block = state.editor.present.blocks.byClientId[ clientId ];
+		if ( ! block ) {
+			return null;
+		}
+
+		return {
+			...block,
+			attributes: getBlockAttributes( state, clientId ),
+		};
+	},
+	( state, clientId ) => [
+		state.editor.present.blocks.byClientId[ clientId ],
+		...getBlockAttributes.getDependants( state, clientId ),
+	]
+);
+
 function getPostMeta( state, key ) {
 	return has( state, [ 'editor', 'present', 'edits', 'meta', key ] ) ?
 		get( state, [ 'editor', 'present', 'edits', 'meta', key ] ) :
