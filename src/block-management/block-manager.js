@@ -6,15 +6,18 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 
-import { Text, View, FlatList, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
 import BlockHolder from './block-holder';
 import { InlineToolbarActions } from './inline-toolbar';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
+import inlineToolbarStyles from './inline-toolbar/style.scss';
+import toolbarStyles from './block-toolbar.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
+import KeyboardAwareFlatList from '../components/keyboard-aware-flat-list';
 
 // Gutenberg imports
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -63,6 +66,10 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	constructor( props: PropsType ) {
 		super( props );
+
+		( this: any ).renderItem = this.renderItem.bind( this );
+		( this: any ).shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		( this: any ).keyExtractor = this.keyExtractor.bind( this );
 
 		const blocks = props.blocks.map( ( block ) => {
 			const newBlock = { ...block };
@@ -208,33 +215,52 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		this.props.replaceBlock( clientId, block );
 	}
 
+	shouldFlatListPreventAutomaticScroll() {
+		return this.state.blockTypePickerVisible;
+	}
+
+	keyExtractor( item: Object ) {
+		return item.clientId;
+	}
+
 	renderList() {
 		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
 		// And fix problems with RecyclerViewList on Android
 		const list = (
-			<FlatList
+			<KeyboardAwareFlatList
+				blockToolbarHeight={ toolbarStyles.container.height }
+				innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
+				parentHeight={ this.state.rootViewHeight }
 				keyboardShouldPersistTaps="always"
 				style={ styles.list }
 				data={ this.state.blocks }
 				extraData={ { refresh: this.state.refresh } }
-				keyExtractor={ ( item ) => item.clientId }
-				renderItem={ this.renderItem.bind( this ) }
+				keyExtractor={ this.keyExtractor }
+				renderItem={ this.renderItem }
+				shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 			/>
 		);
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } } parentHeight={ this.state.rootViewHeight }>
+			<View style={ { flex: 1 } } >
 				<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
 				{ list }
-				<BlockToolbar
-					onInsertClick={ () => {
-						this.showBlockTypePicker( true );
-					} }
-					onKeyboardHide={ () => {
-						this.onKeyboardHide();
-					} }
-					showKeyboardHideButton={ this.state.isKeyboardVisible }
-				/>
-			</KeyboardAvoidingView>
+				<SafeAreaView>
+					<View style={ { height: toolbarStyles.container.height } } />
+				</SafeAreaView>
+				<KeyboardAvoidingView
+					style={ styles.blockToolbarKeyboardAvoidingView }
+					parentHeight={ this.state.rootViewHeight } >
+					<BlockToolbar
+						onInsertClick={ () => {
+							this.showBlockTypePicker( true );
+						} }
+						onKeyboardHide={ () => {
+							this.onKeyboardHide();
+						} }
+						showKeyboardHideButton={ this.state.isKeyboardVisible }
+					/>
+				</KeyboardAvoidingView>
+			</View>
 		);
 	}
 
