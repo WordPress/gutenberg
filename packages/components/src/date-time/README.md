@@ -41,10 +41,11 @@ The component accepts the following props:
 
 ### currentDate
 
-The current date and time at initialization.
+The current date and time at initialization. Optionally pass in a `null` value to specify no date is currently selected.
 
 - Type: `string`
-- Required: Yes
+- Required: No
+- Default: today's date
 
 ### onChange
 
