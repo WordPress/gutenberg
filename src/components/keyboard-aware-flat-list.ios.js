@@ -22,10 +22,19 @@ const KeyboardAwareFlatList = ( props: PropsType ) => {
 		shouldPreventAutomaticScroll,
 		...listProps
 	} = props;
-	const { height: fullHeight } = Dimensions.get( 'window' );
-	const keyboardVerticalOffset = fullHeight - parentHeight;
-	const blockHolderPadding = 8;
-	const extraScrollHeight = blockToolbarHeight + innerToolbarHeight + blockHolderPadding + keyboardVerticalOffset;
+
+	const extraScrollHeight = ( () => {
+		const { height: fullHeight, width: fullWidth } = Dimensions.get( 'window' );
+		const keyboardVerticalOffset = fullHeight - parentHeight;
+		const blockHolderPadding = 8;
+
+		if ( fullWidth > fullHeight ) { //landscape mode
+			//we won't try to make inner block visible in landscape mode because there's not enough room for it
+			return blockToolbarHeight + keyboardVerticalOffset;
+		}
+		//portrait mode
+		return blockToolbarHeight + keyboardVerticalOffset + blockHolderPadding + innerToolbarHeight;
+	} )();
 
 	return (
 		<KeyboardAwareScrollView
