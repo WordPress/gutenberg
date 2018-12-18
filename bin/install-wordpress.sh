@@ -92,5 +92,5 @@ echo -e $(status_message "Activating Gutenberg...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin activate gutenberg --quiet
 
 # Install a dummy favicon to avoid 404 errors.
-echo -e $(status_message "Intalling a dummy favicon...")
+echo -e $(status_message "Installing a dummy favicon...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER touch /var/www/html/favicon.ico
