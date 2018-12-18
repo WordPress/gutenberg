@@ -11,6 +11,7 @@
 	border-color: $gray-lighten-30;
 	border-top-width: 1px;
 	border-bottom-width: 1px;
+	padding-bottom: -12;
 }
 
 .blockContainer {
@@ -19,6 +20,14 @@
 	padding-right: 16;
 	padding-top: 12;
 	padding-bottom: 12;
+}
+
+.blockContainerFocused {
+	background-color: white;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 0; // will be flushed into inline toolbar height
 }
 
 .blockTitle {

@@ -80,7 +80,7 @@ export class BlockHolder extends React.Component<PropsType> {
 			<TouchableWithoutFeedback onPress={ this.props.onSelect } >
 				<View style={ [ styles.blockHolder, focused && styles.blockHolderFocused ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
-					<View style={ styles.blockContainer }>{ this.getBlockForType() }</View>
+					<View style={ [ !focused && styles.blockContainer, focused && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
 					{ this.renderToolbarIfBlockFocused() }
 				</View>
 			</TouchableWithoutFeedback>
