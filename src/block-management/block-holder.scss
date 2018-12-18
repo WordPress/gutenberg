@@ -15,8 +15,10 @@
 
 .blockContainer {
 	background-color: white;
-	padding-left: 8;
-	padding-right: 8;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 12;
 }
 
 .blockTitle {
@@ -32,8 +34,6 @@
 	padding-bottom: 8;
 	padding-left: 8;
 	padding-right: 8;
-	margin-top: 12;
-	margin-bottom: 12;
 }
 
 .unsupportedBlockImagePlaceholder {
