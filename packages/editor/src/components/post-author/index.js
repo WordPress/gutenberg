@@ -17,7 +17,7 @@ import PostAuthorCheck from './check';
  */
 import Autocomplete from 'accessible-autocomplete/react';
 
-import { findWhere, debounce } from 'lodash';
+import { debounce } from 'lodash';
 
 export class PostAuthor extends Component {
 	constructor() {
@@ -39,7 +39,9 @@ export class PostAuthor extends Component {
 			this.setState( { postAuthor } );
 		}
 
-		const authorInAuthors = findWhere( authors, { id: postAuthorId } );
+		const authorInAuthors = authors.find( ( singleAuthor ) => {
+			return singleAuthor.id === postAuthorId;
+		} );
 
 		// Set or fetch the current author.
 		if ( authorInAuthors ) {
@@ -76,7 +78,9 @@ export class PostAuthor extends Component {
 		const { onUpdateAuthor } = this.props;
 		if ( typeof selection === 'string' ) {
 			// Author name from the autocompleter.
-			const author = findWhere( this.authors, { name: selection } );
+			const author = this.authors.find( ( singleAuthor ) => {
+				return singleAuthor.name === selection;
+			} );
 			onUpdateAuthor( Number( author.id ) );
 		} else {
 			// Author ID from the select.
