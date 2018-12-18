@@ -138,6 +138,34 @@ describe( 'persistence', () => {
 		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":1}}' );
 	} );
 
+	it( 'should not persist an unchanging subset', () => {
+		const initialState = { foo: 'bar' };
+		function reducer( state = initialState, action ) {
+			const { type, key, value } = action;
+			if ( type === 'SET_KEY_VALUE' ) {
+				return { ...state, [ key ]: value };
+			}
+
+			return state;
+		}
+
+		registry.registerStore( 'test', {
+			reducer,
+			persist: [ 'foo' ],
+			actions: {
+				setKeyValue( key, value ) {
+					return { type: 'SET_KEY_VALUE', key, value };
+				},
+			},
+		} );
+
+		registry.dispatch( 'test' ).setKeyValue( 'foo', 1 );
+		objectStorage.setItem.mockClear();
+
+		registry.dispatch( 'test' ).setKeyValue( 'foo', 1 );
+		expect( objectStorage.setItem ).not.toHaveBeenCalled();
+	} );
+
 	describe( 'createPersistenceInterface', () => {
 		const storage = objectStorage;
 		const storageKey = 'FOO';
