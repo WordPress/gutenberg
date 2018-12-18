@@ -35,7 +35,7 @@
 	position: relative;
 }
 .components-color-picker__body {
-	padding: 16px 0 12px;
+	padding: $grid-size-large 0 #{ $grid-size-small * 3 };
 }
 .components-color-picker__controls {
 	display: flex;
@@ -199,6 +199,7 @@
 	fieldset {
 		flex: 1;
 	}
+
 	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
 		padding: 2px;
 	}
