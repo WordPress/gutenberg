@@ -19,6 +19,39 @@ Basic block settings won’t always make sense in the context of the placeholder
 
 The sidebar is not visible by default on a small / mobile screen, and may also be collapsed in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the sidebar as something that only power users may discover. In addition, use sections and headers in the block sidebar if there are more than a handful of options, in order to allow users to easily scan and understand the options available.
 
+## Setup state vs. live preview state
+
+Often a block will use the placeholder content to walk users through a setup process. The setup process gathers information from the user that is needed to render the block. A block’s setup state is indicated with a grey background to provide clear differentiation for the user. Not all blocks have setup states — for example, the paragraph block.
+
+
+![An example of a gallery block’s setup state on a grey background](https://make.wordpress.org/design/files/2018/12/gallery-setup.png)
+
+
+A setup state is **not** necessary if:
+
+- You can provide good default content in the block that will meet most people’s needs.
+- That default content is easy to edit and customize.
+
+Use a setup state if:
+
+- There isn’t a clear default state that would work for most users.
+- You need to gather input from the user that doesn’t have a 1-1 relationship with the live preview of the block (for example, if you need the user to input an API key to render content).
+- You need more information from the user in order to render useful default content.
+
+For blocks that do have setup states, once the user has gone through the setup process, the placeholder is replaced with the live preview state of that block.
+
+
+![An example of the image gallery’s live preview state](https://make.wordpress.org/design/files/2018/12/gallery-live-preview.png)
+
+
+When the block is selected, additional controls may be revealed to customize the block’s contents. For example, when the image gallery is selected, it reveals controls to remove or add images.
+
+
+![An example of additional controls being revealed on selection of a block.](https://make.wordpress.org/design/files/2018/12/gallery-additional-controls.png)
+
+
+In most cases, a block’s setup state is only shown once and then further customization is done via the live preview state. However, in some cases it might be desirable to allow the user to return to the setup state — for example, if all the block content has been deleted or via a link from the block’s toolbar or sidebar.
+
 ## Do's and Don'ts 
 
 ### Blocks
