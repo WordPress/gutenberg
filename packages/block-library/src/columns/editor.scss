@@ -77,6 +77,10 @@
 				margin-right: $block-padding;
 			}
 
+			// Because the columns wrap, each column container needs the same margin a block would have,
+			// otherwise there would be overlap.
+			margin-bottom: $block-padding * 2;
+
 			// Prevent the columns from growing wider than their distributed sizes.
 			min-width: 0;
 
@@ -91,7 +95,7 @@
 			@include break-small() {
 				// Size should be half the available width, minus the margins added below.
 				// In the editor, we also need to account for additional block padding.
-				flex-basis: calc(50% - #{$grid-size-large * 2} - #{$block-padding * 2});
+				flex-basis: calc(50% - #{ $grid-size-large } - #{$block-padding * 2});
 				flex-grow: 0;
 			}
 
@@ -102,15 +106,19 @@
 			// 2 columns at this breakpoint, and items beyond the second will wrap.
 			@include break-small() {
 				&:nth-child(odd) {
-					margin-right: $grid-size-large * 2 + $block-padding;
+					margin-right: $grid-size-large + $block-padding;
 				}
 
 				&:nth-child(even) {
-					margin-left: $grid-size-large * 2 + $block-padding;
+					margin-left: $grid-size-large + $block-padding;
 				}
 			}
 
+			// Beyond the medium breakpoint, show the user-set amount of columns.
 			@include break-medium() {
+				// Because columns do not wrap, reset the column margin.
+				margin-bottom: initial;
+
 				// Reset odd, even margins from small breakpoint.
 				&:nth-child(even) {
 					margin-left: $block-padding;
@@ -122,12 +130,12 @@
 
 				// Add left margin to all but first column.
 				&:not(:first-child) {
-					margin-left: ($grid-size-large * 2) + $block-padding;
+					margin-left: $grid-size-large + $block-padding;
 				}
 
 				// Add right margin to all but last column.
 				&:not(:last-child) {
-					margin-right: ($grid-size-large * 2) + $block-padding;
+					margin-right: $grid-size-large + $block-padding;
 				}
 			}
 		}

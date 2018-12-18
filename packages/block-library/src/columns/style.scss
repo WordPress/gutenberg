@@ -20,7 +20,7 @@
 	@include break-small() {
 
 		// Size should be half the available width, minus the margins added below.
-		flex-basis: calc(50% - #{$grid-size-large * 2});
+		flex-basis: calc(50% - #{ $grid-size-large });
 		flex-grow: 0;
 	}
 
@@ -37,11 +37,11 @@
 	// 2 columns at this breakpoint, and items beyond the second will wrap.
 	@include break-small() {
 		&:nth-child(even) {
-			margin-left: $grid-size-large * 2;
+			margin-left: $grid-size-large;
 		}
 
 		&:nth-child(odd) {
-			margin-right: $grid-size-large * 2;
+			margin-right: $grid-size-large;
 		}
 	}
 
@@ -58,12 +58,12 @@
 
 		// Add left margin to all but first column.
 		&:not(:first-child) {
-			margin-left: $grid-size-large * 2;
+			margin-left: $grid-size-large;
 		}
 
 		// Add right margin to all but last column.
 		&:not(:last-child) {
-			margin-right: $grid-size-large * 2;
+			margin-right: $grid-size-large;
 		}
 	}
 }
