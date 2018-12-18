@@ -16,6 +16,8 @@ class URLInput extends Component {
 				autoFocus={ autoFocus }
 				editable
 				selectTextOnFocus
+				autoCapitalize="none"
+				autoCorrect={ false }
 				textContentType="URL"
 				value={ value }
 				onChangeText={ this.props.onChange }
