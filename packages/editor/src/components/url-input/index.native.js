@@ -1,4 +1,4 @@
-import { TextInput, View } from 'react-native';
+import { TextInput } from 'react-native';
 
 /**
  * WordPress dependencies

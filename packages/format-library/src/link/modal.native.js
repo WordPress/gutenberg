@@ -5,7 +5,7 @@ import Modal from 'react-native-modal';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { URLInput } from '@wordpress/editor';
-import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
+import { prependHTTP } from '@wordpress/url';
 import {
 	withSpokenMessages,
 } from '@wordpress/components';
@@ -103,7 +103,7 @@ class ModalLinkUI extends Component {
 				swipeDirection="down"
 			>
 				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
-					<View style={ styles.dragIndicator }/>
+					<View style={ styles.dragIndicator } />
 					<View style={ styles.head }>
 						<Button
 							color="red"
@@ -121,7 +121,7 @@ class ModalLinkUI extends Component {
 							onPress={ this.submitLink }
 						/>
 					</View>
-					<View style={ styles.separator }/>
+					<View style={ styles.separator } />
 					<View style={ styles.inlineInput }>
 						<Text style={ styles.inlineInputLabel }>
 							{ __( 'URL' ) }
@@ -132,7 +132,7 @@ class ModalLinkUI extends Component {
 							onChange={ this.onChangeInputValue }
 						/>
 					</View>
-					<View style={ styles.separator }/>
+					<View style={ styles.separator } />
 					<View style={ styles.inlineInput }>
 						<Text style={ styles.inlineInputLabel }>
 							{ __( 'Link Text' ) }
@@ -143,7 +143,7 @@ class ModalLinkUI extends Component {
 							onChangeText={ this.onChangeText }
 						/>
 					</View>
-					<View style={ styles.separator }/>
+					<View style={ styles.separator } />
 					<View style={ styles.inlineInput }>
 						<Text style={ styles.inlineInputLabel }>
 							{ __( 'Open in a new window' ) }
@@ -158,7 +158,7 @@ class ModalLinkUI extends Component {
 				</View>
 			</Modal>
 		);
-	};
+	}
 }
 
 export default withSpokenMessages( ModalLinkUI );
