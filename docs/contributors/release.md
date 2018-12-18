@@ -198,7 +198,7 @@ You should check that folks are able to install the new version from their Dashb
 1. Publish the [make/core](https://make.wordpress.org/core/) release blog post drafted earlier.
 2. Pat yourself on the back! 👍
 
-If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping someone on the Gutenberg Core team in the [WordPress #core-editor](https://make.wordpress.org/chat/) Slack channel to publish the post.
+If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping [someone on the Gutenberg Core team](https://github.com/orgs/WordPress/teams/gutenberg-core) in the [WordPress #core-editor Slack channel](https://make.wordpress.org/chat/) to publish the post.
 
 ---------
 
