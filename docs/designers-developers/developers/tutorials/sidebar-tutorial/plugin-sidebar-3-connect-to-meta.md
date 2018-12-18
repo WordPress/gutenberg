@@ -39,34 +39,33 @@ add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 ```js
 ( function( wp ) {
 	var el = wp.element.createElement;
-	var Component = wp.element.Component;
 	var Text = wp.components.TextControl;
-	var setMeta = function( fieldName, fieldValue ) {
-		wp.data.dispatch( 'core/editor' ).editPost( { meta: { [ fieldName ] : fieldValue } } );
-	}
-	var getMeta = function( fieldName ) {
-		return wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' )[ fieldName ];
-	}
+	var compose = wp.compose.compose;
+	var withSelect = wp.data.withSelect;
+	var withDispatch = wp.data.withDispatch;
 
-	class MetaBlockField extends Component {
-		constructor() {
-			super( ...arguments );
-			this.state = {
-				value: getMeta( 'sidebar_plugin_meta_block_field' ) || '',
+	var MetaBlockField = compose(
+		withSelect( function( select, props ) {
+			return {
+				metaFieldValue: select( 'core/editor' ).getEditedPostAttribute( 'meta' )[ props.fieldName ]
 			}
-		}
-
-		render() {
-			return el( Text, {
+		} ),
+		withDispatch( function( dispatch, props ) {
+			return {
+				setMetaFieldValue: function( fieldValue ) {
+					dispatch( 'core/editor' ).editPost( { meta: { [ props.fieldName ]: fieldValue } } );
+				}
+			}
+		} )
+	)( function( props ) {
+		return el( Text, {
 				label: 'Meta Block Field',
-				value: this.state.value,
+				value: props.metaFieldValue,
 				onChange: ( content ) => {
-					this.setState( { value: content } );
-					setMeta( 'sidebar_plugin_meta_block_field', content );
+					props.setMetaFieldValue( content );
 				},
 			} );
-		}
-	}
+	} );
 
 	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
@@ -77,7 +76,7 @@ add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 				children: el(
 					'div',
 					{ className: 'sidebar-plugin-content' },
-					el( MetaBlockField )
+					el( MetaBlockField, { fieldName: 'sidebar_plugin_meta_block_field' } )
 				),
 			} );
 		}

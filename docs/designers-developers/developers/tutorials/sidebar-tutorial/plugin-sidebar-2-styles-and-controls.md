@@ -30,7 +30,13 @@ After the sidebar is up and running, we can focus on filling it up with the nece
 } )( window.wp );
 ```
 
-Within the sidebar body, we have created a `<div>` element wich coontains the `TextControl` component. The `<div>` has a class attribute with value equals to `sidebar-plugin-content` so we can style.
+Within the sidebar body, we have created a `<div>` element wich coontains the `TextControl` component. The `<div>` has a class attribute with value equals to `sidebar-plugin-content` so we can style it.
+
+```css
+.sidebar-plugin-content {
+	padding: 16px;
+}
+```
 
 ```php
 <?php
@@ -39,7 +45,7 @@ Within the sidebar body, we have created a `<div>` element wich coontains the `T
 Plugin Name: Sidebar example
 */
 
-function sidebar_plugin_script_register() {
+function sidebar_plugin_register() {
 	wp_register_script(
 		'sidebar-plugin-js',
 		plugins_url( 'sidebar-plugin.js', __FILE__ ),
@@ -49,9 +55,8 @@ function sidebar_plugin_script_register() {
 		'sidebar-plugin-css',
 		plugins_url( 'sidebar-plugin.css', __FILE__ )
 	);
-
 }
-add_action( 'init', 'sidebar_plugin_script_register' );
+add_action( 'init', 'sidebar_plugin_register' );
 
 function sidebar_plugin_script_enqueue() {
 	wp_enqueue_script( 'sidebar-plugin-js' );
