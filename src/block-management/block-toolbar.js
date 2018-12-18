@@ -36,7 +36,6 @@ export class BlockToolbar extends Component<PropsType> {
 		} = this.props;
 
 		return (
-			<SafeAreaView>
 				<View style={ styles.container }>
 					<ScrollView
 						horizontal={ true }
@@ -74,7 +73,6 @@ export class BlockToolbar extends Component<PropsType> {
 						<BlockFormatControls.Slot />
 					</ScrollView>
 				</View>
-			</SafeAreaView>
 		);
 	}
 }
