@@ -1,6 +1,6 @@
 # Creating a sidebar for your plugin
 
-In this tutorial we're going to create a sidebar for our plugin that takes as input a value stored in the `post_meta` table and updates it accordingly.
+In this tutorial we're going to create a custom sidebar for a plugin. This sidebar will have a text control for the user to update a value that is stored in the `post_meta` table.
 
 1. [Get a sidebar up and running](./plugin-sidebar-1-up-and-running.md)
 2. [Tweak the sidebar style and add controls](./plugin-sidebar-2-styles-and-controls.md)
