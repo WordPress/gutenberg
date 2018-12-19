@@ -83,4 +83,4 @@ Reload the editor and open the sidebar. It should look like this:
 
 ![Sidebar with style and controls](./sidebar-style-and-controls.png)
 
-We have an input control in the sidebar now and things looks nicer. This code doesn't allow us to store our data, though, so the next steps will focus on how to connect this control to the meta block field.
+We have an input control in the sidebar now and things looks nicer. This code doesn't allow us to store our data just yet, so the next steps will focus on how to connect it to the meta block field.
