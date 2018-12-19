@@ -17,6 +17,8 @@ import styles from './block-holder.scss';
 // Gutenberg imports
 import { BlockEdit } from '@wordpress/editor';
 
+import TextInputState from 'react-native/lib/TextInputState';
+
 type PropsType = BlockType & {
 	isSelected: boolean,
 	showTitle: boolean,
@@ -106,7 +108,17 @@ export default compose( [
 		} = dispatch( 'core/editor' );
 
 		return {
-			onSelect: () => {
+			onSelect: (event) => {
+				if ( event ) {
+					// This fix an issue with the way we are handling focus on TextIput fields and handling the keyboard state.
+					// When moving from a TextInput field to another kind of field the call that hides the keyboard was not invoked properly,
+					// resulting in keyboard up when it should not be there.
+					const currentlyFocusedTextInput = TextInputState.currentlyFocusedField();
+					if ( event.nativeEvent.target !== currentlyFocusedTextInput && ! TextInputState.isTextInput( event.nativeEvent.target ) ) {
+						// This check that the current TextInputState "focused" field is the one that has the focus.
+						TextInputState.blurTextInput( currentlyFocusedTextInput );
+					}
+				}
 				clearSelectedBlock();
 				selectBlock( clientId );
 			},
