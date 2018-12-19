@@ -15,7 +15,19 @@ public protocol GutenbergBridgeDelegate: class {
     ///                       image Url or nil to signal that the action was canceled.
     func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback)
 
-    /// Informs the delegate that the Gutenberg module has finished loading.
+    /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
+
+
+    /// Tells the delegate every time the editor has finished layout.
+    ///
+    func gutenbergDidLayout()
+}
+
+// MARK: - Optional GutenbergBridgeDelegate methods
+
+public extension GutenbergBridgeDelegate {
+    func gutenbergDidLoad() { }
+    func gutenbergDidLayout() { }
 }
