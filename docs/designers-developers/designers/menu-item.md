@@ -1,117 +1,73 @@
-# MenuItem
+MenuItem is a component which renders a button intended to be used in combination with the [DropdownMenu component](../dropdown-menu).
 
-`MenuItem` is a component which renders a button intended to be used in combination with the `MenuGroup` component.
+## Usage
 
-![An image of a MenuItem being highlighted inside of a DropdownMenu component](https://wordpress.org/gutenberg/files/2018/11/MenuItem.png)
-
-1. MenuItem
-
-
-
-## Table of contents
-
-
-
-1. [Design guidelines](http://#design-guidelines)
-2. [Development guidelines](http://#development-guidelines)
-3. [Related components](http://#related-components)
-
-
-
-## Design guidelines
-
-###Usage
-
-A `MenuGroup` contiaining `MenuItem`s can be used within a `Dropdown`. A `MenuGroup` can also have other `MenuGroup`s within it so menus can be nested.
-
-## Development guidelines
-
-###Usage
-
-`MenuItem` is a component which renders a button intended to be used in combination with the `MenuGroup` component.
-
-```
+```jsx
 import { MenuItem } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
-```
 
-```
 const MyMenuItem = withState( {
-    isActive: true,
+	isActive: true,
 } )( ( { isActive, setState } ) => (
-    <MenuItem
-        icon={ isActive ? 'yes' : 'no' }
-        isSelected={ isActive }
-        onClick={ () => setState( state => ( { isActive: ! state.isActive } ) ) }
-    >
-        Toggle
-    </MenuItem>
+	<MenuItem
+		icon={ isActive ? 'yes' : 'no' }
+		isSelected={ isActive }
+		onClick={ () => setState( state => ( { isActive: ! state.isActive } ) ) }
+	>
+		Toggle
+	</MenuItem>
 ) );
 ```
 
-###Props 
+## Props
 
-`MenuItem` supports the following props. Any additional props are passed through to the underlying  `Button` or `IconButton` component.
+MenuItem supports the following props. Any additional props are passed through to the underlying [Button](../button) or [IconButton](../icon-button) component.
 
-```children```
+### `children`
 
-- Type: WPElement
-
+- Type: `WPElement`
 - Required: No
-
 
 Element to render as child of button.
 
 Element
 
-```label```
+### `label`
 
-- Type: string
-
+- Type: `string`
 - Required: No
 
+String to use as primary button label text, applied as `aria-label`. Useful in cases where an `info` prop is passed, where `label` should be the minimal text of the button, described in further detail by `info`.
 
-String to use as primary button label text, applied as aria-label. Useful in cases where an info prop is passed, where label should be the minimal text of the button, described in further detail by info.
+Defaults to the value of `children`, if `children` is passed as a string.
 
-Defaults to the value of children, if children is passed as a string.
+### `info`
 
-```info```
-
-- Type: string
-
+- Type: `string`
 - Required: No
-
 
 Text to use as description for button text.
 
-Refer to documentation for [label](https://wordpress.org/gutenberg/handbook/components/menu-item/#label).
+Refer to documentation for [`label`](#label).
 
-```Icon```
+### `icon`
 
-- Type: string
-
+- Type: `string`
 - Required: No
 
-Refer to documentation for IconButton’s icon prop.
+Refer to documentation for [IconButton's `icon` prop](../icon-button/README.md#icon).
 
-```shortcut```
+### `shortcut`
 
-- Type: string
-
+- Type: `string`
 - Required: No
 
+Refer to documentation for [Shortcut's `shortcut` prop](../shortcut/README.md#shortcut).
 
-Refer to documentation for Shortcut’s shortcut prop.
+### `role`
 
-```role```
-
-- Type: string
+- Type: `string`
 - Require: No
-- Default: 'menuitem'
+- Default: `'menuitem'`
 
-[Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use `MenuItemRadio` for single select, and `MenuItemCheckbox` for multiselect.
-
-## Related components
-
-- The `DropdownMenu` displays a list of actions (each contained in a `MenuItem`, `MenuItemsChoice`, or `MenuGroup`) in a compact way. It appears in a `Popover` after the user has interacted with an element (a button or icon) or when they perform a specific action. 
-- `MenuItemsChoice`
+[Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use menuitemradio for single select, and menuitemcheckbox for multiselect.
