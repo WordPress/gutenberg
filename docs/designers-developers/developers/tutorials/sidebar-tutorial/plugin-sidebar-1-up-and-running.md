@@ -41,7 +41,6 @@ function sidebar_plugin_script_enqueue() {
 add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 ```
 
-After installing and activating this plugin, we'll see a new icon resembling a tack in the top-right of the editor, to the right of the settings button. On clicking it, our plugin's sidebar will open:
+After installing and activating this plugin, we'll see a new icon resembling a tack in the top-right of the editor. Upon clicking it, our plugin's sidebar will be opened:
 
 ![Sidebar Up and Running](./sidebar-up-and-running.png)
-
