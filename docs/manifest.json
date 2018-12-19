@@ -240,6 +240,48 @@
 		"parent": "javascript"
 	},
 	{
+		"title": "How to create a custom sidebar for your plugin",
+		"slug": "sidebar-tutorial",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Get a sidebar up and running",
+		"slug": "up-and-running",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
+		"parent": "sidebar-tutorial"
+	},
+	{
+		"title": "Tweak the sidebar style and add controls",
+		"slug": "styles-and-controls",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md",
+		"parent": "sidebar-tutorial"
+	},
+	{
+		"title": "Register a new meta field",
+		"slug": "register-meta",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
+		"parent": "sidebar-tutorial"
+	},
+	{
+		"title": "Initialize the input control with the meta field value",
+		"slug": "initialize-input",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
+		"parent": "sidebar-tutorial"
+	},
+	{
+		"title": "Update the meta field value when the input's content changes",
+		"slug": "update-meta",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
+		"parent": "sidebar-tutorial"
+	},
+	{
+		"title": "Finishing touches",
+		"slug": "finishing-touches",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
+		"parent": "sidebar-tutorial"
+	},
+	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/README.md",

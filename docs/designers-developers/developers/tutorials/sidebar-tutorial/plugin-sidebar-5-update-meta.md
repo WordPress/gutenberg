@@ -1,4 +1,4 @@
-# Update the meta field when the input content changes
+# Update the meta field when the input's content changes
 
 The last step in our journey is to update the meta field when the input content changes. To do that, we'll use another utility from the `@wordpress/data` package, [`withDispatch`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-data/#withdispatch-mapdispatchtoprops-function-function).
 
