@@ -6,6 +6,7 @@
  *
  * @package gutenberg-test-inner-blocks-templates
  */
+
 wp_enqueue_script(
 	'gutenberg-test-inner-blocks-templates',
 	plugins_url( 'inner-blocks-templates/index.js', __FILE__ ),
@@ -15,7 +16,7 @@ wp_enqueue_script(
 		'wp-element',
 		'wp-editor',
 		'wp-hooks',
-		'wp-i18n'
+		'wp-i18n',
 	),
 	filemtime( plugin_dir_path( __FILE__ ) . 'inner-blocks-templates/index.js' ),
 	true
