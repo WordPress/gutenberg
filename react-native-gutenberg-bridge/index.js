@@ -12,7 +12,7 @@ const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBrid
 export function sendNativeEditorDidLayout() {
 	// For now, this is only needed on iOS to solve layout issues with the toolbar.
 	// If this become necessary on Android in the future, we can try to build a registration API from Native
-	// to register messages it wants to receive, similar to the Natice -> JS messages listener system.
+	// to register messages it wants to receive, similar to the Native -> JS messages listener system.
 	if ( isIOS ) {
 		RNReactNativeGutenbergBridge.editorDidLayout();
 	}
