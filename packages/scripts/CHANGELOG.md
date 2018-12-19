@@ -1,8 +1,9 @@
 ## 2.5.0 (Unreleased)
 
-### New Feature
+### New Features
 
 - Added support for `check-engines` script ([#12721](https://github.com/WordPress/gutenberg/pull/12721))
+- Update default config provided for `lint-js` script ([#12845](https://github.com/WordPress/gutenberg/pull/12845)).
 
 ## 2.4.4 (2018-11-20)
 

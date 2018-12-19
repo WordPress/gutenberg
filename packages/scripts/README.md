@@ -30,7 +30,7 @@ _Example:_
 
 ### `check-engines`
 
-Check if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the default configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
+Check if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
 
 _Example:_
 
@@ -48,7 +48,7 @@ This is how you execute the script with presented setup:
 
 ### `wp-scripts lint-js`
 
-Helps enforce coding style guidelines for your JavaScript files. It uses [eslint](https://eslint.org/) with no rules provided (we plan to add zero config support in the near future). You can specify your own rules as described in [eslint docs](https://eslint.org/docs/rules/).
+Helps enforce coding style guidelines for your JavaScript files. It uses [eslint](https://eslint.org/) with the set of recommended rules defined in [@wordpress/eslint-plugin](https://www.npmjs.com/package/@wordpress/eslint-plugin) npm package. You can override default rules with your own as described in [eslint docs](https://eslint.org/docs/rules/).
 
 _Example:_
 
@@ -65,7 +65,7 @@ This is how you execute the script with presented setup:
 
 ### `wp-scripts lint-pkg-json`
 
-Helps enforce standards for your package.json files. It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of default rules provided. You can override them with your own rules as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki).
+Helps enforce standards for your package.json files. It uses [npm-package-json-lint](https://www.npmjs.com/package/npm-package-json-lint) with the set of recommended rules defined in [@wordpress/npm-package-json-lint-config](https://www.npmjs.com/package/@wordpress/npm-package-json-lint-config) npm package. You can override default rules with your own as described in [npm-package-json-lint wiki](https://github.com/tclindner/npm-package-json-lint/wiki).
 
 _Example:_
 
@@ -84,7 +84,7 @@ This is how you execute those scripts using the presented setup:
 
 _Alias_: `wp-scripts test-unit-jest` 
 
-Launches the test runner. It uses [Jest](https://facebook.github.io/jest/) behind the scenes and you are able to utilize all of its [CLI options](https://facebook.github.io/jest/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:help` (as presented below) to view all of the available options.
+Launches the test runner. It uses [Jest](https://facebook.github.io/jest/) behind the scenes and you are able to utilize all of its [CLI options](https://facebook.github.io/jest/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:help` (as presented below) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration).
 
 _Example:_
 
