@@ -8,3 +8,5 @@ In this tutorial we're going to create a custom sidebar for a plugin. This sideb
 4. [Initialize the input control with the meta field value](./plugin-sidebar-4-initialize-input.md)
 5. [Update the meta field value when input's content changes](./plugin-sidebar-5-update-meta.md)
 6. [Finishing touches](./plugin-sidebar-6-finishing-touches.md)
+
+Please, refer to [Getting started with JavaScript](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
