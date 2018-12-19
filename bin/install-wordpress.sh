@@ -87,11 +87,6 @@ if [ "$CURRENT_URL" != "http://localhost:$HOST_PORT" ]; then
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI option update siteurl "http://localhost:$HOST_PORT" --quiet
 fi
 
-# Ensure plugins can be installed.
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 777 /var/www/html/wp-content/plugins
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER mkdir -p /var/www/html/wp-content/upgrade
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 777 /var/www/html/wp-content/upgrade
-
 # Activate Gutenberg.
 echo -e $(status_message "Activating Gutenberg...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin activate gutenberg --quiet
