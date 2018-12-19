@@ -64,10 +64,9 @@ export function getFormatValue( formatName ) {
 }
 
 export class RichText extends Component {
-	isIOS: boolean = Platform.OS === 'ios';
-
 	constructor() {
 		super( ...arguments );
+		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );

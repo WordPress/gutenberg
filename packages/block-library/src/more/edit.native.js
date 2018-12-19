@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -48,7 +48,7 @@ export default class MoreEdit extends Component {
 	}
 
 	renderLine() {
-		return <View style={ styles[ 'block-library-more__line' ] } />
+		return <View style={ styles[ 'block-library-more__line' ] } />;
 	}
 
 	renderText() {
@@ -71,12 +71,12 @@ export default class MoreEdit extends Component {
 					onBlur={ onBlur }
 				/>
 			</View>
-		)
+		);
 	}
 
 	render() {
 		return (
-			<View style={ styles[ 'block-library-more__container' ]}>
+			<View style={ styles[ 'block-library-more__container' ] }>
 				{ this.renderLine() }
 				{ this.renderText() }
 				{ this.renderLine() }
