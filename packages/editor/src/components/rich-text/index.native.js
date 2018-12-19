@@ -3,10 +3,6 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
-import {
-	forEach,
-	merge,
-} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -287,7 +283,7 @@ export class RichText extends Component {
 		const record = this.getRecord();
 		// Use record instead of this.props.value to make sure we're in sync with Aztec on the selection
 		// TODO: Make sure the selection in Aztec and in Gutenberg both handle whitespaces in HTML and thus are in sync
-		const html = '<' + tagName + '>' + this.valueToFormat( record ) + '</' + tagName + '>';
+		const html = `<${ tagName }>${ this.valueToFormat( record ) }</${ tagName }>`;
 
 		return (
 			<View>
