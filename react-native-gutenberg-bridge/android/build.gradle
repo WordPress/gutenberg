@@ -71,12 +71,14 @@ dependencies {
         implementation project(':react-native-svg')
         implementation project(':react-native-aztec')
         implementation project(':react-native-recyclerview-list')
+
+        implementation 'com.facebook.react:react-native:+'
     } else {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-aztec', submoduleGitHash('../../', 'react-native-aztec')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'f845b3c2c4411b8e97db23724bf1a535530c5435'))
-    }
 
-    def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
-    implementation "com.facebook.react:react-native:${rnVersion}"
+        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        implementation "com.facebook.react:react-native:${rnVersion}"
+    }
 }
