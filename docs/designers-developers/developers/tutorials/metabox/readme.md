@@ -10,7 +10,7 @@ Here are two mini-tutorials for creating similar functionality to meta boxes in 
 
 The first method is to use Blocks to store extra data with a post. The data is stored in a post meta field, similar to how meta boxes store information.
 
-* [Store Post Meta with a Block](../../../../../docs/designers-developers/developers/tutorials/metabox/block-post-meta.md)
+* [Store Post Meta with a Block](../../../../../docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md)
 
 
 ## Sidebar Plugin
