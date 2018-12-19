@@ -63,10 +63,10 @@ class WP_Block_Parser_Block {
 	public $innerContent;
 
 	function __construct( $name, $attrs, $innerBlocks, $innerHTML, $innerContent ) {
-		$this->blockName   = $name;
-		$this->attrs       = $attrs;
-		$this->innerBlocks = $innerBlocks;
-		$this->innerHTML   = $innerHTML;
+		$this->blockName    = $name;
+		$this->attrs        = $attrs;
+		$this->innerBlocks  = $innerBlocks;
+		$this->innerHTML    = $innerHTML;
 		$this->innerContent = $innerContent;
 	}
 }
