@@ -1,6 +1,10 @@
 # Scripts
 
-Collection of JS scripts for WordPress development.
+Collection of reusable scripts for WordPress development.
+
+Command-line interfaces help to turn working with an app into a pleasant experience, but it is still not enough to keep it easy to maintain in the long run. Developers are left on their own to keep all configurations and dependent tools up to date. This problem multiplies when they own more than one project which shares the same setup. Fortunately, there is a pattern that can simplify maintainers life – reusable scripts. This idea boils down to moving all the necessary configurations and scripts to one single tool dependency. In most cases, it should be possible to accomplish all tasks using the default settings, but some customization is allowed, too. With all that in place updating all projects should become a very straightforward task.
+
+_This package is inspired by [react-scripts](https://www.npmjs.com/package/react-scripts) and [kcd-scripts](https://www.npmjs.com/package/kcd-scripts)._
 
 ## Installation
 
@@ -171,9 +175,5 @@ This is how you execute those scripts using the presented setup:
 * `npm run test:unit` - runs all unit tests.
 * `npm run test:unit:help` - prints all available options to configure unit tests runner.
 * `npm run test:unit:watch` - runs all unit tests in the watch mode.
-
-## Inspiration
-
-This package is inspired by [react-scripts](https://www.npmjs.com/package/react-scripts) and [kcd-scripts](https://www.npmjs.com/package/kcd-scripts).
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
