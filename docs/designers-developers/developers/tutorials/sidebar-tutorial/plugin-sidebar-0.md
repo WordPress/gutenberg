@@ -7,3 +7,4 @@ In this tutorial we're going to create a custom sidebar for a plugin. This sideb
 3. [Register a new meta field](./plugin-sidebar-3-register-meta.md)
 4. [Initialize the input control with the meta field value](./plugin-sidebar-4-initialize-input.md)
 5. [Update meta field value when input changes](./plugin-sidebar-5-update-meta.md)
+6. [Finishing touches](./plugin-sidebar-6-finishing-touches.md)
