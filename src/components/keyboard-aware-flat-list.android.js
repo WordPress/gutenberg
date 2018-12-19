@@ -2,7 +2,8 @@
 * @format
 * @flow
 */
-import { FlatList, KeyboardAvoidingView } from 'react-native';
+import { FlatList } from 'react-native';
+import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 
 type PropsType = {
 	...FlatList.propTypes,
