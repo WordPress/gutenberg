@@ -1,6 +1,6 @@
 # Get a sidebar up and running
 
-First, we need to tell the editor that we are registering a new plugin that will have its own sidebar. We can do so by using the `wp.plugins.registerPlugin` and `wp.editPost.PluginSidebar` utilities.
+First, we need to tell the editor that we are registering a new plugin that will have its own sidebar. We can do so by using the [`wp.plugins.registerPlugin`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/) and [`wp.editPost.PluginSidebar`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-edit-post/#pluginsidebar) utilities.
 
 ```js
 ( function( wp ) {
@@ -17,7 +17,7 @@ First, we need to tell the editor that we are registering a new plugin that will
 } )( window.wp );
 ```
 
-For this code to work, we need to make those utilities available in the browser, so we tell WordPress to enqueue them for us:
+For this code to work, we need to make those utilities available in the browser, so we tell WordPress to enqueue `wp-plugins` and `wp-edit-post` for us:
 
 ```php
 <?php
@@ -40,3 +40,8 @@ function sidebar_plugin_script_enqueue() {
 }
 add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 ```
+
+After installing and activating this plugin, we'll see a new icon resembling a tack in the top-right of the editor, to the right of the settings button. On clicking it, our plugin's sidebar will open:
+
+![Sidebar Up and Running](./sidebar-up-and-running.png)
+
