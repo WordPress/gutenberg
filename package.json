@@ -1,6 +1,6 @@
 {
   "name": "gutenberg-mobile",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "private": true,
   "config": {
     "jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
