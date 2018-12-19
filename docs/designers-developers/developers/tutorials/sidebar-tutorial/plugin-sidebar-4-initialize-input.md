@@ -46,7 +46,7 @@ withSelect(
 );
 ```
 
-`withSelect` is a component designed to wrap other components and pass them some data. Besides helping us to query data, it will also update the component it wraps (the second function call) when the original data changes (the first function call). Let's use it in our plugin code:
+`withSelect` is useful to pass some data to other components, and update them when the original data changes. Let's use it in our plugin code:
 
 ```js
 ( function( wp ) {
@@ -98,7 +98,7 @@ Notice the changes from the previous code we had:
 
 * The `MetaBlockField` function has now a `props` argument as input. It contains the data object returned by the `selectToData` function, which it uses to initialize its value property.
 * We've also updated the component we render within the `div` element. We now use `MetaBlockFieldWithData`. This will be updated every time the original data changes.
-* We've imported the `wp.data.withSelect` utility, so we have to declare our script depends on the `wp-data`. package. Go ahead and add that dependency in our PHP script.
+* We've imported the `wp.data.withSelect` utility, so we have to declare our script depends on the `wp-data`. package. Go ahead and add that dependency in the PHP script.
 * We use the [`getEditedPostAttribute`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#geteditedpostattribute) function to retrieve data instead of [`getCurrentPost`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#getcurrentpost) that we saw in the previous section. `getEditedPostAttribute` returns the most recent values of the post, including user editions that haven't been yet saved.
 
 With this new code, when we open the sidebar, we'll see that the input's value is no longer `Initial value`, but a void string. We can't type values yet, but let's check that the component is updated if the value in the store changes. Open the browser's console, execute
