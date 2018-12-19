@@ -79,15 +79,11 @@ repositories {
     maven { url "https://jitpack.io" }
 
     if (project == rootProject) {
-        // if we are the root project, use a remote RN maven repo so jitpack can build this lib without local RN setup
-        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
-        def npmCdnUrl = "https://cdn.jsdelivr.net/npm/react-native@${rnVersion}/android"
-        println "Will use the jsdelivr.net exposed RN maven repo at ${npmCdnUrl}"
-        maven {
-            // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-            url npmCdnUrl
-        }
-    }
+         // if we are the root project, use a remote RN maven repo so jitpack can build this lib without local RN setup
+         def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
+         println "Will use the RN maven repo at ${reactNativeRepo}"
+         maven { url reactNativeRepo }
+     }
 }
 
 dependencies {
@@ -107,5 +103,10 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "com.android.support:recyclerview-v7:$supportLibVersion"
 
-    implementation "com.facebook.react:react-native:+" // From node_modules.
+    if (project == rootProject) {
+        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        implementation "com.facebook.react:react-native:${rnVersion}" // From Maven repo
+    } else {
+        implementation "com.facebook.react:react-native:+" // From node_modules.
+    }
 }
