@@ -49,6 +49,9 @@ const schema = {
 		multiline: 'li',
 		default: '',
 	},
+	placeholder: {
+		type: 'string',
+	},
 };
 
 export const name = 'core/list';
@@ -220,7 +223,7 @@ export const settings = {
 		onReplace,
 		className,
 	} ) {
-		const { ordered, values } = attributes;
+		const { ordered, values, placeholder } = attributes;
 
 		return (
 			<RichText
@@ -231,7 +234,7 @@ export const settings = {
 				value={ values }
 				wrapperClassName="block-library-list"
 				className={ className }
-				placeholder={ __( 'Write list…' ) }
+				placeholder={ placeholder || __( 'Write list…' ) }
 				onMerge={ mergeBlocks }
 				unstableOnSplit={
 					insertBlocksAfter ?
