@@ -15,7 +15,7 @@ The first step is to convert the functions `selectToData` and `dispatchToActions
 		return el( Text, {
 			label: 'Meta Block Field',
 			value: props.metaFieldValue,
-			onChange: ( content ) => {
+			onChange: function( content ) {
 				props.setMetaFieldValue( content );
 			},
 		} );
@@ -87,7 +87,7 @@ Next, we want to merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBloc
 		return el( Text, {
 			label: 'Meta Block Field',
 			value: props.metaFieldValue,
-			onChange: ( content ) => {
+			onChange: function( content ) {
 				props.setMetaFieldValue( content );
 			},
 		} );
@@ -160,7 +160,7 @@ Let's change our code to take advantage of that:
 		return el( Text, {
 			label: 'Meta Block Field',
 			value: props.metaFieldValue,
-			onChange: ( content ) => {
+			onChange: function( content ) {
 				props.setMetaFieldValue( content );
 			},
 		} );

@@ -41,7 +41,7 @@ The last step in our journey is to update the meta field when the input content 
 		return el( Text, {
 			label: 'Meta Block Field',
 			value: props.metaFieldValue,
-			onChange: ( content ) => {
+			onChange: function( content ) {
 				props.setMetaFieldValue( content );
 			},
 		} );

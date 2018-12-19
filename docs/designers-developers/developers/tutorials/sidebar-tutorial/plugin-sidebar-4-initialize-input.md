@@ -69,7 +69,7 @@ withSelect(
 		return el( Text, {
 			label: 'Meta Block Field',
 			value: props.metaFieldValue,
-			onChange: ( content ) => {
+			onChange: function( content ) {
 				console.log( 'content has changed to ', content );
 			},
 		} );
