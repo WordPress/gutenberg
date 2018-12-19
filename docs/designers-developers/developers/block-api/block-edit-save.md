@@ -96,7 +96,7 @@ const addListItem = ( newListItem ) => {
 
 ```
 
-Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, Gutenberg follows the philisophy of the Redux library that state should be immutable—data should not be changed directly, but instead a new version of the data created containing the changes.
+Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, Gutenberg follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
 
 ## Save
 
