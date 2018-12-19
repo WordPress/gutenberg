@@ -15,7 +15,18 @@
 
 .blockContainer {
 	background-color: white;
-	padding: 8px;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 12;
+}
+
+.blockContainerFocused {
+	background-color: white;
+	padding-left: 16;
+	padding-right: 16;
+	padding-top: 12;
+	padding-bottom: 0; // will be flushed into inline toolbar height
 }
 
 .blockTitle {
