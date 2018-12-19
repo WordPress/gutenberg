@@ -9,3 +9,17 @@
 		padding-right: $icon-button-size;
 	}
 }
+
+// Don't show the drop cap when editing the paragraph's content. It causes a
+// number of bugs in combination with `contenteditable` fields. The caret
+// cannot be set around it, caret position calculation fails in Chrome, and
+// typing at the end of the paragraph doesn't work.
+// As a visual indicator that a drop cap is present, use font-size and
+// text-shadow to make the first letter a tiny bit larger than paragraph text.
+.has-drop-cap:focus::first-letter {
+	float: none;
+	font-size: 1.2em;
+	line-height: inherit;
+	margin: 0 0.1em 0 0;
+	text-shadow: -1px 0 currentColor, 0 1px currentColor, 1px 0 currentColor, 0 -1px currentColor;
+}
