@@ -108,10 +108,10 @@ export default compose( [
 		} = dispatch( 'core/editor' );
 
 		return {
-			onSelect: (event) => {
+			onSelect: ( event ) => {
 				if ( event ) {
 					// == Hack for the Alpha ==
-					// When moving the focus from a TextInput field to another kind of field the call that hides the keyboard is not invoked 
+					// When moving the focus from a TextInput field to another kind of field the call that hides the keyboard is not invoked
 					// properly, resulting in keyboard up when it should not be there.
 					// The code below dismisses the keyboard (calling blur on the last TextInput field) when the field that now gets the focus is a non-textual field
 					const currentlyFocusedTextInput = TextInputState.currentlyFocusedField();
