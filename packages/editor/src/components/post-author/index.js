@@ -26,9 +26,19 @@ export class PostAuthor extends Component {
 		this.setAuthorId = this.setAuthorId.bind( this );
 		this.suggestAuthor = this.suggestAuthor.bind( this );
 		this.getCurrentAuthor = this.getCurrentAuthor.bind( this );
+		this.resolveResults = this.resolveResults.bind( this );
 		this.state = {
 			postAuthor: false,
 		};
+		this.searchCache = [];
+		this.requestResults = debounce( ( query, populateResults ) => {
+			const payload = '?search=' + encodeURIComponent( query );
+			apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
+				populateResults( this.resolveResults( results ) );
+				this.searchCache[ query ] = results;
+			} );
+		}, 300 );
+		this.requestResults = this.requestResults.bind( this );
 	}
 
 	componentDidMount() {
@@ -55,11 +65,18 @@ export class PostAuthor extends Component {
 		if ( query.length < 2 ) {
 			return;
 		}
-		const payload = '?search=' + encodeURIComponent( query );
-		apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
-			this.authors = results;
-			populateResults( results.map( ( author ) => ( author.name ) ) );
-		} );
+
+		if ( this.searchCache[ query ] ) {
+			populateResults( this.resolveResults( this.searchCache[ query ] ) );
+			return;
+		}
+
+		this.requestResults( query, populateResults );
+	}
+
+	resolveResults( results ) {
+		this.authors = results;
+		return results.map( ( author ) => ( author.name ) );
 	}
 
 	getCurrentAuthor( authorId ) {
@@ -120,7 +137,7 @@ export class PostAuthor extends Component {
 					defaultValue={ postAuthor ? postAuthor.name : '' }
 					displayMenu="overlay"
 					onConfirm={ this.setAuthorId }
-					source={ debounce( this.suggestAuthor, 300 ) }
+					source={ this.suggestAuthor }
 					showNoResultsFound={ false }
 					tStatusQueryTooShort={ ( minQueryLength ) =>
 						__( `Type in ${ minQueryLength } or more characters for results` ) }
