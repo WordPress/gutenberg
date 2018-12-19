@@ -16,7 +16,6 @@ var el = wp.element.createElement;
 var registerBlockType = wp.blocks.registerBlockType;
 var TextField = wp.components.TextControl;
 
-
 registerBlockType("myguten/meta-block", {
 	title: "Meta Block",
 	icon: "smiley",
