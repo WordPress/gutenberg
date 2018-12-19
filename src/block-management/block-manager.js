@@ -24,7 +24,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender } from '@wordpress/editor';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 import EventEmitter from 'events';
 
@@ -151,7 +151,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	onRootViewLayout = ( event: LayoutChangeEvent ) => {
 		const { height } = event.nativeEvent.layout;
 		this.setState( { rootViewHeight: height }, () => {
-			RNReactNativeGutenbergBridge.editorDidLayout();
+			sendNativeEditorDidLayout();
 		} );
 	}
 
