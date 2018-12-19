@@ -2,7 +2,7 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import {
 	forEach,
 	merge,
@@ -66,6 +66,7 @@ export function getFormatValue( formatName ) {
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
+		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
@@ -274,8 +275,8 @@ export class RichText extends Component {
 
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
 		// we need to make sure the native is updated as well
-		if ( nextProps.value &&
-			this.lastContent &&
+		if ( ( typeof nextProps.value !== 'undefined' ) &&
+			( typeof this.lastContent !== 'undefined' ) &&
 			nextProps.value !== this.lastContent ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
@@ -292,6 +293,8 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
+		} else if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+			this._editor.blur();
 		}
 	}
 
@@ -370,6 +373,7 @@ export class RichText extends Component {
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
 					isSelected={ this.props.isSelected }
+					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
