@@ -110,12 +110,12 @@ export default compose( [
 		return {
 			onSelect: (event) => {
 				if ( event ) {
-					// This fix an issue with the way we are handling focus on TextIput fields and handling the keyboard state.
-					// When moving from a TextInput field to another kind of field the call that hides the keyboard was not invoked properly,
-					// resulting in keyboard up when it should not be there.
+					// == Hack for the Alpha ==
+					// When moving the focus from a TextInput field to another kind of field the call that hides the keyboard is not invoked 
+					// properly, resulting in keyboard up when it should not be there.
+					// The code below dismisses the keyboard (calling blur on the last TextInput field) when the field that now gets the focus is a non-textual field
 					const currentlyFocusedTextInput = TextInputState.currentlyFocusedField();
 					if ( event.nativeEvent.target !== currentlyFocusedTextInput && ! TextInputState.isTextInput( event.nativeEvent.target ) ) {
-						// This check that the current TextInputState "focused" field is the one that has the focus.
 						TextInputState.blurTextInput( currentlyFocusedTextInput );
 					}
 				}
