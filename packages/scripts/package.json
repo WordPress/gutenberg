@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/scripts",
 	"version": "2.4.4",
-	"description": "Collection of JS scripts for WordPress development.",
+	"description": "Collection of reusable scripts for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -44,7 +44,9 @@
 		"npm-package-json-lint": "^3.3.1",
 		"puppeteer": "1.6.1",
 		"read-pkg-up": "^1.0.1",
-		"resolve-bin": "^0.4.0"
+		"resolve-bin": "^0.4.0",
+		"stylelint": "^9.5.0",
+		"stylelint-config-wordpress": "^13.1.0"
 	},
 	"publishConfig": {
 		"access": "public"
