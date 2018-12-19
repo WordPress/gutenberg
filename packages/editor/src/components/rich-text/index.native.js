@@ -49,7 +49,9 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formats, text } = this.formatToValue( this.props.value );
+		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
+		// Removing the leading or the trailing white spaces using `trim()` should make sure this is the case
+		const { formats, text } = this.formatToValue( this.props.value.trim() );
 		const { start, end } = this.state;
 
 		return { formats, text, start, end };
@@ -281,8 +283,6 @@ export class RichText extends Component {
 
 		// Save back to HTML from React tree
 		const record = this.getRecord();
-		// Use record instead of this.props.value to make sure we're in sync with Aztec on the selection
-		// TODO: Make sure the selection in Aztec and in Gutenberg both handle whitespaces in HTML and thus are in sync
 		const html = `<${ tagName }>${ this.valueToFormat( record ) }</${ tagName }>`;
 
 		return (
