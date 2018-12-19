@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Button, Switch, Text, TextInput, View } from 'react-native';
+import { Switch, Text, TextInput, View } from 'react-native';
 import Modal from 'react-native-modal';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
@@ -19,6 +19,7 @@ import {
 } from '@wordpress/rich-text';
 
 import { createLinkFormat, isValidHref } from './utils';
+import Button from './button';
 
 import styles from './modal.scss';
 
@@ -105,21 +106,19 @@ class ModalLinkUI extends Component {
 				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
 					<View style={ styles.dragIndicator } />
 					<View style={ styles.head }>
-						<Button
-							color="red"
-							title={ __( 'Remove' ) }
-							accessibilityLabel={ __( 'Remove the link' ) }
-							onPress={ this.removeLink }
-						/>
+						<Button onClick={ this.removeLink }>
+							<Text style={ { ...styles.buttonText, color: 'red' } }>
+								{ __( 'Remove' ) }
+							</Text>
+						</Button>
 						<Text style={ styles.title }>
 							{ __( 'Link Settings' ) }
 						</Text>
-						<Button
-							color="#0087be"
-							title={ __( 'Done' ) }
-							accessibilityLabel={ __( 'Finish editing the link' ) }
-							onPress={ this.submitLink }
-						/>
+						<Button onClick={ this.submitLink }>
+							<Text style={ { ...styles.buttonText, color: '#0087be' } } >
+								{ __( 'Done' ) }
+							</Text>
+						</Button>
 					</View>
 					<View style={ styles.separator } />
 					<View style={ styles.inlineInput }>
