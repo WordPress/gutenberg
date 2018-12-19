@@ -1,6 +1,6 @@
 # Tweak the sidebar style and add controls
 
-After the sidebar is up and running, we can focus on filling it up with the necessary components and basic styling. To visualize and edit the meta field value we'll use a input component. The `wp.components` package contains many components available for us to reuse, and, specifically, the `TextControl` let us create a input field, so that what we'll use:
+After the sidebar is up and running, we can focus on filling it up with the necessary components and basic styling. To visualize and edit the meta field value we'll use a input component. The [`wp.components` package](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-components/) contains many components available for us to reuse, and, specifically, the [`TextControl`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/components/text-control/) let us create a input field, so that's what we'll use:
 
 ```js
 ( function( wp ) {
@@ -30,13 +30,23 @@ After the sidebar is up and running, we can focus on filling it up with the nece
 } )( window.wp );
 ```
 
-Within the sidebar body, we have created a `<div>` element wich coontains the `TextControl` component. The `<div>` has a class attribute with value equals to `sidebar-plugin-content` so we can style it.
+We've done a few things here:
+
+* Substituted the raw _Meta field_ text with a TextControl component wrapped within a `div` element.
+* Added the class `sidebar-plugin-content` to the `div` element so we can style it.
+* Added a few dependencies to our JavaScript code here, namely the `wp-element` and `wp-components` packages, which we need to register in the PHP file.
+
+We'll use the new CSS class available to us to give the sidebar a bit of breath. Create a new file in your plugin directory called `sidebar-plugin.css` with the following contents:
 
 ```css
 .sidebar-plugin-content {
 	padding: 16px;
 }
 ```
+
+We have now to tell WordPress to enqueue the new CSS stylesheet, for which we use the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) that will take care of loading the stylesheet both in the editor and front-end.
+
+After those changes, our plugin's PHP code looks like this:
 
 ```php
 <?php
@@ -68,3 +78,9 @@ function sidebar_plugin_style_enqueue() {
 }
 add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 ```
+
+Reload the editor and open the sidebar. It should look like this:
+
+![Sidebar with style and controls](./sidebar-style-controls.png)
+
+We are almost there! But this still doesn't work, we need to connect the input control to the meta block field.
