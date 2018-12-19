@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Children } from '@wordpress/element';
-import { Dropdown, IconButton, NavigableMenu, MenuItem } from '@wordpress/components';
+import { Dropdown, IconButton, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function Warning( { className, actions, children, secondaryActions } ) {
@@ -40,13 +40,13 @@ function Warning( { className, actions, children, secondaryActions } ) {
 						/>
 					) }
 					renderContent={ () => (
-						<NavigableMenu orientation="vertical" className="editor-warning-menu__content">
+						<MenuGroup>
 							{ secondaryActions.map( ( item, pos ) =>
 								<MenuItem onClick={ item.onClick } key={ pos }>
 									{ item.title }
 								</MenuItem>
 							) }
-						</NavigableMenu>
+						</MenuGroup>
 					) }
 				/>
 			) }
