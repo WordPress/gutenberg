@@ -94,7 +94,6 @@ docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin activate 
 if [ "$POPULAR_PLUGINS" == "true" ]; then
 	echo -e $(status_message "Activating popular plugins...")
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install advanced-custom-fields --activate --quiet
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install amp --activate --quiet
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install jetpack --activate --quiet
 	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install wpforms-lite --activate --quiet
 fi
