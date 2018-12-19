@@ -21,11 +21,9 @@ The sidebar is not visible by default on a small / mobile screen, and may also b
 
 ## Setup state vs. live preview state
 
-Often a block will use the placeholder content to walk users through a setup process. The setup process gathers information from the user that is needed to render the block. A block’s setup state is indicated with a grey background to provide clear differentiation for the user. Not all blocks have setup states — for example, the paragraph block.
-
+Setup states, sometimes referred to as "placeholders", can be used to walk users through an initial process before shoing the live preview state of the block. The setup process gathers information from the user that is needed to render the block. A block’s setup state is indicated with a grey background to provide clear differentiation for the user. Not all blocks have setup states — for example, the paragraph block.
 
 ![An example of a gallery block’s setup state on a grey background](https://make.wordpress.org/design/files/2018/12/gallery-setup.png)
-
 
 A setup state is **not** necessary if:
 
@@ -40,15 +38,11 @@ Use a setup state if:
 
 For blocks that do have setup states, once the user has gone through the setup process, the placeholder is replaced with the live preview state of that block.
 
-
 ![An example of the image gallery’s live preview state](https://make.wordpress.org/design/files/2018/12/gallery-live-preview.png)
-
 
 When the block is selected, additional controls may be revealed to customize the block’s contents. For example, when the image gallery is selected, it reveals controls to remove or add images.
 
-
 ![An example of additional controls being revealed on selection of a block.](https://make.wordpress.org/design/files/2018/12/gallery-additional-controls.png)
-
 
 In most cases, a block’s setup state is only shown once and then further customization is done via the live preview state. However, in some cases it might be desirable to allow the user to return to the setup state — for example, if all the block content has been deleted or via a link from the block’s toolbar or sidebar.
 
