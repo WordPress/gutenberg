@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { reduce, noop } from 'lodash';
+import { reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -108,15 +108,13 @@ const effects = {
 		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 		// Save the metaboxes
-		// TODO: improve error handling.
 		apiFetch( {
 			url: window._wpMetaBoxUrl,
 			method: 'POST',
 			body: formData,
 			parse: false,
 		} )
-			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) )
-			.catch( noop );
+			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 	SWITCH_MODE( action ) {
 		// Unselect blocks when we switch to the code editor.
