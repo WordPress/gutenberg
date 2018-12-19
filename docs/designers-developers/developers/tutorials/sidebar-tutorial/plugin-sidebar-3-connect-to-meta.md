@@ -1,40 +1,28 @@
 # Connect the input component to the meta field
 
+We're now in the last step of our journey. We have to do a few things to connect the input control to the meta block field:
+
+1. Tell WordPress that our plugin will use a field from the `post_meta`.
+2. Initialize the input control with the block field value.
+3. Update the block field value when the input control changes.
+
+To work with fields in the _post_meta_ table, WordPress has a function called [register_meta](https://developer.wordpress.org/reference/functions/register_meta/). We're going to use it to register a new field called `sidebar_plugin_meta_block_field`. We configure this field to be available through the [REST API](https://developer.wordpress.org/rest-api/) because that's how the block editor access data, to be a single field (meaning that it contains a value, not an array of values), and to be of type _string_. We need to add this to our PHP code, within the _init_ callback function.
+
 ```php
-<?php
-
-/*
-Plugin Name: Sidebar example
-*/
-
-function sidebar_plugin_register() {
-	register_meta( 'post', 'sidebar_plugin_meta_block_field', array(
-		'show_in_rest' => true,
-		'single' => true,
-		'type' => 'string',
-	) );
-	wp_register_script(
-		'sidebar-plugin-js',
-		plugins_url( 'sidebar-plugin.js', __FILE__ ),
-		array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data' )
-	);
-	wp_register_style(
-		'sidebar-plugin-css',
-		plugins_url( 'sidebar-plugin.css', __FILE__ )
-	);
-}
-add_action( 'init', 'sidebar_plugin_register' );
-
-function sidebar_plugin_script_enqueue() {
-	wp_enqueue_script( 'sidebar-plugin-js' );
-}
-add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
-
-function sidebar_plugin_style_enqueue() {
-	wp_enqueue_style( 'sidebar-plugin-css' );
-}
-add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
+register_meta( 'post', 'sidebar_plugin_meta_block_field', array(
+	'show_in_rest' => true,
+	'single' => true,
+	'type' => 'string',
+) );
 ```
+
+To make sure the field has been loaded, we can query the block editor [data structures](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/). Open your browser's console, and execute:
+
+```js
+wp.data.select( 'core/editor' ).getCurrentPost().meta;
+```
+
+Before adding the `register_meta` function to our plugin, this returns a void array, because we haven't told WordPress to load any meta field yet. After registering the field, the same code will return an object containing the registered meta field and their values. In our case, it will contain `sidebar_plugin_meta_block_field`.
 
 ```js
 ( function( wp ) {
