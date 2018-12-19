@@ -4,6 +4,9 @@
     "browser": true,
     "jest/globals": true
   },
+  "globals": {
+    "__DEV__": true
+  },
   "plugins": [
     "react",
     "react-native",
