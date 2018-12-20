@@ -6,6 +6,7 @@
  *
  * @package gutenberg-test-block-icons
  */
+
 wp_enqueue_script(
 	'gutenberg-test-block-icons',
 	plugins_url( 'block-icons/index.js', __FILE__ ),

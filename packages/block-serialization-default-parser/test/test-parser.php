@@ -1,6 +1,14 @@
 <?php
+/**
+ * PHP Test Helper
+ *
+ * Facilitates running PHP parser against same tests as the JS parser implementation.
+ *
+ * @package gutenberg
+ */
 
-require_once __DIR__ . '/../parser.php';
+// Include the default parser.
+require_once dirname( __FILE__ ) . '/../parser.php';
 
 $parser = new WP_Block_Parser();
 

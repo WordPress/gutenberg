@@ -80,6 +80,24 @@ edit( { attributes, setAttributes, className, isSelected } ) {
 }
 ```
 
+When using attributes that are objects or arrays it's a good idea to copy or clone the attribute prior to updating it:
+
+```js
+// Good - here a new array is created from the old list attribute and a new list item:
+const { list } = attributes;
+const addListItem = ( newListItem ) => setAttributes( { list: [ ...list, newListItem ] } );
+
+// Bad - here the list from the existing attribute is modified directly to add the new list item:
+const { list } = attributes;
+const addListItem = ( newListItem ) => {
+	list.push( newListItem );
+	setAttributes( { list } );
+};
+
+```
+
+Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, Gutenberg follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
+
 ## Save
 
 The `save` function defines the way in which the different attributes should be combined into the final markup, which is then serialized by Gutenberg into `post_content`.

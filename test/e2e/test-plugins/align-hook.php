@@ -6,6 +6,7 @@
  *
  * @package gutenberg-test-align-hook
  */
+
 wp_enqueue_script(
 	'gutenberg-test-align-hook',
 	plugins_url( 'align-hook/index.js', __FILE__ ),
@@ -13,7 +14,7 @@ wp_enqueue_script(
 		'wp-blocks',
 		'wp-element',
 		'wp-editor',
-		'wp-i18n'
+		'wp-i18n',
 	),
 	filemtime( plugin_dir_path( __FILE__ ) . 'align-hook/index.js' ),
 	true

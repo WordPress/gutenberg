@@ -1,18 +1,10 @@
 # Blocks
 
-"Block" is the abstract term used to describe units of markup that, composed
-together, form the content or layout of a webpage. The idea combines concepts
-of what in WordPress today we achieve with shortcodes, custom HTML, and embed
-discovery into a single consistent API and user experience.
+"Block" is the abstract term used to describe units of markup that, composed together, form the content or layout of a webpage. The idea combines concepts of what in WordPress today we achieve with shortcodes, custom HTML, and embed discovery into a single consistent API and user experience.
 
-For more context, refer to
-[_What Are Little Blocks Made Of?_](https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of/)
-from the
-[Make WordPress Design](https://make.wordpress.org/design/)
-blog.
+For more context, refer to [_What Are Little Blocks Made Of?_](https://make.wordpress.org/design/2017/01/25/what-are-little-blocks-made-of/) from the [Make WordPress Design](https://make.wordpress.org/design/) blog.
 
-The following documentation outlines steps you as a developer will need to
-follow to add your own custom blocks to WordPress's editor interfaces.
+The following documentation outlines steps you as a developer will need to follow to add your own custom blocks to WordPress's editor interfaces.
 
 ## Installation
 
@@ -26,14 +18,9 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Getting Started
 
-If you're not already accustomed to working with JavaScript in your WordPress
-plugins, you may first want to reference the guide on
-[_Including CSS & JavaScript_](https://developer.wordpress.org/themes/basics/including-css-javascript/)
-in the Theme Handbook.
+If you're not already accustomed to working with JavaScript in your WordPress plugins, you may first want to reference the guide on [_Including CSS & JavaScript_](https://developer.wordpress.org/themes/basics/including-css-javascript/) in the Theme Handbook.
 
-At a minimum, you will need to enqueue scripts for your block as part of a
-`enqueue_block_editor_assets` action callback, with a dependency on the
-`wp-blocks` and `wp-element` script handles:
+At a minimum, you will need to enqueue scripts for your block as part of a `enqueue_block_editor_assets` action callback, with a dependency on the `wp-blocks` and `wp-element` script handles:
 
 ```php
 <?php
@@ -49,65 +36,34 @@ function myplugin_enqueue_block_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'myplugin_enqueue_block_editor_assets' );
 ```
 
-The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor
-context when the editor is ready to receive additional scripts and stylesheets.
-There is also an `enqueue_block_assets` hook which is run under __both__ the
-editor and front-end contexts.  This should be used to enqueue stylesheets
-common to the front-end and the editor.  (The rules can be overridden in the
-editor-specific stylesheet if necessary.)
+The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor context when the editor is ready to receive additional scripts and stylesheets. There is also an `enqueue_block_assets` hook which is run under __both__ the editor and front-end contexts.  This should be used to enqueue stylesheets common to the front-end and the editor.  (The rules can be overridden in the editor-specific stylesheet if necessary.)
 
-The following sections will describe what you'll need to include in `block.js`
-to describe the behavior of your custom block.
+The following sections will describe what you'll need to include in `block.js` to describe the behavior of your custom block.
 
-Note that all JavaScript code samples in this document are enclosed in a
-function that is evaluated immediately afterwards.  We recommend using either
-ES6 modules
-[as used in this project](https://wordpress.org/gutenberg/handbook/reference/coding-guidelines/#imports)
-(documentation on setting up a plugin with Webpack + ES6 modules coming soon)
-or these
-["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression)
-as used in this document.  Both of these methods ensure that your plugin's
-variables will not pollute the global `window` object, which could cause
-incompatibilities with WordPress core or with other plugins.
+Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards.  We recommend using either ES6 modules [as used in this project](https://wordpress.org/gutenberg/handbook/reference/coding-guidelines/#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document.  Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
 
 ## Example
 
-Let's imagine you wanted to define a block to show a randomly generated image
-in a post's content using
-[lorempixel.com](http://lorempixel.com/).
-The service provides a choice of category and you'd like to offer this as an
-option when editing the post.
+Let's imagine you wanted to define a block to show a randomly generated image in a post's content using [lorempixel.com](http://lorempixel.com/). The service provides a choice of category and you'd like to offer this as an option when editing the post.
 
 Take a step back and consider the ideal workflow for adding a new random image:
 
 - Insert the block.  It should be shown in some empty state, with an option to choose a category in a select dropdown.
 - Upon confirming my selection, a preview of the image should be shown next to the dropdown.
 
-At this point, you might realize that while you'd want some controls to be
-shown when editing content, the markup included in the published post might not
-appear the same (your visitors should not see a dropdown field when reading
-your content).
+At this point, you might realize that while you'd want some controls to be shown when editing content, the markup included in the published post might not appear the same (your visitors should not see a dropdown field when reading your content).
 
 This leads to the first requirement of describing a block:
 
-__You will need to provide implementations both for what's to be shown in an
-editor and what's to be saved with the published content__.
+__You will need to provide implementations both for what's to be shown in an editor and what's to be saved with the published content__.
 
-To eliminate redundant effort here, share common behaviors by splitting your
-code up into
-[components](../element).
+To eliminate redundant effort here, share common behaviors by splitting your code up into [components](/packages/element/README.md).
 
-Now that we've considered user interaction, you should think about the
-underlying values that determine the markup generated by your block. In our
-example, the output is affected only when the category changes. Put another
-way: __the output of a block is a function of its attributes__.
+Now that we've considered user interaction, you should think about the underlying values that determine the markup generated by your block. In our example, the output is affected only when the category changes. Put another way: __the output of a block is a function of its attributes__.
 
-The category, a simple string, is the only thing we require to be able to
-generate the image we want to include in the published content. We call these
-underlying values of a block instance its __attributes__.
+The category, a simple string, is the only thing we require to be able to generate the image we want to include in the published content. We call these underlying values of a block instance its __attributes__.
 
-With these concepts in mind, let's explore an implementation of our random
-image block:
+With these concepts in mind, let's explore an implementation of our random image block:
 
 ```php
 <?php
@@ -199,7 +155,7 @@ Let's briefly review a few items you might observe in the implementation:
   your plugin. This helps prevent conflicts when more than one plugin registers
   a block with the same name.
 - You will use `createElement` to describe the structure of your block's
-  markup. See the [Element documentation](../element/README.md) for more
+  markup. See the [Element documentation](/packages/element/README.md) for more
   information.
 - Extracting `RandomImage` to a separate function allows us to reuse it in both
   the editor-specific interface and the published content.
@@ -210,34 +166,17 @@ Let's briefly review a few items you might observe in the implementation:
 - React provides conveniences for working with `select` element with
   [`value` and `onChange` props](https://facebook.github.io/react/docs/forms.html#the-select-tag).
 
-By concerning yourself only with describing the markup of a block given its
-attributes, you need not worry about maintaining the state of the page, or how
-your block interacts in the context of the surrounding editor.
+By concerning yourself only with describing the markup of a block given its attributes, you need not worry about maintaining the state of the page, or how your block interacts in the context of the surrounding editor.
 
-But how does the markup become an object of attributes? We need a pattern for
-encoding the values into the published post's markup, and then retrieving them
-the next time the post is edited. This is the motivation for the block's
-`attributes` property. The shape of this object matches that of the attributes
-object we'd like to receive, where each value is a
-[__source__](http://github.com/aduth/hpq)
-which tries to find the desired value from the markup of the block.
+But how does the markup become an object of attributes? We need a pattern for encoding the values into the published post's markup, and then retrieving them the next time the post is edited. This is the motivation for the block's `attributes` property. The shape of this object matches that of the attributes object we'd like to receive, where each value is a [__source__](http://github.com/aduth/hpq) which tries to find the desired value from the markup of the block.
 
-In the random image block above, we've given the `alt` attribute of the image a
-secondary responsibility of tracking the selected category. There are a few
-other ways we could have achieved this, but the category value happens to work
-well as an `alt` descriptor. In the `attributes` property, we define an object
-with a key of `category` whose value tries to find this `alt` attribute of the
-markup. If it's successful, the category's value in our `edit` and `save`
-functions will be assigned. In the case of a new block or invalid markup, this
-value would be `undefined`, so we adjust our return value accordingly.
+In the random image block above, we've given the `alt` attribute of the image a secondary responsibility of tracking the selected category. There are a few other ways we could have achieved this, but the category value happens to work well as an `alt` descriptor. In the `attributes` property, we define an object with a key of `category` whose value tries to find this `alt` attribute of the markup. If it's successful, the category's value in our `edit` and `save` functions will be assigned. In the case of a new block or invalid markup, this value would be `undefined`, so we adjust our return value accordingly.
 
 ## API
 
 ### `wp.blocks.registerBlockType( name: string, typeDefinition: Object )`
 
-Registers a new block provided a unique name and an object defining its
-behavior. Once registered, the block is made available as an option to any
-editor interface where blocks are implemented.
+Registers a new block provided a unique name and an object defining its behavior. Once registered, the block is made available as an option to any editor interface where blocks are implemented.
 
 - `title: string` - A human-readable
   [localized](https://codex.wordpress.org/I18n_for_WordPress_Developers#Handling_JavaScript_files)
@@ -274,6 +213,5 @@ Returns type definitions associated with a registered block.
 ### `wp.blocks.getControlSettings( name: string )`
 
 Returns settings associated with a registered control.
-
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
