@@ -124,3 +124,4 @@ This list is manually curated to include valuable contributions by volunteers th
 | @designsimply | @designsimply |
 | @aldavigdis | @aldavigdis |
 | @miya0001 | @miyauchi |
+| @naogify | @naoki0h |
