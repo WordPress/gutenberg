@@ -6,6 +6,7 @@ The last step in the journey is to update the meta field when the input content 
 
 ```js
 ( function( wp ) {
+	var registerPlugin = wp.plugins.registerPlugin;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -42,7 +43,7 @@ The last step in the journey is to update the meta field when the input content 
 	var MetaBlockFieldWithData = withSelect( mapSelectToProps )( MetaBlockField );
 	var MetaBlockFieldWithDataAndActions = withDispatch( mapDispatchToProps )( MetaBlockFieldWithData );
 
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
