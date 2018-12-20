@@ -40,11 +40,12 @@ const FORMATTING_CONTROLS = [
 		title: __( 'Italic' ),
 		format: 'italic',
 	},
-	{
-		icon: 'admin-links',
-		title: __( 'Link' ),
-		format: 'link',
-	},
+	// TODO: get this back after alpha
+	// {
+	// 	icon: 'admin-links',
+	// 	title: __( 'Link' ),
+	// 	format: 'link',
+	// },
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
