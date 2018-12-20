@@ -12,13 +12,14 @@ To visualize and edit the meta field value you'll use an input component. The `@
 	var Text = wp.components.TextControl;
 
 	registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
-			return PluginSidebar( {
-				name: 'my-plugin-sidebar',
-				icon: 'admin-post',
-				title: 'My plugin sidebar',
-				children: el(
-					'div',
+		render: function() {
+			return el( PluginSidebar,
+				{
+					name: 'my-plugin-sidebar',
+					icon: 'admin-post',
+					title: 'My plugin sidebar',
+				},
+				el( 'div',
 					{ className: 'sidebar-plugin-content' },
 					el( Text, {
 						label: 'Meta Block Field',
@@ -27,14 +28,14 @@ To visualize and edit the meta field value you'll use an input component. The `@
 							console.log( 'content changed to ', content );
 						},
 					} )
-				),
-			} );
+				)
+			);
 		}
 	} );
 } )( window.wp );
 ```
 
-Update the `sidebar-plugin.js` with this new code. Notice that it uses the new utilities `wp.element` and `wp.components` from the `@wordpress/element` and `@wordpress/components` packages, respectively. Go ahead and add them as `wp-element` and `wp-components` in the PHP dependencies array.
+Update the `sidebar-plugin.js` with this new code. Notice that it uses a new utility called `wp.components` from the `@wordpress/components` package. Go ahead and add it as `wp-components` in the PHP dependencies array.
 
 It introduces a few changes from the previous section:
 

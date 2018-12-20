@@ -45,16 +45,17 @@ The last step in the journey is to update the meta field when the input content 
 	var MetaBlockFieldWithDataAndActions = withDispatch( mapDispatchToProps )( MetaBlockFieldWithData );
 
 	registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
-			return PluginSidebar( {
-				name: 'my-plugin-sidebar',
-				icon: 'admin-post',
-				title: 'My plugin sidebar',
-				children: el(
-					'div',
+		render: function() {
+			return el( PluginSidebar),
+				{
+					name: 'my-plugin-sidebar',
+					icon: 'admin-post',
+					title: 'My plugin sidebar',
+				},
+				el( 'div',
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockFieldWithDataAndActions )
-				),
+				)
 			} );
 		}
 	} );

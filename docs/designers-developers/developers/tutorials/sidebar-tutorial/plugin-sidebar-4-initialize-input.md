@@ -16,20 +16,21 @@ Now that the field is available in the editor store, it can be surfaced to the U
 			onChange: function( content ) {
 				console.log( 'content changed to ', content );
 			},
-		});
+		} );
 	}
 
 	registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
-			return PluginSidebar( {
-				name: 'my-plugin-sidebar',
-				icon: 'admin-post',
-				title: 'My plugin sidebar',
-				children: el(
-					'div',
+		render: function() {
+			return el( PluginSidebar,
+				{
+					name: 'my-plugin-sidebar',
+					icon: 'admin-post',
+					title: 'My plugin sidebar',
+				},
+				el( 'div',
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockField )
-				),
+				)
 			} );
 		}
 	} );
@@ -81,16 +82,17 @@ withSelect(
 	var MetaBlockFieldWithData = withSelect( mapSelectToProps )( MetaBlockField );
 
 	registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
-			return PluginSidebar( {
-				name: 'my-plugin-sidebar',
-				icon: 'admin-post',
-				title: 'My plugin sidebar',
-				children: el(
-					'div',
+		render: function() {
+			return el( PluginSidebar,
+				{
+					name: 'my-plugin-sidebar',
+					icon: 'admin-post',
+					title: 'My plugin sidebar',
+				},
+				el( 'div',
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockFieldWithData )
-				),
+				)
 			} );
 		}
 	} );

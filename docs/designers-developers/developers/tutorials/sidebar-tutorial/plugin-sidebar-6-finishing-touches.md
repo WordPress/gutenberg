@@ -45,15 +45,16 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
-			return PluginSidebar( {
-				name: 'my-plugin-sidebar',
-				icon: 'admin-post',
-				title: 'My plugin sidebar',
-				children: el(
-					'div',
+			return el( PluginSidebar),
+				{
+					name: 'my-plugin-sidebar',
+					icon: 'admin-post',
+					title: 'My plugin sidebar',
+				},
+				el( 'div',
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockFieldWithDataAndActions )
-				),
+				)
 			} );
 		}
 	} );
@@ -88,7 +89,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 					.getEditedPostAttribute( 'meta' )
 					[ 'sidebar_plugin_meta_block_field' ],
 			}
-		} ),
+		} )
 	)( function( props ) {
 		return el( Text, {
 			label: 'Meta Block Field',
@@ -101,15 +102,16 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
-			return PluginSidebar( {
-				name: 'my-plugin-sidebar',
-				icon: 'admin-post',
-				title: 'My plugin sidebar',
-				children: el(
-					'div',
+			return el( PluginSidebar,
+				{
+					name: 'my-plugin-sidebar',
+					icon: 'admin-post',
+					title: 'My plugin sidebar',
+				},
+				el( 'div',
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockField )
-				),
+				)
 			} );
 		}
 	} );
@@ -162,7 +164,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 					.getEditedPostAttribute( 'meta' )
 					[ props.fieldName ],
 			}
-		} ),
+		} )
 	)( function( props ) {
 		return el( Text, {
 			label: 'Meta Block Field',
@@ -175,19 +177,19 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
-			return PluginSidebar( {
-				name: 'my-plugin-sidebar',
-				icon: 'admin-post',
-				title: 'My plugin sidebar',
-				children: el(
-					'div',
+			return el( PluginSidebar,
+				{
+					name: 'my-plugin-sidebar',
+					icon: 'admin-post',
+					title: 'My plugin sidebar',
+				},
+				el( 'div',
 					{ className: 'sidebar-plugin-content' },
-					el(
-						MetaBlockField,
+					el( MetaBlockField,
 						{ fieldName: 'sidebar_plugin_meta_block_field' }
 					)
-				),
-			} );
+				)
+			);
 		}
 	} );
 } )( window.wp );
