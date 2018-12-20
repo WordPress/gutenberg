@@ -5,6 +5,7 @@
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import React from 'react';
 import { FlatList, Dimensions } from 'react-native';
+import styles from '../block-management/block-holder.scss';
 
 type PropsType = {
 	...FlatList.propTypes,
@@ -26,7 +27,7 @@ const KeyboardAwareFlatList = ( props: PropsType ) => {
 	const extraScrollHeight = ( () => {
 		const { height: fullHeight, width: fullWidth } = Dimensions.get( 'window' );
 		const keyboardVerticalOffset = fullHeight - parentHeight;
-		const blockHolderPadding = 8;
+		const blockHolderPadding = styles.blockContainerFocused.paddingBottom;
 
 		if ( fullWidth > fullHeight ) { //landscape mode
 			//we won't try to make inner block visible in landscape mode because there's not enough room for it
