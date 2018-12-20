@@ -2,18 +2,14 @@
  * Internal dependencies
  */
 import { getEmbedEditComponent } from './edit';
-
-/**
- * External dependencies
- */
-import classnames from 'classnames/dedupe';
+import { getEmbedSaveComponent } from './save';
+import { getEmbedDeprecatedMigrations } from './deprecated';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { RichText } from '@wordpress/block-editor';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 const embedAttributes = {
@@ -35,11 +31,27 @@ const embedAttributes = {
 		type: 'boolean',
 		default: true,
 	},
+	extraOptions: {
+		type: 'object',
+		default: {},
+	},
 };
 
-export function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {}, responsive = true } ) {
+export function getEmbedBlockSettings( options ) {
+	const {
+		title,
+		description,
+		icon,
+		transforms,
+		category = 'embed',
+		keywords = [],
+		supports = {},
+	} = options;
 	const blockDescription = description || __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' );
-	const edit = getEmbedEditComponent( title, icon, responsive );
+	const edit = getEmbedEditComponent( options );
+	const save = getEmbedSaveComponent( options );
+	const deprecated = getEmbedDeprecatedMigrations( embedAttributes, options );
+
 	return {
 		title,
 		description: blockDescription,
@@ -60,9 +72,29 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 				const { url } = ownProps.attributes;
 				const core = select( 'core' );
 				const { getEmbedPreview, isPreviewEmbedFallback, isRequestingEmbedPreview, getThemeSupports } = core;
-				const preview = undefined !== url && getEmbedPreview( url );
+
+				let preview = false;
+				let fetching = false;
+
+				if ( undefined !== url ) {
+					if ( options.preview ) {
+						// We have a custom preview, so pass it the response from oembed and the attributes
+						// and use whatever it returns.
+						preview = options.preview( getEmbedPreview( url ), ownProps.attributes );
+					} else {
+						preview = getEmbedPreview( url );
+					}
+
+					if ( options.requesting ) {
+						// To support custom previews that use a rendering API endpoint, `options.requesting`
+						// should return if the API request is in progress.
+						fetching = options.requesting( url );
+					} else {
+						fetching = isRequestingEmbedPreview( url );
+					}
+				}
+
 				const previewIsFallback = undefined !== url && isPreviewEmbedFallback( url );
-				const fetching = undefined !== url && isRequestingEmbedPreview( url );
 				const themeSupports = getThemeSupports();
 				// The external oEmbed provider does not exist. We got no type info and no html.
 				const badEmbedProvider = !! preview && undefined === preview.type && false === preview.html;
@@ -91,51 +123,8 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 			} )
 		)( edit ),
 
-		save( { attributes } ) {
-			const { url, caption, type, providerNameSlug } = attributes;
+		save,
 
-			if ( ! url ) {
-				return null;
-			}
-
-			const embedClassName = classnames( 'wp-block-embed', {
-				[ `is-type-${ type }` ]: type,
-				[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
-			} );
-
-			return (
-				<figure className={ embedClassName }>
-					<div className="wp-block-embed__wrapper">
-						{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-					</div>
-					{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
-				</figure>
-			);
-		},
-
-		deprecated: [
-			{
-				attributes: embedAttributes,
-				save( { attributes } ) {
-					const { url, caption, type, providerNameSlug } = attributes;
-
-					if ( ! url ) {
-						return null;
-					}
-
-					const embedClassName = classnames( 'wp-block-embed', {
-						[ `is-type-${ type }` ]: type,
-						[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
-					} );
-
-					return (
-						<figure className={ embedClassName }>
-							{ `\n${ url }\n` /* URL needs to be on its own line. */ }
-							{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
-						</figure>
-					);
-				},
-			},
-		],
+		deprecated,
 	};
 }

@@ -11,7 +11,7 @@ import { findBlock, getClassNames } from '../util';
 
 describe( 'core/embed', () => {
 	test( 'block edit matches snapshot', () => {
-		const EmbedEdit = getEmbedEditComponent( 'Embed', 'embed-generic' );
+		const EmbedEdit = getEmbedEditComponent( { title: 'Embed', icon: 'embed-generic' } );
 		const wrapper = render( <EmbedEdit attributes={ {} } /> );
 
 		expect( wrapper ).toMatchSnapshot();

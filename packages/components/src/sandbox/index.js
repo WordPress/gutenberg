@@ -28,7 +28,11 @@ class Sandbox extends Component {
 		this.trySandbox();
 	}
 
-	componentDidUpdate() {
+	componentDidUpdate( prevProps ) {
+		if ( prevProps.html !== this.props.html ) {
+			// Allows the new html to go into the sandbox.
+			this.iframe.current.contentDocument.body.removeAttribute( 'data-resizable-iframe-connected' );
+		}
 		this.trySandbox();
 	}
 

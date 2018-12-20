@@ -18,7 +18,14 @@ import { kebabCase, toLower } from 'lodash';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 
-export function getEmbedEditComponent( title, icon, responsive = true ) {
+export function getEmbedEditComponent( options ) {
+	const {
+		title,
+		icon,
+		responsive = true,
+		inspector: InspectorControls,
+		preview: previewTransform = ( fetchedPreview ) => fetchedPreview,
+	} = options;
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -180,7 +187,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						switchBackToURLInput={ this.switchBackToURLInput }
 					/>
 					<EmbedPreview
-						preview={ preview }
+						preview={ previewTransform( preview, this.props.attributes ) }
 						className={ className }
 						url={ url }
 						type={ type }
@@ -190,6 +197,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						icon={ icon }
 						label={ label }
 					/>
+					{ InspectorControls && <InspectorControls setAttributes={ this.props.setAttributes } attributes={ this.props.attributes } /> }
 				</Fragment>
 			);
 		}

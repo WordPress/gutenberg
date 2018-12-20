@@ -6,6 +6,7 @@
         "attributes": {
             "url": "https://example.com/",
             "caption": "Embedded content from an example URL",
+            "extraOptions": {},
             "allowResponsive": true
         },
         "innerBlocks": [],

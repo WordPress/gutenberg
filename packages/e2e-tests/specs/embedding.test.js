@@ -9,6 +9,9 @@ import {
 	createJSONResponse,
 	getEditedPostContent,
 	clickButton,
+	activatePlugin,
+	deactivatePlugin,
+	publishPost,
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
@@ -26,6 +29,15 @@ const MOCK_EMBED_RICH_SUCCESS_RESPONSE = {
 	type: 'rich',
 	provider_name: 'Twitter',
 	provider_url: 'https://twitter.com',
+	version: '1.0',
+};
+
+const MOCK_EMBED_REDDIT_SUCCESS_RESPONSE = {
+	url: 'https://www.reddit.com/r/stevenuniverse/comments/8x2lsy/after_a_few_months_of_work_i_finally_finished/',
+	html: '<p>Mock success response.</p>',
+	type: 'rich',
+	provider_name: 'Reddit',
+	provider_url: 'https://reddit.com',
 	version: '1.0',
 };
 
@@ -67,6 +79,10 @@ const MOCK_RESPONSES = [
 	{
 		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
 		onRequestMatch: createJSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+	},
+	{
+		match: createEmbeddingMatcher( 'https://www.reddit.com/r/stevenuniverse/comments/8x2lsy/after_a_few_months_of_work_i_finally_finished/' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_REDDIT_SUCCESS_RESPONSE ),
 	},
 	{
 		match: createEmbeddingMatcher( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
@@ -191,5 +207,47 @@ describe( 'Embedding content', () => {
 		);
 		await clickButton( 'Try again' );
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+	} );
+} );
+
+describe( 'Extending embed blocks', () => {
+	beforeAll( async () => {
+		// Plugin that overrides the preview and save of the Reddit block.
+		// Allows us to enter any content to be saved instead of the URL,
+		// so we can check the save code is used when publishing the post.
+		await activatePlugin( 'gutenberg-test-extend-embeds' );
+		await setUpResponseMocking( MOCK_RESPONSES );
+	} );
+	afterAll( async () => {
+		await deactivatePlugin( 'gutenberg-test-extend-embeds' );
+	} );
+	beforeEach( createNewPost );
+
+	it( 'can use a custom preview, inspector controls, and save in an extended block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '/reddit' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://www.reddit.com/r/stevenuniverse/comments/8x2lsy/after_a_few_months_of_work_i_finally_finished/' );
+		await page.keyboard.press( 'Enter' );
+		// Check that the response from the custom preview endpoint is rendered.
+		await page.waitForFunction(
+			"null !== document.querySelector('.components-sandbox') && null !== document.querySelector('.components-sandbox').contentDocument.querySelector('p') && document.querySelector('.components-sandbox').contentDocument.querySelector('p').innerText === 'This is a preview from a custom endpoint.'"
+		);
+
+		// Use the custom control to set the save content.
+		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
+		const labels = await page.$x( "//label[contains(text(), 'The content to save')]" );
+		await labels[ 0 ].click();
+		await page.keyboard.type( 'Save override' );
+		await publishPost();
+
+		// View the post.
+		const viewPostLinks = await page.$x( "//a[contains(text(), 'View Post')]" );
+		await viewPostLinks[ 0 ].click();
+		await page.waitForNavigation();
+
+		// Check the custom save was used for the published post.
+		const content = await page.$eval( '.entry-content p', ( element ) => element.innerText.trim() );
+		expect( content ).toEqual( 'Save override' );
 	} );
 } );
