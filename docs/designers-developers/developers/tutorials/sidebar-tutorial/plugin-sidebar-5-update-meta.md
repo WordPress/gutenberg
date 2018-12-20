@@ -11,32 +11,36 @@ The last step in the journey is to update the meta field when the input content 
 	var withSelect = wp.data.withSelect;
 	var withDispatch = wp.data.withDispatch;
 
-	// Function that takes `select` as input and returns some data.
-	// This will be used by `withSelect`.
+	// Function that takes `select` as input
+	// and returns an object containing data.
 	var selectToData = function( select ) {
 		return {
-			metaFieldValue: select(
-				'core/editor'
-			).getEditedPostAttribute( 'meta' )[ 'sidebar_plugin_meta_block_field' ],
+			metaFieldValue: select( 'core/editor' )
+				.getEditedPostAttribute( 'meta' )
+				[ 'sidebar_plugin_meta_block_field' ],
 		}
 	}
 
-	// Function that takes `dispatch` as input and returns an object with functions.
-	// These functions are known as _actions_, and they are used to update
-	// the internal data structures of the editor.
+	// Function that takes `dispatch` as input
+	// and returns an object containing functions
+	// to update the internal data structures.
+	// These functions are also known as actions.
 	var dispatchToActions = function( dispatch ) {
 		return {
 			setMetaFieldValue: function( value ) {
-				dispatch(
-					'core/editor'
-				).editPost( { meta: { sidebar_plugin_meta_block_field: value } } );
+				dispatch( 'core/editor' ).editPost(
+					{ meta: { sidebar_plugin_meta_block_field: value } }
+				);
 			}
 		}
 	}
 
-	// The original UI component. The `props` argument now contains both:
+	// Function that takes an object called `props` as input
+	// and outputs a component.
+	//
+	// Note that the `props` argument now contains:
 	// 1) the data passed by `selectToData`
-	// 2) the actions passed by `dispatchToActions`
+	// 2) the functions passed by `dispatchToActions`
 	var MetaBlockField = function( props ) {
 		return el( Text, {
 			label: 'Meta Block Field',

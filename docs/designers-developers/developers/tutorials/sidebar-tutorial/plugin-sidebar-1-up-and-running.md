@@ -7,7 +7,7 @@ Add the following code to a JavaScript file called `sidebar-plugin.js` and save 
 ```js
 ( function( wp ) {
 	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
+		render: function() {
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',

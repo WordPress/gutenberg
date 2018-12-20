@@ -23,24 +23,26 @@ The first step is to convert the functions `selectToData` and `dispatchToActions
 
 	var MetaBlockFieldWithData = withSelect( function( select ) {
 		return {
-			metaFieldValue: select(
-				'core/editor'
-			).getEditedPostAttribute( 'meta' )[ 'sidebar_plugin_meta_block_field' ],
+			metaFieldValue: select( 'core/editor' )
+				.getEditedPostAttribute( 'meta' )
+				[ 'sidebar_plugin_meta_block_field' ],
 		}
 	} )( MetaBlockField );
 
-	var MetaBlockFieldWithDataAndActions = withDispatch( function( dispatch ) {
-		return {
-			setMetaFieldValue: function( value ) {
-				dispatch(
-					'core/editor'
-				).editPost( { meta: { sidebar_plugin_meta_block_field: value } } );
+	var MetaBlockFieldWithDataAndActions = withDispatch(
+		function( dispatch ) {
+			return {
+				setMetaFieldValue: function( value ) {
+					dispatch( 'core/editor' ).editPost(
+						{ meta: { sidebar_plugin_meta_block_field: value } }
+					);
+				}
 			}
 		}
-	} )( MetaBlockFieldWithData );
+	)( MetaBlockFieldWithData );
 
 	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
+		render: function() {
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
@@ -70,17 +72,17 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 		withDispatch( function( dispatch ) {
 			return {
 				setMetaFieldValue: function( value ) {
-					dispatch(
-						'core/editor'
-					).editPost( { meta: { sidebar_plugin_meta_block_field: value } } );
+					dispatch( 'core/editor' ).editPost(
+						{ meta: { sidebar_plugin_meta_block_field: value } }
+					);
 				}
 			}
 		} ),
 		withSelect( function( select ) {
 			return {
-				metaFieldValue: select(
-					'core/editor'
-				).getEditedPostAttribute( 'meta' )[ 'sidebar_plugin_meta_block_field' ],
+				metaFieldValue: select( 'core/editor' )
+					.getEditedPostAttribute( 'meta' )
+					[ 'sidebar_plugin_meta_block_field' ],
 			}
 		} ),
 	)( function( props ) {
@@ -94,7 +96,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 	} );
 
 	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
+		render: function() {
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
@@ -114,22 +116,21 @@ Finally, extract the meta field name (`sidebar_plugin_meta_block_field`) from th
 
 ```js
 // ...
-
 var MetaBlockFieldWithData = withSelect(
 	function( select, props ) {
-		// props.metaFieldName can be accessed here!
+		console.log( props.metaFieldName );
 	}
 )( MetaBlockField );
 
 // ...
 	el(
 		MetaBlockFieldWithData,
-		{ metaFieldName: 'sidebar_plugin_meta_block_field' } // props passed to the component
+		{ metaFieldName: 'sidebar_plugin_meta_block_field' }
 	)
 // ...
 ```
 
-Let's change the code to take advantage of that:
+Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change the code to take advantage of that:
 
 ```js
 ( function( wp ) {
@@ -143,17 +144,17 @@ Let's change the code to take advantage of that:
 		withDispatch( function( dispatch, props ) {
 			return {
 				setMetaFieldValue: function( value ) {
-					dispatch(
-						'core/editor'
-					).editPost( { meta: { [ props.fieldName ]: value } } );
+					dispatch( 'core/editor' ).editPost(
+						{ meta: { [ props.fieldName ]: value } }
+					);
 				}
 			}
 		} ),
 		withSelect( function( select, props ) {
 			return {
-				metaFieldValue: select(
-					'core/editor'
-				).getEditedPostAttribute( 'meta' )[ props.fieldName ],
+				metaFieldValue: select( 'core/editor' )
+					.getEditedPostAttribute( 'meta' )
+					[ props.fieldName ],
 			}
 		} ),
 	)( function( props ) {
@@ -185,3 +186,5 @@ Let's change the code to take advantage of that:
 	} );
 } )( window.wp );
 ```
+
+That's it. You have now a compact version of the original code. Go ahead and add more functionality to your plugin, review other tutorials, or create your next gig!

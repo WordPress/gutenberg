@@ -43,12 +43,12 @@ withSelect(
 	// a function that takes `select` as input
 	// and returns an object containing data
 )(
-	// another function that takes the previous data as input
-	// and returns an UI component
+	// a function that takes the previous data as input
+	// and returns a component
 );
 ```
 
-`withSelect` is used to pass data to other components, and update them when the original data changes. Let's use it:
+`withSelect` is used to pass data to other components, and update them when the original data changes. Let's update the code to use it:
 
 ```js
 ( function( wp ) {
@@ -56,17 +56,18 @@ withSelect(
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
 
-	// Function that takes `select` as input and returns some data.
+	// Function that takes `select` as input
+	// and returns an object containing data.
 	var selectToData = function( select ) {
 		return {
-			metaFieldValue: select(
-				'core/editor'
-			).getEditedPostAttribute( 'meta' )[ 'sidebar_plugin_meta_block_field' ]
+			metaFieldValue: select( 'core/editor' )
+				.getEditedPostAttribute( 'meta' )
+				[ 'sidebar_plugin_meta_block_field' ]
 		}
 	}
 
-	// The previous component,
-	// a function that takes the data object and outputs the component UI.
+	// Function that takes the data as input
+	// and outputs a component.
 	var MetaBlockField = function( props ) {
 		return el( Text, {
 			label: 'Meta Block Field',
