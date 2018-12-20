@@ -39,7 +39,7 @@ Creating a release candidate involves:
 ### Bumping the Version
 
 1. Create [a pull request like this](https://github.com/WordPress/gutenberg/pull/9663), bumping the version number in `gutenberg.php`, `package.json`, and `package-lock.json`.
-2. Check that there's no work-in-progress that's just about to land. [Inform committers in `#core-editor` on Slack](https://make.wordpress.org/chat/) to hold off on merging any changes until after the release candidate is tagged.
+2. Check that there's no work-in-progress that's just about to land. [Inform committers in `#core-editor` on Slack](https://wordpress.slack.com/messages/C02QB2JS7) to hold off on merging any changes until after the release candidate is tagged.
 3. Merge the version bump pull request.
 
 ### Tag the Release
@@ -198,7 +198,7 @@ You should check that folks are able to install the new version from their Dashb
 1. Publish the [make/core](https://make.wordpress.org/core/) release blog post drafted earlier.
 2. Pat yourself on the back! 👍
 
-If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping [Matias Ventura](https://profiles.wordpress.org/matveb) or someone else on the Gutenberg Core team to publish the post.
+If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping [someone on the Gutenberg Core team](https://github.com/orgs/WordPress/teams/gutenberg-core) in the [WordPress #core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7) to publish the post.
 
 ---------
 
