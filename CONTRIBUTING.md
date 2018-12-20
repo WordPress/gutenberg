@@ -23,7 +23,7 @@ npx nvm install
 npx nvm use
 ```
 
-You should also have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need also to update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`
+You also should have the latest release of [npm installed][npm]. npm is a separate project from Node.js and is updated frequently. If you've just installed Node.js which includes a version of npm within the installation you most likely will need also to update your npm installation. To update npm, type this into your terminal: `npm install npm@latest -g`
 
 To test the plugin, or to contribute to it, you can clone this repository and build the plugin files using Node. How you do that depends on whether you're developing locally or uploading the plugin to a remote host.
 
@@ -48,7 +48,7 @@ Then, run a setup script to check if docker and node are configured properly and
 2. If you've already had the previous environment set up, you need to start fresh, and you can do that by first running `docker-compose down --rmi all`. After that, you can repeat step 1.
 3. If you turn off your computer or restart Docker, you can get your local WordPress dev environment back by typing `docker-compose -f docker-compose.yml -f docker-compose-localdev.yml up`. If you just run `docker-compose up`, you will get the vanilla install that doesn't expose the WordPress folder.
 
-**If everything was successful**, you'd see the following ASCII art:
+**If everything was successful**, you'll see the following ASCII art:
 ```
 Welcome to...
 
@@ -114,7 +114,7 @@ Gutenberg contains both PHP and JavaScript code and encourages testing and code 
 
 This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm].
 
-### Creating A New Package
+### Creating a New Package
 
 When creating a new package, you need to provide at least the following:
 
