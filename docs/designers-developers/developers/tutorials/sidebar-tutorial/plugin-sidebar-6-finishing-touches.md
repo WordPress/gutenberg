@@ -2,7 +2,7 @@
 
 Your JavaScript code now works as expected, here are a few ways to simplify and make it easier to change in the future.
 
-The first step is to convert the functions `mapSelectToProps` and `dispatchToActions` to anonymous functions that get passed directly to `withSelect` and `withData`, respectively:
+The first step is to convert the functions `mapSelectToProps` and `mapDispatchToProps` to anonymous functions that get passed directly to `withSelect` and `withData`, respectively:
 
 ```js
 ( function( wp ) {

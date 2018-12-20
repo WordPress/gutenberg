@@ -19,7 +19,7 @@ The last step in the journey is to update the meta field when the input content 
 		}
 	}
 
-	var dispatchToActions = function( dispatch ) {
+	var mapDispatchToProps = function( dispatch ) {
 		return {
 			setMetaFieldValue: function( value ) {
 				dispatch( 'core/editor' ).editPost(
@@ -40,7 +40,7 @@ The last step in the journey is to update the meta field when the input content 
 	}
 
 	var MetaBlockFieldWithData = withSelect( mapSelectToProps )( MetaBlockField );
-	var MetaBlockFieldWithDataAndActions = withDispatch( dispatchToActions )( MetaBlockFieldWithData );
+	var MetaBlockFieldWithDataAndActions = withDispatch( mapDispatchToProps )( MetaBlockFieldWithData );
 
 	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
@@ -61,9 +61,9 @@ The last step in the journey is to update the meta field when the input content 
 
 Here's how it changed from the previous section:
 
-* Added a new `dispatchToActions` function that will be passed to `withDispatch`. It takes `dispatch` as input and returns an object containing functions to update the internal data structures of the editor. These functions are also known as _actions_.
+* Added a new `mapDispatchToProps` function that will be passed to `withDispatch`. It takes `dispatch` as input and returns an object containing functions to update the internal data structures of the editor. These functions are also known as _actions_.
 * By calling `setMetaFieldValue` every time the user types something within the input control, we're effectively updating the editor store on each key stroke.
-* The `props` argument to the `MetaBlockField` component contains now the data passed by `mapSelectToProps` and the actions passed by `dispatchToActions`.
+* The `props` argument to the `MetaBlockField` component contains now the data passed by `mapSelectToProps` and the actions passed by `mapDispatchToProps`.
 
 Copy this new code to the JavaScript file, load the sidebar and see how the input value gets updated as you type. You may want to check that the internal data structures are updated as well. Type something in the input control, and execute the following instruction in your browser's console:
 
