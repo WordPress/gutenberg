@@ -45,7 +45,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
-			return el( PluginSidebar),
+			return el( PluginSidebar,
 				{
 					name: 'my-plugin-sidebar',
 					icon: 'admin-post',

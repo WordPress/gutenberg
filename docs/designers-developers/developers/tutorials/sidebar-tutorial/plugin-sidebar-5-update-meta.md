@@ -46,7 +46,7 @@ The last step in the journey is to update the meta field when the input content 
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
-			return el( PluginSidebar),
+			return el( PluginSidebar,
 				{
 					name: 'my-plugin-sidebar',
 					icon: 'admin-post',
