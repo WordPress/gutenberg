@@ -7,7 +7,7 @@ const BlockView = ( { title, rawContent, renderedContent, action, actionText, cl
 	return (
 		<div className={ className }>
 			<div className="editor-block-compare__content">
-				<h1 className="editor-block-compare__heading">{ title }</h1>
+				<h2 className="editor-block-compare__heading">{ title }</h2>
 
 				<div className="editor-block-compare__html">
 					{ rawContent }

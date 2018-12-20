@@ -27,7 +27,7 @@ After a meta box is converted to a block, it can be declared as existing for bac
 add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 	null, 'normal', 'high',
 	array(
-		'__back_compat_meta_box' => false,
+		'__back_compat_meta_box' => true,
 	)
 );
 ```

@@ -115,7 +115,7 @@ wp.hooks.addFilter(
 
 #### `blocks.switchToBlockType.transformedBlock`
 
-Used to filters an individual transform result from block transformation. All of the original blocks are passed, since transformations are many-to-many, not one-to-one.
+Used to filter an individual transform result from block transformation. All of the original blocks are passed since transformations are many-to-many, not one-to-one.
 
 #### `blocks.getBlockAttributes`
 
@@ -200,7 +200,7 @@ var withClientIdClassName = wp.compose.createHigherOrderComponent( function( Blo
 			{},
 			props,
 			{
-				classsName: "block-" + props.clientId,
+				className: "block-" + props.clientId,
 			}
 		);
 
@@ -322,9 +322,9 @@ function my_plugin_block_categories( $categories, $post ) {
 add_filter( 'block_categories', 'my_plugin_block_categories', 10, 2 );
 ```
 
-You can also display an icon with your block category by setting an `icon` attribute.The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
+You can also display an icon with your block category by setting an `icon` attribute. The value can be the slug of a [WordPress Dashicon](https://developer.wordpress.org/resource/dashicons/).
 
-It is possible to set an SVG as the icon of the category if a custom icon is needed.To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
+It is possible to set an SVG as the icon of the category if a custom icon is needed. To do so, the icon should be rendered and set on the frontend, so it can make use of WordPress SVG, allowing mobile compatibility and making the icon more accessible.
 
 To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
 ```js
@@ -335,5 +335,5 @@ To set an SVG icon for the category shown in the previous example, add the follo
 	var svgIcon = el( SVG, { width: 20, height: 20, viewBox: '0 0 20 20'}, circle);
 	wp.blocks.updateCategory( 'my-category', { icon: svgIcon } );
 } )();
-``` 
+```
 
