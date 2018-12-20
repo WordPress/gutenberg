@@ -216,6 +216,7 @@ class FileEdit extends Component {
 							className={ `${ className }__copy-url-button` }
 							onCopy={ this.confirmCopyURL }
 							onFinishCopy={ this.resetCopyConfirmation }
+							disabled={ isBlobURL( href ) }
 						>
 							{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>
