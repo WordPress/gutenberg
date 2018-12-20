@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Plugin Name: Gutenberg Test Plugin, Disable Login Autofocus
  * Plugin URI: https://github.com/WordPress/gutenberg
