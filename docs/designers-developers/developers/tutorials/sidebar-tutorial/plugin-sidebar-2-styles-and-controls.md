@@ -1,6 +1,8 @@
 # Tweak the sidebar style and add controls
 
-After the sidebar is up and running, we can focus on filling it up with the necessary components and basic styling. To visualize and edit the meta field value we'll use a input component. The [`wp.components` package](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-components/) contains many components available for us to reuse, and, specifically, the [`TextControl`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/components/text-control/) let us create an input field, so that's what we'll use:
+After the sidebar is up and running, the next step is to fill it up with the necessary components and basic styling.
+
+To visualize and edit the meta field value you'll use an input component. The `@wordpress/components` package contains many components available for you to reuse, and, specifically, the [TextControl](https://wordpress.org/gutenberg/handbook/designers-developers/developers/components/text-control/) is aimed at creating an input field:
 
 ```js
 ( function( wp ) {
@@ -30,13 +32,13 @@ After the sidebar is up and running, we can focus on filling it up with the nece
 } )( window.wp );
 ```
 
-We've done a few things here:
+Update the `sidebar-plugin.js` with this new code. It introduces a few changes from the previous section:
 
-* Substituted the raw _Meta field_ text with a TextControl component wrapped within a `div` element.
-* Added the class `sidebar-plugin-content` to the `div` element so we can style it.
-* Added a few dependencies to our JavaScript code, namely the `wp-element` and `wp-components` packages, which we need to register in the PHP file.
+* Added a few utilities, namely `wp.element` and `wp.components`. Go ahead and add them as `wp-element` and `wp-components` in the PHP dependencies array.
+* Added the CSS class `sidebar-plugin-content` to the `div` element to be able to add some styles.
+* Substituted the raw _Meta field_ text with a `TextControl` component wrapped within the `div` element.
 
-We'll use the new CSS class available to us to give the sidebar a bit of breath. Create a new file in your plugin directory called `sidebar-plugin.css` with the following contents:
+With the new CSS class available you can now give the sidebar a bit of breath. Create a new file in your plugin directory called `sidebar-plugin.css` with the following contents:
 
 ```css
 .sidebar-plugin-content {
@@ -44,9 +46,9 @@ We'll use the new CSS class available to us to give the sidebar a bit of breath.
 }
 ```
 
-and tell WordPress to enqueue it by using the [`enqueue_block_editor_assets`](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) action hook. It will take care of loading the stylesheet both in the editor and front-end.
+For WordPress to load this stylesheet in the editor and front-end, you need to tell it to enqueue it by using the [enqueue_block_editor_assets](https://developer.wordpress.org/reference/hooks/enqueue_block_editor_assets/) action hook.
 
-After those changes, our plugin's PHP code looks like this:
+After those changes, the PHP code should look like this:
 
 ```php
 <?php
@@ -59,7 +61,12 @@ function sidebar_plugin_register() {
 	wp_register_script(
 		'sidebar-plugin-js',
 		plugins_url( 'sidebar-plugin.js', __FILE__ ),
-		array( 'wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components' )
+		array(
+			'wp-plugins',
+			'wp-edit-post',
+			'wp-element',
+			'wp-components'
+		)
 	);
 	wp_register_style(
 		'sidebar-plugin-css',
@@ -79,8 +86,8 @@ function sidebar_plugin_style_enqueue() {
 add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 ```
 
-Reload the editor and open the sidebar. It should look like this:
+Reload the editor and open the sidebar:
 
 ![Sidebar with style and controls](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/sidebar-style-and-controls.png)
 
-We have an input control in the sidebar now and things looks nicer. This code doesn't allow us to store our data just yet, so the next steps will focus on how to connect it to the meta block field.
+With the input control and the styling the sidebar looks nicer. This code doesn't let users to store or retrieve data just yet, so the next steps will focus on how to connect it to the meta block field.

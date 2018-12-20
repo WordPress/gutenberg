@@ -1,6 +1,6 @@
 # Finishing touches
 
-We have now JavaScript code that works as expected, so we can now focus on making our code more idiomatic.
+Your JavaScript code now works as expected, here are a few ways to simplify and make it easier to change in the future.
 
 The first step is to convert the functions `selectToData` and `dispatchToActions` to anonymous functions that get passed directly to `withSelect` and `withData`, respectively:
 
@@ -56,7 +56,7 @@ The first step is to convert the functions `selectToData` and `dispatchToActions
 } )( window.wp );
 ```
 
-Next, we want to merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithDataAndActions` into one function called `MetaBlockField` that gets passed to the `div` element. The `@wordpress/compose` package offers an utility to concatenate functions called `compose`. Don't forget adding `wp-compose` to the dependencies array in the PHP script.
+Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithDataAndActions` into one function called `MetaBlockField` that gets passed to the `div` element. The `@wordpress/compose` package offers an utility to concatenate functions called `compose`. Don't forget adding `wp-compose` to the dependencies array in the PHP script.
 
 ```js
 ( function( wp ) {
@@ -110,14 +110,14 @@ Next, we want to merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBloc
 } )( window.wp );
 ```
 
-Finally, we're going to extract the meta field name (`sidebar_plugin_meta_block_field`) from `withSelect` and `withDispatch` to have it declared in a single place, so it's easier to change in the future. We can leverage the fact that `withSelect` and `withDispatch` first functions can take the props of the UI component they wrap as a second argument. For example:
+Finally, extract the meta field name (`sidebar_plugin_meta_block_field`) from the `withSelect` and `withDispatch` functions to a single place, so it's easier to change in the future. You can leverage the fact that `withSelect` and `withDispatch` first functions can take the props of the UI component they wrap as a second argument. For example:
 
 ```js
 // ...
 
 var MetaBlockFieldWithData = withSelect(
 	function( select, props ) {
-		// We can access props.metaFieldName here!
+		// props.metaFieldName can be accessed here!
 	}
 )( MetaBlockField );
 
@@ -129,7 +129,7 @@ var MetaBlockFieldWithData = withSelect(
 // ...
 ```
 
-Let's change our code to take advantage of that:
+Let's change the code to take advantage of that:
 
 ```js
 ( function( wp ) {

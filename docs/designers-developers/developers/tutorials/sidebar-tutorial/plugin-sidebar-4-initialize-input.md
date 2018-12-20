@@ -1,6 +1,6 @@
 # Initialize the input control
 
-Now that the field is available in the editor store, we can surface it to the UI. The first thing we're going to do is to extract our input control to a function so we can expand its functionality and our code stays clear.
+Now that the field is available in the editor store, it can be surfaced to the UI. The first step will be to extract the input control to a separate function so you can expand its functionality while the code stays clear.
 
 ```js
 ( function( wp ) {
@@ -34,19 +34,21 @@ Now that the field is available in the editor store, we can surface it to the UI
 } )( window.wp );
 ```
 
-Now we can focus solely on the `MetaBlockField` component. Our goal is to initialize it with the value of `sidebar_plugin_meta_block_field`, but also to keep it updated when that value changes.
+Now you can focus solely on the `MetaBlockField` component. The goal is to initialize it with the value of `sidebar_plugin_meta_block_field`, but also to keep it updated when that value changes.
 
-WordPress has [some utilities to work with data](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-data/) from the stores. The first we're going to use is [`withSelect`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-data/#withselect-mapselecttoprops-function-function), whose signature is:
+WordPress has [some utilities to work with data](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-data/) from the stores. The first you're going to use is [withSelect](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-data/#withselect-mapselecttoprops-function-function), whose signature is:
 
 ```js
 withSelect(
-	/* function that takes `select` as input and returns an object containing data */
+	// a function that takes `select` as input
+	// and returns an object containing data
 )(
-	/* function that takes the previous data as input and returns an UI component */
+	// another function that takes the previous data as input
+	// and returns an UI component
 );
 ```
 
-`withSelect` is useful to pass some data to other components, and update them when the original data changes. Let's use it in our plugin code:
+`withSelect` is used to pass data to other components, and update them when the original data changes. Let's use it in our plugin code:
 
 ```js
 ( function( wp ) {
@@ -94,17 +96,19 @@ withSelect(
 } )( window.wp );
 ```
 
-Notice the changes from the previous code we had:
+Notice the changes from the previous code:
 
+* The JavaScript code now depends on the `wp.data.withSelect` utility. Go ahead and add `wp-data` as a dependency in the PHP script.
 * The `MetaBlockField` function has now a `props` argument as input. It contains the data object returned by the `selectToData` function, which it uses to initialize its value property.
-* We've also updated the component we render within the `div` element. We now use `MetaBlockFieldWithData`. This will be updated every time the original data changes.
-* We've imported the `wp.data.withSelect` utility, so we have to declare our script depends on the `wp-data`. package. Go ahead and add that dependency in the PHP script.
-* We use the [`getEditedPostAttribute`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#geteditedpostattribute) function to retrieve data instead of [`getCurrentPost`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#getcurrentpost) that we saw in the previous section. `getEditedPostAttribute` returns the most recent values of the post, including user editions that haven't been yet saved.
+* The component rendered within the `div` element was also updated, the plugin now uses `MetaBlockFieldWithData`. This will be updated every time the original data changes.
+* [getEditedPostAttribute](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#geteditedpostattribute) is used to retrieve data instead of [getCurrentPost](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#getcurrentpost) because it returns the most recent values of the post, including user editions that haven't been yet saved.
 
-With this new code, when we open the sidebar, we'll see that the input's value is no longer `Initial value`, but a void string. We can't type values yet, but let's check that the component is updated if the value in the store changes. Open the browser's console, execute
+Copy this code to the JavaScript file, open the sidebar. The input's content is no longer `Initial value`, but a void string. Users can't type values yet, but let's check that the component is updated if the value in the store changes. Open the browser's console, execute
 
 ```js
-wp.data.dispatch( 'core/editor' ).editPost( { meta: { sidebar_plugin_meta_block_field: 'hello world!' } } );
+wp.data.dispatch( 'core/editor' ).editPost(
+	{ meta: { sidebar_plugin_meta_block_field: 'hello world!' } }
+);
 ```
 
 and observe how the contents of the input component change!

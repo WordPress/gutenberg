@@ -1,6 +1,10 @@
 # Get a sidebar up and running
 
-First, we need to tell the editor that we are registering a new plugin that will have its own sidebar. We can do so by using the [`wp.plugins.registerPlugin`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/) and [`wp.editPost.PluginSidebar`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-edit-post/#pluginsidebar) utilities.
+This tutorial starts with you having an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
+
+This is going to be the first step in the journey: to tell the editor that there is a new plugin that will have its own sidebar. You can do so by using the [wp.plugins.registerPlugin](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/) and [wp.editPost.PluginSidebar](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-edit-post/#pluginsidebar) utilities provided by WordPress, to be found in the `@wordpress/plugins` and `@wordpress/edit-post` [packages](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/).
+
+Add the following code to a JavaScript file called `sidebar-plugin.js` and save it within your plugin's directory:
 
 ```js
 ( function( wp ) {
@@ -17,7 +21,9 @@ First, we need to tell the editor that we are registering a new plugin that will
 } )( window.wp );
 ```
 
-For this code to work, we need to make those utilities available in the browser, so we tell WordPress to enqueue `wp-plugins` and `wp-edit-post` for us:
+For this code to work, those utilities need to be available in the browser, so you tell WordPress to enqueue the packages that include them by introducing `wp-plugins` and `wp-edit-post` as dependencies of your script.
+
+Copy this code to a PHP file within your plugin's directory:
 
 ```php
 <?php
@@ -41,6 +47,6 @@ function sidebar_plugin_script_enqueue() {
 add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 ```
 
-After installing and activating this plugin, we'll see a new icon resembling a tack in the top-right of the editor. Upon clicking it, our plugin's sidebar will be opened:
+After installing and activating this plugin, there is a new icon resembling a tack in the top-right of the editor. Upon clicking it, the plugin's sidebar will be opened:
 
 ![Sidebar Up and Running](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/sidebar-up-and-running.png)
