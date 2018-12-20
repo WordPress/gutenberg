@@ -48,7 +48,7 @@ withSelect(
 );
 ```
 
-`withSelect` is used to pass data to other components, and update them when the original data changes. Let's use it in our plugin code:
+`withSelect` is used to pass data to other components, and update them when the original data changes. Let's use it:
 
 ```js
 ( function( wp ) {
@@ -65,7 +65,7 @@ withSelect(
 		}
 	}
 
-	// Our previous component,
+	// The previous component,
 	// a function that takes the data object and outputs the component UI.
 	var MetaBlockField = function( props ) {
 		return el( Text, {

@@ -34,7 +34,7 @@ The last step in the journey is to update the meta field when the input content 
 		}
 	}
 
-	// Our original UI component. The `props` argument now contains both:
+	// The original UI component. The `props` argument now contains both:
 	// 1) the data passed by `selectToData`
 	// 2) the actions passed by `dispatchToActions`
 	var MetaBlockField = function( props ) {
