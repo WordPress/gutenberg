@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "4.7.0",
+	"version": "4.7.1",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -90,13 +90,12 @@
 		"jest-puppeteer": "3.2.1",
 		"jsdom": "11.12.0",
 		"lerna": "3.4.3",
-		"lint-staged": "7.2.0",
+		"lint-staged": "7.3.0",
 		"lodash": "4.17.10",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.11.0",
 		"pegjs": "0.10.0",
 		"phpegjs": "1.0.0-beta7",
-		"puppeteer": "1.6.1",
 		"react-dom": "16.6.3",
 		"react-test-renderer": "16.6.3",
 		"redux": "4.0.0",
@@ -108,7 +107,6 @@
 		"shallowequal": "1.1.0",
 		"sprintf-js": "1.1.1",
 		"source-map-loader": "0.2.3",
-		"stylelint": "9.5.0",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
 		"webpack": "4.8.3",
@@ -165,11 +163,11 @@
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"lint": "concurrently \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "wp-scripts lint-js .",
-		"lint-js:fix": "wp-scripts lint-js . --fix",
+		"lint-js:fix": "npm run lint-js -- --fix",
 		"lint-php": "docker-compose run --rm composer run-script lint",
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
-		"lint-css": "stylelint '**/*.scss'",
-		"lint-css:fix": "stylelint '**/*.scss' --fix",
+		"lint-css": "wp-scripts lint-style '**/*.scss'",
+		"lint-css:fix": "npm run lint-css -- --fix",
 		"package-plugin": "./bin/build-plugin-zip.sh",
 		"postinstall": "npm run check-licenses && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
@@ -179,7 +177,7 @@
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"pretest-e2e": "concurrently \"./bin/reset-e2e-tests.sh\" \"npm run build\"",
-		"test-e2e": "cross-env JEST_PUPPETEER_CONFIG=test/e2e/puppeteer.config.js wp-scripts test-unit-js --config test/e2e/jest.config.json --runInBand",
+		"test-e2e": "wp-scripts test-e2e --config test/e2e/jest.config.json",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
@@ -194,7 +192,7 @@
 			"wp-scripts lint-pkg-json"
 		],
 		"*.scss": [
-			"stylelint"
+			"wp-scripts lint-style"
 		],
 		"*.js": [
 			"wp-scripts lint-js"

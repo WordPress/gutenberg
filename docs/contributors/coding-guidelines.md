@@ -170,7 +170,7 @@ function MyComponent() {}
 
 An exception to camel case is made for constant values which are never intended to be reassigned or mutated. Such variables must use the [SCREAMING_SNAKE_CASE convention](https://en.wikipedia.org/wiki/Snake_case).
 
-In almost all cases, a constant should be defined in the top-most scope of a file. It is important to note that [JavaScript's `const` assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const) is conceptually more limited than what is implied here, where a value assigned by `const` in JavaScript can in-fact be mutated, and is only protected against reassignment. A constant as defined in these coding guidelines applies only to values which are expected to never change, and is a strategy for developers to communicate intent moreso than it is a technical restriction.
+In almost all cases, a constant should be defined in the top-most scope of a file. It is important to note that [JavaScript's `const` assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/const) is conceptually more limited than what is implied here, where a value assigned by `const` in JavaScript can in-fact be mutated, and is only protected against reassignment. A constant as defined in these coding guidelines applies only to values which are expected to never change, and is a strategy for developers to communicate intent more so than it is a technical restriction.
 
 ### Strings
 
