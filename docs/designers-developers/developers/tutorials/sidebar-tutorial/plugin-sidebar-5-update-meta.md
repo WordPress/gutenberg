@@ -7,6 +7,7 @@ The last step in the journey is to update the meta field when the input content 
 ```js
 ( function( wp ) {
 	var registerPlugin = wp.plugins.registerPlugin;
+	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -45,7 +46,7 @@ The last step in the journey is to update the meta field when the input content 
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
-			return wp.editPost.PluginSidebar( {
+			return PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
 				title: 'My plugin sidebar',

@@ -5,6 +5,7 @@ Now that the field is available in the editor store, it can be surfaced to the U
 ```js
 ( function( wp ) {
 	var registerPlugin = wp.plugins.registerPlugin;
+	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 
@@ -20,7 +21,7 @@ Now that the field is available in the editor store, it can be surfaced to the U
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
-			return wp.editPost.PluginSidebar( {
+			return PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
 				title: 'My plugin sidebar',
@@ -54,6 +55,7 @@ withSelect(
 ```js
 ( function( wp ) {
 	var registerPlugin = wp.plugins.registerPlugin;
+	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -80,7 +82,7 @@ withSelect(
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
-			return wp.editPost.PluginSidebar( {
+			return PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
 				title: 'My plugin sidebar',

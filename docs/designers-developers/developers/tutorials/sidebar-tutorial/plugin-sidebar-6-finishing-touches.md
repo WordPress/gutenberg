@@ -7,6 +7,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 ```js
 ( function( wp ) {
 	var registerPlugin = wp.plugins.registerPlugin;
+	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -44,7 +45,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
-			return wp.editPost.PluginSidebar( {
+			return PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
 				title: 'My plugin sidebar',
@@ -64,6 +65,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 ```js
 ( function( wp ) {
 	var registerPlugin = wp.plugins.registerPlugin;
+	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -99,7 +101,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
-			return wp.editPost.PluginSidebar( {
+			return PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
 				title: 'My plugin sidebar',
@@ -137,6 +139,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 ```js
 ( function( wp ) {
 	var registerPlugin = wp.plugins.registerPlugin;
+	var PluginSidebar = wp.editPost.PluginSidebar;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -172,7 +175,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 
 	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
-			return wp.editPost.PluginSidebar( {
+			return PluginSidebar( {
 				name: 'my-plugin-sidebar',
 				icon: 'admin-post',
 				title: 'My plugin sidebar',
