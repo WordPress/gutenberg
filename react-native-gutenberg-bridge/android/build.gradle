@@ -46,32 +46,22 @@ android {
     }
 }
 
-def cdnOrNodeModules(remotePath, localPath) {
-    def url
-    if (rootProject.ext.buildGutenbergFromSource) {
-        url = "${project.buildDir}/../../../node_modules/${localPath}"
-    } else {
-        // if we are the root project, use a remote maven repo so jitpack can build this lib without local RN setup
-        url = "https://cdn.jsdelivr.net/npm/${remotePath}"
-        println "Will use the jsdelivr.net exposed maven repo at ${url}"
-    }
-    return url
-}
-
 repositories {
     google()
     jcenter()
 
     maven { url "https://jitpack.io" }
 
-    maven {
-        // All of React Native (JS, Obj-C sources, Android binaries)
-        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
-        url cdnOrNodeModules("react-native@${rnVersion}/android", "react-native/android")
-    }
-    maven {
-        // Maven repo containing AARs with JSC library built for Android
-        url cdnOrNodeModules("jsc-android@224109.1.0/dist/", "jsc-android/dist")
+    if (rootProject.ext.buildGutenbergFromSource) {
+        // If building from source, use the local sources from node_modules
+        def nodeModulesPath = "${project.buildDir}/../../../node_modules/"
+        maven { url "${nodeModulesPath}/react-native/android" }
+        maven { url "${nodeModulesPath}/jsc-android/dist" }
+    } else {
+        // If not building from source (e.g. Jitpack), use the bintray repo so a local RN setup is not needed
+        def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
+        println "Will use the RN maven repo at ${reactNativeRepo}"
+        maven { url reactNativeRepo }
     }
 }
 
@@ -81,10 +71,14 @@ dependencies {
         implementation project(':react-native-svg')
         implementation project(':react-native-aztec')
         implementation project(':react-native-recyclerview-list')
+
+        implementation 'com.facebook.react:react-native:+'
     } else {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-svg', readHashedVersion('../../package.json', 'react-native-svg', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-aztec', submoduleGitHash('../../', 'react-native-aztec')))
-        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'a2e8ca550412504c32218fd473c55f696f18f1f7'))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-recyclerview-list', 'f845b3c2c4411b8e97db23724bf1a535530c5435'))
+
+        def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
+        implementation "com.facebook.react:react-native:${rnVersion}"
     }
-    implementation 'com.facebook.react:react-native:+'
 }
