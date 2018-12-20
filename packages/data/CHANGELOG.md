@@ -1,3 +1,9 @@
+## 4.2.0 (Unreleased)
+
+### Enhancements
+
+- Optimized performance of selector execution (~511% improvement)
+
 ## 4.1.0 (2018-12-12)
 
 ### New Feature
