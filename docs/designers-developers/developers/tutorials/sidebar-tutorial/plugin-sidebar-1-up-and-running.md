@@ -1,7 +1,5 @@
 # Get a sidebar up and running
 
-This tutorial starts with you having an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
-
 This is going to be the first step in the journey: to tell the editor that there is a new plugin that will have its own sidebar. You can do so by using the [wp.plugins.registerPlugin](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/) and [wp.editPost.PluginSidebar](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-edit-post/#pluginsidebar) utilities provided by WordPress, to be found in the `@wordpress/plugins` and `@wordpress/edit-post` [packages](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/).
 
 Add the following code to a JavaScript file called `sidebar-plugin.js` and save it within your plugin's directory:
