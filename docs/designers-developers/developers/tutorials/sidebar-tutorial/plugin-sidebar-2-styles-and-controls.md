@@ -32,9 +32,10 @@ To visualize and edit the meta field value you'll use an input component. The `@
 } )( window.wp );
 ```
 
-Update the `sidebar-plugin.js` with this new code. It introduces a few changes from the previous section:
+Update the `sidebar-plugin.js` with this new code. Notice that it uses the new utilities `wp.element` and `wp.components` from the `@wordpress/element` and `@wordpress/components` packages, respectively. Go ahead and add them as `wp-element` and `wp-components` in the PHP dependencies array.
 
-* Added a few utilities, namely `wp.element` and `wp.components`. Go ahead and add them as `wp-element` and `wp-components` in the PHP dependencies array.
+It introduces a few changes from the previous section:
+
 * Added the CSS class `sidebar-plugin-content` to the `div` element to be able to add some styles.
 * Substituted the raw _Meta field_ text with a `TextControl` component wrapped within the `div` element.
 

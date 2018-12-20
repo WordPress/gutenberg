@@ -56,8 +56,6 @@ withSelect(
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
 
-	// Function that takes `select` as input
-	// and returns an object containing data.
 	var selectToData = function( select ) {
 		return {
 			metaFieldValue: select( 'core/editor' )
@@ -66,8 +64,6 @@ withSelect(
 		}
 	}
 
-	// Function that takes the data as input
-	// and outputs a component.
 	var MetaBlockField = function( props ) {
 		return el( Text, {
 			label: 'Meta Block Field',
@@ -97,14 +93,15 @@ withSelect(
 } )( window.wp );
 ```
 
-Notice the changes from the previous code:
+Copy this code to the JavaScript file. Note that it now uses the `wp.data.withSelect` utility to be found in the `@wordpress/data` package. Go ahead and add `wp-data` as a dependency in the PHP script.
 
-* The JavaScript code now depends on the `wp.data.withSelect` utility. Go ahead and add `wp-data` as a dependency in the PHP script.
+This is how the code changes from the previous section:
+
 * The `MetaBlockField` function has now a `props` argument as input. It contains the data object returned by the `selectToData` function, which it uses to initialize its value property.
 * The component rendered within the `div` element was also updated, the plugin now uses `MetaBlockFieldWithData`. This will be updated every time the original data changes.
 * [getEditedPostAttribute](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#geteditedpostattribute) is used to retrieve data instead of [getCurrentPost](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#getcurrentpost) because it returns the most recent values of the post, including user editions that haven't been yet saved.
 
-Copy this code to the JavaScript file, open the sidebar. The input's content is no longer `Initial value`, but a void string. Users can't type values yet, but let's check that the component is updated if the value in the store changes. Open the browser's console, execute
+Update the code and open the sidebar. The input's content is no longer `Initial value` but a void string. Users can't type values yet, but let's check that the component is updated if the value in the store changes. Open the browser's console, execute
 
 ```js
 wp.data.dispatch( 'core/editor' ).editPost(

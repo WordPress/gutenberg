@@ -11,8 +11,6 @@ The last step in the journey is to update the meta field when the input content 
 	var withSelect = wp.data.withSelect;
 	var withDispatch = wp.data.withDispatch;
 
-	// Function that takes `select` as input
-	// and returns an object containing data.
 	var selectToData = function( select ) {
 		return {
 			metaFieldValue: select( 'core/editor' )
@@ -21,10 +19,6 @@ The last step in the journey is to update the meta field when the input content 
 		}
 	}
 
-	// Function that takes `dispatch` as input
-	// and returns an object containing functions
-	// to update the internal data structures.
-	// These functions are also known as actions.
 	var dispatchToActions = function( dispatch ) {
 		return {
 			setMetaFieldValue: function( value ) {
@@ -35,12 +29,6 @@ The last step in the journey is to update the meta field when the input content 
 		}
 	}
 
-	// Function that takes an object called `props` as input
-	// and outputs a component.
-	//
-	// Note that the `props` argument now contains:
-	// 1) the data passed by `selectToData`
-	// 2) the functions passed by `dispatchToActions`
 	var MetaBlockField = function( props ) {
 		return el( Text, {
 			label: 'Meta Block Field',
@@ -71,9 +59,13 @@ The last step in the journey is to update the meta field when the input content 
 } )( window.wp );
 ```
 
-Copy this new code to the JavaScript file, load the sidebar and see how the input value gets updated as you type.
+Here's how it changed from the previous section:
 
-Now that this is in place, you may want to check that the internal data structures are updated after the input's content is changed. Type something in the input control, and execute the following instruction in your browser's console:
+* Added a new `dispatchToActions` function that will be passed to `withDispatch`. It takes `dispatch` as input and returns an object containing functions to update the internal data structures of the editor. These functions are also known as _actions_.
+* By calling `setMetaFieldValue` every time the user types something within the input control, we're effectively updating the editor store on each key stroke.
+* The `props` argument to the `MetaBlockField` component contains now the data passed by `selectToData` and the actions passed by `dispatchToActions`.
+
+Copy this new code to the JavaScript file, load the sidebar and see how the input value gets updated as you type. You may want to check that the internal data structures are updated as well. Type something in the input control, and execute the following instruction in your browser's console:
 
 ```js
 wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
@@ -81,9 +73,11 @@ wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
 ];
 ```
 
-The message displayed should be what you typed in the input. Now, after doing some changes, hit the "Save draft" button (or publish the post). Then, reload the editor page. The browser has now new content, fresh from the database. You want to confirm that what you typed was stored properly in the database, the current post data. Open the sidebar and make sure it is initialized with the last value you typed.
+The message displayed should be what you typed in the input.
 
-At this point, because you haven't yet edited the input, the current post and the edited attributes should be the same. Confirm that by executing this code in your browser's console:
+Now, after doing some changes, hit the "Save draft" button or publish the post. Then, reload the editor page. The browser has now new content, fresh from the database. You want to confirm that what you typed was stored properly in the database, and has been reloaded in the current post data structure. Open the sidebar and make sure the input control is initialized with the last value you typed.
+
+One last check. At this point, because you haven't edited the input yet, the current post and the edited attributes should be the same. Confirm that by executing this code in your browser's console:
 
 ```js
 wp.data.select( 'core/editor' ).getCurrentPost()[ 'meta' ][
