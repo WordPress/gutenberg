@@ -56,7 +56,7 @@ withSelect(
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
 
-	var selectToData = function( select ) {
+	var mapSelectToProps = function( select ) {
 		return {
 			metaFieldValue: select( 'core/editor' )
 				.getEditedPostAttribute( 'meta' )
@@ -74,7 +74,7 @@ withSelect(
 		} );
 	}
 
-	var MetaBlockFieldWithData = withSelect( selectToData )( MetaBlockField );
+	var MetaBlockFieldWithData = withSelect( mapSelectToProps )( MetaBlockField );
 
 	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
@@ -97,7 +97,7 @@ Copy this code to the JavaScript file. Note that it now uses the `wp.data.withSe
 
 This is how the code changes from the previous section:
 
-* The `MetaBlockField` function has now a `props` argument as input. It contains the data object returned by the `selectToData` function, which it uses to initialize its value property.
+* The `MetaBlockField` function has now a `props` argument as input. It contains the data object returned by the `mapSelectToProps` function, which it uses to initialize its value property.
 * The component rendered within the `div` element was also updated, the plugin now uses `MetaBlockFieldWithData`. This will be updated every time the original data changes.
 * [getEditedPostAttribute](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#geteditedpostattribute) is used to retrieve data instead of [getCurrentPost](https://wordpress.org/gutenberg/handbook/designers-developers/developers/data/data-core-editor/#getcurrentpost) because it returns the most recent values of the post, including user editions that haven't been yet saved.
 
