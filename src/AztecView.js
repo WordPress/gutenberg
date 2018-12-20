@@ -150,6 +150,10 @@ class AztecView extends React.Component {
     TextInputState.focusTextInput(ReactNative.findNodeHandle(this));
   }
 
+  isFocused = () => {
+    return TextInputState.currentlyFocusedField() === ReactNative.findNodeHandle(this);
+  }
+
   _onPress = (event) => {
     this.focus(event); // Call to move the focus in RN way (TextInputState)
     this._onFocus(event); // Check if there are listeners set on the focus event
