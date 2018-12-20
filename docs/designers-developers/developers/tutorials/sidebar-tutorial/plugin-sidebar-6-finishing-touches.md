@@ -176,7 +176,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 	} );
 
 	registerPlugin( 'my-plugin-sidebar', {
-		render: function(){
+		render: function() {
 			return el( PluginSidebar,
 				{
 					name: 'my-plugin-sidebar',
