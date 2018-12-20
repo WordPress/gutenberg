@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
-import { pick, includes } from 'lodash';
+import { get, pick, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,7 +28,6 @@ import {
 	getEditedPostContent,
 	getAutosave,
 	getCurrentPostType,
-	isEditedPostAutosaveable,
 	isEditedPostSaveable,
 	isEditedPostNew,
 	POST_UPDATE_TRANSACTION_ID,
@@ -51,12 +50,11 @@ export const requestPostUpdate = async ( action, store ) => {
 	const { dispatch, getState } = store;
 	const state = getState();
 	const post = getCurrentPost( state );
-	const isAutosave = !! action.options.autosave;
+	const isAutosave = !! action.options.isAutosave;
 
 	// Prevent save if not saveable.
-	const isSaveable = isAutosave ? isEditedPostAutosaveable : isEditedPostSaveable;
-
-	if ( ! isSaveable( state ) ) {
+	// We don't check for dirtiness here as this can be overriden in the UI.
+	if ( ! isEditedPostSaveable( state ) ) {
 		return;
 	}
 
@@ -91,7 +89,7 @@ export const requestPostUpdate = async ( action, store ) => {
 	dispatch( {
 		type: 'REQUEST_POST_UPDATE_START',
 		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
-		isAutosave,
+		options: action.options,
 	} );
 
 	// Optimistically apply updates under the assumption that the post
@@ -110,7 +108,6 @@ export const requestPostUpdate = async ( action, store ) => {
 			...pick( post, [ 'title', 'content', 'excerpt' ] ),
 			...getAutosave( state ),
 			...toSend,
-			parent: post.id,
 		};
 
 		request = apiFetch( {
@@ -151,7 +148,7 @@ export const requestPostUpdate = async ( action, store ) => {
 				type: isRevision ? REVERT : COMMIT,
 				id: POST_UPDATE_TRANSACTION_ID,
 			},
-			isAutosave,
+			options: action.options,
 			postType,
 		} );
 	} catch ( error ) {
@@ -161,6 +158,7 @@ export const requestPostUpdate = async ( action, store ) => {
 			post,
 			edits,
 			error,
+			options: action.options,
 		} );
 	}
 };
@@ -172,10 +170,10 @@ export const requestPostUpdate = async ( action, store ) => {
  * @param {Object} store   Redux Store.
  */
 export const requestPostUpdateSuccess = ( action ) => {
-	const { previousPost, post, isAutosave, postType } = action;
+	const { previousPost, post, postType } = action;
 
 	// Autosaves are neither shown a notice nor redirected.
-	if ( isAutosave ) {
+	if ( get( action.options, [ 'isAutosave' ] ) ) {
 		return;
 	}
 
@@ -184,7 +182,7 @@ export const requestPostUpdateSuccess = ( action ) => {
 	const willPublish = includes( publishStatus, post.status );
 
 	let noticeMessage;
-	let shouldShowLink = true;
+	let shouldShowLink = get( postType, [ 'viewable' ], false );
 
 	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
@@ -313,8 +311,8 @@ export const refreshPost = async ( action, store ) => {
 	const postTypeSlug = getCurrentPostType( getState() );
 	const postType = await resolveSelector( 'core', 'getPostType', postTypeSlug );
 	const newPost = await apiFetch( {
-		path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
-		data: { context: 'edit' },
+		// Timestamp arg allows caller to bypass browser caching, which is expected for this specific function.
+		path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit&_timestamp=${ Date.now() }`,
 	} );
 	dispatch( resetPost( newPost ) );
 };

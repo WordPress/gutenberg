@@ -10,6 +10,7 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	overflow: hidden;
 
 	&.has-left-content {
 		justify-content: flex-start;
@@ -82,17 +83,32 @@
 		}
 	}
 
-	&.components-placeholder {
-		height: inherit;
-	}
-
 	// Apply max-width to floated items that have no intrinsic width
-	[data-align="left"] &,
-	[data-align="right"] &,
 	&.alignleft,
 	&.alignright {
 		max-width: $content-width / 2;
 		width: 100%;
+	}
+
+	// Using flexbox without an assigned height property breaks vertical center alignment in IE11.
+	// Appending an empty ::after element tricks IE11 into giving the cover image an implicit height, which sidesteps this issue.
+	&::after {
+		display: block;
+		content: "";
+		font-size: 0;
+		min-height: inherit;
+
+		// IE doesn't support flex so omit that.
+		@supports (position: sticky) {
+			content: none;
+		}
+	}
+
+	// Aligned cover blocks should not use our global alignment rules
+	&.aligncenter,
+	&.alignleft,
+	&.alignright {
+		display: flex;
 	}
 }
 
@@ -104,5 +120,5 @@
 	width: 100%;
 	height: 100%;
 	z-index: z-index(".wp-block-cover__video-background");
-	object-fit: fill;
+	object-fit: cover;
 }

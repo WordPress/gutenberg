@@ -8,7 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { MenuItem, MenuGroup } from '@wordpress/components';
+import { Button, NavigableMenu } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
@@ -25,23 +25,30 @@ function BlockNavigationList( {
 	showNestedBlocks,
 } ) {
 	return (
-		<ul className="editor-block-navigation__list" role="presentation">
+		/*
+		 * Disable reason: The `list` ARIA role is redundant but
+		 * Safari+VoiceOver won't announce the list otherwise.
+		 */
+		/* eslint-disable jsx-a11y/no-redundant-roles */
+		<ul className="editor-block-navigation__list" role="list">
 			{ map( blocks, ( block ) => {
 				const blockType = getBlockType( block.name );
+				const isSelected = block.clientId === selectedBlockClientId;
+
 				return (
-					<li key={ block.clientId } role="presentation">
-						<div role="presentation" className="editor-block-navigation__item">
-							<MenuItem
+					<li key={ block.clientId }>
+						<div className="editor-block-navigation__item">
+							<Button
 								className={ classnames( 'editor-block-navigation__item-button', {
 									'is-selected': block.clientId === selectedBlockClientId,
 								} ) }
 								onClick={ () => selectBlock( block.clientId ) }
-								isSelected={ block.clientId === selectedBlockClientId }
-								role="menuitemradio"
+								isSelected={ isSelected }
 							>
 								<BlockIcon icon={ blockType.icon } showColors />
 								{ blockType.title }
-							</MenuItem>
+								{ isSelected && <span className="screen-reader-text">{ __( '(selected block)' ) }</span> }
+							</Button>
 						</div>
 						{ showNestedBlocks && !! block.innerBlocks && !! block.innerBlocks.length && (
 							<BlockNavigationList
@@ -55,10 +62,15 @@ function BlockNavigationList( {
 				);
 			} ) }
 		</ul>
+		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 }
 
 function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, selectBlock } ) {
+	if ( ! rootBlocks || rootBlocks.length === 0 ) {
+		return null;
+	}
+
 	const hasHierarchy = (
 		rootBlock && (
 			rootBlock.clientId !== selectedBlockClientId ||
@@ -67,7 +79,11 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 	);
 
 	return (
-		<MenuGroup label={ __( 'Block Navigation' ) }>
+		<NavigableMenu
+			role="presentation"
+			className="editor-block-navigation__container"
+		>
+			<p className="editor-block-navigation__label">{ __( 'Block Navigation' ) }</p>
 			{ hasHierarchy && (
 				<BlockNavigationList
 					blocks={ [ rootBlock ] }
@@ -83,14 +99,7 @@ function BlockNavigation( { rootBlock, rootBlocks, selectedBlockClientId, select
 					selectBlock={ selectBlock }
 				/>
 			) }
-			{ ( ! rootBlocks || rootBlocks.length === 0 ) && (
-				// If there are no blocks in this document, don't render a list of blocks.
-				// Instead: inform the user no blocks exist yet.
-				<p className="editor-block-navigation__paragraph">
-					{ __( 'No blocks created yet.' ) }
-				</p>
-			) }
-		</MenuGroup>
+		</NavigableMenu>
 	);
 }
 

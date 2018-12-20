@@ -73,6 +73,7 @@ export class PostTextEditor extends Component {
 				</label>
 				<Textarea
 					autoComplete="off"
+					dir="auto"
 					value={ value }
 					onChange={ this.edit }
 					onBlur={ this.stopEditing }

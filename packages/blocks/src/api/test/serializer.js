@@ -39,12 +39,29 @@ describe( 'block serializer', () => {
 
 	describe( 'getSaveContent()', () => {
 		describe( 'function save', () => {
+			const fruitBlockSave = ( { attributes } ) => createElement( 'div', null, attributes.fruit );
+
 			it( 'should return element as string if save returns element', () => {
 				const saved = getSaveContent(
 					{
-						save: ( { attributes } ) => createElement( 'div', null, attributes.fruit ),
 						name: 'core/fruit',
+						save: fruitBlockSave,
 					},
+					{ fruit: 'Bananas' }
+				);
+
+				expect( saved ).toBe( '<div>Bananas</div>' );
+			} );
+
+			it( 'should work when block type is passed as string', () => {
+				registerBlockType( 'core/fruit', {
+					title: 'Fruit',
+					category: 'widgets',
+					save: fruitBlockSave,
+				} );
+
+				const saved = getSaveContent(
+					'core/fruit',
 					{ fruit: 'Bananas' }
 				);
 

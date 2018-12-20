@@ -94,24 +94,6 @@ describe( 'registerFormatType', () => {
 		expect( duplicateFormat ).toBeUndefined();
 	} );
 
-	it( 'should error on undefined edit property', () => {
-		const format = registerFormatType( 'plugin/test', {
-			...validSettings,
-			edit: undefined,
-		} );
-		expect( console ).toHaveErroredWith( 'The "edit" property must be specified and must be a valid function.' );
-		expect( format ).toBeUndefined();
-	} );
-
-	it( 'should reject formats with an invalid edit function', () => {
-		const format = registerFormatType( validName, {
-			...validSettings,
-			edit: 'not-a-function',
-		} );
-		expect( console ).toHaveErroredWith( 'The "edit" property must be specified and must be a valid function.' );
-		expect( format ).toBeUndefined();
-	} );
-
 	it( 'should reject formats without tag name', () => {
 		const settings = { ...validSettings };
 		delete settings.tagName;

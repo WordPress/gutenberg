@@ -497,11 +497,25 @@ export function isEntirelySelected( element ) {
 
 	const { startContainer, endContainer, startOffset, endOffset } = range;
 
-	return (
+	if (
 		startContainer === element &&
 		endContainer === element &&
 		startOffset === 0 &&
 		endOffset === element.childNodes.length
+	) {
+		return true;
+	}
+
+	const lastChild = element.lastChild;
+	const lastChildContentLength = lastChild.nodeType === TEXT_NODE ?
+		lastChild.data.length :
+		lastChild.childNodes.length;
+
+	return (
+		startContainer === element.firstChild &&
+		endContainer === element.lastChild &&
+		startOffset === 0 &&
+		endOffset === lastChildContentLength
 	);
 }
 

@@ -15,7 +15,12 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '../factory';
-import { getBlockTypes, unregisterBlockType, registerBlockType } from '../registration';
+import {
+	getBlockType,
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+} from '../registration';
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -1173,6 +1178,20 @@ describe( 'block factory', () => {
 
 		it( 'should return single block type transforms of direction', () => {
 			const transforms = getBlockTransforms( 'from', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+			] );
+		} );
+
+		it( 'should return single block type transforms when passed as an object', () => {
+			const transforms = getBlockTransforms(
+				'from',
+				getBlockType( 'core/transform-from-text-block-1' )
+			);
 
 			expect( transforms ).toEqual( [
 				{

@@ -219,6 +219,7 @@ class ParagraphBlock extends Component {
 					</PanelColorSettings>
 				</InspectorControls>
 				<RichText
+					identifier="content"
 					tagName="p"
 					className={ classnames( 'wp-block-paragraph', className, {
 						'has-text-color': textColor.color,
@@ -241,12 +242,12 @@ class ParagraphBlock extends Component {
 							content: nextContent,
 						} );
 					} }
-					onSplit={ this.splitBlock }
+					unstableOnSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onReplace={ this.onReplace }
 					onRemove={ () => onReplace( [] ) }
-					aria-label={ __( 'Empty block; type text or press the forward slash key to insert a block' ) }
-					placeholder={ placeholder || __( 'Start writing or press / to insert a block' ) }
+					aria-label={ content ? __( 'Paragraph block' ) : __( 'Empty block; start writing or type forward slash to choose a block' ) }
+					placeholder={ placeholder || __( 'Start writing or type / to choose a block' ) }
 				/>
 			</Fragment>
 		);

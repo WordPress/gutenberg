@@ -17,15 +17,18 @@ import {
 import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 import { G, Path, SVG } from '@wordpress/components';
 
+const ATTRIBUTE_QUOTE = 'value';
+const ATTRIBUTE_CITATION = 'citation';
+
 const blockAttributes = {
-	value: {
+	[ ATTRIBUTE_QUOTE ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 		default: '',
 	},
-	citation: {
+	[ ATTRIBUTE_CITATION ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'cite',
@@ -87,9 +90,9 @@ export const settings = {
 				} ),
 			},
 			{
-				type: 'pattern',
-				regExp: /^>\s/,
-				transform: ( { content } ) => {
+				type: 'prefix',
+				prefix: '>',
+				transform: ( content ) => {
 					return createBlock( 'core/quote', {
 						value: `<p>${ content }</p>`,
 					} );
@@ -97,7 +100,12 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				selector: 'blockquote',
+				isMatch: ( node ) => (
+					node.nodeName === 'BLOCKQUOTE' &&
+					// The quote block can only handle multiline paragraph
+					// content.
+					Array.from( node.childNodes ).every( ( child ) => child.nodeName === 'P' )
+				),
 				schema: {
 					blockquote: {
 						children: {
@@ -201,6 +209,7 @@ export const settings = {
 				</BlockControls>
 				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
+						identifier={ ATTRIBUTE_QUOTE }
 						multiline
 						value={ value }
 						onChange={
@@ -222,6 +231,7 @@ export const settings = {
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
+							identifier={ ATTRIBUTE_CITATION }
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {

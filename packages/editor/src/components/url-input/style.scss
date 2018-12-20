@@ -39,7 +39,7 @@ $input-size: 300px;
 	transition: all 0.15s ease-in-out;
 	padding: 4px 0;
 	// To match the url-input width: input width + padding + 2 buttons.
-	width: $input-size + 2 + 2 * $icon-button-size;
+	width: $input-size + 2;
 	overflow-y: auto;
 }
 

@@ -39,7 +39,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 	 */
 	function getNextMergeProps( props ) {
 		return (
-			mapSelectToProps( props.registry.select, props.ownProps ) ||
+			mapSelectToProps( props.registry.select, props.ownProps, props.registry ) ||
 			DEFAULT_MERGE_PROPS
 		);
 	}
@@ -48,6 +48,8 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		constructor( props ) {
 			super( props );
 
+			this.onStoreChange = this.onStoreChange.bind( this );
+
 			this.subscribe( props.registry );
 
 			this.mergeProps = getNextMergeProps( props );
@@ -55,6 +57,14 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 
 		componentDidMount() {
 			this.canRunSelection = true;
+
+			// A state change may have occurred between the constructor and
+			// mount of the component (e.g. during the wrapped component's own
+			// constructor), in which case selection should be rerun.
+			if ( this.hasQueuedSelection ) {
+				this.hasQueuedSelection = false;
+				this.onStoreChange();
+			}
 		}
 
 		componentWillUnmount() {
@@ -103,29 +113,31 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			return true;
 		}
 
+		onStoreChange() {
+			if ( ! this.canRunSelection ) {
+				this.hasQueuedSelection = true;
+				return;
+			}
+
+			const nextMergeProps = getNextMergeProps( this.props );
+			if ( isShallowEqual( this.mergeProps, nextMergeProps ) ) {
+				return;
+			}
+
+			this.mergeProps = nextMergeProps;
+
+			// Schedule an update. Merge props are not assigned to state since
+			// derivation of merge props from incoming props occurs within
+			// shouldComponentUpdate, where setState is not allowed. setState
+			// is used here instead of forceUpdate because forceUpdate bypasses
+			// shouldComponentUpdate altogether, which isn't desireable if both
+			// state and props change within the same render. Unfortunately,
+			// this requires that next merge props are generated twice.
+			this.setState( {} );
+		}
+
 		subscribe( registry ) {
-			this.unsubscribe = registry.subscribe( () => {
-				if ( ! this.canRunSelection ) {
-					return;
-				}
-
-				const nextMergeProps = getNextMergeProps( this.props );
-				if ( isShallowEqual( this.mergeProps, nextMergeProps ) ) {
-					return;
-				}
-
-				this.mergeProps = nextMergeProps;
-
-				// Schedule an update. Merge props are not assigned to state
-				// because derivation of merge props from incoming props occurs
-				// within shouldComponentUpdate, where setState is not allowed.
-				// setState is used here instead of forceUpdate because forceUpdate
-				// bypasses shouldComponentUpdate altogether, which isn't desireable
-				// if both state and props change within the same render.
-				// Unfortunately this requires that next merge props are generated
-				// twice.
-				this.setState( {} );
-			} );
+			this.unsubscribe = registry.subscribe( this.onStoreChange );
 		}
 
 		render() {

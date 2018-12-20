@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import {
-	META_KEY,
 	newPost,
 	getEditedPostContent,
 	saveDraft,
@@ -49,7 +48,7 @@ describe( 'templates', () => {
 			// re-added after saving and reloading the editor.
 			await page.type( '.editor-post-title__input', 'My Empty Book' );
 			await page.keyboard.press( 'ArrowDown' );
-			await pressWithModifier( META_KEY, 'A' );
+			await pressWithModifier( 'primary', 'A' );
 			await page.keyboard.press( 'Backspace' );
 			await saveDraft();
 			await page.reload();
@@ -73,8 +72,14 @@ describe( 'templates', () => {
 			await switchToTestUser();
 		}
 
-		beforeAll( async () => await setPostFormat( 'image' ) );
-		afterAll( async () => await setPostFormat( STANDARD_FORMAT_VALUE ) );
+		beforeAll( async () => {
+			await activatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+			await setPostFormat( 'image' );
+		} );
+		afterAll( async () => {
+			await setPostFormat( STANDARD_FORMAT_VALUE );
+			await deactivatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+		} );
 
 		it( 'should populate new post with default block for format', async () => {
 			await newPost();

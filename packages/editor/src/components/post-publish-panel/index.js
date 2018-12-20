@@ -12,6 +12,7 @@ import {
 	IconButton,
 	Spinner,
 	CheckboxControl,
+	withFocusReturn,
 	withConstrainedTabbing,
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -39,8 +40,8 @@ export class PostPublishPanel extends Component {
 	}
 
 	onSubmit() {
-		const { onClose, hasPublishAction } = this.props;
-		if ( ! hasPublishAction ) {
+		const { onClose, hasPublishAction, isPostTypeViewable } = this.props;
+		if ( ! hasPublishAction || ! isPostTypeViewable ) {
 			onClose();
 		}
 	}
@@ -60,7 +61,7 @@ export class PostPublishPanel extends Component {
 			PrePublishExtension,
 			...additionalProps
 		} = this.props;
-		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'isDirty' ] );
+		const propsForPanel = omit( additionalProps, [ 'hasPublishAction', 'isDirty', 'isPostTypeViewable' ] );
 		const isPublishedOrScheduled = isPublished || ( isScheduled && isBeingScheduled );
 		const isPrePublish = ! isPublishedOrScheduled && ! isSaving;
 		const isPostPublish = isPublishedOrScheduled && ! isSaving;
@@ -111,8 +112,10 @@ export class PostPublishPanel extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { getPostType } = select( 'core' );
 		const {
 			getCurrentPost,
+			getEditedPostAttribute,
 			isCurrentPostPublished,
 			isCurrentPostScheduled,
 			isEditedPostBeingScheduled,
@@ -120,8 +123,11 @@ export default compose( [
 			isSavingPost,
 		} = select( 'core/editor' );
 		const { isPublishSidebarEnabled } = select( 'core/editor' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
 		return {
 			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			isPostTypeViewable: get( postType, [ 'viewable' ], false ),
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isDirty: isEditedPostDirty(),
 			isPublished: isCurrentPostPublished(),
@@ -142,5 +148,6 @@ export default compose( [
 			},
 		};
 	} ),
+	withFocusReturn,
 	withConstrainedTabbing,
 ] )( PostPublishPanel );

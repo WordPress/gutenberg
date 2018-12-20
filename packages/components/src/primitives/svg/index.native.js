@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { omit } from 'lodash';
 import { Svg } from 'react-native-svg';
 
 /**
  * Internal dependencies
  */
-import styles from '../../dashicon/style.scss';
+import styles from './style.scss';
 
 export {
 	Circle,
@@ -18,27 +17,18 @@ export {
 } from 'react-native-svg';
 
 export const SVG = ( props ) => {
-	// We're using the react-native-classname-to-style plugin, so when a `className` prop is passed it gets converted to `style` here.
-	// Given it carries a string (as it was originally className) but an object is expected for `style`,
-	// we need to check whether `style` exists and is a string, and convert it to an object
-	let styleKeys = new Array();
-	const styleValues = new Array();
-	if ( typeof props.style === 'string' || props.style instanceof String ) {
-		styleKeys = props.style.split( ' ' );
-		styleKeys.forEach( ( element ) => {
-			const oneStyle = styles[ element ];
-			if ( oneStyle !== undefined ) {
-				styleValues.push( oneStyle );
-			}
-		} );
-	}
+	const stylesFromClasses = ( props.className || '' ).split( ' ' ).map( ( element ) => styles[ element ] ).filter( Boolean );
+	const styleValues = Object.assign( {}, props.style, ...stylesFromClasses );
+	const safeProps = { ...props, style: styleValues };
 
-	const safeProps = styleValues.length === 0 ? { ...omit( props, [ 'style' ] ) } : { ...props, style: styleValues };
 	return (
 		<Svg
+			//We want to re-render when style color is changed
+			key={ safeProps.style.color }
 			height="100%"
 			width="100%"
 			{ ...safeProps }
 		/>
 	);
 };
+

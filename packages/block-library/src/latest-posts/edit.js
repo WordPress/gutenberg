@@ -33,7 +33,7 @@ import { withSelect } from '@wordpress/data';
  * Module Constants
  */
 const CATEGORIES_LIST_QUERY = {
-	per_page: 100,
+	per_page: -1,
 };
 const MAX_POSTS_COLUMNS = 6;
 
@@ -176,7 +176,7 @@ class LatestPostsEdit extends Component {
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
-								<time dateTime={ format( 'c', post.date_gmt ) } className={ `${ this.props.className }__post-date` }>
+								<time dateTime={ format( 'c', post.date_gmt ) } className="wp-block-latest-posts__post-date">
 									{ dateI18n( dateFormat, post.date_gmt ) }
 								</time>
 							}

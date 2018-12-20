@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { cond, matchesProperty } from 'lodash';
+import { cond, matchesProperty, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -61,6 +61,12 @@ class NavigableToolbar extends Component {
 		}
 	}
 
+	componentDidMount() {
+		if ( this.props.focusOnMount ) {
+			this.focusToolbar();
+		}
+	}
+
 	render() {
 		const { children, ...props } = this.props;
 		return (
@@ -69,7 +75,9 @@ class NavigableToolbar extends Component {
 				role="toolbar"
 				ref={ this.toolbar }
 				onKeyDown={ this.switchOnKeyDown }
-				{ ...props }
+				{ ...omit( props, [
+					'focusOnMount',
+				] ) }
 			>
 				<KeyboardShortcuts
 					bindGlobal

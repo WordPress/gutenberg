@@ -155,11 +155,26 @@ describe( 'Blocks raw handling', () => {
 			} );
 		} );
 	} );
+} );
 
-	describe( 'rawHandler', () => {
-		it( 'should convert HTML post to blocks with minimal content changes', () => {
-			const HTML = readFile( path.join( __dirname, 'fixtures/wordpress-convert.html' ) );
-			expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
-		} );
+describe( 'rawHandler', () => {
+	it( 'should convert HTML post to blocks with minimal content changes', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/wordpress-convert.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a caption shortcode', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a caption shortcode with link', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-link.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a caption shortcode with caption', () => {
+		const HTML = readFile( path.join( __dirname, 'fixtures/shortcode-caption-with-caption-link.html' ) );
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
 	} );
 } );
