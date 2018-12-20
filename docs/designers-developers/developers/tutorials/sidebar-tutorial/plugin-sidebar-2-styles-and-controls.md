@@ -6,10 +6,11 @@ To visualize and edit the meta field value you'll use an input component. The `@
 
 ```js
 ( function( wp ) {
+	var registerPlugin = wp.plugins.registerPlugin;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',

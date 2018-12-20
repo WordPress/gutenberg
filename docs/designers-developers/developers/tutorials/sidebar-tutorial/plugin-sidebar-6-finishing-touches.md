@@ -6,6 +6,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 
 ```js
 ( function( wp ) {
+	var registerPlugin = wp.plugins.registerPlugin;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -41,7 +42,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 		}
 	)( MetaBlockFieldWithData );
 
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
@@ -62,6 +63,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 
 ```js
 ( function( wp ) {
+	var registerPlugin = wp.plugins.registerPlugin;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -95,7 +97,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 		} );
 	} );
 
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
@@ -134,6 +136,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 
 ```js
 ( function( wp ) {
+	var registerPlugin = wp.plugins.registerPlugin;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -167,7 +170,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 		} );
 	} );
 
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',

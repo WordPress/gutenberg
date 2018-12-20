@@ -1,12 +1,14 @@
 # Get a sidebar up and running
 
-This is going to be the first step in the journey: to tell the editor that there is a new plugin that will have its own sidebar. You can do so by using the [wp.plugins.registerPlugin](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/) and [wp.editPost.PluginSidebar](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-edit-post/#pluginsidebar) utilities provided by WordPress, to be found in the `@wordpress/plugins` and `@wordpress/edit-post` [packages](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/).
+This is going to be the first step in the journey: to tell the editor that there is a new plugin that will have its own sidebar. You can do so by using the [registerPlugin](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/) and [wp.editPost.PluginSidebar](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-edit-post/#pluginsidebar) utilities provided by WordPress, to be found in the `@wordpress/plugins` and `@wordpress/edit-post` [packages](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/).
 
 Add the following code to a JavaScript file called `sidebar-plugin.js` and save it within your plugin's directory:
 
 ```js
 ( function( wp ) {
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	var registerPlugin = wp.plugins.registerPlugin;
+
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function() {
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',

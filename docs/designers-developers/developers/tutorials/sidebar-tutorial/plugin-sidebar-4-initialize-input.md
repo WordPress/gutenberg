@@ -4,6 +4,7 @@ Now that the field is available in the editor store, it can be surfaced to the U
 
 ```js
 ( function( wp ) {
+	var registerPlugin = wp.plugins.registerPlugin;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 
@@ -17,7 +18,7 @@ Now that the field is available in the editor store, it can be surfaced to the U
 		});
 	}
 
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
@@ -52,6 +53,7 @@ withSelect(
 
 ```js
 ( function( wp ) {
+	var registerPlugin = wp.plugins.registerPlugin;
 	var el = wp.element.createElement;
 	var Text = wp.components.TextControl;
 	var withSelect = wp.data.withSelect;
@@ -76,7 +78,7 @@ withSelect(
 
 	var MetaBlockFieldWithData = withSelect( mapSelectToProps )( MetaBlockField );
 
-	wp.plugins.registerPlugin( 'my-plugin-sidebar', {
+	registerPlugin( 'my-plugin-sidebar', {
 		render: function(){
 			return wp.editPost.PluginSidebar( {
 				name: 'my-plugin-sidebar',
