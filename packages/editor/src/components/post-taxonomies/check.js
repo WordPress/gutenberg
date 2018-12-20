@@ -22,7 +22,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		return {
 			postType: select( 'core/editor' ).getCurrentPostType(),
-			taxonomies: select( 'core' ).getTaxonomies(),
+			taxonomies: select( 'core' ).getTaxonomies( { per_page: -1 } ),
 		};
 	} ),
 ] )( PostTaxonomiesCheck );
