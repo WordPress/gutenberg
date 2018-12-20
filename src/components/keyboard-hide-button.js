@@ -7,7 +7,11 @@ import React from 'react';
 import Svg, { G, Rect, Path } from 'react-native-svg';
 import { TouchableOpacity } from 'react-native';
 
-const KeyboardHideButton = ( props ) => (
+type PropsType = {
+	onPress: void => void,
+};
+
+const KeyboardHideButton = ( props: PropsType ) => (
 	<TouchableOpacity
 		style={ { justifyContent: 'center', alignItems: 'center', width: 44 } }
 		onPress={ props.onPress }
