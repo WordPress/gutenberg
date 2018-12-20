@@ -43,7 +43,6 @@
 		> [data-type="core/column"] {
 			display: flex;
 			flex-direction: column;
-			flex: 1;
 
 			// The Column block is a child of the Columns block and is mostly a passthrough container.
 			// Therefore it shouldn't add additional paddings and margins, so we reset these, and compensate for margins.
@@ -89,14 +88,13 @@
 			overflow-wrap: break-word; // New standard.
 
 			// Responsiveness: Show at most one columns on mobile.
-			flex-basis: 100%;
+			width: 100%;
 
 			// Beyond mobile, allow 2 columns.
 			@include break-small() {
 				// Size should be half the available width, minus the margins added below.
 				// In the editor, we also need to account for additional block padding.
-				flex-basis: calc(50% - #{ $grid-size-large } - #{$block-padding * 2});
-				flex-grow: 0;
+				width: calc(50% - #{ $grid-size-large } - #{$block-padding * 2});
 			}
 
 			// Add space between columns. Themes can customize this if they wish to work differently.
@@ -117,7 +115,7 @@
 			// Beyond the medium breakpoint, show the user-set amount of columns.
 			@include break-medium() {
 				// Because columns do not wrap, reset the column margin.
-				margin-bottom: initial;
+				margin-bottom: 0;
 
 				// Reset odd, even margins from small breakpoint.
 				&:nth-child(even) {

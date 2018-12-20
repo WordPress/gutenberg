@@ -10,18 +10,16 @@
 }
 
 .wp-block-column {
-	flex: 1;
 	margin-bottom: 1em;
 
 	// Responsiveness: Show at most one columns on mobile.
-	flex-basis: 100%;
+	width: 100%;
 
 	// Beyond mobile, allow 2 columns.
 	@include break-small() {
 
 		// Size should be half the available width, minus the margins added below.
-		flex-basis: calc(50% - #{ $grid-size-large });
-		flex-grow: 0;
+		width: calc(50% - #{ $grid-size-large });
 	}
 
 	// Prevent the columns from growing wider than their distributed sizes.
@@ -49,11 +47,11 @@
 	@include break-medium() {
 		// Reset odd, even margins from small breakpoint.
 		&:nth-child(even) {
-			margin-left: initial;
+			margin-left: 0;
 		}
 
 		&:nth-child(odd) {
-			margin-right: initial;
+			margin-right: 0;
 		}
 
 		// Add left margin to all but first column.
