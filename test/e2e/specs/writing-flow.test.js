@@ -7,7 +7,6 @@ import {
 	newPost,
 	pressTimes,
 	pressWithModifier,
-	META_KEY,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
@@ -45,6 +44,8 @@ describe( 'adding blocks', () => {
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
+		// We need to arrow up key presses in the paragraph block because it shows up in two lines.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
@@ -53,6 +54,7 @@ describe( 'adding blocks', () => {
 		// Arrow up from first text field in nested context focuses column and
 		// columns wrappers before escaping out.
 		let activeElementBlockType;
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementBlockType = await page.evaluate( () => (
 			document.activeElement.getAttribute( 'data-type' )
@@ -89,7 +91,7 @@ describe( 'adding blocks', () => {
 		await page.keyboard.down( 'Shift' );
 		await pressTimes( 'ArrowLeft', 6 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
@@ -146,7 +148,7 @@ describe( 'adding blocks', () => {
 		// Ensure no zero-width space character. Notably, this can occur when
 		// save occurs while at an inline boundary edge.
 		await clickBlockAppender();
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Backspace to remove the content in this block, resetting it.
@@ -154,7 +156,7 @@ describe( 'adding blocks', () => {
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
-		await pressWithModifier( META_KEY, 'b' );
+		await pressWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -162,14 +164,14 @@ describe( 'adding blocks', () => {
 	it( 'should insert line break at end', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a' );
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should insert line break at end and continue writing', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a' );
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -178,7 +180,7 @@ describe( 'adding blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -186,13 +188,13 @@ describe( 'adding blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should insert line break in empty container', async () => {
 		await clickBlockAppender();
-		await pressWithModifier( 'Shift', 'Enter' );
+		await pressWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -210,7 +212,7 @@ describe( 'adding blocks', () => {
 		expect( isInTitle ).toBe( true );
 
 		// Should remain in title upon modifier + ArrowDown:
-		await pressWithModifier( META_KEY, 'ArrowDown' );
+		await pressWithModifier( 'primary', 'ArrowDown' );
 		isInTitle = await page.evaluate( () => (
 			!! document.activeElement.closest( '.editor-post-title' )
 		) );
@@ -224,42 +226,58 @@ describe( 'adding blocks', () => {
 		expect( isInBlock ).toBe( true );
 	} );
 
-	it( 'should not delete trailing spaces when deleting a word with backspace', async () => {
+	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( '1 2 3 4' );
+		await page.keyboard.type( '1 2 3' );
+		await pressTimes( 'ArrowLeft', ' 3'.length );
 		await page.keyboard.press( 'Backspace' );
-		await page.keyboard.type( '4' );
-		const blockText = await page.evaluate( () => document.activeElement.textContent );
-		expect( blockText ).toBe( '1 2 3 4' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.type( '2' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should not delete trailing spaces when deleting a word with alt + backspace', async () => {
+	it( 'should not delete surrounding space when deleting a word with Alt+Backspace', async () => {
 		await clickBlockAppender();
-		await page.keyboard.type( 'alpha beta gamma delta' );
+		await page.keyboard.type( 'alpha beta gamma' );
+		await pressTimes( 'ArrowLeft', ' gamma'.length );
+
 		if ( process.platform === 'darwin' ) {
-			await pressWithModifier( 'Alt', 'Backspace' );
+			await pressWithModifier( 'alt', 'Backspace' );
 		} else {
-			await pressWithModifier( META_KEY, 'Backspace' );
+			await pressWithModifier( 'primary', 'Backspace' );
 		}
-		await page.keyboard.type( 'delta' );
-		const blockText = await page.evaluate( () => document.activeElement.textContent );
-		expect( blockText ).toBe( 'alpha beta gamma delta' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.type( 'beta' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not delete surrounding space when deleting a selected word', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'alpha beta gamma' );
+		await pressTimes( 'ArrowLeft', ' gamma'.length );
+		await page.keyboard.down( 'Shift' );
+		await pressTimes( 'ArrowLeft', 'beta'.length );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'Backspace' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.type( 'beta' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should create valid paragraph blocks when rapidly pressing Enter', async () => {
 		await clickBlockAppender();
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.press( 'Enter' );
+		await pressTimes( 'Enter', 10 );
+
 		// Check that none of the paragraph blocks have <br> in them.
-		const postContent = await getEditedPostContent();
-		expect( postContent.indexOf( 'br' ) ).toBe( -1 );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

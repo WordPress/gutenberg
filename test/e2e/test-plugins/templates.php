@@ -12,10 +12,10 @@
  */
 function gutenberg_test_templates_register_book_type() {
 	$args = array(
-		'public' => true,
-		'label'  => 'Books',
+		'public'       => true,
+		'label'        => 'Books',
 		'show_in_rest' => true,
-		'template' => array(
+		'template'     => array(
 			array( 'core/image' ),
 			array(
 				'core/paragraph',

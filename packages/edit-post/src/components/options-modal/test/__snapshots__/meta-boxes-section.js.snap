@@ -17,12 +17,12 @@ exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`
   <WithSelect(EnableCustomFieldsOption)
     label="Custom Fields"
   />
-  <WithSelect(WithDispatch(BaseOption))
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
     key="test1"
     label="Meta Box 1"
     panelName="meta-box-test1"
   />
-  <WithSelect(WithDispatch(BaseOption))
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
     key="test2"
     label="Meta Box 2"
     panelName="meta-box-test2"
@@ -34,12 +34,12 @@ exports[`MetaBoxesSection renders meta box options 1`] = `
 <Section
   title="Advanced Panels"
 >
-  <WithSelect(WithDispatch(BaseOption))
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
     key="test1"
     label="Meta Box 1"
     panelName="meta-box-test1"
   />
-  <WithSelect(WithDispatch(BaseOption))
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
     key="test2"
     label="Meta Box 2"
     panelName="meta-box-test2"

@@ -45,37 +45,59 @@ echo ''
 # dirty up the tests.
 if [ "$1" == '--e2e_tests' ]; then
 	echo -e $(status_message "Resetting test database...")
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI db reset --yes >/dev/null
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI db reset --yes --quiet
 fi
 
 # Install WordPress.
 echo -e $(status_message "Installing WordPress...")
 # The `-u 33` flag tells Docker to run the command as a particular user and
 # prevents permissions errors. See: https://github.com/WordPress/gutenberg/pull/8427#issuecomment-410232369
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=http://localhost:$HOST_PORT >/dev/null
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core install --title="$SITE_TITLE" --admin_user=admin --admin_password=password --admin_email=test@test.com --skip-email --url=http://localhost:$HOST_PORT --quiet
 
 if [ "$E2E_ROLE" = "author" ]; then
-	# Create an additional author user for testsing.
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI user create author author@example.com --role=author --user_pass=authpass
+	echo -e $(status_message "Creating an additional author user for testing...")
+	# Create an additional author user for testing.
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI user create author author@example.com --role=author --user_pass=authpass --quiet
 	# Assign the existing Hello World post to the author.
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI post update 1 --post_author=2 
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI post update 1 --post_author=2 --quiet
 fi
+
+# Make sure the uploads and upgrade folders exist and we have permissions to add files.
+echo -e $(status_message "Ensuring that files can be uploaded...")
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 767 /var/www/html/wp-content/plugins
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER mkdir -p /var/www/html/wp-content/uploads
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod -v 767 /var/www/html/wp-content/uploads
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER mkdir -p /var/www/html/wp-content/upgrade
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER chmod 767 /var/www/html/wp-content/upgrade
+
+CURRENT_WP_VERSION=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm $CLI core version)
+echo -e $(status_message "Current WordPress version: $CURRENT_WP_VERSION...")
 
 if [ "$WP_VERSION" == "latest" ]; then
 	# Check for WordPress updates, to make sure we're running the very latest version.
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core update >/dev/null
+	echo -e $(status_message "Updating WordPress to the latest version...")
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI core update --quiet
 fi
 
 # If the 'wordpress' volume wasn't during the down/up earlier, but the post port has changed, we need to update it.
+echo -e $(status_message "Checking the site's url...")
 CURRENT_URL=$(docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run -T --rm $CLI option get siteurl)
 if [ "$CURRENT_URL" != "http://localhost:$HOST_PORT" ]; then
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI option update home "http://localhost:$HOST_PORT" >/dev/null
-	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI option update siteurl "http://localhost:$HOST_PORT" >/dev/null
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI option update home "http://localhost:$HOST_PORT" --quiet
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI option update siteurl "http://localhost:$HOST_PORT" --quiet
 fi
 
 # Activate Gutenberg.
 echo -e $(status_message "Activating Gutenberg...")
-docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CLI plugin activate gutenberg >/dev/null
+docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin activate gutenberg --quiet
+
+if [ "$POPULAR_PLUGINS" == "true" ]; then
+	echo -e $(status_message "Activating popular plugins...")
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install advanced-custom-fields --activate --quiet
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install jetpack --activate --quiet
+	docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm -u 33 $CLI plugin install wpforms-lite --activate --quiet
+fi
 
 # Install a dummy favicon to avoid 404 errors.
+echo -e $(status_message "Installing a dummy favicon...")
 docker-compose $DOCKER_COMPOSE_FILE_OPTIONS run --rm $CONTAINER touch /var/www/html/favicon.ico

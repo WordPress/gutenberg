@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/categories` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -27,7 +27,7 @@ function render_block_core_categories( $attributes ) {
 	if ( ! empty( $attributes['displayAsDropdown'] ) ) {
 		$id                       = 'wp-block-categories-' . $block_id;
 		$args['id']               = $id;
-		$args['show_option_none'] = __( 'Select Category', 'gutenberg' );
+		$args['show_option_none'] = __( 'Select Category' );
 		$wrapper_markup           = '<div class="%1$s">%2$s</div>';
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
@@ -72,7 +72,7 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
 	?>
 	<script type='text/javascript'>
 	/* <![CDATA[ */
-	(function() {
+	( function() {
 		var dropdown = document.getElementById( '<?php echo esc_js( $dropdown_id ); ?>' );
 		function onCatChange() {
 			if ( dropdown.options[ dropdown.selectedIndex ].value > 0 ) {

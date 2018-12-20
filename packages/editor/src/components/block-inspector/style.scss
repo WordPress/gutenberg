@@ -1,5 +1,4 @@
-.editor-block-inspector__no-blocks,
-.editor-block-inspector__multi-blocks {
+.editor-block-inspector__no-blocks {
 	display: block;
 	font-size: $default-font-size;
 	background: $white;
@@ -7,9 +6,6 @@
 	text-align: center;
 }
 
-.editor-block-inspector__multi-blocks {
-	border-bottom: $border-width solid $light-gray-500;
-}
 
 .editor-block-inspector__card {
 	display: flex;

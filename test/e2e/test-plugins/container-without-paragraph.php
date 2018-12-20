@@ -6,6 +6,7 @@
  *
  * @package gutenberg-test-container-without-paragraph
  */
+
 wp_enqueue_script(
 	'gutenberg-test-container-without-paragraph',
 	plugins_url( 'container-without-paragraph/index.js', __FILE__ ),

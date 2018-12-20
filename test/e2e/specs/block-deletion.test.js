@@ -6,7 +6,6 @@ import {
 	getEditedPostContent,
 	newPost,
 	pressWithModifier,
-	ACCESS_MODIFIER_KEYS,
 } from '../support/utils';
 
 const addThreeParagraphsToNewPost = async () => {
@@ -50,7 +49,7 @@ describe( 'block deletion -', () => {
 		it( 'results in two remaining blocks and positions the caret at the end of the second block', async () => {
 			// Type some text to assert that the shortcut also deletes block content.
 			await page.keyboard.type( 'this is block 2' );
-			await pressWithModifier( ACCESS_MODIFIER_KEYS, 'z' );
+			await pressWithModifier( 'access', 'z' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// Type additional text and assert that caret position is correct by comparing to snapshot.
@@ -98,7 +97,7 @@ describe( 'block deletion -', () => {
 			await page.keyboard.press( 'Enter' );
 
 			// Press the up arrow once to select the third and fourth blocks.
-			await pressWithModifier( 'Shift', 'ArrowUp' );
+			await pressWithModifier( 'shift', 'ArrowUp' );
 
 			// Now that the block wrapper is selected, press backspace to delete it.
 			await page.keyboard.press( 'Backspace' );

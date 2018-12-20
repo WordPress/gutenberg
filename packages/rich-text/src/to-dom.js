@@ -3,6 +3,7 @@
  */
 
 import { toTree } from './to-tree';
+import { createElement } from './create-element';
 
 /**
  * Browser dependencies
@@ -58,10 +59,17 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-function createEmpty() {
-	const { body } = document.implementation.createHTMLDocument( '' );
-	return body;
-}
+/**
+ * Returns a new instance of a DOM tree upon which RichText operations can be
+ * applied.
+ *
+ * Note: The current implementation will return a shared reference, reset on
+ * each call to `createEmpty`. Therefore, you should not hold a reference to
+ * the value to operate upon asynchronously, as it may have unexpected results.
+ *
+ * @return {WPRichTextTree} RichText tree.
+ */
+const createEmpty = () => createElement( document, '' );
 
 function append( element, child ) {
 	if ( typeof child === 'string' ) {
@@ -218,21 +226,17 @@ export function apply( {
 
 export function applyValue( future, current ) {
 	let i = 0;
+	let futureChild;
 
-	while ( future.firstChild ) {
+	while ( ( futureChild = future.firstChild ) ) {
 		const currentChild = current.childNodes[ i ];
-		const futureNodeType = future.firstChild.nodeType;
 
 		if ( ! currentChild ) {
-			current.appendChild( future.firstChild );
-		} else if (
-			futureNodeType !== currentChild.nodeType ||
-			futureNodeType !== TEXT_NODE ||
-			future.firstChild.nodeValue !== currentChild.nodeValue
-		) {
-			current.replaceChild( future.firstChild, currentChild );
+			current.appendChild( futureChild );
+		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
+			current.replaceChild( futureChild, currentChild );
 		} else {
-			future.removeChild( future.firstChild );
+			future.removeChild( futureChild );
 		}
 
 		i++;
@@ -241,6 +245,25 @@ export function applyValue( future, current ) {
 	while ( current.childNodes[ i ] ) {
 		current.removeChild( current.childNodes[ i ] );
 	}
+}
+
+/**
+ * Returns true if two ranges are equal, or false otherwise. Ranges are
+ * considered equal if their start and end occur in the same container and
+ * offset.
+ *
+ * @param {Range} a First range object to test.
+ * @param {Range} b First range object to test.
+ *
+ * @return {boolean} Whether the two ranges are equal.
+ */
+function isRangeEqual( a, b ) {
+	return (
+		a.startContainer === b.startContainer &&
+		a.startOffset === b.startOffset &&
+		a.endContainer === b.endContainer &&
+		a.endOffset === b.endOffset
+	);
 }
 
 export function applySelection( selection, current ) {
@@ -275,6 +298,15 @@ export function applySelection( selection, current ) {
 		range.setEnd( endContainer, endOffset );
 	}
 
-	windowSelection.removeAllRanges();
+	if ( windowSelection.rangeCount > 0 ) {
+		// If the to be added range and the live range are the same, there's no
+		// need to remove the live range and add the equivalent range.
+		if ( isRangeEqual( range, windowSelection.getRangeAt( 0 ) ) ) {
+			return;
+		}
+
+		windowSelection.removeAllRanges();
+	}
+
 	windowSelection.addRange( range );
 }

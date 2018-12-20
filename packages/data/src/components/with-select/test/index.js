@@ -115,11 +115,10 @@ describe( 'withSelect', () => {
 		testInstance.findByType( 'button' ).props.onClick();
 
 		expect( testInstance.findByType( 'button' ).props.children ).toBe( 1 );
-		// 3 times =
+		// 2 times =
 		//  1. Initial mount
 		//  2. When click handler is called
-		//  3. After select updates its merge props
-		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 3 );
+		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 2 );
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );

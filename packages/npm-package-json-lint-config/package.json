@@ -18,9 +18,6 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "index.js",
-	"devDependencies": {
-		"is-plain-obj": "^1.1.0"
-	},
 	"peerDependencies": {
 		"npm-package-json-lint": ">= 3.3.1"
 	},

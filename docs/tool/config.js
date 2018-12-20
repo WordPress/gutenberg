@@ -51,11 +51,11 @@ module.exports = {
 			actions: [ path.resolve( root, 'packages/viewport/src/store/actions.js' ) ],
 		},
 	},
-	dataDocsOutput: path.resolve( __dirname, '../data' ),
+	dataDocsOutput: path.resolve( __dirname, '../designers-developers/developers/data' ),
 
 	packageFileNames: glob( 'packages/*/package.json' )
 		.map( ( fileName ) => fileName.split( '/' )[ 1 ] ),
 
-	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
+	tocFileName: path.resolve( __dirname, '../toc.json' ),
 	manifestOutput: path.resolve( __dirname, '../manifest.json' ),
 };

@@ -10,6 +10,7 @@ import classnames from 'classnames';
  */
 import { Component, createElement } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
+import { isEntirelySelected } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ import { diffAriaProps, pickAriaProps } from './aria';
 
 const { getSelection } = window;
 const { TEXT_NODE } = window.Node;
+const { userAgent } = window.navigator;
 
 /**
  * Zero-width space character used by TinyMCE as a caret landing point for
@@ -32,23 +34,6 @@ const { TEXT_NODE } = window.Node;
  * @type {string}
  */
 export const TINYMCE_ZWSP = '\uFEFF';
-
-/**
- * Determines whether we need a fix to provide `input` events for contenteditable.
- *
- * @param {Element} editorNode The root editor node.
- *
- * @return {boolean} A boolean indicating whether the fix is needed.
- */
-function needsInternetExplorerInputFix( editorNode ) {
-	return (
-		// Rely on userAgent in the absence of a reasonable feature test for contenteditable `input` events.
-		/Trident/.test( window.navigator.userAgent ) &&
-		// IE11 dispatches input events for `<input>` and `<textarea>`.
-		! /input/i.test( editorNode.tagName ) &&
-		! /textarea/i.test( editorNode.tagName )
-	);
-}
 
 /**
  * Applies a fix that provides `input` events for contenteditable in Internet Explorer.
@@ -112,12 +97,21 @@ function applyInternetExplorerInputFix( editorNode ) {
 }
 
 const IS_PLACEHOLDER_VISIBLE_ATTR_NAME = 'data-is-placeholder-visible';
+
+/**
+ * Whether or not the user agent is Internet Explorer.
+ *
+ * @type {boolean}
+ */
+const IS_IE = userAgent.indexOf( 'Trident' ) >= 0;
+
 export default class TinyMCE extends Component {
 	constructor() {
 		super();
 		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.initialize = this.initialize.bind( this );
 	}
 
 	onFocus() {
@@ -174,8 +168,18 @@ export default class TinyMCE extends Component {
 		}
 	}
 
+	/**
+	 * Initializes TinyMCE. Can only be called once per instance.
+	 */
 	initialize() {
-		const settings = this.props.getSettings( {
+		if ( this.initialize.called ) {
+			return;
+		}
+
+		this.initialize.called = true;
+
+		const { multilineTag } = this.props;
+		const settings = {
 			theme: false,
 			inline: true,
 			toolbar: false,
@@ -189,7 +193,16 @@ export default class TinyMCE extends Component {
 			verify_html: false,
 			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
-		} );
+			forced_root_block: multilineTag || false,
+			// Allow TinyMCE to keep one undo level for comparing changes.
+			// Prevent it otherwise from accumulating any history.
+			custom_undo_redo_levels: 1,
+			lists_indent_on_tab: false,
+		};
+
+		if ( multilineTag === 'li' ) {
+			settings.plugins.push( 'lists' );
+		}
 
 		tinymce.init( {
 			...settings,
@@ -211,7 +224,18 @@ export default class TinyMCE extends Component {
 				} );
 
 				editor.on( 'init', () => {
-					// See https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
+					// History is handled internally by RichText.
+					//
+					// See: https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/api/UndoManager.ts
+					[ 'z', 'y' ].forEach( ( character ) => {
+						editor.shortcuts.remove( `meta+${ character }` );
+					} );
+					editor.shortcuts.remove( 'meta+shift+z' );
+
+					// Reset TinyMCE's default formatting shortcuts, since
+					// RichText supports only registered formats.
+					//
+					// See: https://github.com/tinymce/tinymce/blob/master/src/core/main/ts/keyboard/FormatShortcuts.ts
 					[ 'b', 'i', 'u' ].forEach( ( character ) => {
 						editor.shortcuts.remove( `meta+${ character }` );
 					} );
@@ -219,7 +243,18 @@ export default class TinyMCE extends Component {
 						editor.shortcuts.remove( `access+${ number }` );
 					} );
 
+					// Restore the original `setHTML` once initialized.
 					editor.dom.setHTML = setHTML;
+
+					// In IE11, focus is lost to parent after initialising
+					// TinyMCE, so we have to set it back.
+					if (
+						IS_IE &&
+						document.activeElement !== this.editorNode &&
+						document.activeElement.contains( this.editorNode )
+					) {
+						this.editorNode.focus();
+					}
 				} );
 
 				editor.on( 'keydown', this.onKeyDown, true );
@@ -234,27 +269,26 @@ export default class TinyMCE extends Component {
 			this.props.setRef( editorNode );
 		}
 
-		/**
-		 * A ref function can be used for cleanup because React calls it with
-		 * `null` when unmounting.
-		 */
-		if ( this.removeInternetExplorerInputFix ) {
-			this.removeInternetExplorerInputFix();
-			this.removeInternetExplorerInputFix = null;
-		}
-
-		if ( editorNode && needsInternetExplorerInputFix( editorNode ) ) {
-			this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+		if ( IS_IE ) {
+			if ( editorNode ) {
+				// Mounting:
+				this.removeInternetExplorerInputFix = applyInternetExplorerInputFix( editorNode );
+			} else {
+				// Unmounting:
+				this.removeInternetExplorerInputFix();
+			}
 		}
 	}
 
 	onKeyDown( event ) {
 		const { keyCode } = event;
-		const { startContainer, startOffset, endContainer, endOffset } = getSelection().getRangeAt( 0 );
-		const isCollapsed = startContainer === endContainer && startOffset === endOffset;
+		const isDelete = keyCode === DELETE || keyCode === BACKSPACE;
 
 		// Disables TinyMCE behaviour.
-		if ( keyCode === ENTER || ( ! isCollapsed && ( keyCode === DELETE || keyCode === BACKSPACE ) ) ) {
+		if (
+			keyCode === ENTER ||
+			( isDelete && isEntirelySelected( this.editorNode ) )
+		) {
 			event.preventDefault();
 			// For some reason this is needed to also prevent the insertion of
 			// line breaks.
@@ -308,13 +342,15 @@ export default class TinyMCE extends Component {
 		const {
 			tagName = 'div',
 			style,
-			defaultValue,
+			record,
+			valueToEditableHTML,
 			className,
 			isPlaceholderVisible,
 			onPaste,
 			onInput,
 			onKeyDown,
-			onKeyUp,
+			onCompositionEnd,
+			onBlur,
 		} = this.props;
 
 		/*
@@ -338,12 +374,13 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: defaultValue },
+			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,
+			onBlur,
 			onKeyDown,
-			onKeyUp,
+			onCompositionEnd,
 		} );
 	}
 }

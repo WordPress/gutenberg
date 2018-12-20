@@ -43,18 +43,19 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 
 export default withSelect( ( select ) => {
 	const {
-		getSelectedBlock,
+		getSelectedBlockClientId,
 		getBlockMode,
 		getMultiSelectedBlockClientIds,
+		isBlockValid,
 	} = select( 'core/editor' );
-	const block = getSelectedBlock();
-	const blockClientIds = block ?
-		[ block.clientId ] :
+	const selectedBlockClientId = getSelectedBlockClientId();
+	const blockClientIds = selectedBlockClientId ?
+		[ selectedBlockClientId ] :
 		getMultiSelectedBlockClientIds();
 
 	return {
 		blockClientIds,
-		isValid: block ? block.isValid : null,
-		mode: block ? getBlockMode( block.clientId ) : null,
+		isValid: selectedBlockClientId ? isBlockValid( selectedBlockClientId ) : null,
+		mode: selectedBlockClientId ? getBlockMode( selectedBlockClientId ) : null,
 	};
 } )( BlockToolbar );

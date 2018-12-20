@@ -32,6 +32,52 @@ exports[`adding blocks should clean TinyMCE content 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`adding blocks should create valid paragraph blocks when rapidly pressing Enter 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`adding blocks should insert line break at end 1`] = `
 "<!-- wp:paragraph -->
 <p>a<br><br></p>
@@ -73,5 +119,41 @@ exports[`adding blocks should navigate around inline boundaries 1`] = `
 
 <!-- wp:paragraph -->
 <p>BeforeThird</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not delete surrounding space when deleting a selected word 1`] = `
+"<!-- wp:paragraph -->
+<p>alpha  gamma</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not delete surrounding space when deleting a selected word 2`] = `
+"<!-- wp:paragraph -->
+<p>alpha beta gamma</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not delete surrounding space when deleting a word with Alt+Backspace 1`] = `
+"<!-- wp:paragraph -->
+<p>alpha  gamma</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not delete surrounding space when deleting a word with Alt+Backspace 2`] = `
+"<!-- wp:paragraph -->
+<p>alpha beta gamma</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not delete surrounding space when deleting a word with Backspace 1`] = `
+"<!-- wp:paragraph -->
+<p>1  3</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should not delete surrounding space when deleting a word with Backspace 2`] = `
+"<!-- wp:paragraph -->
+<p>1 2 3</p>
 <!-- /wp:paragraph -->"
 `;

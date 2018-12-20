@@ -1,3 +1,21 @@
+## 6.0.4 (2018-12-12)
+
+## 6.0.3 (2018-11-30)
+
+## 6.0.2 (2018-11-21)
+
+## 6.0.1 (2018-11-20)
+
+## 6.0.0 (2018-11-15)
+
+### Breaking Changes
+
+- `isValidBlock` has been removed. Please use `isValidBlockContent` instead but keep in mind that the order of params has changed.
+
+### Bug Fix
+
+- The block validator is more lenient toward equivalent encoding forms.
+
 ## 5.3.1 (2018-11-12)
 
 ## 5.3.0 (2018-11-09)
@@ -9,9 +27,9 @@
 
 ## 5.2.0 (2018-11-09)
 
--   Paste: Google Docs: fix nested formatting, sub, sup and del.
--   Expose @wordpress/editor to Gutenberg mobile.
--   Separate Paste Handler.
+- Paste: Google Docs: fix nested formatting, sub, sup and del.
+- Expose @wordpress/editor to Gutenberg mobile.
+- Separate Paste Handler.
 
 ## 5.1.2 (2018-11-03)
 
@@ -54,7 +72,7 @@
 ### Breaking Changes
 
 - The `isSharedBlock` function is removed. Use `isReusableBlock` instead.
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 
 ### Deprecations
 

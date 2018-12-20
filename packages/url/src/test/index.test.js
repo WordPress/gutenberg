@@ -78,9 +78,7 @@ describe( 'isValidProtocol', () => {
 		expect( isValidProtocol( 'tel:' ) ).toBe( true );
 		expect( isValidProtocol( 'http:' ) ).toBe( true );
 		expect( isValidProtocol( 'https:' ) ).toBe( true );
-		expect( isValidProtocol( 'http://' ) ).toBe( true );
-		expect( isValidProtocol( 'https://' ) ).toBe( true );
-		expect( isValidProtocol( 'file:///' ) ).toBe( true );
+		expect( isValidProtocol( 'file:' ) ).toBe( true );
 		expect( isValidProtocol( 'test.protocol:' ) ).toBe( true );
 		expect( isValidProtocol( 'test-protocol:' ) ).toBe( true );
 		expect( isValidProtocol( 'test+protocol:' ) ).toBe( true );

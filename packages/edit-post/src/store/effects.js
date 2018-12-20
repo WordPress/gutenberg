@@ -45,24 +45,26 @@ const effects = {
 
 		let wasSavingPost = select( 'core/editor' ).isSavingPost();
 		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		let wasPreviewingPost = select( 'core/editor' ).isPreviewingPost();
 		// Save metaboxes when performing a full save on the post.
 		subscribe( () => {
 			const isSavingPost = select( 'core/editor' ).isSavingPost();
 			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+			const isPreviewingPost = select( 'core/editor' ).isPreviewingPost();
 			const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
 
-			// Save metaboxes on save completion when past save wasn't an autosave.
+			// Save metaboxes on save completion, except for autosaves that are not a post preview.
 			const shouldTriggerMetaboxesSave = (
-				hasActiveMetaBoxes &&
-				wasSavingPost &&
-				! wasAutosavingPost &&
-				! isSavingPost &&
-				! isAutosavingPost
+				hasActiveMetaBoxes && (
+					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost ) ||
+					( wasAutosavingPost && wasPreviewingPost && ! isPreviewingPost )
+				)
 			);
 
 			// Save current state for next inspection.
 			wasSavingPost = isSavingPost;
 			wasAutosavingPost = isAutosavingPost;
+			wasPreviewingPost = isPreviewingPost;
 
 			if ( shouldTriggerMetaboxesSave ) {
 				store.dispatch( requestMetaBoxUpdates() );
@@ -70,9 +72,14 @@ const effects = {
 		} );
 	},
 	REQUEST_META_BOX_UPDATES( action, store ) {
+		// Saves the wp_editor fields
+		if ( window.tinyMCE ) {
+			window.tinyMCE.triggerSave();
+		}
+
 		const state = store.getState();
 
-		// Additional data needed for backwards compatibility.
+		// Additional data needed for backward compatibility.
 		// If we do not provide this data, the post will be overridden with the default values.
 		const post = select( 'core/editor' ).getCurrentPost( state );
 		const additionalData = [

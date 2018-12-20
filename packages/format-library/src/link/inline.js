@@ -14,13 +14,15 @@ import {
 	ToggleControl,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { ESCAPE, LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
 import {
 	create,
 	insert,
 	isCollapsed,
 	applyFormat,
+	getTextContent,
+	slice,
 } from '@wordpress/rich-text';
 import { URLInput, URLPopover } from '@wordpress/editor';
 
@@ -51,7 +53,7 @@ function createLinkFormat( { url, opensInNewWindow, text } ) {
 
 	if ( opensInNewWindow ) {
 		// translators: accessibility label for external links, where the argument is the link text
-		const label = sprintf( __( '%s (opens in a new tab)' ), text ).trim();
+		const label = sprintf( __( '%s (opens in a new tab)' ), text );
 
 		format.attributes.target = '_blank';
 		format.attributes.rel = 'noreferrer noopener';
@@ -84,12 +86,27 @@ const LinkEditor = ( { value, onChangeInputValue, onKeyDown, submitLink, autocom
 	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 );
 
-const LinkViewer = ( { url, editLink } ) => {
+const LinkViewerUrl = ( { url } ) => {
 	const prependedURL = prependHTTP( url );
 	const linkClassName = classnames( 'editor-format-toolbar__link-container-value', {
 		'has-invalid-link': ! isValidHref( prependedURL ),
 	} );
 
+	if ( ! url ) {
+		return <span className={ linkClassName }></span>;
+	}
+
+	return (
+		<ExternalLink
+			className={ linkClassName }
+			href={ url }
+		>
+			{ filterURLForDisplay( safeDecodeURI( url ) ) }
+		</ExternalLink>
+	);
+};
+
+const LinkViewer = ( { url, editLink } ) => {
 	return (
 		// Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -97,12 +114,7 @@ const LinkViewer = ( { url, editLink } ) => {
 			className="editor-format-toolbar__link-container-content"
 			onKeyPress={ stopKeyPropagation }
 		>
-			<ExternalLink
-				className={ linkClassName }
-				href={ url }
-			>
-				{ filterURLForDisplay( safeDecodeURI( url ) ) }
-			</ExternalLink>
+			<LinkViewerUrl url={ url } />
 			<IconButton icon="edit" label={ __( 'Edit' ) } onClick={ editLink } />
 		</div>
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
@@ -122,7 +134,10 @@ class InlineLinkUI extends Component {
 		this.resetState = this.resetState.bind( this );
 		this.autocompleteRef = createRef();
 
-		this.state = {};
+		this.state = {
+			opensInNewWindow: false,
+			inputValue: '',
+		};
 	}
 
 	static getDerivedStateFromProps( props, state ) {
@@ -143,11 +158,6 @@ class InlineLinkUI extends Component {
 	}
 
 	onKeyDown( event ) {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
-			this.resetState();
-		}
-
 		if ( [ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].indexOf( event.keyCode ) > -1 ) {
 			// Stop the key event from propagating up to ObserveTyping.startTypingInTextField.
 			event.stopPropagation();
@@ -159,13 +169,19 @@ class InlineLinkUI extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		const { activeAttributes: { url }, value, onChange } = this.props;
+		const { activeAttributes: { url = '' }, value, onChange } = this.props;
 
 		this.setState( { opensInNewWindow } );
 
 		// Apply now if URL is not being edited.
 		if ( ! isShowingInput( this.props, this.state ) ) {
-			onChange( applyFormat( value, createLinkFormat( { url, opensInNewWindow, text: value.text } ) ) );
+			const selectedText = getTextContent( slice( value ) );
+
+			onChange( applyFormat( value, createLinkFormat( {
+				url,
+				opensInNewWindow,
+				text: selectedText,
+			} ) ) );
 		}
 	}
 
@@ -178,7 +194,12 @@ class InlineLinkUI extends Component {
 		const { isActive, value, onChange, speak } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
 		const url = prependHTTP( inputValue );
-		const format = createLinkFormat( { url, opensInNewWindow, text: value.text } );
+		const selectedText = getTextContent( slice( value ) );
+		const format = createLinkFormat( {
+			url,
+			opensInNewWindow,
+			text: selectedText,
+		} );
 
 		event.preventDefault();
 
@@ -196,7 +217,7 @@ class InlineLinkUI extends Component {
 		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
-			speak( __( 'Link inserted' ), 'assertive' );
+			speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
 
@@ -234,6 +255,7 @@ class InlineLinkUI extends Component {
 			>
 				<URLPopover
 					onClickOutside={ this.onClickOutside }
+					onClose={ this.resetState }
 					focusOnMount={ showInput ? 'firstElement' : false }
 					renderSettings={ () => (
 						<ToggleControl

@@ -6,6 +6,7 @@
  *
  * @package gutenberg-test-hooks-api
  */
+
 wp_enqueue_script(
 	'gutenberg-test-hooks-api',
 	plugins_url( 'hooks-api/index.js', __FILE__ ),
@@ -15,7 +16,7 @@ wp_enqueue_script(
 		'wp-element',
 		'wp-editor',
 		'wp-hooks',
-		'wp-i18n'
+		'wp-i18n',
 	),
 	filemtime( plugin_dir_path( __FILE__ ) . 'hooks-api/index.js' ),
 	true

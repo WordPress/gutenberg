@@ -42,6 +42,7 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 				<EnableTipsOption label={ __( 'Enable Tips' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
+				<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
 				<PostTaxonomies
 					taxonomyWrapper={ ( content, taxonomy ) => (
 						<EnablePanelOption
