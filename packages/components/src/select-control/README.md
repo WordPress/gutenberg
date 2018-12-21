@@ -3,7 +3,7 @@
 SelectControl allow users to select from a single-option menu. It functions as a wrapper around the browser's native `<select>` element.
 
 
-![A “Link To” select with “none” selected.](select.png)
+![A “Link To” select with “none” selected.](https://wordpress.org/gutenberg/files/2018/12/select.png)
 
 
 ## Table of contents
@@ -29,14 +29,14 @@ Use a select control when:
 If you have a shorter list of options, or need all of the options visible to the user, consider using RadioControl instead.
 
 
-![](select-do-multiple.png)
+![](https://wordpress.org/gutenberg/files/2018/12/select-do-multiple.png)
 
 
 **Do**
 Use selects when you have multiple options, and can only choose one.
 
 
-![](select-dont-binary.png)
+![](https://wordpress.org/gutenberg/files/2018/12/select-dont-binary.png)
 
 
 **Don’t**
@@ -57,14 +57,14 @@ Once the menu is displayed onscreen, it remains open until the user chooses a me
 Label the SelectControl with a text label above it, or to its left, using sentence capitalization. Clicking the label allows the user to focus directly on the select.
 
 
-![](select-do-position.png)
+![](https://wordpress.org/gutenberg/files/2018/12/select-do-position.png)
 
 
 **Do**
 Position the label above, or to the left of, the select.
 
 
-![](select-dont-position.png)
+![](https://wordpress.org/gutenberg/files/2018/12/select-dont-position.png)
 
 
 **Don’t**
@@ -78,14 +78,14 @@ Position the label centered over the select, or right aligned against the side o
 - Ensure that menu items are ordered in a way that is most useful to users. Alphabetical or recency ordering is preferred.
 
 
-![](select-do-options.png)
+![](https://wordpress.org/gutenberg/files/2018/12/select-do-options.png)
 
 
 **Do**
 Use short menu items.
 
 
-![](select-dont-options.png)
+![](https://wordpress.org/gutenberg/files/2018/12/select-dont-options.png)
 
 
 **Don’t**
