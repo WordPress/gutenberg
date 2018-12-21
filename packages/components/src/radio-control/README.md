@@ -38,7 +38,7 @@ When using radio buttons **one should be selected by default** (i.e., when the p
 
 **User control**
 
-In most interactions, a user should be able to undo and redo their actions. With most selection controls you can un-choose a selection, but in this instance you cannot click or tap a selected radio button to deselect it — selecting is a final action. The finality isn’t conveyed when none are selected by default. Selecting a radio button by default communicates that the user is required to choose one in the set.
+In most interactions, a user should be able to undo and redo their actions. With most selection controls you can un-choose a selection, but in this instance you cannot click or tap a selected radio button to deselect it—selecting is a final action. The finality isn’t conveyed when none are selected by default. Selecting a radio button by default communicates that the user is required to choose one in the set.
 
 **Expediting tasks**
 
