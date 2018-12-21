@@ -41,7 +41,7 @@ function() {
 }
 ```
 
-With this trick, the different files won't override each other. They also won't work as intended! Nothing will be displayed in the console because these functions are being called by no one.
+With this trick, the different files won't override each other's variables. Unfortunately, they also won't work, because these functions are being called by no one. We've only _defined_ the functions; we haven't _executed_ them yet.
 
 **2. Make it so the function is executed when is loaded**
 
