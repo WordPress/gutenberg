@@ -81,7 +81,7 @@ You may also have noticed the parentheses at the end of the code sample as well.
 } )( window.wp )
 ```
 
-**Coda**
+## Future changes
 
 At the beginning we mentioned that:
 
