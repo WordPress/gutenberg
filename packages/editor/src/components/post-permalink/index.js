@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -57,9 +58,19 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, postLink, permalinkParts, postSlug, postTitle, postID, isEditable, isPublished } = this.props;
+		const {
+			isEditable,
+			isNew,
+			isPublished,
+			isViewable,
+			permalinkParts,
+			postLink,
+			postSlug,
+			postID,
+			postTitle,
+		} = this.props;
 
-		if ( isNew || ! postLink ) {
+		if ( isNew || ! isViewable || ! permalinkParts || ! postLink ) {
 			return null;
 		}
 
@@ -138,8 +149,14 @@ export default compose( [
 			getEditedPostAttribute,
 			isCurrentPostPublished,
 		} = select( 'core/editor' );
+		const {
+			getPostType,
+		} = select( 'core' );
 
 		const { id, link } = getCurrentPost();
+
+		const postTypeName = getEditedPostAttribute( 'type' );
+		const postType = getPostType( postTypeName );
 
 		return {
 			isNew: isEditedPostNew(),
@@ -150,6 +167,7 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			postTitle: getEditedPostAttribute( 'title' ),
 			postID: id,
+			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

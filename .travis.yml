@@ -58,7 +58,7 @@ jobs:
         - ./bin/run-wp-unit-tests.sh
 
     - stage: test
-      env: WP_VERSION=latest
+      env: WP_VERSION=latest POPULAR_PLUGINS=true
       script:
         - ./bin/run-e2e-tests.sh || exit 1
 

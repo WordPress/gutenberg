@@ -111,6 +111,21 @@ const schema = {
 	},
 };
 
+function getFirstAnchorAttributeFormHTML( html, attributeName ) {
+	const { body } = document.implementation.createHTMLDocument( '' );
+
+	body.innerHTML = html;
+
+	const { firstElementChild } = body;
+
+	if (
+		firstElementChild &&
+		firstElementChild.nodeName === 'A'
+	) {
+		return firstElementChild.getAttribute( attributeName ) || undefined;
+	}
+}
+
 export const settings = {
 	title: __( 'Image' ),
 
@@ -185,27 +200,28 @@ export const settings = {
 					},
 					caption: {
 						shortcode: ( attributes, { shortcode } ) => {
-							const { content } = shortcode;
-							return content.replace( /\s*<img[^>]*>\s/, '' );
+							const { body } = document.implementation.createHTMLDocument( '' );
+
+							body.innerHTML = shortcode.content;
+							body.removeChild( body.firstElementChild );
+
+							return body.innerHTML.trim();
 						},
 					},
 					href: {
-						type: 'string',
-						source: 'attribute',
-						attribute: 'href',
-						selector: 'a',
+						shortcode: ( attributes, { shortcode } ) => {
+							return getFirstAnchorAttributeFormHTML( shortcode.content, 'href' );
+						},
 					},
 					rel: {
-						type: 'string',
-						source: 'attribute',
-						attribute: 'rel',
-						selector: 'a',
+						shortcode: ( attributes, { shortcode } ) => {
+							return getFirstAnchorAttributeFormHTML( shortcode.content, 'rel' );
+						},
 					},
 					linkClass: {
-						type: 'string',
-						source: 'attribute',
-						attribute: 'class',
-						selector: 'a',
+						shortcode: ( attributes, { shortcode } ) => {
+							return getFirstAnchorAttributeFormHTML( shortcode.content, 'class' );
+						},
 					},
 					id: {
 						type: 'number',

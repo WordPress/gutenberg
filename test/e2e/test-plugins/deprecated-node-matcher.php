@@ -6,6 +6,7 @@
  *
  * @package gutenberg-test-deprecated-node-matcher
  */
+
 wp_enqueue_script(
 	'gutenberg-test-deprecated-node-matcher',
 	plugins_url( 'deprecated-node-matcher/index.js', __FILE__ ),
@@ -13,7 +14,7 @@ wp_enqueue_script(
 		'lodash',
 		'wp-blocks',
 		'wp-element',
-		'wp-editor'
+		'wp-editor',
 	),
 	filemtime( plugin_dir_path( __FILE__ ) . 'deprecated-node-matcher/index.js' ),
 	true

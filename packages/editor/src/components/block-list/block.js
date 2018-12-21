@@ -59,7 +59,6 @@ export class BlockListBlock extends Component {
 		this.maybeHover = this.maybeHover.bind( this );
 		this.forceFocusedContextualToolbar = this.forceFocusedContextualToolbar.bind( this );
 		this.hideHoverEffects = this.hideHoverEffects.bind( this );
-		this.mergeBlocks = this.mergeBlocks.bind( this );
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.preventDrag = this.preventDrag.bind( this );
@@ -232,30 +231,6 @@ export class BlockListBlock extends Component {
 	hideHoverEffects() {
 		if ( this.state.isHovered ) {
 			this.setState( { isHovered: false } );
-		}
-	}
-
-	mergeBlocks( forward = false ) {
-		const {
-			clientId,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
-			onMerge,
-		} = this.props;
-		const previousBlockClientId = getPreviousBlockClientId( clientId );
-		const nextBlockClientId = getNextBlockClientId( clientId );
-		// Do nothing when it's the first block.
-		if (
-			( ! forward && ! previousBlockClientId ) ||
-			( forward && ! nextBlockClientId )
-		) {
-			return;
-		}
-
-		if ( forward ) {
-			onMerge( clientId, nextBlockClientId );
-		} else {
-			onMerge( previousBlockClientId, clientId );
 		}
 	}
 
@@ -504,7 +479,7 @@ export class BlockListBlock extends Component {
 							setAttributes={ this.setAttributes }
 							insertBlocksAfter={ isLocked ? undefined : this.insertBlocksAfter }
 							onReplace={ isLocked ? undefined : onReplace }
-							mergeBlocks={ isLocked ? undefined : this.mergeBlocks }
+							mergeBlocks={ isLocked ? undefined : this.props.onMerge }
 							clientId={ clientId }
 							isSelectionEnabled={ this.props.isSelectionEnabled }
 							toggleSelection={ this.props.toggleSelection }
@@ -657,9 +632,6 @@ const applyWithSelect = withSelect(
 	( select, { clientId, rootClientId, isLargeViewport } ) => {
 		const {
 			isBlockSelected,
-			getBlockName,
-			isBlockValid,
-			getBlockAttributes,
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
@@ -673,15 +645,18 @@ const applyWithSelect = withSelect(
 			getEditorSettings,
 			hasSelectedInnerBlock,
 			getTemplateLock,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
+			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/editor' );
+		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode } = getEditorSettings();
 		const templateLock = getTemplateLock( rootClientId );
 		const isParentOfSelectedBlock = hasSelectedInnerBlock( clientId, true );
-		const name = getBlockName( clientId );
-		const attributes = getBlockAttributes( clientId );
+
+		// The fallback to `{}` is a temporary fix.
+		// This function should never be called when a block is not present in the state.
+		// It happens now because the order in withSelect rendering is not correct.
+		const { name, attributes, isValid } = block || {};
 
 		return {
 			isPartOfMultiSelection:
@@ -699,20 +674,21 @@ const applyWithSelect = withSelect(
 			initialPosition: getSelectedBlocksInitialCaretPosition(),
 			isEmptyDefaultBlock:
 				name && isUnmodifiedDefaultBlock( { name, attributes } ),
-			isValid: isBlockValid( clientId ),
 			isMovable: 'all' !== templateLock,
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
 			hasFixedToolbar: hasFixedToolbar && isLargeViewport,
+
+			// Users of the editor.BlockListBlock filter used to be able to access the block prop
+			// Ideally these blocks would rely on the clientId prop only.
+			// This is kept for backward compatibility reasons.
+			block,
+
 			name,
 			attributes,
+			isValid,
 			isSelected,
 			isParentOfSelectedBlock,
-
-			// We only care about these selectors when events are triggered.
-			// We call them dynamically in the event handlers to avoid unnecessary re-renders.
-			getPreviousBlockClientId,
-			getNextBlockClientId,
 		};
 	}
 );
@@ -750,8 +726,24 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		onRemove( clientId ) {
 			removeBlock( clientId );
 		},
-		onMerge( ...args ) {
-			mergeBlocks( ...args );
+		onMerge( forward ) {
+			const { clientId } = ownProps;
+			const {
+				getPreviousBlockClientId,
+				getNextBlockClientId,
+			} = select( 'core/editor' );
+
+			if ( forward ) {
+				const nextBlockClientId = getNextBlockClientId( clientId );
+				if ( nextBlockClientId ) {
+					mergeBlocks( clientId, nextBlockClientId );
+				}
+			} else {
+				const previousBlockClientId = getPreviousBlockClientId( clientId );
+				if ( previousBlockClientId ) {
+					mergeBlocks( previousBlockClientId, clientId );
+				}
+			}
 		},
 		onReplace( blocks ) {
 			replaceBlocks( [ ownProps.clientId ], blocks );
@@ -777,9 +769,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 } );
 
 export default compose(
-	withFilters( 'editor.BlockListBlock' ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),
 	applyWithSelect,
 	applyWithDispatch,
-	withFilters( 'editor.__experimentalBlockListBlock' )
+	withFilters( 'editor.BlockListBlock' )
 )( BlockListBlock );

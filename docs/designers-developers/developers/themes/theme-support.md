@@ -138,25 +138,21 @@ Blocks may allow the user to configure the font sizes they use, e.g., the paragr
 add_theme_support( 'editor-font-sizes', array(
 	array(
 		'name' => __( 'small', 'themeLangDomain' ),
-		'shortName' => __( 'S', 'themeLangDomain' ),
 		'size' => 12,
 		'slug' => 'small'
 	),
 	array(
 		'name' => __( 'regular', 'themeLangDomain' ),
-		'shortName' => __( 'M', 'themeLangDomain' ),
 		'size' => 16,
 		'slug' => 'regular'
 	),
 	array(
 		'name' => __( 'large', 'themeLangDomain' ),
-		'shortName' => __( 'L', 'themeLangDomain' ),
 		'size' => 36,
 		'slug' => 'large'
 	),
 	array(
 		'name' => __( 'larger', 'themeLangDomain' ),
-		'shortName' => __( 'XL', 'themeLangDomain' ),
 		'size' => 50,
 		'slug' => 'larger'
 	)

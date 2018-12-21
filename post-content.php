@@ -1,3 +1,11 @@
+<?php
+/**
+ * Default content of the demo page
+ *
+ * @package gutenberg
+ */
+
+?>
 <!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
 <div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-text"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p></div>
 <!-- /wp:cover -->

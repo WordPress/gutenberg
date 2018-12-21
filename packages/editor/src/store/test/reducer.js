@@ -37,6 +37,7 @@ import {
 	blockListSettings,
 	autosave,
 	postSavingLock,
+	previewLink,
 } from '../reducer';
 import { INITIAL_EDITS_DEFAULTS } from '../defaults';
 
@@ -489,8 +490,11 @@ describe( 'state', () => {
 			expect( state.present.blocks.byClientId.chicken ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
-				attributes: { content: 'ribs' },
 				isValid: true,
+			} );
+
+			expect( state.present.blocks.attributes.chicken ).toEqual( {
+				content: 'ribs',
 			} );
 		} );
 
@@ -517,10 +521,11 @@ describe( 'state', () => {
 			expect( state.present.blocks.byClientId.chicken ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/block',
-				attributes: {
-					ref: 3,
-				},
 				isValid: false,
+			} );
+
+			expect( state.present.blocks.attributes.chicken ).toEqual( {
+				ref: 3,
 			} );
 		} );
 
@@ -790,8 +795,10 @@ describe( 'state', () => {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
-					attributes: {},
 				},
+			} );
+			expect( state.present.blocks.attributes ).toEqual( {
+				ribs: {},
 			} );
 		} );
 
@@ -827,8 +834,10 @@ describe( 'state', () => {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
-					attributes: {},
 				},
+			} );
+			expect( state.present.blocks.attributes ).toEqual( {
+				ribs: {},
 			} );
 		} );
 
@@ -1211,51 +1220,6 @@ describe( 'state', () => {
 			} );
 
 			describe( 'byClientId', () => {
-				it( 'should return with attribute block updates', () => {
-					const original = deepFreeze( editor( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {},
-							innerBlocks: [],
-						} ],
-					} ) );
-					const state = editor( original, {
-						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
-						attributes: {
-							updated: true,
-						},
-					} );
-
-					expect( state.present.blocks.byClientId.kumquat.attributes.updated ).toBe( true );
-				} );
-
-				it( 'should accumulate attribute block updates', () => {
-					const original = deepFreeze( editor( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {
-								updated: true,
-							},
-							innerBlocks: [],
-						} ],
-					} ) );
-					const state = editor( original, {
-						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
-						attributes: {
-							moreUpdated: true,
-						},
-					} );
-
-					expect( state.present.blocks.byClientId.kumquat.attributes ).toEqual( {
-						updated: true,
-						moreUpdated: true,
-					} );
-				} );
-
 				it( 'should ignore updates to non-existent block', () => {
 					const original = deepFreeze( editor( undefined, {
 						type: 'RESET_BLOCKS',
@@ -1292,6 +1256,91 @@ describe( 'state', () => {
 					} );
 
 					expect( state.present.blocks.byClientId ).toBe( state.present.blocks.byClientId );
+				} );
+			} );
+
+			describe( 'attributes', () => {
+				it( 'should return with attribute block updates', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes.kumquat.updated ).toBe( true );
+				} );
+
+				it( 'should accumulate attribute block updates', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {
+								updated: true,
+							},
+							innerBlocks: [],
+						} ],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							moreUpdated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes.kumquat ).toEqual( {
+						updated: true,
+						moreUpdated: true,
+					} );
+				} );
+
+				it( 'should ignore updates to non-existent block', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes ).toBe( original.present.blocks.attributes );
+				} );
+
+				it( 'should return with same reference if no changes in updates', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {
+								updated: true,
+							},
+							innerBlocks: [],
+						} ],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes ).toBe( state.present.blocks.attributes );
 				} );
 			} );
 		} );
@@ -2494,6 +2543,71 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'previewLink', () => {
+		it( 'returns null by default', () => {
+			const state = previewLink( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns preview link from save success', () => {
+			const state = previewLink( null, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: {
+					preview_link: 'https://example.com/?p=2611&preview=true',
+				},
+			} );
+
+			expect( state ).toBe( 'https://example.com/?p=2611&preview=true' );
+		} );
+
+		it( 'returns post link with query arg from save success if no preview link', () => {
+			const state = previewLink( null, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: {
+					link: 'https://example.com/sample-post/',
+				},
+			} );
+
+			expect( state ).toBe( 'https://example.com/sample-post/?preview=true' );
+		} );
+
+		it( 'returns same state if save success without preview link or post link', () => {
+			// Bug: This can occur for post types which are defined as
+			// `publicly_queryable => false` (non-viewable).
+			//
+			// See: https://github.com/WordPress/gutenberg/issues/12677
+			const state = previewLink( null, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: {
+					preview_link: '',
+				},
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns resets on preview start', () => {
+			const state = previewLink( 'https://example.com/sample-post/', {
+				type: 'REQUEST_POST_UPDATE_START',
+				options: {
+					isPreview: true,
+				},
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns state on non-preview save start', () => {
+			const state = previewLink( 'https://example.com/sample-post/', {
+				type: 'REQUEST_POST_UPDATE_START',
+				options: {},
+			} );
+
+			expect( state ).toBe( 'https://example.com/sample-post/' );
 		} );
 	} );
 } );
