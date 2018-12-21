@@ -120,24 +120,19 @@ Earlier examples used the `createElement` function to create DOM nodes, but it's
 
 The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc. It is not too much unlike the single editor region of the legacy post editor, and is in fact powered by the same TinyMCE library.
 
-```php
-<?php
-
-function gutenberg_boilerplate_block() {
-	wp_register_script(
-		'gutenberg-boilerplate-es5-step03',
-		plugins_url( 'step-03/block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element', 'wp-editor' )
-	);
-
-	register_block_type( 'gutenberg-boilerplate-es5/hello-world-step-03', array(
-		'editor_script' => 'gutenberg-boilerplate-es5-step03',
-	) );
-}
-add_action( 'init', 'gutenberg_boilerplate_block' );
-```
-
 To use the `RichText` component, add `wp-editor` to the array of registered script handles when calling `wp_register_script`.
+
+```php
+wp_register_script(
+	'gutenberg-boilerplate-es5-step03',
+	plugins_url( 'step-03/block.js', __FILE__ ),
+	array( 
+		'wp-blocks', 
+		'wp-element', 
+		'wp-editor', // Note the addition of wp-editor to the dependencies
+	)
+);
+```
 
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `RichText` at all, or it may need many independent `RichText` elements, each operating on a subset of the overall block state.
 
