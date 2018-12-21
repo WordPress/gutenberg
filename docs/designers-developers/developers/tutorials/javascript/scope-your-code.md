@@ -85,7 +85,7 @@ You may also have noticed the parentheses at the end of the code sample as well.
 
 At the beginning we mentioned that:
 
-	> Historically, JavaScript files loaded by same document share the same scope.
+> Historically, JavaScript files loaded in a web page share the same scope.
 
 Notice the _historically_.
 
