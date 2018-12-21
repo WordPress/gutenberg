@@ -2,50 +2,65 @@
 
 Historically, JavaScript files loaded in a web page share the same scope. This means that a global variable declared in one file will be seen by the code in other files.
 
-To see how this works, create a web page that loads two JavaScript files. For example, a file called `one.js`:
+To see how this works, create a web page that loads three JavaScript files. The `first.js` file will be:
 
 ```js
-var yourPluginName = 'MyPlugin';
-console.log( 'Plugin name is ', yourPluginName );
+var pluginName = 'MyPlugin';
+console.log( 'Plugin name is ', pluginName );
 ```
 
-And another JavaScript file  called `two.js`:
+Let's create `second.js` as:
 
 ```js
-var yourPluginName = 'YourPlugin';
-var yourName = 'A great JS developer!';
-console.log( 'Plugin ', yourPluginName, ' authored by ', yourName );
+var pluginName = 'DifferentPlugin';
+console.log( 'Plugin name is ', pluginName );
 ```
 
-When loaded on the same page, the value of `yourPluginName` changes because it is overwritten by the second file. By scoping your code, you can avoid the problem of values unexpectedly changing.
+And, finally, `third.js`:
+
+```js
+console.log( 'Plugin name is ', pluginName );
+```
+
+When loaded on the same page, `first.js` and `second.js` will output the plugin name declared within itself. They will override the value of the global `pluginName` variable if one was already declared. It's not known what gets printed in the console when `third.js` is executed, though - it depends on the value of the global `pluginName` variable when `third.js` is executed, which will depend on the files load order.
+
+This behavior is problematic and the reason we need to scope the code, to prevent values unexpectedly changing.
 
 ## Scoping code within a function
 
-In JavaScript, you can scope your code by writing it within a function. Functions have "local scope", or a scope that is specific only to that function. You can also write an "anonymous function" which will also prevent your function name from being overridden in the global scope.
+In JavaScript, you can scope your code by writing it within a function. Functions have "local scope", or a scope that is specific only to that function. Aditionally, in JavaScript you can write anonymous functions, functions without a name, which will also prevent your function name from being overridden in the global scope.
 
-Scoped `one.js` code:
-
-```js
-function() {
-	var yourPluginName = 'my plugin';
-	console.log( 'Plugin name is ', yourPluginName );
-}
-```
-
-And `two.js`:
+Taking advantage of these two JavaScript features, `first.js` could be scoped as:
 
 ```js
 function() {
-	var yourName = 'A great JS developer!';
-	console.log( 'Plugin ', yourPluginName, ' authored by ', yourName );
+	var pluginName = 'MyPlugin';
+	console.log( 'Plugin name is ', pluginName );
 }
 ```
 
-With this trick, the different files won't override each other's variables. Unfortunately, they also won't work, because these functions are being called by no one. We've only _defined_ the functions; we haven't _executed_ them yet.
+`second.js` as:
+
+```js
+function() {
+	var pluginName = 'DifferentPlugin';
+	console.log( 'Plugin name is ', pluginName );
+}
+```
+
+And `third.js`:
+
+```js
+function() {
+	console.log( 'Plugin name is ', pluginName );
+}
+```
+
+With this trick, the different files won't override each other's variables. Unfortunately, they also won't work as expected, because these functions are being called by no one. We've only _defined_ the functions; we haven't _executed_ them yet.
 
 ## Automatically execute anonymous functions
 
-The problem is, how do you execute anonymous functions in JavaScript? It turns out there are a few ways, but the most popular is this:
+It turns out there are a few ways to execute anonymous functions in JavaScript, but the most popular is this:
 
 ```js
 ( function() {
@@ -55,30 +70,40 @@ The problem is, how do you execute anonymous functions in JavaScript? It turns o
 
 You wrap your function between parentheses, and then call it like any other named function. This pattern is known as [Immediately-Invoked Function Expression](http://benalman.com/news/2010/11/immediately-invoked-function-expression/), or IIFE for short.
 
-This is `one.js` written as an IIFE:
+This is `first.js` written as an IIFE:
 
 ```js
 ( function() {
-	var yourPluginName = 'my plugin';
-	console.log( 'Plugin name is ', yourPluginName );
+	var pluginName = 'MyPlugin';
+	console.log( 'Plugin name is ', pluginName );
 } )( )
 ```
 
-And this is `two.js`:
+And this is `second.js`:
 
 ```js
 ( function() {
-	var yourName = 'A great JS developer!';
-	console.log( 'Plugin ', yourPluginName, ' authored by ', yourName );
+	var pluginName = 'DifferentPlugin';
+	console.log( 'Plugin name is ', pluginName );
 } )( )
 ```
 
-You may also have noticed the parentheses at the end of the code sample as well. This allows you to take a variable from the global scope and pass it into your function. For example, below we pass the `window.wp` variable into our function as the `wordpress` function parameter:
+And this is `third.js`:
 
 ```js
-( function( wordpress ) {
-	console.log( 'WordPress is ', wordpress );
-} )( window.wp )
+( function() {
+	console.log( 'Plugin name is ', pluginName );
+} )( )
+```
+
+The code in `first.js` and `second.js` is unaffected by other variables in the global scope, so it's safe and deterministic.
+
+On the other hand, `third.js` doesn't declare a `pluginName` variable, but needs to be provided one. IIFEs still allow you to take a variable from the global scope and pass it into your function. Provided that there was a global `window.pluginName` variable, we could rewrite `third.js` as:
+
+```js
+( function( name ) {
+	console.log( 'Plugin name is ', name );
+} )( window.pluginName )
 ```
 
 ## Future changes
@@ -89,4 +114,4 @@ At the beginning we mentioned that:
 
 Notice the _historically_.
 
-JavaScript has evolved quite a bit since its creation. As of 2015, the language supports modules, also known as _ES6 modules_, that introduce separate scope per file: a global variable in `one.js` wouldn't be exposed to `two.js`. This feature is already [supported by modern browsers](https://caniuse.com/#feat=es6-module), but not all of them do. If your code needs to run in browsers that don't support modules, your last resort is using IIFEs.
+JavaScript has evolved quite a bit since its creation. As of 2015, the language supports modules, also known as _ES6 modules_, that introduce separate scope per file: a global variable in `first.js` wouldn't be exposed to `second.js`. This feature is already [supported by modern browsers](https://caniuse.com/#feat=es6-module), but not all of them do. If your code needs to run in browsers that don't support modules, your last resort is using IIFEs.
