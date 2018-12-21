@@ -75,6 +75,7 @@ const EmbedPreview = class extends Component {
 					scripts={ scripts }
 					title={ iframeTitle }
 					type={ sandboxClassnames }
+					onFocus={ this.hideOverlay }
 				/>
 				{ ! interactive && <div
 					role="dialog"
