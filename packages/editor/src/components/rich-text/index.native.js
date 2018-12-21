@@ -10,7 +10,9 @@ import { View, Platform } from 'react-native';
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { BlockFormatControls } from '@wordpress/editor';
+import { withSelect } from '@wordpress/data';
 import {
+	getActiveFormat,
 	isEmpty,
 	create,
 	split,
@@ -29,6 +31,12 @@ const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
 };
 
+const gutenbergFormatNamesToAztec = {
+	'core/bold': 'bold',
+	'core/italic': 'italic',
+	'core/strikethrough': 'strikethrough',
+};
+
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
@@ -40,7 +48,11 @@ export class RichText extends Component {
 		this.onFormatChange = this.onFormatChange.bind( this );
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
-		this.state = {};
+		this.state = {
+			start: 0,
+			end: 0,
+			formatPlaceholder: null,
+		};
 	}
 
 	/**
@@ -49,12 +61,12 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
+		const { formatPlaceholder, start, end, lastValue } = this.state;
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
 		// Removing the leading or the trailing white spaces using `trim()` should make sure this is the case
-		const { formats, text } = this.formatToValue( this.props.value.trim() );
-		const { start, end } = this.state;
+		const { formats, text } = this.formatToValue( lastValue || this.props.value.trim() );
 
-		return { formats, text, start, end };
+		return { formats, formatPlaceholder, text, start, end };
 	}
 
 	/*
@@ -113,18 +125,32 @@ export class RichText extends Component {
 		onSplit( before, after );
 	}
 
-	valueToFormat( { formats, text } ) {
+	valueToFormat( { formats, formatPlaceholder, text } ) {
 		const value = toHTMLString( {
-			value: { formats, text },
+			value: { formats, formatPlaceholder, text },
 			multilineTag: this.multilineTag,
 		} );
 		// remove the outer root tags
 		return this.removeRootTagsProduceByAztec( value );
 	}
 
+	getActiveFormatNames( record ) {
+		const {
+			formatTypes,
+		} = this.props;
+
+		return formatTypes.map( ( { name } ) => name ).filter( ( name ) => {
+			return getActiveFormat( record, name ) !== undefined;
+		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] );
+	}
+
 	onFormatChange( record ) {
 		const newContent = this.valueToFormat( record );
 		this.props.onChange( newContent );
+		this.setState( {
+			formatPlaceholder: record.formatPlaceholder,
+			lastValue: null,
+		} );
 	}
 
 	/*
@@ -195,12 +221,17 @@ export class RichText extends Component {
 		}
 	}
 
-	onSelectionChange( start, end ) {
+	onSelectionChange( start, end, text ) {
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
 		const realEnd = Math.max( start, end );
-		this.setState( { start: realStart, end: realEnd } );
+		this.setState( {
+			start: realStart,
+			end: realEnd,
+			formatPlaceholder: null,
+			lastValue: text,
+		} );
 	}
 
 	isEmpty() {
@@ -281,8 +312,8 @@ export class RichText extends Component {
 			isSelected,
 		} = this.props;
 
-		// Save back to HTML from React tree
 		const record = this.getRecord();
+		// Save back to HTML from React tree
 		const html = `<${ tagName }>${ this.valueToFormat( record ) }</${ tagName }>`;
 
 		return (
@@ -302,6 +333,7 @@ export class RichText extends Component {
 					onBlur={ this.props.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
+					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					onSelectionChange={ this.onSelectionChange }
@@ -324,6 +356,13 @@ RichText.defaultProps = {
 
 const RichTextContainer = compose( [
 	withInstanceId,
+	withSelect( ( select ) => {
+		const { getFormatTypes } = select( 'core/rich-text' );
+
+		return {
+			formatTypes: getFormatTypes(),
+		};
+	} ),
 ] )( RichText );
 
 RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
