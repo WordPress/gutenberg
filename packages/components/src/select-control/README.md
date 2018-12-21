@@ -142,28 +142,24 @@ Render a user interface to select multiple users from a list.
 **label**
 
 If this property is added, a label will be generated using label property as the content.
-
 - Type: `String`
 - Required: No
 
 **help**
 
 If this property is added, a help text will be generated using help property as the content.
-
 - Type: `String`
 - Required: No
 
 **multiple**
 
 If this property is added, multiple values can be selected. The value passed should be an array.
-
 - Type: `Boolean`
 - Required: No
 
 **options**
 
 An array of objects containing the following properties:
-
 - `label`: (string) The label to be shown to the user.
 - `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
 - Type: `Array`
@@ -174,12 +170,10 @@ An array of objects containing the following properties:
 A function that receives the value of the new option that is being selected as input.
 If multiple is true the value received is an array of the selected value.
 If multiple is false the value received is a single value with the new selected value.
-
 - Type: `function`
 - Required: Yes
 
 ## Related components
-
 
 - To select one option from a set, and you want to show them all the available options at once, use the `Radio` component.
 - To select one or more items from a set, use the `CheckboxControl` component.
