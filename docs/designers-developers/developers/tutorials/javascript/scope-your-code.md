@@ -53,7 +53,7 @@ The problem is, how do you execute anonymous functions in JavaScript? It turns o
 } )()
 ```
 
-You wrap your function between parenthesis, and then call it like any other named function. This pattern is known as [Immediately-Invoked Function Expression](http://benalman.com/news/2010/11/immediately-invoked-function-expression/), or IIFE for short.
+You wrap your function between parentheses, and then call it like any other named function. This pattern is known as [Immediately-Invoked Function Expression](http://benalman.com/news/2010/11/immediately-invoked-function-expression/), or IIFE for short.
 
 This is `one.js` written as an IIFE:
 
