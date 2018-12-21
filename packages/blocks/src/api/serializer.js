@@ -268,10 +268,11 @@ export function serializeBlock( block ) {
 		case getUnregisteredTypeHandlerName():
 			return saveContent;
 
-		default:
+		default: {
 			const blockType = getBlockType( blockName );
 			const saveAttributes = getCommentAttributes( blockType, block.attributes );
 			return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+		}
 	}
 }
 
