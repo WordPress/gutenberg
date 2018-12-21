@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.inputmethod.InputMethodManager;
 
@@ -78,6 +79,7 @@ public class ReactAztecText extends AztecText {
                 ReactAztecText.this.propagateSelectionChanges(selStart, selEnd);
             }
         });
+        this.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
     }
 
     @Override
