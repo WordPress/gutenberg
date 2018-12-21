@@ -24,27 +24,29 @@ Use radio buttons when you want users to:
 
 If you have a list of available options that can be collapsed, consider using a dropdown menu instead, as dropdowns use less space. A country selection field, for instance, would be very large as a group of radio buttons and wouldn't help the user gain more context by seeing all options at once.
 
+#### Do
+
 ![](https://make.wordpress.org/design/files/2018/11/radio-usage-do.png)
-**Do**
 Use radio buttons when only one item can be selected from a list.
 
+#### Don’t
+
 ![](https://make.wordpress.org/design/files/2018/11/radio-usage-dont.png)
-**Don’t**
 Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.
 
 #### Defaults
 
 When using radio buttons **one should be selected by default** (i.e., when the page loads, in the case of a web application).
 
-**User control**
+##### User control
 
 In most interactions, a user should be able to undo and redo their actions. With most selection controls you can un-choose a selection, but in this instance you cannot click or tap a selected radio button to deselect it—selecting is a final action. The finality isn’t conveyed when none are selected by default. Selecting a radio button by default communicates that the user is required to choose one in the set.
 
-**Expediting tasks**
+##### Expediting tasks
 
 When one a choice in a set of radio buttons is the most desirable or frequently selected, it’s helpful to select it by default. Doing this reduces the interaction cost and can save the user time and clicks.
 
-**The power of suggestion**
+##### The power of suggestion
 
 Designs with a radio button selected by default make a strong suggestion to the user. It can help them make the best decision and increase their confidence. (Use this guidance with caution, and only for good.)
 
