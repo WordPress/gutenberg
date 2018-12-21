@@ -1,6 +1,6 @@
 # Scope your code
 
-Historically, JavaScript files loaded by the same document share the same scope. This means that a global variable declared in a file will be seen by the code in other files.
+Historically, JavaScript files loaded in a web page share the same scope. This means that a global variable declared in one file will be seen by the code in other files.
 
 This is `one.js` file:
 
