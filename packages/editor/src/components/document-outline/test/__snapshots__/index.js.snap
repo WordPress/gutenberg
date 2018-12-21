@@ -10,7 +10,6 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       isValid={true}
       key="0"
       level="H2"
-      onSelect={[Function]}
       path={Array []}
     >
       Heading parent
@@ -20,7 +19,6 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       isValid={true}
       key="1"
       level="H3"
-      onSelect={[Function]}
       path={Array []}
     >
       Heading child
@@ -39,7 +37,6 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       isValid={false}
       key="0"
       level="H1"
-      onSelect={[Function]}
       path={Array []}
     >
       Heading 1
@@ -57,7 +54,6 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       isValid={false}
       key="1"
       level="H1"
-      onSelect={[Function]}
       path={Array []}
     >
       Heading 1
