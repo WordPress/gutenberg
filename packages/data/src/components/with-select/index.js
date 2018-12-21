@@ -19,22 +19,33 @@ const runWaitingList = () => {
 		isRunning = false;
 		return;
 	}
-	const next = waitingList.shift();
-	next();
+	const nextComponent = waitingList.shift();
+	componentsMap.get( nextComponent )();
+	componentsMap.delete( nextComponent );
 	window.requestAnimationFrame( runWaitingList );
 };
 
 const addToWaitingList = ( component, item ) => {
-	if ( componentsMap.has( component ) ) {
-		waitingList[ componentsMap.get( component ) ] = item;
-	} else {
-		componentsMap.set( component, waitingList.length );
-		waitingList.push( item );
+	if ( ! componentsMap.has( component ) ) {
+		waitingList.push( component );
 	}
+	componentsMap.set( component, item );
 	if ( ! isRunning ) {
 		isRunning = true;
 		window.requestAnimationFrame( runWaitingList );
 	}
+};
+
+const flushComponent = ( component ) => {
+	if ( ! componentsMap.has( component ) ) {
+		return false;
+	}
+
+	componentsMap.delete( component );
+	const index = waitingList.indexOf( component );
+	waitingList.splice( index, 1 );
+
+	return true;
 };
 
 /**
@@ -97,14 +108,22 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		componentWillUnmount() {
 			this.canRunSelection = false;
 			this.unsubscribe();
+			flushComponent( this );
 		}
 
 		shouldComponentUpdate( nextProps, nextState ) {
 			// Cycle subscription if registry changes.
 			const hasRegistryChanged = nextProps.registry !== this.props.registry;
+			const hasSyncRenderingChanged = nextProps.isAsync !== this.props.isAsync;
+			let shouldComputeProps = false;
+
 			if ( hasRegistryChanged ) {
 				this.unsubscribe();
 				this.subscribe( nextProps.registry );
+			}
+
+			if ( hasSyncRenderingChanged ) {
+				shouldComputeProps = flushComponent( this );
 			}
 
 			// Treat a registry change as equivalent to `ownProps`, to reflect
@@ -116,11 +135,11 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 
 			// Only render if props have changed or merge props have been updated
 			// from the store subscriber.
-			if ( this.state === nextState && ! hasPropsChanged ) {
+			if ( this.state === nextState && ! hasPropsChanged && ! shouldComputeProps ) {
 				return false;
 			}
 
-			if ( hasPropsChanged ) {
+			if ( hasPropsChanged || shouldComputeProps ) {
 				const nextMergeProps = getNextMergeProps( nextProps );
 				if ( ! isShallowEqualObjects( this.mergeProps, nextMergeProps ) ) {
 					// If merge props change as a result of the incoming props,
