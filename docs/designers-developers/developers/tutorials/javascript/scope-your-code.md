@@ -9,7 +9,7 @@ var yourPluginName = 'MyPlugin';
 console.log( 'Plugin name is ', yourPluginName );
 ```
 
-This is `two.js` file:
+And another JavaScript file  called `two.js`:
 
 ```js
 var yourPluginName = 'YourPlugin';
