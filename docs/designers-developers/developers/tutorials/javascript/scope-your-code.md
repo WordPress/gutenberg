@@ -43,7 +43,7 @@ function() {
 
 With this trick, the different files won't override each other's variables. Unfortunately, they also won't work, because these functions are being called by no one. We've only _defined_ the functions; we haven't _executed_ them yet.
 
-**2. Make it so the function is executed when is loaded**
+## Automatically execute anonymous functions
 
 The problem is, how do you execute anonymous functions in JavaScript? It turns out there are a few ways, but the most popular is this:
 
