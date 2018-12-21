@@ -118,7 +118,7 @@ public class WPAndroidGlueCode {
 
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
-        mReactRootView.startReactApplication(mReactInstanceManager, "gutenberg", initialProps);
+        mReactRootView.setAppProperties(initialProps);
     }
 
     public void onPause(Activity activity) {
@@ -181,7 +181,7 @@ public class WPAndroidGlueCode {
             appProps = new Bundle();
         }
         appProps.putString(PROP_NAME_INITIAL_DATA, content);
-        mReactRootView.setAppProperties(appProps);
+        mReactRootView.startReactApplication(mReactInstanceManager, "gutenberg", appProps);
     }
 
     private void updateContent(String content) {
