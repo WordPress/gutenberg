@@ -15,11 +15,11 @@ import { activatePlugin, deactivatePlugin } from '../support/plugins';
 // the focus is lost and a new element is focused once the save is completed.
 describe( 'Sidebar Permalink Panel', () => {
 	beforeAll( async () => {
-		await activatePlugin( 'gutenberg-test-custom-cpts' );
+		await activatePlugin( 'gutenberg-test-custom-post-types' );
 	} );
 
 	afterAll( async () => {
-		await deactivatePlugin( 'gutenberg-test-custom-cpts' );
+		await deactivatePlugin( 'gutenberg-test-custom-post-types' );
 	} );
 
 	it( 'should not render permalink sidebar panel while the post is new', async () => {
