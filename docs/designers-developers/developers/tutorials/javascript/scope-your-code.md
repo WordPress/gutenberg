@@ -17,7 +17,7 @@ var yourName = 'A great JS developer!';
 console.log( 'Plugin ', yourPluginName, ' authored by ', yourName );
 ```
 
-If you load them both in a page, they'll overwrite each other global variables.
+When loaded on the same page, the value of `yourPluginName` changes because it is overwritten by the second file. By scoping your code, you can avoid the problem of values unexpectedly changing.
 
 **First step: scope the code within a function**
 
