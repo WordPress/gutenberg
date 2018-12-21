@@ -22,7 +22,7 @@ Use radio buttons when you want users to:
 - Select a single option from a list.
 - Expose all available options.
 
-If you have a list of available options can be collapsed, consider using a dropdown menu instead — it uses less space.
+If you have a list of available options that can be collapsed, consider using a dropdown menu instead, as dropdowns use less space. A country selection field, for instance, would be very large as a group of radio buttons and wouldn't help the user gain more context by seeing all options at once.
 
 ![](https://make.wordpress.org/design/files/2018/11/radio-usage-do.png)
 **Do**
