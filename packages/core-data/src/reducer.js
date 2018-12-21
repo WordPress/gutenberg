@@ -225,7 +225,7 @@ export function embedPreviews( state = {}, action ) {
  *
  * @return {Object} Updated state.
  */
-export function hasUploadPermissions( state = {}, action ) {
+export function hasUploadPermissions( state = true, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_UPLOAD_PERMISSIONS':
 			return action.hasUploadPermissions;
