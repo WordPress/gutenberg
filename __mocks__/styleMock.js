@@ -13,4 +13,7 @@ module.exports = {
 	toolbar: {
 		height: 44,
 	},
+	blockContainerFocused: {
+		paddingBottom: 0,
+	},
 };
