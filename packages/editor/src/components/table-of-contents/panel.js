@@ -5,6 +5,8 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 
+import { delay } from 'lodash';
+
 /**
  * Internal dependencies
  */
@@ -12,6 +14,13 @@ import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
 
 function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, onRequestClose } ) {
+	// Remove the block id hash from the url because block ids are only valid for the session.
+	const removeBlockIdHash = () => {
+		delay( () => {
+			const { pathname, search } = window.location;
+			window.history.pushState( '', document.title, pathname + search );
+		}, 50 );
+	};
 	return (
 		<Fragment>
 			<div
@@ -49,7 +58,10 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, o
 					<span className="table-of-contents__title">
 						{ __( 'Document Outline' ) }
 					</span>
-					<DocumentOutline onSelect={ onRequestClose } />
+					<DocumentOutline onSelect={ () => {
+						removeBlockIdHash();
+						onRequestClose();
+					} } />
 				</Fragment>
 			) }
 		</Fragment>
