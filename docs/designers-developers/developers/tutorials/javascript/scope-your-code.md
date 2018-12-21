@@ -21,7 +21,7 @@ When loaded on the same page, the value of `yourPluginName` changes because it i
 
 ## Scoping code within a function
 
-In order to fix this, you need to scope your code. In JavaScript, you do this by writing it within a function, because they create a _local scope_. And, to prevent polluting the global scope with your function's name, you should write your code within an _anonymous_ function.
+In JavaScript, you can scope your code by writing it within a function. Functions have "local scope", or a scope that is specific only to that function. You can also write an "anonymous function" which will also prevent your function name from being overridden in the global scope.
 
 Scoped `one.js` code:
 
