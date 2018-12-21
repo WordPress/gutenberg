@@ -2,7 +2,7 @@
 
 Historically, JavaScript files loaded in a web page share the same scope. This means that a global variable declared in one file will be seen by the code in other files.
 
-This is `one.js` file:
+To see how this works, create a web page that loads two JavaScript files. For example, a file called `one.js`:
 
 ```js
 var yourPluginName = 'MyPlugin';
