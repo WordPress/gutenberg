@@ -42,7 +42,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
 	} );
 
-	it( 'should not render link panel when post is public queryable but not public', async () => {
+	it( 'should not render link panel when post is publicly queryable but not public', async () => {
 		await newPost( { postType: 'public_q_not_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
@@ -51,7 +51,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
 	} );
 
-	it( 'should not render link panel when post is public but not public queryable', async () => {
+	it( 'should not render link panel when post is public but not publicly queryable', async () => {
 		await newPost( { postType: 'not_public_q_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
@@ -60,7 +60,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
 	} );
 
-	it( 'should render link panel when post is public and public queryable', async () => {
+	it( 'should render link panel when post is public and publicly queryable', async () => {
 		await newPost( { postType: 'public_q_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
