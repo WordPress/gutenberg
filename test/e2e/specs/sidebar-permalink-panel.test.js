@@ -7,12 +7,21 @@ import {
 	openDocumentSettingsSidebar,
 	publishPost,
 } from '../support/utils';
+import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 // This tests are not together with the remaining sidebar tests,
 // because we need to publish/save a post, to correctly test the permalink panel.
 // The sidebar test suit enforces that focus is never lost, but during save operations
 // the focus is lost and a new element is focused once the save is completed.
 describe( 'Sidebar Permalink Panel', () => {
+	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-custom-cpts' );
+	} );
+
+	afterAll( async () => {
+		await deactivatePlugin( 'gutenberg-test-custom-cpts' );
+	} );
+
 	it( 'should not render permalink sidebar panel while the post is new', async () => {
 		await newPost();
 		await openDocumentSettingsSidebar();
@@ -31,5 +40,32 @@ describe( 'Sidebar Permalink Panel', () => {
 			removeEditorPanel( 'post-link' );
 		} );
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+	} );
+
+	it( 'should not render link panel when post is public queryable but not public', async () => {
+		await newPost( { postType: 'public_q_not_public' } );
+		await page.keyboard.type( 'aaaaa' );
+		await publishPost();
+		// Start editing again.
+		await page.type( '.editor-post-title__input', ' (Updated)' );
+		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+	} );
+
+	it( 'should not render link panel when post is public but not public queryable', async () => {
+		await newPost( { postType: 'not_public_q_public' } );
+		await page.keyboard.type( 'aaaaa' );
+		await publishPost();
+		// Start editing again.
+		await page.type( '.editor-post-title__input', ' (Updated)' );
+		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
+	} );
+
+	it( 'should render link panel when post is public and public queryable', async () => {
+		await newPost( { postType: 'public_q_public' } );
+		await page.keyboard.type( 'aaaaa' );
+		await publishPost();
+		// Start editing again.
+		await page.type( '.editor-post-title__input', ' (Updated)' );
+		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeDefined();
 	} );
 } );
