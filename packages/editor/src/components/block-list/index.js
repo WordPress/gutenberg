@@ -21,6 +21,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockListBlock from './block';
+// import RenderingProvider from './rendering-provider';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
 
@@ -182,16 +183,16 @@ class BlockList extends Component {
 			blockClientIds,
 			rootClientId,
 			isDraggable,
+			selectedBlockClientId,
 		} = this.props;
 
 		return (
-			<AsyncModeProvider value={ true }>
-				<div className="editor-block-list__layout">
-					{ map( blockClientIds, ( clientId, blockIndex ) => (
+			<div className="editor-block-list__layout">
+				{ map( blockClientIds, ( clientId, blockIndex ) => (
+					<AsyncModeProvider key={ 'block-' + clientId } value={ selectedBlockClientId !== clientId }>
 						<BlockListBlock
-							key={ 'block-' + clientId }
-							index={ blockIndex }
 							clientId={ clientId }
+							index={ blockIndex }
 							blockRef={ this.setBlockRef }
 							onSelectionStart={ this.onSelectionStart }
 							rootClientId={ rootClientId }
@@ -199,10 +200,10 @@ class BlockList extends Component {
 							isLast={ blockIndex === blockClientIds.length - 1 }
 							isDraggable={ isDraggable }
 						/>
-					) ) }
-					<BlockListAppender rootClientId={ rootClientId } />
-				</div>
-			</AsyncModeProvider>
+					</AsyncModeProvider>
+				) ) }
+				<BlockListAppender rootClientId={ rootClientId } />
+			</div>
 		);
 	}
 }
@@ -215,6 +216,7 @@ export default compose( [
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
 			getMultiSelectedBlocksEndClientId,
+			getSelectedBlockClientId,
 		} = select( 'core/editor' );
 		const { rootClientId } = ownProps;
 
@@ -224,6 +226,7 @@ export default compose( [
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
+			selectedBlockClientId: getSelectedBlockClientId(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
