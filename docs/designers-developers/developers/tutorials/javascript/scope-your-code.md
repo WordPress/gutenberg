@@ -19,7 +19,7 @@ console.log( 'Plugin ', yourPluginName, ' authored by ', yourName );
 
 When loaded on the same page, the value of `yourPluginName` changes because it is overwritten by the second file. By scoping your code, you can avoid the problem of values unexpectedly changing.
 
-**First step: scope the code within a function**
+## Scoping code within a function
 
 In order to fix this, you need to scope your code. In JavaScript, you do this by writing it within a function, because they create a _local scope_. And, to prevent polluting the global scope with your function's name, you should write your code within an _anonymous_ function.
 
