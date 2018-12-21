@@ -73,7 +73,7 @@ And this is `two.js`:
 } )( )
 ```
 
-It's important not to forget that these are just regular functions, so they can take parameters:
+You may also have noticed the parentheses at the end of the code sample as well. This allows you to take a variable from the global scope and pass it into your function. For example, below we pass the `window.wp` variable into our function as the `wordpress` function parameter:
 
 ```js
 ( function( wordpress ) {
