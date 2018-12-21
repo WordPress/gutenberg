@@ -184,9 +184,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function ( content ) {
+            transform: function ( attributes ) {
                 return createBlock( 'core/heading', {
-                    content,
+                    content: attributes.content,
                 } );
             },
         },
