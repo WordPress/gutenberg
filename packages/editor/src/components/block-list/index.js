@@ -14,7 +14,7 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch, AsyncModeProvider } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -185,22 +185,24 @@ class BlockList extends Component {
 		} = this.props;
 
 		return (
-			<div className="editor-block-list__layout">
-				{ map( blockClientIds, ( clientId, blockIndex ) => (
-					<BlockListBlock
-						key={ 'block-' + clientId }
-						index={ blockIndex }
-						clientId={ clientId }
-						blockRef={ this.setBlockRef }
-						onSelectionStart={ this.onSelectionStart }
-						rootClientId={ rootClientId }
-						isFirst={ blockIndex === 0 }
-						isLast={ blockIndex === blockClientIds.length - 1 }
-						isDraggable={ isDraggable }
-					/>
-				) ) }
-				<BlockListAppender rootClientId={ rootClientId } />
-			</div>
+			<AsyncModeProvider value={ true }>
+				<div className="editor-block-list__layout">
+					{ map( blockClientIds, ( clientId, blockIndex ) => (
+						<BlockListBlock
+							key={ 'block-' + clientId }
+							index={ blockIndex }
+							clientId={ clientId }
+							blockRef={ this.setBlockRef }
+							onSelectionStart={ this.onSelectionStart }
+							rootClientId={ rootClientId }
+							isFirst={ blockIndex === 0 }
+							isLast={ blockIndex === blockClientIds.length - 1 }
+							isDraggable={ isDraggable }
+						/>
+					) ) }
+					<BlockListAppender rootClientId={ rootClientId } />
+				</div>
+			</AsyncModeProvider>
 		);
 	}
 }

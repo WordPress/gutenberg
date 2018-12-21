@@ -9,6 +9,33 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  * Internal dependencies
  */
 import { RegistryConsumer } from '../registry-provider';
+import { AsyncModeConsumer } from '../async-mode-provider';
+
+const waitingList = [];
+const componentsMap = new WeakMap();
+let isRunning = false;
+const runWaitingList = () => {
+	if ( waitingList.length === 0 ) {
+		isRunning = false;
+		return;
+	}
+	const next = waitingList.shift();
+	next();
+	window.requestAnimationFrame( runWaitingList );
+};
+
+const addToWaitingList = ( component, item ) => {
+	if ( componentsMap.has( component ) ) {
+		waitingList[ componentsMap.get( component ) ] = item;
+	} else {
+		componentsMap.set( component, waitingList.length );
+		waitingList.push( item );
+	}
+	if ( ! isRunning ) {
+		isRunning = true;
+		window.requestAnimationFrame( runWaitingList );
+	}
+};
 
 /**
  * Higher-order component used to inject state-derived props using registered
@@ -137,7 +164,13 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		}
 
 		subscribe( registry ) {
-			this.unsubscribe = registry.subscribe( this.onStoreChange );
+			this.unsubscribe = registry.subscribe( () => {
+				if ( this.props.isAsync ) {
+					addToWaitingList( this, this.onStoreChange );
+				} else {
+					this.onStoreChange();
+				}
+			} );
 		}
 
 		render() {
@@ -146,14 +179,19 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 	}
 
 	return ( ownProps ) => (
-		<RegistryConsumer>
-			{ ( registry ) => (
-				<ComponentWithSelect
-					ownProps={ ownProps }
-					registry={ registry }
-				/>
+		<AsyncModeConsumer>
+			{ ( isAsync ) => (
+				<RegistryConsumer>
+					{ ( registry ) => (
+						<ComponentWithSelect
+							ownProps={ ownProps }
+							registry={ registry }
+							isAsync={ isAsync }
+						/>
+					) }
+				</RegistryConsumer>
 			) }
-		</RegistryConsumer>
+		</AsyncModeConsumer>
 	);
 }, 'withSelect' );
 
