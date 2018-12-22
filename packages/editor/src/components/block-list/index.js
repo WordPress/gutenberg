@@ -194,7 +194,7 @@ class BlockList extends Component {
 						key={ 'block-' + clientId }
 						value={
 							selectedBlockClientId !== clientId &&
-							( selectedBlockClientId || ! multiSelectedBlockClientIds.includes( clientId ) )
+							( !! selectedBlockClientId || multiSelectedBlockClientIds.indexOf( clientId ) === -1 )
 						}
 					>
 						<BlockListBlock
