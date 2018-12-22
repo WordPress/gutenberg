@@ -165,6 +165,7 @@ class Sandbox extends Component {
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
+					{ this.props.css && <style dangerouslySetInnerHTML={ { __html: this.props.css } } /> }
 				</head>
 				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
