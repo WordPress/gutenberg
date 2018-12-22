@@ -1,12 +1,18 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Disabled, SandBox, SVG, Path } from '@wordpress/components';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { BlockControls, PlainText } from '@wordpress/editor';
+import { BlockControls, PlainText, urlRewrite, traverse } from '@wordpress/editor';
 import { compose, withState } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 export const name = 'core/html';
 
@@ -57,8 +63,20 @@ export const settings = {
 	},
 
 	edit: compose( [
+		withSelect( ( select ) => {
+			const { getEditorSettings } = select( 'core/editor' );
+			const styles = map( getEditorSettings().styles, ( { css, baseURL } ) => {
+				if ( ! baseURL ) {
+					return css;
+				}
+				return traverse( css, urlRewrite( baseURL ) );
+			} );
+			return {
+				css: styles.join( '\n' ),
+			};
+		} ),
 		withState( { isPreview: false } ),
-	] )( ( { attributes, setAttributes, setState, isPreview } ) => (
+	] )( ( { attributes, setAttributes, setState, isPreview, css } ) => (
 		<div className="wp-block-html">
 			<BlockControls>
 				<div className="components-toolbar">
@@ -79,7 +97,7 @@ export const settings = {
 			<Disabled.Consumer>
 				{ ( isDisabled ) => (
 					( isPreview || isDisabled ) ? (
-						<SandBox html={ attributes.content } />
+						<SandBox html={ attributes.content } css={ css } />
 					) : (
 						<PlainText
 							value={ attributes.content }
