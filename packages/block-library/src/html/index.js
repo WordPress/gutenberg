@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { Disabled, SandBox, SVG, Path } from '@wordpress/components';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { BlockControls, PlainText } from '@wordpress/editor';
-import { withState } from '@wordpress/compose';
+import { compose, withState } from '@wordpress/compose';
 
 export const name = 'core/html';
 
@@ -56,9 +56,9 @@ export const settings = {
 		],
 	},
 
-	edit: withState( {
-		isPreview: false,
-	} )( ( { attributes, setAttributes, setState, isPreview } ) => (
+	edit: compose( [
+		withState( { isPreview: false } ),
+	] )( ( { attributes, setAttributes, setState, isPreview } ) => (
 		<div className="wp-block-html">
 			<BlockControls>
 				<div className="components-toolbar">
