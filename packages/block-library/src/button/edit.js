@@ -183,7 +183,7 @@ class ButtonEdit extends Component {
 							) }
 						>
 							<form
-								className="block-library-button__inline-link"
+								className="editor-format-toolbar__link-container-content"
 								onSubmit={ ( event ) => event.preventDefault() }
 							>
 								<URLInput
