@@ -25,21 +25,16 @@ export function getActiveFormat( { formats, formatPlaceholder, start, end }, for
 		return find( formats[ start ], { type: formatType } );
 	}
 
-	// otherwise get the previous character format (or the next one at the beginning of the text)
-	const previousLetterFormat = find( formats[ start > 0 ? start - 1 : start ], { type: formatType } );
+	// if user picked (or unpicked) formats but didn't write anything in those formats yet return this format
+	if ( formatPlaceholder && formatPlaceholder.index === start ) {
+		return find( formatPlaceholder.formats, { type: formatType } );
+	}
+
+	// otherwise get the previous character format
+	const previousLetterFormat = find( formats[ start - 1 ], { type: formatType } );
 
 	if ( previousLetterFormat ) {
 		return previousLetterFormat;
-	}
-
-	// if user picked a format but didn't write anything in this format yet return this format
-	if (
-		formatPlaceholder &&
-		formatPlaceholder.format &&
-		formatPlaceholder.index === start &&
-		formatPlaceholder.format.type === formatType
-	) {
-		return formatPlaceholder.format;
 	}
 
 	return undefined;

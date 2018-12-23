@@ -125,9 +125,9 @@ export class RichText extends Component {
 		onSplit( before, after );
 	}
 
-	valueToFormat( { formats, formatPlaceholder, text } ) {
+	valueToFormat( { formats, text } ) {
 		const value = toHTMLString( {
-			value: { formats, formatPlaceholder, text },
+			value: { formats, text },
 			multilineTag: this.multilineTag,
 		} );
 		// remove the outer root tags
@@ -226,10 +226,17 @@ export class RichText extends Component {
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
 		const realEnd = Math.max( start, end );
+		const jump = this.state.start + 1 !== realStart;
+		// update format placeholder to continue writing in the current format
+		// or set it to null if user jumped to another part in the text
+		const formatPlaceholder = ! jump && this.state.formatPlaceholder ? {
+			...this.state.formatPlaceholder,
+			index: realStart,
+		} : null;
 		this.setState( {
 			start: realStart,
 			end: realEnd,
-			formatPlaceholder: null,
+			formatPlaceholder,
 			lastValue: text,
 		} );
 	}
