@@ -1,7 +1,14 @@
-
+/**
+ * External dependencies
+ */
+import memize from 'memize';
 import React from 'react';
 import { Switch, Text, TextInput, View } from 'react-native';
 import Modal from 'react-native-modal';
+
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { URLInput } from '@wordpress/editor';
@@ -18,8 +25,16 @@ import {
 	slice,
 } from '@wordpress/rich-text';
 
+/**
+ * Internal dependencies
+ */
 import { createLinkFormat, isValidHref } from './utils';
 import Button from './button';
+import defaultFormats from '../default-formats';
+
+const isDefaultFormat = memize( ( formatType ) => {
+	return Boolean( defaultFormats.find( ( defaultFormat ) => defaultFormat.name === formatType ) );
+} );
 
 import styles from './modal.scss';
 
@@ -61,7 +76,8 @@ class ModalLinkUI extends Component {
 			opensInNewWindow,
 			text,
 		} );
-		const placeholderFormats = ( value.formatPlaceholder && value.formatPlaceholder.formats ) || [];
+		let placeholderFormats = ( value.formatPlaceholder && value.formatPlaceholder.formats ) || [];
+		placeholderFormats = placeholderFormats.filter( ( placeholderFormat ) => isDefaultFormat( placeholderFormat.type ) );
 
 		if ( isCollapsed( value ) && ! isActive ) {
 			const toInsert = applyFormat( create( { text } ), [ ...placeholderFormats, format ], 0, text.length );
