@@ -1,6 +1,6 @@
 # Editor Filters (Experimental)
 
-To modify the behavior of the editor experience, Gutenberg exposes the following Filters:
+To modify the behavior of the editor experience, the following Filters are exposed:
 
 ### `editor.PostFeaturedImage.imageSize`
 
