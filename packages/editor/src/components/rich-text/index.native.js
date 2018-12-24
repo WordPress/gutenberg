@@ -226,10 +226,12 @@ export class RichText extends Component {
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
 		const realEnd = Math.max( start, end );
-		const jump = this.state.start + 1 !== realStart;
+		const noChange = this.state.start === start && this.state.end === end;
+		const isTyping = this.state.start + 1 === realStart;
+		const shouldKeepFormats = noChange || isTyping;
 		// update format placeholder to continue writing in the current format
 		// or set it to null if user jumped to another part in the text
-		const formatPlaceholder = ! jump && this.state.formatPlaceholder ? {
+		const formatPlaceholder = shouldKeepFormats && this.state.formatPlaceholder ? {
 			...this.state.formatPlaceholder,
 			index: realStart,
 		} : null;
