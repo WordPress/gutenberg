@@ -61,15 +61,16 @@ class ModalLinkUI extends Component {
 			opensInNewWindow,
 			text,
 		} );
+		const placeholderFormats = ( value.formatPlaceholder && value.formatPlaceholder.formats ) || [];
 
 		if ( isCollapsed( value ) && ! isActive ) {
-			const toInsert = applyFormat( create( { text } ), format, 0, text.length );
+			const toInsert = applyFormat( create( { text } ), [ ...placeholderFormats, format ], 0, text.length );
 			onChange( insert( value, toInsert ) );
 		} else if ( text !== getTextContent( slice( value ) ) ) {
-			const toInsert = applyFormat( create( { text } ), format, 0, text.length );
+			const toInsert = applyFormat( create( { text } ), [ ...placeholderFormats, format ], 0, text.length );
 			onChange( insert( value, toInsert, value.start, value.end ) );
 		} else {
-			onChange( applyFormat( value, format ) );
+			onChange( applyFormat( value, [ ...placeholderFormats, format ] ) );
 		}
 
 		if ( ! isValidHref( url ) ) {

@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { find, without } from 'lodash';
+import { differenceBy } from 'lodash';
 
 /**
  * Internal dependencies
@@ -16,54 +16,59 @@ import { normaliseFormats } from './normalise-formats';
  * provided.
  *
  * @param {Object} value      Value to modify.
- * @param {Object} format     Format to apply.
+ * @param {Object} formats    Formats to apply.
  * @param {number} startIndex Start index.
  * @param {number} endIndex   End index.
  *
  * @return {Object} A new value with the format applied.
  */
 export function applyFormat(
-	{ formats, formatPlaceholder, text, start, end },
-	format,
+	{ formats: currentFormats, formatPlaceholder, text, start, end },
+	formats,
 	startIndex = start,
 	endIndex = end
 ) {
+	if ( ! Array.isArray( formats ) ) {
+		formats = [ formats ];
+	}
+
 	// The selection is collpased, insert a placeholder with the format so new input appears
 	// with the format applied.
 	if ( startIndex === endIndex ) {
-		const previousFormats = formats[ startIndex - 1 ] || [];
+		const previousFormats = currentFormats[ startIndex - 1 ] || [];
 		const placeholderFormats = formatPlaceholder && formatPlaceholder.index === start && formatPlaceholder.formats;
 		// Follow the same logic as in getActiveFormat: placeholderFormats has priority over previousFormats
 		const activeFormats = ( placeholderFormats ? placeholderFormats : previousFormats ) || [];
-		const hasType = find( activeFormats, { type: format.type } );
-		const newFormats = hasType ? without( activeFormats, hasType ) : [ ...activeFormats, format ];
 		return {
-			formats,
+			formats: currentFormats,
 			text,
 			start,
 			end,
 			formatPlaceholder: {
 				index: start,
-				formats: newFormats,
+				formats: mergeFormats( activeFormats, formats ),
 			},
 		};
 	}
 
-	const newFormats = formats.slice( 0 );
+	const newFormats = currentFormats.slice( 0 );
 
 	for ( let index = startIndex; index < endIndex; index++ ) {
-		applyFormats( newFormats, index, format );
+		applyFormats( newFormats, index, formats );
 	}
 
 	return normaliseFormats( { formats: newFormats, text, start, end } );
 }
 
-function applyFormats( formats, index, format ) {
+function mergeFormats( formats1, formats2 ) {
+	const formats1Without2 = differenceBy( formats1, formats2, 'type' );
+	return formats1Without2.concat( formats2 );
+}
+
+function applyFormats( formats, index, newFormats ) {
 	if ( formats[ index ] ) {
-		const newFormatsAtIndex = formats[ index ].filter( ( { type } ) => type !== format.type );
-		newFormatsAtIndex.push( format );
-		formats[ index ] = newFormatsAtIndex;
+		formats[ index ] = mergeFormats( formats[ index ], newFormats );
 	} else {
-		formats[ index ] = [ format ];
+		formats[ index ] = newFormats;
 	}
 }
