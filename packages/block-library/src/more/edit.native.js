@@ -23,6 +23,7 @@ export default class MoreEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChangeInput = this.onChangeInput.bind( this );
+		this.onEnter = this.onEnter.bind( this );
 
 		this.state = {
 			defaultText: __( 'Read more' ),
@@ -30,21 +31,17 @@ export default class MoreEdit extends Component {
 	}
 
 	onChangeInput( newValue ) {
-		// Detect Enter.key and add new empty block after.
-		// Note: This is detected after the fact, and the newline could be visible on the block
-		// for a very small time. This is OK for the alpha, we will revisit the logic later.
-		// See https://github.com/wordpress-mobile/gutenberg-mobile/issues/324
-		if ( newValue.indexOf( '\n' ) !== -1 ) {
-			const { insertBlocksAfter } = this.props;
-			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
-			return;
-		}
 		// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
 		this.setState( {
 			defaultText: '',
 		} );
 		const value = newValue.length === 0 ? undefined : newValue;
 		this.props.setAttributes( { customText: value } );
+	}
+
+	onEnter( ) {
+		const { insertBlocksAfter } = this.props;
+		insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
 	}
 
 	renderLine() {
@@ -62,7 +59,8 @@ export default class MoreEdit extends Component {
 				<PlainText
 					style={ styles[ 'block-library-more__text' ] }
 					value={ value }
-					multiline={ true }
+					multiline={ false }
+					onSubmitEditing={ this.onEnter }
 					underlineColorAndroid="transparent"
 					onChange={ this.onChangeInput }
 					placeholder={ defaultText }
