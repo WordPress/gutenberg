@@ -3,7 +3,7 @@
  * @flow
  */
 
- /**
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -315,7 +315,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		const insertHere = (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ styles.lineStyleAddHere }></View>
-				<Text style={ styles.labelStyleAddHere } > {titleForAddPlaceIndicator } </Text>
+				<Text style={ styles.labelStyleAddHere } > { titleForAddPlaceIndicator } </Text>
 				<View style={ styles.lineStyleAddHere }></View>
 			</View>
 		);
