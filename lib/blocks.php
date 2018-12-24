@@ -129,38 +129,40 @@ if ( ! function_exists( 'get_dynamic_blocks_regex' ) ) {
 	}
 }
 
-/**
- * Renders a single block into a HTML string.
- *
- * @since 1.9.0
- * @since 4.4.0 renders full nested tree of blocks before reassembling into HTML string
- * @global WP_Post $post The post to edit.
- *
- * @param  array $block A single parsed block object.
- * @return string String of rendered HTML.
- */
-function gutenberg_render_block( $block ) {
-	global $post;
+if ( ! function_exists( 'gutenberg_render_block' ) ) {
+	/**
+	 * Renders a single block into a HTML string.
+	 *
+	 * @since 1.9.0
+	 * @since 4.4.0 renders full nested tree of blocks before reassembling into HTML string
+	 * @global WP_Post $post The post to edit.
+	 *
+	 * @param  array $block A single parsed block object.
+	 * @return string String of rendered HTML.
+	 */
+	function gutenberg_render_block( $block ) {
+		global $post;
 
-	$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
-	$inner_content = '';
-	$index         = 0;
+		$block_type    = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+		$is_dynamic    = $block['blockName'] && null !== $block_type && $block_type->is_dynamic();
+		$inner_content = '';
+		$index         = 0;
 
-	foreach ( $block['innerContent'] as $chunk ) {
-		$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
+		foreach ( $block['innerContent'] as $chunk ) {
+			$inner_content .= is_string( $chunk ) ? $chunk : gutenberg_render_block( $block['innerBlocks'][ $index++ ] );
+		}
+
+		if ( $is_dynamic ) {
+			$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
+			$global_post = $post;
+			$output      = $block_type->render( $attributes, $inner_content );
+			$post        = $global_post;
+
+			return $output;
+		}
+
+		return $inner_content;
 	}
-
-	if ( $is_dynamic ) {
-		$attributes  = is_array( $block['attrs'] ) ? (array) $block['attrs'] : array();
-		$global_post = $post;
-		$output      = $block_type->render( $attributes, $inner_content );
-		$post        = $global_post;
-
-		return $output;
-	}
-
-	return $inner_content;
 }
 
 if ( ! function_exists( 'do_blocks' ) ) {
