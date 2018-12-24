@@ -53,6 +53,9 @@ export class BlockSwitcher extends Component {
 			'desc'
 		);
 
+		const sourceBlockName = blocks[ 0 ].name;
+		const blockType = getBlockType( sourceBlockName );
+
 		if ( ! hasBlockStyles && ! possibleBlockTransformations.length ) {
 			if ( blocks.length > 1 ) {
 				return null;
@@ -69,9 +72,6 @@ export class BlockSwitcher extends Component {
 				</Toolbar>
 			);
 		}
-
-		const sourceBlockName = blocks[ 0 ].name;
-		const blockType = getBlockType( sourceBlockName );
 
 		return (
 			<Dropdown
