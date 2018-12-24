@@ -137,6 +137,7 @@ export function* canUser( action, resource, id ) {
 			// Ideally this would always be an OPTIONS request, but unfortunately there's
 			// a bug in the REST API which causes the Allow header to not be sent on
 			// OPTIONS requests to /posts/:id routes.
+			// https://core.trac.wordpress.org/ticket/45753
 			method: id ? 'GET' : 'OPTIONS',
 			parse: false,
 		} );
