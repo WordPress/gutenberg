@@ -1,33 +1,37 @@
 /**
  * External dependencies
  */
-import { flow, map } from 'lodash';
+import { map } from 'lodash';
+import memize from 'memize';
 
 /**
  * WordPress dependencies
  */
-import { createElement, Component } from '@wordpress/element';
-import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { Component } from '@wordpress/element';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { BlockEditorProvider } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import transformStyles from '../../editor-styles';
-
 class EditorProvider extends Component {
 	constructor( props ) {
 		super( ...arguments );
+
+		this.getBlockEditorSettings = memize( this.getBlockEditorSettings, {
+			maxSize: 1,
+		} );
 
 		// Assume that we don't need to initialize in the case of an error recovery.
 		if ( props.recovery ) {
 			return;
 		}
 
-		props.updateEditorSettings( props.settings );
 		props.updatePostLock( props.settings.postLock );
-		props.setupEditor( props.post, props.initialEdits );
+		props.setupEditor( props.post, props.initialEdits, props.settings.template );
 
 		if ( props.settings.autosave ) {
 			props.createWarningNotice(
@@ -43,6 +47,17 @@ class EditorProvider extends Component {
 				}
 			);
 		}
+	}
+
+	getBlockEditorSettings( settings, meta, onMetaChange, reusableBlocks ) {
+		return {
+			...settings,
+			__experimentalMetaSource: {
+				value: meta,
+				onChange: onMetaChange,
+			},
+			__experimentalReusableBlocks: reusableBlocks,
+		};
 	}
 
 	componentDidMount() {
@@ -61,55 +76,70 @@ class EditorProvider extends Component {
 		} );
 	}
 
-	componentDidUpdate( prevProps ) {
-		if ( this.props.settings !== prevProps.settings ) {
-			this.props.updateEditorSettings( this.props.settings );
-		}
-	}
-
 	render() {
 		const {
 			children,
+			blocks,
+			resetEditorBlocks,
+			isReady,
+			settings,
+			meta,
+			onMetaChange,
+			reusableBlocks,
 		} = this.props;
 
-		const providers = [
-			// Slot / Fill provider:
-			//
-			//  - context.getSlot
-			//  - context.registerSlot
-			//  - context.unregisterSlot
-			[
-				SlotFillProvider,
-			],
+		if ( ! isReady ) {
+			return null;
+		}
 
-			// DropZone provider:
-			[
-				DropZoneProvider,
-			],
-		];
-
-		const createEditorElement = flow(
-			providers.map( ( [ Provider, props ] ) => (
-				( arg ) => createElement( Provider, props, arg )
-			) )
+		const editorSettings = this.getBlockEditorSettings(
+			settings, meta, onMetaChange, reusableBlocks
 		);
 
-		return createEditorElement( children );
+		return (
+			<BlockEditorProvider
+				value={ blocks }
+				onChange={ resetEditorBlocks }
+				settings={ editorSettings }
+			>
+				{ children }
+			</BlockEditorProvider>
+		);
 	}
 }
 
-export default withDispatch( ( dispatch ) => {
-	const {
-		setupEditor,
-		updateEditorSettings,
-		updatePostLock,
-	} = dispatch( 'core/editor' );
-	const { createWarningNotice } = dispatch( 'core/notices' );
+export default compose( [
+	withSelect( ( select ) => {
+		const {
+			__unstableIsEditorReady: isEditorReady,
+			getEditorBlocks,
+			getEditedPostAttribute,
+			__experimentalGetReusableBlocks,
+		} = select( 'core/editor' );
+		return {
+			isReady: isEditorReady(),
+			blocks: getEditorBlocks(),
+			meta: getEditedPostAttribute( 'meta' ),
+			reusableBlocks: __experimentalGetReusableBlocks(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const {
+			setupEditor,
+			updatePostLock,
+			resetEditorBlocks,
+			editPost,
+		} = dispatch( 'core/editor' );
+		const { createWarningNotice } = dispatch( 'core/notices' );
 
-	return {
-		setupEditor,
-		updateEditorSettings,
-		updatePostLock,
-		createWarningNotice,
-	};
-} )( EditorProvider );
+		return {
+			setupEditor,
+			updatePostLock,
+			createWarningNotice,
+			resetEditorBlocks,
+			onMetaChange( meta ) {
+				editPost( { meta } );
+			},
+		};
+	} ),
+] )( EditorProvider );

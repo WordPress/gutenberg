@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/block-editor",
+	"version": "1.0.0-alpha.0",
+	"description": "Generic Block Editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"editor",
+		"blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"lodash": "^4.17.10",
+		"refx": "^3.0.0",
+		"rememo": "^3.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

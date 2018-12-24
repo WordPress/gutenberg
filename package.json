@@ -19,6 +19,7 @@
 		"@wordpress/api-fetch": "file:packages/api-fetch",
 		"@wordpress/autop": "file:packages/autop",
 		"@wordpress/blob": "file:packages/blob",
+		"@wordpress/block-editor": "file:packages/block-editor",
 		"@wordpress/block-library": "file:packages/block-library",
 		"@wordpress/block-serialization-default-parser": "file:packages/block-serialization-default-parser",
 		"@wordpress/block-serialization-spec-parser": "file:packages/block-serialization-spec-parser",
