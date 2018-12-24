@@ -454,18 +454,18 @@ export function isEditedPostSaveable( state ) {
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
-	const blocks = getBlocksForSerialization( state );
+	const rootBlocks = getBlockOrder( state );
 
 	// While the condition of truthy content string is sufficient to determine
 	// emptiness, testing saveable blocks length is a trivial operation. Since
 	// this function can be called frequently, optimize for the fast case as a
 	// condition of the mere existence of blocks. Note that the value of edited
 	// content is used in place of blocks, thus allowed to fall through.
-	if ( blocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
+	if ( rootBlocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
 		// joined with with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
-		if ( blocks.length > 1 ) {
+		if ( rootBlocks.length > 1 ) {
 			return false;
 		}
 
@@ -474,7 +474,7 @@ export function isEditedPostEmpty( state ) {
 		// to save. In the case of a single freeform block, fall through to the
 		// full serialize. Otherwise, the single block is assumed non-empty by
 		// virtue of its comment delimiters.
-		if ( blocks[ 0 ].name !== getFreeformContentHandlerName() ) {
+		if ( getBlockName( state, rootBlocks[ 0 ] ) !== getFreeformContentHandlerName() ) {
 			return false;
 		}
 	}
