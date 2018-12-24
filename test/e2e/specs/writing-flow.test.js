@@ -23,14 +23,14 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/columns' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'First column paragraph' );
+		await page.keyboard.type( 'First col' );
 
 		// Arrow down should navigate through layouts in columns block (to
 		// its default appender). Two key presses are required since the first
 		// will land user on the Column wrapper block.
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.type( 'Second column paragraph' );
+		await page.keyboard.type( 'Second col' );
 
 		// Arrow down from last of layouts exits nested context to default
 		// appender of root level.
@@ -40,21 +40,18 @@ describe( 'adding blocks', () => {
 		// Arrow up into nested context focuses last text input
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
-		expect( activeElementText ).toBe( 'Second column paragraph' );
+		expect( activeElementText ).toBe( 'Second col' );
 
 		// Arrow up in inner blocks should navigate through (1) column wrapper,
 		// (2) text fields.
-		// We need to arrow up key presses in the paragraph block because it shows up in two lines.
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementText = await page.evaluate( () => document.activeElement.textContent );
-		expect( activeElementText ).toBe( 'First column paragraph' );
+		expect( activeElementText ).toBe( 'First col' );
 
 		// Arrow up from first text field in nested context focuses column and
 		// columns wrappers before escaping out.
 		let activeElementBlockType;
-		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		activeElementBlockType = await page.evaluate( () => (
 			document.activeElement.getAttribute( 'data-type' )
