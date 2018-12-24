@@ -61,8 +61,8 @@ export function applyFormat(
 }
 
 function mergeFormats( formats1, formats2 ) {
-	const formats1Without2 = differenceBy( formats1, formats2, 'type' );
-	return formats1Without2.concat( formats2 );
+	const formats2Without1 = differenceBy( formats2, formats1, 'type' );
+	return formats1.concat( formats2Without1 );
 }
 
 function applyFormats( formats, index, newFormats ) {
