@@ -9,67 +9,82 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
  */
 import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-export default function ImageEdit( props ) {
-	const { attributes, isSelected, setAttributes } = props;
-	const { url, caption } = attributes;
+class ImageEdit extends Component {
 
-	const onUploadPress = () => {
+	constructor() {
+		super( ...arguments );
+		this.onMediaLibraryPress = this.onMediaLibraryPress.bind( this );
+		this.onUploadPress = this.onUploadPress.bind( this );
+		this.toolbarEditButton = this.toolbarEditButton.bind( this );
+	}
+
+	onUploadPress() {
 		// This method should present an image picker from
 		// the device.
 		//TODO: Implement upload image method.
 	};
 
-	const onMediaLibraryPress = () => {
+	onMediaLibraryPress() {
 		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
 			if ( mediaUrl ) {
-				setAttributes( { url: mediaUrl } );
+				this.props.setAttributes( { url: mediaUrl } );
 			}
 		} );
 	};
 
-	if ( ! url ) {
+	toolbarEditButton() {
 		return (
-			<MediaPlaceholder
-				onUploadPress={ onUploadPress }
-				onMediaLibraryPress={ onMediaLibraryPress }
-			/>
+			<Toolbar>
+				<ToolbarButton
+					className="components-toolbar__control"
+					label={ __( 'Edit image' ) }
+					icon="edit"
+					onClick={ this.onMediaLibraryPress }
+				/>
+			</Toolbar>
 		);
 	}
 
-	const toolbarEditButton = (
-		<Toolbar>
-			<ToolbarButton
-				className="components-toolbar__control"
-				label={ __( 'Edit image' ) }
-				icon="edit"
-				onClick={ onMediaLibraryPress }
-			/>
-		</Toolbar>
-	);
+	render() {
+		const { attributes, isSelected, setAttributes } = this.props;
+		const { url, caption } = attributes;
 
-	return (
-		<View style={ { flex: 1 } }>
-			<BlockControls>
-				{ toolbarEditButton }
-			</BlockControls>
-			<Image
-				style={ { width: '100%', height: 200 } }
-				resizeMethod="scale"
-				source={ { uri: url } }
-			/>
-			{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-				<View style={ { padding: 12, flex: 1 } }>
-					<TextInput
-						style={ { textAlign: 'center' } }
-						underlineColorAndroid="transparent"
-						value={ caption }
-						placeholder={ 'Write caption…' }
-						onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-					/>
-				</View>
-			) }
-		</View>
-	);
+		if ( ! url ) {
+			return (
+				<MediaPlaceholder
+					onUploadPress={ this.onUploadPress }
+					onMediaLibraryPress={ this.onMediaLibraryPress }
+				/>
+			);
+		}
+
+		return (
+			<View style={ { flex: 1 } }>
+				<BlockControls>
+					{ this.toolbarEditButton }
+				</BlockControls>
+				<Image
+					style={ { width: '100%', height: 200 } }
+					resizeMethod="scale"
+					source={ { uri: url } }
+				/>
+				{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
+					<View style={ { padding: 12, flex: 1 } }>
+						<TextInput
+							style={ { textAlign: 'center' } }
+							underlineColorAndroid="transparent"
+							value={ caption }
+							placeholder={ 'Write caption…' }
+							onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+						/>
+					</View>
+				) }
+			</View>
+		);
+	}
 }
+
+export default ImageEdit;
