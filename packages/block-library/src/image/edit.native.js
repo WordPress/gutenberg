@@ -11,6 +11,7 @@ import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import ImageSize from './image-size';
 
 class ImageEdit extends Component {
 
@@ -50,7 +51,7 @@ class ImageEdit extends Component {
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption } = attributes;
+		const { url, caption, height, width } = attributes;
 
 		if ( ! url ) {
 			return (
@@ -64,13 +65,38 @@ class ImageEdit extends Component {
 		return (
 			<View style={ { flex: 1 } }>
 				<BlockControls>
-					{ this.toolbarEditButton }
+					{ this.toolbarEditButton() }
 				</BlockControls>
-				<Image
-					style={ { width: '100%', height: 200 } }
-					resizeMethod="scale"
-					source={ { uri: url } }
-				/>
+				<ImageSize src={ url } >
+					{ ( sizes ) => {
+						const {
+							imageWidthWithinContainer,
+							imageHeightWithinContainer,
+							imageWidth,
+							imageHeight,
+						} = sizes;
+
+						let finalHeight = imageHeightWithinContainer;
+						if ( height > 0 && height < imageHeightWithinContainer ) {
+							finalHeight = height;
+						}
+
+						let finalWidth = imageWidthWithinContainer;
+						if ( width > 0 && width < imageWidthWithinContainer ) {
+							finalWidth = width;
+						}
+
+						return (
+							<View style={ { flex: 1 } } >
+								<Image
+									style={ { width: finalWidth, height: finalHeight } }
+									resizeMethod="scale"
+									source={ { uri: url } }
+								/>
+							</View>
+						)
+					}}
+				</ImageSize>
 				{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 					<View style={ { padding: 12, flex: 1 } }>
 						<TextInput
