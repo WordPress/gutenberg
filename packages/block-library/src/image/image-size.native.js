@@ -8,6 +8,11 @@ import { Component } from '@wordpress/element';
 */
 import { View, Image } from 'react-native';
 
+/**
+ * Internal dependencies
+ */
+import { calculatePreferedImageSize } from './utils'
+
 class ImageSize extends Component {
 	constructor() {
 		super( ...arguments );
@@ -15,13 +20,8 @@ class ImageSize extends Component {
 			width: undefined,
 			height: undefined,
 		};
-		this.bindContainer = this.bindContainer.bind( this );
         this.calculateSize = this.calculateSize.bind( this );
         this.onLayout = this.onLayout.bind( this );
-	}
-
-	bindContainer( ref ) {
-		this.container = ref;
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -43,11 +43,8 @@ class ImageSize extends Component {
 	}
 
 	fetchImageSize() {
-		Image.getSize( this.props.src, ( imageRealWidth, imageRealHeight ) => {
-			const image = {};
-			image.width = imageRealWidth;
-			image.height = imageRealHeight;
-            this.image = image;
+		Image.getSize( this.props.src, ( width, height ) => {
+			this.image = { width, height };
             this.calculateSize();
 		} );
 	}
@@ -56,21 +53,16 @@ class ImageSize extends Component {
 		if ( this.image === undefined || this.container === undefined ) {
 			return;
 		}
-
-		const maxWidth = this.container.clientWidth;
-		const exceedMaxWidth = this.image.width > maxWidth;
-		const ratio = this.image.height / this.image.width;
-		const width = exceedMaxWidth ? maxWidth : this.image.width;
-		const height = exceedMaxWidth ? maxWidth * ratio : this.image.height;
+        const { width, height } = calculatePreferedImageSize(this.image, this.container);
 		this.setState( { width, height } );
 	}
 
 	onLayout( event ) {
 		const { width, height } = event.nativeEvent.layout;
-		const container = {};
-		container.clientWidth = width;
-		container.clientHeight = height;
-        this.container = container;
+		this.container = {
+            clientWidth: width,
+            clientHeight: height,
+        };
         this.calculateSize();
 	}
 
@@ -78,8 +70,8 @@ class ImageSize extends Component {
 		const sizes = {
 			imageWidth: this.image && this.image.width,
 			imageHeight: this.image && this.image.height,
-			containerWidth: this.container && this.container.clientWidth,
-			containerHeight: this.container && this.container.clientHeight,
+			containerWidth: this.container && this.container.width,
+			containerHeight: this.container && this.container.height,
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};

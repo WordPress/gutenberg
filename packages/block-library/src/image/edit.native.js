@@ -92,6 +92,7 @@ class ImageEdit extends Component {
 									style={ { width: finalWidth, height: finalHeight } }
 									resizeMethod="scale"
 									source={ { uri: url } }
+									key={ url }
 								/>
 							</View>
 						)
