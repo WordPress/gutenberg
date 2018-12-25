@@ -20,8 +20,8 @@ class ImageSize extends Component {
 			width: undefined,
 			height: undefined,
 		};
-        this.calculateSize = this.calculateSize.bind( this );
-        this.onLayout = this.onLayout.bind( this );
+		this.calculateSize = this.calculateSize.bind( this );
+		this.onLayout = this.onLayout.bind( this );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -45,7 +45,7 @@ class ImageSize extends Component {
 	fetchImageSize() {
 		Image.getSize( this.props.src, ( width, height ) => {
 			this.image = { width, height };
-            this.calculateSize();
+			this.calculateSize();
 		} );
 	}
 
@@ -53,17 +53,17 @@ class ImageSize extends Component {
 		if ( this.image === undefined || this.container === undefined ) {
 			return;
 		}
-        const { width, height } = calculatePreferedImageSize(this.image, this.container);
+		const { width, height } = calculatePreferedImageSize(this.image, this.container);
 		this.setState( { width, height } );
 	}
 
 	onLayout( event ) {
 		const { width, height } = event.nativeEvent.layout;
 		this.container = {
-            clientWidth: width,
-            clientHeight: height,
-        };
-        this.calculateSize();
+			clientWidth: width,
+			clientHeight: height,
+		};
+		this.calculateSize();
 	}
 
 	render() {
