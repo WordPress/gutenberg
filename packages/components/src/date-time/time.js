@@ -45,6 +45,7 @@ class TimePicker extends Component {
 		this.onChangeMinutes = this.onChangeMinutes.bind( this );
 		this.renderMonth = this.renderMonth.bind( this );
 		this.renderDay = this.renderDay.bind( this );
+		this.renderDayMonthFormat = this.renderDayMonthFormat.bind( this );
 	}
 
 	componentDidMount() {
@@ -193,7 +194,7 @@ class TimePicker extends Component {
 
 	renderMonth( month ) {
 		return (
-			<div className="components-datetime__time-field components-datetime__time-field-month">
+			<div key="render-month" className="components-datetime__time-field components-datetime__time-field-month">
 				<select
 					aria-label={ __( 'Month' ) }
 					className="components-datetime__time-field-month-select"
@@ -220,7 +221,7 @@ class TimePicker extends Component {
 
 	renderDay( day ) {
 		return (
-			<div className="components-datetime__time-field components-datetime__time-field-day">
+			<div key="render-day" className="components-datetime__time-field components-datetime__time-field-day">
 				<input
 					aria-label={ __( 'Day' ) }
 					className="components-datetime__time-field-day-input"
@@ -235,18 +236,21 @@ class TimePicker extends Component {
 		);
 	}
 
+	renderDayMonthFormat( is12Hour ) {
+		const { day, month } = this.state;
+		const layout = [ this.renderDay( day ), this.renderMonth( month ) ];
+		return is12Hour ? layout : layout.reverse();
+	}
+
 	render() {
 		const { is12Hour } = this.props;
-		const { day, month, year, minutes, hours, am } = this.state;
-		const renderMonthDay = [ this.renderMonth( month ), this.renderDay( day ) ];
-		const renderDayMonth = [ this.renderDay( day ), this.renderMonth( month ) ];
-
+		const { year, minutes, hours, am } = this.state;
 		return (
 			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
 					<legend className="components-datetime__time-legend invisible">{ __( 'Date' ) }</legend>
 					<div className="components-datetime__time-wrapper">
-						{ is12Hour ? renderMonthDay : renderDayMonth }
+						{ this.renderDayMonthFormat( is12Hour ) }
 						<div className="components-datetime__time-field components-datetime__time-field-year">
 							<input
 								aria-label={ __( 'Year' ) }
