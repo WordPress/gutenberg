@@ -152,9 +152,9 @@ add_theme_support( 'editor-font-sizes', array(
 		'slug' => 'large'
 	),
 	array(
-		'name' => __( 'huge', 'themeLangDomain' ),
+		'name' => __( 'larger', 'themeLangDomain' ),
 		'size' => 50,
-		'slug' => 'huge'
+		'slug' => 'larger'
 	)
 ) );
 ```
