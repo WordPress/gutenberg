@@ -254,15 +254,15 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					onChangeText={ this.onChangeTitle }>
 				</TextInput>
 				<View
-					style={{
+					style={ {
 						paddingLeft: 16,
 						paddingRight: 16,
-					}}>
+					} }>
 					<View
-						style={{
+						style={ {
 							borderBottomColor: 'black',
 							borderBottomWidth: 1,
-						}}
+						} }
 					/>
 				</View>
 			</View>
