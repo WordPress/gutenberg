@@ -63,7 +63,9 @@ export class RichText extends Component {
 	getRecord() {
 		const { formatPlaceholder, start, end, lastValue } = this.state;
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
-		// Removing the leading or the trailing white spaces using `trim()` should make sure this is the case
+		// Removing the leading or the trailing white spaces using `trim()` should make sure this is the case.
+		// Moreover onSelectionChange seems to be emitted on each cursor change and more frequently than onChange while typing,
+		// Thus we store the html returned by onSelectionChange in lastValue to make sure we use the up to date value
 		const { formats, text } = this.formatToValue( lastValue || this.props.value.trim() );
 
 		return { formats, formatPlaceholder, text, start, end };
@@ -239,7 +241,7 @@ export class RichText extends Component {
 			start: realStart,
 			end: realEnd,
 			formatPlaceholder,
-			lastValue: text,
+			lastValue: this.removeRootTagsProduceByAztec( text ),
 		} );
 	}
 

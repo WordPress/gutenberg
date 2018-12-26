@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import memize from 'memize';
 import React from 'react';
 import { Switch, Text, TextInput, View } from 'react-native';
 import Modal from 'react-native-modal';
@@ -30,11 +29,6 @@ import {
  */
 import { createLinkFormat, isValidHref } from './utils';
 import Button from './button';
-import defaultFormats from '../default-formats';
-
-const isDefaultFormat = memize( ( formatType ) => {
-	return Boolean( defaultFormats.find( ( defaultFormat ) => defaultFormat.name === formatType ) );
-} );
 
 import styles from './modal.scss';
 
@@ -71,21 +65,21 @@ class ModalLinkUI extends Component {
 		const { isActive, value, onChange, speak } = this.props;
 		const { inputValue, opensInNewWindow, text } = this.state;
 		const url = prependHTTP( inputValue );
+		const linkText = text || inputValue;
 		const format = createLinkFormat( {
 			url,
 			opensInNewWindow,
-			text,
+			text: linkText,
 		} );
-		let placeholderFormats = ( value.formatPlaceholder && value.formatPlaceholder.formats ) || [];
-		placeholderFormats = placeholderFormats.filter( ( placeholderFormat ) => isDefaultFormat( placeholderFormat.type ) );
+		const placeholderFormats = ( value.formatPlaceholder && value.formatPlaceholder.formats ) || [];
 
-		if ( isCollapsed( value ) && ! isActive ) {
-			const toInsert = applyFormat( create( { text } ), [ ...placeholderFormats, format ], 0, text.length );
+		if ( isCollapsed( value ) && ! isActive ) { // insert link
+			const toInsert = applyFormat( create( { text: linkText } ), [ ...placeholderFormats, format ], 0, text.length );
 			onChange( insert( value, toInsert ) );
-		} else if ( text !== getTextContent( slice( value ) ) ) {
+		} else if ( text !== getTextContent( slice( value ) ) ) { // edit text in selected link
 			const toInsert = applyFormat( create( { text } ), [ ...placeholderFormats, format ], 0, text.length );
 			onChange( insert( value, toInsert, value.start, value.end ) );
-		} else {
+		} else { // transform selected text into link
 			onChange( applyFormat( value, [ ...placeholderFormats, format ] ) );
 		}
 
