@@ -14,7 +14,6 @@ import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 
 class ImageEdit extends Component {
-
 	constructor() {
 		super( ...arguments );
 		this.onMediaLibraryPress = this.onMediaLibraryPress.bind( this );
@@ -26,7 +25,7 @@ class ImageEdit extends Component {
 		// This method should present an image picker from
 		// the device.
 		//TODO: Implement upload image method.
-	};
+	}
 
 	onMediaLibraryPress() {
 		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
@@ -34,7 +33,7 @@ class ImageEdit extends Component {
 				this.props.setAttributes( { url: mediaUrl } );
 			}
 		} );
-	};
+	}
 
 	toolbarEditButton() {
 		return (
@@ -72,8 +71,6 @@ class ImageEdit extends Component {
 						const {
 							imageWidthWithinContainer,
 							imageHeightWithinContainer,
-							imageWidth,
-							imageHeight,
 						} = sizes;
 
 						let finalHeight = imageHeightWithinContainer;
@@ -95,8 +92,8 @@ class ImageEdit extends Component {
 									key={ url }
 								/>
 							</View>
-						)
-					}}
+						);
+					} }
 				</ImageSize>
 				{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
 					<View style={ { padding: 12, flex: 1 } }>

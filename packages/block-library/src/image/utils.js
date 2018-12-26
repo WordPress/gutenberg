@@ -1,5 +1,5 @@
 
-export function calculatePreferedImageSize(image, container) {
+export function calculatePreferedImageSize( image, container ) {
 	const maxWidth = container.clientWidth;
 	const exceedMaxWidth = image.width > maxWidth;
 	const ratio = image.height / image.width;
