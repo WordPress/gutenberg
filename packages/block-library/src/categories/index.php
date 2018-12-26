@@ -32,6 +32,8 @@ function render_block_core_categories( $attributes ) {
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
 		$title                    = __( 'Categories' );
+		$label_class 			  = 'wp-block-categories-label';
+		$items_markup = '<label class="' . $label_class . '" for="' . $id . '">' . $title . '</label> ' . $items_markup;
 
 		if ( ! is_admin() ) {
 			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
@@ -44,8 +46,6 @@ function render_block_core_categories( $attributes ) {
 
 	$class = "wp-block-categories wp-block-categories-{$type}";
 
-	$label_class = 'wp-block-categories-label';
-
 	if ( isset( $attributes['align'] ) ) {
 		$class .= " align{$attributes['align']}";
 	}
@@ -53,8 +53,6 @@ function render_block_core_categories( $attributes ) {
 	if ( isset( $attributes['className'] ) ) {
 		$class .= " {$attributes['className']}";
 	}
-
-	$items_markup = '<label class="' . $label_class . '" for="' . $id . '">' . $title . '</label> ' . $items_markup;
 
 	$block_content = sprintf(
 		$wrapper_markup,
