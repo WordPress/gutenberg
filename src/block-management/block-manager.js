@@ -89,7 +89,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			refresh: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
-			title: "Some title",
+			title: 'Welcome to Gutenberg Mobile!',
 		};
 	}
 
@@ -231,8 +231,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return item.clientId;
 	}
 
-	onChangeTitle(title: string) {
-		this.setState({title: title})
+	onChangeTitle( title: string ) {
+		this.setState( { title: title } );
 	}
 
 	renderDefaultBlockAppender() {
@@ -243,15 +243,29 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderHeader() {
 		return (
-			<TextInput
-				blurOnSubmit = {true}
-				style={ styles.title }
-				textAlignVertical="top"
-				multiline
-				numberOfLines={ 0 }
-				value={ this.state.title }
-				onChangeText={ this.onChangeTitle }>
-			</TextInput>
+			<View>
+				<TextInput
+					blurOnSubmit={ true }
+					style={ styles.title }
+					textAlignVertical="top"
+					multiline
+					numberOfLines={ 0 }
+					value={ this.state.title }
+					onChangeText={ this.onChangeTitle }>
+				</TextInput>
+				<View
+					style={{
+						paddingLeft: 16,
+						paddingRight: 16,
+					}}>
+					<View
+						style={{
+							borderBottomColor: 'black',
+							borderBottomWidth: 1,
+						}}
+					/>
+				</View>
+			</View>
 		);
 	}
 
