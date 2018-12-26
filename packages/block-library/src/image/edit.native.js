@@ -14,13 +14,6 @@ import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 
 class ImageEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.onMediaLibraryPress = this.onMediaLibraryPress.bind( this );
-		this.onUploadPress = this.onUploadPress.bind( this );
-		this.toolbarEditButton = this.toolbarEditButton.bind( this );
-	}
-
 	onUploadPress() {
 		// This method should present an image picker from
 		// the device.

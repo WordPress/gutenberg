@@ -20,8 +20,6 @@ class ImageSize extends Component {
 			width: undefined,
 			height: undefined,
 		};
-		this.calculateSize = this.calculateSize.bind( this );
-		this.onLayout = this.onLayout.bind( this );
 	}
 
 	componentDidUpdate( prevProps ) {
