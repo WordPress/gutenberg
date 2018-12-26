@@ -6,7 +6,7 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 
-import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
+import { Text, TextInput, View, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
 import BlockHolder from './block-holder';
 import { InlineToolbarActions } from './inline-toolbar';
 import type { BlockType } from '../store/types';
@@ -59,6 +59,7 @@ type StateType = {
 	refresh: boolean,
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;
+	title: string;
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
@@ -71,6 +72,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).renderItem = this.renderItem.bind( this );
 		( this: any ).shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 		( this: any ).keyExtractor = this.keyExtractor.bind( this );
+		( this: any ).onChangeTitle = this.onChangeTitle.bind( this );
+		( this: any ).renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
+		( this: any ).renderHeader = this.renderHeader.bind( this );
 
 		const blocks = props.blocks.map( ( block ) => {
 			const newBlock = { ...block };
@@ -85,6 +89,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			refresh: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
+			title: "Some title",
 		};
 	}
 
@@ -226,6 +231,30 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return item.clientId;
 	}
 
+	onChangeTitle(title: string) {
+		this.setState({title: title})
+	}
+
+	renderDefaultBlockAppender() {
+		return (
+			<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
+		);
+	}
+
+	renderHeader() {
+		return (
+			<TextInput
+				blurOnSubmit = {true}
+				style={ styles.title }
+				textAlignVertical="top"
+				multiline
+				numberOfLines={ 0 }
+				value={ this.state.title }
+				onChangeText={ this.onChangeTitle }>
+			</TextInput>
+		);
+	}
+
 	renderList() {
 		// TODO: we won't need this. This just a temporary solution until we implement the RecyclerViewList native code for iOS
 		// And fix problems with RecyclerViewList on Android
@@ -241,11 +270,12 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				keyExtractor={ this.keyExtractor }
 				renderItem={ this.renderItem }
 				shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
+				ListHeaderComponent={ this.renderHeader }
+				ListEmptyComponent={ this.renderDefaultBlockAppender }
 			/>
 		);
 		return (
 			<View style={ { flex: 1 } } >
-				<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
 				{ list }
 				<SafeAreaView>
 					<View style={ { height: toolbarStyles.container.height } } />
