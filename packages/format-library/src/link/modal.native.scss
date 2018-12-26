@@ -8,8 +8,9 @@
 	background-color: $light-gray-400;
 	height: 4px;
 	width: 10%;
-	top: -10px;
+	top: -12px;
 	margin: auto;
+	border-radius: 2px;
 }
 
 .separator {
@@ -21,9 +22,10 @@
 
 .content {
 	background-color: $white;
-	padding: 20px 10px;
+	padding: 18px 10px 5px 10px;
 	justify-content: center;
-	border-radius: 8px;
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
 }
 
 .head {
@@ -36,7 +38,9 @@
 }
 
 .title {
+	color: $dark-gray-600;
 	font-size: 18px;
+	font-weight: 600;
 	flex: 1;
 	text-align: center;
 }
@@ -55,19 +59,22 @@
 }
 
 .inlineInputLabel {
-	flex: 1;
-	padding: 5px 10px;
+	padding: 10px 10px;
 	color: $dark-gray-600;
 	font-size: 14px;
 	font-weight: bold;
 }
 
 .inlineInputValue {
-	flex: 1;
+	flex-grow: 1;
 	font-size: 14px;
 	text-align: right;
 	align-items: stretch;
 	align-self: flex-end;
+	padding: 10px;
+}
+
+.inlineInputValueSwitch {
 	padding: 5px;
 }
 

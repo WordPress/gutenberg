@@ -158,7 +158,7 @@ class ModalLinkUI extends Component {
 						<Text style={ styles.inlineInputLabel }>
 							{ __( 'Open in a new window' ) }
 						</Text>
-						<View style={ { ...styles.inlineInputValue, alignItems: 'flex-end' } }>
+						<View style={ { ...styles.inlineInputValue, ...styles.inlineInputValueSwitch, alignItems: 'flex-end' } }>
 							<Switch
 								value={ this.state.opensInNewWindow }
 								onValueChange={ this.onChangeOpensInNewWindow }
