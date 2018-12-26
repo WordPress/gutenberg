@@ -26,6 +26,8 @@ class ImageSize extends Component {
 
 	componentDidUpdate( prevProps ) {
 		if ( this.props.src !== prevProps.src ) {
+			this.image = {};
+
 			this.setState( {
 				width: undefined,
 				height: undefined,
