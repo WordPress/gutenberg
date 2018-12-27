@@ -67,11 +67,11 @@ export class BlockHTML extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => ( {
-		block: select( 'core/editor' ).getBlock( ownProps.clientId ),
+		block: select( 'core/block-editor' ).getBlock( ownProps.clientId ),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
 		onChange( clientId, attributes, originalContent, isValid ) {
-			dispatch( 'core/editor' ).updateBlock( clientId, { attributes, originalContent, isValid } );
+			dispatch( 'core/block-editor' ).updateBlock( clientId, { attributes, originalContent, isValid } );
 		},
 	} ) ),
 ] )( BlockHTML );

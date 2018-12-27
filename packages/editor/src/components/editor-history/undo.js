@@ -25,9 +25,9 @@ function EditorHistoryUndo( { hasUndo, undo } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		hasUndo: select( 'core/editor' ).hasEditorUndo(),
+		hasUndo: select( 'core/block-editor' ).hasEditorUndo(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		undo: dispatch( 'core/editor' ).undo,
+		undo: dispatch( 'core/block-editor' ).undo,
 	} ) ),
 ] )( EditorHistoryUndo );

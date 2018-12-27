@@ -60,7 +60,7 @@ class BlockSelectionClearer extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select( 'core/editor' );
+		const { hasSelectedBlock, hasMultiSelection } = select( 'core/block-editor' );
 
 		return {
 			hasSelectedBlock: hasSelectedBlock(),
@@ -68,7 +68,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( 'core/editor' );
+		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 		return { clearSelectedBlock };
 	} ),
 ] )( BlockSelectionClearer );

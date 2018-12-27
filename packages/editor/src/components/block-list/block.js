@@ -637,7 +637,7 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
-		} = select( 'core/editor' );
+		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
 		const { hasFixedToolbar, focusMode } = getEditorSettings();
@@ -683,7 +683,6 @@ const applyWithSelect = withSelect(
 );
 
 const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
-	const { getBlockSelectionStart } = select( 'core/editor' );
 	const {
 		updateBlockAttributes,
 		selectBlock,
@@ -694,7 +693,8 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 		mergeBlocks,
 		replaceBlocks,
 		toggleSelection,
-	} = dispatch( 'core/editor' );
+		getBlockSelectionStart,
+	} = dispatch( 'core/block-editor' );
 
 	return {
 		onChange( clientId, attributes ) {
@@ -711,7 +711,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			const { clientId, rootClientId } = ownProps;
 			const {
 				getBlockIndex,
-			} = select( 'core/editor' );
+			} = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertDefaultBlock( {}, rootClientId, index + 1 );
 		},
@@ -719,7 +719,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			const { clientId, rootClientId } = ownProps;
 			const {
 				getBlockIndex,
-			} = select( 'core/editor' );
+			} = select( 'core/block-editor' );
 			const index = getBlockIndex( clientId, rootClientId );
 			insertBlocks( blocks, index + 1, rootClientId );
 		},
@@ -731,7 +731,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			const {
 				getPreviousBlockClientId,
 				getNextBlockClientId,
-			} = select( 'core/editor' );
+			} = select( 'core/block-editor' );
 
 			if ( forward ) {
 				const nextBlockClientId = getNextBlockClientId( clientId );
@@ -749,7 +749,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 			replaceBlocks( [ ownProps.clientId ], blocks );
 		},
 		onMetaChange( updatedMeta ) {
-			const { getEditorSettings } = select( 'core/editor' );
+			const { getEditorSettings } = select( 'core/block-editor' );
 			const onChangeMeta = getEditorSettings().__experimentalMetaSource.onChange;
 			onChangeMeta( updatedMeta );
 		},

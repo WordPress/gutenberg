@@ -705,7 +705,7 @@ class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( 'core' );
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getEditorSettings } = select( 'core/block-editor' );
 		const { id } = props.attributes;
 		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 

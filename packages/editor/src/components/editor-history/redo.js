@@ -25,9 +25,9 @@ function EditorHistoryRedo( { hasRedo, redo } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		hasRedo: select( 'core/editor' ).hasEditorRedo(),
+		hasRedo: select( 'core/block-editor' ).hasEditorRedo(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		redo: dispatch( 'core/editor' ).redo,
+		redo: dispatch( 'core/block-editor' ).redo,
 	} ) ),
 ] )( EditorHistoryRedo );

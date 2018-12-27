@@ -137,7 +137,7 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const { selectBlock } = dispatch( 'core/editor' );
+	const { selectBlock } = dispatch( 'core/block-editor' );
 
 	return {
 		onSelect( clientId ) {
