@@ -79,7 +79,7 @@ public class ReactAztecText extends AztecText {
                 ReactAztecText.this.propagateSelectionChanges(selStart, selEnd);
             }
         });
-        this.setInputType(InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        this.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES | InputType.TYPE_TEXT_FLAG_MULTI_LINE);
     }
 
     @Override
