@@ -12,6 +12,7 @@ import type { BlockType } from '../store/types';
 
 type PropsType = {
 	rootClientId: ?string,
+	initialHtmlModeEnabled: boolean,
 	showHtml: boolean,
 	editedPostContent: string,
 	initialHtml: string,
@@ -37,6 +38,11 @@ class AppContainer extends React.Component<PropsType> {
 
 		this.props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
+
+		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
+			// enable html mode if the initial mode the parent wants it but we're not already in it
+			this.toggleHtmlModeAction();
+		}
 	}
 
 	serializeToNativeAction = () => {

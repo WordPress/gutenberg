@@ -104,5 +104,8 @@ suppress_comment=\\(.\\|\n\\)*\\$FlowIssue\\((\\(>=0\\.\\(5[0-6]\\|[1-4][0-9]\\|
 suppress_comment=\\(.\\|\n\\)*\\$FlowFixedInNextDeploy
 suppress_comment=\\(.\\|\n\\)*\\$FlowExpectedError
 
+[untyped]
+<PROJECT_ROOT>/node_modules/react-native-keyboard-aware-scroll-view/.*
+
 [version]
-^0.67.0
+^0.67.1

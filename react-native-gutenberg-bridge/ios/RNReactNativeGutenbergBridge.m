@@ -4,5 +4,6 @@
 
 RCT_EXTERN_METHOD(provideToNative_Html:(NSString *)html changed:(BOOL)changed)
 RCT_EXTERN_METHOD(onMediaLibraryPress:(RCTResponseSenderBlock)callback)
+RCT_EXTERN_METHOD(editorDidLayout)
 
 @end

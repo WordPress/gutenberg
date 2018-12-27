@@ -4,21 +4,26 @@
  */
 
 import React from 'react';
+import { identity } from 'lodash';
 
-import { Text, View, FlatList, Keyboard, LayoutChangeEvent } from 'react-native';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
 import BlockHolder from './block-holder';
 import type { BlockType } from '../store/types';
 import styles from './block-manager.scss';
+import inlineToolbarStyles from './inline-toolbar/style.scss';
+import toolbarStyles from './block-toolbar.scss';
 import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
+import KeyboardAwareFlatList from '../components/keyboard-aware-flat-list';
 
 // Gutenberg imports
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender } from '@wordpress/editor';
+import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
 	blockClientIds: Array<string>,
@@ -43,6 +48,9 @@ type StateType = {
 export class BlockManager extends React.Component<PropsType, StateType> {
 	constructor( props: PropsType ) {
 		super( props );
+
+		( this: any ).renderItem = this.renderItem.bind( this );
+		( this: any ).shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this )
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -80,8 +88,10 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	onRootViewLayout = ( event: LayoutChangeEvent ) => {
 		const { height } = event.nativeEvent.layout;
-		this.setState( { rootViewHeight: height } );
-	};
+		this.setState( { rootViewHeight: height }, () => {
+			sendNativeEditorDidLayout();
+		} );
+	}
 
 	keyboardDidShow = () => {
 		this.setState( { isKeyboardVisible: true } );
@@ -101,30 +111,50 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		Keyboard.removeListener( 'keyboardDidHide', this.keyboardDidHide );
 	}
 
+	shouldFlatListPreventAutomaticScroll() {
+		return this.state.blockTypePickerVisible;
+	}
+
+	keyExtractor( clientId: string ) {
+		return clientId;
+	}
+
 	renderList() {
 		return (
-			<KeyboardAvoidingView style={ { flex: 1 } } parentHeight={ this.state.rootViewHeight }>
+			<View style={ { flex: 1 } } >
 				<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
-				<FlatList
+				<KeyboardAwareFlatList
+					blockToolbarHeight={ toolbarStyles.container.height }
+					innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
+					parentHeight={ this.state.rootViewHeight }
 					keyboardShouldPersistTaps="always"
 					style={ styles.list }
 					data={ this.props.blockClientIds }
-					keyExtractor={ ( item ) => item }
+					keyExtractor={ identity }
 					renderItem={ this.renderItem }
+					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
 				/>
-				<BlockToolbar
-					onInsertClick={ () => {
-						this.showBlockTypePicker( true );
-					} }
-					showKeyboardHideButton={ this.state.isKeyboardVisible }
-				/>
-			</KeyboardAvoidingView>
+				<SafeAreaView>
+					<View style={ { height: toolbarStyles.container.height } } />
+				</SafeAreaView>
+				<KeyboardAvoidingView
+					style={ styles.blockToolbarKeyboardAvoidingView }
+					parentHeight={ this.state.rootViewHeight }
+				>
+					<BlockToolbar
+						onInsertClick={ () => {
+							this.showBlockTypePicker( true );
+						} }
+						showKeyboardHideButton={ this.state.isKeyboardVisible }
+					/>
+				</KeyboardAvoidingView>
+			</View>
 		);
 	}
 
 	render() {
 		return (
-			<View style={ styles.container } onLayout={ this.onRootViewLayout }>
+			<SafeAreaView style={ styles.container } onLayout={ this.onRootViewLayout }>
 				{
 					this.props.showHtml ?
 						this.renderHTML() :
@@ -137,28 +167,18 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
 					/>
 				) }
-			</View>
+			</SafeAreaView>
 		);
-	}
-
-	isEmptyBlock( block: BlockType ) {
-		const content = block.attributes.content;
-		const innerBlocks = block.innerBlocks;
-		return ( content === undefined || content === '' ) && ( innerBlocks.length === 0 );
-	}
-
-	isCandidateForReplaceBlock( block: BlockType ) {
-		return ( block.name === 'core/paragraph' || block.name === 'core/heading' || block.name === 'core/code' );
 	}
 
 	isReplaceable( block: ?BlockType ) {
 		if ( ! block ) {
 			return false;
 		}
-		return this.isEmptyBlock( block ) && this.isCandidateForReplaceBlock( block );
+		return isUnmodifiedDefaultBlock( block );
 	}
 
-	renderItem = ( value: { item: string, index: number } ) => {
+	renderItem( value: { item: string, index: number } ) {
 		const clientId = value.item;
 
 		return (

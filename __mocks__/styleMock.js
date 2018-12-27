@@ -7,4 +7,13 @@ module.exports = {
 	blockText: {
 		minHeight: 50,
 	},
+	container: {
+		height: 44,
+	},
+	toolbar: {
+		height: 44,
+	},
+	blockContainerFocused: {
+		paddingBottom: 0,
+	},
 };

@@ -17,6 +17,8 @@ import styles from './block-holder.scss';
 // Gutenberg imports
 import { BlockEdit } from '@wordpress/editor';
 
+import TextInputState from 'react-native/lib/TextInputState';
+
 type PropsType = BlockType & {
 	clientId: string,
 	rootClientId: string,
@@ -40,7 +42,17 @@ type PropsType = BlockType & {
 };
 
 export class BlockHolder extends React.Component<PropsType> {
-	onFocus = () => {
+	onFocus = ( event ) => {
+		if ( event ) {
+			// == Hack for the Alpha ==
+			// When moving the focus from a TextInput field to another kind of field the call that hides the keyboard is not invoked
+			// properly, resulting in keyboard up when it should not be there.
+			// The code below dismisses the keyboard (calling blur on the last TextInput field) when the field that now gets the focus is a non-textual field
+			const currentlyFocusedTextInput = TextInputState.currentlyFocusedField();
+			if ( event.nativeEvent.target !== currentlyFocusedTextInput && ! TextInputState.isTextInput( event.nativeEvent.target ) ) {
+				TextInputState.blurTextInput( currentlyFocusedTextInput );
+			}
+		}
 		this.props.onSelect( this.props.clientId );
 	};
 
@@ -139,7 +151,7 @@ export class BlockHolder extends React.Component<PropsType> {
 			<TouchableWithoutFeedback onPress={ this.onFocus } >
 				<View style={ [ styles.blockHolder, isSelected && styles.blockHolderFocused ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
-					<View style={ styles.blockContainer }>{ this.getBlockForType() }</View>
+					<View style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
 					{ this.renderToolbar() }
 				</View>
 			</TouchableWithoutFeedback>

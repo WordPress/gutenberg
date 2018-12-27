@@ -38,9 +38,11 @@ public class WPAndroidGlueCode {
 
     private String mContentHtml = "";
     private boolean mContentChanged;
+    private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
+    private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -84,7 +86,8 @@ public class WPAndroidGlueCode {
                 mRnReactNativeGutenbergBridgePackage);
     }
 
-    public void onCreateView(View reactRootView, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+    public void onCreateView(View reactRootView, boolean htmlModeEnabled,
+                             OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource) {
         mReactRootView = (ReactRootView) reactRootView;
 
@@ -110,11 +113,12 @@ public class WPAndroidGlueCode {
             initialProps = new Bundle();
         }
         initialProps.putString(PROP_NAME_INITIAL_DATA, "");
+        initialProps.putBoolean(PROP_NAME_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled);
 
 
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
-        mReactRootView.startReactApplication(mReactInstanceManager, "gutenberg", initialProps);
+        mReactRootView.setAppProperties(initialProps);
     }
 
     public void onPause(Activity activity) {
@@ -160,12 +164,30 @@ public class WPAndroidGlueCode {
             return;
         }
 
+        // Content can be set directly to RootView only once (per RootView instance)
+        // because we don't want to bootstrap the whole Gutenberg state.
+        // Otherwise it should be done through module interface
+        if (mShouldUpdateContent) {
+            updateContent(postContent);
+        } else {
+            mShouldUpdateContent = true;
+            initContent(postContent);
+        }
+    }
+
+    private void initContent(String content) {
         Bundle appProps = mReactRootView.getAppProperties();
         if (appProps == null) {
             appProps = new Bundle();
         }
-        appProps.putString(PROP_NAME_INITIAL_DATA, postContent);
-        mReactRootView.setAppProperties(appProps);
+        appProps.putString(PROP_NAME_INITIAL_DATA, content);
+        mReactRootView.startReactApplication(mReactInstanceManager, "gutenberg", appProps);
+    }
+
+    private void updateContent(String content) {
+        if (mReactContext != null) {
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setHtmlInJS(content);
+        }
     }
 
     public interface OnGetContentTimeout {
@@ -197,6 +219,10 @@ public class WPAndroidGlueCode {
             mPendingMediaSelectedCallback.onMediaSelected(mediaUrl);
             mPendingMediaSelectedCallback = null;
         }
+    }
+
+    public void toggleEditorMode() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 }
 

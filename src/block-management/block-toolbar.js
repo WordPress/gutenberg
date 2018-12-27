@@ -10,6 +10,7 @@ import { compose } from '@wordpress/compose';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { BlockFormatControls, BlockControls } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
+import KeyboardHideButton from '../components/keyboard-hide-button';
 
 import styles from './block-toolbar.scss';
 
@@ -65,10 +66,8 @@ export class BlockToolbar extends Component<PropsType> {
 						/>
 					</Toolbar>
 					{ showKeyboardHideButton && ( <Toolbar>
-						<ToolbarButton
-							label={ __( 'Keyboard hide' ) }
-							icon="arrow-down"
-							onClick={ this.onKeyboardHide }
+						<KeyboardHideButton
+							onPress={ onKeyboardHide }
 						/>
 					</Toolbar> ) }
 					<BlockControls.Slot />
