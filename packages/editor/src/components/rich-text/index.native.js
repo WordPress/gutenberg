@@ -143,7 +143,7 @@ export class RichText extends Component {
 
 		return formatTypes.map( ( { name } ) => name ).filter( ( name ) => {
 			return getActiveFormat( record, name ) !== undefined;
-		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] );
+		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] ).filter( Boolean );
 	}
 
 	onFormatChange( record ) {
