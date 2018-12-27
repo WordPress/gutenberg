@@ -353,7 +353,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					onReplace={ ( block ) => this.onReplace( value.item.clientId, block ) }
 					{ ...value.item }
 				/>
-				{ this.state.blockTypePickerVisible && value.item.focused && addBlockHere }
+				{ this.state.blockTypePickerVisible && value.item.focused && ( ! this.isReplaceable( value.item ) ) && addBlockHere }
 			</View>
 		);
 	}
