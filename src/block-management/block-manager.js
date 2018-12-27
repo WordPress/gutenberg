@@ -298,7 +298,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				onValueSelected={ ( itemValue ) => {
 					this.onBlockTypeSelected( itemValue );
 				} }
-				isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
 			/>
 		);
 
@@ -328,7 +327,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderItem( value: { item: BlockType, index: number } ) {
 		const titleForAddPlaceIndicator = __( 'ADD BLOCK HERE' );
-		const insertHere = (
+		const addBlockHere = (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ styles.lineStyleAddHere }></View>
 				<Text style={ styles.labelStyleAddHere } > { titleForAddPlaceIndicator } </Text>
@@ -354,7 +353,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					onReplace={ ( block ) => this.onReplace( value.item.clientId, block ) }
 					{ ...value.item }
 				/>
-				{ this.state.blockTypePickerVisible && value.item.focused && ( ! this.isReplaceable( value.item ) ) && insertHere }
+				{ this.state.blockTypePickerVisible && value.item.focused && addBlockHere }
 			</View>
 		);
 	}
