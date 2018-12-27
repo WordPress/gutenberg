@@ -13,6 +13,7 @@ type PropsType = {
 	parentHeight: number,
 	blockToolbarHeight: number,
 	innerToolbarHeight: number,
+	safeAreaBottomInset: number,
 }
 
 const KeyboardAwareFlatList = ( props: PropsType ) => {
@@ -44,6 +45,7 @@ const KeyboardAwareFlatList = ( props: PropsType ) => {
 			enableResetScrollToCoords={ false }
 			keyboardShouldPersistTaps={ 'handled' }
 			extraScrollHeight={ extraScrollHeight }
+			extraBottomInset={ -props.safeAreaBottomInset }
 			extraHeight={ 0 }
 			innerRef={ ( ref ) => {
 				( this: any ).scrollViewRef = ref;
