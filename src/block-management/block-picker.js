@@ -18,7 +18,6 @@ import { getBlockTypes } from '@wordpress/blocks';
 
 type PropsType = {
 	style?: StyleSheet,
-	isReplacement: boolean,
 	onValueSelected: ( itemValue: string, itemIndex: number ) => void,
 	onDismiss: () => void,
 };
