@@ -3,6 +3,11 @@
  * @flow
  */
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 import React from 'react';
 import { isEqual } from 'lodash';
 
@@ -322,10 +327,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderItem( value: { item: BlockType, index: number } ) {
+		const titleForAddPlaceIndicator = __( 'ADD BLOCK HERE' );
 		const insertHere = (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ styles.lineStyleAddHere }></View>
-				<Text style={ styles.labelStyleAddHere } >ADD BLOCK HERE</Text>
+				<Text style={ styles.labelStyleAddHere } > { titleForAddPlaceIndicator } </Text>
 				<View style={ styles.lineStyleAddHere }></View>
 			</View>
 		);
@@ -348,7 +354,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					onReplace={ ( block ) => this.onReplace( value.item.clientId, block ) }
 					{ ...value.item }
 				/>
-				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
+				{ this.state.blockTypePickerVisible && value.item.focused && ( ! this.isReplaceable( value.item ) ) && insertHere }
 			</View>
 		);
 	}
