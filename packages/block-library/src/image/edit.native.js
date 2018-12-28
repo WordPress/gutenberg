@@ -19,7 +19,6 @@ const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 const MEDIA_UPLOAD_STATE_FAILED = 3;
 
 export default class ImageEdit extends React.Component {
-
 	constructor( props ) {
 		super( props );
 
@@ -34,12 +33,12 @@ export default class ImageEdit extends React.Component {
 	}
 
 	mediaUpload( payload ) {
-		if( payload.state === MEDIA_UPLOAD_STATE_UPLOADING ) {
+		if ( payload.state === MEDIA_UPLOAD_STATE_UPLOADING ) {
 			this.setState( { progress: payload.progress } );
-		} else if( payload.state === MEDIA_UPLOAD_STATE_SUCCEEDED || payload.state === MEDIA_UPLOAD_STATE_FAILED) {
+		} else if ( payload.state === MEDIA_UPLOAD_STATE_SUCCEEDED || payload.state === MEDIA_UPLOAD_STATE_FAILED ) {
 			this.finishMediaUploading( payload );
 		}
-	} 
+	}
 
 	finishMediaUploading( payload ) {
 		const { setAttributes } = this.props;
@@ -73,7 +72,7 @@ export default class ImageEdit extends React.Component {
 			const onUploadMediaPress = () => {
 				RNReactNativeGutenbergBridge.onUploadMediaPress( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
-						this.addMediaUploadListener( mediaId )
+						this.addMediaUploadListener( mediaId );
 						setAttributes( { url: mediaUri, id: mediaId } );
 					}
 				} );
@@ -97,15 +96,15 @@ export default class ImageEdit extends React.Component {
 				/>
 			</Toolbar>
 		);
-		
+
 		const http = 'http';
-		const showSpinner = url !== undefined ? ! url.includes(http) : false;
+		const showSpinner = url !== undefined ? ! url.includes( http ) : false;
 		const progress = this.state.progress * 100;
 		const opacity = showSpinner ? 0.3 : 1;
 
 		return (
 			<View style={ { flex: 1 } }>
-				{ showSpinner && <Spinner progress={ progress } />}
+				{ showSpinner && <Spinner progress={ progress } /> }
 				<BlockControls>
 					{ toolbarEditButton }
 				</BlockControls>

@@ -7,7 +7,7 @@ export default function Spinner( props 	) {
 
 	return (
 		<View style={ { flex: 1, height: 5, backgroundColor: '#a8bece' } }>
-			<View style={ { width: width, height: 5, backgroundColor: '#0087be' } }/>
+			<View style={ { width: width, height: 5, backgroundColor: '#0087be' } } />
 		</View>
 	);
 }
