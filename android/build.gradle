@@ -3,7 +3,7 @@ buildscript {
         gradlePluginVersion = '3.0.1'
         kotlinVersion = '1.2.31'
         supportLibVersion = '27.1.1'
-        tagSoupVersion = '1.2.2'
+        tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
         picassoVersion = '2.5.2'
         robolectricVersion = '3.5.1'
@@ -87,10 +87,10 @@ repositories {
 }
 
 dependencies {
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:v1.3.13')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:v1.3.13')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:v1.3.13')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:v1.3.13')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:d8675f5c617b9816f836d687e1af0321c2130063')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:d8675f5c617b9816f836d687e1af0321c2130063')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:d8675f5c617b9816f836d687e1af0321c2130063')
+    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:d8675f5c617b9816f836d687e1af0321c2130063')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
