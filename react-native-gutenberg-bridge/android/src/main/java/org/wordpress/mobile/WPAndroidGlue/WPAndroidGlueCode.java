@@ -22,6 +22,7 @@ import com.horcrux.svg.SvgPackage;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
 import java.util.Arrays;
@@ -35,6 +36,7 @@ public class WPAndroidGlueCode {
     private ReactContext mReactContext;
     private RNReactNativeGutenbergBridgePackage mRnReactNativeGutenbergBridgePackage;
     private MediaSelectedCallback mPendingMediaSelectedCallback;
+    private MediaUploadCallback mPendingMediaUploadCallback;
 
     private String mContentHtml = "";
     private boolean mContentChanged;
@@ -62,6 +64,7 @@ public class WPAndroidGlueCode {
 
     public interface OnMediaLibraryButtonListener {
         void onMediaLibraryButtonClick();
+        void onUploadMediaButtonClick();
     }
 
     protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener) {
@@ -76,6 +79,12 @@ public class WPAndroidGlueCode {
             @Override public void onMediaLibraryPress(MediaSelectedCallback mediaSelectedCallback) {
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
                 onMediaLibraryButtonListener.onMediaLibraryButtonClick();
+            }
+
+            @Override
+            public void onUploadMediaPress(MediaUploadCallback mediaUploadCallback) {
+                mPendingMediaUploadCallback = mediaUploadCallback;
+                onMediaLibraryButtonListener.onUploadMediaButtonClick();
             }
         });
         return Arrays.asList(
@@ -228,6 +237,36 @@ public class WPAndroidGlueCode {
 
     public void toggleEditorMode() {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
+    }
+
+    public void selectMediaFile(final String mediaId, final String mediaUri) {
+       if (isMediaUploadCallbackRegistered()) {
+           mPendingMediaUploadCallback.onMediaFileSelect(mediaId, mediaUri);
+       }
+    }
+
+    public void mediaFileUpload(final String mediaId, final float progress) {
+        if (isMediaUploadCallbackRegistered()) {
+            mPendingMediaUploadCallback.onMediaFileUpload(mediaId, progress);
+        }
+    }
+
+    public void mediaFileUploadFailed(final String mediaId) {
+        if (isMediaUploadCallbackRegistered()) {
+            mPendingMediaUploadCallback.onMediaFileUploadFailed(mediaId);
+            mPendingMediaUploadCallback = null;
+        }
+    }
+
+    public void mediaFileUploadSucceeded(final String mediaId, final String mediaUrl) {
+        if (isMediaUploadCallbackRegistered()) {
+            mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl);
+            mPendingMediaUploadCallback = null;
+        }
+    }
+
+    private boolean isMediaUploadCallbackRegistered() {
+        return mPendingMediaUploadCallback != null;
     }
 }
 
