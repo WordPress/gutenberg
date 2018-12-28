@@ -12,7 +12,6 @@ import {
 	BlockControls,
 	RichText,
 	PanelColorSettings,
-	ContrastChecker,
 	createCustomColorsHOC,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
@@ -23,7 +22,6 @@ import {
 	Button,
 	Toolbar,
 	DropdownMenu,
-	withFallbackStyles,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
@@ -38,8 +36,6 @@ import {
 	insertColumn,
 	deleteColumn,
 } from './state';
-
-const { getComputedStyle } = window;
 
 const BACKGROUND_COLORS = [
 	{
@@ -65,16 +61,6 @@ const BACKGROUND_COLORS = [
 ];
 
 const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
-
-const applyFallbackStyles = withFallbackStyles( ( node, props ) => {
-	const { textColor, backgroundColor } = props.attributes;
-	const rowElement = node ? node.querySelector( 'tr' ) : undefined;
-	const styles = rowElement ? getComputedStyle( node.querySelector( 'tr' ) ) : undefined;
-	return {
-		fallbackBackgroundColor: backgroundColor || ! styles ? undefined : styles.backgroundColor,
-		textColor: textColor || ! styles ? undefined : styles.color,
-	};
-} );
 
 export class TableEdit extends Component {
 	constructor() {
@@ -411,9 +397,7 @@ export class TableEdit extends Component {
 			attributes,
 			className,
 			backgroundColor,
-			fallbackBackgroundColor,
 			setBackgroundColor,
-			textColor,
 		} = this.props;
 		const { initialRowCount, initialColumnCount } = this.state;
 		const { hasFixedLayout, head, body, foot } = attributes;
@@ -479,15 +463,7 @@ export class TableEdit extends Component {
 								colors: BACKGROUND_COLORS,
 							},
 						] }
-					>
-						<ContrastChecker
-							{ ...{
-								textColor,
-								backgroundColor: backgroundColor.color,
-								fallbackBackgroundColor,
-							} }
-						/>
-					</PanelColorSettings>
+					/>
 				</InspectorControls>
 				<table className={ classes }>
 					<Section type="head" rows={ head } />
@@ -501,5 +477,4 @@ export class TableEdit extends Component {
 
 export default compose( [
 	withCustomBackgroundColors( 'backgroundColor' ),
-	applyFallbackStyles,
 ] )( TableEdit );
