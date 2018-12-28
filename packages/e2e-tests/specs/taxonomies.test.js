@@ -36,6 +36,19 @@ describe( 'Taxonomies', () => {
 		);
 	};
 
+	const getCurrentTags = async () => {
+		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
+		return tagsPanel.$eval( '*', ( node ) => {
+			return Array.from(
+				node.parentElement.parentElement.parentElement.querySelectorAll(
+					'.components-form-token-field__token-text span:not(.screen-reader-text)'
+				)
+			).map( ( spanNode ) => {
+				return spanNode.innerText;
+			} );
+		} );
+	};
+
 	it( 'should be able to open the categories panel and create a new main category if the user has the right capabilities', async () => {
 		await createNewPost();
 
@@ -44,13 +57,13 @@ describe( 'Taxonomies', () => {
 		const categoriesPanel = await findSidebarPanelWithTitle( 'Categories' );
 		expect( categoriesPanel ).toBeDefined();
 
-		// Open the categories panel.
-		await categoriesPanel.click( 'button' );
-
 		// If the user has no permission to add a new category finish the test.
-		if ( ! ( await canCreatTermInTaxonomy( 'category' ) ) ) {
+		if ( ! ( await canCreatTermInTaxonomy( 'categories' ) ) ) {
 			return;
 		}
+
+		// Open the categories panel.
+		await categoriesPanel.click( 'button' );
 
 		await page.waitForSelector( 'button.editor-post-taxonomies__hierarchical-terms-add' );
 
@@ -92,5 +105,60 @@ describe( 'Taxonomies', () => {
 		// The category selection was persisted after the publish process.
 		expect( selectedCategories ).toHaveLength( 1 );
 		expect( selectedCategories[ 0 ] ).toEqual( 'z rand category 1' );
+	} );
+
+	it( 'should be able to open the tags panel and create a new tag if the user has the right capabilities', async () => {
+		await createNewPost();
+
+		await openDocumentSettingsSidebar();
+
+		const tagsPanel = await findSidebarPanelWithTitle( 'Tags' );
+		expect( tagsPanel ).toBeDefined();
+
+		// If the user has no permission to add a new category finish the test.
+		if ( ! ( await canCreatTermInTaxonomy( 'tags' ) ) ) {
+			return;
+		}
+
+		// Open the tags panel.
+		await tagsPanel.click( 'button' );
+
+		const tagInput = await page.$( '.components-form-token-field__input' );
+
+		// Click the tag input field.
+		await tagInput.click();
+
+		// Type the category name in the field.
+		await tagInput.type( 'tag1 ok' );
+
+		// Press enter to create a new tag.
+		await tagInput.press( 'Enter' );
+
+		page.waitForSelector( '.components-form-token-field__token' );
+
+		// Get an array with the tags of the post.
+		let tags = await getCurrentTags();
+
+		// The post should only contain the tag we added.
+		expect( tags ).toHaveLength( 1 );
+		expect( tags[ 0 ] ).toEqual( 'tag1 ok' );
+
+		// Type something in the title so we can publish the post.
+		await page.type( '.editor-post-title__input', 'Hello World' );
+
+		// Publish the post.
+		await publishPost();
+
+		// Reload the editor.
+		await page.reload();
+
+		// Wait for the tags to load.
+		page.waitForSelector( '.components-form-token-field__token' );
+
+		tags = await getCurrentTags();
+
+		// The tag selection was persisted after the publish process.
+		expect( tags ).toHaveLength( 1 );
+		expect( tags[ 0 ] ).toEqual( 'tag1 ok' );
 	} );
 } );
