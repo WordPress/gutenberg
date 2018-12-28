@@ -5,7 +5,7 @@ import React from 'react';
 import { View, Image, TextInput, NativeEventEmitter } from 'react-native';
 import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
-const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge )
+const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
 
 /**
  * Internal dependencies
@@ -14,13 +14,17 @@ import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+const MEDIA_UPLOAD_STATE_UPLOADING = 1;
+const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
+const MEDIA_UPLOAD_STATE_FAILED = 3;
+
 export default class ImageEdit extends React.Component {
 
-	constructor(props) {
-		super(props);
+	constructor( props ) {
+		super( props );
 
 		this.state = {
-			progress: 0
+			progress: 0,
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -29,12 +33,10 @@ export default class ImageEdit extends React.Component {
 		this.finishMediaUploading = this.finishMediaUploading.bind( this );
 	}
 
-	mediaUpload ( payload ) {
-		
-		if ( payload.state == 1 ) {
+	mediaUpload( payload ) {
+		if( payload.state === MEDIA_UPLOAD_STATE_UPLOADING ) {
 			this.setState( { progress: payload.progress } );
-		}
-		else if ( payload.state === 2 || payload.state == 3) {
+		} else if( payload.state === MEDIA_UPLOAD_STATE_SUCCEEDED || payload.state === MEDIA_UPLOAD_STATE_FAILED) {
 			this.finishMediaUploading( payload );
 		}
 	} 
@@ -48,17 +50,16 @@ export default class ImageEdit extends React.Component {
 	}
 
 	addMediaUploadListener( mediaId ) {
-		gutenbergBridgeEvents.addListener( 'mediaUpload'+ mediaId, this.mediaUpload );
+		gutenbergBridgeEvents.addListener( 'mediaUpload' + mediaId, this.mediaUpload );
 	}
 
 	removeMediaUploadListener( mediaId ) {
-		gutenbergBridgeEvents.removeListener( 'mediaUpload'+ mediaId, this.mediaUpload );
+		gutenbergBridgeEvents.removeListener( 'mediaUpload' + mediaId, this.mediaUpload );
 	}
 
 	render() {
-
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, id, caption } = attributes;
+		const { url, caption } = attributes;
 
 		const onMediaLibraryPress = () => {
 			RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
@@ -69,11 +70,9 @@ export default class ImageEdit extends React.Component {
 		};
 
 		if ( ! url ) {
-
 			const onUploadMediaPress = () => {
 				RNReactNativeGutenbergBridge.onUploadMediaPress( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
-						
 						this.addMediaUploadListener( mediaId )
 						setAttributes( { url: mediaUri, id: mediaId } );
 					}
@@ -106,8 +105,7 @@ export default class ImageEdit extends React.Component {
 
 		return (
 			<View style={ { flex: 1 } }>
-
-				{showSpinner && <Spinner progress={ progress }/>}
+				{ showSpinner && <Spinner progress={ progress } />}
 				<BlockControls>
 					{ toolbarEditButton }
 				</BlockControls>
