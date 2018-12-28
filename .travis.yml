@@ -17,7 +17,6 @@ cache:
     - $HOME/.npm
     - $HOME/.nvm/.cache
     - $HOME/.phpbrew
-    - node_modules
 
 branches:
   only:
@@ -33,7 +32,7 @@ jobs:
       before_install:
         - nvm install --latest-npm
       install:
-        - npm install
+        - npm ci
       script:
         - npm run lint
         - npm run check-local-changes
