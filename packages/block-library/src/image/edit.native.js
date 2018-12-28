@@ -14,9 +14,9 @@ import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const MEDIA_UPLOAD_STATE_UPLOADING = 1;
-const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
-const MEDIA_UPLOAD_STATE_FAILED = 3;
+const mediaUploadStateUploading = 1;
+const mediaUploadStateSucceeded = 2;
+const mediaUploadStateFailed = 3;
 
 export default class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -33,9 +33,9 @@ export default class ImageEdit extends React.Component {
 	}
 
 	mediaUpload( payload ) {
-		if ( payload.state === MEDIA_UPLOAD_STATE_UPLOADING ) {
+		if ( payload.state === mediaUploadStateUploading ) {
 			this.setState( { progress: payload.progress } );
-		} else if ( payload.state === MEDIA_UPLOAD_STATE_SUCCEEDED || payload.state === MEDIA_UPLOAD_STATE_FAILED ) {
+		} else if ( payload.state === mediaUploadStateSucceeded || payload.state === mediaUploadStateFailed ) {
 			this.finishMediaUploading( payload );
 		}
 	}
