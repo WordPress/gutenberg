@@ -67,7 +67,7 @@ export class BlockToolbar extends Component<PropsType> {
 					</Toolbar>
 					{ showKeyboardHideButton && ( <Toolbar>
 						<KeyboardHideButton
-							onPress={ onKeyboardHide }
+							onPress={ this.onKeyboardHide }
 						/>
 					</Toolbar> ) }
 					<BlockControls.Slot />
