@@ -34,6 +34,7 @@ jobs:
       install:
         - npm ci
       script:
+        - echo $(composer config cache-dir)
         - npm run lint
         - npm run check-local-changes
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
