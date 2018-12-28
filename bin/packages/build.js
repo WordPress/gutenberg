@@ -17,6 +17,8 @@ const mkdirp = require( 'mkdirp' );
 const sass = require( 'node-sass' );
 const postcss = require( 'postcss' );
 const deasync = require( 'deasync' );
+const crypto = require( 'crypto' );
+const minimist = require( 'minimist' );
 
 /**
  * Internal dependencies
@@ -92,14 +94,15 @@ function buildFiles( files ) {
 }
 
 /**
- * Build a javaScript file for the required environments (node and ES5)
+ * Build a JavaScript file for the required environments (node and ES5).
  *
- * @param {string} file    File path to build
- * @param {boolean} silent Show logs
+ * @param {string}   file           File path to build.
+ * @param {boolean} silent         Show logs.
+ * @param {string}  cacheDirectory Path to object cache directory.
  */
-function buildJsFile( file, silent ) {
-	buildJsFileFor( file, silent, 'main' );
-	buildJsFileFor( file, silent, 'module' );
+function buildJsFile( file, silent, cacheDirectory = null ) {
+	buildJsFileFor( file, silent, 'main', cacheDirectory );
+	buildJsFileFor( file, silent, 'module', cacheDirectory );
 }
 
 /**
@@ -155,23 +158,39 @@ function buildScssFile( styleFile ) {
 }
 
 /**
- * Build a file for a specific environment
+ * Build a file for a specific environment.
  *
- * @param {string}  file        File path to build
- * @param {boolean} silent      Show logs
- * @param {string}  environment Dist environment (node or es5)
+ * @param {string}  file           File path to build.
+ * @param {boolean} silent         Show logs.
+ * @param {string}  environment    Dist environment (node or ES5).
+ * @param {string}  cacheDirectory Path to object cache directory.
  */
-function buildJsFileFor( file, silent, environment ) {
+function buildJsFileFor( file, silent, environment, cacheDirectory ) {
 	const buildDir = BUILD_DIR[ environment ];
 	const destPath = getBuildPath( file, buildDir );
-	const babelOptions = getBabelConfig( environment );
-	babelOptions.sourceMaps = true;
-	babelOptions.sourceFileName = file;
+
+	const source = fs.readFileSync( file, 'utf8' );
+
+	const key = sha1( file + environment + source );
+	let code = readCacheFile( cacheDirectory, key );
+	let map = readCacheFile( cacheDirectory, key + '-map' );
+
+	if ( ! code || ! map ) {
+		const babelOptions = getBabelConfig( environment );
+		babelOptions.sourceMaps = true;
+		babelOptions.sourceFileName = file;
+
+		const transformed = babel.transformSync( source, babelOptions );
+		code = transformed.code + '\n//# sourceMappingURL=' + path.basename( destPath ) + '.map';
+		map = JSON.stringify( transformed.map );
+
+		writeCacheFile( cacheDirectory, key, code );
+		writeCacheFile( cacheDirectory, key + '-map', map );
+	}
 
 	mkdirp.sync( path.dirname( destPath ) );
-	const transformed = babel.transformFileSync( file, babelOptions );
-	fs.writeFileSync( destPath + '.map', JSON.stringify( transformed.map ) );
-	fs.writeFileSync( destPath, transformed.code + '\n//# sourceMappingURL=' + path.basename( destPath ) + '.map' );
+	fs.writeFileSync( destPath, code );
+	fs.writeFileSync( destPath + '.map', map );
 
 	if ( ! silent ) {
 		process.stdout.write(
@@ -184,12 +203,42 @@ function buildJsFileFor( file, silent, environment ) {
 	}
 }
 
+function sha1( text ) {
+	const hash = crypto.createHash( 'sha1' );
+	hash.update( text );
+	return hash.digest( 'hex' );
+}
+
+function readCacheFile( cacheDirectory, key ) {
+	if ( ! cacheDirectory ) {
+		return null;
+	}
+
+	const filePath = path.resolve( cacheDirectory, key );
+	if ( ! fs.existsSync( filePath ) ) {
+		return null;
+	}
+
+	return fs.readFileSync( filePath, 'utf8' );
+}
+
+function writeCacheFile( cacheDirectory, key, text ) {
+	if ( ! cacheDirectory ) {
+		return null;
+	}
+
+	const filePath = path.resolve( cacheDirectory, key );
+	mkdirp.sync( path.dirname( filePath ) );
+	fs.writeFileSync( filePath, text );
+}
+
 /**
- * Build the provided package path
+ * Build the provided package path.
  *
- * @param {string} packagePath absolute package path
+ * @param {string} packagePath    Absolute package path.
+ * @param {string} cacheDirectory Path to object cache directory.
  */
-function buildPackage( packagePath ) {
+function buildPackage( packagePath, cacheDirectory ) {
 	const srcDir = path.resolve( packagePath, SRC_DIR );
 	const jsFiles = glob.sync( `${ srcDir }/**/*.js`, {
 		ignore: [
@@ -202,7 +251,7 @@ function buildPackage( packagePath ) {
 	process.stdout.write( `${ path.basename( packagePath ) }\n` );
 
 	// Build js files individually.
-	jsFiles.forEach( ( file ) => buildJsFile( file, true ) );
+	jsFiles.forEach( ( file ) => buildJsFile( file, true, cacheDirectory ) );
 
 	// Build package CSS files
 	buildPackageScss( packagePath );
@@ -210,13 +259,15 @@ function buildPackage( packagePath ) {
 	process.stdout.write( `${ DONE }\n` );
 }
 
-const files = process.argv.slice( 2 );
+const {
+	_: files,
+	cacheDirectory = path.resolve( process.env.HOME, '.cache/wordpress-packages' ),
+} = minimist( process.argv.slice( 2 ) );
 
 if ( files.length ) {
 	buildFiles( files );
 } else {
 	process.stdout.write( chalk.inverse( '>> Building packages \n' ) );
-	getPackages()
-		.forEach( buildPackage );
+	getPackages().forEach( ( packageName ) => buildPackage( packageName, cacheDirectory ) );
 	process.stdout.write( '\n' );
 }

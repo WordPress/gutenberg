@@ -12,6 +12,7 @@ notifications:
 
 cache:
   directories:
+    - $HOME/.cache/wordpress-packages
     - $HOME/.composer/cache
     - $HOME/.jest-cache
     - $HOME/.npm

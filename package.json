@@ -95,6 +95,7 @@
 		"lerna": "3.4.3",
 		"lint-staged": "7.3.0",
 		"lodash": "4.17.10",
+		"minimist": "1.2.0",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.11.0",
 		"pegjs": "0.10.0",
