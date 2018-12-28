@@ -18,8 +18,18 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private static final String EVENT_NAME_REQUEST_GET_HTML = "requestGetHtml";
     private static final String EVENT_NAME_UPDATE_HTML = "updateHtml";
+    private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
+    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_STATE = "state";
+    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
+    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
+    private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS = "progress";
+
+    private static final int MEDIA_UPLOAD_STATE_UPLOADING = 1;
+    private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
+    private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
+
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
             GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
@@ -59,6 +69,40 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 onMediaSelected.invoke(mediaUrl);
             }
         });
+    }
+
+    @ReactMethod
+    public void onUploadMediaPress(final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.onUploadMediaPress(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
+            @Override
+            public void onMediaFileSelect(String mediaId, String mediaUri) {
+                onUploadMediaSelected.invoke(mediaId, mediaUri);
+            }
+
+            @Override
+            public void onMediaFileUpload(String mediaId, float progress) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
+            }
+
+            @Override
+            public void onMediaFileUploadSucceeded(String mediaId, String mediaUrl) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1);
+            }
+
+            @Override
+            public void onMediaFileUploadFailed(String mediaId) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
+            }
+        });
+    }
+
+    private void setMediaFileUploadDataInJS(int state, String mediaId, String mediaUrl, float progress) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
+        writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
+        emitToJS(EVENT_NAME_MEDIA_UPLOAD + mediaId, writableMap);
     }
 
     public void toggleEditorMode() {
