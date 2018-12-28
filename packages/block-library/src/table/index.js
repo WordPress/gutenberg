@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { __, _x } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
 import { G, Path, SVG } from '@wordpress/components';
-import { RichText } from '@wordpress/editor';
+import { RichText, getColorClassName } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -86,7 +86,7 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
-		customBackgroundColor: {
+		backgroundColor: {
 			type: 'string',
 		},
 		head: getTableSectionAttributeSchema( 'head' ),
@@ -121,7 +121,7 @@ export const settings = {
 			head,
 			body,
 			foot,
-			customBackgroundColor,
+			backgroundColor,
 		} = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 
@@ -129,16 +129,13 @@ export const settings = {
 			return null;
 		}
 
-		const hasBackgroundColor = !! customBackgroundColor;
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 
-		const tableClasses = classnames( {
+		const classes = classnames( {
 			'has-fixed-layout': hasFixedLayout,
-			'has-background-color': hasBackgroundColor,
+			'has-background': !! backgroundClass,
+			[ backgroundClass ]: backgroundClass,
 		} );
-
-		const styles = hasBackgroundColor ? {
-			background: customBackgroundColor,
-		} : undefined;
 
 		const Section = ( { type, rows } ) => {
 			if ( ! rows.length ) {
@@ -165,7 +162,7 @@ export const settings = {
 		};
 
 		return (
-			<table className={ tableClasses } style={ styles }>
+			<table className={ classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />

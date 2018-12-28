@@ -13,7 +13,7 @@ import {
 	RichText,
 	PanelColorSettings,
 	ContrastChecker,
-	withColors,
+	createCustomColorsHOC,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -43,38 +43,28 @@ const { getComputedStyle } = window;
 
 const BACKGROUND_COLORS = [
 	{
-		color: '#ffeded',
-		name: 'Subtle pale pink',
-	},
-	{
-		color: '#fff2d1',
-		name: 'Subtle pale yellow',
-	},
-	{
-		color: '#deffdb',
-		name: 'Subtle pale green',
-	},
-	{
-		color: '#daf8ef',
-		name: 'Subtle pale mint',
-	},
-	{
-		color: '#e8f7ff',
-		name: 'Subtle pale blue',
-	},
-	{
-		color: '#fff3ff',
-		name: 'Subtle pale violet',
-	},
-	{
 		color: '#f3f4f5',
 		name: 'Subtle light gray',
+		slug: 'subtle-light-gray',
 	},
 	{
-		color: '#e2e2e2',
-		name: 'Light gray',
+		color: '#e9fbe5',
+		name: 'Subtle pale green',
+		slug: 'subtle-pale-green',
+	},
+	{
+		color: '#e7f5fe',
+		name: 'Subtle pale blue',
+		slug: 'subtle-pale-blue',
+	},
+	{
+		color: '#fcf0ef',
+		name: 'Subtle pale pink',
+		slug: 'subtle-pale-pink',
 	},
 ];
+
+const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
 
 const applyFallbackStyles = withFallbackStyles( ( node, props ) => {
 	const { textColor, backgroundColor } = props.attributes;
@@ -452,16 +442,11 @@ export class TableEdit extends Component {
 			);
 		}
 
-		const hasBackgroundColor = !! backgroundColor.color;
-
 		const classes = classnames( className, {
 			'has-fixed-layout': hasFixedLayout,
-			'has-background-color': hasBackgroundColor,
+			'has-background': !! backgroundColor.color,
+			[ backgroundColor.class ]: backgroundColor.class,
 		} );
-
-		const style = hasBackgroundColor ? {
-			backgroundColor: backgroundColor.color,
-		} : undefined;
 
 		return (
 			<Fragment>
@@ -504,7 +489,7 @@ export class TableEdit extends Component {
 						/>
 					</PanelColorSettings>
 				</InspectorControls>
-				<table className={ classes } style={ style }>
+				<table className={ classes }>
 					<Section type="head" rows={ head } />
 					<Section type="body" rows={ body } />
 					<Section type="foot" rows={ foot } />
@@ -515,6 +500,6 @@ export class TableEdit extends Component {
 }
 
 export default compose( [
-	withColors( 'backgroundColor' ),
+	withCustomBackgroundColors( 'backgroundColor' ),
 	applyFallbackStyles,
 ] )( TableEdit );
