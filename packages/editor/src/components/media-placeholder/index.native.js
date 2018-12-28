@@ -5,6 +5,8 @@ import { View, Text, Button } from 'react-native';
 
 import styles from './styles.scss';
 
+import { __ } from '@wordpress/i18n';
+
 function MediaPlaceholder( props ) {
 	return (
 		<View style={ styles.emptyStateContainer }>
@@ -12,10 +14,11 @@ function MediaPlaceholder( props ) {
                 Image
 			</Text>
 			<Text style={ styles.emptyStateDescription }>
-                Select an image from your library.
+				Upload a new image or select a file from your library.
 			</Text>
 			<View style={ styles.emptyStateButtonsContainer }>
-				<Button title="Media Library" onPress={ props.onMediaLibraryPress } />
+				<Button title={ __( 'Upload' ) } onPress={ props.onUploadMediaPress } />
+				<Button title={ __( 'Media Library' ) } onPress={ props.onMediaLibraryPress } />
 			</View>
 		</View>
 	);
