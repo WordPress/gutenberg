@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions, LayoutChangeEvent } from 'react-native';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -41,7 +41,19 @@ type PropsType = BlockType & {
 	replaceBlock: ( clientId: string ) => void,
 };
 
-export class BlockHolder extends React.Component<PropsType> {
+type StateType = {
+	isFullyBordered: boolean;
+}
+
+export class BlockHolder extends React.Component<PropsType, StateType> {
+	constructor( props: PropsType ) {
+		super( props );
+
+		this.state = {
+			isFullyBordered: false,
+		};
+	}
+
 	onFocus = ( event ) => {
 		if ( event ) {
 			// == Hack for the Alpha ==
@@ -106,6 +118,19 @@ export class BlockHolder extends React.Component<PropsType> {
 		}
 	};
 
+	onBlockHolderLayout = ( event: LayoutChangeEvent ) => {
+		const { width: fullWidth } = Dimensions.get( 'window' );
+		const { width } = event.nativeEvent.layout;
+		const isFullyBordered = fullWidth > width;
+		if ( isFullyBordered !== this.state.isFullyBordered ) {
+			this.setState( { ...this.state, isFullyBordered } );
+		}
+	}
+
+	blockHolderFocusedStyle() {
+		return this.state.isFullyBordered ? styles.blockHolderFocusedFullBordered : styles.blockHolderFocusedSemiBordered;
+	}
+
 	renderToolbar() {
 		if ( ! this.props.isSelected ) {
 			return null;
@@ -148,8 +173,8 @@ export class BlockHolder extends React.Component<PropsType> {
 		const { isSelected } = this.props;
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onFocus } >
-				<View style={ [ styles.blockHolder, isSelected && styles.blockHolderFocused ] }>
+			<TouchableWithoutFeedback onPress={ this.onFocus } onLayout={ this.onBlockHolderLayout } >
+				<View style={ [ styles.blockHolder, isSelected && this.blockHolderFocusedStyle() ] }>
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View style={ [ ! isSelected && styles.blockContainer, isSelected && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
 					{ this.renderToolbar() }

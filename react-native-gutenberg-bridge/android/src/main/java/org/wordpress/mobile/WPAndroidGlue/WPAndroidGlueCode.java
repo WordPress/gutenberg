@@ -88,7 +88,8 @@ public class WPAndroidGlueCode {
 
     public void onCreateView(View reactRootView, boolean htmlModeEnabled,
                              OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                             Application application, boolean isDebug, boolean buildGutenbergFromSource) {
+                             Application application, boolean isDebug, boolean buildGutenbergFromSource,
+                             boolean isNewPost) {
         mReactRootView = (ReactRootView) reactRootView;
 
         ReactInstanceManagerBuilder builder =
@@ -119,6 +120,10 @@ public class WPAndroidGlueCode {
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
         mReactRootView.setAppProperties(initialProps);
+
+        if (isNewPost) {
+            initContent("");
+        }
     }
 
     public void onPause(Activity activity) {

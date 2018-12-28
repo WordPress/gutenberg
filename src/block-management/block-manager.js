@@ -3,6 +3,11 @@
  * @flow
  */
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 import React from 'react';
 import { identity } from 'lodash';
 
@@ -17,6 +22,7 @@ import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 import KeyboardAwareFlatList from '../components/keyboard-aware-flat-list';
+import SafeArea from 'react-native-safe-area';
 
 // Gutenberg imports
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -26,11 +32,11 @@ import { DefaultBlockAppender } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
+	rootClientId: ?string,
 	blockClientIds: Array<string>,
 	blockCount: number,
 	focusBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
-	rootClientId: ?string,
 	replaceBlock: ( string, BlockType ) => mixed,
 	selectedBlock: ?BlockType,
 	selectedBlockClientId: string,
@@ -43,6 +49,7 @@ type StateType = {
 	blockTypePickerVisible: boolean,
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;
+	safeAreaBottomInset: number;
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
@@ -50,13 +57,20 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		super( props );
 
 		( this: any ).renderItem = this.renderItem.bind( this );
-		( this: any ).shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this )
+		( this: any ).shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		( this: any ).onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
+		( this: any ).onBlockTypeSelected = this.onBlockTypeSelected.bind( this );
+		( this: any ).onRootViewLayout = this.onRootViewLayout.bind( this );
+		( this: any ).keyboardDidShow = this.keyboardDidShow.bind( this );
+		( this: any ).keyboardDidHide = this.keyboardDidHide.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
+			safeAreaBottomInset: 0,
 		};
+		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
 	}
 
 	// TODO: in the near future this will likely be changed to onShowBlockTypePicker and bound to this.props
@@ -65,7 +79,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		this.setState( { blockTypePickerVisible: show } );
 	}
 
-	onBlockTypeSelected = ( itemValue: string ) => {
+	onBlockTypeSelected( itemValue: string ) {
 		this.setState( { blockTypePickerVisible: false } );
 
 		// create an empty block of the selected type
@@ -84,39 +98,44 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 		// now set the focus
 		this.props.focusBlock( newBlock.clientId );
-	};
+	}
 
-	onRootViewLayout = ( event: LayoutChangeEvent ) => {
+	onSafeAreaInsetsUpdate( result: Object ) {
+		const { safeAreaInsets } = result;
+		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
+			this.setState( { ...this.state, safeAreaBottomInset: safeAreaInsets.bottom } );
+		}
+	}
+
+	onRootViewLayout( event: LayoutChangeEvent ) {
 		const { height } = event.nativeEvent.layout;
 		this.setState( { rootViewHeight: height }, () => {
 			sendNativeEditorDidLayout();
 		} );
 	}
 
-	keyboardDidShow = () => {
-		this.setState( { isKeyboardVisible: true } );
-	};
-
-	keyboardDidHide = () => {
-		this.setState( { isKeyboardVisible: false } );
-	};
-
 	componentDidMount() {
 		Keyboard.addListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.addListener( 'keyboardDidHide', this.keyboardDidHide );
+		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	componentWillUnmount() {
 		Keyboard.removeListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.removeListener( 'keyboardDidHide', this.keyboardDidHide );
+		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+	}
+
+	keyboardDidShow() {
+		this.setState( { isKeyboardVisible: true } );
+	}
+
+	keyboardDidHide() {
+		this.setState( { isKeyboardVisible: false } );
 	}
 
 	shouldFlatListPreventAutomaticScroll() {
 		return this.state.blockTypePickerVisible;
-	}
-
-	keyExtractor( clientId: string ) {
-		return clientId;
 	}
 
 	renderList() {
@@ -126,6 +145,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				<KeyboardAwareFlatList
 					blockToolbarHeight={ toolbarStyles.container.height }
 					innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
+					safeAreaBottomInset={ this.state.safeAreaBottomInset }
 					parentHeight={ this.state.rootViewHeight }
 					keyboardShouldPersistTaps="always"
 					style={ styles.list }
@@ -192,13 +212,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				{ this.state.blockTypePickerVisible && this.props.isBlockSelected( clientId ) && (
 					<View style={ styles.containerStyleAddHere } >
 						<View style={ styles.lineStyleAddHere }></View>
-						<Text style={ styles.labelStyleAddHere } >ADD BLOCK HERE</Text>
+						<Text style={ styles.labelStyleAddHere } >{ __( 'ADD BLOCK HERE' ) }</Text>
 						<View style={ styles.lineStyleAddHere }></View>
 					</View>
 				) }
 			</View>
 		);
-	};
+	}
 
 	renderHTML() {
 		return (

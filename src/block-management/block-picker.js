@@ -28,7 +28,6 @@ export default class BlockPicker extends Component<PropsType> {
 
 	render() {
 		const titleForAdd = __( 'ADD BLOCK' );
-		const titleForReplace = __( 'REPLACE BLOCK' );
 		return (
 			<Modal
 				transparent={ true }
@@ -44,7 +43,7 @@ export default class BlockPicker extends Component<PropsType> {
 					<View style={ styles.shortLineStyle } />
 					<View>
 						<Text style={ styles.title }>
-							{ this.props.isReplacement ? titleForReplace : titleForAdd }
+							{ titleForAdd }
 						</Text>
 					</View>
 					<View style={ styles.lineStyle } />
