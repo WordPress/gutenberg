@@ -4,10 +4,17 @@
 import { buildTermsTree } from '../terms';
 
 describe( 'buildTermsTree()', () => {
-	it( 'Should return empty array if parent is never specified.', () => {
-		const input = Object.freeze( [ { term: 2232 }, { term: 2245 } ] );
+	it( 'Should return same array as input with zero parentand empty children added if parent is never specified.', () => {
+		const input = Object.freeze( [
+			{ id: 2232, dummy: true },
+			{ id: 2245, dummy: true },
+		] );
+		const output = Object.freeze( [
+			{ id: 2232, parent: 0, children: [], dummy: true },
+			{ id: 2245, parent: 0, children: [], dummy: true },
+		] );
 		const termsTreem = buildTermsTree( input );
-		expect( termsTreem ).toEqual( [] );
+		expect( termsTreem ).toEqual( output );
 	} );
 	it( 'Should return same array as input with empty children added if all the elements are top level', () => {
 		const input = Object.freeze( [
