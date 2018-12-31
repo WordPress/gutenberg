@@ -40,7 +40,7 @@ Blocks are the unifying evolution of what is now covered, in different ways, by 
 
 Imagine a custom `employee` block that a client can drag onto an `About` page to automatically display a picture, name, and bio of all the employees. Imagine a whole universe of plugins just as flexible, all extending WordPress in the same way. Imagine simplified menus and widgets. Users who can instantly understand and use WordPress—and 90% of plugins. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
 
-Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/reference/faq.md">FAQ</a> for answers to the most common questions about the project.
+Check out the <a href="https://wordpress.org/gutenberg/handbook/designers-developers/faq/">FAQ</a> for answers to the most common questions about the project.
 
 ## Compatibility
 
