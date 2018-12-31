@@ -12,6 +12,11 @@
 // with the JSON output.
 error_reporting( 0 );
 
+//avoid direct calls to this file
+if ( !defined( 'ABSPATH' ) ) { 
+   exit; 
+}
+
 $abspath = getenv( 'ABSPATH' );
 define( 'ABSPATH', $abspath ? $abspath : dirname( dirname( dirname( dirname( dirname( __FILE__ ) ) ) ) ) . '/' );
 define( 'WPINC', 'wp-includes' );
