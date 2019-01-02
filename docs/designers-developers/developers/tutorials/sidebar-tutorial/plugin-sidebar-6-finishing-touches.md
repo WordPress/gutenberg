@@ -55,7 +55,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockFieldWithDataAndActions )
 				)
-			} );
+			);
 		}
 	} );
 } )( window.wp );
@@ -112,7 +112,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockField )
 				)
-			} );
+			);
 		}
 	} );
 } )( window.wp );
