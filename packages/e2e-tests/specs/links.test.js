@@ -284,11 +284,12 @@ describe( 'Links', () => {
 		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
-		await page.waitForSelector( '.block-editor-url-input__suggestion' );
-		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
+		const suggestionXPath = `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]`;
+		await page.waitForXPath( suggestionXPath );
+		const autocompleteSuggestions = await page.$x( suggestionXPath );
 
 		// Expect there to be some autocomplete suggestions.
-		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+		expect( autocompleteSuggestions ).toHaveLength( 1 );
 
 		const firstSuggestion = autocompleteSuggestions[ 0 ];
 
@@ -330,7 +331,7 @@ describe( 'Links', () => {
 		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "block-editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
 
 		// Expect there to be some autocomplete suggestions.
-		expect( autocompleteSuggestions.length ).toBeGreaterThan( 0 );
+		expect( autocompleteSuggestions ).toHaveLength( 1 );
 
 		// Expect the the first suggestion to be selected when pressing the down arrow.
 		await page.keyboard.press( 'ArrowDown' );
