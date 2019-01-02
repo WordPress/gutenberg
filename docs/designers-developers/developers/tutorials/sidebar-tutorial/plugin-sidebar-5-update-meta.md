@@ -56,7 +56,7 @@ The last step in the journey is to update the meta field when the input content 
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockFieldWithDataAndActions )
 				)
-			} );
+			);
 		}
 	} );
 } )( window.wp );
