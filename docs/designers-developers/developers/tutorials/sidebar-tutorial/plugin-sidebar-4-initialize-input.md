@@ -31,7 +31,7 @@ Now that the field is available in the editor store, it can be surfaced to the U
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockField )
 				)
-			} );
+			);
 		}
 	} );
 } )( window.wp );
