@@ -16,7 +16,7 @@ import {
 	receiveEntityRecords,
 	receiveThemeSupports,
 	receiveEmbedPreview,
-	receiveUserPermissions,
+	receiveUserPermission,
 } from './actions';
 import { getKindEntities } from './entities';
 import { apiFetch } from './controls';
@@ -158,5 +158,5 @@ export function* canUser( action, resource, id ) {
 
 	const key = compact( [ action, resource, id ] ).join( '/' );
 	const isAllowed = includes( allowHeader, method );
-	yield receiveUserPermissions( key, isAllowed );
+	yield receiveUserPermission( key, isAllowed );
 }

@@ -228,7 +228,7 @@ export function embedPreviews( state = {}, action ) {
  */
 export function userPermissions( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_USER_PERMISSIONS':
+		case 'RECEIVE_USER_PERMISSION':
 			return {
 				...state,
 				[ action.key ]: action.isAllowed,

@@ -130,7 +130,7 @@ describe( 'userPermissions()', () => {
 		} );
 
 		const state = userPermissions( original, {
-			type: 'RECEIVE_USER_PERMISSIONS',
+			type: 'RECEIVE_USER_PERMISSION',
 			key: 'create/media',
 			isAllowed: true,
 		} );

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { saveEntityRecord, receiveEntityRecords, receiveUserPermissions } from '../actions';
+import { saveEntityRecord, receiveEntityRecords, receiveUserPermission } from '../actions';
 
 describe( 'saveEntityRecord', () => {
 	it( 'triggers a POST request for a new record', async () => {
@@ -59,10 +59,10 @@ describe( 'saveEntityRecord', () => {
 	} );
 } );
 
-describe( 'receiveUserPermissions', () => {
+describe( 'receiveUserPermission', () => {
 	it( 'builds an action object', () => {
-		expect( receiveUserPermissions( 'create/media', true ) ).toEqual( {
-			type: 'RECEIVE_USER_PERMISSIONS',
+		expect( receiveUserPermission( 'create/media', true ) ).toEqual( {
+			type: 'RECEIVE_USER_PERMISSION',
 			key: 'create/media',
 			isAllowed: true,
 		} );

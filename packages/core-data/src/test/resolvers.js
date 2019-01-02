@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { getEntityRecord, getEntityRecords, getEmbedPreview, canUser } from '../resolvers';
-import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermissions } from '../actions';
+import { receiveEntityRecords, receiveEmbedPreview, receiveUserPermission } from '../actions';
 import { apiFetch } from '../controls';
 
 describe( 'getEntityRecord', () => {
@@ -104,7 +104,7 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual( receiveUserPermissions( 'create/media', false ) );
+		expect( received.value ).toEqual( receiveUserPermission( 'create/media', false ) );
 
 		received = generator.next();
 		expect( received.done ).toBe( true );
@@ -128,7 +128,7 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual( receiveUserPermissions( 'create/media', true ) );
+		expect( received.value ).toEqual( receiveUserPermission( 'create/media', true ) );
 
 		received = generator.next();
 		expect( received.done ).toBe( true );
@@ -152,7 +152,7 @@ describe( 'canUser', () => {
 			},
 		} );
 		expect( received.done ).toBe( false );
-		expect( received.value ).toEqual( receiveUserPermissions( 'update/blocks/123', true ) );
+		expect( received.value ).toEqual( receiveUserPermission( 'update/blocks/123', true ) );
 
 		received = generator.next();
 		expect( received.done ).toBe( true );

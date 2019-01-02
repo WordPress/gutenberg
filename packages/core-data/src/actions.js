@@ -137,7 +137,7 @@ export function* saveEntityRecord( kind, name, record ) {
  */
 export function receiveUploadPermissions( hasUploadPermissions ) {
 	return {
-		type: 'RECEIVE_USER_PERMISSIONS',
+		type: 'RECEIVE_USER_PERMISSION',
 		key: 'create/media',
 		isAllowed: hasUploadPermissions,
 	};
@@ -152,9 +152,9 @@ export function receiveUploadPermissions( hasUploadPermissions ) {
  *
  * @return {Object} Action object.
  */
-export function receiveUserPermissions( key, isAllowed ) {
+export function receiveUserPermission( key, isAllowed ) {
 	return {
-		type: 'RECEIVE_USER_PERMISSIONS',
+		type: 'RECEIVE_USER_PERMISSION',
 		key,
 		isAllowed,
 	};
