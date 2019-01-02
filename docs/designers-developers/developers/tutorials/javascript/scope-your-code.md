@@ -24,7 +24,7 @@ console.log( 'Plugin name is ', pluginName );
 
 When loaded on the same page, `first.js` and `second.js` will output the plugin name declared within itself. They will override the value of the global `pluginName` variable if one was already declared. It's not known what gets printed in the console when `third.js` is executed, though - it depends on the value of the global `pluginName` variable when `third.js` is executed, which will depend on the order the files are loaded.
 
-This behavior is problematic and the reason we need to scope the code, to prevent values unexpectedly changing.
+This behavior can be problematic, and is the reason we need to scope the code. By scoping the code—ensuring each file is isolated from each other—we can prevent values unexpectedly changing.
 
 ## Scoping code within a function
 
