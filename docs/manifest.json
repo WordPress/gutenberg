@@ -102,6 +102,12 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Accessibility",
+		"slug": "accessibility",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/accessibility.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
