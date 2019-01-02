@@ -93,7 +93,7 @@ withSelect(
 					{ className: 'sidebar-plugin-content' },
 					el( MetaBlockFieldWithData )
 				)
-			} );
+			);
 		}
 	} );
 } )( window.wp );
