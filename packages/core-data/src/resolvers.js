@@ -125,7 +125,7 @@ export function* canUser( action, resource, id ) {
 
 	const method = methods[ action ];
 	if ( ! method ) {
-		throw new Error( `'${ action }' is not a valid action` );
+		throw new Error( `'${ action }' is not a valid action.` );
 	}
 
 	const path = id ? `/wp/v2/${ resource }/${ id }` : `/wp/v2/${ resource }`;
