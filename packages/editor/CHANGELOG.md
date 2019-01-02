@@ -8,6 +8,10 @@
 
 - BlockSwitcher will now consistently render an icon for block multi-selections.
 
+### New feature
+
+- Added new `EditorSaveKeyboardShortcut` component, which was refactored out from the `EditorGlobalKeyboardShortcuts` component.
+
 ### Internal
 
 - Removed `jQuery` dependency
