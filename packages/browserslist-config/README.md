@@ -7,7 +7,7 @@
 Install the module
 
 ```shell
-$ npm install @wordpress/browserslist-config
+$ npm install browserslist @wordpress/browserslist-config --save-dev
 ```
 
 ## Usage
