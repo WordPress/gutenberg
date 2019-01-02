@@ -328,7 +328,18 @@ describe( 'addQueryArgs', () => {
 	} );
 
 	it( 'should return only querystring when passed undefined url', () => {
-		expect( addQueryArgs( undefined, { sun: 'true' } ) ).toBe( '?sun=true' );
+		const url = undefined;
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe( '?sun=true' );
+	} );
+
+	it( 'should return URL argument unaffected if no query arguments to append', () => {
+		const args = {};
+
+		[ '', 'https://example.com', 'https://example.com?' ].forEach( ( url ) => {
+			expect( addQueryArgs( url, args ) ).toBe( url );
+		} );
 	} );
 } );
 
