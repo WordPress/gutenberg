@@ -1,0 +1,35 @@
+{
+	"name": "@wordpress/babel-plugin-transform-with-select",
+	"version": "1.0.0",
+	"description": "WordPress Babel transform to provide withSelect reducerKeys hint.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"babel",
+		"plugin"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/babel-plugin-transform-with-select/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"files": [
+		"build",
+		"build-module"
+	],
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0"
+	},
+	"peerDependencies": {
+		"@babel/core": "^7.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
