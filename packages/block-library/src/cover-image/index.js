@@ -39,7 +39,6 @@ const blockAttributes = {
 	},
 	contentAlign: {
 		type: 'string',
-		default: 'center',
 	},
 	id: {
 		type: 'number',
