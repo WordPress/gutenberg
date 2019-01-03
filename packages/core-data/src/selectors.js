@@ -178,7 +178,7 @@ export function isPreviewEmbedFallback( state, url ) {
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @deprecated since 4.8. Callers should use the more generic `canUser()` selector instead of
+ * @deprecated since 4.9. Callers should use the more generic `canUser()` selector instead of
  *             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
  *
  * @param {Object} state Data state.
