@@ -142,6 +142,8 @@ export function* canUser( action, resource, id ) {
 			parse: false,
 		} );
 	} catch ( error ) {
+		// Do nothing if our OPTIONS request comes back with an API error (4xx or
+		// 5xx). The previously determined isAllowed value will remain in the store.
 		return;
 	}
 
