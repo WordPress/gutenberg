@@ -14,13 +14,18 @@ import { RegistryConsumer } from '../registry-provider';
  * Higher-order component used to inject state-derived props using registered
  * selectors.
  *
- * @param {Function} mapSelectToProps Function called on every state change,
- *                                   expected to return object of props to
- *                                   merge with the component's own props.
+ * @param {Function}                mapSelectToProps Function called on every
+ *                                                   state change, expected to
+ *                                                   return object of props to
+ *                                                   merge with the component's
+ *                                                   own props.
+ * @param {?(string|Array<string>)} reducerKeys      Optional subset of reducer
+ *                                                   keys on which subscribe
+ *                                                   callback should be called.
  *
  * @return {Component} Enhanced component with merged state data props.
  */
-const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( WrappedComponent ) => {
+const withSelect = ( mapSelectToProps, reducerKeys ) => createHigherOrderComponent( ( WrappedComponent ) => {
 	/**
 	 * Default merge props. A constant value is used as the fallback since it
 	 * can be more efficiently shallow compared in case component is repeatedly
@@ -137,7 +142,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		}
 
 		subscribe( registry ) {
-			this.unsubscribe = registry.subscribe( this.onStoreChange );
+			this.unsubscribe = registry.subscribe( this.onStoreChange, reducerKeys );
 		}
 
 		render() {
