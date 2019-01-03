@@ -24,6 +24,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender } from '@wordpress/editor';
+import { PostTitle } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 import EventEmitter from 'events';
@@ -241,9 +242,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		);
 	}
 
-	renderHeader() {
-		return (
-			<View>
+	/*
 				<TextInput
 					blurOnSubmit={ true }
 					style={ styles.title }
@@ -253,6 +252,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					value={ this.state.title }
 					onChangeText={ this.onChangeTitle }>
 				</TextInput>
+				*/
+	renderHeader() {
+		console.log("Header!");
+
+		return (
+			<View>
+				<PostTitle/>
 				<View
 					style={ {
 						paddingLeft: 16,
