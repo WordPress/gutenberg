@@ -122,7 +122,7 @@ export const ListEdit = ( {
 		<BlockFormatControls>
 			<Toolbar
 				controls={ [
-					{
+					onTagNameChange && {
 						icon: 'editor-ul',
 						title: __( 'Convert to unordered list' ),
 						isActive: isActiveListType( 'ul', tagName ),
@@ -134,7 +134,7 @@ export const ListEdit = ( {
 							}
 						},
 					},
-					{
+					onTagNameChange && {
 						icon: 'editor-ol',
 						title: __( 'Convert to ordered list' ),
 						isActive: isActiveListType( 'ol', tagName ),
@@ -160,7 +160,7 @@ export const ListEdit = ( {
 							onChange( indentListItems( value, { type: tagName } ) );
 						},
 					},
-				] }
+				].filter( Boolean ) }
 			/>
 		</BlockFormatControls>
 	</Fragment>
