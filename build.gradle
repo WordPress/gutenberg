@@ -13,6 +13,8 @@ buildscript {
     }
 }
 
+group='com.github.wordpress-mobile.gutenberg-mobile'
+
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
 

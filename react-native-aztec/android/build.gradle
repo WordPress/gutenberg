@@ -28,6 +28,8 @@ apply plugin: 'com.android.library'
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
+group='com.github.wordpress-mobile.gutenberg-mobile'
+
 // fallback flag value for when lib is compiled individually (e.g. via jitpack)
 project.ext.buildGutenbergFromSource = false
 
