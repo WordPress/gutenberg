@@ -4,6 +4,7 @@ module.exports = function( api ) {
 	return {
 		presets: [ '@wordpress/babel-preset-default' ],
 		plugins: [
+			'@wordpress/babel-plugin-transform-with-select',
 			[
 				'@wordpress/babel-plugin-import-jsx-pragma',
 				{
