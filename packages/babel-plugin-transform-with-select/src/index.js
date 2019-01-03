@@ -45,13 +45,11 @@ export default function( babel ) {
 
 	return {
 		visitor: {
-			CallExpression: {
-				exit( path ) {
-					const { node } = path;
-					if ( node.callee.name === 'select' && node.arguments.length > 0 && node.arguments[ 0 ].type === 'StringLiteral' ) {
-						addNamespaceToWithSelect( path, node.arguments[ 0 ].value );
-					}
-				},
+			CallExpression( path ) {
+				const { node } = path;
+				if ( node.callee.name === 'select' && node.arguments.length > 0 && node.arguments[ 0 ].type === 'StringLiteral' ) {
+					addNamespaceToWithSelect( path, node.arguments[ 0 ].value );
+				}
 			},
 		},
 	};
