@@ -572,7 +572,7 @@ export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
 	const status = getEditedPostAttribute( state, 'status' );
-	if ( status === 'draft' || status === 'auto-draft' ) {
+	if ( status === 'draft' || status === 'auto-draft' || status === 'pending' ) {
 		return date === modified;
 	}
 	return false;
