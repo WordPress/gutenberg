@@ -335,10 +335,10 @@ describe( 'addQueryArgs', () => {
 	} );
 
 	it( 'should return URL argument unaffected if no query arguments to append', () => {
-		const args = {};
-
 		[ '', 'https://example.com', 'https://example.com?' ].forEach( ( url ) => {
-			expect( addQueryArgs( url, args ) ).toBe( url );
+			[ undefined, {} ].forEach( ( args ) => {
+				expect( addQueryArgs( url, args ) ).toBe( url );
+			} );
 		} );
 	} );
 } );

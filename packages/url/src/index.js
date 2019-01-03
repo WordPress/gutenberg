@@ -171,7 +171,7 @@ export function isValidFragment( fragment ) {
  */
 export function addQueryArgs( url = '', args ) {
 	// If no arguments are to be appended, return original URL.
-	if ( ! Object.keys( args ).length ) {
+	if ( ! args || ! Object.keys( args ).length ) {
 		return url;
 	}
 
