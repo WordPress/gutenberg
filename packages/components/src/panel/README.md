@@ -8,14 +8,14 @@ The `Panel` creates a container with a header that can take collapsible `PanelBo
 
 #### Props
 
-###### className
+##### className
 
 The class that will be added with `components-panel`. If no `className` is passed only `components-panel__body` and `is-opened` is used.
 
 - Type: `String`
 - Required: No
 
-###### header
+##### header
 
 Title of the `Panel`. Text will be rendered inside an `<h2>` tag.
 
@@ -72,6 +72,7 @@ Whether or not the panel will start open.
 - Type: `Boolean`
 - Required: No
 - Default: true
+
 ---
 ### PanelRow
 
