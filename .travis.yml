@@ -68,7 +68,7 @@ jobs:
         - ./bin/setup-local-env.sh
       script:
         - $( npm bin )/jest --config test/e2e/jest.config.json --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --runInBand --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Admin with plugins) (2/2)
       env: WP_VERSION=latest POPULAR_PLUGINS=true
@@ -76,7 +76,7 @@ jobs:
         - ./bin/setup-local-env.sh
       script:
         - $( npm bin )/jest --config test/e2e/jest.config.json --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --runInBand --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author without plugins) (1/2)
       env: WP_VERSION=latest E2E_ROLE=author
@@ -84,7 +84,7 @@ jobs:
         - ./bin/setup-local-env.sh
       script:
         - $( npm bin )/jest --config test/e2e/jest.config.json --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --runInBand --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
 
     - name: E2E tests (Author without plugins) (2/2)
       env: WP_VERSION=latest E2E_ROLE=author
@@ -92,4 +92,4 @@ jobs:
         - ./bin/setup-local-env.sh
       script:
         - $( npm bin )/jest --config test/e2e/jest.config.json --listTests > ~/.jest-e2e-tests
-        - npm run test-e2e -- --ci --runInBand --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )
