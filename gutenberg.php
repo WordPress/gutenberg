@@ -96,7 +96,7 @@ function gutenberg_menu() {
 		$submenu['gutenberg'][] = array(
 			__( 'Feedback', 'gutenberg' ),
 			'edit_posts',
-			'http://wordpressdotorg.polldaddy.com/s/gutenberg-support',
+			'https://wordpressdotorg.survey.fm/gutenberg-support',
 		);
 
 		$submenu['gutenberg'][] = array(
