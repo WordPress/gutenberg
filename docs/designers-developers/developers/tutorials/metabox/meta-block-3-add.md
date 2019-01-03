@@ -59,8 +59,9 @@ registerBlockType("myguten/meta-block", {
 
 ```php
 function myguten_enqueue() {
-	wp_enqueue_script( 'myguten-script',
-    	plugins_url( 'myguten.js', __FILE__ ),
+	wp_enqueue_script(
+		'myguten-script',
+		plugins_url( 'myguten.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element', 'wp-components' )
 	);
 }
