@@ -120,11 +120,18 @@ describe( 'isPreviewEmbedFallback()', () => {
 } );
 
 describe( 'canUser', () => {
-	it( 'returns true by default', () => {
+	it( 'returns false by default', () => {
 		const state = deepFreeze( {
 			userPermissions: {},
 		} );
-		expect( canUser( state, 'create', 'media' ) ).toBe( true );
+		expect( canUser( state, 'create', 'media' ) ).toBe( false );
+	} );
+
+	it( 'returns true by default if defaultIsAllowed is specified', () => {
+		const state = deepFreeze( {
+			userPermissions: {},
+		} );
+		expect( canUser( state, 'create', 'media', undefined, true ) ).toBe( true );
 	} );
 
 	it( 'returns whether an action can be performed', () => {

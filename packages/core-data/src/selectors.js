@@ -171,14 +171,23 @@ export function isPreviewEmbedFallback( state, url ) {
 }
 
 /**
- * Return Upload Permissions.
+ * Returns whether the current user can upload media.
  *
- * @param  {Object}  state State tree.
+ * Calling this may trigger an OPTIONS request ot the REST API via the
+ * `canUser()` resolver.
  *
- * @return {boolean} Upload Permissions.
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @deprecated since 4.8. Callers should use the more generic `canUser()` selector instead of
+ *             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {boolean} Whether or not the user can upload media. Defaults to `true` if the OPTIONS
+ *                   request is being made.
  */
 export function hasUploadPermissions( state ) {
-	return canUser( state, 'create', 'media' );
+	return canUser( state, 'create', 'media', undefined, true );
 }
 
 /**
@@ -190,15 +199,18 @@ export function hasUploadPermissions( state ) {
  *
  * https://developer.wordpress.org/rest-api/reference/
  *
- * @param {Object}  state    Data state.
- * @param {string}  action   Action to check. One of: 'create', 'read', 'update',
- *                           'delete'.
- * @param {string}  resource REST resource to check, e.g. 'media' or 'posts'.
- * @param {?string} id       ID of the rest resource to check.
+ * @param {Object}   state            Data state.
+ * @param {string}   action           Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param {string}   resource         REST resource to check, e.g. 'media' or 'posts'.
+ * @param {string=}  id               Optional ID of the rest resource to check.
+ * @param {boolean=} defaultIsAllowed What to return when we don't know if the current user can
+ *                                    perform the given action on the given resource. Defaults to
+ *                                    `false`.
  *
- * @return {boolean} Whether or not the user can perform the action.
+ * @return {boolean} Whether or not the user can perform the action, or `defaultIsAllowed` if the
+ *                   OPTIONS request is still being made.
  */
-export function canUser( state, action, resource, id ) {
+export function canUser( state, action, resource, id = undefined, defaultIsAllowed = false ) {
 	const key = compact( [ action, resource, id ] ).join( '/' );
-	return get( state, [ 'userPermissions', key ], true );
+	return get( state, [ 'userPermissions', key ], defaultIsAllowed );
 }
