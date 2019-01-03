@@ -8,4 +8,16 @@ jest.mock( '../react-native-gutenberg-bridge', () => {
 	};
 } );
 
+jest.mock( 'react-native-safe-area', () => {
+	return {
+		getSafeAreaInsetsForRootView: () => {
+			return new Promise( ( accept ) => {
+				accept( { safeAreaInsets: { bottom: 34 } } );
+			} );
+		},
+		addEventListener: jest.fn(),
+		removeEventListener: jest.fn(),
+	};
+} );
+
 jest.mock( 'react-native-recyclerview-list' );

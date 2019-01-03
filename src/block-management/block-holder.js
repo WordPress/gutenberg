@@ -4,7 +4,7 @@
 */
 
 import React from 'react';
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions, LayoutChangeEvent } from 'react-native';
 import InlineToolbar from './inline-toolbar';
 
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -32,7 +32,19 @@ type PropsType = BlockType & {
 	canMoveDown: boolean,
 };
 
-export class BlockHolder extends React.Component<PropsType> {
+type StateType = {
+	isFullyBordered: boolean;
+}
+
+export class BlockHolder extends React.Component<PropsType, StateType> {
+	constructor( props: PropsType ) {
+		super( props );
+
+		this.state = {
+			isFullyBordered: false,
+		};
+	}
+
 	renderToolbarIfBlockFocused() {
 		if ( this.props.isSelected ) {
 			return (
@@ -79,14 +91,27 @@ export class BlockHolder extends React.Component<PropsType> {
 		const { focused } = this.props;
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.props.onSelect } >
-				<View style={ [ styles.blockHolder, focused && styles.blockHolderFocused ] }>
+			<TouchableWithoutFeedback onPress={ this.props.onSelect } onLayout={ this.onBlockHolderLayout } >
+				<View style={ [ styles.blockHolder, focused && this.blockHolderFocusedStyle() ] } >
 					{ this.props.showTitle && this.renderBlockTitle() }
 					<View style={ [ ! focused && styles.blockContainer, focused && styles.blockContainerFocused ] }>{ this.getBlockForType() }</View>
 					{ this.renderToolbarIfBlockFocused() }
 				</View>
 			</TouchableWithoutFeedback>
 		);
+	}
+
+	onBlockHolderLayout = ( event: LayoutChangeEvent ) => {
+		const { width: fullWidth } = Dimensions.get( 'window' );
+		const { width } = event.nativeEvent.layout;
+		const isFullyBordered = fullWidth > width;
+		if ( isFullyBordered !== this.state.isFullyBordered ) {
+			this.setState( { ...this.state, isFullyBordered } );
+		}
+	}
+
+	blockHolderFocusedStyle() {
+		return this.state.isFullyBordered ? styles.blockHolderFocusedFullBordered : styles.blockHolderFocusedSemiBordered;
 	}
 }
 

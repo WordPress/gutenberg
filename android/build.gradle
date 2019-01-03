@@ -3,7 +3,7 @@ buildscript {
         gradlePluginVersion = '3.1.0'
         kotlinVersion = '1.2.31'
         supportLibVersion = '27.1.1'
-        tagSoupVersion = '1.2.2'
+        tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
         picassoVersion = '2.5.2'
         robolectricVersion = '3.5.1'

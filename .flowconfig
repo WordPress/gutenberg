@@ -106,6 +106,7 @@ suppress_comment=\\(.\\|\n\\)*\\$FlowExpectedError
 
 [untyped]
 <PROJECT_ROOT>/node_modules/react-native-keyboard-aware-scroll-view/.*
+<PROJECT_ROOT>/node_modules/react-native-safe-area/.*
 
 [version]
 ^0.67.1
