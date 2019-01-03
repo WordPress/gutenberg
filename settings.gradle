@@ -1,0 +1,4 @@
+include ':react-native-aztec'
+project(':react-native-aztec').projectDir = new File(rootProject.projectDir, 'react-native-aztec/android')
+include ':react-native-gutenberg-bridge'
+project(':react-native-gutenberg-bridge').projectDir = new File(rootProject.projectDir, 'react-native-gutenberg-bridge/android')
