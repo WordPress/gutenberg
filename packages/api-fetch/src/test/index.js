@@ -183,4 +183,38 @@ describe( 'apiFetch', () => {
 			} );
 		} );
 	} );
+
+	it( 'should not use the default fetch handler when using a custom fetch handler', () => {
+		const customFetchHandler = jest.fn();
+
+		apiFetch.setFetchHandler( customFetchHandler );
+
+		apiFetch( { path: '/random' } );
+
+		expect( window.fetch ).not.toHaveBeenCalled();
+
+		expect( customFetchHandler ).toHaveBeenCalledWith( {
+			path: '/random?_locale=user',
+		} );
+	} );
+
+	it( 'should run the last-registered user-defined middleware first', () => {
+		// This could potentially impact other tests in that a lingering
+		// middleware is left. For the purposes of this test, it is sufficient
+		// to ensure that the last-registered middleware receives the original
+		// options object. It also assumes that some built-in middleware would
+		// either mutate or clone the original options if the extra middleware
+		// had been pushed to the stack.
+		expect.assertions( 1 );
+
+		const expectedOptions = {};
+
+		apiFetch.use( ( actualOptions, next ) => {
+			expect( actualOptions ).toBe( expectedOptions );
+
+			return next( actualOptions );
+		} );
+
+		apiFetch( expectedOptions );
+	} );
 } );
