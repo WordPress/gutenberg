@@ -214,7 +214,6 @@ export class BlockListBlock extends Component {
 			isHovered ||
 			isPartOfMultiSelection ||
 			isSelected ||
-			this.props.isMultiSelecting ||
 			this.hadTouchStart
 		) {
 			return;
@@ -376,7 +375,6 @@ export class BlockListBlock extends Component {
 						isFirstMultiSelected,
 						isTypingWithinBlock,
 						isCaretWithinFormattedText,
-						isMultiSelecting,
 						isEmptyDefaultBlock,
 						isMovable,
 						isParentOfSelectedBlock,
@@ -386,7 +384,7 @@ export class BlockListBlock extends Component {
 						isValid,
 						attributes,
 					} = this.props;
-					const isHovered = this.state.isHovered && ! isMultiSelecting;
+					const isHovered = this.state.isHovered && ! isPartOfMultiSelection;
 					const blockType = getBlockType( name );
 					// translators: %s: Type of block (i.e. Text, Image etc)
 					const blockLabel = sprintf( __( 'Block: %s' ), blockType.title );
@@ -416,7 +414,6 @@ export class BlockListBlock extends Component {
 						! isFocusMode &&
 						( isSelected || hoverArea === 'left' ) &&
 						! showEmptyBlockSideInserter &&
-						! isMultiSelecting &&
 						! isPartOfMultiSelection &&
 						! isTypingWithinBlock;
 					const shouldShowBreadcrumb =
@@ -635,7 +632,6 @@ const applyWithSelect = withSelect(
 			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
-			isMultiSelecting,
 			isTyping,
 			isCaretWithinFormattedText,
 			getBlockIndex,
@@ -662,7 +658,6 @@ const applyWithSelect = withSelect(
 			isPartOfMultiSelection:
 				isBlockMultiSelected( clientId ) || isAncestorMultiSelected( clientId ),
 			isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
-			isMultiSelecting: isMultiSelecting(),
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if the block is not selected.
 			isTypingWithinBlock:
