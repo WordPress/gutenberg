@@ -12,6 +12,8 @@ set -e
 cd "$( dirname $0 )"
 cd ..
 
+TMP_WORKING_DIRECTORY=$(mktemp -d)
+
 BINTRAY_REPO="wordpress-mobile/react-native-mirror"
 PACKAGE_PATHS=("node_modules/react-native/android/com/facebook/react/react-native" "node_modules/jsc-android/dist/org/webkit/android-jsc")
 
@@ -49,6 +51,13 @@ create_bintray_version () {
 echo "Please sign into Bintray..."
 echo "You can find your Bintray API key here: https://bintray.com/profile/edit"
 jfrog bt config
+
+# Yarn install
+echo "Running yarn install in '${TMP_WORKING_DIRECTORY}'..."
+cp "package.json" "${TMP_WORKING_DIRECTORY}/"
+cp "yarn.lock" "${TMP_WORKING_DIRECTORY}/"
+cd "${TMP_WORKING_DIRECTORY}"
+yarn install --silent
 
 # Find local packages in node_modules/
 echo "Getting local package details..."
