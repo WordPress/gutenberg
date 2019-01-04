@@ -18,6 +18,7 @@ import {
  * Internal dependencies
  */
 import DocumentOutlineItem from './item';
+import removeURLHash from './remove-url-hash';
 
 /**
  * Module constants
@@ -86,7 +87,10 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						onSelect={ onSelect }
+						onSelect={ ( e ) => {
+							removeURLHash();
+							onSelect( e );
+						} }
 						href={ `#${ titleNode.id }` }
 					>
 						{ title }
