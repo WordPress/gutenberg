@@ -110,11 +110,13 @@ class Sandbox extends Component {
 				// the iframe root and interfere with our mechanism for
 				// determining the unconstrained page bounds.
 				function removeViewportStyles( ruleOrNode ) {
-					[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-						if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-							ruleOrNode.style[ style ] = '';
-						}
-					} );
+					if( ruleOrNode.style ) {
+						[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
+							if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
+								ruleOrNode.style[ style ] = '';
+							}
+						} );
+					}
 				}
 
 				Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
