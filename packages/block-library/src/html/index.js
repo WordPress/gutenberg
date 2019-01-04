@@ -65,18 +65,24 @@ export const settings = {
 	edit: compose( [
 		withSelect( ( select ) => {
 			const { getEditorSettings } = select( 'core/editor' );
-			const styles = map( getEditorSettings().styles, ( { css, baseURL } ) => {
-				if ( ! baseURL ) {
-					return css;
-				}
-				return traverse( css, urlRewrite( baseURL ) );
-			} );
+			const styles = getEditorSettings().styles;
+			if ( styles && styles.length > 0 ) {
+				return {
+					styles: map( styles, ( { css, baseURL } ) => {
+						if ( ! baseURL ) {
+							return css;
+						}
+						return traverse( css, urlRewrite( baseURL ) );
+					} ),
+				};
+			}
+
 			return {
-				css: styles.join( '\n' ),
+				styles: [],
 			};
 		} ),
 		withState( { isPreview: false } ),
-	] )( ( { attributes, setAttributes, setState, isPreview, css } ) => (
+	] )( ( { attributes, setAttributes, setState, isPreview, styles } ) => (
 		<div className="wp-block-html">
 			<BlockControls>
 				<div className="components-toolbar">
@@ -97,7 +103,7 @@ export const settings = {
 			<Disabled.Consumer>
 				{ ( isDisabled ) => (
 					( isPreview || isDisabled ) ? (
-						<SandBox html={ attributes.content } css={ css } />
+						<SandBox html={ attributes.content } styles={ styles } />
 					) : (
 						<PlainText
 							value={ attributes.content }
