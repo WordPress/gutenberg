@@ -4,6 +4,7 @@
 import plugin, {
 	createPersistenceInterface,
 	withInitialState,
+	withLazySameState,
 } from '../';
 import objectStorage from '../storage/object';
 import { createRegistry } from '../../../';
@@ -138,6 +139,34 @@ describe( 'persistence', () => {
 		expect( objectStorage.setItem ).toHaveBeenCalledWith( 'WP_DATA', '{"test":{"foo":1}}' );
 	} );
 
+	it( 'should not persist an unchanging subset', () => {
+		const initialState = { foo: 'bar' };
+		function reducer( state = initialState, action ) {
+			const { type, key, value } = action;
+			if ( type === 'SET_KEY_VALUE' ) {
+				return { ...state, [ key ]: value };
+			}
+
+			return state;
+		}
+
+		registry.registerStore( 'test', {
+			reducer,
+			persist: [ 'foo' ],
+			actions: {
+				setKeyValue( key, value ) {
+					return { type: 'SET_KEY_VALUE', key, value };
+				},
+			},
+		} );
+
+		registry.dispatch( 'test' ).setKeyValue( 'foo', 1 );
+		objectStorage.setItem.mockClear();
+
+		registry.dispatch( 'test' ).setKeyValue( 'foo', 1 );
+		expect( objectStorage.setItem ).not.toHaveBeenCalled();
+	} );
+
 	describe( 'createPersistenceInterface', () => {
 		const storage = objectStorage;
 		const storageKey = 'FOO';
@@ -192,6 +221,32 @@ describe( 'persistence', () => {
 			const enhanced = withInitialState( reducer, 2 );
 
 			expect( enhanced() ).toBe( 2 );
+		} );
+	} );
+
+	describe( 'withLazySameState', () => {
+		it( 'should call the original reducer if action.nextState differs from state', () => {
+			const reducer = jest.fn().mockImplementation( ( state, action ) => action.nextState );
+			const enhanced = withLazySameState( reducer );
+
+			reducer.mockClear();
+
+			const state = enhanced( 1, { nextState: 2 } );
+
+			expect( state ).toBe( 2 );
+			expect( reducer ).toHaveBeenCalled();
+		} );
+
+		it( 'should not call the original reducer if action.nextState equals state', () => {
+			const reducer = jest.fn().mockImplementation( ( state, action ) => action.nextState );
+			const enhanced = withLazySameState( reducer );
+
+			reducer.mockClear();
+
+			const state = enhanced( 1, { nextState: 1 } );
+
+			expect( state ).toBe( 1 );
+			expect( reducer ).not.toHaveBeenCalled();
 		} );
 	} );
 } );
