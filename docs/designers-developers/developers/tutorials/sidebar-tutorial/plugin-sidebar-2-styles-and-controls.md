@@ -20,7 +20,7 @@ To visualize and edit the meta field value you'll use an input component. The `@
 					title: 'My plugin sidebar',
 				},
 				el( 'div',
-					{ className: 'sidebar-plugin-content' },
+					{ className: 'plugin-sidebar-content' },
 					el( Text, {
 						label: 'Meta Block Field',
 						value: 'Initial value',
@@ -35,17 +35,17 @@ To visualize and edit the meta field value you'll use an input component. The `@
 } )( window.wp );
 ```
 
-Update the `sidebar-plugin.js` with this new code. Notice that it uses a new utility called `wp.components` from the `@wordpress/components` package. Go ahead and add it as `wp-components` in the PHP dependencies array.
+Update the `plugin-sidebar.js` with this new code. Notice that it uses a new utility called `wp.components` from the `@wordpress/components` package. Go ahead and add it as `wp-components` in the PHP dependencies array.
 
 It introduces a few changes from the previous section:
 
-* Added the CSS class `sidebar-plugin-content` to the `div` element to be able to add some styles.
+* Added the CSS class `plugin-sidebar-content` to the `div` element to be able to add some styles.
 * Substituted the raw _Meta field_ text with a `TextControl` component wrapped within the `div` element.
 
-With the new CSS class available you can now give the sidebar a bit of breath. Create a new file in your plugin directory called `sidebar-plugin.css` with the following contents:
+With the new CSS class available you can now give the sidebar a bit of breath. Create a new file in your plugin directory called `plugin-sidebar.css` with the following contents:
 
 ```css
-.sidebar-plugin-content {
+.plugin-sidebar-content {
 	padding: 16px;
 }
 ```
@@ -63,8 +63,8 @@ Plugin Name: Sidebar example
 
 function sidebar_plugin_register() {
 	wp_register_script(
-		'sidebar-plugin-js',
-		plugins_url( 'sidebar-plugin.js', __FILE__ ),
+		'plugin-sidebar-js',
+		plugins_url( 'plugin-sidebar.js', __FILE__ ),
 		array(
 			'wp-plugins',
 			'wp-edit-post',
@@ -73,19 +73,19 @@ function sidebar_plugin_register() {
 		)
 	);
 	wp_register_style(
-		'sidebar-plugin-css',
-		plugins_url( 'sidebar-plugin.css', __FILE__ )
+		'plugin-sidebar-css',
+		plugins_url( 'plugin-sidebar.css', __FILE__ )
 	);
 }
 add_action( 'init', 'sidebar_plugin_register' );
 
 function sidebar_plugin_script_enqueue() {
-	wp_enqueue_script( 'sidebar-plugin-js' );
+	wp_enqueue_script( 'plugin-sidebar-js' );
 }
 add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 
 function sidebar_plugin_style_enqueue() {
-	wp_enqueue_style( 'sidebar-plugin-css' );
+	wp_enqueue_style( 'plugin-sidebar-css' );
 }
 add_action( 'enqueue_block_assets', 'sidebar_plugin_style_enqueue' );
 ```

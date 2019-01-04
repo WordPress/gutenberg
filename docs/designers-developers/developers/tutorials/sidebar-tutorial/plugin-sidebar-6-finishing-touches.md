@@ -52,7 +52,7 @@ The first step is to convert the functions `mapSelectToProps` and `mapDispatchTo
 					title: 'My plugin sidebar',
 				},
 				el( 'div',
-					{ className: 'sidebar-plugin-content' },
+					{ className: 'plugin-sidebar-content' },
 					el( MetaBlockFieldWithDataAndActions )
 				)
 			);
@@ -109,7 +109,7 @@ Next, merge `MetaBlockField`, `MetaBlockFieldWithData`, and `MetaBlockFieldWithD
 					title: 'My plugin sidebar',
 				},
 				el( 'div',
-					{ className: 'sidebar-plugin-content' },
+					{ className: 'plugin-sidebar-content' },
 					el( MetaBlockField )
 				)
 			);
@@ -184,7 +184,7 @@ Notice how the `metaFieldName` can be accessed within `withSelect`. Let's change
 					title: 'My plugin sidebar',
 				},
 				el( 'div',
-					{ className: 'sidebar-plugin-content' },
+					{ className: 'plugin-sidebar-content' },
 					el( MetaBlockField,
 						{ fieldName: 'sidebar_plugin_meta_block_field' }
 					)

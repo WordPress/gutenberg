@@ -53,7 +53,7 @@ The last step in the journey is to update the meta field when the input content 
 					title: 'My plugin sidebar',
 				},
 				el( 'div',
-					{ className: 'sidebar-plugin-content' },
+					{ className: 'plugin-sidebar-content' },
 					el( MetaBlockFieldWithDataAndActions )
 				)
 			);

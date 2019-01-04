@@ -28,7 +28,7 @@ Now that the field is available in the editor store, it can be surfaced to the U
 					title: 'My plugin sidebar',
 				},
 				el( 'div',
-					{ className: 'sidebar-plugin-content' },
+					{ className: 'plugin-sidebar-content' },
 					el( MetaBlockField )
 				)
 			);
@@ -90,7 +90,7 @@ withSelect(
 					title: 'My plugin sidebar',
 				},
 				el( 'div',
-					{ className: 'sidebar-plugin-content' },
+					{ className: 'plugin-sidebar-content' },
 					el( MetaBlockFieldWithData )
 				)
 			);

@@ -2,7 +2,7 @@
 
 The first step in the journey is to tell the editor that there is a new plugin that will have its own sidebar. You can do so by using the [registerPlugin](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-plugins/), [PluginSidebar](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-edit-post/#pluginsidebar), and [createElement](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/packages-element/) utilities provided by WordPress, to be found in the `@wordpress/plugins`, `@wordpress/edit-post`, and `@wordpress/element` [packages](https://wordpress.org/gutenberg/handbook/designers-developers/developers/packages/), respectively.
 
-Add the following code to a JavaScript file called `sidebar-plugin.js` and save it within your plugin's directory:
+Add the following code to a JavaScript file called `plugin-sidebar.js` and save it within your plugin's directory:
 
 ```js
 ( function( wp ) {
@@ -38,15 +38,15 @@ Plugin Name: Sidebar plugin
 
 function sidebar_plugin_register() {
 	wp_register_script(
-		'sidebar-plugin-js',
-		plugins_url( 'sidebar-plugin.js', __FILE__ ),
+		'plugin-sidebar-js',
+		plugins_url( 'plugin-sidebar.js', __FILE__ ),
 		array( 'wp-plugins', 'wp-edit-post', 'wp-element' )
 	);
 }
 add_action( 'init', 'sidebar_plugin_register' );
 
 function sidebar_plugin_script_enqueue() {
-	wp_enqueue_script( 'sidebar-plugin-js' );
+	wp_enqueue_script( 'plugin-sidebar-js' );
 }
 add_action( 'enqueue_block_editor_assets', 'sidebar_plugin_script_enqueue' );
 ```
