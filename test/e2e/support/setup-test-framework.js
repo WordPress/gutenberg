@@ -2,6 +2,7 @@
  * External dependencies
  */
 import 'expect-puppeteer';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -108,7 +109,7 @@ function observeConsoleLogging() {
 			return;
 		}
 
-		const text = message.text();
+		let text = message.text();
 
 		// An exception is made for _blanket_ deprecation warnings: Those
 		// which log regardless of whether a deprecated feature is in use.
@@ -123,6 +124,19 @@ function observeConsoleLogging() {
 		}
 
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
+
+		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of
+		// type JSHandle for error logging, instead of the expected string.
+		//
+		// See: https://github.com/GoogleChrome/puppeteer/issues/3397
+		//
+		// The recommendation there to asynchronously resolve the error value
+		// upon a console event may be prone to a race condition with the test
+		// completion, leaving a possibility of an error not being surfaced
+		// correctly. Instead, the logic here synchronously inspects the
+		// internal object shape of the JSHandle to find the error text. If it
+		// cannot be found, the default text value is used instead.
+		text = get( message.args(), [ 0, '_remoteObject', 'description' ], text );
 
 		// Disable reason: We intentionally bubble up the console message
 		// which, unless the test explicitly anticipates the logging via

@@ -1,3 +1,5 @@
+/* eslint-disable @wordpress/no-unused-vars-before-return */
+
 // Adapted from https://github.com/reworkcss/css
 // because we needed to remove source map support.
 
