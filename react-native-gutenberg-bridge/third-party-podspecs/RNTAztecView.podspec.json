@@ -3,13 +3,14 @@
   "version": "0.1.4",
   "summary": "Aztec editor for React Native",
   "license": "GPL-2.0",
-  "homepage": "https://github.com/wordpress-mobile/react-native-aztec",
+  "homepage": "https://github.com/wordpress-mobile/gutenberg-mobile",
   "authors": "Automattic",
   "source": {
-    "git": "https://github.com/wordpress-mobile/react-native-aztec.git"
+    "git": "https://github.com/wordpress-mobile/gutenberg-mobile.git",
+    "branch": "feature/fold-aztec-wrapper-in-main-repo"
   },
-  "source_files": "ios/RNTAztecView/*.{h,m,swift}",
-  "public_header_files": "ios/RNTAztecView/*.h",
+  "source_files": "react-native-aztec/ios/RNTAztecView/*.{h,m,swift}",
+  "public_header_files": "react-native-aztec/ios/RNTAztecView/*.h",
   "requires_arc": true,
   "platforms": {
     "ios": "10.0"
