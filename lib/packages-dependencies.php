@@ -131,7 +131,6 @@ return array(
 		'wp-viewport',
 	),
 	'wp-editor'                             => array(
-		'jquery',
 		'lodash',
 		'wp-a11y',
 		'wp-api-fetch',
