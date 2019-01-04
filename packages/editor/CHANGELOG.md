@@ -1,3 +1,9 @@
+## 9.0.7 (Unreleased)
+
+### Internal
+
+- Removed `jQuery` dependency
+
 ## 9.0.7 (2019-01-03)
 
 ## 9.0.6 (2018-12-18)
