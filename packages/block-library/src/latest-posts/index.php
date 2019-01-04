@@ -21,7 +21,7 @@ function render_block_core_latest_posts( $attributes ) {
 		'suppress_filters' => false,
 	);
 
-	if( isset( $attributes['categories'] ) ){
+	if ( isset( $attributes['categories'] ) ) {
 		$args['category'] = join( ',', $attributes['categories'] );
 	}
 
