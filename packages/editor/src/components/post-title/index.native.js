@@ -34,8 +34,6 @@ class PostTitle extends Component {
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.redirectHistory = this.redirectHistory.bind( this );
 
-		console.log( "Arguments: " +  JSON.stringify(arguments) );
-
 		this.state = {
 			isSelected: false,
 		};
@@ -99,9 +97,6 @@ class PostTitle extends Component {
 		
 		const { isSelected } = this.state;
 		const decodedPlaceholder = decodeEntities( placeholder );
-
-		console.log("Placeholder: " + placeholder);
-		console.log("Decoded: " + decodedPlaceholder);
 
 		return (
 			<TextInput
