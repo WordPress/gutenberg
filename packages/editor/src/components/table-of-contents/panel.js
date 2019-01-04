@@ -1,11 +1,14 @@
 /**
+ * External dependencies
+ */
+import { defer } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-
-import { delay } from 'lodash';
 
 /**
  * Internal dependencies
@@ -16,10 +19,10 @@ import DocumentOutline from '../document-outline';
 function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, onRequestClose } ) {
 	// Remove the block id hash from the url because block ids are only valid for the session.
 	const removeBlockIdHash = () => {
-		delay( () => {
+		defer( () => {
 			const { pathname, search } = window.location;
 			window.history.replaceState( '', document.title, pathname + search );
-		}, 50 );
+		} );
 	};
 	return (
 		<Fragment>
