@@ -135,17 +135,23 @@ class InlineLinkUI extends Component {
 			const selectedText = getTextContent( slice( value ) );
 
 			if ( opensInNewWindow ) {
+				let rel = 'noopener noreferrer';
+
+				if ( attributes.rel ) {
+					rel = [ rel, attributes.rel ].join( ' ' );
+				}
+
 				this.setLinkAttributes( {
 					'aria-label': sprintf( __( '%s (opens in a new tab)' ), selectedText ),
 					target: '_blank',
-					rel: 'nofollow noreferrer',
+					rel,
 					...attributes,
 				} );
 			} else {
 				if ( typeof attributes.rel === 'string' ) {
 					attributes.rel = attributes.rel.split( ' ' ).filter( ( relItem ) => {
 						return relItem !== 'noopener' && relItem !== 'noreferrer';
-					} ).join( ' ' );
+					} ).join( ' ' ).trim();
 				} else {
 					delete attributes.rel;
 				}
