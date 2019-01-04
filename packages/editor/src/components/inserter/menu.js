@@ -368,6 +368,10 @@ export default compose(
 			hideInsertionPoint,
 		} = dispatch( 'core/editor' );
 
+		// To avoid duplication, getInsertionPoint is extracted and used in two event handlers
+		// This breaks the withDispatch not containing any logic rule.
+		// Since it's a function only called when the event handlers are called,
+		// it's fine to extract it.
 		// eslint-disable-next-line no-restricted-syntax
 		function getInsertionPoint() {
 			const {

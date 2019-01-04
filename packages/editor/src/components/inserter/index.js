@@ -112,7 +112,7 @@ export default compose( [
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			hasItems: hasInserterItems( rootClientId ),
-			rootClientId: rootClientId || getBlockInsertionPoint().rootClientId,
+			rootClientId,
 		};
 	} ),
 	ifCondition( ( { hasItems } ) => hasItems ),
