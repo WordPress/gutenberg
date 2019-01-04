@@ -254,7 +254,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				blockToolbarHeight={ toolbarStyles.container.height }
 				innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
 				safeAreaBottomInset={ this.state.safeAreaBottomInset }
-				parentHeight={ this.state.rootViewHeight }
 				keyboardShouldPersistTaps="always"
 				style={ styles.list }
 				data={ this.state.blocks }
