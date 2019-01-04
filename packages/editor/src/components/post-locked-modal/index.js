@@ -2,6 +2,7 @@
  * External dependencies
  */
 import jQuery from 'jquery';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -118,7 +119,7 @@ class PostLockedModal extends Component {
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils } = this.props;
+		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}
@@ -133,7 +134,10 @@ class PostLockedModal extends Component {
 			action: 'edit',
 			_wpnonce: postLockUtils.nonce,
 		} );
-		const allPosts = getWPAdminURL( 'edit.php' );
+		const allPostsUrl = getWPAdminURL( 'edit.php', {
+			post_type: get( postType, [ 'slug' ] ),
+		} );
+		const allPostsLabel = get( postType, [ 'labels', 'all_items' ] );
 		return (
 			<Modal
 				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
@@ -155,19 +159,19 @@ class PostLockedModal extends Component {
 						<div>
 							{ userDisplayName ?
 								sprintf(
-									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-									__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' ),
+									/* translators: %s: user's display name */
+									__( '%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' ),
 									userDisplayName
 								) :
-								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-								__( 'Another user now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' )
+								__( 'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' )
 							}
 						</div>
-						<p>
-							<a href={ allPosts }>
-								{ __( 'View all posts' ) }
-							</a>
-						</p>
+
+						<div className="editor-post-locked-modal__buttons">
+							<Button isPrimary isLarge href={ allPostsUrl }>
+								{ allPostsLabel }
+							</Button>
+						</div>
 					</div>
 				) }
 				{ ! isTakeover && (
@@ -175,18 +179,17 @@ class PostLockedModal extends Component {
 						<div>
 							{ userDisplayName ?
 								sprintf(
-									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+									/* translators: %s: user's display name */
 									__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
 									userDisplayName
 								) :
-								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
 								__( 'Another user is currently working on this post, which means you cannot make changes, unless you take over.' )
 							}
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isDefault isLarge href={ allPosts }>
-								{ __( 'All Posts' ) }
+							<Button isDefault isLarge href={ allPostsUrl }>
+								{ allPostsLabel }
 							</Button>
 							<PostPreviewButton />
 							<Button isPrimary isLarge href={ unlockUrl }>
@@ -209,7 +212,9 @@ export default compose(
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -217,6 +222,7 @@ export default compose(
 			postId: getCurrentPostId(),
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
+			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

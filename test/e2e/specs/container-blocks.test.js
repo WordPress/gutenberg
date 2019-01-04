@@ -49,6 +49,15 @@ describe( 'InnerBlocks Template Sync', () => {
 		await insertBlockAndAddParagraphInside( 'Test InnerBlocks locking all', 'test/test-inner-blocks-locking-all' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'Ensure inner block writing flow works as expected without additional paragraphs added', async () => {
+		const TEST_BLOCK_NAME = 'Test Inner Blocks Paragraph Placeholder';
+
+		await insertBlock( TEST_BLOCK_NAME );
+		await page.keyboard.type( 'Test Paragraph' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
 
 describe( 'Container block without paragraph support', () => {

@@ -1,7 +1,15 @@
 /**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost } from '../support/utils';
+import {
+	clickBlockAppender,
+	newPost,
+	isEmbedding,
+	setUpResponseMocking,
+	JSONResponse,
+	getEditedPostContent,
+	clickButton,
+} from '../support/utils';
 
 const MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE = {
 	url: 'https://wordpress.org/gutenberg/handbook/block-api/attributes/',
@@ -51,43 +59,38 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 	html: false,
 };
 
-const MOCK_RESPONSES = {
-	'https://wordpress.org/gutenberg/handbook/': MOCK_BAD_WORDPRESS_RESPONSE,
-	'https://wordpress.org/gutenberg/handbook/block-api/attributes/': MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE,
-	'https://www.youtube.com/watch?v=lXMskKTw3Bc': MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
-	'https://cloudup.com/cQFlxqtY4ob': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
-	'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
-	'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
-	'https://twitter.com/wooyaygutenberg123454312': MOCK_CANT_EMBED_RESPONSE,
-};
+const MOCK_RESPONSES = [
+	{
+		match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
+		onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://cloudup.com/cQFlxqtY4ob' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://twitter.com/notnownikki' ),
+		onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://twitter.com/thatbunty' ),
+		onRequestMatch: JSONResponse( MOCK_BAD_EMBED_PROVIDER_RESPONSE ),
+	},
+	{
+		match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
+		onRequestMatch: JSONResponse( MOCK_CANT_EMBED_RESPONSE ),
+	},
+];
 
-const setupEmbedRequestInterception = async () => {
-	// Intercept successful embed requests so that scripts loaded from third parties
-	// cannot leave errors in the console and cause the test to fail.
-	await page.setRequestInterception( true );
-	page.on( 'request', async ( request ) => {
-		const requestUrl = request.url();
-		const isEmbeddingUrl = -1 !== requestUrl.indexOf( 'oembed%2F1.0%2Fproxy' );
-		if ( isEmbeddingUrl ) {
-			const embedUrl = decodeURIComponent( /.*url=([^&]+).*/.exec( requestUrl )[ 1 ] );
-			const mockResponse = MOCK_RESPONSES[ embedUrl ];
-			if ( undefined !== mockResponse ) {
-				request.respond( {
-					content: 'application/json',
-					body: JSON.stringify( mockResponse ),
-				} );
-			} else {
-				request.continue();
-			}
-		} else {
-			request.continue();
-		}
-	} );
-};
-
-const addEmbeds = async () => {
-	await newPost();
-
+const addAllEmbeds = async () => {
 	// Valid embed.
 	await clickBlockAppender();
 	await page.keyboard.type( '/embed' );
@@ -138,15 +141,12 @@ const addEmbeds = async () => {
 	await page.keyboard.press( 'Enter' );
 };
 
-const setUp = async () => {
-	await setupEmbedRequestInterception();
-	await addEmbeds();
-};
-
 describe( 'Embedding content', () => {
-	beforeEach( setUp );
+	beforeAll( async () => await setUpResponseMocking( MOCK_RESPONSES ) );
+	beforeEach( newPost );
 
 	it( 'should render embeds in the correct state', async () => {
+		await addAllEmbeds();
 		// The successful embeds should be in a correctly classed figure element.
 		// This tests that they have switched to the correct block.
 		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
@@ -159,5 +159,37 @@ describe( 'Embedding content', () => {
 		await page.waitForSelector( 'input[value="https://twitter.com/wooyaygutenberg123454312"]' );
 		await page.waitForSelector( 'input[value="https://twitter.com/thatbunty"]' );
 		await page.waitForSelector( 'input[value="https://wordpress.org/gutenberg/handbook/"]' );
+	} );
+
+	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
+		// URL that can't be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.press( 'Enter' );
+
+		await clickButton( 'Convert to link' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should allow the user to try embedding a failed URL again', async () => {
+		// URL that can't be embedded.
+		await clickBlockAppender();
+		await page.keyboard.type( '/embed' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'https://twitter.com/wooyaygutenberg123454312' );
+		await page.keyboard.press( 'Enter' );
+		// Set up a different mock to make sure that try again actually does make the request again.
+		await setUpResponseMocking(
+			[
+				{
+					match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
+					onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+				},
+			]
+		);
+		await clickButton( 'Try again' );
+		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
 	} );
 } );

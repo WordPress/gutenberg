@@ -21,6 +21,7 @@ describe( 'persistence', () => {
 
 		// Since the exposed `registerStore` is a proxying function, mimic
 		// intercept of original call by adding an initial plugin.
+		// TODO: Remove the `use` function in favor of `registerGenericStore`
 		registry = createRegistry()
 			.use( ( originalRegistry ) => {
 				originalRegisterStore = jest.spyOn( originalRegistry, 'registerStore' );

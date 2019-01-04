@@ -8,14 +8,14 @@ import { getEmbedBlockSettings } from './settings';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 
 export const name = 'core/embed';
 
 export const settings = getEmbedBlockSettings( {
-	title: __( 'Embed' ),
-	description: __( 'The Embed block allows you to easily add videos, images, tweets, audio, and other content to your post or page.' ),
+	title: _x( 'Embed', 'block title' ),
+	description: __( 'Embed videos, images, tweets, audio, and other content from external sources.' ),
 	icon: embedContentIcon,
 	// Unknown embeds should not be responsive by default.
 	responsive: false,

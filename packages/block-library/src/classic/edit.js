@@ -5,6 +5,8 @@ import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
 
+const { wp } = window;
+
 function isTmceEmpty( editor ) {
 	// When tinyMce is empty the content seems to be:
 	// <p><br data-mce-bogus="1"></p>
@@ -76,25 +78,32 @@ export default class ClassicEdit extends Component {
 	onSetup( editor ) {
 		const { attributes: { content }, setAttributes } = this.props;
 		const { ref } = this;
+		let bookmark;
 
 		this.editor = editor;
-
-		// Disable TinyMCE's keyboard shortcut help.
-		editor.on( 'BeforeExecCommand', ( event ) => {
-			if ( event.command === 'WP_Help' ) {
-				event.preventDefault();
-			}
-		} );
 
 		if ( content ) {
 			editor.on( 'loadContent', () => editor.setContent( content ) );
 		}
 
 		editor.on( 'blur', () => {
+			bookmark = editor.selection.getBookmark( 2, true );
+
 			setAttributes( {
 				content: editor.getContent(),
 			} );
+
+			editor.once( 'focus', () => {
+				if ( bookmark ) {
+					editor.selection.moveToBookmark( bookmark );
+				}
+			} );
+
 			return false;
+		} );
+
+		editor.on( 'mousedown touchstart', () => {
+			bookmark = null;
 		} );
 
 		editor.on( 'keydown', ( event ) => {
@@ -115,6 +124,7 @@ export default class ClassicEdit extends Component {
 			}
 		} );
 
+		// TODO: the following is for back-compat with WP 4.9, not needed in WP 5.0. Remove it after the release.
 		editor.addButton( 'kitchensink', {
 			tooltip: _x( 'More', 'button to expand options' ),
 			icon: 'dashicon dashicons-editor-kitchensink',
@@ -127,11 +137,19 @@ export default class ClassicEdit extends Component {
 			},
 		} );
 
+		// Show the second, third, etc. toolbars when the `kitchensink` button is removed by a plugin.
+		editor.on( 'init', function() {
+			if ( editor.settings.toolbar1 && editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1 ) {
+				editor.dom.addClass( ref, 'has-advanced-toolbar' );
+			}
+		} );
+
 		editor.addButton( 'wp_add_media', {
 			tooltip: __( 'Insert Media' ),
 			icon: 'dashicon dashicons-admin-media',
 			cmd: 'WP_Medialib',
 		} );
+		// End TODO.
 
 		editor.on( 'init', () => {
 			const rootNode = this.editor.getBody();

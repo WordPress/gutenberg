@@ -4,11 +4,6 @@
 import { castArray } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * Returns an action object used in signalling that block types have been added.
  *
  * @param {Array|Object} blockTypes Block types received.
@@ -37,6 +32,38 @@ export function removeBlockTypes( names ) {
 }
 
 /**
+ * Returns an action object used in signalling that new block styles have been added.
+ *
+ * @param {string}       blockName  Block name.
+ * @param {Array|Object} styles     Block styles.
+ *
+ * @return {Object} Action object.
+ */
+export function addBlockStyles( blockName, styles ) {
+	return {
+		type: 'ADD_BLOCK_STYLES',
+		styles: castArray( styles ),
+		blockName,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that block styles have been removed.
+ *
+ * @param {string}       blockName  Block name.
+ * @param {Array|string} styleNames Block style names.
+ *
+ * @return {Object} Action object.
+ */
+export function removeBlockStyles( blockName, styleNames ) {
+	return {
+		type: 'REMOVE_BLOCK_STYLES',
+		styleNames: castArray( styleNames ),
+		blockName,
+	};
+}
+
+/**
  * Returns an action object used to set the default block name.
  *
  * @param {string} name Block name.
@@ -48,23 +75,6 @@ export function setDefaultBlockName( name ) {
 		type: 'SET_DEFAULT_BLOCK_NAME',
 		name,
 	};
-}
-
-/**
- * Returns an action object used to set the name of the block used as a fallback
- * for non-block content.
- *
- * @param {string} name Block name.
- *
- * @return {Object} Action object.
- */
-export function setFallbackBlockName( name ) {
-	deprecated( 'setFallbackBlockName', {
-		plugin: 'Gutenberg',
-		version: '4.2',
-		alternative: 'setFreeformFallbackBlockName and setUnregisteredFallbackBlockName',
-	} );
-	return setFreeformFallbackBlockName( name );
 }
 
 /**
@@ -108,5 +118,21 @@ export function setCategories( categories ) {
 	return {
 		type: 'SET_CATEGORIES',
 		categories,
+	};
+}
+
+/**
+ * Returns an action object used to update a category.
+ *
+ * @param {string} slug     Block category slug.
+ * @param {Object} category Object containing the category properties that should be updated.
+ *
+ * @return {Object} Action object.
+ */
+export function updateCategory( slug, category ) {
+	return {
+		type: 'UPDATE_CATEGORY',
+		slug,
+		category,
 	};
 }

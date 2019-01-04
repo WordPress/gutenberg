@@ -25,8 +25,6 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import BrowserURL from '../browser-url';
-import BlockSidebar from '../sidebar/block-sidebar';
-import DocumentSidebar from '../sidebar/document-sidebar';
 import Header from '../header';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -34,6 +32,7 @@ import EditorModeKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import OptionsModal from '../options-modal';
 import MetaBoxes from '../meta-boxes';
+import SettingsSidebar from '../sidebar/settings-sidebar';
 import Sidebar from '../sidebar';
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
@@ -50,6 +49,7 @@ function Layout( {
 	hasActiveMetaboxes,
 	isSaving,
 	isMobileViewport,
+	isRichEditingEnabled,
 } ) {
 	const sidebarIsOpened = editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 
@@ -83,8 +83,8 @@ function Layout( {
 				<EditorModeKeyboardShortcuts />
 				<KeyboardShortcutHelpModal />
 				<OptionsModal />
-				{ mode === 'text' && <TextEditor /> }
-				{ mode === 'visual' && <VisualEditor /> }
+				{ ( mode === 'text' || ! isRichEditingEnabled ) && <TextEditor /> }
+				{ isRichEditingEnabled && mode === 'visual' && <VisualEditor /> }
 				<div className="edit-post-layout__metaboxes">
 					<MetaBoxes location="normal" />
 				</div>
@@ -114,8 +114,7 @@ function Layout( {
 							{ __( 'Open publish panel' ) }
 						</Button>
 					</div>
-					<DocumentSidebar />
-					<BlockSidebar />
+					<SettingsSidebar />
 					<Sidebar.Slot />
 					{
 						isMobileViewport && sidebarIsOpened && <ScrollLock />
@@ -137,6 +136,7 @@ export default compose(
 		hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive( 'fixedToolbar' ),
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { closePublishSidebar, togglePublishSidebar } = dispatch( 'core/edit-post' );

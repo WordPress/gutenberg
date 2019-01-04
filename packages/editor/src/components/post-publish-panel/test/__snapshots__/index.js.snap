@@ -21,7 +21,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
   <div
     className="editor-post-publish-panel__content"
   >
-    <WithSelect(PostPublishPanelPostpublish) />
+    <WithSelect(PostPublishPanelPostpublish)
+      focusOnMount={true}
+    />
   </div>
   <div
     className="editor-post-publish-panel__footer"
@@ -54,7 +56,9 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
   <div
     className="editor-post-publish-panel__content"
   >
-    <WithSelect(PostPublishPanelPostpublish) />
+    <WithSelect(PostPublishPanelPostpublish)
+      focusOnMount={true}
+    />
   </div>
   <div
     className="editor-post-publish-panel__footer"

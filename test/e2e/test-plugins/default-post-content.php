@@ -10,20 +10,23 @@
 /**
  * Change the default title.
  */
-add_filter( 'default_title', function() {
+function gutenberg_test_default_title() {
 	return 'My default title';
-} );
+}
+add_filter( 'default_title', 'gutenberg_test_default_title' );
 
 /**
- * Change teh default post content.
+ * Change the default post content.
  */
-add_filter( 'default_content', function() {
+function gutenberg_test_default_content() {
 	return 'My default content';
-} );
+}
+add_filter( 'default_content', 'gutenberg_test_default_content' );
 
 /**
  * Change the default excerpt.
  */
-add_filter( 'default_excerpt', function() {
+function gutenberg_test_default_excerpt() {
 	return 'My default excerpt';
-} );
+}
+add_filter( 'default_excerpt', 'gutenberg_test_default_excerpt' );

@@ -15,6 +15,11 @@ module.exports = {
 			selectors: [ path.resolve( root, 'packages/core-data/src/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/core-data/src/actions.js' ) ],
 		},
+		'core/annotations': {
+			title: 'Annotations',
+			selectors: [ path.resolve( root, 'packages/annotations/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/annotations/src/store/actions.js' ) ],
+		},
 		'core/blocks': {
 			title: 'Block Types Data',
 			selectors: [ path.resolve( root, 'packages/blocks/src/store/selectors.js' ) ],
@@ -30,6 +35,11 @@ module.exports = {
 			selectors: [ path.resolve( root, 'packages/edit-post/src/store/selectors.js' ) ],
 			actions: [ path.resolve( root, 'packages/edit-post/src/store/actions.js' ) ],
 		},
+		'core/notices': {
+			title: 'Notices Data',
+			selectors: [ path.resolve( root, 'packages/notices/src/store/selectors.js' ) ],
+			actions: [ path.resolve( root, 'packages/notices/src/store/actions.js' ) ],
+		},
 		'core/nux': {
 			title: 'The NUX (New User Experience) Data',
 			selectors: [ path.resolve( root, 'packages/nux/src/store/selectors.js' ) ],
@@ -41,11 +51,11 @@ module.exports = {
 			actions: [ path.resolve( root, 'packages/viewport/src/store/actions.js' ) ],
 		},
 	},
-	dataDocsOutput: path.resolve( __dirname, '../data' ),
+	dataDocsOutput: path.resolve( __dirname, '../designers-developers/developers/data' ),
 
 	packageFileNames: glob( 'packages/*/package.json' )
 		.map( ( fileName ) => fileName.split( '/' )[ 1 ] ),
 
-	rootManifest: path.resolve( __dirname, '../root-manifest.json' ),
+	tocFileName: path.resolve( __dirname, '../toc.json' ),
 	manifestOutput: path.resolve( __dirname, '../manifest.json' ),
 };

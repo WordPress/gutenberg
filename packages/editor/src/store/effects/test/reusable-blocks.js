@@ -12,7 +12,6 @@ import {
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
-import '@wordpress/core-data'; // Needed to load the core store
 
 /**
  * Internal dependencies
@@ -28,15 +27,16 @@ import {
 import {
 	resetBlocks,
 	receiveBlocks,
-	saveReusableBlock,
-	deleteReusableBlock,
+	__experimentalSaveReusableBlock as saveReusableBlock,
+	__experimentalDeleteReusableBlock as deleteReusableBlock,
 	removeBlocks,
-	convertBlockToReusable as convertBlockToReusableAction,
-	convertBlockToStatic as convertBlockToStaticAction,
-	receiveReusableBlocks as receiveReusableBlocksAction,
-	fetchReusableBlocks as fetchReusableBlocksAction,
+	__experimentalConvertBlockToReusable as convertBlockToReusableAction,
+	__experimentalConvertBlockToStatic as convertBlockToStaticAction,
+	__experimentalReceiveReusableBlocks as receiveReusableBlocksAction,
+	__experimentalFetchReusableBlocks as fetchReusableBlocksAction,
 } from '../../actions';
 import reducer from '../../reducer';
+import '../../..'; // Ensure store dependencies are imported via root.
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
@@ -70,11 +70,13 @@ describe( 'reusable blocks effects', () => {
 			const blockPromise = Promise.resolve( [
 				{
 					id: 123,
+					status: 'publish',
 					title: {
 						raw: 'My cool block',
 					},
 					content: {
 						raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+						protected: false,
 					},
 				},
 			] );
@@ -83,7 +85,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -118,11 +120,13 @@ describe( 'reusable blocks effects', () => {
 		it( 'should fetch a single reusable block', async () => {
 			const blockPromise = Promise.resolve( {
 				id: 123,
+				status: 'publish',
 				title: {
 					raw: 'My cool block',
 				},
 				content: {
 					raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+					protected: false,
 				},
 			} );
 			const postTypePromise = Promise.resolve( {
@@ -130,7 +134,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -162,6 +166,42 @@ describe( 'reusable blocks effects', () => {
 			} );
 		} );
 
+		it( 'should ignore reusable blocks with a trashed post status', async () => {
+			const blockPromise = Promise.resolve( {
+				id: 123,
+				status: 'trash',
+				title: {
+					raw: 'My cool block',
+				},
+				content: {
+					raw: '<!-- wp:test-block {"name":"Big Bird"} /-->',
+					protected: false,
+				},
+			} );
+			const postTypePromise = Promise.resolve( {
+				slug: 'wp_block', rest_base: 'blocks',
+			} );
+
+			apiFetch.mockImplementation( ( options ) => {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
+					return postTypePromise;
+				}
+
+				return blockPromise;
+			} );
+
+			const dispatch = jest.fn();
+			const store = { getState: noop, dispatch };
+
+			await fetchReusableBlocks( fetchReusableBlocksAction( 123 ), store );
+
+			expect( dispatch ).toHaveBeenCalledTimes( 1 );
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
+				id: 123,
+			} );
+		} );
+
 		it( 'should handle an API error', async () => {
 			const blockPromise = Promise.reject( {
 				code: 'unknown_error',
@@ -172,7 +212,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -202,7 +242,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -236,7 +276,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -284,7 +324,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -330,7 +370,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 
 			apiFetch.mockImplementation( ( options ) => {
-				if ( options.path === '/wp/v2/types/wp_block?context=edit' ) {
+				if ( options.path === '/wp/v2/types/wp_block' ) {
 					return postTypePromise;
 				}
 
@@ -399,6 +439,46 @@ describe( 'reusable blocks effects', () => {
 					expect.objectContaining( {
 						name: 'core/test-block',
 						attributes: { name: 'Big Bird' },
+					} ),
+				],
+				time: expect.any( Number ),
+			} );
+		} );
+
+		it( 'should convert a reusable block with nested blocks into a static block', () => {
+			const associatedBlock = createBlock( 'core/block', { ref: 123 } );
+			const reusableBlock = { id: 123, title: 'My cool block' };
+			const parsedBlock = createBlock( 'core/test-block', { name: 'Big Bird' }, [
+				createBlock( 'core/test-block', { name: 'Oscar the Grouch' } ),
+				createBlock( 'core/test-block', { name: 'Cookie Monster' } ),
+			] );
+
+			const state = reduce( [
+				resetBlocks( [ associatedBlock ] ),
+				receiveReusableBlocksAction( [ { reusableBlock, parsedBlock } ] ),
+				receiveBlocks( [ parsedBlock ] ),
+			], reducer, undefined );
+
+			const dispatch = jest.fn();
+			const store = { getState: () => state, dispatch };
+
+			convertBlockToStatic( convertBlockToStaticAction( associatedBlock.clientId ), store );
+
+			expect( dispatch ).toHaveBeenCalledWith( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ associatedBlock.clientId ],
+				blocks: [
+					expect.objectContaining( {
+						name: 'core/test-block',
+						attributes: { name: 'Big Bird' },
+						innerBlocks: [
+							expect.objectContaining( {
+								attributes: { name: 'Oscar the Grouch' },
+							} ),
+							expect.objectContaining( {
+								attributes: { name: 'Cookie Monster' },
+							} ),
+						],
 					} ),
 				],
 				time: expect.any( Number ),

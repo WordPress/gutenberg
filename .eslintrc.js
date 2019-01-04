@@ -19,14 +19,8 @@ const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.
 module.exports = {
 	root: true,
 	extends: [
-		'./eslint/config.js',
-		'plugin:jest/recommended'
-	],
-	env: {
-		'jest/globals': true,
-	},
-	plugins: [
-		'jest',
+		'plugin:@wordpress/eslint-plugin/recommended',
+		'plugin:jest/recommended',
 	],
 	rules: {
 		'no-restricted-syntax': [
@@ -155,10 +149,7 @@ module.exports = {
 				message: 'Prefer page.waitForSelector instead.',
 			},
 			{
-				// The <DotTip> component uses the `id` prop for something that does not require an
-				// instanceId; maybe we should change its key.
-				// See: https://github.com/WordPress/gutenberg/issues/10305
-				selector: 'JSXOpeningElement[name.name!="DotTip"] JSXAttribute[name.name="id"][value.type="Literal"]',
+				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
 				message: 'Do not use string literals for IDs; use withInstanceId instead.',
 			},
 			{
@@ -167,6 +158,10 @@ module.exports = {
 				// component: `withInstanceId`.
 				selector: 'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
 				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
+			},
+			{
+				selector: 'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
+				message: 'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
 			},
 		],
 		'react/forbid-elements': [ 'error', {
@@ -188,9 +183,13 @@ module.exports = {
 	overrides: [
 		{
 			files: [ 'test/e2e/**/*.js' ],
-			globals: {
-				page: true,
+			env: {
 				browser: true,
+			},
+			globals: {
+				browser: true,
+				page: true,
+				wp: true,
 			},
 		},
 	],

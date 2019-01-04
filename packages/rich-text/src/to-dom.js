@@ -3,6 +3,7 @@
  */
 
 import { toTree } from './to-tree';
+import { createElement } from './create-element';
 
 /**
  * Browser dependencies
@@ -58,15 +59,17 @@ function getNodeByPath( node, path ) {
 	};
 }
 
-function createEmpty( type ) {
-	const { body } = document.implementation.createHTMLDocument( '' );
-
-	if ( type ) {
-		return body.appendChild( body.ownerDocument.createElement( type ) );
-	}
-
-	return body;
-}
+/**
+ * Returns a new instance of a DOM tree upon which RichText operations can be
+ * applied.
+ *
+ * Note: The current implementation will return a shared reference, reset on
+ * each call to `createEmpty`. Therefore, you should not hold a reference to
+ * the value to operate upon asynchronously, as it may have unexpected results.
+ *
+ * @return {WPRichTextTree} RichText tree.
+ */
+const createEmpty = () => createElement( document, '' );
 
 function append( element, child ) {
 	if ( typeof child === 'string' ) {
@@ -110,11 +113,56 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-export function toDom( value, multilineTag ) {
+function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
+	const length = element.childNodes.length;
+	const doc = element.ownerDocument;
+
+	for ( let index = 0; index < length; index++ ) {
+		const child = element.childNodes[ index ];
+
+		if ( child.nodeType === TEXT_NODE ) {
+			if ( length === 1 && ! child.nodeValue ) {
+				// Pad if the only child is an empty text node.
+				element.appendChild( createLinePadding( doc ) );
+			}
+		} else {
+			if (
+				multilineWrapperTags &&
+				! child.previousSibling &&
+				multilineWrapperTags.indexOf( child.nodeName.toLowerCase() ) !== -1
+			) {
+				// Pad the line if there is no content before a nested wrapper.
+				element.insertBefore( createLinePadding( doc ), child );
+			}
+
+			padEmptyLines( { element: child, createLinePadding, multilineWrapperTags } );
+		}
+	}
+}
+
+function prepareFormats( prepareEditableTree = [], value ) {
+	return prepareEditableTree.reduce( ( accumlator, fn ) => {
+		return fn( accumlator, value.text );
+	}, value.formats );
+}
+
+export function toDom( {
+	value,
+	multilineTag,
+	multilineWrapperTags,
+	createLinePadding,
+	prepareEditableTree,
+} ) {
 	let startPath = [];
 	let endPath = [];
 
-	const tree = toTree( value, multilineTag, {
+	const tree = toTree( {
+		value: {
+			...value,
+			formats: prepareFormats( prepareEditableTree, value ),
+		},
+		multilineTag,
+		multilineWrapperTags,
 		createEmpty,
 		append,
 		getLastChild,
@@ -123,26 +171,18 @@ export function toDom( value, multilineTag ) {
 		getText,
 		remove,
 		appendText,
-		onStartIndex( body, pointer, multilineIndex ) {
+		onStartIndex( body, pointer ) {
 			startPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
-
-			if ( multilineIndex !== undefined ) {
-				startPath = [ multilineIndex, ...startPath ];
-			}
 		},
-		onEndIndex( body, pointer, multilineIndex ) {
+		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
-
-			if ( multilineIndex !== undefined ) {
-				endPath = [ multilineIndex, ...endPath ];
-			}
 		},
-		onEmpty( body ) {
-			const br = body.ownerDocument.createElement( 'br' );
-			br.setAttribute( 'data-mce-bogus', '1' );
-			body.appendChild( br );
-		},
+		isEditableTree: true,
 	} );
+
+	if ( createLinePadding ) {
+		padEmptyLines( { element: tree, createLinePadding, multilineWrapperTags } );
+	}
 
 	return {
 		body: tree,
@@ -160,9 +200,22 @@ export function toDom( value, multilineTag ) {
  *                                   tree to.
  * @param {string}      multilineTag Multiline tag.
  */
-export function apply( value, current, multilineTag ) {
+export function apply( {
+	value,
+	current,
+	multilineTag,
+	multilineWrapperTags,
+	createLinePadding,
+	prepareEditableTree,
+} ) {
 	// Construct a new element tree in memory.
-	const { body, selection } = toDom( value, multilineTag );
+	const { body, selection } = toDom( {
+		value,
+		multilineTag,
+		multilineWrapperTags,
+		createLinePadding,
+		prepareEditableTree,
+	} );
 
 	applyValue( body, current );
 
@@ -173,21 +226,17 @@ export function apply( value, current, multilineTag ) {
 
 export function applyValue( future, current ) {
 	let i = 0;
+	let futureChild;
 
-	while ( future.firstChild ) {
+	while ( ( futureChild = future.firstChild ) ) {
 		const currentChild = current.childNodes[ i ];
-		const futureNodeType = future.firstChild.nodeType;
 
 		if ( ! currentChild ) {
-			current.appendChild( future.firstChild );
-		} else if (
-			futureNodeType !== currentChild.nodeType ||
-			futureNodeType !== TEXT_NODE ||
-			future.firstChild.nodeValue !== currentChild.nodeValue
-		) {
-			current.replaceChild( future.firstChild, currentChild );
+			current.appendChild( futureChild );
+		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
+			current.replaceChild( futureChild, currentChild );
 		} else {
-			future.removeChild( future.firstChild );
+			future.removeChild( futureChild );
 		}
 
 		i++;
@@ -196,6 +245,25 @@ export function applyValue( future, current ) {
 	while ( current.childNodes[ i ] ) {
 		current.removeChild( current.childNodes[ i ] );
 	}
+}
+
+/**
+ * Returns true if two ranges are equal, or false otherwise. Ranges are
+ * considered equal if their start and end occur in the same container and
+ * offset.
+ *
+ * @param {Range} a First range object to test.
+ * @param {Range} b First range object to test.
+ *
+ * @return {boolean} Whether the two ranges are equal.
+ */
+function isRangeEqual( a, b ) {
+	return (
+		a.startContainer === b.startContainer &&
+		a.startOffset === b.startOffset &&
+		a.endContainer === b.endContainer &&
+		a.endOffset === b.endOffset
+	);
 }
 
 export function applySelection( selection, current ) {
@@ -230,6 +298,15 @@ export function applySelection( selection, current ) {
 		range.setEnd( endContainer, endOffset );
 	}
 
-	windowSelection.removeAllRanges();
+	if ( windowSelection.rangeCount > 0 ) {
+		// If the to be added range and the live range are the same, there's no
+		// need to remove the live range and add the equivalent range.
+		if ( isRangeEqual( range, windowSelection.getRangeAt( 0 ) ) ) {
+			return;
+		}
+
+		windowSelection.removeAllRanges();
+	}
+
 	windowSelection.addRange( range );
 }

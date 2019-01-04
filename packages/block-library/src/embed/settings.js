@@ -14,13 +14,14 @@ import classnames from 'classnames/dedupe';
 import { __, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { RichText } from '@wordpress/editor';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 const embedAttributes = {
 	url: {
 		type: 'string',
 	},
 	caption: {
+		type: 'string',
 		source: 'html',
 		selector: 'figcaption',
 	},
@@ -75,8 +76,18 @@ export function getEmbedBlockSettings( { title, description, icon, category = 'e
 				return {
 					preview: validPreview ? preview : undefined,
 					fetching,
-					supportsResponsive: themeSupports[ 'responsive-embeds' ],
+					themeSupportsResponsive: themeSupports[ 'responsive-embeds' ],
 					cannotEmbed,
+				};
+			} ),
+			withDispatch( ( dispatch, ownProps ) => {
+				const { url } = ownProps.attributes;
+				const coreData = dispatch( 'core/data' );
+				const tryAgain = () => {
+					coreData.invalidateResolution( 'core', 'getEmbedPreview', [ url ] );
+				};
+				return {
+					tryAgain,
 				};
 			} )
 		)( edit ),

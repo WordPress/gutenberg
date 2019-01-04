@@ -22,28 +22,29 @@
 		flex-grow: 0;
 	}
 
+	// Prevent the columns from growing wider than their distributed sizes.
+	min-width: 0;
+
+	// Prevent long unbroken words from overflowing.
+	word-break: break-word; // For back-compat.
+	overflow-wrap: break-word; // New standard.
+
 	// Add space between columns. Themes can customize this if they wish to work differently.
 	// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 	@include break-small() {
-		padding-left: $grid-size-large;
-		padding-right: $grid-size-large;
-
 		&:nth-child(odd) {
-			padding-left: 0;
+			margin-right: $grid-size-large * 2;
 		}
-
 		&:nth-child(even) {
-			padding-right: 0;
+			margin-left: $grid-size-large * 2;
 		}
-	}
 
-	@include break-medium() {
 		&:not(:first-child) {
-			padding-left: $grid-size-large;
+			margin-left: $grid-size-large * 2;
 		}
 
 		&:not(:last-child) {
-			padding-right: $grid-size-large;
+			margin-right: $grid-size-large * 2;
 		}
 	}
 }

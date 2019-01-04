@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`KeyboardShortcutHelpModal should match snapshot when the modal is active 1`] = `
-<React.Fragment>
+<Fragment>
   <KeyboardShortcuts
     bindGlobal={true}
     shortcuts={
@@ -121,6 +121,14 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
               "Alt",
               "+",
               "P",
+            ],
+          },
+          Object {
+            "description": "Navigate to the nearest toolbar.",
+            "keyCombination": Array [
+              "Alt",
+              "+",
+              "F10",
             ],
           },
           Object {
@@ -252,11 +260,11 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
           Object {
             "description": "Remove a link.",
             "keyCombination": Array [
+              "Ctrl",
+              "+",
               "Shift",
               "+",
-              "Alt",
-              "+",
-              "S",
+              "K",
             ],
           },
           Object {
@@ -284,11 +292,11 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
       title="Text formatting"
     />
   </WithInstanceId(Modal)>
-</React.Fragment>
+</Fragment>
 `;
 
 exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not active 1`] = `
-<React.Fragment>
+<Fragment>
   <KeyboardShortcuts
     bindGlobal={true}
     shortcuts={
@@ -297,5 +305,5 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is not a
       }
     }
   />
-</React.Fragment>
+</Fragment>
 `;

@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/latest-posts` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -32,7 +32,7 @@ function render_block_core_latest_posts( $attributes ) {
 	foreach ( $recent_posts as $post ) {
 		$title = get_the_title( $post );
 		if ( ! $title ) {
-			$title = __( '(Untitled)', 'gutenberg' );
+			$title = __( '(Untitled)' );
 		}
 		$list_items_markup .= sprintf(
 			'<li><a href="%1$s">%2$s</a>',

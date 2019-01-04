@@ -11,7 +11,7 @@ export {
 	getBlockAttributes,
 	parseWithAttributeSchema,
 } from './parser';
-export { default as rawHandler, getPhrasingContentSchema } from './raw-handling';
+export { pasteHandler, rawHandler, getPhrasingContentSchema } from './raw-handling';
 export {
 	default as serialize,
 	getBlockContent,
@@ -20,16 +20,15 @@ export {
 	getSaveElement,
 	getSaveContent,
 } from './serializer';
-export { isValidBlock } from './validation';
+export { isValidBlockContent } from './validation';
 export {
 	getCategories,
 	setCategories,
+	updateCategory,
 } from './categories';
 export {
 	registerBlockType,
 	unregisterBlockType,
-	setUnknownTypeHandlerName,
-	getUnknownTypeHandlerName,
 	setFreeformContentHandlerName,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -46,6 +45,7 @@ export {
 	hasChildBlocksWithInserterSupport,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 	registerBlockStyle,
+	unregisterBlockStyle,
 } from './registration';
 export {
 	isUnmodifiedDefaultBlock,

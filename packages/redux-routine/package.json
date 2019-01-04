@@ -26,9 +26,6 @@
 		"is-promise": "^2.1.0",
 		"rungen": "^0.3.2"
 	},
-	"devDependencies": {
-		"redux": "^4.0.0"
-	},
 	"publishConfig": {
 		"access": "public"
 	}

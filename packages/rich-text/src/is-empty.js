@@ -1,3 +1,5 @@
+import { LINE_SEPARATOR } from './special-characters';
+
 /**
  * Check if a Rich Text value is Empty, meaning it contains no text or any
  * objects (such as images).
@@ -27,13 +29,13 @@ export function isEmptyLine( { text, start, end } ) {
 		return true;
 	}
 
-	if ( start === 0 && text.slice( 0, 1 ) === '\u2028' ) {
+	if ( start === 0 && text.slice( 0, 1 ) === LINE_SEPARATOR ) {
 		return true;
 	}
 
-	if ( start === text.length && text.slice( -1 ) === '\u2028' ) {
+	if ( start === text.length && text.slice( -1 ) === LINE_SEPARATOR ) {
 		return true;
 	}
 
-	return text.slice( start - 1, end + 1 ) === '\u2028\u2028';
+	return text.slice( start - 1, end + 1 ) === `${ LINE_SEPARATOR }${ LINE_SEPARATOR }`;
 }

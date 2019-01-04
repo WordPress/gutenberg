@@ -19,8 +19,10 @@ export const settings = {
 
 	attributes: {
 		content: {
+			type: 'string',
 			source: 'html',
 			selector: 'pre',
+			default: '',
 		},
 	},
 

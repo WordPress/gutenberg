@@ -6,15 +6,23 @@
  *
  * @package gutenberg-test-align-hook
  */
-wp_enqueue_script(
-	'gutenberg-test-align-hook',
-	plugins_url( 'align-hook/index.js', __FILE__ ),
-	array(
-		'wp-blocks',
-		'wp-element',
-		'wp-editor',
-		'wp-i18n'
-	),
-	filemtime( plugin_dir_path( __FILE__ ) . 'align-hook/index.js' ),
-	true
-);
+
+/**
+ * Registers a custom script for the plugin.
+ */
+function enqueue_align_plugin_script() {
+	wp_enqueue_script(
+		'gutenberg-test-align-hook',
+		plugins_url( 'align-hook/index.js', __FILE__ ),
+		array(
+			'wp-blocks',
+			'wp-element',
+			'wp-editor',
+			'wp-i18n',
+		),
+		filemtime( plugin_dir_path( __FILE__ ) . 'align-hook/index.js' ),
+		true
+	);
+}
+
+add_action( 'init', 'enqueue_align_plugin_script' );

@@ -254,8 +254,9 @@ class WritingFlow extends Component {
 					event.preventDefault();
 				}
 
-				// Set in case the meta key doesn't get released.
-				this.isEntirelySelected = isEntirelySelected( target );
+				// After pressing primary + A we can assume isEntirelySelected is true.
+				// Calling right away isEntirelySelected after primary + A may still return false on some browsers.
+				this.isEntirelySelected = true;
 			}
 
 			return;
@@ -334,7 +335,7 @@ class WritingFlow extends Component {
 					aria-hidden
 					tabIndex={ -1 }
 					onClick={ this.focusLastTextField }
-					className="editor-writing-flow__click-redirect"
+					className="wp-block editor-writing-flow__click-redirect"
 				/>
 			</div>
 		);

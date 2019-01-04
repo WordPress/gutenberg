@@ -23,4 +23,21 @@
 	&.has-right-content .editor-rich-text__inline-toolbar {
 		justify-content: flex-end;
 	}
+
+	&.components-placeholder {
+		// use opacity to work in various editor styles
+		background: $dark-opacity-light-200;
+		min-height: 200px;
+
+		.is-dark-theme & {
+			background: $light-opacity-light-200;
+		}
+	}
+
+	// Apply max-width to floated items that have no intrinsic width
+	[data-align="left"] &,
+	[data-align="right"] & {
+		max-width: $content-width / 2;
+		width: 100%;
+	}
 }
