@@ -9,7 +9,7 @@ import { parse } from 'url';
  */
 import {
 	createNewPost,
-	createUrl,
+	createURL,
 	publishPost,
 	savePostAsDraft,
 } from '../support/utils';
@@ -72,7 +72,7 @@ describe( 'Preview', () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
-		const expectedPreviewURL = createUrl( '', `?p=${ postId }&preview=true` );
+		const expectedPreviewURL = createURL( '', `?p=${ postId }&preview=true` );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Title in preview should match input.
