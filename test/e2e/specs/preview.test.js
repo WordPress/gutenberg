@@ -11,6 +11,7 @@ import {
 	newPost,
 	getUrl,
 	publishPost,
+	saveDraft,
 } from '../support/utils';
 
 describe( 'Preview', () => {
@@ -46,9 +47,9 @@ describe( 'Preview', () => {
 	 * @return {Promise} Promise resolving once navigation completes.
 	 */
 	async function waitForPreviewNavigation( previewPage ) {
-		const nagivationCompleted = previewPage.waitForNavigation();
+		const navigationCompleted = previewPage.waitForNavigation();
 		await page.click( '.editor-post-preview' );
-		return nagivationCompleted;
+		return navigationCompleted;
 	}
 
 	it( 'Should open a preview window for a new post', async () => {
@@ -67,11 +68,11 @@ describe( 'Preview', () => {
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
-		const [ , postId ] = await ( await editorPage.waitForFunction( () => {
+		const [ , postId ] = await( await editorPage.waitForFunction( () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
-		let expectedPreviewURL = getUrl( '', `?p=${ postId }&preview=true` );
+		const expectedPreviewURL = getUrl( '', `?p=${ postId }&preview=true` );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Title in preview should match input.
@@ -94,19 +95,9 @@ describe( 'Preview', () => {
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World!' );
 
-		// Preview for published post (no unsaved changes) directs to canonical
-		// URL for post.
+		// Preview for published post (no unsaved changes) directs to canonical URL for post.
 		await editorPage.bringToFront();
 		await publishPost();
-		await Promise.all( [
-			editorPage.waitForFunction( () => ! document.querySelector( '.editor-post-preview' ) ),
-			editorPage.click( '.editor-post-publish-panel__header button' ),
-		] );
-		expectedPreviewURL = await editorPage.$eval( '.components-notice.is-success a', ( node ) => node.href );
-
-		await editorPage.bringToFront();
-		await waitForPreviewNavigation( previewPage );
-		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Return to editor to change title.
 		await editorPage.bringToFront();
@@ -134,6 +125,43 @@ describe( 'Preview', () => {
 		// Title in preview should match updated input.
 		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
 		expect( previewTitle ).toBe( 'Hello World! And more.' );
+
+		await previewPage.close();
+	} );
+
+	it( 'Should not revert title during a preview right after a save draft', async () => {
+		const editorPage = page;
+
+		// Type aaaaa in the title filed.
+		await editorPage.type( '.editor-post-title__input', 'aaaaa' );
+		await editorPage.keyboard.press( 'Tab' );
+
+		// Save the post as a draft.
+		await editorPage.waitForSelector( '.editor-post-save-draft' );
+		await saveDraft();
+
+		// Open the preview page.
+		const previewPage = await openPreviewPage( editorPage );
+
+		// Title in preview should match input.
+		let previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		expect( previewTitle ).toBe( 'aaaaa' );
+
+		// Return to editor.
+		await editorPage.bringToFront();
+
+		// Append bbbbb to the title, and tab away from the title so blur event is triggered.
+		await editorPage.type( '.editor-post-title__input', 'bbbbb' );
+		await editorPage.keyboard.press( 'Tab' );
+
+		// Save draft and open the preview page right after.
+		await editorPage.waitForSelector( '.editor-post-save-draft' );
+		await saveDraft();
+		await waitForPreviewNavigation( previewPage );
+
+		// Title in preview should match updated input.
+		previewTitle = await previewPage.$eval( '.entry-title', ( node ) => node.textContent );
+		expect( previewTitle ).toBe( 'aaaaabbbbb' );
 
 		await previewPage.close();
 	} );

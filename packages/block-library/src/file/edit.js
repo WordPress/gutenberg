@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
+import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
 	ClipboardButton,
 	IconButton,
@@ -19,12 +19,12 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	MediaPlaceholder,
+	MediaUploadCheck,
 	BlockControls,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
-import { create } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -53,7 +53,7 @@ class FileEdit extends Component {
 		const { href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
-		if ( this.isBlobURL( href ) ) {
+		if ( isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
@@ -81,15 +81,11 @@ class FileEdit extends Component {
 			this.setState( { hasError: false } );
 			this.props.setAttributes( {
 				href: media.url,
-				fileName: create( { text: media.title } ),
+				fileName: media.title,
 				textLinkHref: media.url,
 				id: media.id,
 			} );
 		}
-	}
-
-	isBlobURL( url = '' ) {
-		return url.indexOf( 'blob:' ) === 0;
 	}
 
 	confirmCopyURL() {
@@ -143,7 +139,7 @@ class FileEdit extends Component {
 					icon="media-default"
 					labels={ {
 						title: __( 'File' ),
-						name: __( 'a file' ),
+						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
@@ -154,7 +150,7 @@ class FileEdit extends Component {
 		}
 
 		const classes = classnames( className, {
-			'is-transient': this.isBlobURL( href ),
+			'is-transient': isBlobURL( href ),
 		} );
 
 		return (
@@ -170,20 +166,22 @@ class FileEdit extends Component {
 					} }
 				/>
 				<BlockControls>
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectFile }
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit file' ) }
-									onClick={ open }
-									icon="edit"
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectFile }
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit file' ) }
+										onClick={ open }
+										icon="edit"
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				</BlockControls>
 				<div className={ classes }>
 					<div className={ `${ className }__content-wrapper` }>
@@ -218,6 +216,7 @@ class FileEdit extends Component {
 							className={ `${ className }__copy-url-button` }
 							onCopy={ this.confirmCopyURL }
 							onFinishCopy={ this.resetCopyConfirmation }
+							disabled={ isBlobURL( href ) }
 						>
 							{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>

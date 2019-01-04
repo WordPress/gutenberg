@@ -20,9 +20,9 @@ function EditorNotices( props ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		notices: select( 'core/editor' ).getNotices(),
+		notices: select( 'core/notices' ).getNotices(),
 	} ) ),
 	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( 'core/editor' ).removeNotice,
+		onRemove: dispatch( 'core/notices' ).removeNotice,
 	} ) ),
 ] )( EditorNotices );

@@ -66,7 +66,7 @@ If this property is true, a button to reset the the slider is rendered.
 
 ### initialPosition
 
-In no value exists this prop contains the slider starting position.
+If no value exists this prop contains the slider starting position.
 
 - Type: `Number`
 - Required: No

@@ -4,56 +4,7 @@
         "name": "core/paragraph",
         "isValid": true,
         "attributes": {
-            "content": {
-                "formats": [
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    [
-                        {
-                            "type": "em"
-                        }
-                    ],
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ],
-                "text": "Unwrapped is still valid."
-            },
+            "content": "Unwrapped is <em>still</em> valid.",
             "dropCap": false
         },
         "innerBlocks": [],

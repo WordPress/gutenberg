@@ -1,6 +1,14 @@
-<!-- wp:cover-image {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
-<div class="wp-block-cover-image has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-image-text"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p></div>
-<!-- /wp:cover-image -->
+<?php
+/**
+ * Default content of the demo page
+ *
+ * @package gutenberg
+ */
+
+?>
+<!-- wp:cover {"url":"https://cldup.com/Fz-ASbo2s3.jpg","align":"wide"} -->
+<div class="wp-block-cover has-background-dim alignwide" style="background-image:url(https://cldup.com/Fz-ASbo2s3.jpg)"><p class="wp-block-cover-text"><?php _e( 'Of Mountains &amp; Printing Presses', 'gutenberg' ); ?></p></div>
+<!-- /wp:cover -->
 
 <!-- wp:paragraph -->
 <p><?php _e( 'The goal of this new editor is to make adding rich content to WordPress simple and enjoyable. This whole post is composed of <em>pieces of content</em>—somewhat similar to LEGO bricks—that you can move around and interact with. Move your cursor around and you&#8217;ll notice the different blocks light up with outlines and arrows. Press the arrows to reposition blocks quickly, without fearing about losing things in the process of copying and pasting.', 'gutenberg' ); ?></p>
@@ -88,7 +96,7 @@
 <p><?php _e( 'Blocks can be anything you need. For instance, you may want to add a subdued quote as part of the composition of your text, or you may prefer to display a giant stylized one. All of these options are available in the inserter.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"columns":2} -->
+<!-- wp:gallery {"ids":[null,null,null],"columns":2} -->
 <ul class="wp-block-gallery columns-2 is-cropped">
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/n0g6ME5VKC.jpg" alt="" /></figure></li>
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/ZjESfxPI3R.jpg" alt="" /></figure></li>
@@ -116,7 +124,7 @@
 <p><?php _e( 'Sure, the full-wide image can be pretty big. But sometimes the image is worth it.', 'gutenberg' ); ?></p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->
+<!-- wp:gallery {"ids":[null,null],"align":"wide","images":[{"url":"https://cldup.com/_rSwtEeDGD.jpg","alt":""},{"url":"https://cldup.com/L-cC3qX2DN.jpg","alt":""}]} -->
 <ul class="wp-block-gallery alignwide columns-2 is-cropped">
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/_rSwtEeDGD.jpg" alt="" /></figure></li>
 <li class="blocks-gallery-item"><figure><img src="https://cldup.com/L-cC3qX2DN.jpg" alt="" /></figure></li>
@@ -149,9 +157,9 @@ https://vimeo.com/22439234
 <p style="text-align:center">
 	<em>
 		<?php
-		sprintf(
+		echo sprintf(
 			/* translators: %s: Gutenberg GitHub repository URL */
-			_e( 'If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="%s">GitHub repository</a>.', 'gutenberg' ),
+			__( 'If you want to learn more about how to build additional blocks, or if you are interested in helping with the project, head over to the <a href="%s">GitHub repository</a>.', 'gutenberg' ),
 			'https://github.com/WordPress/gutenberg'
 		);
 		?>

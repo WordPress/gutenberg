@@ -6,7 +6,7 @@ import { reduce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, forwardRef } from '@wordpress/element';
 
 /**
  * Component which renders a div with passed props applied except the optional
@@ -22,7 +22,7 @@ import { Component } from '@wordpress/element';
  *
  * @type {Component}
  */
-class IgnoreNestedEvents extends Component {
+export class IgnoreNestedEvents extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -66,7 +66,7 @@ class IgnoreNestedEvents extends Component {
 	}
 
 	render() {
-		const { childHandledEvents = [], ...props } = this.props;
+		const { childHandledEvents = [], forwardedRef, ...props } = this.props;
 
 		const eventHandlers = reduce( [
 			...childHandledEvents,
@@ -96,8 +96,13 @@ class IgnoreNestedEvents extends Component {
 			return result;
 		}, {} );
 
-		return <div { ...props } { ...eventHandlers } />;
+		return <div ref={ forwardedRef } { ...props } { ...eventHandlers } />;
 	}
 }
 
-export default IgnoreNestedEvents;
+const forwardedIgnoreNestedEvents = ( props, ref ) => {
+	return <IgnoreNestedEvents { ...props } forwardedRef={ ref } />;
+};
+forwardedIgnoreNestedEvents.displayName = 'IgnoreNestedEvents';
+
+export default forwardRef( forwardedIgnoreNestedEvents );

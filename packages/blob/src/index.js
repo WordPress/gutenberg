@@ -45,3 +45,17 @@ export function revokeBlobURL( url ) {
 
 	delete cache[ url ];
 }
+
+/**
+ * Check whether a url is a blob url.
+ *
+ * @param {string} url The URL.
+ *
+ * @return {boolean} Is the url a blob url?
+ */
+export function isBlobURL( url ) {
+	if ( ! url || ! url.indexOf ) {
+		return false;
+	}
+	return url.indexOf( 'blob:' ) === 0;
+}

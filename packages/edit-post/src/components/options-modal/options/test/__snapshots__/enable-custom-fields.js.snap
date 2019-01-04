@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EnableCustomFieldsOption renders properly when checked 1`] = `
+<BaseOption
+  isChecked={true}
+  label="Custom Fields"
+  onChange={[Function]}
+/>
+`;
+
+exports[`EnableCustomFieldsOption renders properly when unchecked 1`] = `
+<BaseOption
+  isChecked={false}
+  label="Custom Fields"
+  onChange={[Function]}
+/>
+`;

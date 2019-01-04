@@ -11,7 +11,6 @@ exports[`core/list block edit matches snapshot 1`] = `
       >
         <ul
           aria-autocomplete="list"
-          aria-expanded="false"
           aria-label="Write list…"
           aria-multiline="true"
           class="editor-rich-text__tinymce"
@@ -19,7 +18,11 @@ exports[`core/list block edit matches snapshot 1`] = `
           data-is-placeholder-visible="true"
           role="textbox"
         >
-          <li />
+          <li>
+            <br
+              data-mce-bogus="1"
+            />
+          </li>
         </ul>
         <ul
           class="editor-rich-text__tinymce"

@@ -7,7 +7,8 @@ import { omit, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { G, Path, SVG } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
 import {
 	RichText,
 	getColorClassName,
@@ -32,7 +33,8 @@ const blockAttributes = {
 		attribute: 'title',
 	},
 	text: {
-		source: 'rich-text',
+		type: 'string',
+		source: 'html',
 		selector: 'a',
 	},
 	backgroundColor: {
@@ -62,9 +64,9 @@ const colorsMigration = ( attributes ) => {
 export const settings = {
 	title: __( 'Button' ),
 
-	description: __( 'Want visitors to click to subscribe, buy, or read more? Get their attention with a button.' ),
+	description: __( 'Prompt visitors to take action with a custom button.' ),
 
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z" /></g></svg>,
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M19 6H5L3 8v8l2 2h14l2-2V8l-2-2zm0 10H5V8h14v8z" /></G></SVG>,
 
 	category: 'layout',
 
@@ -76,9 +78,9 @@ export const settings = {
 	},
 
 	styles: [
-		{ name: 'default', label: __( 'Rounded' ), isDefault: true },
+		{ name: 'default', label: _x( 'Rounded', 'block style' ), isDefault: true },
 		{ name: 'outline', label: __( 'Outline' ) },
-		{ name: 'squared', label: __( 'Squared' ) },
+		{ name: 'squared', label: _x( 'Squared', 'block style' ) },
 	],
 
 	edit,

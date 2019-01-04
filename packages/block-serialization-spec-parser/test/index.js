@@ -1,14 +1,13 @@
 /**
+ * External dependencies
+ */
+import path from 'path';
+
+/**
  * Internal dependencies
  */
-import { parse } from '../';
+import { jsTester, phpTester, parse } from '../';
 
-describe( 'block-serialization-spec-parser', () => {
-	test( 'parse() works properly', () => {
-		const result = parse(
-			'<!-- wp:core/more --><!--more--><!-- /wp:core/more -->'
-		);
+describe( 'block-serialization-spec-parser-js', jsTester( parse ) );
 
-		expect( result ).toMatchSnapshot();
-	} );
-} );
+phpTester( 'block-serialization-spec-parser-php', path.join( __dirname, 'test-parser.php' ) );

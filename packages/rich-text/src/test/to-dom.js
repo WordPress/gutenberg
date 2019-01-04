@@ -16,9 +16,26 @@ const { window } = new JSDOM();
 const { document } = window;
 
 describe( 'recordToDom', () => {
-	spec.forEach( ( { description, multilineTag, record, startPath, endPath } ) => {
+	beforeAll( () => {
+		// Initialize the rich-text store.
+		require( '../store' );
+	} );
+
+	spec.forEach( ( {
+		description,
+		multilineTag,
+		multilineWrapperTags,
+		record,
+		startPath,
+		endPath,
+	} ) => {
 		it( description, () => {
-			const { body, selection } = toDom( record, multilineTag );
+			const { body, selection } = toDom( {
+				value: record,
+				multilineTag,
+				multilineWrapperTags,
+				createLinePadding: ( doc ) => doc.createElement( 'br' ),
+			} );
 			expect( body ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );
 		} );
@@ -49,8 +66,8 @@ describe( 'applyValue', () => {
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
 		it( description, () => {
-			const body = createElement( document, current );
-			const futureBody = createElement( document, future );
+			const body = createElement( document, current ).cloneNode( true );
+			const futureBody = createElement( document, future ).cloneNode( true );
 			const childNodes = Array.from( futureBody.childNodes );
 			applyValue( futureBody, body );
 			const count = childNodes.reduce( ( acc, { parentNode } ) => {

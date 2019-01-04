@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { keyBy, omit } from 'lodash';
+import {
+	filter,
+	find,
+	get,
+	isEmpty,
+	keyBy,
+	map,
+	mapValues,
+	omit,
+	uniqBy,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -34,10 +44,54 @@ export function blockTypes( state = {}, action ) {
 		case 'ADD_BLOCK_TYPES':
 			return {
 				...state,
-				...keyBy( action.blockTypes, 'name' ),
+				...keyBy(
+					map( action.blockTypes, ( blockType ) => omit( blockType, 'styles ' ) ),
+					'name'
+				),
 			};
 		case 'REMOVE_BLOCK_TYPES':
 			return omit( state, action.names );
+	}
+
+	return state;
+}
+
+/**
+ * Reducer managing the block style variations.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockStyles( state = {}, action ) {
+	switch ( action.type ) {
+		case 'ADD_BLOCK_TYPES':
+			return {
+				...state,
+				...mapValues( keyBy( action.blockTypes, 'name' ), ( blockType ) => {
+					return uniqBy( [
+						...get( blockType, [ 'styles' ], [] ),
+						...get( state, [ blockType.name ], [] ),
+					], ( style ) => style.name );
+				} ),
+			};
+		case 'ADD_BLOCK_STYLES':
+			return {
+				...state,
+				[ action.blockName ]: uniqBy( [
+					...get( state, [ action.blockName ], [] ),
+					...( action.styles ),
+				], ( style ) => style.name ),
+			};
+		case 'REMOVE_BLOCK_STYLES':
+			return {
+				...state,
+				[ action.blockName ]: filter(
+					get( state, [ action.blockName ], [] ),
+					( style ) => action.styleNames.indexOf( style.name ) === -1,
+				),
+			};
 	}
 
 	return state;
@@ -68,8 +122,8 @@ export function createBlockNameSetterReducer( setActionType ) {
 }
 
 export const defaultBlockName = createBlockNameSetterReducer( 'SET_DEFAULT_BLOCK_NAME' );
-
-export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLOCK_NAME' );
+export const freeformFallbackBlockName = createBlockNameSetterReducer( 'SET_FREEFORM_FALLBACK_BLOCK_NAME' );
+export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_UNREGISTERED_FALLBACK_BLOCK_NAME' );
 
 /**
  * Reducer managing the categories
@@ -80,16 +134,35 @@ export const fallbackBlockName = createBlockNameSetterReducer( 'SET_FALLBACK_BLO
  * @return {Object} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
-	if ( action.type === 'SET_CATEGORIES' ) {
-		return action.categories || [];
+	switch ( action.type ) {
+		case 'SET_CATEGORIES':
+			return action.categories || [];
+		case 'UPDATE_CATEGORY': {
+			if ( ! action.category || isEmpty( action.category ) ) {
+				return state;
+			}
+			const categoryToChange = find( state, [ 'slug', action.slug ] );
+			if ( categoryToChange ) {
+				return map( state, ( category ) => {
+					if ( category.slug === action.slug ) {
+						return {
+							...category,
+							...action.category,
+						};
+					}
+					return category;
+				} );
+			}
+		}
 	}
-
 	return state;
 }
 
 export default combineReducers( {
 	blockTypes,
+	blockStyles,
 	defaultBlockName,
-	fallbackBlockName,
+	freeformFallbackBlockName,
+	unregisteredFallbackBlockName,
 	categories,
 } );

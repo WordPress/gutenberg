@@ -28,7 +28,7 @@ import {
 
 const { getComputedStyle } = window;
 
-const FallbackStyles = withFallbackStyles( ( node, ownProps ) => {
+const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
 	const { textColor, backgroundColor } = ownProps;
 	const backgroundColorValue = backgroundColor && backgroundColor.color;
 	const textColorValue = textColor && textColor.color;
@@ -114,7 +114,9 @@ class ButtonEdit extends Component {
 						>
 							<ContrastChecker
 								{ ...{
-									isLargeText: true,
+									// Text is considered large if font size is greater or equal to 18pt or 24px,
+									// currently that's not the case for button.
+									isLargeText: false,
 									textColor: textColor.color,
 									backgroundColor: backgroundColor.color,
 									fallbackBackgroundColor,
@@ -143,5 +145,5 @@ class ButtonEdit extends Component {
 
 export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
-	FallbackStyles,
+	applyFallbackStyles,
 ] )( ButtonEdit );

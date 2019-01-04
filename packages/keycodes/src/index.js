@@ -43,13 +43,14 @@ export const CTRL = 'ctrl';
 export const COMMAND = 'meta';
 export const SHIFT = 'shift';
 
-const modifiers = {
+export const modifiers = {
 	primary: ( _isApple ) => _isApple() ? [ COMMAND ] : [ CTRL ],
 	primaryShift: ( _isApple ) => _isApple() ? [ SHIFT, COMMAND ] : [ CTRL, SHIFT ],
 	primaryAlt: ( _isApple ) => _isApple() ? [ ALT, COMMAND ] : [ CTRL, ALT ],
 	secondary: ( _isApple ) => _isApple() ? [ SHIFT, ALT, COMMAND ] : [ CTRL, SHIFT, ALT ],
 	access: ( _isApple ) => _isApple() ? [ CTRL, ALT ] : [ SHIFT, ALT ],
 	ctrl: () => [ CTRL ],
+	alt: () => [ ALT ],
 	ctrlShift: () => [ CTRL, SHIFT ],
 	shift: () => [ SHIFT ],
 	shiftAlt: () => [ SHIFT, ALT ],

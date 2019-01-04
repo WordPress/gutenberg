@@ -10,7 +10,7 @@ import { diffChars } from 'diff';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { getBlockType, getSaveContent, getSaveElement } from '@wordpress/blocks';
+import { getSaveContent, getSaveElement } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,12 +32,9 @@ class BlockCompare extends Component {
 	}
 
 	getOriginalContent( block ) {
-		// Get current block details
-		const blockType = getBlockType( block.name );
-
 		return {
 			rawContent: block.originalContent,
-			renderedContent: getSaveElement( blockType, block.attributes ),
+			renderedContent: getSaveElement( block.name, block.attributes ),
 		};
 	}
 
@@ -46,8 +43,8 @@ class BlockCompare extends Component {
 		const newBlocks = castArray( block );
 
 		// Get converted block details
-		const newContent = newBlocks.map( ( item ) => getSaveContent( getBlockType( item.name ), item.attributes, item.innerBlocks ) );
-		const renderedContent = newBlocks.map( ( item ) => getSaveElement( getBlockType( item.name ), item.attributes, item.innerBlocks ) );
+		const newContent = newBlocks.map( ( item ) => getSaveContent( item.name, item.attributes, item.innerBlocks ) );
+		const renderedContent = newBlocks.map( ( item ) => getSaveElement( item.name, item.attributes, item.innerBlocks ) );
 
 		return {
 			rawContent: newContent.join( '' ),

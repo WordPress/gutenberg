@@ -13,7 +13,7 @@ import { combineReducers } from '@wordpress/data';
  */
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
-import { defaultEntities } from './entities';
+import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -125,7 +125,7 @@ function entity( entityConfig ) {
 		replaceAction( ( action ) => {
 			return {
 				...action,
-				key: entityConfig.key || 'id',
+				key: entityConfig.key || DEFAULT_ENTITY_KEY,
 			};
 		} ),
 	] )( queriedDataReducer );
@@ -217,6 +217,23 @@ export function embedPreviews( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing Upload permissions.
+ *
+ * @param  {Object}  state  Current state.
+ * @param  {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function hasUploadPermissions( state = true, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_UPLOAD_PERMISSIONS':
+			return action.hasUploadPermissions;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	terms,
 	users,
@@ -224,4 +241,5 @@ export default combineReducers( {
 	themeSupports,
 	entities,
 	embedPreviews,
+	hasUploadPermissions,
 } );
