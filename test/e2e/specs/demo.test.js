@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { visitAdmin, matchURL, setUpResponseMocking, mockOrTransform } from '../support/utils';
+import { visitAdminPage, createURLMatcher, setUpResponseMocking, mockOrTransform } from '../support/utils';
 
 const MOCK_VIMEO_RESPONSE = {
 	url: 'https://vimeo.com/22439234',
@@ -24,11 +24,11 @@ describe( 'new editor state', () => {
 	beforeAll( async () => {
 		setUpResponseMocking( [
 			{
-				match: matchURL( 'oembed%2F1.0%2Fproxy' ),
+				match: createURLMatcher( 'oembed%2F1.0%2Fproxy' ),
 				onRequestMatch: mockOrTransform( couldNotBePreviewed, MOCK_VIMEO_RESPONSE, stripIframeFromEmbed ),
 			},
 		] );
-		await visitAdmin( 'post-new.php', 'gutenberg-demo' );
+		await visitAdminPage( 'post-new.php', 'gutenberg-demo' );
 	} );
 
 	it( 'content should load without making the post dirty', async () => {

@@ -11,14 +11,14 @@ import uuid from 'uuid/v4';
  */
 import {
 	getEditedPostContent,
-	newPost,
+	createNewPost,
 	insertBlock,
-	pressWithModifier,
+	pressKeyWithModifier,
 } from '../../support/utils';
 
 describe( 'Classic', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should be inserted', async () => {
@@ -29,7 +29,7 @@ describe( 'Classic', () => {
 		await page.focus( '.mce-content-body' );
 		await page.keyboard.type( 'test' );
 		// Move focus away.
-		await pressWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -65,7 +65,7 @@ describe( 'Classic', () => {
 		await page.waitForSelector( '.mce-content-body img' );
 
 		// Move focus away.
-		await pressWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 
 		const regExp = new RegExp( `test<img class="alignnone size-full wp-image-\\d+" src="[^"]+\\/${ filename }\\.png" alt="" width="10" height="10" \\/>` );
 		expect( await getEditedPostContent() ).toMatch( regExp );

@@ -7,7 +7,7 @@
  * @param {number} width  Width of the window.
  * @param {height} height Height of the window.
  */
-export async function waitForPageDimensions( width, height ) {
+export async function waitForWindowDimensions( width, height ) {
 	await page
 		.mainFrame()
 		.waitForFunction(

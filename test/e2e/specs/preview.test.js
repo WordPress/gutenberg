@@ -8,15 +8,15 @@ import { parse } from 'url';
  * Internal dependencies
  */
 import {
-	newPost,
-	getUrl,
+	createNewPost,
+	createUrl,
 	publishPost,
-	saveDraft,
+	savePostAsDraft,
 } from '../support/utils';
 
 describe( 'Preview', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	async function openPreviewPage( editorPage ) {
@@ -72,7 +72,7 @@ describe( 'Preview', () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
-		const expectedPreviewURL = getUrl( '', `?p=${ postId }&preview=true` );
+		const expectedPreviewURL = createUrl( '', `?p=${ postId }&preview=true` );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Title in preview should match input.
@@ -138,7 +138,7 @@ describe( 'Preview', () => {
 
 		// Save the post as a draft.
 		await editorPage.waitForSelector( '.editor-post-save-draft' );
-		await saveDraft();
+		await savePostAsDraft();
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
@@ -156,7 +156,7 @@ describe( 'Preview', () => {
 
 		// Save draft and open the preview page right after.
 		await editorPage.waitForSelector( '.editor-post-save-draft' );
-		await saveDraft();
+		await savePostAsDraft();
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.

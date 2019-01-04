@@ -4,12 +4,12 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
+	createNewPost,
 } from '../../support/utils';
 
 describe( 'Separator', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'can be created by prefixing number sign and a space', async () => {

@@ -2,20 +2,20 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	insertBlock,
 	getEditedPostContent,
-	pressTimes,
-	pressWithModifier,
+	pressKeyTimes,
+	pressKeyWithModifier,
 } from '../support/utils';
 
 async function openBlockNavigator() {
-	return pressWithModifier( 'access', 'o' );
+	return pressKeyWithModifier( 'access', 'o' );
 }
 
 describe( 'Navigating the block hierarchy', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should navigate using the block hierarchy dropdown menu', async () => {
@@ -44,7 +44,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.
-		await pressTimes( 'Tab', 2 ); // Navigate to the appender.
+		await pressKeyTimes( 'Tab', 2 ); // Navigate to the appender.
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -61,22 +61,22 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Move focus to the sidebar area.
-		await pressWithModifier( 'ctrl', '`' );
-		await pressWithModifier( 'ctrl', '`' );
-		await pressWithModifier( 'ctrl', '`' );
-		await pressWithModifier( 'ctrl', '`' );
-		await pressTimes( 'Tab', 4 );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyTimes( 'Tab', 4 );
 
 		// Tweak the columns count by increasing it by one.
 		page.keyboard.press( 'ArrowRight' );
 
 		// Navigate to the last column in the columns block.
 		await openBlockNavigator();
-		await pressTimes( 'Tab', 4 );
+		await pressKeyTimes( 'Tab', 4 );
 		await page.keyboard.press( 'Enter' );
 
 		// Insert text in the last column block
-		await pressTimes( 'Tab', 2 ); // Navigate to the appender.
+		await pressKeyTimes( 'Tab', 2 ); // Navigate to the appender.
 		await page.keyboard.type( 'Third column' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -97,7 +97,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Space' );
 
 		// Replace its content.
-		await pressWithModifier( 'primary', 'A' );
+		await pressKeyWithModifier( 'primary', 'A' );
 		await page.keyboard.type( 'and I say hello' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

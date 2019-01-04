@@ -2,14 +2,14 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	getEditedPostContent,
 	clickBlockAppender,
 } from '../support/utils';
 
 describe( 'autocomplete mentions', () => {
 	beforeAll( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should insert mention', async () => {

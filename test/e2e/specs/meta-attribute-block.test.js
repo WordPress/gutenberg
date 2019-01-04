@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
 	getEditedPostContent,
-	saveDraft,
 	insertBlock,
+	savePostAsDraft,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Block with a meta attribute', () => {
 	beforeAll( async () => {
@@ -15,7 +16,7 @@ describe( 'Block with a meta attribute', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {
@@ -25,7 +26,7 @@ describe( 'Block with a meta attribute', () => {
 	it( 'Should persist the meta attribute properly', async () => {
 		await insertBlock( 'Test Meta Attribute Block' );
 		await page.keyboard.type( 'Meta Value' );
-		await saveDraft();
+		await savePostAsDraft();
 		await page.reload();
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

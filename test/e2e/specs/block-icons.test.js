@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import {
-	pressWithModifier,
-	newPost,
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
 	insertBlock,
+	pressKeyWithModifier,
 	searchForBlock,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 const INSERTER_BUTTON_SELECTOR = '.components-popover__content .editor-block-types-list__item';
 const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .editor-block-types-list__item-icon`;
@@ -35,7 +36,7 @@ async function getFirstInserterIcon() {
 }
 
 async function selectFirstBlock() {
-	await pressWithModifier( 'access', 'o' );
+	await pressKeyWithModifier( 'access', 'o' );
 	const navButtons = await page.$$( '.editor-block-navigation__item-button' );
 	await navButtons[ 0 ].click();
 }
@@ -58,7 +59,7 @@ describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {

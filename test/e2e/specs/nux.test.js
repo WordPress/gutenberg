@@ -4,9 +4,9 @@
 import {
 	clickBlockAppender,
 	clickOnMoreMenuItem,
-	newPost,
-	saveDraft,
-	toggleOption,
+	createNewPost,
+	savePostAsDraft,
+	toggleScreenOption,
 } from '../support/utils';
 
 describe( 'New User Experience (NUX)', () => {
@@ -35,7 +35,7 @@ describe( 'New User Experience (NUX)', () => {
 	}
 
 	beforeEach( async () => {
-		await newPost( { enableTips: true } );
+		await createNewPost( { enableTips: true } );
 	} );
 
 	it( 'should show tips to a first-time user', async () => {
@@ -100,7 +100,7 @@ describe( 'New User Experience (NUX)', () => {
 		expect( areTipsEnabled ).toEqual( false );
 
 		// Toggle the 'Enable Tips' option to enable.
-		await toggleOption( 'Enable Tips' );
+		await toggleScreenOption( 'Enable Tips' );
 
 		// Tips should once again appear.
 		nuxTipElements = await page.$$( '.nux-dot-tip' );
@@ -163,7 +163,7 @@ describe( 'New User Experience (NUX)', () => {
 		await page.keyboard.type( 'Post title' );
 		await clickBlockAppender();
 		await page.keyboard.type( 'Post content goes here.' );
-		await saveDraft();
+		await savePostAsDraft();
 
 		// Refresh the page; tips should be disabled.
 		await page.reload();

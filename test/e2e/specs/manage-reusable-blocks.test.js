@@ -6,11 +6,11 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { visitAdmin } from '../support/utils';
+import { visitAdminPage } from '../support/utils';
 
 describe( 'Managing reusable blocks', () => {
 	beforeAll( async () => {
-		await visitAdmin( 'edit.php', 'post_type=wp_block' );
+		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 	} );
 
 	it( 'Should import reusable blocks', async () => {
@@ -34,7 +34,7 @@ describe( 'Managing reusable blocks', () => {
 		expect( noticeContent ).toEqual( 'Reusable block imported successfully!' );
 
 		// Refresh the page
-		await visitAdmin( 'edit.php', 'post_type=wp_block' );
+		await visitAdminPage( 'edit.php', 'post_type=wp_block' );
 
 		// The reusable block has been imported
 		page.waitForXPath( 'div[@class="post_title"][contains(text(), "Greeting")]' );

@@ -2,13 +2,13 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	clickOnMoreMenuItem,
 } from '../support/utils';
 
 describe( 'Fullscreen Mode', () => {
 	beforeAll( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should open the fullscreen mode from the more menu', async () => {

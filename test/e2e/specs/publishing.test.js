@@ -2,13 +2,13 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	publishPost,
-	publishPostWithoutPrePublishChecks,
+	publishPostWithPrePublishChecksDisabled,
 	enablePrePublishChecks,
 	disablePrePublishChecks,
 	arePrePublishChecksEnabled,
-	setViewport,
+	setBrowserViewport,
 } from '../support/utils';
 
 describe( 'Publishing', () => {
@@ -16,7 +16,7 @@ describe( 'Publishing', () => {
 		let werePrePublishChecksEnabled;
 		describe( `a ${ postType }`, () => {
 			beforeEach( async () => {
-				await newPost( postType );
+				await createNewPost( postType );
 				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 				if ( ! werePrePublishChecksEnabled ) {
 					await enablePrePublishChecks();
@@ -50,7 +50,7 @@ describe( 'Publishing', () => {
 		let werePrePublishChecksEnabled;
 		describe( `a ${ postType } with pre-publish checks disabled`, () => {
 			beforeEach( async () => {
-				await newPost( postType );
+				await createNewPost( postType );
 				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 				if ( werePrePublishChecksEnabled ) {
 					await disablePrePublishChecks();
@@ -70,7 +70,7 @@ describe( 'Publishing', () => {
 				expect( await page.$( '.editor-post-publish-panel__toggle' ) ).toBeNull();
 				expect( await page.$( '.editor-post-publish-button' ) ).not.toBeNull();
 
-				await publishPostWithoutPrePublishChecks();
+				await publishPostWithPrePublishChecksDisabled();
 
 				// The post-publishing panel should have been not shown.
 				expect( await page.$( '.editor-post-publish-panel' ) ).toBeNull();
@@ -82,16 +82,16 @@ describe( 'Publishing', () => {
 		let werePrePublishChecksEnabled;
 		describe( `a ${ postType } in small viewports`, () => {
 			beforeEach( async () => {
-				await newPost( postType );
+				await createNewPost( postType );
 				werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 				if ( werePrePublishChecksEnabled ) {
 					await disablePrePublishChecks();
 				}
-				await setViewport( 'small' );
+				await setBrowserViewport( 'small' );
 			} );
 
 			afterEach( async () => {
-				await setViewport( 'large' );
+				await setBrowserViewport( 'large' );
 				if ( werePrePublishChecksEnabled ) {
 					await enablePrePublishChecks();
 				}

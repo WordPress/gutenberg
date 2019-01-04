@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import {
-	newPost,
-	insertBlock,
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
 	getEditedPostContent,
-	pressWithModifier,
+	insertBlock,
+	pressKeyWithModifier,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Deprecated Node Matcher', () => {
 	beforeAll( async () => {
@@ -15,7 +16,7 @@ describe( 'Deprecated Node Matcher', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {
@@ -37,7 +38,7 @@ describe( 'Deprecated Node Matcher', () => {
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

@@ -2,16 +2,16 @@ import {
 	arePrePublishChecksEnabled,
 	disablePrePublishChecks,
 	enablePrePublishChecks,
-	newPost,
+	createNewPost,
 	openPublishPanel,
-	pressWithModifier,
+	pressKeyWithModifier,
 	publishPost,
 } from '../support/utils';
 
 describe( 'PostPublishPanel', () => {
 	let werePrePublishChecksEnabled;
 	beforeEach( async () => {
-		await newPost( );
+		await createNewPost( );
 		werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 		if ( ! werePrePublishChecksEnabled ) {
 			await enablePrePublishChecks();
@@ -52,7 +52,7 @@ describe( 'PostPublishPanel', () => {
 	it( 'should retain focus within the panel', async () => {
 		await page.type( '.editor-post-title__input', 'E2E Test Post' );
 		await openPublishPanel();
-		await pressWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
 
 		const focusedElementClassList = await page.$eval( ':focus', ( focusedElement ) => {
 			return Object.values( focusedElement.classList );

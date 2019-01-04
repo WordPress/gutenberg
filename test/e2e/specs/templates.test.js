@@ -2,16 +2,17 @@
  * Internal dependencies
  */
 import {
-	newPost,
-	getEditedPostContent,
-	saveDraft,
-	pressWithModifier,
-	visitAdmin,
+	activatePlugin,
 	clickBlockAppender,
-	switchToAdminUser,
-	switchToTestUser,
+	createNewPost,
+	deactivatePlugin,
+	getEditedPostContent,
+	pressKeyWithModifier,
+	savePostAsDraft,
+	switchUserToAdmin,
+	switchUserToTest,
+	visitAdminPage,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'templates', () => {
 	describe( 'Using a CPT with a predefined template', () => {
@@ -20,7 +21,7 @@ describe( 'templates', () => {
 		} );
 
 		beforeEach( async () => {
-			await newPost( { postType: 'book' } );
+			await createNewPost( { postType: 'book' } );
 		} );
 
 		afterAll( async () => {
@@ -37,7 +38,7 @@ describe( 'templates', () => {
 			await page.click( '.editor-post-title__input' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Backspace' );
-			await saveDraft();
+			await savePostAsDraft();
 			await page.reload();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -48,9 +49,9 @@ describe( 'templates', () => {
 			// re-added after saving and reloading the editor.
 			await page.type( '.editor-post-title__input', 'My Empty Book' );
 			await page.keyboard.press( 'ArrowDown' );
-			await pressWithModifier( 'primary', 'A' );
+			await pressKeyWithModifier( 'primary', 'A' );
 			await page.keyboard.press( 'Backspace' );
-			await saveDraft();
+			await savePostAsDraft();
 			await page.reload();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -62,14 +63,14 @@ describe( 'templates', () => {
 
 		async function setPostFormat( format ) {
 			// To set the post format, we need to be the admin user.
-			await switchToAdminUser();
-			await visitAdmin( 'options-writing.php' );
+			await switchUserToAdmin();
+			await visitAdminPage( 'options-writing.php' );
 			await page.select( '#default_post_format', format );
 			await Promise.all( [
 				page.waitForNavigation(),
 				page.click( '#submit' ),
 			] );
-			await switchToTestUser();
+			await switchUserToTest();
 		}
 
 		beforeAll( async () => {
@@ -82,13 +83,13 @@ describe( 'templates', () => {
 		} );
 
 		it( 'should populate new post with default block for format', async () => {
-			await newPost();
+			await createNewPost();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'should not populate edited post with default block for format', async () => {
-			await newPost();
+			await createNewPost();
 
 			// Remove the default block template to verify that it's not
 			// re-added after saving and reloading the editor.
@@ -96,7 +97,7 @@ describe( 'templates', () => {
 			await clickBlockAppender();
 			await page.keyboard.press( 'Backspace' );
 			await page.keyboard.press( 'Backspace' );
-			await saveDraft();
+			await savePostAsDraft();
 			await page.reload();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -105,11 +106,11 @@ describe( 'templates', () => {
 		it( 'should not populate new page with default block for format', async () => {
 			// This test always needs to run as the admin user, because other roles can't create pages.
 			// It can't be skipped, because then it failed because of not testing the snapshot.
-			await switchToAdminUser();
-			await newPost( { postType: 'page' } );
+			await switchUserToAdmin();
+			await createNewPost( { postType: 'page' } );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
-			await switchToTestUser();
+			await switchUserToTest();
 		} );
 	} );
 } );
