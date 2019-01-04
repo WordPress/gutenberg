@@ -1,6 +1,6 @@
 # Creating a sidebar for your plugin
 
-This tutorial starts with you having an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
+This tutorial starts with you having an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](../../../../../docs/designers-developers/developers/tutorials/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
 
  In the next sections, you're going to create a custom sidebar for a plugin that contains a text control so the user can update a value that is stored in the `post_meta` table.
 
