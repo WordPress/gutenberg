@@ -18,7 +18,7 @@ function TableOfContentsPanel( { headingCount, paragraphCount, numberOfBlocks, o
 	const removeBlockIdHash = () => {
 		delay( () => {
 			const { pathname, search } = window.location;
-			window.history.pushState( '', document.title, pathname + search );
+			window.history.replaceState( '', document.title, pathname + search );
 		}, 50 );
 	};
 	return (
