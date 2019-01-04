@@ -161,13 +161,13 @@ async function buildScssFile( styleFile ) {
 		to: 'dest/app.css',
 	} );
 
-	const resultRTL = await postcss( [ require( 'rtlcss' )() ] ).process( result, {
+	const resultRTL = await postcss( [ require( 'rtlcss' )() ] ).process( result.css, {
 		from: 'src/app.css',
 		to: 'dest/app.css',
 	} );
 
 	await writeFile( outputFile, result.css );
-	await writeFile( outputFileRTL, resultRTL );
+	await writeFile( outputFileRTL, resultRTL.css );
 }
 
 /**
