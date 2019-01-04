@@ -156,12 +156,12 @@ async function buildScssFile( styleFile ) {
 		),
 	} );
 
-	const result = postcss( require( './post-css-config' ) ).process( builtSass.css, {
+	const result = await postcss( require( './post-css-config' ) ).process( builtSass.css, {
 		from: 'src/app.css',
 		to: 'dest/app.css',
 	} );
 
-	const resultRTL = postcss( [ require( 'rtlcss' )() ] ).process( result, {
+	const resultRTL = await postcss( [ require( 'rtlcss' )() ] ).process( result, {
 		from: 'src/app.css',
 		to: 'dest/app.css',
 	} );
