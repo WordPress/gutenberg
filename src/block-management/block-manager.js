@@ -254,11 +254,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				</TextInput>
 				*/
 	renderHeader() {
-		console.log("Header!");
-
 		return (
 			<View>
-				<PostTitle/>
+				<PostTitle
+					style={ styles.title }
+					title={ this.state.title }
+					onUpdate={ this.onChangeTitle }
+					placeholder={ "Pick a title..." }/>
 				<View
 					style={ {
 						paddingLeft: 16,
