@@ -240,46 +240,46 @@
 		"parent": "javascript"
 	},
 	{
-		"title": "How to create a custom sidebar for your plugin",
-		"slug": "sidebar-tutorial",
+		"title": "Creating a sidebar for your plugin",
+		"slug": "plugin-sidebar-0",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
 		"parent": "tutorials"
 	},
 	{
 		"title": "Get a sidebar up and running",
-		"slug": "up-and-running",
+		"slug": "plugin-sidebar-1-up-and-running",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md",
-		"parent": "sidebar-tutorial"
+		"parent": "plugin-sidebar-0"
 	},
 	{
 		"title": "Tweak the sidebar style and add controls",
-		"slug": "styles-and-controls",
+		"slug": "plugin-sidebar-2-styles-and-controls",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md",
-		"parent": "sidebar-tutorial"
+		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Register a new meta field",
-		"slug": "register-meta",
+		"title": "Register the meta field",
+		"slug": "plugin-sidebar-3-register-meta",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md",
-		"parent": "sidebar-tutorial"
+		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Initialize the input control with the meta field value",
-		"slug": "initialize-input",
+		"title": "Initialize the input control",
+		"slug": "plugin-sidebar-4-initialize-input",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md",
-		"parent": "sidebar-tutorial"
+		"parent": "plugin-sidebar-0"
 	},
 	{
-		"title": "Update the meta field value when the input's content changes",
-		"slug": "update-meta",
+		"title": "Update the meta field when the input's content changes",
+		"slug": "plugin-sidebar-5-update-meta",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md",
-		"parent": "sidebar-tutorial"
+		"parent": "plugin-sidebar-0"
 	},
 	{
 		"title": "Finishing touches",
-		"slug": "finishing-touches",
+		"slug": "plugin-sidebar-6-finishing-touches",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
-		"parent": "sidebar-tutorial"
+		"parent": "plugin-sidebar-0"
 	},
 	{
 		"title": "Designer Documentation",
