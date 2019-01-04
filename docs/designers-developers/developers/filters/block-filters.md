@@ -237,8 +237,9 @@ Adding blocks is easy enough, removing them is as easy. Plugin or theme authors 
 
 ```js
 // my-plugin.js
-
-wp.blocks.unregisterBlockType( 'core/verse' );
+window.onload = () => {
+	wp.blocks.unregisterBlockType( 'core/verse' );
+}
 ```
 
 and load this script in the Editor
