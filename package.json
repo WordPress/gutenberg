@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "4.7.0",
+	"version": "4.8.0",
 	"private": true,
 	"description": "A new WordPress editor experience",
 	"repository": "git+https://github.com/WordPress/gutenberg.git",
@@ -77,7 +77,6 @@
 		"cross-env": "3.2.4",
 		"cssnano": "4.0.3",
 		"enzyme": "3.7.0",
-		"deasync": "0.1.13",
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
 		"eslint-plugin-jest": "21.5.0",
@@ -152,7 +151,6 @@
 		"check-licenses": "concurrently \"wp-scripts check-licenses --prod --gpl2\" \"wp-scripts check-licenses --dev\"",
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
-		"ci": "concurrently \"npm run lint\" \"npm run test-unit:ci\" \"npm run check-local-changes\"",
 		"predev": "npm run check-engines",
 		"dev": "npm run build:packages && concurrently \"cross-env webpack --watch\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
@@ -183,7 +181,6 @@
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
 		"test-unit:watch": "npm run test-unit -- --watch",
-		"test-unit:ci": "npm run test-unit -- --ci --runInBand",
 		"test-unit-php": "docker-compose run --rm wordpress_phpunit phpunit",
 		"test-unit-php-multisite": "docker-compose run -e WP_MULTISITE=1 --rm wordpress_phpunit phpunit"
 	},

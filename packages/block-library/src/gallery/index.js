@@ -99,14 +99,18 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ 'core/image' ],
 				transform: ( attributes ) => {
+					// Init the align attribute from the first item which may be either the placeholder or an image.
+					let { align } = attributes[ 0 ];
+					// Loop through all the images and check if they have the same align.
+					align = every( attributes, [ 'align', align ] ) ? align : undefined;
+
 					const validImages = filter( attributes, ( { id, url } ) => id && url );
-					if ( validImages.length > 0 ) {
-						return createBlock( 'core/gallery', {
-							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
-							ids: validImages.map( ( { id } ) => id ),
-						} );
-					}
-					return createBlock( 'core/gallery' );
+
+					return createBlock( 'core/gallery', {
+						images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
+						ids: validImages.map( ( { id } ) => id ),
+						align,
+					} );
 				},
 			},
 			{
@@ -174,11 +178,11 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
-				transform: ( { images } ) => {
+				transform: ( { images, align } ) => {
 					if ( images.length > 0 ) {
-						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
+						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption, align } ) );
 					}
-					return createBlock( 'core/image' );
+					return createBlock( 'core/image', { align } );
 				},
 			},
 		],

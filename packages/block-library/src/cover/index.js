@@ -235,16 +235,6 @@ export const settings = {
 				backgroundColor: overlayColor.color,
 			};
 
-			const classes = classnames(
-				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
-				dimRatioToClass( dimRatio ),
-				{
-					'has-background-dim': dimRatio !== 0,
-					'has-parallax': hasParallax,
-				}
-			);
-
 			const controls = (
 				<Fragment>
 					<BlockControls>
@@ -345,6 +335,16 @@ export const settings = {
 					</Fragment>
 				);
 			}
+
+			const classes = classnames(
+				className,
+				contentAlign !== 'center' && `has-${ contentAlign }-content`,
+				dimRatioToClass( dimRatio ),
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+				}
+			);
 
 			return (
 				<Fragment>

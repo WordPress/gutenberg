@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews } from '../reducer';
+import { terms, entities, embedPreviews, hasUploadPermissions } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -115,5 +115,24 @@ describe( 'embedPreviews()', () => {
 		expect( state ).toEqual( {
 			'http://twitter.com/notnownikki': { data: 42 },
 		} );
+	} );
+} );
+
+describe( 'hasUploadPermissions()', () => {
+	it( 'returns true by default', () => {
+		const state = hasUploadPermissions( undefined, {} );
+
+		expect( state ).toEqual( true );
+	} );
+
+	it( 'returns with updated upload permissions value', () => {
+		const originalState = true;
+
+		const state = hasUploadPermissions( originalState, {
+			type: 'RECEIVE_UPLOAD_PERMISSIONS',
+			hasUploadPermissions: false,
+		} );
+
+		expect( state ).toEqual( false );
 	} );
 } );

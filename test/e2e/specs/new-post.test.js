@@ -7,11 +7,13 @@ import { activatePlugin, deactivatePlugin } from '../support/plugins';
 describe( 'new editor state', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-plugin-post-formats-support' );
+	} );
+
+	beforeEach( async () => {
 		await newPost();
 	} );
 
 	afterAll( async () => {
-		await newPost();
 		await deactivatePlugin( 'gutenberg-test-plugin-post-formats-support' );
 	} );
 
@@ -38,16 +40,6 @@ describe( 'new editor state', () => {
 	} );
 
 	it( 'should focus the title if the title is empty', async () => {
-		// We need to remove the tips to make sure they aren't clicked/removed
-		// during our check of the title `textarea`'s focus.
-		await page.evaluate( () => {
-			return wp.data.dispatch( 'core/nux' ).disableTips();
-		} );
-
-		// And then reload the page to ensure we get a new page that should
-		// autofocus the title, without any NUX tips.
-		await page.reload();
-
 		const activeElementClasses = await page.evaluate( () => {
 			return Object.values( document.activeElement.classList );
 		} );
