@@ -27,6 +27,6 @@ count accepts three parameters:
 ```JS
 import { count } from '@wordpress/wordcount';
 const numberOfWords = count( 'Words to count', 'words', {} )
-````
+```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
