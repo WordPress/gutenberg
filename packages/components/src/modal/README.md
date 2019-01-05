@@ -105,6 +105,14 @@ If this property is set to false, the modal will not display a close icon and ca
 - Required: No
 - Default: true
 
+### noHeader
+
+If this property is set to true, the modal will not display its header, which contains the icon, title and close icon.
+
+- Type: `boolean`
+- Required: No
+- Default: false
+
 ### className
 
 If this property is added, it will an additional class name to the modal content `div`.

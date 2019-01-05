@@ -119,6 +119,7 @@ class Modal extends Component {
 			aria,
 			instanceId,
 			isDismissable,
+			noHeader,
 			...otherProps
 		} = this.props;
 
@@ -144,14 +145,16 @@ class Modal extends Component {
 					{ ...otherProps }
 				>
 					<div className={ 'components-modal__content' } tabIndex="0">
-						<ModalHeader
-							closeLabel={ closeButtonLabel }
-							headingId={ headingId }
-							icon={ icon }
-							isDismissable={ isDismissable }
-							onClose={ onRequestClose }
-							title={ title }
-						/>
+						{ ! noHeader &&
+							<ModalHeader
+								closeLabel={ closeButtonLabel }
+								headingId={ headingId }
+								icon={ icon }
+								isDismissable={ isDismissable }
+								onClose={ onRequestClose }
+								title={ title }
+							/>
+						}
 						{ children }
 					</div>
 				</ModalFrame>
@@ -171,6 +174,7 @@ Modal.defaultProps = {
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
 	isDismissable: true,
+	noHeader: false,
 	/* accessibility */
 	aria: {
 		labelledby: null,
