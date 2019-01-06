@@ -4,7 +4,15 @@
 */
 
 import React from 'react';
-import { View, Text, TouchableWithoutFeedback, Dimensions, LayoutChangeEvent } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	Dimensions,
+	LayoutChangeEvent,
+	NativeSyntheticEvent,
+	NativeTouchEvent,
+} from 'react-native';
 import InlineToolbar, { InlineToolbarActions } from './inline-toolbar';
 
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -29,15 +37,15 @@ type PropsType = BlockType & {
 	getBlockIndex: ( clientId: string, rootClientId: string ) => number,
 	getPreviousBlockClientId: ( clientId: string ) => string,
 	getNextBlockClientId: ( clientId: string ) => string,
-	onChange: ( clientId: string, attributes: mixed ) => void,
+	onChange: ( attributes: mixed ) => void,
 	onReplace: ( blocks: Array<Object> ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
-	onInlineToolbarButtonPressed: ( button: number, clientId: string ) => void,
+	onInlineToolbarButtonPressed: ( button: number ) => void,
 	onSelect: ( clientId: string ) => void,
 	mergeBlocks: ( clientId: string, clientId: string ) => void,
-	moveBlocksUp: ( clientId: string ) => void,
-	moveBlocksDown: ( clientId: string ) => void,
-	removeBlock: ( clientId: string ) => void,
+	moveBlockUp: () => void,
+	moveBlockDown: () => void,
+	removeBlock: () => void,
 	replaceBlock: ( clientId: string ) => void,
 };
 
@@ -54,7 +62,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		};
 	}
 
-	onFocus = ( event ) => {
+	onFocus = ( event: NativeSyntheticEvent<NativeTouchEvent> ) => {
 		if ( event ) {
 			// == Hack for the Alpha ==
 			// When moving the focus from a TextInput field to another kind of field the call that hides the keyboard is not invoked
