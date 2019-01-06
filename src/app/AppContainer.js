@@ -20,6 +20,7 @@ type PropsType = {
 	setupEditor: ( mixed, ?mixed ) => mixed,
 	toggleBlockMode: ?string => mixed,
 	getBlocks: () => Array<BlockType>,
+	post: ?mixed,
 };
 
 class AppContainer extends React.Component<PropsType> {
