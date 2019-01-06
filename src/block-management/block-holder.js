@@ -68,16 +68,16 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 		this.props.onSelect( this.props.clientId );
 	};
 
-	onInlineToolbarButtonPressed = ( button: number, clientId: string ) => {
+	onInlineToolbarButtonPressed = ( button: number ) => {
 		switch ( button ) {
 			case InlineToolbarActions.UP:
-				this.props.moveBlocksUp( clientId );
+				this.props.moveBlockUp();
 				break;
 			case InlineToolbarActions.DOWN:
-				this.props.moveBlocksDown( clientId );
+				this.props.moveBlockDown();
 				break;
 			case InlineToolbarActions.DELETE:
-				this.props.removeBlock( clientId );
+				this.props.removeBlock();
 				break;
 		}
 	};
@@ -222,20 +222,22 @@ export default compose( [
 			moveBlocksUp,
 			removeBlock,
 			replaceBlock,
-			resetBlocks,
 			selectBlock,
 			updateBlockAttributes,
-			toggleBlockMode,
 		} = dispatch( 'core/editor' );
 
 		return {
-			clearSelectedBlock,
 			mergeBlocks,
-			moveBlocksDown,
-			moveBlocksUp,
-			removeBlock,
-			resetBlocks,
-			toggleBlockMode,
+			replaceBlock,
+			moveBlockDown() {
+				moveBlocksDown( clientId );
+			},
+			moveBlockUp() {
+				moveBlocksUp( clientId );
+			},
+			removeBlock() {
+				removeBlock( clientId );
+			},
 			onInsertBlocks( blocks, index ) {
 				insertBlocks( blocks, index, rootClientId );
 			},
@@ -246,7 +248,6 @@ export default compose( [
 			onChange: ( attributes ) => {
 				updateBlockAttributes( clientId, attributes );
 			},
-			replaceBlock,
 		};
 	} ),
 ] )( BlockHolder );
