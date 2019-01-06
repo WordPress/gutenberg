@@ -325,6 +325,10 @@ function gutenberg_add_edit_link( $actions, $post ) {
 		return $actions;
 	}
 
+	if ( ! is_plugin_active( 'classic-editor/classic-editor.php' ) ) {
+		return $actions;
+	}
+
 	$edit_url = get_edit_post_link( $post->ID, 'raw' );
 	$edit_url = add_query_arg( 'classic-editor', '', $edit_url );
 
@@ -388,6 +392,10 @@ function gutenberg_replace_default_add_new_button() {
 	}
 
 	if ( ! gutenberg_can_edit_post_type( $typenow ) ) {
+		return;
+	}
+
+	if ( ! is_plugin_active( 'classic-editor/classic-editor.php' ) ) {
 		return;
 	}
 
