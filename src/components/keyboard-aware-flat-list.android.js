@@ -8,7 +8,6 @@ import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 type PropsType = {
 	...FlatList.propTypes,
 	shouldPreventAutomaticScroll: void => boolean,
-	parentHeight: number,
 	blockToolbarHeight: number,
 	innerToolbarHeight: number,
 }
