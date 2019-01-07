@@ -1,6 +1,6 @@
 # Gutenberg Release Process
 
-The Gutenberg Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
+This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
 To release Gutenberg, you need commit access to the [WordPress.org plugin repository]. 🙂
 
@@ -15,7 +15,7 @@ We release a new major version approximately every two weeks. The current and ne
 On the date of the current milestone, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new release candidate can be published.
 
 
-The date in the milestone is the date of **tagging the release candidate**. On this date, all remaining PRs on the milestone are punted automatically to the next release.
+The date in the milestone is the date of **tagging the release candidate**. On this date, all remaining PRs on the milestone are moved automatically to the next release.
 
 Release candidates should be versioned incrementally, starting with `-rc.1`, then `-rc.2`, and so on.
 
@@ -26,9 +26,9 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 1. writing a release blog post and changelog
 2. creating the release branch
 3. bumping the version and tagging the release
-5. building the plugin
-6. publishing the release to GitHub
-7. publishing the call for testing
+4. building the plugin
+5. publishing the release to GitHub
+6. publishing the call for testing
 
 ##### Writing the Release Post and Changelog
 
@@ -39,7 +39,7 @@ Releasing the first release candidate for this milestone (`x.x`) involves:
 
 ##### Creating the Release Branch
 
-For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minors. For the first RC of the milestone, a release branch is created from master.
+For each milestone (let's assume it's `x.x` here), a release branch is used to release all RCs and minor releases. For the first RC of the milestone, a release branch is created from master.
 
 ```
 git checkout master
