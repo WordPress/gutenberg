@@ -2,13 +2,13 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	clickBlockAppender,
 } from '../support/utils';
 
 describe( 'invalid blocks', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Should show an invalid block message with clickable options', async () => {

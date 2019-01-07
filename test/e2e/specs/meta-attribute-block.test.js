@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
 	getEditedPostContent,
-	saveDraft,
 	insertBlock,
+	saveDraft,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Block with a meta attribute', () => {
 	beforeAll( async () => {
@@ -15,7 +16,7 @@ describe( 'Block with a meta attribute', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {

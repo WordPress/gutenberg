@@ -3,8 +3,8 @@
  */
 import {
 	clickBlockAppender,
-	newPost,
-	pressWithModifier,
+	createNewPost,
+	pressKeyWithModifier,
 	ensureSidebarOpened,
 	publishPost,
 } from '../support/utils';
@@ -15,7 +15,7 @@ describe( 'Change detection', () => {
 	beforeEach( async () => {
 		hadInterceptedSave = false;
 
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterEach( () => {
@@ -68,7 +68,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier( 'primary', 'S' );
 
 		expect( hadInterceptedSave ).toBe( false );
 	} );
@@ -134,7 +134,7 @@ describe( 'Change detection', () => {
 	} );
 
 	it( 'Should not prompt to confirm unsaved changes for new post with initial edits', async () => {
-		await newPost( {
+		await createNewPost( {
 			title: 'My New Post',
 			content: 'My content',
 			excerpt: 'My excerpt',
@@ -163,7 +163,7 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'primary', 'S' ),
+			pressKeyWithModifier( 'primary', 'S' ),
 		] );
 
 		await assertIsDirty( false );
@@ -177,13 +177,13 @@ describe( 'Change detection', () => {
 			page.waitForSelector( '.editor-post-saved-state.is-saved' ),
 
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'primary', 'S' ),
+			pressKeyWithModifier( 'primary', 'S' ),
 		] );
 
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier( 'primary', 'S' );
 
 		expect( hadInterceptedSave ).toBe( false );
 	} );
@@ -195,7 +195,7 @@ describe( 'Change detection', () => {
 
 		await Promise.all( [
 			// Keyboard shortcut Ctrl+S save.
-			pressWithModifier( 'primary', 'S' ),
+			pressKeyWithModifier( 'primary', 'S' ),
 
 			// Ensure save update fails and presents button.
 			page.waitForXPath(
@@ -221,7 +221,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier( 'primary', 'S' );
 
 		await releaseSaveIntercept();
 
@@ -237,7 +237,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier( 'primary', 'S' );
 
 		await page.type( '.editor-post-title__input', '!' );
 
@@ -254,7 +254,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier( 'primary', 'S' );
 
 		// Dirty post while save is in-flight.
 		await page.type( '.editor-post-title__input', '!' );
@@ -276,7 +276,7 @@ describe( 'Change detection', () => {
 		await interceptSave();
 
 		// Keyboard shortcut Ctrl+S save.
-		await pressWithModifier( 'primary', 'S' );
+		await pressKeyWithModifier( 'primary', 'S' );
 
 		await clickBlockAppender();
 

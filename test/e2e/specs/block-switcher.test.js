@@ -4,21 +4,21 @@
 import {
 	hasBlockSwitcher,
 	getAvailableBlockTransforms,
-	newPost,
+	createNewPost,
 	insertBlock,
-	pressWithModifier,
+	pressKeyWithModifier,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Should show the expected block transforms on the list block when the blocks are removed', async () => {
 		// Insert a list block.
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List content' );
-		await pressWithModifier( 'alt', 'F10' );
+		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
 		expect( await hasBlockSwitcher() ).toBeTruthy();
@@ -41,7 +41,7 @@ describe( 'adding blocks', () => {
 		// Insert a list block.
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List content' );
-		await pressWithModifier( 'alt', 'F10' );
+		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
 		expect( await hasBlockSwitcher() ).toBeTruthy();
@@ -66,7 +66,7 @@ describe( 'adding blocks', () => {
 		// Insert a list block.
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List content' );
-		await pressWithModifier( 'alt', 'F10' );
+		await pressKeyWithModifier( 'alt', 'F10' );
 
 		// Verify the block switcher exists.
 		expect( await hasBlockSwitcher() ).toBeFalsy();

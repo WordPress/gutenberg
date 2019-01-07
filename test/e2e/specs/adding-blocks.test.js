@@ -2,15 +2,15 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	insertBlock,
 	getEditedPostContent,
-	pressTimes,
+	pressKeyTimes,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	/**
@@ -66,8 +66,8 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Foo' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
-		await pressTimes( 'ArrowRight', 3 );
-		await pressTimes( 'Delete', 6 );
+		await pressKeyTimes( 'ArrowRight', 3 );
+		await pressKeyTimes( 'Delete', 6 );
 		await page.keyboard.type( ' text' );
 
 		// Ensure newline preservation in shortcode block.
@@ -93,7 +93,7 @@ describe( 'adding blocks', () => {
 			document.activeElement.classList.contains( 'editor-inserter__search' )
 		) );
 		await page.keyboard.type( 'para' );
-		await pressTimes( 'Tab', 3 );
+		await pressKeyTimes( 'Tab', 3 );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Second paragraph' );
 

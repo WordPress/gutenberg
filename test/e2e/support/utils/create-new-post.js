@@ -6,14 +6,14 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { visitAdmin } from './visit-admin';
+import { visitAdminPage } from './visit-admin-page';
 
 /**
  * Creates new post.
  *
  * @param {Object} obj Object to create new post, along with tips enabling option.
  */
-export async function newPost( {
+export async function createNewPost( {
 	postType,
 	title,
 	content,
@@ -26,7 +26,7 @@ export async function newPost( {
 		content,
 		excerpt,
 	} ).slice( 1 );
-	await visitAdmin( 'post-new.php', query );
+	await visitAdminPage( 'post-new.php', query );
 
 	await page.evaluate( ( _enableTips ) => {
 		const action = _enableTips ? 'enableTips' : 'disableTips';

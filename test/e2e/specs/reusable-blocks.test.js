@@ -3,8 +3,8 @@
  */
 import {
 	insertBlock,
-	newPost,
-	pressWithModifier,
+	createNewPost,
+	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
 } from '../support/utils';
@@ -17,7 +17,7 @@ function waitForAndAcceptDialog() {
 
 describe( 'Reusable Blocks', () => {
 	beforeAll( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	beforeEach( async () => {
@@ -210,7 +210,7 @@ describe( 'Reusable Blocks', () => {
 	} );
 
 	it( 'can be created from multiselection', async () => {
-		await newPost();
+		await createNewPost();
 
 		// Insert a Two paragraphs block
 		await insertBlock( 'Paragraph' );
@@ -219,8 +219,8 @@ describe( 'Reusable Blocks', () => {
 		await page.keyboard.type( 'Second paragraph' );
 
 		// Select all the blocks
-		await pressWithModifier( 'primary', 'a' );
-		await pressWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Trigger isTyping = false
 		await page.mouse.move( 200, 300, { steps: 10 } );

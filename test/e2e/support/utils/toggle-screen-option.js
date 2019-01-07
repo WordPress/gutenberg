@@ -10,7 +10,7 @@ import { clickOnMoreMenuItem } from './click-on-more-menu-item';
  * @param {?boolean} shouldBeChecked If true, turns the option on. If false, off. If
  *                                   undefined, the option will be toggled.
  */
-export async function toggleOption( label, shouldBeChecked = undefined ) {
+export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
 	await clickOnMoreMenuItem( 'Options' );
 	const [ handle ] = await page.$x( `//label[contains(text(), "${ label }")]` );
 

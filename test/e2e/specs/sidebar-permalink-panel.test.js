@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import {
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
 	findSidebarPanelWithTitle,
-	newPost,
 	openDocumentSettingsSidebar,
 	publishPost,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 // This tests are not together with the remaining sidebar tests,
 // because we need to publish/save a post, to correctly test the permalink panel.
@@ -23,13 +24,13 @@ describe( 'Sidebar Permalink Panel', () => {
 	} );
 
 	it( 'should not render permalink sidebar panel while the post is new', async () => {
-		await newPost();
+		await createNewPost();
 		await openDocumentSettingsSidebar();
 		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeUndefined();
 	} );
 
 	it( 'should render permalink sidebar panel after the post is published and allow its removal', async () => {
-		await newPost();
+		await createNewPost();
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
@@ -43,7 +44,7 @@ describe( 'Sidebar Permalink Panel', () => {
 	} );
 
 	it( 'should not render link panel when post is publicly queryable but not public', async () => {
-		await newPost( { postType: 'public_q_not_public' } );
+		await createNewPost( { postType: 'public_q_not_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
@@ -52,7 +53,7 @@ describe( 'Sidebar Permalink Panel', () => {
 	} );
 
 	it( 'should not render link panel when post is public but not publicly queryable', async () => {
-		await newPost( { postType: 'not_public_q_public' } );
+		await createNewPost( { postType: 'not_public_q_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.
@@ -61,7 +62,7 @@ describe( 'Sidebar Permalink Panel', () => {
 	} );
 
 	it( 'should render link panel when post is public and publicly queryable', async () => {
-		await newPost( { postType: 'public_q_public' } );
+		await createNewPost( { postType: 'public_q_public' } );
 		await page.keyboard.type( 'aaaaa' );
 		await publishPost();
 		// Start editing again.

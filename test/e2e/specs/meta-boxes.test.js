@@ -1,13 +1,18 @@
 /**
  * Internal dependencies
  */
-import { newPost, insertBlock, publishPost } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
+import {
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
+	insertBlock,
+	publishPost,
+} from '../support/utils';
 
 describe( 'Meta boxes', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-plugin-meta-box' );
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {
@@ -38,14 +43,14 @@ describe( 'Meta boxes', () => {
 
 	it( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async () => {
 		// Publish a post so there's something for the latest posts dynamic block to render.
-		await newPost();
+		await createNewPost();
 		await page.type( '.editor-post-title__input', 'A published post' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'Hello there!' );
 		await publishPost();
 
 		// Publish a post with the latest posts dynamic block.
-		await newPost();
+		await createNewPost();
 		await page.type( '.editor-post-title__input', 'Dynamic block test' );
 		await insertBlock( 'Latest Posts' );
 		await publishPost();

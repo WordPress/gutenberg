@@ -15,8 +15,8 @@ import '@wordpress/jest-console';
 import {
 	clearLocalStorage,
 	enablePageDialogAccept,
-	setViewport,
-	visitAdmin,
+	setBrowserViewport,
+	visitAdminPage,
 } from './utils';
 
 /**
@@ -49,7 +49,7 @@ jest.setTimeout( PUPPETEER_TIMEOUT || 100000 );
 
 async function setupBrowser() {
 	await clearLocalStorage();
-	await setViewport( 'large' );
+	await setBrowserViewport( 'large' );
 }
 
 /**
@@ -59,7 +59,7 @@ async function setupBrowser() {
  */
 async function trashExistingPosts() {
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
-	await visitAdmin( 'edit.php' );
+	await visitAdminPage( 'edit.php' );
 
 	// If this selector doesn't exist there are no posts for us to delete.
 	const bulkSelector = await page.$( '#bulk-action-selector-top' );

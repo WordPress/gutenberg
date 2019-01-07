@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 import {
+	activatePlugin,
 	clickOnMoreMenuItem,
-	newPost,
+	createNewPost,
+	deactivatePlugin,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
 	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );
@@ -25,7 +26,7 @@ describe( 'Using Plugins API', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	/**

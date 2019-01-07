@@ -175,7 +175,7 @@
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"pretest-e2e": "concurrently \"./bin/reset-e2e-tests.sh\" \"npm run build\"",
-		"test-e2e": "wp-scripts test-e2e --config test/e2e/jest.config.json",
+		"test-e2e": "wp-scripts test-e2e --setupTestFrameworkScriptFile=./test/e2e/support/setup-test-framework.js --testPathPattern=/test/e2e/specs/",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",

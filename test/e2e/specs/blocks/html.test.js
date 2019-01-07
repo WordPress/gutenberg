@@ -4,12 +4,12 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
+	createNewPost,
 } from '../../support/utils';
 
 describe( 'HTML block', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'can be created by typing "/html"', async () => {

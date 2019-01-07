@@ -3,10 +3,10 @@
  */
 import {
 	clickBlockAppender,
-	newPost,
-	isEmbedding,
+	createNewPost,
+	createEmbeddingMatcher,
 	setUpResponseMocking,
-	JSONResponse,
+	createJSONResponse,
 	getEditedPostContent,
 	clickButton,
 } from '../support/utils';
@@ -61,32 +61,32 @@ const MOCK_BAD_WORDPRESS_RESPONSE = {
 
 const MOCK_RESPONSES = [
 	{
-		match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
-		onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/' ),
+		onRequestMatch: createJSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
 	},
 	{
-		match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
-		onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+		match: createEmbeddingMatcher( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
 	},
 	{
-		match: isEmbedding( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
-		onRequestMatch: JSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
+		match: createEmbeddingMatcher( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_VIDEO_SUCCESS_RESPONSE ),
 	},
 	{
-		match: isEmbedding( 'https://cloudup.com/cQFlxqtY4ob' ),
-		onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+		match: createEmbeddingMatcher( 'https://cloudup.com/cQFlxqtY4ob' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
 	},
 	{
-		match: isEmbedding( 'https://twitter.com/notnownikki' ),
-		onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+		match: createEmbeddingMatcher( 'https://twitter.com/notnownikki' ),
+		onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
 	},
 	{
-		match: isEmbedding( 'https://twitter.com/thatbunty' ),
-		onRequestMatch: JSONResponse( MOCK_BAD_EMBED_PROVIDER_RESPONSE ),
+		match: createEmbeddingMatcher( 'https://twitter.com/thatbunty' ),
+		onRequestMatch: createJSONResponse( MOCK_BAD_EMBED_PROVIDER_RESPONSE ),
 	},
 	{
-		match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
-		onRequestMatch: JSONResponse( MOCK_CANT_EMBED_RESPONSE ),
+		match: createEmbeddingMatcher( 'https://twitter.com/wooyaygutenberg123454312' ),
+		onRequestMatch: createJSONResponse( MOCK_CANT_EMBED_RESPONSE ),
 	},
 ];
 
@@ -143,7 +143,7 @@ const addAllEmbeds = async () => {
 
 describe( 'Embedding content', () => {
 	beforeAll( async () => await setUpResponseMocking( MOCK_RESPONSES ) );
-	beforeEach( newPost );
+	beforeEach( createNewPost );
 
 	it( 'should render embeds in the correct state', async () => {
 		await addAllEmbeds();
@@ -184,8 +184,8 @@ describe( 'Embedding content', () => {
 		await setUpResponseMocking(
 			[
 				{
-					match: isEmbedding( 'https://twitter.com/wooyaygutenberg123454312' ),
-					onRequestMatch: JSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
+					match: createEmbeddingMatcher( 'https://twitter.com/wooyaygutenberg123454312' ),
+					onRequestMatch: createJSONResponse( MOCK_EMBED_RICH_SUCCESS_RESPONSE ),
 				},
 			]
 		);

@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import {
-	newPost,
-	insertBlock,
-	switchToEditor,
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
 	getEditedPostContent,
+	insertBlock,
+	switchEditorModeTo,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'InnerBlocks Template Sync', () => {
 	beforeAll( async () => {
@@ -15,7 +16,7 @@ describe( 'InnerBlocks Template Sync', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {
@@ -29,7 +30,7 @@ describe( 'InnerBlocks Template Sync', () => {
 			<!-- /wp:paragraph -->
 		`;
 		await insertBlock( blockName );
-		await switchToEditor( 'Code' );
+		await switchEditorModeTo( 'Code' );
 		await page.$eval( '.editor-post-text-editor', ( element, _paragraph, _blockSlug ) => {
 			const blockDelimiter = `<!-- /wp:${ _blockSlug } -->`;
 			element.value = element.value.replace( blockDelimiter, `${ _paragraph }${ blockDelimiter }` );
@@ -37,7 +38,7 @@ describe( 'InnerBlocks Template Sync', () => {
 		// Press "Enter" inside the Code Editor to fire the `onChange` event for the new value.
 		await page.click( '.editor-post-text-editor' );
 		await page.keyboard.press( 'Enter' );
-		await switchToEditor( 'Visual' );
+		await switchEditorModeTo( 'Visual' );
 	};
 
 	it( 'Ensures blocks without locking are kept intact even if they do not match the template ', async () => {
@@ -66,7 +67,7 @@ describe( 'Container block without paragraph support', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {

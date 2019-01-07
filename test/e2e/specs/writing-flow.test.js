@@ -4,14 +4,14 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
-	pressTimes,
-	pressWithModifier,
+	createNewPost,
+	pressKeyTimes,
+	pressKeyWithModifier,
 } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Should navigate inner blocks with arrow keys', async () => {
@@ -82,13 +82,13 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Third' );
 
 		// Navigate to second paragraph
-		await pressTimes( 'ArrowLeft', 6 );
+		await pressKeyTimes( 'ArrowLeft', 6 );
 
 		// Bold second paragraph text
 		await page.keyboard.down( 'Shift' );
-		await pressTimes( 'ArrowLeft', 6 );
+		await pressKeyTimes( 'ArrowLeft', 6 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
@@ -109,18 +109,18 @@ describe( 'adding blocks', () => {
 
 		// Arrow right from end of first should traverse to second, *BEFORE*
 		// the bolded text. Another press should move within inline boundary.
-		await pressTimes( 'ArrowRight', 2 );
+		await pressKeyTimes( 'ArrowRight', 2 );
 		await page.keyboard.type( 'Inside' );
 
 		// Arrow left from end of beginning of inline boundary should move to
 		// the outside of the inline boundary.
-		await pressTimes( 'ArrowLeft', 6 );
+		await pressKeyTimes( 'ArrowLeft', 6 );
 		await page.keyboard.press( 'ArrowLeft' ); // Separate for emphasis.
 		await page.keyboard.type( 'Before' );
 
 		// Likewise, test at the end of the inline boundary for same effect.
 		await page.keyboard.press( 'ArrowRight' ); // Move inside
-		await pressTimes( 'ArrowRight', 12 );
+		await pressKeyTimes( 'ArrowRight', 12 );
 		await page.keyboard.type( 'Inside' );
 		await page.keyboard.press( 'ArrowRight' );
 
@@ -145,7 +145,7 @@ describe( 'adding blocks', () => {
 		// Ensure no zero-width space character. Notably, this can occur when
 		// save occurs while at an inline boundary edge.
 		await clickBlockAppender();
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Backspace to remove the content in this block, resetting it.
@@ -153,7 +153,7 @@ describe( 'adding blocks', () => {
 
 		// Ensure no data-mce-selected. Notably, this can occur when content
 		// is saved while typing within an inline boundary.
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -161,14 +161,14 @@ describe( 'adding blocks', () => {
 	it( 'should insert line break at end', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a' );
-		await pressWithModifier( 'shift', 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should insert line break at end and continue writing', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a' );
-		await pressWithModifier( 'shift', 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'b' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -177,7 +177,7 @@ describe( 'adding blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'ab' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressWithModifier( 'shift', 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -185,13 +185,13 @@ describe( 'adding blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await pressWithModifier( 'shift', 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should insert line break in empty container', async () => {
 		await clickBlockAppender();
-		await pressWithModifier( 'shift', 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -209,7 +209,7 @@ describe( 'adding blocks', () => {
 		expect( isInTitle ).toBe( true );
 
 		// Should remain in title upon modifier + ArrowDown:
-		await pressWithModifier( 'primary', 'ArrowDown' );
+		await pressKeyWithModifier( 'primary', 'ArrowDown' );
 		isInTitle = await page.evaluate( () => (
 			!! document.activeElement.closest( '.editor-post-title' )
 		) );
@@ -226,7 +226,7 @@ describe( 'adding blocks', () => {
 	it( 'should not delete surrounding space when deleting a word with Backspace', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1 2 3' );
-		await pressTimes( 'ArrowLeft', ' 3'.length );
+		await pressKeyTimes( 'ArrowLeft', ' 3'.length );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -239,12 +239,12 @@ describe( 'adding blocks', () => {
 	it( 'should not delete surrounding space when deleting a word with Alt+Backspace', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'alpha beta gamma' );
-		await pressTimes( 'ArrowLeft', ' gamma'.length );
+		await pressKeyTimes( 'ArrowLeft', ' gamma'.length );
 
 		if ( process.platform === 'darwin' ) {
-			await pressWithModifier( 'alt', 'Backspace' );
+			await pressKeyWithModifier( 'alt', 'Backspace' );
 		} else {
-			await pressWithModifier( 'primary', 'Backspace' );
+			await pressKeyWithModifier( 'primary', 'Backspace' );
 		}
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -257,9 +257,9 @@ describe( 'adding blocks', () => {
 	it( 'should not delete surrounding space when deleting a selected word', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'alpha beta gamma' );
-		await pressTimes( 'ArrowLeft', ' gamma'.length );
+		await pressKeyTimes( 'ArrowLeft', ' gamma'.length );
 		await page.keyboard.down( 'Shift' );
-		await pressTimes( 'ArrowLeft', 'beta'.length );
+		await pressKeyTimes( 'ArrowLeft', 'beta'.length );
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.press( 'Backspace' );
 
@@ -272,7 +272,7 @@ describe( 'adding blocks', () => {
 
 	it( 'should create valid paragraph blocks when rapidly pressing Enter', async () => {
 		await clickBlockAppender();
-		await pressTimes( 'Enter', 10 );
+		await pressKeyTimes( 'Enter', 10 );
 
 		// Check that none of the paragraph blocks have <br> in them.
 		expect( await getEditedPostContent() ).toMatchSnapshot();

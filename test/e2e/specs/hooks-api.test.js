@@ -2,10 +2,11 @@
  * Internal dependencies
  */
 import {
+	activatePlugin,
 	clickBlockAppender,
-	newPost,
+	createNewPost,
+	deactivatePlugin,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using Hooks API', () => {
 	beforeAll( async () => {
@@ -17,7 +18,7 @@ describe( 'Using Hooks API', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Should contain a reset block button on the sidebar', async () => {

@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { createNewPost } from '../support/utils';
 
 describe( 'popovers', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	describe( 'dropdown', () => {

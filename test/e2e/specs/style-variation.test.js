@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { newPost, insertBlock, getEditedPostContent } from '../support/utils';
+import { createNewPost, insertBlock, getEditedPostContent } from '../support/utils';
 
 describe( 'adding blocks', () => {
 	beforeAll( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Should switch the style of the quote block', async () => {

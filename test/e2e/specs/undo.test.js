@@ -4,13 +4,13 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
-	pressWithModifier,
+	createNewPost,
+	pressKeyWithModifier,
 } from '../support/utils';
 
 describe( 'undo', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should undo typing after a pause', async () => {
@@ -22,7 +22,7 @@ describe( 'undo', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( 'primary', 'z' );
+		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -31,12 +31,12 @@ describe( 'undo', () => {
 		await clickBlockAppender();
 
 		await page.keyboard.type( 'before keyboard ' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'after keyboard' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( 'primary', 'z' );
+		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -52,12 +52,12 @@ describe( 'undo', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( 'primary', 'z' ); // Undo 3rd paragraph text.
-		await pressWithModifier( 'primary', 'z' ); // Undo 3rd block.
-		await pressWithModifier( 'primary', 'z' ); // Undo 2nd paragraph text.
-		await pressWithModifier( 'primary', 'z' ); // Undo 2nd block.
-		await pressWithModifier( 'primary', 'z' ); // Undo 1st paragraph text.
-		await pressWithModifier( 'primary', 'z' ); // Undo 1st block.
+		await pressKeyWithModifier( 'primary', 'z' ); // Undo 3rd paragraph text.
+		await pressKeyWithModifier( 'primary', 'z' ); // Undo 3rd block.
+		await pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd paragraph text.
+		await pressKeyWithModifier( 'primary', 'z' ); // Undo 2nd block.
+		await pressKeyWithModifier( 'primary', 'z' ); // Undo 1st paragraph text.
+		await pressKeyWithModifier( 'primary', 'z' ); // Undo 1st block.
 
 		expect( await getEditedPostContent() ).toBe( '' );
 		// After undoing every action, there should be no more undo history.
