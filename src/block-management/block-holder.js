@@ -38,7 +38,6 @@ type PropsType = BlockType & {
 	getPreviousBlockClientId: ( clientId: string ) => string,
 	getNextBlockClientId: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
-	onReplace: ( blocks: Array<Object> ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	onSelect: ( clientId: string ) => void,
 	mergeBlocks: ( clientId: string, clientId: string ) => void,
