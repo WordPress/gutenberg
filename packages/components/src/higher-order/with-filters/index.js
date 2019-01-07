@@ -26,23 +26,31 @@ export default function withFilters( hookName ) {
 	return createHigherOrderComponent( ( OriginalComponent ) => {
 		const namespace = 'core/with-filters-' + hookName;
 
-		class FilteredComponent extends Component {
+		/**
+		 * Since filtering is applied to the component, each filtered instance
+		 * can reuse a shared reference to the definition. This optimizes to
+		 * avoid excessive calls to `applyFilters` when many instances exist.
+		 *
+		 * @type {Component}
+		 */
+		let FilteredComponent = applyFilters( hookName, OriginalComponent );
+
+		class FilteredComponentRenderer extends Component {
 			constructor( props ) {
 				super( props );
 
-				this.Component = applyFilters( hookName, OriginalComponent );
-				this.throttledForceUpdate = debounce( () => {
-					this.Component = applyFilters( hookName, OriginalComponent );
-					this.forceUpdate();
-				}, ANIMATION_FRAME_PERIOD );
+				this.throttledForceUpdate = debounce(
+					() => this.forceUpdate(),
+					ANIMATION_FRAME_PERIOD
+				);
 			}
 
 			componentDidMount() {
-				FilteredComponent.instances.push( this );
+				FilteredComponentRenderer.instances.push( this );
 
 				// If there were previously no mounted instances for components
 				// filtered on this hook, add the hook handler.
-				if ( FilteredComponent.instances.length === 1 ) {
+				if ( FilteredComponentRenderer.instances.length === 1 ) {
 					addAction( 'hookRemoved', namespace, onHooksUpdated );
 					addAction( 'hookAdded', namespace, onHooksUpdated );
 				}
@@ -51,37 +59,47 @@ export default function withFilters( hookName ) {
 			componentWillUnmount() {
 				this.throttledForceUpdate.cancel();
 
-				FilteredComponent.instances = without( FilteredComponent.instances, this );
+				FilteredComponentRenderer.instances = without(
+					FilteredComponentRenderer.instances,
+					this
+				);
 
 				// If this was the last of the mounted components filtered on
 				// this hook, remove the hook handler.
-				if ( FilteredComponent.instances.length === 0 ) {
+				if ( FilteredComponentRenderer.instances.length === 0 ) {
 					removeAction( 'hookRemoved', namespace );
 					removeAction( 'hookAdded', namespace );
 				}
 			}
 
 			render() {
-				return <this.Component { ...this.props } />;
+				return <FilteredComponent { ...this.props } />;
 			}
 		}
 
-		FilteredComponent.instances = [];
+		FilteredComponentRenderer.instances = [];
 
 		/**
 		 * When a filter is added or removed for the matching hook name, each
-		 * mounted instance should re-render.
+		 * mounted instance should re-render with the new filters having been
+		 * applied to the original component.
 		 *
 		 * @param {string} updatedHookName Name of the hook that was updated.
 		 */
 		function onHooksUpdated( updatedHookName ) {
-			if ( updatedHookName === hookName ) {
-				FilteredComponent.instances.forEach( ( instance ) => {
-					instance.throttledForceUpdate();
-				} );
+			if ( updatedHookName !== hookName ) {
+				return;
 			}
+
+			// Recreate the filtered component.
+			FilteredComponent = applyFilters( hookName, OriginalComponent );
+
+			// Force each instance to render.
+			FilteredComponentRenderer.instances.forEach( ( instance ) => {
+				instance.throttledForceUpdate();
+			} );
 		}
 
-		return FilteredComponent;
+		return FilteredComponentRenderer;
 	}, 'withFilters' );
 }
