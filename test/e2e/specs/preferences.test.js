@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { createNewPost } from '../support/utils';
 
 describe( 'preferences', () => {
 	beforeAll( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	/**

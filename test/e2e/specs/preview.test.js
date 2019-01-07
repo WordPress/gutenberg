@@ -8,15 +8,15 @@ import { parse } from 'url';
  * Internal dependencies
  */
 import {
-	newPost,
-	getUrl,
+	createNewPost,
+	createURL,
 	publishPost,
 	saveDraft,
 } from '../support/utils';
 
 describe( 'Preview', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	async function openPreviewPage( editorPage ) {
@@ -72,7 +72,7 @@ describe( 'Preview', () => {
 			return window.location.search.match( /[\?&]post=(\d+)/ );
 		} ) ).jsonValue();
 
-		const expectedPreviewURL = getUrl( '', `?p=${ postId }&preview=true` );
+		const expectedPreviewURL = createURL( '', `?p=${ postId }&preview=true` );
 		expect( previewPage.url() ).toBe( expectedPreviewURL );
 
 		// Title in preview should match input.

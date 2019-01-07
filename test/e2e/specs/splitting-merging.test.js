@@ -2,16 +2,16 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	insertBlock,
 	getEditedPostContent,
-	pressTimes,
-	pressWithModifier,
+	pressKeyTimes,
+	pressKeyWithModifier,
 } from '../support/utils';
 
 describe( 'splitting and merging blocks', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should split and merge paragraph blocks using Enter and Backspace', async () => {
@@ -21,7 +21,7 @@ describe( 'splitting and merging blocks', () => {
 
 		// Move caret between 'First' and 'Second' and press Enter to split
 		// paragraph blocks
-		await pressTimes( 'ArrowLeft', 6 );
+		await pressKeyTimes( 'ArrowLeft', 6 );
 		await page.keyboard.press( 'Enter' );
 
 		// Assert that there are now two paragraph blocks with correct content
@@ -34,16 +34,16 @@ describe( 'splitting and merging blocks', () => {
 		await page.keyboard.type( 'Between' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressTimes( 'Backspace', 7 ); // Delete "Between"
+		await pressKeyTimes( 'Backspace', 7 ); // Delete "Between"
 
 		// Edge case: Without ensuring that the editor still has focus when
 		// restoring a bookmark, the caret may be inadvertently moved back to
 		// an inline boundary after a split occurs.
 		await page.keyboard.press( 'Home' );
 		await page.keyboard.down( 'Shift' );
-		await pressTimes( 'ArrowRight', 5 );
+		await pressKeyTimes( 'ArrowRight', 5 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		// Collapse selection, still within inline boundary.
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
@@ -56,13 +56,13 @@ describe( 'splitting and merging blocks', () => {
 		// Regression Test: Caret should reset to end of inline boundary when
 		// backspacing to delete second paragraph.
 		await insertBlock( 'Paragraph' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'Foo' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Replace contents of first paragraph with "Bar".
-		await pressTimes( 'Backspace', 4 );
+		await pressKeyTimes( 'Backspace', 4 );
 		await page.keyboard.type( 'Bar' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -107,7 +107,7 @@ describe( 'splitting and merging blocks', () => {
 
 		// Select text.
 		await page.keyboard.down( 'Shift' );
-		await pressTimes( 'ArrowLeft', 3 );
+		await pressKeyTimes( 'ArrowLeft', 3 );
 		await page.keyboard.up( 'Shift' );
 
 		// Delete selection.
@@ -126,9 +126,9 @@ describe( 'splitting and merging blocks', () => {
 		// The regression appeared to only affect paragraphs created while
 		// within an inline boundary.
 		await page.keyboard.down( 'Shift' );
-		await pressTimes( 'ArrowLeft', 3 );
+		await pressKeyTimes( 'ArrowLeft', 3 );
 		await page.keyboard.up( 'Shift' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Enter' );

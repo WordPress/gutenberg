@@ -6,7 +6,7 @@ import fetch from 'node-fetch';
 /**
  * Internal dependencies
  */
-import { getJSONResponse } from './get-json-response';
+import { getJSONResponse } from '../shared/get-json-response';
 
 /**
  * Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the

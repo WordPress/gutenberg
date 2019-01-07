@@ -13,12 +13,12 @@ import {
 	clickBlockAppender,
 	getEditedPostContent,
 	insertBlock,
-	newPost,
+	createNewPost,
 } from '../support/utils';
 
 describe( 'adding inline tokens', () => {
 	beforeAll( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should insert inline image', async () => {

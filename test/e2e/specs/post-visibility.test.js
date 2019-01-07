@@ -2,17 +2,17 @@
  * Internal dependencies
  */
 import {
-	setViewport,
-	newPost,
+	setBrowserViewport,
+	createNewPost,
 	openDocumentSettingsSidebar,
 } from '../support/utils';
 
 describe( 'Post visibility', () => {
 	[ 'large', 'small' ].forEach( ( viewport ) => {
 		it( `can be changed when the viewport is ${ viewport }`, async () => {
-			await setViewport( viewport );
+			await setBrowserViewport( viewport );
 
-			await newPost();
+			await createNewPost();
 
 			await openDocumentSettingsSidebar();
 

@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { toggleOption } from './toggle-option';
+import { toggleScreenOption } from './toggle-screen-option';
 
 /**
  * Enables Pre-publish checks.
  */
 export async function enablePrePublishChecks() {
-	await toggleOption( 'Enable Pre-publish Checks', true );
+	await toggleScreenOption( 'Enable Pre-publish Checks', true );
 }

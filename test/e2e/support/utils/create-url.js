@@ -4,7 +4,7 @@
 import { join } from 'path';
 import { URL } from 'url';
 
-import { WP_BASE_URL } from './config';
+import { WP_BASE_URL } from './shared/config';
 
 /**
  * Creates new URL by parsing base URL, WPPath and query string.
@@ -13,7 +13,7 @@ import { WP_BASE_URL } from './config';
  * @param {?string} query String to be serialized as query portion of URL.
  * @return {string} String which represents full URL.
  */
-export function getUrl( WPPath, query = '' ) {
+export function createURL( WPPath, query = '' ) {
 	const url = new URL( WP_BASE_URL );
 
 	url.pathname = join( url.pathname, WPPath );

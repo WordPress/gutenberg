@@ -1,13 +1,17 @@
 /**
  * Internal dependencies
  */
-import { newPost, publishPost } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
+import {
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
+	publishPost,
+} from '../support/utils';
 
 describe( 'WP Editor Meta Boxes', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-plugin-wp-editor-meta-box' );
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {

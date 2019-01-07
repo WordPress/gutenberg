@@ -1,8 +1,14 @@
 /**
  * Internal dependencies
  */
-import { findSidebarPanelWithTitle, newPost, getEditedPostContent, openDocumentSettingsSidebar } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
+import {
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
+	findSidebarPanelWithTitle,
+	getEditedPostContent,
+	openDocumentSettingsSidebar,
+} from '../support/utils';
 
 describe( 'new editor filtered state', () => {
 	beforeAll( async () => {
@@ -10,7 +16,7 @@ describe( 'new editor filtered state', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {

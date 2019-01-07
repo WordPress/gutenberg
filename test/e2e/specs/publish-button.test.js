@@ -2,13 +2,13 @@ import {
 	arePrePublishChecksEnabled,
 	disablePrePublishChecks,
 	enablePrePublishChecks,
-	newPost,
+	createNewPost,
 } from '../support/utils';
 
 describe( 'PostPublishButton', () => {
 	let werePrePublishChecksEnabled;
 	beforeEach( async () => {
-		await newPost( );
+		await createNewPost( );
 		werePrePublishChecksEnabled = await arePrePublishChecksEnabled();
 		if ( werePrePublishChecksEnabled ) {
 			await disablePrePublishChecks();

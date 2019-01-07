@@ -15,7 +15,7 @@ import { modifiers, SHIFT, ALT, CTRL } from '@wordpress/keycodes';
  * @param {string} modifier Modifier key.
  * @param {string} key Key to press while modifier held.
  */
-export async function pressWithModifier( modifier, key ) {
+export async function pressKeyWithModifier( modifier, key ) {
 	const isAppleOS = () => process.platform === 'darwin';
 	const overWrittenModifiers = {
 		...modifiers,
