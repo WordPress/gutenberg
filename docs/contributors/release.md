@@ -1,6 +1,6 @@
 # Gutenberg Release Process
 
-The Gutenberg Repository is used to perform several types of releases. This document serves as a checklist for each one of these. Tt is helpful if you'd like to understand the different workflows.
+The Gutenberg Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
 To release Gutenberg, you need commit access to the [WordPress.org plugin repository]. 🙂
 
