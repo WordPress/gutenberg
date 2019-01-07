@@ -200,7 +200,7 @@ For minor releases, the critical fixes targetted for this WordPress Minor releas
 
 1. Checkout the `g-minor` branch.
 2. Run [the package release process](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md#releasing-packages)
-3. Update the CHANGELOG files of the published packages with the new released versions and commit to the `g-minor` branch.
+3. Update the `CHANGELOG` files of the published packages with the new released versions and commit to the `g-minor` branch.
 
 ---------
 
