@@ -654,6 +654,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/tests-e2e",
+		"slug": "packages-tests-e2e",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/tests-e2e/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/token-list",
 		"slug": "packages-token-list",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/token-list/README.md",
