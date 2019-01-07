@@ -186,7 +186,7 @@ WordPress Core Updates are based on the `g-minor` branch. Releasing packages in 
 
 ### Major WordPress Releases
 
-For major WordPress releases, The last Gutenberg plugin release is merged into `g-minor`. This involves the following steps:
+For major WordPress releases, the last Gutenberg plugin release is merged into `g-minor`. This involves the following steps:
 
 1. Checkout the last published Gutenberg's release branch `git checkout release/x.x`
 2. Create a Pull Request from this branch into `g-minor`.
