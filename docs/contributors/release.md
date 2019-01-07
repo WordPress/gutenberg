@@ -12,7 +12,7 @@ We release a new major version approximately every two weeks. The current and ne
 
 ### Release Candidates
 
-On the date of the current's milestone, we publish a release candidate and make it available for plugin authors and for users to test. If any bugs/regressions are found with a release candidate, a new release candidate can be published.
+On the date of the current milestone, we publish a release candidate and make it available for plugin authors and users to test. If any regressions are found with a release candidate, a new release candidate can be published.
 
 
 The date in the milestone is the date of **tagging the release candidate**. On this date, all remaining PRs on the milestone are punted automatically to the next release.
