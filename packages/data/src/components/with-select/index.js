@@ -115,7 +115,6 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			// Cycle subscription if registry changes.
 			const hasRegistryChanged = nextProps.registry !== this.props.registry;
 			const hasSyncRenderingChanged = nextProps.isAsync !== this.props.isAsync;
-			let shouldComputeProps = false;
 
 			if ( hasRegistryChanged ) {
 				this.unsubscribe();
@@ -123,7 +122,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			}
 
 			if ( hasSyncRenderingChanged ) {
-				shouldComputeProps = flushComponent( this );
+				flushComponent( this );
 			}
 
 			// Treat a registry change as equivalent to `ownProps`, to reflect
@@ -135,11 +134,11 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 
 			// Only render if props have changed or merge props have been updated
 			// from the store subscriber.
-			if ( this.state === nextState && ! hasPropsChanged && ! shouldComputeProps ) {
+			if ( this.state === nextState && ! hasPropsChanged && ! hasSyncRenderingChanged ) {
 				return false;
 			}
 
-			if ( hasPropsChanged || shouldComputeProps ) {
+			if ( hasPropsChanged || hasSyncRenderingChanged ) {
 				const nextMergeProps = getNextMergeProps( nextProps );
 				if ( ! isShallowEqualObjects( this.mergeProps, nextMergeProps ) ) {
 					// If merge props change as a result of the incoming props,
