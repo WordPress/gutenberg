@@ -1569,6 +1569,41 @@ describe( 'selectors', () => {
 			expect( isEditedPostEmpty( state ) ).toBe( false );
 		} );
 
+		it( 'should account for filtering logic of getBlocksForSerialization', () => {
+			// Note: As an optimization, isEditedPostEmpty avoids using the
+			// getBlocksForSerialization selector and instead makes assumptions
+			// about its filtering. The behavior should still be reflected.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/13086
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: false,
+								},
+							},
+							order: {
+								'': [ 'block1' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
+		} );
+
 		it( 'should return true if blocks, but empty content edit', () => {
 			const state = {
 				editor: {

@@ -28,6 +28,7 @@ import {
 	getBlockTypes,
 	hasBlockSupport,
 	hasChildBlocksWithInserterSupport,
+	getDefaultBlockName,
 	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
@@ -454,13 +455,13 @@ export function isEditedPostSaveable( state ) {
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
-	const rootClientIds = getBlockOrder( state );
-
 	// While the condition of truthy content string is sufficient to determine
 	// emptiness, testing saveable blocks length is a trivial operation. Since
 	// this function can be called frequently, optimize for the fast case as a
 	// condition of the mere existence of blocks. Note that the value of edited
-	// content is used in place of blocks, thus allowed to fall through.
+	// content takes precedent over block content, and must fall through to the
+	// default logic.
+	const rootClientIds = getBlockOrder( state );
 	if ( rootClientIds.length && ! ( 'content' in getPostEdits( state ) ) ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
 		// joined with with newlines such that even if every individual block
@@ -469,12 +470,22 @@ export function isEditedPostEmpty( state ) {
 			return false;
 		}
 
-		// Freeform and unregistered blocks omit comment delimiters in their
-		// output. The freeform block specifically may produce an empty string
-		// to save. In the case of a single freeform block, fall through to the
-		// full serialize. Otherwise, the single block is assumed non-empty by
-		// virtue of its comment delimiters.
-		if ( getBlockName( state, rootClientIds[ 0 ] ) !== getFreeformContentHandlerName() ) {
+		// There are two conditions under which the optimization cannot be
+		// assumed, and a fallthrough to getEditedPostContent must occur:
+		//
+		// 1. getBlocksForSerialization has special treatment in omitting a
+		//    single unmodified default block.
+		// 2. Comment delimiters are omitted for a freeform or unregistered
+		//    block in its serialization. The freeform block specifically may
+		//    produce an empty string in its saved output.
+		//
+		// For all other content, the single block is assumed to make a post
+		// non-empty, if only by virtue of its own comment delimiters.
+		const blockName = getBlockName( state, rootClientIds[ 0 ] );
+		if (
+			blockName !== getDefaultBlockName() &&
+			blockName !== getFreeformContentHandlerName()
+		) {
 			return false;
 		}
 	}
@@ -1665,6 +1676,11 @@ export function getSuggestedPostFormat( state ) {
  */
 export function getBlocksForSerialization( state ) {
 	const blocks = getBlocks( state );
+
+	// WARNING: Any changes to the logic of this function should be verified
+	// against the implementation of isEditedPostEmpty, which bypasses this
+	// function for performance' sake, in an assumption of this current logic
+	// being irrelevant to the optimized condition of emptiness.
 
 	// A single unmodified default block is assumed to be equivalent to an
 	// empty post.
