@@ -89,7 +89,7 @@ If a bug is found in a release candidate and a fix is committed to `master`, we 
 7. Merge the version bump pull request and avoid removing the release branch.
 8. Follow the steps in [build the plugin](#build-the-plugin) and [publish the release on GitHub](#publish-the-release-on-github). 
 
-You can copy the existing changelog from the previous release candidate. It's worth mentioning that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7) and the call for testing post.
+You can copy the existing changelog from the previous release candidate. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7) and the call for testing post.
 
 ### Official Gutenberg Releases™
 
