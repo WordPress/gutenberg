@@ -40,7 +40,6 @@ type PropsType = BlockType & {
 	onChange: ( attributes: mixed ) => void,
 	onReplace: ( blocks: Array<Object> ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
-	onInlineToolbarButtonPressed: ( button: number ) => void,
 	onSelect: ( clientId: string ) => void,
 	mergeBlocks: ( clientId: string, clientId: string ) => void,
 	moveBlockUp: () => void,
