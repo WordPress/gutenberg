@@ -101,6 +101,9 @@ export function* getEmbedPreview( url ) {
 
 /**
  * Requests Upload Permissions from the REST API.
+ *
+ * @deprecated since 4.9. Callers should use the more generic `canUser()` selector instead of
+ *             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
  */
 export function* hasUploadPermissions() {
 	yield* canUser( 'create', 'media' );
