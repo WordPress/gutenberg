@@ -6,7 +6,7 @@ import {
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
-} from '../support/utils';
+} from '../../support/utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
 	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );

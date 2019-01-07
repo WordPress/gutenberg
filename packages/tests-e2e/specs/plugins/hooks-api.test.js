@@ -6,7 +6,7 @@ import {
 	clickBlockAppender,
 	createNewPost,
 	deactivatePlugin,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'Using Hooks API', () => {
 	beforeAll( async () => {

@@ -8,7 +8,7 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	searchForBlock,
-} from '../support/utils';
+} from '../../support/utils';
 
 const INSERTER_BUTTON_SELECTOR = '.components-popover__content .editor-block-types-list__item';
 const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .editor-block-types-list__item-icon`;

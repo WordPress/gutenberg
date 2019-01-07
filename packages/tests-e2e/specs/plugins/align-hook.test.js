@@ -10,7 +10,7 @@ import {
 	insertBlock,
 	selectBlockByClientId,
 	setPostContent,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'Align Hook Works As Expected', () => {
 	beforeAll( async () => {

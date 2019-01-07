@@ -8,7 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	switchEditorModeTo,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'InnerBlocks Template Sync', () => {
 	beforeAll( async () => {

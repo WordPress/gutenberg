@@ -9,7 +9,7 @@ import {
 	insertBlock,
 	openDocumentSettingsSidebar,
 	publishPost,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'Meta boxes', () => {
 	beforeAll( async () => {

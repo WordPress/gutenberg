@@ -8,7 +8,7 @@ import {
 	deactivatePlugin,
 	getEditedPostContent,
 	pressKeyWithModifier,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'Using Format API', () => {
 	beforeAll( async () => {

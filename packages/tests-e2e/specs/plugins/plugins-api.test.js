@@ -10,7 +10,7 @@ import {
 	openDocumentSettingsSidebar,
 	openPublishPanel,
 	publishPost,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'Using Plugins API', () => {
 	beforeAll( async () => {

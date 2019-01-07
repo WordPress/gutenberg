@@ -12,7 +12,7 @@ import {
 	switchUserToAdmin,
 	switchUserToTest,
 	visitAdminPage,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'templates', () => {
 	describe( 'Using a CPT with a predefined template', () => {

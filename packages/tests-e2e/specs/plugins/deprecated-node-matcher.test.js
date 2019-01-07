@@ -8,7 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	pressKeyWithModifier,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'Deprecated Node Matcher', () => {
 	beforeAll( async () => {

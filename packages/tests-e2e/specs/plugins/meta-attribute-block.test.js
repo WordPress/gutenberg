@@ -8,7 +8,7 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	saveDraft,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'Block with a meta attribute', () => {
 	beforeAll( async () => {

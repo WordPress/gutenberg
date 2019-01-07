@@ -6,7 +6,7 @@ import {
 	createNewPost,
 	deactivatePlugin,
 	publishPost,
-} from '../support/utils';
+} from '../../support/utils';
 
 describe( 'WP Editor Meta Boxes', () => {
 	beforeAll( async () => {
