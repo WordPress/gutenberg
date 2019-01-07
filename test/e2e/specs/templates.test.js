@@ -8,7 +8,7 @@ import {
 	deactivatePlugin,
 	getEditedPostContent,
 	pressKeyWithModifier,
-	savePostAsDraft,
+	saveDraft,
 	switchUserToAdmin,
 	switchUserToTest,
 	visitAdminPage,
@@ -38,7 +38,7 @@ describe( 'templates', () => {
 			await page.click( '.editor-post-title__input' );
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Backspace' );
-			await savePostAsDraft();
+			await saveDraft();
 			await page.reload();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -51,7 +51,7 @@ describe( 'templates', () => {
 			await page.keyboard.press( 'ArrowDown' );
 			await pressKeyWithModifier( 'primary', 'A' );
 			await page.keyboard.press( 'Backspace' );
-			await savePostAsDraft();
+			await saveDraft();
 			await page.reload();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -97,7 +97,7 @@ describe( 'templates', () => {
 			await clickBlockAppender();
 			await page.keyboard.press( 'Backspace' );
 			await page.keyboard.press( 'Backspace' );
-			await savePostAsDraft();
+			await saveDraft();
 			await page.reload();
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();

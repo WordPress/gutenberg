@@ -4,7 +4,7 @@
  *
  * @return {Promise} Promise resolving when draft save is complete.
  */
-export async function savePostAsDraft() {
+export async function saveDraft() {
 	await page.click( '.editor-post-save-draft' );
 	return page.waitForSelector( '.editor-post-saved-state.is-saved' );
 }

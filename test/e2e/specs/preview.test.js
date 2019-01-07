@@ -11,7 +11,7 @@ import {
 	createNewPost,
 	createURL,
 	publishPost,
-	savePostAsDraft,
+	saveDraft,
 } from '../support/utils';
 
 describe( 'Preview', () => {
@@ -138,7 +138,7 @@ describe( 'Preview', () => {
 
 		// Save the post as a draft.
 		await editorPage.waitForSelector( '.editor-post-save-draft' );
-		await savePostAsDraft();
+		await saveDraft();
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
@@ -156,7 +156,7 @@ describe( 'Preview', () => {
 
 		// Save draft and open the preview page right after.
 		await editorPage.waitForSelector( '.editor-post-save-draft' );
-		await savePostAsDraft();
+		await saveDraft();
 		await waitForPreviewNavigation( previewPage );
 
 		// Title in preview should match updated input.

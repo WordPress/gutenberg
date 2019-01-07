@@ -12,6 +12,7 @@ import { loginUser } from './login-user';
 
 /**
  * Visits admin page; if user is not logged in then it logging in it first, then visits admin page.
+ *
  * @param {string} adminPath String to be serialized as pathname.
  * @param {string} query String to be serialized as query portion of URL.
  */

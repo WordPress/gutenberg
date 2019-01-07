@@ -7,7 +7,7 @@ import {
 	deactivatePlugin,
 	getEditedPostContent,
 	insertBlock,
-	savePostAsDraft,
+	saveDraft,
 } from '../support/utils';
 
 describe( 'Block with a meta attribute', () => {
@@ -26,7 +26,7 @@ describe( 'Block with a meta attribute', () => {
 	it( 'Should persist the meta attribute properly', async () => {
 		await insertBlock( 'Test Meta Attribute Block' );
 		await page.keyboard.type( 'Meta Value' );
-		await savePostAsDraft();
+		await saveDraft();
 		await page.reload();
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

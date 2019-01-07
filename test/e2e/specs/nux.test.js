@@ -5,7 +5,7 @@ import {
 	clickBlockAppender,
 	clickOnMoreMenuItem,
 	createNewPost,
-	savePostAsDraft,
+	saveDraft,
 	toggleScreenOption,
 } from '../support/utils';
 
@@ -163,7 +163,7 @@ describe( 'New User Experience (NUX)', () => {
 		await page.keyboard.type( 'Post title' );
 		await clickBlockAppender();
 		await page.keyboard.type( 'Post content goes here.' );
-		await savePostAsDraft();
+		await saveDraft();
 
 		// Refresh the page; tips should be disabled.
 		await page.reload();

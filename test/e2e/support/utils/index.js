@@ -28,7 +28,7 @@ export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';
 export { publishPost } from './publish-post';
 export { publishPostWithPrePublishChecksDisabled } from './publish-post-with-pre-publish-checks-disabled';
-export { savePostAsDraft } from './save-post-as-draft';
+export { saveDraft } from './save-draft';
 export { searchForBlock } from './search-for-block';
 export { selectBlockByClientId } from './select-block-by-client-id';
 export { setBrowserViewport } from './set-browser-viewport';
