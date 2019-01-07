@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { debounce, uniqueId } from 'lodash';
+import { debounce, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,45 +24,64 @@ const ANIMATION_FRAME_PERIOD = 16;
  */
 export default function withFilters( hookName ) {
 	return createHigherOrderComponent( ( OriginalComponent ) => {
-		return class FilteredComponent extends Component {
-			/** @inheritdoc */
+		const namespace = 'core/with-filters-' + hookName;
+
+		class FilteredComponent extends Component {
 			constructor( props ) {
 				super( props );
 
-				this.onHooksUpdated = this.onHooksUpdated.bind( this );
 				this.Component = applyFilters( hookName, OriginalComponent );
-				this.namespace = uniqueId( 'core/with-filters/component-' );
 				this.throttledForceUpdate = debounce( () => {
 					this.Component = applyFilters( hookName, OriginalComponent );
 					this.forceUpdate();
 				}, ANIMATION_FRAME_PERIOD );
-
-				addAction( 'hookRemoved', this.namespace, this.onHooksUpdated );
-				addAction( 'hookAdded', this.namespace, this.onHooksUpdated );
 			}
 
-			/** @inheritdoc */
-			componentWillUnmount() {
-				this.throttledForceUpdate.cancel();
-				removeAction( 'hookRemoved', this.namespace );
-				removeAction( 'hookAdded', this.namespace );
-			}
+			componentDidMount() {
+				FilteredComponent.instances.push( this );
 
-			/**
-			 * When a filter is added or removed for the matching hook name, the wrapped component should re-render.
-			 *
-			 * @param {string} updatedHookName  Name of the hook that was updated.
-			 */
-			onHooksUpdated( updatedHookName ) {
-				if ( updatedHookName === hookName ) {
-					this.throttledForceUpdate();
+				// If there were previously no mounted instances for components
+				// filtered on this hook, add the hook handler.
+				if ( FilteredComponent.instances.length === 1 ) {
+					addAction( 'hookRemoved', namespace, onHooksUpdated );
+					addAction( 'hookAdded', namespace, onHooksUpdated );
 				}
 			}
 
-			/** @inheritdoc */
+			componentWillUnmount() {
+				this.throttledForceUpdate.cancel();
+
+				FilteredComponent.instances = without( FilteredComponent.instances, this );
+
+				// If this was the last of the mounted components filtered on
+				// this hook, remove the hook handler.
+				if ( FilteredComponent.instances.length === 0 ) {
+					removeAction( 'hookRemoved', namespace );
+					removeAction( 'hookAdded', namespace );
+				}
+			}
+
 			render() {
 				return <this.Component { ...this.props } />;
 			}
-		};
+		}
+
+		FilteredComponent.instances = [];
+
+		/**
+		 * When a filter is added or removed for the matching hook name, each
+		 * mounted instance should re-render.
+		 *
+		 * @param {string} updatedHookName Name of the hook that was updated.
+		 */
+		function onHooksUpdated( updatedHookName ) {
+			if ( updatedHookName === hookName ) {
+				FilteredComponent.instances.forEach( ( instance ) => {
+					instance.throttledForceUpdate();
+				} );
+			}
+		}
+
+		return FilteredComponent;
 	}, 'withFilters' );
 }
