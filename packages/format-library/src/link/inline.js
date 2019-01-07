@@ -217,7 +217,7 @@ class InlineLinkUI extends Component {
 		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
-			speak( __( 'Link inserted' ), 'assertive' );
+			speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
 

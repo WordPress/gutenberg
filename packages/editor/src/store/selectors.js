@@ -290,8 +290,6 @@ export function getCurrentPostAttribute( state, attributeName ) {
  * @return {*} Post attribute value.
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	const edits = getPostEdits( state );
-
 	// Special cases
 	switch ( attributeName ) {
 		case 'content':
@@ -299,6 +297,7 @@ export function getEditedPostAttribute( state, attributeName ) {
 	}
 
 	// Fall back to saved post value if not edited.
+	const edits = getPostEdits( state );
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
 		return getCurrentPostAttribute( state, attributeName );
 	}
@@ -349,13 +348,15 @@ export function getAutosaveAttribute( state, attributeName ) {
  */
 export function getEditedPostVisibility( state ) {
 	const status = getEditedPostAttribute( state, 'status' );
-	const password = getEditedPostAttribute( state, 'password' );
-
 	if ( status === 'private' ) {
 		return 'private';
-	} else if ( password ) {
+	}
+
+	const password = getEditedPostAttribute( state, 'password' );
+	if ( password ) {
 		return 'password';
 	}
+
 	return 'public';
 }
 
@@ -642,7 +643,7 @@ export const getBlockAttributes = createSelector(
 			return null;
 		}
 
-		let { attributes } = block;
+		let attributes = state.editor.present.blocks.attributes[ clientId ];
 
 		// Inject custom source attribute values.
 		//
@@ -667,6 +668,7 @@ export const getBlockAttributes = createSelector(
 	},
 	( state, clientId ) => [
 		state.editor.present.blocks.byClientId[ clientId ],
+		state.editor.present.blocks.attributes[ clientId ],
 		state.editor.present.edits.meta,
 		state.initialEdits.meta,
 		state.currentPost.meta,
@@ -698,9 +700,8 @@ export const getBlock = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		state.editor.present.blocks.byClientId[ clientId ],
-		getBlockDependantsCacheBust( state, clientId ),
 		...getBlockAttributes.getDependants( state, clientId ),
+		getBlockDependantsCacheBust( state, clientId ),
 	]
 );
 
@@ -747,9 +748,7 @@ export const getBlocks = createSelector(
 			( clientId ) => getBlock( state, clientId )
 		);
 	},
-	( state ) => [
-		state.editor.present.blocks,
-	]
+	( state ) => [ state.editor.present.blocks ]
 );
 
 /**
@@ -1143,10 +1142,8 @@ export const getMultiSelectedBlocks = createSelector(
 		return multiSelectedBlockClientIds.map( ( clientId ) => getBlock( state, clientId ) );
 	},
 	( state ) => [
-		state.editor.present.blocks.order,
-		state.blockSelection.start,
-		state.blockSelection.end,
-		state.editor.present.blocks.byClientId,
+		...getMultiSelectedBlockClientIds.getDependants( state ),
+		state.editor.present.blocks,
 		state.editor.present.edits.meta,
 		state.initialEdits.meta,
 		state.currentPost.meta,
@@ -1196,7 +1193,7 @@ const isAncestorOf = createSelector(
 		return possibleAncestorId === idToCheck;
 	},
 	( state ) => [
-		state.editor.present.blocks,
+		state.editor.present.blocks.order,
 	],
 );
 
@@ -2003,7 +2000,8 @@ export const getInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.present.blocks,
+		state.editor.present.blocks.byClientId,
+		state.editor.present.blocks.order,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -2037,7 +2035,7 @@ export const hasInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.present.blocks,
+		state.editor.present.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.reusableBlocks.data,

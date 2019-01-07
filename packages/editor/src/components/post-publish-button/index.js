@@ -73,6 +73,9 @@ export class PostPublishButton extends Component {
 		}
 
 		const onClick = () => {
+			if ( isButtonDisabled ) {
+				return;
+			}
 			onSubmit();
 			onStatusChange( publishStatus );
 			onSave();

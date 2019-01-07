@@ -270,7 +270,7 @@
 		"parent": "designers-developers"
 	},
 	{
-		"title": "Contributors",
+		"title": "Contributors Guide",
 		"slug": "contributors",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/readme.md",
 		"parent": null
@@ -651,6 +651,12 @@
 		"title": "@wordpress/shortcode",
 		"slug": "packages-shortcode",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/shortcode/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/tests-e2e",
+		"slug": "packages-tests-e2e",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/tests-e2e/README.md",
 		"parent": "packages"
 	},
 	{
