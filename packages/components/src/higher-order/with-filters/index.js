@@ -24,7 +24,7 @@ const ANIMATION_FRAME_PERIOD = 16;
  */
 export default function withFilters( hookName ) {
 	return createHigherOrderComponent( ( OriginalComponent ) => {
-		const namespace = 'core/with-filters-' + hookName;
+		const namespace = 'core/with-filters/' + hookName;
 
 		/**
 		 * Since filtering is applied to the component, each filtered instance
