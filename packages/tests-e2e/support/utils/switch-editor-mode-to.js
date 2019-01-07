@@ -1,6 +1,7 @@
 /**
  * Switches editor mode.
-* @param {string} mode String editor mode.
+ *
+ * @param {string} mode String editor mode.
  */
 export async function switchEditorModeTo( mode ) {
 	await page.click(

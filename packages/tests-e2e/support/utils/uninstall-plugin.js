@@ -1,5 +1,5 @@
 /**
- * Node dependencies
+ * Internal dependencies
  */
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
