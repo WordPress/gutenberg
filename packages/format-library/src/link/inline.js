@@ -114,6 +114,11 @@ class InlineLinkUI extends Component {
 			...this.state,
 			attributes,
 		}, () => {
+			// Don't apply if URL is being edited.
+			if ( isShowingInput( this.props, this.state ) ) {
+				return;
+			}
+
 			const {
 				value,
 				onChange,
@@ -129,40 +134,46 @@ class InlineLinkUI extends Component {
 		} );
 	}
 
+	getLabel( opensInNewWindow ) {
+		const selectedText = getTextContent( slice( this.props.value ) );
+
+		if ( opensInNewWindow ) {
+			return sprintf( __( '%s (opens in a new tab)' ), selectedText );
+		}
+
+		return selectedText;
+	}
+
 	setLinkTarget( opensInNewWindow ) {
-		const { attributes = {}, value } = this.props;
+		const { attributes = {} } = this.props;
+		const label = this.getLabel( opensInNewWindow );
 
-		// Apply now if URL is not being edited.
-		if ( ! isShowingInput( this.props, this.state ) ) {
-			const selectedText = getTextContent( slice( value ) );
+		if ( opensInNewWindow ) {
+			let rel = 'noopener noreferrer';
 
-			if ( opensInNewWindow ) {
-				let rel = 'noopener noreferrer';
-
-				if ( attributes.rel ) {
-					rel = [ rel, attributes.rel ].join( ' ' );
-				}
-
-				this.setLinkAttributes( {
-					'aria-label': sprintf( __( '%s (opens in a new tab)' ), selectedText ),
-					target: '_blank',
-					rel,
-					...attributes,
-				} );
-			} else {
-				if ( typeof attributes.rel === 'string' ) {
-					attributes.rel = attributes.rel.split( ' ' ).filter( ( relItem ) => {
-						return relItem !== 'noopener' && relItem !== 'noreferrer';
-					} ).join( ' ' ).trim();
-				} else {
-					delete attributes.rel;
-				}
-
-				delete attributes.target;
-				attributes[ 'aria-label' ] = selectedText;
-
-				this.setLinkAttributes( attributes );
+			if ( attributes.rel ) {
+				rel = [ rel, attributes.rel ].join( ' ' );
 			}
+
+			this.setLinkAttributes( {
+				'aria-label': label,
+				target: '_blank',
+				rel,
+				...attributes,
+			} );
+		} else {
+			if ( typeof attributes.rel === 'string' ) {
+				attributes.rel = attributes.rel.split( ' ' ).filter( ( relItem ) => {
+					return relItem !== 'noopener' && relItem !== 'noreferrer';
+				} ).join( ' ' ).trim();
+			} else {
+				delete attributes.rel;
+			}
+
+			delete attributes.target;
+			attributes[ 'aria-label' ] = label;
+
+			this.setLinkAttributes( attributes );
 		}
 	}
 
