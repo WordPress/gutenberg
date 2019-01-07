@@ -130,7 +130,7 @@ class InlineLinkUI extends Component {
 	}
 
 	setLinkTarget( opensInNewWindow ) {
-		const { attributes = { url: '' }, value } = this.props;
+		const { attributes = {}, value } = this.props;
 
 		// Apply now if URL is not being edited.
 		if ( ! isShowingInput( this.props, this.state ) ) {
@@ -175,10 +175,8 @@ class InlineLinkUI extends Component {
 		const { isActive, value, onChange, speak } = this.props;
 		const { inputValue } = this.state;
 		const url = prependHTTP( inputValue );
-		const selectedText = getTextContent( slice( value ) );
 		const format = createLinkFormat( {
 			url,
-			text: selectedText,
 			...this.state.attributes,
 		} );
 
