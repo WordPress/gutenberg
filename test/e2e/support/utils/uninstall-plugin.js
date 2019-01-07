@@ -18,8 +18,8 @@ export async function uninstallPlugin( slug ) {
 	} );
 	await Promise.all( [
 		confirmPromise,
-		page.click( 'tr[data-slug="' + slug + '"] .delete a' ),
+		page.click( `tr[data-slug="${ slug }"] .delete a` ),
 	] );
-	await page.waitForSelector( 'tr[data-slug="' + slug + '"].deleted' );
+	await page.waitForSelector( `tr[data-slug="${ slug }"].deleted` );
 	await switchUserToTest();
 }

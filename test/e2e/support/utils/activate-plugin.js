@@ -14,6 +14,6 @@ export async function activatePlugin( slug ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'plugins.php' );
 	await page.click( `tr[data-slug="${ slug }"] .activate a` );
-	await page.waitForSelector( 'tr[data-slug="' + slug + '"] .deactivate a' );
+	await page.waitForSelector( `tr[data-slug="${ slug }"] .deactivate a` );
 	await switchUserToTest();
 }

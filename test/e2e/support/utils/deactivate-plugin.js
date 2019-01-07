@@ -13,7 +13,7 @@ import { visitAdminPage } from './visit-admin-page';
 export async function deactivatePlugin( slug ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'plugins.php' );
-	await page.click( 'tr[data-slug="' + slug + '"] .deactivate a' );
-	await page.waitForSelector( 'tr[data-slug="' + slug + '"] .delete a' );
+	await page.click( `tr[data-slug="${ slug }"] .deactivate a` );
+	await page.waitForSelector( `tr[data-slug="${ slug }"] .delete a` );
 	await switchUserToTest();
 }
