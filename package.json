@@ -78,6 +78,7 @@
 		"cross-env": "3.2.4",
 		"cssnano": "4.0.3",
 		"enzyme": "3.7.0",
+		"deasync": "0.1.13",
 		"deep-freeze": "0.0.1",
 		"doctrine": "2.1.0",
 		"eslint-plugin-jest": "21.5.0",
