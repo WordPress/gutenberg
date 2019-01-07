@@ -74,7 +74,7 @@ Here's an example [release candidate page](https://github.com/WordPress/gutenber
 
 ##### Publishing the Call For Testing
 
-Ping someone from the `[#core-test](https://wordpress.slack.com/messages/C03B0H5J0)` team to publish a call for testing post (Here's an [example](https://make.wordpress.org/test/2019/01/04/call-for-testing-gutenberg-4-8/).
+Ping someone from the `[#core-test](https://wordpress.slack.com/messages/C03B0H5J0)` team to publish a call for testing post. Here's an [example call for testing post.](https://make.wordpress.org/test/2019/01/04/call-for-testing-gutenberg-4-8/)
 
 #### Creating Release Candidate Patches (done via `git cherry-pick`)
 
