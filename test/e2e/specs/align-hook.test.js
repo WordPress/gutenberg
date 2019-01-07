@@ -2,14 +2,15 @@
  * Internal dependencies
  */
 import {
-	newPost,
-	insertBlock,
-	getEditedPostContent,
-	setPostContent,
+	activatePlugin,
+	createNewPost,
+	deactivatePlugin,
 	getAllBlocks,
+	getEditedPostContent,
+	insertBlock,
 	selectBlockByClientId,
+	setPostContent,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Align Hook Works As Expected', () => {
 	beforeAll( async () => {
@@ -17,7 +18,7 @@ describe( 'Align Hook Works As Expected', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	afterAll( async () => {

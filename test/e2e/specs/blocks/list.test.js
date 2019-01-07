@@ -4,16 +4,16 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
-	pressTimes,
-	convertBlock,
-	pressWithModifier,
+	createNewPost,
+	pressKeyTimes,
+	transformBlockTo,
+	pressKeyWithModifier,
 	insertBlock,
 } from '../../support/utils';
 
 describe( 'List', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'can be created by using an asterisk at the start of a paragraph block', async () => {
@@ -32,7 +32,7 @@ describe( 'List', () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await pressTimes( 'ArrowLeft', 4 );
+		await pressKeyTimes( 'ArrowLeft', 4 );
 		await page.keyboard.type( '* ' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -49,7 +49,7 @@ describe( 'List', () => {
 	it( 'can undo asterisk transform', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1. ' );
-		await pressWithModifier( 'primary', 'z' );
+		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -67,7 +67,7 @@ describe( 'List', () => {
 	it( 'can be created by converting a paragraph', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await convertBlock( 'List' );
+		await transformBlockTo( 'List' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -80,7 +80,7 @@ describe( 'List', () => {
 		await page.keyboard.down( 'Shift' );
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
-		await convertBlock( 'List' );
+		await transformBlockTo( 'List' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -88,9 +88,9 @@ describe( 'List', () => {
 	it( 'can be created by converting a paragraph with line breaks', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'one' );
-		await pressWithModifier( 'shift', 'Enter' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 		await page.keyboard.type( 'two' );
-		await convertBlock( 'List' );
+		await transformBlockTo( 'List' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -100,7 +100,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await convertBlock( 'Paragraph' );
+		await transformBlockTo( 'Paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -115,7 +115,7 @@ describe( 'List', () => {
 		await page.mouse.move( 250, 350, { steps: 10 } );
 		await page.click( 'button[aria-label="Indent list item"]' );
 		await page.keyboard.type( 'two' );
-		await convertBlock( 'Paragraph' );
+		await transformBlockTo( 'Paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -125,7 +125,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await convertBlock( 'List' );
+		await transformBlockTo( 'List' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -135,7 +135,7 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await convertBlock( 'Quote' );
+		await transformBlockTo( 'Quote' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -149,7 +149,7 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.type( 'two' );
-		await pressTimes( 'ArrowLeft', 'two'.length );
+		await pressKeyTimes( 'ArrowLeft', 'two'.length );
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -174,7 +174,7 @@ describe( 'List', () => {
 
 		// Should merge lists into one.
 		await page.keyboard.press( 'ArrowDown' );
-		await pressTimes( 'ArrowLeft', 'two'.length );
+		await pressKeyTimes( 'ArrowLeft', 'two'.length );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -199,7 +199,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		await pressWithModifier( 'primary', 'm' );
+		await pressKeyWithModifier( 'primary', 'm' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

@@ -2,14 +2,15 @@
  * Internal dependencies
  */
 import {
+	activatePlugin,
 	clickBlockAppender,
 	clickOnMoreMenuItem,
+	createNewPost,
+	deactivatePlugin,
 	openDocumentSettingsSidebar,
-	newPost,
 	openPublishPanel,
 	publishPost,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using Plugins API', () => {
 	beforeAll( async () => {
@@ -21,7 +22,7 @@ describe( 'Using Plugins API', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	describe( 'Post Status Info', () => {

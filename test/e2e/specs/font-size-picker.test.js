@@ -4,13 +4,13 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
-	pressTimes,
+	createNewPost,
+	pressKeyTimes,
 } from '../support/utils';
 
 describe( 'Font Size Picker', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should apply a named font size using the font size buttons', async () => {
@@ -85,8 +85,8 @@ describe( 'Font Size Picker', () => {
 
 		// Clear the custom font size input.
 		await page.click( '.blocks-font-size .components-range-control__number' );
-		await pressTimes( 'ArrowRight', 4 );
-		await pressTimes( 'Backspace', 4 );
+		await pressKeyTimes( 'ArrowRight', 4 );
+		await pressKeyTimes( 'Backspace', 4 );
 
 		// Ensure content matches snapshot.
 		const content = await getEditedPostContent();

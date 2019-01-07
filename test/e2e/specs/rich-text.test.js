@@ -2,16 +2,16 @@
  * Internal dependencies
  */
 import {
-	newPost,
+	createNewPost,
 	getEditedPostContent,
 	insertBlock,
 	clickBlockAppender,
-	pressWithModifier,
+	pressKeyWithModifier,
 } from '../support/utils';
 
 describe( 'RichText', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should handle change in tag name gracefully', async () => {
@@ -29,8 +29,8 @@ describe( 'RichText', () => {
 	it( 'should apply formatting with access shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await pressWithModifier( 'primary', 'a' );
-		await pressWithModifier( 'access', 'd' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'access', 'd' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -38,8 +38,8 @@ describe( 'RichText', () => {
 	it( 'should apply formatting with primary shortcut', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await pressWithModifier( 'primary', 'a' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'b' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -48,10 +48,10 @@ describe( 'RichText', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Some ' );
 		// All following characters should now be bold.
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( 'bold' );
 		// All following characters should no longer be bold.
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '.' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -63,7 +63,7 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await pressWithModifier( 'primary', 'z' );
+		await pressKeyWithModifier( 'primary', 'z' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -71,9 +71,9 @@ describe( 'RichText', () => {
 	it( 'should only mutate text data on input', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '2' );
-		await pressWithModifier( 'primary', 'b' );
+		await pressKeyWithModifier( 'primary', 'b' );
 		await page.keyboard.type( '3' );
 
 		await page.evaluate( () => {

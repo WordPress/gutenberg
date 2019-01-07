@@ -4,15 +4,15 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
-	pressTimes,
-	convertBlock,
+	createNewPost,
+	pressKeyTimes,
+	transformBlockTo,
 	insertBlock,
 } from '../../support/utils';
 
 describe( 'Quote', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'can be created by using > at the start of a paragraph block', async () => {
@@ -31,7 +31,7 @@ describe( 'Quote', () => {
 		// Create a list with the slash block shortcut.
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await pressTimes( 'ArrowLeft', 4 );
+		await pressKeyTimes( 'ArrowLeft', 4 );
 		await page.keyboard.type( '> ' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -50,7 +50,7 @@ describe( 'Quote', () => {
 	it( 'can be created by converting a paragraph', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'test' );
-		await convertBlock( 'Quote' );
+		await transformBlockTo( 'Quote' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -63,7 +63,7 @@ describe( 'Quote', () => {
 		await page.keyboard.down( 'Shift' );
 		await page.click( '[data-type="core/paragraph"]' );
 		await page.keyboard.up( 'Shift' );
-		await convertBlock( 'Quote' );
+		await transformBlockTo( 'Quote' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -74,7 +74,7 @@ describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			await convertBlock( 'Paragraph' );
+			await transformBlockTo( 'Paragraph' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -86,7 +86,7 @@ describe( 'Quote', () => {
 			await page.keyboard.type( 'two' );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( 'cite' );
-			await convertBlock( 'Paragraph' );
+			await transformBlockTo( 'Paragraph' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -95,14 +95,14 @@ describe( 'Quote', () => {
 			await insertBlock( 'Quote' );
 			await page.keyboard.press( 'Tab' );
 			await page.keyboard.type( 'cite' );
-			await convertBlock( 'Paragraph' );
+			await transformBlockTo( 'Paragraph' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
 		it( 'and renders a void paragraph if both the cite and quote are void', async () => {
 			await insertBlock( 'Quote' );
-			await convertBlock( 'Paragraph' );
+			await transformBlockTo( 'Paragraph' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -111,7 +111,7 @@ describe( 'Quote', () => {
 	it( 'can be created by converting a heading', async () => {
 		await insertBlock( 'Heading' );
 		await page.keyboard.type( 'test' );
-		await convertBlock( 'Quote' );
+		await transformBlockTo( 'Quote' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -123,13 +123,13 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'cite' );
-		await convertBlock( 'Heading' );
+		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 		await page.click( '[data-type="core/quote"]' );
-		await convertBlock( 'Heading' );
+		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 		await page.click( '[data-type="core/quote"]' );
-		await convertBlock( 'Heading' );
+		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -140,7 +140,7 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.type( 'cite' );
-		await convertBlock( 'Pullquote' );
+		await transformBlockTo( 'Pullquote' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
@@ -148,7 +148,7 @@ describe( 'Quote', () => {
 		await insertBlock( 'Quote' );
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'test' );
-		await pressTimes( 'ArrowLeft', 'test'.length );
+		await pressKeyTimes( 'ArrowLeft', 'test'.length );
 		await page.keyboard.press( 'Backspace' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

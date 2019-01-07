@@ -4,12 +4,12 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
+	createNewPost,
 } from '../../support/utils';
 
 describe( 'Code', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'can be created by three backticks and enter', async () => {

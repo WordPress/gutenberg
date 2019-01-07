@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { createNewPost } from '../support/utils';
 
 describe( 'block mover', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should show block mover when more than one block exists', async () => {

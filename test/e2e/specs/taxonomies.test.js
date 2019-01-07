@@ -3,7 +3,7 @@
  */
 import {
 	findSidebarPanelWithTitle,
-	newPost,
+	createNewPost,
 	openDocumentSettingsSidebar,
 	publishPost,
 } from '../support/utils';
@@ -37,7 +37,7 @@ describe( 'Taxonomies', () => {
 	};
 
 	it( 'should be able to open the categories panel and create a new main category if the user has the right capabilities', async () => {
-		await newPost();
+		await createNewPost();
 
 		await openDocumentSettingsSidebar();
 

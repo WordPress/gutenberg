@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { clickBlockAppender, newPost, switchToEditor } from '../support/utils';
+import { clickBlockAppender, createNewPost, switchEditorModeTo } from '../support/utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 		await clickBlockAppender();
 		await page.keyboard.type( 'Hello world!' );
 	} );
@@ -95,7 +95,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( blockInspectorTab ).not.toBeNull();
 
 		// Switch to Code Editor
-		await switchToEditor( 'Code' );
+		await switchEditorModeTo( 'Code' );
 
 		// The Block inspector should not be active anymore
 		blockInspectorTab = await page.$( '.edit-post-sidebar__panel-tab.is-active[data-label="Block"]' );

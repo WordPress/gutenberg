@@ -2,12 +2,13 @@
  * Internal dependencies
  */
 import {
+	activatePlugin,
 	clickBlockAppender,
+	createNewPost,
+	deactivatePlugin,
 	getEditedPostContent,
-	newPost,
-	pressWithModifier,
+	pressKeyWithModifier,
 } from '../support/utils';
-import { activatePlugin, deactivatePlugin } from '../support/plugins';
 
 describe( 'Using Format API', () => {
 	beforeAll( async () => {
@@ -19,7 +20,7 @@ describe( 'Using Format API', () => {
 	} );
 
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Format toolbar is present in a paragraph block', async () => {
@@ -32,8 +33,8 @@ describe( 'Using Format API', () => {
 	it( 'Clicking the control wraps the selected text properly with HTML code', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressWithModifier( 'primary', 'A' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'A' );
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.click( '[aria-label="Custom Link"]' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();

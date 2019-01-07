@@ -4,13 +4,13 @@
 import {
 	clickBlockAppender,
 	insertBlock,
-	newPost,
-	pressWithModifier,
+	createNewPost,
+	pressKeyWithModifier,
 } from '../support/utils';
 
 describe( 'Multi-block selection', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Should select/unselect multiple blocks', async () => {
@@ -59,7 +59,7 @@ describe( 'Multi-block selection', () => {
 
 		// Multiselect via keyboard
 		await page.click( 'body' );
-		await pressWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
 
 		// Verify selection
 		await expectMultiSelected( blocks, true );
@@ -72,8 +72,8 @@ describe( 'Multi-block selection', () => {
 
 		// Select all via double shortcut.
 		await page.click( firstBlockSelector );
-		await pressWithModifier( 'primary', 'a' );
-		await pressWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
 		await expectMultiSelected( blocks, true );
 	} );
 
@@ -126,8 +126,8 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.type( 'Third Paragraph' );
 
 		// Multiselect via keyboard.
-		await pressWithModifier( 'primary', 'a' );
-		await pressWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
 
 		// TODO: It would be great to do this test by spying on `wp.a11y.speak`,
 		// but it's very difficult to do that because `wp.a11y` has

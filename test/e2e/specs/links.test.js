@@ -4,9 +4,9 @@
 import {
 	clickBlockAppender,
 	getEditedPostContent,
-	newPost,
-	pressWithModifier,
-	pressTimes,
+	createNewPost,
+	pressKeyWithModifier,
+	pressKeyTimes,
 	insertBlock,
 } from '../support/utils';
 
@@ -18,7 +18,7 @@ import {
 
 describe( 'Links', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	const waitForAutoFocus = async () => {
@@ -36,7 +36,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -60,10 +60,10 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -87,7 +87,7 @@ describe( 'Links', () => {
 		await moveMouse();
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -108,10 +108,10 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg: https://wordpress.org/gutenberg' );
 
 		// Select the URL
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -126,7 +126,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -147,7 +147,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 
 		// Select some text
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -244,7 +244,7 @@ describe( 'Links', () => {
 	it( 'can be edited with collapsed selection', async () => {
 		await createAndReselectLink();
 		// Make a collapsed selection inside the link
-		await pressTimes( 'ArrowRight', 3 );
+		await pressKeyTimes( 'ArrowRight', 3 );
 		await moveMouse();
 		await page.click( 'button[aria-label="Edit"]' );
 		await waitForAutoFocus();
@@ -254,7 +254,7 @@ describe( 'Links', () => {
 	} );
 
 	const createPostWithTitle = async ( titleText ) => {
-		await newPost();
+		await createNewPost();
 		await page.type( '.editor-post-title__input', titleText );
 		await page.click( '.editor-post-publish-panel__toggle' );
 
@@ -280,10 +280,10 @@ describe( 'Links', () => {
 
 		// Now create a new post and try to select the post created previously
 		// from the autocomplete suggestions.
-		await newPost();
+		await createNewPost();
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await page.click( 'button[aria-label="Link"]' );
 
 		// Wait for the URL field to auto-focus
@@ -318,15 +318,15 @@ describe( 'Links', () => {
 		const titleText = 'Test post keyboard';
 		const postURL = await createPostWithTitle( titleText );
 
-		await newPost();
+		await createNewPost();
 		await clickBlockAppender();
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -354,15 +354,15 @@ describe( 'Links', () => {
 		const titleText = 'Test post escape';
 		await createPostWithTitle( titleText );
 
-		await newPost();
+		await createNewPost();
 		await clickBlockAppender();
 
 		// Now in a new post and try to create a link from an autocomplete suggestion using the keyboard.
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -378,7 +378,7 @@ describe( 'Links', () => {
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -389,7 +389,7 @@ describe( 'Links', () => {
 		expect( await page.$( '.editor-url-popover' ) ).toBeNull();
 
 		// Press Cmd+K to insert a link
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'primary', 'K' );
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -410,8 +410,8 @@ describe( 'Links', () => {
 		// Create a block with some text and format it as a link.
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
 		await page.keyboard.type( URL );
 		await page.keyboard.press( 'Enter' );
@@ -428,7 +428,7 @@ describe( 'Links', () => {
 
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
 		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.classList ) );
 		expect( activeElementParentClasses ).toContain( 'editor-url-input' );
@@ -439,8 +439,8 @@ describe( 'Links', () => {
 	it( 'adds an assertive message for screenreader users when an invalid link is set', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is Gutenberg' );
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressWithModifier( 'primary', 'K' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'K' );
 		await waitForAutoFocus();
 		await page.keyboard.type( 'http://#test.com' );
 		await page.keyboard.press( 'Enter' );
@@ -460,7 +460,7 @@ describe( 'Links', () => {
 		await page.click( '.editor-block-navigation__item button' );
 
 		// Select some text
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
@@ -489,8 +489,8 @@ describe( 'Links', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'This is WordPress' );
 		// Select "WordPress".
-		await pressWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await pressWithModifier( 'primary', 'k' );
+		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'k' );
 		await waitForAutoFocus();
 		await page.keyboard.type( 'w.org' );
 		// Navigate to the settings toggle.

@@ -6,7 +6,7 @@ import { forEach } from 'lodash';
 /**
  * Internal dependencies
  */
-import { newPost, pressWithModifier } from '../support/utils';
+import { createNewPost, pressKeyWithModifier } from '../support/utils';
 
 describe( 'block toolbar', () => {
 	forEach( {
@@ -14,7 +14,7 @@ describe( 'block toolbar', () => {
 		contextual: false,
 	}, ( isUnifiedToolbar, label ) => {
 		beforeEach( async () => {
-			await newPost();
+			await createNewPost();
 
 			await page.evaluate( ( _isUnifiedToolbar ) => {
 				const { select, dispatch } = wp.data;
@@ -44,7 +44,7 @@ describe( 'block toolbar', () => {
 				await page.keyboard.type( 'Example' );
 
 				// Upward
-				await pressWithModifier( 'alt', 'F10' );
+				await pressKeyWithModifier( 'alt', 'F10' );
 				expect( await isInBlockToolbar() ).toBe( true );
 
 				// Downward

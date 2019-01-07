@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { newPost, insertBlock, publishPost } from '../support/utils';
+import { createNewPost, insertBlock, publishPost } from '../support/utils';
 
 describe( 'Compatibility with Classic Editor', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'Should not apply autop when rendering blocks', async () => {

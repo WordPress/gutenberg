@@ -3,7 +3,7 @@
  *
  * @param {string} name Block name.
  */
-export async function convertBlock( name ) {
+export async function transformBlockTo( name ) {
 	await page.mouse.move( 200, 300, { steps: 10 } );
 	await page.mouse.move( 250, 350, { steps: 10 } );
 	await page.click( '.editor-block-switcher__toggle' );

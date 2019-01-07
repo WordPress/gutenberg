@@ -3,11 +3,11 @@
  */
 import {
 	findSidebarPanelWithTitle,
-	newPost,
+	createNewPost,
 	observeFocusLoss,
 	openDocumentSettingsSidebar,
-	pressWithModifier,
-	setViewport,
+	pressKeyWithModifier,
+	setBrowserViewport,
 } from '../support/utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
@@ -20,8 +20,8 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should have sidebar visible at the start with document sidebar active on desktop', async () => {
-		await setViewport( 'large' );
-		await newPost();
+		await setBrowserViewport( 'large' );
+		await createNewPost();
 		const { nodesCount, content, height, width } = await page.$$eval( ACTIVE_SIDEBAR_TAB_SELECTOR, ( nodes ) => {
 			const firstNode = nodes[ 0 ];
 			return {
@@ -44,20 +44,20 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should have the sidebar closed by default on mobile', async () => {
-		await setViewport( 'small' );
-		await newPost();
+		await setBrowserViewport( 'small' );
+		await createNewPost();
 		const sidebar = await page.$( SIDEBAR_SELECTOR );
 		expect( sidebar ).toBeNull();
 	} );
 
 	it( 'should close the sidebar when resizing from desktop to mobile', async () => {
-		await setViewport( 'large' );
-		await newPost();
+		await setBrowserViewport( 'large' );
+		await createNewPost();
 
 		const sidebars = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebars ).toHaveLength( 1 );
 
-		await setViewport( 'small' );
+		await setBrowserViewport( 'small' );
 
 		const sidebarsMobile = await page.$$( SIDEBAR_SELECTOR );
 		// sidebar should be closed when resizing to mobile.
@@ -65,27 +65,27 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should reopen sidebar the sidebar when resizing from mobile to desktop if the sidebar was closed automatically', async () => {
-		await setViewport( 'large' );
-		await newPost();
-		await setViewport( 'small' );
+		await setBrowserViewport( 'large' );
+		await createNewPost();
+		await setBrowserViewport( 'small' );
 
 		const sidebarsMobile = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebarsMobile ).toHaveLength( 0 );
 
-		await setViewport( 'large' );
+		await setBrowserViewport( 'large' );
 
 		const sidebarsDesktop = await page.$$( SIDEBAR_SELECTOR );
 		expect( sidebarsDesktop ).toHaveLength( 1 );
 	} );
 
 	it( 'should preserve tab order while changing active tab', async () => {
-		await newPost();
+		await createNewPost();
 
 		// Region navigate to Sidebar.
-		await pressWithModifier( 'ctrl', '`' );
-		await pressWithModifier( 'ctrl', '`' );
-		await pressWithModifier( 'ctrl', '`' );
-		await pressWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
+		await pressKeyWithModifier( 'ctrl', '`' );
 
 		// Tab lands at first (presumed selected) option "Document".
 		await page.keyboard.press( 'Tab' );
@@ -106,7 +106,7 @@ describe( 'Sidebar', () => {
 	} );
 
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {
-		await newPost();
+		await createNewPost();
 
 		await openDocumentSettingsSidebar();
 

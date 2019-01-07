@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { newPost } from '../support/utils';
+import { createNewPost } from '../support/utils';
 
 describe( 'Datepicker', () => {
 	beforeEach( async () => {
-		await newPost();
+		await createNewPost();
 	} );
 
 	it( 'should show the publishing date as "Immediately" if the date is not altered', async () => {
