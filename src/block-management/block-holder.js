@@ -39,12 +39,12 @@ type PropsType = BlockType & {
 	getNextBlockClientId: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
+	onReplace: ( blocks: Array<Object> ) => void,
 	onSelect: ( clientId: string ) => void,
 	mergeBlocks: ( clientId: string, clientId: string ) => void,
 	moveBlockUp: () => void,
 	moveBlockDown: () => void,
 	removeBlock: () => void,
-	replaceBlock: ( clientId: string ) => void,
 };
 
 type StateType = {
@@ -160,7 +160,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				attributes={ this.props.attributes }
 				setAttributes={ this.props.onChange }
 				onFocus={ this.onFocus }
-				onReplace={ this.props.replaceBlock }
+				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.insertBlocksAfter }
 				mergeBlocks={ this.mergeBlocks }
 			/>
@@ -227,14 +227,13 @@ export default compose( [
 			moveBlocksDown,
 			moveBlocksUp,
 			removeBlock,
-			replaceBlock,
+			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
 		} = dispatch( 'core/editor' );
 
 		return {
 			mergeBlocks,
-			replaceBlock,
 			moveBlockDown() {
 				moveBlocksDown( clientId );
 			},
@@ -244,15 +243,18 @@ export default compose( [
 			removeBlock() {
 				removeBlock( clientId );
 			},
-			onInsertBlocks( blocks, index ) {
+			onInsertBlocks( blocks: Array<Object>, index: number ) {
 				insertBlocks( blocks, index, rootClientId );
 			},
-			onSelect: ( selectedClientId ) => {
+			onSelect: ( selectedClientId: string ) => {
 				clearSelectedBlock();
 				selectBlock( selectedClientId );
 			},
-			onChange: ( attributes ) => {
+			onChange: ( attributes: Object ) => {
 				updateBlockAttributes( clientId, attributes );
+			},
+			onReplace( blocks: Array<Object> ) {
+				replaceBlocks( [ clientId ], blocks );
 			},
 		};
 	} ),
