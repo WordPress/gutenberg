@@ -18,11 +18,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-Refer to [the plugins module documentation](../plugins/) for more information.
+Refer to [the plugins module documentation](/packages/plugins/README.md) for more information.
 
 ## Plugin Components
 
-The following components can be used with the `registerPlugin` ([see documentation](../plugins)) API.
+The following components can be used with the `registerPlugin` ([see documentation](/packages/plugins/README.md)) API.
 They can be found in the global variable `wp.editPost` when defining `wp-edit-post` as a script dependency.
 
 ### `PluginBlockSettingsMenuItem`
@@ -249,7 +249,7 @@ const MyButtonMoreMenuItem = () => (
 
 #### Props
 
-`PluginMoreMenuItem` supports the following props. Any additional props are passed through to the underlying [MenuItem](../components/src/menu-item) component.
+`PluginMoreMenuItem` supports the following props. Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
 
 ##### href
 

@@ -290,8 +290,6 @@ export function getCurrentPostAttribute( state, attributeName ) {
  * @return {*} Post attribute value.
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	const edits = getPostEdits( state );
-
 	// Special cases
 	switch ( attributeName ) {
 		case 'content':
@@ -299,6 +297,7 @@ export function getEditedPostAttribute( state, attributeName ) {
 	}
 
 	// Fall back to saved post value if not edited.
+	const edits = getPostEdits( state );
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
 		return getCurrentPostAttribute( state, attributeName );
 	}
@@ -349,13 +348,15 @@ export function getAutosaveAttribute( state, attributeName ) {
  */
 export function getEditedPostVisibility( state ) {
 	const status = getEditedPostAttribute( state, 'status' );
-	const password = getEditedPostAttribute( state, 'password' );
-
 	if ( status === 'private' ) {
 		return 'private';
-	} else if ( password ) {
+	}
+
+	const password = getEditedPostAttribute( state, 'password' );
+	if ( password ) {
 		return 'password';
 	}
+
 	return 'public';
 }
 
