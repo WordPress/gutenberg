@@ -21,7 +21,6 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockListBlock from './block';
-// import RenderingProvider from './rendering-provider';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
 
