@@ -33,7 +33,7 @@
 		"jest-enzyme": "^6.0.2"
 	},
 	"peerDependencies": {
-		"jest": ">=23"
+		"jest": ">= 23"
 	},
 	"publishConfig": {
 		"access": "public"

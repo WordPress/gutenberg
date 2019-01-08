@@ -30,7 +30,7 @@
 		"lodash": "^4.17.10"
 	},
 	"peerDependencies": {
-		"jest": ">=22"
+		"jest": ">= 22"
 	},
 	"publishConfig": {
 		"access": "public"
