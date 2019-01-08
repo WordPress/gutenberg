@@ -28,6 +28,7 @@ type PropsType = {
 	onSelect: string => mixed,
 	clearSelectedBlock: void => void,
 	onAttributesUpdate: ( string, mixed ) => mixed,
+	title: string,
 	initialHtml: string,
 	setupEditor: ( mixed, ?mixed ) => mixed,
 	clientId: string,
@@ -44,6 +45,7 @@ class AppContainer extends React.Component<PropsType> {
 			content: {
 				raw: props.initialHtml,
 			},
+			title: props.title,
 			type: 'draft',
 		};
 
@@ -100,6 +102,10 @@ class AppContainer extends React.Component<PropsType> {
 		this.props.onToggleBlockMode( this.props.rootClientId );
 	};
 
+	setTitleAction = (title: string) => {
+		this.props.title = title;
+	};
+
 	updateHtmlAction = ( html: string ) => {
 		this.parseBlocksAction( html );
 	};
@@ -122,6 +128,7 @@ class AppContainer extends React.Component<PropsType> {
 				createBlockAction={ this.createBlockAction }
 				serializeToNativeAction={ this.serializeToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
+				setTitleAction={ this.setTitleAction }
 				updateHtmlAction={ this.updateHtmlAction }
 				mergeBlocksAction={ this.mergeBlocksAction }
 				isBlockSelected={ this.props.isBlockSelected }

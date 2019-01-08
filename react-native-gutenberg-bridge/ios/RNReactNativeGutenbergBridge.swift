@@ -36,6 +36,7 @@ extension RNReactNativeGutenbergBridge {
         return [
             Gutenberg.EventName.requestHTML,
             Gutenberg.EventName.toggleHTMLMode,
+            Gutenberg.EventName.setTitle,
             Gutenberg.EventName.updateHtml
         ]
     }
