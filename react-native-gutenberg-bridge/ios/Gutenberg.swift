@@ -40,7 +40,7 @@ public class Gutenberg: NSObject {
             initialProps["initialData"] = initialContent
         }
         
-        if let initialTitle = dataSource.gutenbergInitialContent() {
+        if let initialTitle = dataSource.gutenbergInitialTitle() {
             initialProps["initialTitle"] = initialTitle
         }
         
