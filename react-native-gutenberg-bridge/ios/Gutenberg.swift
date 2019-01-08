@@ -34,10 +34,17 @@ public class Gutenberg: NSObject {
     }()
 
     private var initialProps: [String: String]? {
-        guard let initialContent = dataSource.gutenbergInitialContent() else {
-            return nil
+        var initialProps = [String: String]()
+        
+        if let initialContent = dataSource.gutenbergInitialContent() {
+            initialProps["initialData"] = initialContent
         }
-        return ["initialData": initialContent]
+        
+        if let initialTitle = dataSource.gutenbergInitialContent() {
+            initialProps["initialTitle"] = initialTitle
+        }
+        
+        return initialProps
     }
 
     public init(dataSource: GutenbergBridgeDataSource) {

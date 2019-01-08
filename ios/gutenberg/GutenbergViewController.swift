@@ -30,7 +30,7 @@ class GutenbergViewController: UIViewController {
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidLoad() {
-
+        
     }
 
     func gutenbergDidProvideHTML(_ html: String, changed: Bool) {
@@ -45,6 +45,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergInitialContent() -> String? {
+        return nil
+    }
+    
+    func gutenbergInitialTitle() -> String? {
         return nil
     }
 
