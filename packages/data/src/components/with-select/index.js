@@ -4,6 +4,7 @@
 import { Component } from '@wordpress/element';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { createQueue } from '@wordpress/priority-queue';
 
 /**
  * Internal dependencies
@@ -11,42 +12,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { RegistryConsumer } from '../registry-provider';
 import { AsyncModeConsumer } from '../async-mode-provider';
 
-const waitingList = [];
-const componentsMap = new WeakMap();
-let isRunning = false;
-const runWaitingList = () => {
-	if ( waitingList.length === 0 ) {
-		isRunning = false;
-		return;
-	}
-	const nextComponent = waitingList.shift();
-	componentsMap.get( nextComponent )();
-	componentsMap.delete( nextComponent );
-	window.requestAnimationFrame( runWaitingList );
-};
-
-const addToWaitingList = ( component, item ) => {
-	if ( ! componentsMap.has( component ) ) {
-		waitingList.push( component );
-	}
-	componentsMap.set( component, item );
-	if ( ! isRunning ) {
-		isRunning = true;
-		window.requestAnimationFrame( runWaitingList );
-	}
-};
-
-const flushComponent = ( component ) => {
-	if ( ! componentsMap.has( component ) ) {
-		return false;
-	}
-
-	componentsMap.delete( component );
-	const index = waitingList.indexOf( component );
-	waitingList.splice( index, 1 );
-
-	return true;
-};
+const renderQueue = createQueue();
 
 /**
  * Higher-order component used to inject state-derived props using registered
@@ -108,7 +74,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		componentWillUnmount() {
 			this.canRunSelection = false;
 			this.unsubscribe();
-			flushComponent( this );
+			renderQueue.flush( this );
 		}
 
 		shouldComponentUpdate( nextProps, nextState ) {
@@ -122,7 +88,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			}
 
 			if ( hasSyncRenderingChanged ) {
-				flushComponent( this );
+				renderQueue.flush( this );
 			}
 
 			// Treat a registry change as equivalent to `ownProps`, to reflect
@@ -184,7 +150,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		subscribe( registry ) {
 			this.unsubscribe = registry.subscribe( () => {
 				if ( this.props.isAsync ) {
-					addToWaitingList( this, this.onStoreChange );
+					renderQueue.add( this, this.onStoreChange );
 				} else {
 					this.onStoreChange();
 				}
