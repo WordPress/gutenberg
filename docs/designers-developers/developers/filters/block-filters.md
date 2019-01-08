@@ -1,6 +1,6 @@
 # Block Filters
 
-To modify the behavior of existing blocks, Gutenberg exposes several APIs:
+To modify the behavior of existing blocks, WordPress exposes several APIs:
 
 ### Block Style Variations
 
