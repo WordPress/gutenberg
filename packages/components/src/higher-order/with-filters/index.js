@@ -27,17 +27,29 @@ export default function withFilters( hookName ) {
 		const namespace = 'core/with-filters/' + hookName;
 
 		/**
-		 * Since filtering is applied to the component, each filtered instance
-		 * can reuse a shared reference to the definition. This optimizes to
-		 * avoid excessive calls to `applyFilters` when many instances exist.
+		 * The component definition with current filters applied. Each instance
+		 * reuse this shared reference as an optimization to avoid excessive
+		 * calls to `applyFilters` when many instances exist.
 		 *
-		 * @type {Component}
+		 * @type {?Component}
 		 */
-		let FilteredComponent = applyFilters( hookName, OriginalComponent );
+		let FilteredComponent;
+
+		/**
+		 * Initializes the FilteredComponent variable once, if not already
+		 * assigned. Subsequent calls are effectively a noop.
+		 */
+		function ensureFilteredComponent() {
+			if ( FilteredComponent === undefined ) {
+				FilteredComponent = applyFilters( hookName, OriginalComponent );
+			}
+		}
 
 		class FilteredComponentRenderer extends Component {
 			constructor( props ) {
 				super( props );
+
+				ensureFilteredComponent();
 
 				this.throttledForceUpdate = debounce(
 					() => this.forceUpdate(),
