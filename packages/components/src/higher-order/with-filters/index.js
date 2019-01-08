@@ -46,15 +46,10 @@ export default function withFilters( hookName ) {
 		}
 
 		class FilteredComponentRenderer extends Component {
-			constructor( props ) {
-				super( props );
+			constructor() {
+				super( ...arguments );
 
 				ensureFilteredComponent();
-
-				this.throttledForceUpdate = debounce(
-					() => this.forceUpdate(),
-					ANIMATION_FRAME_PERIOD
-				);
 			}
 
 			componentDidMount() {
@@ -69,8 +64,6 @@ export default function withFilters( hookName ) {
 			}
 
 			componentWillUnmount() {
-				this.throttledForceUpdate.cancel();
-
 				FilteredComponentRenderer.instances = without(
 					FilteredComponentRenderer.instances,
 					this
@@ -92,6 +85,21 @@ export default function withFilters( hookName ) {
 		FilteredComponentRenderer.instances = [];
 
 		/**
+		 * Updates the FilteredComponent definition, forcing a render for each
+		 * mounted instance. This occurs a maximum of once per animation frame.
+		 */
+		const throttledForceUpdate = debounce( () => {
+			// Recreate the filtered component, only after delay so that it's
+			// computed once, even if many filters added.
+			FilteredComponent = applyFilters( hookName, OriginalComponent );
+
+			// Force each instance to render.
+			FilteredComponentRenderer.instances.forEach( ( instance ) => {
+				instance.forceUpdate();
+			} );
+		}, ANIMATION_FRAME_PERIOD );
+
+		/**
 		 * When a filter is added or removed for the matching hook name, each
 		 * mounted instance should re-render with the new filters having been
 		 * applied to the original component.
@@ -99,17 +107,9 @@ export default function withFilters( hookName ) {
 		 * @param {string} updatedHookName Name of the hook that was updated.
 		 */
 		function onHooksUpdated( updatedHookName ) {
-			if ( updatedHookName !== hookName ) {
-				return;
+			if ( updatedHookName === hookName ) {
+				throttledForceUpdate();
 			}
-
-			// Recreate the filtered component.
-			FilteredComponent = applyFilters( hookName, OriginalComponent );
-
-			// Force each instance to render.
-			FilteredComponentRenderer.instances.forEach( ( instance ) => {
-				instance.throttledForceUpdate();
-			} );
 		}
 
 		return FilteredComponentRenderer;
