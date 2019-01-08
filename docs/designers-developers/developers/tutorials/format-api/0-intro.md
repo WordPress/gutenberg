@@ -1,10 +1,12 @@
 # Introduction to the Format API
 
-Example: add a formatting button for highlighting sample output from programs.
+The purpose of this tutorial is to introduce you to the Format API. The Format API enables developers to add custom buttons to the formatting toolbar.
 
-1. Create a custom button
-2. Add the proper tag
+In this example, you're going to add a new button for highlighting the sample output of programs by wrapping the text within the `<samp>` HTML tag.
 
-Pre-requisites:
+If you are unfamiliar with how to work with WordPress plugins and JavaScript, you may want to check the [JavaScript Tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md).
 
-- Know how to create a plugin up and work with JS.
+## Table of contents
+
+1. [Create a custom button](/docs/designers-developers/developers/tutorials/format-api/1-custom-buttom.md)
+2. [Add the proper tag](/docs/designers-developers/developers/tutorials/format-api/2-add-html-tag.md)

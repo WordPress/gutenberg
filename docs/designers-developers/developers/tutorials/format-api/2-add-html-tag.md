@@ -1,4 +1,4 @@
-# Add code tag
+# Add HTML tag
 
 ```js
 ( function( wp ) {
