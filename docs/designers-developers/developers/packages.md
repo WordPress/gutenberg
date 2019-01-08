@@ -1,6 +1,6 @@
 # Packages
 
-Gutenberg exposes a list of JavaScript packages and tools for WordPress development.
+WordPress exposes a list of JavaScript packages and tools for WordPress development.
 
 ## Using the packages via WordPress global
 

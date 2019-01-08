@@ -1,6 +1,6 @@
 # Autocomplete
 
-Gutenberg provides an `editor.Autocomplete.completers` filter for extending and overriding the list of autocompleters used by blocks.
+The `editor.Autocomplete.completers` filter is for extending and overriding the list of autocompleters used by blocks.
 
 The `Autocomplete` component found in `@wordpress/editor` applies this filter. The `@wordpress/components` package provides the foundational `Autocomplete` component that does not apply such a filter, but blocks should generally use the component provided by `@wordpress/editor`.
 
