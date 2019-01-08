@@ -191,19 +191,26 @@ class WP_Block_Type {
 	 * @return array Array of attributes.
 	 */
 	public function get_attributes() {
-		return is_array( $this->attributes ) ?
+		$attributes = is_array( $this->attributes ) ?
 			array_merge(
 				$this->attributes,
 				array(
+					'className' => array(
+						'type' => 'string',
+					),
 					'layout' => array(
 						'type' => 'string',
 					),
 				)
 			) :
 			array(
+				'className' => array(
+					'type' => 'string',
+				),
 				'layout' => array(
 					'type' => 'string',
 				),
 			);
+		return apply_filters( 'block_attributes', $attributes, $this );
 	}
 }
