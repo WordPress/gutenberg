@@ -1,17 +1,23 @@
+const requestFrame = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
+
 export const createQueue = () => {
 	const waitingList = [];
 	const elementsMap = new WeakMap();
 	let isRunning = false;
 
-	const runWaitingList = () => {
-		if ( waitingList.length === 0 ) {
-			isRunning = false;
-			return;
-		}
-		const nextElement = waitingList.shift();
-		elementsMap.get( nextElement )();
-		elementsMap.delete( nextElement );
-		window.requestAnimationFrame( runWaitingList );
+	const runWaitingList = ( deadline ) => {
+		do {
+			if ( waitingList.length === 0 ) {
+				isRunning = false;
+				return;
+			}
+
+			const nextElement = waitingList.shift();
+			elementsMap.get( nextElement )();
+			elementsMap.delete( nextElement );
+		} while ( deadline && deadline.timeRemaining && deadline.timeRemaining() > 0 );
+
+		requestFrame( runWaitingList );
 	};
 
 	const add = ( element, item ) => {
@@ -21,7 +27,7 @@ export const createQueue = () => {
 		elementsMap.set( element, item );
 		if ( ! isRunning ) {
 			isRunning = true;
-			window.requestAnimationFrame( runWaitingList );
+			requestFrame( runWaitingList );
 		}
 	};
 
