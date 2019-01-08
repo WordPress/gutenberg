@@ -14,7 +14,11 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect, withDispatch, AsyncModeProvider } from '@wordpress/data';
+import {
+	withSelect,
+	withDispatch,
+	__experimentalAsyncModeProvider as AsyncModeProvider,
+} from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
