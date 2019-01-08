@@ -1,5 +1,3 @@
-const requestFrame = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
-
 export const createQueue = () => {
 	const waitingList = [];
 	const elementsMap = new WeakMap();
@@ -13,7 +11,7 @@ export const createQueue = () => {
 		const nextElement = waitingList.shift();
 		elementsMap.get( nextElement )();
 		elementsMap.delete( nextElement );
-		requestFrame( runWaitingList );
+		window.requestAnimationFrame( runWaitingList );
 	};
 
 	const add = ( element, item ) => {
@@ -23,7 +21,7 @@ export const createQueue = () => {
 		elementsMap.set( element, item );
 		if ( ! isRunning ) {
 			isRunning = true;
-			requestFrame( runWaitingList );
+			window.requestAnimationFrame( runWaitingList );
 		}
 	};
 
