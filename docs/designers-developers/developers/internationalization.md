@@ -1,6 +1,6 @@
 # Internationalization
 
-This document aims to give an overview of the possibilities for both internationalization and localization when developing with Gutenberg.
+This document aims to give an overview of the possibilities for both internationalization and localization when developing with WordPress.
 
 ## PHP
 
@@ -13,7 +13,7 @@ For years, WordPress has been providing the necessary tools and functions to int
 - `_e( 'Hello World', 'my-text-domain' )`: Translate and print a certain string.
 - `esc_html__( 'Hello World', 'my-text-domain' )`: Translate a certain string and escape it for safe use in HTML output.
 - `esc_html_e( 'Hello World', 'my-text-domain' )`: Translate a certain string, escape it for safe use in HTML output, and print it.
-- `_n( '%s Comment', '%s Comments', $number, 'my-text-domain' )`: Translate and retrieve the singular or plural form based on the supplied number.  
+- `_n( '%s Comment', '%s Comments', $number, 'my-text-domain' )`: Translate and retrieve the singular or plural form based on the supplied number.
   Usually used in combination with `sprintf()` and `number_format_i18n()`.
 
 ## JavaScript
