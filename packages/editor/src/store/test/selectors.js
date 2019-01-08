@@ -10,7 +10,6 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	createBlock,
-	getBlockTypes,
 	getDefaultBlockName,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
@@ -89,6 +88,7 @@ const {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
+	getBlocksForSerialization,
 	getEditedPostContent,
 	__experimentalGetReusableBlock: getReusableBlock,
 	__experimentalIsSavingReusableBlock: isSavingReusableBlock,
@@ -171,7 +171,20 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/test-default', {
+			category: 'common',
+			title: 'default',
+			attributes: {
+				modified: {
+					type: 'boolean',
+					default: false,
+				},
+			},
+			save: () => null,
+		} );
+
 		setFreeformContentHandlerName( 'core/test-freeform' );
+		setDefaultBlockName( 'core/test-default' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
@@ -182,8 +195,10 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/test-default' );
 
 		setFreeformContentHandlerName( undefined );
+		setDefaultBlockName( undefined );
 	} );
 
 	describe( 'hasEditorUndo', () => {
@@ -1552,6 +1567,41 @@ describe( 'selectors', () => {
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should account for filtering logic of getBlocksForSerialization', () => {
+			// Note: As an optimization, isEditedPostEmpty avoids using the
+			// getBlocksForSerialization selector and instead makes assumptions
+			// about its filtering. The behavior should still be reflected.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/13086
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: false,
+								},
+							},
+							order: {
+								'': [ 'block1' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if blocks, but empty content edit', () => {
@@ -3995,33 +4045,109 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getEditedPostContent', () => {
-		let originalDefaultBlockName;
-
-		beforeAll( () => {
-			originalDefaultBlockName = getDefaultBlockName();
-
-			registerBlockType( 'core/default', {
-				category: 'common',
-				title: 'default',
-				attributes: {
-					modified: {
-						type: 'boolean',
-						default: false,
+	describe( 'getBlocksForSerialization', () => {
+		it( 'should return blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+								block2: {
+									clientId: 'block2',
+									name: 'core/heading',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: false,
+								},
+								block2: {},
+							},
+							order: {
+								'': [ 'block1', 'block2' ],
+							},
+						},
+						edits: {},
 					},
 				},
-				save: () => null,
-			} );
-			setDefaultBlockName( 'core/default' );
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( getBlocksForSerialization( state ) ).toEqual( [
+				{ clientId: 'block1', name: 'core/test-default', attributes: { modified: false }, innerBlocks: [] },
+				{ clientId: 'block2', name: 'core/heading', attributes: {}, innerBlocks: [] },
+			] );
 		} );
 
-		afterAll( () => {
-			setDefaultBlockName( originalDefaultBlockName );
-			getBlockTypes().forEach( ( block ) => {
-				unregisterBlockType( block.name );
-			} );
+		it( 'should return an empty set if content is a single unmodified default block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: false,
+								},
+							},
+							order: {
+								'': [ 'block1' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( getBlocksForSerialization( state ) ).toEqual( [] );
 		} );
 
+		it( 'should return a set including a single modified default block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: true,
+								},
+							},
+							order: {
+								'': [ 'block1' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( getBlocksForSerialization( state ) ).toEqual( [
+				{ clientId: 'block1', name: 'core/test-default', attributes: { modified: true }, innerBlocks: [] },
+			] );
+		} );
+	} );
+
+	describe( 'getEditedPostContent', () => {
 		it( 'defers to returning an edited post attribute', () => {
 			const block = createBlock( 'core/block' );
 
@@ -4205,7 +4331,7 @@ describe( 'selectors', () => {
 
 			const content = getEditedPostContent( state );
 
-			expect( content ).toBe( '<!-- wp:default {\"modified\":true} /-->' );
+			expect( content ).toBe( '<!-- wp:test-default {\"modified\":true} /-->' );
 		} );
 	} );
 
@@ -4643,6 +4769,7 @@ describe( 'selectors', () => {
 				'core/block/1',
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-default',
 				'core/test-block-a',
 			] );
 		} );
@@ -4701,6 +4828,7 @@ describe( 'selectors', () => {
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-default',
 				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
@@ -4711,6 +4839,7 @@ describe( 'selectors', () => {
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-default',
 				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
