@@ -90,7 +90,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			refresh: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
-			title: 'Welcome to Gutenberg Mobile!',
+			title: props.title,
 		};
 	}
 
@@ -242,17 +242,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		);
 	}
 
-	/*
-				<TextInput
-					blurOnSubmit={ true }
-					style={ styles.title }
-					textAlignVertical="top"
-					multiline
-					numberOfLines={ 0 }
-					value={ this.state.title }
-					onChangeText={ this.onChangeTitle }>
-				</TextInput>
-				*/
 	renderHeader() {
 		return (
 			<View>

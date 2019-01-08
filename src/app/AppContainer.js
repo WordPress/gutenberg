@@ -45,7 +45,6 @@ class AppContainer extends React.Component<PropsType> {
 			content: {
 				raw: props.initialHtml,
 			},
-			title: props.title,
 			type: 'draft',
 		};
 
@@ -132,6 +131,7 @@ class AppContainer extends React.Component<PropsType> {
 				updateHtmlAction={ this.updateHtmlAction }
 				mergeBlocksAction={ this.mergeBlocksAction }
 				isBlockSelected={ this.props.isBlockSelected }
+				title={ this.props.title }
 			/>
 		);
 	}
