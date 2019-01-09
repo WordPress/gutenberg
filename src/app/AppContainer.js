@@ -36,6 +36,7 @@ type PropsType = {
 
 class AppContainer extends React.Component<PropsType> {
 	lastHtml: ?string;
+	lastTitle: ?string;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -50,6 +51,7 @@ class AppContainer extends React.Component<PropsType> {
 
 		this.props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
+		this.lastTitle = this.title;
 
 		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
@@ -97,6 +99,12 @@ class AppContainer extends React.Component<PropsType> {
 		this.lastHtml = html;
 	};
 
+	titleToNativeAction = () => {
+		console.log("Title: " + this.props.title);
+		RNReactNativeGutenbergBridge.provideTitleToNative( this.props.title, this.props.title != this.lastTitle );
+		this.lastTitle = this.props.title;
+	};
+
 	toggleHtmlModeAction = () => {
 		this.props.onToggleBlockMode( this.props.rootClientId );
 	};
@@ -126,6 +134,7 @@ class AppContainer extends React.Component<PropsType> {
 				deleteBlockAction={ this.deleteBlockAction }
 				createBlockAction={ this.createBlockAction }
 				serializeToNativeAction={ this.serializeToNativeAction }
+				titleToNativeAction={ this.titleToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
 				setTitleAction={ this.setTitleAction }
 				updateHtmlAction={ this.updateHtmlAction }

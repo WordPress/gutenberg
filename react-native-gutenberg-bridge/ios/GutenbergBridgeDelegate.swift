@@ -8,6 +8,14 @@ public protocol GutenbergBridgeDelegate: class {
     ///   - html: The current HTML presented by the editor.
     ///   - changed: True if the given HTML presents changes from the last request or initial value.
     func gutenbergDidProvideHTML(_ html: String, changed: Bool)
+    
+    /// Tells the delegate that Gutenberg has provided the title.
+    /// You can request the title by calling `requestTitle()` on a Gutenberg bridge instance.
+    ///
+    /// - Parameters:
+    ///   - title: The title as shown in the editor.
+    ///   - changed: True if the given title presents changes from the last request or initial value.
+    func gutenbergDidProvideTitle(_ title: String, changed: Bool)
 
     /// Tells the delegate that an image block requested an image from the media picker.
     ///

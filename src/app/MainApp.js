@@ -4,6 +4,7 @@
 import React from 'react';
 import {
 	subscribeParentGetHtml,
+	subscribeParentGetTitle,
 	subscribeParentToggleHTMLMode,
 	subscribeSetTitle,
 	subscribeUpdateHtml,
@@ -25,6 +26,7 @@ type PropsType = {
 	deleteBlockAction: string => mixed,
 	createBlockAction: ( string, BlockType ) => mixed,
 	serializeToNativeAction: void => void,
+	titleToNativeAction: void => void,
 	toggleHtmlModeAction: void => void,
 	setTitleAction: string => void,
 	updateHtmlAction: string => void,
@@ -46,6 +48,10 @@ export default class MainScreen extends React.Component<PropsType, StateType> {
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.props.serializeToNativeAction();
 		} );
+
+		this.subscriptionParentGetTitle = subscribeParentGetTitle( () => {
+			this.props.titleToNativeAction();
+		});
 
 		this.subscriptionParentToggleHTMLMode = subscribeParentToggleHTMLMode( () => {
 			this.props.toggleHtmlModeAction();

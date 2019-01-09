@@ -24,6 +24,10 @@ export function subscribeParentGetHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'requestGetHtml', callback );
 }
 
+export function subscribeParentGetTitle( callback ) {
+	return gutenbergBridgeEvents.addListener( 'requestTitle', callback );
+}
+
 export function subscribeParentToggleHTMLMode( callback ) {
 	return gutenbergBridgeEvents.addListener( 'toggleHTMLMode', callback );
 }

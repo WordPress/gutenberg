@@ -11,6 +11,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidProvideHTML(html, changed: changed)
         }
     }
+    
+    @objc
+    func provideTitleToNative(_ title: String, changed: Bool) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidProvideTitle(title, changed: changed)
+        }
+    }
 
     @objc
     func onMediaLibraryPress(_ callback: @escaping RCTResponseSenderBlock) {
@@ -35,6 +42,7 @@ extension RNReactNativeGutenbergBridge {
     public override func supportedEvents() -> [String]! {
         return [
             Gutenberg.EventName.requestHTML,
+            Gutenberg.EventName.requestTitle,
             Gutenberg.EventName.toggleHTMLMode,
             Gutenberg.EventName.setTitle,
             Gutenberg.EventName.updateHtml

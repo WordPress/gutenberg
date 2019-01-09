@@ -24,6 +24,7 @@ class GutenbergViewController: UIViewController {
     }
 
     @objc func saveButtonPressed(sender: UIBarButtonItem) {
+        gutenberg.requestTitle()
         gutenberg.requestHTML()
     }
 }
@@ -35,6 +36,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidProvideHTML(_ html: String, changed: Bool) {
         print("Did receive HTML: \(html) changed: \(changed)")
+    }
+    
+    func gutenbergDidProvideTitle(_ title: String, changed: Bool) {
+        print("Did receive title: \(title) changed: \(changed)")
     }
 
     func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback) {
