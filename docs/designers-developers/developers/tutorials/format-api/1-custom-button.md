@@ -4,8 +4,6 @@ Through this section you're going to add a custom button to the format toolbar t
 
 ## Registering a new format
 
-In WordPress lingo, a _format_ is a [HTML phrase tag](https://www.w3.org/TR/html5/dom.html#phrasing-content) intended to give some special meaning to a text selection. For example, in this tutorial, the button to be hooked into the format toolbar will let users wrap a particular text selection with the [`<samp>` HTML tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/samp).
-
 Before adding the button you'll create the new format the button intends to apply. To register a new format type you use the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) primitive.
 
 Let's prepare a minimal plugin. Create a new folder and a file named `my-custom-format.php` within it containing the necessary PHP code to register and enqueue the JavaScript assets:
@@ -85,3 +83,5 @@ Note that you're using two new utilities (`wp.element.createElement`, and `wp.ed
 Before moving forward, let's check that everything is working as expected so far. Reload the post/page and select a text block. Make sure the new button was added to the format toolbar, it uses the [editor-code dashicon](https://developer.wordpress.org/resource/dashicons/#editor-code), and the hover text is what you set in the title:
 
 ![Toolbar with custom button](/docs/designers-developers/assets/toolbar-with-custom-button.png)
+
+You may also want to check that upon clicking the button the `toggle format` message is shown in the console.
