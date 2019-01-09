@@ -318,6 +318,24 @@
 		"parent": "plugin-sidebar-0"
 	},
 	{
+		"title": "Introduction to the Format API",
+		"slug": "format-api",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/README.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Create a custom button",
+		"slug": "1-custom-button",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/1-custom-button.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Addd the `<samp>` tag to the selected text",
+		"slug": "2-add-html-tag",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/2-add-html-tag.md",
+		"parent": "format-api"
+	},
+	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/README.md",
