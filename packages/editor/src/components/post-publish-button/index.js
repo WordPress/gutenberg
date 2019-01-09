@@ -72,7 +72,7 @@ export class PostPublishButton extends Component {
 			publishStatus = 'publish';
 		}
 
-		const onClick = () => {
+		const onClickButton = () => {
 			if ( isButtonDisabled ) {
 				return;
 			}
@@ -81,13 +81,20 @@ export class PostPublishButton extends Component {
 			onSave();
 		};
 
+		const onClickToggle = () => {
+			if ( isToggleDisabled ) {
+				return;
+			}
+			onToggle();
+		};
+
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled,
 			className: 'editor-post-publish-button',
 			isBusy: isSaving && isPublished,
 			isLarge: true,
 			isPrimary: true,
-			onClick,
+			onClick: onClickButton,
 		};
 
 		const toggleProps = {
@@ -96,7 +103,7 @@ export class PostPublishButton extends Component {
 			className: 'editor-post-publish-panel__toggle',
 			isBusy: isSaving && isPublished,
 			isPrimary: true,
-			onClick: onToggle,
+			onClick: onClickToggle,
 		};
 
 		const toggleChildren = isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' );
