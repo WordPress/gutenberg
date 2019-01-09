@@ -91,6 +91,13 @@ removeFormat( value: Object, formatType: string, ?startIndex: number, ?endIndex:
 
 Remove any format object from a Rich Text value by type from the given `startIndex` to the given `endIndex`. Indices are retrieved from the selection if none are provided.
 
+### toggleFormat
+
+```js
+toggleFormat( value: Object, format: Object ): Object
+```
+
+Toggles a format object to a Rich Text value at the current selection, and returns a new value with the format applied or removed.
 
 ### getActiveFormat
 
