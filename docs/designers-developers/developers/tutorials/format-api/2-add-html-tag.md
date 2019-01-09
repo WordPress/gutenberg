@@ -1,4 +1,4 @@
-# Addding the samp tag to selection
+# Addd the `<samp>` tag to the selected text
 
 So far, your custom button doesn't modify the text selected, it only renders a message in the console. Let's change that.
 
