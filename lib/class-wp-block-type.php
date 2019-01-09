@@ -198,7 +198,7 @@ class WP_Block_Type {
 					'className' => array(
 						'type' => 'string',
 					),
-					'layout' => array(
+					'layout'    => array(
 						'type' => 'string',
 					),
 				)
