@@ -30,8 +30,8 @@
 		"node-fetch": "^1.7.3"
 	},
 	"peerDependencies": {
-		"jest": ">=23.0.0",
-		"puppeteer": ">=1.6.0"
+		"jest": ">=23",
+		"puppeteer": ">=1.6"
 	},
 	"publishConfig": {
 		"access": "public"

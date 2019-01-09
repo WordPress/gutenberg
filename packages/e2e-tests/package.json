@@ -20,13 +20,16 @@
 	"dependencies": {
 		"@wordpress/e2e-test-utils": "file:../e2e-test-utils",
 		"@wordpress/jest-console": "file:../jest-console",
+		"@wordpress/jest-puppeteer-axe": "file:../jest-puppeteer-axe",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/scripts": "file:../scripts",
+		"@wordpress/url": "file:../url",
 		"expect-puppeteer": "^3.2.0",
 		"lodash": "^4.17.10"
 	},
 	"peerDependencies": {
-		"jest": ">= 23",
-		"puppeteer": ">= 1.6"
+		"jest": ">=23",
+		"puppeteer": ">=1.6"
 	},
 	"publishConfig": {
 		"access": "public"

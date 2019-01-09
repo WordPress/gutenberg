@@ -9,7 +9,7 @@
 		"jest",
 		"puppeteer",
 		"axe",
-		"accesibility"
+		"accessibility"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/jest-puppeteer-axe/README.md",
 	"repository": {
@@ -29,8 +29,8 @@
 		"axe-puppeteer": "^0.1.0"
 	},
 	"peerDependencies": {
-		"jest": ">= 23",
-		"puppeteer": ">= 1.6"
+		"jest": ">=23",
+		"puppeteer": ">=1.6"
 	},
 	"publishConfig": {
 		"access": "public"
