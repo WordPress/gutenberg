@@ -4,7 +4,7 @@ Through this section you're going to add a custom button to the format toolbar t
 
 ## Registering a new format
 
-In WordPress lingo, a _format_ is a [HTML phrase tag](https://www.w3.org/TR/html5/dom.html#phrasing-content) intended to give some special meaning to a text selection. For example, in this tutorial, the button to be hooked into the format toolbar will let users add the `samp` HTML tag to a particular text selection.
+In WordPress lingo, a _format_ is a [HTML phrase tag](https://www.w3.org/TR/html5/dom.html#phrasing-content) intended to give some special meaning to a text selection. For example, in this tutorial, the button to be hooked into the format toolbar will let users wrap a particular text selection with the [`<samp>` HTML tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/samp).
 
 Before adding the button you'll create the new format the button intends to apply. To register a new format type you use the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) primitive.
 

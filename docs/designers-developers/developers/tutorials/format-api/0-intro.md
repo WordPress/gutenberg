@@ -2,7 +2,7 @@
 
 The purpose of this tutorial is to introduce you to the Format API. The Format API enables developers to add custom buttons to the formatting toolbar.
 
-In this example, you're going to add a new button for highlighting the sample output of programs by wrapping the text within the `<samp>` HTML tag.
+In this example, you're going to add a new button for highlighting the sample output of programs by wrapping the text within the [`<samp>` HTML tag](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/samp).
 
 If you are unfamiliar with how to work with WordPress plugins and JavaScript, you may want to check the [JavaScript Tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md).
 
