@@ -1,42 +1,18 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Disabled, SandBox, SVG, Path } from '@wordpress/components';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { BlockControls, PlainText, urlRewrite, traverse } from '@wordpress/editor';
+import { BlockControls, PlainText } from '@wordpress/editor';
 import { compose, withState } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
-let editorStylesCache = [];
-
 /**
- * Parse editor styles.
- *
- * @param {Object} select
- * @return {Array} css rule set array.
+ * Internal dependencies
  */
-const getEditorStyles = ( select ) => {
-	if ( editorStylesCache.length === 0 ) {
-		const { getEditorSettings } = select( 'core/editor' );
-		const styles = getEditorSettings().styles;
-		if ( styles && styles.length > 0 ) {
-			editorStylesCache = map( styles, ( { css, baseURL } ) => {
-				if ( ! baseURL ) {
-					return css;
-				}
-				return traverse( css, urlRewrite( baseURL ) );
-			} );
-		}
-	}
-	return editorStylesCache;
-};
+import getEditorStyles from './getEditorStyles';
 
 export const name = 'core/html';
 
