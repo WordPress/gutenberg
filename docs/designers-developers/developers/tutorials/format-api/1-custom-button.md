@@ -1,10 +1,14 @@
 # Create a custom button
 
-Through this section you're going to add a custom button to the format toolbar to match the new format to be created.
+Through this section you're going to add a custom button to the format toolbar that will match the new format to be created.
 
 ## Registering a new format
 
-As a first step, you'll register the new format type using the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) primitive. Create a folder for your plugin, and within it a file named `my-custom-format.php` containing the necessary PHP code to register and enqueue the JavaScript assets:
+In WordPress lingo, a _format_ is a [HTML phrase tag](https://www.w3.org/TR/html5/dom.html#phrasing-content) intended to give some special format to a specific text selection.
+
+The button to be hooked into the format toolbar will encapsulate this behavior for us. Before adding the button you'll create the new format the button intends to apply. To register a new format type you use the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) primitive.
+
+Let's create a minimal plugin. Create a new plugin folder and a file named `my-custom-format.php` within it containing the necessary PHP code to register and enqueue the JavaScript assets:
 
 ```php
 <?php
@@ -28,7 +32,7 @@ function my_custom_format_enqueue_assets_editor() {
 add_action( 'enqueue_block_editor_assets', 'my_custom_format_enqueue_assets_editor' );
 ```
 
-Then create a new file named `my-custom-format.js` with the following contents in the same folder:
+Then add a new file named `my-custom-format.js` with the following contents:
 
 ```js
 ( function( wp ) {
@@ -42,7 +46,7 @@ Then create a new file named `my-custom-format.js` with the following contents i
 } )( window.wp );
 ```
 
-The registered format types are stored in the `core/rich-text` store, so once the plugin is available and activated, and after a new post/page is loaded in the browser, you may want to check the new registered format is avaliable. Run this code in your browser's console:
+WordPress maintains the available format types in the `core/rich-text` store, so once the plugin is available and activated, and after a new post/page is loaded in the browser, you may want to check your custom format has been made avaliable as well. Run this code in your browser's console:
 
 	wp.data.select( 'core/rich-text' ).getFormatTypes();
 
@@ -50,33 +54,34 @@ It'll return an array containing the format types, including your own.
 
 ## Adding a button attached to the new format
 
-Next step is to surface the new format in the UI by using the [`RichTextToolbarButton`](/packages/editor/src/components/rich-text/README.md#RichTextToolbarButton) component.
+Now that the format is avaible, the next step is to surface it to the UI by using the [`RichTextToolbarButton`](/packages/editor/src/components/rich-text/README.md#RichTextToolbarButton) component.
 
 ```js
 ( function( wp ) {
+	var MyCustomButton = function( props ) {
+		return wp.element.createElement(
+			wp.editor.RichTextToolbarButton, {
+				icon: 'editor-code',
+				title: 'Sample output',
+				onClick: function() {
+					console.log( 'toggle format' );
+				},
+			}
+		);
+	}
 	wp.richText.registerFormatType(
 		'my-custom-format/sample-output', {
 			title: 'Sample output',
 			tagName: 'samp',
 			className: null,
-			edit: function( props ) {
-				return wp.element.createElement(
-					wp.editor.RichTextToolbarButton, {
-						icon: 'editor-code',
-						title: 'Sample output',
-						onClick: function() {
-							console.log( 'toggle format' );
-						},
-					}
-				);
-			},
+			edit: MyCustomButton,
 		}
 	);
 } )( window.wp );
 ```
 
-Don't forget also adding `wp-element` and `wp-editor` to the dependencies array in the PHP file along with the existing `wp-rich-text`.
+Note that you're using two new utilities (`wp.element.createElement`, and `wp.editor.RichTextToolbarButton`) so don't forget adding `wp-element` and `wp-editor` to the dependencies array in the PHP file along with the existing `wp-rich-text`.
 
-Let's check that everything worked as expected. Reload the post/page and select a block. Make sure the new button was added to the format toolbar with the [editor-code dashicon](https://developer.wordpress.org/resource/dashicons/#editor-code):
+Before moving forward, let's check that everything is working as expected. Reload the post/page and select a text block. Make sure the new button was added to the format toolbar, it uses the [editor-code dashicon](https://developer.wordpress.org/resource/dashicons/#editor-code), and the hover text is what you set in the title:
 
 ![Toolbar with custom button](/docs/designers-developers/assets/toolbar-with-custom-button.png)
