@@ -14,6 +14,30 @@ import { BlockControls, PlainText, urlRewrite, traverse } from '@wordpress/edito
 import { compose, withState } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
+let editorStylesCache = [];
+
+/**
+ * Parse editor styles.
+ *
+ * @param {Object} select
+ * @return {Array} css rule set array.
+ */
+const getEditorStyles = ( select ) => {
+	if ( editorStylesCache.length === 0 ) {
+		const { getEditorSettings } = select( 'core/editor' );
+		const styles = getEditorSettings().styles;
+		if ( styles && styles.length > 0 ) {
+			editorStylesCache = map( styles, ( { css, baseURL } ) => {
+				if ( ! baseURL ) {
+					return css;
+				}
+				return traverse( css, urlRewrite( baseURL ) );
+			} );
+		}
+	}
+	return editorStylesCache;
+};
+
 export const name = 'core/html';
 
 export const settings = {
@@ -64,21 +88,8 @@ export const settings = {
 
 	edit: compose( [
 		withSelect( ( select ) => {
-			const { getEditorSettings } = select( 'core/editor' );
-			const styles = getEditorSettings().styles;
-			if ( styles && styles.length > 0 ) {
-				return {
-					styles: map( styles, ( { css, baseURL } ) => {
-						if ( ! baseURL ) {
-							return css;
-						}
-						return traverse( css, urlRewrite( baseURL ) );
-					} ),
-				};
-			}
-
 			return {
-				styles: [],
+				styles: getEditorStyles( select ),
 			};
 		} ),
 		withState( { isPreview: false } ),
