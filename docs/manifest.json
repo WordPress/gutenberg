@@ -234,12 +234,6 @@
 		"parent": "javascript"
 	},
 	{
-		"title": "Scope your code",
-		"slug": "scope-your-code",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/scope-your-code.md",
-		"parent": "javascript"
-	},
-	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/README.md",
