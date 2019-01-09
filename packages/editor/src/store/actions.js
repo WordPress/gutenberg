@@ -307,7 +307,7 @@ export function insertBlock( block, index, rootClientId, updateSelection = true 
  *
  * @param {Object[]} blocks          Block objects to insert.
  * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root cliente ID of block list on which to insert.
+ * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
  * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.

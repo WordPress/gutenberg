@@ -1622,7 +1622,7 @@ be inserted, optionally at a specific index respective a root block list.
 
  * blocks: Block objects to insert.
  * index: Index at which block should be inserted.
- * rootClientId: Optional root cliente ID of block list on which to insert.
+ * rootClientId: Optional root client ID of block list on which to insert.
  * updateSelection: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
 
 ### showInsertionPoint
