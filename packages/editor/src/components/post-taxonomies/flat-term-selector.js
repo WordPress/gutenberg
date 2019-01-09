@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { isEmpty, get, unescape as unescapeString, find, throttle, uniqBy, invoke } from 'lodash';
+import {
+	escape as escapeString,
+	find,
+	get,
+	invoke,
+	isEmpty,
+	map,
+	throttle,
+	unescape as unescapeString,
+	uniqBy,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -25,6 +35,33 @@ const DEFAULT_QUERY = {
 };
 const MAX_TERMS_SUGGESTIONS = 20;
 const isSameTermName = ( termA, termB ) => termA.toLowerCase() === termB.toLowerCase();
+
+/**
+ * Returns a term object with name unescaped.
+ * The unescape of the name propery is done using lodash unescape function.
+ *
+ * @param {Object} term The term object to unescape.
+ *
+ * @return {Object} Term object with name property unescaped.
+ */
+const unescapeTerm = ( term ) => {
+	return {
+		...term,
+		name: unescapeString( term.name ),
+	};
+};
+
+/**
+ * Returns an array of term objects with names unescaped.
+ * The unescape of each term is performed using the unescapeTerm function.
+ *
+ * @param {Object[]} terms Array of term objects to unescape.
+ *
+ * @return {Object[]} Array of therm objects unscaped.
+ */
+const unescapeTerms = ( terms ) => {
+	return map( terms, unescapeTerm );
+};
 
 class FlatTermSelector extends Component {
 	constructor() {
@@ -79,7 +116,7 @@ class FlatTermSelector extends Component {
 		const request = apiFetch( {
 			path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, query ),
 		} );
-		request.then( ( terms ) => {
+		request.then( unescapeTerms ).then( ( terms ) => {
 			this.setState( ( state ) => ( {
 				availableTerms: state.availableTerms.concat(
 					terms.filter( ( term ) => ! find( state.availableTerms, ( availableTerm ) => availableTerm.id === term.id ) )
@@ -107,24 +144,25 @@ class FlatTermSelector extends Component {
 
 	findOrCreateTerm( termName ) {
 		const { taxonomy } = this.props;
+		const termNameEscaped = escapeString( termName );
 		// Tries to create a term or fetch it if it already exists.
 		return apiFetch( {
 			path: `/wp/v2/${ taxonomy.rest_base }`,
 			method: 'POST',
-			data: { name: termName },
+			data: { name: termNameEscaped },
 		} ).catch( ( error ) => {
 			const errorCode = error.code;
 			if ( errorCode === 'term_exists' ) {
 				// If the terms exist, fetch it instead of creating a new one.
 				this.addRequest = apiFetch( {
-					path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, { ...DEFAULT_QUERY, search: termName } ),
-				} );
+					path: addQueryArgs( `/wp/v2/${ taxonomy.rest_base }`, { ...DEFAULT_QUERY, search: termNameEscaped } ),
+				} ).then( unescapeTerms );
 				return this.addRequest.then( ( searchResult ) => {
 					return find( searchResult, ( result ) => isSameTermName( result.name, termName ) );
 				} );
 			}
 			return Promise.reject( error );
-		} );
+		} ).then( unescapeTerm );
 	}
 
 	onChange( termNames ) {
@@ -189,7 +227,6 @@ class FlatTermSelector extends Component {
 		return (
 			<FormTokenField
 				value={ selectedTerms }
-				displayTransform={ unescapeString }
 				suggestions={ termNames }
 				onChange={ this.onChange }
 				onInputChange={ this.searchTerms }
