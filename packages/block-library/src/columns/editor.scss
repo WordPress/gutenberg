@@ -125,7 +125,7 @@
 
 	// The empty state of a columns block has the default appenders.
 	// Since those appenders are not blocks, the parent, actual block, appears "hovered" when hovering the appenders.
-	// Because the column shouldn't be hovered as part of this temporary passhthrough, we unset the hover style.
+	// Because the column shouldn't be hovered as part of this temporary passthrough, we unset the hover style.
 	&.is-hovered {
 		> .editor-block-list__block-edit::before {
 			content: none;

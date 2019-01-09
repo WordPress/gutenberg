@@ -51,7 +51,7 @@ export const requestPostUpdate = async ( action, store ) => {
 	const state = getState();
 
 	// Prevent save if not saveable.
-	// We don't check for dirtiness here as this can be overriden in the UI.
+	// We don't check for dirtiness here as this can be overridden in the UI.
 	if ( ! isEditedPostSaveable( state ) ) {
 		return;
 	}
