@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { traverse, urlRewrite } from '@wordpress/editor';
+import { transformStyles } from '@wordpress/editor';
 
 let editorStylesCache = [];
 
@@ -21,12 +16,7 @@ const getEditorStyles = ( select ) => {
 		const { getEditorSettings } = select( 'core/editor' );
 		const styles = getEditorSettings().styles;
 		if ( styles && styles.length > 0 ) {
-			editorStylesCache = map( styles, ( { css, baseURL } ) => {
-				if ( ! baseURL ) {
-					return css;
-				}
-				return traverse( css, urlRewrite( baseURL ) );
-			} );
+			editorStylesCache = transformStyles( styles );
 		}
 	}
 	return editorStylesCache;
