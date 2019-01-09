@@ -48,7 +48,7 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 The JavaScript code in `myguten.js`:
 
 ```js
-wp.domReady( () => {
+wp.domReady( function() {
 	wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
 } );
 ```
