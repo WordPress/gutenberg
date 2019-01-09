@@ -1,8 +1,34 @@
 # Create a custom button
 
-The first step in the journey is to add a custom button to the format toolbar.
+Through this section you're going to add a custom button to the format toolbar to match the new format to be created.
 
-First, you'll register the new format type using the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) utility:
+## Registering a new format
+
+As a first step, you'll register the new format type using the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) primitive. Create a folder for your plugin, and within it a file named `my-custom-format.php` containing the necessary PHP code to register and enqueue the JavaScript assets:
+
+```php
+<?php
+
+/**
+ * Plugin Name: My custom format
+ */
+
+function my_custom_format_script_register() {
+	wp_register_script(
+		'my-custom-format-js',
+		plugins_url( 'my-custom-format.js', __FILE__ ),
+		array( 'wp-rich-text' )
+	);
+}
+add_action( 'init', 'my_custom_format_script_register' );
+
+function my_custom_format_enqueue_assets_editor() {
+	wp_enqueue_script( 'my-custom-format-js' );
+}
+add_action( 'enqueue_block_editor_assets', 'my_custom_format_enqueue_assets_editor' );
+```
+
+Then create a new file named `my-custom-format.js` with the following contents in the same folder:
 
 ```js
 ( function( wp ) {
@@ -16,9 +42,15 @@ First, you'll register the new format type using the [`registerFormatType`](/pac
 } )( window.wp );
 ```
 
-The registered format types are stored in the `core/rich-text` store, so you may want to query it to see the new available format. `wp.data.select( 'core/rich-text' ).getFormatTypes()` should return an array containing the format types, including your own.
+The registered format types are stored in the `core/rich-text` store, so once the plugin is available and activated, and after a new post/page is loaded in the browser, you may want to check the new registered format is avaliable. Run this code in your browser's console:
 
-Now that it's registered, you're going to actually surface it in the UI by means of a button using the `RichTextToolbarButton` component.
+	wp.data.select( 'core/rich-text' ).getFormatTypes();
+
+It'll return an array containing the format types, including your own.
+
+## Adding a button attached to the new format
+
+Next step is to surface the new format in the UI by using the [`RichTextToolbarButton`](/packages/editor/src/components/rich-text/README.md#RichTextToolbarButton) component.
 
 ```js
 ( function( wp ) {
@@ -43,30 +75,8 @@ Now that it's registered, you're going to actually surface it in the UI by means
 } )( window.wp );
 ```
 
-PHP code:
+Don't forget also adding `wp-element` and `wp-editor` to the dependencies array in the PHP file along with the existing `wp-rich-text`.
 
-```php
-<?php
+Let's check that everything worked as expected. Reload the post/page and select a block. Make sure the new button was added to the format toolbar with the [editor-code dashicon](https://developer.wordpress.org/resource/dashicons/#editor-code):
 
-/**
- * Plugin Name: My custom format
- */
-
-function my_custom_format_script_register() {
-	wp_register_script(
-		'my-custom-format-js',
-		plugins_url( 'my-custom-format.js', __FILE__ ),
-		array( 'wp-editor', 'wp-element', 'wp-rich-text' )
-	);
-}
-add_action( 'init', 'my_custom_format_script_register' );
-
-function my_custom_format_enqueue_assets_editor() {
-	wp_enqueue_script( 'my-custom-format-js' );
-}
-add_action( 'enqueue_block_editor_assets', 'my_custom_format_enqueue_assets_editor' );
-```
-
-Make plugin available.
-Activate plugin.
-Check that new button exists.
+![Toolbar with custom button](/docs/designers-developers/assets/toolbar-with-custom-button.png)
