@@ -3,16 +3,13 @@
  */
 import { RawHTML } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Disabled, SandBox, SVG, Path } from '@wordpress/components';
+import { SVG, Path } from '@wordpress/components';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { BlockControls, PlainText } from '@wordpress/editor';
-import { compose, withState } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import getEditorStyles from './getEditorStyles';
+import edit from './edit';
 
 export const name = 'core/html';
 
@@ -62,47 +59,7 @@ export const settings = {
 		],
 	},
 
-	edit: compose( [
-		withSelect( ( select ) => {
-			return {
-				styles: getEditorStyles( select ),
-			};
-		} ),
-		withState( { isPreview: false } ),
-	] )( ( { attributes, setAttributes, setState, isPreview, styles } ) => (
-		<div className="wp-block-html">
-			<BlockControls>
-				<div className="components-toolbar">
-					<button
-						className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
-						onClick={ () => setState( { isPreview: false } ) }
-					>
-						<span>HTML</span>
-					</button>
-					<button
-						className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
-						onClick={ () => setState( { isPreview: true } ) }
-					>
-						<span>{ __( 'Preview' ) }</span>
-					</button>
-				</div>
-			</BlockControls>
-			<Disabled.Consumer>
-				{ ( isDisabled ) => (
-					( isPreview || isDisabled ) ? (
-						<SandBox html={ attributes.content } styles={ styles } />
-					) : (
-						<PlainText
-							value={ attributes.content }
-							onChange={ ( content ) => setAttributes( { content } ) }
-							placeholder={ __( 'Write HTML…' ) }
-							aria-label={ __( 'HTML' ) }
-						/>
-					)
-				) }
-			</Disabled.Consumer>
-		</div>
-	) ),
+	edit: edit,
 
 	save( { attributes } ) {
 		return <RawHTML>{ attributes.content }</RawHTML>;
