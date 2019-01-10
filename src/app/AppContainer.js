@@ -51,7 +51,7 @@ class AppContainer extends React.Component<PropsType> {
 
 		this.props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
-		this.lastTitle = this.title;
+		this.lastTitle = this.props.title;
 
 		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
@@ -94,15 +94,12 @@ class AppContainer extends React.Component<PropsType> {
 		if ( this.props.showHtml ) {
 			this.parseBlocksAction( this.props.editedPostContent );
 		}
-		const html = serialize( this.props.blocks );
-		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.lastHtml !== html );
-		this.lastHtml = html;
-	};
 
-	titleToNativeAction = () => {
-		console.log("Title: " + this.props.title);
-		RNReactNativeGutenbergBridge.provideTitleToNative( this.props.title, this.props.title != this.lastTitle );
+		const html = serialize( this.props.blocks );
+		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.props.title, this.lastHtml !== html );
+
 		this.lastTitle = this.props.title;
+		this.lastHtml = html;
 	};
 
 	toggleHtmlModeAction = () => {
@@ -134,7 +131,6 @@ class AppContainer extends React.Component<PropsType> {
 				deleteBlockAction={ this.deleteBlockAction }
 				createBlockAction={ this.createBlockAction }
 				serializeToNativeAction={ this.serializeToNativeAction }
-				titleToNativeAction={ this.titleToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
 				setTitleAction={ this.setTitleAction }
 				updateHtmlAction={ this.updateHtmlAction }
