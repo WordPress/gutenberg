@@ -4,7 +4,7 @@ To modify the behavior of existing blocks, WordPress exposes several APIs:
 
 ### Block Style Variations
 
-Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected.
+Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected. See the [Getting Started with JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/) for a full example.
 
 _Example:_
 
@@ -24,10 +24,34 @@ To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
 _Example:_
 
 ```js
-wp.blocks.unregisterBlockStyle( 'core/quote', 'fancy-quote' );
+wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
 ```
 
-The above removes the variation named `fancy-quote` from the `core/quote` block.
+The above removes the variation named `large` from the `core/quote` block.
+
+**Important:** When unregistering a block style, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the style, or unregistering the style. You want your unregister code to run last. The way to do that is specify the component that is registering the style as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
+
+Enqueue your JavaScript with the following PHP code:
+
+```php
+function myguten_enqueue() {
+	wp_enqueue_script(
+		'myguten-script',
+		plugins_url( 'myguten.js', __FILE__ ),
+		array( 'wp-blocks', 'wp-dom-ready', 'wp-edit-post' ),
+		filemtime( plugin_dir_path( __FILE__ ) . '/myguten.js' )
+	);
+}
+add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
+```
+
+The JavaScript code in `myguten.js`:
+
+```js
+wp.domReady( function() {
+	wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
+} );
+```
 
 ### Filters
 
