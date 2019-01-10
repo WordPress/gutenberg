@@ -1,6 +1,7 @@
 /**
  * External Dependencies
  */
+import classnames from 'classnames';
 import { filter, pick, map, get } from 'lodash';
 
 /**
@@ -261,7 +262,16 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+				<ul
+					className={ classnames(
+						className,
+						{
+							[ `align${ align }` ]: align,
+							[ `columns-${ columns }` ]: columns,
+							'is-cropped': imageCrop,
+						}
+					) }
+				>
 					{ dropZone }
 					{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */

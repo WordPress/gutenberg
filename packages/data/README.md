@@ -416,3 +416,5 @@ Specific implementation differences from Redux and React Redux:
    - In `@wordpress/data`, a `withSelect` mapping function can return `undefined` if it has no props to inject.
 - In React Redux, the `mapDispatchToProps` argument can be defined as an object or a function.
    - In `@wordpress/data`, the `withDispatch` higher-order component creator must be passed a function.
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

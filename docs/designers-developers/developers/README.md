@@ -1,10 +1,10 @@
 # Developer Documentation
 
-Gutenberg is highly flexible, like most of WordPress. You can build custom blocks, modify the editor's appearance, add special plugins, and much more.
+The new editor is highly flexible, like most of WordPress. You can build custom blocks, modify the editor's appearance, add special plugins, and much more.
 
 ## Creating Blocks
 
-Gutenberg is about blocks, and the main extensibility API of Gutenberg is the Block API. It allows you to create your own static blocks, dynamic blocks rendered on the server and also blocks capable of saving data to Post Meta for more structured content.
+The editor is about blocks, and the main extensibility API is the Block API. It allows you to create your own static blocks, dynamic blocks rendered on the server and also blocks capable of saving data to Post Meta for more structured content.
 
 If you want to learn more about block creation, the [Blocks Tutorial](../../../docs/designers-developers/developers/tutorials/block-tutorial/readme.md) is the best place to start.
 
@@ -24,9 +24,9 @@ You can also filter certain aspects of the editor; this is documented on the [Ed
 
 ## Meta Boxes
 
-**Porting PHP meta boxes to blocks and Gutenberg plugins is highly encouraged!**
+**Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged!**
 
-Discover how [Meta Box](../../../docs/designers-developers/developers/backward-compatibility/meta-box.md) support works in Gutenberg.
+Discover how [Meta Box](../../../docs/designers-developers/developers/backward-compatibility/meta-box.md) support works in the new editor.
 
 ## Theme Support
 
