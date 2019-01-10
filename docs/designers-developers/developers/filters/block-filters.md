@@ -29,7 +29,7 @@ wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
 
 The above removes the variation named `large` from the `core/quote` block.
 
-**Important** When unregistering a block style, there can be a race condition on which code runs first: registering the style, or unregistering the style. You want your unregister code to run last. The way to do that is specify the component that is registering the style as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
+**Important:** When unregistering a block style, there can be a race condition on which code runs first: registering the style, or unregistering the style. You want your unregister code to run last. The way to do that is specify the component that is registering the style as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
 
 The PHP enqueue code is:
 
