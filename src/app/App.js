@@ -35,15 +35,15 @@ const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: Pro
 		initialData = initialHtml;
 	}
 
-	if (initialTitle === undefined) {
-		initialTitle = "Welcome to Gutenberg!";
+	if ( initialTitle === undefined ) {
+		initialTitle = 'Welcome to Gutenberg!';
 	}
 
 	return (
 		<AppContainer
-			initialHtml={ initialData } 
+			initialHtml={ initialData }
 			initialHtmlModeEnabled={ initialHtmlModeEnabled }
-			title={ initialTitle }/>
+			title={ initialTitle } />
 	);
 };
 

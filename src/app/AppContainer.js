@@ -55,7 +55,7 @@ class AppContainer extends React.Component<PropsType, StateType> {
 
 		this.state = {
 			title: props.title,
-		}
+		};
 
 		props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
@@ -104,7 +104,7 @@ class AppContainer extends React.Component<PropsType, StateType> {
 		}
 
 		const html = serialize( this.props.blocks );
-		const hasChanges = this.state.title != this.lastTitle || this.lastHtml !== html
+		const hasChanges = this.state.title !== this.lastTitle || this.lastHtml !== html;
 
 		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.state.title, hasChanges );
 
@@ -116,8 +116,8 @@ class AppContainer extends React.Component<PropsType, StateType> {
 		this.props.onToggleBlockMode( this.props.rootClientId );
 	};
 
-	setTitleAction = (title: string) => {
-		this.setState({ title: title })
+	setTitleAction = ( title: string ) => {
+		this.setState( { title: title } );
 	};
 
 	updateHtmlAction = ( html: string ) => {

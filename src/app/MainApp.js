@@ -51,9 +51,9 @@ export default class MainScreen extends React.Component<PropsType, StateType> {
 			this.props.toggleHtmlModeAction();
 		} );
 
-		this.subscriptionParentSetTitle = subscribeSetTitle( (payload) => {
+		this.subscriptionParentSetTitle = subscribeSetTitle( ( payload ) => {
 			this.props.setTitleAction( payload.title );
-		});
+		} );
 
 		this.subscriptionParentUpdateHtml = subscribeUpdateHtml( ( payload ) => {
 			this.props.updateHtmlAction( payload.html );

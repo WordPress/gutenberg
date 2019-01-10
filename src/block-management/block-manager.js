@@ -6,7 +6,7 @@
 import React from 'react';
 import { isEqual } from 'lodash';
 
-import { Text, TextInput, View, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
+import { Text, View, Keyboard, LayoutChangeEvent, SafeAreaView } from 'react-native';
 import BlockHolder from './block-holder';
 import { InlineToolbarActions } from './inline-toolbar';
 import type { BlockType } from '../store/types';
@@ -23,8 +23,7 @@ import KeyboardAwareFlatList from '../components/keyboard-aware-flat-list';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { DefaultBlockAppender } from '@wordpress/editor';
-import { PostTitle } from '@wordpress/editor';
+import { DefaultBlockAppender, PostTitle } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 import EventEmitter from 'events';
@@ -244,9 +243,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					style={ styles.title }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
-					placeholder={ "Pick a title..." }/>
+					placeholder={ 'Pick a title...' } />
 				<View
-					style={ styles.titleSeparator }/>
+					style={ styles.titleSeparator } />
 			</View>
 		);
 	}
