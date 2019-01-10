@@ -4,7 +4,7 @@
 
 Attribute sources are used to define the strategy by which block attribute values are extracted from saved post content. They provide a mechanism to map from the saved markup to a JavaScript representation of a block.
 
-If no attribute source is specified, the attribute will be saved to (and read from) the block's [comment delimiter](../language.md).
+If no attribute source is specified, the attribute will be saved to (and read from) the block's [comment delimiter](../../../../docs/designers-developers/key-concepts.md#delimiters-and-parsing-expression-grammar).
 
 Each source accepts an optional selector as the first argument. If a selector is specified, the source behavior will be run against the corresponding element(s) contained within the block. Otherwise it will be run against the block's root node.
 

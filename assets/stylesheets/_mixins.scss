@@ -252,7 +252,7 @@
 		}
 	}
 
-	.auto-fold #{$selector} { /* Auto fold is when on smaller breakpoints, nav menu auto colllapses. */
+	.auto-fold #{$selector} { /* Auto fold is when on smaller breakpoints, nav menu auto collapses. */
 		@include break-medium() {
 			left: $admin-sidebar-width-collapsed;
 		}

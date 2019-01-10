@@ -158,7 +158,6 @@ export default {
 		const state = store.getState();
 		const [ firstBlockClientId, secondBlockClientId ] = action.blocks;
 		const blockA = getBlock( state, firstBlockClientId );
-		const blockB = getBlock( state, secondBlockClientId );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
@@ -169,6 +168,7 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
+		const blockB = getBlock( state, secondBlockClientId );
 		const blocksWithTheSameType = blockA.name === blockB.name ?
 			[ blockB ] :
 			switchToBlockType( blockB, blockA.name );

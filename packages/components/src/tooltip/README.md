@@ -36,7 +36,7 @@ The direction in which the tooltip should open relative to its parent node. Spec
 
 The element to which the tooltip should anchor.
 
-__NOTE:__ You must pass only a single child. Tooltip renders itself as a clone of `children` with a [`Popover`](../popover) added as an additional child.
+__NOTE:__ You must pass only a single child. Tooltip renders itself as a clone of `children` with a [`Popover`](/packages/components/src/popover/README.md) added as an additional child.
 
 - Type: `Element`
 - Required: Yes

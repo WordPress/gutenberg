@@ -1,3 +1,13 @@
+## 3.2.0 (Next)
+
+### Polish
+
+* Expose the `className` property to style the `PluginSidebar` component.
+
+## 3.1.7 (2019-01-03)
+
+## 3.1.6 (2018-12-18)
+
 ## 3.1.5 (2018-12-12)
 
 ### Bug Fixes

@@ -154,15 +154,6 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/funnyordie',
-		settings: {
-			title: 'Funny or Die',
-			icon: embedVideoIcon,
-			description: __( 'Embed Funny or Die content.' ),
-		},
-		patterns: [ /^https?:\/\/(www\.)?funnyordie\.com\/.+/i ],
-	},
-	{
 		name: 'core-embed/hulu',
 		settings: {
 			title: 'Hulu',
@@ -216,15 +207,6 @@ export const others = [
 			description: __( 'Embed Mixcloud content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
-	},
-	{
-		name: 'core-embed/photobucket',
-		settings: {
-			title: 'Photobucket',
-			icon: embedPhotoIcon,
-			description: __( 'Embed a Photobucket image.' ),
-		},
-		patterns: [ /^http:\/\/g?i*\.photobucket\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/polldaddy',

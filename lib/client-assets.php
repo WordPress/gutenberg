@@ -501,24 +501,6 @@ function gutenberg_register_scripts_and_styles() {
 			$live_reload_url
 		);
 	}
-
-	// Temporary backward compatibility for `wp-polyfill-ecmascript`, which has
-	// since been absorbed into `wp-polyfill`.
-	//
-	// [TODO][REMOVEME] To be removed in Gutenberg v4.5.
-	gutenberg_override_script(
-		'wp-polyfill-ecmascript',
-		null,
-		array(
-			'wp-polyfill',
-			'wp-deprecated',
-		)
-	);
-	wp_script_add_data(
-		'wp-polyfill-ecmascript',
-		'data',
-		'wp.deprecated( "wp-polyfill-ecmascript script handle", { plugin: "Gutenberg", version: "4.5" } );'
-	);
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -1044,11 +1026,32 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
 
-	// Transform a "heartbeat-tick" jQuery event into "heartbeat.tick" hook action.
-	// This removes the need of using jQuery for listening to the event.
+	// Transforms heartbeat jQuery events into equivalent hook actions. This
+	// avoids a dependency on jQuery for listening to the event.
+	$heartbeat_hooks = <<<JS
+( function() {
+	jQuery( document ).on( [
+		'heartbeat-send',
+		'heartbeat-tick',
+		'heartbeat-error',
+		'heartbeat-connection-lost',
+		'heartbeat-connection-restored',
+		'heartbeat-nonces-expired',
+	].join( ' ' ), function( event ) {
+		var actionName = event.type.replace( /-/g, '.' ),
+			args;
+
+		// Omit the event argument in applying arguments to the hook callback.
+		// The remaining arguments are passed to the hook.
+		args = Array.prototype.slice.call( arguments, 1 );
+
+		wp.hooks.doAction.apply( null, [ actionName ].concat( args ) );
+	} );
+} )();
+JS;
 	wp_add_inline_script(
 		'heartbeat',
-		'jQuery( document ).on( "heartbeat-tick", function ( event, response ) { wp.hooks.doAction( "heartbeat.tick", response ) } );',
+		$heartbeat_hooks,
 		'after'
 	);
 

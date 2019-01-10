@@ -14,6 +14,7 @@ export {
 } from './serializer';
 export {
 	registerBlockType,
+	unregisterBlockType,
 	getFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	getUnregisteredTypeHandlerName,
