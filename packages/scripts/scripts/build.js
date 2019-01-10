@@ -17,24 +17,21 @@ const args = getCliArgs();
 
 const hasWebpackConfig = hasCliArg( '--config' ) ||
 	hasProjectFile( 'webpack.config.js' ) ||
-	hasProjectFile( 'webpackfile.js' );
+	hasProjectFile( 'webpack.config.babel.js' );
 
-let result;
 if ( hasWebpackConfig ) {
 	// Sets environment to production.
 	process.env.NODE_ENV = 'production';
 
-	result = spawn(
+	const { status } = spawn(
 		resolveBin( 'webpack' ),
 		[ ...args ],
 		{ stdio: 'inherit' }
 	);
+	process.exit( status );
 } else {
-	result = spawn(
-		resolveBin( 'parcel' ),
-		[ 'build', ...args ],
-		{ stdio: 'inherit' }
-	);
+	// eslint-disable-next-line no-console
+	console.log( 'Webpack config file is missing.' );
+	process.exit( 1 );
 }
 
-process.exit( result.status );
