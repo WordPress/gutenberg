@@ -142,7 +142,7 @@
 	}
 
 	// Makes the month appear before the day if time format uses AM/PM
-	// We are assuming MM-DD-YYY corelates with AM/PM
+	// We are assuming MM-DD-YYY correlates with AM/PM
 	&.is-12-hour {
 		.components-datetime__time-field-day input {
 			margin: 0 -4px 0 0 !important;
