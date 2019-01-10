@@ -76,7 +76,7 @@ class PostTitle extends Component {
 			style,
 			title,
 		} = this.props;
-		
+
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
