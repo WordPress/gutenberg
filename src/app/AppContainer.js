@@ -34,7 +34,11 @@ type PropsType = {
 	clientId: string,
 };
 
-class AppContainer extends React.Component<PropsType> {
+type StateType = {
+	title: string,
+};
+
+class AppContainer extends React.Component<PropsType, StateType> {
 	lastHtml: ?string;
 	lastTitle: ?string;
 
@@ -49,9 +53,13 @@ class AppContainer extends React.Component<PropsType> {
 			type: 'draft',
 		};
 
-		this.props.setupEditor( post );
+		this.state = {
+			title: props.title,
+		}
+
+		props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
-		this.lastTitle = this.props.title;
+		this.lastTitle = props.title;
 
 		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
@@ -96,11 +104,11 @@ class AppContainer extends React.Component<PropsType> {
 		}
 
 		const html = serialize( this.props.blocks );
-		const hasChanges = this.props.title != this.lastTitle || this.lastHtml !== html
+		const hasChanges = this.state.title != this.lastTitle || this.lastHtml !== html
 
-		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.props.title, hasChanges );
+		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.state.title, hasChanges );
 
-		this.lastTitle = this.props.title;
+		this.lastTitle = this.state.title;
 		this.lastHtml = html;
 	};
 
@@ -109,7 +117,7 @@ class AppContainer extends React.Component<PropsType> {
 	};
 
 	setTitleAction = (title: string) => {
-		this.props.title = title;
+		this.setState({ title: title })
 	};
 
 	updateHtmlAction = ( html: string ) => {
@@ -138,7 +146,7 @@ class AppContainer extends React.Component<PropsType> {
 				updateHtmlAction={ this.updateHtmlAction }
 				mergeBlocksAction={ this.mergeBlocksAction }
 				isBlockSelected={ this.props.isBlockSelected }
-				title={ this.props.title }
+				title={ this.state.title }
 			/>
 		);
 	}

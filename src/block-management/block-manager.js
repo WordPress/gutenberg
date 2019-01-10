@@ -45,11 +45,13 @@ export type BlockListType = {
 	selectedBlockClientId: string,
 	serializeToNativeAction: void => void,
 	toggleHtmlModeAction: void => void,
+	setTitleAction: string => void,
 	updateHtmlAction: string => void,
 	mergeBlocksAction: ( string, string ) => mixed,
 	blocks: Array<BlockType>,
 	isBlockSelected: string => boolean,
 	showHtml: boolean,
+	title: string,
 };
 
 type PropsType = BlockListType;
@@ -60,7 +62,6 @@ type StateType = {
 	refresh: boolean,
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;
-	title: string;
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
@@ -73,7 +74,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).renderItem = this.renderItem.bind( this );
 		( this: any ).shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
 		( this: any ).keyExtractor = this.keyExtractor.bind( this );
-		( this: any ).onChangeTitle = this.onChangeTitle.bind( this );
 		( this: any ).renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		( this: any ).renderHeader = this.renderHeader.bind( this );
 
@@ -90,7 +90,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			refresh: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
-			title: props.title,
 		};
 	}
 
@@ -232,10 +231,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return item.clientId;
 	}
 
-	onChangeTitle( title: string ) {
-		this.setState( { title: title } );
-	}
-
 	renderDefaultBlockAppender() {
 		return (
 			<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
@@ -247,8 +242,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			<View>
 				<PostTitle
 					style={ styles.title }
-					title={ this.state.title }
-					onUpdate={ this.onChangeTitle }
+					title={ this.props.title }
+					onUpdate={ this.props.setTitleAction }
 					placeholder={ "Pick a title..." }/>
 				<View
 					style={ {
