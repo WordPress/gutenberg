@@ -347,8 +347,6 @@ export class InserterMenu extends Component {
 export default compose(
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getEditedPostAttribute,
-			getSelectedBlock,
 			getInserterItems,
 			getBlockName,
 		} = select( 'core/editor' );
@@ -359,14 +357,12 @@ export default compose(
 		const rootBlockName = getBlockName( rootClientId );
 
 		return {
-			selectedBlock: getSelectedBlock(),
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
-			title: getEditedPostAttribute( 'title' ),
 			items: getInserterItems( rootClientId ),
 			rootClientId,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 			showInsertionPoint,
@@ -382,9 +378,11 @@ export default compose(
 					replaceBlocks,
 					insertBlock,
 				} = dispatch( 'core/editor' );
-				const { selectedBlock, index, rootClientId } = ownProps;
+				const { getSelectedBlock } = select( 'core/editor' );
+				const { index, rootClientId } = ownProps;
 				const { name, initialAttributes } = item;
 
+				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
 				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );

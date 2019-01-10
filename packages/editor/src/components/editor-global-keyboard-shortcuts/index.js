@@ -152,7 +152,6 @@ export default compose( [
 			getBlockOrder,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
-			isEditedPostDirty,
 			getBlockRootClientId,
 			getTemplateLock,
 			getSelectedBlockClientId,
@@ -167,11 +166,10 @@ export default compose( [
 				selectedBlockClientIds,
 				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
 			),
-			isDirty: isEditedPostDirty(),
 			selectedBlockClientIds,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			clearSelectedBlock,
 			multiSelect,
@@ -186,10 +184,11 @@ export default compose( [
 				// TODO: This should be handled in the `savePost` effect in
 				// considering `isSaveable`. See note on `isEditedPostSaveable`
 				// selector about dirtiness and meta-boxes. When removing, also
-				// remember to remove `isDirty` prop passing from `withSelect`.
+				// remember to remove `isEditedPostDirty` selector's usage.
 				//
 				// See: `isEditedPostSaveable`
-				if ( ! ownProps.isDirty ) {
+				const { isEditedPostDirty } = select( 'core/editor' );
+				if ( ! isEditedPostDirty() ) {
 					return;
 				}
 
