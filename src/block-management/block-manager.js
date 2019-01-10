@@ -3,6 +3,11 @@
  * @flow
  */
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 import React from 'react';
 import { isEqual } from 'lodash';
 
@@ -18,6 +23,7 @@ import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 import KeyboardAwareFlatList from '../components/keyboard-aware-flat-list';
+import SafeArea from 'react-native-safe-area';
 
 // Gutenberg imports
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -30,6 +36,7 @@ import EventEmitter from 'events';
 
 const keyboardDidShow = 'keyboardDidShow';
 const keyboardDidHide = 'keyboardDidHide';
+const safeAreaInsetsForRootViewDidChange = 'safeAreaInsetsForRootViewDidChange';
 
 export type BlockListType = {
 	rootClientId: ?string,
@@ -61,6 +68,7 @@ type StateType = {
 	refresh: boolean,
 	isKeyboardVisible: boolean,
 	rootViewHeight: number;
+	safeAreaBottomInset: number;
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
@@ -75,6 +83,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).keyExtractor = this.keyExtractor.bind( this );
 		( this: any ).renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
 		( this: any ).renderHeader = this.renderHeader.bind( this );
+		( this: any ).onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 
 		const blocks = props.blocks.map( ( block ) => {
 			const newBlock = { ...block };
@@ -89,7 +98,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			refresh: false,
 			isKeyboardVisible: false,
 			rootViewHeight: 0,
+			safeAreaBottomInset: 0,
 		};
+		SafeArea.getSafeAreaInsetsForRootView().then( this.onSafeAreaInsetsUpdate );
 	}
 
 	// TODO: in the near future this will likely be changed to onShowBlockTypePicker and bound to this.props
@@ -138,6 +149,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return null;
 	}
 
+	onSafeAreaInsetsUpdate = ( result: Object ) => {
+		const { safeAreaInsets } = result;
+		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
+			this.setState( { ...this.state, safeAreaBottomInset: safeAreaInsets.bottom } );
+		}
+	}
+
 	onInlineToolbarButtonPressed = ( button: number, clientId: string ) => {
 		switch ( button ) {
 			case InlineToolbarActions.UP:
@@ -162,11 +180,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	componentDidMount() {
 		this.keyboardDidShowListener = Keyboard.addListener( keyboardDidShow, this.keyboardDidShow );
 		this.keyboardDidHideListener = Keyboard.addListener( keyboardDidHide, this.keyboardDidHide );
+		SafeArea.addEventListener( safeAreaInsetsForRootViewDidChange, this.onSafeAreaInsetsUpdate );
 	}
 
 	componentWillUnmount() {
 		Keyboard.removeListener( keyboardDidShow, this.keyboardDidShow );
 		Keyboard.removeListener( keyboardDidHide, this.keyboardDidHide );
+		SafeArea.removeEventListener( safeAreaInsetsForRootViewDidChange, this.onSafeAreaInsetsUpdate );
 	}
 
 	keyboardDidShow = () => {
@@ -257,7 +277,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			<KeyboardAwareFlatList
 				blockToolbarHeight={ toolbarStyles.container.height }
 				innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
-				parentHeight={ this.state.rootViewHeight }
+				safeAreaBottomInset={ this.state.safeAreaBottomInset }
 				keyboardShouldPersistTaps="always"
 				style={ styles.list }
 				data={ this.state.blocks }
@@ -302,7 +322,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 				onValueSelected={ ( itemValue ) => {
 					this.onBlockTypeSelected( itemValue );
 				} }
-				isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
 			/>
 		);
 
@@ -331,10 +350,11 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderItem( value: { item: BlockType, index: number } ) {
-		const insertHere = (
+		const titleForAddPlaceIndicator = __( 'ADD BLOCK HERE' );
+		const addBlockHere = (
 			<View style={ styles.containerStyleAddHere } >
 				<View style={ styles.lineStyleAddHere }></View>
-				<Text style={ styles.labelStyleAddHere } >ADD BLOCK HERE</Text>
+				<Text style={ styles.labelStyleAddHere } > { titleForAddPlaceIndicator } </Text>
 				<View style={ styles.lineStyleAddHere }></View>
 			</View>
 		);
@@ -357,7 +377,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					onReplace={ ( block ) => this.onReplace( value.item.clientId, block ) }
 					{ ...value.item }
 				/>
-				{ this.state.blockTypePickerVisible && value.item.focused && insertHere }
+				{ this.state.blockTypePickerVisible && value.item.focused && ( ! this.isReplaceable( value.item ) ) && addBlockHere }
 			</View>
 		);
 	}
