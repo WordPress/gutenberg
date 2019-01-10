@@ -2,27 +2,14 @@
  * External dependencies
  */
 import { TextInput } from 'react-native';
-import { get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { KeyboardShortcuts } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
-/**
- * Internal dependencies
- */
-import PostTypeSupportCheck from '../post-type-support-check';
-
-/**
- * Constants
- */
-const REGEXP_NEWLINES = /[\r\n]+/g;
 
 class PostTitle extends Component {
 	constructor() {
@@ -85,17 +72,11 @@ class PostTitle extends Component {
 
 	render() {
 		const {
-			hasFixedToolbar,
-			isCleanNewPost,
-			isFocusMode,
-			isPostTypeViewable,
-			instanceId,
 			placeholder,
 			style,
 			title,
 		} = this.props;
 		
-		const { isSelected } = this.state;
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
