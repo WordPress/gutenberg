@@ -98,7 +98,7 @@ class AppContainer extends React.Component<PropsType> {
 		const html = serialize( this.props.blocks );
 		const hasChanges = this.props.title != this.lastTitle || this.lastHtml !== html
 
-		RNReactNativeGutenbergBridge.provideToNative_Html( html, hasChanges );
+		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.props.title, hasChanges );
 
 		this.lastTitle = this.props.title;
 		this.lastHtml = html;
