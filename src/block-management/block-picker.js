@@ -18,7 +18,6 @@ import { getBlockTypes } from '@wordpress/blocks';
 
 type PropsType = {
 	style?: StyleSheet,
-	isReplacement: boolean,
 	onValueSelected: ( itemValue: string, itemIndex: number ) => void,
 	onDismiss: () => void,
 };
@@ -40,7 +39,6 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 
 	render() {
 		const titleForAdd = __( 'ADD BLOCK' );
-		const titleForReplace = __( 'REPLACE BLOCK' );
 		return (
 			<Modal
 				transparent={ true }
@@ -56,7 +54,7 @@ export default class BlockPicker extends Component<PropsType, StateType> {
 					<View style={ styles.shortLineStyle } />
 					<View>
 						<Text style={ styles.title }>
-							{ this.props.isReplacement ? titleForReplace : titleForAdd }
+							{ titleForAdd }
 						</Text>
 					</View>
 					<View style={ styles.lineStyle } />
