@@ -1,6 +1,6 @@
 # Create Meta Block
 
-With the meta field registered in the previous step, next you will create a new block used to display the field to the user. See the [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) for a deeper understanding of creating custom blocks.
+With the meta field registered in the previous step, next you will create a new block used to display the field value to the user. See the [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) for a deeper understanding of creating custom blocks.
 
 For this block, you will use the TextControl component, this is similar to an HTML input text field. For additional components, check out the [components](https://github.com/WordPress/gutenberg/tree/master/packages/components/src) and the [editor](https://github.com/WordPress/gutenberg/tree/master/packages/editor/src/components) packages repositories.
 
