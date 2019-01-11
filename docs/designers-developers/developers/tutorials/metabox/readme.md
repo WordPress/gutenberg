@@ -12,9 +12,7 @@ The first method is to use Blocks to store extra data with a post. The data is s
 
 * [Store Post Meta with a Block](/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md)
 
-
 ## Sidebar Plugin
-
 
 If you are interested in working with the post meta outside the editor, check out the [Sidebar Tutorial](/docs/designers-developers/developers/tutorials/plugin-sidebar-0/).
 
