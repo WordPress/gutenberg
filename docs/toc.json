@@ -45,6 +45,13 @@
 					{"docs/designers-developers/developers/tutorials/javascript/versions-and-building.md": []},
 					{"docs/designers-developers/developers/tutorials/javascript/scope-your-code.md": []}
 				]},
+				{"docs/designers-developers/developers/tutorials/metabox/readme.md": [
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-2-register-meta.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md": []}
+				]},
 				{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md": [
 					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md": []},
 					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md": []},
