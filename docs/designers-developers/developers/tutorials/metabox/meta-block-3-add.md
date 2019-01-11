@@ -55,7 +55,7 @@ registerBlockType("myguten/meta-block", {
 });
 ```
 
-**Important:** Before you test, you need to enqueue your JavaScript file and its dependencies. Note the WordPress packages used above are: wp.element, wp.blocks, and wp.components. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file adding the enqueue function:
+**Important:** Before you test, you need to enqueue your JavaScript file and its dependencies. Note the WordPress packages used above are `wp.element`, `wp.blocks`, and `wp.components`. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file adding the enqueue function:
 
 ```php
 function myguten_enqueue() {
