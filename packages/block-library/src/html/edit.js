@@ -5,56 +5,49 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { BlockControls, PlainText, transformStyles } from '@wordpress/editor';
 import { Disabled, SandBox } from '@wordpress/components';
-import { select } from '@wordpress/data';
-
-/**
- * Parse editor styles.
- *
- * @return {Array} css rule set array.
- */
-const getEditorStyles = () => {
-	const { getEditorSettings } = select( 'core/editor' );
-	const styles = getEditorSettings().styles;
-	if ( styles && styles.length > 0 ) {
-		return transformStyles( styles );
-	}
-
-	return [];
-};
+import { withSelect } from '@wordpress/data';
 
 class HTMLEdit extends Component {
 	constructor() {
 		super( ...arguments );
-
 		this.state = {
-			styles: [],
 			isPreview: false,
+			styles: [],
 		};
+		this.switchToHTML = this.switchToHTML.bind( this );
+		this.switchToPreview = this.switchToPreview.bind( this );
 	}
 
 	componentDidMount() {
-		if ( ! HTMLEdit.styles ) {
-			HTMLEdit.styles = getEditorStyles();
-		}
+		const { styles } = this.props;
+		this.setState( { styles: transformStyles( styles ) } );
+	}
+
+	switchToPreview() {
+		this.setState( { isPreview: true } );
+	}
+
+	switchToHTML() {
+		this.setState( { isPreview: false } );
 	}
 
 	render() {
 		const { attributes, setAttributes } = this.props;
-		const { isPreview } = this.state;
-		const styles = HTMLEdit.styles;
+		const { isPreview, styles } = this.state;
+
 		return (
 			<div className="wp-block-html">
 				<BlockControls>
 					<div className="components-toolbar">
 						<button
 							className={ `components-tab-button ${ ! isPreview ? 'is-active' : '' }` }
-							onClick={ () => this.setState( { isPreview: false } ) }
+							onClick={ this.switchToHTML }
 						>
 							<span>HTML</span>
 						</button>
 						<button
 							className={ `components-tab-button ${ isPreview ? 'is-active' : '' }` }
-							onClick={ () => this.setState( { isPreview: true } ) }
+							onClick={ this.switchToPreview }
 						>
 							<span>{ __( 'Preview' ) }</span>
 						</button>
@@ -78,4 +71,9 @@ class HTMLEdit extends Component {
 		);
 	}
 }
-export default HTMLEdit;
+export default withSelect( ( select ) => {
+	const { getEditorSettings } = select( 'core/editor' );
+	return {
+		styles: getEditorSettings().styles,
+	};
+} )( HTMLEdit );

@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { transformStyles } from '../../editor-styles';
+import transformStyles from '../../editor-styles';
 
 class EditorProvider extends Component {
 	constructor( props ) {
