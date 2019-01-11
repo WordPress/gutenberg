@@ -15,7 +15,6 @@ import {
 	isEqual,
 	isEmpty,
 	overSome,
-	get,
 } from 'lodash';
 
 /**
@@ -887,9 +886,11 @@ export function blockSelection( state = {
 				return state;
 			}
 
-			// If there is replacement block(s), assign first's client ID as
-			// the next selected block. If empty replacement, reset to null.
-			const nextSelectedBlockClientId = get( action.blocks, [ 0, 'clientId' ], null );
+			// If there are replacement blocks, assign last block as the next
+			// selected block, otherwise set to null.
+			const lastBlock = last( action.blocks );
+			const nextSelectedBlockClientId = lastBlock ? lastBlock.clientId : null;
+
 			if ( nextSelectedBlockClientId === state.start && nextSelectedBlockClientId === state.end ) {
 				return state;
 			}
