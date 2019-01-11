@@ -2,7 +2,7 @@
 
 Prior to the block editor, custom meta boxes were used to extend the editor. With the new editor there are new ways to extend, giving more power to the developer and a better experience for the authors. Porting older custom meta boxes to one of these new methods is encouraged as to create a more unified and consistent experience for those using the editor.
 
-The new block editor does support most existing meta boxes, see [this backward compatibility article](../../../../../docs/designers-developers/developers/backward-compatibility/meta-box.md) for more support details .
+The new block editor does support most existing meta boxes, see [this backward compatibility article](/docs/designers-developers/developers/backward-compatibility/meta-box.md) for more support details .
 
 Here are two mini-tutorials for creating similar functionality to meta boxes in the Block Editor.
 
