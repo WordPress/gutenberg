@@ -1,6 +1,6 @@
 # Register Meta Field
 
-A post meta field is a WordPress object used to store extra data about a post. You need to first register a new meta field prior to use.
+A post meta field is a WordPress object used to store extra data about a post. You need to first register a new meta field prior to use. See Managing [Post Metadata](https://developer.wordpress.org/plugins/metadata/managing-post-metadata/) to learn more about post meta.
 
 When registering the field, note the `show_in_rest` parameter. This ensures the data will be included in the REST API, which the Block Editor uses to load and save meta data. See the [`register_meta`](https://developer.wordpress.org/reference/functions/register_meta/) function definition for extra information.
 
