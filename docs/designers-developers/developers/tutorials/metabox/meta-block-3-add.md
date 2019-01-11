@@ -1,6 +1,6 @@
 # Create Meta Block
 
-With the meta field registered in the previous step, next you will create a new block used to display the field to the user. See the [Block Tutorial](../../../../../docs/designers-developers/developers/tutorials/block-tutorial/readme.md) for a deeper understanding of creating custom blocks.
+With the meta field registered in the previous step, next you will create a new block used to display the field to the user. See the [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) for a deeper understanding of creating custom blocks.
 
 For this block, you will use the TextControl component, this is similar to an HTML input text field. For additional components, see the list in the [editor package repository](https://github.com/WordPress/gutenberg/tree/master/packages/editor/src/components).
 
@@ -70,9 +70,9 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 
 You can now edit a draft post and add a Meta Block to the post. You will see your field that you can type a value in. When you save the post, either as a draft or published, the post meta value will be saved too. You can verify by saving and reloading your draft, the form will still be filled in on reload.
 
-![Meta Block](../../../../../docs/designers-developers/developers/tutorials/metabox/meta-block.png)
+![Meta Block](/docs/designers-developers/developers/tutorials/metabox/meta-block.png)
 
-You can now use the post meta data in a template, or another block. See next section for [using post meta data](../../../../../docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md)
+You can now use the post meta data in a template, or another block. See next section for [using post meta data](/docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md)
 
 You could also confirm the data is saved by checking the database table `wp_postmeta` and confirm the new post id contains the new field data.
 
