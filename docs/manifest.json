@@ -240,6 +240,42 @@
 		"parent": "javascript"
 	},
 	{
+		"title": "Meta Boxes",
+		"slug": "metabox",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Store Post Meta with a Block",
+		"slug": "meta-block-1-intro",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Register Meta Field",
+		"slug": "meta-block-2-register-meta",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-2-register-meta.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Create Meta Block",
+		"slug": "meta-block-3-add",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Use Post Meta Data",
+		"slug": "meta-block-4-use-data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Finishing Touches",
+		"slug": "meta-block-5-finishing",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md",
+		"parent": "metabox"
+	},
+	{
 		"title": "Creating a sidebar for your plugin",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
