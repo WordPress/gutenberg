@@ -1,6 +1,8 @@
 # Store Post Meta with a Block
 
-You can create a block whose sole purpose is to collect data to be used elsewhere. In this short tutorial you will create a meta block that prompts the user for a single value.
+Typically, blocks store their attribute values in the serialised block HTML. However, you can also create a block that saves its attribute values as post meta, which can be accessed programatically anywhere in your template.
+
+In this short tutorial you will create one of these blocks, which will prompt a user for a single value, and save it as post meta.
 
 For background around the thinking of blocks as the interface, please see the [Principles section](/docs/contributors/principles.md) of the handbook.
 
