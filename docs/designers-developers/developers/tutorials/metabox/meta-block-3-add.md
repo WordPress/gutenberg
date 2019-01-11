@@ -48,7 +48,7 @@ registerBlockType("myguten/meta-block", {
 	},
 
 	// No information saved to the block
-	// Data is saved to postmeta via attributes
+	// Data is saved to post meta via attributes
 	save: function() {
 		return null;
 	}
