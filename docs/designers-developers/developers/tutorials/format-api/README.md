@@ -8,5 +8,6 @@ If you are unfamiliar with how to work with WordPress plugins and JavaScript, yo
 
 ## Table of contents
 
-1. [Create a custom button](/docs/designers-developers/developers/tutorials/format-api/1-custom-button.md)
-2. [Add the `<samp>` tag to the selected text](/docs/designers-developers/developers/tutorials/format-api/2-add-html-tag.md)
+1. [Register a new format](/docs/designers-developers/developers/tutorials/format-api/1-register-format.md)
+2. [Add a button to the toolbar](/docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md)
+3. [Apply the format when the button is clicked](/docs/designers-developers/developers/tutorials/format-api/3-apply-format.md)
