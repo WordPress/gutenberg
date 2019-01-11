@@ -2,7 +2,7 @@
 
 With the meta field registered in the previous step, next you will create a new block used to display the field value to the user. See the [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) for a deeper understanding of creating custom blocks.
 
-For this block, you will use the TextControl component, this is similar to an HTML input text field. For additional components, check out the [components](https://github.com/WordPress/gutenberg/tree/master/packages/components/src) and the [editor](https://github.com/WordPress/gutenberg/tree/master/packages/editor/src/components) packages repositories.
+For this block, you will use the TextControl component, which is similar to an HTML input text field. For additional components, check out the [components](https://github.com/WordPress/gutenberg/tree/master/packages/components/src) and [editor](https://github.com/WordPress/gutenberg/tree/master/packages/editor/src/components) packages repositories.
 
 Attributes are the information displayed in blocks. As shown in the block tutorial, the source of attributes come from the text/html a user writes in the editor. For your meta block, the attribute will come from the post meta field.
 
