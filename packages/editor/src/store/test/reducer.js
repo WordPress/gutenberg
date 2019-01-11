@@ -1826,7 +1826,12 @@ describe( 'state', () => {
 					} ],
 			} );
 
-			expect( state ).toBe( original );
+			expect( state ).toEqual( {
+				start: 'wings',
+				end: 'wings',
+				initialPosition: null,
+				isMultiSelecting: false,
+			} );
 		} );
 
 		it( 'should reset if replacing with empty set', () => {
