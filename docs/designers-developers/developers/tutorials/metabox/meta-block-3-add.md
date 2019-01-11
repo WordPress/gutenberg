@@ -8,7 +8,7 @@ Attributes are the information displayed in blocks. As shown in the block tutori
 
 By specifying the source of the attributes as `meta`, the Block Editor automatically handles the loading and storing of the data; no REST API or data functions are needed.
 
-Add this code to your JavaScript file, this example will use `myguten.js`:
+Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
 ```js
 var el = wp.element.createElement;
