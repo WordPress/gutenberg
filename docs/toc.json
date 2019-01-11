@@ -61,8 +61,9 @@
 					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md": []}
 				]},
 				{"docs/designers-developers/developers/tutorials/format-api/README.md": [
-					{"docs/designers-developers/developers/tutorials/format-api/1-custom-button.md": []},
-					{"docs/designers-developers/developers/tutorials/format-api/2-add-html-tag.md": []}
+					{"docs/designers-developers/developers/tutorials/format-api/1-register-format.md": []},
+					{"docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": []},
+					{"docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": []}
 				]}
 			]}
 		]},
