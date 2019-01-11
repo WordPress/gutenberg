@@ -6,7 +6,7 @@ In this short tutorial you will create one of these blocks, which will prompt a 
 
 For background around the thinking of blocks as the interface, please see the [Principles section](/docs/contributors/principles.md) of the handbook.
 
-Let's get started. First up you need a plugin to hold your code. Please take a look at the first two steps of [the JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md) for information setting up a plugin.
+Before starting this tutorial, you will need a plugin to hold your code. Please take a look at the first two steps of [the JavaScript tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md) for information setting up a plugin.
 
 ## Table of Contents
 
