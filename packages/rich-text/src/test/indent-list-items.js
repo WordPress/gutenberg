@@ -11,7 +11,7 @@ import { indentListItems } from '../indent-list-items';
 import { getSparseArrayLength } from './helpers';
 import { LINE_SEPARATOR } from '../special-characters';
 
-describe( 'applyFormat', () => {
+describe( 'indentListItems', () => {
 	const ul = { type: 'ul' };
 	const ol = { type: 'ol' };
 
