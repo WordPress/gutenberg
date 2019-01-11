@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -84,7 +84,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			// `mergeProps` to rendered component if and only if updated.
 			const hasPropsChanged = (
 				hasRegistryChanged ||
-				! isShallowEqual( this.props.ownProps, nextProps.ownProps )
+				! isShallowEqualObjects( this.props.ownProps, nextProps.ownProps )
 			);
 
 			// Only render if props have changed or merge props have been updated
@@ -95,7 +95,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 
 			if ( hasPropsChanged ) {
 				const nextMergeProps = getNextMergeProps( nextProps );
-				if ( ! isShallowEqual( this.mergeProps, nextMergeProps ) ) {
+				if ( ! isShallowEqualObjects( this.mergeProps, nextMergeProps ) ) {
 					// If merge props change as a result of the incoming props,
 					// they should be reflected as such in the upcoming render.
 					// While side effects are discouraged in lifecycle methods,
@@ -120,7 +120,7 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 			}
 
 			const nextMergeProps = getNextMergeProps( this.props );
-			if ( isShallowEqual( this.mergeProps, nextMergeProps ) ) {
+			if ( isShallowEqualObjects( this.mergeProps, nextMergeProps ) ) {
 				return;
 			}
 
