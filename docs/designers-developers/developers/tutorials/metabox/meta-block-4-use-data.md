@@ -8,7 +8,7 @@ The first example uses the value from the post meta field and appends it to the 
 
 ```php
 function myguten_content_filter( $content ) {
-	$value = get_post_meta( get_the_ID(), 'myguten_field', true );
+	$value = get_post_meta( get_the_ID(), 'myguten_meta_block_field', true );
 	return sprintf( "%s <h4> %s </h4>", $content, esc_html( $value ) );
 }
 add_filter( 'the_content', 'myguten_content_filter' );
