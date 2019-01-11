@@ -26,7 +26,7 @@ In PHP, use the [register_block_type](https://developer.wordpress.org/reference/
 
 ```php
 function myguten_render_paragraph( $attributes, $content ) {
-	$value = get_post_meta( get_the_ID(), 'myguten_field', true );
+	$value = get_post_meta( get_the_ID(), 'myguten_meta_block_field', true );
 	// check value is set before outputting
 	if ( $value ) {
 		return sprintf( "%s (%s)", $content, esc_html( $value ) );
