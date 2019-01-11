@@ -23,7 +23,7 @@ function myguten_register_meta() {
 add_action( 'init', 'myguten_register_meta' );
 ```
 
-**NOTE:** If the meta key name starts with an underscore WordPress considers it a protected field, this requires setting an `auth_callback` function for checking permissions.  Here is an example:
+**Note:** If the meta key name starts with an underscore WordPress considers it a protected field. Editing this field requires passing a permission check, which is set as the `auth_callback` in the `register_meta` function. Here is an example:
 
 ```php
 register_meta( 'post', '_myguten_protected_key', array(
