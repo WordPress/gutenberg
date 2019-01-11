@@ -183,8 +183,7 @@ export default compose( [
 			onSave() {
 				// TODO: This should be handled in the `savePost` effect in
 				// considering `isSaveable`. See note on `isEditedPostSaveable`
-				// selector about dirtiness and meta-boxes. When removing, also
-				// remember to remove `isEditedPostDirty` selector's usage.
+				// selector about dirtiness and meta-boxes.
 				//
 				// See: `isEditedPostSaveable`
 				const { isEditedPostDirty } = select( 'core/editor' );
