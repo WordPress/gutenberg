@@ -3,6 +3,13 @@
  */
 import AxePuppeteer from 'axe-puppeteer';
 
+/**
+ * Formats the list of violations object returned by Axe analysis.
+ *
+ * @param {Object} violations The object with the errors found by Axe.
+ *
+ * @return {string} The user friendly message to display when the matcher fails.
+ */
 function formatViolations( violations ) {
 	return violations.map( ( { help, id, nodes } ) => {
 		let output = `Rule: ${ id } (${ help })\n` +
@@ -37,6 +44,21 @@ function formatViolations( violations ) {
 	} ).join( '\n' );
 }
 
+/**
+ * Defines async matcher to check whether a given Puppeteer's page instance is accessible.
+ * It is possible to pass optional Axe API options to perform customized check.
+ *
+ * @see https://github.com/dequelabs/axe-puppeteer
+ *
+ * @param {Page}    page             Puppeteer's page instance.
+ * @param {?Object} params           Optional Axe API options.
+ * @param {?string} params.include   CSS selector to add to the list of elements
+ *                                   to include in analysis.
+ * @param {?string} params.exclude   CSS selector to add to the list of elements
+ *                                   to exclude from analysis.
+ *
+ * @return {Object} A matcher object with two keys `pass` and `message`.
+ */
 async function toBeAccessible( page, { include, exclude } = {} ) {
 	const axe = new AxePuppeteer( page );
 
