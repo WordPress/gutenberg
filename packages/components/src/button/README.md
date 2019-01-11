@@ -4,6 +4,8 @@ Buttons express what action will occur when the user clicks or taps it. Buttons 
 
 The presence of a `href` prop determines whether an `anchor` element is rendered instead of a `button`.
 
+Note that this component may sometimes be confused with the Button block, which has semantically different use cases and functionality.
+
 ## Usage
 
 Renders a button with default style.
