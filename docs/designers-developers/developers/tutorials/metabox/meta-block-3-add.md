@@ -8,7 +8,7 @@ Attributes are the information displayed in blocks. As shown in the block tutori
 
 By specifying the source of the attributes as `meta`, the Block Editor automatically handles the loading and storing of the data; no REST API or data functions are needed.
 
-Replace the previous content in `myguten.js` with the following:
+Add this code to your JavaScript file, this example will use `myguten.js`:
 
 ```js
 var el = wp.element.createElement;
@@ -55,7 +55,7 @@ registerBlockType("myguten/meta-block", {
 });
 ```
 
-**Important:** Before you test, you need to update the dependencies in the enqueue. Note the wp packages used above are: wp.element, wp.blocks, and wp.components. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file so the enqueue function is:
+**Important:** Before you test, you need to update the dependencies in the enqueue. Note the wp packages used above are: wp.element, wp.blocks, and wp.components. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file adding the enqueue function:
 
 ```php
 function myguten_enqueue() {
