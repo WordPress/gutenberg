@@ -15,9 +15,9 @@ export default {
 	options( search ) {
 		let payload = '';
 		if ( search ) {
-			payload = '?search=' + encodeURIComponent( search );
+			payload = `?search=${ encodeURIComponent( search ) }`;
 		}
-		return apiFetch( { path: '/wp/v2/users' + payload } );
+		return apiFetch( { path: `/wp/v2/users${ payload }` } );
 	},
 	isDebounced: true,
 	getOptionKeywords( user ) {

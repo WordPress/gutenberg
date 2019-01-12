@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __, _n } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -33,7 +33,7 @@ export class PostAuthor extends Component {
 		this.searchCache = [];
 		this.requestResults = debounce( ( query, populateResults ) => {
 			const payload = '?search=' + encodeURIComponent( query );
-			apiFetch( { path: '/wp/v2/users' + payload } ).then( ( results ) => {
+			apiFetch( { path: `/wp/v2/users${ payload }` } ).then( ( results ) => {
 				populateResults( this.resolveResults( results ) );
 				this.searchCache[ query ] = results;
 			} );
@@ -83,7 +83,7 @@ export class PostAuthor extends Component {
 		if ( ! authorId ) {
 			return;
 		}
-		apiFetch( { path: '/wp/v2/users/' + encodeURIComponent( authorId ) } ).then( ( results ) => {
+		apiFetch( { path: `/wp/v2/users/${ encodeURIComponent( authorId ) }` } ).then( ( results ) => {
 			this.setState( { postAuthor: results } );
 		} );
 	}
