@@ -147,8 +147,8 @@ export class PostAuthor extends Component {
 					tStatusSelectedOption={ ( selectedOption, length ) => __( `${ selectedOption } (1 of ${ length }) is selected` ) }
 					tStatusResults={ ( length, contentSelectedOption ) => {
 						const words = {
-							result: ( length === 1 ) ? __( 'result' ) : __( 'results' ),
-							is: ( length === 1 ) ? __( 'is' ) : __( 'are' ),
+							result: _n( 'result', 'results', length ),
+							is: _n( 'is', 'are', length ),
 						};
 						return <span>{ length } { words.result } { words.is } available. { contentSelectedOption }</span>;
 					} }
