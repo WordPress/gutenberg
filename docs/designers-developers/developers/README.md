@@ -26,7 +26,7 @@ You can also filter certain aspects of the editor; this is documented on the [Ed
 
 **Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged!**
 
-Discover how [Meta Box](../../../docs/designers-developers/developers/backward-compatibility/meta-box.md) support works in the new editor.
+Discover how to work with [Meta Boxes](/docs/designers-developers/developers/tutorials/metabox/) in the new editor.
 
 ## Theme Support
 
