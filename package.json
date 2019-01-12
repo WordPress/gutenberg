@@ -69,7 +69,6 @@
 		"@wordpress/scripts": "file:packages/scripts",
 		"@wordpress/tests-e2e": "file:packages/tests-e2e",
 		"accessible-autocomplete": "1.6.2",
-		"autoprefixer": "8.2.0",
 		"babel-loader": "8.0.0",
 		"benchmark": "2.1.4",
 		"browserslist": "3.2.8",
