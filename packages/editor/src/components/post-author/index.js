@@ -140,7 +140,9 @@ export class PostAuthor extends Component {
 					source={ this.suggestAuthor }
 					showNoResultsFound={ false }
 					tStatusQueryTooShort={ ( minQueryLength ) =>
-						__( `Type in ${ minQueryLength } or more characters for results` ) }
+						// translators: %d: the number characters required to initiate an author search.
+						sprintf( __( 'Type in %d or more characters for results' ), minQueryLength )
+					}
 					tStatusNoResults={ () => __( 'No search results' ) }
 					tStatusSelectedOption={ ( selectedOption, length ) => __( `${ selectedOption } (1 of ${ length }) is selected` ) }
 					tStatusResults={ ( length, contentSelectedOption ) => {
