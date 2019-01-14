@@ -22,8 +22,8 @@ export default function castError( error ) {
  *
  * Error responses are exposed on the `response` property of the error instance.
  *
- * @param {mixed} errorResponse
- * @param {...mixed} args
+ * @param {*} errorResponse
+ * @param {...*} args
  * @return {Error} An instance of ReduxRoutineResponseError
  * @constructor
  */
