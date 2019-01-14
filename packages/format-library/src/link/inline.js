@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { sprintf, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component, createRef, useMemo } from '@wordpress/element';
 import {
-	ToggleControl,
 	withSpokenMessages,
 	Slot,
 } from '@wordpress/components';
@@ -25,6 +24,7 @@ import { URLPopover } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
+import OpenInNewTabToggle from './open-in-new-tab-toggle';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -74,7 +74,6 @@ class InlineLinkUI extends Component {
 		this.submitLink = this.submitLink.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
 		this.onChangeInputValue = this.onChangeInputValue.bind( this );
-		this.setLinkTarget = this.setLinkTarget.bind( this );
 		this.onClickOutside = this.onClickOutside.bind( this );
 		this.resetState = this.resetState.bind( this );
 		this.setLinkAttributes = this.setLinkAttributes.bind( this );
@@ -131,49 +130,6 @@ class InlineLinkUI extends Component {
 				url,
 			} ) ) );
 		} );
-	}
-
-	getLabel( opensInNewWindow ) {
-		const selectedText = getTextContent( slice( this.props.value ) );
-
-		if ( opensInNewWindow ) {
-			return sprintf( __( '%s (opens in a new tab)' ), selectedText );
-		}
-
-		return selectedText;
-	}
-
-	setLinkTarget( opensInNewWindow ) {
-		const { attributes = {} } = this.props;
-		const label = this.getLabel( opensInNewWindow );
-
-		if ( opensInNewWindow ) {
-			let rel = 'noopener noreferrer';
-
-			if ( attributes.rel ) {
-				rel = [ rel, attributes.rel ].join( ' ' );
-			}
-
-			this.setLinkAttributes( {
-				'aria-label': label,
-				target: '_blank',
-				rel,
-				...attributes,
-			} );
-		} else {
-			if ( typeof attributes.rel === 'string' ) {
-				attributes.rel = attributes.rel.split( ' ' ).filter( ( relItem ) => {
-					return relItem !== 'noopener' && relItem !== 'noreferrer';
-				} ).join( ' ' ).trim();
-			} else {
-				delete attributes.rel;
-			}
-
-			delete attributes.target;
-			attributes[ 'aria-label' ] = label;
-
-			this.setLinkAttributes( attributes );
-		}
 	}
 
 	editLink( event ) {
@@ -250,12 +206,6 @@ class InlineLinkUI extends Component {
 				className="editor-format-toolbar__link-settings-container"
 				renderSettings={ () => (
 					<div className="editor-format-toolbar__link-settings-container">
-						<ToggleControl
-							label={ __( 'Open in New Tab' ) }
-							checked={ this.state.attributes.target === '_blank' }
-							onChange={ this.setLinkTarget }
-
-						/>
 						<Slot
 							name="LinkSettings"
 							fillProps={ {
@@ -265,6 +215,7 @@ class InlineLinkUI extends Component {
 								setLinkAttributes: this.setLinkAttributes,
 							} }
 						/>
+						<OpenInNewTabToggle />
 					</div>
 				) }
 			>
