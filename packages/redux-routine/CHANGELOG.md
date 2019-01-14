@@ -1,3 +1,9 @@
+## 3.0.4
+
+### Bug Fixes
+
+- Fix unhandled promise rejection error caused by returning null from registered generator ([#13314](https://github.com/WordPress/gutenberg/pull/13314)
+
 ## 3.0.3 (2018-10-19)
 
 ## 3.0.2 (2018-10-18)
