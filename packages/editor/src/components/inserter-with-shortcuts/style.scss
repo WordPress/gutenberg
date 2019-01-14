@@ -19,8 +19,8 @@
 	padding-top: 8px;
 
 	// Use opacity to work in various editor styles.
-	color: $dark-opacity-light-700;
+	color: $dark-opacity-500;
 	.is-dark-theme & {
-		color: $light-opacity-light-700;
+		color: $light-opacity-500;
 	}
 }
