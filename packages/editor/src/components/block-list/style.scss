@@ -250,12 +250,12 @@
 	&.is-typing .editor-block-list__empty-block-inserter,
 	&.is-typing .editor-block-list__side-inserter {
 		opacity: 0;
+		animation: none;
 	}
 
 	.editor-block-list__empty-block-inserter,
 	.editor-block-list__side-inserter {
-		opacity: 1;
-		transition: opacity 0.2s;
+		@include edit-post__fade-in-animation;
 	}
 
 	// Reusable blocks
