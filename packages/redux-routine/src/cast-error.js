@@ -27,7 +27,7 @@ export default function castError( error ) {
  * @return {Error} An instance of ReduxRoutineResponseError
  * @constructor
  */
-function ReduxRoutineResponseError( errorResponse, ...args ) {
+export function ReduxRoutineResponseError( errorResponse, ...args ) {
 	const instance = new Error(
 		isString( errorResponse ) ? errorResponse : 'ReduxRoutineResponseError',
 		...args
