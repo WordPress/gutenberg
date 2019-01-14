@@ -38,6 +38,6 @@ Now, let's check that is working as intended: reload the post/page, make a text 
 
 The expected behavior is that the format will be toggled, meaning that the text selected will be wrapped by a `<samp>` tag if it isn't yet, or the tag will be removed if the selection is already wrapped with the tag. Notice that the button renders a different style depending on whether the selection has the tag or not as well - this is controlled by the `isActive` property of the `RichTextToolbarButton` component.
 
-Probably your browser has already displayed the selection differently once the tag was applied. You may want to use a special style for it, though. So far, you can only target the `samp` element in your CSS to do so. Another option that you could explore is to add a class to the format using the `className` option in [`registerFormatType`](/packages/rich-text/README.md#registerFormatType).
+Your browser may have already displayed the selection differently once the tag was applied, but you may want to use a special style of your own. So far, you can only target the `samp` element in your CSS to do so. Another option that you could explore is to add a class to the format using the `className` option in [`registerFormatType`](/packages/rich-text/README.md#registerFormatType).
 
 That's it. This is all that is necessary to make a custom format available in the new editor. From here, you may want to check out other [tutorials](/docs/designers-developers/developers/tutorials/) or apply your new knowledge to your next plugin!
