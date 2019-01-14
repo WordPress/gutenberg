@@ -11,48 +11,50 @@ By specifying the source of the attributes as `meta`, the Block Editor automatic
 Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
 ```js
-var el = wp.element.createElement;
-var registerBlockType = wp.blocks.registerBlockType;
-var TextField = wp.components.TextControl;
+( function( wp ) {
+	var el = wp.element.createElement;
+	var registerBlockType = wp.blocks.registerBlockType;
+	var TextField = wp.components.TextControl;
 
-registerBlockType("myguten/meta-block", {
-	title: "Meta Block",
-	icon: "smiley",
-	category: "common",
+	registerBlockType("myguten/meta-block", {
+		title: "Meta Block",
+		icon: "smiley",
+		category: "common",
 
-	attributes: {
-		blockValue: {
-			type: "string",
-			source: "meta",
-			meta: "myguten_meta_block_field"
+		attributes: {
+			blockValue: {
+				type: "string",
+				source: "meta",
+				meta: "myguten_meta_block_field"
+			}
+		},
+
+		edit: function(props) {
+			var className = props.className;
+			var setAttributes = props.setAttributes;
+
+			function updateBlockValue( blockValue ) {
+				setAttributes({ blockValue });
+			}
+
+		return el(
+				"div",
+				{ className: className },
+				el( TextField, {
+					label: "Meta Block Field",
+					value: props.attributes.blockValue,
+					onChange: updateBlockValue
+				} )
+			);
+		},
+
+		// No information saved to the block
+		// Data is saved to post meta via attributes
+		save: function() {
+			return null;
 		}
-	},
-
-	edit: function(props) {
-		var className = props.className;
-		var setAttributes = props.setAttributes;
-
-		function updateBlockValue( blockValue ) {
-			setAttributes({ blockValue });
-		}
-
-	return el(
-			"div",
-			{ className: className },
-			el( TextField, {
-				label: "Meta Block Field",
-				value: props.attributes.blockValue,
-				onChange: updateBlockValue
-			} )
-		);
-	},
-
-	// No information saved to the block
-	// Data is saved to post meta via attributes
-	save: function() {
-		return null;
-	}
-});
+	});
+})( window.wp );
 ```
 
 **Important:** Before you test, you need to enqueue your JavaScript file and its dependencies. Note the WordPress packages used above are `wp.element`, `wp.blocks`, and `wp.components`. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file adding the enqueue function:
