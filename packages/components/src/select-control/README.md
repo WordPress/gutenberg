@@ -2,12 +2,9 @@
 
 SelectControl allow users to select from a single-option menu. It functions as a wrapper around the browser's native `<select>` element.
 
-
 ![A “Link To” select with “none” selected.](https://wordpress.org/gutenberg/files/2018/12/select.png)
 
-
 ## Table of contents
-
 
 1. [Design guidelines](http://##design-guidelines)
 2. [Development guidelines](http://##development-guidelines)
@@ -28,16 +25,12 @@ Use a select control when:
 
 If you have a shorter list of options, or need all of the options visible to the user, consider using RadioControl instead.
 
-
 ![](https://wordpress.org/gutenberg/files/2018/12/select-do-multiple.png)
-
 
 **Do**
 Use selects when you have multiple options, and can only choose one.
 
-
 ![](https://wordpress.org/gutenberg/files/2018/12/select-dont-binary.png)
-
 
 **Don’t**
 Use selects for binary questions.
@@ -56,37 +49,28 @@ Once the menu is displayed onscreen, it remains open until the user chooses a me
 
 Label the SelectControl with a text label above it, or to its left, using sentence capitalization. Clicking the label allows the user to focus directly on the select.
 
-
 ![](https://wordpress.org/gutenberg/files/2018/12/select-do-position.png)
-
 
 **Do**
 Position the label above, or to the left of, the select.
 
-
 ![](https://wordpress.org/gutenberg/files/2018/12/select-dont-position.png)
-
 
 **Don’t**
 Position the label centered over the select, or right aligned against the side of the select.
 
 **Menu Items**
 
-
 - Menu items should be short — ideally, single words — and use sentence capitalization.
 - Do not use full sentences inside menu items.
 - Ensure that menu items are ordered in a way that is most useful to users. Alphabetical or recency ordering is preferred.
 
-
 ![](https://wordpress.org/gutenberg/files/2018/12/select-do-options.png)
-
 
 **Do**
 Use short menu items.
 
-
 ![](https://wordpress.org/gutenberg/files/2018/12/select-dont-options.png)
-
 
 **Don’t**
 Use sentences in your menu.
@@ -96,7 +80,6 @@ Use sentences in your menu.
 ### Usage
 
 Render a user interface to select the size of an image.
-
 
     import { SelectControl } from '@wordpress/components';
     import { withState } from '@wordpress/compose';
@@ -117,7 +100,6 @@ Render a user interface to select the size of an image.
     ) );
 
 Render a user interface to select multiple users from a list.
-
 
         <SelectControl
             multiple
