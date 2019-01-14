@@ -184,9 +184,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function ( content ) {
+            transform: function ( attributes ) {
                 return createBlock( 'core/heading', {
-                    content,
+                    content: attributes.content,
                 } );
             },
         },
@@ -284,9 +284,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function( content ) {
+            transform: function( attributes ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: attributes.content,
                 } );
             },
         },
@@ -321,12 +321,12 @@ transforms: {
         {
             type: 'block',
 			blocks: [ 'core/paragraph' ],
-			isMatch: function( attribute ) {
+			isMatch: function( attributes ) {
 				return attributes.isText;
 			},
-            transform: function( content ) {
+            transform: function( attributes ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: attributes.content,
                 } );
             },
         },
