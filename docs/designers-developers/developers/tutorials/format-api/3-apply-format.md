@@ -2,7 +2,7 @@
 
 So far, your custom button doesn't modify the text selected, it only renders a message in the console. Let's change that.
 
-The [rich-text package](/packages/rich-text/README.md) offers a few utilities to work with formats: [applyFormat](/packages/rich-text/README.md#applyFormat), [removeFormat](/packages/rich-text/README.md#removeFormat), and [toggleFormat](/packages/rich-text/README.md#toggleFormat). In this particular example, the format you want to apply (the `<samp>` tag) may be considered binary -either a text selection has the tag or hasn't. Taking that into account, the `toggleFormat` primitive seems more convenient.
+The [rich-text package](/packages/rich-text/README.md) offers a few utilities to work with formats: [applyFormat](/packages/rich-text/README.md#applyFormat), [removeFormat](/packages/rich-text/README.md#removeFormat), and [toggleFormat](/packages/rich-text/README.md#toggleFormat). In this particular example, the format you want to apply (the `<samp>` tag) may be considered binary - either a text selection has the tag or not. Taking that into account, the `toggleFormat` primitive seems more convenient.
 
 Update `my-custom-format.js` with this new code:
 
