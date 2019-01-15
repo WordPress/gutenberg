@@ -678,6 +678,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/jest-puppeteer-axe",
+		"slug": "packages-jest-puppeteer-axe",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/jest-puppeteer-axe/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/keycodes",
 		"slug": "packages-keycodes",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/keycodes/README.md",
