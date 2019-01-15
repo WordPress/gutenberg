@@ -108,6 +108,12 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/feature-flags.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
