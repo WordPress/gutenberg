@@ -14,7 +14,7 @@ SelectControl allow users to select from a single-option menu. It functions as a
 
 ### Usage
 
-**When to use** **a select control**
+#### When to use **a select control**
 
 Use a select control when: 
 
@@ -39,13 +39,13 @@ Use selects for binary questions.
 
 A SelectControl includes a double-arrow indicator. The menu appears layered over the select.
 
-**Opening and Closing**
+#### Opening and Closing
 
 Once the menu is displayed onscreen, it remains open until the user chooses a menu item, clicks outside of the menu, or switches to another browser tab.
 
 ### Content Guidelines
 
-**Labels**
+#### Labels
 
 Label the SelectControl with a text label above it, or to its left, using sentence capitalization. Clicking the label allows the user to focus directly on the select.
 
