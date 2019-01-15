@@ -40,12 +40,12 @@ describe( 'Block with a meta attribute', () => {
 		await insertBlock( 'Test Meta Attribute Block' );
 		await page.keyboard.type( 'Meta Value' );
 
-		// Wait for all async blocks to update
-		await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
-
-		const persistedValues = await page.evaluate( () => Array.from( document.querySelectorAll( '.my-meta-input' ) ).map( ( input ) => input.value ) );
-		persistedValues.forEach( ( val ) => {
-			expect( val ).toBe( 'Meta Value' );
+		const inputs = await page.$$( '.my-meta-input' );
+		await inputs.forEach( async ( input ) => {
+			// Clicking the input selects the block,
+			// and selecting the block enables the sync data mode.
+			await input.click();
+			expect( await input.getProperty( 'value' ) ).toBe( 'Meta Value' );
 		} );
 	} );
 } );
