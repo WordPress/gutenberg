@@ -9,7 +9,7 @@ const path = require( 'path' );
  */
 const { last } = require( 'lodash' );
 const espree = require( 'espree' );
-// const doctrine = require( 'doctrine' );
+const doctrine = require( 'doctrine' );
 
 /**
  * Internal dependencies.
@@ -35,7 +35,10 @@ const exportDeclarations = ast.body.filter(
 const apiArtifacts = exportDeclarations.map(
 	( exportDeclaration ) => ( {
 		name: getNameDeclaration( exportDeclaration.declaration ),
-		jsdoc: last( exportDeclaration.leadingComments ).value,
+		jsdoc: doctrine.parse(
+			last( exportDeclaration.leadingComments ).value,
+			{ unwrap: true, recoverable: true }
+		),
 	} )
 );
 
