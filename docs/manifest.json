@@ -654,6 +654,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/editor-configuration",
+		"slug": "packages-editor-configuration",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/editor-configuration/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/editor",
 		"slug": "packages-editor",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/editor/README.md",
