@@ -40,9 +40,14 @@ describe( 'Block with a meta attribute', () => {
 		await insertBlock( 'Test Meta Attribute Block' );
 		await page.keyboard.type( 'Meta Value' );
 
-		const persistedValues = await page.evaluate( () => Array.from( document.querySelectorAll( '.my-meta-input' ) ).map( ( input ) => input.value ) );
-		persistedValues.forEach( ( val ) => {
-			expect( val ).toBe( 'Meta Value' );
+		const inputs = await page.$$( '.my-meta-input' );
+		await inputs.forEach( async ( input ) => {
+			// Clicking the input selects the block,
+			// and selecting the block enables the sync data mode
+			// as otherwise the asynchronous rerendering of unselected blocks
+			// may cause the input to have not yet been updated for the other blocks
+			await input.click();
+			expect( await input.getProperty( 'value' ) ).toBe( 'Meta Value' );
 		} );
 	} );
 } );
