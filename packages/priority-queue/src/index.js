@@ -1,4 +1,4 @@
-const requestFrame = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
+const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
 
 export const createQueue = () => {
 	const waitingList = [];
@@ -17,7 +17,7 @@ export const createQueue = () => {
 			elementsMap.delete( nextElement );
 		} while ( deadline && deadline.timeRemaining && deadline.timeRemaining() > 0 );
 
-		requestFrame( runWaitingList );
+		requestIdleCallback( runWaitingList );
 	};
 
 	const add = ( element, item ) => {
@@ -27,7 +27,7 @@ export const createQueue = () => {
 		elementsMap.set( element, item );
 		if ( ! isRunning ) {
 			isRunning = true;
-			requestFrame( runWaitingList );
+			requestIdleCallback( runWaitingList );
 		}
 	};
 

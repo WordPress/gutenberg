@@ -43,7 +43,9 @@ describe( 'Block with a meta attribute', () => {
 		const inputs = await page.$$( '.my-meta-input' );
 		await inputs.forEach( async ( input ) => {
 			// Clicking the input selects the block,
-			// and selecting the block enables the sync data mode.
+			// and selecting the block enables the sync data mode
+			// as otherwise the asynchronous rerendering of unselected blocks
+			// may cause the input to have not yet been updated for the other blocks
 			await input.click();
 			expect( await input.getProperty( 'value' ) ).toBe( 'Meta Value' );
 		} );
