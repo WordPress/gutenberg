@@ -87,14 +87,12 @@ describe( 'createMiddleware', () => {
 		return store.dispatch( createAction() );
 	} );
 
-	/**
-	 * Currently this test will not error even under conditions producing it but
-	 * instead will have an uncaught error/warning printed in the cli console:
-	 * - (node:37109) UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'type' of null
-	 * (and others)
-	 *
-	 * See this github thread for context: https://github.com/facebook/jest/issues/3251
-	 */
+	// Currently this test will not error even under conditions producing it but
+	// instead will have an uncaught error/warning printed in the cli console:
+	// - (node:37109) UnhandledPromiseRejectionWarning: TypeError: Cannot read
+	// property 'type' of null (and others)
+	// See this github thread for context:
+	// https://github.com/facebook/jest/issues/3251
 	it( 'should handle a null returned from a caught promise error', () => {
 		expect.hasAssertions();
 		const middleware = createMiddleware( {
