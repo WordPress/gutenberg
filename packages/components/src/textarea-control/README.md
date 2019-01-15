@@ -27,7 +27,7 @@ TextareaControl should:
 
 **When not to use TextareaControl**
 
-Do not use TextareaControl if you need to let users enter shorter answers no longer than a single line, such as a phone number or name. In this case, you should use `Text Control`.
+Do not use TextareaControl if you need to let users enter shorter answers (no longer than a single line), such as a phone number or name. In this case, you should use `Text Control`.
 
 ![](https://wordpress.org/gutenberg/files/2019/01/TextareaControl-Answers-Do.png)
 
