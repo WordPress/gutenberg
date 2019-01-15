@@ -36,9 +36,27 @@ _Example:_
 
 ## Available Scripts
 
+### `build`
+
+Builds the code for production to the `build` folder. It correctly bundles code in production mode and optimizes the build for the best performance. Your code is ready to be deployed. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"build": "wp-scripts build"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+* `npm run build` - builds the code for production.
+
+
 ### `check-engines`
 
-Check if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
+Checks if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
 
 _Example:_
 
@@ -124,6 +142,23 @@ _Example:_
 
 This is how you execute the script with presented setup:
 * `npm run lint:css` - lints CSS files in the whole project's directory.
+
+### `start`
+
+Builds the code for development to the `build` folder. The script will automatically rebuild if you make changes to the code. You will see the build errors in the console. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"start": "wp-scripts start"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+* `npm start` - starts the build for development.
 
 ### `test-e2e`
 
