@@ -86,6 +86,18 @@ exports[`List should be immeadiately saved on indentation 1`] = `
 <!-- /wp:list -->"
 `;
 
+exports[`List should change the base list type 1`] = `
+"<!-- wp:list {\\"ordered\\":true} -->
+<ol><li></li></ol>
+<!-- /wp:list -->"
+`;
+
+exports[`List should change the indented list type 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ol><li>1</li></ol></li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should create paragraph on split at end and merge back with content 1`] = `
 "<!-- wp:list -->
 <ul><li>one</li></ul>
@@ -99,6 +111,36 @@ exports[`List should create paragraph on split at end and merge back with conten
 exports[`List should create paragraph on split at end and merge back with content 2`] = `
 "<!-- wp:list -->
 <ul><li>one</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 1 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 1 2`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>1</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 1`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1<ul><li>i</li></ul></li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 2`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li><li>i</li></ul></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should indent and outdent level 2 3`] = `
+"<!-- wp:list -->
+<ul><li>a<ul><li>1</li></ul></li><li>i</li></ul>
 <!-- /wp:list -->"
 `;
 
