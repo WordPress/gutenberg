@@ -25,6 +25,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"equivalent-key-map": "^0.2.2",
 		"is-promise": "^2.1.0",
