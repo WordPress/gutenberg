@@ -9,7 +9,7 @@
 		"build",
 		"build-module",
 		"node_modules",
-		"packages/tests-e2e/plugins",
+		"packages/e2e-tests/plugins",
 		"vendor"
 	]
 }
