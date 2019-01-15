@@ -495,3 +495,10 @@ test( 'that autop doses not add extra closing p in figure', () => {
 	expect( autop( content1 ).trim() ).toBe( expected1 );
 	expect( autop( content2 ).trim() ).toBe( expected2 );
 } );
+
+test( 'that autop correctly adds a start and end tag when followed by a div', () => {
+	const content = 'Testing autop with a div\n<div class="wp-some-class">content</div>';
+	const expected = '<p>Testing autop with a div</p>\n<div class="wp-some-class">content</div>';
+
+	expect( autop( content ).trim() ).toBe( expected );
+} );
