@@ -14,7 +14,7 @@ TextareaControls are TextControls that allow for multiple lines of text, and wra
 
 ### Usage
 
-**When to use TextareaControl**
+#### When to use **TextareaControl**
 
 Use TextareaControl when you need to encourage users enter an amount of text that’s longer than a single line. (A bigger box can encourage people to be more verbose, where a smaller one encourages them to be succinct.)
 
@@ -25,7 +25,7 @@ TextareaControl should:
 - Make it easy to understand and address any errors via clear and direct error notices.
 - Make it easy to understand the requested information by using a clear and descriptive label.
 
-**When not to use TextareaControl**
+#### When not to use **TextareaControl**
 
 Do not use TextareaControl if you need to let users enter shorter answers (no longer than a single line), such as a phone number or name. In this case, you should use `Text Control`.
 
@@ -48,7 +48,7 @@ Use TextareaControl for shorter answers.
 1. Container
 2. Label
 
-**Containers**
+### Containers
 
 Containers improve the discoverability of text fields by creating contrast between the text field and surrounding content.
 
@@ -62,11 +62,11 @@ Use a stroke around the container, which clearly indicates that users can input 
 **Don’t** 
 Use unclear visual markers to indicate a text field.
 
-**Label text**
+### Label text
 
 Label text is used to inform users as to what information is requested for a text field. Every text field should have a label. Label text should be above the input field, and always visible. Write labels in sentence capitalization.
 
-**Error text**
+### Error text
 
 When text input isn’t accepted, an error message can display instructions on how to fix it. Error messages are displayed below the input line, replacing helper text until fixed.
 
