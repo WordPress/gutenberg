@@ -45,7 +45,9 @@ function formatViolations( violations ) {
 }
 
 /**
- * Defines async matcher to check whether a given Puppeteer's page instance is accessible.
+ * Defines async matcher to check whether a given Puppeteer's page instance passes Axe accessibility tests.
+ *
+ * @see https://www.deque.com/axe/
  * It is possible to pass optional Axe API options to perform customized check.
  *
  * @see https://github.com/dequelabs/axe-puppeteer
@@ -59,7 +61,7 @@ function formatViolations( violations ) {
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */
-async function toBeAccessible( page, { include, exclude } = {} ) {
+async function toPassAxeTests( page, { include, exclude } = {} ) {
 	const axe = new AxePuppeteer( page );
 
 	if ( include ) {
@@ -75,15 +77,15 @@ async function toBeAccessible( page, { include, exclude } = {} ) {
 	const pass = violations.length === 0;
 	const message = pass ?
 		() => {
-			return this.utils.matcherHint( '.not.toBeAccessible' ) +
+			return this.utils.matcherHint( '.not.toPassAxeTests' ) +
 				'\n\n' +
 				'Expected page to contain accessibility check violations.\n' +
 				'No violations found.';
 		} :
 		() => {
-			return this.utils.matcherHint( '.toBeAccessible' ) +
+			return this.utils.matcherHint( '.toPassAxeTests' ) +
 				'\n\n' +
-				'Expected page to be accessible.\n' +
+				'Expected page to pass Axe accessibility tests.\n' +
 				'Violations found:\n' +
 				this.utils.RECEIVED_COLOR(
 					formatViolations( violations )
@@ -97,5 +99,5 @@ async function toBeAccessible( page, { include, exclude } = {} ) {
 }
 
 expect.extend( {
-	toBeAccessible,
+	toPassAxeTests,
 } );

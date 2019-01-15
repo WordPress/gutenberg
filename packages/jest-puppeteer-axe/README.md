@@ -2,7 +2,7 @@
 
 [Axe](https://www.deque.com/axe/) (the Accessibility Engine) API integration with [Jest](https://jestjs.io/) and [Puppeteer](https://pptr.dev/).
 
-Defines Jest async matcher to check whether a given Puppeteer's page instance is accessible.
+Defines Jest async matcher to check whether a given Puppeteer's page instance passes [Axe](https://www.deque.com/axe/) accessibility tests.
 
 ## Installation
 
@@ -33,11 +33,11 @@ import '@wordpress/jest-puppeteer-axe';
 In your Jest test suite add the following code to the test's body:
 
 ```js
-test( 'checks accessibility of the test page', async () => {
+test( 'checks the test page with Axe', async () => {
 	// First, run some code which loads the content of the page.
 	loadTestPage();
 	
-	await expect( page ).toBeAccessible();
+	await expect( page ).toPassAxeTests();
 } );
 ```
 
@@ -46,11 +46,12 @@ It is also possible to pass optional Axe API options to perform customized check
 - `exclude` - CSS selector to to add the list of elements to exclude from analysis.
 
 ```js
-test( 'checks accessibility of the test component excluding some button', async () => {
+test( 'checks the test component with Axe excluding some button', async () => {
+
 	// First, run some code which loads the content of the page.
 	loadPageWithTestComponent();
 	
-	await expect( page ).toBeAccessible( {
+	await expect( page ).toPassAxeTests( {
 		include: '.test-component',
 		exclude: '.some-button',
 	} );
