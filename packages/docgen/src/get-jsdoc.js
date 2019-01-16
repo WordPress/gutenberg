@@ -34,7 +34,7 @@ module.exports = function( ast, token ) {
 	}
 
 	if ( jsdoc === undefined ) {
-		jsdoc = '*\n * Undocumented declaration\n ';
+		jsdoc = { description: 'Undocumented declaration.', tags: [] };
 	}
 
 	return jsdoc;

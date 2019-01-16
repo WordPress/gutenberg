@@ -177,3 +177,18 @@ test( 'engine returns IR for default export (identifier) using JSDoc from variab
 	);
 	t.end();
 } );
+
+test( 'engine returns IR for undocumented export', ( t ) => {
+	const ir = engine( `
+		const myDeclaration = function() {
+			// do nothing
+		}
+
+		export default myDeclaration;
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'Undocumented declaration.', tags: [] } } ]
+	);
+	t.end();
+} );
