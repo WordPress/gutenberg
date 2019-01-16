@@ -8,4 +8,4 @@
 
 * The [Sidebar Tutorial](/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md) will walk you through the steps of creating a sidebar to update data from the `post_meta` table.
 
-* Learn how to add customized buttons to the toolbar with the [Format API tutorial](/docs/designers-developers/developers/tutorials/format-api/0-intro.md).
+* Learn how to add customized buttons to the toolbar with the [Format API tutorial](/docs/designers-developers/developers/tutorials/format-api/).
