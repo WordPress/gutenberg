@@ -12,7 +12,6 @@ const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBrid
  */
 import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
@@ -154,5 +153,3 @@ export default class ImageEdit extends React.Component {
 		);
 	}
 }
-
-export default ImageEdit;
