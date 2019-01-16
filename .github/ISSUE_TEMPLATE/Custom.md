@@ -4,10 +4,10 @@ about: Questions or 'how to' about Gutenberg
 
 ---
 
-If you have a question you have a few places that you can ask this:
+Please post general help requests in the support forum at https://wordpress.org/support/forum/how-to-and-troubleshooting/.
 
-- Support Forums: https://wordpress.org/support/plugin/gutenberg
-- Handbook: https://wordpress.org/gutenberg/handbook
-- https://chat.wordpress.org #core-editor
+Please post technical help requests in the support forum at https://wordpress.org/support/forum/wp-advanced/.
 
-If you are unable to ask in those places you can ask here, however you will get faster responses through those recommended places.
+Make sure you have checked the Handbook at https://wordpress.org/gutenberg/handbook before asking your question.
+
+Thank you!
