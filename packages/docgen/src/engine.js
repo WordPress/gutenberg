@@ -17,15 +17,15 @@ module.exports = function( code ) {
 		sourceType: 'module',
 	} );
 
-	const exportDeclarations = ast.body.filter(
+	const tokens = ast.body.filter(
 		( node ) => [ 'ExportNamedDeclaration', 'ExportDefaultDeclaration', 'ExportAllDeclaration' ].some( ( declaration ) => declaration === node.type )
 	);
 
-	const intermediateRepresentation = exportDeclarations.map(
-		( exportDeclaration ) => ( {
-			name: getNameDeclaration( exportDeclaration.declaration ),
+	const intermediateRepresentation = tokens.map(
+		( token ) => ( {
+			name: getNameDeclaration( token ),
 			jsdoc: doctrine.parse(
-				getLeadingComments( exportDeclaration ),
+				getLeadingComments( token ),
 				{ unwrap: true, recoverable: true }
 			),
 		} )

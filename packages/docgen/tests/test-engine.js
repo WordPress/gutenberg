@@ -40,6 +40,24 @@ test( 'engine returns IR for named export (variable)', ( t ) => {
 	t.end();
 } );
 
+test( 'engine returns IR for named export (identifier)', ( t ) => {
+	const ir = engine( `
+		/**
+ 		 * My declaration example.
+ 		 */
+		const myDeclaration = function() {
+			// do nothing
+		}
+
+		export { myDeclaration };
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'Undocumented declaration', tags: [] } } ]
+	);
+	t.end();
+} );
+
 test( 'engine returns IR for default export (named function)', ( t ) => {
 	const ir = engine( `
 		/**
