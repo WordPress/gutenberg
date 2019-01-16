@@ -25,6 +25,7 @@
 		"access": "public"
 	},
 	"scripts": {
-		"test": "tape tests/*.js | faucet"
+		"test": "tape tests/*.js | faucet",
+		"test:engine": "tape tests/test-engine.js | faucet"
 	}
 }
