@@ -89,7 +89,6 @@ export default class ImageEdit extends React.Component {
 		const toolbarEditButton = (
 			<Toolbar>
 				<ToolbarButton
-					className="components-toolbar__control"
 					label={ __( 'Edit image' ) }
 					icon="edit"
 					onClick={ onMediaLibraryPressed }
@@ -119,7 +118,7 @@ export default class ImageEdit extends React.Component {
 							style={ { textAlign: 'center' } }
 							underlineColorAndroid="transparent"
 							value={ caption }
-							placeholder={ 'Write caption…' }
+							placeholder={ __( 'Write caption…' )  }
 							onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						/>
 					</View>
