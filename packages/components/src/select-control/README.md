@@ -14,7 +14,7 @@ SelectControl allow users to select from a single-option menu. It functions as a
 
 ### Usage
 
-**When to use** **a select control**
+#### When to use a select control
 
 Use a select control when: 
 
@@ -39,13 +39,13 @@ Use selects for binary questions.
 
 A SelectControl includes a double-arrow indicator. The menu appears layered over the select.
 
-**Opening and Closing**
+#### Opening and Closing
 
 Once the menu is displayed onscreen, it remains open until the user chooses a menu item, clicks outside of the menu, or switches to another browser tab.
 
 ### Content Guidelines
 
-**Labels**
+#### Labels
 
 Label the SelectControl with a text label above it, or to its left, using sentence capitalization. Clicking the label allows the user to focus directly on the select.
 
@@ -121,25 +121,25 @@ Render a user interface to select multiple users from a list.
 - One important prop to refer is `value`. If `multiple` is `true`, `value` should be an array with the values of the selected options.
 - If `multiple` is `false`, `value` should be equal to the value of the selected option.
 
-**label**
+#### label
 
 If this property is added, a label will be generated using label property as the content.
 - Type: `String`
 - Required: No
 
-**help**
+#### help
 
 If this property is added, a help text will be generated using help property as the content.
 - Type: `String`
 - Required: No
 
-**multiple**
+#### multiple
 
 If this property is added, multiple values can be selected. The value passed should be an array.
 - Type: `Boolean`
 - Required: No
 
-**options**
+#### options
 
 An array of objects containing the following properties:
 - `label`: (string) The label to be shown to the user.
@@ -147,7 +147,7 @@ An array of objects containing the following properties:
 - Type: `Array`
 - Required: No
 
-**onChange**
+#### onChange
 
 A function that receives the value of the new option that is being selected as input.
 If multiple is true the value received is an array of the selected value.
