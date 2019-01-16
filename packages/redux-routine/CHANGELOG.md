@@ -2,7 +2,9 @@
 
 ### Bug Fixes
 
-- Fix unhandled promise rejection error caused by returning null from registered generator ([#13314](https://github.com/WordPress/gutenberg/pull/13314)
+- Fix unhandled promise rejection error caused by returning null from registered generator ([#13314](https://github.com/WordPress/gutenberg/pull/13314))
+- Improve `castError` handling of non string promise reject responses. Now `castError` returns a custom `ReduxRoutineResponseError` instance to the catch block.  On this instance, the reject response is found on the `response` property.
+([#13315](https://github.com/WordPress/gutenberg/pull/13315)) 
 
 ## 3.0.3 (2018-10-19)
 
