@@ -121,25 +121,25 @@ Render a user interface to select multiple users from a list.
 - One important prop to refer is `value`. If `multiple` is `true`, `value` should be an array with the values of the selected options.
 - If `multiple` is `false`, `value` should be equal to the value of the selected option.
 
-**label**
+#### label
 
 If this property is added, a label will be generated using label property as the content.
 - Type: `String`
 - Required: No
 
-**help**
+#### help
 
 If this property is added, a help text will be generated using help property as the content.
 - Type: `String`
 - Required: No
 
-**multiple**
+#### multiple
 
 If this property is added, multiple values can be selected. The value passed should be an array.
 - Type: `Boolean`
 - Required: No
 
-**options**
+#### options
 
 An array of objects containing the following properties:
 - `label`: (string) The label to be shown to the user.
@@ -147,7 +147,7 @@ An array of objects containing the following properties:
 - Type: `Array`
 - Required: No
 
-**onChange**
+#### onChange
 
 A function that receives the value of the new option that is being selected as input.
 If multiple is true the value received is an array of the selected value.
