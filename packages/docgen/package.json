@@ -17,10 +17,14 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"main": "src/index.js",
+	"devDependencies": {
+		"faucet": "0.0.1",
+		"tape": "4.9.2"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"scripts": {
-		"test": "echo \"Error: run tests from root\" && exit 1"
+		"test": "tape tests/*.js | faucet"
 	}
 }
