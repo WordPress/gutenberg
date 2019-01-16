@@ -13,8 +13,6 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
-const args = getCliArgs();
-
 const hasWebpackConfig = hasCliArg( '--config' ) ||
 	hasProjectFile( 'webpack.config.js' ) ||
 	hasProjectFile( 'webpack.config.babel.js' );
@@ -22,7 +20,7 @@ const hasWebpackConfig = hasCliArg( '--config' ) ||
 if ( hasWebpackConfig ) {
 	const { status } = spawn(
 		resolveBin( 'webpack' ),
-		[ '--watch', ...args ],
+		[ '--watch', ...getCliArgs() ],
 		{ stdio: 'inherit' }
 	);
 	process.exit( status );

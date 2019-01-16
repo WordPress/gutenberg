@@ -38,7 +38,7 @@ _Example:_
 
 ### `build`
 
-Builds the code for production to the `build` folder. It correctly bundles code in production mode and optimizes the build for the best performance. Your code is ready to be deployed. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+Builds the code to the designated `build` folder in the configuration file. It correctly bundles code in production mode and optimizes the build for the best performance. Your code is ready to be deployed. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
 
 _Example:_
 
@@ -145,7 +145,7 @@ This is how you execute the script with presented setup:
 
 ### `start`
 
-Builds the code for development to the `build` folder. The script will automatically rebuild if you make changes to the code. You will see the build errors in the console. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+Builds the code for development to the designated `build` folder in the configuration file. The script will automatically rebuild if you make changes to the code. You will see the build errors in the console. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
 
 _Example:_
 
