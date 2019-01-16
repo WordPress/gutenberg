@@ -39,3 +39,19 @@ test( 'engine returns IR for named export (const)', ( t ) => {
 	);
 	t.end();
 } );
+
+test( 'engine returns IR for default export (named function)', ( t ) => {
+	const ir = engine( `
+		/**
+ 		 * My declaration example.
+ 		 */
+		export default function myDeclaration() {
+			// do nothing
+		}
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );
