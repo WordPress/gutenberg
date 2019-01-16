@@ -12,16 +12,24 @@ const formatter = require( './formatter' );
 
 const packageName = process.argv[ 2 ];
 if ( packageName === undefined ) {
-	process.stdout.write( '\nUsage: <path-to-docgen> <gutenberg-package-name>\n' );
+	process.stdout.write( '\nUsage: <path-to-docgen> <gutenberg-package-name>\n\n\n' );
 	process.exit( 1 );
 }
 
-const root = path.resolve( __dirname, '../../../' );
-const input = path.resolve( root, `packages/${ packageName }/src/index.js` );
-const output = path.resolve( root, `packages/${ packageName }/src/doc-api.md` );
+const root = path.join( __dirname, '../../../' );
+// TODO:
+// - take input file from package.json?
+// - make CLI take input file instead of package?
+const input = path.join( root, `packages/${ packageName }/src/index.js` );
+const output = path.join( root, `packages/${ packageName }/api.md` );
 
-const code = fs.readFileSync( input, 'utf8' );
-const json = engine( code );
-const docs = formatter( json );
+fs.readFile( input, 'utf8', ( err, data ) => {
+	if ( err ) {
+		process.stdout.write( `\n${ input } does not exists.\n\n\n` );
+		process.exit( 1 );
+	}
 
-fs.writeFileSync( output, docs );
+	const json = engine( data );
+	const docs = formatter( json );
+	fs.writeFileSync( output, docs );
+} );
