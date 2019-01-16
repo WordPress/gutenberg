@@ -74,7 +74,7 @@ test( 'engine returns IR for named export (variable)', ( t ) => {
 	t.end();
 } );
 
-test( 'engine returns IR for named export (single identifier)', ( t ) => {
+test( 'engine returns IR for named export (single identifier) using JSDoc from identifier', ( t ) => {
 	const ir = engine( `
 		/**
  		 * My declaration example.
@@ -87,7 +87,7 @@ test( 'engine returns IR for named export (single identifier)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'myDeclaration', jsdoc: { description: 'Undocumented declaration', tags: [] } } ]
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
 	);
 	t.end();
 } );
@@ -133,6 +133,42 @@ test( 'engine returns IR for default export (identifier)', ( t ) => {
 		/**
  		 * My declaration example.
  		 */
+		export default myDeclaration;
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );
+
+test( 'engine returns IR for default export (identifier) using JSDoc from function', ( t ) => {
+	const ir = engine( `
+		/**
+		 * My declaration example.
+		 */
+		function myDeclaration() {
+			// do nothing
+		}
+
+		export default myDeclaration;
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );
+
+test( 'engine returns IR for default export (identifier) using JSDoc from variable', ( t ) => {
+	const ir = engine( `
+		/**
+		 * My declaration example.
+		 */
+		const myDeclaration = function() {
+			// do nothing
+		}
+
 		export default myDeclaration;
 ` );
 	t.deepEqual(

@@ -2,13 +2,12 @@
 * External dependencies.
 */
 const espree = require( 'espree' );
-const doctrine = require( 'doctrine' );
 
 /**
 * Internal dependencies.
 */
 const getNameDeclaration = require( './get-name-declaration' );
-const getLeadingComments = require( './get-leading-comments' );
+const getJSDoc = require( './get-jsdoc' );
 
 module.exports = function( code ) {
 	const ast = espree.parse( code, {
@@ -24,10 +23,7 @@ module.exports = function( code ) {
 	const intermediateRepresentation = tokens.map(
 		( token ) => ( {
 			name: getNameDeclaration( token ),
-			jsdoc: doctrine.parse(
-				getLeadingComments( token ),
-				{ unwrap: true, recoverable: true }
-			),
+			jsdoc: getJSDoc( ast, token ),
 		} )
 	);
 
