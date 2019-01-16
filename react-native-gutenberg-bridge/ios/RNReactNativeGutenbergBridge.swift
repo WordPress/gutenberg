@@ -20,6 +20,19 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             })
         }
     }
+    
+    @objc
+    func onUploadMediaPress(_ callback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFromDevicePicker(with: { (url, mediaID) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
+            })
+        }
+    }
 
     @objc
     func editorDidLayout() {
@@ -36,7 +49,8 @@ extension RNReactNativeGutenbergBridge {
         return [
             Gutenberg.EventName.requestHTML,
             Gutenberg.EventName.toggleHTMLMode,
-            Gutenberg.EventName.updateHtml
+            Gutenberg.EventName.updateHtml,
+            Gutenberg.EventName.mediaUpload
         ]
     }
 
@@ -57,10 +71,12 @@ extension RNReactNativeGutenbergBridge {
 // MARK: - Helpers
 
 extension RNReactNativeGutenbergBridge {
+    
     func optionalArray(from optionalString: String?) -> [String]? {
         guard let string = optionalString else {
             return nil
         }
         return [string]
     }
+
 }

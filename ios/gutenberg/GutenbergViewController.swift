@@ -29,6 +29,7 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+    
     func gutenbergDidLoad() {
 
     }
@@ -40,6 +41,11 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback) {
         print("Gutenberg did request media picker, passing a sample url in callback")
         callback("https://cldup.com/cXyG__fTLN.jpg")
+    }
+    
+    func gutenbergDidRequestMediaFromDevicePicker(with callback: MediaPickerDidPickMediaToUploadCallback) {
+        print("Gutenberg did request a device media picker, passing a sample url in callback and a fake ID")
+        callback("https://cldup.com/cXyG__fTLN.jpg", "1")
     }
 }
 
