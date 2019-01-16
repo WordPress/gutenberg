@@ -9,6 +9,7 @@ import { TextInput } from 'react-native';
 import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 
 class PostTitle extends Component {
@@ -86,6 +87,7 @@ class PostTitle extends Component {
 				multiline
 				numberOfLines={ 0 }
 				onChangeText={ this.onChange }
+				onFocus={ this.onSelect }
 				placeholder={ decodedPlaceholder }
 				style={ style }
 				value={ title }>
@@ -94,6 +96,17 @@ class PostTitle extends Component {
 	}
 }
 
+const applyWithDispatch = withDispatch( ( dispatch ) => {
+	const {
+		clearSelectedBlock,
+	} = dispatch( 'core/editor' );
+
+	return {
+		clearSelectedBlock,
+	};
+} );
+
 export default compose(
+	applyWithDispatch,
 	withInstanceId,
 )( PostTitle );
