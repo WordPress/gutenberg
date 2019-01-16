@@ -8,38 +8,6 @@ const test = require( 'tape' );
  */
 const engine = require( '../src/engine' );
 
-test( 'engine returns IR for named export (function)', ( t ) => {
-	const ir = engine( `
-		/**
- 		 * My declaration example.
- 		 */
-		export function myDeclaration() {
-			// do nothing
-		}
-` );
-	t.deepEqual(
-		ir,
-		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
-	);
-	t.end();
-} );
-
-test( 'engine returns IR for named export (variable)', ( t ) => {
-	const ir = engine( `
-		/**
- 		 * My declaration example.
- 		 */
-		export const myDeclaration = function() {
-			// do nothing
-		}
-` );
-	t.deepEqual(
-		ir,
-		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
-	);
-	t.end();
-} );
-
 test( 'engine returns IR for many exports at once', ( t ) => {
 	const ir = engine( `
 		/**
@@ -74,7 +42,39 @@ test( 'engine returns IR for many exports at once', ( t ) => {
 	t.end();
 } );
 
-test( 'engine returns IR for named export (identifier)', ( t ) => {
+test( 'engine returns IR for named export (function)', ( t ) => {
+	const ir = engine( `
+		/**
+ 		 * My declaration example.
+ 		 */
+		export function myDeclaration() {
+			// do nothing
+		}
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );
+
+test( 'engine returns IR for named export (variable)', ( t ) => {
+	const ir = engine( `
+		/**
+ 		 * My declaration example.
+ 		 */
+		export const myDeclaration = function() {
+			// do nothing
+		}
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );
+
+test( 'engine returns IR for named export (single identifier)', ( t ) => {
 	const ir = engine( `
 		/**
  		 * My declaration example.
