@@ -14,7 +14,7 @@ SelectControl allow users to select from a single-option menu. It functions as a
 
 ### Usage
 
-#### When to use **a select control**
+#### When to use a select control
 
 Use a select control when: 
 
