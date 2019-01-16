@@ -223,6 +223,12 @@
 			color: color(theme(outlines) shade(25%));
 		}
 	}
+
+	// Fixes a Safari+VoiceOver bug, where the screen reader text is announced not respecting the source order.
+	// See https://core.trac.wordpress.org/ticket/42006 and https://github.com/h5bp/html5-boilerplate/issues/1985
+	.screen-reader-text {
+		height: auto;
+	}
 }
 
 @keyframes components-button__busy-animation {
