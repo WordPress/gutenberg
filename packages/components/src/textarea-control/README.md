@@ -97,21 +97,21 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-**label**
+#### label
 
 If this property is added, a label will be generated using label property as the content.
 
 - Type: `String`
 - Required: No
 
-**help**
+#### help
 
 If this property is added, a help text will be generated using help property as the content.
 
 - Type: `String`
 - Required: No
 
-**rows**
+#### rows
 
 The number of rows the textarea should contain. Defaults to four.
 
@@ -119,19 +119,20 @@ The number of rows the textarea should contain. Defaults to four.
 - Required: No
 - Default: 4
 
-**value**
+#### value
 
 The current value of the textarea.
 
 - Type: `String`
 - Required: Yes
 
-**onChange**
+#### onChange
 
 A function that receives the new value of the textarea each time it changes.
 
 - Type: `function`
 - Required: Yes
-# Related components
+
+## Related components
 
 - For a field where users only enter one line of text, use the `TextControl` component.
