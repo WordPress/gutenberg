@@ -55,3 +55,19 @@ test( 'engine returns IR for default export (named function)', ( t ) => {
 	);
 	t.end();
 } );
+
+test( 'engine returns IR for default export (anonymous function)', ( t ) => {
+	const ir = engine( `
+		/**
+ 		 * My declaration example.
+ 		 */
+		export default function() {
+			// do nothing
+		}
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'default export', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );

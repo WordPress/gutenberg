@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-const { first } = require( 'lodash' );
+const { first, get } = require( 'lodash' );
 
 /**
  * Returns the assigned name for a given declaration node type, or undefined if
@@ -23,6 +23,6 @@ module.exports = function( declaration ) {
 	}
 
 	if ( declarator ) {
-		return declarator.id.name;
+		return get( declarator, [ 'id', 'name' ], 'default export' );
 	}
 };
