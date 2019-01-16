@@ -13,7 +13,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func onMediaLibraryPress(_ callback: @escaping RCTResponseSenderBlock) {
+    func onMediaLibraryPressed(_ callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaPicker(with: { (url) in
                 callback(self.optionalArray(from: url))

@@ -76,13 +76,13 @@ public class WPAndroidGlueCode {
                 mGetContentCountDownLatch.countDown();
             }
 
-            @Override public void onMediaLibraryPress(MediaSelectedCallback mediaSelectedCallback) {
+            @Override public void onMediaLibraryPressed(MediaSelectedCallback mediaSelectedCallback) {
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
                 onMediaLibraryButtonListener.onMediaLibraryButtonClicked();
             }
 
             @Override
-            public void onUploadMediaPress(MediaUploadCallback mediaUploadCallback) {
+            public void onUploadMediaPressed(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onMediaLibraryButtonListener.onUploadMediaButtonClicked();
             }

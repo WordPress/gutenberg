@@ -63,8 +63,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void onMediaLibraryPress(final Callback onMediaSelected) {
-        mGutenbergBridgeJS2Parent.onMediaLibraryPress(new MediaSelectedCallback() {
+    public void onMediaLibraryPressed(final Callback onMediaSelected) {
+        mGutenbergBridgeJS2Parent.onMediaLibraryPressed(new MediaSelectedCallback() {
             @Override public void onMediaSelected(String mediaUrl) {
                 onMediaSelected.invoke(mediaUrl);
             }
@@ -72,8 +72,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void onUploadMediaPress(final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.onUploadMediaPress(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
+    public void onUploadMediaPressed(final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.onUploadMediaPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
             public void onUploadMediaFileSelected(String mediaId, String mediaUri) {
                 onUploadMediaSelected.invoke(mediaId, mediaUri);
