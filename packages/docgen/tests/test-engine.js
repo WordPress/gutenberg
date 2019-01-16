@@ -74,6 +74,24 @@ test( 'engine returns IR for named export (variable)', ( t ) => {
 	t.end();
 } );
 
+test( 'engine returns IR for named export (single identifier)', ( t ) => {
+	const ir = engine( `
+	const myDeclaration = function() {
+		// do nothing
+	}
+	
+	/**
+	 * My declaration example.
+	 */
+	export { myDeclaration };
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );
+
 test( 'engine returns IR for named export (single identifier) using JSDoc from identifier', ( t ) => {
 	const ir = engine( `
 		/**
