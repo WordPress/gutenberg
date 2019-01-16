@@ -10,7 +10,12 @@ const path = require( 'path' );
 const engine = require( './engine' );
 const formatter = require( './formatter' );
 
-const packageName = 'i18n';
+const packageName = process.argv[ 2 ];
+if ( packageName === undefined ) {
+	process.stdout.write( '\nUsage: <path-to-docgen> <gutenberg-package-name>\n' );
+	process.exit( 1 );
+}
+
 const root = path.resolve( __dirname, '../../../' );
 const input = path.resolve( root, `packages/${ packageName }/src/index.js` );
 const output = path.resolve( root, `packages/${ packageName }/src/doc-api.md` );
