@@ -7,7 +7,7 @@ class GutenbergViewController: UIViewController {
 
     fileprivate lazy var gutenberg = Gutenberg(dataSource: self)
     fileprivate var htmlMode = false
-    fileprivate var mediaCallback: MediaPickerDidPickMediaToUploadCallback?
+    fileprivate var mediaPickAndUploadCoordinator: MediaPickAndUploadCoordinator?
     
     override func loadView() {
         view = gutenberg.rootView
@@ -46,70 +46,12 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     
     func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaToUploadCallback) {
         print("Gutenberg did request a device media picker, passing a sample url in callback and a fake ID")
-        mediaCallback = callback
-        let pickerController = UIImagePickerController()
-        pickerController.delegate = self
-        show(pickerController, sender: nil)
+        mediaPickAndUploadCoordinator = MediaPickAndUploadCoordinator(presenter: self, gutenberg: gutenberg, mediaCallback: callback, finishCallback: {
+            self.mediaPickAndUploadCoordinator = nil
+        } )
+        mediaPickAndUploadCoordinator?.pickAndUpload()
     }
 }
-
-extension GutenbergViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-        mediaCallback?(nil, nil)
-        mediaCallback = nil
-    }
-    
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        dismiss(animated: true, completion: nil)
-        let url = URL(fileURLWithPath: NSTemporaryDirectory() + UUID().uuidString + ".jpg")
-        guard
-            let image = info[UIImagePickerControllerOriginalImage] as? UIImage,
-            let data = UIImageJPEGRepresentation(image, 1.0)
-        else {
-            return
-        }
-        do {
-            try data.write(to: url)
-            let mediaID = "1"
-            mediaCallback?(url.absoluteString, "1")
-            mediaCallback = nil            
-            let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
-            progress.totalUnitCount = 100
-            
-            Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(GutenbergViewController.timerFireMethod(_:)), userInfo: progress, repeats: true)
-        } catch {
-            mediaCallback?(nil, nil)
-            mediaCallback = nil
-        }
-    }
-    
-    @objc func timerFireMethod(_ timer: Timer) {
-        guard let progress = timer.userInfo as? Progress,
-            let mediaID = progress.userInfo[.mediaID] as? String,
-            let mediaURL = progress.userInfo[.mediaURL] as? URL
-            //let otherURL = URL(string: "https://cldup.com/cXyG__fTLN.jpg")
-            else {
-                timer.invalidate()
-                return
-        }
-        progress.completedUnitCount += 1
-        
-        if progress.fractionCompleted < 1 {
-            gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil)
-        } else if progress.fractionCompleted >= 1 {
-            timer.invalidate()
-            gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL)
-        }
-    }
-}
-
-extension ProgressUserInfoKey {
-    static let mediaID = ProgressUserInfoKey("mediaID")
-    static let mediaURL = ProgressUserInfoKey("mediaURL")
-}
-
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergInitialContent() -> String? {
