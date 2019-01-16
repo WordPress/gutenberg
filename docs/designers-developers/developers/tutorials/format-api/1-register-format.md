@@ -6,7 +6,6 @@ Let's prepare a minimal plugin to make this work. Create a new folder and a file
 
 ```php
 <?php
-
 /**
  * Plugin Name: My custom format
  */
