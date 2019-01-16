@@ -16,8 +16,8 @@ const doctrine = require( 'doctrine' );
 const getNameDeclaration = require( './get-name-declaration' );
 const getLeadingComments = require( './get-leading-comments' );
 
-const packageName = 'dom-ready';
-const root = path.resolve( __dirname, '../../' );
+const packageName = 'i18n';
+const root = path.resolve( __dirname, '../../../' );
 const input = path.resolve( root, `packages/${ packageName }/src/index.js` );
 const outputExportDeclarations = path.resolve( root, `packages/${ packageName }/src/doc-ast.json` );
 const outputApiArtifacts = path.resolve( root, `packages/${ packageName }/src/doc-api.json` );

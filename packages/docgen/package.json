@@ -1,0 +1,26 @@
+{
+	"name": "docgen",
+	"version": "1.0.0",
+	"description": "Autogenerate public API documentation from exports and JSDoc comments.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"jsdoc",
+		"documentation"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "src/index.js",
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"test": "echo \"Error: run tests from root\" && exit 1"
+	}
+}
