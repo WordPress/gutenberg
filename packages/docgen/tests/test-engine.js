@@ -40,6 +40,40 @@ test( 'engine returns IR for named export (variable)', ( t ) => {
 	t.end();
 } );
 
+test( 'engine returns IR for many exports at once', ( t ) => {
+	const ir = engine( `
+		/**
+ 		 * First declaration example.
+ 		 */
+		export const firstDeclaration = function() {
+			// do nothing
+		}
+
+		/**
+		 * Second declaration example.
+		 */
+		export function secondDeclaration(){
+			// do nothing
+		}
+
+		/**
+		 * Default declaration example.
+		 */
+		export default function() {
+			// do nothing
+		}
+` );
+	t.deepEqual(
+		ir,
+		[
+			{ name: 'firstDeclaration', jsdoc: { description: 'First declaration example.', tags: [] } },
+			{ name: 'secondDeclaration', jsdoc: { description: 'Second declaration example.', tags: [] } },
+			{ name: 'default export', jsdoc: { description: 'Default declaration example.', tags: [] } },
+		]
+	);
+	t.end();
+} );
+
 test( 'engine returns IR for named export (identifier)', ( t ) => {
 	const ir = engine( `
 		/**
