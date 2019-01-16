@@ -10,6 +10,7 @@ import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { ENTER } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
+import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
 class PostTitle extends Component {
@@ -109,4 +110,5 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 export default compose(
 	applyWithDispatch,
 	withInstanceId,
+	withFocusOutside
 )( PostTitle );
