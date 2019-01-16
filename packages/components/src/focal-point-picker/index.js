@@ -8,12 +8,6 @@ import BaseControl from '../base-control/';
 import withFocusOutside from '../higher-order/with-focus-outside';
 import classnames from 'classnames';
 
-/**
- * Internal dependencies
- */
-
-import './style.scss';
-
 export class FocalPointPicker extends Component {
 	constructor() {
 		super( ...arguments );
