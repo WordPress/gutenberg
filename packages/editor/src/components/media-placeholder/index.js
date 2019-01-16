@@ -258,10 +258,10 @@ export class MediaPlaceholder extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { hasUploadPermissions } = select( 'core' );
+	const { canUser } = select( 'core' );
 
 	return {
-		hasUploadPermissions: hasUploadPermissions(),
+		hasUploadPermissions: canUser( 'create', 'media', undefined, true ),
 	};
 } );
 

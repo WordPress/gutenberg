@@ -8,6 +8,7 @@ import { map, find, get, filter, compact } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -187,6 +188,9 @@ export function isPreviewEmbedFallback( state, url ) {
  *                   request is being made.
  */
 export function hasUploadPermissions( state ) {
+	deprecated( "select( 'core' ).hasUploadPermissions()", {
+		alternative: "select( 'core' ).canUser( 'create', 'media' )",
+	} );
 	return canUser( state, 'create', 'media', undefined, true );
 }
 

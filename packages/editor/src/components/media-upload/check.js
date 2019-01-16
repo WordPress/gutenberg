@@ -8,9 +8,9 @@ export function MediaUploadCheck( { hasUploadPermissions, fallback = null, child
 }
 
 export default withSelect( ( select ) => {
-	const { hasUploadPermissions } = select( 'core' );
+	const { canUser } = select( 'core' );
 
 	return {
-		hasUploadPermissions: hasUploadPermissions(),
+		hasUploadPermissions: canUser( 'create', 'media', undefined, true ),
 	};
 } )( MediaUploadCheck );
