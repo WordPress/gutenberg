@@ -7,7 +7,8 @@ class GutenbergViewController: UIViewController {
 
     fileprivate lazy var gutenberg = Gutenberg(dataSource: self)
     fileprivate var htmlMode = false
-
+    fileprivate var mediaCallback: MediaPickerDidPickMediaToUploadCallback?
+    
     override func loadView() {
         view = gutenberg.rootView
     }
@@ -43,9 +44,27 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback("https://cldup.com/cXyG__fTLN.jpg")
     }
     
-    func gutenbergDidRequestMediaFromDevicePicker(with callback: MediaPickerDidPickMediaToUploadCallback) {
+    func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaToUploadCallback) {
         print("Gutenberg did request a device media picker, passing a sample url in callback and a fake ID")
-        callback("https://cldup.com/cXyG__fTLN.jpg", "1")
+        mediaCallback = callback
+        let pickerController = UIImagePickerController()
+        pickerController.delegate = self
+        show(pickerController, sender: nil)
+    }
+}
+
+extension GutenbergViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+        mediaCallback?(nil, nil)
+        mediaCallback = nil
+    }
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        dismiss(animated: true, completion: nil)
+        mediaCallback?("https://cldup.com/cXyG__fTLN.jpg", "1")
+        mediaCallback = nil
     }
 }
 
