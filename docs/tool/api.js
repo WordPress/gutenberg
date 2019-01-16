@@ -7,7 +7,6 @@ const path = require( 'path' );
 /**
  * External dependencies.
  */
-const { last } = require( 'lodash' );
 const espree = require( 'espree' );
 const doctrine = require( 'doctrine' );
 
@@ -15,12 +14,14 @@ const doctrine = require( 'doctrine' );
  * Internal dependencies.
  */
 const getNameDeclaration = require( './get-name-declaration' );
+const getLeadingComments = require( './get-leading-comments' );
 
+const packageName = 'dom-ready';
 const root = path.resolve( __dirname, '../../' );
-const input = path.resolve( root, 'packages/i18n/src/index.js' );
-const outputExportDeclarations = path.resolve( root, 'packages/i18n/src/ast.json' );
-const outputApiArtifacts = path.resolve( root, 'packages/i18n/src/api.json' );
-const output = path.resolve( root, 'packages/i18n/src/api.md' );
+const input = path.resolve( root, `packages/${ packageName }/src/index.js` );
+const outputExportDeclarations = path.resolve( root, `packages/${ packageName }/src/doc-ast.json` );
+const outputApiArtifacts = path.resolve( root, `packages/${ packageName }/src/doc-api.json` );
+const output = path.resolve( root, `packages/${ packageName }/src/doc-api.md` );
 
 const code = fs.readFileSync( input, 'utf8' );
 const ast = espree.parse( code, {
@@ -37,7 +38,7 @@ const apiArtifacts = exportDeclarations.map(
 	( exportDeclaration ) => ( {
 		name: getNameDeclaration( exportDeclaration.declaration ),
 		jsdoc: doctrine.parse(
-			last( exportDeclaration.leadingComments ).value,
+			getLeadingComments( exportDeclaration ),
 			{ unwrap: true, recoverable: true }
 		),
 	} )
