@@ -1,13 +1,12 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { withGlobalEvents } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
+
+/**
+* External dependencies
+*/
+import { View, Image } from 'react-native';
 
 /**
  * Internal dependencies
@@ -21,16 +20,13 @@ class ImageSize extends Component {
 			width: undefined,
 			height: undefined,
 		};
-		this.bindContainer = this.bindContainer.bind( this );
-		this.calculateSize = this.calculateSize.bind( this );
-	}
-
-	bindContainer( ref ) {
-		this.container = ref;
+		this.onLayout = this.onLayout.bind( this );
 	}
 
 	componentDidUpdate( prevProps ) {
 		if ( this.props.src !== prevProps.src ) {
+			this.image = {};
+
 			this.setState( {
 				width: undefined,
 				height: undefined,
@@ -47,40 +43,45 @@ class ImageSize extends Component {
 		this.fetchImageSize();
 	}
 
-	componentWillUnmount() {
-		if ( this.image ) {
-			this.image.onload = noop;
-		}
-	}
-
 	fetchImageSize() {
-		this.image = new window.Image();
-		this.image.onload = this.calculateSize;
-		this.image.src = this.props.src;
+		Image.getSize( this.props.src, ( width, height ) => {
+			this.image = { width, height };
+			this.calculateSize();
+		} );
 	}
 
 	calculateSize() {
+		if ( this.image === undefined || this.container === undefined ) {
+			return;
+		}
 		const { width, height } = calculatePreferedImageSize( this.image, this.container );
 		this.setState( { width, height } );
+	}
+
+	onLayout( event ) {
+		const { width, height } = event.nativeEvent.layout;
+		this.container = {
+			clientWidth: width,
+			clientHeight: height,
+		};
+		this.calculateSize();
 	}
 
 	render() {
 		const sizes = {
 			imageWidth: this.image && this.image.width,
 			imageHeight: this.image && this.image.height,
-			containerWidth: this.container && this.container.clientWidth,
-			containerHeight: this.container && this.container.clientHeight,
+			containerWidth: this.container && this.container.width,
+			containerHeight: this.container && this.container.height,
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};
 		return (
-			<div ref={ this.bindContainer }>
+			<View onLayout={ this.onLayout }>
 				{ this.props.children( sizes ) }
-			</div>
+			</View>
 		);
 	}
 }
 
-export default withGlobalEvents( {
-	resize: 'calculateSize',
-} )( ImageSize );
+export default ImageSize;
