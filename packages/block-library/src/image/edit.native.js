@@ -60,8 +60,8 @@ export default class ImageEdit extends React.Component {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption } = attributes;
 
-		const onMediaLibraryPress = () => {
-			RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
+		const onMediaLibraryPressed = () => {
+			RNReactNativeGutenbergBridge.onMediaLibraryPressed( ( mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { url: mediaUrl } );
 				}
@@ -69,8 +69,8 @@ export default class ImageEdit extends React.Component {
 		};
 
 		if ( ! url ) {
-			const onUploadMediaPress = () => {
-				RNReactNativeGutenbergBridge.onUploadMediaPress( ( mediaId, mediaUri ) => {
+			const onUploadMediaPressed = () => {
+				RNReactNativeGutenbergBridge.onUploadMediaPressed( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
 						this.addMediaUploadListener( mediaId );
 						setAttributes( { url: mediaUri, id: mediaId } );
@@ -80,8 +80,8 @@ export default class ImageEdit extends React.Component {
 
 			return (
 				<MediaPlaceholder
-					onUploadMediaPress={ onUploadMediaPress }
-					onMediaLibraryPress={ onMediaLibraryPress }
+					onUploadMediaPressed={ onUploadMediaPressed }
+					onMediaLibraryPressed={ onMediaLibraryPressed }
 				/>
 			);
 		}
@@ -92,7 +92,7 @@ export default class ImageEdit extends React.Component {
 					className="components-toolbar__control"
 					label={ __( 'Edit image' ) }
 					icon="edit"
-					onClick={ onMediaLibraryPress }
+					onClick={ onMediaLibraryPressed }
 				/>
 			</Toolbar>
 		);
