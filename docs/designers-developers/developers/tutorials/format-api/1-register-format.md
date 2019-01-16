@@ -1,6 +1,6 @@
 # Register a new format
 
-The first thing you're going to do in this tutorial is to register the new format that the plugin intends to apply. WordPress has the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) primitive to do so.
+The first thing you're going to do in this tutorial is to register the new format that the plugin intends to apply. WordPress has the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) function to do so.
 
 Let's prepare a minimal plugin to make this work. Create a new folder and a file named `my-custom-format.php` within it containing the necessary PHP code to register and enqueue the JavaScript assets:
 
