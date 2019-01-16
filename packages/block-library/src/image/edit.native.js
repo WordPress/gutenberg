@@ -61,7 +61,7 @@ export default class ImageEdit extends React.Component {
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption } = attributes;
+		const { url, caption, height, width } = attributes;
 
 		const onMediaLibraryPressed = () => {
 			RNReactNativeGutenbergBridge.onMediaLibraryPressed( ( mediaUrl ) => {
