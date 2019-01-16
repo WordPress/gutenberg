@@ -24,7 +24,7 @@ test( 'engine returns IR for named export (function)', ( t ) => {
 	t.end();
 } );
 
-test( 'engine returns IR for named export (const)', ( t ) => {
+test( 'engine returns IR for named export (variable)', ( t ) => {
 	const ir = engine( `
 		/**
  		 * My declaration example.
