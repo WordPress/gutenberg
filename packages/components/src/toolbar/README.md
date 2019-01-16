@@ -29,12 +29,12 @@ Toolbars should:
 
 ### States
 
-**Active and available toolbars**
+#### Active and available toolbars
 A toolbar’s state makes it clear which icon button is active. Hover and focus states express the available selection options for icon buttons in a toolbar.
 
 ![Toolbar component](https://wordpress.org/gutenberg/files/2019/01/s_96EC471FE9C9D91A996770229947AAB54A03351BDE98F444FD3C1BF0CED365EA_1541784539545_ButtonGroup.png)
 
-**Disabled toolbars**
+#### Disabled toolbars
 Toolbars that cannot be selected can either be given a disabled state, or be hidden.
 
 ## Development guidelines
