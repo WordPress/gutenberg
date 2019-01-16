@@ -71,3 +71,21 @@ test( 'engine returns IR for default export (anonymous function)', ( t ) => {
 	);
 	t.end();
 } );
+
+test( 'engine returns IR for default export (identifier)', ( t ) => {
+	const ir = engine( `
+		function myDeclaration() {
+			// do nothing
+		}
+
+		/**
+ 		 * My declaration example.
+ 		 */
+		export default myDeclaration;
+` );
+	t.deepEqual(
+		ir,
+		[ { name: 'myDeclaration', jsdoc: { description: 'My declaration example.', tags: [] } } ]
+	);
+	t.end();
+} );
