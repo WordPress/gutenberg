@@ -9,15 +9,15 @@ Toolbar can be used to group related options. To emphasize groups of related ico
 1. [Design guidelines](#design-guidelines)
 2. [Development guidelines](#development-guidelines)
 
-# Design guidelines
+## Design guidelines
 
-## Usage
+### Usage
 
-### Selected action
+#### Selected action
 
 Only one option in a toolbar can be selected and active at a time. Selecting one option deselects any other.
 
-## Best practices
+### Best practices
 
 Toolbars should:
 
@@ -27,7 +27,7 @@ Toolbars should:
 
 ![A toolbar attached to the top left side of a block. (1. Toolbar, 2. Block)](https://wordpress.org/gutenberg/files/2019/01/s_D8D19E5A314C2D056B8CCC92B2DB5E27164936A0C5ED98A4C2DFDA650BE2A771_1542388042335_toolbar-block.png)
 
-## States
+### States
 
 **Active and available toolbars**
 A toolbar’s state makes it clear which icon button is active. Hover and focus states express the available selection options for icon buttons in a toolbar.
@@ -37,9 +37,9 @@ A toolbar’s state makes it clear which icon button is active. Hover and focus 
 **Disabled toolbars**
 Toolbars that cannot be selected can either be given a disabled state, or be hidden.
 
-# Development guidelines
+## Development guidelines
 
-## Usage
+### Usage
 
 ```jsx
 import { Toolbar } from '@wordpress/components';
