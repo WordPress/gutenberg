@@ -1,0 +1,57 @@
+# Coverage
+
+- [x] a11y
+- [x] annotations - export nothing
+- [x] api-fetch
+- [x] autop
+- [x] babel-plugin-import-jsx-pragma
+- [ ] babel-plugin-makepot - NODE EXPORT
+- [ ] babel-preset-default - NODE EXPORT, not `src/index.js`
+- [x] blob
+- [x] block-library
+- [x] block-serialization-default-parser
+- [ ] block-serialization-spec-parser - not `src/index.js`, multiple named exports
+- [ ] blocks - `export *`
+- [ ] browserslist-config - NODE, not `src/index.js`
+- [ ] components - `export *`, `default as`
+- [ ] compose - directory dependency
+- [x] core-data - export nothing
+- [ ] custom-templated-path-webpack-plugin - NODE EXPORT
+- [ ] data - directory dependency
+- [x] date
+- [ ] deprecated - do not name default export
+- [ ] docgen - not `src/index.js`
+- [ ] dom - `export *`
+- [x] dom-ready
+- [ ] e2e-tests - what shall be documented?
+- [ ] e2e-test-utils - what shall be documented?
+- [ ] editor - `export *`
+- [ ] edit-post - directory dependency
+- [ ] element - `export *`, `default as`
+- [x] escape-html
+- [ ] eslint-plugin - NODE EXPORT
+- [x] format-library - exports nothing
+- [ ] hooks - multiple named exports
+- [x] html-entities
+- [x] i18n
+- [ ] is-shallow-equal - NODE EXPORT
+- [x] jest-console - export nothing
+- [ ] jest-preset-default - NODE EXPORT, not `src/index.js`
+- [x] jest-puppeteer-axe - export nothing
+- [-] keycodes - how to document CONSTANTS?
+- [ ] library-export-default-webpack-plugin - NODE EXPORT
+- [x] list-reusable-blocks - export nothing
+- [ ] notices - REVIEW. Does weird things.
+- [ ] npm-package-json-lint-config - CONFIG file
+- [ ] nux - `default as`, directory dependency 
+- [ ] plugins - `export *`
+- [ ] postcss-themes - NODE export
+- [x] priority-queue
+- [-] redux-routine - check description with many paragraphs
+- [x] rich-text
+- [ ] scripts - what shall be documented?
+- [x] shortcode
+- [ ] token-list - `export class`
+- [x] url
+- [ ] viewport - `default as`
+- [x] wordcount
