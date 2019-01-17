@@ -3,9 +3,11 @@
  */
 import React from 'react';
 import { View, Image, TextInput, NativeEventEmitter } from 'react-native';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
-
-const gutenbergBridgeEvents = new NativeEventEmitter( RNReactNativeGutenbergBridge );
+import {
+	subscribeMediaUpload,
+	onMediaLibraryPressed,
+	onUploadMediaPressed,
+} from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -22,6 +24,9 @@ const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
 const MEDIA_ULOAD_STATE_FAILED = 3;
 
 export default class ImageEdit extends React.Component {
+
+	subscriptionParentMediaUpload: ?EmitterSubscription;
+
 	constructor( props ) {
 		super( props );
 
@@ -33,6 +38,10 @@ export default class ImageEdit extends React.Component {
 		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploading = this.finishMediaUploading.bind( this );
+	}
+
+	componentWillUnmount() {
+		this.removeMediaUploadListener();
 	}
 
 	mediaUpload( payload ) {
@@ -54,20 +63,24 @@ export default class ImageEdit extends React.Component {
 		this.removeMediaUploadListener( payload.mediaId );
 	}
 
-	addMediaUploadListener( mediaId ) {
-		gutenbergBridgeEvents.addListener( 'mediaUpload', this.mediaUpload );
+	addMediaUploadListener( ) {
+		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
+			this.mediaUpload( payload );
+		} );
 	}
 
-	removeMediaUploadListener( mediaId ) {
-		gutenbergBridgeEvents.removeListener( 'mediaUpload', this.mediaUpload );
+	removeMediaUploadListener( ) {
+		if ( this.subscriptionParentMediaUpload ) {
+			this.subscriptionParentMediaUpload.remove();
+		}
 	}
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width } = attributes;
 
-		const onMediaLibraryPressed = () => {
-			RNReactNativeGutenbergBridge.onMediaLibraryPressed( ( mediaUrl ) => {
+		const onMediaLibraryButtonPressed = () => {
+			onMediaLibraryPressed( ( mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { url: mediaUrl } );
 				}
@@ -75,8 +88,8 @@ export default class ImageEdit extends React.Component {
 		};
 
 		if ( ! url ) {
-			const onUploadMediaPressed = () => {
-				RNReactNativeGutenbergBridge.onUploadMediaPressed( ( mediaId, mediaUri ) => {
+			const onUploadMediaButtonPressed = () => {
+				onUploadMediaPressed( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
 						this.addMediaUploadListener( mediaId );
 						setAttributes( { url: mediaUri, id: mediaId } );
@@ -86,8 +99,8 @@ export default class ImageEdit extends React.Component {
 
 			return (
 				<MediaPlaceholder
-					onUploadMediaPressed={ onUploadMediaPressed }
-					onMediaLibraryPressed={ onMediaLibraryPressed }
+					onUploadMediaPressed={ onUploadMediaButtonPressed }
+					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
 				/>
 			);
 		}
@@ -97,7 +110,7 @@ export default class ImageEdit extends React.Component {
 				<ToolbarButton
 					label={ __( 'Edit image' ) }
 					icon="edit"
-					onClick={ onMediaLibraryPressed }
+					onClick={ onMediaLibraryButtonPressed }
 				/>
 			</Toolbar>
 		);
