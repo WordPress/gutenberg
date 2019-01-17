@@ -8,7 +8,7 @@ import { TextInput } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
