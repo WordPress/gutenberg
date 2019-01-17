@@ -110,6 +110,25 @@ test( 'engine returns IR for named export (single identifier) using JSDoc from i
 	t.end();
 } );
 
+test( 'engine returns IR for named export (single identifier) using JSDoc from dependency', ( t ) => {
+	const getDependency = () => `/**
+ 		 * My declaration example.
+ 		 */
+		export const myDeclaration = function() {
+			// do nothing
+		}
+	`;
+	const ir = engine(
+		`export { myDeclaration } from './my-dependency';`,
+		getDependency
+	);
+	t.deepEqual(
+		ir,
+		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+	);
+	t.end();
+} );
+
 test( 'engine returns IR for default export (named function)', ( t ) => {
 	const ir = engine( `
 		/**
@@ -208,5 +227,11 @@ test( 'engine returns IR for undocumented export', ( t ) => {
 		ir,
 		[ { description: 'Undocumented declaration.', tags: [], name: 'myDeclaration' } ]
 	);
+	t.end();
+} );
+
+test( 'engine returns IR for undefined code', ( t ) => {
+	const ir = engine( undefined );
+	t.deepEqual( ir, [ ] );
 	t.end();
 } );
