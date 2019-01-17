@@ -14,7 +14,7 @@ TextareaControls are TextControls that allow for multiple lines of text, and wra
 
 ### Usage
 
-**When to use TextareaControl**
+#### When to use TextareaControl
 
 Use TextareaControl when you need to encourage users enter an amount of text that’s longer than a single line. (A bigger box can encourage people to be more verbose, where a smaller one encourages them to be succinct.)
 
@@ -25,7 +25,7 @@ TextareaControl should:
 - Make it easy to understand and address any errors via clear and direct error notices.
 - Make it easy to understand the requested information by using a clear and descriptive label.
 
-**When not to use TextareaControl**
+#### When not to use TextareaControl
 
 Do not use TextareaControl if you need to let users enter shorter answers (no longer than a single line), such as a phone number or name. In this case, you should use `Text Control`.
 
@@ -48,7 +48,7 @@ Use TextareaControl for shorter answers.
 1. Container
 2. Label
 
-**Containers**
+### Containers
 
 Containers improve the discoverability of text fields by creating contrast between the text field and surrounding content.
 
@@ -62,11 +62,11 @@ Use a stroke around the container, which clearly indicates that users can input 
 **Don’t** 
 Use unclear visual markers to indicate a text field.
 
-**Label text**
+### Label text
 
 Label text is used to inform users as to what information is requested for a text field. Every text field should have a label. Label text should be above the input field, and always visible. Write labels in sentence capitalization.
 
-**Error text**
+### Error text
 
 When text input isn’t accepted, an error message can display instructions on how to fix it. Error messages are displayed below the input line, replacing helper text until fixed.
 
@@ -97,21 +97,21 @@ The set of props accepted by the component will be specified below.
 
 Props not included in this set will be applied to the textarea element.
 
-**label**
+#### label
 
 If this property is added, a label will be generated using label property as the content.
 
 - Type: `String`
 - Required: No
 
-**help**
+#### help
 
 If this property is added, a help text will be generated using help property as the content.
 
 - Type: `String`
 - Required: No
 
-**rows**
+#### rows
 
 The number of rows the textarea should contain. Defaults to four.
 
@@ -119,19 +119,20 @@ The number of rows the textarea should contain. Defaults to four.
 - Required: No
 - Default: 4
 
-**value**
+#### value
 
 The current value of the textarea.
 
 - Type: `String`
 - Required: Yes
 
-**onChange**
+#### onChange
 
 A function that receives the new value of the textarea each time it changes.
 
 - Type: `function`
 - Required: Yes
-# Related components
+
+## Related components
 
 - For a field where users only enter one line of text, use the `TextControl` component.
