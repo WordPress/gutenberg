@@ -6,8 +6,7 @@ const espree = require( 'espree' );
 /**
 * Internal dependencies.
 */
-const getNameDeclaration = require( './get-name-declaration' );
-const getJSDoc = require( './get-jsdoc' );
+const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
 module.exports = function( code ) {
 	const ast = espree.parse( code, {
@@ -17,14 +16,15 @@ module.exports = function( code ) {
 	} );
 
 	const tokens = ast.body.filter(
-		( node ) => [ 'ExportNamedDeclaration', 'ExportDefaultDeclaration', 'ExportAllDeclaration' ].some( ( declaration ) => declaration === node.type )
+		( node ) => [
+			'ExportNamedDeclaration',
+			'ExportDefaultDeclaration',
+			'ExportAllDeclaration',
+		].some( ( declaration ) => declaration === node.type )
 	);
 
 	const intermediateRepresentation = tokens.map(
-		( token ) => ( {
-			name: getNameDeclaration( token ),
-			jsdoc: getJSDoc( ast, token ),
-		} )
+		( token ) => getIntermediateRepresentation( ast, token )
 	);
 
 	return intermediateRepresentation;

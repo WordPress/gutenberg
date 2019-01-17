@@ -37,5 +37,6 @@ module.exports = function( ast, token ) {
 		jsdoc = { description: 'Undocumented declaration.', tags: [] };
 	}
 
+	jsdoc.name = name;
 	return jsdoc;
 };
