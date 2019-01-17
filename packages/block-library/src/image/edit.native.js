@@ -36,10 +36,14 @@ export default class ImageEdit extends React.Component {
 	}
 
 	mediaUpload( payload ) {
-		if ( payload.state === mediaUploadStateUploading ) {
-			this.setState( { progress: payload.progress } );
-		} else if ( payload.state === mediaUploadStateSucceeded || payload.state === mediaUploadStateFailed ) {
-			this.finishMediaUploading( payload );
+		const { attributes } = this.props;
+
+		if (payload.mediaId === attributes.id) {
+			if ( payload.state === mediaUploadStateUploading ) {
+				this.setState( { progress: payload.progress } );
+			} else if ( payload.state === mediaUploadStateSucceeded || payload.state === mediaUploadStateFailed ) {
+				this.finishMediaUploading( payload );
+			}	
 		}
 	}
 
