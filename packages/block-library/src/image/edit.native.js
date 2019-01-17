@@ -17,7 +17,6 @@ import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
-import { isURL } from '@wordpress/url'
 
 const MEDIA_ULOAD_STATE_UPLOADING = 1;
 const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
@@ -32,6 +31,7 @@ export default class ImageEdit extends React.Component {
 
 		this.state = {
 			progress: 0,
+			isUploadInProgress: false,
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -49,7 +49,7 @@ export default class ImageEdit extends React.Component {
 
 		if (payload.mediaId === attributes.id) {
 			if ( payload.state === MEDIA_ULOAD_STATE_UPLOADING ) {
-				this.setState( { progress: payload.progress } );
+				this.setState( { progress: payload.progress, isUploadInProgress: true } );
 			} else if ( payload.state === MEDIA_ULOAD_STATE_SUCCEEDED || payload.state === MEDIA_ULOAD_STATE_FAILED ) {
 				this.finishMediaUploading( payload );
 			}	
@@ -60,6 +60,8 @@ export default class ImageEdit extends React.Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
+		this.setState( { isUploadInProgress: false } );
+
 		this.removeMediaUploadListener( payload.mediaId );
 	}
 
@@ -115,8 +117,8 @@ export default class ImageEdit extends React.Component {
 			</Toolbar>
 		);
 
-		const showSpinner = ! isURL( url )
-		const opacity = ! isURL( url ) ? 0.3 : 1;
+		const showSpinner = this.state.isUploadInProgress;
+		const opacity =  this.state.isUploadInProgress ? 0.3 : 1;
 		const progress = this.state.progress * 100;
 
 		return (
