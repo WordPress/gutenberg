@@ -149,10 +149,20 @@ class RCTAztecView: Aztec.TextView {
         if selectionAffinity == .backward {
             (start, end) = (end, start)
         }
-        return ["text": getHTML(),
-                "selectionStart": start,
-                "selectionEnd": end,
+        
+        var result: [String : Any] = [
+            "text": getHTML(),
+            "selectionStart": start,
+            "selectionEnd": end
         ]
+        
+        if let selectedTextRange = selectedTextRange {
+            let caretEndRect = caretRect(for: selectedTextRange.end)
+            result["selectionEndCaretX"] = caretEndRect.origin.x
+            result["selectionEndCaretY"] = caretEndRect.origin.y
+        }
+
+        return result
     }
 
     // MARK: - RN Properties

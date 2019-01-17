@@ -6,7 +6,8 @@ import TextInputState from 'react-native/lib/TextInputState';
 const AztecManager = UIManager.RCTAztecView;
 
 class AztecView extends React.Component {
-  
+  selectionEndCaretY: number;
+
   static propTypes = {
     isSelected: PropTypes.bool,
     disableGutenbergMode: PropTypes.bool,
@@ -27,6 +28,7 @@ class AztecView extends React.Component {
     onActiveFormatAttributesChange: PropTypes.func,
     onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
+    onCaretVerticalPositionChange: PropTypes.func,
     blockType: PropTypes.object,
     ...ViewPropTypes, // include the default view properties
   }
@@ -123,6 +125,7 @@ class AztecView extends React.Component {
   }
   
   _onBlur = (event) => {
+    this.selectionEndCaretY = null;
     TextInputState.blurTextInput(ReactNative.findNodeHandle(this));
 
     if (!this.props.onBlur) {
@@ -134,12 +137,18 @@ class AztecView extends React.Component {
   }
 
   _onSelectionChange = (event) => {
-    if (!this.props.onSelectionChange) {
-      return;
+    if ( this.props.onSelectionChange ) {
+      const { selectionStart, selectionEnd, text } = event.nativeEvent;
+      const { onSelectionChange } = this.props;
+      onSelectionChange( selectionStart, selectionEnd, text );
     }
-    const { selectionStart, selectionEnd, text } = event.nativeEvent;
-    const { onSelectionChange } = this.props;
-    onSelectionChange(selectionStart, selectionEnd, text);
+
+    if ( this.props.onCaretVerticalPositionChange && 
+      this.selectionEndCaretY != event.nativeEvent.selectionEndCaretY ) {
+        const caretY = event.nativeEvent.selectionEndCaretY;
+        this.props.onCaretVerticalPositionChange( event.target, caretY, this.selectionEndCaretY );
+        this.selectionEndCaretY = caretY;
+    }
   }
 
   blur = () => {
