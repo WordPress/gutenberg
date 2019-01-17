@@ -1,7 +1,7 @@
 # FormToggle
 FormToggle switches a single setting on or off.
 
-![On and off FormToggles](https://wordpress.org/gutenberg/files/2019/01/Toggle.jpg)
+![On and off FormToggles. The top toggle is on, while the bottom toggle is off.](https://wordpress.org/gutenberg/files/2019/01/Toggle.jpg)
 
 ## Table of contents
 
