@@ -6,7 +6,7 @@ module.exports = function( artifacts ) {
 		docs.push( `## ${ artifact.name }` );
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( artifact.jsdoc.description.replace( '\n', ' ' ) );
+		docs.push( artifact.description.replace( '\n', ' ' ) );
 		docs.push( '\n' );
 		docs.push( '\n' );
 	} );
