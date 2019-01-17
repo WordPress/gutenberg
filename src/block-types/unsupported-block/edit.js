@@ -13,15 +13,10 @@ type PropsType = BlockType & {
 	onBlockHolderPressed: ( clientId: string ) => void,
 };
 
-type StateType = {
-	selected: boolean,
-	focused: boolean,
-};
-
 // Styles
 import styles from '../../block-management/block-holder.scss';
 
-export default class UnsupportedBlockEdit extends React.Component<PropsType, StateType> {
+export default class UnsupportedBlockEdit extends React.Component<PropsType> {
 	render() {
 		return (
 			<View style={ styles.unsupportedBlock }>

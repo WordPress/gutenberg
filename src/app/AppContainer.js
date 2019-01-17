@@ -12,26 +12,16 @@ import type { BlockType } from '../store/types';
 
 type PropsType = {
 	rootClientId: ?string,
-	isBlockSelected: string => boolean,
 	initialHtmlModeEnabled: boolean,
 	showHtml: boolean,
 	editedPostContent: string,
-	selectedBlockIndex: number,
-	blocks: Array<BlockType>,
-	onInsertBlock: ( BlockType, number, ?string ) => mixed,
-	onMerge: ( string, string ) => mixed,
-	onMoveDown: ( string, ?string ) => mixed,
-	onMoveUp: ( string, ?string ) => mixed,
-	onRemove: ( string, ?string ) => mixed,
-	onToggleBlockMode: ?string => mixed,
-	onResetBlocks: Array<BlockType> => mixed,
-	onSelect: string => mixed,
-	clearSelectedBlock: void => void,
-	onAttributesUpdate: ( string, mixed ) => mixed,
 	title: string,
 	initialHtml: string,
+	resetBlocks: Array<BlockType> => mixed,
 	setupEditor: ( mixed, ?mixed ) => mixed,
-	clientId: string,
+	toggleBlockMode: ?string => mixed,
+	getBlocks: () => Array<BlockType>,
+	post: ?mixed,
 };
 
 type StateType = {
@@ -67,43 +57,12 @@ class AppContainer extends React.Component<PropsType, StateType> {
 		}
 	}
 
-	onChange = ( clientId, attributes ) => {
-		this.props.onAttributesUpdate( clientId, attributes );
-	};
-
-	focusBlockAction = ( clientId ) => {
-		this.props.onSelect( clientId );
-	};
-
-	moveBlockUpAction = ( clientId ) => {
-		this.props.onMoveUp( clientId, this.props.rootClientId );
-	};
-
-	moveBlockDownAction = ( clientId ) => {
-		this.props.onMoveDown( clientId, this.props.rootClientId );
-	};
-
-	deleteBlockAction = ( clientId ) => {
-		this.props.onRemove( clientId, this.props.rootClientId );
-	};
-
-	createBlockAction = ( clientId, block ) => {
-		const indexAfterSelected = this.props.selectedBlockIndex + 1;
-		const insertionIndex = indexAfterSelected || this.props.blocks.length;
-		this.props.onInsertBlock( block, insertionIndex, this.props.rootClientId );
-	};
-
-	parseBlocksAction = ( html = '' ) => {
-		const parsed = parse( html );
-		this.props.onResetBlocks( parsed );
-	};
-
 	serializeToNativeAction = () => {
 		if ( this.props.showHtml ) {
-			this.parseBlocksAction( this.props.editedPostContent );
+			this.updateHtmlAction( this.props.editedPostContent );
 		}
 
-		const html = serialize( this.props.blocks );
+		const html = serialize( this.props.getBlocks() );
 		const hasChanges = this.state.title !== this.lastTitle || this.lastHtml !== html;
 
 		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.state.title, hasChanges );
@@ -113,39 +72,26 @@ class AppContainer extends React.Component<PropsType, StateType> {
 	};
 
 	toggleHtmlModeAction = () => {
-		this.props.onToggleBlockMode( this.props.rootClientId );
+		this.props.toggleBlockMode( this.props.rootClientId );
 	};
 
 	setTitleAction = ( title: string ) => {
 		this.setState( { title: title } );
 	};
 
-	updateHtmlAction = ( html: string ) => {
-		this.parseBlocksAction( html );
-	};
-
-	mergeBlocksAction = ( blockOneClientId, blockTwoClientId ) => {
-		this.props.onMerge( blockOneClientId, blockTwoClientId );
+	updateHtmlAction = ( html: string = '' ) => {
+		const parsed = parse( html );
+		this.props.resetBlocks( parsed );
 	};
 
 	render() {
 		return (
 			<MainApp
 				rootClientId={ this.props.rootClientId }
-				blocks={ this.props.blocks }
-				showHtml={ this.props.showHtml }
-				onChange={ this.onChange }
-				focusBlockAction={ this.focusBlockAction }
-				moveBlockUpAction={ this.moveBlockUpAction }
-				moveBlockDownAction={ this.moveBlockDownAction }
-				deleteBlockAction={ this.deleteBlockAction }
-				createBlockAction={ this.createBlockAction }
 				serializeToNativeAction={ this.serializeToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
 				setTitleAction={ this.setTitleAction }
 				updateHtmlAction={ this.updateHtmlAction }
-				mergeBlocksAction={ this.mergeBlocksAction }
-				isBlockSelected={ this.props.isBlockSelected }
 				title={ this.state.title }
 			/>
 		);
@@ -155,53 +101,28 @@ class AppContainer extends React.Component<PropsType, StateType> {
 export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getBlockIndex,
 			getBlocks,
-			getSelectedBlockClientId,
-			isBlockSelected,
 			getBlockMode,
 			getEditedPostContent,
 		} = select( 'core/editor' );
-		const selectedBlockClientId = getSelectedBlockClientId();
 
 		return {
-			isBlockSelected,
-			selectedBlockIndex: getBlockIndex( selectedBlockClientId, rootClientId ),
-			blocks: getBlocks( rootClientId ),
+			getBlocks,
 			showHtml: getBlockMode( rootClientId ) === 'html',
 			editedPostContent: getEditedPostContent(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
-			clearSelectedBlock,
-			insertBlock,
-			mergeBlocks,
-			moveBlocksDown,
-			moveBlocksUp,
-			removeBlock,
 			resetBlocks,
-			selectBlock,
 			setupEditor,
-			updateBlockAttributes,
 			toggleBlockMode,
 		} = dispatch( 'core/editor' );
 
 		return {
-			clearSelectedBlock,
-			onInsertBlock: insertBlock,
-			onMerge: mergeBlocks,
-			onMoveDown: moveBlocksDown,
-			onMoveUp: moveBlocksUp,
-			onRemove: removeBlock,
-			onResetBlocks: resetBlocks,
-			onToggleBlockMode: toggleBlockMode,
-			onSelect: ( clientId ) => {
-				clearSelectedBlock();
-				selectBlock( clientId );
-			},
-			onAttributesUpdate: updateBlockAttributes,
+			resetBlocks,
 			setupEditor,
+			toggleBlockMode,
 		};
 	} ),
 ] )( AppContainer );
