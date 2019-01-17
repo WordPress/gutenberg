@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PluginSettingsSidebar renders fill properly 1`] = `"My panel content"`;
