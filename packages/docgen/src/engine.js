@@ -31,7 +31,7 @@ module.exports = function( code ) {
 	);
 
 	const intermediateRepresentation = tokens.map(
-		( token ) => getIntermediateRepresentation( ast, token )
+		( token ) => getIntermediateRepresentation( token, ast )
 	);
 
 	return intermediateRepresentation;

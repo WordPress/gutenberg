@@ -31,7 +31,16 @@ const isIdentifier = ( token ) => {
 	}
 };
 
-module.exports = function( ast, token ) {
+/**
+ * Takes a export token and the file AST
+ * and returns an intermediate representation in JSON.
+ *
+ * @param {Object} token Espree export token.
+ * @param {Object} ast Espree ast of a single file.
+ *
+ * @return {Object} Intermediate Representation in JSON.
+ */
+module.exports = function( token, ast ) {
 	let jsdoc = getJSDoc( token );
 	const name = getNameDeclaration( token );
 	if ( jsdoc === undefined && isIdentifier( token ) ) {
