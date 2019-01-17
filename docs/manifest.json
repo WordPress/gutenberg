@@ -240,6 +240,42 @@
 		"parent": "javascript"
 	},
 	{
+		"title": "Meta Boxes",
+		"slug": "metabox",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/readme.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Store Post Meta with a Block",
+		"slug": "meta-block-1-intro",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Register Meta Field",
+		"slug": "meta-block-2-register-meta",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-2-register-meta.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Create Meta Block",
+		"slug": "meta-block-3-add",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Use Post Meta Data",
+		"slug": "meta-block-4-use-data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md",
+		"parent": "metabox"
+	},
+	{
+		"title": "Finishing Touches",
+		"slug": "meta-block-5-finishing",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md",
+		"parent": "metabox"
+	},
+	{
 		"title": "Creating a sidebar for your plugin",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
@@ -280,6 +316,30 @@
 		"slug": "plugin-sidebar-6-finishing-touches",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md",
 		"parent": "plugin-sidebar-0"
+	},
+	{
+		"title": "Introduction to the Format API",
+		"slug": "format-api",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/README.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Register a new format",
+		"slug": "1-register-format",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/1-register-format.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Add a button to the toolbar",
+		"slug": "2-toolbar-button",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Apply the format when the button is clicked",
+		"slug": "3-apply-format",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/3-apply-format.md",
+		"parent": "format-api"
 	},
 	{
 		"title": "Designer Documentation",
@@ -558,6 +618,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/e2e-test-utils",
+		"slug": "packages-e2e-test-utils",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/e2e-test-utils/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/e2e-tests",
+		"slug": "packages-e2e-tests",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/e2e-tests/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-post/README.md",
@@ -630,6 +702,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/jest-puppeteer-axe",
+		"slug": "packages-jest-puppeteer-axe",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/jest-puppeteer-axe/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/keycodes",
 		"slug": "packages-keycodes",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/keycodes/README.md",
@@ -678,6 +756,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/priority-queue",
+		"slug": "packages-priority-queue",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/redux-routine/README.md",
@@ -699,12 +783,6 @@
 		"title": "@wordpress/shortcode",
 		"slug": "packages-shortcode",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/shortcode/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/tests-e2e",
-		"slug": "packages-tests-e2e",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/tests-e2e/README.md",
 		"parent": "packages"
 	},
 	{

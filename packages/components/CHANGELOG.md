@@ -1,3 +1,10 @@
+## 7.1.0 (Unreleased)
+
+### Improvements
+
+- `withFilters` has been optimized to avoid binding hook handlers for each mounted instance of the component, instead using a single centralized hook delegator.
+- `withFilters` has been optimized to reuse a single shared component definition for all filtered instances of the component.
+
 ## 7.0.5 (2019-01-03)
 
 ## 7.0.4 (2018-12-12)
