@@ -102,7 +102,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
-        emitToJS(EVENT_NAME_MEDIA_UPLOAD + mediaId, writableMap);
+        emitToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
     }
 
     public void toggleEditorMode() {
