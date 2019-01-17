@@ -16,7 +16,10 @@ describe( 'PluginSettingsSidebar', () => {
 		const div = document.createElement( 'div' );
 		render(
 			<SlotFillProvider>
-				<PluginSettingsSidebar>
+				<PluginSettingsSidebar
+					className="my-plugin-settings-sidebar"
+					title="My panel title"
+					initialOpen={ true }>
 					My panel content
 				</PluginSettingsSidebar>
 				<PluginSettingsSidebar.Slot />

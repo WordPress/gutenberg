@@ -5,12 +5,20 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { createSlotFill, PanelBody } from '@wordpress/components';
 
 export const { Fill, Slot } = createSlotFill( 'PluginSettingsSidebar' );
 
-const PluginSettingsSidebar = ( { children } ) => (
-	<Fill>{ children }</Fill>
+const PluginSettingsSidebar = ( { children, className, title, initialOpen } ) => (
+	<Fill>
+		<PanelBody
+			className={ className }
+			initialOpen={ initialOpen || ! title }
+			title={ title }
+		>
+			{ children }
+		</PanelBody>
+	</Fill>
 );
 
 PluginSettingsSidebar.Slot = Slot;
