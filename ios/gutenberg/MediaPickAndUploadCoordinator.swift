@@ -31,7 +31,8 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
   
   func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
     presenter.dismiss(animated: true, completion: nil)
-    let url = URL(fileURLWithPath: NSTemporaryDirectory() + UUID().uuidString + ".jpg")
+    let mediaID = UUID().uuidString
+    let url = URL(fileURLWithPath: NSTemporaryDirectory() + mediaID + ".jpg")
     guard
       let image = info[UIImagePickerControllerOriginalImage] as? UIImage,
       let data = UIImageJPEGRepresentation(image, 1.0)
@@ -40,8 +41,7 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
     }
     do {
       try data.write(to: url)
-      let mediaID = "1"
-      mediaCallback(url.absoluteString, "1")
+      mediaCallback(url.absoluteString, mediaID)
       let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
       progress.totalUnitCount = 100
       
