@@ -136,14 +136,9 @@ get back from the oEmbed preview API.
 
 Is the preview for the URL an oEmbed link fallback.
 
-### hasUploadPermissions (deprecated)
+### hasUploadPermissions
 
 Return Upload Permissions.
-
-*Deprecated*
-
-Deprecated since 4.9. Callers should use the more generic `canUser()` selector instead of
-            `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
 
 *Parameters*
 
