@@ -6,6 +6,10 @@ The following guidelines are in place to create consistency across the project a
 
 ## Philosophy
 
+* [Architecturial and UX Principles of Gutenberg](/docs/contributors/principles/)
+
+## Sections
+
 The contributors guide has the following different sections by contribution type:
 
 * [Design Contributions](/docs/contributors/design.md)
