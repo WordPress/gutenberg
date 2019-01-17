@@ -21,9 +21,14 @@ import scrollIntoView from 'dom-scroll-into-view';
  * WordPress dependencies
  */
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
-import { Component, findDOMNode, createRef } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSpokenMessages, PanelBody } from '@wordpress/components';
-import { getCategories, isReusableBlock } from '@wordpress/blocks';
+import {
+	getCategories,
+	isReusableBlock,
+	createBlock,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
@@ -125,10 +130,12 @@ export class InserterMenu extends Component {
 			hoveredItem: item,
 		} );
 
+		const { showInsertionPoint, hideInsertionPoint } = this.props;
 		if ( item ) {
-			this.props.showInsertionPoint();
+			const { rootClientId, index } = this.props;
+			showInsertionPoint( rootClientId, index );
 		} else {
-			this.props.hideInsertionPoint();
+			hideInsertionPoint();
 		}
 	}
 
@@ -156,7 +163,7 @@ export class InserterMenu extends Component {
 				this.props.setTimeout( () => {
 					// We need a generic way to access the panel's container
 					// eslint-disable-next-line react/no-find-dom-node
-					scrollIntoView( findDOMNode( this.panels[ panel ] ), this.inserterResults.current, {
+					scrollIntoView( this.panels[ panel ], this.inserterResults.current, {
 						alignWithTop: true,
 					} );
 				} );
@@ -340,21 +347,53 @@ export class InserterMenu extends Component {
 export default compose(
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getChildBlockNames,
-		} = select( 'core/blocks' );
-		const {
+			getInserterItems,
 			getBlockName,
 		} = select( 'core/editor' );
+		const {
+			getChildBlockNames,
+		} = select( 'core/blocks' );
+
 		const rootBlockName = getBlockName( rootClientId );
+
 		return {
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
+			items: getInserterItems( rootClientId ),
+			rootClientId,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		fetchReusableBlocks: dispatch( 'core/editor' ).fetchReusableBlocks,
-		showInsertionPoint: dispatch( 'core/editor' ).showInsertionPoint,
-		hideInsertionPoint: dispatch( 'core/editor' ).hideInsertionPoint,
-	} ) ),
+	withDispatch( ( dispatch, ownProps, { select } ) => {
+		const {
+			__experimentalFetchReusableBlocks: fetchReusableBlocks,
+			showInsertionPoint,
+			hideInsertionPoint,
+		} = dispatch( 'core/editor' );
+
+		return {
+			fetchReusableBlocks,
+			showInsertionPoint,
+			hideInsertionPoint,
+			onSelect( item ) {
+				const {
+					replaceBlocks,
+					insertBlock,
+				} = dispatch( 'core/editor' );
+				const { getSelectedBlock } = select( 'core/editor' );
+				const { index, rootClientId } = ownProps;
+				const { name, initialAttributes } = item;
+
+				const selectedBlock = getSelectedBlock();
+				const insertedBlock = createBlock( name, initialAttributes );
+				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+					replaceBlocks( selectedBlock.clientId, insertedBlock );
+				} else {
+					insertBlock( insertedBlock, index, rootClientId );
+				}
+
+				ownProps.onSelect();
+			},
+		};
+	} ),
 	withSpokenMessages,
 	withInstanceId,
 	withSafeTimeout

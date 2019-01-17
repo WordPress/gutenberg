@@ -4,9 +4,11 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 <div
   className="wp-block editor-default-block-appender"
   data-root-client-id=""
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
 >
-  <WithDispatch(WithSelect(BlockDropZone)) />
-  <input
+  <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
+  <TextareaAutosize
     aria-label="Add block"
     className="editor-default-block-appender__content"
     onFocus={
@@ -19,11 +21,10 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     }
     readOnly={true}
     role="button"
-    type="text"
-    value="Write your story"
+    rows={1}
+    value="Start writing or type / to choose a block"
   />
-  <WithSelect(WithDispatch(InserterWithShortcuts)) />
-  <WithSelect(WithDispatch(Inserter))
+  <WithSelect(IfCondition(Inserter))
     position="top right"
   />
 </div>
@@ -33,19 +34,20 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
   className="wp-block editor-default-block-appender"
   data-root-client-id=""
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
 >
-  <WithDispatch(WithSelect(BlockDropZone)) />
-  <input
+  <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
+  <TextareaAutosize
     aria-label="Add block"
     className="editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
-    type="text"
-    value="Write your story"
+    rows={1}
+    value="Start writing or type / to choose a block"
   />
-  <WithSelect(WithDispatch(InserterWithShortcuts)) />
-  <WithSelect(WithDispatch(Inserter))
+  <WithSelect(IfCondition(Inserter))
     position="top right"
   />
 </div>
@@ -55,19 +57,20 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 <div
   className="wp-block editor-default-block-appender"
   data-root-client-id=""
+  onMouseEnter={[Function]}
+  onMouseLeave={[Function]}
 >
-  <WithDispatch(WithSelect(BlockDropZone)) />
-  <input
+  <WithDispatch(WithSelect(WithFilters(BlockDropZone))) />
+  <TextareaAutosize
     aria-label="Add block"
     className="editor-default-block-appender__content"
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
-    type="text"
+    rows={1}
     value=""
   />
-  <WithSelect(WithDispatch(InserterWithShortcuts)) />
-  <WithSelect(WithDispatch(Inserter))
+  <WithSelect(IfCondition(Inserter))
     position="top right"
   />
 </div>

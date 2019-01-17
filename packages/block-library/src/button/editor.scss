@@ -1,5 +1,3 @@
-$blocks-button__line-height: $big-font-size + 6px;
-
 .editor-block-list__block[data-type="core/button"] {
 	&[data-align="center"] {
 		text-align: center;
@@ -18,7 +16,6 @@ $blocks-button__line-height: $big-font-size + 6px;
 
 	.editor-rich-text__tinymce.mce-content-body {
 		cursor: text;
-		line-height: $blocks-button__line-height;
 	}
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.
@@ -34,6 +31,11 @@ $blocks-button__line-height: $big-font-size + 6px;
 	// Don't let the placeholder text wrap in the variation preview.
 	.editor-block-preview__content & {
 		max-width: 100%;
+
+		// Polish the empty placeholder text for the button in variation previews.
+		.editor-rich-text__tinymce[data-is-placeholder-visible="true"] {
+			height: auto;
+		}
 
 		.wp-block-button__link {
 			max-width: 100%;
@@ -53,8 +55,8 @@ $blocks-button__line-height: $big-font-size + 6px;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 
-	// the width of input box plus two icon buttons plus a padding
-	$blocks-button__link-input-width: 300px + 2 * $icon-button-size + 8px;
+	// The width of input box plus padding plus two icon buttons.
+	$blocks-button__link-input-width: 300px + 2px + 2 * $icon-button-size;
 	width: $blocks-button__link-input-width;
 
 	.editor-url-input {

@@ -34,12 +34,11 @@ getPackages().forEach( ( p ) => {
 	try {
 		fs.accessSync( srcDir, fs.F_OK );
 		fs.watch( path.resolve( p, 'src' ), { recursive: true }, ( event, filename ) => {
-			const filePath = path.resolve( srcDir, filename );
-
 			if ( ! isSourceFile( filename ) ) {
 				return;
 			}
 
+			const filePath = path.resolve( srcDir, filename );
 			if ( ( event === 'change' || event === 'rename' ) && exists( filePath ) ) {
 				// eslint-disable-next-line no-console
 				console.log( chalk.green( '->' ), `${ event }: ${ filename }` );

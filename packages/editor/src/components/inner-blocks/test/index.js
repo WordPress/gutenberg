@@ -3,7 +3,6 @@
  */
 import {
 	createBlock,
-	getBlockType,
 	getBlockTypes,
 	getSaveElement,
 	registerBlockType,
@@ -52,7 +51,7 @@ describe( 'InnerBlocks', () => {
 
 		const saved = renderToString(
 			getSaveElement(
-				getBlockType( 'core/fruit' ),
+				'core/fruit',
 				{ fruit: 'Bananas' },
 				[ createBlock( 'core/fruit', { fruit: 'Apples' } ) ],
 			)

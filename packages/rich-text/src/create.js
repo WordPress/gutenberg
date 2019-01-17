@@ -1,8 +1,7 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-
-import { find } from 'lodash';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,7 +10,6 @@ import { find } from 'lodash';
 import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
-import { getFormatTypes } from './get-format-types';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
@@ -36,9 +34,24 @@ function simpleFindKey( object, value ) {
 }
 
 function toFormat( { type, attributes } ) {
-	const formatType = find( getFormatTypes(), ( { match } ) =>
-		type === match.tagName
-	);
+	let formatType;
+
+	if ( attributes && attributes.class ) {
+		formatType = select( 'core/rich-text' ).getFormatTypeForClassName( attributes.class );
+
+		if ( formatType ) {
+			// Preserve any additional classes.
+			attributes.class = ` ${ attributes.class } `.replace( ` ${ formatType.className } `, ' ' ).trim();
+
+			if ( ! attributes.class ) {
+				delete attributes.class;
+			}
+		}
+	}
+
+	if ( ! formatType ) {
+		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement( type );
+	}
 
 	if ( ! formatType ) {
 		return attributes ? { type, attributes } : { type };
@@ -284,11 +297,10 @@ function createFromElement( {
 
 	const length = element.childNodes.length;
 
-	// Remove any line breaks in text nodes. They are not content, but used to
-	// format the HTML. Line breaks in HTML are stored as BR elements.
-	// See https://www.w3.org/TR/html5/syntax.html#newlines.
 	const filterStringComplete = ( string ) => {
-		string = string.replace( /[\r\n]/g, '' );
+		// Reduce any whitespace used for HTML formatting to one space
+		// character, because it will also be displayed as such by the browser.
+		string = string.replace( /[\n\r\t]+/g, ' ' );
 
 		if ( filterString ) {
 			string = filterString( string );
@@ -346,11 +358,13 @@ function createFromElement( {
 				} ),
 			} );
 
-			// Reuse the last format if it's equal.
-			if ( isFormatEqual( newFormat, lastFormat ) ) {
-				format = lastFormat;
-			} else {
-				format = newFormat;
+			if ( newFormat ) {
+				// Reuse the last format if it's equal.
+				if ( isFormatEqual( newFormat, lastFormat ) ) {
+					format = lastFormat;
+				} else {
+					format = newFormat;
+				}
 			}
 		}
 

@@ -1,3 +1,56 @@
+## 3.2.0 (Next)
+
+### Polish
+
+* Expose the `className` property to style the `PluginSidebar` component.
+
+## 3.1.7 (2019-01-03)
+
+## 3.1.6 (2018-12-18)
+
+## 3.1.5 (2018-12-12)
+
+### Bug Fixes
+ - Fix saving WYSIWYG Meta Boxes
+
+## 3.1.4 (2018-11-30)
+
+## 3.1.3 (2018-11-30)
+
+## 3.1.2 (2018-11-22)
+
+## 3.1.1 (2018-11-21)
+
+## 3.1.0 (2018-11-20)
+
+### New Feature
+
+- The new `AdminNotices` component will transparently upgrade any `.notice` elements on the page to the equivalent `@wordpress/notices` module notice state.
+
+## 3.0.2 (2018-11-15)
+
+## 3.0.1 (2018-11-12)
+
+## 3.0.0 (2018-11-12)
+
+### Breaking Change
+
+- `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
+- `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
+
+## 2.1.1 (2018-11-09)
+
+## 2.1.0 (2018-11-09)
+
+### Bug Fixes
+
+- "View as" link is not updated after the post is updated and the permalink is changed.
+- Hide custom fields option when the meta box is disabled.
+
+## 2.0.3 (2018-11-03)
+
+## 2.0.2 (2018-10-30)
+
 ## 2.0.1 (2018-10-30)
 
 ## 2.0.0 (2018-10-29)

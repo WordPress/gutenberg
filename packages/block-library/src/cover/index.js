@@ -23,17 +23,15 @@ import { compose } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	AlignmentToolbar,
 	PanelColorSettings,
 	RichText,
 	withColors,
 	getColorClassName,
 } from '@wordpress/editor';
-
-const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
 
 const blockAttributes = {
 	title: {
@@ -42,9 +40,6 @@ const blockAttributes = {
 		selector: 'p',
 	},
 	url: {
-		type: 'string',
-	},
-	align: {
 		type: 'string',
 	},
 	contentAlign: {
@@ -83,13 +78,17 @@ const VIDEO_BACKGROUND_TYPE = 'video';
 export const settings = {
 	title: __( 'Cover' ),
 
-	description: __( 'Add a full-width image or video, and layer text over it — great for headers.' ),
+	description: __( 'Add an image or video with a text overlay — great for headers.' ),
 
 	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z" /><Path d="M0 0h24v24H0z" fill="none" /></SVG>,
 
 	category: 'common',
 
 	attributes: blockAttributes,
+
+	supports: {
+		align: true,
+	},
 
 	transforms: {
 		from: [
@@ -167,20 +166,12 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( -1 !== validAlignments.indexOf( align ) ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit: compose( [
 		withColors( { overlayColor: 'background-color' } ),
 		withNotices,
 	] )(
 		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
 			const {
-				align,
 				backgroundType,
 				contentAlign,
 				dimRatio,
@@ -189,7 +180,6 @@ export const settings = {
 				title,
 				url,
 			} = attributes;
-			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const onSelectMedia = ( media ) => {
 				if ( ! media || ! media.url ) {
 					setAttributes( { url: undefined, id: undefined } );
@@ -214,6 +204,7 @@ export const settings = {
 					}
 					mediaType = media.type;
 				}
+
 				setAttributes( {
 					url: media.url,
 					id: media.id,
@@ -233,23 +224,9 @@ export const settings = {
 				backgroundColor: overlayColor.color,
 			};
 
-			const classes = classnames(
-				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
-				dimRatioToClass( dimRatio ),
-				{
-					'has-background-dim': dimRatio !== 0,
-					'has-parallax': hasParallax,
-				}
-			);
-
 			const controls = (
 				<Fragment>
 					<BlockControls>
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
 						{ !! url && (
 							<Fragment>
 								<AlignmentToolbar
@@ -258,21 +235,23 @@ export const settings = {
 										setAttributes( { contentAlign: nextAlign } );
 									} }
 								/>
-								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectMedia }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
-												icon="edit"
-												onClick={ open }
-											/>
-										) }
-									/>
-								</Toolbar>
+								<MediaUploadCheck>
+									<Toolbar>
+										<MediaUpload
+											onSelect={ onSelectMedia }
+											allowedTypes={ ALLOWED_MEDIA_TYPES }
+											value={ id }
+											render={ ( { open } ) => (
+												<IconButton
+													className="components-toolbar__control"
+													label={ __( 'Edit media' ) }
+													icon="edit"
+													onClick={ open }
+												/>
+											) }
+										/>
+									</Toolbar>
+								</MediaUploadCheck>
 							</Fragment>
 						) }
 					</BlockControls>
@@ -342,6 +321,16 @@ export const settings = {
 				);
 			}
 
+			const classes = classnames(
+				className,
+				contentAlign !== 'center' && `has-${ contentAlign }-content`,
+				dimRatioToClass( dimRatio ),
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+				}
+			);
+
 			return (
 				<Fragment>
 					{ controls }
@@ -375,9 +364,8 @@ export const settings = {
 		}
 	),
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const {
-			align,
 			backgroundType,
 			contentAlign,
 			customOverlayColor,
@@ -396,7 +384,6 @@ export const settings = {
 		}
 
 		const classes = classnames(
-			className,
 			dimRatioToClass( dimRatio ),
 			overlayColorClass,
 			{
@@ -404,7 +391,6 @@ export const settings = {
 				'has-parallax': hasParallax,
 				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
-			align ? `align${ align }` : null,
 		);
 
 		return (
@@ -426,6 +412,9 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+			},
 		},
 
 		supports: {
@@ -463,6 +452,9 @@ export const settings = {
 	}, {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+			},
 			title: {
 				type: 'string',
 				source: 'html',
@@ -470,11 +462,10 @@ export const settings = {
 			},
 		},
 
-		save( { attributes, className } ) {
+		save( { attributes } ) {
 			const { url, title, hasParallax, dimRatio, align } = attributes;
 			const style = backgroundImageStyles( url );
 			const classes = classnames(
-				className,
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,

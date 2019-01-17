@@ -1,30 +1,27 @@
 /**
  * External Dependencies
  */
-import { partial, castArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	getDefaultBlockName,
-	createBlock,
-} from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
-import { dispatch } from '@wordpress/data';
+import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post Post object.
+ * @param {Object} post  Post object.
+ * @param {Object} edits Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post ) {
+export function setupEditor( post, edits ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
+		edits,
 	};
 }
 
@@ -76,18 +73,16 @@ export function updatePost( edits ) {
 /**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object}  post            Post object.
- * @param {Array}   blocks          Array of blocks.
- * @param {Object}  edits           Initial edited attributes object.
+ * @param {Object} post   Post object.
+ * @param {Array}  blocks Array of blocks.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post, blocks, edits ) {
+export function setupEditorState( post, blocks ) {
 	return {
 		type: 'SETUP_EDITOR_STATE',
 		post,
 		blocks,
-		edits,
 	};
 }
 
@@ -295,35 +290,36 @@ export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId,
  * Returns an action object used in signalling that a single block should be
  * inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object}  block        Block object to insert.
- * @param {?number} index        Index at which block should be inserted.
- * @param {?string} rootClientId Optional root client ID of block list on which
- *                               to insert.
+ * @param {Object}  block            Block object to insert.
+ * @param {?number} index            Index at which block should be inserted.
+ * @param {?string} rootClientId     Optional root client ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlock( block, index, rootClientId ) {
-	return insertBlocks( [ block ], index, rootClientId );
+export function insertBlock( block, index, rootClientId, updateSelection = true ) {
+	return insertBlocks( [ block ], index, rootClientId, updateSelection );
 }
 
 /**
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks       Block objects to insert.
- * @param {?number}  index        Index at which block should be inserted.
- * @param {?string}  rootClientId Optional root cliente ID of block list on
- *                                which to insert.
+ * @param {Object[]} blocks          Block objects to insert.
+ * @param {?number}  index           Index at which block should be inserted.
+ * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlocks( blocks, index, rootClientId ) {
+export function insertBlocks( blocks, index, rootClientId, updateSelection = true ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
 		index,
 		rootClientId,
 		time: Date.now(),
+		updateSelection,
 	};
 }
 
@@ -331,11 +327,17 @@ export function insertBlocks( blocks, index, rootClientId ) {
  * Returns an action object used in signalling that the insertion point should
  * be shown.
  *
+ * @param {?string} rootClientId Optional root client ID of block list on
+ *                               which to insert.
+ * @param {?number} index        Index at which block should be inserted.
+ *
  * @return {Object} Action object.
  */
-export function showInsertionPoint() {
+export function showInsertionPoint( rootClientId, index ) {
 	return {
 		type: 'SHOW_INSERTION_POINT',
+		rootClientId,
+		index,
 	};
 }
 
@@ -375,6 +377,14 @@ export function synchronizeTemplate() {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that attributes of the post have
+ * been edited.
+ *
+ * @param {Object} edits Post attributes to edit.
+ *
+ * @return {Object} Action object.
+ */
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',
@@ -386,7 +396,7 @@ export function editPost( edits ) {
  * Returns an action object to save the post.
  *
  * @param {Object}  options          Options for the save.
- * @param {boolean} options.autosave Perform an autosave if true.
+ * @param {boolean} options.isAutosave Perform an autosave if true.
  *
  * @return {Object} Action object.
  */
@@ -429,10 +439,12 @@ export function mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 /**
  * Returns an action object used in signalling that the post should autosave.
  *
+ * @param {Object?} options Extra flags to identify the autosave.
+ *
  * @return {Object} Action object.
  */
-export function autosave() {
-	return savePost( { autosave: true } );
+export function autosave( options ) {
+	return savePost( { isAutosave: true, ...options } );
 }
 
 /**
@@ -578,7 +590,7 @@ export function updatePostLock( lock ) {
  *
  * @return {Object} Action object.
  */
-export function fetchReusableBlocks( id ) {
+export function __experimentalFetchReusableBlocks( id ) {
 	return {
 		type: 'FETCH_REUSABLE_BLOCKS',
 		id,
@@ -595,7 +607,7 @@ export function fetchReusableBlocks( id ) {
  *
  * @return {Object} Action object.
  */
-export function receiveReusableBlocks( results ) {
+export function __experimentalReceiveReusableBlocks( results ) {
 	return {
 		type: 'RECEIVE_REUSABLE_BLOCKS',
 		results,
@@ -610,7 +622,7 @@ export function receiveReusableBlocks( results ) {
  *
  * @return {Object} Action object.
  */
-export function saveReusableBlock( id ) {
+export function __experimentalSaveReusableBlock( id ) {
 	return {
 		type: 'SAVE_REUSABLE_BLOCK',
 		id,
@@ -624,7 +636,7 @@ export function saveReusableBlock( id ) {
  *
  * @return {Object} Action object.
  */
-export function deleteReusableBlock( id ) {
+export function __experimentalDeleteReusableBlock( id ) {
 	return {
 		type: 'DELETE_REUSABLE_BLOCK',
 		id,
@@ -640,7 +652,7 @@ export function deleteReusableBlock( id ) {
  *
  * @return {Object} Action object.
  */
-export function updateReusableBlockTitle( id, title ) {
+export function __experimentalUpdateReusableBlockTitle( id, title ) {
 	return {
 		type: 'UPDATE_REUSABLE_BLOCK_TITLE',
 		id,
@@ -655,7 +667,7 @@ export function updateReusableBlockTitle( id, title ) {
  *
  * @return {Object} Action object.
  */
-export function convertBlockToStatic( clientId ) {
+export function __experimentalConvertBlockToStatic( clientId ) {
 	return {
 		type: 'CONVERT_BLOCK_TO_STATIC',
 		clientId,
@@ -669,7 +681,7 @@ export function convertBlockToStatic( clientId ) {
  *
  * @return {Object} Action object.
  */
-export function convertBlockToReusable( clientIds ) {
+export function __experimentalConvertBlockToReusable( clientIds ) {
 	return {
 		type: 'CONVERT_BLOCK_TO_REUSABLE',
 		clientIds: castArray( clientIds ),
@@ -772,52 +784,3 @@ export function unlockPostSaving( lockName ) {
 		lockName,
 	};
 }
-
-/**
- * Returns an action object signaling that a new term is added to the edited post.
- *
- * @param {string} slug  Taxonomy slug.
- * @param {Object} term  Term object.
- *
- * @return {Object} Action object.
- */
-export function addTermToEditedPost( slug, term ) {
-	return {
-		type: 'ADD_TERM_TO_EDITED_POST',
-		slug,
-		term,
-	};
-}
-
-//
-// Deprecated
-//
-
-export function createNotice( status, content, options ) {
-	deprecated( 'createNotice action (`core/editor` store)', {
-		alternative: 'createNotice action (`core/notices` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	dispatch( 'core/notices' ).createNotice( status, content, options );
-
-	return { type: '__INERT__' };
-}
-
-export function removeNotice( id ) {
-	deprecated( 'removeNotice action (`core/editor` store)', {
-		alternative: 'removeNotice action (`core/notices` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	dispatch( 'core/notices' ).removeNotice( id );
-
-	return { type: '__INERT__' };
-}
-
-export const createSuccessNotice = partial( createNotice, 'success' );
-export const createInfoNotice = partial( createNotice, 'info' );
-export const createErrorNotice = partial( createNotice, 'error' );
-export const createWarningNotice = partial( createNotice, 'warning' );

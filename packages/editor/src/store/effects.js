@@ -1,11 +1,12 @@
 /**
  * External dependencies
  */
-import { compact, last } from 'lodash';
+import { compact, last, has } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { speak } from '@wordpress/a11y';
 import {
 	parse,
 	getBlockType,
@@ -13,6 +14,7 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
+import { _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,7 +33,8 @@ import {
 	getBlocks,
 	getBlockCount,
 	getPreviousBlockClientId,
-	getSelectedBlock,
+	getSelectedBlockClientId,
+	getSelectedBlockCount,
 	getTemplate,
 	getTemplateLock,
 	isValidTemplate,
@@ -52,9 +55,6 @@ import {
 	trashPostFailure,
 	refreshPost,
 } from './effects/posts';
-import {
-	addTermToEditedPost,
-} from './effects/terms';
 
 /**
  * Block validity is a function of blocks state (at the point of a
@@ -104,7 +104,7 @@ export function selectPreviousBlock( action, store ) {
 
 	const firstRemovedBlockClientId = action.clientIds[ 0 ];
 	const state = store.getState();
-	const currentSelectedBlock = getSelectedBlock( state );
+	const selectedBlockClientId = getSelectedBlockClientId( state );
 
 	// recreate the state before the block was removed.
 	const previousState = { ...state, editor: { present: last( state.editor.past ) } };
@@ -118,7 +118,7 @@ export function selectPreviousBlock( action, store ) {
 
 	// Dispatch select block action if the currently selected block
 	// is not already the block we want to be selected.
-	if ( blockClientIdToSelect !== currentSelectedBlock ) {
+	if ( blockClientIdToSelect !== selectedBlockClientId ) {
 		return selectBlock( blockClientIdToSelect, -1 );
 	}
 }
@@ -158,7 +158,6 @@ export default {
 		const state = store.getState();
 		const [ firstBlockClientId, secondBlockClientId ] = action.blocks;
 		const blockA = getBlock( state, firstBlockClientId );
-		const blockB = getBlock( state, secondBlockClientId );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
@@ -169,6 +168,7 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
+		const blockB = getBlock( state, secondBlockClientId );
 		const blocksWithTheSameType = blockA.name === blockB.name ?
 			[ blockB ] :
 			switchToBlockType( blockB, blockA.name );
@@ -200,11 +200,20 @@ export default {
 		) );
 	},
 	SETUP_EDITOR( action, store ) {
-		const { post } = action;
+		const { post, edits } = action;
 		const state = store.getState();
 
-		// Parse content as blocks
-		let blocks = parse( post.content.raw );
+		// In order to ensure maximum of a single parse during setup, edits are
+		// included as part of editor setup action. Assume edited content as
+		// canonical if provided, falling back to post.
+		let content;
+		if ( has( edits, [ 'content' ] ) ) {
+			content = edits.content;
+		} else {
+			content = post.content.raw;
+		}
+
+		let blocks = parse( content );
 
 		// Apply a template for new posts only, if exists.
 		const isNewPost = post.status === 'auto-draft';
@@ -213,13 +222,7 @@ export default {
 			blocks = synchronizeBlocksWithTemplate( blocks, template );
 		}
 
-		// Include auto draft title in edits while not flagging post as dirty
-		const edits = {};
-		if ( isNewPost ) {
-			edits.title = post.title.raw;
-		}
-
-		const setupAction = setupEditorState( post, blocks, edits );
+		const setupAction = setupEditorState( post, blocks );
 
 		return compact( [
 			setupAction,
@@ -261,7 +264,10 @@ export default {
 	REPLACE_BLOCKS: [
 		ensureDefaultBlock,
 	],
-	ADD_TERM_TO_EDITED_POST: ( action ) => {
-		addTermToEditedPost( action );
+	MULTI_SELECT: ( action, { getState } ) => {
+		const blockCount = getSelectedBlockCount( getState() );
+
+		/* translators: %s: number of selected blocks */
+		speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
 	},
 };

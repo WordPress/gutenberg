@@ -20,3 +20,13 @@ export function getCategories() {
 export function setCategories( categories ) {
 	dispatch( 'core/blocks' ).setCategories( categories );
 }
+
+/**
+ * Updates a category.
+ *
+ * @param {string} slug          Block category slug.
+ * @param {Object} category Object containing the category properties that should be updated.
+ */
+export function updateCategory( slug, category ) {
+	dispatch( 'core/blocks' ).updateCategory( slug, category );
+}

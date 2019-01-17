@@ -11,7 +11,6 @@ import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
-	getBlockType,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 import {
@@ -64,7 +63,7 @@ export const name = 'core/heading';
 export const settings = {
 	title: __( 'Heading' ),
 
-	description: __( 'Introduce topics and help visitors (and search engines!) understand how your content is organized.' ),
+	description: __( 'Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.' ),
 
 	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M5 4v3h5.5v12h3V7H19V4z" /><Path fill="none" d="M0 0h24v24H0V0z" /></SVG>,
 
@@ -101,25 +100,23 @@ export const settings = {
 				transform( node ) {
 					return createBlock( 'core/heading', {
 						...getBlockAttributes(
-							getBlockType( 'core/heading' ),
+							'core/heading',
 							node.outerHTML
 						),
 						level: getLevelFromHeadingNodeName( node.nodeName ),
 					} );
 				},
 			},
-			{
-				type: 'pattern',
-				regExp: /^(#{2,6})\s/,
-				transform: ( { content, match } ) => {
-					const level = match[ 1 ].length;
-
+			...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+				type: 'prefix',
+				prefix: Array( level + 1 ).join( '#' ),
+				transform( content ) {
 					return createBlock( 'core/heading', {
 						level,
 						content,
 					} );
 				},
-			},
+			} ) ),
 		],
 		to: [
 			{

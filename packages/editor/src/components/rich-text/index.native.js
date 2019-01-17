@@ -2,7 +2,7 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import {
 	forEach,
 	merge,
@@ -14,6 +14,7 @@ import {
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
+import { BlockFormatControls } from '@wordpress/editor';
 import {
 	isEmpty,
 	create,
@@ -39,11 +40,12 @@ const FORMATTING_CONTROLS = [
 		title: __( 'Italic' ),
 		format: 'italic',
 	},
-	{
-		icon: 'admin-links',
-		title: __( 'Link' ),
-		format: 'link',
-	},
+	// TODO: get this back after alpha
+	// {
+	// 	icon: 'admin-links',
+	// 	title: __( 'Link' ),
+	// 	format: 'link',
+	// },
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
@@ -65,6 +67,7 @@ export function getFormatValue( formatName ) {
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
+		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
@@ -172,23 +175,16 @@ export class RichText extends Component {
 	}
 
 	/**
-	 * Handles any case where the content of the AztecRN instance has changed.
+	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 
 	onChange( event ) {
-		// If we had a timer set to propagate a change, let's cancel it, because the user meanwhile typed something extra
-		if ( !! this.currentTimer ) {
-			clearTimeout( this.currentTimer );
-		}
 		this.lastEventCount = event.nativeEvent.eventCount;
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
 		this.lastContent = contentWithoutRootTag;
-		// Set a time to call the onChange prop if nothing changes in the next second
-		this.currentTimer = setTimeout( function() {
-			this.props.onChange( {
-				content: this.lastContent,
-			} );
-		}.bind( this ), 1000 );
+		this.props.onChange( {
+			content: this.lastContent,
+		} );
 	}
 
 	/**
@@ -274,15 +270,39 @@ export class RichText extends Component {
 			this.lastContent = undefined;
 			return true;
 		}
-		// The check below allows us to avoid updating the content right after an `onChange` call
-		// first time the component is drawn with empty content `lastContent` is undefined
-		if ( nextProps.value &&
-			this.lastContent &&
-			this.lastEventCount ) {
-			return false;
+
+		// TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
+		// It was removed in https://github.com/WordPress/gutenberg/pull/12417 to fix undo/redo problem.
+
+		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
+		// we need to make sure the native is updated as well
+		if ( ( typeof nextProps.value !== 'undefined' ) &&
+			( typeof this.lastContent !== 'undefined' ) &&
+			nextProps.value !== this.lastContent ) {
+			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
 		return true;
+	}
+
+	componentDidMount() {
+		if ( this.props.isSelected ) {
+			this._editor.focus();
+		}
+	}
+
+	componentWillUnmount() {
+		if ( this._editor.isFocused() ) {
+			this._editor.blur();
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isSelected && ! prevProps.isSelected ) {
+			this._editor.focus();
+		} else if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+			this._editor.blur();
+		}
 	}
 
 	isFormatActive( format ) {
@@ -343,9 +363,9 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				<View style={ { flex: 1 } }>
+				<BlockFormatControls>
 					<Toolbar controls={ toolbarControls } />
-				</View>
+				</BlockFormatControls>
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
@@ -353,10 +373,15 @@ export class RichText extends Component {
 					}
 					text={ { text: html, eventCount: this.lastEventCount } }
 					onChange={ this.onChange }
+					onFocus={ this.props.onFocus }
+					onBlur={ this.props.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
+					isSelected={ this.props.isSelected }
+					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }

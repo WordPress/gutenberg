@@ -119,4 +119,67 @@ describe( 'withDispatch', () => {
 		expect( firstRegistryAction ).toHaveBeenCalledTimes( 2 );
 		expect( secondRegistryAction ).toHaveBeenCalledTimes( 2 );
 	} );
+
+	it( 'always calls select with the latest state in the handler passed to the component', () => {
+		const store = registry.registerStore( 'counter', {
+			reducer: ( state = 0, action ) => {
+				if ( action.type === 'update' ) {
+					return action.count;
+				}
+				return state;
+			},
+			actions: {
+				update: ( count ) => ( { type: 'update', count } ),
+			},
+			selectors: {
+				getCount: ( state ) => state,
+			},
+		} );
+
+		const Component = withDispatch( ( _dispatch, ownProps, { select: _select } ) => {
+			const outerCount = _select( 'counter' ).getCount();
+			return {
+				update: () => {
+					const innerCount = _select( 'counter' ).getCount();
+					expect( innerCount ).toBe( outerCount );
+					const actionReturnedFromDispatch = _dispatch( 'counter' ).update( innerCount + 1 );
+					expect( actionReturnedFromDispatch ).toBe( undefined );
+				},
+			};
+		} )( ( props ) => <button onClick={ props.update } /> );
+
+		const testRenderer = TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component />
+			</RegistryProvider>
+		);
+
+		const counterUpdateHandler = testRenderer.root.findByType( 'button' ).props.onClick;
+
+		counterUpdateHandler();
+		expect( store.getState() ).toBe( 1 );
+
+		counterUpdateHandler();
+		expect( store.getState() ).toBe( 2 );
+
+		counterUpdateHandler();
+		expect( store.getState() ).toBe( 3 );
+	} );
+
+	it( 'warns when mapDispatchToProps returns non-function property', () => {
+		const Component = withDispatch( () => {
+			return {
+				count: 3,
+			};
+		} )( () => null );
+
+		TestRenderer.create(
+			<RegistryProvider value={ registry }>
+				<Component />
+			</RegistryProvider>
+		);
+		expect( console ).toHaveWarnedWith(
+			'Property count returned from mapDispatchToProps in withDispatch must be a function.'
+		);
+	} );
 } );

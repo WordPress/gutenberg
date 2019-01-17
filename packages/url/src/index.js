@@ -19,19 +19,178 @@ export function isURL( url ) {
 }
 
 /**
- * Appends arguments to the query string of the url
+ * Returns the protocol part of the URL.
  *
- * @param {string} url  URL
- * @param {Object} args Query Args
+ * @param {string} url The full URL.
  *
- * @return {string} Updated URL
+ * @return {?string} The protocol part of the URL.
  */
-export function addQueryArgs( url, args ) {
-	const queryStringIndex = url.indexOf( '?' );
-	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
-	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
+export function getProtocol( url ) {
+	const matches = /^([^\s:]+:)/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
 
-	return baseUrl + '?' + stringify( { ...query, ...args } );
+/**
+ * Tests if a url protocol is valid.
+ *
+ * @param {string} protocol The url protocol.
+ *
+ * @return {boolean} True if the argument is a valid protocol (e.g. http:, tel:).
+ */
+export function isValidProtocol( protocol ) {
+	if ( ! protocol ) {
+		return false;
+	}
+	return /^[a-z\-.\+]+[0-9]*:$/i.test( protocol );
+}
+
+/**
+ * Returns the authority part of the URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The authority part of the URL.
+ */
+export function getAuthority( url ) {
+	const matches = /^[^\/\s:]+:(?:\/\/)?\/?([^\/\s#?]+)[\/#?]{0,1}\S*$/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided authority.
+ *
+ * @param {string} authority A string containing the URL authority.
+ *
+ * @return {boolean} True if the argument contains a valid authority.
+ */
+export function isValidAuthority( authority ) {
+	if ( ! authority ) {
+		return false;
+	}
+	return /^[^\s#?]+$/.test( authority );
+}
+
+/**
+ * Returns the path part of the URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The path part of the URL.
+ */
+export function getPath( url ) {
+	const matches = /^[^\/\s:]+:(?:\/\/)?[^\/\s#?]+[\/]([^\s#?]+)[#?]{0,1}\S*$/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided path.
+ *
+ * @param {string} path The URL path.
+ *
+ * @return {boolean} True if the argument contains a valid path
+ */
+export function isValidPath( path ) {
+	if ( ! path ) {
+		return false;
+	}
+	return /^[^\s#?]+$/.test( path );
+}
+
+/**
+ * Returns the query string part of the URL.
+ *
+ * @param {string} url The full URL.
+ *
+ * @return {?string} The query string part of the URL.
+ */
+export function getQueryString( url ) {
+	const matches = /^\S+?\?([^\s#]+)/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided query string.
+ *
+ * @param {string} queryString The query string.
+ *
+ * @return {boolean} True if the argument contains a valid query string.
+ */
+export function isValidQueryString( queryString ) {
+	if ( ! queryString ) {
+		return false;
+	}
+	return /^[^\s#?\/]+$/.test( queryString );
+}
+
+/**
+ * Returns the fragment part of the URL.
+ *
+ * @param {string} url The full URL
+ *
+ * @return {?string} The fragment part of the URL.
+ */
+export function getFragment( url ) {
+	const matches = /^\S+?(#[^\s\?]*)/.exec( url );
+	if ( matches ) {
+		return matches[ 1 ];
+	}
+}
+
+/**
+ * Checks for invalid characters within the provided fragment.
+ *
+ * @param {string} fragment The url fragment.
+ *
+ * @return {boolean} True if the argument contains a valid fragment.
+ */
+export function isValidFragment( fragment ) {
+	if ( ! fragment ) {
+		return false;
+	}
+	return /^#[^\s#?\/]*$/.test( fragment );
+}
+
+/**
+ * Appends arguments as querystring to the provided URL. If the URL already
+ * includes query arguments, the arguments are merged with (and take precedent
+ * over) the existing set.
+ *
+ * @param {?string} url  URL to which arguments should be appended. If omitted,
+ *                       only the resulting querystring is returned.
+ * @param {Object}  args Query arguments to apply to URL.
+ *
+ * @return {string} URL with arguments applied.
+ */
+export function addQueryArgs( url = '', args ) {
+	// If no arguments are to be appended, return original URL.
+	if ( ! args || ! Object.keys( args ).length ) {
+		return url;
+	}
+
+	let baseUrl = url;
+
+	// Determine whether URL already had query arguments.
+	const queryStringIndex = url.indexOf( '?' );
+	if ( queryStringIndex !== -1 ) {
+		// Merge into existing query arguments.
+		args = Object.assign(
+			parse( url.substr( queryStringIndex + 1 ) ),
+			args
+		);
+
+		// Change working base URL to omit previous query arguments.
+		baseUrl = baseUrl.substr( 0, queryStringIndex );
+	}
+
+	return baseUrl + '?' + stringify( args );
 }
 
 /**

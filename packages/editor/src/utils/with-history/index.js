@@ -113,6 +113,11 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 		}
 
 		let nextPast = past;
+		// The `lastAction` property is used to compare actions in the
+		// `shouldOverwriteState` option. If an action should be ignored, do not
+		// submit that action as the last action, otherwise the ability to
+		// compare subsequent actions will break.
+		let lastActionToSubmit = previousAction;
 
 		if (
 			shouldCreateUndoLevel ||
@@ -120,6 +125,7 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 			! shouldOverwriteState( action, previousAction )
 		) {
 			nextPast = [ ...past, present ];
+			lastActionToSubmit = action;
 		}
 
 		return {
@@ -127,7 +133,7 @@ const withHistory = ( options = {} ) => ( reducer ) => {
 			present: nextPresent,
 			future: [],
 			shouldCreateUndoLevel: false,
-			lastAction: action,
+			lastAction: lastActionToSubmit,
 		};
 	};
 };

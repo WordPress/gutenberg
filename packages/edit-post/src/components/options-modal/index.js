@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, map } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,11 +16,16 @@ import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck } from '@wordpres
  * Internal dependencies
  */
 import Section from './section';
-import { EnablePublishSidebarOption, EnableTipsOption, EnablePanelOption } from './options';
+import {
+	EnablePublishSidebarOption,
+	EnableTipsOption,
+	EnablePanelOption,
+} from './options';
+import MetaBoxesSection from './meta-boxes-section';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
+export function OptionsModal( { isModalActive, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -37,6 +42,7 @@ export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 				<EnableTipsOption label={ __( 'Enable Tips' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
+				<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
 				<PostTaxonomies
 					taxonomyWrapper={ ( content, taxonomy ) => (
 						<EnablePanelOption
@@ -54,13 +60,7 @@ export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
 			</Section>
-			{ metaBoxes.length !== 0 && (
-				<Section title={ __( 'Advanced Panels' ) }>
-					{ map( metaBoxes, ( { title, id } ) => (
-						<EnablePanelOption key={ id } label={ title } panelName={ `meta-box-${ id }` } />
-					) ) }
-				</Section>
-			) }
+			<MetaBoxesSection title={ __( 'Advanced Panels' ) } />
 		</Modal>
 	);
 }
@@ -68,7 +68,6 @@ export function OptionsModal( { isModalActive, closeModal, metaBoxes = [] } ) {
 export default compose(
 	withSelect( ( select ) => ( {
 		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
-		metaBoxes: select( 'core/edit-post' ).getAllMetaBoxes(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		return {

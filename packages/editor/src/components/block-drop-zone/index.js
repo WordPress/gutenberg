@@ -6,15 +6,23 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { DropZone } from '@wordpress/components';
 import {
-	rawHandler,
+	DropZone,
+	withFilters,
+} from '@wordpress/components';
+import {
+	pasteHandler,
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import MediaUploadCheck from '../media-upload/check';
 
 const parseDropEvent = ( event ) => {
 	let result = {
@@ -67,7 +75,7 @@ class BlockDropZone extends Component {
 	}
 
 	onHTMLDrop( HTML, position ) {
-		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
@@ -108,14 +116,16 @@ class BlockDropZone extends Component {
 		const isAppender = index === undefined;
 
 		return (
-			<DropZone
-				className={ classnames( 'editor-block-drop-zone', {
-					'is-appender': isAppender,
-				} ) }
-				onFilesDrop={ this.onFilesDrop }
-				onHTMLDrop={ this.onHTMLDrop }
-				onDrop={ this.onDrop }
-			/>
+			<MediaUploadCheck>
+				<DropZone
+					className={ classnames( 'editor-block-drop-zone', {
+						'is-appender': isAppender,
+					} ) }
+					onFilesDrop={ this.onFilesDrop }
+					onHTMLDrop={ this.onHTMLDrop }
+					onDrop={ this.onDrop }
+				/>
+			</MediaUploadCheck>
 		);
 	}
 }
@@ -149,5 +159,6 @@ export default compose(
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,
 		};
-	} )
+	} ),
+	withFilters( 'editor.BlockDropZone' )
 )( BlockDropZone );

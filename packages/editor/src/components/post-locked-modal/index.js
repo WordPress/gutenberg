@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import jQuery from 'jquery';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,8 @@ import { Modal, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import { Component } from '@wordpress/element';
-import { compose, withGlobalEvents } from '@wordpress/compose';
+import { addAction, removeAction } from '@wordpress/hooks';
+import { compose, withGlobalEvents, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -29,17 +30,30 @@ class PostLockedModal extends Component {
 	}
 
 	componentDidMount() {
+		const hookName = this.getHookName();
+
 		// Details on these events on the Heartbeat API docs
 		// https://developer.wordpress.org/plugins/javascript/heartbeat-api/
-		jQuery( document )
-			.on( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.on( 'heartbeat-tick.refresh-lock', this.receivePostLock );
+		addAction( 'heartbeat.send', hookName, this.sendPostLock );
+		addAction( 'heartbeat.tick', hookName, this.receivePostLock );
 	}
 
 	componentWillUnmount() {
-		jQuery( document )
-			.off( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.off( 'heartbeat-tick.refresh-lock', this.receivePostLock );
+		const hookName = this.getHookName();
+
+		removeAction( 'heartbeat.send', hookName );
+		removeAction( 'heartbeat.tick', hookName );
+	}
+
+	/**
+	 * Returns a `@wordpress/hooks` hook name specific to the instance of the
+	 * component.
+	 *
+	 * @return {string} Hook name prefix.
+	 */
+	getHookName() {
+		const { instanceId } = this.props;
+		return 'core/editor/post-locked-modal-' + instanceId;
 	}
 
 	/**
@@ -48,10 +62,9 @@ class PostLockedModal extends Component {
 	 * When the user does not send a heartbeat in a heartbeat-tick
 	 * the user is no longer editing and another user can start editing.
 	 *
-	 * @param {Object} event Event.
-	 * @param {Object} data  Data to send in the heartbeat request.
+	 * @param {Object} data Data to send in the heartbeat request.
 	 */
-	sendPostLock( event, data ) {
+	sendPostLock( data ) {
 		const { isLocked, activePostLock, postId } = this.props;
 		if ( isLocked ) {
 			return;
@@ -66,10 +79,9 @@ class PostLockedModal extends Component {
 	/**
 	 * Refresh post locks: update the lock string or show the dialog if somebody has taken over editing.
 	 *
-	 * @param {Object} event Event.
-	 * @param {Object} data  Data received in the heartbeat request
+	 * @param {Object} data Data received in the heartbeat request
 	 */
-	receivePostLock( event, data ) {
+	receivePostLock( data ) {
 		if ( ! data[ 'wp-refresh-post-lock' ] ) {
 			return;
 		}
@@ -103,22 +115,19 @@ class PostLockedModal extends Component {
 			return;
 		}
 
-		const data = {
-			action: 'wp-remove-post-lock',
-			_wpnonce: postLockUtils.unlockNonce,
-			post_ID: postId,
-			active_post_lock: activePostLock,
-		};
+		const data = new window.FormData();
+		data.append( 'action', 'wp-remove-post-lock' );
+		data.append( '_wpnonce', postLockUtils.unlockNonce );
+		data.append( 'post_ID', postId );
+		data.append( 'active_post_lock', activePostLock );
 
-		jQuery.post( {
-			async: false,
-			url: postLockUtils.ajaxUrl,
-			data,
-		} );
+		const xhr = new window.XMLHttpRequest();
+		xhr.open( 'POST', postLockUtils.ajaxUrl, false );
+		xhr.send( data );
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils } = this.props;
+		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}
@@ -133,7 +142,10 @@ class PostLockedModal extends Component {
 			action: 'edit',
 			_wpnonce: postLockUtils.nonce,
 		} );
-		const allPosts = getWPAdminURL( 'edit.php' );
+		const allPostsUrl = getWPAdminURL( 'edit.php', {
+			post_type: get( postType, [ 'slug' ] ),
+		} );
+		const allPostsLabel = get( postType, [ 'labels', 'all_items' ] );
 		return (
 			<Modal
 				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
@@ -155,19 +167,19 @@ class PostLockedModal extends Component {
 						<div>
 							{ userDisplayName ?
 								sprintf(
-									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-									__( '%s now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' ),
+									/* translators: %s: user's display name */
+									__( '%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' ),
 									userDisplayName
 								) :
-								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
-								__( 'Another user now has editing control of this post. Don\'t worry, your changes up to this moment have been saved' )
+								__( 'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' )
 							}
 						</div>
-						<p>
-							<a href={ allPosts }>
-								{ __( 'View all posts' ) }
-							</a>
-						</p>
+
+						<div className="editor-post-locked-modal__buttons">
+							<Button isPrimary isLarge href={ allPostsUrl }>
+								{ allPostsLabel }
+							</Button>
+						</div>
 					</div>
 				) }
 				{ ! isTakeover && (
@@ -175,18 +187,17 @@ class PostLockedModal extends Component {
 						<div>
 							{ userDisplayName ?
 								sprintf(
-									/* translators: 'post' is generic and may be of any type (post, page, etc.). */
+									/* translators: %s: user's display name */
 									__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
 									userDisplayName
 								) :
-								/* translators: 'post' is generic and may be of any type (post, page, etc.). */
 								__( 'Another user is currently working on this post, which means you cannot make changes, unless you take over.' )
 							}
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isDefault isLarge href={ allPosts }>
-								{ __( 'All Posts' ) }
+							<Button isDefault isLarge href={ allPostsUrl }>
+								{ allPostsLabel }
 							</Button>
 							<PostPreviewButton />
 							<Button isPrimary isLarge href={ unlockUrl }>
@@ -209,7 +220,9 @@ export default compose(
 			getPostLockUser,
 			getCurrentPostId,
 			getActivePostLock,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
 		return {
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -217,6 +230,7 @@ export default compose(
 			postId: getCurrentPostId(),
 			postLockUtils: getEditorSettings().postLockUtils,
 			activePostLock: getActivePostLock(),
+			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -226,6 +240,7 @@ export default compose(
 			updatePostLock,
 		};
 	} ),
+	withInstanceId,
 	withGlobalEvents( {
 		beforeunload: 'releasePostLock',
 	} )

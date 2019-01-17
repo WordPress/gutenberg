@@ -42,12 +42,13 @@ export default function HeadingEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<RichText
+				identifier="content"
 				wrapperClassName="wp-block-heading"
 				tagName={ tagName }
 				value={ content }
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
-				onSplit={
+				unstableOnSplit={
 					insertBlocksAfter ?
 						( before, after, ...blocks ) => {
 							setAttributes( { content: before } );

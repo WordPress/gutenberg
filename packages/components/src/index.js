@@ -37,7 +37,6 @@ export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as Panel } from './panel';
 export { default as PanelBody } from './panel/body';
-export { default as PanelColor } from './panel/color';
 export { default as PanelHeader } from './panel/header';
 export { default as PanelRow } from './panel/row';
 export { default as Placeholder } from './placeholder';
@@ -59,6 +58,7 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as Tooltip } from './tooltip';
 export { default as TreeSelect } from './tree-select';
+export { default as IsolatedEventContainer } from './isolated-event-container';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 
 // Higher-Order Components

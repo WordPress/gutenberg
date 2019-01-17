@@ -13,7 +13,7 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { RichText } from '@wordpress/editor';
+import { RichText, BlockControls } from '@wordpress/editor';
 import { parse, createBlock } from '@wordpress/blocks';
 
 /**
@@ -24,6 +24,14 @@ import './editor.scss';
 const minHeight = 50;
 
 class HeadingEdit extends Component {
+	constructor( props ) {
+		super( props );
+
+		this.state = {
+			aztecHeight: 0,
+		};
+	}
+
 	render() {
 		const {
 			attributes,
@@ -39,15 +47,20 @@ class HeadingEdit extends Component {
 		} = attributes;
 
 		const tagName = 'h' + level;
-
 		return (
 			<View>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				<BlockControls>
+					<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+				</BlockControls>
 				<RichText
 					tagName={ tagName }
 					value={ content }
+					isSelected={ this.props.isSelected }
+					onFocus={ this.props.onFocus } // always assign onFocus as a props
+					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					style={ {
-						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
+						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
@@ -70,7 +83,7 @@ class HeadingEdit extends Component {
 							undefined
 					}
 					onContentSizeChange={ ( event ) => {
-						setAttributes( { aztecHeight: event.aztecHeight } );
+						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
 					placeholder={ placeholder || __( 'Write heading…' ) }
 				/>

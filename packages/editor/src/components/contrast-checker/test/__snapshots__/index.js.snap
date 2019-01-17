@@ -87,7 +87,7 @@ exports[`ContrastChecker should render messages when the textColor is valid, but
 exports[`ContrastChecker should take into consideration the font size passed 1`] = `
 <ContrastChecker
   backgroundColor="#C44B4B"
-  fontSize={17}
+  fontSize={23}
   textColor="#000000"
 >
   <div
@@ -141,7 +141,7 @@ exports[`ContrastChecker should take into consideration wherever text is large o
 exports[`ContrastChecker should use isLargeText to make decisions if both isLargeText and fontSize props are passed 1`] = `
 <ContrastChecker
   backgroundColor="#C44B4B"
-  fontSize={18}
+  fontSize={24}
   isLargeText={false}
   textColor="#000000"
 >
