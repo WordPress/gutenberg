@@ -88,7 +88,7 @@ extension Gutenberg {
         static let requestHTML = "requestGetHtml"
         static let toggleHTMLMode = "toggleHTMLMode"
         static let updateHtml = "updateHtml"
-        static let mediaUpload = "mediaUpload1"
+        static let mediaUpload = "mediaUpload"
     }
     
     public enum MediaUploadState: Int {
