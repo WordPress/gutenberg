@@ -1,9 +1,9 @@
 # Developer Contributions
 
-Please see CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) for technical details on how to setup and make contributions to the Gutenberg repository.
+Please see [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) for technical details on how to setup and make contributions to the Gutenberg repository.
 
 * [Coding Guidelines](/docs/contributors/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
 * [Gutenberg Block Grammer](/docs/contributors/grammar.md)
 * [Testing Overview](/docs/contributors/testing-overview.md) for PHP and JavaScript development in Gutenberg.
-* [Scripts](/docs/contributors/scripts.md) a list of vendor and interval script available to plugin developers.
+* [Scripts](/docs/contributors/scripts.md) a list of vendor and internal scripts available to plugin developers.
 * [Gutenberg Release Process](/docs/contributors/release.md) a checklist for the different type of releases for Gutenberg project.
