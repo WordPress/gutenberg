@@ -8,6 +8,13 @@ const espree = require( 'espree' );
 */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
+/**
+ * Function that takes code and returns an intermediate representation.
+ *
+ * @param {string} code The code to parse.
+ *
+ * @return {Object} Intermediate Representation in JSON.
+ */
 module.exports = function( code ) {
 	const ast = espree.parse( code, {
 		attachComment: true,

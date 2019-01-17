@@ -19,11 +19,22 @@ const getJSDoc = ( token ) => {
 	return jsdoc;
 };
 
+const isIdentifier = ( token ) => {
+	if ( token.declaration !== null &&
+		token.declaration.type === 'Identifier' ) {
+		return true;
+	}
+	if ( token.declaration === null &&
+		token.specifiers !== null &&
+		token.specifiers.length > 0 ) {
+		return true;
+	}
+};
+
 module.exports = function( ast, token ) {
 	let jsdoc = getJSDoc( token );
 	const name = getNameDeclaration( token );
-	// TODO: 'default export' is tangling getNameDeclaration and this module
-	if ( jsdoc === undefined && name !== 'default export' ) {
+	if ( jsdoc === undefined && isIdentifier( token ) ) {
 		const candidates = ast.body.filter( ( node ) => {
 			return ( node.type === 'FunctionDeclaration' && node.id.name === name ) ||
 				( node.type === 'VariableDeclaration' && first( node.declarations ).id.name === name );
