@@ -8,31 +8,41 @@ const espree = require( 'espree' );
 */
 const getIntermediateRepresentation = require( './get-intermediate-representation' );
 
+const getAST = ( source ) => espree.parse( source, {
+	attachComment: true,
+	ecmaVersion: 2018,
+	sourceType: 'module',
+} );
+
+const getExportTokens = ( ast ) => ast.body.filter(
+	( node ) => [
+		'ExportNamedDeclaration',
+		'ExportDefaultDeclaration',
+		'ExportAllDeclaration',
+	].some( ( declaration ) => declaration === node.type )
+);
+
+const getIRFromDependency = ( getCodeFromPath ) => ( path ) => engine( getCodeFromPath( path ) );
+
+const engine = ( code, getCodeFromPath = () => {} ) => {
+	const ast = getAST( code );
+	const tokens = getExportTokens( ast );
+	return tokens.map(
+		( token ) => getIntermediateRepresentation(
+			token,
+			ast,
+			getIRFromDependency( getCodeFromPath )
+		)
+	);
+};
+
 /**
  * Function that takes code and returns an intermediate representation.
  *
  * @param {string} code The code to parse.
+ * @param {Function} getCodeFromDependency Callback to retrieve code
+ * from a relative path.
  *
  * @return {Object} Intermediate Representation in JSON.
  */
-module.exports = function( code ) {
-	const ast = espree.parse( code, {
-		attachComment: true,
-		ecmaVersion: 2018,
-		sourceType: 'module',
-	} );
-
-	const tokens = ast.body.filter(
-		( node ) => [
-			'ExportNamedDeclaration',
-			'ExportDefaultDeclaration',
-			'ExportAllDeclaration',
-		].some( ( declaration ) => declaration === node.type )
-	);
-
-	const intermediateRepresentation = tokens.map(
-		( token ) => getIntermediateRepresentation( token, ast )
-	);
-
-	return intermediateRepresentation;
-};
+module.exports = engine;

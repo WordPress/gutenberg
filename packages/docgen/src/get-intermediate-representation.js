@@ -38,7 +38,8 @@ module.exports = function( token, ast, parseDependency = () => {} ) {
 			ir = getJSDoc( candidates[ 0 ] );
 		}
 	} else if ( ir === undefined && isIdentifierInDependency( token ) ) {
-		ir = parseDependency( getDependencyPath( token ) );
+		const irFromDependency = parseDependency( getDependencyPath( token ) );
+		ir = irFromDependency.find( ( exportDeclaration ) => exportDeclaration.name === name );
 	}
 
 	// Sometimes, humans do not add JSDoc, though.
