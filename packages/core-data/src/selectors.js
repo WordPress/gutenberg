@@ -173,6 +173,9 @@ export function isPreviewEmbedFallback( state, url ) {
 /**
  * Return Upload Permissions.
  *
+ * @deprecated since 4.9. Callers should use the more generic `canUser()` selector instead of
+ *             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
+ *
  * @param  {Object}  state State tree.
  *
  * @return {boolean} Upload Permissions.
