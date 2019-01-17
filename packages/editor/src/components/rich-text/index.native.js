@@ -379,6 +379,7 @@ export class RichText extends Component {
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					isSelected={ this.props.isSelected }
 					blockType={ { tag: tagName } }
 					color={ 'black' }
