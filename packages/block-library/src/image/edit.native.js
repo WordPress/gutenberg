@@ -17,9 +17,9 @@ import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url'
 
-const mediaUploadStateUploading = 1;
-const mediaUploadStateSucceeded = 2;
-const mediaUploadStateFailed = 3;
+const MEDIA_ULOAD_STATE_UPLOADING = 1;
+const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
+const MEDIA_ULOAD_STATE_FAILED = 3;
 
 export default class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -39,9 +39,9 @@ export default class ImageEdit extends React.Component {
 		const { attributes } = this.props;
 
 		if (payload.mediaId === attributes.id) {
-			if ( payload.state === mediaUploadStateUploading ) {
+			if ( payload.state === MEDIA_ULOAD_STATE_UPLOADING ) {
 				this.setState( { progress: payload.progress } );
-			} else if ( payload.state === mediaUploadStateSucceeded || payload.state === mediaUploadStateFailed ) {
+			} else if ( payload.state === MEDIA_ULOAD_STATE_SUCCEEDED || payload.state === MEDIA_ULOAD_STATE_FAILED ) {
 				this.finishMediaUploading( payload );
 			}	
 		}
