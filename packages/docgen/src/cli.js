@@ -20,16 +20,19 @@ const root = path.join( __dirname, '../../../' );
 // TODO:
 // - take input file from package.json?
 // - make CLI take input file instead of package?
-const input = path.join( root, `packages/${ packageName }/src/index.js` );
+const srcDir = path.join( root, `packages/${ packageName }/src/` );
+const input = path.join( srcDir, `index.js` );
 const output = path.join( root, `packages/${ packageName }/api.md` );
 
-fs.readFile( input, 'utf8', ( err, data ) => {
+const getCodeFromFile = ( file ) => fs.readFileSync( path.join( srcDir, file + '.js' ), 'utf8' );
+
+fs.readFile( input, 'utf8', ( err, code ) => {
 	if ( err ) {
 		process.stdout.write( `\n${ input } does not exists.\n\n\n` );
 		process.exit( 1 );
 	}
 
-	const json = engine( data );
+	const json = engine( code, getCodeFromFile );
 	const docs = formatter( json );
 	fs.writeFileSync( output, docs );
 } );
