@@ -47,16 +47,15 @@ export default class ImageEdit extends React.Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
-		this.setState( { progress: payload.progress } );
 		this.removeMediaUploadListener( payload.mediaId );
 	}
 
 	addMediaUploadListener( mediaId ) {
-		gutenbergBridgeEvents.addListener( 'mediaUpload' + mediaId, this.mediaUpload );
+		gutenbergBridgeEvents.addListener( 'mediaUpload', this.mediaUpload );
 	}
 
 	removeMediaUploadListener( mediaId ) {
-		gutenbergBridgeEvents.removeListener( 'mediaUpload' + mediaId, this.mediaUpload );
+		gutenbergBridgeEvents.removeListener( 'mediaUpload', this.mediaUpload );
 	}
 
 	render() {
@@ -100,8 +99,8 @@ export default class ImageEdit extends React.Component {
 		);
 
 		const showSpinner = ! isURL( url )
+		const opacity = ! isURL( url ) ? 0.3 : 1;
 		const progress = this.state.progress * 100;
-		const opacity = showSpinner ? 0.3 : 1;
 
 		return (
 			<View style={ { flex: 1 } }>
