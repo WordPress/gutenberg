@@ -149,8 +149,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderHeader() {
-		console.log("B - The title is: " + this.props.title);
-
 		return (
 			<View>
 				<PostTitle
@@ -165,8 +163,6 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderList() {
-		console.log("A - The title is: " + this.props.title);
-
 		return (
 			<View style={ { flex: 1 } } >
 				<KeyboardAwareFlatList
@@ -180,6 +176,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
+					title={ this.props.title }
 					ListHeaderComponent={ this.renderHeader }
 					ListEmptyComponent={ this.renderDefaultBlockAppender }
 				/>
