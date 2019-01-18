@@ -22,9 +22,12 @@ const root = path.join( __dirname, '../../../' );
 // - make CLI take input file instead of package?
 const srcDir = path.join( root, `packages/${ packageName }/src/` );
 const input = path.join( srcDir, `index.js` );
-const output = path.join( root, `packages/${ packageName }/api.md` );
+const doc = path.join( root, `packages/${ packageName }/api.md` );
+const ir = path.join( root, `packages/${ packageName }/ir.json` );
+const tokens = path.join( root, `packages/${ packageName }/tokens.json` );
+const ast = path.join( root, `packages/${ packageName }/ast.json` );
 
-const getCodeFromFile = ( file ) => fs.readFileSync( path.join( srcDir, file + '.js' ), 'utf8' );
+const getCodeFromPath = ( file ) => fs.readFileSync( path.join( srcDir, file + '.js' ), 'utf8' );
 
 fs.readFile( input, 'utf8', ( err, code ) => {
 	if ( err ) {
@@ -32,7 +35,9 @@ fs.readFile( input, 'utf8', ( err, code ) => {
 		process.exit( 1 );
 	}
 
-	const json = engine( code, getCodeFromFile );
-	const docs = formatter( json );
-	fs.writeFileSync( output, docs );
+	const result = engine( code, getCodeFromPath );
+	fs.writeFileSync( doc, formatter( result.ir ) );
+	fs.writeFileSync( ir, JSON.stringify( result.ir ) );
+	fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
+	fs.writeFileSync( ast, JSON.stringify( result.ast ) );
 } );
