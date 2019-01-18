@@ -1,0 +1,19 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 65,
+	"end": 97,
+	"range": [
+		65,
+		97
+	],
+	"declaration": {
+		"type": "Identifier",
+		"start": 80,
+		"end": 96,
+		"range": [
+			80,
+			96
+		],
+		"name": "ClassDeclaration"
+	}
+}
