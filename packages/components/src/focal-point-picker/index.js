@@ -27,12 +27,13 @@ export class FocalPointPicker extends Component {
 			percentages: {},
 		};
 		this.containerRef = createRef();
+		this.imageRef = createRef();
 	}
 	componentDidMount() {
 		this.setState( { bounds: this.calculateBounds() } );
 	}
 	componentDidUpdate( prevProps ) {
-		if ( prevProps.dimensions !== this.props.dimensions || prevProps.url !== this.props.url ) {
+		if ( prevProps.url !== this.props.url ) {
 			this.setState( {
 				bounds: this.calculateBounds(),
 				isDragging: false,
@@ -40,7 +41,10 @@ export class FocalPointPicker extends Component {
 		}
 	}
 	calculateBounds() {
-		const { dimensions } = this.props;
+		const dimensions = {
+			width: this.imageRef.current.clientWidth,
+			height: this.imageRef.current.clientHeight,
+		};
 		const pickerDimensions = this.pickerDimensions();
 		const bounds = {
 			top: 0,
@@ -150,6 +154,7 @@ export class FocalPointPicker extends Component {
 					role="button"
 					tabIndex="0"
 				>
+					<img src={ url } ref={ this.imageRef } alt="Dimensions helper" />
 					<div className={ iconContainerClasses } style={ iconContainerStyle }>
 						<i className="component-focal-point-picker__icon" />
 					</div>
@@ -176,10 +181,6 @@ export class FocalPointPicker extends Component {
 
 FocalPointPicker.defaultProps = {
 	url: null,
-	dimensions: {
-		height: 0,
-		width: 0,
-	},
 	value: {
 		x: 0.5,
 		y: 0.5,

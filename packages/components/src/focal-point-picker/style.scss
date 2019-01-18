@@ -11,6 +11,9 @@ $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height=
 	height: 200px;
 	position: relative;
 	width: 100%;
+	img {
+		opacity: 0;
+	}
 }
 
 .component-focal-point-picker__icon_container {
