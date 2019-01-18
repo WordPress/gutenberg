@@ -1,3 +1,9 @@
+## 2.3.0 (Unreleased)
+
+### New Feature
+
+- Add background color controls for the table block.
+
 ## 2.2.12 (2019-01-03)
 
 ## 2.2.11 (2018-12-18)

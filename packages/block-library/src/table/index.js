@@ -8,8 +8,8 @@ import classnames from 'classnames';
  */
 import { __, _x } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
 import { G, Path, SVG } from '@wordpress/components';
+import { RichText, getColorClassName } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -86,6 +86,9 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
+		backgroundColor: {
+			type: 'string',
+		},
 		head: getTableSectionAttributeSchema( 'head' ),
 		body: getTableSectionAttributeSchema( 'body' ),
 		foot: getTableSectionAttributeSchema( 'foot' ),
@@ -113,15 +116,24 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { hasFixedLayout, head, body, foot } = attributes;
+		const {
+			hasFixedLayout,
+			head,
+			body,
+			foot,
+			backgroundColor,
+		} = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 		if ( isEmpty ) {
 			return null;
 		}
 
-		const classes = classnames( {
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+
+		const classes = classnames( backgroundClass, {
 			'has-fixed-layout': hasFixedLayout,
+			'has-background': !! backgroundClass,
 		} );
 
 		const Section = ( { type, rows } ) => {
@@ -133,13 +145,17 @@ export const settings = {
 
 			return (
 				<Tag>
-					{ rows.map( ( { cells }, rowIndex ) =>
+					{ rows.map( ( { cells }, rowIndex ) => (
 						<tr key={ rowIndex }>
 							{ cells.map( ( { content, tag }, cellIndex ) =>
-								<RichText.Content tagName={ tag } value={ content } key={ cellIndex } />
+								<RichText.Content
+									tagName={ tag }
+									value={ content }
+									key={ cellIndex }
+								/>
 							) }
 						</tr>
-					) }
+					) ) }
 				</Tag>
 			);
 		};
