@@ -1,6 +1,6 @@
 # Jest Console
 
-Custom [Jest](http://facebook.github.io/jest/) matchers for the [Console](https://developer.mozilla.org/en-US/docs/Web/API/Console)
+Custom [Jest](https://jestjs.io/) matchers for the [Console](https://developer.mozilla.org/en-US/docs/Web/API/Console)
 object to test JavaScript code in WordPress.
 
 This package converts `console.error`, `console.info`, `console.log` and `console.warn` functions into mocks and tracks their calls.
