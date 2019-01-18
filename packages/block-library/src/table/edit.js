@@ -23,7 +23,6 @@ import {
 	Toolbar,
 	DropdownMenu,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -475,6 +474,4 @@ export class TableEdit extends Component {
 	}
 }
 
-export default compose( [
-	withCustomBackgroundColors( 'backgroundColor' ),
-] )( TableEdit );
+export default withCustomBackgroundColors( 'backgroundColor' )( TableEdit );
