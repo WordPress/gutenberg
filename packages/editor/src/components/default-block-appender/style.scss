@@ -26,28 +26,17 @@
 		}
 	}
 
-	// Show quick insertion icons faded until hover.
-	.editor-inserter-with-shortcuts {
-		opacity: 0.5;
-		transition: opacity 0.2s;
-
-		.components-icon-button:not(:hover) {
-			// Use opacity to work in various editor styles.
-			color: $dark-opacity-500;
-			.is-dark-theme & {
-				color: $light-opacity-500;
-			}
-		}
-	}
-
 	// Don't show the inserter until mousing over.
 	.editor-inserter__toggle:not([aria-expanded="true"]) {
 		opacity: 0;
+		transition: opacity 0.2s;
 	}
+
 	&:hover {
 		.editor-inserter-with-shortcuts {
-			opacity: 1;
+			@include edit-post__fade-in-animation;
 		}
+
 		.editor-inserter__toggle {
 			opacity: 1;
 		}
@@ -103,7 +92,6 @@
 	}
 
 	.editor-inserter__toggle {
-		transition: opacity 0.2s;
 		border-radius: 50%;
 		width: $block-side-ui-width;
 		height: $block-side-ui-width;

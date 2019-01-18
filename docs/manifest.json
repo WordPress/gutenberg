@@ -318,6 +318,30 @@
 		"parent": "plugin-sidebar-0"
 	},
 	{
+		"title": "Introduction to the Format API",
+		"slug": "format-api",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/README.md",
+		"parent": "tutorials"
+	},
+	{
+		"title": "Register a new format",
+		"slug": "1-register-format",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/1-register-format.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Add a button to the toolbar",
+		"slug": "2-toolbar-button",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md",
+		"parent": "format-api"
+	},
+	{
+		"title": "Apply the format when the button is clicked",
+		"slug": "3-apply-format",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/3-apply-format.md",
+		"parent": "format-api"
+	},
+	{
 		"title": "Designer Documentation",
 		"slug": "designers",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/README.md",
@@ -594,6 +618,18 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/e2e-test-utils",
+		"slug": "packages-e2e-test-utils",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/e2e-test-utils/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/e2e-tests",
+		"slug": "packages-e2e-tests",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/e2e-tests/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-post/README.md",
@@ -666,6 +702,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/jest-puppeteer-axe",
+		"slug": "packages-jest-puppeteer-axe",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/jest-puppeteer-axe/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/keycodes",
 		"slug": "packages-keycodes",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/keycodes/README.md",
@@ -714,6 +756,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/priority-queue",
+		"slug": "packages-priority-queue",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/priority-queue/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/redux-routine",
 		"slug": "packages-redux-routine",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/redux-routine/README.md",
@@ -735,12 +783,6 @@
 		"title": "@wordpress/shortcode",
 		"slug": "packages-shortcode",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/shortcode/README.md",
-		"parent": "packages"
-	},
-	{
-		"title": "@wordpress/tests-e2e",
-		"slug": "packages-tests-e2e",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/tests-e2e/README.md",
 		"parent": "packages"
 	},
 	{
