@@ -8,12 +8,12 @@ import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
 type PropsType = {
 	...FlatList.propTypes,
 	shouldPreventAutomaticScroll: void => boolean,
-	parentHeight: number,
 	blockToolbarHeight: number,
 	innerToolbarHeight: number,
+	innerRef?: Function,
 }
 
-const KeyboardAwareFlatList = ( props: PropsType ) => {
+export const KeyboardAwareFlatList = ( props: PropsType ) => {
 	return (
 		<KeyboardAvoidingView style={ { flex: 1 } }>
 			<FlatList { ...props } />
@@ -21,4 +21,8 @@ const KeyboardAwareFlatList = ( props: PropsType ) => {
 	);
 };
 
-export default KeyboardAwareFlatList;
+export const handleCaretVerticalPositionChange = () => {
+	//no need to handle on Android, it is system managed
+};
+
+export default { KeyboardAwareFlatList, handleCaretVerticalPositionChange };

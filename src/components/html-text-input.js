@@ -4,8 +4,9 @@
  */
 
 import React from 'react';
-import { Platform, TextInput, KeyboardAvoidingView } from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import styles from './html-text-input.scss';
+import KeyboardAvoidingView from './keyboard-avoiding-view';
 
 // Gutenberg imports
 import { parse } from '@wordpress/blocks';
@@ -16,6 +17,7 @@ type PropsType = {
 	onChange: string => mixed,
 	onPersist: string => mixed,
 	value: string,
+	parentHeight: number,
 };
 
 type StateType = {
@@ -70,21 +72,21 @@ export class HTMLInputView extends React.Component<PropsType, StateType> {
 	}
 
 	render() {
-		const behavior = this.isIOS ? 'padding' : null;
-
 		return (
-			<KeyboardAvoidingView style={ styles.container } behavior={ behavior }>
-				<TextInput
-					autoCorrect={ false }
-					ref={ ( textInput ) => this.textInput = textInput }
-					textAlignVertical="top"
-					multiline
-					numberOfLines={ 0 }
-					style={ styles.htmlView }
-					value={ this.state.value }
-					onChangeText={ this.edit }
-					onBlur={ this.stopEditing }
-				/>
+			<KeyboardAvoidingView style={ styles.container } parentHeight={ this.props.parentHeight }>
+				<View style={ { flex: 1 } } >
+					<TextInput
+						autoCorrect={ false }
+						ref={ ( textInput ) => this.textInput = textInput }
+						textAlignVertical="top"
+						multiline
+						numberOfLines={ 0 }
+						style={ styles.htmlView }
+						value={ this.state.value }
+						onChangeText={ this.edit }
+						onBlur={ this.stopEditing }
+					/>
+				</View>
 			</KeyboardAvoidingView>
 		);
 	}
