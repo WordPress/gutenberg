@@ -8,6 +8,7 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import Dashicon from '../dashicon';
 
 /**
  * Internal dependencies
@@ -49,6 +50,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 								aria-pressed={ value === color }
 							/>
 						</Tooltip>
+						{ value === color && <Dashicon icon="saved" /> }
 					</div>
 				);
 			} ) }
