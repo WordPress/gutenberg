@@ -1,0 +1,42 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 64,
+	"end": 89,
+	"range": [
+		64,
+		89
+	],
+	"declaration": null,
+	"specifiers": [
+		{
+			"type": "ExportSpecifier",
+			"start": 73,
+			"end": 86,
+			"range": [
+				73,
+				86
+			],
+			"local": {
+				"type": "Identifier",
+				"start": 73,
+				"end": 86,
+				"range": [
+					73,
+					86
+				],
+				"name": "myDeclaration"
+			},
+			"exported": {
+				"type": "Identifier",
+				"start": 73,
+				"end": 86,
+				"range": [
+					73,
+					86
+				],
+				"name": "myDeclaration"
+			}
+		}
+	],
+	"source": null
+}
