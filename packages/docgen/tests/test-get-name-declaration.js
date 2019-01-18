@@ -20,7 +20,7 @@ test( 'returns name for named export (class)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'MyDeclaration' );
+	t.deepEqual( name, [ 'MyDeclaration' ] );
 	t.end();
 } );
 
@@ -30,7 +30,7 @@ test( 'returns name for named export (function)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'myDeclaration' );
+	t.deepEqual( name, [ 'myDeclaration' ] );
 	t.end();
 } );
 
@@ -40,7 +40,7 @@ test( 'returns name for named export (variable)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'myDeclaration' );
+	t.deepEqual( name, [ 'myDeclaration' ] );
 	t.end();
 } );
 
@@ -50,7 +50,7 @@ test( 'returns name for named export (single identifier)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'myDeclaration' );
+	t.deepEqual( name, [ 'myDeclaration' ] );
 	t.end();
 } );
 
@@ -70,7 +70,7 @@ test( 'returns name for default export (function anonymous)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'default export' );
+	t.deepEqual( name, [ 'default export' ] );
 	t.end();
 } );
 
@@ -80,7 +80,7 @@ test( 'returns name for default export (function named)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'default export' );
+	t.deepEqual( name, [ 'default export' ] );
 	t.end();
 } );
 
@@ -90,7 +90,7 @@ test( 'returns name for default export (variable anonymous)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'default export' );
+	t.deepEqual( name, [ 'default export' ] );
 	t.end();
 } );
 
@@ -100,7 +100,7 @@ test( 'returns name for default export (variable named)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'default export' );
+	t.deepEqual( name, [ 'default export' ] );
 	t.end();
 } );
 
@@ -110,7 +110,7 @@ test( 'returns name for default export (class anonymous)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'default export' );
+	t.deepEqual( name, [ 'default export' ] );
 	t.end();
 } );
 
@@ -120,7 +120,7 @@ test( 'returns name for default export (class named)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'default export' );
+	t.deepEqual( name, [ 'default export' ] );
 	t.end();
 } );
 
@@ -130,7 +130,7 @@ test( 'returns name for default export (identifier)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, 'default export' );
+	t.deepEqual( name, [ 'default export' ] );
 	t.end();
 } );
 
@@ -140,7 +140,7 @@ test( 'returns name for named export redirections (*)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, [ 'TODO' ] );
+	t.deepEqual( name, [ 'TODO: to look up in module' ] );
 	t.end();
 } );
 
@@ -150,6 +150,6 @@ test( 'returns name for named export redirections (default)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.equal( name, [ 'TODO' ] );
+	t.deepEqual( name, [ 'TODO: default export?' ] );
 	t.end();
 } );

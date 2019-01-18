@@ -9,34 +9,35 @@ const { first, get } = require( 'lodash' );
  *
  * @param {Object} token Espree node.
  *
- * @return {?string} Exported declaration name.
+ * @return {Array} Exported declaration names.
  */
 module.exports = function( token ) {
 	if ( token.type === 'ExportDefaultDeclaration' ) {
-		return 'default export';
+		return [ 'default export' ];
 	}
 
 	if ( token.type === 'ExportAllDeclaration' ) {
-		return 'TODO'; // need to look up in dependency
+		return [ 'TODO' ]; // need to look up in dependency
 	}
 
+	const name = [];
 	if ( token.declaration === null ) {
-		return first( token.specifiers ).local.name;
+		name.push( first( token.specifiers ).local.name );
+		return name;
 	}
 
-	let name;
 	switch ( token.declaration.type ) {
 		case 'ClassDeclaration':
 		case 'FunctionDeclaration':
-			name = token.declaration.id.name;
+			name.push( token.declaration.id.name );
 			break;
 
 		case 'VariableDeclaration':
-			name = get( first( token.declaration.declarations ), [ 'id', 'name' ] );
+			name.push( get( first( token.declaration.declarations ), [ 'id', 'name' ] ) );
 			break;
 
 		case 'Identifier':
-			name = token.declaration.name;
+			name.push( token.declaration.name );
 			break;
 	}
 
