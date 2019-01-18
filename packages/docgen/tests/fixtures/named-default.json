@@ -1,0 +1,52 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 0,
+	"end": 35,
+	"range": [
+		0,
+		35
+	],
+	"declaration": null,
+	"specifiers": [
+		{
+			"type": "ExportSpecifier",
+			"start": 9,
+			"end": 16,
+			"range": [
+				9,
+				16
+			],
+			"local": {
+				"type": "Identifier",
+				"start": 9,
+				"end": 16,
+				"range": [
+					9,
+					16
+				],
+				"name": "default"
+			},
+			"exported": {
+				"type": "Identifier",
+				"start": 9,
+				"end": 16,
+				"range": [
+					9,
+					16
+				],
+				"name": "default"
+			}
+		}
+	],
+	"source": {
+		"type": "Literal",
+		"start": 24,
+		"end": 34,
+		"range": [
+			24,
+			34
+		],
+		"value": "./module",
+		"raw": "'./module'"
+	}
+}

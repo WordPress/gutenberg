@@ -133,3 +133,23 @@ test( 'returns name for default export (identifier)', function( t ) {
 	t.equal( name, 'default export' );
 	t.end();
 } );
+
+test( 'returns name for named export redirections (*)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-star.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, [ 'TODO' ] );
+	t.end();
+} );
+
+test( 'returns name for named export redirections (default)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-default.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, [ 'TODO' ] );
+	t.end();
+} );
