@@ -30,7 +30,12 @@ export class FocalPointPicker extends Component {
 		this.imageRef = createRef();
 	}
 	componentDidMount() {
-		this.setState( { bounds: this.calculateBounds() } );
+		setTimeout( () => {
+			this.setState( {
+				bounds: this.calculateBounds(),
+				percentages: this.props.value,
+			} );
+		}, 1 );
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
