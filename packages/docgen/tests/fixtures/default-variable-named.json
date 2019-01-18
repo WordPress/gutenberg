@@ -1,0 +1,52 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 98,
+	"end": 134,
+	"range": [
+		98,
+		134
+	],
+	"declaration": {
+		"type": "AssignmentExpression",
+		"start": 113,
+		"end": 133,
+		"range": [
+			113,
+			133
+		],
+		"operator": "=",
+		"left": {
+			"type": "Identifier",
+			"start": 113,
+			"end": 126,
+			"range": [
+				113,
+				126
+			],
+			"name": "myDeclaration"
+		},
+		"right": {
+			"type": "Literal",
+			"start": 129,
+			"end": 133,
+			"range": [
+				129,
+				133
+			],
+			"value": true,
+			"raw": "true"
+		}
+	},
+	"leadingComments": [
+		{
+			"type": "Line",
+			"value": " eslint-disable-line no-unused-vars",
+			"start": 60,
+			"end": 97,
+			"range": [
+				60,
+				97
+			]
+		}
+	]
+}

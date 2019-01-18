@@ -12,6 +12,10 @@ const { first, get } = require( 'lodash' );
  * @return {?string} Exported declaration name.
  */
 module.exports = function( token ) {
+	if ( token.type === 'ExportDefaultDeclaration' ) {
+		return 'default export';
+	}
+
 	if ( token.declaration === null ) {
 		return first( token.specifiers ).local.name;
 	}
@@ -19,11 +23,8 @@ module.exports = function( token ) {
 	let name;
 	switch ( token.declaration.type ) {
 		case 'ClassDeclaration':
-			name = token.declaration.id.name;
-			break;
-
 		case 'FunctionDeclaration':
-			name = get( token.declaration, [ 'id', 'name' ], 'default export' );
+			name = token.declaration.id.name;
 			break;
 
 		case 'VariableDeclaration':

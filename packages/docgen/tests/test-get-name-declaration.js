@@ -83,3 +83,23 @@ test( 'returns name for default export (function named)', function( t ) {
 	t.equal( name, 'default export' );
 	t.end();
 } );
+
+test( 'returns name for default export (variable anonymous)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-variable-anonymous.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, 'default export' );
+	t.end();
+} );
+
+test( 'returns name for default export (variable named)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-variable-named.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, 'default export' );
+	t.end();
+} );

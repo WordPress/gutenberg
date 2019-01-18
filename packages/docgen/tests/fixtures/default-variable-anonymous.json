@@ -1,0 +1,32 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 41,
+	"end": 61,
+	"range": [
+		41,
+		61
+	],
+	"declaration": {
+		"type": "Literal",
+		"start": 56,
+		"end": 60,
+		"range": [
+			56,
+			60
+		],
+		"value": true,
+		"raw": "true"
+	},
+	"leadingComments": [
+		{
+			"type": "Block",
+			"value": "*\n * Variable declaration example.\n ",
+			"start": 0,
+			"end": 40,
+			"range": [
+				0,
+				40
+			]
+		}
+	]
+}
