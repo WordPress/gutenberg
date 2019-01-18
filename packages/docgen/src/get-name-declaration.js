@@ -16,6 +16,10 @@ module.exports = function( token ) {
 		return 'default export';
 	}
 
+	if ( token.type === 'ExportAllDeclaration' ) {
+		return 'TODO'; // need to look up in dependency
+	}
+
 	if ( token.declaration === null ) {
 		return first( token.specifiers ).local.name;
 	}
