@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, TextInput, NativeEventEmitter } from 'react-native';
+import { View, Image, TextInput } from 'react-native';
 import {
 	subscribeMediaUpload,
 	onMediaLibraryPressed,
@@ -14,7 +14,6 @@ import {
  */
 import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
-import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 
@@ -23,7 +22,6 @@ const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
 const MEDIA_ULOAD_STATE_FAILED = 3;
 
 export default class ImageEdit extends React.Component {
-
 	constructor( props ) {
 		super( props );
 
@@ -45,12 +43,12 @@ export default class ImageEdit extends React.Component {
 	mediaUpload( payload ) {
 		const { attributes } = this.props;
 
-		if (payload.mediaId === attributes.id) {
+		if ( payload.mediaId === attributes.id ) {
 			if ( payload.state === MEDIA_ULOAD_STATE_UPLOADING ) {
 				this.setState( { progress: payload.progress, isUploadInProgress: true } );
 			} else if ( payload.state === MEDIA_ULOAD_STATE_SUCCEEDED || payload.state === MEDIA_ULOAD_STATE_FAILED ) {
 				this.finishMediaUploading( payload );
-			}	
+			}
 		}
 	}
 
@@ -116,7 +114,7 @@ export default class ImageEdit extends React.Component {
 		);
 
 		const showSpinner = this.state.isUploadInProgress;
-		const opacity =  this.state.isUploadInProgress ? 0.3 : 1;
+		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
 		const progress = this.state.progress * 100;
 
 		return (
@@ -160,7 +158,7 @@ export default class ImageEdit extends React.Component {
 							style={ { textAlign: 'center' } }
 							underlineColorAndroid="transparent"
 							value={ caption }
-							placeholder={ __( 'Write caption…' )  }
+							placeholder={ __( 'Write caption…' ) }
 							onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						/>
 					</View>
