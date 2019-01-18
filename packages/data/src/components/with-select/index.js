@@ -4,11 +4,15 @@
 import { Component } from '@wordpress/element';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { createQueue } from '@wordpress/priority-queue';
 
 /**
  * Internal dependencies
  */
 import { RegistryConsumer } from '../registry-provider';
+import { AsyncModeConsumer } from '../async-mode-provider';
+
+const renderQueue = createQueue();
 
 /**
  * Higher-order component used to inject state-derived props using registered
@@ -70,14 +74,21 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		componentWillUnmount() {
 			this.canRunSelection = false;
 			this.unsubscribe();
+			renderQueue.flush( this );
 		}
 
 		shouldComponentUpdate( nextProps, nextState ) {
 			// Cycle subscription if registry changes.
 			const hasRegistryChanged = nextProps.registry !== this.props.registry;
+			const hasSyncRenderingChanged = nextProps.isAsync !== this.props.isAsync;
+
 			if ( hasRegistryChanged ) {
 				this.unsubscribe();
 				this.subscribe( nextProps.registry );
+			}
+
+			if ( hasSyncRenderingChanged ) {
+				renderQueue.flush( this );
 			}
 
 			// Treat a registry change as equivalent to `ownProps`, to reflect
@@ -89,11 +100,11 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 
 			// Only render if props have changed or merge props have been updated
 			// from the store subscriber.
-			if ( this.state === nextState && ! hasPropsChanged ) {
+			if ( this.state === nextState && ! hasPropsChanged && ! hasSyncRenderingChanged ) {
 				return false;
 			}
 
-			if ( hasPropsChanged ) {
+			if ( hasPropsChanged || hasSyncRenderingChanged ) {
 				const nextMergeProps = getNextMergeProps( nextProps );
 				if ( ! isShallowEqualObjects( this.mergeProps, nextMergeProps ) ) {
 					// If merge props change as a result of the incoming props,
@@ -137,7 +148,13 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 		}
 
 		subscribe( registry ) {
-			this.unsubscribe = registry.subscribe( this.onStoreChange );
+			this.unsubscribe = registry.subscribe( () => {
+				if ( this.props.isAsync ) {
+					renderQueue.add( this, this.onStoreChange );
+				} else {
+					this.onStoreChange();
+				}
+			} );
 		}
 
 		render() {
@@ -146,14 +163,19 @@ const withSelect = ( mapSelectToProps ) => createHigherOrderComponent( ( Wrapped
 	}
 
 	return ( ownProps ) => (
-		<RegistryConsumer>
-			{ ( registry ) => (
-				<ComponentWithSelect
-					ownProps={ ownProps }
-					registry={ registry }
-				/>
+		<AsyncModeConsumer>
+			{ ( isAsync ) => (
+				<RegistryConsumer>
+					{ ( registry ) => (
+						<ComponentWithSelect
+							ownProps={ ownProps }
+							registry={ registry }
+							isAsync={ isAsync }
+						/>
+					) }
+				</RegistryConsumer>
 			) }
-		</RegistryConsumer>
+		</AsyncModeConsumer>
 	);
 }, 'withSelect' );
 
