@@ -236,7 +236,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderHTML() {
 		return (
-			<HTMLTextInput { ...this.props } />
+			<HTMLTextInput { ...this.props } parentHeight={ this.state.rootViewHeight } />
 		);
 	}
 }
