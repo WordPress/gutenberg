@@ -37,7 +37,6 @@ export class PostAuthor extends Component {
 				this.searchCache[ query ] = results;
 			} );
 		}, 300 );
-		this.requestResults = this.requestResults.bind( this );
 	}
 
 	componentDidMount() {
