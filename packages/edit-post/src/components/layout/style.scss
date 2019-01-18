@@ -114,11 +114,10 @@
 			margin-left: $admin-sidebar-width-collapsed;
 		}
 
-		// Undo the above rules for fullscreen mode.
+		// Provide special rules for fullscreen mode.
 		body.is-fullscreen-mode & {
 			margin-left: 0 !important;
-			position: relative;
-			top: inherit;
+			top: $header-height;
 		}
 	}
 
