@@ -103,3 +103,23 @@ test( 'returns name for default export (variable named)', function( t ) {
 	t.equal( name, 'default export' );
 	t.end();
 } );
+
+test( 'returns name for default export (class anonymous)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-class-anonymous.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, 'default export' );
+	t.end();
+} );
+
+test( 'returns name for default export (class named)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-class-named.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, 'default export' );
+	t.end();
+} );
