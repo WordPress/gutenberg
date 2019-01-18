@@ -131,10 +131,9 @@ export const settings = {
 
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
 
-		const classes = classnames( {
+		const classes = classnames( backgroundClass, {
 			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundClass,
-			[ backgroundClass ]: backgroundClass,
 		} );
 
 		const Section = ( { type, rows } ) => {

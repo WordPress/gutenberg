@@ -425,10 +425,9 @@ export class TableEdit extends Component {
 			);
 		}
 
-		const classes = classnames( className, {
+		const classes = classnames( className, backgroundColor.class, {
 			'has-fixed-layout': hasFixedLayout,
 			'has-background': !! backgroundColor.color,
-			[ backgroundColor.class ]: backgroundColor.class,
 		} );
 
 		return (
