@@ -114,6 +114,7 @@ module.exports = function( config ) {
 					const func = {
 						name,
 						description: docBlock.description,
+						deprecated: docBlock.tags.find( ( tag ) => tag.title === 'deprecated' ),
 						params: docBlock.tags.filter( ( tag ) => tag.title === 'param' ),
 						return: docBlock.tags.find( ( tag ) => tag.title === 'return' ),
 					};
