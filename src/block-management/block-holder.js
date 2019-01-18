@@ -39,6 +39,7 @@ type PropsType = BlockType & {
 	getNextBlockClientId: ( clientId: string ) => string,
 	onChange: ( attributes: mixed ) => void,
 	onInsertBlocks: ( blocks: Array<Object>, index: number ) => void,
+	onCaretVerticalPositionChange: ( targetId: number, caretY: number, previousCaretY: ?number ) => void,
 	onReplace: ( blocks: Array<Object> ) => void,
 	onSelect: ( clientId: string ) => void,
 	mergeBlocks: ( clientId: string, clientId: string ) => void,
@@ -163,6 +164,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 				onReplace={ this.props.onReplace }
 				insertBlocksAfter={ this.insertBlocksAfter }
 				mergeBlocks={ this.mergeBlocks }
+				onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 			/>
 		);
 	}

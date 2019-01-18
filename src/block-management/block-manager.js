@@ -21,7 +21,7 @@ import BlockPicker from './block-picker';
 import HTMLTextInput from '../components/html-text-input';
 import BlockToolbar from './block-toolbar';
 import KeyboardAvoidingView from '../components/keyboard-avoiding-view';
-import KeyboardAwareFlatList from '../components/keyboard-aware-flat-list';
+import { KeyboardAwareFlatList, handleCaretVerticalPositionChange } from '../components/keyboard-aware-flat-list';
 import SafeArea from 'react-native-safe-area';
 
 // Gutenberg imports
@@ -53,6 +53,8 @@ type StateType = {
 };
 
 export class BlockManager extends React.Component<PropsType, StateType> {
+	scrollViewRef: Object;
+
 	constructor( props: PropsType ) {
 		super( props );
 
@@ -63,6 +65,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).onRootViewLayout = this.onRootViewLayout.bind( this );
 		( this: any ).keyboardDidShow = this.keyboardDidShow.bind( this );
 		( this: any ).keyboardDidHide = this.keyboardDidHide.bind( this );
+		( this: any ).onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
+		( this: any ).scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -134,6 +138,14 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		this.setState( { isKeyboardVisible: false } );
 	}
 
+	onCaretVerticalPositionChange = ( targetId: number, caretY: number, previousCaretY: ?number ) => {
+		handleCaretVerticalPositionChange( this.scrollViewRef, targetId, caretY, previousCaretY );
+	}
+
+	scrollViewInnerRef( ref: Object ) {
+		this.scrollViewRef = ref;
+	}
+
 	shouldFlatListPreventAutomaticScroll() {
 		return this.state.blockTypePickerVisible;
 	}
@@ -143,6 +155,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 			<View style={ { flex: 1 } } >
 				<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
 				<KeyboardAwareFlatList
+					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
 					innerToolbarHeight={ inlineToolbarStyles.toolbar.height }
 					safeAreaBottomInset={ this.state.safeAreaBottomInset }
@@ -208,6 +221,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					showTitle={ false }
 					clientId={ clientId }
 					rootClientId={ this.props.rootClientId }
+					onCaretVerticalPositionChange={ this.onCaretVerticalPositionChange }
 				/>
 				{ this.state.blockTypePickerVisible && this.props.isBlockSelected( clientId ) && (
 					<View style={ styles.containerStyleAddHere } >
@@ -222,7 +236,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderHTML() {
 		return (
-			<HTMLTextInput { ...this.props } />
+			<HTMLTextInput { ...this.props } parentHeight={ this.state.rootViewHeight } />
 		);
 	}
 }
