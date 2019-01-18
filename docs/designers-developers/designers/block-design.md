@@ -17,7 +17,11 @@ Basic block settings won’t always make sense in the context of the placeholder
 
 ### The block sidebar should only be used for advanced, tertiary controls
 
-The sidebar is not visible by default on a small / mobile screen, and may also be collapsed in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the sidebar as something that only power users may discover. In addition, use sections and headers in the block sidebar if there are more than a handful of options, in order to allow users to easily scan and understand the options available.
+The sidebar is not visible by default on a small / mobile screen, and may also be collapsed in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the sidebar as something that most users should not need to open.
+
+In addition, use sections and headers in the block sidebar if there are more than a handful of options, in order to allow users to easily scan and understand the options available. 
+
+Each block sidebar comes with an "Advanced" section by default. This area houses an "Additional CSS Class" field, and should be used to house other power user controls. 
 
 ## Setup state vs. live preview state
 
