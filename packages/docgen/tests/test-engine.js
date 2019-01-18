@@ -92,7 +92,7 @@ test( 'engine returns IR for named export (single identifier)', ( t ) => {
 	t.end();
 } );
 
-test( 'engine returns IR for named export (single identifier) using JSDoc from identifier', ( t ) => {
+test( 'engine returns IR for named export (single identifier) using JSDoc from declaration', ( t ) => {
 	const ir = engine( `
 		/**
  		 * My declaration example.
@@ -106,6 +106,34 @@ test( 'engine returns IR for named export (single identifier) using JSDoc from i
 	t.deepEqual(
 		ir,
 		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+	);
+	t.end();
+} );
+
+test( 'engine returns IR for named export (multiple identifiers) using JSDoc from declaration', ( t ) => {
+	const ir = engine( `
+		/**
+ 		 * First declaration example.
+ 		 */
+		const firstDeclaration = function() {
+			// do nothing
+		}
+
+		/**
+ 		 * Second declaration example.
+ 		 */
+		const secondDeclaration = function() {
+			// do nothing
+		}
+
+		export { firstDeclaration, secondDeclaration };
+` );
+	t.deepEqual(
+		ir,
+		[
+			{ description: 'First declaration example.', tags: [], name: 'firstDeclaration' },
+			{ description: 'Second declaration example.', tags: [], name: 'secondDeclaration' },
+		]
 	);
 	t.end();
 } );
