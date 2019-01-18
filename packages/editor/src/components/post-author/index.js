@@ -113,6 +113,7 @@ export class PostAuthor extends Component {
 		}
 
 		if ( authors.length < 50 ) {
+			// Disable reason: A select with an onchange throws a warning.
 			/* eslint-disable jsx-a11y/no-onchange */
 			selector =
 				<select
