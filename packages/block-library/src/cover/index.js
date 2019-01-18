@@ -71,9 +71,6 @@ const blockAttributes = {
 	focalPoint: {
 		type: 'object',
 	},
-	dimensions: {
-		type: 'object',
-	},
 };
 
 export const name = 'core/cover';
@@ -182,7 +179,6 @@ export const settings = {
 				backgroundType,
 				contentAlign,
 				dimRatio,
-				dimensions,
 				focalPoint,
 				hasParallax,
 				id,
@@ -218,10 +214,6 @@ export const settings = {
 					url: media.url,
 					id: media.id,
 					backgroundType: mediaType,
-					dimensions: {
-						height: media.height,
-						width: media.width,
-					},
 				} );
 			};
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
@@ -286,7 +278,6 @@ export const settings = {
 									<FocalPointPicker
 										label={ __( 'Focal Point Picker' ) }
 										url={ url }
-										dimensions={ dimensions }
 										value={ focalPoint }
 										onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 									/>
