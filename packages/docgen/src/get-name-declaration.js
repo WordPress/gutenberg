@@ -18,6 +18,10 @@ module.exports = function( token ) {
 
 	let name;
 	switch ( token.declaration.type ) {
+		case 'ClassDeclaration':
+			name = token.declaration.id.name;
+			break;
+
 		case 'FunctionDeclaration':
 			name = get( token.declaration, [ 'id', 'name' ], 'default export' );
 			break;
