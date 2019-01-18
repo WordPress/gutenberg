@@ -16,6 +16,7 @@ import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
+import { isURL } from '@wordpress/url'
 
 const MEDIA_ULOAD_STATE_UPLOADING = 1;
 const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
@@ -34,6 +35,14 @@ export default class ImageEdit extends React.Component {
 		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploading = this.finishMediaUploading.bind( this );
+	}
+
+	componentDidMount() {
+		const { attributes } = this.props;
+		
+		if ( attributes.id && !isURL( attributes.url )) {
+			this.addMediaUploadListener();
+		}
 	}
 
 	componentWillUnmount() {
@@ -89,7 +98,7 @@ export default class ImageEdit extends React.Component {
 			const onUploadMediaButtonPressed = () => {
 				onUploadMediaPressed( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
-						this.addMediaUploadListener( mediaId );
+						this.addMediaUploadListener( );
 						setAttributes( { url: mediaUri, id: mediaId } );
 					}
 				} );
