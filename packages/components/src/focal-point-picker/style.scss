@@ -37,3 +37,14 @@ $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height=
 	top: -15px;
 	width: 100%;
 }
+
+.component-focal-point-picker_position-display-container {
+	margin: 1em 0;
+	display: flex;
+	.components-base-control__field {
+		margin: 0 1em 0 0;
+	}
+	input {
+		max-width: 4em;
+	}
+}
