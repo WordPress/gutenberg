@@ -17,6 +17,9 @@ import BaseControl from '../base-control';
 import TextControl from '../text-control';
 import withFocusOutside from '../higher-order/with-focus-outside';
 
+const TEXTCONTROL_MIN = 0;
+const TEXTCONTROL_MAX = 100;
+
 export class FocalPointPicker extends Component {
 	constructor() {
 		super( ...arguments );
@@ -28,6 +31,8 @@ export class FocalPointPicker extends Component {
 		};
 		this.containerRef = createRef();
 		this.imageRef = createRef();
+		this.horizontalPositionChanged = this.horizontalPositionChanged.bind( this );
+		this.verticalPositionChanged = this.verticalPositionChanged.bind( this );
 	}
 	componentDidMount() {
 		setTimeout( () => {
@@ -109,7 +114,25 @@ export class FocalPointPicker extends Component {
 		}
 	}
 	fractionToPercentage( fraction ) {
-		return Math.round( fraction * 100 ) + '%';
+		return Math.round( fraction * 100 );
+	}
+	horizontalPositionChanged( value ) {
+		this.positionChangeFromTextControl( 'x', value );
+	}
+	verticalPositionChanged( value ) {
+		this.positionChangeFromTextControl( 'y', value );
+	}
+	positionChangeFromTextControl( axis, value ) {
+		const { onChange } = this.props;
+		const { percentages } = this.state;
+		const cleanValue = Math.max( Math.min( parseInt( value ), 100 ), 0 );
+		percentages[ axis ] = cleanValue ? cleanValue / 100 : 0;
+		this.setState( { percentages }, function() {
+			onChange( {
+				x: this.state.percentages.x,
+				y: this.state.percentages.y,
+			} );
+		} );
 	}
 	pickerDimensions() {
 		if ( this.containerRef.current ) {
@@ -167,10 +190,18 @@ export class FocalPointPicker extends Component {
 				<div className="component-focal-point-picker_position-display-container">
 					<TextControl
 						label={ __( 'Horizontal Pos.' ) }
+						max={ TEXTCONTROL_MAX }
+						min={ TEXTCONTROL_MIN }
+						onChange={ this.horizontalPositionChanged }
+						type="number"
 						value={ this.fractionToPercentage( percentages.x ) }
 					/>
 					<TextControl
 						label={ __( 'Vertical Pos.' ) }
+						max={ TEXTCONTROL_MAX }
+						min={ TEXTCONTROL_MIN }
+						onChange={ this.verticalPositionChanged }
+						type="number"
 						value={ this.fractionToPercentage( percentages.y ) }
 					/>
 				</div>

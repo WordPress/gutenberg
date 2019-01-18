@@ -12,7 +12,11 @@ $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height=
 	position: relative;
 	width: 100%;
 	img {
-		opacity: 0;
+		height: auto;
+		max-height: 100%;
+		max-width: 100%;
+		opacity: 0.1;
+		width: auto;
 	}
 }
 
