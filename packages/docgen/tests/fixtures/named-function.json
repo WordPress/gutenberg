@@ -1,0 +1,56 @@
+{
+	"type": "ExportNamedDeclaration",
+	"start": 46,
+	"end": 100,
+	"range": [
+		46,
+		100
+	],
+	"declaration": {
+		"type": "FunctionDeclaration",
+		"start": 53,
+		"end": 100,
+		"range": [
+			53,
+			100
+		],
+		"id": {
+			"type": "Identifier",
+			"start": 62,
+			"end": 75,
+			"range": [
+				62,
+				75
+			],
+			"name": "myDeclaration"
+		},
+		"generator": false,
+		"expression": false,
+		"async": false,
+		"params": [],
+		"body": {
+			"type": "BlockStatement",
+			"start": 78,
+			"end": 100,
+			"range": [
+				78,
+				100
+			],
+			"body": []
+		}
+	},
+	"specifiers": [],
+	"source": null,
+	"leadingComments": [
+		{
+			"type": "Block",
+			"value": "*\n \t\t * My declaration example.\n \t\t ",
+			"start": 3,
+			"end": 43,
+			"range": [
+				3,
+				43
+			]
+		}
+	]
+}

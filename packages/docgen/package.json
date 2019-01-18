@@ -26,6 +26,7 @@
 	},
 	"scripts": {
 		"test": "tape tests/test-*.js | faucet",
-		"test:engine": "tape tests/test-engine.js | faucet"
+		"test:engine": "tape tests/test-engine.js | faucet",
+		"test:get-name-declaration": "tape tests/test-get-name-declaration.js | faucet"
 	}
 }
