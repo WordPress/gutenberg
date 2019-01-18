@@ -22,7 +22,7 @@ module.exports = function( token ) {
 
 	const name = [];
 	if ( token.declaration === null ) {
-		name.push( first( token.specifiers ).local.name );
+		token.specifiers.forEach( ( specifier ) => name.push( specifier.local.name ) );
 		return name;
 	}
 
