@@ -1,2 +1,2 @@
-github "wordpress-mobile/AztecEditor-iOS" "f946678f319302ac6a8eb2e830a285a1ce9602db"
+github "wordpress-mobile/AztecEditor-iOS" ~> 1.4
 

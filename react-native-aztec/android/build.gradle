@@ -11,6 +11,8 @@ buildscript {
         jSoupVersion = '1.10.3'
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
+
+        aztecVersion = 'v1.3.14'
     }
 
     repositories {
@@ -94,10 +96,10 @@ repositories {
 }
 
 dependencies {
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:d8675f5c617b9816f836d687e1af0321c2130063')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:d8675f5c617b9816f836d687e1af0321c2130063')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:d8675f5c617b9816f836d687e1af0321c2130063')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:d8675f5c617b9816f836d687e1af0321c2130063')
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:$aztecVersion")
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:$aztecVersion")
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:$aztecVersion")
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:$aztecVersion")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
