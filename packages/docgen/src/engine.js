@@ -25,7 +25,10 @@ const getExportTokens = ( ast ) => ast.body.filter(
 	].some( ( declaration ) => declaration === node.type )
 );
 
-const getIRFromDependency = ( getCodeFromPath ) => ( path ) => engine( getCodeFromPath( path ) );
+const getIRFromDependency = ( getCodeFromPath ) => ( path ) => {
+	const { ir } = engine( getCodeFromPath( path ) );
+	return ir;
+};
 
 const engine = ( code, getCodeFromPath = () => {} ) => {
 	const result = {};

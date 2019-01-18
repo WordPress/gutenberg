@@ -9,7 +9,7 @@ const test = require( 'tape' );
 const engine = require( '../src/engine' );
 
 test( 'engine returns IR for many exports at once', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
  		 * First declaration example.
  		 */
@@ -43,7 +43,7 @@ test( 'engine returns IR for many exports at once', ( t ) => {
 } );
 
 test( 'engine returns IR for named export (function)', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
  		 * My declaration example.
  		 */
@@ -59,7 +59,7 @@ test( 'engine returns IR for named export (function)', ( t ) => {
 } );
 
 test( 'engine returns IR for named export (variable)', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
  		 * My declaration example.
  		 */
@@ -75,7 +75,7 @@ test( 'engine returns IR for named export (variable)', ( t ) => {
 } );
 
 test( 'engine returns IR for named export (single identifier)', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 	const myDeclaration = function() {
 		// do nothing
 	}
@@ -93,7 +93,7 @@ test( 'engine returns IR for named export (single identifier)', ( t ) => {
 } );
 
 test( 'engine returns IR for named export (single identifier) using JSDoc from declaration', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
  		 * My declaration example.
  		 */
@@ -111,7 +111,7 @@ test( 'engine returns IR for named export (single identifier) using JSDoc from d
 } );
 
 test( 'engine returns IR for named export (multiple identifiers) using JSDoc from declaration', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
  		 * First declaration example.
  		 */
@@ -146,7 +146,7 @@ test( 'engine returns IR for named export (single identifier) using JSDoc from d
 			// do nothing
 		}
 	`;
-	const ir = engine(
+	const { ir } = engine(
 		`export { myDeclaration } from './my-dependency';`,
 		getDependency
 	);
@@ -158,7 +158,7 @@ test( 'engine returns IR for named export (single identifier) using JSDoc from d
 } );
 
 test( 'engine returns IR for default export (named function)', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
  		 * My declaration example.
  		 */
@@ -174,7 +174,7 @@ test( 'engine returns IR for default export (named function)', ( t ) => {
 } );
 
 test( 'engine returns IR for default export (anonymous function)', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
  		 * My declaration example.
  		 */
@@ -190,7 +190,7 @@ test( 'engine returns IR for default export (anonymous function)', ( t ) => {
 } );
 
 test( 'engine returns IR for default export (identifier)', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		function myDeclaration() {
 			// do nothing
 		}
@@ -202,13 +202,13 @@ test( 'engine returns IR for default export (identifier)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { description: 'My declaration example.', tags: [], name: 'default export' } ]
 	);
 	t.end();
 } );
 
 test( 'engine returns IR for default export (identifier) using JSDoc from function', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
 		 * My declaration example.
 		 */
@@ -220,13 +220,13 @@ test( 'engine returns IR for default export (identifier) using JSDoc from functi
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { description: 'My declaration example.', tags: [], name: 'default export' } ]
 	);
 	t.end();
 } );
 
 test( 'engine returns IR for default export (identifier) using JSDoc from variable', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		/**
 		 * My declaration example.
 		 */
@@ -238,13 +238,13 @@ test( 'engine returns IR for default export (identifier) using JSDoc from variab
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { description: 'My declaration example.', tags: [], name: 'default export' } ]
 	);
 	t.end();
 } );
 
 test( 'engine returns IR for undocumented export', ( t ) => {
-	const ir = engine( `
+	const { ir } = engine( `
 		const myDeclaration = function() {
 			// do nothing
 		}
@@ -253,13 +253,13 @@ test( 'engine returns IR for undocumented export', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'Undocumented declaration.', tags: [], name: 'myDeclaration' } ]
+		[ { description: 'Undocumented declaration.', tags: [], name: 'default export' } ]
 	);
 	t.end();
 } );
 
 test( 'engine returns IR for undefined code', ( t ) => {
-	const ir = engine( undefined );
+	const { ir } = engine( undefined );
 	t.deepEqual( ir, [ ] );
 	t.end();
 } );
