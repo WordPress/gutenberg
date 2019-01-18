@@ -63,3 +63,23 @@ test( 'returns name for named export (multiple identifier)', function( t ) {
 	t.equal( name, [ 'functionDeclaration', 'variableDeclaration', 'ClassDeclaration' ] );
 	t.end();
 } );
+
+test( 'returns name for default export (function anonymous)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-function-anonymous.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, 'default export' );
+	t.end();
+} );
+
+test( 'returns name for default export (function named)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-function-named.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.equal( name, 'default export' );
+	t.end();
+} );
