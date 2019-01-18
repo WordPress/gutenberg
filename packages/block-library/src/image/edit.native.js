@@ -24,8 +24,6 @@ const MEDIA_ULOAD_STATE_FAILED = 3;
 
 export default class ImageEdit extends React.Component {
 
-	subscriptionParentMediaUpload: ?EmitterSubscription;
-
 	constructor( props ) {
 		super( props );
 
