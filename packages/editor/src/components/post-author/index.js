@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+import Autocomplete from 'accessible-autocomplete/react';
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { sprintf, __, _n } from '@wordpress/i18n';
@@ -11,13 +17,6 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import PostAuthorCheck from './check';
-
-/**
- * External dependencies
- */
-import Autocomplete from 'accessible-autocomplete/react';
-
-import { debounce } from 'lodash';
 
 export class PostAuthor extends Component {
 	constructor() {
