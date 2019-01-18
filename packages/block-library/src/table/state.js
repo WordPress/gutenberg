@@ -157,3 +157,56 @@ export function deleteColumn( state, {
 		} ) ).filter( ( row ) => row.cells.length ),
 	};
 }
+
+/**
+ * Get the integer value of a style property.
+ *
+ * @param {?string} rawValue The style's raw value (e.g. 100%, 25px).
+ *
+ * @return {?number} The integer value (e.g. 100, 25).
+ */
+export function getStyleValue( rawValue ) {
+	const parsedValue = parseInt( rawValue, 10 );
+
+	if ( isNaN( parsedValue ) ) {
+		return;
+	}
+
+	return parsedValue;
+}
+
+/**
+ * Get the px or % unit from a style value.
+ *
+ * @param {?string} value The style's value (e.g. 100px, 25%).
+ *
+ * @return {?string} The unit (e.g. px, %).
+ */
+export function getStyleUnit( value ) {
+	const match = /(px|%)/i.exec( value );
+
+	if ( ! match ) {
+		return;
+	}
+
+	return match[ 1 ].toLowerCase();
+}
+
+/**
+ * Given the table block attributes, return the style properties.
+ *
+ * @param {?string} attributes.width  The width value.
+ * @param {?string} attributes.height The height value.
+ *
+ * @return {?Object} The style properties.
+ */
+export function getTableStyles( { width, height } ) {
+	if ( ! width && ! height ) {
+		return;
+	}
+
+	return {
+		width: width ? width : undefined,
+		height: height ? height : undefined,
+	};
+}

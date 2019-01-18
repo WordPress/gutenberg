@@ -15,6 +15,7 @@ import { RichText, getColorClassName } from '@wordpress/editor';
  * Internal dependencies
  */
 import edit from './edit';
+import { getTableStyles } from './state';
 
 const tableContentPasteSchema = {
 	tr: {
@@ -31,6 +32,7 @@ const tableContentPasteSchema = {
 
 const tablePasteSchema = {
 	table: {
+		attributes: [ 'style' ],
 		children: {
 			thead: {
 				children: tableContentPasteSchema,
@@ -87,6 +89,13 @@ export const settings = {
 			default: false,
 		},
 		backgroundColor: {
+			type: 'string',
+		},
+		width: {
+			type: 'string',
+			default: '100%',
+		},
+		height: {
 			type: 'string',
 		},
 		head: getTableSectionAttributeSchema( 'head' ),
@@ -161,7 +170,7 @@ export const settings = {
 		};
 
 		return (
-			<table className={ classes }>
+			<table className={ classes } style={ getTableStyles( attributes ) }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />

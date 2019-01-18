@@ -19,11 +19,6 @@
 
 
 .wp-block-table {
-	table {
-		border-collapse: collapse;
-		width: 100%;
-	}
-
 	td,
 	th {
 		padding: 0;
@@ -41,3 +36,14 @@
 		padding: 0.5em;
 	}
 }
+
+.block-library-table__dimensions__row {
+	display: flex;
+}
+
+.block-library-table__dimensions__width {
+	flex: 1;
+	// Use padding since it's hard to override the margin of the base control.
+	padding-right: 5px;
+}
+
