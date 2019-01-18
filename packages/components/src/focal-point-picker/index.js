@@ -1,12 +1,19 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 
+/**
+ * WordPress dependencies
+ */
 import { Component, createRef } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import BaseControl from '../base-control/';
+
+/**
+ * Internal dependencies
+ */
+import BaseControl from '../base-control';
 import withFocusOutside from '../higher-order/with-focus-outside';
-import classnames from 'classnames';
 
 export class FocalPointPicker extends Component {
 	constructor() {
