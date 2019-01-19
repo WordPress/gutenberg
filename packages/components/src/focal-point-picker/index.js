@@ -154,7 +154,6 @@ export class FocalPointPicker extends Component {
 		const { instanceId, url, value, label, help, className } = this.props;
 		const { bounds, isDragging, percentages } = this.state;
 		const pickerDimensions = this.pickerDimensions();
-		const containerStyle = { backgroundImage: `url(${ url })` };
 		const iconCoordinates = {
 			left: ( value.x * ( pickerDimensions.width - ( bounds.left * 2 ) ) ) + bounds.left,
 			top: ( value.y * ( pickerDimensions.height - ( bounds.top * 2 ) ) ) + bounds.top,
@@ -172,7 +171,6 @@ export class FocalPointPicker extends Component {
 			<BaseControl label={ label } id={ id } help={ help } className={ className }>
 				<div
 					className="component-focal-point-picker"
-					style={ containerStyle }
 					onMouseDown={ () => this.setState( { isDragging: true } ) }
 					onDragStart={ () => this.setState( { isDragging: true } ) }
 					onMouseUp={ () => this.setState( { isDragging: false } ) }
