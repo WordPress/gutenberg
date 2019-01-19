@@ -8,7 +8,6 @@ import isPromise from 'is-promise';
 /**
  * Internal dependencies
  */
-import castError from './cast-error';
 import { isActionOfType, isAction } from './is-action';
 
 /**
@@ -29,7 +28,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 			// Async control routine awaits resolution.
 			routine.then(
 				yieldNext,
-				( error ) => yieldError( castError( error ) ),
+				( error ) => yieldError( error ),
 			);
 		} else {
 			next( routine );
