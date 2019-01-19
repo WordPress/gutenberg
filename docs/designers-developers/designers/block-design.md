@@ -116,6 +116,10 @@ Because the Drop Cap feature is not necessary for the basic operation of the blo
 
 Check how your block looks, feels, and works on as many devices and screen sizes as you can.
 
+### Support Gutenberg's dark background editor scheme
+
+Check how your block looks with [dark backgrounds](https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#dark-backgrounds) in the editor.
+
 ## Examples
 
 To demonstrate some of these practices, here are a few annotated examples of default Gutenberg blocks:
