@@ -33,29 +33,21 @@ export class FocalPointPicker extends Component {
 		this.imageRef = createRef();
 		this.horizontalPositionChanged = this.horizontalPositionChanged.bind( this );
 		this.verticalPositionChanged = this.verticalPositionChanged.bind( this );
+		this.onLoad = this.onLoad.bind( this );
 	}
 	componentDidMount() {
-		setTimeout( () => {
-			this.setState( {
-				bounds: this.calculateBounds(),
-				percentages: this.props.value,
-			} );
-		}, 1 );
+		this.setState( {
+			percentages: this.props.value,
+		} );
 	}
 	componentDidUpdate( prevProps ) {
 		if ( prevProps.url !== this.props.url ) {
 			this.setState( {
-				bounds: this.calculateBounds(),
 				isDragging: false,
 			} );
 		}
 	}
 	calculateBounds() {
-		const dimensions = {
-			width: this.imageRef.current.clientWidth,
-			height: this.imageRef.current.clientHeight,
-		};
-		const pickerDimensions = this.pickerDimensions();
 		const bounds = {
 			top: 0,
 			left: 0,
@@ -64,6 +56,14 @@ export class FocalPointPicker extends Component {
 			width: 0,
 			height: 0,
 		};
+		if ( ! this.imageRef.current ) {
+			return bounds;
+		}
+		const dimensions = {
+			width: this.imageRef.current.clientWidth,
+			height: this.imageRef.current.clientHeight,
+		};
+		const pickerDimensions = this.pickerDimensions();
 		const widthRatio = pickerDimensions.width / dimensions.width;
 		const heightRatio = pickerDimensions.height / dimensions.height;
 		if ( heightRatio >= widthRatio ) {
@@ -78,6 +78,11 @@ export class FocalPointPicker extends Component {
 			bounds.right = bounds.left + bounds.width;
 		}
 		return bounds;
+	}
+	onLoad() {
+		this.setState( {
+			bounds: this.calculateBounds(),
+		} );
 	}
 	onMouseMove( event ) {
 		const { isDragging, bounds } = this.state;
@@ -180,7 +185,12 @@ export class FocalPointPicker extends Component {
 					role="button"
 					tabIndex="0"
 				>
-					<img src={ url } ref={ this.imageRef } alt="Dimensions helper" />
+					<img
+						alt="Dimensions helper"
+						onLoad={ this.onLoad }
+						ref={ this.imageRef }
+						src={ url }
+					/>
 					<div className={ iconContainerClasses } style={ iconContainerStyle }>
 						<i className="component-focal-point-picker__icon" />
 					</div>
