@@ -1,12 +1,17 @@
 $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform='translate(1 1)' stroke='%23000' strokeWidth='2' fill='none' fillRule='evenodd'%3E%3Cellipse fill='%23fff' cx='11' cy='11.129' rx='9.533' ry='9.645' /%3E%3Cpath d='M0 11.13h22M10.945 22.347V.09' strokeLinecap='square' /%3E%3C/g%3E%3C/svg%3E";
 
-.component-focal-point-picker {
-	align-items: center;
+.component-focal-point-picker-wrapper {
 	background-color: transparent;
 	border: 1px solid $light-gray-500;
+	height: 200px;
+	width: 100%;
+	padding: 14px;
+}
+.component-focal-point-picker {
+	align-items: center;
 	cursor: pointer;
 	display: flex;
-	height: 200px;
+	height: 100%;
 	justify-content: center;
 	position: relative;
 	width: 100%;

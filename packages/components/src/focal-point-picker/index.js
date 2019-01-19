@@ -175,25 +175,27 @@ export class FocalPointPicker extends Component {
 		const verticalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
 		return (
 			<BaseControl label={ label } id={ id } help={ help } className={ className }>
-				<div
-					className="component-focal-point-picker"
-					onMouseDown={ () => this.setState( { isDragging: true } ) }
-					onDragStart={ () => this.setState( { isDragging: true } ) }
-					onMouseUp={ () => this.setState( { isDragging: false } ) }
-					onDrop={ () => this.setState( { isDragging: false } ) }
-					onMouseMove={ this.onMouseMove }
-					ref={ this.containerRef }
-					role="button"
-					tabIndex="0"
-				>
-					<img
-						alt="Dimensions helper"
-						onLoad={ this.onLoad }
-						ref={ this.imageRef }
-						src={ url }
-					/>
-					<div className={ iconContainerClasses } style={ iconContainerStyle }>
-						<i className="component-focal-point-picker__icon" />
+				<div className="component-focal-point-picker-wrapper">
+					<div
+						className="component-focal-point-picker"
+						onMouseDown={ () => this.setState( { isDragging: true } ) }
+						onDragStart={ () => this.setState( { isDragging: true } ) }
+						onMouseUp={ () => this.setState( { isDragging: false } ) }
+						onDrop={ () => this.setState( { isDragging: false } ) }
+						onMouseMove={ this.onMouseMove }
+						ref={ this.containerRef }
+						role="button"
+						tabIndex="0"
+					>
+						<img
+							alt="Dimensions helper"
+							onLoad={ this.onLoad }
+							ref={ this.imageRef }
+							src={ url }
+						/>
+						<div className={ iconContainerClasses } style={ iconContainerStyle }>
+							<i className="component-focal-point-picker__icon" />
+						</div>
 					</div>
 				</div>
 				<div className="component-focal-point-picker_position-display-container">
