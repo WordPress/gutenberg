@@ -3,9 +3,11 @@ package org.wordpress.mobile.WPAndroidGlue;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.MutableContextWrapper;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout.LayoutParams;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
@@ -86,11 +88,11 @@ public class WPAndroidGlueCode {
                 mRnReactNativeGutenbergBridgePackage);
     }
 
-    public void onCreateView(View reactRootView, boolean htmlModeEnabled,
+    public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost) {
-        mReactRootView = (ReactRootView) reactRootView;
+        mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
 
         ReactInstanceManagerBuilder builder =
                 ReactInstanceManager.builder()
@@ -98,7 +100,7 @@ public class WPAndroidGlueCode {
                                     .setJSMainModulePath("index")
                                     .addPackages(getPackages(onMediaLibraryButtonListener))
                                     .setUseDeveloperSupport(isDebug)
-                                    .setInitialLifecycleState(LifecycleState.RESUMED);
+                                    .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
             builder.setBundleAssetName("index.android.bundle");
         }
@@ -124,6 +126,18 @@ public class WPAndroidGlueCode {
         if (isNewPost) {
             initContent("");
         }
+    }
+
+    public void attachToContainer(ViewGroup viewGroup) {
+        MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
+        contextWrapper.setBaseContext(viewGroup.getContext());
+
+        if (mReactRootView.getParent() != null) {
+            ((ViewGroup) mReactRootView.getParent()).removeView(mReactRootView);
+        }
+
+        viewGroup.addView(mReactRootView, 0,
+                new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     }
 
     public void onPause(Activity activity) {
