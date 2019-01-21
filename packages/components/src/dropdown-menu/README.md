@@ -2,7 +2,7 @@
 
 The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuItemsChoice, or MenuGroup) in a compact way. It appears in a Popover after the user has interacted with an element (a button or icon) or when they perform a specific action. 
 
-![An expanded DropdownMenu, containing a list of MenuItems.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenu.png)
+![An expanded DropdownMenu, containing a list of MenuItems.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuExample.png)
 
 ## Table of contents
 
@@ -11,7 +11,7 @@ The DropdownMenu displays a list of actions (each contained in a MenuItem, MenuI
 
 ## Anatomy
 
-![Anatomy of a DropdownMenu.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenu-Anatomy.png)
+![Anatomy of a DropdownMenu.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuAnatomy.png)
 
 1. Popover: a container component in which the DropdownMenu is wrapped.
 2. Parent button: the icon or button that is used to toggle the display of the Popover containing the DropdownMenu.
@@ -30,12 +30,12 @@ Use a DropdownMenu when you want users to:
 
 If you need to display all the available options at all times, consider using a Toolbar instead.
 
-![Use a DropdownMenu to display a list of actions after the user interacts with an icon.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenu-Do.png)
+![Use a DropdownMenu to display a list of actions after the user interacts with an icon.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuDo.png)
 
 **Do**
 Use a DropdownMenu to display a list of actions after the user interacts with an icon.
 
-![Don’t use a DropdownMenu for important actions that should always be visible. Use a Toolbar instead.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenu-dont.png)
+![Don’t use a DropdownMenu for important actions that should always be visible. Use a Toolbar instead.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuDont.png)
 
 **Don’t**
 Don’t use a DropdownMenu for important actions that should always be visible. Use a Toolbar instead.
