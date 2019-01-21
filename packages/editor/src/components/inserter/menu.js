@@ -375,26 +375,35 @@ export default compose(
 		// eslint-disable-next-line no-restricted-syntax
 		function getInsertionPoint() {
 			const {
-				getBlockInsertionPoint,
 				getBlockIndex,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+				getBlockOrder,
 			} = select( 'core/editor' );
 			const { clientId, rootClientId } = ownProps;
-			let insertionRootClientId, insertionIndex;
-			if ( rootClientId === undefined && clientId === undefined ) {
-				// Unless explicitly provided, the default insertion point provided
-				// by the store occurs immediately following the selected block.
-				// Otherwise, the default behavior for an undefined index is to
-				// append block to the end of the rootClientId context.
-				const insertionPoint = getBlockInsertionPoint();
-				( { rootClientId: insertionRootClientId, index: insertionIndex } = insertionPoint );
-			} else {
-				insertionIndex = getBlockIndex( clientId, rootClientId );
-				insertionRootClientId = rootClientId;
+
+			// If the clientId is defined, we insert at the position of the block.
+			if ( clientId ) {
+				return {
+					index: getBlockIndex( clientId, rootClientId ),
+					rootClientId,
+				};
 			}
 
+			// If there a selected block, we insert after the selected block.
+			const end = getBlockSelectionEnd();
+			if ( end ) {
+				const selectedBlockRootClientId = getBlockRootClientId( end ) || undefined;
+				return {
+					index: getBlockIndex( end, selectedBlockRootClientId ) + 1,
+					rootClientId: selectedBlockRootClientId,
+				};
+			}
+
+			// Otherwise, we insert at the end of the current rootClientId
 			return {
-				index: insertionIndex,
-				rootClientId: insertionRootClientId,
+				index: getBlockOrder( rootClientId ).length,
+				rootClientId,
 			};
 		}
 

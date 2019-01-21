@@ -391,11 +391,9 @@ export class BlockListBlock extends Component {
 					// Empty paragraph blocks should always show up as unselected.
 					const showEmptyBlockSideInserter =
 						( isSelected || isHovered ) && isEmptyDefaultBlock && isValid;
-					const showSideInserter =
-						( isSelected || isHovered ) && isEmptyDefaultBlock;
 					const shouldAppearSelected =
 						! isFocusMode &&
-						! showSideInserter &&
+						! showEmptyBlockSideInserter &&
 						isSelected &&
 						! isTypingWithinBlock;
 					const shouldAppearHovered =
@@ -414,7 +412,7 @@ export class BlockListBlock extends Component {
 						! isFocusMode && isHovered && ! isEmptyDefaultBlock;
 					const shouldShowContextualToolbar =
 						! hasFixedToolbar &&
-						! showSideInserter &&
+						! showEmptyBlockSideInserter &&
 						( ( isSelected &&
 							( ! isTypingWithinBlock || isCaretWithinFormattedText ) ) ||
 							isFirstMultiSelected );
@@ -606,6 +604,7 @@ export class BlockListBlock extends Component {
 											position="top right"
 											onToggle={ this.selectOnOpen }
 											rootClientId={ rootClientId }
+											clientId={ clientId }
 										/>
 									</div>
 								</Fragment>

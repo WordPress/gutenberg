@@ -103,16 +103,12 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getEditedPostAttribute,
-			getBlockInsertionPoint,
 			hasInserterItems,
 		} = select( 'core/editor' );
-
-		rootClientId = rootClientId || getBlockInsertionPoint().rootClientId;
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			hasItems: hasInserterItems( rootClientId ),
-			rootClientId,
 		};
 	} ),
 	ifCondition( ( { hasItems } ) => hasItems ),
