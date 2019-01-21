@@ -6,7 +6,7 @@ const { first } = require( 'lodash' );
 /**
  * Internal dependencies.
  */
-const getNameDeclaration = require( './get-name-declaration' );
+const getNameDeclaration = require( './get-export-entries' );
 const getJSDoc = require( './get-jsdoc' );
 const isIdentifierInSameFile = require( './is-identifier-in-same-file' );
 const isIdentifierInDependency = require( './is-identifier-in-dependency' );

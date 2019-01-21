@@ -7,7 +7,7 @@ const path = require( 'path' );
 /**
  * Internal dependencies.
  */
-const getNameDeclaration = require( '../src/get-name-declaration' );
+const getExportEntries = require( '../src/get-export-entries' );
 
 /**
  * External dependencies.
@@ -19,7 +19,7 @@ test( 'default export class (anonymous)', function( t ) {
 		path.join( __dirname, './fixtures/default-class-anonymous.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: '*default*',
 		exportName: 'default',
@@ -33,7 +33,7 @@ test( 'default export class (named)', function( t ) {
 		path.join( __dirname, './fixtures/default-class-named.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'ClassDeclaration',
 		exportName: 'default',
@@ -47,7 +47,7 @@ test( 'default export function (anonymous)', function( t ) {
 		path.join( __dirname, './fixtures/default-function-anonymous.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: '*default*',
 		exportName: 'default',
@@ -61,7 +61,7 @@ test( 'default export function (named)', function( t ) {
 		path.join( __dirname, './fixtures/default-function-named.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'myDeclaration',
 		exportName: 'default',
@@ -75,7 +75,7 @@ test( 'default export identifier', function( t ) {
 		path.join( __dirname, './fixtures/default-identifier.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'ClassDeclaration',
 		exportName: 'default',
@@ -89,7 +89,7 @@ test( 'default export variable (anonymous)', function( t ) {
 		path.join( __dirname, './fixtures/default-variable-anonymous.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: '*default*',
 		exportName: 'default',
@@ -103,7 +103,7 @@ test( 'default export variable (named)', function( t ) {
 		path.join( __dirname, './fixtures/default-variable-named.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'myDeclaration',
 		exportName: 'default',
@@ -117,7 +117,7 @@ test( 'named export class', function( t ) {
 		path.join( __dirname, './fixtures/named-class.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'MyDeclaration',
 		exportName: 'MyDeclaration',
@@ -131,7 +131,7 @@ test( 'named export default', function( t ) {
 		path.join( __dirname, './fixtures/named-default.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'default',
 		exportName: 'default',
@@ -145,7 +145,7 @@ test( 'named export function', function( t ) {
 		path.join( __dirname, './fixtures/named-function.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'myDeclaration',
 		exportName: 'myDeclaration',
@@ -159,7 +159,7 @@ test( 'named export identifier', function( t ) {
 		path.join( __dirname, './fixtures/named-identifier.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'myDeclaration',
 		exportName: 'myDeclaration',
@@ -173,7 +173,7 @@ test( 'named export identifiers', function( t ) {
 		path.join( __dirname, './fixtures/named-identifiers.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [
 		{ localName: 'functionDeclaration', exportName: 'functionDeclaration', module: null },
 		{ localName: 'variableDeclaration', exportName: 'variableDeclaration', module: null },
@@ -187,7 +187,7 @@ test( 'named export variable', function( t ) {
 		path.join( __dirname, './fixtures/named-variable.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: 'myDeclaration',
 		exportName: 'myDeclaration',
@@ -201,7 +201,7 @@ test( 'named export variables', function( t ) {
 		path.join( __dirname, './fixtures/named-variables.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [
 		{ localName: 'firstDeclaration', exportName: 'firstDeclaration', module: null },
 		{ localName: 'secondDeclaration', exportName: 'secondDeclaration', module: null },
@@ -214,7 +214,7 @@ test( 'namespace export (*)', function( t ) {
 		path.join( __dirname, './fixtures/namespace.json' ),
 		'utf-8'
 	);
-	const name = getNameDeclaration( JSON.parse( token ) );
+	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: '*',
 		exportName: null,
