@@ -9,7 +9,7 @@ Pod::Spec.new do |s|
   s.license          = package['license']
   s.homepage         = 'https://github.com/wordpress-mobile/gutenberg-mobile'
   s.authors          = 'Automattic'
-  s.source           = { :git => 'https://github.com/wordpress-mobile/gutenberg-mobile.git', :branch => 'feature/fold-aztec-wrapper-in-main-repo'}
+  s.source           = { :git => 'https://github.com/wordpress-mobile/gutenberg-mobile.git' }
   s.source_files     = 'react-native-aztec/ios/RNTAztecView/*.{h,m,swift}'
   s.public_header_files = 'react-native-aztec/ios/RNTAztecView/*.h'
   s.requires_arc     = true
