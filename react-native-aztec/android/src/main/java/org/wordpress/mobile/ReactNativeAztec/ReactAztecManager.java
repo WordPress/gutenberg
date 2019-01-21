@@ -39,6 +39,8 @@ import org.wordpress.aztec.plugins.wpcomments.WordPressCommentsPlugin;
 import org.wordpress.aztec.plugins.wpcomments.toolbar.MoreToolbarButton;
 
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
@@ -46,7 +48,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     private static final int FOCUS_TEXT_INPUT = 1;
     private static final int BLUR_TEXT_INPUT = 2;
-    private static final int COMMAND_NOTIFY_APPLY_FORMAT = 100;
 
     // we define the same codes in ReactAztecText as they have for ReactNative's TextInput, so
     // it's easier to handle focus between Aztec and TextInput instances on the same screen.
@@ -171,6 +172,19 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.setIsSettingTextFromJS(false);
     }
 
+    @ReactProp(name = "activeFormats", defaultBoolean = false)
+    public void setActiveFormats(final ReactAztecText view, @Nullable ReadableArray activeFormats) {
+        if (activeFormats != null) {
+            String[] activeFormatsArray = new String[activeFormats.size()];
+            for (int i = 0; i < activeFormats.size(); i++) {
+                activeFormatsArray[i] = activeFormats.getString(i);
+            }
+            view.setActiveFormats(Arrays.asList(activeFormatsArray));
+        } else {
+            view.setActiveFormats(new ArrayList<String>());
+        }
+    }
+
     @ReactProp(name = "color", customType = "Color")
     public void setColor(ReactAztecText view, @Nullable Integer color) {
         int newColor = Color.BLACK;
@@ -254,11 +268,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         }
     }
 
-    @ReactProp(name = "onActiveFormatsChange", defaultBoolean = false)
-    public void setOnActiveFormatsChange(final ReactAztecText view, boolean onActiveFormatsChange) {
-        view.shouldHandleActiveFormatsChange = onActiveFormatsChange;
-    }
-
     @ReactProp(name = "onSelectionChange", defaultBoolean = false)
     public void setOnSelectionChange(final ReactAztecText view, boolean onSelectionChange) {
         view.shouldHandleOnSelectionChange = onSelectionChange;
@@ -286,7 +295,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
-                .put("applyFormat", COMMAND_NOTIFY_APPLY_FORMAT)
                 .put("focusTextInput", mFocusTextInputCommandCode)
                 .put("blurTextInput", mBlurTextInputCommandCode)
                 .build();
@@ -295,12 +303,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     @Override
     public void receiveCommand(final ReactAztecText parent, int commandType, @Nullable ReadableArray args) {
         Assertions.assertNotNull(parent);
-        if (commandType == COMMAND_NOTIFY_APPLY_FORMAT) {
-            final String format = args.getString(0);
-            Log.d(TAG, String.format("Apply format: %s", format));
-            parent.applyFormat(format);
-            return;
-        } else if (commandType == mFocusTextInputCommandCode) {
+        if (commandType == mFocusTextInputCommandCode) {
             parent.requestFocusFromJS();
             return;
         } else if (commandType == mBlurTextInputCommandCode) {
