@@ -15,21 +15,34 @@ import { withPluginContext } from '@wordpress/plugins';
  */
 import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
-const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
-	<PluginsMoreMenuGroup>
-		{ ( fillProps ) => (
-			<MenuItem
-				{ ...props }
-				onClick={ compose( onClick, fillProps.onClose ) }
-			/>
-		) }
-	</PluginsMoreMenuGroup>
-);
+const PluginMoreMenuItem = ( { onClick = noop, href, ...props } ) => {
+	// Provide console warning if the href prop value is #
+	if ( href === '#' ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'Links should trigger navigation. Replace Menu Item href with a navigable URL.'
+		);
+	}
+
+	return (
+		<PluginsMoreMenuGroup>
+			{ ( fillProps ) => (
+				<MenuItem
+					{ ...props }
+					onClick={ compose(
+						onClick,
+						fillProps.onClose
+					) }
+				/>
+			) }
+		</PluginsMoreMenuGroup>
+	);
+};
 
 export default compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} ),
+	} )
 )( PluginMoreMenuItem );
