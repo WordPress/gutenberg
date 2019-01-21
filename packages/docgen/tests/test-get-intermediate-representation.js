@@ -150,6 +150,16 @@ test( 'named export (JSDoc in identifier declaration, same file)', function( t )
 } );
 
 test( 'named export (JSDoc in identifer declaration, module dependency)', function( t ) {
-	t.equal( false, true );
+	const tokens = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-default.json' ),
+		'utf-8'
+	);
+	const getCodeFromPath = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/named-default-module-ir.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokens ), { body: [] }, getCodeFromPath ),
+		[ { name: 'default', description: 'Module declaration.', tags: [] } ] );
 	t.end();
 } );

@@ -26,8 +26,8 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 			doc = getJSDoc( candidates[ 0 ] );
 		}
 	} else if ( doc === undefined && entry.module !== null ) {
-		const irFromDependency = parseDependency( getDependencyPath( token ) );
-		doc = irFromDependency.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
+		const ir = parseDependency( getDependencyPath( token ) );
+		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.exportName );
 	}
 	return doc;
 };
