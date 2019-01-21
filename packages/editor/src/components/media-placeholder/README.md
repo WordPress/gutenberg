@@ -12,17 +12,18 @@ const { MediaPlaceholder } = wp.editor;
 
 ...
 
-	edit: ({ attributes, setAttributes }) {
-		<MediaPlaceholder
+	edit: ( { attributes, setAttributes } ) {
+		const mediaPlaceholder = <MediaPlaceholder
 			onSelect = {
 				( el ) => {
 					setAttributes( { theImage: el.url } );
 				}
 			}
-			allowedTypes = {[ 'image' ]}
+			allowedTypes = { [ 'image' ] }
 			multiple = { false }
-			labels = { {title: 'The Image'} }
-		/>
+			labels = { { title: 'The Image' } }
+		/>;
+		...
 	}
 ```
 
