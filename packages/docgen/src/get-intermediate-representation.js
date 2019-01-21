@@ -27,7 +27,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 		}
 	} else if ( doc === undefined && entry && entry.module !== null ) {
 		const ir = parseDependency( getDependencyPath( token ) );
-		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.exportName );
+		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
 	}
 	return doc;
 };

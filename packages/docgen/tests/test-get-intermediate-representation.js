@@ -150,16 +150,25 @@ test( 'IR - named (JSDoc in identifier declaration, same file)', function( t ) {
 } );
 
 test( 'IR - named (JSDoc in identifer declaration, module dependency)', function( t ) {
-	const tokens = fs.readFileSync(
+	const tokenDefault = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default.json' ),
 		'utf-8'
 	);
-	const getCodeFromPath = () => JSON.parse( fs.readFileSync(
+	const getModule = () => JSON.parse( fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default-module-ir.json' ),
 		'utf-8'
 	) );
 	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokens ), { body: [] }, getCodeFromPath ),
-		[ { name: 'default', description: 'Module declaration.', tags: [] } ] );
+		getIntermediateRepresentation( JSON.parse( tokenDefault ), { body: [] }, getModule ),
+		[ { name: 'default', description: 'Module declaration.', tags: [] } ]
+	);
+	const tokenDefaultExported = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-default-exported.json' ),
+		'utf-8'
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenDefaultExported ), { body: [] }, getModule ),
+		[ { name: 'moduleName', description: 'Module declaration.', tags: [] } ]
+	);
 	t.end();
 } );
