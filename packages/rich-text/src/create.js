@@ -124,7 +124,7 @@ export function create( {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
-			text: text,
+			text,
 		};
 	}
 
