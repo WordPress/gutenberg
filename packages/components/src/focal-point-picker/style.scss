@@ -7,6 +7,7 @@ $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height=
 	width: 100%;
 	padding: 14px;
 }
+
 .component-focal-point-picker {
 	align-items: center;
 	cursor: pointer;
@@ -15,6 +16,7 @@ $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height=
 	justify-content: center;
 	position: relative;
 	width: 100%;
+
 	img {
 		height: auto;
 		max-height: 100%;
@@ -52,12 +54,16 @@ $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height=
 .component-focal-point-picker_position-display-container {
 	margin: 1em 0;
 	display: flex;
+
 	.components-base-control__field {
 		margin: 0 1em 0 0;
 	}
-	input {
+
+	input[type="number"].components-text-control__input { // Needs specificity to override padding.
 		max-width: 4em;
+		padding: 6px 4px;
 	}
+
 	span {
 		margin: 0 0 0 0.2em;
 	}

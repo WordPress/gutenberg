@@ -185,7 +185,7 @@ export class FocalPointPicker extends Component {
 						onMouseMove={ this.onMouseMove }
 						ref={ this.containerRef }
 						role="button"
-						tabIndex="0"
+						tabIndex="-1"
 					>
 						<img
 							alt="Dimensions helper"
