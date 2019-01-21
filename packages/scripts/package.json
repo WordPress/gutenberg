@@ -42,6 +42,7 @@
 		"jest": "^23.6.0",
 		"jest-puppeteer": "3.2.1",
 		"npm-package-json-lint": "^3.3.1",
+		"prettier-eslint-cli": "^4.7.1",
 		"puppeteer": "1.6.1",
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0",
