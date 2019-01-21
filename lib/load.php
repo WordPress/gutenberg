@@ -69,7 +69,7 @@ if ( ! function_exists( 'render_block_core_latest_comments' )
 	require dirname( __FILE__ ) . '/../packages/block-library/src/latest-comments/index.php';
 }
 if ( ! function_exists( 'render_block_core_rss' ) ) {
-    require dirname( __FILE__ ) . '/../packages/block-library/src/rss/index.php';
+	require dirname( __FILE__ ) . '/../packages/block-library/src/rss/index.php';
 }
 if ( ! function_exists( 'render_block_core_latest_posts' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/latest-posts/index.php';
