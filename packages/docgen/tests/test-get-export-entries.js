@@ -84,28 +84,14 @@ test( 'default export identifier', function( t ) {
 	t.end();
 } );
 
-test( 'default export variable (anonymous)', function( t ) {
+test( 'default export variable', function( t ) {
 	const token = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-variable-anonymous.json' ),
+		path.join( __dirname, './fixtures/default-variable.json' ),
 		'utf-8'
 	);
 	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
 		localName: '*default*',
-		exportName: 'default',
-		module: null,
-	} ] );
-	t.end();
-} );
-
-test( 'default export variable (named)', function( t ) {
-	const token = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-variable-named.json' ),
-		'utf-8'
-	);
-	const name = getExportEntries( JSON.parse( token ) );
-	t.deepEqual( name, [ {
-		localName: 'myDeclaration',
 		exportName: 'default',
 		module: null,
 	} ] );
