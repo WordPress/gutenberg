@@ -13,23 +13,11 @@ import { SlotFillProvider } from '@wordpress/components';
 
 import type { EmitterSubscription } from 'react-native';
 
-import type { BlockType } from '../store/types';
-
 type PropsType = {
 	rootClientId: ?string,
-	onChange: ( clientId: string, attributes: mixed ) => void,
-	focusBlockAction: string => void,
-	moveBlockUpAction: string => mixed,
-	moveBlockDownAction: string => mixed,
-	deleteBlockAction: string => mixed,
-	createBlockAction: ( string, BlockType ) => mixed,
 	serializeToNativeAction: void => void,
 	toggleHtmlModeAction: void => void,
 	updateHtmlAction: string => void,
-	mergeBlocksAction: ( string, string ) => mixed,
-	blocks: Array<BlockType>,
-	isBlockSelected: string => boolean,
-	showHtml: boolean,
 };
 
 type StateType = {};
