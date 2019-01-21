@@ -53,10 +53,11 @@ describe( 'PluginMoreMenuItem', () => {
 	} );
 
 	test( 'it outputs console warning when href is #', () => {
+		const url = '#';
+
 		global.console = {
 			warn: jest.fn(),
 		};
-		const url = '#';
 
 		expect( global.console.warn ).not.toHaveBeenCalled();
 

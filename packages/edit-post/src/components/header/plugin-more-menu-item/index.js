@@ -15,9 +15,9 @@ import { withPluginContext } from '@wordpress/plugins';
  */
 import PluginsMoreMenuGroup from '../plugins-more-menu-group';
 
-const PluginMoreMenuItem = ( { onClick = noop, href, ...props } ) => {
+const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => {
 	// Provide console warning if the href prop value is #
-	if ( href === '#' ) {
+	if ( props.href === '#' ) {
 		// eslint-disable-next-line no-console
 		console.warn(
 			'Links should trigger navigation. Replace href value for PluginMoreMenuItem component with a navigable URL.'
