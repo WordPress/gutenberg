@@ -73,7 +73,7 @@
 		"@wordpress/scripts": "file:packages/scripts",
 		"babel-loader": "8.0.0",
 		"benchmark": "2.1.4",
-		"browserslist": "3.2.8",
+		"browserslist": "4.4.1",
 		"chalk": "2.4.1",
 		"concurrently": "3.5.0",
 		"copy-webpack-plugin": "4.5.2",
