@@ -1,0 +1,22 @@
+[
+	{
+		"name": "myVariable",
+		"description": "Named variable.",
+		"tags": []
+	},
+	{
+		"name": "myFunction",
+		"description": "Named function.",
+		"tags": []
+	},
+	{
+		"name": "myClass",
+		"description": "Named class.",
+		"tags": []
+	},
+	{
+		"name": "default",
+		"description": "Default variable declaration.",
+		"tags": []
+	}
+]

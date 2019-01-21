@@ -172,3 +172,23 @@ test( 'IR - named (JSDoc in identifer declaration, module dependency)', function
 	);
 	t.end();
 } );
+
+test( 'IR - namespace (JSDoc in identifer declaration, module dependency)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/namespace.json' ),
+		'utf-8'
+	);
+	const getModule = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/namespace-module-ir.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( token ), { body: [] }, getModule ),
+		[
+			{ name: 'myVariable', description: 'Named variable.', tags: [] },
+			{ name: 'myFunction', description: 'Named function.', tags: [] },
+			{ name: 'MyClass', description: 'Named variable.', tags: [] },
+		]
+	);
+	t.end();
+} );
