@@ -14,7 +14,7 @@ const UNDOCUMENTED = 'Undocumented declaration.';
 
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc = getJSDocFromToken( token );
-	if ( doc === undefined && entry.module === null ) {
+	if ( doc === undefined && entry && entry.module === null ) {
 		const candidates = ast.body.filter( ( node ) => {
 			return ( node.type === 'ClassDeclaration' && node.id.name === entry.localName ) ||
 				( node.type === 'FunctionDeclaration' && node.id.name === entry.localName ) ||
@@ -25,7 +25,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 		if ( candidates.length === 1 ) {
 			doc = getJSDoc( candidates[ 0 ] );
 		}
-	} else if ( doc === undefined && entry.module !== null ) {
+	} else if ( doc === undefined && entry && entry.module !== null ) {
 		const ir = parseDependency( getDependencyPath( token ) );
 		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.exportName );
 	}
