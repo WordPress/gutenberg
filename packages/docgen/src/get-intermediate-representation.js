@@ -7,7 +7,7 @@ const { get } = require( 'lodash' );
  * Internal dependencies.
  */
 const getExportEntries = require( './get-export-entries' );
-const getJSDocFromToken = require( './get-jsdoc' );
+const getJSDocFromToken = require( './get-jsdoc-from-token' );
 const getDependencyPath = require( './get-dependency-path' );
 
 const UNDOCUMENTED = 'Undocumented declaration.';
