@@ -34,9 +34,9 @@ test( 'engine returns IR for many exports at once', ( t ) => {
 	t.deepEqual(
 		ir,
 		[
-			{ description: 'First declaration example.', tags: [], name: 'firstDeclaration' },
-			{ description: 'Second declaration example.', tags: [], name: 'secondDeclaration' },
-			{ description: 'Default declaration example.', tags: [], name: 'default export' },
+			{ name: 'firstDeclaration', description: 'First declaration example.', tags: [] },
+			{ name: 'secondDeclaration', description: 'Second declaration example.', tags: [] },
+			{ name: 'default', description: 'Default declaration example.', tags: [] },
 		]
 	);
 	t.end();
@@ -53,7 +53,7 @@ test( 'engine returns IR for named export (function)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -69,7 +69,7 @@ test( 'engine returns IR for named export (variable)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -87,7 +87,7 @@ test( 'engine returns IR for named export (single identifier)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -105,7 +105,7 @@ test( 'engine returns IR for named export (single identifier) using JSDoc from d
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -131,8 +131,8 @@ test( 'engine returns IR for named export (multiple identifiers) using JSDoc fro
 	t.deepEqual(
 		ir,
 		[
-			{ description: 'First declaration example.', tags: [], name: 'firstDeclaration' },
-			{ description: 'Second declaration example.', tags: [], name: 'secondDeclaration' },
+			{ name: 'firstDeclaration', description: 'First declaration example.', tags: [] },
+			{ name: 'secondDeclaration', description: 'Second declaration example.', tags: [] },
 		]
 	);
 	t.end();
@@ -152,7 +152,7 @@ test( 'engine returns IR for named export (single identifier) using JSDoc from d
 	);
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -168,7 +168,7 @@ test( 'engine returns IR for default export (named function)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -184,7 +184,7 @@ test( 'engine returns IR for default export (anonymous function)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'default export' } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -202,7 +202,7 @@ test( 'engine returns IR for default export (identifier)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'default export' } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -220,7 +220,7 @@ test( 'engine returns IR for default export (identifier) using JSDoc from functi
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'default export' } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -238,7 +238,7 @@ test( 'engine returns IR for default export (identifier) using JSDoc from variab
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'My declaration example.', tags: [], name: 'default export' } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -253,7 +253,7 @@ test( 'engine returns IR for undocumented export', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { description: 'Undocumented declaration.', tags: [], name: 'default export' } ]
+		[ { name: 'default', description: 'Undocumented declaration.', tags: [] } ]
 	);
 	t.end();
 } );
