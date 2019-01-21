@@ -20,7 +20,12 @@ test( 'default export class (anonymous)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'default export' ] );
+	t.deepEqual( name, [ {
+		importName: null,
+		localName: '*default*',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -30,7 +35,12 @@ test( 'default export class (named)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'default export' ] );
+	t.deepEqual( name, [ {
+		importName: null,
+		localName: 'ClassDeclaration',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -40,7 +50,12 @@ test( 'default export function (anonymous)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'default export' ] );
+	t.deepEqual( name, [ {
+		importName: null,
+		localName: '*default*',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -50,7 +65,12 @@ test( 'default export function (named)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'default export' ] );
+	t.deepEqual( name, [ {
+		importName: null,
+		localName: 'myDeclaration',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -60,7 +80,12 @@ test( 'default export identifier', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'default export' ] );
+	t.deepEqual( name, [ {
+		importName: null,
+		localName: 'ClassDeclaration',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -70,7 +95,12 @@ test( 'default export variable (anonymous)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'default export' ] );
+	t.deepEqual( name, [ {
+		importName: null,
+		localName: '*default*',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -80,7 +110,12 @@ test( 'default export variable (named)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'default export' ] );
+	t.deepEqual( name, [ {
+		importName: null,
+		localName: 'myDeclaration',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -150,6 +185,11 @@ test( 'namespace export (*)', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'TODO: to look up in module' ] );
+	t.deepEqual( name, [ {
+		importName: '*',
+		localName: null,
+		exportName: null,
+		module: './module',
+	} ] );
 	t.end();
 } );

@@ -13,11 +13,37 @@ const { first, get } = require( 'lodash' );
  */
 module.exports = function( token ) {
 	if ( token.type === 'ExportDefaultDeclaration' ) {
-		return [ 'default export' ];
+		const getLocalName = ( t ) => {
+			let name;
+			switch ( t.declaration.type ) {
+				case 'Identifier':
+					name = t.declaration.name;
+					break;
+				case 'AssignmentExpression':
+					name = t.declaration.left.name;
+					break;
+				//case 'FunctionDeclaration'
+				//case 'ClassDeclaration'
+				default:
+					name = get( t.declaration, [ 'id', 'name' ], '*default*' );
+			}
+			return name;
+		};
+		return [ {
+			importName: null,
+			localName: getLocalName( token ),
+			exportName: 'default',
+			module: null,
+		} ];
 	}
 
 	if ( token.type === 'ExportAllDeclaration' ) {
-		return [ 'TODO' ]; // need to look up in dependency
+		return [ {
+			importName: '*',
+			localName: null,
+			exportName: null,
+			module: token.source.value,
+		} ];
 	}
 
 	const name = [];
