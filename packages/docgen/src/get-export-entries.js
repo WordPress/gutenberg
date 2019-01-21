@@ -54,7 +54,7 @@ module.exports = function( token ) {
 	if ( token.declaration === null ) {
 		token.specifiers.forEach( ( specifier ) => name.push( {
 			localName: specifier.local.name,
-			exportName: specifier.local.name,
+			exportName: specifier.exported.name,
 			module: get( token.source, [ 'value' ], null ),
 		} ) );
 		return name;

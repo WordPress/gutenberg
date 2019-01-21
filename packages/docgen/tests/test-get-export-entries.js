@@ -126,6 +126,20 @@ test( 'Export entries - named default', function( t ) {
 	t.end();
 } );
 
+test( 'Export entries - named default (exported)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-default-exported.json' ),
+		'utf-8'
+	);
+	const name = getExportEntries( JSON.parse( token ) );
+	t.deepEqual( name, [ {
+		localName: 'default',
+		exportName: 'moduleName',
+		module: './named-default-module',
+	} ] );
+	t.end();
+} );
+
 test( 'Export entries - named function', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-function.json' ),
