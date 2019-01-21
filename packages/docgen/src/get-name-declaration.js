@@ -30,7 +30,6 @@ module.exports = function( token ) {
 			return name;
 		};
 		return [ {
-			importName: null,
 			localName: getLocalName( token ),
 			exportName: 'default',
 			module: null,
@@ -39,8 +38,7 @@ module.exports = function( token ) {
 
 	if ( token.type === 'ExportAllDeclaration' ) {
 		return [ {
-			importName: '*',
-			localName: null,
+			localName: '*',
 			exportName: null,
 			module: token.source.value,
 		} ];

@@ -21,7 +21,6 @@ test( 'default export class (anonymous)', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: null,
 		localName: '*default*',
 		exportName: 'default',
 		module: null,
@@ -36,7 +35,6 @@ test( 'default export class (named)', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: null,
 		localName: 'ClassDeclaration',
 		exportName: 'default',
 		module: null,
@@ -51,7 +49,6 @@ test( 'default export function (anonymous)', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: null,
 		localName: '*default*',
 		exportName: 'default',
 		module: null,
@@ -66,7 +63,6 @@ test( 'default export function (named)', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: null,
 		localName: 'myDeclaration',
 		exportName: 'default',
 		module: null,
@@ -81,7 +77,6 @@ test( 'default export identifier', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: null,
 		localName: 'ClassDeclaration',
 		exportName: 'default',
 		module: null,
@@ -96,7 +91,6 @@ test( 'default export variable (anonymous)', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: null,
 		localName: '*default*',
 		exportName: 'default',
 		module: null,
@@ -111,7 +105,6 @@ test( 'default export variable (named)', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: null,
 		localName: 'myDeclaration',
 		exportName: 'default',
 		module: null,
@@ -186,8 +179,7 @@ test( 'namespace export (*)', function( t ) {
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		importName: '*',
-		localName: null,
+		localName: '*',
 		exportName: null,
 		module: './module',
 	} ] );
