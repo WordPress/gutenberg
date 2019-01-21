@@ -38,7 +38,7 @@ Use a DropdownMenu to display a list of actions after the user interacts with an
 ![Don’t use a DropdownMenu for important actions that should always be visible. Use a Toolbar instead.](https://wordpress.org/gutenberg/files/2019/01/DropdownMenuDont.png)
 
 **Don’t**
-Don’t use a DropdownMenu for important actions that should always be visible. Use a Toolbar instead.
+Don’t use a DropdownMenu for frequently used actions. Use a Toolbar instead.
 
 #### Behavior
 
