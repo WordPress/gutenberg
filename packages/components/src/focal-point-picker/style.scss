@@ -1,4 +1,4 @@
-.component-focal-point-picker-wrapper {
+.components-focal-point-picker-wrapper {
 	background-color: transparent;
 	border: 1px solid $light-gray-500;
 	height: 200px;
@@ -6,7 +6,7 @@
 	padding: 14px;
 }
 
-.component-focal-point-picker {
+.components-focal-point-picker {
 	align-items: center;
 	cursor: pointer;
 	display: flex;
@@ -24,7 +24,7 @@
 	}
 }
 
-.component-focal-point-picker__icon_container {
+.components-focal-point-picker__icon_container {
 	background-color: transparent;
 	cursor: grab;
 	height: 30px;
@@ -39,7 +39,7 @@
 	}
 }
 
-.component-focal-point-picker__icon {
+.components-focal-point-picker__icon {
 	display: block;
 	height: 100%;
 	left: -15px;
@@ -47,16 +47,16 @@
 	top: -15px;
 	width: 100%;
 
-	.component-focal-point-picker__icon-outline {
+	.components-focal-point-picker__icon-outline {
 		fill: $white;
 	}
 
-	.component-focal-point-picker__icon-fill {
+	.components-focal-point-picker__icon-fill {
 		fill: theme(primary);
 	}
 }
 
-.component-focal-point-picker_position-display-container {
+.components-focal-point-picker_position-display-container {
 	margin: 1em 0;
 	display: flex;
 

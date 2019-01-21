@@ -155,6 +155,11 @@ export class FocalPointPicker extends Component {
 			top: 0,
 		};
 	}
+	handleFocusOutside() {
+		this.setState( {
+			isDragging: false,
+		} );
+	}
 	render() {
 		const { instanceId, url, value, label, help, className } = this.props;
 		const { bounds, isDragging, percentages } = this.state;
@@ -168,7 +173,7 @@ export class FocalPointPicker extends Component {
 			top: `${ iconCoordinates.top }px`,
 		};
 		const iconContainerClasses = classnames(
-			'component-focal-point-picker__icon_container',
+			'components-focal-point-picker__icon_container',
 			isDragging ? 'is-dragging' : null
 		);
 		const id = `inspector-focal-point-picker-control-${ instanceId }`;
@@ -176,9 +181,9 @@ export class FocalPointPicker extends Component {
 		const verticalPositionId = `inspector-focal-point-picker-control-horizontal-position-${ instanceId }`;
 		return (
 			<BaseControl label={ label } id={ id } help={ help } className={ className }>
-				<div className="component-focal-point-picker-wrapper">
+				<div className="components-focal-point-picker-wrapper">
 					<div
-						className="component-focal-point-picker"
+						className="components-focal-point-picker"
 						onMouseDown={ () => this.setState( { isDragging: true } ) }
 						onDragStart={ () => this.setState( { isDragging: true } ) }
 						onMouseUp={ () => this.setState( { isDragging: false } ) }
@@ -196,14 +201,14 @@ export class FocalPointPicker extends Component {
 							draggable="false"
 						/>
 						<div className={ iconContainerClasses } style={ iconContainerStyle }>
-							<SVG className="component-focal-point-picker__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
-								<Path className="component-focal-point-picker__icon-outline" d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
-								<Path className="component-focal-point-picker__icon-fill" d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z" />
+							<SVG className="components-focal-point-picker__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 30 30">
+								<Path className="components-focal-point-picker__icon-outline" d="M15 1C7.3 1 1 7.3 1 15s6.3 14 14 14 14-6.3 14-14S22.7 1 15 1zm0 22c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z" />
+								<Path className="components-focal-point-picker__icon-fill" d="M15 3C8.4 3 3 8.4 3 15s5.4 12 12 12 12-5.4 12-12S21.6 3 15 3zm0 22C9.5 25 5 20.5 5 15S9.5 5 15 5s10 4.5 10 10-4.5 10-10 10z" />
 							</SVG>
 						</div>
 					</div>
 				</div>
-				<div className="component-focal-point-picker_position-display-container">
+				<div className="components-focal-point-picker_position-display-container">
 					<BaseControl label={ __( 'Horizontal Pos.' ) }>
 						<input
 							className="components-text-control__input"
@@ -231,11 +236,6 @@ export class FocalPointPicker extends Component {
 				</div>
 			</BaseControl>
 		);
-	}
-	handleFocusOutside() {
-		this.setState( {
-			isDragging: false,
-		} );
 	}
 }
 
