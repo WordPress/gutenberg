@@ -1,5 +1,3 @@
-$focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height='24' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E%3Cg transform='translate(1 1)' stroke='%23000' strokeWidth='2' fill='none' fillRule='evenodd'%3E%3Cellipse fill='%23fff' cx='11' cy='11.129' rx='9.533' ry='9.645' /%3E%3Cpath d='M0 11.13h22M10.945 22.347V.09' strokeLinecap='square' /%3E%3C/g%3E%3C/svg%3E";
-
 .component-focal-point-picker-wrapper {
 	background-color: transparent;
 	border: 1px solid $light-gray-500;
@@ -28,27 +26,33 @@ $focalPointPickerSVG: "data:image/svg+xml;charset=utf8,%3Csvg width='24' height=
 
 .component-focal-point-picker__icon_container {
 	background-color: transparent;
-	cursor: -webkit-grab;
+	cursor: grab;
 	height: 30px;
-	opacity: 0.5;
+	opacity: 0.8;
 	position: absolute;
 	width: 30px;
 	z-index: 10000;
 
 	&.is-dragging {
-		cursor: -webkit-grabbing;
+		cursor: grabbing;
 	}
 }
 
 .component-focal-point-picker__icon {
-	background-image: url($focalPointPickerSVG);
-	background-size: 100%;
 	display: block;
 	height: 100%;
 	left: -15px;
 	position: absolute;
 	top: -15px;
 	width: 100%;
+
+	.component-focal-point-picker__icon-outline {
+		fill: $white;
+	}
+
+	.component-focal-point-picker__icon-fill {
+		fill: theme(primary);
+	}
 }
 
 .component-focal-point-picker_position-display-container {
