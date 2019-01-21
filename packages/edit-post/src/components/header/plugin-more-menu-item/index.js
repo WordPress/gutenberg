@@ -20,7 +20,7 @@ const PluginMoreMenuItem = ( { onClick = noop, href, ...props } ) => {
 	if ( href === '#' ) {
 		// eslint-disable-next-line no-console
 		console.warn(
-			'Links should trigger navigation. Replace Menu Item href with a navigable URL.'
+			'Links should trigger navigation. Replace href value for PluginMoreMenuItem component with a navigable URL.'
 		);
 	}
 
