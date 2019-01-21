@@ -124,7 +124,11 @@ test( 'named export (JSDoc in identifier declaration, same file)', function( t )
 		path.join( __dirname, './fixtures/named-identifier.json' ),
 		'utf-8'
 	);
-	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ) ), [ {
+	const ast = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifier-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ) ), [ {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
 		tags: [] },
@@ -133,16 +137,19 @@ test( 'named export (JSDoc in identifier declaration, same file)', function( t )
 		path.join( __dirname, './fixtures/named-identifiers.json' ),
 		'utf-8'
 	);
-	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokens ) ), [
-		{ name: 'functionDeclaration', description: 'My declaration example.', tags: [] },
-		{ name: 'variableDeclaration', description: 'My declaration example.', tags: [] },
-		{ name: 'ClassDeclaration', description: 'My declaration example.', tags: [] },
+	const asts = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifiers-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokens ), JSON.parse( asts ) ), [
+		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
+		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
+		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
 	] );
 	t.end();
 } );
 
 test( 'named export (JSDoc in identifer declaration, module dependency)', function( t ) {
-	// TODO: named-default, namespace, other names
 	t.equal( false, true );
 	t.end();
 } );
