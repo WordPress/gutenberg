@@ -1,9 +1,9 @@
 #!/bin/sh
 
 # Check for jfrog-cli-go
-command -v jfrog > /dev/null || ( echo "jfrog-cli-go is required to update the repo. Install it with 'brew install jfrog-cli-go'"; exit 1 )
+command -v jfrog > /dev/null || { echo "jfrog-cli-go is required to update the repo. Install it with 'brew install jfrog-cli-go'" >&2; exit 1; }
 # Check for xmlstarlet
-command -v xmlstarlet > /dev/null || ( echo "xmlstarlet is required to update the repo. Install it with 'brew install xmlstarlet'"; exit 1 )
+command -v xmlstarlet > /dev/null || { echo "xmlstarlet is required to update the repo. Install it with 'brew install xmlstarlet'" >&2; exit 1; }
 
 # Exit if any command fails
 set -e
