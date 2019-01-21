@@ -3,7 +3,7 @@ buildscript {
         gradlePluginVersion = '3.0.1'
         kotlinVersion = '1.2.31'
         supportLibVersion = '27.1.1'
-        tagSoupVersion = '1.2.2'
+        tagSoupVersion = '1.2.1'
         glideVersion = '3.7.0'
         picassoVersion = '2.5.2'
         robolectricVersion = '3.5.1'
@@ -11,6 +11,8 @@ buildscript {
         jSoupVersion = '1.10.3'
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
+
+        aztecVersion = 'v1.3.14'
     }
 
     repositories {
@@ -20,24 +22,20 @@ buildscript {
 
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
     }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
 
 // import the `readReactNativeVersion()` function
-//apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
-import groovy.json.JsonSlurper
+apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
-def readReactNativeVersion(packagejson, section) {
-    def packageSlurper = new JsonSlurper()
-    def packageJson = packageSlurper.parse file(packagejson)
-    return packageJson.get(section).get('react-native')
-}
+group='com.github.wordpress-mobile.gutenberg-mobile'
 
-ext {
-    readReactNativeVersion = this.&readReactNativeVersion
-}
+// fallback flag value for when lib is compiled individually (e.g. via jitpack)
+project.ext.buildGutenbergFromSource = false
 
 // The sample build uses multiple directories to
 // keep boilerplate and common code separate from
@@ -89,8 +87,8 @@ repositories {
 
     maven { url "https://jitpack.io" }
 
-    if (project == rootProject) {
-         // if we are the root project, use a remote RN maven repo so jitpack can build this lib without local RN setup
+    if (!rootProject.ext.buildGutenbergFromSource) {
+         // if not building from source (where the node_modules dir is used), use a remote RN maven repo
          def reactNativeRepo = 'https://dl.bintray.com/wordpress-mobile/react-native-mirror/'
          println "Will use the RN maven repo at ${reactNativeRepo}"
          maven { url reactNativeRepo }
@@ -98,10 +96,10 @@ repositories {
 }
 
 dependencies {
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:v1.3.16')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:v1.3.13')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:v1.3.13')
-    api ('com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:v1.3.13')
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:aztec:$aztecVersion")
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-shortcodes:$aztecVersion")
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:wordpress-comments:$aztecVersion")
+    api ("com.github.wordpress-mobile.WordPress-Aztec-Android:glide-loader:$aztecVersion")
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
@@ -114,10 +112,10 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "com.android.support:recyclerview-v7:$supportLibVersion"
 
-    if (project == rootProject) {
+    if (rootProject.ext.buildGutenbergFromSource) {
+        implementation "com.facebook.react:react-native:+" // From node_modules.
+    } else {
         def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
         implementation "com.facebook.react:react-native:${rnVersion}" // From Maven repo
-    } else {
-        implementation "com.facebook.react:react-native:+" // From node_modules.
     }
 }

@@ -10,20 +10,14 @@ class RCTAztecView: Aztec.TextView {
     @objc var onBlur: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
+    @objc var onActiveFormatsChange: RCTBubblingEventBlock? = nil
+    @objc var onActiveFormatAttributesChange: RCTBubblingEventBlock? = nil
     @objc var blockType: NSDictionary? = nil {
         didSet {
             guard let block = blockType, let tag = block["tag"] as? String else {
                 return
             }
             blockModel = BlockModel(tag: tag)
-        }
-    }
-    @objc var activeFormats: NSSet? = nil {
-        didSet {
-            let currentTypingAttributes = formattingIdentifiersForTypingAttributes()
-            for (key, value) in formatStringMap where currentTypingAttributes.contains(key) != activeFormats?.contains(value) {
-                toggleFormat(format: value)
-            }
         }
     }
 
@@ -155,10 +149,20 @@ class RCTAztecView: Aztec.TextView {
         if selectionAffinity == .backward {
             (start, end) = (end, start)
         }
-        return ["text": getHTML(),
-                "selectionStart": start,
-                "selectionEnd": end,
+        
+        var result: [String : Any] = [
+            "text": getHTML(),
+            "selectionStart": start,
+            "selectionEnd": end
         ]
+        
+        if let selectedTextRange = selectedTextRange {
+            let caretEndRect = caretRect(for: selectedTextRange.end)
+            result["selectionEndCaretX"] = caretEndRect.origin.x
+            result["selectionEndCaretY"] = caretEndRect.origin.y
+        }
+
+        return result
     }
 
     // MARK: - RN Properties
@@ -202,14 +206,42 @@ class RCTAztecView: Aztec.TextView {
 
     // MARK: - Formatting interface
 
-    @objc func toggleFormat(format: String) {
-        let emptyRange = NSRange(location: selectedRange.location, length: 0)
+    @objc func apply(format: String) {
         switch format {
-        case "bold": toggleBold(range: emptyRange)
-        case "italic": toggleItalic(range: emptyRange)
-        case "strikethrough": toggleStrikethrough(range: emptyRange)
+        case "bold": toggleBold(range: selectedRange)
+        case "italic": toggleItalic(range: selectedRange)
+        case "strikethrough": toggleStrikethrough(range: selectedRange)
         default: print("Format not recognized")
         }
+    }
+
+    @objc
+    func setLink(with url: String, and title: String?) {
+        guard let url = URL(string: url) else {
+            return
+        }
+        if let title = title {
+            setLink(url, title: title, inRange: selectedRange)
+        } else {
+            setLink(url, inRange: selectedRange)
+        }
+    }
+
+    @objc
+    func removeLink() {
+        guard let expandedRange = linkFullRange(forRange: selectedRange) else {
+            return
+        }
+        removeLink(inRange: expandedRange)
+    }
+
+    func linkAttributes() -> [String: Any] {
+        var attributes: [String: Any] = ["isActive": false]
+        if let expandedRange = linkFullRange(forRange: selectedRange) {
+            attributes["url"] = linkURL(forRange: expandedRange)?.absoluteString ?? ""
+            attributes["isActive"] = true
+        }
+        return attributes
     }
 
     func forceTypingAttributesIfNeeded() {
@@ -227,6 +259,27 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
+    func propagateFormatChanges() {
+        guard let onActiveFormatsChange = onActiveFormatsChange else {
+            return
+        }
+        let identifiers: Set<FormattingIdentifier>
+        if selectedRange.length > 0 {
+            identifiers = formattingIdentifiersSpanningRange(selectedRange)
+        } else {
+            identifiers = formattingIdentifiersForTypingAttributes()
+        }
+        let formats = identifiers.compactMap { formatStringMap[$0] }
+        onActiveFormatsChange(["formats": formats])
+    }
+
+    func propagateAttributesChanges() {
+        let attributes: [String: [String: Any]] = [
+            "link": linkAttributes()
+        ]
+        onActiveFormatAttributesChange?(["attributes": attributes])
+    }
+
     func propagateSelectionChanges() {
         guard let onSelectionChange = onSelectionChange else {
             return
@@ -240,11 +293,14 @@ class RCTAztecView: Aztec.TextView {
 extension RCTAztecView: UITextViewDelegate {
 
     func textViewDidChangeSelection(_ textView: UITextView) {
+        propagateAttributesChanges()
+        propagateFormatChanges()
         propagateSelectionChanges()
     }
 
     func textViewDidChange(_ textView: UITextView) {
         forceTypingAttributesIfNeeded()
+        propagateFormatChanges()
         propagateContentChanges()
     }
 
