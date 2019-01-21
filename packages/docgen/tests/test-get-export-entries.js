@@ -14,7 +14,7 @@ const test = require( 'tape' );
  */
 const getExportEntries = require( '../src/get-export-entries' );
 
-test( 'default export class (anonymous)', function( t ) {
+test( 'Export entries: default class (anonymous)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-anonymous.json' ),
 		'utf-8'
@@ -28,7 +28,7 @@ test( 'default export class (anonymous)', function( t ) {
 	t.end();
 } );
 
-test( 'default export class (named)', function( t ) {
+test( 'Export entries: default class (named)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-named.json' ),
 		'utf-8'
@@ -42,7 +42,7 @@ test( 'default export class (named)', function( t ) {
 	t.end();
 } );
 
-test( 'default export function (anonymous)', function( t ) {
+test( 'Export entries: default function (anonymous)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-function-anonymous.json' ),
 		'utf-8'
@@ -56,7 +56,7 @@ test( 'default export function (anonymous)', function( t ) {
 	t.end();
 } );
 
-test( 'default export function (named)', function( t ) {
+test( 'Export entries: default function (named)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-function-named.json' ),
 		'utf-8'
@@ -70,7 +70,7 @@ test( 'default export function (named)', function( t ) {
 	t.end();
 } );
 
-test( 'default export identifier', function( t ) {
+test( 'Export entries: default identifier', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-identifier.json' ),
 		'utf-8'
@@ -84,7 +84,7 @@ test( 'default export identifier', function( t ) {
 	t.end();
 } );
 
-test( 'default export variable', function( t ) {
+test( 'Export entries: default variable', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-variable.json' ),
 		'utf-8'
@@ -98,7 +98,7 @@ test( 'default export variable', function( t ) {
 	t.end();
 } );
 
-test( 'named export class', function( t ) {
+test( 'Export entries - named class', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-class.json' ),
 		'utf-8'
@@ -112,7 +112,7 @@ test( 'named export class', function( t ) {
 	t.end();
 } );
 
-test( 'named export default', function( t ) {
+test( 'Export entries - named default', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default.json' ),
 		'utf-8'
@@ -126,7 +126,7 @@ test( 'named export default', function( t ) {
 	t.end();
 } );
 
-test( 'named export function', function( t ) {
+test( 'Export entries - named function', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-function.json' ),
 		'utf-8'
@@ -140,7 +140,7 @@ test( 'named export function', function( t ) {
 	t.end();
 } );
 
-test( 'named export identifier', function( t ) {
+test( 'Export entries - named identifier', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifier.json' ),
 		'utf-8'
@@ -154,7 +154,7 @@ test( 'named export identifier', function( t ) {
 	t.end();
 } );
 
-test( 'named export identifiers', function( t ) {
+test( 'Export entries - named identifiers', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifiers.json' ),
 		'utf-8'
@@ -168,7 +168,7 @@ test( 'named export identifiers', function( t ) {
 	t.end();
 } );
 
-test( 'named export variable', function( t ) {
+test( 'Export entries - named variable', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-variable.json' ),
 		'utf-8'
@@ -182,7 +182,7 @@ test( 'named export variable', function( t ) {
 	t.end();
 } );
 
-test( 'named export variables', function( t ) {
+test( 'Export entries - named variables', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-variables.json' ),
 		'utf-8'
@@ -195,7 +195,7 @@ test( 'named export variables', function( t ) {
 	t.end();
 } );
 
-test( 'namespace export (*)', function( t ) {
+test( 'Export entries - namespace (*)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/namespace.json' ),
 		'utf-8'

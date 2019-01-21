@@ -27,6 +27,7 @@
 	"scripts": {
 		"test": "tape tests/test-*.js | faucet",
 		"test:engine": "tape tests/test-engine.js | faucet",
+		"test:formatter": "tape tests/test-formatter-markdown.js | faucet",
 		"test:get-export-entries": "tape tests/test-get-export-entries.js | faucet",
 		"test:get-intermediate-representation": "tape tests/test-get-intermediate-representation.js | faucet"
 	}

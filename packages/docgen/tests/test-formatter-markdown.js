@@ -8,7 +8,7 @@ const test = require( 'tape' );
  */
 const formatter = require( '../src/formatter' );
 
-test( 'formatter returns markdown', ( t ) => {
+test( 'Formatter - returns markdown', ( t ) => {
 	const docs = formatter( [ { description: 'My declaration example.', tags: [], name: 'myDeclaration' } ] );
 	t.equal(
 		docs,
