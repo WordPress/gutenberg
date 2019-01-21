@@ -2,6 +2,7 @@
 * External dependencies.
 */
 const espree = require( 'espree' );
+const { flatten } = require( 'lodash' );
 
 /**
 * Internal dependencies.
@@ -34,13 +35,13 @@ const engine = ( code, getCodeFromPath = () => {} ) => {
 	const result = {};
 	result.ast = getAST( code );
 	result.tokens = getExportTokens( result.ast );
-	result.ir = result.tokens.map(
+	result.ir = flatten( result.tokens.map(
 		( token ) => getIntermediateRepresentation(
 			token,
 			result.ast,
 			getIRFromDependency( getCodeFromPath )
 		)
-	);
+	) );
 
 	return result;
 };
