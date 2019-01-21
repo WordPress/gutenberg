@@ -5,14 +5,14 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 /**
- * Internal dependencies.
- */
-const getExportEntries = require( '../src/get-export-entries' );
-
-/**
  * External dependencies.
  */
 const test = require( 'tape' );
+
+/**
+ * Internal dependencies.
+ */
+const getExportEntries = require( '../src/get-export-entries' );
 
 test( 'default export class (anonymous)', function( t ) {
 	const token = fs.readFileSync(
