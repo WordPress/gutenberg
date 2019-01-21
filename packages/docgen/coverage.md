@@ -31,7 +31,7 @@
 - [x] escape-html
 - [ ] eslint-plugin - NODE EXPORT
 - [x] format-library - exports nothing
-- [ ] hooks - multiple named exports
+- [ ] hooks - hooks is defined in other file by importing first
 - [x] html-entities
 - [x] i18n
 - [ ] is-shallow-equal - NODE EXPORT
@@ -51,7 +51,7 @@
 - [x] rich-text
 - [ ] scripts - what shall be documented?
 - [x] shortcode
-- [ ] token-list - `export class`
+- [x] token-list - `export class`
 - [x] url
-- [ ] viewport - `default as`
+- [x] viewport - `default as`
 - [x] wordcount
