@@ -14,7 +14,7 @@ const test = require( 'tape' );
  */
 const getIntermediateRepresentation = require( '../src/get-intermediate-representation' );
 
-test( 'default export (inline)', function( t ) {
+test( 'default export (JSDoc in export statement)', function( t ) {
 	const tokenClassAnonymous = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-anonymous.json' ),
 		'utf-8'
@@ -63,7 +63,7 @@ test( 'default export (inline)', function( t ) {
 	t.end();
 } );
 
-test( 'default export (lookup identifier)', function( t ) {
+test( 'default export (JSDoc in identifier declaration, same file)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-identifier.json' ),
 		'utf-8'
@@ -77,5 +77,72 @@ test( 'default export (lookup identifier)', function( t ) {
 		description: 'Class declaration example.',
 		tags: [],
 	} ] );
+	t.end();
+} );
+
+test( 'named export (JSDoc in export statement)', function( t ) {
+	const tokenClass = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-class.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenClass ) ), [ {
+		name: 'MyDeclaration',
+		description: 'My declaration example.',
+		tags: [],
+	} ] );
+	const tokenFn = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-function.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenFn ) ), [ {
+		name: 'myDeclaration',
+		description: 'My declaration example.',
+		tags: [],
+	} ] );
+	const tokenVariable = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-variable.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenVariable ) ), [ {
+		name: 'myDeclaration',
+		description: 'My declaration example.',
+		tags: [],
+	} ] );
+	const tokenVariables = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-variables.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenVariables ) ), [
+		{ name: 'firstDeclaration', description: 'My declaration example.', tags: [] },
+		{ name: 'secondDeclaration', description: 'My declaration example.', tags: [] },
+	] );
+	t.end();
+} );
+
+test( 'named export (JSDoc in identifier declaration, same file)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifier.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ) ), [ {
+		name: 'myDeclaration',
+		description: 'My declaration example.',
+		tags: [] },
+	] );
+	const tokens = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifiers.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokens ) ), [
+		{ name: 'functionDeclaration', description: 'My declaration example.', tags: [] },
+		{ name: 'variableDeclaration', description: 'My declaration example.', tags: [] },
+		{ name: 'ClassDeclaration', description: 'My declaration example.', tags: [] },
+	] );
+	t.end();
+} );
+
+test( 'named export (JSDoc in identifer declaration, module dependency)', function( t ) {
+	// TODO: named-default, namespace, other names
+	t.equal( false, true );
 	t.end();
 } );
