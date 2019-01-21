@@ -1940,6 +1940,24 @@ describe( 'selectors', () => {
 
 			expect( isEditedPostDateFloating( state ) ).toBe( false );
 		} );
+
+		it( 'should return true for pending posts', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'pending',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'getBlockDependantsCacheBust', () => {
