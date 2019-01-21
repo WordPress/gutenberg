@@ -24,6 +24,12 @@ exports[`RichText should handle change in tag name gracefully 1`] = `
 <!-- /wp:heading -->"
 `;
 
+exports[`RichText should not insert non breaking spaces 1`] = `
+"<!-- wp:paragraph -->
+<p>test <strong>test test</strong></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should only mutate text data on input 1`] = `
 "<!-- wp:paragraph -->
 <p>1<strong>2</strong>34</p>

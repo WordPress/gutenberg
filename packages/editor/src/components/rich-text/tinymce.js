@@ -9,7 +9,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Component, createElement } from '@wordpress/element';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
 import { isEntirelySelected } from '@wordpress/dom';
 
 /**
@@ -111,6 +111,7 @@ export default class TinyMCE extends Component {
 		this.bindEditorNode = this.bindEditorNode.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onKeyDown = this.onKeyDown.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
 		this.initialize = this.initialize.bind( this );
 	}
 
@@ -337,6 +338,42 @@ export default class TinyMCE extends Component {
 		}
 	}
 
+	/**
+	 * Replaces non breaking spaces inserted by TinyMCE on the space key by
+	 * a normal space.
+	 *
+	 * @param  {SyntheticEvent} event Synthetic key up event.
+	 */
+	onKeyUp( event ) {
+		if ( event.shiftKey || event.keyCode !== SPACE ) {
+			return;
+		}
+
+		const selection = getSelection();
+
+		if ( selection.rangeCount < 0 ) {
+			return;
+		}
+
+		const range = selection.getRangeAt( 0 );
+		const { startContainer, startOffset, collapsed } = range;
+
+		if ( ! collapsed ) {
+			return;
+		}
+
+		const characterOffset = startOffset - 1;
+		const character = startContainer.data[ characterOffset ];
+
+		if ( character !== '\u00a0' ) {
+			return;
+		}
+
+		startContainer.deleteData( characterOffset, 1 );
+		range.insertNode( document.createTextNode( ' ' ) );
+		range.collapse();
+	}
+
 	render() {
 		const ariaProps = pickAriaProps( this.props );
 		const {
@@ -380,6 +417,7 @@ export default class TinyMCE extends Component {
 			onFocus: this.onFocus,
 			onBlur,
 			onKeyDown,
+			onKeyUp: this.onKeyUp,
 			onCompositionEnd,
 		} );
 	}

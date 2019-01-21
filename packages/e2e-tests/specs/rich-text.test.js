@@ -138,4 +138,13 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should not insert non breaking spaces', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'test ' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( 'test test' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
