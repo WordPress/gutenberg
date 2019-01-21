@@ -409,8 +409,10 @@ export default compose(
 				const {
 					replaceBlocks,
 					insertBlock,
-					getSelectedBlock,
 				} = dispatch( 'core/editor' );
+				const {
+					getSelectedBlock,
+				} = select( 'core/editor' );
 				const { name, initialAttributes } = item;
 				const { index, rootClientId } = getInsertionPoint();
 				const selectedBlock = getSelectedBlock();
