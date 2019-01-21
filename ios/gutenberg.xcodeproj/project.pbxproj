@@ -45,6 +45,7 @@
 		F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15198392100DC3D000F6E97 /* AppDelegate.swift */; };
 		F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151983A2100DC3D000F6E97 /* MediaProvider.swift */; };
 		F19CFDA821021EB100EAB240 /* Aztec.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1289ECA2100E4320091E81D /* Aztec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FF22719321EFF5EE00E13B96 /* MediaPickAndUploadCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF22719221EFF5EE00E13B96 /* MediaPickAndUploadCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -424,6 +425,7 @@
 		F15198392100DC3D000F6E97 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = gutenberg/AppDelegate.swift; sourceTree = "<group>"; tabWidth = 1; };
 		F151983A2100DC3D000F6E97 /* MediaProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = MediaProvider.swift; path = gutenberg/MediaProvider.swift; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; };
 		F619623252704B46A619C33C /* RNTAztecView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTAztecView.xcodeproj; path = "../react-native-aztec/ios/RNTAztecView.xcodeproj"; sourceTree = "<group>"; };
+		FF22719221EFF5EE00E13B96 /* MediaPickAndUploadCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MediaPickAndUploadCoordinator.swift; path = gutenberg/MediaPickAndUploadCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -578,6 +580,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				13B07FB11A68108700A75B9A /* LaunchScreen.xib */,
+				FF22719221EFF5EE00E13B96 /* MediaPickAndUploadCoordinator.swift */,
 			);
 			name = gutenberg;
 			sourceTree = "<group>";
@@ -1332,6 +1335,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */,
+				FF22719321EFF5EE00E13B96 /* MediaPickAndUploadCoordinator.swift in Sources */,
 				F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */,
 				7EC7328F21907E3F00FED2E6 /* GutenbergViewController.swift in Sources */,
 			);
