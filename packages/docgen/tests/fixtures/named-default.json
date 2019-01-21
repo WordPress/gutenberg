@@ -1,10 +1,10 @@
 {
 	"type": "ExportNamedDeclaration",
 	"start": 0,
-	"end": 35,
+	"end": 49,
 	"range": [
 		0,
-		35
+		49
 	],
 	"declaration": null,
 	"specifiers": [
@@ -41,12 +41,12 @@
 	"source": {
 		"type": "Literal",
 		"start": 24,
-		"end": 34,
+		"end": 48,
 		"range": [
 			24,
-			34
+			48
 		],
-		"value": "./module",
-		"raw": "'./module'"
+		"value": "./named-default-module",
+		"raw": "'./named-default-module'"
 	}
 }

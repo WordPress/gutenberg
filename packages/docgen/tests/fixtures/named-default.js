@@ -1,1 +1,1 @@
-export { default } from './module';
+export { default } from './named-default-module';

@@ -121,7 +121,7 @@ test( 'named export default', function( t ) {
 	t.deepEqual( name, [ {
 		localName: 'default',
 		exportName: 'default',
-		module: null,
+		module: './named-default-module',
 	} ] );
 	t.end();
 } );
