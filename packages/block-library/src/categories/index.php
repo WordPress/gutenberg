@@ -31,7 +31,7 @@ function render_block_core_categories( $attributes ) {
 		$wrapper_markup           = '<div class="%1$s">%2$s</div>';
 		$items_markup             = wp_dropdown_categories( $args );
 		$type                     = 'dropdown';
-		$title                    = __( 'Categories' );
+		$title                    = esc_html( __( 'Categories' ) );
 		$label_class              = 'wp-block-categories-label';
 		$items_markup             = '<label class="' . $label_class . '" for="' . $id . '">' . $title . '</label> ' . $items_markup;
 
