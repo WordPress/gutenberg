@@ -1,52 +1,61 @@
 /**
  * External dependencies.
  */
-const { first } = require( 'lodash' );
+const { get } = require( 'lodash' );
 
 /**
  * Internal dependencies.
  */
-const getNameDeclaration = require( './get-export-entries' );
-const getJSDoc = require( './get-jsdoc' );
-const isIdentifierInSameFile = require( './is-identifier-in-same-file' );
-const isIdentifierInDependency = require( './is-identifier-in-dependency' );
+const getExportEntries = require( './get-export-entries' );
+const getJSDocFromToken = require( './get-jsdoc' );
 const getDependencyPath = require( './get-dependency-path' );
 
+const UNDOCUMENTED = 'Undocumented declaration.';
+
+const getJSDoc = ( token, entry, ast, parseDependency ) => {
+	let doc = getJSDocFromToken( token );
+	if ( doc === undefined && entry.module === null ) {
+		const candidates = ast.body.filter( ( node ) => {
+			return ( node.type === 'ClassDeclaration' && node.id.name === entry.localName ) ||
+				( node.type === 'FunctionDeclaration' && node.id.name === entry.localName ) ||
+				( node.type === 'VariableDeclaration' && ( node.declarations ).some(
+					( declaration ) => declaration.id.name === entry.localName )
+				);
+		} );
+		if ( candidates.length === 1 ) {
+			doc = getJSDoc( candidates[ 0 ] );
+		}
+	} else if ( doc === undefined && entry.module !== null ) {
+		const irFromDependency = parseDependency( getDependencyPath( token ) );
+		doc = irFromDependency.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
+	}
+	return doc;
+};
+
 /**
- * Takes a export token and the file AST
- * and returns an intermediate representation in JSON.
+ * Takes a export token and returns an intermediate representation in JSON.
+ *
+ * If the export token doesn't contain any JSDoc, and it's a identifier,
+ * the identifier declaration will be looked up in the file or dependency
+ * if an `ast` and `parseDependency` callback are provided.
  *
  * @param {Object} token Espree export token.
- * @param {Object} ast Espree ast of a single file.
- * @param {Function} parseDependency Function that takes a path
+ * @param {Object} [ast] Espree ast of a single file.
+ * @param {Function} [parseDependency] Function that takes a path
  * and returns the AST of the dependency file.
  *
  * @return {Object} Intermediate Representation in JSON.
  */
-module.exports = function( token, ast, parseDependency = () => {} ) {
-	let ir = getJSDoc( token );
-	const name = getNameDeclaration( token );
-	// If at this point, the ir is undefined, we'll lookup JSDoc comments either:
-	// 1) in the same file declaration
-	// 2) in the dependency file declaration
-	if ( ir === undefined && isIdentifierInSameFile( token ) ) {
-		const candidates = ast.body.filter( ( node ) => {
-			return ( node.type === 'FunctionDeclaration' && node.id.name === name ) ||
-			( node.type === 'VariableDeclaration' && first( node.declarations ).id.name === name );
+module.exports = function( token, ast = { body: [] }, parseDependency = () => {} ) {
+	const exportEntries = getExportEntries( token );
+	const ir = [];
+	exportEntries.forEach( ( entry ) => {
+		const doc = getJSDoc( token, entry, ast, parseDependency );
+		ir.push( {
+			name: entry.exportName,
+			description: get( doc, [ 'description' ], UNDOCUMENTED ),
+			tags: [],
 		} );
-		if ( candidates.length === 1 ) {
-			ir = getJSDoc( candidates[ 0 ] );
-		}
-	} else if ( ir === undefined && isIdentifierInDependency( token ) ) {
-		const irFromDependency = parseDependency( getDependencyPath( token ) );
-		ir = irFromDependency.find( ( exportDeclaration ) => exportDeclaration.name === name );
-	}
-
-	// Sometimes, humans do not add JSDoc, though.
-	if ( ir === undefined ) {
-		ir = { description: 'Undocumented declaration.', tags: [] };
-	}
-
-	ir.name = name;
+	} );
 	return ir;
 };

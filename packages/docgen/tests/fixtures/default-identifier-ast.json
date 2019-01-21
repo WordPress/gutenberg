@@ -1,0 +1,85 @@
+{
+	"type": "Program",
+	"start": 0,
+	"end": 98,
+	"range": [
+		38,
+		97
+	],
+	"body": [
+		{
+			"type": "ClassDeclaration",
+			"start": 38,
+			"end": 63,
+			"range": [
+				38,
+				63
+			],
+			"id": {
+				"type": "Identifier",
+				"start": 44,
+				"end": 60,
+				"range": [
+					44,
+					60
+				],
+				"name": "ClassDeclaration"
+			},
+			"superClass": null,
+			"body": {
+				"type": "ClassBody",
+				"start": 61,
+				"end": 63,
+				"range": [
+					61,
+					63
+				],
+				"body": []
+			},
+			"leadingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Class declaration example.\n ",
+					"start": 0,
+					"end": 37,
+					"range": [
+						0,
+						37
+					]
+				}
+			]
+		},
+		{
+			"type": "ExportDefaultDeclaration",
+			"start": 65,
+			"end": 97,
+			"range": [
+				65,
+				97
+			],
+			"declaration": {
+				"type": "Identifier",
+				"start": 80,
+				"end": 96,
+				"range": [
+					80,
+					96
+				],
+				"name": "ClassDeclaration"
+			}
+		}
+	],
+	"sourceType": "module",
+	"comments": [
+		{
+			"type": "Block",
+			"value": "*\n * Class declaration example.\n ",
+			"start": 0,
+			"end": 37,
+			"range": [
+				0,
+				37
+			]
+		}
+	]
+}
