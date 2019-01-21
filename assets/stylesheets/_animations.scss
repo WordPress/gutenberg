@@ -6,3 +6,8 @@
 	animation: edit-post__fade-in-animation $speed ease-out $delay;
 	animation-fill-mode: forwards;
 }
+
+@mixin components-popover__appear-animation($speed: 0.2s, $delay: 0s) {
+	animation: components-popover__appear-animation $speed cubic-bezier(0, 0, 0.2, 1) $delay;
+	animation-fill-mode: forwards;
+}

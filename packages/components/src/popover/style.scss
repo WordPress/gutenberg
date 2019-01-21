@@ -177,6 +177,18 @@ $arrow-size: 8px;
 	.components-popover:not(.is-mobile):not(.is-middle).is-left & {
 		margin-right: -24px;
 	}
+
+	// Animate some of the popovers
+	.editor-inserter__popover &,
+	.edit-post-more-menu__content &,
+	.editor-block-settings-menu__popover & {
+		@include components-popover__appear-animation();
+		transform-origin: top left;
+	}
+
+	.edit-post-more-menu__content & {
+		transform-origin: top right;
+	}
 }
 
 // The withFocusReturn div
