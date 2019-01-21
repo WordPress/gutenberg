@@ -1,15 +1,21 @@
 /**
  * External dependencies
  */
-const { first, get } = require( 'lodash' );
+const { get } = require( 'lodash' );
 
 /**
- * Returns the assigned name for a given export node type,
- * or undefined if it cannot be determined.
+ * Returns the export entry records of the given export statement.
+ * Unlike [the standard](http://www.ecma-international.org/ecma-262/9.0/#exportentry-record),
+ * the `importName` and the `localName` are merged together.
  *
- * @param {Object} token Espree node.
+ * @param {Object} token Espree node representing an export.
  *
- * @return {Array} Exported declaration names.
+ * @return {Array} Exported entry records. Example:
+ * [ {
+ *    localName: 'localName',
+ *    exportName: 'exportedName',
+ *    module: null,
+ * } ]
  */
 module.exports = function( token ) {
 	if ( token.type === 'ExportDefaultDeclaration' ) {
@@ -46,22 +52,32 @@ module.exports = function( token ) {
 
 	const name = [];
 	if ( token.declaration === null ) {
-		token.specifiers.forEach( ( specifier ) => name.push( specifier.local.name ) );
+		token.specifiers.forEach( ( specifier ) => name.push( {
+			localName: specifier.local.name,
+			exportName: specifier.local.name,
+			module: null,
+		} ) );
 		return name;
 	}
 
 	switch ( token.declaration.type ) {
 		case 'ClassDeclaration':
 		case 'FunctionDeclaration':
-			name.push( token.declaration.id.name );
+			name.push( {
+				localName: token.declaration.id.name,
+				exportName: token.declaration.id.name,
+				module: null,
+			} );
 			break;
 
 		case 'VariableDeclaration':
-			name.push( get( first( token.declaration.declarations ), [ 'id', 'name' ] ) );
-			break;
-
-		case 'Identifier':
-			name.push( token.declaration.name );
+			token.declaration.declarations.forEach( ( declaration ) => {
+				name.push( {
+					localName: declaration.id.name,
+					exportName: declaration.id.name,
+					module: null,
+				} );
+			} );
 			break;
 	}
 

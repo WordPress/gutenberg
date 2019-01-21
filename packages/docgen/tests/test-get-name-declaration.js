@@ -118,7 +118,11 @@ test( 'named export class', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'MyDeclaration' ] );
+	t.deepEqual( name, [ {
+		localName: 'MyDeclaration',
+		exportName: 'MyDeclaration',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -128,7 +132,11 @@ test( 'named export default', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'TODO: default export?' ] );
+	t.deepEqual( name, [ {
+		localName: 'default',
+		exportName: 'default',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -138,7 +146,11 @@ test( 'named export function', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'myDeclaration' ] );
+	t.deepEqual( name, [ {
+		localName: 'myDeclaration',
+		exportName: 'myDeclaration',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -148,7 +160,11 @@ test( 'named export identifier', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'myDeclaration' ] );
+	t.deepEqual( name, [ {
+		localName: 'myDeclaration',
+		exportName: 'myDeclaration',
+		module: null,
+	} ] );
 	t.end();
 } );
 
@@ -158,7 +174,11 @@ test( 'named export identifiers', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'functionDeclaration', 'variableDeclaration', 'ClassDeclaration' ] );
+	t.deepEqual( name, [
+		{ localName: 'functionDeclaration', exportName: 'functionDeclaration', module: null },
+		{ localName: 'variableDeclaration', exportName: 'variableDeclaration', module: null },
+		{ localName: 'ClassDeclaration', exportName: 'ClassDeclaration', module: null },
+	] );
 	t.end();
 } );
 
@@ -168,7 +188,24 @@ test( 'named export variable', function( t ) {
 		'utf-8'
 	);
 	const name = getNameDeclaration( JSON.parse( token ) );
-	t.deepEqual( name, [ 'myDeclaration' ] );
+	t.deepEqual( name, [ {
+		localName: 'myDeclaration',
+		exportName: 'myDeclaration',
+		module: null,
+	} ] );
+	t.end();
+} );
+
+test( 'named export variables', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-variables.json' ),
+		'utf-8'
+	);
+	const name = getNameDeclaration( JSON.parse( token ) );
+	t.deepEqual( name, [
+		{ localName: 'firstDeclaration', exportName: 'firstDeclaration', module: null },
+		{ localName: 'secondDeclaration', exportName: 'secondDeclaration', module: null },
+	] );
 	t.end();
 } );
 
