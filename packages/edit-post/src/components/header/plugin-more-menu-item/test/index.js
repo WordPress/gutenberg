@@ -51,4 +51,26 @@ describe( 'PluginMoreMenuItem', () => {
 
 		expect( component.root.findByType( 'a' ).props.href ).toBe( url );
 	} );
+
+	test( 'it outputs console warning when href is #', () => {
+		global.console = {
+			warn: jest.fn(),
+		};
+		const url = '#';
+
+		expect( global.console.warn ).not.toHaveBeenCalled();
+
+		ReactTestRenderer.create(
+			<SlotFillProvider>
+				<PluginMoreMenuItem
+					href={ url }
+				>
+					My plugin link menu item
+				</PluginMoreMenuItem>
+				<PluginsMoreMenuGroup.Slot fillProps={ fillProps } />
+			</SlotFillProvider>
+		);
+
+		expect( global.console.warn ).toHaveBeenCalled();
+	} );
 } );
