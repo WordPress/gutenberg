@@ -22,7 +22,7 @@ function render_block_core_latest_posts( $attributes ) {
 	);
 
 	if ( isset( $attributes['categories'] ) ) {
-		$args['category'] = join( ',', $attributes['categories'] );
+		$args['category'] = $attributes['categories'];
 	}
 
 	$recent_posts = get_posts( $args );
