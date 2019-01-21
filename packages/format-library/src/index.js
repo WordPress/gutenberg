@@ -7,6 +7,7 @@ import { image } from './image';
 import { italic } from './italic';
 import { link } from './link';
 import { strikethrough } from './strikethrough';
+import { underline } from './underline';
 
 /**
  * WordPress dependencies
@@ -22,4 +23,5 @@ import {
 	italic,
 	link,
 	strikethrough,
+	underline,
 ].forEach( ( { name, ...settings } ) => registerFormatType( name, settings ) );
