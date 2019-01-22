@@ -23,7 +23,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 				);
 		} );
 		if ( candidates.length === 1 ) {
-			doc = getJSDoc( candidates[ 0 ] ); // TODO: use getJSDocFromToken
+			doc = getJSDocFromToken( candidates[ 0 ] );
 		}
 	} else if ( doc === undefined && entry && entry.module !== null ) {
 		const ir = parseDependency( getDependencyPath( token ) );
