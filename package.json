@@ -198,7 +198,7 @@
 		"*.js": [
 			"wp-scripts lint-js"
 		],
-		"{docs/{root-manifest.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
+		"{docs/{toc.json,tool/*.js},packages/{*/README.md,*/src/{actions,selectors}.js,components/src/*/**/README.md}}": [
 			"npm run docs:build"
 		]
 	}
