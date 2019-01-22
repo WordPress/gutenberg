@@ -11,7 +11,18 @@ import { groupBy } from 'lodash';
  * @return {Array} Array of terms in tree format.
  */
 export function buildTermsTree( flatTerms ) {
-	const termsByParent = groupBy( flatTerms, 'parent' );
+	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
+		return {
+			children: [],
+			parent: null,
+			...term,
+		};
+	} );
+
+	const termsByParent = groupBy( flatTermsWithParentAndChildren, 'parent' );
+	if ( termsByParent.null && termsByParent.null.length ) {
+		return flatTermsWithParentAndChildren;
+	}
 	const fillWithChildren = ( terms ) => {
 		return terms.map( ( term ) => {
 			const children = termsByParent[ term.id ];
