@@ -24,7 +24,6 @@ ES6 modules:
 - [ ] e2e-tests - what shall be documented?
 - [ ] edit-post - directory dependency
 - [ ] editor - directory dependency
-- [ ] hooks - `import something; ... export something;`
 - [ ] npm-package-json-lint-config - CONFIG file
 - [ ] nux - directory dependency
 - [ ] plugins - directory dependency
@@ -47,6 +46,7 @@ ES6 modules:
 - [x] element
 - [x] escape-html
 - [x] format-library - exports nothing
+- [x] hooks
 - [x] html-entities
 - [x] i18n
 - [x] jest-console - export nothing
