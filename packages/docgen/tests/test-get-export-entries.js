@@ -218,7 +218,7 @@ test( 'Export entries - namespace (*)', function( t ) {
 	t.deepEqual( name, [ {
 		localName: '*',
 		exportName: null,
-		module: './module',
+		module: './namespace-module',
 	} ] );
 	t.end();
 } );
