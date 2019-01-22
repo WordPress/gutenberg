@@ -124,23 +124,9 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 ## Contribute to the Documentation
 
+Please see the [Documentation section](/docs/contributors/document.md) of the Contributors Handbook.
+
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
-
-To add a new documentation page, you create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [toc.json](https://github.com/WordPress/gutenberg/blob/master/docs/toc.json) and generate using `npm run docs:build`.
-
-### Using links
-
-It's very likely that at some point you will want to link to other documentation pages. It's worth emphasizing that all documents can be browsed in different contexts:
-- Gutenberg Handbook
-- GitHub website
-- npm website
-
-That's why it's recommended to use absolute links without the `https://github.com/WordPress/gutenberg` part for all files which match the following patterns:
-- `/docs/*.md`
-- `/packages/*/README.md`
-- `/packages/components/src/**/README.md`
-
-This way they will be properly handled in all three aforementioned contexts.
 
 ### `@wordpress/component`
 
