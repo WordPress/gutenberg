@@ -67,7 +67,7 @@ export function DefaultBlockAppender( {
 				value={ showPrompt ? value : '' }
 			/>
 			{ hovered && <InserterWithShortcuts rootClientId={ rootClientId } /> }
-			<Inserter rootClientId={ rootClientId } position="top right" />
+			<Inserter rootClientId={ rootClientId } position="top right" isAppender />
 		</div>
 	);
 }
