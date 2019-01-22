@@ -11,6 +11,8 @@ const getJSDocFromToken = require( './get-jsdoc-from-token' );
 const getDependencyPath = require( './get-dependency-path' );
 
 const UNDOCUMENTED = 'Undocumented declaration.';
+const NAMESPACE_EXPORT = '*';
+const DEFAULT_EXPORT = 'default';
 
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc = getJSDocFromToken( token );
@@ -27,8 +29,8 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 		}
 	} else if ( doc === undefined && entry && entry.module !== null ) {
 		const ir = parseDependency( getDependencyPath( token ) );
-		if ( entry.localName === '*' ) {
-			doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== 'default' );
+		if ( entry.localName === NAMESPACE_EXPORT ) {
+			doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== DEFAULT_EXPORT );
 		} else {
 			doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
 		}
@@ -54,7 +56,7 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 	const exportEntries = getExportEntries( token );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {
-		if ( entry.localName === '*' ) {
+		if ( entry.localName === NAMESPACE_EXPORT ) {
 			const doc = getJSDoc( token, entry, ast, parseDependency );
 			doc.forEach( ( namedExport ) => {
 				ir.push( {
