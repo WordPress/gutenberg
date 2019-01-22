@@ -16,7 +16,9 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
-	"main": "src/index.js",
+	"bin": {
+		"docgen": "./src/cli.js"
+	},
 	"devDependencies": {
 		"faucet": "0.0.1",
 		"tape": "4.9.2"
