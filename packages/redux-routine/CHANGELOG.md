@@ -3,7 +3,7 @@
 ### Bug Fixes
 
 - Fix unhandled promise rejection error caused by returning null from registered generator ([#13314](https://github.com/WordPress/gutenberg/pull/13314))
-- Removed `castError`.  The middleware will now simply throw the value exposed on a Promise reject or thrown error rather than coercing to an instance of `Error`.  Consuming code can now access whatever value is thrown directly.
+- The middleware will no longer attempt to coerce an error to an instance of `Error`, and instead passes through the thrown value directly. This resolves issues where an `Error` with a non-sensical message would be thrown when the underlying values were not of type `Error` or `string` (e.g. a thrown object).
 ([#13315](https://github.com/WordPress/gutenberg/pull/13315)) 
 
 ## 3.0.3 (2018-10-19)
