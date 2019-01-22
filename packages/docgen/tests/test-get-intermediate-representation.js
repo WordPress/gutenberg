@@ -173,6 +173,26 @@ test( 'IR - named (JSDoc in identifer declaration, module dependency)', function
 	t.end();
 } );
 
+test( 'IR - named and default', function( t ) {
+	const tokens = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-function-and-default.json' ),
+		'utf-8'
+	);
+	const ast = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-function-and-default-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokens )[ 0 ], JSON.parse( ast ) ),
+		[ { name: 'functionDeclaration', description: 'Function declaration example.', tags: [] } ]
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokens )[ 1 ], JSON.parse( ast ) ),
+		[ { name: 'default', description: 'Function declaration example.', tags: [] } ]
+	);
+	t.end();
+} );
+
 test( 'IR - namespace (JSDoc in identifer declaration, module dependency)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/namespace.json' ),
