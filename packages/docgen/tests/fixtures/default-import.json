@@ -1,0 +1,19 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 62,
+	"end": 97,
+	"range": [
+		62,
+		97
+	],
+	"declaration": {
+		"type": "Identifier",
+		"start": 77,
+		"end": 96,
+		"range": [
+			77,
+			96
+		],
+		"name": "functionDeclaration"
+	}
+}

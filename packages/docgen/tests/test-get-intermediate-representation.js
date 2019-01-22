@@ -96,6 +96,30 @@ test( 'IR - default (JSDoc in same file)', function( t ) {
 	t.end();
 } );
 
+test( 'IR - default (JSDoc in module dependency)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import.json' ),
+		'utf-8'
+	);
+	const ast = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-ast.json' ),
+		'utf-8'
+	);
+	const getModule = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-module-ir.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ), getModule ),
+		[ {
+			name: 'default',
+			description: 'Function declaration.',
+			tags: [],
+		} ]
+	);
+	t.end();
+} );
+
 test( 'IR - named (JSDoc in export statement)', function( t ) {
 	const tokenClass = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-class.json' ),

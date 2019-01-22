@@ -14,20 +14,47 @@ const UNDOCUMENTED = 'Undocumented declaration.';
 const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
+const hasClassWithName = ( node, name ) =>
+	node.type === 'ClassDeclaration' &&
+	node.id.name === name;
+
+const hasFunctionWithName = ( node, name ) =>
+	node.type === 'FunctionDeclaration' &&
+	node.id.name === name;
+
 const hasVariableWithName = ( node, name ) =>
+	node.type === 'VariableDeclaration' &&
 	node.declarations.some( ( declaration ) => declaration.id.name === name );
+
+const hasNamedExportWithName = ( node, name ) =>
+	node.type === 'ExportNamedDeclaration' &&
+	node.declaration &&
+	node.declaration.id.name === name;
+
+const hasImportWithName = ( node, name ) =>
+	node.type === 'ImportDeclaration' &&
+	node.specifiers.some( ( specifier ) => specifier.local.name === name );
+
+const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
 
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc = getJSDocFromToken( token );
 	if ( doc === undefined && entry && entry.module === null ) {
 		const candidates = ast.body.filter( ( node ) => {
-			return ( node.type === 'ClassDeclaration' && node.id.name === entry.localName ) ||
-				( node.type === 'FunctionDeclaration' && node.id.name === entry.localName ) ||
-				( node.type === 'VariableDeclaration' && hasVariableWithName( node, entry.localName ) ) ||
-				( node.type === 'ExportNamedDeclaration' && node.declaration && node.declaration.id.name === entry.localName );
+			return hasClassWithName( node, entry.localName ) ||
+				hasFunctionWithName( node, entry.localName ) ||
+				hasVariableWithName( node, entry.localName ) ||
+				hasNamedExportWithName( node, entry.localName ) ||
+				hasImportWithName( node, entry.localName );
 		} );
-		if ( candidates.length === 1 ) {
+		if ( candidates.length === 1 && ! isImportDeclaration( candidates[ 0 ] ) ) {
 			doc = getJSDocFromToken( candidates[ 0 ] );
+		} else if ( candidates.length === 1 && isImportDeclaration( candidates[ 0 ] ) ) {
+			const importNode = candidates[ 0 ];
+			const ir = parseDependency( getDependencyPath( importNode ) );
+			doc = ir.find( ( exportDeclaration ) => importNode.specifiers.some(
+				( specifier ) => specifier.imported.name === exportDeclaration.name
+			) );
 		}
 	} else if ( doc === undefined && entry && entry.module !== null ) {
 		const ir = parseDependency( getDependencyPath( token ) );

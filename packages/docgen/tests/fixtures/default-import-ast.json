@@ -1,0 +1,83 @@
+{
+	"type": "Program",
+	"start": 0,
+	"end": 98,
+	"range": [
+		0,
+		97
+	],
+	"body": [
+		{
+			"type": "ImportDeclaration",
+			"start": 0,
+			"end": 60,
+			"range": [
+				0,
+				60
+			],
+			"specifiers": [
+				{
+					"type": "ImportSpecifier",
+					"start": 9,
+					"end": 28,
+					"range": [
+						9,
+						28
+					],
+					"imported": {
+						"type": "Identifier",
+						"start": 9,
+						"end": 28,
+						"range": [
+							9,
+							28
+						],
+						"name": "functionDeclaration"
+					},
+					"local": {
+						"type": "Identifier",
+						"start": 9,
+						"end": 28,
+						"range": [
+							9,
+							28
+						],
+						"name": "functionDeclaration"
+					}
+				}
+			],
+			"source": {
+				"type": "Literal",
+				"start": 36,
+				"end": 59,
+				"range": [
+					36,
+					59
+				],
+				"value": "default-import-module",
+				"raw": "'default-import-module'"
+			}
+		},
+		{
+			"type": "ExportDefaultDeclaration",
+			"start": 62,
+			"end": 97,
+			"range": [
+				62,
+				97
+			],
+			"declaration": {
+				"type": "Identifier",
+				"start": 77,
+				"end": 96,
+				"range": [
+					77,
+					96
+				],
+				"name": "functionDeclaration"
+			}
+		}
+	],
+	"sourceType": "module",
+	"comments": []
+}

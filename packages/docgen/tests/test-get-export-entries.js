@@ -84,6 +84,20 @@ test( 'Export entries: default identifier', function( t ) {
 	t.end();
 } );
 
+test( 'Export entries: default import', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import.json' ),
+		'utf-8'
+	);
+	const name = getExportEntries( JSON.parse( token ) );
+	t.deepEqual( name, [ {
+		localName: 'functionDeclaration',
+		exportName: 'default',
+		module: null,
+	} ] );
+	t.end();
+} );
+
 test( 'Export entries: default named export', function( t ) {
 	const tokens = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-named-export.json' ),
