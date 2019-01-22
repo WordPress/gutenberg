@@ -53,18 +53,20 @@ export default class ImageEdit extends React.Component {
 	mediaUpload( payload ) {
 		const { attributes } = this.props;
 
-		if ( payload.mediaId === attributes.id ) {
-			switch ( payload.state ) {
-				case MEDIA_ULOAD_STATE_UPLOADING:
-					this.setState( { progress: payload.progress, isUploadInProgress: true } );
-					break;
-				case MEDIA_ULOAD_STATE_SUCCEEDED:
-					this.finishMediaUploadWithSuccess( payload );
-					break;
-				case MEDIA_ULOAD_STATE_FAILED:
-					this.finishMediaUploadWithFailure( payload );
-					break;
-			}
+		if ( payload.mediaId !== attributes.id ) {
+			return;
+		}
+
+		switch ( payload.state ) {
+			case MEDIA_ULOAD_STATE_UPLOADING:
+				this.setState( { progress: payload.progress, isUploadInProgress: true } );
+				break;
+			case MEDIA_ULOAD_STATE_SUCCEEDED:
+				this.finishMediaUploadWithSuccess( payload );
+				break;
+			case MEDIA_ULOAD_STATE_FAILED:
+				this.finishMediaUploadWithFailure( payload );
+				break;
 		}
 	}
 
