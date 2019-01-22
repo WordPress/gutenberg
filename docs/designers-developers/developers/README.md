@@ -12,15 +12,15 @@ If you want to learn more about block creation, the [Blocks Tutorial](/docs/desi
 
 It is also possible to modify the behavior of existing blocks or even remove them completely using filters.
 
-Learn more in the [Block Filters](/docs/designers-developers/developers/reference/hooks/block-filters.md) section.
+Learn more in the [Block Filters](/docs/designers-developers/developers/filters/block-filters.md) section.
 
 ## Extending the Editor UI
 
 Extending the editor UI can be accomplished with the `registerPlugin` API, allowing you to define all your plugin's UI elements in one place.
 
-Refer to the [Plugins](https://github.com/WordPress/gutenberg/blob/master/packages/plugins/README.md) and [Edit Post](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/README.md) section for more information.
+Refer to the [Plugins](/packages/plugins/README.md) and [Edit Post](/packages/edit-post/README.md) section for more information.
 
-You can also filter certain aspects of the editor; this is documented on the [Editor Filters](/docs/designers-developers/developers/reference/hooks/editor-filters.md) page.
+You can also filter certain aspects of the editor; this is documented on the [Editor Filters](/docs/designers-developers/developers/filters/editor-filters.md) page.
 
 ## Meta Boxes
 
