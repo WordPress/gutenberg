@@ -345,7 +345,7 @@ export default class TinyMCE extends Component {
 	 * @param  {SyntheticEvent} event Synthetic key up event.
 	 */
 	onKeyUp( event ) {
-		if ( event.shiftKey || event.keyCode !== SPACE ) {
+		if ( event.altKey || event.keyCode !== SPACE ) {
 			return;
 		}
 
@@ -358,7 +358,7 @@ export default class TinyMCE extends Component {
 		const range = selection.getRangeAt( 0 );
 		const { startContainer, startOffset, collapsed } = range;
 
-		if ( ! collapsed ) {
+		if ( ! collapsed || startContainer.nodeType !== TEXT_NODE ) {
 			return;
 		}
 

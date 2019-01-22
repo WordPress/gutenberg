@@ -21,5 +21,6 @@ export async function getEditedPostContent() {
 		throw new Error( 'Unexpected zero-width space character in editor content.' );
 	}
 
-	return content;
+	// Encode non breaking spaces so they are visible in snapshots.
+	return content.replace( /\u00a0/g, '&nbsp;' );
 }
