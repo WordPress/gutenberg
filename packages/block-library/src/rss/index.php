@@ -12,9 +12,6 @@
  * @return string|void Void if renders on frontend.
  */
 function render_rss_error_message( $message ) {
-	if ( ! is_admin() ) {
-		return;
-	}
 	return '<div class="components-placeholder"><div class="notice notice-alt notice-error">' . $message . '</div></div>';
 }
 
@@ -103,7 +100,7 @@ function render_block_core_rss( $attributes ) {
 
 		$excerpt = '';
 		if ( $attributes['displayExcerpt'] ) {
-			$excerpt = @html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
+			$excerpt = html_entity_decode( $item->get_description(), ENT_QUOTES, get_option( 'blog_charset' ) );
 			$excerpt = esc_attr( wp_trim_words( $excerpt, $attributes['excerptLength'], ' [&hellip;]' ) );
 
 			// Change existing [...] to [&hellip;].
@@ -150,13 +147,16 @@ function register_block_core_rss() {
 					'default' => 5,
 				),
 				'displayExcerpt' => array(
-					'type' => 'boolean',
+					'type'    => 'boolean',
+					'default' => false,
 				),
 				'displayAuthor'  => array(
-					'type' => 'boolean',
+					'type'    => 'boolean',
+					'default' => false,
 				),
 				'displayDate'    => array(
-					'type' => 'boolean',
+					'type'    => 'boolean',
+					'default' => false,
 				),
 				'excerptLength'  => array(
 					'type'    => 'number',

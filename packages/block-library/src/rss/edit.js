@@ -46,9 +46,11 @@ class RSSEdit extends Component {
 
 	onSubmitURL( event ) {
 		event.preventDefault();
-		this.setState( {
-			editing: false,
-		} );
+
+		const { feedURL } = this.props.attributes;
+		if ( feedURL ) {
+			this.setState( { editing: false } );
+		}
 	}
 
 	render() {
