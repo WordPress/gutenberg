@@ -1,4 +1,4 @@
-public typealias MediaPickerDidPickMediaCallback = (_ id: String?, _ url: String?) -> Void
+public typealias MediaPickerDidPickMediaCallback = (_ id: Int?, _ url: String?) -> Void
 public typealias MediaPickerDidPickMediaToUploadCallback = (_ id: String?, _ url: String?) -> Void
 
 public protocol GutenbergBridgeDelegate: class {
