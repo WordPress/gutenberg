@@ -97,20 +97,40 @@ test( 'IR - default (JSDoc in same file)', function( t ) {
 } );
 
 test( 'IR - default (JSDoc in module dependency)', function( t ) {
-	const token = fs.readFileSync(
+	const tokenDefault = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-default.json' ),
+		'utf-8'
+	);
+	const astDefault = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-default-ast.json' ),
+		'utf-8'
+	);
+	const getModuleDefault = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-default-module-ir.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenDefault ), JSON.parse( astDefault ), getModuleDefault ),
+		[ {
+			name: 'default',
+			description: 'Function declaration.',
+			tags: [],
+		} ]
+	);
+	const tokenNamed = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-import-named.json' ),
 		'utf-8'
 	);
-	const ast = fs.readFileSync(
+	const astNamed = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-import-named-ast.json' ),
 		'utf-8'
 	);
-	const getModule = () => JSON.parse( fs.readFileSync(
+	const getModuleNamed = () => JSON.parse( fs.readFileSync(
 		path.join( __dirname, './fixtures/default-import-named-module-ir.json' ),
 		'utf-8'
 	) );
 	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ), getModule ),
+		getIntermediateRepresentation( JSON.parse( tokenNamed ), JSON.parse( astNamed ), getModuleNamed ),
 		[ {
 			name: 'default',
 			description: 'Function declaration.',
