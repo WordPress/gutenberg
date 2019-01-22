@@ -63,7 +63,7 @@ test( 'IR - default (JSDoc in export statement)', function( t ) {
 	t.end();
 } );
 
-test( 'IR - default (JSDoc in identifier declaration, same file)', function( t ) {
+test( 'IR - default (JSDoc in same file)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-identifier.json' ),
 		'utf-8'
@@ -77,6 +77,22 @@ test( 'IR - default (JSDoc in identifier declaration, same file)', function( t )
 		description: 'Class declaration example.',
 		tags: [],
 	} ] );
+	const namedExport = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-named-export.json' ),
+		'utf-8'
+	);
+	const namedExportAST = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-named-export-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( namedExport )[ 0 ], JSON.parse( namedExportAST ) ),
+		[ { name: 'functionDeclaration', description: 'Function declaration example.', tags: [] } ]
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( namedExport )[ 1 ], JSON.parse( namedExportAST ) ),
+		[ { name: 'default', description: 'Function declaration example.', tags: [] } ]
+	);
 	t.end();
 } );
 
@@ -119,7 +135,7 @@ test( 'IR - named (JSDoc in export statement)', function( t ) {
 	t.end();
 } );
 
-test( 'IR - named (JSDoc in identifier declaration, same file)', function( t ) {
+test( 'IR - named (JSDoc in same file)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifier.json' ),
 		'utf-8'
@@ -149,7 +165,7 @@ test( 'IR - named (JSDoc in identifier declaration, same file)', function( t ) {
 	t.end();
 } );
 
-test( 'IR - named (JSDoc in identifer declaration, module dependency)', function( t ) {
+test( 'IR - named (JSDoc in module dependency)', function( t ) {
 	const tokenDefault = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default.json' ),
 		'utf-8'
@@ -173,27 +189,7 @@ test( 'IR - named (JSDoc in identifer declaration, module dependency)', function
 	t.end();
 } );
 
-test( 'IR - named and default', function( t ) {
-	const tokens = fs.readFileSync(
-		path.join( __dirname, './fixtures/named-function-and-default.json' ),
-		'utf-8'
-	);
-	const ast = fs.readFileSync(
-		path.join( __dirname, './fixtures/named-function-and-default-ast.json' ),
-		'utf-8'
-	);
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokens )[ 0 ], JSON.parse( ast ) ),
-		[ { name: 'functionDeclaration', description: 'Function declaration example.', tags: [] } ]
-	);
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokens )[ 1 ], JSON.parse( ast ) ),
-		[ { name: 'default', description: 'Function declaration example.', tags: [] } ]
-	);
-	t.end();
-} );
-
-test( 'IR - namespace (JSDoc in identifer declaration, module dependency)', function( t ) {
+test( 'IR - namespace (JSDoc in module dependency)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/namespace.json' ),
 		'utf-8'

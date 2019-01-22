@@ -84,6 +84,26 @@ test( 'Export entries: default identifier', function( t ) {
 	t.end();
 } );
 
+test( 'Export entries: default named export', function( t ) {
+	const tokens = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-named-export.json' ),
+		'utf-8'
+	);
+	const namedExport = getExportEntries( JSON.parse( tokens )[ 0 ] );
+	t.deepEqual( namedExport, [ {
+		localName: 'functionDeclaration',
+		exportName: 'functionDeclaration',
+		module: null,
+	} ] );
+	const defaultExport = getExportEntries( JSON.parse( tokens )[ 1 ] );
+	t.deepEqual( defaultExport, [ {
+		localName: 'functionDeclaration',
+		exportName: 'default',
+		module: null,
+	} ] );
+	t.end();
+} );
+
 test( 'Export entries: default variable', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-variable.json' ),
