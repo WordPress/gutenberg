@@ -14,15 +14,17 @@ const UNDOCUMENTED = 'Undocumented declaration.';
 const NAMESPACE_EXPORT = '*';
 const DEFAULT_EXPORT = 'default';
 
+const hasVariableWithName = ( node, name ) =>
+	node.declarations.some( ( declaration ) => declaration.id.name === name );
+
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc = getJSDocFromToken( token );
 	if ( doc === undefined && entry && entry.module === null ) {
 		const candidates = ast.body.filter( ( node ) => {
 			return ( node.type === 'ClassDeclaration' && node.id.name === entry.localName ) ||
 				( node.type === 'FunctionDeclaration' && node.id.name === entry.localName ) ||
-				( node.type === 'VariableDeclaration' && ( node.declarations ).some(
-					( declaration ) => declaration.id.name === entry.localName )
-				);
+				( node.type === 'VariableDeclaration' && hasVariableWithName( node, entry.localName ) ) ||
+				( node.type === 'ExportNamedDeclaration' && node.declaration && node.declaration.id.name === entry.localName );
 		} );
 		if ( candidates.length === 1 ) {
 			doc = getJSDocFromToken( candidates[ 0 ] );
