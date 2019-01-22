@@ -15,22 +15,20 @@ CJS modules:
 
 ES6 modules:
 
-- [ ] block-serialization-spec-parser - not `src/index.js`, multiple named exports
-- [ ] blocks - `export *`
-- [ ] components - `export *`, `default as`
+- [ ] block-serialization-spec-parser - not `src/index.js`
+- [ ] blocks - directory dependency
+- [ ] components - directory dependency
 - [ ] compose - directory dependency
 - [ ] data - directory dependency
-- [ ] dom - `export *`
 - [ ] e2e-test-utils - what shall be documented?
 - [ ] e2e-tests - what shall be documented?
 - [ ] edit-post - directory dependency
-- [ ] editor - `export *`, directory dependency
-- [ ] element - `export *`, `default as` is a identifier
-- [ ] hooks - hooks is defined in other file by importing first
-- [ ] notices - REVIEW. Does weird things.
+- [ ] editor - directory dependency
+- [ ] element - `renderToString`
+- [ ] hooks - `import something; ... export something;`
 - [ ] npm-package-json-lint-config - CONFIG file
-- [ ] nux - `default as`, directory dependency
-- [ ] plugins - `export *`, directory dependency
+- [ ] nux - directory dependency
+- [ ] plugins - directory dependency
 - [ ] scripts - what shall be documented? not `src/index`
 - [-] keycodes - how to document CONSTANTS?
 - [-] redux-routine - check description with many paragraphs
@@ -44,7 +42,8 @@ ES6 modules:
 - [x] block-serialization-default-parser
 - [x] core-data - export nothing
 - [x] date
-- [x] deprecated - do not name default export
+- [x] deprecated
+- [x] dom
 - [x] dom-ready
 - [x] escape-html
 - [x] format-library - exports nothing
@@ -53,10 +52,11 @@ ES6 modules:
 - [x] jest-console - export nothing
 - [x] jest-puppeteer-axe - export nothing
 - [x] list-reusable-blocks - export nothing
+- [x] notices - does not export anything
 - [x] priority-queue
 - [x] rich-text
 - [x] shortcode
-- [x] token-list - `export class`
+- [x] token-list
 - [x] url
-- [x] viewport - `default as`
+- [x] viewport
 - [x] wordcount
