@@ -63,10 +63,10 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
     progress.completedUnitCount += 1
     
     if progress.fractionCompleted < 1 {
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil)
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
     } else if progress.fractionCompleted >= 1 {
       timer.invalidate()
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL)
+      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: "1")
     }
   }
 }
