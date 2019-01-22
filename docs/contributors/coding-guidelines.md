@@ -102,6 +102,30 @@ If an API must be exposed but is clearly not intended to be supported into the f
 export { __unstableDoAction } from './api';
 ```
 
+### Objects
+
+When possible, use [shorthand notation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer#New_notations_in_ECMAScript_2015) when defining object property values:
+
+```js
+const a = 10;
+
+// Bad:
+const object = {
+	a: a,
+	performAction: function() {
+		// ...
+	},
+};
+
+// Good:
+const object = {
+	a,
+	performAction() {
+		// ...
+	},
+};
+```
+
 ### Strings
 
 String literals should be declared with single-quotes *unless* the string itself contains a single-quote that would need to be escaped–in that case: use a double-quote. If the string contains a single-quote *and* a double-quote, you can use ES6 template strings to avoid escaping the quotes.
