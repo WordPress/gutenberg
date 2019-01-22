@@ -246,6 +246,20 @@ Documentation is automatically synced from master to the [Gutenberg Documentatio
 
 To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [root-manifest.json](https://github.com/WordPress/gutenberg/blob/master/docs/root-manifest.json).
 
+### Using links
+
+It's very likely that at some point you will want to link to other documentation pages. It's worth emphasizing that all documents can be browsed in different contexts:
+- Gutenberg Handbook
+- GitHub website
+- npm website
+
+That's why it's recommended to use absolute links without the `https://github.com/WordPress/gutenberg` part for all files which match the following patterns:
+- `/docs/*.md`
+- `/packages/*/README.md`
+- `/packages/components/src/**/README.md`
+
+This way they will be properly handled in all three aforementioned contexts.
+
 ### `@wordpress/component`
 
 If you're contributing to the documentation of any component from the `@wordpress/component` package, take a look at its [guidelines for contributing](./packages/components/CONTRIBUTING.md).
