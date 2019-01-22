@@ -59,7 +59,7 @@ export const settings = {
 		],
 	},
 
-	edit: edit,
+	edit,
 
 	save( { attributes } ) {
 		return <RawHTML>{ attributes.content }</RawHTML>;
