@@ -91,10 +91,10 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 		}
 
 		pageItems.push( {
-			title: title,
-			slug: slug,
+			title,
+			slug,
 			markdown_source: `${ baseRepoUrl }\/${ fileName }`,
-			parent: parent,
+			parent,
 		} );
 		if ( Array.isArray( children ) && children.length ) {
 			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
