@@ -22,8 +22,8 @@ const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, ind
 			{
 				( { onDraggableStart, onDraggableEnd } ) => {
 					return children( {
-						onDraggableStart: onDraggableStart,
-						onDraggableEnd: onDraggableEnd,
+						onDraggableStart,
+						onDraggableEnd,
 					} );
 				}
 			}

@@ -92,7 +92,7 @@ export default compose(
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' ),
-			closeGeneralSidebar: closeGeneralSidebar,
+			closeGeneralSidebar,
 		};
 	} ),
 )( Header );
