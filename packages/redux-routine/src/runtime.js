@@ -26,10 +26,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 		const routine = control( value );
 		if ( isPromise( routine ) ) {
 			// Async control routine awaits resolution.
-			routine.then(
-				yieldNext,
-				( error ) => yieldError( error ),
-			);
+			routine.then( yieldNext, yieldError );
 		} else {
 			next( routine );
 		}
