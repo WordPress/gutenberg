@@ -152,12 +152,6 @@
 			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
 		}
 	}
-
-	&.is-24-hour {
-		.components-datetime__time-field-day {
-			order: 0 !important;
-		}
-	}
 }
 
 .components-datetime__time-legend {

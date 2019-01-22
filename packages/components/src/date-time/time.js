@@ -43,6 +43,9 @@ class TimePicker extends Component {
 		this.updateMinutes = this.updateMinutes.bind( this );
 		this.onChangeHours = this.onChangeHours.bind( this );
 		this.onChangeMinutes = this.onChangeMinutes.bind( this );
+		this.renderMonth = this.renderMonth.bind( this );
+		this.renderDay = this.renderDay.bind( this );
+		this.renderDayMonthFormat = this.renderDayMonthFormat.bind( this );
 	}
 
 	componentDidMount() {
@@ -189,52 +192,65 @@ class TimePicker extends Component {
 		this.setState( { minutes: event.target.value } );
 	}
 
+	renderMonth( month ) {
+		return (
+			<div key="render-month" className="components-datetime__time-field components-datetime__time-field-month">
+				<select
+					aria-label={ __( 'Month' ) }
+					className="components-datetime__time-field-month-select"
+					value={ month }
+					onChange={ this.onChangeMonth }
+					onBlur={ this.updateMonth }
+				>
+					<option value="01">{ __( 'January' ) }</option>
+					<option value="02">{ __( 'February' ) }</option>
+					<option value="03">{ __( 'March' ) }</option>
+					<option value="04">{ __( 'April' ) }</option>
+					<option value="05">{ __( 'May' ) }</option>
+					<option value="06">{ __( 'June' ) }</option>
+					<option value="07">{ __( 'July' ) }</option>
+					<option value="08">{ __( 'August' ) }</option>
+					<option value="09">{ __( 'September' ) }</option>
+					<option value="10">{ __( 'October' ) }</option>
+					<option value="11">{ __( 'November' ) }</option>
+					<option value="12">{ __( 'December' ) }</option>
+				</select>
+			</div>
+		);
+	}
+
+	renderDay( day ) {
+		return (
+			<div key="render-day" className="components-datetime__time-field components-datetime__time-field-day">
+				<input
+					aria-label={ __( 'Day' ) }
+					className="components-datetime__time-field-day-input"
+					type="number"
+					value={ day }
+					step={ 1 }
+					min={ 1 }
+					onChange={ this.onChangeDay }
+					onBlur={ this.updateDay }
+				/>
+			</div>
+		);
+	}
+
+	renderDayMonthFormat( is12Hour ) {
+		const { day, month } = this.state;
+		const layout = [ this.renderDay( day ), this.renderMonth( month ) ];
+		return is12Hour ? layout : layout.reverse();
+	}
+
 	render() {
 		const { is12Hour } = this.props;
-		const { day, month, year, minutes, hours, am } = this.state;
-
+		const { year, minutes, hours, am } = this.state;
 		return (
-			<div className={ classnames( 'components-datetime__time', {
-				'is-12-hour': is12Hour,
-				'is-24-hour': ! is12Hour,
-			} ) }>
+			<div className={ classnames( 'components-datetime__time' ) }>
 				<fieldset>
 					<legend className="components-datetime__time-legend invisible">{ __( 'Date' ) }</legend>
 					<div className="components-datetime__time-wrapper">
-						<div className="components-datetime__time-field components-datetime__time-field-month">
-							<select
-								aria-label={ __( 'Month' ) }
-								className="components-datetime__time-field-month-select"
-								value={ month }
-								onChange={ this.onChangeMonth }
-								onBlur={ this.updateMonth }
-							>
-								<option value="01">{ __( 'January' ) }</option>
-								<option value="02">{ __( 'February' ) }</option>
-								<option value="03">{ __( 'March' ) }</option>
-								<option value="04">{ __( 'April' ) }</option>
-								<option value="05">{ __( 'May' ) }</option>
-								<option value="06">{ __( 'June' ) }</option>
-								<option value="07">{ __( 'July' ) }</option>
-								<option value="08">{ __( 'August' ) }</option>
-								<option value="09">{ __( 'September' ) }</option>
-								<option value="10">{ __( 'October' ) }</option>
-								<option value="11">{ __( 'November' ) }</option>
-								<option value="12">{ __( 'December' ) }</option>
-							</select>
-						</div>
-						<div className="components-datetime__time-field components-datetime__time-field-day">
-							<input
-								aria-label={ __( 'Day' ) }
-								className="components-datetime__time-field-day-input"
-								type="number"
-								value={ day }
-								step={ 1 }
-								min={ 1 }
-								onChange={ this.onChangeDay }
-								onBlur={ this.updateDay }
-							/>
-						</div>
+						{ this.renderDayMonthFormat( is12Hour ) }
 						<div className="components-datetime__time-field components-datetime__time-field-year">
 							<input
 								aria-label={ __( 'Year' ) }
