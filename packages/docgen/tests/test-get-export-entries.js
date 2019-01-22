@@ -84,14 +84,14 @@ test( 'Export entries: default identifier', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default import', function( t ) {
+test( 'Export entries: default import (named)', function( t ) {
 	const token = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import.json' ),
+		path.join( __dirname, './fixtures/default-import-named.json' ),
 		'utf-8'
 	);
 	const name = getExportEntries( JSON.parse( token ) );
 	t.deepEqual( name, [ {
-		localName: 'functionDeclaration',
+		localName: 'fnDeclaration',
 		exportName: 'default',
 		module: null,
 	} ] );

@@ -98,15 +98,15 @@ test( 'IR - default (JSDoc in same file)', function( t ) {
 
 test( 'IR - default (JSDoc in module dependency)', function( t ) {
 	const token = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import.json' ),
+		path.join( __dirname, './fixtures/default-import-named.json' ),
 		'utf-8'
 	);
 	const ast = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-ast.json' ),
+		path.join( __dirname, './fixtures/default-import-named-ast.json' ),
 		'utf-8'
 	);
 	const getModule = () => JSON.parse( fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-module-ir.json' ),
+		path.join( __dirname, './fixtures/default-import-named-module-ir.json' ),
 		'utf-8'
 	) );
 	t.deepEqual(
