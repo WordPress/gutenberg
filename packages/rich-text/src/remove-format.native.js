@@ -31,11 +31,19 @@ export function removeFormat(
 	const newFormats = formats.slice( 0 );
 	let newFormatPlaceholder = null;
 
-	if ( start === end && formatPlaceholder && formatPlaceholder.index === start ) {
-		newFormatPlaceholder = {
-			...formatPlaceholder,
-			formats: without( formatPlaceholder.formats || [], find( formatPlaceholder.formats || [], { type: formatType } ) ),
-		};
+	if ( start === end ) {
+		if ( formatPlaceholder && formatPlaceholder.index === start ) {
+			newFormatPlaceholder = {
+				...formatPlaceholder,
+				formats: without( formatPlaceholder.formats || [], find( formatPlaceholder.formats || [], { type: formatType } ) ),
+			};
+		} else if ( ! formatPlaceholder ) {
+			const previousFormat = start > 0 ? formats[ start - 1 ] : formats[ 0 ];
+			newFormatPlaceholder = {
+				index: start,
+				formats: without( previousFormat || [], find( previousFormat || [], { type: formatType } ) ),
+			};
+		}
 	}
 
 	// Do not remove format if selection is empty
