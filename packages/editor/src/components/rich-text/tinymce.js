@@ -345,6 +345,7 @@ export default class TinyMCE extends Component {
 	 * @param  {SyntheticEvent} event Synthetic key up event.
 	 */
 	onKeyUp( event ) {
+		// Alt+Space *should* insert a non breaking space. Do not remove it.
 		if ( event.altKey || event.keyCode !== SPACE ) {
 			return;
 		}
