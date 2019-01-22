@@ -24,7 +24,6 @@ ES6 modules:
 - [ ] e2e-tests - what shall be documented?
 - [ ] edit-post - directory dependency
 - [ ] editor - directory dependency
-- [ ] element - `renderToString`
 - [ ] hooks - `import something; ... export something;`
 - [ ] npm-package-json-lint-config - CONFIG file
 - [ ] nux - directory dependency
@@ -45,6 +44,7 @@ ES6 modules:
 - [x] deprecated
 - [x] dom
 - [x] dom-ready
+- [x] element
 - [x] escape-html
 - [x] format-library - exports nothing
 - [x] html-entities
