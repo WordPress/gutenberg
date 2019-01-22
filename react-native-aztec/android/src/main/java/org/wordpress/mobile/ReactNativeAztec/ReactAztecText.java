@@ -339,7 +339,7 @@ public class ReactAztecText extends AztecText {
                     newFormatsSet.add(AztecTextFormat.FORMAT_STRONG);
                     break;
                 case "italic":
-                    newFormatsSet.add(AztecTextFormat.FORMAT_CITE);
+                    newFormatsSet.add(AztecTextFormat.FORMAT_ITALIC);
                     break;
                 case "strikethrough":
                     newFormatsSet.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
