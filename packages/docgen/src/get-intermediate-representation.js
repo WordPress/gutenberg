@@ -23,11 +23,15 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 				);
 		} );
 		if ( candidates.length === 1 ) {
-			doc = getJSDoc( candidates[ 0 ] );
+			doc = getJSDoc( candidates[ 0 ] ); // TODO: use getJSDocFromToken
 		}
 	} else if ( doc === undefined && entry && entry.module !== null ) {
 		const ir = parseDependency( getDependencyPath( token ) );
-		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
+		if ( entry.localName === '*' ) {
+			doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== 'default' );
+		} else {
+			doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
+		}
 	}
 	return doc;
 };
@@ -50,12 +54,23 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 	const exportEntries = getExportEntries( token );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {
-		const doc = getJSDoc( token, entry, ast, parseDependency );
-		ir.push( {
-			name: entry.exportName,
-			description: get( doc, [ 'description' ], UNDOCUMENTED ),
-			tags: [],
-		} );
+		if ( entry.localName === '*' ) {
+			const doc = getJSDoc( token, entry, ast, parseDependency );
+			doc.forEach( ( namedExport ) => {
+				ir.push( {
+					name: namedExport.name,
+					description: namedExport.description,
+					tags: namedExport.tags,
+				} );
+			} );
+		} else {
+			const doc = getJSDoc( token, entry, ast, parseDependency );
+			ir.push( {
+				name: entry.exportName,
+				description: get( doc, [ 'description' ], UNDOCUMENTED ),
+				tags: [],
+			} );
+		}
 	} );
 	return ir;
 };

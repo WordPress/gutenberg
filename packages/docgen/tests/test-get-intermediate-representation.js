@@ -187,7 +187,7 @@ test( 'IR - namespace (JSDoc in identifer declaration, module dependency)', func
 		[
 			{ name: 'myVariable', description: 'Named variable.', tags: [] },
 			{ name: 'myFunction', description: 'Named function.', tags: [] },
-			{ name: 'MyClass', description: 'Named variable.', tags: [] },
+			{ name: 'MyClass', description: 'Named class.', tags: [] },
 		]
 	);
 	t.end();
