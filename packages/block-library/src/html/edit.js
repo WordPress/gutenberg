@@ -20,7 +20,22 @@ class HTMLEdit extends Component {
 
 	componentDidMount() {
 		const { styles } = this.props;
-		this.setState( { styles: transformStyles( styles ) } );
+
+		// Default styles used to unset some of the styles
+		// that might be inherited from the editor style.
+		const defaultStyles = `
+			html,body,:root {
+				margin: 0 !important;
+				padding: 0 !important;
+				overflow: visible !important;
+				min-height: auto !important;
+			}
+		`;
+
+		this.setState( { styles: [
+			defaultStyles,
+			...transformStyles( styles ),
+		] } );
 	}
 
 	switchToPreview() {
