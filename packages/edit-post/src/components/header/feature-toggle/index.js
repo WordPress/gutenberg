@@ -11,19 +11,12 @@ import { compose } from '@wordpress/compose';
 import { MenuItem, withSpokenMessages } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function FeatureToggle( { onToggle, isActive, label, info, messages, speak } ) {
-	const defaultMessages = {
-		activated: __( 'Feature activated' ),
-		deactivated: __( 'Feature deactivated' ),
-	};
-
-	messages = Object.assign( defaultMessages, messages );
-
+function FeatureToggle( { onToggle, isActive, label, info, messageActivated, messageDeactivated, speak } ) {
 	const speakMessage = () => {
 		if ( isActive ) {
-			speak( messages.deactivated );
+			speak( messageDeactivated || __( 'Feature deactivated' ) );
 		} else {
-			speak( messages.activated );
+			speak( messageActivated || __( 'Feature activated' ) );
 		}
 	};
 
