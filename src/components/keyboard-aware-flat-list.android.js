@@ -10,9 +10,10 @@ type PropsType = {
 	shouldPreventAutomaticScroll: void => boolean,
 	blockToolbarHeight: number,
 	innerToolbarHeight: number,
+	innerRef?: Function,
 }
 
-const KeyboardAwareFlatList = ( props: PropsType ) => {
+export const KeyboardAwareFlatList = ( props: PropsType ) => {
 	return (
 		<KeyboardAvoidingView style={ { flex: 1 } }>
 			<FlatList { ...props } />
@@ -20,4 +21,8 @@ const KeyboardAwareFlatList = ( props: PropsType ) => {
 	);
 };
 
-export default KeyboardAwareFlatList;
+export const handleCaretVerticalPositionChange = () => {
+	//no need to handle on Android, it is system managed
+};
+
+export default { KeyboardAwareFlatList, handleCaretVerticalPositionChange };
