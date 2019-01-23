@@ -24,7 +24,14 @@ const hasFunctionWithName = ( node, name ) =>
 
 const hasVariableWithName = ( node, name ) =>
 	node.type === 'VariableDeclaration' &&
-	node.declarations.some( ( declaration ) => declaration.id.name === name );
+	node.declarations.some( ( declaration ) => {
+		if ( declaration.id.type === 'ObjectPattern' ) {
+			return declaration.id.properties.some(
+				( property ) => property.key.name === name
+			);
+		}
+		return declaration.id.name === name;
+	} );
 
 const hasNamedExportWithName = ( node, name ) =>
 	node.type === 'ExportNamedDeclaration' &&
@@ -45,8 +52,14 @@ const someImportMatchesName = ( name, node ) => node.specifiers.some( ( specifie
 } );
 
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
+	// Use JSDoc in node if present
 	let doc = getJSDocFromToken( token );
-	if ( doc === undefined && entry && entry.module === null ) {
+	if ( doc !== undefined ) {
+		return doc;
+	}
+
+	// Look up JSDoc in same file
+	if ( entry && entry.module === null ) {
 		const candidates = ast.body.filter( ( node ) => {
 			return hasClassWithName( node, entry.localName ) ||
 				hasFunctionWithName( node, entry.localName ) ||
@@ -54,22 +67,26 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 				hasNamedExportWithName( node, entry.localName ) ||
 				hasImportWithName( node, entry.localName );
 		} );
-		if ( candidates.length === 1 ) {
-			const node = candidates[ 0 ];
-			if ( isImportDeclaration( node ) ) {
-				const ir = parseDependency( getDependencyPath( node ) );
-				doc = ir.find( ( { name } ) => someImportMatchesName( name, node ) );
-			} else {
-				doc = getJSDocFromToken( node );
-			}
+		if ( candidates.length !== 1 ) {
+			return doc;
 		}
-	} else if ( doc === undefined && entry && entry.module !== null ) {
-		const ir = parseDependency( getDependencyPath( token ) );
-		if ( entry.localName === NAMESPACE_EXPORT ) {
-			doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== DEFAULT_EXPORT );
+		const node = candidates[ 0 ];
+		if ( isImportDeclaration( node ) ) {
+			// Actually, look up JSDoc in file dependency
+			const ir = parseDependency( getDependencyPath( node ) );
+			doc = ir.find( ( { name } ) => someImportMatchesName( name, node ) );
 		} else {
-			doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
+			doc = getJSDocFromToken( node );
 		}
+		return doc;
+	}
+
+	// Look up JSDoc in file dependency
+	const ir = parseDependency( getDependencyPath( token ) );
+	if ( entry.localName === NAMESPACE_EXPORT ) {
+		doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== DEFAULT_EXPORT );
+	} else {
+		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
 	}
 	return doc;
 };
