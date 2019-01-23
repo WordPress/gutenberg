@@ -15,16 +15,12 @@ CJS modules:
 
 ES6 modules:
 
-- [ ] block-serialization-spec-parser - not `src/index.js`
-- [ ] blocks - directory dependency
-- [ ] components - directory dependency
-- [ ] data - directory dependency
+- [ ] components - directory dependency, BUG
+- [ ] data - directory dependency, BUG
 - [ ] e2e-test-utils - what shall be documented?
 - [ ] e2e-tests - what shall be documented?
-- [ ] edit-post - directory dependency
-- [ ] editor - directory dependency
+- [ ] editor - directory dependency, BUG
 - [ ] npm-package-json-lint-config - CONFIG file
-- [ ] plugins - directory dependency
 - [ ] scripts - what shall be documented? not `src/index`
 - [-] keycodes - how to document CONSTANTS?
 - [-] redux-routine - check description with many paragraphs
@@ -36,12 +32,15 @@ ES6 modules:
 - [x] blob
 - [x] block-library
 - [x] block-serialization-default-parser
+- [x] block-serialization-spec-parser - not `src/index.js`
+- [x] blocks - directory dependency
 - [x] compose - directory dependency
 - [x] core-data - export nothing
 - [x] date
 - [x] deprecated
 - [x] dom
 - [x] dom-ready
+- [x] edit-post - directory dependency
 - [x] element
 - [x] escape-html
 - [x] format-library - exports nothing
@@ -53,6 +52,7 @@ ES6 modules:
 - [x] list-reusable-blocks - export nothing
 - [x] notices - does not export anything
 - [x] nux - directory dependency
+- [x] plugins
 - [x] priority-queue
 - [x] rich-text
 - [x] shortcode
