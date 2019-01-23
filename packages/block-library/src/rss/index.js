@@ -19,7 +19,7 @@ export const settings = {
 
 	category: 'widgets',
 
-	keywords: [ __( 'rss' ) ],
+	keywords: [ __( 'atom' ), __( 'feed' ) ],
 
 	supports: {
 		html: false,
