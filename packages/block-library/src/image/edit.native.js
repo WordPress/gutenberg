@@ -16,7 +16,7 @@ import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
-import { isURL } from '@wordpress/url'
+import { isURL } from '@wordpress/url';
 
 const MEDIA_ULOAD_STATE_UPLOADING = 1;
 const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
@@ -34,13 +34,14 @@ export default class ImageEdit extends React.Component {
 		this.mediaUpload = this.mediaUpload.bind( this );
 		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
-		this.finishMediaUploading = this.finishMediaUploading.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 	}
 
 	componentDidMount() {
 		const { attributes } = this.props;
-		
-		if ( attributes.id && !isURL( attributes.url )) {
+
+		if ( attributes.id && ! isURL( attributes.url ) ) {
 			this.addMediaUploadListener();
 		}
 	}
@@ -52,31 +53,48 @@ export default class ImageEdit extends React.Component {
 	mediaUpload( payload ) {
 		const { attributes } = this.props;
 
-		if ( payload.mediaId === attributes.id ) {
-			if ( payload.state === MEDIA_ULOAD_STATE_UPLOADING ) {
+		if ( payload.mediaId !== attributes.id ) {
+			return;
+		}
+
+		switch ( payload.state ) {
+			case MEDIA_ULOAD_STATE_UPLOADING:
 				this.setState( { progress: payload.progress, isUploadInProgress: true } );
-			} else if ( payload.state === MEDIA_ULOAD_STATE_SUCCEEDED || payload.state === MEDIA_ULOAD_STATE_FAILED ) {
-				this.finishMediaUploading( payload );
-			}
+				break;
+			case MEDIA_ULOAD_STATE_SUCCEEDED:
+				this.finishMediaUploadWithSuccess( payload );
+				break;
+			case MEDIA_ULOAD_STATE_FAILED:
+				this.finishMediaUploadWithFailure( payload );
+				break;
 		}
 	}
 
-	finishMediaUploading( payload ) {
+	finishMediaUploadWithSuccess( payload ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
+		this.setState( { isUploadInProgress: false } );
+
+		this.removeMediaUploadListener();
+	}
+
+	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
 		this.setState( { isUploadInProgress: false } );
 
-		this.removeMediaUploadListener( payload.mediaId );
+		this.removeMediaUploadListener();
 	}
 
-	addMediaUploadListener( ) {
+	addMediaUploadListener() {
 		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
 			this.mediaUpload( payload );
 		} );
 	}
 
-	removeMediaUploadListener( ) {
+	removeMediaUploadListener() {
 		if ( this.subscriptionParentMediaUpload ) {
 			this.subscriptionParentMediaUpload.remove();
 		}
@@ -87,9 +105,9 @@ export default class ImageEdit extends React.Component {
 		const { url, caption, height, width } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
-			onMediaLibraryPressed( ( mediaUrl ) => {
+			onMediaLibraryPressed( ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
-					setAttributes( { url: mediaUrl } );
+					setAttributes( { id: mediaId, url: mediaUrl } );
 				}
 			} );
 		};
