@@ -43,7 +43,6 @@ class DatePicker extends Component {
 		return (
 			<div className="components-datetime__date">
 				<DayPickerSingleDateController
-					block
 					date={ momentDate }
 					daySize={ 30 }
 					focused

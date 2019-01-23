@@ -61,7 +61,7 @@ describe( 'createMiddleware', () => {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
-				expect( error.message ).toBe( 'Message' );
+				expect( error ).toBe( 'Message' );
 			}
 		}
 
