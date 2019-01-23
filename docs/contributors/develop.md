@@ -2,6 +2,8 @@
 
 Please see [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) for technical details on how to setup and make contributions to the Gutenberg repository.
 
+The following resources offer additional information for developers who wish to contribute to Gutenberg:
+
 * [Coding Guidelines](/docs/contributors/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
 * [Gutenberg Block Grammer](/docs/contributors/grammar.md)
 * [Testing Overview](/docs/contributors/testing-overview.md) for PHP and JavaScript development in Gutenberg.
