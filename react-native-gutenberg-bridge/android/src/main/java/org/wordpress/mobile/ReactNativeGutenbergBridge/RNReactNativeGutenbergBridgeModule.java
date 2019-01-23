@@ -111,7 +111,6 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
             @Override
             public void onMediaFileUploadSucceeded(String mediaId, String mediaUrl) {
-                //mediaUrl = mediaUrl.replace("..", ".");
                 setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1);
             }
 
