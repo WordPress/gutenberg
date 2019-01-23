@@ -889,45 +889,15 @@ function gutenberg_get_autosave_newer_than_post_save( $post ) {
  * Returns all the block categories.
  *
  * @since 2.2.0
+ * @deprecated 5.0.0 get_block_categories
  *
  * @param  WP_Post $post Post object.
  * @return Object[] Block categories.
  */
 function gutenberg_get_block_categories( $post ) {
-	$default_categories = array(
-		array(
-			'slug'  => 'common',
-			'title' => __( 'Common Blocks', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'formatting',
-			'title' => __( 'Formatting', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'layout',
-			'title' => __( 'Layout Elements', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'widgets',
-			'title' => __( 'Widgets', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'embed',
-			'title' => __( 'Embeds', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'reusable',
-			'title' => __( 'Reusable Blocks', 'gutenberg' ),
-			'icon'  => null,
-		),
-	);
+	_deprecated_function( __FUNCTION__, '5.0.0', 'get_block_categories' );
 
-	return apply_filters( 'block_categories', $default_categories, $post );
+	return get_block_categories( $post );
 }
 
 /**
@@ -1092,7 +1062,7 @@ JS;
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( $post ) ) ),
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
 		'after'
 	);
 
