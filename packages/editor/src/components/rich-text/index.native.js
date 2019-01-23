@@ -46,6 +46,7 @@ export class RichText extends Component {
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.onFormatChange = this.onFormatChange.bind( this );
+		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.state = {
@@ -61,12 +62,10 @@ export class RichText extends Component {
 	 * @return {Object} The current record (value and selection).
 	 */
 	getRecord() {
-		const { formatPlaceholder, start, end, lastValue } = this.state;
+		const { formatPlaceholder, start, end } = this.state;
 		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
 		// Removing the leading or the trailing white spaces using `trim()` should make sure this is the case.
-		// Moreover onSelectionChange seems to be emitted on each cursor change and more frequently than onChange while typing,
-		// Thus we store the html returned by onSelectionChange in lastValue to make sure we use the up to date value
-		const { formats, text } = this.formatToValue( lastValue || this.props.value.trim() );
+		const { formats, text } = this.formatToValue( this.props.value.trim() );
 
 		return { formats, formatPlaceholder, text, start, end };
 	}
@@ -148,10 +147,12 @@ export class RichText extends Component {
 
 	onFormatChange( record ) {
 		const newContent = this.valueToFormat( record );
-		this.props.onChange( newContent );
+		if ( this.state.start !== this.state.end && newContent !== this.lastContent ) {
+			this.lastContent = newContent;
+			this.props.onChange( newContent );
+		}
 		this.setState( {
 			formatPlaceholder: record.formatPlaceholder,
-			lastValue: null,
 		} );
 	}
 
@@ -241,8 +242,9 @@ export class RichText extends Component {
 			start: realStart,
 			end: realEnd,
 			formatPlaceholder,
-			lastValue: this.removeRootTagsProduceByAztec( text ),
 		} );
+		this.lastContent = this.removeRootTagsProduceByAztec( text );
+		this.props.onChange( this.lastContent );
 	}
 
 	isEmpty() {
