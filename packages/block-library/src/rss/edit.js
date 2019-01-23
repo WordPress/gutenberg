@@ -5,7 +5,6 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	Button,
 	Disabled,
-	IconButton,
 	PanelBody,
 	Placeholder,
 	RangeControl,
@@ -89,7 +88,12 @@ class RSSEdit extends Component {
 			);
 		}
 
-		const layoutControls = [
+		const toolbarControls = [
+			{
+				icon: 'edit',
+				title: __( 'Edit RSS URL' ),
+				onClick: () => this.setState( { editing: true } ),
+			},
 			{
 				icon: 'list-view',
 				title: __( 'List View' ),
@@ -107,15 +111,7 @@ class RSSEdit extends Component {
 		return (
 			<Fragment>
 				<BlockControls>
-					<Toolbar>
-						<IconButton
-							className="components-icon-button components-toolbar__control"
-							label={ __( 'Edit RSS URL' ) }
-							onClick={ () => this.setState( { editing: true } ) }
-							icon="edit"
-						/>
-					</Toolbar>
-					<Toolbar controls={ layoutControls } />
+					<Toolbar controls={ toolbarControls } />
 				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'RSS Settings' ) }>
