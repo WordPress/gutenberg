@@ -1,0 +1,165 @@
+/**
+ * WordPress dependencies
+ */
+import {
+	createNewPost,
+	insertBlock,
+} from '@wordpress/e2e-test-utils';
+
+describe( 'Order of block keyboard navigation', () => {
+	beforeEach( async () => {
+		await createNewPost();
+	} );
+
+	it( 'permits tabbing through paragraph blocks in the expected order', async () => {
+		const paragraphBlocks = [ 'Paragraph 0', 'Paragraph 1', 'Paragraph 2' ];
+
+		const navigateToContentEditorTop = async () => {
+			// Use 'Ctrl+`' to return to the top of the editor
+			await page.keyboard.down( 'Control' );
+			await page.keyboard.press( '`' );
+			await page.keyboard.press( '`' );
+			await page.keyboard.up( 'Control' );
+			// Tab into the Title block
+			await page.keyboard.press( 'Tab' );
+		};
+
+		const tabThroughParagraphBlock = async ( paragraphText ) => {
+			// Tab to the next paragraph block
+			await page.keyboard.press( 'Tab' );
+
+			// The block external focusable wrapper has focus
+			const isFocusedParagraphBlock = await page.evaluate(
+				() => document.activeElement.dataset.type
+			);
+			await expect( isFocusedParagraphBlock ).toEqual( 'core/paragraph' );
+
+			// Tab causes 'add block' button to receive focus
+			await page.keyboard.press( 'Tab' );
+			const isFocusedParagraphInserterToggle = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'editor-inserter__toggle' )
+			);
+			await expect( isFocusedParagraphInserterToggle ).toBe( true );
+
+			await tabThroughBlockMoverControl();
+			await tabThroughBlockToolbar();
+
+			// Tab causes the paragraph content to receive focus
+			await page.keyboard.press( 'Tab' );
+			const isFocusedParagraphContent = await page.evaluate(
+				() => document.activeElement.contentEditable
+			);
+			// The value of 'contentEditable' should be the string 'true'
+			await expect( isFocusedParagraphContent ).toBe( 'true' );
+
+			const paragraphEditableContent = await page.evaluate(
+				() => document.activeElement.innerHTML
+			);
+			await expect( paragraphEditableContent ).toBe( paragraphText );
+		};
+
+		const tabThroughBlockMoverControl = async () => {
+			// Tab to focus on the 'move up' control
+			await page.keyboard.press( 'Tab' );
+			const isFocusedMoveUpControl = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'editor-block-mover__control' )
+			);
+			await expect( isFocusedMoveUpControl ).toBe( true );
+
+			// Tab to focus on the 'move down' control
+			await page.keyboard.press( 'Tab' );
+			const isFocusedMoveDownControl = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'editor-block-mover__control' )
+			);
+			await expect( isFocusedMoveDownControl ).toBe( true );
+		};
+
+		const tabThroughBlockToolbar = async () => {
+			// Tab to focus on the 'block switcher' control
+			await page.keyboard.press( 'Tab' );
+			const isFocusedBlockSwitcherControl = await page.evaluate( () =>
+				document.activeElement.classList.contains(
+					'editor-block-switcher__toggle'
+				)
+			);
+			await expect( isFocusedBlockSwitcherControl ).toBe( true );
+
+			// Tab to focus on the 'left paragraph alignment' dropdown control
+			await page.keyboard.press( 'Tab' );
+			const isFocusedLeftAlignmentControl = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'components-toolbar__control' )
+			);
+			await expect( isFocusedLeftAlignmentControl ).toBe( true );
+
+			// Tab to focus on the 'center paragraph alignment' dropdown control
+			await page.keyboard.press( 'Tab' );
+			const isFocusedCenterAlignmentControl = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'components-toolbar__control' )
+			);
+			await expect( isFocusedCenterAlignmentControl ).toBe( true );
+
+			// Tab to focus on the 'right paragraph alignment' dropdown control
+			await page.keyboard.press( 'Tab' );
+			const isFocusedRightAlignmentControl = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'components-toolbar__control' )
+			);
+			await expect( isFocusedRightAlignmentControl ).toBe( true );
+
+			// Tab to focus on the 'Bold' formatting button
+			await page.keyboard.press( 'Tab' );
+			const isFocusedBoldFormattingButton = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'components-toolbar__control' )
+			);
+			await expect( isFocusedBoldFormattingButton ).toBe( true );
+
+			// Tab to focus on the 'Italic' formatting button
+			await page.keyboard.press( 'Tab' );
+			const isFocusedItalicFormattingButton = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'components-toolbar__control' )
+			);
+			await expect( isFocusedItalicFormattingButton ).toBe( true );
+
+			// Tab to focus on the 'Hyperlink' formatting button
+			await page.keyboard.press( 'Tab' );
+			const isFocusedHyperlinkFormattingButton = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'components-toolbar__control' )
+			);
+			await expect( isFocusedHyperlinkFormattingButton ).toBe( true );
+
+			// Tab to focus on the 'Strikethrough' formatting button
+			await page.keyboard.press( 'Tab' );
+			const isFocusedStrikethroughFormattingButton = await page.evaluate( () =>
+				document.activeElement.classList.contains( 'components-toolbar__control' )
+			);
+			await expect( isFocusedStrikethroughFormattingButton ).toBe( true );
+
+			// Tab to focus on the 'More formatting' dropdown toggle
+			await page.keyboard.press( 'Tab' );
+			const isFocusedMoreFormattingDropdown = await page.evaluate( () =>
+				document.activeElement.classList.contains(
+					'editor-block-settings-menu__toggle'
+				)
+			);
+			await expect( isFocusedMoreFormattingDropdown ).toBe( true );
+		};
+
+		// create 3 paragraphs blocks with some content
+		for ( const paragraphBlock of paragraphBlocks ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( paragraphBlock );
+			await page.keyboard.press( 'Enter' );
+		}
+
+		await navigateToContentEditorTop();
+
+		for ( const paragraphBlock of paragraphBlocks ) {
+			await tabThroughParagraphBlock( paragraphBlock );
+		}
+
+		await navigateToContentEditorTop();
+
+		for ( const paragraphBlock of paragraphBlocks ) {
+			await tabThroughParagraphBlock( paragraphBlock );
+		}
+	} );
+} );
