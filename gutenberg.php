@@ -211,6 +211,15 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
+	// Instruct WordPress that this is the block editor. Without this, a call
+	// to `is_block_editor()` would yield `false` while editing a post with
+	// Gutenberg.
+	//
+	// [TODO]: This is temporary so long as Gutenberg is implemented to use
+	// `replace_editor`, rather than allow `edit-form-blocks.php` from core to
+	// take effect, where this would otherwise be assigned.
+	get_current_screen()->is_block_editor( true );
+
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );

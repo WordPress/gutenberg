@@ -721,72 +721,26 @@ function gutenberg_prepare_blocks_for_js() {
  * are loaded last.
  *
  * @since 0.4.0
+ * @deprecated 5.0.0 wp_common_block_scripts_and_styles
  */
 function gutenberg_common_scripts_and_styles() {
-	if ( ! is_gutenberg_page() && is_admin() ) {
-		return;
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_common_block_scripts_and_styles' );
 
-	// Enqueue basic styles built out of Gutenberg through `npm build`.
-	wp_enqueue_style( 'wp-block-library' );
-
-	/*
-	 * Enqueue block styles built through plugins.  This lives in a separate
-	 * action for a couple of reasons: (1) we want to load these assets
-	 * (usually stylesheets) in *both* frontend and editor contexts, and (2)
-	 * one day we may need to be smarter about whether assets are included
-	 * based on whether blocks are actually present on the page.
-	 */
-
-	/**
-	 * Fires after enqueuing block assets for both editor and front-end.
-	 *
-	 * Call `add_action` on any hook before 'wp_enqueue_scripts'.
-	 *
-	 * In the function call you supply, simply use `wp_enqueue_script` and
-	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
-	 *
-	 * @since 0.4.0
-	 */
-	do_action( 'enqueue_block_assets' );
+	wp_common_block_scripts_and_styles();
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
-add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
 /**
  * Enqueues registered block scripts and styles, depending on current rendered
  * context (only enqueuing editor scripts while in context of the editor).
  *
  * @since 2.0.0
+ * @deprecated 5.0.0 wp_enqueue_registered_block_scripts_and_styles
  */
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
-	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_enqueue_registered_block_scripts_and_styles' );
 
-	$block_registry = WP_Block_Type_Registry::get_instance();
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
-		// Front-end styles.
-		if ( ! empty( $block_type->style ) ) {
-			wp_enqueue_style( $block_type->style );
-		}
-
-		// Front-end script.
-		if ( ! empty( $block_type->script ) ) {
-			wp_enqueue_script( $block_type->script );
-		}
-
-		// Editor styles.
-		if ( $is_editor && ! empty( $block_type->editor_style ) ) {
-			wp_enqueue_style( $block_type->editor_style );
-		}
-
-		// Editor script.
-		if ( $is_editor && ! empty( $block_type->editor_script ) ) {
-			wp_enqueue_script( $block_type->editor_script );
-		}
-	}
+	wp_enqueue_registered_block_scripts_and_styles();
 }
-add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
 /**
  * Assigns a default editor template with a default block by post format, if
@@ -1277,7 +1231,7 @@ JS;
 
 	$init_script = <<<JS
 	( function() {
-		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
+		window._wpLoadGutenbergEditor = window._wpLoadBlockEditor = new Promise( function( resolve ) {
 			wp.domReady( function() {
 				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 			} );
