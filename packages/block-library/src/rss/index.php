@@ -6,16 +6,6 @@
  */
 
 /**
- * Renders the rss error message.
- *
- * @param string $message RSS error message.
- * @return string|void Void if renders on frontend.
- */
-function render_rss_error_message( $message ) {
-	return '<div class="components-placeholder"><div class="notice notice-alt notice-error">' . $message . '</div></div>';
-}
-
-/**
  * Renders the `core/rss` block on server.
  *
  * @param array $attributes The block attributes.
@@ -36,13 +26,13 @@ function render_block_core_rss( $attributes ) {
 	$rss = fetch_feed( $url );
 
 	if ( is_wp_error( $rss ) ) {
-		return render_rss_error_message( '<strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() );
+		return '<div class="components-placeholder"><div class="notice notice-alt notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
 		$rss->__destruct();
 		unset( $rss );
-		return render_rss_error_message( __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) );
+		return '<div class="components-placeholder"><div class="notice notice-alt notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
 	}
 
 	$items = (int) $attributes['itemsToShow'];
