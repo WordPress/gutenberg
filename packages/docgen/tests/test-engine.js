@@ -139,13 +139,14 @@ test( 'Engine - named export (multiple identifiers) using JSDoc from declaration
 } );
 
 test( 'Engine - named export (single identifier) using JSDoc from dependency', ( t ) => {
-	const getDependency = () => `/**
+	const dependency = `/**
  		 * My declaration example.
  		 */
 		export const myDeclaration = function() {
 			// do nothing
 		}
 	`;
+	const getDependency = () => engine( dependency ).ir;
 	const { ir } = engine(
 		`export { myDeclaration } from './my-dependency';`,
 		getDependency
