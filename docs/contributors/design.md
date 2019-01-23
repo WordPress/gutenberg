@@ -1,4 +1,4 @@
-# Gutenberg Design Principles & Vision
+# Design Principles & Vision
 
 This is a living document that outlines the design principles and patterns of the editor interface. Its aim is to explain the background of the design, inform future improvements, and help people design great blocks.
 
