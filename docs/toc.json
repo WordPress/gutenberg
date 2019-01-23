@@ -71,29 +71,28 @@
 			{"docs/designers-developers/designers/block-design.md": []},
 			{"docs/designers-developers/designers/design-patterns.md": []},
 			{"docs/designers-developers/designers/design-resources.md": []}
-		]},
-		{"docs/designers-developers/glossary.md": []},
-		{"docs/designers-developers/faq.md": []}
+		]}
 	]},
 	{"docs/contributors/readme.md": [
-		{"docs/contributors/coding-guidelines.md": []},
-		{"docs/contributors/copy-guide.md": []},
-		{"docs/contributors/design.md": []},
-		{"docs/contributors/grammar.md": []},
+		{"docs/contributors/principles.md": []},
+		{"docs/contributors/design.md": [
+			{"docs/contributors/principles/the-block.md": []},
+			{"docs/contributors/reference.md": []}
+		]},
+		{"docs/contributors/develop.md": [
+			{"docs/contributors/coding-guidelines.md": []},
+			{"docs/contributors/grammar.md": []},
+			{"docs/contributors/testing-overview.md": []},
+			{"docs/contributors/scripts.md": []},
+			{"docs/contributors/release.md": []}
+		]},
+		{"docs/contributors/document.md": [
+			{"docs/contributors/copy-guide.md": []}
+		]},
 		{"docs/contributors/history.md": []},
-		{"docs/contributors/outreach.md": [
-			{"docs/contributors/outreach/articles.md": []},
-			{"docs/contributors/outreach/meetups.md": []},
-			{"docs/contributors/outreach/resources.md": []},
-			{"docs/contributors/outreach/talks.md": []}
-		]},
-		{"docs/contributors/principles.md": [
-			{"docs/contributors/principles/the-block.md": []}
-		]},
-		{"docs/contributors/reference.md": []},
-		{"docs/contributors/release.md": []},
+		{"docs/designers-developers/glossary.md": []},
+		{"docs/designers-developers/faq.md": []},
 		{"docs/contributors/repository-management.md": []},
-		{"docs/contributors/scripts.md": []},
-		{"docs/contributors/testing-overview.md": []}
+		{"docs/contributors/outreach.md": []}
 	]}
 ]

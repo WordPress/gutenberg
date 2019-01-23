@@ -1,4 +1,4 @@
-# Gutencopy Guidelines
+# Copy Guidelines
 
 ## Longer Text
 Guidelines for writing multi-line/step instructions or narrative introductions/orientation to pages or features.
@@ -8,7 +8,7 @@ This will obviously vary quite a lot depending on the context, but here are some
 #### ONE: Contractions are your friends!
 They’re more conversational, and a simple way to make text sound friendlier and less formal. (And they save a bit of space as well: a win-win.)
 
-#### TWO: Cut phrases that inflate your word count without actually adding meaning. 
+#### TWO: Cut phrases that inflate your word count without actually adding meaning.
 This happens frequently in two specific instances. First, when writing in the passive voice:
 
 > This block can be used to display single images.
@@ -25,7 +25,7 @@ Does it or doesn’t it? We’re making this software: we’re allowed to be dec
 
 > The gallery block displays multiple images in an elegant layout.
 
-We also all do this a lot with the phrase “allows you to.” 
+We also all do this a lot with the phrase “allows you to.”
 
 > Preformatted text allows you to keep your tabs and line breaks.
 
@@ -33,9 +33,9 @@ Features don’t allow anyone to do anything; they’re just tools that do speci
 
 > Preformatted text preserves your tabs and line breaks.
 
-The more direct sentences are almost always clearer. Scan your copy for the words “can,” “be,” “might,” “allows you to,” and “helps”—they’re the most common culprits, and looking for those words specifically is a way to locate phrasing you can tighten up. 
+The more direct sentences are almost always clearer. Scan your copy for the words “can,” “be,” “might,” “allows you to,” and “helps”—they’re the most common culprits, and looking for those words specifically is a way to locate phrasing you can tighten up.
 
-#### THREE: Beware of “simple,” “easy,” and “just.” 
+#### THREE: Beware of “simple,” “easy,” and “just.”
 It is not for us to decide what is simple: it’s for the user to decide. If we say something is easy and the user doesn’t have an easy experience, it undermines their trust in us and what we’re building. Same goes for “just”—many of us know to avoid “simple,” but still use “just” all the time. “Just click here.” “Just enter your username.” It’s the same thing: it implies that something will be no big deal, but we can’t know what the user will find to be a big deal.
 
 It’s also safer and more helpful to be specific. “Easy” and “simple” are shorthand for explanations that we haven’t written; whenever you see them, take a minute to think about what they’re standing in for. Maybe “It’s easy to add a block by hitting ‘enter’” really means “You can add more content to the page without taking your hands off the keyboard.” Great! Say the specific thing instead of relying on “easy.”
@@ -43,7 +43,7 @@ It’s also safer and more helpful to be specific. “Easy” and “simple” a
 This isn’t to say that you should banish these words from your vocabulary. You might want to write a tooltip describing how the cover image block now requires less configuration, or an email about how we’re building a tool for quick creation of custom blocks, and you could legitimately say that the cover image block has been simplified or that we’re working to make custom block creation easier—there, the terms are descriptive and relative. But be on the lookout for ways you might be using (or overusing) them to make absolute claims that something is easy or simple, and use those as opportunities to be more specific and clear.
 
 #### FOUR: Look out for “we.”
-Any time text or instructions uses “we” a lot, it means the focus of the text is on the people behind the software and not the people using the software. Sometimes that’s what you actually want—but it’s usually not. The focus should typically be on the user, what they need, and how they benefit rather than “what we did” or “what we want.” 
+Any time text or instructions uses “we” a lot, it means the focus of the text is on the people behind the software and not the people using the software. Sometimes that’s what you actually want—but it’s usually not. The focus should typically be on the user, what they need, and how they benefit rather than “what we did” or “what we want.”
 
 We’re the only ones that care about what we did or want; the user just wants software that works. If you see a lot of “we”s, think about whether you should reframe what you’re writing to focus on the benefits to and successes of the user.
 
@@ -51,7 +51,7 @@ We’re the only ones that care about what we did or want; the user just wants s
 Guidelines for (duh) writing bulleted lists.
 
 #### ONE: Keep sentence structures parallel across all bullets.
-Parallel structure makes lists easier to read quickly—their predictability takes some cognitive load off the reader.	
+Parallel structure makes lists easier to read quickly—their predictability takes some cognitive load off the reader.
 
 GOOD:
 > What can you do with this block? Lots of things!
@@ -60,7 +60,7 @@ GOOD:
 > * Display multiple images.
 > * Create a bulleted list.
 
-Every bullet is a full sentence, and ends with a period. (If your list is a bunch of one- or two-word items, those can often just turn into a single regular sentence—easier to read, and space-saving.) Every line begins with a verb that tells the user what the block can do. The subject of the sentence is always the user. 
+Every bullet is a full sentence, and ends with a period. (If your list is a bunch of one- or two-word items, those can often just turn into a single regular sentence—easier to read, and space-saving.) Every line begins with a verb that tells the user what the block can do. The subject of the sentence is always the user.
 
 A user can absorb this list quickly because once they read the first item, they understand how to read the rest and know what information they’ll find.
 
@@ -101,7 +101,7 @@ If your list is more persuasive (e.g., trying to convince someone to use a featu
 >* Use it to highlight a link you love—sharing links is the currency of the internet.
 >* Create a gallery that displays multiple images, and show off your best photos.
 
-These aren’t hard-and-fast rules—you might choose the use the same verb in a persuasive list to be more focused and powerful, for example. But they’re good starting places for solid lists. 
+These aren’t hard-and-fast rules—you might choose the use the same verb in a persuasive list to be more focused and powerful, for example. But they’re good starting places for solid lists.
 
 #### THREE: When something's clearly a list, you don't have to tell us it's a list.
 
@@ -120,7 +120,7 @@ LESS GOOD:
 Find the balance between being as clear as possible and trusting a user. On one hand, we know that people don’t always read instructions; on the other, redundancy can make the user feel like we think they’re stupid.
 
 #### FOUR: Bold is sometimes your friend.
-Use it to focus readers on the key information in a bulleted list. This is especially useful when your bullets include some supplemental but ultimately secondary information. 
+Use it to focus readers on the key information in a bulleted list. This is especially useful when your bullets include some supplemental but ultimately secondary information.
 
 “Key information” is, well, key: bold draws the eye, so stick to the most vital piece of information in a given bullet:
 
@@ -136,7 +136,7 @@ On the flipside, bolding too many things creates visual confusion:
 > * Use it to highlight a **link** you love—sharing **links** is the currency of the internet.
 > * Create a **gallery** that displays **multiple images**, and show off your best **photos**.
 
-When lists are short and basic, don't bother—bolding just adds busy-ness. 
+When lists are short and basic, don't bother—bolding just adds busy-ness.
 
 > What can you do with this block? Lots of things!
 > * Add a **quote**.
@@ -148,7 +148,7 @@ The lack of words creates its own focus; you don't have to add any more.
 ## UI Descriptions
 Guidelines for writing one-line feature descriptions, or short descriptions to clarify options.
 
-#### ONE: Clarity above all! 
+#### ONE: Clarity above all!
 If the user doesn't understand what using a particular option will result in, it doesn't matter how clever your pun is. Wordplay and idioms are frequently unclear, and easily misunderstood. If you use them at all, they should be as supplemental information— never to explain the main idea—and they should be something you’re fairly certain will be understandable to a pretty wide range of people.
 
 #### TWO: Refer back to section one, and look out for those bulk-adding phrases.
@@ -187,7 +187,7 @@ And when something means everything, it actually means nothing. The more specifi
 #### FOUR: This is still writing. It should have personality and interest.
 Clarity above all, yes, and space is often limited here—but UI text can still be interesting to read.
 
-Single lines of description can still be complete sentences. 
+Single lines of description can still be complete sentences.
 
 > List. Numbered or bulleted.
 
@@ -195,7 +195,7 @@ vs.
 
 > Add a list, either numbered or bulleted.
 
-You can still use contractions. 
+You can still use contractions.
 
 > Add a list. We will provide formatting options.
 
@@ -203,7 +203,7 @@ vs.
 
 > Add a bulleted list—we’ll give you some formatting options.
 
-You can still use punctuation—em dashes, colons, semicolons—to control the flow of your words, link ideas, and create pauses. 
+You can still use punctuation—em dashes, colons, semicolons—to control the flow of your words, link ideas, and create pauses.
 
 > List. Numbered or bulleted.
 
