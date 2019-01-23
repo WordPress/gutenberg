@@ -65,6 +65,7 @@ public class WPAndroidGlueCode {
     public interface OnMediaLibraryButtonListener {
         void onMediaLibraryButtonClicked();
         void onUploadMediaButtonClicked();
+        void onCapturePhotoButtonClicked();
     }
 
     protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener) {
@@ -85,6 +86,12 @@ public class WPAndroidGlueCode {
             public void onUploadMediaPressed(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onMediaLibraryButtonListener.onUploadMediaButtonClicked();
+            }
+
+            @Override
+            public void onCapturePhotoPressed(MediaUploadCallback mediaUploadCallback) {
+                mPendingMediaUploadCallback = mediaUploadCallback;
+                onMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
         });
         return Arrays.asList(

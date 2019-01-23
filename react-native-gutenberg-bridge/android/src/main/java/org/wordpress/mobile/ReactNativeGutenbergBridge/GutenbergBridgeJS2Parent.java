@@ -17,4 +17,6 @@ public interface GutenbergBridgeJS2Parent {
     void onMediaLibraryPressed(MediaSelectedCallback mediaSelectedCallback);
 
     void onUploadMediaPressed(MediaUploadCallback mediaUploadCallback);
+    
+    void onCapturePhotoPressed(MediaUploadCallback mediaUploadCallback);
 }

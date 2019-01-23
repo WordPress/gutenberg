@@ -96,6 +96,32 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         });
     }
 
+    @ReactMethod
+    public void onCapturePhotoPressed(final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.onCapturePhotoPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
+            @Override
+            public void onUploadMediaFileSelected(String mediaId, String mediaUri) {
+                onUploadMediaSelected.invoke(mediaId, mediaUri);
+            }
+
+            @Override
+            public void onMediaFileUploadProgress(String mediaId, float progress) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
+            }
+
+            @Override
+            public void onMediaFileUploadSucceeded(String mediaId, String mediaUrl) {
+                //mediaUrl = mediaUrl.replace("..", ".");
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1);
+            }
+
+            @Override
+            public void onMediaFileUploadFailed(String mediaId) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
+            }
+        });
+    }
+
     private void setMediaFileUploadDataInJS(int state, String mediaId, String mediaUrl, float progress) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);

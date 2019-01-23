@@ -44,4 +44,8 @@ export function onUploadMediaPressed( callback ) {
 	return RNReactNativeGutenbergBridge.onUploadMediaPressed( callback );
 }
 
+export function onCapturePhotoPressed( callback ) {
+	return RNReactNativeGutenbergBridge.onCapturePhotoPressed( callback );
+}
+
 export default RNReactNativeGutenbergBridge;
