@@ -20,10 +20,6 @@
 		position: fixed;
 		padding: $grid-size;
 		top: $admin-bar-height-big;
-
-		body.is-fullscreen-mode & {
-			top: 0;
-		}
 	}
 
 	@include break-medium() {

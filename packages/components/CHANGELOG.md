@@ -5,6 +5,14 @@
 - `withFilters` has been optimized to avoid binding hook handlers for each mounted instance of the component, instead using a single centralized hook delegator.
 - `withFilters` has been optimized to reuse a single shared component definition for all filtered instances of the component.
 
+### Bug Fixes
+
+- Resolves a conflict where two instance of Slot would produce an inconsistent or duplicated rendering output.
+
+### New Feature
+
+- `Dropdown` now has a `focusOnMount` prop which is passed directly to the contained `Popover`.
+
 ## 7.0.5 (2019-01-03)
 
 ## 7.0.4 (2018-12-12)
