@@ -18,7 +18,7 @@ It's very likely that at some point you will want to link to other documentation
 - GitHub website
 - npm website
 
-That's why it's recommended to use absolute links without the `https://github.com/WordPress/gutenberg` part for all files which match the following patterns:
+To create links that work in all contexts, you should use absolute path links without the `https://github.com/WordPress/gutenberg` prefix. You can reference files using the following patterns:
 - `/docs/*.md`
 - `/packages/*/README.md`
 - `/packages/components/src/**/README.md`
