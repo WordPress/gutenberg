@@ -28,8 +28,6 @@ function render_block_core_rss( $attributes ) {
 		return;
 	}
 
-	$url = filter_var( $attributes['feedURL'], FILTER_VALIDATE_URL );
-
 	// self-url destruction sequence.
 	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
 		return render_rss_error_message( __( 'Use \'Latest Posts\' block for this domain.', 'gutenberg' ) );
@@ -60,7 +58,6 @@ function render_block_core_rss( $attributes ) {
 		}
 
 		$link = $item->get_link();
-		$link = filter_var( $link, FILTER_VALIDATE_URL );
 		$link = esc_url( strip_tags( $link ) );
 		if ( $link ) {
 			$title = "<a href='$link'>$title</a>";
