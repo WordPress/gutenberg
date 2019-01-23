@@ -82,7 +82,7 @@ function render_block_core_rss( $attributes ) {
 
 			if ( $date ) {
 				$date = sprintf(
-					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time>',
+					'<time datetime="%1$s" class="wp-block-rss__item-publish-date">%2$s</time> ',
 					date_i18n( get_option( 'c' ), $date ),
 					date_i18n( get_option( 'date_format' ), $date )
 				);
@@ -94,7 +94,7 @@ function render_block_core_rss( $attributes ) {
 			$author = $item->get_author();
 			if ( is_object( $author ) ) {
 				$author = $author->get_name();
-				$author = '<span class="wp-block-rss__item-author">' . __( 'By', 'gutenberg' ) . ' ' . esc_html( strip_tags( $author ) ) . '</span>';
+				$author = '<span class="wp-block-rss__item-author">' . __( 'by', 'gutenberg' ) . ' ' . esc_html( strip_tags( $author ) ) . '</span>';
 			}
 		}
 
