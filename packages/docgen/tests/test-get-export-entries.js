@@ -237,6 +237,19 @@ test( 'Export entries - named identifiers', function( t ) {
 		{ localName: 'variableDeclaration', exportName: 'variableDeclaration', module: null },
 		{ localName: 'ClassDeclaration', exportName: 'ClassDeclaration', module: null },
 	] );
+	const tokenIdentifiersAndInline = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifiers-and-inline.json' ),
+		'utf-8'
+	);
+	const name0 = getExportEntries( JSON.parse( tokenIdentifiersAndInline )[ 0 ] );
+	t.deepEqual( name0, [
+		{ localName: 'functionDeclaration', exportName: 'functionDeclaration', module: null },
+		{ localName: 'ClassDeclaration', exportName: 'ClassDeclaration', module: null },
+	] );
+	const name1 = getExportEntries( JSON.parse( tokenIdentifiersAndInline )[ 1 ] );
+	t.deepEqual( name1, [
+		{ localName: 'variableDeclaration', exportName: 'variableDeclaration', module: null },
+	] );
 	t.end();
 } );
 

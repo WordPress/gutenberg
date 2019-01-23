@@ -1,0 +1,291 @@
+{
+	"type": "Program",
+	"start": 0,
+	"end": 275,
+	"range": [
+		41,
+		273
+	],
+	"body": [
+		{
+			"type": "FunctionDeclaration",
+			"start": 41,
+			"end": 74,
+			"range": [
+				41,
+				74
+			],
+			"id": {
+				"type": "Identifier",
+				"start": 50,
+				"end": 69,
+				"range": [
+					50,
+					69
+				],
+				"name": "functionDeclaration"
+			},
+			"generator": false,
+			"expression": false,
+			"async": false,
+			"params": [],
+			"body": {
+				"type": "BlockStatement",
+				"start": 72,
+				"end": 74,
+				"range": [
+					72,
+					74
+				],
+				"body": []
+			},
+			"leadingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Function declaration example.\n ",
+					"start": 0,
+					"end": 40,
+					"range": [
+						0,
+						40
+					]
+				}
+			],
+			"trailingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Class declaration example.\n ",
+					"start": 76,
+					"end": 113,
+					"range": [
+						76,
+						113
+					]
+				}
+			]
+		},
+		{
+			"type": "ClassDeclaration",
+			"start": 114,
+			"end": 139,
+			"range": [
+				114,
+				139
+			],
+			"id": {
+				"type": "Identifier",
+				"start": 120,
+				"end": 136,
+				"range": [
+					120,
+					136
+				],
+				"name": "ClassDeclaration"
+			},
+			"superClass": null,
+			"body": {
+				"type": "ClassBody",
+				"start": 137,
+				"end": 139,
+				"range": [
+					137,
+					139
+				],
+				"body": []
+			},
+			"leadingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Class declaration example.\n ",
+					"start": 76,
+					"end": 113,
+					"range": [
+						76,
+						113
+					]
+				}
+			]
+		},
+		{
+			"type": "ExportNamedDeclaration",
+			"start": 141,
+			"end": 190,
+			"range": [
+				141,
+				190
+			],
+			"declaration": null,
+			"specifiers": [
+				{
+					"type": "ExportSpecifier",
+					"start": 150,
+					"end": 169,
+					"range": [
+						150,
+						169
+					],
+					"local": {
+						"type": "Identifier",
+						"start": 150,
+						"end": 169,
+						"range": [
+							150,
+							169
+						],
+						"name": "functionDeclaration"
+					},
+					"exported": {
+						"type": "Identifier",
+						"start": 150,
+						"end": 169,
+						"range": [
+							150,
+							169
+						],
+						"name": "functionDeclaration"
+					}
+				},
+				{
+					"type": "ExportSpecifier",
+					"start": 171,
+					"end": 187,
+					"range": [
+						171,
+						187
+					],
+					"local": {
+						"type": "Identifier",
+						"start": 171,
+						"end": 187,
+						"range": [
+							171,
+							187
+						],
+						"name": "ClassDeclaration"
+					},
+					"exported": {
+						"type": "Identifier",
+						"start": 171,
+						"end": 187,
+						"range": [
+							171,
+							187
+						],
+						"name": "ClassDeclaration"
+					}
+				}
+			],
+			"source": null,
+			"trailingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Variable declaration example.\n ",
+					"start": 192,
+					"end": 232,
+					"range": [
+						192,
+						232
+					]
+				}
+			]
+		},
+		{
+			"type": "ExportNamedDeclaration",
+			"start": 233,
+			"end": 273,
+			"range": [
+				233,
+				273
+			],
+			"declaration": {
+				"type": "VariableDeclaration",
+				"start": 240,
+				"end": 273,
+				"range": [
+					240,
+					273
+				],
+				"declarations": [
+					{
+						"type": "VariableDeclarator",
+						"start": 246,
+						"end": 272,
+						"range": [
+							246,
+							272
+						],
+						"id": {
+							"type": "Identifier",
+							"start": 246,
+							"end": 265,
+							"range": [
+								246,
+								265
+							],
+							"name": "variableDeclaration"
+						},
+						"init": {
+							"type": "Literal",
+							"start": 268,
+							"end": 272,
+							"range": [
+								268,
+								272
+							],
+							"value": true,
+							"raw": "true"
+						}
+					}
+				],
+				"kind": "const"
+			},
+			"specifiers": [],
+			"source": null,
+			"leadingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Variable declaration example.\n ",
+					"start": 192,
+					"end": 232,
+					"range": [
+						192,
+						232
+					]
+				}
+			]
+		}
+	],
+	"sourceType": "module",
+	"comments": [
+		{
+			"type": "Block",
+			"value": "*\n * Function declaration example.\n ",
+			"start": 0,
+			"end": 40,
+			"range": [
+				0,
+				40
+			]
+		},
+		{
+			"type": "Block",
+			"value": "*\n * Class declaration example.\n ",
+			"start": 76,
+			"end": 113,
+			"range": [
+				76,
+				113
+			]
+		},
+		{
+			"type": "Block",
+			"value": "*\n * Variable declaration example.\n ",
+			"start": 192,
+			"end": 232,
+			"range": [
+				192,
+				232
+			]
+		}
+	]
+}

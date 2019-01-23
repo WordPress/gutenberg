@@ -34,9 +34,11 @@ const hasVariableWithName = ( node, name ) =>
 	} );
 
 const hasNamedExportWithName = ( node, name ) =>
-	node.type === 'ExportNamedDeclaration' &&
-	node.declaration &&
-	node.declaration.id.name === name;
+	node.type === 'ExportNamedDeclaration' && (
+		( node.declaration && hasClassWithName( node.declaration, name ) ) ||
+		( node.declaration && hasFunctionWithName( node.declaration, name ) ) ||
+		( node.declaration && hasVariableWithName( node.declaration, name ) )
+	);
 
 const hasImportWithName = ( node, name ) =>
 	node.type === 'ImportDeclaration' &&

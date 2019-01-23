@@ -219,6 +219,21 @@ test( 'IR - named (JSDoc in same file)', function( t ) {
 		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
 		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
 	] );
+	const foo = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifiers-and-inline.json' ),
+		'utf-8'
+	);
+	const bar = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifiers-and-inline-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( foo )[ 0 ], JSON.parse( bar ) ), [
+		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
+		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
+	] );
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( foo )[ 1 ], JSON.parse( bar ) ), [
+		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
+	] );
 	t.end();
 } );
 
