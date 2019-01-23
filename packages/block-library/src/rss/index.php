@@ -21,13 +21,13 @@ function render_block_core_rss( $attributes ) {
 	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
-		return '<div class="components-placeholder"><div class="notice notice notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
 		$rss->__destruct();
 		unset( $rss );
-		return '<div class="components-placeholder"><div class="notice notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
 	}
 
 	$items = (int) $attributes['itemsToShow'];
