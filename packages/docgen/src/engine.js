@@ -26,12 +26,7 @@ const getExportTokens = ( ast ) => ast.body.filter(
 	].some( ( declaration ) => declaration === node.type )
 );
 
-const getIRFromDependency = ( getCodeFromPath ) => ( path ) => {
-	const { ir } = engine( getCodeFromPath( path ) );
-	return ir;
-};
-
-const engine = ( code, getCodeFromPath = () => {} ) => {
+const engine = ( code, getIRFromPath = () => {} ) => {
 	const result = {};
 	result.ast = getAST( code );
 	result.tokens = getExportTokens( result.ast );
@@ -39,7 +34,7 @@ const engine = ( code, getCodeFromPath = () => {} ) => {
 		( token ) => getIntermediateRepresentation(
 			token,
 			result.ast,
-			getIRFromDependency( getCodeFromPath )
+			getIRFromPath
 		)
 	) );
 
@@ -50,8 +45,9 @@ const engine = ( code, getCodeFromPath = () => {} ) => {
  * Function that takes code and returns an intermediate representation.
  *
  * @param {string} code The code to parse.
- * @param {Function} [getCodeFromPath=noop] Callback to retrieve code
- * from a relative path.
+ * @param {Function} [getIRFromPath=noop] Callback to retrieve the
+ * Intermediate Representation from a path relative to the file
+ * being parsed.
  *
  * @return {Object} Intermediate Representation in JSON.
  */

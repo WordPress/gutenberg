@@ -5,39 +5,93 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 /**
+ * External dependencies.
+ */
+const { last } = require( 'lodash' );
+
+/**
  * Internal dependencies.
  */
 const engine = require( './engine' );
 const formatter = require( './formatter' );
 
-const packageName = process.argv[ 2 ];
-if ( packageName === undefined ) {
-	process.stdout.write( '\nUsage: <path-to-docgen> <gutenberg-package-name>\n\n\n' );
+/**
+ * Helpers functions.
+ */
+
+const relativeToAbsolute = ( basePath, relativePath ) => {
+	const target = path.join( path.dirname( basePath ), relativePath );
+	let targetFile = target + '.js';
+	if ( fs.existsSync( targetFile ) ) {
+		return targetFile;
+	}
+	targetFile = path.join( target, 'index.js' );
+	if ( fs.existsSync( targetFile ) ) {
+		return targetFile;
+	}
+	process.stdout.write( '\nRelative path does not exists.' );
+	process.stdout.write( '\n' );
+	process.stdout.write( `\nBase: ${ basePath }` );
+	process.stdout.write( `\nRelative: ${ relativePath }` );
+	process.stdout.write( '\n\n' );
 	process.exit( 1 );
-}
+};
 
-const root = path.join( __dirname, '../../../' );
-// TODO:
-// - take input file from package.json?
-// - make CLI take input file instead of package?
-const srcDir = path.join( root, `packages/${ packageName }/src/` );
-const input = path.join( srcDir, `index.js` );
-const doc = path.join( root, `packages/${ packageName }/api.md` );
-const ir = path.join( root, `packages/${ packageName }/ir.json` );
-const tokens = path.join( root, `packages/${ packageName }/tokens.json` );
-const ast = path.join( root, `packages/${ packageName }/ast.json` );
+const getIRFromRelativePath = ( basePath ) => ( relativePath ) => {
+	if ( ! relativePath.startsWith( './' ) ) {
+		return [];
+	}
+	const absolutePath = relativeToAbsolute( basePath, relativePath );
+	const result = processFile( absolutePath );
+	return result.ir || undefined;
+};
 
-const getCodeFromPath = ( file ) => fs.readFileSync( path.join( srcDir, file + '.js' ), 'utf8' );
-
-fs.readFile( input, 'utf8', ( err, code ) => {
-	if ( err ) {
-		process.stdout.write( `\n${ input } does not exists.\n\n\n` );
+const processFile = ( inputFile ) => {
+	try {
+		const data = fs.readFileSync( inputFile, 'utf8' );
+		currentFileStack.push( inputFile );
+		const result = engine( data, getIRFromRelativePath( last( currentFileStack ) ) );
+		currentFileStack.pop( inputFile );
+		return result;
+	} catch ( e ) {
+		process.stdout.write( `\n${ e }` );
+		process.stdout.write( '\n\n' );
 		process.exit( 1 );
 	}
+};
 
-	const result = engine( code, getCodeFromPath );
-	fs.writeFileSync( doc, formatter( result.ir ) );
-	fs.writeFileSync( ir, JSON.stringify( result.ir ) );
-	fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
-	fs.writeFileSync( ast, JSON.stringify( result.ast ) );
-} );
+/**
+ * Start up processing.
+ */
+
+// Prepare input
+let initialInputFile = process.argv[ 2 ];
+if ( initialInputFile === undefined ) {
+	process.stdout.write( '\nUsage: <path-to-docgen> <relative-path-to-file>' );
+	process.stdout.write( '\n\n' );
+	process.exit( 1 );
+}
+initialInputFile = path.join( process.cwd(), initialInputFile );
+
+// Process
+const currentFileStack = []; // To keep track of file being processed.
+const result = processFile( initialInputFile );
+
+// Ouput
+const inputDirectory = path.dirname( initialInputFile );
+const doc = path.join( inputDirectory, 'api.md' );
+const ir = path.join( inputDirectory, 'ir.json' );
+const tokens = path.join( inputDirectory, 'tokens.json' );
+const ast = path.join( inputDirectory, 'ast.json' );
+
+if ( result === undefined ) {
+	process.stdout.write( '\nFile was processed, but contained no ES6 module exports:' );
+	process.stdout.write( `\n${ initialInputFile }` );
+	process.stdout.write( '\n\n' );
+	process.exit( 0 );
+}
+
+fs.writeFileSync( doc, formatter( result.ir ) );
+fs.writeFileSync( ir, JSON.stringify( result.ir ) );
+fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
+fs.writeFileSync( ast, JSON.stringify( result.ast ) );

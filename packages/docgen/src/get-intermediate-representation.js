@@ -82,9 +82,9 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
  * if an `ast` and `parseDependency` callback are provided.
  *
  * @param {Object} token Espree export token.
- * @param {Object} [ast] Espree ast of a single file.
+ * @param {Object} [ast] Espree ast of the file being parsed.
  * @param {Function} [parseDependency] Function that takes a path
- * and returns the AST of the dependency file.
+ * and returns the intermediate representation of the dependency file.
  *
  * @return {Object} Intermediate Representation in JSON.
  */

@@ -18,14 +18,12 @@ ES6 modules:
 - [ ] block-serialization-spec-parser - not `src/index.js`
 - [ ] blocks - directory dependency
 - [ ] components - directory dependency
-- [ ] compose - directory dependency
 - [ ] data - directory dependency
 - [ ] e2e-test-utils - what shall be documented?
 - [ ] e2e-tests - what shall be documented?
 - [ ] edit-post - directory dependency
 - [ ] editor - directory dependency
 - [ ] npm-package-json-lint-config - CONFIG file
-- [ ] nux - directory dependency
 - [ ] plugins - directory dependency
 - [ ] scripts - what shall be documented? not `src/index`
 - [-] keycodes - how to document CONSTANTS?
@@ -38,6 +36,7 @@ ES6 modules:
 - [x] blob
 - [x] block-library
 - [x] block-serialization-default-parser
+- [x] compose - directory dependency
 - [x] core-data - export nothing
 - [x] date
 - [x] deprecated
@@ -53,6 +52,7 @@ ES6 modules:
 - [x] jest-puppeteer-axe - export nothing
 - [x] list-reusable-blocks - export nothing
 - [x] notices - does not export anything
+- [x] nux - directory dependency
 - [x] priority-queue
 - [x] rich-text
 - [x] shortcode
