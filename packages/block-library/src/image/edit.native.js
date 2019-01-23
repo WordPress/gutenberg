@@ -7,6 +7,7 @@ import {
 	subscribeMediaUpload,
 	onMediaLibraryPressed,
 	onUploadMediaPressed,
+	onCapturePhotoPressed,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -104,10 +105,20 @@ export default class ImageEdit extends React.Component {
 				} );
 			};
 
+			const onCapturePhotoButtonPressed = () => {
+				onCapturePhotoPressed( ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						this.addMediaUploadListener( );
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			};
+
 			return (
 				<MediaPlaceholder
 					onUploadMediaPressed={ onUploadMediaButtonPressed }
 					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
+					onCapturePhotoPressed={ onCapturePhotoButtonPressed }
 				/>
 			);
 		}
