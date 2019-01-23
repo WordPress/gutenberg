@@ -3,6 +3,7 @@
  */
 
 import { getFormatType } from './get-format-type';
+import { getActiveFormat } from './get-active-format';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
@@ -19,7 +20,7 @@ function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	const elementAttributes = { ...unregisteredAttributes };
 
 	for ( const name in attributes ) {
-		const key = formatType.attributes[ name ];
+		const key = formatType.attributes ? formatType.attributes[ name ] : false;
 
 		if ( key ) {
 			elementAttributes[ key ] = attributes[ name ];
@@ -146,14 +147,25 @@ export function toTree( {
 					return;
 				}
 
+				const { type, attributes = {}, object } = format;
+				const activeFormat = getActiveFormat( value, type );
+
+				if ( format === activeFormat ) {
+					attributes[ 'data-mce-selected' ] = 'inline-boundary';
+				}
+
 				const parent = getParent( pointer );
-				const newNode = append( parent, fromFormat( format ) );
+				const newNode = append( parent, fromFormat( {
+					type,
+					attributes,
+					object,
+				} ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );
 				}
 
-				pointer = append( format.object ? parent : newNode, '' );
+				pointer = append( object ? parent : newNode, '' );
 			} );
 		}
 
