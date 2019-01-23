@@ -3,10 +3,6 @@
 
 	@include break-small() {
 		padding-top: ($grid-size * 5) + $admin-bar-height-big;
-
-		body.is-fullscreen-mode & {
-			padding-top: $grid-size * 5;
-		}
 	}
 
 	@include break-medium() {
