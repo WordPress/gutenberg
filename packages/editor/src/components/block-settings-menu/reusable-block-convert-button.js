@@ -15,7 +15,7 @@ import { compose } from '@wordpress/compose';
 
 export function ReusableBlockConvertButton( {
 	isVisible,
-	isStaticBlock,
+	isReusable,
 	onConvertToStatic,
 	onConvertToReusable,
 } ) {
@@ -25,7 +25,7 @@ export function ReusableBlockConvertButton( {
 
 	return (
 		<Fragment>
-			{ isStaticBlock && (
+			{ ! isReusable && (
 				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -34,7 +34,7 @@ export function ReusableBlockConvertButton( {
 					{ __( 'Add to Reusable Blocks' ) }
 				</MenuItem>
 			) }
-			{ ! isStaticBlock && (
+			{ isReusable && (
 				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -54,32 +54,40 @@ export default compose( [
 			canInsertBlockType,
 			__experimentalGetReusableBlock: getReusableBlock,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
 
 		const blocks = getBlocksByClientId( clientIds );
 
-		const isVisible = (
-			// Hide 'Add to Reusable Blocks' when Reusable Blocks are disabled, i.e. when
-			// core/block is not in the allowed_block_types filter.
+		const isReusable = (
+			blocks.length === 1 &&
+			blocks[ 0 ] &&
+			isReusableBlock( blocks[ 0 ] ) &&
+			!! getReusableBlock( blocks[ 0 ].attributes.ref )
+		);
+
+		// Show 'Convert to Regular Block' when selected block is a reusable block
+		const isVisible = isReusable || (
+			// Hide 'Add to Reusable Blocks' when reusable blocks are disabled
 			canInsertBlockType( 'core/block' ) &&
 
 			every( blocks, ( block ) => (
-				// Guard against the case where a regular block has *just* been converted to a
-				// reusable block and doesn't yet exist in the editor store.
+				// Guard against the case where a regular block has *just* been converted
 				!! block &&
-				// Only show the option to covert to reusable blocks on valid blocks.
+
+				// Hide 'Add to Reusable Blocks' on invalid blocks
 				block.isValid &&
-				// Make sure the block supports being converted into a reusable block (by default that is the case).
+
+				// Hide 'Add to Reusable Blocks' when block doesn't support being made reusable
 				hasBlockSupport( block.name, 'reusable', true )
-			) )
+			) ) &&
+
+			// Hide 'Add to Reusable Blocks' when current doesn't have permission to do that
+			!! canUser( 'create', 'blocks' )
 		);
 
 		return {
+			isReusable,
 			isVisible,
-			isStaticBlock: isVisible && (
-				blocks.length !== 1 ||
-				! isReusableBlock( blocks[ 0 ] ) ||
-				! getReusableBlock( blocks[ 0 ].attributes.ref )
-			),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {

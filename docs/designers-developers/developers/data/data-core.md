@@ -136,17 +136,50 @@ get back from the oEmbed preview API.
 
 Is the preview for the URL an oEmbed link fallback.
 
-### hasUploadPermissions
+### hasUploadPermissions (deprecated)
 
-Return Upload Permissions.
+Returns whether the current user can upload media.
+
+Calling this may trigger an OPTIONS request to the REST API via the
+`canUser()` resolver.
+
+https://developer.wordpress.org/rest-api/reference/
+
+*Deprecated*
+
+Deprecated since 5.0. Callers should use the more generic `canUser()` selector instead of
+            `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
 
 *Parameters*
 
- * state: State tree.
+ * state: Data state.
 
 *Returns*
 
-Upload Permissions.
+Whether or not the user can upload media. Defaults to `true` if the OPTIONS
+                  request is being made.
+
+### canUser
+
+Returns whether the current user can perform the given action on the given
+REST resource.
+
+Calling this may trigger an OPTIONS request to the REST API via the
+`canUser()` resolver.
+
+https://developer.wordpress.org/rest-api/reference/
+
+*Parameters*
+
+ * state: Data state.
+ * action: Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * resource: REST resource to check, e.g. 'media' or 'posts'.
+ * id: Optional ID of the rest resource to check.
+
+*Returns*
+
+Whether or not the user can perform the action,
+                            or `undefined` if the OPTIONS request is still being made.
 
 ## Actions
 
@@ -214,3 +247,13 @@ Returns an action object used in signalling that Upload permissions have been re
 *Parameters*
 
  * hasUploadPermissions: Does the user have permission to upload files?
+
+### receiveUserPermission
+
+Returns an action object used in signalling that the current user has
+permission to perform an action on a REST resource.
+
+*Parameters*
+
+ * key: A key that represents the action and REST resource.
+ * isAllowed: Whether or not the user can perform the action.
