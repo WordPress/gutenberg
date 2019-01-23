@@ -1,5 +1,5 @@
-public typealias MediaPickerDidPickMediaCallback = (String?) -> Void
-public typealias MediaPickerDidPickMediaToUploadCallback = (String?, String?) -> Void
+public typealias MediaPickerDidPickMediaCallback = (_ id: Int?, _ url: String?) -> Void
+public typealias MediaPickerDidPickMediaToUploadCallback = (_ id: String?, _ url: String?) -> Void
 
 public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.

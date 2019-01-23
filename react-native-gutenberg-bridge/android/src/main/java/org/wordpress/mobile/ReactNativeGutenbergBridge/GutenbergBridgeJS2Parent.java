@@ -10,7 +10,7 @@ public interface GutenbergBridgeJS2Parent {
     interface MediaUploadCallback {
         void onUploadMediaFileSelected(int mediaId, String mediaUri);
         void onMediaFileUploadProgress(int mediaId, float progress);
-        void onMediaFileUploadSucceeded(int mediaId, String mediaUrl);
+        void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int serverId);
         void onMediaFileUploadFailed(int mediaId);
     }
 
