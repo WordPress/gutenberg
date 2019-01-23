@@ -18,21 +18,16 @@ function render_block_core_rss( $attributes ) {
 		return;
 	}
 
-	// self-url destruction sequence.
-	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
-		return render_rss_error_message( __( 'Use \'Latest Posts\' block for this domain.', 'gutenberg' ) );
-	}
-
-	$rss = fetch_feed( $url );
+	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-alt notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
 		$rss->__destruct();
 		unset( $rss );
-		return '<div class="components-placeholder"><div class="notice notice-alt notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
 	}
 
 	$items = (int) $attributes['itemsToShow'];
