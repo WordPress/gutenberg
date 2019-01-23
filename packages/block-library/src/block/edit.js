@@ -162,7 +162,7 @@ export default compose( [
 			isFetching: isFetchingReusableBlock( ref ),
 			isSaving: isSavingReusableBlock( ref ),
 			block: reusableBlock ? getBlock( reusableBlock.clientId ) : null,
-			canUpdateBlock: !! reusableBlock && ! reusableBlock.isTemporary && canUser( 'update', 'blocks', ref ),
+			canUpdateBlock: !! reusableBlock && ! reusableBlock.isTemporary && !! canUser( 'update', 'blocks', ref ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter, compact } from 'lodash';
+import { map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -191,7 +191,7 @@ export function hasUploadPermissions( state ) {
 	deprecated( "select( 'core' ).hasUploadPermissions()", {
 		alternative: "select( 'core' ).canUser( 'create', 'media' )",
 	} );
-	return canUser( state, 'create', 'media', undefined, true );
+	return defaultTo( canUser( state, 'create', 'media' ), true );
 }
 
 /**
@@ -207,14 +207,11 @@ export function hasUploadPermissions( state ) {
  * @param {string}   action           Action to check. One of: 'create', 'read', 'update', 'delete'.
  * @param {string}   resource         REST resource to check, e.g. 'media' or 'posts'.
  * @param {string=}  id               Optional ID of the rest resource to check.
- * @param {boolean=} defaultIsAllowed What to return when we don't know if the current user can
- *                                    perform the given action on the given resource. Defaults to
- *                                    `false`.
  *
- * @return {boolean} Whether or not the user can perform the action, or `defaultIsAllowed` if the
- *                   OPTIONS request is still being made.
+ * @return {boolean|undefined} Whether or not the user can perform the action,
+ *                             or `undefined` if the OPTIONS request is still being made.
  */
-export function canUser( state, action, resource, id = undefined, defaultIsAllowed = false ) {
+export function canUser( state, action, resource, id ) {
 	const key = compact( [ action, resource, id ] ).join( '/' );
-	return get( state, [ 'userPermissions', key ], defaultIsAllowed );
+	return get( state, [ 'userPermissions', key ] );
 }

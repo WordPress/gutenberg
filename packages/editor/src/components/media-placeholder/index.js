@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, get, noop, startsWith } from 'lodash';
+import { every, get, noop, startsWith, defaultTo } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -261,7 +261,7 @@ const applyWithSelect = withSelect( ( select ) => {
 	const { canUser } = select( 'core' );
 
 	return {
-		hasUploadPermissions: canUser( 'create', 'media', undefined, true ),
+		hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 	};
 } );
 

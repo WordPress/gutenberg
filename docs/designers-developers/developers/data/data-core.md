@@ -136,7 +136,7 @@ get back from the oEmbed preview API.
 
 Is the preview for the URL an oEmbed link fallback.
 
-### hasUploadPermissions
+### hasUploadPermissions (deprecated)
 
 Returns whether the current user can upload media.
 
@@ -144,6 +144,11 @@ Calling this may trigger an OPTIONS request to the REST API via the
 `canUser()` resolver.
 
 https://developer.wordpress.org/rest-api/reference/
+
+*Deprecated*
+
+Deprecated since 4.9. Callers should use the more generic `canUser()` selector instead of
+            `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
 
 *Parameters*
 
@@ -170,14 +175,11 @@ https://developer.wordpress.org/rest-api/reference/
  * action: Action to check. One of: 'create', 'read', 'update', 'delete'.
  * resource: REST resource to check, e.g. 'media' or 'posts'.
  * id: Optional ID of the rest resource to check.
- * defaultIsAllowed: What to return when we don't know if the current user can
-                                   perform the given action on the given resource. Defaults to
-                                   `false`.
 
 *Returns*
 
-Whether or not the user can perform the action, or `defaultIsAllowed` if the
-                  OPTIONS request is still being made.
+Whether or not the user can perform the action,
+                            or `undefined` if the OPTIONS request is still being made.
 
 ## Actions
 

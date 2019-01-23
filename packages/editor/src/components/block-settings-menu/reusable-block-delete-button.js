@@ -44,7 +44,7 @@ export default compose( [
 			null;
 
 		return {
-			isVisible: !! reusableBlock && canUser( 'delete', 'blocks', reusableBlock.id ),
+			isVisible: !! reusableBlock && !! canUser( 'delete', 'blocks', reusableBlock.id ),
 			isDisabled: reusableBlock && reusableBlock.isTemporary,
 		};
 	} ),

@@ -82,7 +82,7 @@ export default compose( [
 			) ) &&
 
 			// Hide 'Add to Reusable Blocks' when current doesn't have permission to do that
-			canUser( 'create', 'blocks' )
+			!! canUser( 'create', 'blocks' )
 		);
 
 		return {
