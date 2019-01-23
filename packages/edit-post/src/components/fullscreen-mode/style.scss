@@ -1,8 +1,7 @@
 body.js.is-fullscreen-mode {
 
 	@include break-medium {
-
-		// Reset the html.wp-topbar padding
+		// Reset the html.wp-topbar padding.
 		// Because this uses negative margins, we have to compensate for the height.
 		margin-top: -$admin-bar-height-big;
 		height: calc(100% + #{ $admin-bar-height-big });
@@ -21,7 +20,7 @@ body.js.is-fullscreen-mode {
 			margin-left: 0;
 		}
 
-		// Animations
+		// Animations.
 		@include edit-post__fade-in-animation(0.3s);
 
 		.edit-post-header {
