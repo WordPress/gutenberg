@@ -147,7 +147,7 @@ https://developer.wordpress.org/rest-api/reference/
 
 *Deprecated*
 
-Deprecated since 4.9. Callers should use the more generic `canUser()` selector instead of
+Deprecated since 5.0. Callers should use the more generic `canUser()` selector instead of
             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
 
 *Parameters*
