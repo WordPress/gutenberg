@@ -52,8 +52,8 @@ function the_gutenberg_project() {
 	<div class="block-editor gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="block-editor__container gutenberg__editor"></div>
-		<div id="metaboxes" style="display: none;">
-			<?php the_gutenberg_metaboxes(); ?>
+		<div id="metaboxes" class="hidden">
+			<?php the_block_editor_meta_boxes(); ?>
 		</div>
 	</div>
 	<?php
@@ -246,7 +246,7 @@ function gutenberg_init( $return, $post ) {
 	 * includes/meta-boxes is typically loaded from edit-form-advanced.php.
 	 */
 	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
-	gutenberg_collect_meta_box_data();
+	register_and_do_post_meta_boxes( $post );
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
