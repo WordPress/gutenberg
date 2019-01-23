@@ -75,31 +75,31 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void onUploadMediaPressed(final Callback onUploadMediaSelected) {
         mGutenbergBridgeJS2Parent.onUploadMediaPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
-            public void onUploadMediaFileSelected(String mediaId, String mediaUri) {
+            public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
                 onUploadMediaSelected.invoke(mediaId, mediaUri);
             }
 
             @Override
-            public void onMediaFileUploadProgress(String mediaId, float progress) {
+            public void onMediaFileUploadProgress(int mediaId, float progress) {
                 setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
             }
 
             @Override
-            public void onMediaFileUploadSucceeded(String mediaId, String mediaUrl) {
+            public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl) {
                 setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1);
             }
 
             @Override
-            public void onMediaFileUploadFailed(String mediaId) {
+            public void onMediaFileUploadFailed(int mediaId) {
                 setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
             }
         });
     }
 
-    private void setMediaFileUploadDataInJS(int state, String mediaId, String mediaUrl, float progress) {
+    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);
-        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
         emitToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
