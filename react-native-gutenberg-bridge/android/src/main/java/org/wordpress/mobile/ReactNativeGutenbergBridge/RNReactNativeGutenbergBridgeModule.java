@@ -31,6 +31,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
     private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
 
+    private static final int MEDIA_SERVER_ID_UNKNOWN = 0;
+
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
             GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
@@ -82,7 +84,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
             @Override
             public void onMediaFileUploadProgress(int mediaId, float progress) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress, 0);
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
             }
 
             @Override
@@ -92,7 +94,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
             @Override
             public void onMediaFileUploadFailed(int mediaId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0, 0);
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0 );
             }
         });
     }
@@ -107,7 +109,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
             @Override
             public void onMediaFileUploadProgress(int mediaId, float progress) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress, 0);
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
             }
 
             @Override
@@ -117,11 +119,14 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
             @Override
             public void onMediaFileUploadFailed(int mediaId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0, 0);
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
             }
         });
     }
 
+    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {
+        setMediaFileUploadDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN);
+    }
 
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId) {
         WritableMap writableMap = new WritableNativeMap();
@@ -129,7 +134,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
-        if ( mediaServerId > 0 ) {
+        if (mediaServerId != MEDIA_SERVER_ID_UNKNOWN) {
             writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID, mediaServerId);
         }
         emitToJS(EVENT_NAME_MEDIA_UPLOAD, writableMap);
