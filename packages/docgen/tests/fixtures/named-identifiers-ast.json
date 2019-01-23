@@ -1,1 +1,309 @@
-{"type":"Program","start":0,"end":288,"range":[41,287],"body":[{"type":"FunctionDeclaration","start":41,"end":74,"range":[41,74],"id":{"type":"Identifier","start":50,"end":69,"range":[50,69],"name":"functionDeclaration"},"generator":false,"expression":false,"async":false,"params":[],"body":{"type":"BlockStatement","start":72,"end":74,"range":[72,74],"body":[]},"leadingComments":[{"type":"Block","value":"*\n * Function declaration example.\n ","start":0,"end":40,"range":[0,40]}],"trailingComments":[{"type":"Block","value":"*\n * Class declaration example.\n ","start":76,"end":113,"range":[76,113]}]},{"type":"ClassDeclaration","start":114,"end":139,"range":[114,139],"id":{"type":"Identifier","start":120,"end":136,"range":[120,136],"name":"ClassDeclaration"},"superClass":null,"body":{"type":"ClassBody","start":137,"end":139,"range":[137,139],"body":[]},"leadingComments":[{"type":"Block","value":"*\n * Class declaration example.\n ","start":76,"end":113,"range":[76,113]}],"trailingComments":[{"type":"Block","value":"*\n * Variable declaration example.\n ","start":141,"end":181,"range":[141,181]}]},{"type":"VariableDeclaration","start":182,"end":215,"range":[182,215],"declarations":[{"type":"VariableDeclarator","start":188,"end":214,"range":[188,214],"id":{"type":"Identifier","start":188,"end":207,"range":[188,207],"name":"variableDeclaration"},"init":{"type":"Literal","start":210,"end":214,"range":[210,214],"value":true,"raw":"true"}}],"kind":"const","leadingComments":[{"type":"Block","value":"*\n * Variable declaration example.\n ","start":141,"end":181,"range":[141,181]}]},{"type":"ExportNamedDeclaration","start":217,"end":287,"range":[217,287],"declaration":null,"specifiers":[{"type":"ExportSpecifier","start":226,"end":245,"range":[226,245],"local":{"type":"Identifier","start":226,"end":245,"range":[226,245],"name":"functionDeclaration"},"exported":{"type":"Identifier","start":226,"end":245,"range":[226,245],"name":"functionDeclaration"}},{"type":"ExportSpecifier","start":247,"end":266,"range":[247,266],"local":{"type":"Identifier","start":247,"end":266,"range":[247,266],"name":"variableDeclaration"},"exported":{"type":"Identifier","start":247,"end":266,"range":[247,266],"name":"variableDeclaration"}},{"type":"ExportSpecifier","start":268,"end":284,"range":[268,284],"local":{"type":"Identifier","start":268,"end":284,"range":[268,284],"name":"ClassDeclaration"},"exported":{"type":"Identifier","start":268,"end":284,"range":[268,284],"name":"ClassDeclaration"}}],"source":null}],"sourceType":"module","comments":[{"type":"Block","value":"*\n * Function declaration example.\n ","start":0,"end":40,"range":[0,40]},{"type":"Block","value":"*\n * Class declaration example.\n ","start":76,"end":113,"range":[76,113]},{"type":"Block","value":"*\n * Variable declaration example.\n ","start":141,"end":181,"range":[141,181]}]}
+{
+	"type": "Program",
+	"start": 0,
+	"end": 288,
+	"range": [
+		41,
+		287
+	],
+	"body": [
+		{
+			"type": "FunctionDeclaration",
+			"start": 41,
+			"end": 74,
+			"range": [
+				41,
+				74
+			],
+			"id": {
+				"type": "Identifier",
+				"start": 50,
+				"end": 69,
+				"range": [
+					50,
+					69
+				],
+				"name": "functionDeclaration"
+			},
+			"generator": false,
+			"expression": false,
+			"async": false,
+			"params": [],
+			"body": {
+				"type": "BlockStatement",
+				"start": 72,
+				"end": 74,
+				"range": [
+					72,
+					74
+				],
+				"body": []
+			},
+			"leadingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Function declaration example.\n ",
+					"start": 0,
+					"end": 40,
+					"range": [
+						0,
+						40
+					]
+				}
+			],
+			"trailingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Class declaration example.\n ",
+					"start": 76,
+					"end": 113,
+					"range": [
+						76,
+						113
+					]
+				}
+			]
+		},
+		{
+			"type": "ClassDeclaration",
+			"start": 114,
+			"end": 139,
+			"range": [
+				114,
+				139
+			],
+			"id": {
+				"type": "Identifier",
+				"start": 120,
+				"end": 136,
+				"range": [
+					120,
+					136
+				],
+				"name": "ClassDeclaration"
+			},
+			"superClass": null,
+			"body": {
+				"type": "ClassBody",
+				"start": 137,
+				"end": 139,
+				"range": [
+					137,
+					139
+				],
+				"body": []
+			},
+			"leadingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Class declaration example.\n ",
+					"start": 76,
+					"end": 113,
+					"range": [
+						76,
+						113
+					]
+				}
+			],
+			"trailingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Variable declaration example.\n ",
+					"start": 141,
+					"end": 181,
+					"range": [
+						141,
+						181
+					]
+				}
+			]
+		},
+		{
+			"type": "VariableDeclaration",
+			"start": 182,
+			"end": 215,
+			"range": [
+				182,
+				215
+			],
+			"declarations": [
+				{
+					"type": "VariableDeclarator",
+					"start": 188,
+					"end": 214,
+					"range": [
+						188,
+						214
+					],
+					"id": {
+						"type": "Identifier",
+						"start": 188,
+						"end": 207,
+						"range": [
+							188,
+							207
+						],
+						"name": "variableDeclaration"
+					},
+					"init": {
+						"type": "Literal",
+						"start": 210,
+						"end": 214,
+						"range": [
+							210,
+							214
+						],
+						"value": true,
+						"raw": "true"
+					}
+				}
+			],
+			"kind": "const",
+			"leadingComments": [
+				{
+					"type": "Block",
+					"value": "*\n * Variable declaration example.\n ",
+					"start": 141,
+					"end": 181,
+					"range": [
+						141,
+						181
+					]
+				}
+			]
+		},
+		{
+			"type": "ExportNamedDeclaration",
+			"start": 217,
+			"end": 287,
+			"range": [
+				217,
+				287
+			],
+			"declaration": null,
+			"specifiers": [
+				{
+					"type": "ExportSpecifier",
+					"start": 226,
+					"end": 245,
+					"range": [
+						226,
+						245
+					],
+					"local": {
+						"type": "Identifier",
+						"start": 226,
+						"end": 245,
+						"range": [
+							226,
+							245
+						],
+						"name": "functionDeclaration"
+					},
+					"exported": {
+						"type": "Identifier",
+						"start": 226,
+						"end": 245,
+						"range": [
+							226,
+							245
+						],
+						"name": "functionDeclaration"
+					}
+				},
+				{
+					"type": "ExportSpecifier",
+					"start": 247,
+					"end": 266,
+					"range": [
+						247,
+						266
+					],
+					"local": {
+						"type": "Identifier",
+						"start": 247,
+						"end": 266,
+						"range": [
+							247,
+							266
+						],
+						"name": "variableDeclaration"
+					},
+					"exported": {
+						"type": "Identifier",
+						"start": 247,
+						"end": 266,
+						"range": [
+							247,
+							266
+						],
+						"name": "variableDeclaration"
+					}
+				},
+				{
+					"type": "ExportSpecifier",
+					"start": 268,
+					"end": 284,
+					"range": [
+						268,
+						284
+					],
+					"local": {
+						"type": "Identifier",
+						"start": 268,
+						"end": 284,
+						"range": [
+							268,
+							284
+						],
+						"name": "ClassDeclaration"
+					},
+					"exported": {
+						"type": "Identifier",
+						"start": 268,
+						"end": 284,
+						"range": [
+							268,
+							284
+						],
+						"name": "ClassDeclaration"
+					}
+				}
+			],
+			"source": null
+		}
+	],
+	"sourceType": "module",
+	"comments": [
+		{
+			"type": "Block",
+			"value": "*\n * Function declaration example.\n ",
+			"start": 0,
+			"end": 40,
+			"range": [
+				0,
+				40
+			]
+		},
+		{
+			"type": "Block",
+			"value": "*\n * Class declaration example.\n ",
+			"start": 76,
+			"end": 113,
+			"range": [
+				76,
+				113
+			]
+		},
+		{
+			"type": "Block",
+			"value": "*\n * Variable declaration example.\n ",
+			"start": 141,
+			"end": 181,
+			"range": [
+				141,
+				181
+			]
+		}
+	]
+}

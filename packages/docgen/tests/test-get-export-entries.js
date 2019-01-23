@@ -213,6 +213,16 @@ test( 'Export entries - named identifier', function( t ) {
 		exportName: 'myDeclaration',
 		module: null,
 	} ] );
+	const tokenObject = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifier-destructuring.json' ),
+		'utf-8'
+	);
+	const nameObject = getExportEntries( JSON.parse( tokenObject ) );
+	t.deepEqual( nameObject, [ {
+		localName: 'someDeclaration',
+		exportName: 'myDeclaration',
+		module: null,
+	} ] );
 	t.end();
 } );
 

@@ -193,6 +193,19 @@ test( 'IR - named (JSDoc in same file)', function( t ) {
 		description: 'My declaration example.',
 		tags: [] },
 	] );
+	const tokenObject = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifier-destructuring.json' ),
+		'utf-8'
+	);
+	const astObject = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-identifier-destructuring-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenObject ), JSON.parse( astObject ) ), [ {
+		name: 'myDeclaration',
+		description: 'My declaration example.',
+		tags: [] },
+	] );
 	const tokens = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifiers.json' ),
 		'utf-8'
