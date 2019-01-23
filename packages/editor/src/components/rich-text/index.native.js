@@ -147,7 +147,7 @@ export class RichText extends Component {
 
 	onFormatChange( record ) {
 		const newContent = this.valueToFormat( record );
-		if ( this.state.start !== this.state.end && newContent !== this.lastContent ) {
+		if ( this.state.start !== this.state.end || newContent !== this.lastContent ) {
 			this.props.onChange( newContent );
 		}
 		this.setState( {
