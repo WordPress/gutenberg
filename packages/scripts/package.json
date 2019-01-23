@@ -46,7 +46,9 @@
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0",
 		"stylelint": "^9.10.1",
-		"stylelint-config-wordpress": "^13.1.0"
+		"stylelint-config-wordpress": "^13.1.0",
+		"webpack": "4.8.3",
+		"webpack-cli": "^3.1.2"
 	},
 	"publishConfig": {
 		"access": "public"
