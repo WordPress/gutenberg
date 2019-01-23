@@ -246,28 +246,28 @@ public class WPAndroidGlueCode {
         mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().toggleEditorMode();
     }
 
-    public void appendUploadMediaFile(final String mediaId, final String mediaUri) {
+    public void appendUploadMediaFile(final int mediaId, final String mediaUri) {
        if (isMediaUploadCallbackRegistered()) {
            mPendingMediaUploadCallback.onUploadMediaFileSelected(mediaId, mediaUri);
        }
     }
 
-    public void mediaFileUploadProgress(final String mediaId, final float progress) {
+    public void mediaFileUploadProgress(final int mediaId, final float progress) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onMediaFileUploadProgress(mediaId, progress);
         }
     }
 
-    public void mediaFileUploadFailed(final String mediaId) {
+    public void mediaFileUploadFailed(final int mediaId) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onMediaFileUploadFailed(mediaId);
             mPendingMediaUploadCallback = null;
         }
     }
 
-    public void mediaFileUploadSucceeded(final String mediaId, final String mediaUrl) {
+    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl) {
         if (isMediaUploadCallbackRegistered()) {
-            mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl);
+            mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl, 0);
             mPendingMediaUploadCallback = null;
         }
     }

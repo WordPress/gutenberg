@@ -41,7 +41,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback) {
         print("Gutenberg did request media picker, passing a sample url in callback")
-        callback("https://cldup.com/cXyG__fTLN.jpg")
+        callback(1, "https://cldup.com/cXyG__fTLN.jpg")
     }
     
     func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaToUploadCallback) {
