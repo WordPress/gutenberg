@@ -11,7 +11,15 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `strip_dynamic_blocks_add_filter` has been removed.
 - The PHP function `strip_dynamic_blocks_remove_filter` has been removed.
 - The PHP function `gutenberg_post_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
-- The PHP function `gutenberg_content_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
+- The PHP function `gutenberg_content_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.- The PHP function `gutenberg_register_rest_routes` has been removed.
+- The PHP function `gutenberg_add_taxonomy_visibility_field` has been removed.
+- The PHP function `gutenberg_get_taxonomy_visibility_data` has been removed.
+- The PHP function `gutenberg_add_permalink_template_to_posts` has been removed.
+- The PHP function `gutenberg_add_block_format_to_post_content` has been removed.
+- The PHP function `gutenberg_add_target_schema_to_links` has been removed.
+- The PHP function `gutenberg_register_post_prepare_functions` has been removed.
+- The PHP function `gutenberg_silence_rest_errors` has been removed.
+- The PHP function `gutenberg_filter_post_type_labels` has been removed.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
