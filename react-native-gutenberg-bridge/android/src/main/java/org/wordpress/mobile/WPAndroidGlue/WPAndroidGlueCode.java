@@ -258,9 +258,9 @@ public class WPAndroidGlueCode {
         }
     }
 
-    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl) {
+    public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
         if (isMediaUploadCallbackRegistered()) {
-            mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl);
+            mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
             mPendingMediaUploadCallback = null;
         }
     }
