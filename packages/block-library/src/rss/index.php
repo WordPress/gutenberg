@@ -106,10 +106,9 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$columns_class = 'grid' === $attributes['blockLayout'] ? 'columns-' . $attributes['columns'] . ' ' : '';
-	$is_grid       = 'grid' === $attributes['blockLayout'] ? 'is-grid' : '';
+	$classes = 'grid' === $attributes['blockLayout'] ? 'is-grid columns-' . $attributes['columns'] : '';
 
-	$list_items_markup = "<ul class='wp-block-rss {$columns_class}{$is_grid}'>{$list_items}</ul>";
+	$list_items_markup = "<ul class='wp-block-rss {$classes}'>{$list_items}</ul>";
 
 	$rss->__destruct();
 	unset( $rss );
