@@ -76,31 +76,31 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void onUploadMediaPressed(final Callback onUploadMediaSelected) {
         mGutenbergBridgeJS2Parent.onUploadMediaPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
-            public void onUploadMediaFileSelected(String mediaId, String mediaUri) {
-                onUploadMediaSelected.invoke(mediaId, mediaUri, 0);
+            public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
+                onUploadMediaSelected.invoke(mediaId, mediaUri);
             }
 
             @Override
-            public void onMediaFileUploadProgress(String mediaId, float progress) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress, 0);
+            public void onMediaFileUploadProgress(int mediaId, float progress) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
             }
 
             @Override
-            public void onMediaFileUploadSucceeded(String mediaId, String mediaUrl, int mediaServerId) {
+            public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
                 setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
             }
 
             @Override
-            public void onMediaFileUploadFailed(String mediaId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0, 0);
+            public void onMediaFileUploadFailed(int mediaId) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
             }
         });
     }
 
-    private void setMediaFileUploadDataInJS(int state, String mediaId, String mediaUrl, float progress, int mediaServerId) {
+    private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);
-        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
         if ( mediaServerId > 0 ) {
