@@ -11,6 +11,7 @@ import {
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
+	observePageWarnings,
 	setBrowserViewport,
 	switchUserToAdmin,
 	switchUserToTest,
@@ -275,6 +276,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
+	observePageWarnings();
 
 	await trashExistingPosts();
 	await setupBrowser();
