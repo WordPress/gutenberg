@@ -11,7 +11,8 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `strip_dynamic_blocks_add_filter` has been removed.
 - The PHP function `strip_dynamic_blocks_remove_filter` has been removed.
 - The PHP function `gutenberg_post_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
-- The PHP function `gutenberg_content_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.- The PHP function `gutenberg_register_rest_routes` has been removed.
+- The PHP function `gutenberg_content_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
+- The PHP function `gutenberg_register_rest_routes` has been removed.
 - The PHP function `gutenberg_add_taxonomy_visibility_field` has been removed.
 - The PHP function `gutenberg_get_taxonomy_visibility_data` has been removed.
 - The PHP function `gutenberg_add_permalink_template_to_posts` has been removed.
