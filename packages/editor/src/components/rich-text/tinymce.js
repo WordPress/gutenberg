@@ -191,7 +191,6 @@ export default class TinyMCE extends Component {
 			// already with dangerouslySetInnerHTML, we don't need this to be
 			// verified.
 			verify_html: false,
-			inline_boundaries_selector: 'a[href],code,b,i,strong,em,del,ins,sup,sub',
 			plugins: [],
 			forced_root_block: multilineTag || false,
 			// Allow TinyMCE to keep one undo level for comparing changes.

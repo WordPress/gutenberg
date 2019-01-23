@@ -377,7 +377,8 @@ export class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
-		const { start, end, formats } = this.createRecord();
+		const value = this.createRecord();
+		const { start, end, formats } = value;
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
@@ -388,6 +389,7 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end } );
+			this.applyRecord( value );
 		}
 	}
 
