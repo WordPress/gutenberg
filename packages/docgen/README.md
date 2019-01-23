@@ -1,11 +1,3 @@
 # `docgen`
 
-> TODO: description
-
-## Usage
-
-```
-const docgen = require('docgen');
-
-// TODO: DEMONSTRATE API
-```
+Autogenerate public API documentation from exports and JSDoc comments.
