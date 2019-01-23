@@ -4,9 +4,11 @@ Thank you for thinking about contributing to WordPress' Gutenberg project! If yo
 
 As with all WordPress projects, we want to ensure a welcoming environment for everyone. With that in mind, all contributors are expected to follow our [Code of Conduct](/CODE_OF_CONDUCT.md).
 
-Before contributing, we encourage you to read our [Contributing Policy](/CONTRIBUTING.md) (you're here already!) and our [Handbook](https://wordpress.org/gutenberg/handbook/). If you have any questions on any of these, please open an issue so we can help clarify them.
+Before contributing, we encourage you to review the [Contributor Handbook](https://wordpress.org/gutenberg/handbook/contributors/). If you have any questions, please ask, either in Slack or open an issue in GitHub so we can help clarify.
 
 All WordPress projects are [licensed under the GPLv2+](/LICENSE.md), and all contributions to Gutenberg will be released under the GPLv2+ license. You maintain copyright over any contribution you make, and by submitting a pull request, you are agreeing to release that contribution under the GPLv2+ license.
+
+This document covers the technical details around setup, and submitting your contribution to the Gutenberg project.
 
 ## Getting Started
 
@@ -114,7 +116,7 @@ Gutenberg contains both PHP and JavaScript code and encourages testing and code 
 
 This repository uses [lerna] to manage Gutenberg modules and publish them as packages to [npm]. This enforces certain steps in the workflow which are described in details in [packages](/packages/README.md) documentation.
 
-Maintaining dozens of npm packages is difficult—it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. As a contributor you should add an entry to the aforementioned file each time you contribute adding production code as described in [Maintaining Changelogs](/packages/README.md#maintaining-changelogs) section. 
+Maintaining dozens of npm packages is difficult—it can be tough to keep track of changes. That's why we use `CHANGELOG.md` files for each package to simplify the release process. As a contributor you should add an entry to the aforementioned file each time you contribute adding production code as described in [Maintaining Changelogs](/packages/README.md#maintaining-changelogs) section.
 
 ## How Can Designers Contribute?
 
@@ -122,23 +124,9 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 ## Contribute to the Documentation
 
-Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
+Please see the [Documentation section](/docs/contributors/document.md) of the Contributor Handbook.
 
-To add a new documentation page, you'll have to create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder and add an item to the [toc.json](/docs/toc.json).
-
-### Using links
-
-It's very likely that at some point you will want to link to other documentation pages. It's worth emphasizing that all documents can be browsed in different contexts:
-- Gutenberg Handbook
-- GitHub website
-- npm website
-
-That's why it's recommended to use absolute links without the `https://github.com/WordPress/gutenberg` part for all files which match the following patterns:
-- `/docs/*.md`
-- `/packages/*/README.md`
-- `/packages/components/src/**/README.md`
-
-This way they will be properly handled in all three aforementioned contexts.
+Documentation is automatically synced from `master` to the [Gutenberg Handbook](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
 ### `@wordpress/component`
 
