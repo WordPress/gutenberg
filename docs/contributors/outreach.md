@@ -6,7 +6,7 @@ This includes articles, talks, demos and anything the community is doing to disc
 
 ## Articles
 
-A short list of useful articles around defining, extending, and contributing to Gutenberg project.
+A short list of useful articles around defining, extending, and contributing to Gutenberg.
 
 ### Overviews of Gutenberg
 
