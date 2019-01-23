@@ -12,28 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 // These files only need to be loaded if within a rest server instance
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
-	if ( ! class_exists( 'WP_REST_Blocks_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-blocks-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Autosaves_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-autosaves-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Themes_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-themes-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Block_Renderer_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-block-renderer-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Search_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-search-controller.php';
-	}
-	if ( ! class_exists( 'WP_REST_Search_Handler' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-search-handler.php';
-	}
-	if ( ! class_exists( 'WP_REST_Post_Search_Handler' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-post-search-handler.php';
-	}
-
 	require dirname( __FILE__ ) . '/rest-api.php';
 }
 
