@@ -5,7 +5,7 @@ Please see [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/
 The following resources offer additional information for developers who wish to contribute to Gutenberg:
 
 * [Coding Guidelines](/docs/contributors/coding-guidelines.md) outline additional patterns and conventions used in the Gutenberg project.
-* [Gutenberg Block Grammer](/docs/contributors/grammar.md)
+* [Gutenberg Block Grammar](/docs/contributors/grammar.md)
 * [Testing Overview](/docs/contributors/testing-overview.md) for PHP and JavaScript development in Gutenberg.
 * [Scripts](/docs/contributors/scripts.md) a list of vendor and internal scripts available to plugin developers.
 * [Gutenberg Release Process](/docs/contributors/release.md) a checklist for the different type of releases for Gutenberg project.
