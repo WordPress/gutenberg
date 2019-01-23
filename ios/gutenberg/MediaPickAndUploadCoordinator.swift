@@ -41,7 +41,7 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
     }
     do {
       try data.write(to: url)
-      mediaCallback(mediaID, url.absoluteString)
+      mediaCallback(mediaID.hashValue, url.absoluteString)
       let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
       progress.totalUnitCount = 100
       
@@ -63,10 +63,10 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
     progress.completedUnitCount += 1
     
     if progress.fractionCompleted < 1 {
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
+      gutenberg.mediaUploadUpdate(id: mediaID.hashValue, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
     } else if progress.fractionCompleted >= 1 {
       timer.invalidate()
-      gutenberg.mediaUploadUpdate(id: mediaID, state: .succeeded, progress: 1, url: mediaURL, serverID: 124)
+      gutenberg.mediaUploadUpdate(id: mediaID.hashValue, state: .succeeded, progress: 1, url: mediaURL, serverID: 124)
     }
   }
 }

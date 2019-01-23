@@ -60,7 +60,7 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEvent(withName: EventName.updateHtml, body: [ "html": html ])
     }
     
-    public func mediaUploadUpdate(id: String, state: MediaUploadState, progress: Float, url: URL?, serverID: Int?) {
+    public func mediaUploadUpdate(id: Int, state: MediaUploadState, progress: Float, url: URL?, serverID: Int?) {
         var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress];
         if let url = url {
             data["mediaUrl"] = url.absoluteString
