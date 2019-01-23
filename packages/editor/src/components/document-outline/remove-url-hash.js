@@ -3,7 +3,9 @@
  */
 import { defer } from 'lodash';
 
-// Remove the URL hash.
+/**
+ * Remove the hash from the browser URL.
+ */
 const removeURLHash = () => {
 	defer( () => {
 		const { pathname, search } = window.location;
