@@ -1,8 +1,10 @@
 .wp-block-rss {
 	&.alignleft {
+		/*rtl:ignore*/
 		margin-right: 2em;
 	}
 	&.alignright {
+		/*rtl:ignore*/
 		margin-left: 2em;
 	}
 	&.is-grid {
@@ -28,6 +30,6 @@
 
 .wp-block-rss__item-publish-date,
 .wp-block-rss__item-author {
-	color: #6c7781;
-	font-size: 13px;
+	color: $dark-gray-300;
+	font-size: $default-font-size;
 }
