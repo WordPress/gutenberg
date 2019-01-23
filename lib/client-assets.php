@@ -702,28 +702,14 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
  * array of registered block data keyed by block name. Data includes properties
  * of a block relevant for client registration.
  *
+ * @deprecated 5.0.0 get_block_editor_server_block_settings
+ *
  * @return array An associative array of registered block data.
  */
 function gutenberg_prepare_blocks_for_js() {
-	$block_registry = WP_Block_Type_Registry::get_instance();
-	$blocks         = array();
-	$keys_to_pick   = array( 'title', 'description', 'icon', 'category', 'keywords', 'supports', 'attributes' );
+	_deprecated_function( __FUNCTION__, '5.0.0', 'get_block_editor_server_block_settings' );
 
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
-		foreach ( $keys_to_pick as $key ) {
-			if ( ! isset( $block_type->{ $key } ) ) {
-				continue;
-			}
-
-			if ( ! isset( $blocks[ $block_name ] ) ) {
-				$blocks[ $block_name ] = array();
-			}
-
-			$blocks[ $block_name ][ $key ] = $block_type->{ $key };
-		}
-	}
-
-	return $blocks;
+	return get_block_editor_server_block_settings();
 }
 
 /**
@@ -1081,7 +1067,7 @@ JS;
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . json_encode( gutenberg_prepare_blocks_for_js() ) . ');'
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
 
 	// Get admin url for handling meta boxes.
