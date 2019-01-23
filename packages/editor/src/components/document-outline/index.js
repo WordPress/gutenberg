@@ -87,9 +87,9 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 					<DocumentOutlineItem
 						level={ __( 'Title' ) }
 						isValid
-						onSelect={ ( e ) => {
+						onSelect={ () => {
 							removeURLHash();
-							onSelect( e );
+							onSelect();
 						} }
 						href={ `#${ titleNode.id }` }
 					>
