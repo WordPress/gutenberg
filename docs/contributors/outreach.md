@@ -1,6 +1,6 @@
 # Outreach
 
-This includes articles, talks, demos and anything the community is doing to discuss, learn about, and contribute to Gutenberg. This is not an exhaustive list, if we are missing your event just let us know.
+This includes articles, talks, demos and anything the community is doing to discuss, learn about, and contribute to Gutenberg. This is not an exhaustive list; if we are missing your event or article, just let us know.
 
 
 
