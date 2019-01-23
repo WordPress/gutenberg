@@ -24,19 +24,15 @@ function render_rss_error_message( $message ) {
  */
 function render_block_core_rss( $attributes ) {
 
-	$url = $attributes['feedURL'];
-
-	if ( empty( $url ) ) {
+	if ( ! isset( $attributes['feedURL'] ) ) {
 		return;
 	}
 
-	while ( stristr( $url, 'http' ) !== $url ) {
-		$url = substr( $url, 1 );
-	}
+	$url = filter_var( $attributes['feedURL'], FILTER_VALIDATE_URL );
 
 	// self-url destruction sequence.
 	if ( in_array( untrailingslashit( $url ), array( site_url(), home_url() ) ) ) {
-		return render_rss_error_message( __( 'Use \'Latest Posts\' block for this domain', 'gutenberg' ) );
+		return render_rss_error_message( __( 'Use \'Latest Posts\' block for this domain.', 'gutenberg' ) );
 	}
 
 	$rss = fetch_feed( $url );
@@ -58,17 +54,13 @@ function render_block_core_rss( $attributes ) {
 
 	$list_items = '';
 	foreach ( $rss->get_items( 0, $items ) as $item ) {
-		$link = $item->get_link();
-
-		while ( stristr( $link, 'http' ) != $link ) {
-			$link = substr( $link, 1 );
-		}
-
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
 		if ( empty( $title ) ) {
 			$title = __( '(Untitled)', 'gutenberg' );
 		}
 
+		$link = $item->get_link();
+		$link = filter_var( $link, FILTER_VALIDATE_URL );
 		$link = esc_url( strip_tags( $link ) );
 		if ( $link ) {
 			$title = "<a href='$link'>$title</a>";
