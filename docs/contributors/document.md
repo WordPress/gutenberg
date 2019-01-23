@@ -14,11 +14,13 @@ To add a new documentation page:
 ## Using Links
 
 It's very likely that at some point you will want to link to other documentation pages. It's worth emphasizing that all documents can be browsed in different contexts:
+
 - Gutenberg Handbook
 - GitHub website
 - npm website
 
 To create links that work in all contexts, you should use absolute path links without the `https://github.com/WordPress/gutenberg` prefix. You can reference files using the following patterns:
+
 - `/docs/*.md`
 - `/packages/*/README.md`
 - `/packages/components/src/**/README.md`

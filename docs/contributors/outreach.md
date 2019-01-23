@@ -2,8 +2,6 @@
 
 This includes articles, talks, demos and anything the community is doing to discuss, learn about, and contribute to Gutenberg. This is not an exhaustive list; if we are missing your event or article, just let us know.
 
-
-
 ## Articles
 
 A short list of useful articles around defining, extending, and contributing to Gutenberg.
@@ -34,8 +32,6 @@ A short list of useful articles around defining, extending, and contributing to 
 - [Articles about Gutenberg](https://github.com/WordPress/gutenberg/issues/1419) (Github Issue thread with links)
 - [Gutenberg articles on ManageWP.org](https://managewp.org/search?q=gutenberg)
 - [Gutenberg Times](https://gutenbergtimes.com/category/updates/)
-
-
 
 ## Talks
 
