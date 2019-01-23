@@ -41,8 +41,7 @@ import ToolbarContainer from './toolbar-container';
  *
  * @return {ReactElement} The rendered toolbar.
  */
-function Toolbar( props ) {
-	const { controls = [], children, className, isCollapsed, icon, label, ...otherProps } = props;
+function Toolbar( { controls = [], children, className, isCollapsed, icon, label, ...otherProps } ) {
 	if (
 		( ! controls || ! controls.length ) &&
 		! children
