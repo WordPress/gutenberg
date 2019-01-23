@@ -124,7 +124,7 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 ## Contribute to the Documentation
 
-Please see the [Documentation section](/docs/contributors/document.md) of the Contributors Handbook.
+Please see the [Documentation section](/docs/contributors/document.md) of the Contributor Handbook.
 
 Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
