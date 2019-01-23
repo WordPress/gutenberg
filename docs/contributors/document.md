@@ -8,7 +8,7 @@ To add a new documentation page:
 
 1. Create a Markdown file in the [docs](https://github.com/WordPress/gutenberg/tree/master/docs) folder
 2. Add item to the [toc.json](https://github.com/WordPress/gutenberg/blob/master/docs/toc.json) hierarchy
-3. Generate manifest.json by running `npm run docs:build`
+3. Update manifest.json by running `npm run docs:build`
 4. Commit manifest.json with other files updated
 
 ## Using Links
