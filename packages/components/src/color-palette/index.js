@@ -27,7 +27,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 	return (
 		<div className={ classes }>
 			{ map( colors, ( { color, name } ) => {
-				const style = { color: color };
+				const style = { color };
 				const itemClasses = classnames( 'components-color-palette__item', { 'is-active': value === color } );
 
 				return (

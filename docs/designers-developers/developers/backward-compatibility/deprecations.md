@@ -2,6 +2,26 @@
 
 The Gutenberg project's deprecation policy is intended to support backward compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 5.2.0
+
+- The PHP function `gutenberg_parse_blocks` has been removed. Use [`parse_blocks`](https://developer.wordpress.org/reference/functions/parse_blocks/) instead.
+- The PHP function `get_dynamic_blocks_regex` has been removed.
+- The PHP function `gutenberg_render_block` has been removed. Use [`render_block`](https://developer.wordpress.org/reference/functions/render_block/) instead.
+- The PHP function `strip_dynamic_blocks` has been removed. For use in excerpt preparation, consider [`excerpt_remove_blocks`](https://developer.wordpress.org/reference/functions/excerpt_remove_blocks/) instead.
+- The PHP function `strip_dynamic_blocks_add_filter` has been removed.
+- The PHP function `strip_dynamic_blocks_remove_filter` has been removed.
+- The PHP function `gutenberg_post_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
+- The PHP function `gutenberg_content_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
+- The PHP function `gutenberg_register_rest_routes` has been removed.
+- The PHP function `gutenberg_add_taxonomy_visibility_field` has been removed.
+- The PHP function `gutenberg_get_taxonomy_visibility_data` has been removed.
+- The PHP function `gutenberg_add_permalink_template_to_posts` has been removed.
+- The PHP function `gutenberg_add_block_format_to_post_content` has been removed.
+- The PHP function `gutenberg_add_target_schema_to_links` has been removed.
+- The PHP function `gutenberg_register_post_prepare_functions` has been removed.
+- The PHP function `gutenberg_silence_rest_errors` has been removed.
+- The PHP function `gutenberg_filter_post_type_labels` has been removed.
+
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
 - `wp.editor.PostPublishPanelToggle` has been deprecated in favor of `wp.editor.PostPublishButton`.
