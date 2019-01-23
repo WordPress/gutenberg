@@ -60,9 +60,10 @@ public class ReactAztecText extends AztecText {
         {
             put(AztecTextFormat.FORMAT_BOLD, "bold");
             put(AztecTextFormat.FORMAT_STRONG, "bold");
+            put(AztecTextFormat.FORMAT_EMPHASIS, "italic");
             put(AztecTextFormat.FORMAT_ITALIC, "italic");
             put(AztecTextFormat.FORMAT_CITE, "italic");
-            put(AztecTextFormat.FORMAT_STRIKETHROUGH, "bold");
+            put(AztecTextFormat.FORMAT_STRIKETHROUGH, "strikethrough");
         }
     };
 
@@ -339,7 +340,7 @@ public class ReactAztecText extends AztecText {
                     newFormatsSet.add(AztecTextFormat.FORMAT_STRONG);
                     break;
                 case "italic":
-                    newFormatsSet.add(AztecTextFormat.FORMAT_ITALIC);
+                    newFormatsSet.add(AztecTextFormat.FORMAT_EMPHASIS);
                     break;
                 case "strikethrough":
                     newFormatsSet.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
