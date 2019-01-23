@@ -174,7 +174,7 @@ export function isPreviewEmbedFallback( state, url ) {
 /**
  * Returns whether the current user can upload media.
  *
- * Calling this may trigger an OPTIONS request ot the REST API via the
+ * Calling this may trigger an OPTIONS request to the REST API via the
  * `canUser()` resolver.
  *
  * https://developer.wordpress.org/rest-api/reference/
