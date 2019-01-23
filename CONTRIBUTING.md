@@ -126,7 +126,7 @@ If you'd like to contribute to the design or front-end, feel free to contribute 
 
 Please see the [Documentation section](/docs/contributors/document.md) of the Contributor Handbook.
 
-Documentation is automatically synced from master to the [Gutenberg Documentation Website](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
+Documentation is automatically synced from `master` to the [Gutenberg Handbook](https://wordpress.org/gutenberg/handbook/) every 15 minutes.
 
 ### `@wordpress/component`
 
