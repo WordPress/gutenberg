@@ -168,7 +168,9 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     private void setTextfromJS(ReactAztecText view, String text) {
         view.setIsSettingTextFromJS(true);
+        this.setOnSelectionChange(view, false);
         view.fromHtml(text, true);
+        this.setOnSelectionChange(view, true);
         view.setIsSettingTextFromJS(false);
     }
 
