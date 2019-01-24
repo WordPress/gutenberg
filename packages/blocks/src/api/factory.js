@@ -6,6 +6,7 @@ import {
 	every,
 	reduce,
 	castArray,
+	cloneDeep,
 	findIndex,
 	isObjectLike,
 	filter,
@@ -94,8 +95,8 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 		...block,
 		clientId,
 		attributes: {
-			...block.attributes,
-			...mergeAttributes,
+			...cloneDeep( block.attributes ),
+			...cloneDeep( mergeAttributes ),
 		},
 		innerBlocks: newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),
