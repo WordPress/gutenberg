@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/rss` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
