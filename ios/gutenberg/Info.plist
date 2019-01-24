@@ -39,9 +39,18 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>The app would like to add your location to posts on sites where you have enabled geotagging.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To take photos or videos to use in your posts.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>The app would like to add your location to posts on sites where you have enabled geotagging.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Enable microphone access to record sound in your videos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To add photos or videos to your posts.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>To add photos or videos to your posts.</string>
 	<key>NSAppTransportSecurity</key>
-	<!--See http://ste.vn/2015/06/10/configuring-app-transport-security-ios-9-osx-10-11/ -->
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>
