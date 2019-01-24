@@ -2,16 +2,16 @@
 
 CJS modules:
 
-- [ ] babel-plugin-makepot - NODE EXPORT
-- [ ] babel-preset-default - NODE EXPORT, not `src/index.js`
-- [ ] browserslist-config - NODE, not `src/index.js`
-- [ ] custom-templated-path-webpack-plugin - NODE EXPORT
-- [ ] docgen - NODE EXPORT, not `src/index.js`
-- [ ] eslint-plugin - NODE EXPORT
-- [ ] is-shallow-equal - NODE EXPORT
-- [ ] jest-preset-default - NODE EXPORT, not `src/index.js`
-- [ ] postcss-themes - NODE export
-- [ ] library-export-default-webpack-plugin - NODE EXPORT
+- [ ] babel-plugin-makepot
+- [ ] babel-preset-default
+- [ ] browserslist-config
+- [ ] custom-templated-path-webpack-plugin
+- [ ] docgen
+- [ ] eslint-plugin
+- [ ] is-shallow-equal
+- [ ] jest-preset-default
+- [ ] library-export-default-webpack-plugin
+- [ ] postcss-themes
 
 ES6 modules:
 
@@ -21,7 +21,7 @@ ES6 modules:
 - [ ] e2e-tests - what shall be documented?
 - [ ] editor - directory dependency, BUG
 - [ ] npm-package-json-lint-config - CONFIG file
-- [ ] scripts - what shall be documented? not `src/index`
+- [ ] scripts - what shall be documented?
 - [-] keycodes - how to document CONSTANTS?
 - [-] redux-routine - check description with many paragraphs
 - [x] a11y
@@ -32,7 +32,7 @@ ES6 modules:
 - [x] blob
 - [x] block-library
 - [x] block-serialization-default-parser
-- [x] block-serialization-spec-parser - not `src/index.js`
+- [x] block-serialization-spec-parser
 - [x] blocks - directory dependency
 - [x] compose - directory dependency
 - [x] core-data - export nothing
