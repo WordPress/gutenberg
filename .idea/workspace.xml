@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="325d4135-0d34-4e0a-880b-0e5011286544" name="Default Changelist" comment="" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings" doNotAsk="true" synchronizationState="SYNCHRONIZE">
+    <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
+  </component>
+  <component name="FUSProjectUsageTrigger">
+    <session id="-1734498736">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="1" />
+          <entry key="project.open.time.0" value="2" />
+          <entry key="project.opened" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="js" value="3" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="JavaScript" value="3" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.vcs.git.usages">
+        <counts>
+          <entry key="git.branch.checkout.local" value="1" />
+          <entry key="git.branch.create.new" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="js" value="2" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="JavaScript" value="2" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/packages/components/src/color-picker/saturation.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="420">
+              <caret line="177" column="171" selection-start-line="177" selection-start-column="171" selection-end-line="177" selection-end-column="171" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>Use your arrow keys to change the base co</find>
+    </findStrings>
+    <dirStrings>
+      <dir>$PROJECT_DIR$</dir>
+    </dirStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/packages/components/src/color-picker/saturation.js" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodePackageJsonFileManager">
+    <packageJsonPaths>
+      <path value="$PROJECT_DIR$/package.json" />
+      <path value="$PROJECT_DIR$/packages/a11y/package.json" />
+      <path value="$PROJECT_DIR$/packages/annotations/package.json" />
+      <path value="$PROJECT_DIR$/packages/api-fetch/package.json" />
+      <path value="$PROJECT_DIR$/packages/autop/package.json" />
+      <path value="$PROJECT_DIR$/packages/babel-plugin-import-jsx-pragma/package.json" />
+      <path value="$PROJECT_DIR$/packages/babel-plugin-makepot/package.json" />
+      <path value="$PROJECT_DIR$/packages/babel-preset-default/package.json" />
+      <path value="$PROJECT_DIR$/packages/blob/package.json" />
+      <path value="$PROJECT_DIR$/packages/block-library/package.json" />
+      <path value="$PROJECT_DIR$/packages/block-serialization-default-parser/package.json" />
+      <path value="$PROJECT_DIR$/packages/block-serialization-spec-parser/package.json" />
+      <path value="$PROJECT_DIR$/packages/blocks/package.json" />
+      <path value="$PROJECT_DIR$/packages/browserslist-config/package.json" />
+      <path value="$PROJECT_DIR$/packages/components/package.json" />
+      <path value="$PROJECT_DIR$/packages/compose/package.json" />
+      <path value="$PROJECT_DIR$/packages/core-data/package.json" />
+      <path value="$PROJECT_DIR$/packages/custom-templated-path-webpack-plugin/package.json" />
+      <path value="$PROJECT_DIR$/packages/data/package.json" />
+      <path value="$PROJECT_DIR$/packages/date/package.json" />
+      <path value="$PROJECT_DIR$/packages/deprecated/package.json" />
+      <path value="$PROJECT_DIR$/packages/dom-ready/package.json" />
+      <path value="$PROJECT_DIR$/packages/dom/package.json" />
+      <path value="$PROJECT_DIR$/packages/e2e-test-utils/package.json" />
+      <path value="$PROJECT_DIR$/packages/e2e-tests/package.json" />
+      <path value="$PROJECT_DIR$/packages/edit-post/package.json" />
+      <path value="$PROJECT_DIR$/packages/editor/package.json" />
+      <path value="$PROJECT_DIR$/packages/element/package.json" />
+      <path value="$PROJECT_DIR$/packages/escape-html/package.json" />
+      <path value="$PROJECT_DIR$/packages/eslint-plugin/package.json" />
+      <path value="$PROJECT_DIR$/packages/format-library/package.json" />
+      <path value="$PROJECT_DIR$/packages/hooks/package.json" />
+      <path value="$PROJECT_DIR$/packages/html-entities/package.json" />
+      <path value="$PROJECT_DIR$/packages/i18n/package.json" />
+      <path value="$PROJECT_DIR$/packages/is-shallow-equal/package.json" />
+      <path value="$PROJECT_DIR$/packages/jest-console/package.json" />
+      <path value="$PROJECT_DIR$/packages/jest-preset-default/package.json" />
+      <path value="$PROJECT_DIR$/packages/jest-puppeteer-axe/package.json" />
+      <path value="$PROJECT_DIR$/packages/keycodes/package.json" />
+      <path value="$PROJECT_DIR$/packages/library-export-default-webpack-plugin/package.json" />
+      <path value="$PROJECT_DIR$/packages/list-reusable-blocks/package.json" />
+      <path value="$PROJECT_DIR$/packages/notices/package.json" />
+      <path value="$PROJECT_DIR$/packages/npm-package-json-lint-config/package.json" />
+      <path value="$PROJECT_DIR$/packages/nux/package.json" />
+      <path value="$PROJECT_DIR$/packages/plugins/package.json" />
+      <path value="$PROJECT_DIR$/packages/postcss-themes/package.json" />
+      <path value="$PROJECT_DIR$/packages/priority-queue/package.json" />
+      <path value="$PROJECT_DIR$/packages/redux-routine/package.json" />
+      <path value="$PROJECT_DIR$/packages/rich-text/package.json" />
+      <path value="$PROJECT_DIR$/packages/scripts/package.json" />
+      <path value="$PROJECT_DIR$/packages/shortcode/package.json" />
+      <path value="$PROJECT_DIR$/packages/token-list/package.json" />
+      <path value="$PROJECT_DIR$/packages/url/package.json" />
+      <path value="$PROJECT_DIR$/packages/viewport/package.json" />
+      <path value="$PROJECT_DIR$/packages/wordcount/package.json" />
+    </packageJsonPaths>
+  </component>
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="65" />
+    <option name="y" value="-4" />
+    <option name="width" value="1855" />
+    <option name="height" value="1084" />
+  </component>
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="gutenberg" type="b2602c69:ProjectViewProjectNode" />
+              <item name="gutenberg" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+      <pane id="Scope" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="/var/vagrant-local/www/brick-theme" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="nodejs_package_manager_path" value="npm" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="325d4135-0d34-4e0a-880b-0e5011286544" name="Default Changelist" comment="" />
+      <created>1548322277769</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1548322277769</updated>
+      <workItem from="1548322279170" duration="1057000" />
+      <workItem from="1548323391958" duration="1650000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="2707000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25262576" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="npm" order="2" side_tool="true" />
+      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.3294979" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Database" order="3" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/packages/components/src/color-picker/saturation.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="177" column="171" selection-start-line="177" selection-start-column="171" selection-end-line="177" selection-end-column="171" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
