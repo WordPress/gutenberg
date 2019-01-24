@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const { DefinePlugin } = require( 'webpack' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
@@ -105,6 +106,10 @@ const config = {
 		],
 	},
 	plugins: [
+		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
+		new DefinePlugin( {
+			GUTENBERG_PHASE: JSON.stringify( process.env.GUTENBERG_PHASE || 1 ),
+		} ),
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
 			suffix: '-rtl',
