@@ -4,35 +4,16 @@
 
 import { LINE_SEPARATOR } from './special-characters';
 import { normaliseFormats } from './normalise-formats';
+import { getLineIndex } from './get-line-index';
+import { getParentLineIndex } from './get-parent-line-index';
 
-function getLineIndex( { start, text }, startIndex = start ) {
-	let index = startIndex;
-
-	while ( index-- ) {
-		if ( text[ index ] === LINE_SEPARATOR ) {
-			return index;
-		}
-	}
-}
-
-function getParentFormats( { text, formats }, startIndex, formatCount ) {
-	let index = startIndex;
-
-	while ( index-- ) {
-		if ( text[ index ] !== LINE_SEPARATOR ) {
-			continue;
-		}
-
-		const formatsAtIndex = formats[ index ] || [];
-
-		if ( formatsAtIndex.length === formatCount - 1 ) {
-			return formatsAtIndex;
-		}
-	}
-
-	return [];
-}
-
+/**
+ * Outdents any selected list items if possible.
+ *
+ * @param {Object} value Value to change.
+ *
+ * @return {Object} The changed value.
+ */
 export function outdentListItems( value ) {
 	const { text, formats, start, end } = value;
 	const lineIndex = getLineIndex( value );
@@ -43,16 +24,17 @@ export function outdentListItems( value ) {
 	}
 
 	const newFormats = formats.slice( 0 );
-	const parentFormats = getParentFormats( value, lineIndex, lineFormats.length );
+	const parentFormats = formats[ getParentLineIndex( value, lineIndex ) ] || [];
 
 	for ( let index = lineIndex; index < end; index++ ) {
 		if ( text[ index ] !== LINE_SEPARATOR ) {
 			continue;
 		}
 
-		const trailingFormats = newFormats[ index ].slice( parentFormats.length + 1 );
-
-		newFormats[ index ] = parentFormats.concat( trailingFormats );
+		// Omit the indentation level where the selection starts.
+		newFormats[ index ] = parentFormats.concat(
+			newFormats[ index ].slice( parentFormats.length + 1 )
+		);
 
 		if ( newFormats[ index ].length === 0 ) {
 			delete newFormats[ lineIndex ];

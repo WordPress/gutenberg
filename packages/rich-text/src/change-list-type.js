@@ -4,33 +4,21 @@
 
 import { LINE_SEPARATOR } from './special-characters';
 import { normaliseFormats } from './normalise-formats';
+import { getLineIndex } from './get-line-index';
+import { getParentLineIndex } from './get-parent-line-index';
 
-function getLineIndex( { start, text }, startIndex = start ) {
-	let index = startIndex;
-
-	while ( index-- ) {
-		if ( text[ index ] === LINE_SEPARATOR ) {
-			return index;
-		}
-	}
-}
-
-function getParentLineIndex( { text, formats }, startIndex, formatCount ) {
-	let index = startIndex;
-
-	while ( index-- ) {
-		if ( text[ index ] !== LINE_SEPARATOR ) {
-			continue;
-		}
-
-		const formatsAtIndex = formats[ index ] || [];
-
-		if ( formatsAtIndex.length === formatCount - 1 ) {
-			return index;
-		}
-	}
-}
-
+/**
+ * Changes the list type of the selected indented list, if any. Looks at the
+ * currently selected list item and takes the parent list, then changes the list
+ * type of this list. When multiple lines are selected, the parent lists are
+ * takes and changed.
+ *
+ * @param {Object} value     Value to change.
+ * @param {Object} newFormat The new list format object. Choose between
+ *                           `{ type: 'ol' }` and `{ type: 'ul' }`.
+ *
+ * @return {Object} The changed value.
+ */
 export function changeListType( value, newFormat ) {
 	const { text, formats, start, end } = value;
 	const startLineIndex = getLineIndex( value, start );
