@@ -20,7 +20,7 @@ function render_block_core_rss( $attributes ) {
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
-		// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks
+		// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks.
 		$rss->__destruct();
 		unset( $rss );
 
@@ -82,7 +82,7 @@ function render_block_core_rss( $attributes ) {
 	$classes           = 'grid' === $attributes['blockLayout'] ? ' is-grid columns-' . $attributes['columns'] : '';
 	$list_items_markup = "<ul class='wp-block-rss{$classes}'>{$list_items}</ul>";
 
-	// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks
+	// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks.
 	$rss->__destruct();
 	unset( $rss );
 
