@@ -118,7 +118,7 @@ function is_gutenberg_page() {
 		return false;
 	}
 
-	if ( ! gutenberg_can_edit_post( $post ) ) {
+	if ( ! use_block_editor_for_post( $post ) ) {
 		return false;
 	}
 
