@@ -267,6 +267,28 @@ describe( 'block factory', () => {
 			expect( clonedBlock.innerBlocks[ 1 ].attributes ).not.toBe( block.innerBlocks[ 1 ].attributes );
 			expect( clonedBlock.innerBlocks[ 1 ].attributes ).toEqual( block.innerBlocks[ 1 ].attributes );
 		} );
+
+		it( 'should deeply clone attributes', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {
+						type: 'array',
+						default: [],
+					},
+				},
+				save: noop,
+				category: 'common',
+				title: 'test block',
+			} );
+			const block = createBlock(
+				'core/test-block',
+				{ content: [] }
+			);
+
+			const clonedBlock = cloneBlock( block );
+
+			expect( clonedBlock.attributes.content ).not.toBe( block.attributes.content );
+		} );
 	} );
 
 	describe( 'getPossibleBlockTransformations()', () => {
