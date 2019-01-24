@@ -311,6 +311,39 @@ transforms: {
 ```
 {% end %}
 
+A block with innerBlocks can also be transformed from and to another block with innerBlocks.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'some/block-with-innerblocks' ],
+            transform: function( attributes, innerBlocks ) {
+                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'some/block-with-innerblocks' ],
+            transform: ( attributes, innerBlocks ) => {
+                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks);
+            },
+        },
+    ],
+},
+```
+{% end %}
+
 An optional `isMatch` function can be specified on a transform object. This provides an opportunity to perform additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 
 {% codetabs %}
