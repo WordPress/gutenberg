@@ -12,6 +12,11 @@ import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
+import {
+	getDefaultBlockName,
+	createBlock,
+} from '@wordpress/blocks';
+
 class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
@@ -19,6 +24,7 @@ class PostTitle extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
+		this.onEnter = this.onEnter.bind( this );
 
 		this.state = {
 			isSelected: false,
@@ -42,6 +48,14 @@ class PostTitle extends Component {
 		this.props.onUpdate( title );
 	}
 
+	onEnter( ) {
+		const { insertBlocksAfter } = this.props;
+		if ( ! insertBlocksAfter ) {
+			return;
+		}
+		insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
+	}
+
 	render() {
 		const {
 			placeholder,
@@ -55,8 +69,9 @@ class PostTitle extends Component {
 			<TextInput
 				blurOnSubmit={ true }
 				textAlignVertical="top"
-				multiline
-				numberOfLines={ 0 }
+				multiline={ false }
+				onSubmitEditing={ this.onEnter }
+				returnKeyType={ 'next' }
 				onChangeText={ this.onChange }
 				onFocus={ this.onSelect }
 				placeholder={ decodedPlaceholder }
