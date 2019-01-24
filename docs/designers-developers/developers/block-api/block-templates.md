@@ -17,17 +17,50 @@ Planned additions:
 
 Templates can be declared in JS or in PHP as an array of blockTypes (block name and optional attributes).
 
-```js
-const template = [
-  [ 'block/name', {} ], // [ blockName, attributes ]
-];
-```
+The first example in PHP creates a template for posts that includes an image block to start, you can add as many or as few blocks to your template as needed.
+
+
+PHP example:
 
 ```php
-'template' => array(
-	array( 'block/name' ),
-),
+<?php
+function myguten_register_template() {
+    $post_type_object = get_post_type_object( 'post' );
+    $post_type_object->template = array(
+        array( 'core/image' ),
+    );
+}
+add_action( 'init', 'myguten_register_template' );
 ```
+
+The following example in JavaScript creates a new block which uses [InnerBlocks](/packages/editor/src/components/inner-blocks) and templates to insert a set of blocks:
+
+```js
+const el = wp.element.createElement;
+const { registerBlockType } = wp.blocks;
+const { InnerBlocks } = wp.editor;
+
+const BLOCKS_TEMPLATE = [
+	[ 'core/image', {} ],
+	[ 'core/paragraph', { placeholder: 'Image Details' }],
+];
+
+registerBlockType( 'myguten/template', {
+	title: 'Myguten Template Block',
+	category: 'widgets',
+	edit: ( props ) => {
+		return el( InnerBlocks, {
+			template: BLOCKS_TEMPLATE,
+			templateLock: false
+		});
+	},
+	save: ( props ) => {
+		return el( InnerBlocks.Content, {} );
+	},
+});
+```
+
+See the [Meta Block Tutorial](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/metabox/meta-block-5-finishing/) for a full example of a template in use.
 
 ## Custom Post types
 
