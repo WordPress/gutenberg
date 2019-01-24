@@ -13,42 +13,40 @@
  * @return string Returns the block content with received rss items.
  */
 function render_block_core_rss( $attributes ) {
-
-	if ( ! isset( $attributes['feedURL'] ) ) {
-		return;
-	}
+	$defaults = array(
+		'itemsToShow' => 5,
+	);
+	$attributes = wp_parse_args( $attributes, $defaults );
 
 	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
-		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:', 'gutenberg' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error"><strong>' . __( 'RSS Error:' ) . '</strong> ' . $rss->get_error_message() . '</div></div>';
 	}
 
 	if ( ! $rss->get_item_quantity() ) {
 		$rss->__destruct();
 		unset( $rss );
-		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.', 'gutenberg' ) . '</div></div>';
+		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.' ) . '</div></div>';
 	}
 
 	$items = (int) $attributes['itemsToShow'];
 	if ( $items < 1 || 10 < $items ) {
-		$items = 5;
+		$items = $defaults['itemsToShow'];
 	}
 
 	$list_items = '';
 	foreach ( $rss->get_items( 0, $items ) as $item ) {
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
 		if ( empty( $title ) ) {
-			$title = __( '(Untitled)', 'gutenberg' );
+			$title = __( '(Untitled)' );
 		}
-
 		$link = $item->get_link();
-		$link = esc_url( strip_tags( $link ) );
+		$link = esc_url( $link );
 		if ( $link ) {
-			$title = "<a href='$link'>$title</a>";
+			$title = "<a href='{$link}'>{$title}</a>";
 		}
-
-		$title = "<div class='wp-block-rss__item-title'>$title</div>";
+		$title = "<div class='wp-block-rss__item-title'>{$title}</div>";
 
 		$date = '';
 		if ( $attributes['displayDate'] ) {
@@ -68,7 +66,7 @@ function render_block_core_rss( $attributes ) {
 			$author = $item->get_author();
 			if ( is_object( $author ) ) {
 				$author = $author->get_name();
-				$author = '<span class="wp-block-rss__item-author">' . __( 'by', 'gutenberg' ) . ' ' . esc_html( strip_tags( $author ) ) . '</span>';
+				$author = '<span class="wp-block-rss__item-author">' . __( 'by' ) . ' ' . esc_html( strip_tags( $author ) ) . '</span>';
 			}
 		}
 
@@ -88,9 +86,8 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$classes = 'grid' === $attributes['blockLayout'] ? 'is-grid columns-' . $attributes['columns'] : '';
-
-	$list_items_markup = "<ul class='wp-block-rss {$classes}'>{$list_items}</ul>";
+	$classes = 'grid' === $attributes['blockLayout'] ? ' is-grid columns-' . $attributes['columns'] : '';
+	$list_items_markup = "<ul class='wp-block-rss{$classes}'>{$list_items}</ul>";
 
 	$rss->__destruct();
 	unset( $rss );
@@ -113,7 +110,8 @@ function register_block_core_rss() {
 					'default' => 'list',
 				),
 				'feedURL'        => array(
-					'type' => 'string',
+					'type'    => 'string',
+					'default' => '',
 				),
 				'itemsToShow'    => array(
 					'type'    => 'number',
