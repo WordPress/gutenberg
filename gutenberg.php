@@ -543,15 +543,13 @@ function gutenberg_kses_allowedtags( $tags ) {
  * Gutenberg responsive embeds.
  *
  * @since 4.1.0
+ * @deprecated 5.0.0
  *
  * @param Array $classes Array of classes being added to the body tag.
  * @return Array The $classes array, with wp-embed-responsive appended.
  */
 function gutenberg_add_responsive_body_class( $classes ) {
-	if ( current_theme_supports( 'responsive-embeds' ) ) {
-		$classes[] = 'wp-embed-responsive';
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
+
 	return $classes;
 }
-
-add_filter( 'body_class', 'gutenberg_add_responsive_body_class' );
