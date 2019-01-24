@@ -24,6 +24,15 @@ test( 'IR - undocumented', function( t ) {
 		description: 'Undocumented declaration.',
 		tags: [],
 	} ] );
+	const tokenOneliner = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-undocumented-oneliner.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenOneliner ) ), [ {
+		name: 'default',
+		description: 'Undocumented declaration.',
+		tags: [],
+	} ] );
 	t.end();
 } );
 

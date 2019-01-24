@@ -1,0 +1,45 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 34,
+	"end": 63,
+	"range": [
+		34,
+		63
+	],
+	"declaration": {
+		"type": "FunctionDeclaration",
+		"start": 49,
+		"end": 63,
+		"range": [
+			49,
+			63
+		],
+		"id": null,
+		"generator": false,
+		"expression": false,
+		"async": false,
+		"params": [],
+		"body": {
+			"type": "BlockStatement",
+			"start": 60,
+			"end": 63,
+			"range": [
+				60,
+				63
+			],
+			"body": []
+		}
+	},
+	"leadingComments": [
+		{
+			"type": "Line",
+			"value": " This comment should be ignored",
+			"start": 0,
+			"end": 33,
+			"range": [
+				0,
+				33
+			]
+		}
+	]
+}
