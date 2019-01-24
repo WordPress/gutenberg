@@ -78,9 +78,7 @@ class RSSEdit extends Component {
 							onChange={ ( value ) => setAttributes( { feedURL: value } ) }
 							className={ 'components-placeholder__input' }
 						/>
-						<Button
-							isLarge
-							type="submit">
+						<Button isLarge type="submit">
 							{ __( 'Use URL' ) }
 						</Button>
 					</form>
@@ -144,7 +142,6 @@ class RSSEdit extends Component {
 								onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
 								min={ 0 }
 								max={ 100 }
-								step={ 1 }
 							/>
 						}
 						{ blockLayout === 'grid' &&
