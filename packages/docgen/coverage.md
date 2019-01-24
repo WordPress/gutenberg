@@ -15,11 +15,10 @@ CJS modules:
 
 ES6 modules:
 
-- [ ] components - directory dependency, BUG
-- [ ] data - directory dependency, BUG
+- [ ] data - BUG
 - [ ] e2e-test-utils - what shall be documented?
 - [ ] e2e-tests - what shall be documented?
-- [ ] editor - directory dependency, BUG
+- [ ] editor - BUG
 - [ ] npm-package-json-lint-config - CONFIG file
 - [ ] scripts - what shall be documented?
 - [-] keycodes - how to document CONSTANTS?
@@ -34,6 +33,7 @@ ES6 modules:
 - [x] block-serialization-default-parser
 - [x] block-serialization-spec-parser
 - [x] blocks - directory dependency
+- [x] components
 - [x] compose - directory dependency
 - [x] core-data - export nothing
 - [x] date
