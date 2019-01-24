@@ -70,11 +70,13 @@ const processFile = ( inputFile ) => {
 // Prepare input
 let initialInputFile = process.argv[ 2 ];
 if ( initialInputFile === undefined ) {
-	process.stdout.write( '\nUsage: <path-to-docgen> <relative-path-to-file>' );
+	process.stdout.write( '\nUsage: <path-to-docgen> <relative-path-to-entry-point.js>' );
 	process.stdout.write( '\n\n' );
 	process.exit( 1 );
 }
 initialInputFile = path.join( process.cwd(), initialInputFile );
+
+const debugMode = process.argv[ 3 ] === '--debug' ? true : false;
 
 // Process
 const currentFileStack = []; // To keep track of file being processed.
@@ -98,6 +100,8 @@ if ( result === undefined ) {
 }
 
 fs.writeFileSync( doc, formatter( result.ir ) );
-fs.writeFileSync( ir, JSON.stringify( result.ir ) );
-fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
-fs.writeFileSync( ast, JSON.stringify( result.ast ) );
+if ( debugMode ) {
+	fs.writeFileSync( ir, JSON.stringify( result.ir ) );
+	fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
+	fs.writeFileSync( ast, JSON.stringify( result.ast ) );
+}
