@@ -25,9 +25,9 @@ function render_block_core_rss( $attributes ) {
 		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.' ) . '</div></div>';
 	}
 
-	$items = (int) $attributes['itemsToShow'];
+	$rss_items  = $rss->get_items(0, $attributes['itemsToShow']);
 	$list_items = '';
-	foreach ( $rss->get_items( 0, $items ) as $item ) {
+	foreach ( $rss_items as $item ) {
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
 		if ( empty( $title ) ) {
 			$title = __( '(Untitled)' );
