@@ -49,7 +49,10 @@ const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
 const someSpecifierMatchesName = ( name, node ) => node.specifiers.some( ( specifier ) => {
 	if ( specifier.type === 'ImportDefaultSpecifier' ) {
 		return name === 'default';
-	} else if ( specifier.type === 'ExportSpecifier' ) {
+	} else if (
+		specifier.type === 'ExportSpecifier' ||
+		specifier.type === 'ImportNamespaceSpecifier'
+	) {
 		return name === specifier.local.name;
 	}
 	return name === specifier.imported.name;

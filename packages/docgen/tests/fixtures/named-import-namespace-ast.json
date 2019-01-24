@@ -1,19 +1,19 @@
 {
 	"type": "Program",
 	"start": 0,
-	"end": 71,
+	"end": 85,
 	"range": [
 		0,
-		70
+		84
 	],
 	"body": [
 		{
 			"type": "ImportDeclaration",
 			"start": 0,
-			"end": 47,
+			"end": 61,
 			"range": [
 				0,
-				47
+				61
 			],
 			"specifiers": [
 				{
@@ -39,50 +39,50 @@
 			"source": {
 				"type": "Literal",
 				"start": 27,
-				"end": 46,
+				"end": 60,
 				"range": [
 					27,
-					46
+					60
 				],
-				"value": "./named-variables",
-				"raw": "'./named-variables'"
+				"value": "./named-import-namespace-module",
+				"raw": "'./named-import-namespace-module'"
 			}
 		},
 		{
 			"type": "ExportNamedDeclaration",
-			"start": 49,
-			"end": 70,
+			"start": 63,
+			"end": 84,
 			"range": [
-				49,
-				70
+				63,
+				84
 			],
 			"declaration": null,
 			"specifiers": [
 				{
 					"type": "ExportSpecifier",
-					"start": 58,
-					"end": 67,
+					"start": 72,
+					"end": 81,
 					"range": [
-						58,
-						67
+						72,
+						81
 					],
 					"local": {
 						"type": "Identifier",
-						"start": 58,
-						"end": 67,
+						"start": 72,
+						"end": 81,
 						"range": [
-							58,
-							67
+							72,
+							81
 						],
 						"name": "variables"
 					},
 					"exported": {
 						"type": "Identifier",
-						"start": 58,
-						"end": 67,
+						"start": 72,
+						"end": 81,
 						"range": [
-							58,
-							67
+							72,
+							81
 						],
 						"name": "variables"
 					}

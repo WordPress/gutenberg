@@ -274,12 +274,24 @@ test( 'IR - named (JSDoc in module dependency)', function( t ) {
 		path.join( __dirname, './fixtures/named-import-namespace.json' ),
 		'utf-8'
 	);
-	const getModuleImportNamespace = () => JSON.parse( fs.readFileSync(
-		path.join( __dirname, './fixtures/named-variables.json' ),
+	const astImportNamespace = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-import-namespace-ast.json' ),
 		'utf-8'
-	) );
+	);
+	const getModuleImportNamespace = ( filePath ) => {
+		if ( filePath === './named-import-namespace-module' ) {
+			return JSON.parse( fs.readFileSync(
+				path.join( __dirname, './fixtures/named-import-namespace-module-ir.json' ),
+				'utf-8'
+			) );
+		}
+		return JSON.parse( fs.readFileSync(
+			path.join( __dirname, './fixtures/default-function-ir.json' ),
+			'utf-8'
+		) );
+	};
 	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokenImportNamespace ), { body: [] }, getModuleImportNamespace ),
+		getIntermediateRepresentation( JSON.parse( tokenImportNamespace ), JSON.parse( astImportNamespace ), getModuleImportNamespace ),
 		[ { name: 'variables', description: 'Undocumented declaration.', tags: [] } ]
 	);
 	t.end();

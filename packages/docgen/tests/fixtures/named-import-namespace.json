@@ -1,38 +1,38 @@
 {
 	"type": "ExportNamedDeclaration",
-	"start": 49,
-	"end": 70,
+	"start": 63,
+	"end": 84,
 	"range": [
-		49,
-		70
+		63,
+		84
 	],
 	"declaration": null,
 	"specifiers": [
 		{
 			"type": "ExportSpecifier",
-			"start": 58,
-			"end": 67,
+			"start": 72,
+			"end": 81,
 			"range": [
-				58,
-				67
+				72,
+				81
 			],
 			"local": {
 				"type": "Identifier",
-				"start": 58,
-				"end": 67,
+				"start": 72,
+				"end": 81,
 				"range": [
-					58,
-					67
+					72,
+					81
 				],
 				"name": "variables"
 			},
 			"exported": {
 				"type": "Identifier",
-				"start": 58,
-				"end": 67,
+				"start": 72,
+				"end": 81,
 				"range": [
-					58,
-					67
+					72,
+					81
 				],
 				"name": "variables"
 			}
