@@ -17,7 +17,6 @@ ES6 modules:
 
 - [ ] e2e-test-utils - what shall be documented?
 - [ ] e2e-tests - what shall be documented?
-- [ ] editor - BUG, relative path doesnt exists
 - [ ] npm-package-json-lint-config - CONFIG file
 - [ ] scripts - what shall be documented?
 - [-] keycodes - how to document CONSTANTS?
@@ -41,6 +40,7 @@ ES6 modules:
 - [x] dom
 - [x] dom-ready
 - [x] edit-post - directory dependency
+- [x] editor
 - [x] element
 - [x] escape-html
 - [x] format-library - exports nothing
