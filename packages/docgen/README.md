@@ -1,6 +1,6 @@
 # `docgen`
 
-`docgen` helps you to generate the _public API_ of your code. Given an entry point file, it outputs the ES6 export statements in the file with their corresponding JSDoc comments in human-readable format.
+`docgen` helps you to generate the _public API_ of your code. Given an entry point file, it outputs the ES6 export statements and their corresponding JSDoc comments in human-readable format.
 
 Some characteristics:
 
