@@ -302,6 +302,8 @@ extension RCTAztecView: UITextViewDelegate {
         forceTypingAttributesIfNeeded()
         propagateFormatChanges()
         propagateContentChanges()
+        //Necessary to send height information to JS after pasting text.
+        textView.setNeedsLayout()
     }
 
     func textViewDidBeginEditing(_ textView: UITextView) {
