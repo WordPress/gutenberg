@@ -13,13 +13,15 @@ type PropsType = {
 	blockToolbarHeight: number,
 	innerToolbarHeight: number,
 	safeAreaBottomInset: number,
+	innerRef?: Function,
 }
 
-const KeyboardAwareFlatList = ( props: PropsType ) => {
+export const KeyboardAwareFlatList = ( props: PropsType ) => {
 	const {
 		blockToolbarHeight,
 		innerToolbarHeight,
 		shouldPreventAutomaticScroll,
+		innerRef,
 		...listProps
 	} = props;
 
@@ -37,6 +39,7 @@ const KeyboardAwareFlatList = ( props: PropsType ) => {
 			extraHeight={ 0 }
 			innerRef={ ( ref ) => {
 				( this: any ).scrollViewRef = ref;
+				innerRef( ref );
 			} }
 			onKeyboardWillHide={ () => {
 				( this: any ).keyboardWillShowIndicator = false;
@@ -62,4 +65,14 @@ const KeyboardAwareFlatList = ( props: PropsType ) => {
 	);
 };
 
-export default KeyboardAwareFlatList;
+export const handleCaretVerticalPositionChange = (
+	scrollView: Object,
+	targetId: number,
+	caretY: number,
+	previousCaretY: ?number ) => {
+	if ( previousCaretY ) { //if this is not the first tap
+		scrollView.props.refreshScrollForField( targetId );
+	}
+};
+
+export default { KeyboardAwareFlatList, handleCaretVerticalPositionChange };

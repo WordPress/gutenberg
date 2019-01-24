@@ -4,19 +4,17 @@
  */
 
 import React, { Component } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, Keyboard } from 'react-native';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { BlockFormatControls, BlockControls } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import KeyboardHideButton from '../components/keyboard-hide-button';
 
 import styles from './block-toolbar.scss';
 
 type PropsType = {
 	onInsertClick: void => void,
-	onKeyboardHide: void => void,
 	showKeyboardHideButton: boolean,
 	hasRedo: boolean,
 	hasUndo: boolean,
@@ -25,6 +23,10 @@ type PropsType = {
 };
 
 export class BlockToolbar extends Component<PropsType> {
+	onKeyboardHide = () => {
+		Keyboard.dismiss();
+	};
+
 	render() {
 		const {
 			hasRedo,
@@ -32,7 +34,6 @@ export class BlockToolbar extends Component<PropsType> {
 			redo,
 			undo,
 			onInsertClick,
-			onKeyboardHide,
 			showKeyboardHideButton,
 		} = this.props;
 
@@ -63,14 +64,16 @@ export class BlockToolbar extends Component<PropsType> {
 							onClick={ redo }
 						/>
 					</Toolbar>
-					{ showKeyboardHideButton && ( <Toolbar>
-						<KeyboardHideButton
-							onPress={ onKeyboardHide }
-						/>
-					</Toolbar> ) }
 					<BlockControls.Slot />
 					<BlockFormatControls.Slot />
 				</ScrollView>
+				{ showKeyboardHideButton &&
+				( <Toolbar passedStyle={ styles.keyboardHideContainer }>
+					<ToolbarButton
+						icon="keyboard-hide"
+						onClick={ this.onKeyboardHide }
+					/>
+				</Toolbar> ) }
 			</View>
 		);
 	}

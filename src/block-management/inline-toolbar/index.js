@@ -11,7 +11,7 @@ type PropsType = {
 	clientId: string,
 	canMoveUp: boolean,
 	canMoveDown: boolean,
-	onButtonPressed: ( button: number, clientId: string ) => void,
+	onButtonPressed: ( button: number ) => void,
 };
 
 export { InlineToolbarActions };
@@ -29,15 +29,15 @@ export default class InlineToolbar extends React.Component<PropsType> {
 	}
 
 	onUpPressed() {
-		this.props.onButtonPressed( InlineToolbarActions.UP, this.props.clientId );
+		this.props.onButtonPressed( InlineToolbarActions.UP );
 	}
 
 	onDownPressed() {
-		this.props.onButtonPressed( InlineToolbarActions.DOWN, this.props.clientId );
+		this.props.onButtonPressed( InlineToolbarActions.DOWN );
 	}
 
 	onDeletePressed() {
-		this.props.onButtonPressed( InlineToolbarActions.DELETE, this.props.clientId );
+		this.props.onButtonPressed( InlineToolbarActions.DELETE );
 	}
 
 	render() {

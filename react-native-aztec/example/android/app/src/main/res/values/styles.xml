@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <style name="AztecToolbarStyle">
+        <item name="advanced">false</item>
+        <item name="mediaToolbarAvailable">false</item>
+    </style>
+
+</resources>

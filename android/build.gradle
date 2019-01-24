@@ -24,6 +24,9 @@ buildscript {
     }
 }
 
+// Load the "build from source" flag value but default to `true` since this is the demo gutenberg-mobile project so
+project.ext.buildGutenbergFromSource = project.properties.getOrDefault('wp.BUILD_GUTENBERG_FROM_SOURCE', true).toBoolean()
+
 allprojects {
     repositories {
         mavenLocal()
