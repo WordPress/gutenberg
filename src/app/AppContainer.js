@@ -15,6 +15,7 @@ type PropsType = {
 	initialHtmlModeEnabled: boolean,
 	showHtml: boolean,
 	editedPostContent: string,
+	title: string,
 	initialHtml: string,
 	resetBlocks: Array<BlockType> => mixed,
 	setupEditor: ( mixed, ?mixed ) => mixed,
@@ -23,8 +24,13 @@ type PropsType = {
 	post: ?mixed,
 };
 
-class AppContainer extends React.Component<PropsType> {
+type StateType = {
+	title: string,
+};
+
+class AppContainer extends React.Component<PropsType, StateType> {
 	lastHtml: ?string;
+	lastTitle: ?string;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -37,8 +43,13 @@ class AppContainer extends React.Component<PropsType> {
 			type: 'draft',
 		};
 
-		this.props.setupEditor( post );
+		this.state = {
+			title: props.title,
+		};
+
+		props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
+		this.lastTitle = props.title;
 
 		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
@@ -50,13 +61,22 @@ class AppContainer extends React.Component<PropsType> {
 		if ( this.props.showHtml ) {
 			this.updateHtmlAction( this.props.editedPostContent );
 		}
+
 		const html = serialize( this.props.getBlocks() );
-		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.lastHtml !== html );
+		const hasChanges = this.state.title !== this.lastTitle || this.lastHtml !== html;
+
+		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.state.title, hasChanges );
+
+		this.lastTitle = this.state.title;
 		this.lastHtml = html;
 	};
 
 	toggleHtmlModeAction = () => {
 		this.props.toggleBlockMode( this.props.rootClientId );
+	};
+
+	setTitleAction = ( title: string ) => {
+		this.setState( { title: title } );
 	};
 
 	updateHtmlAction = ( html: string = '' ) => {
@@ -70,7 +90,9 @@ class AppContainer extends React.Component<PropsType> {
 				rootClientId={ this.props.rootClientId }
 				serializeToNativeAction={ this.serializeToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
+				setTitleAction={ this.setTitleAction }
 				updateHtmlAction={ this.updateHtmlAction }
+				title={ this.state.title }
 			/>
 		);
 	}

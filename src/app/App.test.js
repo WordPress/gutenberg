@@ -46,7 +46,7 @@ describe( 'App', () => {
 			.forEach( ( blockHolder ) => {
 				if ( 'core/heading' === blockHolder.props.name ) {
 					const aztec = blockHolder.findByType( 'RCTAztecView' );
-					expect( aztec.props.text.text ).toBe( '<h2>Welcome to Gutenberg</h2>' );
+					expect( aztec.props.text.text ).toBe( '<h2>What is Gutenberg?</h2>' );
 				}
 			} );
 	} );
