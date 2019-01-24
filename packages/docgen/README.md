@@ -67,7 +67,7 @@ Adds two numbers.
 
 ### Namespace export
 
-Let `count.js` be:
+Let `count/index.js` be:
 
 ```js
 /**
