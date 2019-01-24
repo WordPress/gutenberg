@@ -46,9 +46,11 @@ const hasImportWithName = ( node, name ) =>
 
 const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
 
-const someImportMatchesName = ( name, node ) => node.specifiers.some( ( specifier ) => {
+const someSpecifierMatchesName = ( name, node ) => node.specifiers.some( ( specifier ) => {
 	if ( specifier.type === 'ImportDefaultSpecifier' ) {
 		return name === 'default';
+	} else if ( specifier.type === 'ExportSpecifier' ) {
+		return name === specifier.local.name;
 	}
 	return name === specifier.imported.name;
 } );
@@ -57,9 +59,9 @@ const getJSDocFromDependency = ( token, entry, parseDependency ) => {
 	let doc;
 	const ir = parseDependency( getDependencyPath( token ) );
 	if ( entry.localName === NAMESPACE_EXPORT ) {
-		doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== DEFAULT_EXPORT );
+		doc = ir.filter( ( { name } ) => name !== DEFAULT_EXPORT );
 	} else {
-		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
+		doc = ir.find( ( { name } ) => someSpecifierMatchesName( name, token ) );
 	}
 	return doc;
 };
@@ -73,7 +75,6 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 		}
 	}
 
-	// Look up JSDoc in same file
 	if ( entry && entry.module === null ) {
 		const candidates = ast.body.filter( ( node ) => {
 			return hasClassWithName( node, entry.localName ) ||
@@ -87,9 +88,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 		}
 		const node = candidates[ 0 ];
 		if ( isImportDeclaration( node ) ) {
-			// Actually, look up JSDoc in file dependency
-			const ir = parseDependency( getDependencyPath( node ) );
-			doc = ir.find( ( { name } ) => someImportMatchesName( name, node ) );
+			doc = getJSDocFromDependency( node, entry, parseDependency );
 		} else {
 			doc = getJSDocFromToken( node );
 		}

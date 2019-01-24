@@ -260,7 +260,7 @@ test( 'IR - named (JSDoc in module dependency)', function( t ) {
 	) );
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenImportNamed ), { body: [] }, getModuleImportNamed ),
-		[ { name: 'default', description: 'Module declaration.', tags: [] } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	const tokenDefaultExported = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default-exported.json' ),
