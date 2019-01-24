@@ -84,6 +84,7 @@ return array(
 		'lodash',
 		'wp-api-fetch',
 		'wp-data',
+		'wp-deprecated',
 		'wp-url',
 	),
 	'wp-data'                               => array(

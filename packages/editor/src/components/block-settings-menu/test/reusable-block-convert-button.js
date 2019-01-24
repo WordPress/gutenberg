@@ -27,7 +27,7 @@ describe( 'ReusableBlockConvertButton', () => {
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockConvertButton
 				isVisible
-				isStaticBlock
+				isReusable={ false }
 				onConvertToReusable={ onConvert }
 			/>
 		);
@@ -43,7 +43,7 @@ describe( 'ReusableBlockConvertButton', () => {
 		const wrapper = getShallowRenderOutput(
 			<ReusableBlockConvertButton
 				isVisible
-				isStaticBlock={ false }
+				isReusable
 				onConvertToStatic={ onConvert }
 			/>
 		);

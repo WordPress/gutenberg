@@ -1,4 +1,8 @@
-## 9.0.8 (Unreleased)
+## 9.1.0 (Unreleased)
+
+### New Feature
+
+- Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
 
 ### Internal
 
