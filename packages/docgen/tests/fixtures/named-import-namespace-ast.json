@@ -1,0 +1,96 @@
+{
+	"type": "Program",
+	"start": 0,
+	"end": 71,
+	"range": [
+		0,
+		70
+	],
+	"body": [
+		{
+			"type": "ImportDeclaration",
+			"start": 0,
+			"end": 47,
+			"range": [
+				0,
+				47
+			],
+			"specifiers": [
+				{
+					"type": "ImportNamespaceSpecifier",
+					"start": 7,
+					"end": 21,
+					"range": [
+						7,
+						21
+					],
+					"local": {
+						"type": "Identifier",
+						"start": 12,
+						"end": 21,
+						"range": [
+							12,
+							21
+						],
+						"name": "variables"
+					}
+				}
+			],
+			"source": {
+				"type": "Literal",
+				"start": 27,
+				"end": 46,
+				"range": [
+					27,
+					46
+				],
+				"value": "./named-variables",
+				"raw": "'./named-variables'"
+			}
+		},
+		{
+			"type": "ExportNamedDeclaration",
+			"start": 49,
+			"end": 70,
+			"range": [
+				49,
+				70
+			],
+			"declaration": null,
+			"specifiers": [
+				{
+					"type": "ExportSpecifier",
+					"start": 58,
+					"end": 67,
+					"range": [
+						58,
+						67
+					],
+					"local": {
+						"type": "Identifier",
+						"start": 58,
+						"end": 67,
+						"range": [
+							58,
+							67
+						],
+						"name": "variables"
+					},
+					"exported": {
+						"type": "Identifier",
+						"start": 58,
+						"end": 67,
+						"range": [
+							58,
+							67
+						],
+						"name": "variables"
+					}
+				}
+			],
+			"source": null
+		}
+	],
+	"sourceType": "module",
+	"comments": []
+}
