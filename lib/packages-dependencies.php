@@ -157,7 +157,6 @@ return array(
 		'wp-viewport',
 		'wp-wordcount',
 	),
-	'wp-editor-configuration'               => array(),
 	'wp-element'                            => array(
 		'lodash',
 		'react',

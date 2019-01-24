@@ -60,10 +60,8 @@ gutenbergPackages.forEach( ( name ) => {
 	};
 } );
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-const isPlugin = process.env.NODE_ENV === 'plugin';
 const isProduction = process.env.NODE_ENV === 'production';
-const mode = isProduction || isPlugin ? 'production' : 'development';
+const mode = isProduction ? 'production' : 'development';
 
 const config = {
 	mode,
@@ -169,7 +167,7 @@ const config = {
 		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// GUTENBERG_LIVE_RELOAD_PORT global variable changes port on which live reload works
 		// when running watch mode.
-		isDevelopment && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
+		! isProduction && new LiveReloadPlugin( { port: process.env.GUTENBERG_LIVE_RELOAD_PORT || 35729 } ),
 	].filter( Boolean ),
 	stats: {
 		children: false,
