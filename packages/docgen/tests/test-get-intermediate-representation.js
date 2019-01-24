@@ -14,6 +14,19 @@ const test = require( 'tape' );
  */
 const getIntermediateRepresentation = require( '../src/get-intermediate-representation' );
 
+test( 'IR - undocumented', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-undocumented-nocomments.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ) ), [ {
+		name: 'default',
+		description: 'Undocumented declaration.',
+		tags: [],
+	} ] );
+	t.end();
+} );
+
 test( 'IR - default (JSDoc in export statement)', function( t ) {
 	const tokenClassAnonymous = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-anonymous.json' ),

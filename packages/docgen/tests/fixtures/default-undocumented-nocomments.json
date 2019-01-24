@@ -1,0 +1,19 @@
+{
+	"type": "ExportDefaultDeclaration",
+	"start": 38,
+	"end": 67,
+	"range": [
+		38,
+		67
+	],
+	"declaration": {
+		"type": "Identifier",
+		"start": 53,
+		"end": 66,
+		"range": [
+			53,
+			66
+		],
+		"name": "myDeclaration"
+	}
+}
