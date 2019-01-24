@@ -37,6 +37,7 @@ type PropsType = {
 	blockCount: number,
 	focusBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
+	insertBlocks: ( blocks: Array<Object>, index: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
 	selectedBlock: ?BlockType,
 	selectedBlockClientId: string,
@@ -71,6 +72,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		( this: any ).keyboardDidHide = this.keyboardDidHide.bind( this );
 		( this: any ).onCaretVerticalPositionChange = this.onCaretVerticalPositionChange.bind( this );
 		( this: any ).scrollViewInnerRef = this.scrollViewInnerRef.bind( this );
+		( this: any ).insertBlocksAfterTitle = this.insertBlocksAfterTitle.bind( this );
 
 		this.state = {
 			blockTypePickerVisible: false,
@@ -85,6 +87,15 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	// once we move the action to the toolbar
 	showBlockTypePicker( show: boolean ) {
 		this.setState( { blockTypePickerVisible: show } );
+	}
+
+	insertBlocksAfterTitle = ( blocks: Array<Object> ) => {
+		this.props.insertBlocks( blocks, 0 );
+		// now set the focus
+		if ( blocks[ 0 ] ) {
+			// focus on the first block inserted
+			this.props.focusBlock( blocks[ 0 ].clientId );
+		}
 	}
 
 	onBlockTypeSelected( itemValue: string ) {
@@ -167,6 +178,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					style={ styles.title }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
+					insertBlocksAfter={ this.insertBlocksAfterTitle }
 					placeholder={ 'Pick a title...' } />
 				<View
 					style={ styles.titleSeparator } />
@@ -294,12 +306,14 @@ export default compose( [
 		const {
 			clearSelectedBlock,
 			insertBlock,
+			insertBlocks,
 			replaceBlock,
 			selectBlock,
 		} = dispatch( 'core/editor' );
 
 		return {
 			insertBlock,
+			insertBlocks,
 			focusBlock: ( clientId ) => {
 				clearSelectedBlock();
 				selectBlock( clientId );
