@@ -95,7 +95,6 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 		...block,
 		clientId,
 		attributes: Object.assign(
-			{},
 			cloneDeep( block.attributes ),
 			cloneDeep( mergeAttributes )
 		),
