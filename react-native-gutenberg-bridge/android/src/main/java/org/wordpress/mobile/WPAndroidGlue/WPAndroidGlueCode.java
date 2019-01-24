@@ -72,7 +72,9 @@ public class WPAndroidGlueCode {
             public void responseHtml(String title, String html, boolean changed) {
                 mContentHtml = html;
                 mTitle = title;
-                mContentChanged = changed;
+                // This code is called twice. When getTitle and getContent are called.
+                // Make sure mContentChanged has the correct value (true) if one of the call returned with changes.
+                mContentChanged = mContentChanged || changed;
                 mGetContentCountDownLatch.countDown();
             }
 
