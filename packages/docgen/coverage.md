@@ -1,28 +1,25 @@
 # Coverage
 
-CJS modules:
+Packages outside of scope:
 
-- [ ] babel-plugin-makepot
-- [ ] babel-preset-default
-- [ ] browserslist-config
-- [ ] custom-templated-path-webpack-plugin
-- [ ] docgen
-- [ ] eslint-plugin
-- [ ] is-shallow-equal
-- [ ] jest-preset-default
-- [ ] library-export-default-webpack-plugin
-- [ ] postcss-themes
+- babel-plugin-makepot. CommonJS module. Babel plugin.
+- babel-preset-default. CommonJS module. Babel preset.
+- browserslist-config. CommonJS module. Config.
+- custom-templated-path-webpack-plugin. CommonJS module. Webpack plugin.
+- docgen. CommonJS module.
+- e2e-tests. Do not export anything.
+- eslint-plugin. CommonJS module. ESLint plugin.
+- is-shallow-equal. CommonJS module.
+- jest-preset-default. CommonJS module. Jest preset.
+- library-export-default-webpack-plugin. CommonJS. Webpack plugin.
+- npm-package-json-lint-config. CommonJS. Config.
+- postcss-themes. CommonJS module.
+- scripts. CommonJS module.
 
-ES6 modules:
+DONE:
 
-- [ ] e2e-test-utils - what shall be documented?
-- [ ] e2e-tests - what shall be documented?
-- [ ] npm-package-json-lint-config - CONFIG file
-- [ ] scripts - what shall be documented?
-- [-] keycodes - how to document CONSTANTS?
-- [-] redux-routine - check description with many paragraphs
 - [x] a11y
-- [x] annotations - export nothing
+- [x] annotations
 - [x] api-fetch
 - [x] autop
 - [x] babel-plugin-import-jsx-pragma
@@ -30,30 +27,33 @@ ES6 modules:
 - [x] block-library
 - [x] block-serialization-default-parser
 - [x] block-serialization-spec-parser
-- [x] blocks - directory dependency
+- [x] blocks
 - [x] components
-- [x] compose - directory dependency
-- [x] core-data - export nothing
+- [x] compose
+- [x] core-data
 - [x] data
 - [x] date
 - [x] deprecated
 - [x] dom
 - [x] dom-ready
-- [x] edit-post - directory dependency
+- [x] e2e-test-utils
+- [x] edit-post
 - [x] editor
 - [x] element
 - [x] escape-html
-- [x] format-library - exports nothing
+- [x] format-library
 - [x] hooks
 - [x] html-entities
 - [x] i18n
-- [x] jest-console - export nothing
-- [x] jest-puppeteer-axe - export nothing
-- [x] list-reusable-blocks - export nothing
-- [x] notices - does not export anything
-- [x] nux - directory dependency
+- [x] jest-console
+- [x] jest-puppeteer-axe
+- [x] keycodes
+- [x] list-reusable-blocks
+- [x] notices
+- [x] nux
 - [x] plugins
 - [x] priority-queue
+- [x] redux-routine
 - [x] rich-text
 - [x] shortcode
 - [x] token-list
