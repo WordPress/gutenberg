@@ -39,6 +39,19 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func onCapturePhotoPressed(_ callback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFromCameraPicker(with: { (mediaID, url) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
+            })
+        }
+    }
+
+    @objc
     func editorDidLayout() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidLayout()

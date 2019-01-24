@@ -6,20 +6,26 @@ import RNReactNativeGutenbergBridge
 class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
   
   private let presenter: UIViewController
-  private let mediaCallback: MediaPickerDidPickMediaToUploadCallback
+  private let mediaCallback: MediaPickerDidPickMediaCallback
   private let gutenberg: Gutenberg
   
   init(presenter: UIViewController,
        gutenberg: Gutenberg,
-       mediaCallback: @escaping MediaPickerDidPickMediaToUploadCallback,
+       mediaCallback: @escaping MediaPickerDidPickMediaCallback,
        finishCallback: @escaping () -> Void) {
       self.presenter = presenter
       self.gutenberg = gutenberg
       self.mediaCallback = mediaCallback
   }
   
-  func pickAndUpload() {
+  func pickAndUpload(from source: UIImagePickerController.SourceType) {
+    guard UIImagePickerController.isSourceTypeAvailable(source) else {
+        // Camera not available, bound to happen in the simulator
+        mediaCallback(nil, nil)
+        return
+    }
     let pickerController = UIImagePickerController()
+    pickerController.sourceType = source
     pickerController.delegate = self
     presenter.show(pickerController, sender: nil)
   }
