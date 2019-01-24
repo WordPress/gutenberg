@@ -94,10 +94,11 @@ export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	return {
 		...block,
 		clientId,
-		attributes: {
-			...cloneDeep( block.attributes ),
-			...cloneDeep( mergeAttributes ),
-		},
+		attributes: Object.assign(
+			{},
+			cloneDeep( block.attributes ),
+			cloneDeep( mergeAttributes )
+		),
 		innerBlocks: newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),
 	};
