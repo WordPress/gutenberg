@@ -65,6 +65,7 @@ const gpl2CompatibleLicenses = [
 	'Zlib',
 	'(MIT AND BSD-3-Clause)',
 	'(MIT AND Zlib)',
+	'(CC-BY-4.0 AND MIT)',
 ];
 
 /*
