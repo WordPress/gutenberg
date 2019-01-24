@@ -54,10 +54,12 @@ const someImportMatchesName = ( name, node ) => node.specifiers.some( ( specifie
 } );
 
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
-	// Use JSDoc in node if present
-	let doc = getJSDocFromToken( token );
-	if ( doc !== undefined ) {
-		return doc;
+	let doc;
+	if ( entry.localName !== NAMESPACE_EXPORT ) {
+		doc = getJSDocFromToken( token );
+		if ( ( doc !== undefined ) ) {
+			return doc;
+		}
 	}
 
 	// Look up JSDoc in same file
@@ -111,8 +113,8 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 	const exportEntries = getExportEntries( token );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {
+		const doc = getJSDoc( token, entry, ast, parseDependency );
 		if ( entry.localName === NAMESPACE_EXPORT ) {
-			const doc = getJSDoc( token, entry, ast, parseDependency );
 			doc.forEach( ( namedExport ) => {
 				ir.push( {
 					name: namedExport.name,
@@ -121,7 +123,6 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 				} );
 			} );
 		} else {
-			const doc = getJSDoc( token, entry, ast, parseDependency );
 			ir.push( {
 				name: entry.exportName,
 				description: get( doc, [ 'description' ], UNDOCUMENTED ),

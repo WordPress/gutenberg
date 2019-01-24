@@ -278,5 +278,17 @@ test( 'IR - namespace (JSDoc in module dependency)', function( t ) {
 			{ name: 'MyClass', description: 'Named class.', tags: [] },
 		]
 	);
+	const tokenCommented = fs.readFileSync(
+		path.join( __dirname, './fixtures/namespace-commented.json' ),
+		'utf-8'
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenCommented ), { body: [] }, getModule ),
+		[
+			{ name: 'myVariable', description: 'Named variable.', tags: [] },
+			{ name: 'myFunction', description: 'Named function.', tags: [] },
+			{ name: 'MyClass', description: 'Named class.', tags: [] },
+		]
+	);
 	t.end();
 } );
