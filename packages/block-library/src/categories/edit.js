@@ -88,7 +88,7 @@ class CategoriesEdit extends Component {
 			<li key={ category.id }>
 				<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
 				{ showPostCounts &&
-					<span className={ 'wp-block-categories__post-count' }>
+					<span className="wp-block-categories__post-count">
 						{ ' ' }({ category.count })
 					</span>
 				}
@@ -115,7 +115,7 @@ class CategoriesEdit extends Component {
 				<label htmlFor={ selectId } className="screen-reader-text">
 					{ __( 'Categories' ) }
 				</label>
-				<select id={ selectId } className={ 'wp-block-categories__dropdown' }>
+				<select id={ selectId } className="wp-block-categories__dropdown">
 					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
 				</select>
 			</Fragment>
