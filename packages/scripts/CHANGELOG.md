@@ -5,6 +5,10 @@
 - Added support for `build` script ([#12837](https://github.com/WordPress/gutenberg/pull/12837))
 - Added support for `start` script ([#12837](https://github.com/WordPress/gutenberg/pull/12837))
 
+### Bug Fix
+
+- Add missing `root` flag in the default Eslint config ([#13483](https://github.com/WordPress/gutenberg/pull/13483))
+
 ## 2.5.0 (2019-01-09)
 
 ### New Features
