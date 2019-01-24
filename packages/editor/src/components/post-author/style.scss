@@ -33,10 +33,10 @@
 	z-index: -1;
 	display: inline-block;
 	position: absolute;
-	right: 8px;
-	width: 24px;
-	height: 24px;
-	top: 10px;
+	right: $grid-size;
+	width: $icon-button-size-small;
+	height: $icon-button-size-small;
+	top: #{$grid-size + 2};
 }
 
 .autocomplete__menu {
@@ -44,7 +44,7 @@
 	border-top: 0;
 	color: $dark-gray-300;
 	margin: 0;
-	padding: calc(#{$panel-padding} / 4) 0;
+	padding: #{$grid-size-small / 2} 0;
 	overflow-x: hidden;
 	overflow-y: auto;
 	max-height: 200px;
@@ -75,7 +75,7 @@
 
 .autocomplete__option {
 	font-size: $default-font-size;
-	padding: calc(#{$panel-padding} / 4) calc(#{$panel-padding} / 2);
+	padding: #{$grid-size-small / 2} $grid-size;
 	margin-bottom: 0;
 	cursor: pointer;
 	display: block;
