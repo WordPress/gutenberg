@@ -13,11 +13,6 @@
  * @return string Returns the block content with received rss items.
  */
 function render_block_core_rss( $attributes ) {
-	$defaults = array(
-		'itemsToShow' => 5,
-	);
-	$attributes = wp_parse_args( $attributes, $defaults );
-
 	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
@@ -31,10 +26,6 @@ function render_block_core_rss( $attributes ) {
 	}
 
 	$items = (int) $attributes['itemsToShow'];
-	if ( $items < 1 || 10 < $items ) {
-		$items = $defaults['itemsToShow'];
-	}
-
 	$list_items = '';
 	foreach ( $rss->get_items( 0, $items ) as $item ) {
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
