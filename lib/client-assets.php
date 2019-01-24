@@ -83,6 +83,18 @@ function gutenberg_override_script( $handle, $src, $deps = array(), $ver = false
 	} else {
 		wp_register_script( $handle, $src, $deps, $ver, $in_footer );
 	}
+
+	/*
+	 * `WP_Dependencies::set_translations` will fall over on itself if setting
+	 * translations on the `wp-i18n` handle, since it internally adds `wp-i18n`
+	 * as a dependency of itself, exhausting memory. The same applies for the
+	 * polyfill script, which is a dependency _of_ `wp-i18n`.
+	 *
+	 * See: https://core.trac.wordpress.org/ticket/46089
+	 */
+	if ( 'wp-i18n' !== $handle && 'wp-polyfill' !== $handle ) {
+		wp_set_script_translations( $handle, 'gutenberg' );
+	}
 }
 
 /**
@@ -506,14 +518,11 @@ function gutenberg_get_autosave_newer_than_post_save( $post ) {
 
 /**
  * Loads Gutenberg Locale Data.
+ *
+ * @deprecated 5.2.0
  */
 function gutenberg_load_locale_data() {
-	// Prepare Jed locale data.
-	$locale_data = gutenberg_get_jed_locale_data( 'gutenberg' );
-	wp_add_inline_script(
-		'wp-i18n',
-		'wp.i18n.setLocaleData( ' . json_encode( $locale_data ) . ' );'
-	);
+	_deprecated_function( __FUNCTION__, '5.2.0' );
 }
 
 /**
@@ -700,8 +709,6 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	} else {
 		$initial_edits = null;
 	}
-
-	gutenberg_load_locale_data();
 
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
