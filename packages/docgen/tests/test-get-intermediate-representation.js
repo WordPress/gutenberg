@@ -258,6 +258,18 @@ test( 'IR - named (JSDoc in module dependency)', function( t ) {
 		getIntermediateRepresentation( JSON.parse( tokenDefaultExported ), { body: [] }, getModule ),
 		[ { name: 'moduleName', description: 'Module declaration.', tags: [] } ]
 	);
+	const tokenImportNamespace = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-import-namespace.json' ),
+		'utf-8'
+	);
+	const getModuleImportNamespace = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/named-variables.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenImportNamespace ), { body: [] }, getModuleImportNamespace ),
+		[ { name: 'variables', description: 'Undocumented declaration.', tags: [] } ]
+	);
 	t.end();
 } );
 
