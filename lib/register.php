@@ -386,101 +386,11 @@ add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 )
  * Registers custom post types required by the Gutenberg editor.
  *
  * @since 0.10.0
+ * @deprecated 5.0.0
  */
 function gutenberg_register_post_types() {
-	register_post_type(
-		'wp_block',
-		array(
-			'labels'                => array(
-				'name'                     => _x( 'Blocks', 'post type general name', 'gutenberg' ),
-				'singular_name'            => _x( 'Block', 'post type singular name', 'gutenberg' ),
-				'menu_name'                => _x( 'Blocks', 'admin menu', 'gutenberg' ),
-				'name_admin_bar'           => _x( 'Block', 'add new on admin bar', 'gutenberg' ),
-				'add_new'                  => _x( 'Add New', 'Block', 'gutenberg' ),
-				'add_new_item'             => __( 'Add New Block', 'gutenberg' ),
-				'new_item'                 => __( 'New Block', 'gutenberg' ),
-				'edit_item'                => __( 'Edit Block', 'gutenberg' ),
-				'view_item'                => __( 'View Block', 'gutenberg' ),
-				'all_items'                => __( 'All Blocks', 'gutenberg' ),
-				'search_items'             => __( 'Search Blocks', 'gutenberg' ),
-				'not_found'                => __( 'No blocks found.', 'gutenberg' ),
-				'not_found_in_trash'       => __( 'No blocks found in Trash.', 'gutenberg' ),
-				'filter_items_list'        => __( 'Filter blocks list', 'gutenberg' ),
-				'items_list_navigation'    => __( 'Blocks list navigation', 'gutenberg' ),
-				'items_list'               => __( 'Blocks list', 'gutenberg' ),
-				'item_published'           => __( 'Block published.', 'gutenberg' ),
-				'item_published_privately' => __( 'Block published privately.', 'gutenberg' ),
-				'item_reverted_to_draft'   => __( 'Block reverted to draft.', 'gutenberg' ),
-				'item_scheduled'           => __( 'Block scheduled.', 'gutenberg' ),
-				'item_updated'             => __( 'Block updated.', 'gutenberg' ),
-			),
-			'public'                => false,
-			'show_ui'               => true,
-			'show_in_menu'          => false,
-			'rewrite'               => false,
-			'show_in_rest'          => true,
-			'rest_base'             => 'blocks',
-			'rest_controller_class' => 'WP_REST_Blocks_Controller',
-			'capability_type'       => 'block',
-			'capabilities'          => array(
-				'read'         => 'read_blocks',
-				'create_posts' => 'create_blocks',
-			),
-			'map_meta_cap'          => true,
-			'supports'              => array(
-				'title',
-				'editor',
-			),
-		)
-	);
-
-	$editor_caps = array(
-		'edit_blocks',
-		'edit_others_blocks',
-		'publish_blocks',
-		'read_private_blocks',
-		'read_blocks',
-		'delete_blocks',
-		'delete_private_blocks',
-		'delete_published_blocks',
-		'delete_others_blocks',
-		'edit_private_blocks',
-		'edit_published_blocks',
-		'create_blocks',
-	);
-
-	$caps_map = array(
-		'administrator' => $editor_caps,
-		'editor'        => $editor_caps,
-		'author'        => array(
-			'edit_blocks',
-			'publish_blocks',
-			'read_blocks',
-			'delete_blocks',
-			'delete_published_blocks',
-			'edit_published_blocks',
-			'create_blocks',
-		),
-		'contributor'   => array(
-			'read_blocks',
-		),
-	);
-
-	foreach ( $caps_map as $role_name => $caps ) {
-		$role = get_role( $role_name );
-
-		if ( empty( $role ) ) {
-			continue;
-		}
-
-		foreach ( $caps as $cap ) {
-			if ( ! $role->has_cap( $cap ) ) {
-				$role->add_cap( $cap );
-			}
-		}
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 }
-add_action( 'init', 'gutenberg_register_post_types' );
 
 /**
  * Apply the correct labels for Reusable Blocks in the bulk action updated messages.
