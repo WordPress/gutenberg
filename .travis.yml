@@ -31,9 +31,8 @@ jobs:
       env: WP_VERSION=latest
       before_install:
         - nvm install --latest-npm
-      install:
-        - npm ci
       script:
+        - npm ci
         - npm run lint
         - npm run check-local-changes
         - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
