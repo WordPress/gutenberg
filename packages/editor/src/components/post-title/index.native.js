@@ -72,6 +72,8 @@ class PostTitle extends Component {
 				multiline={ false }
 				onSubmitEditing={ this.onEnter }
 				returnKeyType={ 'next' }
+				multiline
+				numberOfLines={ 0 }
 				onChangeText={ this.onChange }
 				onFocus={ this.onSelect }
 				placeholder={ decodedPlaceholder }

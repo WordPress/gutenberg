@@ -1,3 +1,14 @@
+## 2.6.0 (Unreleased)
+
+### New Features
+
+- Added support for `build` script ([#12837](https://github.com/WordPress/gutenberg/pull/12837))
+- Added support for `start` script ([#12837](https://github.com/WordPress/gutenberg/pull/12837))
+
+### Bug Fix
+
+- Avoid inheriting from ESLint configurations in ancestor directories when using the default configuration ([#13483](https://github.com/WordPress/gutenberg/pull/13483))
+
 ## 2.5.0 (2019-01-09)
 
 ### New Features
