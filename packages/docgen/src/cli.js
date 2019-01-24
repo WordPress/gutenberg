@@ -21,6 +21,9 @@ const formatter = require( './formatter' );
 
 const relativeToAbsolute = ( basePath, relativePath ) => {
 	const target = path.join( path.dirname( basePath ), relativePath );
+	if ( path.extname( target ) === '.js' ) {
+		return target;
+	}
 	let targetFile = target + '.js';
 	if ( fs.existsSync( targetFile ) ) {
 		return targetFile;
