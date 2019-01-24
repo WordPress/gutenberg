@@ -122,7 +122,7 @@ public class WPAndroidGlueCode {
         mReactRootView.setAppProperties(initialProps);
 
         if (isNewPost) {
-            initContent("");
+            setContent("");
         }
     }
 
