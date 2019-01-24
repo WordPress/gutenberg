@@ -253,6 +253,18 @@ test( 'Export entries - named identifiers', function( t ) {
 	t.end();
 } );
 
+test( 'Export entries - named import namespace', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-import-namespace.json' ),
+		'utf-8'
+	);
+	const name = getExportEntries( JSON.parse( token ) );
+	t.deepEqual( name, [
+		{ localName: 'variables', exportName: 'variables', module: null },
+	] );
+	t.end();
+} );
+
 test( 'Export entries - named variable', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-variable.json' ),
