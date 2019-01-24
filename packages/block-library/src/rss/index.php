@@ -25,7 +25,7 @@ function render_block_core_rss( $attributes ) {
 		return '<div class="components-placeholder"><div class="notice notice-error">' . __( 'An error has occurred, which probably means the feed is down. Try again later.' ) . '</div></div>';
 	}
 
-	$rss_items  = $rss->get_items(0, $attributes['itemsToShow']);
+	$rss_items  = $rss->get_items( 0, $attributes['itemsToShow'] );
 	$list_items = '';
 	foreach ( $rss_items as $item ) {
 		$title = esc_html( trim( strip_tags( $item->get_title() ) ) );
@@ -77,7 +77,7 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$classes = 'grid' === $attributes['blockLayout'] ? ' is-grid columns-' . $attributes['columns'] : '';
+	$classes           = 'grid' === $attributes['blockLayout'] ? ' is-grid columns-' . $attributes['columns'] : '';
 	$list_items_markup = "<ul class='wp-block-rss{$classes}'>{$list_items}</ul>";
 
 	$rss->__destruct();
