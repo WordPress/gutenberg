@@ -53,6 +53,17 @@ const someImportMatchesName = ( name, node ) => node.specifiers.some( ( specifie
 	return name === specifier.imported.name;
 } );
 
+const getJSDocFromDependency = ( token, entry, parseDependency ) => {
+	let doc;
+	const ir = parseDependency( getDependencyPath( token ) );
+	if ( entry.localName === NAMESPACE_EXPORT ) {
+		doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== DEFAULT_EXPORT );
+	} else {
+		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
+	}
+	return doc;
+};
+
 const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	let doc;
 	if ( entry.localName !== NAMESPACE_EXPORT ) {
@@ -85,14 +96,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 		return doc;
 	}
 
-	// Look up JSDoc in file dependency
-	const ir = parseDependency( getDependencyPath( token ) );
-	if ( entry.localName === NAMESPACE_EXPORT ) {
-		doc = ir.filter( ( exportDeclaration ) => exportDeclaration.name !== DEFAULT_EXPORT );
-	} else {
-		doc = ir.find( ( exportDeclaration ) => exportDeclaration.name === entry.localName );
-	}
-	return doc;
+	return getJSDocFromDependency( token, entry, parseDependency );
 };
 
 /**
