@@ -15,10 +15,9 @@ CJS modules:
 
 ES6 modules:
 
-- [ ] data - BUG
 - [ ] e2e-test-utils - what shall be documented?
 - [ ] e2e-tests - what shall be documented?
-- [ ] editor - BUG
+- [ ] editor - BUG, relative path doesnt exists
 - [ ] npm-package-json-lint-config - CONFIG file
 - [ ] scripts - what shall be documented?
 - [-] keycodes - how to document CONSTANTS?
@@ -36,6 +35,7 @@ ES6 modules:
 - [x] components
 - [x] compose - directory dependency
 - [x] core-data - export nothing
+- [x] data
 - [x] date
 - [x] deprecated
 - [x] dom
