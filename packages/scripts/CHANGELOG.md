@@ -7,7 +7,7 @@
 
 ### Bug Fix
 
-- Add missing `root` flag in the default Eslint config ([#13483](https://github.com/WordPress/gutenberg/pull/13483))
+- Avoid inheriting from ESLint configurations in ancestor directories when using the default configuration ([#13483](https://github.com/WordPress/gutenberg/pull/13483))
 
 ## 2.5.0 (2019-01-09)
 
