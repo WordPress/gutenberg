@@ -148,10 +148,10 @@ export class RichText extends Component {
 	onFormatChange( record ) {
 		const newContent = this.valueToFormat( record );
 		// we need to force a refresh on the native side so aztec can synchronize the active formats
-		this.props.onChange( newContent );
 		this.setState( {
 			formatPlaceholder: record.formatPlaceholder,
 		} );
+		this.props.onChange( newContent );
 	}
 
 	/*
@@ -241,6 +241,8 @@ export class RichText extends Component {
 			end: realEnd,
 			formatPlaceholder,
 		} );
+		// we don't want to refresh aztec as no content can have changed from this event
+		// let's update lastContent to prevent that in shouldComponentUpdate
 		this.lastContent = this.removeRootTagsProduceByAztec( text );
 		this.props.onChange( this.lastContent );
 	}
