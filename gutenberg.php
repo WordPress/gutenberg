@@ -187,10 +187,6 @@ function gutenberg_pre_init() {
 
 	require_once dirname( __FILE__ ) . '/lib/load.php';
 
-	if ( function_exists( 'gutenberg_silence_rest_errors' ) ) {
-		gutenberg_silence_rest_errors();
-	}
-
 	add_filter( 'replace_editor', 'gutenberg_init', 10, 2 );
 }
 
@@ -531,33 +527,29 @@ function gutenberg_add_admin_body_class( $classes ) {
  * Adds attributes to kses allowed tags that aren't in the default list
  * and that Gutenberg needs to save blocks such as the Gallery block.
  *
+ * @deprecated 5.0.0
+ *
  * @param array $tags Allowed HTML.
  * @return array (Maybe) modified allowed HTML.
  */
 function gutenberg_kses_allowedtags( $tags ) {
-	if ( isset( $tags['img'] ) ) {
-		$tags['img']['data-link'] = true;
-		$tags['img']['data-id']   = true;
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
+
 	return $tags;
 }
-
-add_filter( 'wp_kses_allowed_html', 'gutenberg_kses_allowedtags', 10, 2 );
 
 /**
  * Adds the wp-embed-responsive class to the body tag if the theme has opted in to
  * Gutenberg responsive embeds.
  *
  * @since 4.1.0
+ * @deprecated 5.0.0
  *
  * @param Array $classes Array of classes being added to the body tag.
  * @return Array The $classes array, with wp-embed-responsive appended.
  */
 function gutenberg_add_responsive_body_class( $classes ) {
-	if ( current_theme_supports( 'responsive-embeds' ) ) {
-		$classes[] = 'wp-embed-responsive';
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
+
 	return $classes;
 }
-
-add_filter( 'body_class', 'gutenberg_add_responsive_body_class' );
