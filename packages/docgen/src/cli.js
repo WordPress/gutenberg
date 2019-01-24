@@ -78,11 +78,14 @@ const currentFileStack = []; // To keep track of file being processed.
 const result = processFile( initialInputFile );
 
 // Ouput
-const inputDirectory = path.dirname( initialInputFile );
-const doc = path.join( inputDirectory, 'api.md' );
-const ir = path.join( inputDirectory, 'ir.json' );
-const tokens = path.join( inputDirectory, 'tokens.json' );
-const ast = path.join( inputDirectory, 'ast.json' );
+const inputBase = path.join(
+	path.dirname( initialInputFile ),
+	path.basename( initialInputFile, path.extname( initialInputFile ) )
+);
+const doc = inputBase + '-api.md';
+const ir = inputBase + '-ir.json';
+const tokens = inputBase + '-exports.json';
+const ast = inputBase + '-ast.json';
 
 if ( result === undefined ) {
 	process.stdout.write( '\nFile was processed, but contained no ES6 module exports:' );
