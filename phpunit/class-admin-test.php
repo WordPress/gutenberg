@@ -142,21 +142,6 @@ class Admin_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests gutenberg_add_gutenberg_post_state().
-	 *
-	 * @covers ::gutenberg_add_gutenberg_post_state
-	 */
-	function test_add_gutenberg_post_state() {
-		// With blocks.
-		$post_states = apply_filters( 'display_post_states', array(), get_post( self::$post_with_blocks ) );
-		$this->assertEquals( array( 'Gutenberg' ), $post_states );
-
-		// Without blocks.
-		$post_states = apply_filters( 'display_post_states', array(), get_post( self::$post_without_blocks ) );
-		$this->assertEquals( array(), $post_states );
-	}
-
-	/**
 	 * Test that the revisions 'return to editor' links are set correctly for Classic & Gutenberg editors.
 	 *
 	 * @covers ::gutenberg_revisions_link_to_editor

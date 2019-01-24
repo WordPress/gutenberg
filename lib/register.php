@@ -421,18 +421,16 @@ function gutenberg_content_block_version( $content ) {
 /**
  * Adds a "Gutenberg" post state for post tables, if the post contains blocks.
  *
- * @param  array   $post_states An array of post display states.
- * @param  WP_Post $post        The current post object.
- * @return array                A filtered array of post display states.
+ * @deprecated 5.0.0
+ *
+ * @param array $post_states An array of post display states.
+ * @return array A filtered array of post display states.
  */
-function gutenberg_add_gutenberg_post_state( $post_states, $post ) {
-	if ( has_blocks( $post ) ) {
-		$post_states[] = 'Gutenberg';
-	}
+function gutenberg_add_gutenberg_post_state( $post_states ) {
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 
 	return $post_states;
 }
-add_filter( 'display_post_states', 'gutenberg_add_gutenberg_post_state', 10, 2 );
 
 /**
  * Registers custom post types required by the Gutenberg editor.
