@@ -54,6 +54,7 @@ function BlockListAppender( {
 						disabled={ disabled }
 					/>
 				) }
+				isAppender
 			/>
 		</div>
 	);
