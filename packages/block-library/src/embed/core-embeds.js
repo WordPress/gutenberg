@@ -351,7 +351,7 @@ export const others = [
 		patterns: [
 			/^https?:\/\/([a-z0-9-]+\.)?amazon(\.[a-z]{2,3})+\/.+/i,
 			/^https?:\/\/(www\.)?a\.co\/.+/i,
-			/^https?:\/\/(www\.)?amzn(\.[a-z]{2,3})+\/.+/i,
+			/^https?:\/\/(www\.)?amzn(\.[a-z]{2,4})+\/.+/i,
 			/^https?:\/\/(www\.)?z\.cn\/.+/i,
 		],
 	},
