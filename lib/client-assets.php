@@ -69,26 +69,14 @@ function gutenberg_get_script_polyfill( $tests ) {
 if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 	/**
 	 * Registers the main TinyMCE scripts.
+	 *
+	 * @deprecated 5.0.0 wp_register_tinymce_scripts
 	 */
 	function register_tinymce_scripts() {
-		global $tinymce_version, $concatenate_scripts, $compress_scripts;
-		if ( ! isset( $concatenate_scripts ) ) {
-			script_concat_settings();
-		}
-		$suffix     = SCRIPT_DEBUG ? '' : '.min';
-		$compressed = $compress_scripts && $concatenate_scripts && isset( $_SERVER['HTTP_ACCEPT_ENCODING'] )
-			&& false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip' );
-		// Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in production) or
-		// tinymce.min.js (when SCRIPT_DEBUG is true).
-		$mce_suffix = false !== strpos( get_bloginfo( 'version' ), '-src' ) ? '' : '.min';
-		if ( $compressed ) {
-			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array(), $tinymce_version );
-		} else {
-			gutenberg_override_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
-			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
-		}
+		_deprecated_function( __FUNCTION__, '5.0.0', 'wp_register_tinymce_scripts' );
 
-		gutenberg_override_script( 'wp-tinymce-lists', includes_url( 'js/tinymce/' ) . "plugins/lists/plugin{$suffix}.js", array( 'wp-tinymce' ), $tinymce_version );
+		global $wp_scripts;
+		return wp_register_tinymce_scripts( $wp_scripts );
 	}
 }
 
@@ -166,8 +154,6 @@ function gutenberg_register_packages_scripts() {
  */
 function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_vendor_scripts();
-
-	register_tinymce_scripts();
 
 	wp_add_inline_script(
 		'wp-polyfill',
