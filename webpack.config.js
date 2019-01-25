@@ -108,7 +108,7 @@ const config = {
 	plugins: [
 		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 		new DefinePlugin( {
-			GUTENBERG_PHASE: JSON.stringify( process.env.GUTENBERG_PHASE || 1 ),
+			'window.GUTENBERG_PHASE': JSON.stringify( process.env.GUTENBERG_PHASE || 1 ),
 		} ),
 		// Create RTL files with a -rtl suffix
 		new WebpackRTLPlugin( {
