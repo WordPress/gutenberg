@@ -33,6 +33,8 @@ Help requests or 'how to' questions should be posted in a relevant support forum
 
 Here are some labels you might commonly see:
 
+- [Good First Issue](https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue) - Issues identified as good for new contributors to work on. Comment to note that you intend to work on the issue and reference the issue number in the pull request you submit.
+- [Good First Review](https://github.com/WordPress/gutenberg/labels/Good%20First%20Review) - Pull requests identified as good for new contributors who are interested in doing code reviews.
 - [Needs Accessibility Feedback](https://github.com/WordPress/gutenberg/labels/Accessibility) - Changes that impact accessibility and need corresponding review (e.g. markup changes).
 - [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) - Changes that modify the design or user experience in some way and need sign-off.
 - [[Type] Bug](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Bug) - An existing feature is broken in some way.
@@ -48,8 +50,8 @@ We put issues into [milestones](https://github.com/wordpress/gutenberg/milestone
 
 Here are some milestones you might see:
 
-- [WordPress 5.x](https://github.com/WordPress/gutenberg/milestone/70): Tasks that should be done for future WordPress releases such as 5.1 or 5.2.
-- [5.0 (Gutenberg)](https://github.com/WordPress/gutenberg/milestone/85): PRs targeted for the Gutenberg Plugin 5.0 release.
+- [WordPress X.X](https://github.com/WordPress/gutenberg/milestone/70): Tasks that should be done for future WordPress releases.
+- [X.X (Gutenberg)](https://github.com/WordPress/gutenberg/milestone/85): PRs targeted for the Gutenberg Plugin 5.0 release.
 - [Future](https://github.com/WordPress/gutenberg/milestone/35): this is something that is confirmed by everyone as a good thing but doesn’t fall into other criteria.
 
 ### Triaging Issues
@@ -69,6 +71,8 @@ When reviewing issues, here are some steps you can perform:
 - If the issue is missing labels, add some to better categorize it (requires proper permissions).
 - If the title doesn’t communicate the issue, edit it for clarity (requires proper permissions).
 - If it’s a bug report, test to confirm the report or add the `Needs Testing` label. If there is not enough information to confirm the report, add the `[Status] Needs More Info` label and ask for the details needed.
+- Remove the `[Status] Needs More Info` if the author of the issue has responded with enough details.
+- Close the issue with a note if it has a `[Status] Needs More Info` label but the author didn't respond in 2+ weeks.
 - If there was conversation on the issue but no actionable steps identified, follow up with the participants to see what’s actionable.
 - If you feel comfortable triaging the issue further, then you can also:
   - Check that the bug report is valid by debugging it to see if you can track down the technical specifics.
