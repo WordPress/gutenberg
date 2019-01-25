@@ -17,9 +17,10 @@ function MediaPlaceholder( props ) {
 				{ __( 'Upload a new image or select a file from your library.' ) }
 			</Text>
 			<View style={ styles.emptyStateButtonsContainer }>
-				<Button title={ __( 'Upload' ) } onPress={ props.onUploadMediaPressed } />
-				<Button title={ __( 'Media Library' ) } onPress={ props.onMediaLibraryPressed } />
+				<Button title={ __( 'Device Library' ) } onPress={ props.onUploadMediaPressed } />
+				<Button title={ __( 'Take photo' ) } onPress={ props.onCapturePhotoPressed } />
 			</View>
+			<Button title={ __( 'Media Library' ) } onPress={ props.onMediaLibraryPressed } />
 		</View>
 	);
 }
