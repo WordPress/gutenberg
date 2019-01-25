@@ -2,8 +2,7 @@
 
 The `compose` package is a collection of handy [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
-
-The **compose** function is an alias to flowRight from Lodash. It comes from functional programming world and allows to compose any number of functions. An example that illustrates it for two functions:
+The **compose** function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming world and allows to compose any number of functions. An example that illustrates it for two functions:
 
 ```js
 const compose = ( f, g ) => x
@@ -74,3 +73,4 @@ const ComponentWithInstanceIdProp = withInstanceId( WrappedComponent );
 
 Refer to each Higher Order Component's README file for more details, see [list of components](https://github.com/WordPress/gutenberg/tree/master/packages/compose/src).
 
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
