@@ -1,0 +1,26 @@
+[
+    {
+        "blockName": "core/rss",
+        "attrs": {
+            "postLayout": "grid",
+            "feedURL": "https://wordpress.org/news/",
+            "postsToShow": 4,
+            "displayExcerpt": true,
+            "displayAuthor": true,
+            "displayDate": true,
+            "excerptLength": 20
+        },
+        "innerBlocks": [],
+        "innerHTML": "",
+        "innerContent": []
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
