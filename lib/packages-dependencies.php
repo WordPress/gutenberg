@@ -16,7 +16,6 @@ return array(
 		'wp-rich-text',
 	),
 	'wp-api-fetch'                          => array(
-		'wp-hooks',
 		'wp-i18n',
 		'wp-url',
 	),

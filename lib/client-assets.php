@@ -185,10 +185,31 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_packages_scripts();
 
 	// Inline scripts.
+	global $wp_scripts;
+	if ( isset( $wp_scripts->registered['wp-api-fetch'] ) ) {
+		$wp_scripts->registered['wp-api-fetch']->deps[] = 'wp-hooks';
+	}
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
-			'wp.apiFetch.use( wp.apiFetch.createNonceMiddleware( "%s" ) );',
+			implode(
+				"\n",
+				array(
+					'( function() {',
+					'	var nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );',
+					'	wp.apiFetch.use( nonceMiddleware );',
+					'	wp.hooks.addAction(',
+					'		"heartbeat.tick",',
+					'		"core/api-fetch/create-nonce-middleware",',
+					'		function( response ) {',
+					'			if ( response[ "rest_nonce" ] ) {',
+					'				nonceMiddleware.nonce = response[ "rest_nonce" ];',
+					'			}',
+					'		}',
+					'	)',
+					'} )()',
+				)
+			),
 			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
 		),
 		'after'
