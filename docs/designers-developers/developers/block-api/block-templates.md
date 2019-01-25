@@ -19,21 +19,20 @@ Templates can be declared in JS or in PHP as an array of blockTypes (block name 
 
 The first example in PHP creates a template for posts that includes an image block to start, you can add as many or as few blocks to your template as needed.
 
-
 PHP example:
 
 ```php
 <?php
-function myguten_register_template() {
+function myplugin_register_template() {
     $post_type_object = get_post_type_object( 'post' );
     $post_type_object->template = array(
         array( 'core/image' ),
     );
 }
-add_action( 'init', 'myguten_register_template' );
+add_action( 'init', 'myplugin_register_template' );
 ```
 
-The following example in JavaScript creates a new block which uses [InnerBlocks](/packages/editor/src/components/inner-blocks) and templates to insert a set of blocks:
+The following example in JavaScript creates a new block using [InnerBlocks](/packages/editor/src/components/inner-blocks) and templates, when inserted creates a set of blocks based off the template.
 
 ```js
 const el = wp.element.createElement;
@@ -42,11 +41,11 @@ const { InnerBlocks } = wp.editor;
 
 const BLOCKS_TEMPLATE = [
 	[ 'core/image', {} ],
-	[ 'core/paragraph', { placeholder: 'Image Details' }],
+	[ 'core/paragraph', { placeholder: 'Image Details' } ],
 ];
 
-registerBlockType( 'myguten/template', {
-	title: 'Myguten Template Block',
+registerBlockType( 'myplugin/template', {
+	title: 'My Template Block',
 	category: 'widgets',
 	edit: ( props ) => {
 		return el( InnerBlocks, {
@@ -60,7 +59,7 @@ registerBlockType( 'myguten/template', {
 });
 ```
 
-See the [Meta Block Tutorial](https://wordpress.org/gutenberg/handbook/designers-developers/developers/tutorials/metabox/meta-block-5-finishing/) for a full example of a template in use.
+See the [Meta Block Tutorial](/docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md) for a full example of a template in use.
 
 ## Custom Post types
 
@@ -94,20 +93,7 @@ add_action( 'init', 'myplugin_register_book_post_type' );
 Sometimes the intention might be to lock the template on the UI so that the blocks presented cannot be manipulated. This is achieved with a `template_lock` property.
 
 ```php
-'template_lock' => 'all', // or 'insert' to allow moving
-```
-
-*Options:*
-
-- `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
-- `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
-
-## Existing Post Types
-
-It is also possible to assign a template to an existing post type like "posts" and "pages":
-
-```php
-function my_add_template_to_posts() {
+function myplugin_register_template() {
 	$post_type_object = get_post_type_object( 'post' );
 	$post_type_object->template = array(
 		array( 'core/paragraph', array(
@@ -116,8 +102,13 @@ function my_add_template_to_posts() {
 	);
 	$post_type_object->template_lock = 'all';
 }
-add_action( 'init', 'my_add_template_to_posts' );
+add_action( 'init', 'myplugin_register_template' );
 ```
+
+*Options:*
+
+- `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
+- `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
 ## Nested Templates
 
