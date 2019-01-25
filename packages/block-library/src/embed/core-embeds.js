@@ -344,6 +344,7 @@ export const others = [
 		settings: {
 			title: 'Amazon Kindle',
 			icon: embedAmazonIcon,
+			keywords: [ __( 'ebook' ) ],
 			description: __( 'Embed Amazon Kindle content.' ),
 		},
 		patterns: [
