@@ -310,32 +310,6 @@ function gutenberg_can_edit_post_type( $post_type ) {
 	return apply_filters( 'gutenberg_can_edit_post_type', $can_edit, $post_type );
 }
 
-if ( ! function_exists( 'has_blocks' ) ) {
-	/**
-	 * Determine whether a post or content string has blocks.
-	 *
-	 * This test optimizes for performance rather than strict accuracy, detecting
-	 * the pattern of a block but not validating its structure. For strict accuracy
-	 * you should use the block parser on post content.
-	 *
-	 * @since 3.6.0
-	 * @see gutenberg_parse_blocks()
-	 *
-	 * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
-	 * @return bool Whether the post has blocks.
-	 */
-	function has_blocks( $post = null ) {
-		if ( ! is_string( $post ) ) {
-			$wp_post = get_post( $post );
-			if ( $wp_post instanceof WP_Post ) {
-				$post = $wp_post->post_content;
-			}
-		}
-
-		return false !== strpos( (string) $post, '<!-- wp:' );
-	}
-}
-
 /**
  * Determine whether a post has blocks. This test optimizes for performance
  * rather than strict accuracy, detecting the pattern of a block but not
@@ -372,35 +346,6 @@ function gutenberg_post_has_blocks( $post ) {
 function gutenberg_content_has_blocks( $content ) {
 	_deprecated_function( __FUNCTION__, '3.6.0', 'has_blocks()' );
 	return has_blocks( $content );
-}
-
-if ( ! function_exists( 'has_block' ) ) {
-	/**
-	 * Determine whether a $post or a string contains a specific block type.
-	 * This test optimizes for performance rather than strict accuracy, detecting
-	 * the block type exists but not validating its structure.
-	 * For strict accuracy, you should use the block parser on post content.
-	 *
-	 * @since 3.6.0
-	 *
-	 * @param string                  $block_type Full Block type to look for.
-	 * @param int|string|WP_Post|null $post Optional. Post content, post ID, or post object. Defaults to global $post.
-	 * @return bool Whether the post content contains the specified block.
-	 */
-	function has_block( $block_type, $post = null ) {
-		if ( ! has_blocks( $post ) ) {
-			return false;
-		}
-
-		if ( ! is_string( $post ) ) {
-			$wp_post = get_post( $post );
-			if ( $wp_post instanceof WP_Post ) {
-				$post = $wp_post->post_content;
-			}
-		}
-
-		return false !== strpos( $post, '<!-- wp:' . $block_type . ' ' );
-	}
 }
 
 /**
@@ -538,30 +483,17 @@ add_action( 'init', 'gutenberg_register_post_types' );
  * Apply the correct labels for Reusable Blocks in the bulk action updated messages.
  *
  * @since 4.3.0
+ * @deprecated 5.0.0
  *
- * @param array $messages    Arrays of messages, each keyed by the corresponding post type.
- * @param array $bulk_counts Array of item counts for each message, used to build internationalized strings.
+ * @param array $messages Arrays of messages, each keyed by the corresponding post type.
  *
  * @return array
  */
-function gutenberg_bulk_post_updated_messages( $messages, $bulk_counts ) {
-	$messages['wp_block'] = array(
-		// translators: Number of blocks updated.
-		'updated'   => _n( '%s block updated.', '%s blocks updated.', $bulk_counts['updated'], 'gutenberg' ),
-		// translators: Blocks not updated because they're locked.
-		'locked'    => ( 1 == $bulk_counts['locked'] ) ? __( '1 block not updated, somebody is editing it.', 'gutenberg' ) : _n( '%s block not updated, somebody is editing it.', '%s blocks not updated, somebody is editing them.', $bulk_counts['locked'], 'gutenberg' ),
-		// translators: Number of blocks deleted.
-		'deleted'   => _n( '%s block permanently deleted.', '%s blocks permanently deleted.', $bulk_counts['deleted'], 'gutenberg' ),
-		// translators: Number of blocks trashed.
-		'trashed'   => _n( '%s block moved to the Trash.', '%s blocks moved to the Trash.', $bulk_counts['trashed'], 'gutenberg' ),
-		// translators: Number of blocks untrashed.
-		'untrashed' => _n( '%s block restored from the Trash.', '%s blocks restored from the Trash.', $bulk_counts['untrashed'], 'gutenberg' ),
-	);
+function gutenberg_bulk_post_updated_messages( $messages ) {
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 
 	return $messages;
 }
-
-add_filter( 'bulk_post_updated_messages', 'gutenberg_bulk_post_updated_messages', 10, 2 );
 
 /**
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
