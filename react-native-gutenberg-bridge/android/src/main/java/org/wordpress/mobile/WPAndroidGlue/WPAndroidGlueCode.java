@@ -37,7 +37,9 @@ public class WPAndroidGlueCode {
     private MediaSelectedCallback mPendingMediaSelectedCallback;
 
     private String mContentHtml = "";
+    private boolean mContentInitialized;
     private String mTitle = "";
+    private boolean mTitleInitialized;
     private boolean mContentChanged;
     private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
@@ -112,8 +114,6 @@ public class WPAndroidGlueCode {
             @Override
             public void onReactContextInitialized(ReactContext context) {
                 mReactContext = context;
-                // The React Context is now initialized. Update title and content.
-                WPAndroidGlueCode.this.setContent(mTitle, mContentHtml);
             }
         });
         Bundle initialProps = mReactRootView.getAppProperties();
@@ -130,7 +130,8 @@ public class WPAndroidGlueCode {
         mReactRootView.setAppProperties(initialProps);
 
         if (isNewPost) {
-            setContent("", "");
+            setTitle("");
+            setContent("");
         }
     }
 
@@ -144,7 +145,8 @@ public class WPAndroidGlueCode {
         if (mReactInstanceManager != null) {
             mReactInstanceManager.onHostResume(activity,
                     new DefaultHardwareBackBtnHandler() {
-                        @Override public void invokeDefaultOnBackPressed() {
+                        @Override
+                        public void invokeDefaultOnBackPressed() {
                             if (fragment.isAdded()) {
                                 activity.onBackPressed();
                             }
@@ -172,8 +174,27 @@ public class WPAndroidGlueCode {
         mReactInstanceManager.showDevOptionsDialog();
     }
 
-    public void setContent(String title, String postContent) {
+
+    public void setTitle(String title) {
+        mTitleInitialized = true;
+        mTitle = title;
+        setContent(mTitle, mContentHtml);
+    }
+
+    public void setContent(String postContent) {
+        mContentInitialized = true;
+        mContentHtml = postContent;
+        setContent(mTitle, mContentHtml);
+    }
+
+    private void setContent(String title, String postContent) {
         if (mReactRootView == null) {
+            return;
+        }
+
+        // wait for both title and content to have been set at least once. Legacy editor implementation had the two as
+        // separate calls but, we only want a single call to correctly boot the GB editor
+        if (!mTitleInitialized || !mContentInitialized) {
             return;
         }
 
