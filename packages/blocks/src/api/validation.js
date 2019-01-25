@@ -620,30 +620,30 @@ export function isEquivalentHTML( actual, expected ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param {string|Object} blockTypeOrName Block type.
- * @param {Object}        attributes      Parsed block attributes.
- * @param {string}        innerHTML       Original block content.
+ * @param {string|Object} blockTypeOrName      Block type.
+ * @param {Object}        attributes           Parsed block attributes.
+ * @param {string}        expectedBlockContent Original block content.
  *
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlockContent( blockTypeOrName, attributes, innerHTML ) {
+export function isValidBlockContent( blockTypeOrName, attributes, expectedBlockContent ) {
 	const blockType = normalizeBlockType( blockTypeOrName );
-	let saveContent;
+	let actualBlockContent;
 	try {
-		saveContent = getSaveContent( blockType, attributes );
+		actualBlockContent = getSaveContent( blockType, attributes );
 	} catch ( error ) {
 		log.error( 'Block validation failed because an error occurred while generating block content:\n\n%s', error.toString() );
 		return false;
 	}
 
-	const isValid = isEquivalentHTML( innerHTML, saveContent );
+	const isValid = isEquivalentHTML( expectedBlockContent, actualBlockContent );
 	if ( ! isValid ) {
 		log.error(
 			'Block validation failed for `%s` (%o).\n\nExpected:\n\n%s\n\nActual:\n\n%s',
 			blockType.name,
 			blockType,
-			saveContent,
-			innerHTML
+			actualBlockContent,
+			expectedBlockContent
 		);
 	}
 
