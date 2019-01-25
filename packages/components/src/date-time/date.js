@@ -36,7 +36,7 @@ class DatePicker extends Component {
 	}
 
 	render() {
-		const { currentDate } = this.props;
+		const { currentDate, isInvalidDate } = this.props;
 
 		const momentDate = currentDate ? moment( currentDate ) : moment();
 
@@ -56,6 +56,9 @@ class DatePicker extends Component {
 					transitionDuration={ 0 }
 					weekDayFormat="ddd"
 					isRTL={ isRTL() }
+					isOutsideRange={ ( date ) => {
+						return isInvalidDate && isInvalidDate( date.toDate() );
+					} }
 				/>
 			</div>
 		);
