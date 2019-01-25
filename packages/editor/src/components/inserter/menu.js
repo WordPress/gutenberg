@@ -224,7 +224,7 @@ export class InserterMenu extends Component {
 			resultCount
 		);
 
-		debouncedSpeak( resultsFoundMessage, 'assertive' );
+		debouncedSpeak( resultsFoundMessage );
 	}
 
 	onKeyDown( event ) {
