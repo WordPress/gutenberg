@@ -70,9 +70,13 @@ class PostTitle extends Component {
 const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
 		clearSelectedBlock,
+		undo,
+		redo,
 	} = dispatch( 'core/editor' );
 
 	return {
+		onUndo: undo,
+		onRedo: redo,
 		clearSelectedBlock,
 	};
 } );
