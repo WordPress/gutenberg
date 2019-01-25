@@ -28,7 +28,7 @@ import SafeArea from 'react-native-safe-area';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { DefaultBlockAppender } from '@wordpress/editor';
+import { DefaultBlockAppender, PostTitle } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
@@ -40,9 +40,11 @@ type PropsType = {
 	replaceBlock: ( string, BlockType ) => mixed,
 	selectedBlock: ?BlockType,
 	selectedBlockClientId: string,
+	setTitleAction: string => void,
 	selectedBlockOrder: number,
 	isBlockSelected: string => boolean,
 	showHtml: boolean,
+	title: string,
 };
 
 type StateType = {
@@ -60,6 +62,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 		( this: any ).renderItem = this.renderItem.bind( this );
 		( this: any ).shouldFlatListPreventAutomaticScroll = this.shouldFlatListPreventAutomaticScroll.bind( this );
+		( this: any ).renderDefaultBlockAppender = this.renderDefaultBlockAppender.bind( this );
+		( this: any ).renderHeader = this.renderHeader.bind( this );
 		( this: any ).onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		( this: any ).onBlockTypeSelected = this.onBlockTypeSelected.bind( this );
 		( this: any ).onRootViewLayout = this.onRootViewLayout.bind( this );
@@ -150,10 +154,29 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return this.state.blockTypePickerVisible;
 	}
 
+	renderDefaultBlockAppender() {
+		return (
+			<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
+		);
+	}
+
+	renderHeader() {
+		return (
+			<View>
+				<PostTitle
+					style={ styles.title }
+					title={ this.props.title }
+					onUpdate={ this.props.setTitleAction }
+					placeholder={ 'Pick a title...' } />
+				<View
+					style={ styles.titleSeparator } />
+			</View>
+		);
+	}
+
 	renderList() {
 		return (
 			<View style={ { flex: 1 } } >
-				<DefaultBlockAppender rootClientId={ this.props.rootClientId } />
 				<KeyboardAwareFlatList
 					innerRef={ this.scrollViewInnerRef }
 					blockToolbarHeight={ toolbarStyles.container.height }
@@ -166,6 +189,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					shouldPreventAutomaticScroll={ this.shouldFlatListPreventAutomaticScroll }
+					title={ this.props.title }
+					ListHeaderComponent={ this.renderHeader }
+					ListEmptyComponent={ this.renderDefaultBlockAppender }
 				/>
 				<SafeAreaView>
 					<View style={ { height: toolbarStyles.container.height } } />

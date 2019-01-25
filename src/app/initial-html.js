@@ -17,7 +17,7 @@ Hello World
 <!-- /wp:title -->
 
 <!-- wp:heading {"level": 2} -->
-<h2>Welcome to Gutenberg</h2>
+<h2>What is Gutenberg?</h2>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->

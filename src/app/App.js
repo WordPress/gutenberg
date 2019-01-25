@@ -27,14 +27,23 @@ if ( ! __DEV__ ) {
 type PropsType = {
 	initialData: string,
 	initialHtmlModeEnabled: boolean,
+	initialTitle: string,
 };
 
-const AppProvider = ( { initialData, initialHtmlModeEnabled }: PropsType ) => {
+const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: PropsType ) => {
 	if ( initialData === undefined ) {
 		initialData = initialHtml;
 	}
+
+	if ( initialTitle === undefined ) {
+		initialTitle = 'Welcome to Gutenberg!';
+	}
+
 	return (
-		<AppContainer initialHtml={ initialData } initialHtmlModeEnabled={ initialHtmlModeEnabled } />
+		<AppContainer
+			initialHtml={ initialData }
+			initialHtmlModeEnabled={ initialHtmlModeEnabled }
+			title={ initialTitle } />
 	);
 };
 
