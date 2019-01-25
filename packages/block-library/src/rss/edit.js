@@ -140,7 +140,7 @@ class RSSEdit extends Component {
 								label={ __( 'Max length of the excerpt' ) }
 								value={ excerptLength }
 								onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
-								min={ 0 }
+								min={ 10 }
 								max={ 100 }
 							/>
 						}
