@@ -33,6 +33,7 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `gutenberg_content_block_version` has been removed. Use [`block_version`](https://developer.wordpress.org/reference/functions/block_version/) instead.
 - The PHP function `gutenberg_get_block_categories` has been removed. Use [`get_block_categories`](https://developer.wordpress.org/reference/functions/get_block_categories/) instead.
 - The PHP function `register_tinymce_scripts` has been removed. Use [`wp_register_tinymce_scripts`](https://developer.wordpress.org/reference/functions/wp_register_tinymce_scripts/) instead.
+- The PHP function `gutenberg_register_post_types` has been removed.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
