@@ -2,14 +2,16 @@
 
 The `compose` package is a collection of handy [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
-The **compose** function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming world and allows to compose any number of functions. An example that illustrates it for two functions:
+The `compose` function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute each function in sequence, passing the output of the function to the next function.
+
+An example that illustrates it for two functions:
 
 ```js
 const compose = ( f, g ) => x
     => f( g( x ) );
 ```
 
-Here's a simplified example of **compose** in use from our code, see [plugin-sidebar](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js) for full code:
+Here's a simplified example of **compose** in use from Gutenberg's [`PluginSidebar` component](https://github.com/WordPress/gutenberg/blob/master/packages/edit-post/src/components/sidebar/plugin-sidebar/index.js):
 
 Using compose:
 
@@ -28,7 +30,7 @@ export default compose(
 )( PluginSidebarMoreMenuItem );
 ```
 
-Equivalent to the following without compose:
+Without `compose`, the code would look like this:
 
 ```js
 const applyWithSelect = withSelect( ( select, ownProps ) => {
@@ -45,7 +47,7 @@ export default withPluginContext(
 		)
 	)
 );
-```
+
 
 ## Installation
 
@@ -71,6 +73,6 @@ function WrappedComponent( props ) {
 const ComponentWithInstanceIdProp = withInstanceId( WrappedComponent );
 ```
 
-Refer to each Higher Order Component's README file for more details, see [list of components](https://github.com/WordPress/gutenberg/tree/master/packages/compose/src).
+For more details, you can refer to each Higher Order Component's README file. [Available components are located here.](https://github.com/WordPress/gutenberg/tree/master/packages/compose/src)
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
