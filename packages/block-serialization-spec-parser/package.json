@@ -22,6 +22,8 @@
 		"access": "public"
 	},
 	"scripts": {
-		"build": "pegjs --format umd -o ./parser.js ./grammar.pegjs"
+		"build": "concurrently \"npm run build:js\" \"npm run build:php\"",
+		"build:js": "pegjs --format umd -o ./parser.js ./grammar.pegjs",
+		"build:php": "node bin/create-php-parser.js"
 	}
 }
