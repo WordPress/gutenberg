@@ -30,6 +30,7 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `gutenberg_add_edit_link` has been removed.
 - The PHP function `gutenberg_block_bulk_actions` has been removed.
 - The PHP function `gutenberg_replace_default_add_new_button` has been removed.
+- The PHP function `gutenberg_content_block_version` has been removed. Use [`block_version`](https://developer.wordpress.org/reference/functions/block_version/) instead.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
