@@ -70,7 +70,12 @@ public class WPAndroidGlueCode {
         void onCapturePhotoButtonClicked();
     }
 
-    protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener) {
+    public interface OnReattachQueryListener {
+        void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+                                             final OnReattachQueryListener onReattachQueryListener) {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
             public void responseHtml(String title, String html, boolean changed) {
@@ -101,6 +106,7 @@ public class WPAndroidGlueCode {
 
             @Override public void onImageQueryReattach(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
+                onReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
         });
         return Arrays.asList(
@@ -113,6 +119,7 @@ public class WPAndroidGlueCode {
 
     public void onCreateView(View reactRootView, boolean htmlModeEnabled,
                              OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+                             OnReattachQueryListener onReattachQueryListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost) {
         mReactRootView = (ReactRootView) reactRootView;
@@ -121,7 +128,7 @@ public class WPAndroidGlueCode {
                 ReactInstanceManager.builder()
                                     .setApplication(application)
                                     .setJSMainModulePath("index")
-                                    .addPackages(getPackages(onMediaLibraryButtonListener))
+                                    .addPackages(getPackages(onMediaLibraryButtonListener, onReattachQueryListener))
                                     .setUseDeveloperSupport(isDebug)
                                     .setInitialLifecycleState(LifecycleState.RESUMED);
         if (!buildGutenbergFromSource) {
