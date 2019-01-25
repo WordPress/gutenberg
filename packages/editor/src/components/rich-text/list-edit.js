@@ -18,6 +18,8 @@ import {
 import { RichTextShortcut } from './shortcut';
 import BlockFormatControls from '../block-format-controls';
 
+const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+
 /**
  * Gets the selected list node, which is the closest list node to the start of
  * the selection.
@@ -33,8 +35,12 @@ function getSelectedListNode() {
 
 	let { startContainer } = selection.getRangeAt( 0 );
 
-	if ( startContainer.nodeType === window.Node.TEXT_NODE ) {
+	if ( startContainer.nodeType === TEXT_NODE ) {
 		startContainer = startContainer.parentNode;
+	}
+
+	if ( startContainer.nodeType !== ELEMENT_NODE ) {
+		return;
 	}
 
 	const rootNode = startContainer.closest( '*[contenteditable]' );
@@ -46,6 +52,12 @@ function getSelectedListNode() {
 	return startContainer.closest( 'ol,ul' );
 }
 
+/**
+ * Whether or not the root list is selected.
+ *
+ * @return {boolean} True if the root list or nothing is selected, false if an
+ *                   inner list is selected.
+ */
 function isListRootSelected() {
 	const listNode = getSelectedListNode();
 
@@ -53,6 +65,15 @@ function isListRootSelected() {
 	return ! listNode || listNode.contentEditable === 'true';
 }
 
+/**
+ * Wether or not the selected list has the given tag name.
+ *
+ * @param {string}  tagName     The tag name the list should have.
+ * @param {string}  rootTagName The current root tag name, to compare with in
+ *                              case nothing is selected.
+ *
+ * @return {boolean}             [description]
+ */
 function isActiveListType( tagName, rootTagName ) {
 	const listNode = getSelectedListNode();
 
