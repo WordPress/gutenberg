@@ -206,7 +206,7 @@ export function getTableStyles( { width, height } ) {
 	}
 
 	return {
-		width: width ? width : undefined,
+		width: width && width !== '100%' ? width : undefined,
 		height: height ? height : undefined,
 	};
 }
