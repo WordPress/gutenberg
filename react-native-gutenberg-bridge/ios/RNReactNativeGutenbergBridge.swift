@@ -6,9 +6,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     // MARK: - Messaging methods
 
     @objc
-    func provideToNative_Html(_ html: String, changed: Bool) {
+    func provideToNative_Html(_ html: String, title: String, changed: Bool) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidProvideHTML(html, changed: changed)
+            self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed)
         }
     }
 
@@ -36,6 +36,7 @@ extension RNReactNativeGutenbergBridge {
         return [
             Gutenberg.EventName.requestHTML,
             Gutenberg.EventName.toggleHTMLMode,
+            Gutenberg.EventName.setTitle,
             Gutenberg.EventName.updateHtml
         ]
     }

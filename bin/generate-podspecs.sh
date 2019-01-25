@@ -16,7 +16,6 @@ node_modules/react-native/ReactCommon/yoga/yoga.podspec
 node_modules/react-native/third-party-podspecs/Folly.podspec
 node_modules/react-native/third-party-podspecs/DoubleConversion.podspec
 node_modules/react-native/third-party-podspecs/glog.podspec
-react-native-aztec/RNTAztecView.podspec
 EOP
 )
 

@@ -39,11 +39,13 @@ public class WPAndroidGlueCode {
     private MediaSelectedCallback mPendingMediaSelectedCallback;
 
     private String mContentHtml = "";
+    private String mTitle = "";
     private boolean mContentChanged;
     private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
+    private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
     private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
 
     public void onCreate(Context context) {
@@ -69,9 +71,12 @@ public class WPAndroidGlueCode {
     protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener) {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
-            public void responseHtml(String html, boolean changed) {
+            public void responseHtml(String title, String html, boolean changed) {
                 mContentHtml = html;
-                mContentChanged = changed;
+                mTitle = title;
+                // This code is called twice. When getTitle and getContent are called.
+                // Make sure mContentChanged has the correct value (true) if one of the call returned with changes.
+                mContentChanged = mContentChanged || changed;
                 mGetContentCountDownLatch.countDown();
             }
 
@@ -109,6 +114,8 @@ public class WPAndroidGlueCode {
             @Override
             public void onReactContextInitialized(ReactContext context) {
                 mReactContext = context;
+                // The React Context is now initialized. Update title and content.
+                WPAndroidGlueCode.this.setContent(mTitle, mContentHtml);
             }
         });
         Bundle initialProps = mReactRootView.getAppProperties();
@@ -116,6 +123,7 @@ public class WPAndroidGlueCode {
             initialProps = new Bundle();
         }
         initialProps.putString(PROP_NAME_INITIAL_DATA, "");
+        initialProps.putString(PROP_NAME_INITIAL_TITLE, "");
         initialProps.putBoolean(PROP_NAME_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled);
 
 
@@ -124,7 +132,7 @@ public class WPAndroidGlueCode {
         mReactRootView.setAppProperties(initialProps);
 
         if (isNewPost) {
-            initContent("");
+            setContent("", "");
         }
     }
 
@@ -178,7 +186,7 @@ public class WPAndroidGlueCode {
         mReactInstanceManager.showDevOptionsDialog();
     }
 
-    public void setContent(String postContent) {
+    public void setContent(String title, String postContent) {
         if (mReactRootView == null) {
             return;
         }
@@ -187,25 +195,43 @@ public class WPAndroidGlueCode {
         // because we don't want to bootstrap the whole Gutenberg state.
         // Otherwise it should be done through module interface
         if (mShouldUpdateContent) {
-            updateContent(postContent);
+            updateContent(title, postContent);
         } else {
             mShouldUpdateContent = true;
-            initContent(postContent);
+            initContent(title, postContent);
         }
     }
 
-    private void initContent(String content) {
+    private void initContent(String title, String content) {
         Bundle appProps = mReactRootView.getAppProperties();
         if (appProps == null) {
             appProps = new Bundle();
         }
-        appProps.putString(PROP_NAME_INITIAL_DATA, content);
+        if (content != null) {
+            appProps.putString(PROP_NAME_INITIAL_DATA, content);
+            mContentHtml = content;
+        }
+        if (title != null) {
+            appProps.putString(PROP_NAME_INITIAL_TITLE, title);
+            mTitle = title;
+        }
         mReactRootView.startReactApplication(mReactInstanceManager, "gutenberg", appProps);
     }
 
-    private void updateContent(String content) {
+    private void updateContent(String title, String content) {
+        if (content != null) {
+            mContentHtml = content;
+        }
+        if (title != null) {
+            mTitle = title;
+        }
         if (mReactContext != null) {
-            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setHtmlInJS(content);
+            if (content != null) {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setHtmlInJS(content);
+            }
+            if (title != null) {
+                mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setTitleInJS(title);
+            }
         }
     }
 
@@ -231,6 +257,26 @@ public class WPAndroidGlueCode {
         }
 
         return originalContent;
+    }
+
+    public CharSequence getTitle(OnGetContentTimeout onGetContentTimeout) {
+        if (mReactContext != null) {
+            mGetContentCountDownLatch = new CountDownLatch(1);
+
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().getHtmlFromJS();
+
+            try {
+                mGetContentCountDownLatch.await(10, TimeUnit.SECONDS);
+            } catch (InterruptedException ie) {
+                onGetContentTimeout.onGetContentTimeout(ie);
+            }
+
+            return mTitle == null ? "" : mTitle;
+        } else {
+            // TODO: Add app logging here
+        }
+
+        return "";
     }
 
     public void appendMediaFile(final String mediaUrl) {

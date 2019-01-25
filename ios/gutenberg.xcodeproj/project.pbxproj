@@ -45,6 +45,10 @@
 		F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15198392100DC3D000F6E97 /* AppDelegate.swift */; };
 		F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F151983A2100DC3D000F6E97 /* MediaProvider.swift */; };
 		F19CFDA821021EB100EAB240 /* Aztec.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1289ECA2100E4320091E81D /* Aztec.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F1EE6F7821E7F0A500241744 /* NotoSerif-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7421E7F0A500241744 /* NotoSerif-BoldItalic.ttf */; };
+		F1EE6F7921E7F0A500241744 /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7521E7F0A500241744 /* NotoSerif-Regular.ttf */; };
+		F1EE6F7A21E7F0A500241744 /* NotoSerif-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7621E7F0A500241744 /* NotoSerif-Italic.ttf */; };
+		F1EE6F7B21E7F0A500241744 /* NotoSerif-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7721E7F0A500241744 /* NotoSerif-Bold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -423,6 +427,10 @@
 		F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */ = {isa = PBXFileReference; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = "gutenberg-Bridging-Header.h"; sourceTree = "<group>"; tabWidth = 1; };
 		F15198392100DC3D000F6E97 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = gutenberg/AppDelegate.swift; sourceTree = "<group>"; tabWidth = 1; };
 		F151983A2100DC3D000F6E97 /* MediaProvider.swift */ = {isa = PBXFileReference; fileEncoding = 4; indentWidth = 4; lastKnownFileType = sourcecode.swift; name = MediaProvider.swift; path = gutenberg/MediaProvider.swift; sourceTree = "<group>"; tabWidth = 1; usesTabs = 0; };
+		F1EE6F7421E7F0A500241744 /* NotoSerif-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-BoldItalic.ttf"; sourceTree = "<group>"; };
+		F1EE6F7521E7F0A500241744 /* NotoSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Regular.ttf"; sourceTree = "<group>"; };
+		F1EE6F7621E7F0A500241744 /* NotoSerif-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Italic.ttf"; sourceTree = "<group>"; };
+		F1EE6F7721E7F0A500241744 /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Bold.ttf"; sourceTree = "<group>"; };
 		F619623252704B46A619C33C /* RNTAztecView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTAztecView.xcodeproj; path = "../react-native-aztec/ios/RNTAztecView.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -678,6 +686,7 @@
 			isa = PBXGroup;
 			children = (
 				13B07FAE1A68108700A75B9A /* gutenberg */,
+				F1EE6F7221E7F0A500241744 /* resources */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* gutenbergTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -742,6 +751,26 @@
 				F1B3E7BD20FFA99B0042D8C3 /* libRNTAztecView.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		F1EE6F7221E7F0A500241744 /* resources */ = {
+			isa = PBXGroup;
+			children = (
+				F1EE6F7321E7F0A500241744 /* fonts */,
+			);
+			name = resources;
+			path = ../resources;
+			sourceTree = "<group>";
+		};
+		F1EE6F7321E7F0A500241744 /* fonts */ = {
+			isa = PBXGroup;
+			children = (
+				F1EE6F7421E7F0A500241744 /* NotoSerif-BoldItalic.ttf */,
+				F1EE6F7521E7F0A500241744 /* NotoSerif-Regular.ttf */,
+				F1EE6F7621E7F0A500241744 /* NotoSerif-Italic.ttf */,
+				F1EE6F7721E7F0A500241744 /* NotoSerif-Bold.ttf */,
+			);
+			path = fonts;
 			sourceTree = "<group>";
 		};
 		FFEDF6EF21241BDF007FCC6D /* Products */ = {
@@ -1266,7 +1295,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				F1EE6F7B21E7F0A500241744 /* NotoSerif-Bold.ttf in Resources */,
+				F1EE6F7921E7F0A500241744 /* NotoSerif-Regular.ttf in Resources */,
+				F1EE6F7A21E7F0A500241744 /* NotoSerif-Italic.ttf in Resources */,
 				13B07FBD1A68108700A75B9A /* LaunchScreen.xib in Resources */,
+				F1EE6F7821E7F0A500241744 /* NotoSerif-BoldItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

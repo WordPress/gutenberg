@@ -5,9 +5,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// You can request HTML content by calling `requestHTML()` on a Gutenberg bridge instance.
     ///
     /// - Parameters:
-    ///   - html: The current HTML presented by the editor.
-    ///   - changed: True if the given HTML presents changes from the last request or initial value.
-    func gutenbergDidProvideHTML(_ html: String, changed: Bool)
+    ///     - title: the title as shown by the editor.
+    ///     - html: The current HTML presented by the editor.
+    ///     - changed: True if the given HTML presents changes from the last request or initial value.
+    func gutenbergDidProvideHTML(title: String, html: String, changed: Bool)
 
     /// Tells the delegate that an image block requested an image from the media picker.
     ///
