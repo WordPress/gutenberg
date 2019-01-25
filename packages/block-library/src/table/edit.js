@@ -424,6 +424,14 @@ export class TableEdit extends Component {
 								<CellTag
 									key={ columnIndex }
 									className={ cellClasses }
+									onClick={ ( event ) => {
+										// When a cell is selected, forward focus to the child contenteditable. This solves an issue where the
+										// user may click inside a cell, but outside of the contenteditable, resulting in nothing happening.
+										const contentEditable = event && event.target && event.target.querySelector( '[contenteditable=true]' );
+										if ( contentEditable ) {
+											contentEditable.focus();
+										}
+									} }
 								>
 									<RichText
 										value={ content }
