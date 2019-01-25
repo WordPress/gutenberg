@@ -109,8 +109,10 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( images ) {
+		const { columns } = this.props.attributes;
 		this.setAttributes( {
 			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+			columns: columns ? Math.min( images.length, columns ) : columns,
 		} );
 	}
 
