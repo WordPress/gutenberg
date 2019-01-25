@@ -146,7 +146,8 @@ function is_gutenberg_page() {
  */
 function gutenberg_wordpress_version_notice() {
 	echo '<div class="error"><p>';
-	_e( 'Gutenberg requires WordPress 5.0.0 or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' );
+	/* translators: %s: Minimum required version */
+	printf( __( 'Gutenberg requires WordPress %s or later to function properly. Please upgrade WordPress before activating Gutenberg.', 'gutenberg' ), '5.0.0' );
 	echo '</p></div>';
 
 	deactivate_plugins( array( 'gutenberg/gutenberg.php' ) );
