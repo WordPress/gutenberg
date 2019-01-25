@@ -26,6 +26,18 @@ A RangeControl can contain the following elements:
 4. **Icon** (optional): An icon can be displayed before or after the range slider.
 5. **Tick mark** (optional): Tick marks represent predetermined values to which the user can move the slider.
 
+### Types
+
+#### Continuous sliders
+
+Continuous sliders allow users to select a value along a subjective range. They do not display the selected numeric value. Use them when displaying/editing the numeric value is not important, like volume.
+
+#### Discrete sliders
+
+Discrete sliders can be adjusted to a specific value by referencing its value entry field. Use them when it’s important to display/edit the numeric value, like text size.
+
+Possible selections may be organized through the use of tick marks, which a slider thumb will snap to (or to which an input will round up or down).
+
 ### Behavior
 
 - **Click and drag**: The range slider is controlled by clicking the thumb and dragging it.
@@ -71,18 +83,6 @@ RangeControls should only be used for choosing selections from a range of values
 
 **Don’t**
 Sliders should provide the full range of choices available for the user to select from (e.g., don’t disable only part of a range slider).
-
-#### Types
-
-##### Continuous sliders
-
-Continuous sliders allow users to select a value along a subjective range. They do not display the selected numeric value. Use them when displaying/editing the numeric value is not important, like volume.
-
-##### Discrete sliders
-
-Discrete sliders can be adjusted to a specific value by referencing its value entry field. Use them when it’s important to display/edit the numeric value, like text size.
-
-Possible selections may be organized through the use of tick marks, which a slider thumb will snap to (or to which an input will round up or down).
 
 ## Development guidelines
 
