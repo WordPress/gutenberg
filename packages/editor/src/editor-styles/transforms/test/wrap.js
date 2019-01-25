@@ -61,4 +61,15 @@ describe( 'CSS selector wrap', () => {
 
 		expect( output ).toMatchSnapshot();
 	} );
+
+	it( 'should replace :root selectors', () => {
+		const callback = wrap( '.my-namespace' );
+		const input = `
+		:root {
+			--my-color: #ff0000;
+		}`;
+		const output = traverse( input, callback );
+
+		expect( output ).toMatchSnapshot();
+	} );
 } );

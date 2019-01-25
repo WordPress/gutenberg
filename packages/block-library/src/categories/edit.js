@@ -57,8 +57,7 @@ class CategoriesEdit extends Component {
 	}
 
 	getCategoryListClassName( level ) {
-		const { className } = this.props;
-		return `${ className }__list ${ className }__list-level-${ level }`;
+		return `wp-block-categories__list wp-block-categories__list-level-${ level }`;
 	}
 
 	renderCategoryName( category ) {
@@ -89,7 +88,7 @@ class CategoriesEdit extends Component {
 			<li key={ category.id }>
 				<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
 				{ showPostCounts &&
-					<span className={ `${ this.props.className }__post-count` }>
+					<span className="wp-block-categories__post-count">
 						{ ' ' }({ category.count })
 					</span>
 				}
@@ -107,7 +106,7 @@ class CategoriesEdit extends Component {
 	}
 
 	renderCategoryDropdown() {
-		const { showHierarchy, instanceId, className } = this.props;
+		const { showHierarchy, instanceId } = this.props;
 		const parentId = showHierarchy ? 0 : null;
 		const categories = this.getCategories( parentId );
 		const selectId = `blocks-category-select-${ instanceId }`;
@@ -116,7 +115,7 @@ class CategoriesEdit extends Component {
 				<label htmlFor={ selectId } className="screen-reader-text">
 					{ __( 'Categories' ) }
 				</label>
-				<select id={ selectId } className={ `${ className }__dropdown` }>
+				<select id={ selectId } className="wp-block-categories__dropdown">
 					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
 				</select>
 			</Fragment>

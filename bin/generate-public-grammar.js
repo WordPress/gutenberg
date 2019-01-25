@@ -93,7 +93,7 @@ function flatten( expression ) {
 
 fs.writeFileSync(
 	path.join( __dirname, '..', 'docs', 'grammar.md' ), `
-# The Gutenberg block grammar
+# Block Grammar
 
 ${ flatten( grammar ) }
 ` );

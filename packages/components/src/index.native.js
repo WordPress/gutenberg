@@ -9,3 +9,4 @@ export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot
 
 // Higher-Order Components
 export { default as withFilters } from './higher-order/with-filters';
+export { default as withFocusOutside } from './higher-order/with-focus-outside';
