@@ -181,7 +181,7 @@ export default class ImageEdit extends React.Component {
 						return (
 							<View style={ { flex: 1 } } >
 								<Image
-									style={ { width: finalWidth, height: finalHeight, opacity: opacity } }
+									style={ { width: finalWidth, height: finalHeight, opacity } }
 									resizeMethod="scale"
 									source={ { uri: url } }
 									key={ url }
