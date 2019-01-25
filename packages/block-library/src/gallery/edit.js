@@ -202,7 +202,7 @@ class GalleryEdit extends Component {
 							render={ ( { open } ) => (
 								<IconButton
 									className="components-toolbar__control"
-									label={ __( 'Edit Gallery' ) }
+									label={ __( 'Edit gallery' ) }
 									icon="edit"
 									onClick={ open }
 								/>
