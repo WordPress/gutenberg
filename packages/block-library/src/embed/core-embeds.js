@@ -16,6 +16,7 @@ import {
 	embedVimeoIcon,
 	embedRedditIcon,
 	embedTumbrIcon,
+	embedAmazonIcon,
 } from './icons';
 
 /**
@@ -337,5 +338,25 @@ export const others = [
 			description: __( 'Embed a WordPress.tv video.' ),
 		},
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
+	},
+	{
+		name: 'core-embed/amazon-kindle',
+		settings: {
+			title: 'Amazon Kindle',
+			icon: embedAmazonIcon,
+			description: __( 'Embed Amazon Kindle content.' ),
+		},
+		patterns: [
+			/^https?:\/\/([a-z0-9-]+\.)?amazon\.(com|com\.mx|com\.br|ca)\/./i,
+			/^https?:\/\/([a-z0-9-]+\.)?amazon\.(co\.uk|de|fr|it|es|in|nl|ru)\/./i,
+			/^https?:\/\/([a-z0-9-]+\.)?amazon\.(co\.jp|com\.au)\/./i,
+			/^https?:\/\/([a-z0-9-]+\.)?amazon\.cn\/./i,
+			/^https?:\/\/(www\.)?a\.co\/./i,
+			/^https?:\/\/(www\.)?amzn\.to\/./i,
+			/^https?:\/\/(www\.)?amzn\.eu\/./i,
+			/^https?:\/\/(www\.)?amzn\.in\/./i,
+			/^https?:\/\/(www\.)?amzn\.asia\/./i,
+			/^https?:\/\/(www\.)?z\.cn\/./i,
+		],
 	},
 ];
