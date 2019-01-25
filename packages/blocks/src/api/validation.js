@@ -154,17 +154,16 @@ const TEXT_NORMALIZATIONS = [
 ];
 
 /**
- * Subsitute EntityParser class for `simple-html-tokenizer` which bypasses
- * entity substitution in favor of validator's internal normalization.
+ * Subsitute EntityParser class for `simple-html-tokenizer` which uses the
+ * implementation of `decodeEntities` from `html-entities`, in order to avoid
+ * bundling a massive named character reference.
  *
  * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
  */
-export class IdentityEntityParser {
+export class DecodeEntityParser {
 	/**
 	 * Returns a substitute string for an entity string sequence between `&`
 	 * and `;`, or undefined if no substitution should occur.
-	 *
-	 * In this implementation, undefined is always returned.
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
@@ -451,7 +450,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  */
 function getHTMLTokens( html ) {
 	try {
-		return new Tokenizer( new IdentityEntityParser() ).tokenize( html );
+		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
 	} catch ( e ) {
 		log.warning( 'Malformed HTML detected: %s', html );
 	}

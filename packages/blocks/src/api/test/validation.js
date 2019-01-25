@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import {
-	IdentityEntityParser,
+	DecodeEntityParser,
 	getTextPiecesSplitOnWhitespace,
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
@@ -41,13 +41,13 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'IdentityEntityParser', () => {
+	describe( 'DecodeEntityParser', () => {
 		it( 'can be constructed', () => {
-			expect( new IdentityEntityParser() instanceof IdentityEntityParser ).toBe( true );
+			expect( new DecodeEntityParser() instanceof DecodeEntityParser ).toBe( true );
 		} );
 
 		it( 'returns parse as decoded value', () => {
-			expect( new IdentityEntityParser().parse( 'quot' ) ).toBe( '"' );
+			expect( new DecodeEntityParser().parse( 'quot' ) ).toBe( '"' );
 		} );
 	} );
 
