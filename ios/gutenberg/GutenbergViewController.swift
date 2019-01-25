@@ -30,7 +30,7 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-    
+
     func gutenbergDidLoad() {
         
     }
@@ -47,12 +47,20 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(1, "https://cldup.com/cXyG__fTLN.jpg")
     }
     
-    func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaToUploadCallback) {
-        print("Gutenberg did request a device media picker, passing a sample url in callback and a fake ID")
+    func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaCallback) {
+        print("Gutenberg did request a device media picker, opening the device picker")
         mediaPickAndUploadCoordinator = MediaPickAndUploadCoordinator(presenter: self, gutenberg: gutenberg, mediaCallback: callback, finishCallback: {
             self.mediaPickAndUploadCoordinator = nil
         } )
-        mediaPickAndUploadCoordinator?.pickAndUpload()
+        mediaPickAndUploadCoordinator?.pickAndUpload(from: .savedPhotosAlbum)
+    }
+
+    func gutenbergDidRequestMediaFromCameraPicker(with callback: @escaping MediaPickerDidPickMediaCallback) {
+        print("Gutenberg did request a device media picker, opening the camera picker")
+        mediaPickAndUploadCoordinator = MediaPickAndUploadCoordinator(presenter: self, gutenberg: gutenberg, mediaCallback: callback, finishCallback: {
+            self.mediaPickAndUploadCoordinator = nil
+        } )
+        mediaPickAndUploadCoordinator?.pickAndUpload(from: .camera)
     }
 }
 

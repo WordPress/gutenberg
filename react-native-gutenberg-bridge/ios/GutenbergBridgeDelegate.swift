@@ -1,5 +1,4 @@
 public typealias MediaPickerDidPickMediaCallback = (_ id: Int?, _ url: String?) -> Void
-public typealias MediaPickerDidPickMediaToUploadCallback = (_ id: Int?, _ url: String?) -> Void
 
 public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that Gutenberg had returned the requested HTML content.
@@ -19,9 +18,15 @@ public protocol GutenbergBridgeDelegate: class {
     
     /// Tells the delegate that an image block requested an image from the device media.
     ///
+    /// - Parameter callback: A callbak block to be called with an upload mediaIdentifier and a placaholder image file url,
+    ///                       use nil on both parameters to signal that the action was canceled.
+    func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaCallback)
+
+    /// Tells the delegate that an image block requested an image from the device cameras.
+    ///
     /// - Parameter callback: A callbak block to be called with and temporary
     ///                       image file url and an mediaIdentifier or nil to signal that the action was canceled.
-    func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaToUploadCallback)
+    func gutenbergDidRequestMediaFromCameraPicker(with callback: @escaping MediaPickerDidPickMediaCallback)
 
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///

@@ -87,7 +87,32 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.onUploadMediaPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
             public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
-                onUploadMediaSelected.invoke(mediaId, mediaUri);
+                onUploadMediaSelected.invoke(mediaId, mediaUri, 0);
+            }
+
+            @Override
+            public void onMediaFileUploadProgress(int mediaId, float progress) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
+            }
+
+            @Override
+            public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
+            }
+
+            @Override
+            public void onMediaFileUploadFailed(int mediaId) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0 );
+            }
+        });
+    }
+
+    @ReactMethod
+    public void onCapturePhotoPressed(final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.onCapturePhotoPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
+            @Override
+            public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
+                onUploadMediaSelected.invoke(mediaId, mediaUri, 0);
             }
 
             @Override
