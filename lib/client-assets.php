@@ -1103,6 +1103,11 @@ JS;
 	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
 	$font_sizes              = current( (array) get_theme_support( 'editor-font-sizes' ) );
 
+	if ( ! empty( $gutenberg_theme_support ) ) {
+		wp_enqueue_script( 'wp-deprecated' );
+		wp_add_inline_script( 'wp-deprecated', 'wp.deprecated( "`gutenberg` theme support", { plugin: "Gutenberg", version: "5.2", alternative: "`align-wide` theme support" } );' );
+	}
+
 	/**
 	 * Filters the allowed block types for the editor, defaulting to true (all
 	 * block types supported).
