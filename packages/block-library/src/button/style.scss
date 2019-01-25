@@ -32,7 +32,8 @@ $blocks-button__height: 56px;
 
 	&:hover,
 	&:focus,
-	&:active {
+	&:active,
+	&:visited {
 		color: inherit;
 	}
 }
@@ -45,7 +46,7 @@ $blocks-button__height: 56px;
 	color: $dark-gray-700;
 
 	.wp-block-button__link {
-		background: transparent;
+		background-color: transparent;
 		border: 2px solid currentcolor;
 	}
 }
