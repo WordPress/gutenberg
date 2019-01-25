@@ -21,19 +21,16 @@ import { getParentLineIndex } from './get-parent-line-index';
  */
 export function changeListType( value, newFormat ) {
 	const { text, formats, start, end } = value;
-	const startLineIndex = getLineIndex( value, start );
-	const endLineIndex = getLineIndex( value, end );
-	const startLineFormats = formats[ startLineIndex ] || [];
-	const endLineFormats = formats[ endLineIndex ] || [];
-	const startIndex = getParentLineIndex( value, startLineIndex, startLineFormats.length );
-	const length = text.length;
+	const startLineFormats = formats[ getLineIndex( value, start ) ] || [];
+	const endLineFormats = formats[ getLineIndex( value, end ) ] || [];
+	const startIndex = getParentLineIndex( value, start );
 	const newFormats = formats.slice( 0 );
 	const startCount = startLineFormats.length - 1;
 	const endCount = endLineFormats.length - 1;
 
 	let changed;
 
-	for ( let index = startIndex + 1 || 0; index < length; index++ ) {
+	for ( let index = startIndex + 1 || 0; index < text.length; index++ ) {
 		if ( text[ index ] !== LINE_SEPARATOR ) {
 			continue;
 		}

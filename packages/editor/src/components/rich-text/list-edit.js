@@ -18,54 +18,49 @@ import {
 import { RichTextShortcut } from './shortcut';
 import BlockFormatControls from '../block-format-controls';
 
-function isListRootSelected() {
+/**
+ * Gets the selected list node, which is the closest list node to the start of
+ * the selection.
+ *
+ * @return {?Element} The selected list node, or undefined if none is selected.
+ */
+function getSelectedListNode() {
 	const selection = window.getSelection();
 
 	if ( selection.rangeCount === 0 ) {
-		return true;
-	}
-
-	let { startContainer } = selection.getRangeAt( 0 );
-
-	if ( startContainer.nodeType === window.Node.TEXT_NODE ) {
-		startContainer = startContainer.parentNode;
-	}
-
-	const rootNode = startContainer.closest( '*[contenteditable]' );
-
-	if ( ! rootNode || ! rootNode.contains( startContainer ) ) {
-		return true;
-	}
-
-	return startContainer.closest( 'ol,ul' ) === rootNode;
-}
-
-function isActiveListType( tagName, rootTagName ) {
-	const selection = window.getSelection();
-
-	if ( selection.rangeCount === 0 ) {
-		return tagName === rootTagName;
-	}
-
-	let { startContainer } = selection.getRangeAt( 0 );
-
-	if ( startContainer.nodeType === window.Node.TEXT_NODE ) {
-		startContainer = startContainer.parentNode;
-	}
-
-	const rootNode = startContainer.closest( '*[contenteditable]' );
-
-	if ( ! rootNode || ! rootNode.contains( startContainer ) ) {
-		return tagName === rootTagName;
-	}
-
-	const list = startContainer.closest( 'ol,ul' );
-
-	if ( ! list ) {
 		return;
 	}
 
-	return list.nodeName.toLowerCase() === tagName;
+	let { startContainer } = selection.getRangeAt( 0 );
+
+	if ( startContainer.nodeType === window.Node.TEXT_NODE ) {
+		startContainer = startContainer.parentNode;
+	}
+
+	const rootNode = startContainer.closest( '*[contenteditable]' );
+
+	if ( ! rootNode || ! rootNode.contains( startContainer ) ) {
+		return;
+	}
+
+	return startContainer.closest( 'ol,ul' );
+}
+
+function isListRootSelected() {
+	const listNode = getSelectedListNode();
+
+	// Consider the root list selected if nothing is selected.
+	return ! listNode || listNode.contentEditable === 'true';
+}
+
+function isActiveListType( tagName, rootTagName ) {
+	const listNode = getSelectedListNode();
+
+	if ( ! listNode ) {
+		return tagName === rootTagName;
+	}
+
+	return listNode.nodeName.toLowerCase() === tagName;
 }
 
 export const ListEdit = ( {

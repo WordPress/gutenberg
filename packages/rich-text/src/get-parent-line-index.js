@@ -15,9 +15,8 @@ import { LINE_SEPARATOR } from './special-characters';
  * @return {Array} The parent list line index.
  */
 export function getParentLineIndex( { text, formats }, startIndex ) {
-	const startFormats = formats[ startIndex ] || [];
-
 	let index = startIndex;
+	let startFormats;
 
 	while ( index-- ) {
 		if ( text[ index ] !== LINE_SEPARATOR ) {
@@ -26,7 +25,12 @@ export function getParentLineIndex( { text, formats }, startIndex ) {
 
 		const formatsAtIndex = formats[ index ] || [];
 
-		if ( formatsAtIndex.length === startFormats - 1 ) {
+		if ( ! startFormats ) {
+			startFormats = formatsAtIndex;
+			continue;
+		}
+
+		if ( formatsAtIndex.length === startFormats.length - 1 ) {
 			return index;
 		}
 	}

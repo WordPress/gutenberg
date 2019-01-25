@@ -24,17 +24,15 @@ export function indentListItems( value, rootFormat ) {
 
 	const { text, formats, start, end } = value;
 	const formatsAtLineIndex = formats[ lineIndex ] || [];
-	const previousLineIndex = getLineIndex( value, lineIndex );
-	const formatsAtPreviousLineIndex = formats[ previousLineIndex ] || [];
+	const targetFormats = formats[ getLineIndex( value, lineIndex ) ] || [];
 
 	// The the indentation of the current line is greater than previous line,
 	// then the line cannot be furter indented.
-	if ( formatsAtLineIndex.length > formatsAtPreviousLineIndex.length ) {
+	if ( formatsAtLineIndex.length > targetFormats.length ) {
 		return value;
 	}
 
 	const newFormats = formats.slice();
-	const targetFormats = formats[ getLineIndex( value, lineIndex ) ] || [];
 
 	for ( let index = lineIndex; index < end; index++ ) {
 		if ( text[ index ] !== LINE_SEPARATOR ) {
