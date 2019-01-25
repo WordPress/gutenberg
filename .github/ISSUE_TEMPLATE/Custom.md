@@ -6,9 +6,9 @@ about: Please post help requests or ‘how to’ questions in support channels f
 
 Search first! Your issue may have already been reported.
 
-Please post general help requests in the support forum at https://wordpress.org/support/forum/how-to-and-troubleshooting/.
+For general help requests, please post in the support forum at https://wordpress.org/support/forum/how-to-and-troubleshooting/.
 
-Please post technical help requests in the support forum at https://wordpress.org/support/forum/wp-advanced/. 
+Technical help requests have their own section of the support forum at https://wordpress.org/support/forum/wp-advanced/. 
 
 You may also ask for technical support at https://wordpress.stackexchange.com/.
 
