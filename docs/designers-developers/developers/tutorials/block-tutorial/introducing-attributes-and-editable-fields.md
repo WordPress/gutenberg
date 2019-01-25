@@ -120,6 +120,20 @@ Earlier examples used the `createElement` function to create DOM nodes, but it's
 
 The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc. It is not too much unlike the single editor region of the legacy post editor, and is in fact powered by the same TinyMCE library.
 
+To use the `RichText` component, add `wp-editor` to the array of registered script handles when calling `wp_register_script`.
+
+```php
+wp_register_script(
+	'gutenberg-boilerplate-es5-step03',
+	plugins_url( 'step-03/block.js', __FILE__ ),
+	array( 
+		'wp-blocks', 
+		'wp-element', 
+		'wp-editor', // Note the addition of wp-editor to the dependencies
+	)
+);
+```
+
 Implementing this behavior as a component enables you as the block implementer to be much more granular about editable fields. Your block may not need `RichText` at all, or it may need many independent `RichText` elements, each operating on a subset of the overall block state.
 
 Because `RichText` allows for nested nodes, you'll most often use it in conjunction with the `html` attribute source when extracting the value from saved content. You'll also use `RichText.Content` in the `save` function to output RichText values.
