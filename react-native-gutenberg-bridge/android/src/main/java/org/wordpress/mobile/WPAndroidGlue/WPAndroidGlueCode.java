@@ -98,6 +98,10 @@ public class WPAndroidGlueCode {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
+
+            @Override public void onImageQueryReattach(MediaUploadCallback mediaUploadCallback) {
+                mPendingMediaUploadCallback = mediaUploadCallback;
+            }
         });
         return Arrays.asList(
                 new MainReactPackage(),
