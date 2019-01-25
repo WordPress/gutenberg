@@ -1,3 +1,7 @@
+## 2.1.0 (Unreleased)
+
+- A `parser.php` file generated from the PEGJS grammar is now included.
+
 ## 2.0.2 (2018-12-12)
 
 ## 2.0.1 (2018-11-30)
