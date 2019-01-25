@@ -355,12 +355,15 @@ function gutenberg_content_has_blocks( $content ) {
  *
  * @since 2.8.0
  * @see gutenberg_content_has_blocks()
+ * @deprecated 5.0.0 block_version
  *
  * @param string $content Content to test.
  * @return int The block format version.
  */
 function gutenberg_content_block_version( $content ) {
-	return has_blocks( $content ) ? 1 : 0;
+	_deprecated_function( __FUNCTION__, '5.0.0', 'block_version' );
+
+	return block_version( $content );
 }
 
 /**
