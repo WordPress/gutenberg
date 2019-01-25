@@ -192,13 +192,4 @@ class Admin_Test extends WP_UnitTestCase {
 		$link = apply_filters( 'wp_prepare_revision_for_js', array( 'restoreUrl' => 'http://test.com' ) );
 		$this->assertEquals( array( 'restoreUrl' => 'http://test.com' ), $link );
 	}
-
-	/**
-	 * Ensure gutenberg_preload_api_request() works without notices in PHP 5.2.
-	 *
-	 * The array_reduce() function only accepts mixed variables starting with PHP 5.3.
-	 */
-	function test_preload_api_request_no_notices_php_52() {
-		$this->assertTrue( is_array( gutenberg_preload_api_request( 0, '/' ) ) );
-	}
 }
