@@ -29,6 +29,24 @@ import { isShallowEqualArrays } from '@wordpress/is-shallow-equal';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 ```
 
+Shallow comparison differs from deep comparison by the fact that nested objects must be the exact same variable and not only have the same values. In situations where nested objects must be compared value by value, `isEqual` from `lodash` is recommended.
+
+```js
+import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isEqual } from 'lodash'; // deep comparison
+
+let object = { a: 1 };
+
+isShallowEqual( [ { a: 1 } ], [ { a: 1 } ] );
+// ⇒ false
+
+isEqual( [ { a: 1 } ], [ { a: 1 } ] );
+// ⇒ true
+
+isShallowEqual( [ object ], [ object ] );
+// ⇒ true
+```
+
 ## Rationale
 
 Shallow equality utilities are already a dime a dozen. Since these operations are often at the core of critical hot code paths, the WordPress contributors had specific requirements that were found to only be partially satisfied by existing solutions.
