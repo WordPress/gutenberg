@@ -13,10 +13,40 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func onMediaLibraryPress(_ callback: @escaping RCTResponseSenderBlock) {
+    func onMediaLibraryPressed(_ callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaPicker(with: { (url) in
-                callback(self.optionalArray(from: url))
+            self.delegate?.gutenbergDidRequestMediaPicker(with: { (mediaID, url) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
+            })
+        }
+    }
+    
+    @objc
+    func onUploadMediaPressed(_ callback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFromDevicePicker(with: { (mediaID, url) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
+            })
+        }
+    }
+
+    @objc
+    func onCapturePhotoPressed(_ callback: @escaping RCTResponseSenderBlock) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFromCameraPicker(with: { (mediaID, url) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
             })
         }
     }
@@ -37,7 +67,8 @@ extension RNReactNativeGutenbergBridge {
             Gutenberg.EventName.requestHTML,
             Gutenberg.EventName.toggleHTMLMode,
             Gutenberg.EventName.setTitle,
-            Gutenberg.EventName.updateHtml
+            Gutenberg.EventName.updateHtml,
+            Gutenberg.EventName.mediaUpload
         ]
     }
 
@@ -58,10 +89,12 @@ extension RNReactNativeGutenbergBridge {
 // MARK: - Helpers
 
 extension RNReactNativeGutenbergBridge {
+    
     func optionalArray(from optionalString: String?) -> [String]? {
         guard let string = optionalString else {
             return nil
         }
         return [string]
     }
+
 }
