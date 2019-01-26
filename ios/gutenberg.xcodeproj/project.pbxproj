@@ -49,6 +49,7 @@
 		F1EE6F7921E7F0A500241744 /* NotoSerif-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7521E7F0A500241744 /* NotoSerif-Regular.ttf */; };
 		F1EE6F7A21E7F0A500241744 /* NotoSerif-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7621E7F0A500241744 /* NotoSerif-Italic.ttf */; };
 		F1EE6F7B21E7F0A500241744 /* NotoSerif-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F1EE6F7721E7F0A500241744 /* NotoSerif-Bold.ttf */; };
+		FF9A6F4121FA8E2500D36D14 /* MediaPickAndUploadCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF9A6F1621FA8E2500D36D14 /* MediaPickAndUploadCoordinator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -432,6 +433,7 @@
 		F1EE6F7621E7F0A500241744 /* NotoSerif-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Italic.ttf"; sourceTree = "<group>"; };
 		F1EE6F7721E7F0A500241744 /* NotoSerif-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "NotoSerif-Bold.ttf"; sourceTree = "<group>"; };
 		F619623252704B46A619C33C /* RNTAztecView.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNTAztecView.xcodeproj; path = "../react-native-aztec/ios/RNTAztecView.xcodeproj"; sourceTree = "<group>"; };
+		FF9A6F1621FA8E2500D36D14 /* MediaPickAndUploadCoordinator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MediaPickAndUploadCoordinator.swift; path = gutenberg/MediaPickAndUploadCoordinator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -582,6 +584,7 @@
 				F15198372100DC3C000F6E97 /* gutenberg-Bridging-Header.h */,
 				F15198392100DC3D000F6E97 /* AppDelegate.swift */,
 				7EC7328E21907E3F00FED2E6 /* GutenbergViewController.swift */,
+				FF9A6F1621FA8E2500D36D14 /* MediaPickAndUploadCoordinator.swift */,
 				F151983A2100DC3D000F6E97 /* MediaProvider.swift */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -1365,6 +1368,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F151983C2100DC3D000F6E97 /* AppDelegate.swift in Sources */,
+				FF9A6F4121FA8E2500D36D14 /* MediaPickAndUploadCoordinator.swift in Sources */,
 				F151983D2100DC3D000F6E97 /* MediaProvider.swift in Sources */,
 				7EC7328F21907E3F00FED2E6 /* GutenbergViewController.swift in Sources */,
 			);
