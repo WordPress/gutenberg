@@ -204,7 +204,6 @@ public class WPAndroidGlueCode {
         mReactInstanceManager.showDevOptionsDialog();
     }
 
-
     public void setTitle(String title) {
         mTitleInitialized = true;
         mTitle = title;
@@ -217,6 +216,10 @@ public class WPAndroidGlueCode {
         setContent(mTitle, mContentHtml);
     }
 
+    public boolean hasReceivedInitialTitleAndContent() {
+        return mTitleInitialized && mContentInitialized;
+    }
+
     private void setContent(String title, String postContent) {
         if (mReactRootView == null) {
             return;
@@ -224,7 +227,7 @@ public class WPAndroidGlueCode {
 
         // wait for both title and content to have been set at least once. Legacy editor implementation had the two as
         // separate calls but, we only want a single call to correctly boot the GB editor
-        if (!mTitleInitialized || !mContentInitialized) {
+        if (!hasReceivedInitialTitleAndContent()) {
             return;
         }
 
