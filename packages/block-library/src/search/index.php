@@ -78,5 +78,4 @@ function register_block_core_search() {
 		)
 	);
 }
-
 add_action( 'init', 'register_block_core_search' );

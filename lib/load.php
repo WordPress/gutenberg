@@ -30,49 +30,45 @@ require dirname( __FILE__ ) . '/demo.php';
 require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/widgets-page.php';
 
-// Register server-side code for individual blocks.
-if ( ! function_exists( 'render_block_core_archives' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/archives/index.php';
-}
-if ( ! function_exists( 'render_block_core_block' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/block/index.php';
-}
-if ( ! function_exists( 'render_block_core_categories' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/categories/index.php';
-}
-// Currently merged in core as `gutenberg_render_block_core_latest_comments`,
-// expected to change soon.
-if ( ! function_exists( 'render_block_core_calendar' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/calendar/index.php';
-}
-if ( ! function_exists( 'render_block_core_latest_comments' )
-	&& ! function_exists( 'gutenberg_render_block_core_latest_comments' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/latest-comments/index.php';
-}
-if ( ! function_exists( 'render_block_core_latest_posts' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/latest-posts/index.php';
-}
-
-
 /**
- * Start: Include for phase 2
+ * Unregisters the core set of blocks. This should occur on the default
+ * priority, immediately prior to Gutenberg's own action binding.
  */
-if ( ! function_exists( 'render_block_legacy_widget' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/legacy-widget/index.php';
-}
-/**
- * End: Include for phase 2
- */
+function gutenberg_unregister_core_block_types() {
+	$registry    = WP_Block_Type_Registry::get_instance();
+	$block_names = array(
+		'core/archives',
+		'core/block',
+		'core/calendar',
+		'core/categories',
+		'core/latest-comments',
+		'core/latest-posts',
+		'core/legacy-widget',
+		'core/rss',
+		'core/shortcode',
+		'core/search',
+		'core/tag-cloud',
+	);
 
-if ( ! function_exists( 'render_block_core_rss' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/rss/index.php';
+	foreach ( $block_names as $block_name ) {
+		if ( $registry->is_registered( $block_name ) ) {
+			$registry->unregister( $block_name );
+		}
+	}
 }
-if ( ! function_exists( 'render_block_core_shortcode' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/shortcode/index.php';
-}
-if ( ! function_exists( 'render_block_core_tag_cloud' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/tag-cloud/index.php';
-}
-if ( ! function_exists( 'render_block_core_search' ) ) {
-	require dirname( __FILE__ ) . '/../packages/block-library/src/search/index.php';
+
+if ( file_exists( dirname( __FILE__ ) . '/../build/block-library/blocks' ) ) {
+	add_action( 'init', 'gutenberg_unregister_core_block_types' );
+
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/archives.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/block.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/calendar.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/categories.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/latest-comments.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/latest-posts.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/legacy-widget.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/rss.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/shortcode.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/search.php';
+	require dirname( __FILE__ ) . '/../build/block-library/blocks/tag-cloud.php';
 }

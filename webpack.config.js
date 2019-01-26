@@ -5,8 +5,8 @@ const { DefinePlugin } = require( 'webpack' );
 const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const postcss = require( 'postcss' );
-const { get } = require( 'lodash' );
-const { basename } = require( 'path' );
+const { get, escapeRegExp } = require( 'lodash' );
+const { basename, sep } = require( 'path' );
 
 /**
  * WordPress dependencies
@@ -105,5 +105,31 @@ module.exports = {
 				},
 			} ) )
 		),
+		new CopyWebpackPlugin( [
+			{
+				from: './packages/block-library/src/**/index.php',
+				test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }index\\.php$` ),
+				to: 'build/block-library/blocks/[1].php',
+				transform( content ) {
+					content = content.toString();
+
+					// Within content, search for any function definitions. For
+					// each, replace every other reference to it in the file.
+					return content
+						.match( /^function [^\(]+/gm )
+						.reduce( ( result, functionName ) => {
+							// Trim leading "function " prefix from match.
+							functionName = functionName.slice( 9 );
+
+							// Prepend the Gutenberg prefix, substituting any
+							// other core prefix (e.g. "wp_").
+							return result.replace(
+								new RegExp( functionName, 'g' ),
+								( match ) => 'gutenberg_' + match.replace( /^wp_/, '' )
+							);
+						}, content );
+				},
+			},
+		] ),
 	],
 };
