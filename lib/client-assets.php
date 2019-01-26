@@ -1325,14 +1325,8 @@ JS;
 /**
  * Enqueue the reusable blocks listing page's script
  *
- * @param string $hook Screen name.
+ * @deprecated 5.0.0
  */
-function gutenberg_load_list_reusable_blocks( $hook ) {
-	$is_reusable_blocks_list_page = 'edit.php' === $hook && isset( $_GET['post_type'] ) && 'wp_block' === $_GET['post_type'];
-	if ( $is_reusable_blocks_list_page ) {
-		gutenberg_load_locale_data();
-		wp_enqueue_script( 'wp-list-reusable-blocks' );
-		wp_enqueue_style( 'wp-list-reusable-blocks' );
-	}
+function gutenberg_load_list_reusable_blocks() {
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 }
-add_action( 'admin_enqueue_scripts', 'gutenberg_load_list_reusable_blocks' );
