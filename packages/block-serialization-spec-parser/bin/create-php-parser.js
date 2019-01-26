@@ -5,7 +5,7 @@ const phpegjs = require( 'phpegjs' );
 const fs = require( 'fs' );
 const path = require( 'path' );
 
-const peg = fs.readFileSync( 'packages/block-serialization-spec-parser/grammar.pegjs', 'utf8' );
+const peg = fs.readFileSync( path.join( __dirname, '..', 'grammar.pegjs' ), 'utf8' );
 
 const parser = pegjs.generate(
 	peg,
@@ -20,6 +20,6 @@ const parser = pegjs.generate(
 );
 
 fs.writeFileSync(
-	path.join( __dirname, '..', 'lib', 'parser.php' ),
+	path.join( __dirname, '..', 'parser.php' ),
 	parser
 );

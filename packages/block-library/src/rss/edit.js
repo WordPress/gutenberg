@@ -137,10 +137,10 @@ class RSSEdit extends Component {
 						/>
 						{ displayExcerpt &&
 							<RangeControl
-								label={ __( 'Max length of the excerpt' ) }
+								label={ __( 'Max number of words in excerpt' ) }
 								value={ excerptLength }
 								onChange={ ( value ) => setAttributes( { excerptLength: value } ) }
-								min={ 0 }
+								min={ 10 }
 								max={ 100 }
 							/>
 						}
