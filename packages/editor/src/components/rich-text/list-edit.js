@@ -72,7 +72,7 @@ export const ListEdit = ( { editor, onTagNameChange, tagName, onSyncDOM } ) => (
 		<BlockFormatControls>
 			<Toolbar
 				controls={ [
-					{
+					onTagNameChange && {
 						icon: 'editor-ul',
 						title: __( 'Convert to unordered list' ),
 						isActive: isActiveListType( editor, 'ul', tagName ),
@@ -85,7 +85,7 @@ export const ListEdit = ( { editor, onTagNameChange, tagName, onSyncDOM } ) => (
 							}
 						},
 					},
-					{
+					onTagNameChange && {
 						icon: 'editor-ol',
 						title: __( 'Convert to ordered list' ),
 						isActive: isActiveListType( editor, 'ol', tagName ),
@@ -114,7 +114,7 @@ export const ListEdit = ( { editor, onTagNameChange, tagName, onSyncDOM } ) => (
 							onSyncDOM();
 						},
 					},
-				] }
+				].filter( Boolean ) }
 			/>
 		</BlockFormatControls>
 	</Fragment>

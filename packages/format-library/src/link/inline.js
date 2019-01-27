@@ -217,13 +217,13 @@ class InlineLinkUI extends Component {
 		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
-			speak( __( 'Link inserted' ), 'assertive' );
+			speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
 
 	onClickOutside( event ) {
 		// The autocomplete suggestions list renders in a separate popover (in a portal),
-		// so onClickOutside fails to detect that a click on a suggestion occured in the
+		// so onClickOutside fails to detect that a click on a suggestion occurred in the
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 		// return to avoid the popover being closed.
 		const autocompleteElement = this.autocompleteRef.current;

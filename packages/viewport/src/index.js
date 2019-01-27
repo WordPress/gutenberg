@@ -76,3 +76,4 @@ window.addEventListener( 'orientationchange', setIsMatching );
 
 // Set initial values
 setIsMatching();
+setIsMatching.flush();

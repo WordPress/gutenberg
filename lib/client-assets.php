@@ -501,24 +501,6 @@ function gutenberg_register_scripts_and_styles() {
 			$live_reload_url
 		);
 	}
-
-	// Temporary backward compatibility for `wp-polyfill-ecmascript`, which has
-	// since been absorbed into `wp-polyfill`.
-	//
-	// [TODO][REMOVEME] To be removed in Gutenberg v4.5.
-	gutenberg_override_script(
-		'wp-polyfill-ecmascript',
-		null,
-		array(
-			'wp-polyfill',
-			'wp-deprecated',
-		)
-	);
-	wp_script_add_data(
-		'wp-polyfill-ecmascript',
-		'data',
-		'wp.deprecated( "wp-polyfill-ecmascript script handle", { plugin: "Gutenberg", version: "4.5" } );'
-	);
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -1031,7 +1013,7 @@ function gutenberg_get_available_image_sizes() {
 function gutenberg_editor_scripts_and_styles( $hook ) {
 	$is_demo = isset( $_GET['gutenberg-demo'] );
 
-	global $wp_scripts;
+	global $wp_scripts, $wp_meta_boxes;
 
 	// Add "wp-hooks" as dependency of "heartbeat".
 	$heartbeat_script = $wp_scripts->query( 'heartbeat', 'registered' );
@@ -1044,11 +1026,32 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
 
-	// Transform a "heartbeat-tick" jQuery event into "heartbeat.tick" hook action.
-	// This removes the need of using jQuery for listening to the event.
+	// Transforms heartbeat jQuery events into equivalent hook actions. This
+	// avoids a dependency on jQuery for listening to the event.
+	$heartbeat_hooks = <<<JS
+( function() {
+	jQuery( document ).on( [
+		'heartbeat-send',
+		'heartbeat-tick',
+		'heartbeat-error',
+		'heartbeat-connection-lost',
+		'heartbeat-connection-restored',
+		'heartbeat-nonces-expired',
+	].join( ' ' ), function( event ) {
+		var actionName = event.type.replace( /-/g, '.' ),
+			args;
+
+		// Omit the event argument in applying arguments to the hook callback.
+		// The remaining arguments are passed to the hook.
+		args = Array.prototype.slice.call( arguments, 1 );
+
+		wp.hooks.doAction.apply( null, [ actionName ].concat( args ) );
+	} );
+} )();
+JS;
 	wp_add_inline_script(
 		'heartbeat',
-		'jQuery( document ).on( "heartbeat-tick", function ( event, response ) { wp.hooks.doAction( "heartbeat.tick", response ) } );',
+		$heartbeat_hooks,
 		'after'
 	);
 
@@ -1332,15 +1335,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
 	}
 
-	$init_script = <<<JS
-	( function() {
-		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
-			wp.domReady( function() {
-				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
-			} );
-		} );
-} )();
-JS;
+	$current_screen  = get_current_screen();
+	$core_meta_boxes = array();
+
+	// Make sure the current screen is set as well as the normal core metaboxes.
+	if ( isset( $current_screen->id ) && isset( $wp_meta_boxes[ $current_screen->id ]['normal']['core'] ) ) {
+		$core_meta_boxes = $wp_meta_boxes[ $current_screen->id ]['normal']['core'];
+	}
+
+	// Check if the Custom Fields meta box has been removed at some point.
+	if ( ! isset( $core_meta_boxes['postcustom'] ) || ! $core_meta_boxes['postcustom'] ) {
+		unset( $editor_settings['enableCustomFields'] );
+	}
 
 	/**
 	 * Filters the settings to pass to the block editor.
@@ -1351,6 +1357,16 @@ JS;
 	 * @param WP_Post $post            Post being edited.
 	 */
 	$editor_settings = apply_filters( 'block_editor_settings', $editor_settings, $post );
+
+	$init_script = <<<JS
+	( function() {
+		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
+			wp.domReady( function() {
+				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
+			} );
+		} );
+} )();
+JS;
 
 	$script = sprintf(
 		$init_script,

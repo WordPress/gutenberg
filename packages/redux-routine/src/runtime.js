@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { create } from 'rungen';
-import { map, isString } from 'lodash';
+import { map } from 'lodash';
 import isPromise from 'is-promise';
 
 /**
@@ -51,7 +51,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 
 	return ( action ) => new Promise( ( resolve, reject ) =>
 		rungenRuntime( action, ( result ) => {
-			if ( typeof result === 'object' && isString( result.type ) ) {
+			if ( isAction( result ) ) {
 				dispatch( result );
 			}
 			resolve( result );

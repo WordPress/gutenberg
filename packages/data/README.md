@@ -91,7 +91,7 @@ registerStore( 'my-shop', {
 	},
 
 	resolvers: {
-		* getPrice( state, item ) {
+		* getPrice( item ) {
 			const path = '/wp/v2/prices/' + item;
 			const price = yield actions.fetchFromAPI( path );
 			return actions.setPrice( item, price );
@@ -127,17 +127,17 @@ The **`selectors`** object includes a set of functions for accessing and derivin
 
 A **resolver** is a side-effect for a selector. If your selector result may need to be fulfilled from an external source, you can define a resolver such that the first time the selector is called, the fulfillment behavior is effected.
 
-The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
+The `resolvers` option should be passed as an object where each key is the name of the selector to act upon, the value a function which receives the same arguments passed to the selector, excluding the state argument. It can then dispatch as necessary to fulfill the requirements of the selector, taking advantage of the fact that most data consumers will subscribe to subsequent state changes (by `subscribe` or `withSelect`).
 
 ### `controls`
 
-_**Note:** Controls are an opt-in feature, enabled via `use` (the [Plugins API](https://github.com/WordPress/gutenberg/tree/master/packages/data/src/plugins))._
+_**Note:** Controls are an opt-in feature, enabled via `use` (the [Plugins API](/packages/data/src/plugins/README.md))._
 
 A **control** defines the execution flow behavior associated with a specific action type. This can be particularly useful in implementing asynchronous data flows for your store. By defining your action creator or resolvers as a generator which yields specific controlled action types, the execution will proceed as defined by the control handler.
 
 The `controls` option should be passed as an object where each key is the name of the action type to act upon, the value a function which receives the original action object. It should returns either a promise which is to resolve when evaluation of the action should continue, or a value. The value or resolved promise value is assigned on the return value of the yield assignment. If the control handler returns undefined, the execution is not continued.
 
-Refer to the [documentation of `@wordpress/redux-routine`](https://github.com/WordPress/gutenberg/tree/master/packages/redux-routine/) for more information.
+Refer to the [documentation of `@wordpress/redux-routine`](/packages/redux-routine/README.md) for more information.
 
 ## Data Access and Manipulation
 
@@ -225,7 +225,7 @@ registerStore( 'my-shop', {
 
 ### Higher-Order Components
 
-A higher-order component is a function which accepts a [component](https://github.com/WordPress/gutenberg/tree/master/packages/element) and returns a new, enhanced component. A stateful user interface should respond to changes in the underlying state and updates its displayed element accordingly. WordPress uses higher-order components both as a means to separate the purely visual aspects of an interface from its data backing, and to ensure that the data is kept in-sync with the stores.
+A higher-order component is a function which accepts a [component](/packages/element/README.md) and returns a new, enhanced component. A stateful user interface should respond to changes in the underlying state and updates its displayed element accordingly. WordPress uses higher-order components both as a means to separate the purely visual aspects of an interface from its data backing, and to ensure that the data is kept in-sync with the stores.
 
 #### `withSelect( mapSelectToProps: Function ): Function`
 
@@ -406,7 +406,7 @@ registry.registerGenericStore( 'custom-data', createCustomStore() );
 
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
 
-The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](https://github.com/WordPress/gutenberg/tree/master/packages/compose)).
+The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](/packages/compose/README.md)).
 
 Specific implementation differences from Redux and React Redux:
 
@@ -416,3 +416,5 @@ Specific implementation differences from Redux and React Redux:
    - In `@wordpress/data`, a `withSelect` mapping function can return `undefined` if it has no props to inject.
 - In React Redux, the `mapDispatchToProps` argument can be defined as an object or a function.
    - In `@wordpress/data`, the `withDispatch` higher-order component creator must be passed a function.
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

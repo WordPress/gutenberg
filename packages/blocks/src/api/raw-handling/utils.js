@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, includes, noop } from 'lodash';
+import { mapValues, mergeWith, includes, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,23 +28,25 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
  */
 export function getBlockContentSchema( transforms ) {
 	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
-		// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-		if ( hasBlockSupport( blockName, 'anchor' ) ) {
-			for ( const tag in schema ) {
-				if ( ! schema[ tag ].attributes ) {
-					schema[ tag ].attributes = [];
-				}
-				schema[ tag ].attributes.push( 'id' );
-			}
+		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+		// If the block does not has anchor support and the transform does not
+		// provides an isMatch we can return the schema right away.
+		if ( ! hasAnchorSupport && ! isMatch ) {
+			return schema;
 		}
 
-		// If an isMatch function exists add it to each schema tag that it applies to.
-		if ( isMatch ) {
-			for ( const tag in schema ) {
-				schema[ tag ].isMatch = isMatch;
+		return mapValues( schema, ( value ) => {
+			let attributes = value.attributes || [];
+			// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
+			if ( hasAnchorSupport ) {
+				attributes = [ ...attributes, 'id' ];
 			}
-		}
-		return schema;
+			return {
+				...value,
+				attributes,
+				isMatch: isMatch ? isMatch : undefined,
+			};
+		} );
 	} );
 
 	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
