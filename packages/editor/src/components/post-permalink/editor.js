@@ -7,19 +7,24 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { cleanForSlug } from '../../utils/url';
+
 class PostPermalinkEditor extends Component {
-	constructor( { permalinkParts } ) {
+	constructor( { permalinkParts, slug } ) {
 		super( ...arguments );
 
 		this.state = {
-			editedPostName: permalinkParts.postName,
+			editedPostName: slug || permalinkParts.postName,
 		};
 
 		this.onSavePermalink = this.onSavePermalink.bind( this );
 	}
 
 	onSavePermalink( event ) {
-		const postName = this.state.editedPostName.replace( /\s+/g, '-' );
+		const postName = cleanForSlug( this.state.editedPostName );
 
 		event.preventDefault();
 

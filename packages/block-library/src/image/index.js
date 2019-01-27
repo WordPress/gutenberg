@@ -11,7 +11,6 @@ import { __ } from '@wordpress/i18n';
 import {
 	createBlock,
 	getBlockAttributes,
-	getBlockType,
 	getPhrasingContentSchema,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
@@ -53,6 +52,18 @@ const blockAttributes = {
 		selector: 'figure > a',
 		attribute: 'href',
 	},
+	rel: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'rel',
+	},
+	linkClass: {
+		type: 'string',
+		source: 'attribute',
+		selector: 'figure > a',
+		attribute: 'class',
+	},
 	id: {
 		type: 'number',
 	},
@@ -90,7 +101,7 @@ const schema = {
 		children: {
 			...imageSchema,
 			a: {
-				attributes: [ 'href', 'target' ],
+				attributes: [ 'href', 'rel', 'target' ],
 				children: imageSchema,
 			},
 			figcaption: {
@@ -99,6 +110,21 @@ const schema = {
 		},
 	},
 };
+
+function getFirstAnchorAttributeFormHTML( html, attributeName ) {
+	const { body } = document.implementation.createHTMLDocument( '' );
+
+	body.innerHTML = html;
+
+	const { firstElementChild } = body;
+
+	if (
+		firstElementChild &&
+		firstElementChild.nodeName === 'A'
+	) {
+		return firstElementChild.getAttribute( attributeName ) || undefined;
+	}
+}
 
 export const settings = {
 	title: __( 'Image' ),
@@ -133,8 +159,9 @@ export const settings = {
 					const anchorElement = node.querySelector( 'a' );
 					const linkDestination = anchorElement && anchorElement.href ? 'custom' : undefined;
 					const href = anchorElement && anchorElement.href ? anchorElement.href : undefined;
-					const blockType = getBlockType( 'core/image' );
-					const attributes = getBlockAttributes( blockType, node.outerHTML, { align, id, linkDestination, href } );
+					const rel = anchorElement && anchorElement.rel ? anchorElement.rel : undefined;
+					const linkClass = anchorElement && anchorElement.className ? anchorElement.className : undefined;
+					const attributes = getBlockAttributes( 'core/image', node.outerHTML, { align, id, linkDestination, href, rel, linkClass } );
 					return createBlock( 'core/image', attributes );
 				},
 			},
@@ -173,15 +200,28 @@ export const settings = {
 					},
 					caption: {
 						shortcode: ( attributes, { shortcode } ) => {
-							const { content } = shortcode;
-							return content.replace( /\s*<img[^>]*>\s/, '' );
+							const { body } = document.implementation.createHTMLDocument( '' );
+
+							body.innerHTML = shortcode.content;
+							body.removeChild( body.firstElementChild );
+
+							return body.innerHTML.trim();
 						},
 					},
 					href: {
-						type: 'string',
-						source: 'attribute',
-						attribute: 'href',
-						selector: 'a',
+						shortcode: ( attributes, { shortcode } ) => {
+							return getFirstAnchorAttributeFormHTML( shortcode.content, 'href' );
+						},
+					},
+					rel: {
+						shortcode: ( attributes, { shortcode } ) => {
+							return getFirstAnchorAttributeFormHTML( shortcode.content, 'rel' );
+						},
+					},
+					linkClass: {
+						shortcode: ( attributes, { shortcode } ) => {
+							return getFirstAnchorAttributeFormHTML( shortcode.content, 'class' );
+						},
 					},
 					id: {
 						type: 'number',
@@ -214,7 +254,19 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { url, alt, caption, align, href, width, height, id, linkTarget } = attributes;
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			href,
+			rel,
+			linkClass,
+			width,
+			height,
+			id,
+			linkTarget,
+		} = attributes;
 
 		const classes = classnames( {
 			[ `align${ align }` ]: align,
@@ -233,7 +285,16 @@ export const settings = {
 
 		const figure = (
 			<Fragment>
-				{ href ? <a href={ href } target={ linkTarget } rel={ linkTarget === '_blank' ? 'noreferrer noopener' : undefined }>{ image }</a> : image }
+				{ href ? (
+					<a
+						className={ linkClass }
+						href={ href }
+						target={ linkTarget }
+						rel={ rel }
+					>
+						{ image }
+					</a>
+				) : image }
 				{ ! RichText.isEmpty( caption ) && <RichText.Content tagName="figcaption" value={ caption } /> }
 			</Fragment>
 		);

@@ -1,33 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { compose } from '@wordpress/compose';
-import { __, _n, sprintf } from '@wordpress/i18n';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import SidebarHeader from '../sidebar-header';
 
-const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sidebarName } ) => {
-	// Do not display "0 Blocks".
-	const blockCount = count === 0 ? 1 : count;
-	const blockLabel = blockCount === 1 ?
-		__( 'Block' ) :
-		sprintf( _n( '%d Block', '%d Blocks', blockCount ), blockCount );
-
+const SettingsHeader = ( { openDocumentSettings, openBlockSettings, sidebarName } ) => {
+	const blockLabel = __( 'Block' );
 	const [ documentAriaLabel, documentActiveClass ] = sidebarName === 'edit-post/document' ?
-		// translators: ARIA label for the Document Settings sidebar tab, selected.
-		[ __( 'Document settings (selected)' ), 'is-active' ] :
-		// translators: ARIA label for the Document Settings sidebar tab, not selected.
-		[ __( 'Document settings' ), '' ];
+		// translators: ARIA label for the Document sidebar tab, selected.
+		[ __( 'Document (selected)' ), 'is-active' ] :
+		// translators: ARIA label for the Document sidebar tab, not selected.
+		[ __( 'Document' ), '' ];
 
 	const [ blockAriaLabel, blockActiveClass ] = sidebarName === 'edit-post/block' ?
-		// translators: ARIA label for the Block Settings sidebar tab, selected.
-		[ __( 'Block settings (selected)' ), 'is-active' ] :
-		// translators: ARIA label for the Block Settings sidebar tab, not selected.
-		[ __( 'Block settings' ), '' ];
+		// translators: ARIA label for the Block sidebar tab, selected.
+		[ __( 'Block (selected)' ), 'is-active' ] :
+		// translators: ARIA label for the Block sidebar tab, not selected.
+		[ __( 'Block' ), '' ];
 
 	return (
 		<SidebarHeader
@@ -61,21 +55,16 @@ const SettingsHeader = ( { count, openDocumentSettings, openBlockSettings, sideb
 	);
 };
 
-export default compose(
-	withSelect( ( select ) => ( {
-		count: select( 'core/editor' ).getSelectedBlockCount(),
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-		const { clearSelectedBlock } = dispatch( 'core/editor' );
-		return {
-			openDocumentSettings() {
-				openGeneralSidebar( 'edit-post/document' );
-				clearSelectedBlock();
-			},
-			openBlockSettings() {
-				openGeneralSidebar( 'edit-post/block' );
-			},
-		};
-	} ),
-)( SettingsHeader );
+export default withDispatch( ( dispatch ) => {
+	const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+	const { clearSelectedBlock } = dispatch( 'core/editor' );
+	return {
+		openDocumentSettings() {
+			openGeneralSidebar( 'edit-post/document' );
+			clearSelectedBlock();
+		},
+		openBlockSettings() {
+			openGeneralSidebar( 'edit-post/block' );
+		},
+	};
+} )( SettingsHeader );

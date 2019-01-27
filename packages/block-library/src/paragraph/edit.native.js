@@ -11,14 +11,21 @@ import { Component } from '@wordpress/element';
 import { parse, createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
-const minHeight = 50;
+/**
+ * Import style
+ */
+import styles from './style.scss';
 
 const name = 'core/paragraph';
 
 class ParagraphEdit extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
+
+		this.state = {
+			aztecHeight: 0,
+		};
 	}
 
 	/**
@@ -39,6 +46,7 @@ class ParagraphEdit extends Component {
 			attributes,
 			insertBlocksAfter,
 			setAttributes,
+			onReplace,
 		} = this.props;
 
 		if ( after !== null ) {
@@ -54,8 +62,7 @@ class ParagraphEdit extends Component {
 
 		const { content } = attributes;
 		if ( before === null ) {
-			// TODO : If before content is omitted, treat as intent to delete block.
-			// onReplace( [] );
+			onReplace( [] );
 		} else if ( content !== before ) {
 			// Only update content if it has in-fact changed. In case that user
 			// has created a new paragraph at end of an existing one, the value
@@ -68,8 +75,8 @@ class ParagraphEdit extends Component {
 		const {
 			attributes,
 			setAttributes,
-			style,
 			mergeBlocks,
+			style,
 		} = this.props;
 
 		const {
@@ -77,14 +84,20 @@ class ParagraphEdit extends Component {
 			content,
 		} = attributes;
 
+		const minHeight = styles.blockText.minHeight;
+
 		return (
 			<View>
 				<RichText
 					tagName="p"
 					value={ content }
+					isSelected={ this.props.isSelected }
+					onFocus={ this.props.onFocus } // always assign onFocus as a props
+					onBlur={ this.props.onBlur } // always assign onBlur as a props
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					style={ {
 						...style,
-						minHeight: Math.max( minHeight, typeof attributes.aztecHeight === 'undefined' ? 0 : attributes.aztecHeight ),
+						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
@@ -93,17 +106,12 @@ class ParagraphEdit extends Component {
 							...this.props.attributes,
 							content: newParaBlock.attributes.content,
 						} );
-					}
-					}
+					} }
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
 					onContentSizeChange={ ( event ) => {
-						setAttributes( {
-							...this.props.attributes,
-							aztecHeight: event.aztecHeight,
-						} );
-					}
-					}
+						this.setState( { aztecHeight: event.aztecHeight } );
+					} }
 					placeholder={ placeholder || __( 'Add text or type / to add content' ) }
 				/>
 			</View>

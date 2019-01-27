@@ -2,7 +2,7 @@
 
 ServerSideRender is a component used for server-side rendering a preview of dynamic blocks to display in the editor. Server-side rendering in a block's `edit` function should be limited to blocks that are heavily dependent on existing PHP rendering logic that is heavily intertwined with data, particularly when there are no endpoints available.
 
-ServerSideRender may also be used when a legacy block is provided as a backwards compatibility measure, rather than needing to re-write the deprecated code that the block may depend on.
+ServerSideRender may also be used when a legacy block is provided as a backward compatibility measure, rather than needing to re-write the deprecated code that the block may depend on.
 
 ServerSideRender should be regarded as a fallback or legacy mechanism, it is not appropriate for developing new features against.
 
@@ -20,7 +20,7 @@ const MyServerSideRender = () => (
 		block="core/archives"
 		attributes={ {
 			showPostCounts: true,
-			displayAsDropdown: false, 
+			displayAsDropdown: false,
 		} }
 	/>
 );
@@ -32,5 +32,25 @@ Output uses the block's `render_callback` function, set when defining the block.
 
 ## API Endpoint
 
-The API endpoint for getting the output for ServerSideRender is `/wp/v2/block-renderer/:block`. It accepts any params, which are used as `attributes` for the block's `render_callback` method.
+The API endpoint for getting the output for ServerSideRender is `/wp/v2/block-renderer/:block`. It will use the block's `render_callback` method.
 
+If you pass `attributes` to `ServerSideRender`, the block must also be registered and have its attributes defined in PHP.
+
+```php
+register_block_type(
+	'core/archives',
+	array(
+		'attributes'      => array(
+			'showPostCounts'    => array(
+				'type'      => 'boolean',
+				'default'   => false,
+			),
+			'displayAsDropdown' => array(
+				'type'      => 'boolean',
+				'default'   => false,
+			),
+		),
+		'render_callback' => 'render_block_core_archives',
+	)
+);
+```

@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import TextareaAutosize from 'react-autosize-textarea';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
+import { compose, withState } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -26,12 +26,14 @@ export function DefaultBlockAppender( {
 	showPrompt,
 	placeholder,
 	rootClientId,
+	hovered,
+	setState,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Write your story' );
+	const value = decodeEntities( placeholder ) || __( 'Start writing or type / to choose a block' );
 
 	// The appender "button" is in-fact a text field so as to support
 	// transitions by WritingFlow occurring by arrow key press. WritingFlow
@@ -49,30 +51,34 @@ export function DefaultBlockAppender( {
 	// The wp-block className is important for editor styles.
 
 	return (
-		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
+		<div
+			data-root-client-id={ rootClientId || '' }
+			className="wp-block editor-default-block-appender"
+			onMouseEnter={ () => setState( { hovered: true } ) }
+			onMouseLeave={ () => setState( { hovered: false } ) }
+		>
 			<BlockDropZone rootClientId={ rootClientId } />
-			<input
+			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
-				type="text"
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
-			<InserterWithShortcuts rootClientId={ rootClientId } />
-			<Inserter position="top right" />
+			{ hovered && <InserterWithShortcuts rootClientId={ rootClientId } /> }
+			<Inserter rootClientId={ rootClientId } position="top right" isAppender />
 		</div>
 	);
 }
 export default compose(
+	withState( { hovered: false } ),
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlock, getEditorSettings, getTemplateLock } = select( 'core/editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const lastBlock = getBlock( ownProps.lastBlockClientId );
-		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
-		const isLastBlockValid = get( lastBlock, [ 'isValid' ] );
+		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
+		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 		const { bodyPlaceholder } = getEditorSettings();
 
 		return {

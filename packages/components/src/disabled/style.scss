@@ -10,4 +10,9 @@
 		bottom: 0;
 		left: 0;
 	}
+
+	// Also make nested blocks unselectable.
+	* {
+		pointer-events: none;
+	}
 }

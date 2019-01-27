@@ -9,7 +9,7 @@ import { withSelect } from '@wordpress/data';
  */
 import BaseOption from './base';
 
-class EnableCustomFieldsOption extends Component {
+export class EnableCustomFieldsOption extends Component {
 	constructor( { isChecked } ) {
 		super( ...arguments );
 
@@ -43,5 +43,5 @@ class EnableCustomFieldsOption extends Component {
 }
 
 export default withSelect( ( select ) => ( {
-	isChecked: select( 'core/editor' ).getEditorSettings().enableCustomFields,
+	isChecked: !! select( 'core/editor' ).getEditorSettings().enableCustomFields,
 } ) )( EnableCustomFieldsOption );

@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MetaBoxesSection renders a Custom Fields option 1`] = `
+<Section
+  title="Advanced Panels"
+>
+  <WithSelect(EnableCustomFieldsOption)
+    label="Custom Fields"
+  />
+</Section>
+`;
+
+exports[`MetaBoxesSection renders a Custom Fields option and meta box options 1`] = `
+<Section
+  title="Advanced Panels"
+>
+  <WithSelect(EnableCustomFieldsOption)
+    label="Custom Fields"
+  />
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+    key="test1"
+    label="Meta Box 1"
+    panelName="meta-box-test1"
+  />
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+    key="test2"
+    label="Meta Box 2"
+    panelName="meta-box-test2"
+  />
+</Section>
+`;
+
+exports[`MetaBoxesSection renders meta box options 1`] = `
+<Section
+  title="Advanced Panels"
+>
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+    key="test1"
+    label="Meta Box 1"
+    panelName="meta-box-test1"
+  />
+  <WithSelect(IfCondition(WithDispatch(BaseOption)))
+    key="test2"
+    label="Meta Box 2"
+    panelName="meta-box-test2"
+  />
+</Section>
+`;

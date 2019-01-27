@@ -11,4 +11,8 @@
 	white-space: nowrap;
 	min-width: 150px;
 	max-width: 500px;
+
+	&.has-invalid-link {
+		color: $alert-red;
+	}
 }

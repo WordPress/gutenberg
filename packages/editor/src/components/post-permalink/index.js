@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +18,7 @@ import { safeDecodeURI } from '@wordpress/url';
  * Internal Dependencies
  */
 import PostPermalinkEditor from './editor.js';
-import { getWPAdminURL } from '../../utils/url';
+import { getWPAdminURL, cleanForSlug } from '../../utils/url';
 
 class PostPermalink extends Component {
 	constructor() {
@@ -57,13 +58,28 @@ class PostPermalink extends Component {
 	}
 
 	render() {
-		const { isNew, postLink, isEditable, samplePermalink, isPublished } = this.props;
+		const {
+			isEditable,
+			isNew,
+			isPublished,
+			isViewable,
+			permalinkParts,
+			postLink,
+			postSlug,
+			postID,
+			postTitle,
+		} = this.props;
+
+		if ( isNew || ! isViewable || ! permalinkParts || ! postLink ) {
+			return null;
+		}
+
 		const { isCopied, isEditingPermalink } = this.state;
 		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
-		if ( isNew || ! postLink ) {
-			return null;
-		}
+		const { prefix, suffix } = permalinkParts;
+		const slug = postSlug || cleanForSlug( postTitle ) || postID;
+		const samplePermalink = ( isEditable ) ? prefix + slug + suffix : prefix;
 
 		return (
 			<div className="editor-post-permalink">
@@ -92,6 +108,7 @@ class PostPermalink extends Component {
 
 				{ isEditingPermalink &&
 					<PostPermalinkEditor
+						slug={ slug }
 						onSave={ () => this.setState( { isEditingPermalink: false } ) }
 					/>
 				}
@@ -128,18 +145,29 @@ export default compose( [
 			isEditedPostNew,
 			isPermalinkEditable,
 			getCurrentPost,
-			getPermalink,
+			getPermalinkParts,
+			getEditedPostAttribute,
 			isCurrentPostPublished,
 		} = select( 'core/editor' );
+		const {
+			getPostType,
+		} = select( 'core' );
 
-		const { link } = getCurrentPost();
+		const { id, link } = getCurrentPost();
+
+		const postTypeName = getEditedPostAttribute( 'type' );
+		const postType = getPostType( postTypeName );
 
 		return {
 			isNew: isEditedPostNew(),
 			postLink: link,
+			permalinkParts: getPermalinkParts(),
+			postSlug: getEditedPostAttribute( 'slug' ),
 			isEditable: isPermalinkEditable(),
-			samplePermalink: getPermalink(),
 			isPublished: isCurrentPostPublished(),
+			postTitle: getEditedPostAttribute( 'title' ),
+			postID: id,
+			isViewable: get( postType, [ 'viewable' ], false ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, without } from 'lodash';
+import { filter, without, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,12 +10,10 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	createBlock,
-	getBlockTypes,
 	getDefaultBlockName,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 } from '@wordpress/blocks';
-import { moment } from '@wordpress/date';
 import { RawHTML } from '@wordpress/element';
 
 /**
@@ -29,6 +27,7 @@ const {
 	hasEditorUndo,
 	hasEditorRedo,
 	isEditedPostNew,
+	hasChangedContent,
 	isEditedPostDirty,
 	isCleanNewPost,
 	getCurrentPost,
@@ -89,6 +88,7 @@ const {
 	didPostSaveRequestSucceed,
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
+	getBlocksForSerialization,
 	getEditedPostContent,
 	__experimentalGetReusableBlock: getReusableBlock,
 	__experimentalIsSavingReusableBlock: isSavingReusableBlock,
@@ -171,7 +171,20 @@ describe( 'selectors', () => {
 			},
 		} );
 
+		registerBlockType( 'core/test-default', {
+			category: 'common',
+			title: 'default',
+			attributes: {
+				modified: {
+					type: 'boolean',
+					default: false,
+				},
+			},
+			save: () => null,
+		} );
+
 		setFreeformContentHandlerName( 'core/test-freeform' );
+		setDefaultBlockName( 'core/test-default' );
 
 		cachedSelectors.forEach( ( { clear } ) => clear() );
 	} );
@@ -182,8 +195,10 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-b' );
 		unregisterBlockType( 'core/test-block-c' );
 		unregisterBlockType( 'core/test-freeform' );
+		unregisterBlockType( 'core/test-default' );
 
 		setFreeformContentHandlerName( undefined );
+		setDefaultBlockName( undefined );
 	} );
 
 	describe( 'hasEditorUndo', () => {
@@ -247,6 +262,7 @@ describe( 'selectors', () => {
 						},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostNew( state ) ).toBe( true );
@@ -264,20 +280,107 @@ describe( 'selectors', () => {
 						},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostNew( state ) ).toBe( false );
 		} );
 	} );
 
-	describe( 'isEditedPostDirty', () => {
-		it( 'should return true when post saved state dirty', () => {
+	describe( 'hasChangedContent', () => {
+		it( 'should return false if no dirty blocks nor content property edit', () => {
 			const state = {
 				editor: {
-					isDirty: true,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
-				saving: {
-					requesting: false,
+			};
+
+			expect( hasChangedContent( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if dirty blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							isDirty: true,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( hasChangedContent( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if content property edit', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {
+							content: 'text mode edited',
+						},
+					},
+				},
+			};
+
+			expect( hasChangedContent( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isEditedPostDirty', () => {
+		it( 'should return false when blocks state not dirty nor edits exist', () => {
+			const state = {
+				optimist: [],
+				editor: {
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( isEditedPostDirty( state ) ).toBe( false );
+		} );
+
+		it( 'should return true when blocks state dirty', () => {
+			const state = {
+				optimist: [],
+				editor: {
+					present: {
+						blocks: {
+							isDirty: true,
+						},
+						edits: {},
+					},
+				},
+			};
+
+			expect( isEditedPostDirty( state ) ).toBe( true );
+		} );
+
+		it( 'should return true when edits exist', () => {
+			const state = {
+				optimist: [],
+				editor: {
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {
+							excerpt: 'hello world',
+						},
+					},
 				},
 			};
 
@@ -290,30 +393,27 @@ describe( 'selectors', () => {
 					{
 						beforeState: {
 							editor: {
-								isDirty: true,
+								present: {
+									blocks: {
+										isDirty: true,
+									},
+									edits: {},
+								},
 							},
 						},
 					},
 				],
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 			};
 
 			expect( isEditedPostDirty( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when post saved state not dirty', () => {
-			const state = {
-				editor: {
-					isDirty: false,
-				},
-				saving: {
-					requesting: false,
-				},
-			};
-
-			expect( isEditedPostDirty( state ) ).toBe( false );
 		} );
 	} );
 
@@ -321,7 +421,12 @@ describe( 'selectors', () => {
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					id: 1,
@@ -338,7 +443,12 @@ describe( 'selectors', () => {
 		it( 'should return false when the post is not dirty but the post has been saved', () => {
 			const state = {
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					id: 1,
@@ -355,7 +465,12 @@ describe( 'selectors', () => {
 		it( 'should return false when the post is dirty but the post has not been saved', () => {
 			const state = {
 				editor: {
-					isDirty: true,
+					present: {
+						blocks: {
+							isDirty: true,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					id: 1,
@@ -435,6 +550,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'post slug' );
@@ -450,6 +566,7 @@ describe( 'selectors', () => {
 						},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostAttribute( state, 'slug' ) ).toBe( 'new slug' );
@@ -465,6 +582,7 @@ describe( 'selectors', () => {
 						edits: { status: 'private' },
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'sassel' );
@@ -480,6 +598,7 @@ describe( 'selectors', () => {
 						edits: { title: 'youcha' },
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostAttribute( state, 'title' ) ).toBe( 'youcha' );
@@ -493,9 +612,36 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostAttribute( state, 'valueOf' ) ).toBeUndefined();
+		} );
+
+		it( 'should merge mergeable properties with current post value', () => {
+			const state = {
+				currentPost: {
+					meta: {
+						a: 1,
+						b: 1,
+					},
+				},
+				editor: {
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getEditedPostAttribute( state, 'meta' ) ).toEqual( {
+				a: 1,
+				b: 2,
+			} );
 		} );
 	} );
 
@@ -607,9 +753,36 @@ describe( 'selectors', () => {
 						edits: { title: 'terga' },
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
+		} );
+
+		it( 'should return value from initial edits', () => {
+			const state = {
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: { title: 'terga' },
+			};
+
+			expect( getPostEdits( state ) ).toEqual( { title: 'terga' } );
+		} );
+
+		it( 'should prefer value from edits over initial edits', () => {
+			const state = {
+				editor: {
+					present: {
+						edits: { title: 'werga' },
+					},
+				},
+				initialEdits: { title: 'terga' },
+			};
+
+			expect( getPostEdits( state ) ).toEqual( { title: 'werga' } );
 		} );
 	} );
 
@@ -639,6 +812,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostVisibility( state ) ).toBe( 'public' );
@@ -654,6 +828,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostVisibility( state ) ).toBe( 'private' );
@@ -670,6 +845,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostVisibility( state ) ).toBe( 'password' );
@@ -689,6 +865,7 @@ describe( 'selectors', () => {
 						},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getEditedPostVisibility( state ) ).toBe( 'private' );
@@ -814,7 +991,12 @@ describe( 'selectors', () => {
 		it( 'should return true for pending posts', () => {
 			const state = {
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					status: 'pending',
@@ -830,7 +1012,12 @@ describe( 'selectors', () => {
 		it( 'should return true for draft posts', () => {
 			const state = {
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					status: 'draft',
@@ -846,7 +1033,12 @@ describe( 'selectors', () => {
 		it( 'should return false for published posts', () => {
 			const state = {
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					status: 'publish',
@@ -862,7 +1054,12 @@ describe( 'selectors', () => {
 		it( 'should return true for published, dirty posts', () => {
 			const state = {
 				editor: {
-					isDirty: true,
+					present: {
+						blocks: {
+							isDirty: true,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					status: 'publish',
@@ -878,7 +1075,12 @@ describe( 'selectors', () => {
 		it( 'should return false for private posts', () => {
 			const state = {
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					status: 'private',
@@ -894,7 +1096,12 @@ describe( 'selectors', () => {
 		it( 'should return false for scheduled posts', () => {
 			const state = {
 				editor: {
-					isDirty: false,
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
+					},
 				},
 				currentPost: {
 					status: 'future',
@@ -913,7 +1120,12 @@ describe( 'selectors', () => {
 					status: 'private',
 				},
 				editor: {
-					isDirty: true,
+					present: {
+						blocks: {
+							isDirty: true,
+						},
+						edits: {},
+					},
 				},
 				saving: {
 					requesting: false,
@@ -927,7 +1139,7 @@ describe( 'selectors', () => {
 	describe( 'isPostSavingLocked', () => {
 		it( 'should return true if the post has postSavingLocks', () => {
 			const state = {
-				postSavingLock: [ { 1: true } ],
+				postSavingLock: { example: true },
 				currentPost: {},
 				saving: {},
 			};
@@ -937,7 +1149,7 @@ describe( 'selectors', () => {
 
 		it( 'should return false if the post has no postSavingLocks', () => {
 			const state = {
-				postSavingLock: [],
+				postSavingLock: {},
 				currentPost: {},
 				saving: {},
 			};
@@ -953,11 +1165,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 				saving: {},
 			};
@@ -971,11 +1185,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					title: 'sassel',
 				},
@@ -993,11 +1209,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					title: 'sassel',
 				},
@@ -1013,11 +1231,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					excerpt: 'sassel',
 				},
@@ -1037,9 +1257,11 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-block-a',
 									isValid: true,
-									attributes: {
-										text: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									text: '',
 								},
 							},
 							order: {
@@ -1049,6 +1271,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 				saving: {},
 			};
@@ -1065,9 +1288,11 @@ describe( 'selectors', () => {
 								123: {
 									clientId: 123,
 									name: 'core/test-freeform',
-									attributes: {
-										content: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									content: '',
 								},
 							},
 							order: {
@@ -1077,6 +1302,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 				saving: {},
 			};
@@ -1094,9 +1320,11 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-freeform',
 									isValid: true,
-									attributes: {
-										content: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									content: '',
 								},
 							},
 							order: {
@@ -1106,6 +1334,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					title: 'sassel',
 				},
@@ -1123,11 +1352,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					title: 'sassel',
 				},
@@ -1148,11 +1379,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					title: 'sassel',
 				},
@@ -1168,23 +1401,19 @@ describe( 'selectors', () => {
 				editor: {
 					present: {
 						blocks: {
-							byClientId: {},
-							order: {},
+							isDirty: false,
 						},
-						edits: {
-							content: 'foo',
-						},
+						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					title: 'foo',
-					content: 'foo',
 					excerpt: 'foo',
 				},
 				saving: {},
 				autosave: {
 					title: 'foo',
-					content: 'foo',
 					excerpt: 'foo',
 				},
 			};
@@ -1192,25 +1421,46 @@ describe( 'selectors', () => {
 			expect( isEditedPostAutosaveable( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if title, excerpt, or content have changed', () => {
-			for ( const variantField of [ 'title', 'excerpt', 'content' ] ) {
-				for ( const constantField of without( [ 'title', 'excerpt', 'content' ], variantField ) ) {
+		it( 'should return true if content has changes', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							isDirty: true,
+						},
+						edits: {},
+					},
+				},
+				currentPost: {
+					title: 'foo',
+					excerpt: 'foo',
+				},
+				saving: {},
+				autosave: {
+					title: 'foo',
+					excerpt: 'foo',
+				},
+			};
+
+			expect( isEditedPostAutosaveable( state ) ).toBe( true );
+		} );
+
+		it( 'should return true if title or excerpt have changed', () => {
+			for ( const variantField of [ 'title', 'excerpt' ] ) {
+				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
 					const state = {
 						editor: {
 							present: {
 								blocks: {
-									byClientId: {},
-									order: {},
+									isDirty: false,
 								},
-								edits: {
-									content: 'foo',
-								},
+								edits: {},
 							},
 						},
+						initialEdits: {},
 						currentPost: {
 							title: 'foo',
 							content: 'foo',
-							excerpt: 'foo',
 						},
 						saving: {},
 						autosave: {
@@ -1275,11 +1525,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -1296,9 +1548,11 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-block-a',
 									isValid: true,
-									attributes: {
-										text: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									text: '',
 								},
 							},
 							order: {
@@ -1308,10 +1562,46 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
 			expect( isEditedPostEmpty( state ) ).toBe( false );
+		} );
+
+		it( 'should account for filtering logic of getBlocksForSerialization', () => {
+			// Note: As an optimization, isEditedPostEmpty avoids using the
+			// getBlocksForSerialization selector and instead makes assumptions
+			// about its filtering. The behavior should still be reflected.
+			//
+			// See: https://github.com/WordPress/gutenberg/pull/13086
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: false,
+								},
+							},
+							order: {
+								'': [ 'block1' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( isEditedPostEmpty( state ) ).toBe( true );
 		} );
 
 		it( 'should return true if blocks, but empty content edit', () => {
@@ -1324,9 +1614,11 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-block-a',
 									isValid: true,
-									attributes: {
-										text: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									text: '',
 								},
 							},
 							order: {
@@ -1338,6 +1630,7 @@ describe( 'selectors', () => {
 						},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					content: '',
 				},
@@ -1352,11 +1645,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					content: '',
 				},
@@ -1371,6 +1666,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {
@@ -1378,6 +1674,7 @@ describe( 'selectors', () => {
 						},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -1394,9 +1691,11 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-freeform',
 									isValid: true,
-									attributes: {
-										content: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									content: '',
 								},
 							},
 							order: {
@@ -1406,6 +1705,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -1422,9 +1722,11 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-freeform',
 									isValid: true,
-									attributes: {
-										content: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									content: '',
 								},
 							},
 							order: {
@@ -1434,6 +1736,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					content: '',
 				},
@@ -1452,9 +1755,11 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-freeform',
 									isValid: true,
-									attributes: {
-										content: 'Test Data',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									content: 'Test Data',
 								},
 							},
 							order: {
@@ -1464,6 +1769,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					content: 'Test Data',
 				},
@@ -1482,17 +1788,19 @@ describe( 'selectors', () => {
 									clientId: 123,
 									name: 'core/test-freeform',
 									isValid: true,
-									attributes: {
-										content: '',
-									},
 								},
 								456: {
 									clientId: 456,
 									name: 'core/test-freeform',
 									isValid: true,
-									attributes: {
-										content: '',
-									},
+								},
+							},
+							attributes: {
+								123: {
+									content: '',
+								},
+								456: {
+									content: '',
 								},
 							},
 							order: {
@@ -1502,6 +1810,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {
 					content: '\n\n',
 				},
@@ -1513,12 +1822,15 @@ describe( 'selectors', () => {
 
 	describe( 'isEditedPostBeingScheduled', () => {
 		it( 'should return true for posts with a future date', () => {
+			const time = Date.now() + ( 1000 * 3600 * 24 * 7 ); // 7 days in the future
+			const date = new Date( time );
 			const state = {
 				editor: {
 					present: {
-						edits: { date: moment().add( 7, 'days' ).format( '' ) },
+						edits: { date: date.toUTCString() },
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostBeingScheduled( state ) ).toBe( true );
@@ -1531,6 +1843,7 @@ describe( 'selectors', () => {
 						edits: { date: '2016-05-30T17:21:39' },
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostBeingScheduled( state ) ).toBe( false );
@@ -1538,16 +1851,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isEditedPostDateFloating', () => {
-		let editor;
-
-		beforeEach( () => {
-			editor = {
-				present: {
-					edits: {},
-				},
-			};
-		} );
-
 		it( 'should return true for draft posts where the date matches the modified date', () => {
 			const state = {
 				currentPost: {
@@ -1555,7 +1858,12 @@ describe( 'selectors', () => {
 					modified: '2018-09-27T01:23:45.678Z',
 					status: 'draft',
 				},
-				editor,
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostDateFloating( state ) ).toBe( true );
@@ -1568,7 +1876,12 @@ describe( 'selectors', () => {
 					modified: '2018-09-27T01:23:45.678Z',
 					status: 'auto-draft',
 				},
-				editor,
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostDateFloating( state ) ).toBe( true );
@@ -1581,7 +1894,12 @@ describe( 'selectors', () => {
 					modified: '1970-01-01T00:00:00.000Z',
 					status: 'draft',
 				},
-				editor,
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostDateFloating( state ) ).toBe( false );
@@ -1594,7 +1912,12 @@ describe( 'selectors', () => {
 					modified: '1970-01-01T00:00:00.000Z',
 					status: 'auto-draft',
 				},
-				editor,
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostDateFloating( state ) ).toBe( false );
@@ -1607,15 +1930,39 @@ describe( 'selectors', () => {
 					modified: '2018-09-27T01:23:45.678Z',
 					status: 'publish',
 				},
-				editor,
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
 			};
 
 			expect( isEditedPostDateFloating( state ) ).toBe( false );
 		} );
+
+		it( 'should return true for pending posts', () => {
+			const state = {
+				currentPost: {
+					date: '2018-09-27T01:23:45.678Z',
+					modified: '2018-09-27T01:23:45.678Z',
+					status: 'pending',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( isEditedPostDateFloating( state ) ).toBe( true );
+		} );
 	} );
 
 	describe( 'getBlockDependantsCacheBust', () => {
-		const rootBlock = { clientId: 123, name: 'core/paragraph', attributes: {} };
+		const rootBlock = { clientId: 123, name: 'core/paragraph' };
+		const rootBlockAttributes = {};
 		const rootOrder = [ 123 ];
 
 		it( 'returns an unchanging reference', () => {
@@ -1629,6 +1976,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								123: rootBlock,
 							},
+							attributes: {
+								123: rootBlockAttributes,
+							},
 							order: {
 								'': rootOrder,
 								123: rootBlockOrder,
@@ -1637,6 +1987,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			const nextState = {
@@ -1647,6 +1998,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								123: rootBlock,
 							},
+							attributes: {
+								123: rootBlockAttributes,
+							},
 							order: {
 								'': rootOrder,
 								123: rootBlockOrder,
@@ -1655,6 +2009,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect(
@@ -1671,6 +2026,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								123: rootBlock,
 							},
+							attributes: {
+								123: rootBlockAttributes,
+							},
 							order: {
 								'': rootOrder,
 								123: [],
@@ -1679,6 +2037,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			const nextState = {
@@ -1688,7 +2047,11 @@ describe( 'selectors', () => {
 						blocks: {
 							byClientId: {
 								123: rootBlock,
-								456: { clientId: 456, name: 'core/paragraph', attributes: {} },
+								456: { clientId: 456, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: rootBlockAttributes,
+								456: {},
 							},
 							order: {
 								'': rootOrder,
@@ -1699,6 +2062,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect(
@@ -1708,7 +2072,8 @@ describe( 'selectors', () => {
 
 		it( 'returns an unchanging reference on unchanging inner block', () => {
 			const rootBlockOrder = [ 456 ];
-			const childBlock = { clientId: 456, name: 'core/paragraph', attributes: {} };
+			const childBlock = { clientId: 456, name: 'core/paragraph' };
+			const childBlockAttributes = {};
 			const childBlockOrder = [];
 
 			const state = {
@@ -1720,6 +2085,10 @@ describe( 'selectors', () => {
 								123: rootBlock,
 								456: childBlock,
 							},
+							attributes: {
+								123: rootBlockAttributes,
+								456: childBlockAttributes,
+							},
 							order: {
 								'': rootOrder,
 								123: rootBlockOrder,
@@ -1729,6 +2098,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			const nextState = {
@@ -1740,6 +2110,10 @@ describe( 'selectors', () => {
 								123: rootBlock,
 								456: childBlock,
 							},
+							attributes: {
+								123: rootBlockAttributes,
+								456: childBlockAttributes,
+							},
 							order: {
 								'': rootOrder,
 								123: rootBlockOrder,
@@ -1749,6 +2123,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect(
@@ -1767,7 +2142,11 @@ describe( 'selectors', () => {
 						blocks: {
 							byClientId: {
 								123: rootBlock,
-								456: { clientId: 456, name: 'core/paragraph', attributes: {} },
+								456: { clientId: 456, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: rootBlockAttributes,
+								456: {},
 							},
 							order: {
 								'': rootOrder,
@@ -1778,6 +2157,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			const nextState = {
@@ -1787,7 +2167,11 @@ describe( 'selectors', () => {
 						blocks: {
 							byClientId: {
 								123: rootBlock,
-								456: { clientId: 456, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+								456: { clientId: 456, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: rootBlockAttributes,
+								456: { content: [ 'foo' ] },
 							},
 							order: {
 								'': rootOrder,
@@ -1798,6 +2182,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect(
@@ -1807,7 +2192,8 @@ describe( 'selectors', () => {
 
 		it( 'returns a new reference on updated grandchild inner block', () => {
 			const rootBlockOrder = [ 456 ];
-			const childBlock = { clientId: 456, name: 'core/paragraph', attributes: {} };
+			const childBlock = { clientId: 456, name: 'core/paragraph' };
+			const childBlockAttributes = {};
 			const childBlockOrder = [ 789 ];
 			const grandChildBlockOrder = [];
 
@@ -1819,7 +2205,12 @@ describe( 'selectors', () => {
 							byClientId: {
 								123: rootBlock,
 								456: childBlock,
-								789: { clientId: 789, name: 'core/paragraph', attributes: {} },
+								789: { clientId: 789, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: rootBlockAttributes,
+								456: childBlockAttributes,
+								789: {},
 							},
 							order: {
 								'': rootOrder,
@@ -1831,6 +2222,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			const nextState = {
@@ -1841,7 +2233,12 @@ describe( 'selectors', () => {
 							byClientId: {
 								123: rootBlock,
 								456: childBlock,
-								789: { clientId: 789, name: 'core/paragraph', attributes: { content: [ 'foo' ] } },
+								789: { clientId: 789, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: rootBlockAttributes,
+								456: childBlockAttributes,
+								789: { content: [ 'foo' ] },
 							},
 							order: {
 								'': rootOrder,
@@ -1853,6 +2250,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect(
@@ -1869,11 +2267,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
@@ -1891,8 +2291,10 @@ describe( 'selectors', () => {
 								'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
 									clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 									name: 'core/paragraph',
-									attributes: {},
 								},
+							},
+							attributes: {
+								'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {},
 							},
 							order: {
 								'': [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
@@ -1902,6 +2304,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			const name = getBlockName( state, 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' );
@@ -1918,7 +2321,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+								123: { clientId: 123, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: {},
 							},
 							order: {
 								'': [ 123 ],
@@ -1928,6 +2334,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getBlock( state, 123 ) ).toEqual( {
@@ -1945,11 +2352,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getBlock( state, 123 ) ).toBe( null );
@@ -1962,8 +2371,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
-								456: { clientId: 456, name: 'core/paragraph', attributes: {} },
+								123: { clientId: 123, name: 'core/paragraph' },
+								456: { clientId: 456, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: {},
+								456: {},
 							},
 							order: {
 								'': [ 123 ],
@@ -1974,6 +2387,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getBlock( state, 123 ) ).toEqual( {
@@ -2013,7 +2427,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								123: { clientId: 123, name: 'core/meta-block', attributes: {} },
+								123: { clientId: 123, name: 'core/meta-block' },
+							},
+							attributes: {
+								123: {},
 							},
 							order: {
 								'': [ 123 ],
@@ -2023,6 +2440,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getBlock( state, 123 ) ).toEqual( {
@@ -2046,8 +2464,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+								23: { clientId: 23, name: 'core/heading' },
+								123: { clientId: 123, name: 'core/paragraph' },
+							},
+							attributes: {
+								23: {},
+								123: {},
 							},
 							order: {
 								'': [ 123, 23 ],
@@ -2056,6 +2478,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getBlocks( state ) ).toEqual( [
@@ -2073,21 +2496,38 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								'uuid-2': { clientId: 'uuid-2', name: 'core/image', attributes: {} },
-								'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
-								'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
-								'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: {} },
-								'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: {} },
-								'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: {} },
-								'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: {} },
-								'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: {} },
-								'uuid-18': { clientId: 'uuid-18', name: 'core/block', attributes: {} },
-								'uuid-20': { clientId: 'uuid-20', name: 'core/gallery', attributes: {} },
-								'uuid-22': { clientId: 'uuid-22', name: 'core/block', attributes: {} },
-								'uuid-24': { clientId: 'uuid-24', name: 'core/columns', attributes: {} },
-								'uuid-26': { clientId: 'uuid-26', name: 'core/column', attributes: {} },
-								'uuid-28': { clientId: 'uuid-28', name: 'core/column', attributes: {} },
-								'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph', attributes: {} },
+								'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
+								'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
+								'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
+								'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
+								'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
+								'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
+								'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
+								'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
+								'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
+								'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
+								'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
+								'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
+								'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
+								'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
+								'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
+							},
+							attributes: {
+								'uuid-2': {},
+								'uuid-4': {},
+								'uuid-6': {},
+								'uuid-8': {},
+								'uuid-10': {},
+								'uuid-12': {},
+								'uuid-14': {},
+								'uuid-16': {},
+								'uuid-18': {},
+								'uuid-20': {},
+								'uuid-22': {},
+								'uuid-24': {},
+								'uuid-26': {},
+								'uuid-28': {},
+								'uuid-30': {},
 							},
 							order: {
 								'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
@@ -2110,6 +2550,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual( [
 				'uuid-12',
@@ -2132,21 +2573,38 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								'uuid-2': { clientId: 'uuid-2', name: 'core/image', attributes: {} },
-								'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph', attributes: {} },
-								'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph', attributes: {} },
-								'uuid-8': { clientId: 'uuid-8', name: 'core/block', attributes: {} },
-								'uuid-10': { clientId: 'uuid-10', name: 'core/columns', attributes: {} },
-								'uuid-12': { clientId: 'uuid-12', name: 'core/column', attributes: {} },
-								'uuid-14': { clientId: 'uuid-14', name: 'core/column', attributes: {} },
-								'uuid-16': { clientId: 'uuid-16', name: 'core/quote', attributes: {} },
-								'uuid-18': { clientId: 'uuid-18', name: 'core/block', attributes: {} },
-								'uuid-20': { clientId: 'uuid-20', name: 'core/gallery', attributes: {} },
-								'uuid-22': { clientId: 'uuid-22', name: 'core/block', attributes: {} },
-								'uuid-24': { clientId: 'uuid-24', name: 'core/columns', attributes: {} },
-								'uuid-26': { clientId: 'uuid-26', name: 'core/column', attributes: {} },
-								'uuid-28': { clientId: 'uuid-28', name: 'core/column', attributes: {} },
-								'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph', attributes: {} },
+								'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
+								'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
+								'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
+								'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
+								'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
+								'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
+								'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
+								'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
+								'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
+								'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
+								'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
+								'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
+								'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
+								'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
+								'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
+							},
+							attributes: {
+								'uuid-2': {},
+								'uuid-4': {},
+								'uuid-6': {},
+								'uuid-8': {},
+								'uuid-10': {},
+								'uuid-12': {},
+								'uuid-14': {},
+								'uuid-16': {},
+								'uuid-18': {},
+								'uuid-20': {},
+								'uuid-22': {},
+								'uuid-24': {},
+								'uuid-26': {},
+								'uuid-28': {},
+								'uuid-30': {},
 							},
 							order: {
 								'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
@@ -2169,6 +2627,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 			expect( getClientIdsWithDescendants( state ) ).toEqual( [
 				'uuid-6',
@@ -2194,8 +2653,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+								23: { clientId: 23, name: 'core/heading' },
+								123: { clientId: 123, name: 'core/paragraph' },
+							},
+							attributes: {
+								23: {},
+								123: {},
 							},
 							order: {
 								'': [ 123, 23 ],
@@ -2214,9 +2677,14 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								123: { clientId: 123, name: 'core/columns', attributes: {} },
-								456: { clientId: 456, name: 'core/paragraph', attributes: {} },
-								789: { clientId: 789, name: 'core/paragraph', attributes: {} },
+								123: { clientId: 123, name: 'core/columns' },
+								456: { clientId: 456, name: 'core/paragraph' },
+								789: { clientId: 789, name: 'core/paragraph' },
+							},
+							attributes: {
+								123: {},
+								456: {},
+								789: {},
 							},
 							order: {
 								'': [ 123 ],
@@ -2267,54 +2735,50 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getGlobalBlockCount', () => {
-		it( 'should return the global number of top-level blocks in the post', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
-							},
+		const state = {
+			editor: {
+				present: {
+					blocks: {
+						byClientId: {
+							123: { clientId: 123, name: 'core/heading' },
+							456: { clientId: 456, name: 'core/paragraph' },
+							789: { clientId: 789, name: 'core/paragraph' },
+						},
+						attributes: {
+							123: {},
+							456: {},
+							789: {},
+						},
+						order: {
+							'': [ 123, 456 ],
 						},
 					},
 				},
-			};
+			},
+		};
 
+		it( 'should return the global number of blocks in the post', () => {
 			expect( getGlobalBlockCount( state ) ).toBe( 2 );
 		} );
 
-		it( 'should return the global umber of blocks of a given type', () => {
-			const state = {
-				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: { clientId: 123, name: 'core/columns', attributes: {} },
-								456: { clientId: 456, name: 'core/paragraph', attributes: {} },
-								789: { clientId: 789, name: 'core/paragraph', attributes: {} },
-								124: { clientId: 123, name: 'core/heading', attributes: {} },
-							},
-						},
-					},
-				},
-			};
-
-			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 1 );
+		it( 'should return the global number of blocks in the post of a given type', () => {
+			expect( getGlobalBlockCount( state, 'core/paragraph' ) ).toBe( 1 );
 		} );
 
 		it( 'should return 0 if no blocks exist', () => {
-			const state = {
+			const emptyState = {
 				editor: {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
+							order: {},
 						},
 					},
 				},
 			};
-			expect( getGlobalBlockCount( state ) ).toBe( 0 );
-			expect( getGlobalBlockCount( state, 'core/heading' ) ).toBe( 0 );
+			expect( getGlobalBlockCount( emptyState ) ).toBe( 0 );
+			expect( getGlobalBlockCount( emptyState, 'core/heading' ) ).toBe( 0 );
 		} );
 	} );
 
@@ -2337,6 +2801,7 @@ describe( 'selectors', () => {
 
 		it( 'should return the selected block ClientId', () => {
 			const state = {
+				editor: { present: { blocks: { byClientId: { 23: { name: 'fake block' } } } } },
 				blockSelection: { start: 23, end: 23 },
 			};
 
@@ -2352,8 +2817,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+								23: { clientId: 23, name: 'core/heading' },
+								123: { clientId: 123, name: 'core/paragraph' },
+							},
+							attributes: {
+								23: {},
+								123: {},
 							},
 							order: {
 								'': [ 23, 123 ],
@@ -2364,6 +2833,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				blockSelection: { start: null, end: null },
 			};
 
@@ -2377,8 +2847,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+								23: { clientId: 23, name: 'core/heading' },
+								123: { clientId: 123, name: 'core/paragraph' },
+							},
+							attributes: {
+								23: {},
+								123: {},
 							},
 							order: {
 								'': [ 23, 123 ],
@@ -2389,6 +2863,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				blockSelection: { start: 23, end: 123 },
 			};
 
@@ -2402,8 +2877,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								23: { clientId: 23, name: 'core/heading', attributes: {} },
-								123: { clientId: 123, name: 'core/paragraph', attributes: {} },
+								23: { clientId: 23, name: 'core/heading' },
+								123: { clientId: 123, name: 'core/paragraph' },
+							},
+							attributes: {
+								23: {},
+								123: {},
 							},
 							order: {
 								'': [ 23, 123 ],
@@ -2414,6 +2893,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				blockSelection: { start: 23, end: 23 },
 			};
 
@@ -2571,11 +3051,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				blockSelection: { start: null, end: null },
 				currentPost: {},
 			};
@@ -3168,6 +3650,10 @@ describe( 'selectors', () => {
 								clientId1: { clientId: 'clientId1' },
 								clientId2: { clientId: 'clientId2' },
 							},
+							attributes: {
+								clientId1: {},
+								clientId2: {},
+							},
 							order: {
 								'': [ 'clientId1' ],
 								clientId1: [ 'clientId2' ],
@@ -3177,6 +3663,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				insertionPoint: {
 					rootClientId: undefined,
 					index: 0,
@@ -3203,6 +3690,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								clientId1: { clientId: 'clientId1' },
 							},
+							attributes: {
+								clientId1: {},
+							},
 							order: {
 								'': [ 'clientId1' ],
 								clientId1: [],
@@ -3211,6 +3701,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				insertionPoint: null,
 			};
 
@@ -3235,6 +3726,10 @@ describe( 'selectors', () => {
 								clientId1: { clientId: 'clientId1' },
 								clientId2: { clientId: 'clientId2' },
 							},
+							attributes: {
+								clientId1: {},
+								clientId2: {},
+							},
 							order: {
 								'': [ 'clientId1' ],
 								clientId1: [ 'clientId2' ],
@@ -3244,6 +3739,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				insertionPoint: null,
 			};
 
@@ -3268,6 +3764,10 @@ describe( 'selectors', () => {
 								clientId1: { clientId: 'clientId1' },
 								clientId2: { clientId: 'clientId2' },
 							},
+							attributes: {
+								clientId1: {},
+								clientId2: {},
+							},
 							order: {
 								'': [ 'clientId1', 'clientId2' ],
 								clientId1: [],
@@ -3277,6 +3777,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				insertionPoint: null,
 			};
 
@@ -3301,6 +3802,10 @@ describe( 'selectors', () => {
 								clientId1: { clientId: 'clientId1' },
 								clientId2: { clientId: 'clientId2' },
 							},
+							attributes: {
+								clientId1: {},
+								clientId2: {},
+							},
 							order: {
 								'': [ 'clientId1', 'clientId2' ],
 								clientId1: [],
@@ -3310,6 +3815,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				insertionPoint: null,
 			};
 
@@ -3414,11 +3920,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3431,8 +3939,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								123: { clientId: 123, name: 'core/image', attributes: {} },
-								456: { clientId: 456, name: 'core/quote', attributes: {} },
+								123: { clientId: 123, name: 'core/image' },
+								456: { clientId: 456, name: 'core/quote' },
+							},
+							attributes: {
+								123: {},
+								456: {},
 							},
 							order: {
 								'': [ 123, 456 ],
@@ -3441,6 +3953,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3453,7 +3966,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								123: { clientId: 123, name: 'core/image', attributes: {} },
+								123: { clientId: 123, name: 'core/image' },
+							},
+							attributes: {
+								123: {},
 							},
 							order: {
 								'': [ 123 ],
@@ -3462,6 +3978,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3474,7 +3991,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								456: { clientId: 456, name: 'core/quote', attributes: {} },
+								456: { clientId: 456, name: 'core/quote' },
+							},
+							attributes: {
+								456: {},
 							},
 							order: {
 								'': [ 456 ],
@@ -3483,6 +4003,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3495,7 +4016,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								567: { clientId: 567, name: 'core-embed/youtube', attributes: {} },
+								567: { clientId: 567, name: 'core-embed/youtube' },
+							},
+							attributes: {
+								567: {},
 							},
 							order: {
 								'': [ 567 ],
@@ -3504,6 +4028,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3516,8 +4041,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								456: { clientId: 456, name: 'core/quote', attributes: {} },
-								789: { clientId: 789, name: 'core/paragraph', attributes: {} },
+								456: { clientId: 456, name: 'core/quote' },
+								789: { clientId: 789, name: 'core/paragraph' },
+							},
+							attributes: {
+								456: {},
+								789: {},
 							},
 							order: {
 								'': [ 456, 789 ],
@@ -3526,6 +4055,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3533,33 +4063,109 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getEditedPostContent', () => {
-		let originalDefaultBlockName;
-
-		beforeAll( () => {
-			originalDefaultBlockName = getDefaultBlockName();
-
-			registerBlockType( 'core/default', {
-				category: 'common',
-				title: 'default',
-				attributes: {
-					modified: {
-						type: 'boolean',
-						default: false,
+	describe( 'getBlocksForSerialization', () => {
+		it( 'should return blocks', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+								block2: {
+									clientId: 'block2',
+									name: 'core/heading',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: false,
+								},
+								block2: {},
+							},
+							order: {
+								'': [ 'block1', 'block2' ],
+							},
+						},
+						edits: {},
 					},
 				},
-				save: () => null,
-			} );
-			setDefaultBlockName( 'core/default' );
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( getBlocksForSerialization( state ) ).toEqual( [
+				{ clientId: 'block1', name: 'core/test-default', attributes: { modified: false }, innerBlocks: [] },
+				{ clientId: 'block2', name: 'core/heading', attributes: {}, innerBlocks: [] },
+			] );
 		} );
 
-		afterAll( () => {
-			setDefaultBlockName( originalDefaultBlockName );
-			getBlockTypes().forEach( ( block ) => {
-				unregisterBlockType( block.name );
-			} );
+		it( 'should return an empty set if content is a single unmodified default block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: false,
+								},
+							},
+							order: {
+								'': [ 'block1' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( getBlocksForSerialization( state ) ).toEqual( [] );
 		} );
 
+		it( 'should return a set including a single modified default block', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1: {
+									clientId: 'block1',
+									name: 'core/test-default',
+								},
+							},
+							attributes: {
+								block1: {
+									modified: true,
+								},
+							},
+							order: {
+								'': [ 'block1' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				currentPost: {},
+			};
+
+			expect( getBlocksForSerialization( state ) ).toEqual( [
+				{ clientId: 'block1', name: 'core/test-default', attributes: { modified: true }, innerBlocks: [] },
+			] );
+		} );
+	} );
+
+	describe( 'getEditedPostContent', () => {
 		it( 'defers to returning an edited post attribute', () => {
 			const block = createBlock( 'core/block' );
 
@@ -3568,7 +4174,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								[ block.clientId ]: block,
+								[ block.clientId ]: omit( block, 'attributes' ),
+							},
+							attributes: {
+								[ block.clientId ]: block.attributes,
 							},
 							order: {
 								'': [ block.clientId ],
@@ -3579,6 +4188,7 @@ describe( 'selectors', () => {
 						},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3595,7 +4205,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								[ block.clientId ]: block,
+								[ block.clientId ]: omit( block, 'attributes' ),
+							},
+							attributes: {
+								[ block.clientId ]: block.attributes,
 							},
 							order: {
 								'': [ block.clientId ],
@@ -3604,6 +4217,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3621,7 +4235,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								[ unknownBlock.clientId ]: unknownBlock,
+								[ unknownBlock.clientId ]: omit( unknownBlock, 'attributes' ),
+							},
+							attributes: {
+								[ unknownBlock.clientId ]: unknownBlock.attributes,
 							},
 							order: {
 								'': [ unknownBlock.clientId ],
@@ -3630,6 +4247,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3650,8 +4268,12 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								[ firstUnknown.clientId ]: firstUnknown,
-								[ secondUnknown.clientId ]: secondUnknown,
+								[ firstUnknown.clientId ]: omit( firstUnknown, 'attributes' ),
+								[ secondUnknown.clientId ]: omit( secondUnknown, 'attributes' ),
+							},
+							attributes: {
+								[ firstUnknown.clientId ]: firstUnknown.attributes,
+								[ secondUnknown.clientId ]: secondUnknown.attributes,
 							},
 							order: {
 								'': [ firstUnknown.clientId, secondUnknown.clientId ],
@@ -3660,6 +4282,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3675,7 +4298,10 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {
-								[ defaultBlock.clientId ]: defaultBlock,
+								[ defaultBlock.clientId ]: omit( defaultBlock, 'attributes' ),
+							},
+							attributes: {
+								[ defaultBlock.clientId ]: defaultBlock.attributes,
 							},
 							order: {
 								'': [ defaultBlock.clientId ],
@@ -3684,6 +4310,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
@@ -3700,11 +4327,13 @@ describe( 'selectors', () => {
 						blocks: {
 							byClientId: {
 								[ defaultBlock.clientId ]: {
-									...defaultBlock,
-									attributes: {
-										...defaultBlock.attributes,
-										modified: true,
-									},
+									...omit( defaultBlock, 'attributes' ),
+								},
+							},
+							attributes: {
+								[ defaultBlock.clientId ]: {
+									...defaultBlock.attributes,
+									modified: true,
 								},
 							},
 							order: {
@@ -3714,12 +4343,13 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				currentPost: {},
 			};
 
 			const content = getEditedPostContent( state );
 
-			expect( content ).toBe( '<!-- wp:default {\"modified\":true} /-->' );
+			expect( content ).toBe( '<!-- wp:test-default {\"modified\":true} /-->' );
 		} );
 	} );
 
@@ -3730,6 +4360,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 						},
 					},
 				},
@@ -3745,6 +4376,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 						},
 					},
 				},
@@ -3762,6 +4394,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 						},
 					},
 				},
@@ -3779,6 +4412,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 						},
 					},
 				},
@@ -3796,6 +4430,7 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 						},
 					},
 				},
@@ -3812,6 +4447,9 @@ describe( 'selectors', () => {
 						blocks: {
 							byClientId: {
 								block1: { name: 'core/test-block-a' },
+							},
+							attributes: {
+								block1: {},
 							},
 						},
 					},
@@ -3830,6 +4468,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { name: 'core/test-block-b' },
 							},
+							attributes: {
+								block1: {},
+							},
 						},
 					},
 				},
@@ -3846,6 +4487,9 @@ describe( 'selectors', () => {
 						blocks: {
 							byClientId: {
 								block1: { name: 'core/test-block-a' },
+							},
+							attributes: {
+								block1: {},
 							},
 						},
 					},
@@ -3868,6 +4512,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { name: 'core/test-block-a' },
 							},
+							attributes: {
+								block1: {},
+							},
 						},
 					},
 				},
@@ -3888,6 +4535,9 @@ describe( 'selectors', () => {
 						blocks: {
 							byClientId: {
 								block1: { name: 'core/test-block-b' },
+							},
+							attributes: {
+								block1: {},
 							},
 						},
 					},
@@ -3912,11 +4562,15 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { name: 'core/test-block-a' },
 							},
+							attributes: {
+								block1: {},
+							},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				reusableBlocks: {
 					data: {
 						1: { clientId: 'block1', title: 'Reusable Block 1' },
@@ -3963,6 +4617,135 @@ describe( 'selectors', () => {
 			} );
 		} );
 
+		it( 'should not list a reusable block item if it is being inserted inside it self', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block1ref: {
+									name: 'core/block',
+									clientId: 'block1ref',
+								},
+								itselfBlock1: { name: 'core/test-block-a' },
+								itselfBlock2: { name: 'core/test-block-b' },
+							},
+							attributes: {
+								block1ref: {
+									attributes: {
+										ref: 1,
+									},
+								},
+								itselfBlock1: {},
+								itselfBlock2: {},
+							},
+							order: {
+								'': [ 'block1ref' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				reusableBlocks: {
+					data: {
+						1: { clientId: 'itselfBlock1', title: 'Reusable Block 1' },
+						2: { clientId: 'itselfBlock2', title: 'Reusable Block 2' },
+					},
+				},
+				currentPost: {},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const items = getInserterItems( state, 'itselfBlock1' );
+			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
+			expect( reusableBlockItems ).toHaveLength( 1 );
+			expect( reusableBlockItems[ 0 ] ).toEqual( {
+				id: 'core/block/2',
+				name: 'core/block',
+				initialAttributes: { ref: 2 },
+				title: 'Reusable Block 2',
+				icon: {
+					src: 'test',
+				},
+				category: 'reusable',
+				keywords: [],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+		} );
+
+		it( 'should not list a reusable block item if it is being inserted inside a descendent', () => {
+			const state = {
+				editor: {
+					present: {
+						blocks: {
+							byClientId: {
+								block2ref: {
+									name: 'core/block',
+									clientId: 'block1ref',
+								},
+								referredBlock1: { name: 'core/test-block-a' },
+								referredBlock2: { name: 'core/test-block-b' },
+								childReferredBlock2: { name: 'core/test-block-a' },
+								grandchildReferredBlock2: { name: 'core/test-block-b' },
+							},
+							attributes: {
+								block2ref: {
+									attributes: {
+										ref: 2,
+									},
+								},
+								referredBlock1: {},
+								referredBlock2: {},
+								childReferredBlock2: {},
+								grandchildReferredBlock2: {},
+							},
+							order: {
+								'': [ 'block2ref' ],
+								referredBlock2: [ 'childReferredBlock2' ],
+								childReferredBlock2: [ 'grandchildReferredBlock2' ],
+							},
+						},
+						edits: {},
+					},
+				},
+				initialEdits: {},
+				reusableBlocks: {
+					data: {
+						1: { clientId: 'referredBlock1', title: 'Reusable Block 1' },
+						2: { clientId: 'referredBlock2', title: 'Reusable Block 2' },
+					},
+				},
+				currentPost: {},
+				preferences: {
+					insertUsage: {},
+				},
+				blockListSettings: {},
+				settings: {},
+			};
+			const items = getInserterItems( state, 'grandchildReferredBlock2' );
+			const reusableBlockItems = filter( items, [ 'name', 'core/block' ] );
+			expect( reusableBlockItems ).toHaveLength( 1 );
+			expect( reusableBlockItems[ 0 ] ).toEqual( {
+				id: 'core/block/1',
+				name: 'core/block',
+				initialAttributes: { ref: 1 },
+				title: 'Reusable Block 1',
+				icon: {
+					src: 'test',
+				},
+				category: 'reusable',
+				keywords: [],
+				isDisabled: false,
+				utility: 0,
+				frecency: 0,
+			} );
+		} );
 		it( 'should order items by descending utility and frecency', () => {
 			const state = {
 				editor: {
@@ -3972,11 +4755,16 @@ describe( 'selectors', () => {
 								block1: { name: 'core/test-block-a' },
 								block2: { name: 'core/test-block-a' },
 							},
+							attributes: {
+								block1: {},
+								block2: {},
+							},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				reusableBlocks: {
 					data: {
 						1: { clientId: 'block1', title: 'Reusable Block 1' },
@@ -3999,6 +4787,7 @@ describe( 'selectors', () => {
 				'core/block/1',
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-default',
 				'core/test-block-a',
 			] );
 		} );
@@ -4011,12 +4800,23 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { name: 'core/test-block-a' },
 								block2: { name: 'core/test-block-a' },
+								block3: { name: 'core/test-block-a' },
+								block4: { name: 'core/test-block-a' },
 							},
-							order: {},
+							attributes: {
+								block1: {},
+								block2: {},
+								block3: {},
+								block4: {},
+							},
+							order: {
+								'': [ 'block3', 'block4' ],
+							},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				reusableBlocks: {
 					data: {
 						1: { clientId: 'block1', title: 'Reusable Block 1' },
@@ -4034,28 +4834,30 @@ describe( 'selectors', () => {
 			const stateSecondBlockRestricted = {
 				...state,
 				blockListSettings: {
-					block2: {
+					block4: {
 						allowedBlocks: [ 'core/test-block-b' ],
 					},
 				},
 			};
 
-			const firstBlockFirstCall = getInserterItems( state, 'block1' );
-			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block1' );
+			const firstBlockFirstCall = getInserterItems( state, 'block3' );
+			const firstBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block3' );
 			expect( firstBlockFirstCall ).toBe( firstBlockSecondCall );
 			expect( firstBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-default',
 				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
 			] );
 
-			const secondBlockFirstCall = getInserterItems( state, 'block2' );
-			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block2' );
+			const secondBlockFirstCall = getInserterItems( state, 'block4' );
+			const secondBlockSecondCall = getInserterItems( stateSecondBlockRestricted, 'block4' );
 			expect( secondBlockFirstCall.map( ( item ) => item.id ) ).toEqual( [
 				'core/test-block-b',
 				'core/test-freeform',
+				'core/test-default',
 				'core/test-block-a',
 				'core/block/1',
 				'core/block/2',
@@ -4073,6 +4875,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { clientId: 'block1', name: 'core/test-block-b' },
 							},
+							attributes: {
+								block1: { attribute: {} },
+							},
 							order: {
 								'': [ 'block1' ],
 							},
@@ -4080,6 +4885,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -4101,11 +4907,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -4127,11 +4935,13 @@ describe( 'selectors', () => {
 					present: {
 						blocks: {
 							byClientId: {},
+							attributes: {},
 							order: {},
 						},
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -4158,6 +4968,9 @@ describe( 'selectors', () => {
 							byClientId: {
 								block1: { name: 'core/test-block-b' },
 							},
+							attributes: {
+								block1: { attribute: {} },
+							},
 							order: {
 								'': [ 'block1' ],
 							},
@@ -4165,6 +4978,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 				reusableBlocks: {
 					data: {},
 				},
@@ -4396,9 +5210,6 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: false,
 				},
-				editor: {
-					edits: {},
-				},
 				currentPost: {
 					status: 'publish',
 				},
@@ -4413,9 +5224,6 @@ describe( 'selectors', () => {
 				saving: {
 					requesting: true,
 				},
-				editor: {
-					edits: {},
-				},
 				currentPost: {
 					status: 'draft',
 				},
@@ -4429,9 +5237,6 @@ describe( 'selectors', () => {
 				optimist: [],
 				saving: {
 					requesting: true,
-				},
-				editor: {
-					edits: {},
 				},
 				currentPost: {
 					status: 'publish',
@@ -4449,9 +5254,6 @@ describe( 'selectors', () => {
 							saving: {
 								requesting: false,
 							},
-							editor: {
-								edits: {},
-							},
 							currentPost: {
 								status: 'publish',
 							},
@@ -4465,9 +5267,6 @@ describe( 'selectors', () => {
 				],
 				saving: {
 					requesting: true,
-				},
-				editor: {
-					edits: {},
 				},
 				currentPost: {
 					status: 'publish',
@@ -4485,11 +5284,6 @@ describe( 'selectors', () => {
 							saving: {
 								requesting: false,
 							},
-							editor: {
-								edits: {
-									status: 'publish',
-								},
-							},
 							currentPost: {
 								status: 'draft',
 							},
@@ -4503,9 +5297,6 @@ describe( 'selectors', () => {
 				],
 				saving: {
 					requesting: true,
-				},
-				editor: {
-					edits: {},
 				},
 				currentPost: {
 					status: 'publish',
@@ -4603,6 +5394,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -4616,6 +5408,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( false );
@@ -4629,6 +5422,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -4642,6 +5436,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( isPermalinkEditable( state ) ).toBe( true );
@@ -4658,6 +5453,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getPermalink( state ) ).toBe( url );
@@ -4674,9 +5470,21 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getPermalink( state ) ).toBe( 'http://foo.test/bar/baz/' );
+		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalink( state ) ).toBeNull();
 		} );
 	} );
 
@@ -4697,6 +5505,7 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
@@ -4717,9 +5526,21 @@ describe( 'selectors', () => {
 						edits: {},
 					},
 				},
+				initialEdits: {},
 			};
 
 			expect( getPermalinkParts( state ) ).toEqual( parts );
+		} );
+
+		it( 'should return null if the post has no permalink template', () => {
+			const state = {
+				currentPost: {},
+				editor: {
+					present: {},
+				},
+			};
+
+			expect( getPermalinkParts( state ) ).toBeNull();
 		} );
 	} );
 

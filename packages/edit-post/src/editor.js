@@ -4,9 +4,12 @@
 import { withSelect } from '@wordpress/data';
 import { EditorProvider, ErrorBoundary, PostLockedModal } from '@wordpress/editor';
 import { StrictMode } from '@wordpress/element';
+import { KeyboardShortcuts } from '@wordpress/components';
+
 /**
  * Internal dependencies
  */
+import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 
 function Editor( {
@@ -14,7 +17,7 @@ function Editor( {
 	hasFixedToolbar,
 	focusMode,
 	post,
-	overridePost,
+	initialEdits,
 	onError,
 	...props
 } ) {
@@ -32,11 +35,13 @@ function Editor( {
 		<StrictMode>
 			<EditorProvider
 				settings={ editorSettings }
-				post={ { ...post, ...overridePost } }
+				post={ post }
+				initialEdits={ initialEdits }
 				{ ...props }
 			>
 				<ErrorBoundary onError={ onError }>
 					<Layout />
+					<KeyboardShortcuts shortcuts={ preventEventDiscovery } />
 				</ErrorBoundary>
 				<PostLockedModal />
 			</EditorProvider>

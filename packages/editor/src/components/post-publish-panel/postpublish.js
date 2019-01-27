@@ -8,7 +8,7 @@ import { get } from 'lodash';
  */
 import { PanelBody, Button, ClipboardButton, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
+import { Component, Fragment, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -24,6 +24,13 @@ class PostPublishPanelPostpublish extends Component {
 		};
 		this.onCopy = this.onCopy.bind( this );
 		this.onSelectInput = this.onSelectInput.bind( this );
+		this.postLink = createRef();
+	}
+
+	componentDidMount() {
+		if ( this.props.focusOnMount ) {
+			this.postLink.current.focus();
+		}
 	}
 
 	componentWillUnmount() {
@@ -59,7 +66,7 @@ class PostPublishPanelPostpublish extends Component {
 		return (
 			<div className="post-publish-panel__postpublish">
 				<PanelBody className="post-publish-panel__postpublish-header">
-					<a href={ post.link }>{ post.title || __( '(no title)' ) }</a> { postPublishNonLinkHeader }
+					<a ref={ this.postLink } href={ post.link }>{ post.title || __( '(no title)' ) }</a> { postPublishNonLinkHeader }
 				</PanelBody>
 				<PanelBody>
 					<p className="post-publish-panel__postpublish-subheader">

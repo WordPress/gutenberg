@@ -25,6 +25,7 @@ import { createHooks, applyFilters } from '@wordpress/hooks';
  * Internal dependencies
  */
 import { getBlockType, getBlockTypes } from './registration';
+import { normalizeBlockType } from './utils';
 
 /**
  * Returns a block object given its type and attributes.
@@ -115,10 +116,9 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	if ( isEmpty( blocks ) ) {
 		return false;
 	}
-	const isMultiBlock = blocks.length > 1;
-	const sourceBlock = first( blocks );
 
 	// If multiple blocks are selected, only multi block transforms are allowed.
+	const isMultiBlock = blocks.length > 1;
 	const isValidForMultiBlocks = ! isMultiBlock || transform.isMultiBlock;
 	if ( ! isValidForMultiBlocks ) {
 		return false;
@@ -131,6 +131,7 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 	}
 
 	// Check if the transform's block name matches the source block only if this is a transform 'from'.
+	const sourceBlock = first( blocks );
 	const hasMatchingName = direction !== 'from' || transform.blocks.indexOf( sourceBlock.name ) !== -1;
 	if ( ! hasMatchingName ) {
 		return false;
@@ -279,13 +280,13 @@ export function findTransform( transforms, predicate ) {
  * transform object includes `blockName` as a property.
  *
  * @param {string}  direction Transform direction ("to", "from").
- * @param {?string} blockName Optional block name.
+ * @param {string|Object} blockTypeOrName  Block type or name.
  *
  * @return {Array} Block transforms for direction.
  */
-export function getBlockTransforms( direction, blockName ) {
+export function getBlockTransforms( direction, blockTypeOrName ) {
 	// When retrieving transforms for all block types, recurse into self.
-	if ( blockName === undefined ) {
+	if ( blockTypeOrName === undefined ) {
 		return flatMap(
 			getBlockTypes(),
 			( { name } ) => getBlockTransforms( direction, name )
@@ -293,7 +294,8 @@ export function getBlockTransforms( direction, blockName ) {
 	}
 
 	// Validate that block type exists and has array of direction.
-	const { transforms } = getBlockType( blockName ) || {};
+	const blockType = normalizeBlockType( blockTypeOrName );
+	const { name: blockName, transforms } = blockType || {};
 	if ( ! transforms || ! Array.isArray( transforms[ direction ] ) ) {
 		return [];
 	}

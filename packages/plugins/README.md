@@ -29,7 +29,7 @@ This method takes two arguments:
       or an element (or function returning an element) if you choose to render your own SVG.
     - `render`: A component containing the UI elements to be rendered.
 
-See [the edit-post module documentation](../edit-post/) for available components.
+See [the edit-post module documentation](/packages/edit-post/README.md) for available components.
 
 _Example:_
 {% codetabs %}
@@ -162,3 +162,5 @@ const Layout = () => (
 );
 ```
 {% end %}
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

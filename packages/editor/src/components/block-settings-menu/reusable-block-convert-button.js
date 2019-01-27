@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, every, map } from 'lodash';
+import { noop, every } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,13 +9,13 @@ import { noop, every, map } from 'lodash';
 import { Fragment } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { isReusableBlock } from '@wordpress/blocks';
+import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 export function ReusableBlockConvertButton( {
 	isVisible,
-	isStaticBlock,
+	isReusable,
 	onConvertToStatic,
 	onConvertToReusable,
 } ) {
@@ -25,7 +25,7 @@ export function ReusableBlockConvertButton( {
 
 	return (
 		<Fragment>
-			{ isStaticBlock && (
+			{ ! isReusable && (
 				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -34,7 +34,7 @@ export function ReusableBlockConvertButton( {
 					{ __( 'Add to Reusable Blocks' ) }
 				</MenuItem>
 			) }
-			{ ! isStaticBlock && (
+			{ isReusable && (
 				<MenuItem
 					className="editor-block-settings-menu__control"
 					icon="controls-repeat"
@@ -50,41 +50,44 @@ export function ReusableBlockConvertButton( {
 export default compose( [
 	withSelect( ( select, { clientIds } ) => {
 		const {
-			getBlock,
+			getBlocksByClientId,
 			canInsertBlockType,
 			__experimentalGetReusableBlock: getReusableBlock,
 		} = select( 'core/editor' );
-		const {
-			getFreeformFallbackBlockName,
-			getUnregisteredFallbackBlockName,
-		} = select( 'core/blocks' );
+		const { canUser } = select( 'core' );
 
-		const blocks = map( clientIds, ( clientId ) => getBlock( clientId ) );
+		const blocks = getBlocksByClientId( clientIds );
 
-		const isVisible = (
-			// Guard against the case where a regular block has *just* been converted to a
-			// reusable block and doesn't yet exist in the editor store.
-			every( blocks, ( block ) => !! block ) &&
+		const isReusable = (
+			blocks.length === 1 &&
+			blocks[ 0 ] &&
+			isReusableBlock( blocks[ 0 ] ) &&
+			!! getReusableBlock( blocks[ 0 ].attributes.ref )
+		);
 
-			// Hide 'Add to Reusable Blocks' when Reusable Blocks are disabled, i.e. when
-			// core/block is not in the allowed_block_types filter.
+		// Show 'Convert to Regular Block' when selected block is a reusable block
+		const isVisible = isReusable || (
+			// Hide 'Add to Reusable Blocks' when reusable blocks are disabled
 			canInsertBlockType( 'core/block' ) &&
 
-			// Hide 'Add to Reusable Blocks' on Classic blocks. Showing it causes a
-			// confusing UX, because of its similarity to the 'Convert to Blocks' button.
-			( blocks.length !== 1 || (
-				blocks[ 0 ].name !== getFreeformFallbackBlockName() &&
-				blocks[ 0 ].name !== getUnregisteredFallbackBlockName()
-			) )
+			every( blocks, ( block ) => (
+				// Guard against the case where a regular block has *just* been converted
+				!! block &&
+
+				// Hide 'Add to Reusable Blocks' on invalid blocks
+				block.isValid &&
+
+				// Hide 'Add to Reusable Blocks' when block doesn't support being made reusable
+				hasBlockSupport( block.name, 'reusable', true )
+			) ) &&
+
+			// Hide 'Add to Reusable Blocks' when current doesn't have permission to do that
+			!! canUser( 'create', 'blocks' )
 		);
 
 		return {
+			isReusable,
 			isVisible,
-			isStaticBlock: isVisible && (
-				blocks.length !== 1 ||
-				! isReusableBlock( blocks[ 0 ] ) ||
-				! getReusableBlock( blocks[ 0 ].attributes.ref )
-			),
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, onToggle = noop } ) => {

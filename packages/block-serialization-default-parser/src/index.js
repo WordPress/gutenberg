@@ -2,19 +2,62 @@ let document;
 let offset;
 let output;
 let stack;
-const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:[^}]+|}+(?=})|(?!}\s+-->)[^])+?}\s+)?(\/)?-->/g;
 
-function Block( blockName, attrs, innerBlocks, innerHTML ) {
+/**
+ * Matches block comment delimiters
+ *
+ * While most of this pattern is straightforward the attribute parsing
+ * incorporates a tricks to make sure we don't choke on specific input
+ *
+ *  - since JavaScript has no possessive quantifier or atomic grouping
+ *    we are emulating it with a trick
+ *
+ *    we want a possessive quantifier or atomic group to prevent backtracking
+ *    on the `}`s should we fail to match the remainder of the pattern
+ *
+ *    we can emulate this with a positive lookahead and back reference
+ *    (a++)*c === ((?=(a+))\1)*c
+ *
+ *    let's examine an example:
+ *      - /(a+)*c/.test('aaaaaaaaaaaaad') fails after over 49,000 steps
+ *      - /(a++)*c/.test('aaaaaaaaaaaaad') fails after 85 steps
+ *      - /(?>a+)*c/.test('aaaaaaaaaaaaad') fails after 126 steps
+ *
+ *    this is because the possessive `++` and the atomic group `(?>)`
+ *    tell the engine that all those `a`s belong together as a single group
+ *    and so it won't split it up when stepping backwards to try and match
+ *
+ *    if we use /((?=(a+))\1)*c/ then we get the same behavior as the atomic group
+ *    or possessive and prevent the backtracking because the `a+` is matched but
+ *    not captured. thus, we find the long string of `a`s and remember it, then
+ *    reference it as a whole unit inside our pattern
+ *
+ *    @cite http://instanceof.me/post/52245507631/regex-emulate-atomic-grouping-with-lookahead
+ *    @cite http://blog.stevenlevithan.com/archives/mimic-atomic-groups
+ *    @cite https://javascript.info/regexp-infinite-backtracking-problem
+ *
+ *    once browsers reliably support atomic grouping or possessive
+ *    quantifiers natively we should remove this trick and simplify
+ *
+ * @type RegExp
+ *
+ * @since 3.8.0
+ * @since 4.6.1 added optimization to prevent backtracking on attribute parsing
+ */
+const tokenizer = /<!--\s+(\/)?wp:([a-z][a-z0-9_-]*\/)?([a-z][a-z0-9_-]*)\s+({(?:(?=([^}]+|}+(?=})|(?!}\s+\/?-->)[^])*)\5|[^]*?)}\s+)?(\/)?-->/g;
+
+function Block( blockName, attrs, innerBlocks, innerHTML, innerContent ) {
 	return {
 		blockName,
 		attrs,
 		innerBlocks,
 		innerHTML,
+		innerContent,
 	};
 }
 
 function Freeform( innerHTML ) {
-	return Block( null, {}, [], innerHTML );
+	return Block( null, {}, [], innerHTML, [ innerHTML ] );
 }
 
 function Frame( block, tokenStart, tokenLength, prevOffset, leadingHtmlStart ) {
@@ -84,14 +127,14 @@ function proceed() {
 				if ( null !== leadingHtmlStart ) {
 					output.push( Freeform( document.substr( leadingHtmlStart, startOffset - leadingHtmlStart ) ) );
 				}
-				output.push( Block( blockName, attrs, [], '' ) );
+				output.push( Block( blockName, attrs, [], '', [] ) );
 				offset = startOffset + tokenLength;
 				return true;
 			}
 
 			// otherwise we found an inner block
 			addInnerBlock(
-				Block( blockName, attrs, [], '' ),
+				Block( blockName, attrs, [], '', [] ),
 				startOffset,
 				tokenLength,
 			);
@@ -102,7 +145,7 @@ function proceed() {
 			// track all newly-opened blocks on the stack
 			stack.push(
 				Frame(
-					Block( blockName, attrs, [], '' ),
+					Block( blockName, attrs, [], '', [] ),
 					startOffset,
 					tokenLength,
 					startOffset + tokenLength,
@@ -134,10 +177,9 @@ function proceed() {
 			// otherwise we're nested and we have to close out the current
 			// block and add it as a innerBlock to the parent
 			const stackTop = stack.pop();
-			stackTop.block.innerHTML += document.substr(
-				stackTop.prevOffset,
-				startOffset - stackTop.prevOffset,
-			);
+			const html = document.substr( stackTop.prevOffset, startOffset - stackTop.prevOffset );
+			stackTop.block.innerHTML += html;
+			stackTop.block.innerContent.push( html );
 			stackTop.prevOffset = startOffset + tokenLength;
 
 			addInnerBlock(
@@ -189,7 +231,7 @@ function nextToken() {
 	}
 
 	const startedAt = matches.index;
-	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, voidMatch ] = matches;
+	const [ match, closerMatch, namespaceMatch, nameMatch, attrsMatch, /* internal/unused */, voidMatch ] = matches;
 
 	const length = match.length;
 	const isCloser = !! closerMatch;
@@ -230,20 +272,25 @@ function addFreeform( rawLength ) {
 function addInnerBlock( block, tokenStart, tokenLength, lastOffset ) {
 	const parent = stack[ stack.length - 1 ];
 	parent.block.innerBlocks.push( block );
-	parent.block.innerHTML += document.substr(
-		parent.prevOffset,
-		tokenStart - parent.prevOffset,
-	);
+	const html = document.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+
+	if ( html ) {
+		parent.block.innerHTML += html;
+		parent.block.innerContent.push( html );
+	}
+
+	parent.block.innerContent.push( null );
 	parent.prevOffset = lastOffset ? lastOffset : tokenStart + tokenLength;
 }
 
 function addBlockFromStack( endOffset ) {
 	const { block, leadingHtmlStart, prevOffset, tokenStart } = stack.pop();
 
-	if ( endOffset ) {
-		block.innerHTML += document.substr( prevOffset, endOffset - prevOffset );
-	} else {
-		block.innerHTML += document.substr( prevOffset );
+	const html = endOffset ? document.substr( prevOffset, endOffset - prevOffset ) : document.substr( prevOffset );
+
+	if ( html ) {
+		block.innerHTML += html;
+		block.innerContent.push( html );
 	}
 
 	if ( null !== leadingHtmlStart ) {

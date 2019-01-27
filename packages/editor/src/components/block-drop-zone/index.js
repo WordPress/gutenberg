@@ -11,13 +11,18 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import {
-	rawHandler,
+	pasteHandler,
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+
+/**
+ * Internal dependencies
+ */
+import MediaUploadCheck from '../media-upload/check';
 
 const parseDropEvent = ( event ) => {
 	let result = {
@@ -50,8 +55,9 @@ class BlockDropZone extends Component {
 	}
 
 	getInsertIndex( position ) {
-		const { index } = this.props;
-		if ( index !== undefined ) {
+		const { clientId, rootClientId, getBlockIndex } = this.props;
+		if ( clientId !== undefined ) {
+			const index = getBlockIndex( clientId, rootClientId );
 			return position.y === 'top' ? index : index + 1;
 		}
 	}
@@ -70,7 +76,7 @@ class BlockDropZone extends Component {
 	}
 
 	onHTMLDrop( HTML, position ) {
-		const blocks = rawHandler( { HTML, mode: 'BLOCKS' } );
+		const blocks = pasteHandler( { HTML, mode: 'BLOCKS' } );
 
 		if ( blocks.length ) {
 			this.props.insertBlocks( blocks, this.getInsertIndex( position ) );
@@ -78,7 +84,7 @@ class BlockDropZone extends Component {
 	}
 
 	onDrop( event, position ) {
-		const { rootClientId: dstRootClientId, clientId: dstClientId, index: dstIndex, getClientIdsOfDescendants } = this.props;
+		const { rootClientId: dstRootClientId, clientId: dstClientId, getClientIdsOfDescendants, getBlockIndex } = this.props;
 		const { srcRootClientId, srcClientId, srcIndex, type } = parseDropEvent( event );
 
 		const isBlockDropType = ( dropType ) => dropType === 'block';
@@ -96,6 +102,7 @@ class BlockDropZone extends Component {
 			return;
 		}
 
+		const dstIndex = dstClientId ? getBlockIndex( dstClientId, dstRootClientId ) : undefined;
 		const positionIndex = this.getInsertIndex( position );
 		// If the block is kept at the same level and moved downwards,
 		// subtract to account for blocks shifting upward to occupy its old position.
@@ -111,14 +118,16 @@ class BlockDropZone extends Component {
 		const isAppender = index === undefined;
 
 		return (
-			<DropZone
-				className={ classnames( 'editor-block-drop-zone', {
-					'is-appender': isAppender,
-				} ) }
-				onFilesDrop={ this.onFilesDrop }
-				onHTMLDrop={ this.onHTMLDrop }
-				onDrop={ this.onDrop }
-			/>
+			<MediaUploadCheck>
+				<DropZone
+					className={ classnames( 'editor-block-drop-zone', {
+						'is-appender': isAppender,
+					} ) }
+					onFilesDrop={ this.onFilesDrop }
+					onHTMLDrop={ this.onHTMLDrop }
+					onDrop={ this.onDrop }
+				/>
+			</MediaUploadCheck>
 		);
 	}
 }
@@ -147,10 +156,11 @@ export default compose(
 		};
 	} ),
 	withSelect( ( select, { rootClientId } ) => {
-		const { getClientIdsOfDescendants, getTemplateLock } = select( 'core/editor' );
+		const { getClientIdsOfDescendants, getTemplateLock, getBlockIndex } = select( 'core/editor' );
 		return {
 			isLocked: !! getTemplateLock( rootClientId ),
 			getClientIdsOfDescendants,
+			getBlockIndex,
 		};
 	} ),
 	withFilters( 'editor.BlockDropZone' )
