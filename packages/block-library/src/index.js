@@ -91,12 +91,16 @@ export const registerCoreBlocks = () => {
 		spacer,
 		subhead,
 		table,
+		tagCloud,
 		template,
 		textColumns,
 		verse,
 		video,
-		tagCloud,
-	].forEach( ( { name, settings } ) => {
+	].forEach( ( block ) => {
+		if ( ! block ) {
+			return;
+		}
+		const { name, settings } = block;
 		registerBlockType( name, settings );
 	} );
 

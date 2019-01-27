@@ -2,7 +2,7 @@
 /**
  * Server-side rendering of the `core/tag-cloud` block.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -13,19 +13,22 @@
  * @return string Returns the tag cloud for selected taxonomy.
  */
 function render_block_core_tag_cloud( $attributes ) {
-	$class          = "wp-block-tag-cloud align{$attributes['align']}";
-	$wrapper_markup = '<p class="%1$s">%2$s</p>';
+	if ( ! isset( $attributes['taxonomy'] ) ) {
+		return '';
+	}
+
+	$class = isset( $attributes['align'] ) ? "wp-block-tag-cloud align{$attributes['align']}" : 'wp-block-tag-cloud';
 
 	$args = array(
 		'echo'       => false,
 		'taxonomy'   => $attributes['taxonomy'],
-		'show_count' => ! empty( $attributes['showTagCounts'] ),
+		'show_count' => $attributes['showTagCounts'],
 	);
 
 	$tag_cloud = wp_tag_cloud( $args );
 
 	$block_content = sprintf(
-		$wrapper_markup,
+		'<p class="%1$s">%2$s</p>',
 		esc_attr( $class ),
 		$tag_cloud
 	);
@@ -50,7 +53,6 @@ function register_block_core_tag_cloud() {
 				),
 				'align'         => array(
 					'type'    => 'string',
-					'default' => 'center',
 				),
 			),
 			'render_callback' => 'render_block_core_tag_cloud',

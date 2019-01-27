@@ -16,10 +16,6 @@ import {
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { InspectorControls } from '@wordpress/editor';
 
 class TagCloudEdit extends Component {
@@ -30,15 +26,20 @@ class TagCloudEdit extends Component {
 		this.toggleShowTagCounts = this.toggleShowTagCounts.bind( this );
 	}
 
-	getTaxonomies() {
+	getTaxonomyOptions() {
 		const taxonomies = filter( this.props.taxonomies, 'show_cloud' );
-
-		return map( taxonomies, ( taxonomy ) => {
+		const selectOption = {
+			label: __( '- Select -' ),
+			value: '',
+		};
+		const taxonomyOptions = map( taxonomies, ( taxonomy ) => {
 			return {
 				value: taxonomy.slug,
 				label: taxonomy.name,
 			};
 		} );
+
+		return [ selectOption, ...taxonomyOptions ];
 	}
 
 	setTaxonomy( taxonomy ) {
@@ -57,21 +58,14 @@ class TagCloudEdit extends Component {
 	render() {
 		const { attributes } = this.props;
 		const { taxonomy, showTagCounts } = attributes;
-		const taxonomies = this.getTaxonomies();
-		const options = [
-			{
-				label: __( '- Select -' ),
-				value: '',
-			},
-			...taxonomies,
-		];
+		const taxonomyOptions = this.getTaxonomyOptions();
 
 		const inspectorControls = (
 			<InspectorControls>
 				<PanelBody title={ __( 'Tag Cloud Settings' ) }>
 					<SelectControl
 						label={ __( 'Taxonomy' ) }
-						options={ options }
+						options={ taxonomyOptions }
 						value={ taxonomy }
 						onChange={ this.setTaxonomy }
 					/>
@@ -95,7 +89,7 @@ class TagCloudEdit extends Component {
 						instructions={ __( 'Select a Taxonomy' ) }
 					>
 						<SelectControl
-							options={ options }
+							options={ taxonomyOptions }
 							onChange={ this.setTaxonomy }
 						/>
 					</Placeholder>
