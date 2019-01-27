@@ -17,6 +17,8 @@ wp.blocks.registerBlockStyle( 'core/quote', {
 
 The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
+By adding `isDefault: true` you can make the registered style variation to be used as a fallback if no style in `registerBlockType()` has been set as the default.
+
 To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
 
 _Example:_
