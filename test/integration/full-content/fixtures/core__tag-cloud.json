@@ -5,8 +5,7 @@
         "isValid": true,
         "attributes": {
             "taxonomy": "category",
-            "showTagCounts": false,
-            "align": "center"
+            "showTagCounts": false
         },
         "innerBlocks": [],
         "originalContent": ""

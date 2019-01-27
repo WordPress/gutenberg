@@ -52,7 +52,7 @@ function register_block_core_tag_cloud() {
 					'default' => false,
 				),
 				'align'         => array(
-					'type'    => 'string',
+					'type' => 'string',
 				),
 			),
 			'render_callback' => 'render_block_core_tag_cloud',
