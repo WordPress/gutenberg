@@ -1,9 +1,9 @@
 # Reference
 
-- [Glossary](../../docs/designers-developers/glossary.md)
-- [Coding Guidelines](../../docs/contributors/coding-guidelines.md)
-- [Testing Overview](../../docs/contributors/testing-overview.md)
-- [Frequently Asked Questions](../../docs/designers-developers/faq.md)
+- [Glossary](/docs/designers-developers/glossary.md)
+- [Coding Guidelines](/docs/contributors/coding-guidelines.md)
+- [Testing Overview](/docs/contributors/testing-overview.md)
+- [Frequently Asked Questions](/docs/designers-developers/faq.md)
 
 ## Logo
 <img width="200" src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/final-g-wapuu-black.svg?sanitize=true" alt="Gutenberg Logo" />

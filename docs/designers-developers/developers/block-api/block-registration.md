@@ -66,7 +66,7 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](../docs/extensibility/extending-blocks/#managing-block-categories).
+Plugins and Themes can also register [custom block categories](/docs/extensibility/extending-blocks/#managing-block-categories).
 
 #### Icon (optional)
 
@@ -138,7 +138,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/extensibility/extending-blocks/#block-style-variations) for existing blocks.
 
 #### Attributes (optional)
 
@@ -166,7 +166,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](../docs/block-api/attributes.md).**
+* **See: [Attributes](/docs/block-api/attributes.md).**
 
 #### Transforms (optional)
 
@@ -492,7 +492,7 @@ attributes: {
 }
 ```
 
-- `alignWide` (default `true`): This property allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+- `alignWide` (default `true`): This property allows to enable [wide alignment](/docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 // Remove the support for wide alignment.
