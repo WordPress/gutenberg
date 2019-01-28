@@ -6,9 +6,9 @@ import { View, Image, TextInput } from 'react-native';
 import {
 	subscribeMediaUpload,
 	onMediaLibraryPressed,
-	onUploadMediaPressed,
-	onCapturePhotoPressed,
-	onImageQueryReattach,
+	onMediaUploadPressed,
+	onMediaCapturePressed,
+	mediaUploadResync,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -45,7 +45,7 @@ export default class ImageEdit extends React.Component {
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
 			this.addMediaUploadListener();
-			onImageQueryReattach();
+			mediaUploadResync();
 		}
 	}
 
@@ -116,8 +116,8 @@ export default class ImageEdit extends React.Component {
 		};
 
 		if ( ! url ) {
-			const onUploadMediaButtonPressed = () => {
-				onUploadMediaPressed( ( mediaId, mediaUri ) => {
+			const onMediaUploadButtonPressed = () => {
+				onMediaUploadPressed( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
 						this.addMediaUploadListener( );
 						setAttributes( { url: mediaUri, id: mediaId } );
@@ -125,8 +125,8 @@ export default class ImageEdit extends React.Component {
 				} );
 			};
 
-			const onCapturePhotoButtonPressed = () => {
-				onCapturePhotoPressed( ( mediaId, mediaUri ) => {
+			const onMediaCaptureButtonPressed = () => {
+				onMediaCapturePressed( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
 						this.addMediaUploadListener( );
 						setAttributes( { url: mediaUri, id: mediaId } );
@@ -136,9 +136,9 @@ export default class ImageEdit extends React.Component {
 
 			return (
 				<MediaPlaceholder
-					onUploadMediaPressed={ onUploadMediaButtonPressed }
+					onUploadMediaPressed={ onMediaUploadButtonPressed }
 					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
-					onCapturePhotoPressed={ onCapturePhotoButtonPressed }
+					onCapturePhotoPressed={ onMediaCaptureButtonPressed }
 				/>
 			);
 		}
