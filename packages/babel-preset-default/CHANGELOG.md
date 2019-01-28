@@ -2,6 +2,7 @@
 
 ## Breaking Change
 
+- Plugin updated to include `@wordpress/babel-plugin-import-jsx-pragma` plugin integration.
 - Removed `babel-core` dependency acting as Babel 7 bridge ([#13922](https://github.com/WordPress/gutenberg/pull/13922). Ensure all references to `babel-core` are replaced with `@babel/core` .
 
 ## 3.0.0 (2018-09-30)
