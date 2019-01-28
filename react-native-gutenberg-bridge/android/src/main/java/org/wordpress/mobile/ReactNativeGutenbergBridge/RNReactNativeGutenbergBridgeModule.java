@@ -83,36 +83,25 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void onUploadMediaPressed(final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.onUploadMediaPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
-            @Override
-            public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
-                onUploadMediaSelected.invoke(mediaId, mediaUri, 0);
-            }
-
-            @Override
-            public void onMediaFileUploadProgress(int mediaId, float progress) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
-            }
-
-            @Override
-            public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
-            }
-
-            @Override
-            public void onMediaFileUploadFailed(int mediaId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0 );
-            }
-        });
+    public void onImageQueryReattach(final Callback onImageQueryReattached) {
+        mGutenbergBridgeJS2Parent.onImageQueryReattach(getNewUploadMediaCallback(onImageQueryReattached));
     }
 
     @ReactMethod
-    public void onCapturePhotoPressed(final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.onCapturePhotoPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
+    public void onUploadMediaPressed(final Callback onUploadMediaSelected) {
+        mGutenbergBridgeJS2Parent.onUploadMediaPressed(getNewUploadMediaCallback(onUploadMediaSelected));
+    }
+
+    @ReactMethod
+    public void onCapturePhotoPressed(final Callback onPhotoCaptured) {
+        mGutenbergBridgeJS2Parent.onCapturePhotoPressed(getNewUploadMediaCallback(onPhotoCaptured));
+    }
+
+    private GutenbergBridgeJS2Parent.MediaUploadCallback getNewUploadMediaCallback(final Callback jsCallback) {
+        return new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
             public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
-                onUploadMediaSelected.invoke(mediaId, mediaUri, 0);
+                jsCallback.invoke(mediaId, mediaUri, 0);
             }
 
             @Override
@@ -129,7 +118,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             public void onMediaFileUploadFailed(int mediaId) {
                 setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
             }
-        });
+        };
     }
 
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {
