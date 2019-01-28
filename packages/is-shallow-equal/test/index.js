@@ -84,6 +84,14 @@ describe( 'isShallowEqual', () => {
 		expect( isShallowEqual( b, a ) ).toBe( true );
 	} );
 
+	it( 'returns false on object deep-but-referentially-unequal values', () => {
+		const a = { foo: {} };
+		const b = { foo: {} };
+
+		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
+	} );
+
 	it( 'returns false if a array has more keys than b', () => {
 		const a = [ 1, 2 ];
 		const b = [ 1 ];
