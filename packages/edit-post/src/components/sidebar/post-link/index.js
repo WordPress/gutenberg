@@ -34,7 +34,6 @@ function PostLink( {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
 	const currentSlug = decodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
-
 	if ( isEditable ) {
 		prefixElement = prefix && (
 			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
