@@ -70,6 +70,17 @@ public class Gutenberg: NSObject {
     public func updateHtml(_ html: String) {
         bridgeModule.sendEvent(withName: EventName.updateHtml, body: ["html": html])
     }
+    
+    public func mediaUploadUpdate(id: Int, state: MediaUploadState, progress: Float, url: URL?, serverID: Int?) {
+        var data: [String: Any] = ["mediaId": id, "state": state.rawValue, "progress": progress];
+        if let url = url {
+            data["mediaUrl"] = url.absoluteString
+        }
+        if let serverID = serverID {
+            data["mediaServerId"] = serverID
+        }
+        bridgeModule.sendEvent(withName: EventName.mediaUpload, body: data)
+    }
 }
 
 extension Gutenberg: RCTBridgeDelegate {
@@ -86,10 +97,19 @@ extension Gutenberg: RCTBridgeDelegate {
 }
 
 extension Gutenberg {
+    
     enum EventName {
         static let requestHTML = "requestGetHtml"
         static let setTitle = "setTitle"
         static let toggleHTMLMode = "toggleHTMLMode"
         static let updateHtml = "updateHtml"
+        static let mediaUpload = "mediaUpload"
     }
+    
+    public enum MediaUploadState: Int {
+        case uploading = 1
+        case succeeded = 2
+        case failed = 3
+    }
+    
 }

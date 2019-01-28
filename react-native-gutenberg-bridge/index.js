@@ -36,4 +36,24 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
+export function subscribeMediaUpload( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
+}
+
+export function onMediaLibraryPressed( callback ) {
+	return RNReactNativeGutenbergBridge.onMediaLibraryPressed( callback );
+}
+
+export function onUploadMediaPressed( callback ) {
+	return RNReactNativeGutenbergBridge.onUploadMediaPressed( callback );
+}
+
+export function onCapturePhotoPressed( callback ) {
+	return RNReactNativeGutenbergBridge.onCapturePhotoPressed( callback );
+}
+
+export function onImageQueryReattach( callback ) {
+	return RNReactNativeGutenbergBridge.onImageQueryReattach( callback );
+}
+
 export default RNReactNativeGutenbergBridge;
