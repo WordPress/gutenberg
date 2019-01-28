@@ -160,6 +160,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             // Don't think there is necessity of this branch, but justin case we want to
             // force a 2nd setText from JS side to Native, just set a high eventCount
             int eventCount = inputMap.getInt("eventCount");
+
             if (view.mNativeEventCount < eventCount) {
                 setTextfromJS(view, inputMap.getString("text"));
             }
@@ -168,9 +169,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     private void setTextfromJS(ReactAztecText view, String text) {
         view.setIsSettingTextFromJS(true);
-        this.setOnSelectionChange(view, false);
+        view.disableOnSelectionListener();
+        // make sure we use the last formats as set by react
+        view.resetLastActiveFormats();
         view.fromHtml(text, true);
-        this.setOnSelectionChange(view, true);
+        view.enableOnSelectionListener();
         view.setIsSettingTextFromJS(false);
     }
 
