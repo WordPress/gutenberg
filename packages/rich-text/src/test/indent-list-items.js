@@ -30,15 +30,17 @@ describe( 'indentListItems', () => {
 	} );
 
 	it( 'should indent', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }`;
 		const record = {
 			formats: [ , , ],
-			text: `1${ LINE_SEPARATOR }`,
+			text,
 			start: 2,
 			end: 2,
 		};
 		const expected = {
 			formats: [ , [ ul ] ],
-			text: `1${ LINE_SEPARATOR }`,
+			text,
 			start: 2,
 			end: 2,
 		};
@@ -64,15 +66,17 @@ describe( 'indentListItems', () => {
 	} );
 
 	it( 'should indent and merge with previous list', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }${ LINE_SEPARATOR }`;
 		const record = {
 			formats: [ , [ ol ], , ],
-			text: `1${ LINE_SEPARATOR }${ LINE_SEPARATOR }`,
+			text,
 			start: 3,
 			end: 3,
 		};
 		const expected = {
 			formats: [ , [ ol ], [ ol ] ],
-			text: `1${ LINE_SEPARATOR }${ LINE_SEPARATOR }`,
+			text,
 			start: 3,
 			end: 3,
 		};
@@ -84,15 +88,17 @@ describe( 'indentListItems', () => {
 	} );
 
 	it( 'should indent already indented item', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
 			formats: [ , [ ul ], , [ ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 5,
 			end: 5,
 		};
 		const expected = {
 			formats: [ , [ ul ], , [ ul, ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 5,
 			end: 5,
 		};
@@ -104,15 +110,17 @@ describe( 'indentListItems', () => {
 	} );
 
 	it( 'should indent with multiple lines selected', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
 			formats: [ , , , [ ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 2,
 			end: 5,
 		};
 		const expected = {
 			formats: [ , [ ul ], , [ ul, ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 2,
 			end: 5,
 		};

@@ -29,15 +29,17 @@ describe( 'outdentListItems', () => {
 	} );
 
 	it( 'should indent', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }`;
 		const record = {
 			formats: [ , [ ul ] ],
-			text: `1${ LINE_SEPARATOR }`,
+			text,
 			start: 2,
 			end: 2,
 		};
 		const expected = {
 			formats: [ , , ],
-			text: `1${ LINE_SEPARATOR }`,
+			text,
 			start: 2,
 			end: 2,
 		};
@@ -49,15 +51,17 @@ describe( 'outdentListItems', () => {
 	} );
 
 	it( 'should outdent two levels deep', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
 			formats: [ , [ ul ], , [ ul, ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 5,
 			end: 5,
 		};
 		const expected = {
 			formats: [ , [ ul ], , [ ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 5,
 			end: 5,
 		};
@@ -69,15 +73,17 @@ describe( 'outdentListItems', () => {
 	} );
 
 	it( 'should outdent with multiple lines selected', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
 		const record = {
 			formats: [ , [ ul ], , [ ul, ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 2,
 			end: 5,
 		};
 		const expected = {
 			formats: [ , , , [ ul ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`,
+			text,
 			start: 2,
 			end: 5,
 		};

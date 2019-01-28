@@ -50,15 +50,18 @@ describe( 'changeListType', () => {
 	} );
 
 	it( 'should outdent with multiple lines selected', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `a${ LINE_SEPARATOR }1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }i${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4${ LINE_SEPARATOR }b`;
+
 		const record = {
 			formats: [ , [ ul ], , [ ul ], , [ ul, ul ], , [ ul ], , [ ul ], , , , [ ul ], , ],
-			text: `a${ LINE_SEPARATOR }1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }i${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4${ LINE_SEPARATOR }b`,
+			text,
 			start: 4,
 			end: 9,
 		};
 		const expected = {
 			formats: [ , [ ol ], , [ ol ], , [ ol, ul ], , [ ol ], , [ ol ], , , , [ ul ], , ],
-			text: `a${ LINE_SEPARATOR }1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }i${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4${ LINE_SEPARATOR }b`,
+			text,
 			start: 4,
 			end: 9,
 		};
