@@ -88,7 +88,7 @@ add_action( 'init', 'my_add_template_to_posts' );
 
 ## Nested Templates
 
-Container blocks like the columns blocks also support templates. This is achieved by assigned a nested template to the block.
+Container blocks like the columns blocks also support templates. This is achieved by assigning a nested template to the block.
 
 ```php
 $template = array(
