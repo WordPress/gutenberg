@@ -39,13 +39,17 @@ export class PostAuthor extends Component {
 		};
 	}
 
-	componentDidMount() {
-		const { postAuthorId, authors, postAuthor } = this.props;
+	getInitialPostAuthor() {
+		// Get the initial author from props if available.
+		return this.props.postAuthor;
+	}
 
-		// If the postAuthor is provided, use it directly.
-		if ( postAuthor ) {
-			this.setState( { postAuthor } );
-		}
+	componentDidMount() {
+		const { postAuthorId, authors } = this.props;
+
+		// Load the initial post author.
+		const postAuthor = this.getInitialPostAuthor();
+		this.setState( { postAuthor } );
 
 		const authorInAuthors = authors.find( ( singleAuthor ) => {
 			return singleAuthor.id === postAuthorId;
