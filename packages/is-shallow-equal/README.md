@@ -29,7 +29,7 @@ import { isShallowEqualArrays } from '@wordpress/is-shallow-equal';
 import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 ```
 
-Shallow comparison differs from deep comparison by the fact that nested objects must be the exact same variable and not only have the same values. In situations where nested objects must be compared value by value, `isEqual` from `lodash` is recommended.
+Shallow comparison differs from deep comparison by the fact that it compares members from each as being strictly equal to the other, meaning that arrays and objects will be compared by their _references_, not by their values (see also [_Object Equality in JavaScript_.](http://adripofjavascript.com/blog/drips/object-equality-in-javascript.html)) In situations where nested objects must be compared by value, consider using [Lodash's `isEqual`](https://lodash.com/docs/4.17.11#isEqual) instead.
 
 ```js
 import isShallowEqual from '@wordpress/is-shallow-equal';
