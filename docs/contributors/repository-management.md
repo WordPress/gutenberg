@@ -85,7 +85,6 @@ When reviewing the issue backlog, here are some steps you can perform:
 
 Gutenberg follows a feature branch pull request workflow for all code and documentation changes. At a high-level, the process looks like this:
 
-
 1. Check out a new feature branch locally.
 2. Make your changes, testing thoroughly.
 3. Commit your changes when you’re happy with them, and push the branch.
@@ -129,6 +128,7 @@ A pull request can generally be merged once it is:
 - Vetted against all potential edge cases.
 - Changelog entries were properly added.
 - Reviewed by someone other than the original author.
+- [Rebased](/docs/contributors/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 

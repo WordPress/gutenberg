@@ -81,8 +81,9 @@
 		]},
 		{"docs/contributors/develop.md": [
 			{"docs/contributors/coding-guidelines.md": []},
-			{"docs/contributors/grammar.md": []},
 			{"docs/contributors/testing-overview.md": []},
+			{"docs/contributors/git-workflow.md": []},
+			{"docs/contributors/grammar.md": []},
 			{"docs/contributors/scripts.md": []},
 			{"docs/contributors/release.md": []}
 		]},

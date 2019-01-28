@@ -408,15 +408,21 @@
 		"parent": "develop"
 	},
 	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/grammar.md",
-		"parent": "develop"
-	},
-	{
 		"title": "Testing Overview",
 		"slug": "testing-overview",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/testing-overview.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Git Workflow",
+		"slug": "git-workflow",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/git-workflow.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Block Grammar",
+		"slug": "grammar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/grammar.md",
 		"parent": "develop"
 	},
 	{
