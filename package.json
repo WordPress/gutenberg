@@ -98,6 +98,7 @@
 		"lodash": "4.17.10",
 		"mkdirp": "0.5.1",
 		"node-sass": "4.11.0",
+		"node-watch": "0.6.0",
 		"pegjs": "0.10.0",
 		"phpegjs": "1.0.0-beta7",
 		"react-dom": "16.6.3",

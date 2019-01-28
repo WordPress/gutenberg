@@ -4,6 +4,10 @@
 
 - Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
 
+### Bug Fixes
+
+- BlockSwitcher will now consistently render an icon for block multi-selections.
+
 ### Internal
 
 - Removed `jQuery` dependency

@@ -5,18 +5,22 @@ import { View, Text, Button } from 'react-native';
 
 import styles from './styles.scss';
 
+import { __ } from '@wordpress/i18n';
+
 function MediaPlaceholder( props ) {
 	return (
 		<View style={ styles.emptyStateContainer }>
 			<Text style={ styles.emptyStateTitle }>
-                Image
+				{ __( 'Image' ) }
 			</Text>
 			<Text style={ styles.emptyStateDescription }>
-                Select an image from your library.
+				{ __( 'Upload a new image or select a file from your library.' ) }
 			</Text>
 			<View style={ styles.emptyStateButtonsContainer }>
-				<Button title="Media Library" onPress={ props.onMediaLibraryPress } />
+				<Button title={ __( 'Device Library' ) } onPress={ props.onUploadMediaPressed } />
+				<Button title={ __( 'Take photo' ) } onPress={ props.onCapturePhotoPressed } />
 			</View>
+			<Button title={ __( 'Media Library' ) } onPress={ props.onMediaLibraryPressed } />
 		</View>
 	);
 }
