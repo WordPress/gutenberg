@@ -170,8 +170,6 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
     private void setTextfromJS(ReactAztecText view, String text) {
         view.setIsSettingTextFromJS(true);
         view.disableOnSelectionListener();
-        // make sure we use the last formats as set by react
-        view.resetLastActiveFormats();
         view.fromHtml(text, true);
         view.enableOnSelectionListener();
         view.setIsSettingTextFromJS(false);

@@ -55,7 +55,6 @@ public class ReactAztecText extends AztecText {
     boolean shouldHandleOnBackspace = false;
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
-    Iterable<String> lastFormats = new HashSet<>();
 
     private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
         {
@@ -353,11 +352,6 @@ public class ReactAztecText extends AztecText {
         ArrayList<ITextFormat> newStylesList = new ArrayList<>(selectedStylesSet);
         setSelectedStyles(newStylesList);
         updateToolbarButtons(newStylesList);
-        lastFormats = newFormats;
-    }
-
-    public void resetLastActiveFormats() {
-        setActiveFormats(lastFormats);
     }
 
     /**
