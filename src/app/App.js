@@ -43,7 +43,7 @@ const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: Pro
 		<AppContainer
 			initialHtml={ initialData }
 			initialHtmlModeEnabled={ initialHtmlModeEnabled }
-			title={ initialTitle } />
+			initialTitle={ initialTitle } />
 	);
 };
 
