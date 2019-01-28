@@ -5,11 +5,11 @@ import {
 	escapeAmpersand,
 	escapeQuotationMark,
 	escapeLessThan,
-	__unstableEscapeGreaterThan,
 	escapeAttribute,
 	escapeHTML,
 	isValidAttributeName,
 } from '../';
+import __unstableEscapeGreaterThan from '../escape-greater';
 
 function testUnstableEscapeGreaterThan( implementation ) {
 	it( 'should escape greater than', () => {

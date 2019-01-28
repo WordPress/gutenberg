@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import __unstableEscapeGreaterThan from './escape-greater';
+
+/**
  * Regular expression matching invalid attribute names.
  *
  * "Attribute names must consist of one or more characters other than controls,
@@ -52,17 +57,6 @@ export function escapeLessThan( value ) {
 }
 
 /**
- * Returns a string with greater-than sign replaced.
- *
- * @param {string} value Original string.
- *
- * @return {string} Escaped string.
- */
-export function __unstableEscapeGreaterThan( value ) {
-	return value.replace( />/g, '&gt;' );
-}
-
-/**
  * Returns an escaped attribute value.
  *
  * @link https://w3c.github.io/html/syntax.html#elements-attributes
@@ -74,9 +68,10 @@ export function __unstableEscapeGreaterThan( value ) {
  * split HTML strings. This is a WordPress specific fix
  *
  * Note that if a resolution for Trac#45387 comes to fruition, it is no longer
- * necessary for `__unstableEscapeGreaterThan` to exist in this module.
+ * necessary for `__unstableEscapeGreaterThan` to be used.
  *
  * See: https://core.trac.wordpress.org/ticket/45387
+ *
  * @param {string} value Attribute value.
  *
  * @return {string} Escaped attribute value.
