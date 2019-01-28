@@ -57,6 +57,7 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `gutenberg_toggle_custom_fields` has been removed.
 - The PHP function `gutenberg_collect_meta_box_data` has been removed. Use [`register_and_do_post_meta_boxes`](https://developer.wordpress.org/reference/functions/register_and_do_post_meta_boxes/) instead.
 - `window._wpLoadGutenbergEditor` has been removed. Use `window._wpLoadBlockEditor` instead. Note: This is a private API, not intended for public use. It may be removed in the future.
+- The PHP function `gutenberg_get_script_polyfill` has been removed. Use [`wp_get_script_polyfill`](https://developer.wordpress.org/reference/functions/wp_get_script_polyfill/) instead.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
