@@ -72,12 +72,16 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
 		insertDefaultBlock,
 		clearSelectedBlock,
+		undo,
+		redo,
 	} = dispatch( 'core/editor' );
 
 	return {
 		onEnterPress() {
 			insertDefaultBlock( undefined, undefined, 0 );
 		},
+		onUndo: undo,
+		onRedo: redo,
 		clearSelectedBlock,
 	};
 } );
