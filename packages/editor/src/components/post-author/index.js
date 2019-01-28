@@ -26,10 +26,6 @@ export class PostAuthor extends Component {
 		this.suggestAuthor = this.suggestAuthor.bind( this );
 		this.getCurrentAuthor = this.getCurrentAuthor.bind( this );
 		this.resolveResults = this.resolveResults.bind( this );
-		this.state = {
-			postAuthor: false,
-		};
-		this.searchCache = [];
 		this.requestResults = debounce( ( query, populateResults ) => {
 			const payload = '?search=' + encodeURIComponent( query );
 			apiFetch( { path: `/wp/v2/users${ payload }` } ).then( ( results ) => {
@@ -37,6 +33,10 @@ export class PostAuthor extends Component {
 				this.searchCache[ query ] = results;
 			} );
 		}, 300 );
+		this.searchCache = [];
+		this.state = {
+			postAuthor: false,
+		};
 	}
 
 	componentDidMount() {
