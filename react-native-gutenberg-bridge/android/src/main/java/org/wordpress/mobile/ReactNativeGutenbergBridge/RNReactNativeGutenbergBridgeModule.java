@@ -83,8 +83,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void onImageQueryReattach(final Callback onImageQueryReattached) {
-        mGutenbergBridgeJS2Parent.onImageQueryReattach(getNewUploadMediaCallback(onImageQueryReattached));
+    public void onImageQueryReattach() {
+        mGutenbergBridgeJS2Parent.onImageQueryReattach(getNewUploadMediaCallback(null));
     }
 
     @ReactMethod
@@ -101,7 +101,9 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         return new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
             public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
-                jsCallback.invoke(mediaId, mediaUri, 0);
+                if (jsCallback != null) {
+                    jsCallback.invoke(mediaId, mediaUri, 0);
+                }
             }
 
             @Override
