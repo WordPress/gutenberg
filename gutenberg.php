@@ -255,19 +255,6 @@ function gutenberg_init( $return, $post ) {
 }
 
 /**
- * Redirects the demo page to edit a new post.
- */
-function gutenberg_redirect_demo() {
-	global $pagenow;
-
-	if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'gutenberg' === $_GET['page'] ) {
-		wp_safe_redirect( admin_url( 'post-new.php?gutenberg-demo' ) );
-		exit;
-	}
-}
-add_action( 'admin_init', 'gutenberg_redirect_demo' );
-
-/**
  * Adds the filters to register additional links for the Gutenberg editor in
  * the post/page screens.
  *
