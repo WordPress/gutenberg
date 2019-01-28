@@ -15,7 +15,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func onMediaLibraryPressed(_ callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaPicker(with: { (mediaID, url) in
+            self.delegate?.gutenbergDidRequestMedia(from: .mediaLibrary, with: { (mediaID, url) in
                 guard let url = url, let mediaID = mediaID else {
                     callback(nil)
                     return
@@ -28,7 +28,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func onMediaUploadPressed(_ callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFromDevicePicker(with: { (mediaID, url) in
+            self.delegate?.gutenbergDidRequestMedia(from: .deviceLibrary, with: { (mediaID, url) in
                 guard let url = url, let mediaID = mediaID else {
                     callback(nil)
                     return
@@ -41,7 +41,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func onMediaCapturePressed(_ callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFromCameraPicker(with: { (mediaID, url) in
+            self.delegate?.gutenbergDidRequestMedia(from: .deviceCamera, with: { (mediaID, url) in
                 guard let url = url, let mediaID = mediaID else {
                     callback(nil)
                     return
