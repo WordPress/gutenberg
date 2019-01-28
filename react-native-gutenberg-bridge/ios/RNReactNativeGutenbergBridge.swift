@@ -52,6 +52,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func onImageQueryReattach() {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaUploadSync()
+        }
+    }
+
+    @objc
     func editorDidLayout() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidLayout()

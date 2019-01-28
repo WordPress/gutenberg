@@ -62,6 +62,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         } )
         mediaPickAndUploadCoordinator?.pickAndUpload(from: .camera)
     }
+
+    func gutenbergDidRequestMediaUploadSync() {
+        print("Gutenberg request for media uploads to be resync")
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {

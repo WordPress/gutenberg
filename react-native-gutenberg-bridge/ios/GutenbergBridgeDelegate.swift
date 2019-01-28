@@ -12,21 +12,25 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate that an image block requested an image from the media picker.
     ///
-    /// - Parameter callback: A callbak block to be called with the selected
+    /// - Parameter callback: A callback block to be called with the selected
     ///                       image Url or nil to signal that the action was canceled.
     func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback)
     
     /// Tells the delegate that an image block requested an image from the device media.
     ///
-    /// - Parameter callback: A callbak block to be called with an upload mediaIdentifier and a placaholder image file url,
+    /// - Parameter callback: A callback block to be called with an upload mediaIdentifier and a placeholder image file url,
     ///                       use nil on both parameters to signal that the action was canceled.
     func gutenbergDidRequestMediaFromDevicePicker(with callback: @escaping MediaPickerDidPickMediaCallback)
 
     /// Tells the delegate that an image block requested an image from the device cameras.
     ///
-    /// - Parameter callback: A callbak block to be called with and temporary
-    ///                       image file url and an mediaIdentifier or nil to signal that the action was canceled.
+    /// - Parameter callback: A callback block to be called with an upload mediaIdentifier and a placeholder image file url,
+    ///                       use nil on both parameters to signal that the action was canceled.
     func gutenbergDidRequestMediaFromCameraPicker(with callback: @escaping MediaPickerDidPickMediaCallback)
+
+    /// Tells the delegate that an image block requested to reconnect with media uploads coordinator.
+    ///
+    func gutenbergDidRequestMediaUploadSync()
 
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///

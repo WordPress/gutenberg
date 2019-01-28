@@ -52,8 +52,8 @@ export function onCapturePhotoPressed( callback ) {
 	return RNReactNativeGutenbergBridge.onCapturePhotoPressed( callback );
 }
 
-export function onImageQueryReattach( callback ) {
-	return RNReactNativeGutenbergBridge.onImageQueryReattach( callback );
+export function onImageQueryReattach() {
+	return RNReactNativeGutenbergBridge.onImageQueryReattach();
 }
 
 export default RNReactNativeGutenbergBridge;
