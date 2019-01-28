@@ -55,8 +55,9 @@ class PostTitle extends Component {
 			<TextInput
 				blurOnSubmit={ true }
 				textAlignVertical="top"
-				multiline
-				numberOfLines={ 0 }
+				multiline={ false }
+				onSubmitEditing={ this.props.onEnterPress }
+				returnKeyType={ 'next' }
 				onChangeText={ this.onChange }
 				onFocus={ this.onSelect }
 				placeholder={ decodedPlaceholder }
@@ -69,12 +70,16 @@ class PostTitle extends Component {
 
 const applyWithDispatch = withDispatch( ( dispatch ) => {
 	const {
+		insertDefaultBlock,
 		clearSelectedBlock,
 		undo,
 		redo,
 	} = dispatch( 'core/editor' );
 
 	return {
+		onEnterPress() {
+			insertDefaultBlock( undefined, undefined, 0 );
+		},
 		onUndo: undo,
 		onRedo: redo,
 		clearSelectedBlock,
