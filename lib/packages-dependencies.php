@@ -133,7 +133,6 @@ return array(
 	'wp-editor'                             => array(
 		'jquery',
 		'lodash',
-		'wp-tinymce-lists',
 		'wp-a11y',
 		'wp-api-fetch',
 		'wp-blob',
