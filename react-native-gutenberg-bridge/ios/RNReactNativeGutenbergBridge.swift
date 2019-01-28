@@ -11,37 +11,22 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed)
         }
     }
-
-    @objc
-    func onMediaLibraryPressed(_ callback: @escaping RCTResponseSenderBlock) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMedia(from: .mediaLibrary, with: { (mediaID, url) in
-                guard let url = url, let mediaID = mediaID else {
-                    callback(nil)
-                    return
-                }
-                callback([mediaID, url])
-            })
-        }
-    }
     
     @objc
-    func onMediaUploadPressed(_ callback: @escaping RCTResponseSenderBlock) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMedia(from: .deviceLibrary, with: { (mediaID, url) in
-                guard let url = url, let mediaID = mediaID else {
-                    callback(nil)
-                    return
-                }
-                callback([mediaID, url])
-            })
+    func requestMediaPickFrom(_ source: String, callback: @escaping RCTResponseSenderBlock) {
+        var mediaSource: MediaSource = .deviceLibrary
+        switch source {
+        case "SITE_MEDIA_LIBRARY":
+            mediaSource = .mediaLibrary
+        case "DEVICE_MEDIA_LIBRARY":
+            mediaSource = .deviceLibrary
+        case "DEVICE_CAMERA":
+            mediaSource = .deviceCamera
+        default:
+            mediaSource = .deviceLibrary
         }
-    }
-
-    @objc
-    func onMediaCapturePressed(_ callback: @escaping RCTResponseSenderBlock) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMedia(from: .deviceCamera, with: { (mediaID, url) in
+            self.delegate?.gutenbergDidRequestMedia(from: mediaSource, with: { (mediaID, url) in
                 guard let url = url, let mediaID = mediaID else {
                     callback(nil)
                     return
