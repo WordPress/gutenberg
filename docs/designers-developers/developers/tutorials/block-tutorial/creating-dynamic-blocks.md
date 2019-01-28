@@ -124,7 +124,7 @@ There are a few things to notice:
 
 ## Live rendering in Gutenberg editor
 
-Gutenberg 2.8 added the [`<ServerSideRender>`](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
+Gutenberg 2.8 added the [`<ServerSideRender>`](/packages/components/src/server-side-render) block which enables rendering to take place on the server using PHP rather than in JavaScript. 
 
 *Server-side render is meant as a fallback; client-side rendering in JavaScript is always preferred (client rendering is faster and allows better editor manipulation).*
 

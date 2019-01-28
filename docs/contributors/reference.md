@@ -14,4 +14,4 @@ Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cris
 
 ## Mockups
 
-Mockup Sketch files are available in <a href="https://wordpress.org/gutenberg/handbook/designers-developers/designers/design-resources/">the Design section</a>.
+Mockup Sketch files are available in [the Design section](/docs/designers-developers/designers/design-resources.md)</a>.
