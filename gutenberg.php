@@ -52,8 +52,8 @@ function the_gutenberg_project() {
 	<div class="block-editor gutenberg">
 		<h1 class="screen-reader-text"><?php echo esc_html( $post_type_object->labels->edit_item ); ?></h1>
 		<div id="editor" class="block-editor__container gutenberg__editor"></div>
-		<div id="metaboxes" style="display: none;">
-			<?php the_gutenberg_metaboxes(); ?>
+		<div id="metaboxes" class="hidden">
+			<?php the_block_editor_meta_boxes(); ?>
 		</div>
 	</div>
 	<?php
@@ -211,6 +211,15 @@ function gutenberg_init( $return, $post ) {
 		return false;
 	}
 
+	// Instruct WordPress that this is the block editor. Without this, a call
+	// to `is_block_editor()` would yield `false` while editing a post with
+	// Gutenberg.
+	//
+	// [TODO]: This is temporary so long as Gutenberg is implemented to use
+	// `replace_editor`, rather than allow `edit-form-blocks.php` from core to
+	// take effect, where this would otherwise be assigned.
+	get_current_screen()->is_block_editor( true );
+
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
@@ -237,7 +246,7 @@ function gutenberg_init( $return, $post ) {
 	 * includes/meta-boxes is typically loaded from edit-form-advanced.php.
 	 */
 	require_once ABSPATH . 'wp-admin/includes/meta-boxes.php';
-	gutenberg_collect_meta_box_data();
+	register_and_do_post_meta_boxes( $post );
 
 	require_once ABSPATH . 'wp-admin/admin-header.php';
 	the_gutenberg_project();
