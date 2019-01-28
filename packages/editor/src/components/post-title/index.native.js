@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { TextInput } from 'react-native';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -56,7 +51,7 @@ class PostTitle extends Component {
 				onFocus={ this.onSelect }
 				onBlur={ this.props.onBlur } // always assign onBlur as a props
 				multiline={ false }
-				style={ [ style , {
+				style={ [ style, {
 					minHeight: Math.max( minHeight, this.state.aztecHeight ),
 				} ] }
 				onChange={ ( event ) => {
@@ -68,7 +63,7 @@ class PostTitle extends Component {
 				placeholder={ decodedPlaceholder }
 				value={ title }
 				onSplit={ this.props.onEnterPress }
-				>
+			>
 			</RichText>
 		);
 	}
