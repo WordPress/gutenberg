@@ -109,8 +109,10 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( images ) {
+		const { columns } = this.props.attributes;
 		this.setAttributes( {
 			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+			columns: columns ? Math.min( images.length, columns ) : columns,
 		} );
 	}
 
@@ -202,7 +204,7 @@ class GalleryEdit extends Component {
 							render={ ( { open } ) => (
 								<IconButton
 									className="components-toolbar__control"
-									label={ __( 'Edit Gallery' ) }
+									label={ __( 'Edit gallery' ) }
 									icon="edit"
 									onClick={ open }
 								/>
