@@ -17,7 +17,9 @@ function render_block_core_tag_cloud( $attributes ) {
 		return '';
 	}
 
-	$class = isset( $attributes['align'] ) ? "wp-block-tag-cloud align{$attributes['align']}" : 'wp-block-tag-cloud';
+	$class = isset( $attributes['align'] ) ?
+		"wp-block-tag-cloud align{$attributes['align']}" :
+		'wp-block-tag-cloud';
 
 	$args = array(
 		'echo'       => false,
@@ -27,13 +29,11 @@ function render_block_core_tag_cloud( $attributes ) {
 
 	$tag_cloud = wp_tag_cloud( $args );
 
-	$block_content = sprintf(
+	return sprintf(
 		'<p class="%1$s">%2$s</p>',
 		esc_attr( $class ),
 		$tag_cloud
 	);
-
-	return $block_content;
 }
 
 /**
