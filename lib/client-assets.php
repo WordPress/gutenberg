@@ -1231,10 +1231,26 @@ JS;
 
 	$init_script = <<<JS
 	( function() {
-		window._wpLoadGutenbergEditor = window._wpLoadBlockEditor = new Promise( function( resolve ) {
+		window._wpLoadBlockEditor = new Promise( function( resolve ) {
 			wp.domReady( function() {
 				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 			} );
+		} );
+
+		Object.defineProperty( window, '_wpLoadGutenbergEditor', {
+			get: function() {
+				// TODO: Hello future maintainer. In removing this deprecation,
+				// ensure also to check whether `wp-editor`'s dependencies in
+				// `package-dependencies.php` still require `wp-deprecated`.
+				wp.deprecated( '`window._wpLoadGutenbergEditor`', {
+					plugin: 'Gutenberg',
+					version: '5.2',
+					alternative: '`window._wpLoadBlockEditor`',
+					hint: 'This is a private API, not intended for public use. It may be removed in the future.'
+				} );
+
+				return window._wpLoadBlockEditor;
+			}
 		} );
 } )();
 JS;
