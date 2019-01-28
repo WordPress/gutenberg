@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { differenceBy } from 'lodash';
+import { cloneDeep, differenceBy } from 'lodash';
 
 /**
  * Internal dependencies
@@ -61,14 +61,14 @@ export function applyFormat(
 }
 
 function mergeFormats( formats1, formats2 ) {
-	const formats1Without2 = differenceBy( formats1, formats2, 'type' );
-	return formats2.concat( formats1Without2 );
+	const formats2Without1 = differenceBy( formats2, formats1, 'type' );
+	return formats1.concat( formats2Without1 );
 }
 
 function applyFormats( formats, index, newFormats ) {
 	if ( formats[ index ] ) {
-		formats[ index ] = mergeFormats( formats[ index ], newFormats );
+		formats[ index ] = cloneDeep( mergeFormats( formats[ index ], newFormats ) );
 	} else {
-		formats[ index ] = newFormats;
+		formats[ index ] = cloneDeep( newFormats );
 	}
 }

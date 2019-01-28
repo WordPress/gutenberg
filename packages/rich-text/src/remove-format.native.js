@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { find, without } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 /**
  * Internal dependencies
@@ -33,15 +33,17 @@ export function removeFormat(
 
 	if ( start === end ) {
 		if ( formatPlaceholder && formatPlaceholder.index === start ) {
+			const placeholderFormats = ( formatPlaceholder.formats || [] ).slice( 0 );
 			newFormatPlaceholder = {
 				...formatPlaceholder,
-				formats: without( formatPlaceholder.formats || [], find( formatPlaceholder.formats || [], { type: formatType } ) ),
+				// make sure we do not reuse the formats reference in our placeholder `formats` array
+				formats: cloneDeep( placeholderFormats.filter( ( { type } ) => type !== formatType ) ),
 			};
 		} else if ( ! formatPlaceholder ) {
-			const previousFormat = start > 0 ? formats[ start - 1 ] : formats[ 0 ];
+			const previousFormat = ( start > 0 ? formats[ start - 1 ] : formats[ 0 ] ) || [];
 			newFormatPlaceholder = {
 				index: start,
-				formats: without( previousFormat || [], find( previousFormat || [], { type: formatType } ) ),
+				formats: cloneDeep( previousFormat.filter( ( { type } ) => type !== formatType ) ),
 			};
 		}
 	}

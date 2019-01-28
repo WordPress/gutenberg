@@ -147,10 +147,10 @@ export class RichText extends Component {
 
 	onFormatChange( record ) {
 		const newContent = this.valueToFormat( record );
-		// we need to force a refresh on the native side so aztec can synchronize the active formats
 		this.setState( {
 			formatPlaceholder: record.formatPlaceholder,
 		} );
+		// we need to force a refresh on the native side so aztec can synchronize the active formats
 		this.props.onChange( newContent );
 	}
 
