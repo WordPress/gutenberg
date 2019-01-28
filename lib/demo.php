@@ -38,12 +38,6 @@ function gutenberg_default_demo_content( $content ) {
 		ob_start();
 		include gutenberg_dir_path() . 'post-content.php';
 		return ob_get_clean();
-
-		$initial_edits = array(
-			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			'content' => $demo_content,
-		);
-
 	}
 
 	return $content;
