@@ -55,7 +55,7 @@ function PostLink( {
 			{ isEditable && (
 				<div className="editor-post-link">
 					<TextControl
-						label={ __( 'Page URL' ) }
+						label={ __( 'URL Slug:' ) }
 						value={ forceEmptyField ? '' : currentSlug }
 						onChange={ ( newValue ) => {
 							editPermalink( newValue );
@@ -87,8 +87,9 @@ function PostLink( {
 						} }
 					/>
 					<p>
+						{ __( 'The last part of the URL. ' ) }
 						<ExternalLink href="https://codex.wordpress.org/Posts_Add_New_Screen">
-							{ __( 'Learn more about permalinks' ) }
+							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
 					</p>
 				</div>
