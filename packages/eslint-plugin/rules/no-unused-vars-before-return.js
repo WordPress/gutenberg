@@ -16,7 +16,7 @@ module.exports = {
 				}
 
 				for ( const variable of functionScope.variables ) {
-					const isAssignmentCandidate = variable.defs.some( ( def ) => {
+					const declaratorCandidate = variable.defs.find( ( def ) => {
 						return (
 							def.node.type === 'VariableDeclarator' &&
 							// Allow declarations which are not initialized.
@@ -30,7 +30,7 @@ module.exports = {
 						);
 					} );
 
-					if ( ! isAssignmentCandidate ) {
+					if ( ! declaratorCandidate ) {
 						continue;
 					}
 
@@ -45,8 +45,9 @@ module.exports = {
 					}
 
 					context.report(
-						node,
-						`Declared variable \`${ variable.name }\` is unused before a return path`
+						declaratorCandidate.node,
+						'Variables should not be assigned until just prior its first reference. ' +
+						'An early return statement may leave this variable unused.'
 					);
 				}
 			},
