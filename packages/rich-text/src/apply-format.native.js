@@ -46,7 +46,7 @@ export function applyFormat(
 			end,
 			formatPlaceholder: {
 				index: start,
-				formats: mergeFormats( activeFormats, formats ),
+				formats: cloneDeep( mergeFormats( activeFormats, formats ) ),
 			},
 		};
 	}

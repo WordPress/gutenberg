@@ -151,6 +151,7 @@ export class RichText extends Component {
 			formatPlaceholder: record.formatPlaceholder,
 		} );
 		// we need to force a refresh on the native side so aztec can synchronize the active formats
+		this.lastContent = undefined;
 		this.props.onChange( newContent );
 	}
 
