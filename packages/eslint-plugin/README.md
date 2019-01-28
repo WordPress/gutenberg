@@ -45,4 +45,14 @@ These rules can be used additively, so you could extend both `esnext` and `custo
 
 The granular rulesets will not define any environment globals. As such, if they are required for your project, you will need to define them yourself.
 
+#### Legacy
+
+If you are using WordPress' `.jshintrc` JSHint configuration and you would like to take the first step to migrate to an ESLint equivalent it is also possible to define your own project's `.eslintrc` file as:
+
+```json
+{
+	"extends": [ "plugin:@wordpress/eslint-plugin/jshint" ]
+}
+```
+
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

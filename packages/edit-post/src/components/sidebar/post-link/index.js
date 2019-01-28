@@ -131,8 +131,10 @@ export default compose( [
 		} = select( 'core' );
 
 		const { link, id } = getCurrentPost();
+
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
+
 		return {
 			isNew: isEditedPostNew(),
 			postLink: link,
@@ -147,8 +149,8 @@ export default compose( [
 			postID: id,
 		};
 	} ),
-	ifCondition( ( { isEnabled, isNew, postLink, isViewable } ) => {
-		return isEnabled && ! isNew && postLink && isViewable;
+	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
+		return isEnabled && ! isNew && postLink && isViewable && permalinkParts;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );

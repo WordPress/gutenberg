@@ -2,12 +2,13 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter } from 'lodash';
+import { map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -171,12 +172,46 @@ export function isPreviewEmbedFallback( state, url ) {
 }
 
 /**
- * Return Upload Permissions.
+ * Returns whether the current user can upload media.
  *
- * @param  {Object}  state State tree.
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
  *
- * @return {boolean} Upload Permissions.
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @deprecated since 5.0. Callers should use the more generic `canUser()` selector instead of
+ *             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {boolean} Whether or not the user can upload media. Defaults to `true` if the OPTIONS
+ *                   request is being made.
  */
 export function hasUploadPermissions( state ) {
-	return state.hasUploadPermissions;
+	deprecated( "select( 'core' ).hasUploadPermissions()", {
+		alternative: "select( 'core' ).canUser( 'create', 'media' )",
+	} );
+	return defaultTo( canUser( state, 'create', 'media' ), true );
+}
+
+/**
+ * Returns whether the current user can perform the given action on the given
+ * REST resource.
+ *
+ * Calling this may trigger an OPTIONS request to the REST API via the
+ * `canUser()` resolver.
+ *
+ * https://developer.wordpress.org/rest-api/reference/
+ *
+ * @param {Object}   state            Data state.
+ * @param {string}   action           Action to check. One of: 'create', 'read', 'update', 'delete'.
+ * @param {string}   resource         REST resource to check, e.g. 'media' or 'posts'.
+ * @param {string=}  id               Optional ID of the rest resource to check.
+ *
+ * @return {boolean|undefined} Whether or not the user can perform the action,
+ *                             or `undefined` if the OPTIONS request is still being made.
+ */
+export function canUser( state, action, resource, id ) {
+	const key = compact( [ action, resource, id ] ).join( '/' );
+	return get( state, [ 'userPermissions', key ] );
 }

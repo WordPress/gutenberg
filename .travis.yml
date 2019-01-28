@@ -1,6 +1,6 @@
 dist: trusty
 
-language: php
+language: generic
 
 services:
   - docker
@@ -13,56 +13,83 @@ notifications:
 cache:
   directories:
     - $HOME/.composer/cache
-    - $HOME/.phpbrew
+    - $HOME/.jest-cache
     - $HOME/.npm
-
-before_install:
-  - nvm install && nvm use
-  - npm install npm -g
+    - $HOME/.nvm/.cache
+    - $HOME/.phpbrew
 
 branches:
   only:
     - master
 
+before_install:
+  - nvm install
+
 jobs:
   include:
-    - stage: test
+    - name: JS unit tests
       env: WP_VERSION=latest
+      before_install:
+        - nvm install --latest-npm
+      install:
+        - npm ci
       script:
-        - npm install || exit 1
-        - npm run ci || exit 1
+        - npm run lint
+        - npm run check-local-changes
+        - npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
-    - stage: test
+    - name: PHP unit tests (Docker)
       env: WP_VERSION=latest DOCKER=true
       script:
         - ./bin/run-wp-unit-tests.sh
 
-    - stage: test
+    - name: PHP unit tests (PHP 5.6)
+      language: php
       php: 5.6
       env: WP_VERSION=latest
       script:
         - ./bin/run-wp-unit-tests.sh
       if: branch = master and type != "pull_request"
 
-    - stage: test
-      php: 7.1
+    - name: PHP unit tests (PHP 5.3)
       env: WP_VERSION=latest SWITCH_TO_PHP=5.3
       script:
         - ./bin/run-wp-unit-tests.sh
       if: branch = master and type != "pull_request"
 
-    - stage: test
-      php: 7.1
+    - name: PHP unit tests (PHP 5.2)
       env: WP_VERSION=latest SWITCH_TO_PHP=5.2
       script:
         - ./bin/run-wp-unit-tests.sh
 
-    - stage: test
-      env: WP_VERSION=latest
+    - name: E2E tests (Admin with plugins) (1/2)
+      env: WP_VERSION=latest POPULAR_PLUGINS=true
+      install:
+        - ./bin/setup-local-env.sh
       script:
-        - ./bin/run-e2e-tests.sh || exit 1
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
 
-    - stage: test
-      env: WP_VERSION=latest E2E_ROLE=author
+    - name: E2E tests (Admin with plugins) (2/2)
+      env: WP_VERSION=latest POPULAR_PLUGINS=true
+      install:
+        - ./bin/setup-local-env.sh
       script:
-        - ./bin/run-e2e-tests.sh || exit 1
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )
+
+    - name: E2E tests (Author without plugins) (1/2)
+      env: WP_VERSION=latest E2E_ROLE=author
+      install:
+        - ./bin/setup-local-env.sh
+      script:
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 0' < ~/.jest-e2e-tests )
+
+    - name: E2E tests (Author without plugins) (2/2)
+      env: WP_VERSION=latest E2E_ROLE=author
+      install:
+        - ./bin/setup-local-env.sh
+      script:
+        - $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+        - npm run test-e2e -- --ci --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 2 == 1' < ~/.jest-e2e-tests )

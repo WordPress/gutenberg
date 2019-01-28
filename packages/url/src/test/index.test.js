@@ -285,14 +285,14 @@ describe( 'isValidFragment', () => {
 } );
 
 describe( 'addQueryArgs', () => {
-	it( 'should append args to an URL without query string', () => {
+	it( 'should append args to a URL without query string', () => {
 		const url = 'https://andalouses.example/beach';
 		const args = { sun: 'true', sand: 'false' };
 
 		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?sun=true&sand=false' );
 	} );
 
-	it( 'should append args to an URL with query string', () => {
+	it( 'should append args to a URL with query string', () => {
 		const url = 'https://andalouses.example/beach?night=false';
 		const args = { sun: 'true', sand: 'false' };
 
@@ -325,6 +325,21 @@ describe( 'addQueryArgs', () => {
 		const args = { activity: 'fun in the sun' };
 
 		expect( addQueryArgs( url, args ) ).toBe( 'https://andalouses.example/beach?activity=fun%20in%20the%20sun' );
+	} );
+
+	it( 'should return only querystring when passed undefined url', () => {
+		const url = undefined;
+		const args = { sun: 'true' };
+
+		expect( addQueryArgs( url, args ) ).toBe( '?sun=true' );
+	} );
+
+	it( 'should return URL argument unaffected if no query arguments to append', () => {
+		[ '', 'https://example.com', 'https://example.com?' ].forEach( ( url ) => {
+			[ undefined, {} ].forEach( ( args ) => {
+				expect( addQueryArgs( url, args ) ).toBe( url );
+			} );
+		} );
 	} );
 } );
 

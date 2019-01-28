@@ -25,8 +25,8 @@ isShallowEqual( [ 1 ], [ 1 ] );
 You can import a specific implementation if you already know the types of values you are working with:
 
 ```js
-import isShallowEqualArrays from '@wordpress/is-shallow-equal/arrays';
-import isShallowEqualObjects from '@wordpress/is-shallow-equal/objects';
+import { isShallowEqualArrays } from '@wordpress/is-shallow-equal';
+import { isShallowEqualObjects } from '@wordpress/is-shallow-equal';
 ```
 
 ## Rationale

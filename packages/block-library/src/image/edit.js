@@ -370,7 +370,6 @@ class ImageEdit extends Component {
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
-		const imageSizeOptions = this.getImageSizeOptions();
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -446,6 +445,7 @@ class ImageEdit extends Component {
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const imageSizeOptions = this.getImageSizeOptions();
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>

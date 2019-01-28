@@ -1,6 +1,42 @@
 # Deprecations
 
-Gutenberg's deprecation policy is intended to support backward compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
+The Gutenberg project's deprecation policy is intended to support backward compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
+
+## 5.2.0
+
+- The PHP function `gutenberg_parse_blocks` has been removed. Use [`parse_blocks`](https://developer.wordpress.org/reference/functions/parse_blocks/) instead.
+- The PHP function `get_dynamic_blocks_regex` has been removed.
+- The PHP function `gutenberg_render_block` has been removed. Use [`render_block`](https://developer.wordpress.org/reference/functions/render_block/) instead.
+- The PHP function `strip_dynamic_blocks` has been removed. For use in excerpt preparation, consider [`excerpt_remove_blocks`](https://developer.wordpress.org/reference/functions/excerpt_remove_blocks/) instead.
+- The PHP function `strip_dynamic_blocks_add_filter` has been removed.
+- The PHP function `strip_dynamic_blocks_remove_filter` has been removed.
+- The PHP function `gutenberg_post_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
+- The PHP function `gutenberg_content_has_blocks` has been removed. Use [`has_blocks`](https://developer.wordpress.org/reference/functions/has_blocks/) instead.
+- The PHP function `gutenberg_register_rest_routes` has been removed.
+- The PHP function `gutenberg_add_taxonomy_visibility_field` has been removed.
+- The PHP function `gutenberg_get_taxonomy_visibility_data` has been removed.
+- The PHP function `gutenberg_add_permalink_template_to_posts` has been removed.
+- The PHP function `gutenberg_add_block_format_to_post_content` has been removed.
+- The PHP function `gutenberg_add_target_schema_to_links` has been removed.
+- The PHP function `gutenberg_register_post_prepare_functions` has been removed.
+- The PHP function `gutenberg_silence_rest_errors` has been removed.
+- The PHP function `gutenberg_filter_post_type_labels` has been removed.
+- The PHP function `gutenberg_preload_api_request` has been removed. Use [`rest_preload_api_request`](https://developer.wordpress.org/reference/functions/rest_preload_api_request/) instead.
+- The PHP function `gutenberg_remove_wpcom_markdown_support` has been removed.
+- The PHP function `gutenberg_bulk_post_updated_messages` has been removed.
+- The PHP function `gutenberg_kses_allowedtags` has been removed.
+- The PHP function `gutenberg_add_responsive_body_class` has been removed.
+- The PHP function `gutenberg_add_edit_link_filters` has been removed.
+- The PHP function `gutenberg_add_edit_link` has been removed.
+- The PHP function `gutenberg_block_bulk_actions` has been removed.
+- The PHP function `gutenberg_replace_default_add_new_button` has been removed.
+- The PHP function `gutenberg_content_block_version` has been removed. Use [`block_version`](https://developer.wordpress.org/reference/functions/block_version/) instead.
+- The PHP function `gutenberg_get_block_categories` has been removed. Use [`get_block_categories`](https://developer.wordpress.org/reference/functions/get_block_categories/) instead.
+- The PHP function `register_tinymce_scripts` has been removed. Use [`wp_register_tinymce_scripts`](https://developer.wordpress.org/reference/functions/wp_register_tinymce_scripts/) instead.
+- The PHP function `gutenberg_register_post_types` has been removed.
+- The `gutenberg` theme support option has been removed. Use [`align-wide`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#wide-alignment) instead.
+- The PHP function `gutenberg_prepare_blocks_for_js` has been removed. Use [`get_block_editor_server_block_settings`](https://developer.wordpress.org/reference/functions/get_block_editor_server_block_settings/) instead.
+- The PHP function `gutenberg_load_list_reusable_blocks` has been removed.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
