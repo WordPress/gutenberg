@@ -1,3 +1,19 @@
+## 9.1.0 (Unreleased)
+
+### New Feature
+
+- Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
+
+### Bug Fixes
+
+- BlockSwitcher will now consistently render an icon for block multi-selections.
+
+### Internal
+
+- Removed `jQuery` dependency
+
+## 9.0.7 (2019-01-03)
+
 ## 9.0.6 (2018-12-18)
 
 ### Bug Fixes

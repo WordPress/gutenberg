@@ -182,7 +182,7 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ 'test/e2e/**/*.js' ],
+			files: [ 'packages/e2e-test*/**/*.js' ],
 			env: {
 				browser: true,
 			},

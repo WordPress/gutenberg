@@ -23,7 +23,6 @@ import { compose } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
@@ -34,8 +33,6 @@ import {
 	getColorClassName,
 } from '@wordpress/editor';
 
-const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
-
 const blockAttributes = {
 	title: {
 		type: 'string',
@@ -43,9 +40,6 @@ const blockAttributes = {
 		selector: 'p',
 	},
 	url: {
-		type: 'string',
-	},
-	align: {
 		type: 'string',
 	},
 	contentAlign: {
@@ -91,6 +85,10 @@ export const settings = {
 	category: 'common',
 
 	attributes: blockAttributes,
+
+	supports: {
+		align: true,
+	},
 
 	transforms: {
 		from: [
@@ -168,20 +166,12 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( -1 !== validAlignments.indexOf( align ) ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit: compose( [
 		withColors( { overlayColor: 'background-color' } ),
 		withNotices,
 	] )(
 		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
 			const {
-				align,
 				backgroundType,
 				contentAlign,
 				dimRatio,
@@ -190,7 +180,6 @@ export const settings = {
 				title,
 				url,
 			} = attributes;
-			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const onSelectMedia = ( media ) => {
 				if ( ! media || ! media.url ) {
 					setAttributes( { url: undefined, id: undefined } );
@@ -235,23 +224,9 @@ export const settings = {
 				backgroundColor: overlayColor.color,
 			};
 
-			const classes = classnames(
-				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
-				dimRatioToClass( dimRatio ),
-				{
-					'has-background-dim': dimRatio !== 0,
-					'has-parallax': hasParallax,
-				}
-			);
-
 			const controls = (
 				<Fragment>
 					<BlockControls>
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
 						{ !! url && (
 							<Fragment>
 								<AlignmentToolbar
@@ -346,6 +321,16 @@ export const settings = {
 				);
 			}
 
+			const classes = classnames(
+				className,
+				contentAlign !== 'center' && `has-${ contentAlign }-content`,
+				dimRatioToClass( dimRatio ),
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+				}
+			);
+
 			return (
 				<Fragment>
 					{ controls }
@@ -381,7 +366,6 @@ export const settings = {
 
 	save( { attributes } ) {
 		const {
-			align,
 			backgroundType,
 			contentAlign,
 			customOverlayColor,
@@ -407,7 +391,6 @@ export const settings = {
 				'has-parallax': hasParallax,
 				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
-			align ? `align${ align }` : null,
 		);
 
 		return (
@@ -429,6 +412,9 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+			},
 		},
 
 		supports: {
@@ -466,6 +452,9 @@ export const settings = {
 	}, {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+			},
 			title: {
 				type: 'string',
 				source: 'html',

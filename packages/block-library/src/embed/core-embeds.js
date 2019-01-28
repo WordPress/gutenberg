@@ -16,6 +16,7 @@ import {
 	embedVimeoIcon,
 	embedRedditIcon,
 	embedTumbrIcon,
+	embedAmazonIcon,
 } from './icons';
 
 /**
@@ -154,15 +155,6 @@ export const others = [
 		patterns: [ /^https?:\/\/(www\.)?dailymotion\.com\/.+/i ],
 	},
 	{
-		name: 'core-embed/funnyordie',
-		settings: {
-			title: 'Funny or Die',
-			icon: embedVideoIcon,
-			description: __( 'Embed Funny or Die content.' ),
-		},
-		patterns: [ /^https?:\/\/(www\.)?funnyordie\.com\/.+/i ],
-	},
-	{
 		name: 'core-embed/hulu',
 		settings: {
 			title: 'Hulu',
@@ -216,15 +208,6 @@ export const others = [
 			description: __( 'Embed Mixcloud content.' ),
 		},
 		patterns: [ /^https?:\/\/(www\.)?mixcloud\.com\/.+/i ],
-	},
-	{
-		name: 'core-embed/photobucket',
-		settings: {
-			title: 'Photobucket',
-			icon: embedPhotoIcon,
-			description: __( 'Embed a Photobucket image.' ),
-		},
-		patterns: [ /^http:\/\/g?i*\.photobucket\.com\/.+/i ],
 	},
 	{
 		name: 'core-embed/polldaddy',
@@ -355,5 +338,19 @@ export const others = [
 			description: __( 'Embed a WordPress.tv video.' ),
 		},
 		patterns: [ /^https?:\/\/wordpress\.tv\/.+/i ],
+	},
+	{
+		name: 'core-embed/amazon-kindle',
+		settings: {
+			title: 'Amazon Kindle',
+			icon: embedAmazonIcon,
+			keywords: [ __( 'ebook' ) ],
+			responsive: false,
+			description: __( 'Embed Amazon Kindle content.' ),
+		},
+		patterns: [
+			/^https?:\/\/([a-z0-9-]+\.)?(amazon|amzn)(\.[a-z]{2,4})+\/.+/i,
+			/^https?:\/\/(www\.)?(a\.co|z\.cn)\/.+/i,
+		],
 	},
 ];

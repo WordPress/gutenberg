@@ -10,7 +10,7 @@ import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck } from '@wordpress/editor';
+import { PostTaxonomies, PostExcerptCheck, PageAttributesCheck, PostFeaturedImageCheck, PostTypeSupportCheck } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ import MetaBoxesSection from './meta-boxes-section';
 
 const MODAL_NAME = 'edit-post/options';
 
-export function OptionsModal( { isModalActive, closeModal } ) {
+export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
@@ -42,7 +42,9 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 				<EnableTipsOption label={ __( 'Enable Tips' ) } />
 			</Section>
 			<Section title={ __( 'Document Panels' ) }>
-				<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
+				{ isViewable && (
+					<EnablePanelOption label={ __( 'Permalink' ) } panelName="post-link" />
+				) }
 				<PostTaxonomies
 					taxonomyWrapper={ ( content, taxonomy ) => (
 						<EnablePanelOption
@@ -51,11 +53,15 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 						/>
 					) }
 				/>
-				<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+				<PostFeaturedImageCheck>
+					<EnablePanelOption label={ __( 'Featured Image' ) } panelName="featured-image" />
+				</PostFeaturedImageCheck>
 				<PostExcerptCheck>
 					<EnablePanelOption label={ __( 'Excerpt' ) } panelName="post-excerpt" />
 				</PostExcerptCheck>
-				<EnablePanelOption label={ __( 'Discussion' ) } panelName="discussion-panel" />
+				<PostTypeSupportCheck supportKeys={ [ 'comments', 'trackbacks' ] }>
+					<EnablePanelOption label={ __( 'Discussion' ) } panelName="discussion-panel" />
+				</PostTypeSupportCheck>
 				<PageAttributesCheck>
 					<EnablePanelOption label={ __( 'Page Attributes' ) } panelName="page-attributes" />
 				</PageAttributesCheck>
@@ -66,9 +72,16 @@ export function OptionsModal( { isModalActive, closeModal } ) {
 }
 
 export default compose(
-	withSelect( ( select ) => ( {
-		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
-	} ) ),
+	withSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getPostType } = select( 'core' );
+		const postType = getPostType( getEditedPostAttribute( 'type' ) );
+
+		return {
+			isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
+			isViewable: get( postType, [ 'viewable' ], false ),
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		return {
 			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),

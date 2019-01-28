@@ -120,10 +120,6 @@ body.block-editor-page {
 		bottom: 0;
 		left: 0;
 		min-height: calc(100vh - #{ $admin-bar-height-big });
-
-		body.is-fullscreen-mode & {
-			min-height: 100vh;
-		}
 	}
 
 	// The WP header height changes at this breakpoint

@@ -1,6 +1,7 @@
 /**
  * External Dependencies
  */
+import classnames from 'classnames';
 import { filter, pick, map, get } from 'lodash';
 
 /**
@@ -108,8 +109,10 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( images ) {
+		const { columns } = this.props.attributes;
 		this.setAttributes( {
 			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+			columns: columns ? Math.min( images.length, columns ) : columns,
 		} );
 	}
 
@@ -201,7 +204,7 @@ class GalleryEdit extends Component {
 							render={ ( { open } ) => (
 								<IconButton
 									className="components-toolbar__control"
-									label={ __( 'Edit Gallery' ) }
+									label={ __( 'Edit gallery' ) }
 									icon="edit"
 									onClick={ open }
 								/>
@@ -261,7 +264,16 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+				<ul
+					className={ classnames(
+						className,
+						{
+							[ `align${ align }` ]: align,
+							[ `columns-${ columns }` ]: columns,
+							'is-cropped': imageCrop,
+						}
+					) }
+				>
 					{ dropZone }
 					{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */

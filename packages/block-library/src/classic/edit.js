@@ -128,7 +128,7 @@ export default class ClassicEdit extends Component {
 		editor.addButton( 'kitchensink', {
 			tooltip: _x( 'More', 'button to expand options' ),
 			icon: 'dashicon dashicons-editor-kitchensink',
-			onClick: function() {
+			onClick() {
 				const button = this;
 				const active = ! button.active();
 
