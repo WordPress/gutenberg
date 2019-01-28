@@ -7,21 +7,24 @@ import { TextInput } from 'react-native';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { RichText } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
 import { withFocusOutside } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
 
+const minHeight = 53;
+
 class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onChange = this.onChange.bind( this );
 		this.onSelect = this.onSelect.bind( this );
 		this.onUnselect = this.onUnselect.bind( this );
 
 		this.state = {
 			isSelected: false,
+			aztecHeight: 0,
 		};
 	}
 
@@ -38,10 +41,6 @@ class PostTitle extends Component {
 		this.setState( { isSelected: false } );
 	}
 
-	onChange( title ) {
-		this.props.onUpdate( title );
-	}
-
 	render() {
 		const {
 			placeholder,
@@ -52,18 +51,25 @@ class PostTitle extends Component {
 		const decodedPlaceholder = decodeEntities( placeholder );
 
 		return (
-			<TextInput
-				blurOnSubmit={ true }
-				textAlignVertical="top"
-				multiline={ false }
-				onSubmitEditing={ this.props.onEnterPress }
-				returnKeyType={ 'next' }
-				onChangeText={ this.onChange }
+			<RichText
+				tagName={ 'p' }
 				onFocus={ this.onSelect }
+				onBlur={ this.props.onBlur } // always assign onBlur as a props
+				multiline={ false }
+				style={ [ style , {
+					minHeight: Math.max( minHeight, this.state.aztecHeight ),
+				} ] }
+				onChange={ ( event ) => {
+					this.props.onUpdate( event.content );
+				} }
+				onContentSizeChange={ ( event ) => {
+					this.setState( { aztecHeight: event.aztecHeight } );
+				} }
 				placeholder={ decodedPlaceholder }
-				style={ style }
-				value={ title }>
-			</TextInput>
+				value={ title }
+				onSplit={ this.props.onEnterPress }
+				>
+			</RichText>
 		);
 	}
 }
