@@ -44,16 +44,16 @@ export function onMediaLibraryPressed( callback ) {
 	return RNReactNativeGutenbergBridge.onMediaLibraryPressed( callback );
 }
 
-export function onUploadMediaPressed( callback ) {
-	return RNReactNativeGutenbergBridge.onUploadMediaPressed( callback );
+export function onMediaUploadPressed( callback ) {
+	return RNReactNativeGutenbergBridge.onMediaUploadPressed( callback );
 }
 
-export function onCapturePhotoPressed( callback ) {
-	return RNReactNativeGutenbergBridge.onCapturePhotoPressed( callback );
+export function onMediaCapturePressed( callback ) {
+	return RNReactNativeGutenbergBridge.onMediaCapturePressed( callback );
 }
 
-export function onImageQueryReattach() {
-	return RNReactNativeGutenbergBridge.onImageQueryReattach();
+export function mediaUploadResync() {
+	return RNReactNativeGutenbergBridge.mediaUploadResync();
 }
 
 export default RNReactNativeGutenbergBridge;
