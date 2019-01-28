@@ -44,6 +44,18 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `gutenberg_check_if_classic_needs_warning_about_blocks` has been removed.
 - The PHP function `gutenberg_warn_classic_about_blocks` has been removed.
 - The PHP function `gutenberg_show_privacy_policy_help_text` has been removed.
+- The PHP function `gutenberg_common_scripts_and_styles` has been removed. Use [`wp_common_block_scripts_and_styles`](https://developer.wordpress.org/reference/functions/wp_common_block_scripts_and_styles/) instead.
+- The PHP function `gutenberg_enqueue_registered_block_scripts_and_styles` has been removed. Use [`wp_enqueue_registered_block_scripts_and_styles`](https://developer.wordpress.org/reference/functions/wp_enqueue_registered_block_scripts_and_styles/) instead.
+- The PHP function `gutenberg_meta_box_save` has been removed.
+- The PHP function `gutenberg_meta_box_save_redirect` has been removed.
+- The PHP function `gutenberg_filter_meta_boxes` has been removed.
+- The PHP function `gutenberg_intercept_meta_box_render` has been removed.
+- The PHP function `gutenberg_override_meta_box_callback` has been removed.
+- The PHP function `gutenberg_show_meta_box_warning` has been removed.
+- The PHP function `the_gutenberg_metaboxes` has been removed. Use [`the_block_editor_meta_boxes`](https://developer.wordpress.org/reference/functions/the_block_editor_meta_boxes/) instead.
+- The PHP function `gutenberg_meta_box_post_form_hidden_fields` has been removed. Use [`the_block_editor_meta_box_post_form_hidden_fields`](https://developer.wordpress.org/reference/functions/the_block_editor_meta_box_post_form_hidden_fields/) instead.
+- The PHP function `gutenberg_toggle_custom_fields` has been removed.
+- The PHP function `gutenberg_collect_meta_box_data` has been removed. Use [`register_and_do_post_meta_boxes`](https://developer.wordpress.org/reference/functions/register_and_do_post_meta_boxes/) instead.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
