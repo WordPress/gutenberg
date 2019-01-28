@@ -203,4 +203,63 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should change the base list type', async () => {
+		await insertBlock( 'List' );
+		await page.click( 'button[aria-label="Convert to ordered list"]' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should change the indented list type', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+
+		// Pointer device is needed. Shift+Tab won't focus the toolbar.
+		// To do: fix so Shift+Tab works.
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+
+		await page.click( 'button[aria-label="Convert to ordered list"]' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should indent and outdent level 1', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should indent and outdent level 2', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'i' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
