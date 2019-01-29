@@ -101,6 +101,8 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
 	return getJSDocFromDependency( token, entry, parseDependency );
 };
 
+const getTagsByName = ( tags, tagName ) => tags.filter( ( tag ) => tag.title === tagName );
+
 /**
  * Takes a export token and returns an intermediate representation in JSON.
  *
@@ -125,6 +127,8 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 				ir.push( {
 					name: namedExport.name,
 					description: namedExport.description,
+					params: getTagsByName( namedExport.tags, 'param' ),
+					return: getTagsByName( namedExport.tags, 'return' ),
 					tags: namedExport.tags,
 				} );
 			} );
@@ -132,7 +136,9 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 			ir.push( {
 				name: entry.exportName,
 				description: get( doc, [ 'description' ], UNDOCUMENTED ),
-				tags: [],
+				params: getTagsByName( doc.tags, 'param' ),
+				return: getTagsByName( doc.tags, 'return' ),
+				tags: doc.tags,
 			} );
 		}
 	} );
