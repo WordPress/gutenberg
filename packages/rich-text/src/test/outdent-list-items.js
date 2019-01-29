@@ -137,4 +137,26 @@ describe( 'outdentListItems', () => {
 		expect( result ).not.toBe( record );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
 	} );
+
+	it( 'should outdent when a selected item is at level 0', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3`;
+		const record = {
+			formats: [ , [ ul ], , , , ],
+			text,
+			start: 2,
+			end: 5,
+		};
+		const expected = {
+			formats: [ , , , , , ],
+			text,
+			start: 2,
+			end: 5,
+		};
+		const result = outdentListItems( deepFreeze( record ) );
+
+		expect( result ).toEqual( expected );
+		expect( result ).not.toBe( record );
+		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+	} );
 } );
