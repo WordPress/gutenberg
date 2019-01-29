@@ -1,9 +1,9 @@
 public typealias MediaPickerDidPickMediaCallback = (_ id: Int?, _ url: String?) -> Void
 
-public enum MediaSource {
-    case mediaLibrary
-    case deviceLibrary
-    case deviceCamera
+public enum MediaSource: String {
+    case mediaLibrary = "SITE_MEDIA_LIBRARY"
+    case deviceLibrary = "DEVICE_MEDIA_LIBRARY"
+    case deviceCamera = "DEVICE_CAMERA"
 }
 
 public protocol GutenbergBridgeDelegate: class {

@@ -14,17 +14,8 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     
     @objc
     func requestMediaPickFrom(_ source: String, callback: @escaping RCTResponseSenderBlock) {
-        var mediaSource: MediaSource = .deviceLibrary
-        switch source {
-        case "SITE_MEDIA_LIBRARY":
-            mediaSource = .mediaLibrary
-        case "DEVICE_MEDIA_LIBRARY":
-            mediaSource = .deviceLibrary
-        case "DEVICE_CAMERA":
-            mediaSource = .deviceCamera
-        default:
-            mediaSource = .deviceLibrary
-        }
+        let mediaSource: MediaSource = MediaSource(rawValue: source) ?? .deviceLibrary
+
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMedia(from: mediaSource, with: { (mediaID, url) in
                 guard let url = url, let mediaID = mediaID else {
