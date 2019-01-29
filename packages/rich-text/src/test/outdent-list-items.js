@@ -116,7 +116,7 @@ describe( 'outdentListItems', () => {
 		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
 	} );
 
-	it( 'should outdent list ...', () => {
+	it( 'should outdent list based on parent list', () => {
 		// As we're testing list formats, the text should remain the same.
 		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4`;
 		const record = {
