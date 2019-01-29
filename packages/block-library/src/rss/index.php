@@ -79,13 +79,17 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$classes = 'grid' === $attributes['blockLayout'] ? ' is-grid columns-' . $attributes['columns'] : '';
+    $class = 'wp-block-rss';
 
-	if ( isset( $attributes['className'] ) ) {
-		$classes .= ' ' . $attributes['className'];
+	if ( 'grid' === $attributes['blockLayout'] ) {
+		$class .= ' is-grid columns-' . $attributes['columns'];
 	}
 
-	$list_items_markup = "<ul class='wp-block-rss{$classes}'>{$list_items}</ul>";
+	if ( isset( $attributes['className'] ) ) {
+		$class .= ' ' . $attributes['className'];
+	}
+
+	$list_items_markup = "<ul class='{$class}'>{$list_items}</ul>";
 
 	// PHP 5.2 compatibility. See: http://simplepie.org/wiki/faq/i_m_getting_memory_leaks.
 	$rss->__destruct();
