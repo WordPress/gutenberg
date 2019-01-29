@@ -2,14 +2,12 @@
 [![Build Status](https://img.shields.io/travis/WordPress/gutenberg/master.svg)](https://travis-ci.org/WordPress/gutenberg)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lernajs.io/)
 
-Printing since 1440.
-
-![Gutenberg editing](https://cldup.com/H0oKBfpidk.png)
+![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://cldup.com/H0oKBfpidk.png)
 
 This repo is the development hub for the <a href="https://make.wordpress.org/core/2017/01/04/focus-tech-and-design-leads/">editor focus in WordPress Core</a>. `Gutenberg` is the project name.
 
 ## Getting started
-- **Download:** If you want to use the latest release with your WordPress site, <a href="https://wordpress.org/plugins/gutenberg/">download the latest release from the WordPress.org plugins repository</a>. 
+- **Download:** If you want to use the latest release with your WordPress site, <a href="https://wordpress.org/plugins/gutenberg/">download the latest release from the WordPress.org plugins repository</a>.
 - **Discuss:** Conversations and discussions take place in <a href="https://wordpress.slack.com/messages/C02QB2JS7">`#core-editor` channel on the Making WordPress Slack</a>.
 - **Contribute:** Development of Gutenberg happens in this GitHub repo. Get started by <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md">reading the contributing guidelines</a>.
 - **Learn:** <a href="https://wordpress.org/gutenberg/">Discover more about the project on WordPress.org</a>.
@@ -42,11 +40,11 @@ Blocks are the unifying evolution of what is now covered, in different ways, by 
 
 Imagine a custom `employee` block that a client can drag onto an `About` page to automatically display a picture, name, and bio of all the employees. Imagine a whole universe of plugins just as flexible, all extending WordPress in the same way. Imagine simplified menus and widgets. Users who can instantly understand and use WordPress—and 90% of plugins. This will allow you to easily compose beautiful posts like <a href="http://moc.co/sandbox/example-post/">this example</a>.
 
-Check out the <a href="https://github.com/WordPress/gutenberg/blob/master/docs/reference/faq.md">FAQ</a> for answers to the most common questions about the project.
+Check out the <a href="https://wordpress.org/gutenberg/handbook/designers-developers/faq/">FAQ</a> for answers to the most common questions about the project.
 
 ## Compatibility
 
-Posts are backwards compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding a good solution for highly-tailored existing sites.
+Posts are backward compatible, and shortcodes will still work. We are continuously exploring how highly-tailored meta boxes can be accommodated, and are looking at solutions ranging from a plugin to disable Gutenberg to automatically detecting whether to load Gutenberg or not. While we want to make sure the new editing experience from writing to publishing is user-friendly, we’re committed to finding a good solution for highly-tailored existing sites.
 
 ## The stages of Gutenberg
 
@@ -73,7 +71,7 @@ Please see <a href="https://github.com/WordPress/gutenberg/blob/master/CONTRIBUT
 
 - <a href="http://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/">Gutenberg, or the Ship of Theseus</a>, with examples of what Gutenberg might do in the future
 - <a href="https://make.wordpress.org/core/2017/01/17/editor-technical-overview/">Editor Technical Overview</a>
-- <a href="https://wordpress.org/gutenberg/handbook/reference/design-principles/">Design Principles and block design best practices</a>
+- <a href="https://wordpress.org/gutenberg/handbook/contributors/design/">Design Principles and block design best practices</a>
 - <a href="https://github.com/Automattic/wp-post-grammar">WP Post Grammar Parser</a>
 - <a href="https://make.wordpress.org/core/tag/gutenberg/">Development updates on make.wordpress.org</a>
 - <a href="https://wordpress.org/gutenberg/handbook/">Documentation: Creating Blocks, Reference, and Guidelines</a>

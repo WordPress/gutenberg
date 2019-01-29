@@ -121,7 +121,7 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, setAttributes, noticeOperations } = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -134,6 +134,10 @@ class ImageEdit extends Component {
 						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
+					onError: ( message ) => {
+						noticeOperations.createErrorNotice( message );
+						this.setState( { isEditing: true } );
+					},
 				} );
 			}
 		}
@@ -366,7 +370,6 @@ class ImageEdit extends Component {
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
-		const imageSizeOptions = this.getImageSizeOptions();
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -414,7 +417,7 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( isEditing ) {
+		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
 			return (
 				<Fragment>
@@ -441,7 +444,8 @@ class ImageEdit extends Component {
 		} );
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const imageSizeOptions = this.getImageSizeOptions();
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -529,8 +533,8 @@ class ImageEdit extends Component {
 								label={ __( 'Link URL' ) }
 								value={ href || '' }
 								onChange={ this.onSetCustomHref }
-								placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
-								disabled={ isLinkURLInputDisabled }
+								placeholder={ ! isLinkURLInputReadOnly ? 'https://' : undefined }
+								readOnly={ isLinkURLInputReadOnly }
 							/>
 							<ToggleControl
 								label={ __( 'Open in New Tab' ) }

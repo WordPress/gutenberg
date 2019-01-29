@@ -21,6 +21,8 @@ import {
 	insert,
 	isCollapsed,
 	applyFormat,
+	getTextContent,
+	slice,
 } from '@wordpress/rich-text';
 import { URLInput, URLPopover } from '@wordpress/editor';
 
@@ -51,7 +53,7 @@ function createLinkFormat( { url, opensInNewWindow, text } ) {
 
 	if ( opensInNewWindow ) {
 		// translators: accessibility label for external links, where the argument is the link text
-		const label = sprintf( __( '%s (opens in a new tab)' ), text ).trim();
+		const label = sprintf( __( '%s (opens in a new tab)' ), text );
 
 		format.attributes.target = '_blank';
 		format.attributes.rel = 'noreferrer noopener';
@@ -173,7 +175,13 @@ class InlineLinkUI extends Component {
 
 		// Apply now if URL is not being edited.
 		if ( ! isShowingInput( this.props, this.state ) ) {
-			onChange( applyFormat( value, createLinkFormat( { url, opensInNewWindow, text: value.text } ) ) );
+			const selectedText = getTextContent( slice( value ) );
+
+			onChange( applyFormat( value, createLinkFormat( {
+				url,
+				opensInNewWindow,
+				text: selectedText,
+			} ) ) );
 		}
 	}
 
@@ -186,7 +194,12 @@ class InlineLinkUI extends Component {
 		const { isActive, value, onChange, speak } = this.props;
 		const { inputValue, opensInNewWindow } = this.state;
 		const url = prependHTTP( inputValue );
-		const format = createLinkFormat( { url, opensInNewWindow, text: value.text } );
+		const selectedText = getTextContent( slice( value ) );
+		const format = createLinkFormat( {
+			url,
+			opensInNewWindow,
+			text: selectedText,
+		} );
 
 		event.preventDefault();
 
@@ -204,13 +217,13 @@ class InlineLinkUI extends Component {
 		} else if ( isActive ) {
 			speak( __( 'Link edited.' ), 'assertive' );
 		} else {
-			speak( __( 'Link inserted' ), 'assertive' );
+			speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
 
 	onClickOutside( event ) {
 		// The autocomplete suggestions list renders in a separate popover (in a portal),
-		// so onClickOutside fails to detect that a click on a suggestion occured in the
+		// so onClickOutside fails to detect that a click on a suggestion occurred in the
 		// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 		// return to avoid the popover being closed.
 		const autocompleteElement = this.autocompleteRef.current;

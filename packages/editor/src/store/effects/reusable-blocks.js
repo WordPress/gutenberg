@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, map, uniqueId } from 'lodash';
+import { compact, map, uniqueId } from 'lodash';
 import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 
 /**
@@ -61,30 +61,35 @@ export const fetchReusableBlocks = async ( action, store ) => {
 		return;
 	}
 
-	let result;
-	if ( id ) {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } );
-	} else {
-		result = apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
-	}
-
 	try {
-		const reusableBlockOrBlocks = await result;
-		dispatch( receiveReusableBlocksAction( map(
-			castArray( reusableBlockOrBlocks ),
-			( post ) => {
-				const parsedBlocks = parse( post.content.raw );
-				return {
-					reusableBlock: {
-						id: post.id,
-						title: getPostRawValue( post.title ),
-					},
-					parsedBlock: parsedBlocks.length === 1 ?
-						parsedBlocks[ 0 ] :
-						createBlock( 'core/template', {}, parsedBlocks ),
-				};
+		let posts;
+
+		if ( id ) {
+			posts = [ await apiFetch( { path: `/wp/v2/${ postType.rest_base }/${ id }` } ) ];
+		} else {
+			posts = await apiFetch( { path: `/wp/v2/${ postType.rest_base }?per_page=-1` } );
+		}
+
+		const results = compact( map( posts, ( post ) => {
+			if ( post.status !== 'publish' || post.content.protected ) {
+				return null;
 			}
-		) ) );
+
+			const parsedBlocks = parse( post.content.raw );
+			return {
+				reusableBlock: {
+					id: post.id,
+					title: getPostRawValue( post.title ),
+				},
+				parsedBlock: parsedBlocks.length === 1 ?
+					parsedBlocks[ 0 ] :
+					createBlock( 'core/template', {}, parsedBlocks ),
+			};
+		} ) );
+
+		if ( results.length ) {
+			dispatch( receiveReusableBlocksAction( results ) );
+		}
 
 		dispatch( {
 			type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',

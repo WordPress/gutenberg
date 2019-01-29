@@ -28,6 +28,7 @@ import {
 	getBlockTypes,
 	hasBlockSupport,
 	hasChildBlocksWithInserterSupport,
+	getDefaultBlockName,
 	getFreeformContentHandlerName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
@@ -36,9 +37,10 @@ import { removep } from '@wordpress/autop';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Dependencies
+ * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
+import { EDIT_MERGE_PROPERTIES } from './constants';
 
 /***
  * Module constants
@@ -289,16 +291,28 @@ export function getCurrentPostAttribute( state, attributeName ) {
  * @return {*} Post attribute value.
  */
 export function getEditedPostAttribute( state, attributeName ) {
-	const edits = getPostEdits( state );
-
 	// Special cases
 	switch ( attributeName ) {
 		case 'content':
 			return getEditedPostContent( state );
 	}
 
+	// Fall back to saved post value if not edited.
+	const edits = getPostEdits( state );
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
 		return getCurrentPostAttribute( state, attributeName );
+	}
+
+	// Merge properties are objects which contain only the patch edit in state,
+	// and thus must be merged with the current post attribute.
+	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// [TODO]: Since this will return a new reference on each invocation,
+		// consider caching in a way which would not impact non-merged property
+		// derivation. Alternatively, introduce a new selector for meta lookup.
+		return {
+			...getCurrentPostAttribute( state, attributeName ),
+			...edits[ attributeName ],
+		};
 	}
 
 	return edits[ attributeName ];
@@ -335,13 +349,15 @@ export function getAutosaveAttribute( state, attributeName ) {
  */
 export function getEditedPostVisibility( state ) {
 	const status = getEditedPostAttribute( state, 'status' );
-	const password = getEditedPostAttribute( state, 'password' );
-
 	if ( status === 'private' ) {
 		return 'private';
-	} else if ( password ) {
+	}
+
+	const password = getEditedPostAttribute( state, 'password' );
+	if ( password ) {
 		return 'password';
 	}
+
 	return 'public';
 }
 
@@ -439,27 +455,37 @@ export function isEditedPostSaveable( state ) {
  * @return {boolean} Whether post has content.
  */
 export function isEditedPostEmpty( state ) {
-	const blocks = getBlocksForSerialization( state );
-
 	// While the condition of truthy content string is sufficient to determine
 	// emptiness, testing saveable blocks length is a trivial operation. Since
 	// this function can be called frequently, optimize for the fast case as a
 	// condition of the mere existence of blocks. Note that the value of edited
-	// content is used in place of blocks, thus allowed to fall through.
-	if ( blocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
+	// content takes precedent over block content, and must fall through to the
+	// default logic.
+	const rootClientIds = getBlockOrder( state );
+	if ( rootClientIds.length && ! ( 'content' in getPostEdits( state ) ) ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
 		// joined with with newlines such that even if every individual block
 		// produces an empty save result, the serialized content is non-empty.
-		if ( blocks.length > 1 ) {
+		if ( rootClientIds.length > 1 ) {
 			return false;
 		}
 
-		// Freeform and unregistered blocks omit comment delimiters in their
-		// output. The freeform block specifically may produce an empty string
-		// to save. In the case of a single freeform block, fall through to the
-		// full serialize. Otherwise, the single block is assumed non-empty by
-		// virtue of its comment delimiters.
-		if ( blocks[ 0 ].name !== getFreeformContentHandlerName() ) {
+		// There are two conditions under which the optimization cannot be
+		// assumed, and a fallthrough to getEditedPostContent must occur:
+		//
+		// 1. getBlocksForSerialization has special treatment in omitting a
+		//    single unmodified default block.
+		// 2. Comment delimiters are omitted for a freeform or unregistered
+		//    block in its serialization. The freeform block specifically may
+		//    produce an empty string in its saved output.
+		//
+		// For all other content, the single block is assumed to make a post
+		// non-empty, if only by virtue of its own comment delimiters.
+		const blockName = getBlockName( state, rootClientIds[ 0 ] );
+		if (
+			blockName !== getDefaultBlockName() &&
+			blockName !== getFreeformContentHandlerName()
+		) {
 			return false;
 		}
 	}
@@ -557,7 +583,7 @@ export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
 	const status = getEditedPostAttribute( state, 'status' );
-	if ( status === 'draft' || status === 'auto-draft' ) {
+	if ( status === 'draft' || status === 'auto-draft' || status === 'pending' ) {
 		return date === modified;
 	}
 	return false;
@@ -613,24 +639,22 @@ export function isBlockValid( state, clientId ) {
 }
 
 /**
- * Returns a block given its client ID. This is a parsed copy of the block,
- * containing its `blockName`, `clientId`, and current `attributes` state. This
- * is not the block's registration settings, which must be retrieved from the
- * blocks module registration store.
+ * Returns a block's attributes given its client ID, or null if no block exists with
+ * the client ID.
  *
  * @param {Object} state    Editor state.
  * @param {string} clientId Block client ID.
  *
- * @return {Object} Parsed block object.
+ * @return {Object?} Block attributes.
  */
-export const getBlock = createSelector(
+export const getBlockAttributes = createSelector(
 	( state, clientId ) => {
 		const block = state.editor.present.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
 		}
 
-		let { attributes } = block;
+		let attributes = state.editor.present.blocks.attributes[ clientId ];
 
 		// Inject custom source attribute values.
 		//
@@ -651,18 +675,62 @@ export const getBlock = createSelector(
 			}, attributes );
 		}
 
+		return attributes;
+	},
+	( state, clientId ) => [
+		state.editor.present.blocks.byClientId[ clientId ],
+		state.editor.present.blocks.attributes[ clientId ],
+		state.editor.present.edits.meta,
+		state.initialEdits.meta,
+		state.currentPost.meta,
+	]
+);
+
+/**
+ * Returns a block given its client ID. This is a parsed copy of the block,
+ * containing its `blockName`, `clientId`, and current `attributes` state. This
+ * is not the block's registration settings, which must be retrieved from the
+ * blocks module registration store.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Block client ID.
+ *
+ * @return {Object} Parsed block object.
+ */
+export const getBlock = createSelector(
+	( state, clientId ) => {
+		const block = state.editor.present.blocks.byClientId[ clientId ];
+		if ( ! block ) {
+			return null;
+		}
+
 		return {
 			...block,
-			attributes,
+			attributes: getBlockAttributes( state, clientId ),
 			innerBlocks: getBlocks( state, clientId ),
 		};
 	},
 	( state, clientId ) => [
-		state.editor.present.blocks.byClientId[ clientId ],
+		...getBlockAttributes.getDependants( state, clientId ),
 		getBlockDependantsCacheBust( state, clientId ),
-		state.editor.present.edits.meta,
-		state.initialEdits.meta,
-		state.currentPost.meta,
+	]
+);
+
+export const __unstableGetBlockWithoutInnerBlocks = createSelector(
+	( state, clientId ) => {
+		const block = state.editor.present.blocks.byClientId[ clientId ];
+		if ( ! block ) {
+			return null;
+		}
+
+		return {
+			...block,
+			attributes: getBlockAttributes( state, clientId ),
+		};
+	},
+	( state, clientId ) => [
+		state.editor.present.blocks.byClientId[ clientId ],
+		...getBlockAttributes.getDependants( state, clientId ),
 	]
 );
 
@@ -691,9 +759,7 @@ export const getBlocks = createSelector(
 			( clientId ) => getBlock( state, clientId )
 		);
 	},
-	( state ) => [
-		state.editor.present.blocks,
-	]
+	( state ) => [ state.editor.present.blocks ]
 );
 
 /**
@@ -853,7 +919,10 @@ export function hasSelectedBlock( state ) {
  */
 export function getSelectedBlockClientId( state ) {
 	const { start, end } = state.blockSelection;
-	return start === end && start ? start : null;
+	// We need to check the block exists because the current state.blockSelection reducer
+	// doesn't take into account the UNDO / REDO actions to update selection.
+	// To be removed when that's fixed.
+	return start && start === end && !! state.editor.present.blocks.byClientId[ start ] ? start : null;
 }
 
 /**
@@ -1084,10 +1153,8 @@ export const getMultiSelectedBlocks = createSelector(
 		return multiSelectedBlockClientIds.map( ( clientId ) => getBlock( state, clientId ) );
 	},
 	( state ) => [
-		state.editor.present.blocks.order,
-		state.blockSelection.start,
-		state.blockSelection.end,
-		state.editor.present.blocks.byClientId,
+		...getMultiSelectedBlockClientIds.getDependants( state ),
+		state.editor.present.blocks,
 		state.editor.present.edits.meta,
 		state.initialEdits.meta,
 		state.currentPost.meta,
@@ -1137,7 +1204,7 @@ const isAncestorOf = createSelector(
 		return possibleAncestorId === idToCheck;
 	},
 	( state ) => [
-		state.editor.present.blocks,
+		state.editor.present.blocks.order,
 	],
 );
 
@@ -1610,6 +1677,11 @@ export function getSuggestedPostFormat( state ) {
 export function getBlocksForSerialization( state ) {
 	const blocks = getBlocks( state );
 
+	// WARNING: Any changes to the logic of this function should be verified
+	// against the implementation of isEditedPostEmpty, which bypasses this
+	// function for performance' sake, in an assumption of this current logic
+	// being irrelevant to the optimized condition of emptiness.
+
 	// A single unmodified default block is assumed to be equivalent to an
 	// empty post.
 	const isSingleUnmodifiedDefaultBlock = (
@@ -1747,7 +1819,7 @@ export const canInsertBlockType = createSelector(
  * @param {string} id    A string which identifies the insert, e.g. 'core/block/12'
  *
  * @return {?{ time: number, count: number }} An object containing `time` which is when the last
- *                                            insert occured as a UNIX epoch, and `count` which is
+ *                                            insert occurred as a UNIX epoch, and `count` which is
  *                                            the number of inserts that have occurred.
  */
 function getInsertUsage( state, id ) {
@@ -1944,7 +2016,8 @@ export const getInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.present.blocks,
+		state.editor.present.blocks.byClientId,
+		state.editor.present.blocks.order,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -1978,7 +2051,7 @@ export const hasInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.present.blocks,
+		state.editor.present.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		state.reusableBlocks.data,
@@ -2119,10 +2192,15 @@ export function isPermalinkEditable( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {string} The permalink.
+ * @return {?string} The permalink, or null if the post is not viewable.
  */
 export function getPermalink( state ) {
-	const { prefix, postName, suffix } = getPermalinkParts( state );
+	const permalinkParts = getPermalinkParts( state );
+	if ( ! permalinkParts ) {
+		return null;
+	}
+
+	const { prefix, postName, suffix } = permalinkParts;
 
 	if ( isPermalinkEditable( state ) ) {
 		return prefix + postName + suffix;
@@ -2132,14 +2210,20 @@ export function getPermalink( state ) {
 }
 
 /**
- * Returns the permalink for a post, split into it's three parts: the prefix, the postName, and the suffix.
+ * Returns the permalink for a post, split into it's three parts: the prefix,
+ * the postName, and the suffix.
  *
  * @param {Object} state Editor state.
  *
- * @return {Object} The prefix, postName, and suffix for the permalink.
+ * @return {Object} An object containing the prefix, postName, and suffix for
+ *                  the permalink, or null if the post is not viewable.
  */
 export function getPermalinkParts( state ) {
 	const permalinkTemplate = getEditedPostAttribute( state, 'permalink_template' );
+	if ( ! permalinkTemplate ) {
+		return null;
+	}
+
 	const postName = getEditedPostAttribute( state, 'slug' ) || getEditedPostAttribute( state, 'generated_slug' );
 
 	const [ prefix, suffix ] = permalinkTemplate.split( PERMALINK_POSTNAME_REGEX );

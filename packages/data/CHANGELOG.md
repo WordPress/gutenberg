@@ -1,3 +1,16 @@
+## 4.2.0 (2019-01-03)
+
+### Enhancements
+
+- Optimized performance of selector execution (~511% improvement)
+
+## 4.1.0 (2018-12-12)
+
+### New Feature
+
+- `withDispatch`'s `mapDispatchToProps` function takes the `registry` object as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).
+- `withSelect`'s `mapSelectToProps` function takes the `registry` object as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).
+
 ## 4.0.1 (2018-11-20)
 
 ## 4.0.0 (2018-11-15)

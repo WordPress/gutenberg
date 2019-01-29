@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "3.0.2",
+	"version": "3.0.5",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,10 +26,6 @@
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.10",
 		"rememo": "^3.0.0"
-	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"jsdom": "^11.12.0"
 	},
 	"publishConfig": {
 		"access": "public"

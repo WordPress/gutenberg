@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.0.0",
+	"version": "3.0.1",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,11 +25,6 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"lodash": "^4.17.10"
-	},
-	"devDependencies": {
-		"enzyme": "^3.7.0",
-		"react-dom": "^16.6.3",
-		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"

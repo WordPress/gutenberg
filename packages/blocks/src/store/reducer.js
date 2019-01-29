@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { keyBy, omit, mapValues, get, uniqBy, filter, map } from 'lodash';
+import {
+	filter,
+	find,
+	get,
+	isEmpty,
+	keyBy,
+	map,
+	mapValues,
+	omit,
+	uniqBy,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -124,10 +134,27 @@ export const unregisteredFallbackBlockName = createBlockNameSetterReducer( 'SET_
  * @return {Object} Updated state.
  */
 export function categories( state = DEFAULT_CATEGORIES, action ) {
-	if ( action.type === 'SET_CATEGORIES' ) {
-		return action.categories || [];
+	switch ( action.type ) {
+		case 'SET_CATEGORIES':
+			return action.categories || [];
+		case 'UPDATE_CATEGORY': {
+			if ( ! action.category || isEmpty( action.category ) ) {
+				return state;
+			}
+			const categoryToChange = find( state, [ 'slug', action.slug ] );
+			if ( categoryToChange ) {
+				return map( state, ( category ) => {
+					if ( category.slug === action.slug ) {
+						return {
+							...category,
+							...action.category,
+						};
+					}
+					return category;
+				} );
+			}
+		}
 	}
-
 	return state;
 }
 

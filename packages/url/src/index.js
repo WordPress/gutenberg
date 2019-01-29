@@ -159,19 +159,38 @@ export function isValidFragment( fragment ) {
 }
 
 /**
- * Appends arguments to the query string of the url
+ * Appends arguments as querystring to the provided URL. If the URL already
+ * includes query arguments, the arguments are merged with (and take precedent
+ * over) the existing set.
  *
- * @param {string} url  URL
- * @param {Object} args Query Args
+ * @param {?string} url  URL to which arguments should be appended. If omitted,
+ *                       only the resulting querystring is returned.
+ * @param {Object}  args Query arguments to apply to URL.
  *
- * @return {string} Updated URL
+ * @return {string} URL with arguments applied.
  */
-export function addQueryArgs( url, args ) {
-	const queryStringIndex = url.indexOf( '?' );
-	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
-	const baseUrl = queryStringIndex !== -1 ? url.substr( 0, queryStringIndex ) : url;
+export function addQueryArgs( url = '', args ) {
+	// If no arguments are to be appended, return original URL.
+	if ( ! args || ! Object.keys( args ).length ) {
+		return url;
+	}
 
-	return baseUrl + '?' + stringify( { ...query, ...args } );
+	let baseUrl = url;
+
+	// Determine whether URL already had query arguments.
+	const queryStringIndex = url.indexOf( '?' );
+	if ( queryStringIndex !== -1 ) {
+		// Merge into existing query arguments.
+		args = Object.assign(
+			parse( url.substr( queryStringIndex + 1 ) ),
+			args
+		);
+
+		// Change working base URL to omit previous query arguments.
+		baseUrl = baseUrl.substr( 0, queryStringIndex );
+	}
+
+	return baseUrl + '?' + stringify( args );
 }
 
 /**

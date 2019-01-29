@@ -100,16 +100,38 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'BLOCKQUOTE' &&
+				isMatch: ( node ) => {
+					const isParagraphOrSingleCite = ( () => {
+						let hasCitation = false;
+						return ( child ) => {
+							// Child is a paragraph.
+							if ( child.nodeName === 'P' ) {
+								return true;
+							}
+							// Child is a cite and no other cite child exists before it.
+							if (
+								! hasCitation &&
+								child.nodeName === 'CITE'
+							) {
+								hasCitation = true;
+								return true;
+							}
+						};
+					} )();
+					return node.nodeName === 'BLOCKQUOTE' &&
 					// The quote block can only handle multiline paragraph
-					// content.
-					Array.from( node.childNodes ).every( ( child ) => child.nodeName === 'P' )
-				),
+					// content with an optional cite child.
+					Array.from( node.childNodes ).every(
+						isParagraphOrSingleCite
+					);
+				},
 				schema: {
 					blockquote: {
 						children: {
 							p: {
+								children: getPhrasingContentSchema(),
+							},
+							cite: {
 								children: getPhrasingContentSchema(),
 							},
 						},

@@ -1,75 +1,209 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import { View, Image, TextInput } from 'react-native';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import {
+	subscribeMediaUpload,
+	onMediaLibraryPressed,
+	onUploadMediaPressed,
+	onCapturePhotoPressed,
+	onImageQueryReattach,
+} from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
-import { Toolbar, IconButton } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import ImageSize from './image-size';
+import { isURL } from '@wordpress/url';
 
-export default function ImageEdit( props ) {
-	const { attributes, isSelected, setAttributes } = props;
-	const { url, caption } = attributes;
+const MEDIA_ULOAD_STATE_UPLOADING = 1;
+const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
+const MEDIA_ULOAD_STATE_FAILED = 3;
 
-	const onUploadPress = () => {
-		// This method should present an image picker from
-		// the device.
-		//TODO: Implement upload image method.
-	};
+export default class ImageEdit extends React.Component {
+	constructor( props ) {
+		super( props );
 
-	const onMediaLibraryPress = () => {
-		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
-			if ( mediaUrl ) {
-				setAttributes( { url: mediaUrl } );
-			}
-		} );
-	};
+		this.state = {
+			progress: 0,
+			isUploadInProgress: false,
+		};
 
-	if ( ! url ) {
-		return (
-			<MediaPlaceholder
-				onUploadPress={ onUploadPress }
-				onMediaLibraryPress={ onMediaLibraryPress }
-			/>
-		);
+		this.mediaUpload = this.mediaUpload.bind( this );
+		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
+		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 	}
 
-	const toolbarEditButton = (
-		<Toolbar>
-			<IconButton
-				className="components-toolbar__control"
-				label={ __( 'Edit image' ) }
-				icon="edit"
-				onClick={ onMediaLibraryPress }
-			/>
-		</Toolbar>
-	);
+	componentDidMount() {
+		const { attributes } = this.props;
 
-	return (
-		<View style={ { flex: 1 } }>
-			<BlockControls>
-				{ toolbarEditButton }
-			</BlockControls>
-			<Image
-				style={ { width: '100%', height: 200 } }
-				resizeMethod="scale"
-				source={ { uri: url } }
-			/>
-			{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-				<View style={ { padding: 12, flex: 1 } }>
-					<TextInput
-						style={ { textAlign: 'center' } }
-						underlineColorAndroid="transparent"
-						value={ caption }
-						placeholder={ 'Write caption…' }
-						onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-					/>
-				</View>
-			) }
-		</View>
-	);
+		if ( attributes.id && ! isURL( attributes.url ) ) {
+			this.addMediaUploadListener();
+			onImageQueryReattach();
+		}
+	}
+
+	componentWillUnmount() {
+		this.removeMediaUploadListener();
+	}
+
+	mediaUpload( payload ) {
+		const { attributes } = this.props;
+
+		if ( payload.mediaId !== attributes.id ) {
+			return;
+		}
+
+		switch ( payload.state ) {
+			case MEDIA_ULOAD_STATE_UPLOADING:
+				this.setState( { progress: payload.progress, isUploadInProgress: true } );
+				break;
+			case MEDIA_ULOAD_STATE_SUCCEEDED:
+				this.finishMediaUploadWithSuccess( payload );
+				break;
+			case MEDIA_ULOAD_STATE_FAILED:
+				this.finishMediaUploadWithFailure( payload );
+				break;
+		}
+	}
+
+	finishMediaUploadWithSuccess( payload ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
+		this.setState( { isUploadInProgress: false } );
+
+		this.removeMediaUploadListener();
+	}
+
+	finishMediaUploadWithFailure( payload ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
+		this.setState( { isUploadInProgress: false } );
+
+		this.removeMediaUploadListener();
+	}
+
+	addMediaUploadListener() {
+		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
+			this.mediaUpload( payload );
+		} );
+	}
+
+	removeMediaUploadListener() {
+		if ( this.subscriptionParentMediaUpload ) {
+			this.subscriptionParentMediaUpload.remove();
+		}
+	}
+
+	render() {
+		const { attributes, isSelected, setAttributes } = this.props;
+		const { url, caption, height, width } = attributes;
+
+		const onMediaLibraryButtonPressed = () => {
+			onMediaLibraryPressed( ( mediaId, mediaUrl ) => {
+				if ( mediaUrl ) {
+					setAttributes( { id: mediaId, url: mediaUrl } );
+				}
+			} );
+		};
+
+		if ( ! url ) {
+			const onUploadMediaButtonPressed = () => {
+				onUploadMediaPressed( ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						this.addMediaUploadListener( );
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			};
+
+			const onCapturePhotoButtonPressed = () => {
+				onCapturePhotoPressed( ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						this.addMediaUploadListener( );
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			};
+
+			return (
+				<MediaPlaceholder
+					onUploadMediaPressed={ onUploadMediaButtonPressed }
+					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
+					onCapturePhotoPressed={ onCapturePhotoButtonPressed }
+				/>
+			);
+		}
+
+		const toolbarEditButton = (
+			<Toolbar>
+				<ToolbarButton
+					label={ __( 'Edit image' ) }
+					icon="edit"
+					onClick={ onMediaLibraryButtonPressed }
+				/>
+			</Toolbar>
+		);
+
+		const showSpinner = this.state.isUploadInProgress;
+		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
+		const progress = this.state.progress * 100;
+
+		return (
+			<View style={ { flex: 1 } }>
+				{ showSpinner && <Spinner progress={ progress } /> }
+				<BlockControls>
+					{ toolbarEditButton }
+				</BlockControls>
+				<ImageSize src={ url } >
+					{ ( sizes ) => {
+						const {
+							imageWidthWithinContainer,
+							imageHeightWithinContainer,
+						} = sizes;
+
+						let finalHeight = imageHeightWithinContainer;
+						if ( height > 0 && height < imageHeightWithinContainer ) {
+							finalHeight = height;
+						}
+
+						let finalWidth = imageWidthWithinContainer;
+						if ( width > 0 && width < imageWidthWithinContainer ) {
+							finalWidth = width;
+						}
+
+						return (
+							<View style={ { flex: 1 } } >
+								<Image
+									style={ { width: finalWidth, height: finalHeight, opacity } }
+									resizeMethod="scale"
+									source={ { uri: url } }
+									key={ url }
+								/>
+							</View>
+						);
+					} }
+				</ImageSize>
+				{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
+					<View style={ { padding: 12, flex: 1 } }>
+						<TextInput
+							style={ { textAlign: 'center' } }
+							underlineColorAndroid="transparent"
+							value={ caption }
+							placeholder={ __( 'Write caption…' ) }
+							onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+						/>
+					</View>
+				) }
+			</View>
+		);
+	}
 }

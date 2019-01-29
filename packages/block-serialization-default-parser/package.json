@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-serialization-default-parser",
-	"version": "2.0.0",
+	"version": "2.0.4",
 	"description": "Block serialization specification parser for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,9 +22,6 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.0.0"
-	},
-	"devDependencies": {
-		"@wordpress/block-serialization-spec-parser": "file:../block-serialization-spec-parser"
 	},
 	"publishConfig": {
 		"access": "public"

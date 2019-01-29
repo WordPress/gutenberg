@@ -18,8 +18,8 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 When imported, the notices module registers a data store on the `core/notices` namespace.
 
-For more information about consuming from a data store, refer to [the `@wordpress/data` documentation on _Data Access and Manipulation_](https://wordpress.org/gutenberg/handbook/packages/packages-data/#data-access-and-manipulation).
+For more information about consuming from a data store, refer to [the `@wordpress/data` documentation on _Data Access and Manipulation_](/packages/data/README.md#data-access-and-manipulation).
 
-For a full list of actions and selectors available in the `core/notices` namespace, refer to the [_Notices Data_ Handbook page](https://wordpress.org/gutenberg/handbook/packages/packages-data/packages-data-core-edit-post/).
+For a full list of actions and selectors available in the `core/notices` namespace, refer to the [_Notices Data_ Handbook page](/docs/designers-developers/developers/data/data-core-notices.md).
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

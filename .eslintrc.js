@@ -19,14 +19,8 @@ const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.
 module.exports = {
 	root: true,
 	extends: [
-		'./eslint/config.js',
-		'plugin:jest/recommended'
-	],
-	env: {
-		'jest/globals': true,
-	},
-	plugins: [
-		'jest',
+		'plugin:@wordpress/eslint-plugin/recommended',
+		'plugin:jest/recommended',
 	],
 	rules: {
 		'no-restricted-syntax': [
@@ -188,10 +182,14 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ 'test/e2e/**/*.js' ],
-			globals: {
-				page: true,
+			files: [ 'packages/e2e-test*/**/*.js' ],
+			env: {
 				browser: true,
+			},
+			globals: {
+				browser: true,
+				page: true,
+				wp: true,
 			},
 		},
 	],

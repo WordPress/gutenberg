@@ -7,7 +7,7 @@ import { filter } from 'lodash';
 /**
  * Internal dependencies
  */
-import { terms, entities, embedPreviews } from '../reducer';
+import { terms, entities, embedPreviews, userPermissions } from '../reducer';
 
 describe( 'terms()', () => {
 	it( 'returns an empty object by default', () => {
@@ -114,6 +114,29 @@ describe( 'embedPreviews()', () => {
 
 		expect( state ).toEqual( {
 			'http://twitter.com/notnownikki': { data: 42 },
+		} );
+	} );
+} );
+
+describe( 'userPermissions()', () => {
+	it( 'defaults to an empty object', () => {
+		const state = userPermissions( undefined, {} );
+		expect( state ).toEqual( {} );
+	} );
+
+	it( 'updates state with whether an action is allowed', () => {
+		const original = deepFreeze( {
+			'create/media': false,
+		} );
+
+		const state = userPermissions( original, {
+			type: 'RECEIVE_USER_PERMISSION',
+			key: 'create/media',
+			isAllowed: true,
+		} );
+
+		expect( state ).toEqual( {
+			'create/media': true,
 		} );
 	} );
 } );

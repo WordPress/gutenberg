@@ -66,7 +66,7 @@ The core provided categories are:
 category: 'widgets',
 ```
 
-Plugins and Themes can also register [custom block categories](../docs/extensibility/extending-blocks/#managing-block-categories).
+Plugins and Themes can also register [custom block categories](/docs/designers-developers/developers/filters/block-filters.md#managing-block-categories).
 
 #### Icon (optional)
 
@@ -82,7 +82,7 @@ icon: 'book-alt',
 icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><path d="M19 13H5v-2h14v2z" /></svg>,
 ```
 
-**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
+**Note:** Custom SVG icons are automatically wrapped in the [`wp.components.SVG` component](/packages/components/src/primitives/svg/) to add accessibility attributes (`aria-hidden`, `role`, and `focusable`).
 
 An object can also be passed as icon, in this case, icon, as specified above, should be included in the src property.
 Besides src the object can contain background and foreground colors, this colors will appear with the icon
@@ -138,7 +138,7 @@ styles: [
 ],
 ```
 
-Plugins and Themes can also register [custom block style](../docs/extensibility/extending-blocks/#block-style-variations) for existing blocks.
+Plugins and Themes can also register [custom block style](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) for existing blocks.
 
 #### Attributes (optional)
 
@@ -166,7 +166,7 @@ attributes: {
 },
 ```
 
-* **See: [Attributes](../docs/block-api/attributes.md).**
+* **See: [Attributes](/docs/designers-developers/developers/block-api/block-attributes.md).**
 
 #### Transforms (optional)
 
@@ -184,9 +184,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function ( content ) {
+            transform: function ( attributes ) {
                 return createBlock( 'core/heading', {
-                    content,
+                    content: attributes.content,
                 } );
             },
         },
@@ -233,8 +233,8 @@ transforms: {
                 // An attribute can be source from the shortcode attributes
                 align: {
                     type: 'string',
-                    shortcode: function( named ) {
-                        var align = named.align ? named.align : 'alignnone';
+                    shortcode: function( attributes ) {
+                        var align = attributes.named.align ? attributes.named.align : 'alignnone';
                         return align.replace( 'align', '' );
                     },
                 },
@@ -284,9 +284,9 @@ transforms: {
         {
             type: 'block',
             blocks: [ 'core/paragraph' ],
-            transform: function( content ) {
+            transform: function( attributes ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: attributes.content,
                 } );
             },
         },
@@ -311,6 +311,39 @@ transforms: {
 ```
 {% end %}
 
+A block with innerBlocks can also be transformed from and to another block with innerBlocks.
+
+{% codetabs %}
+{% ES5 %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'some/block-with-innerblocks' ],
+            transform: function( attributes, innerBlocks ) {
+                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks );
+            },
+        },
+    ],
+},
+```
+{% ESNext %}
+```js
+transforms: {
+    to: [
+        {
+            type: 'block',
+            blocks: [ 'some/block-with-innerblocks' ],
+            transform: ( attributes, innerBlocks ) => {
+                return createBlock( 'some/other-block-with-innerblocks', attributes, innerBlocks);
+            },
+        },
+    ],
+},
+```
+{% end %}
+
 An optional `isMatch` function can be specified on a transform object. This provides an opportunity to perform additional checks on whether a transform should be possible. Returning `false` from this function will prevent the transform from being displayed as an option to the user.
 
 {% codetabs %}
@@ -321,12 +354,12 @@ transforms: {
         {
             type: 'block',
 			blocks: [ 'core/paragraph' ],
-			isMatch: function( attribute ) {
+			isMatch: function( attributes ) {
 				return attributes.isText;
 			},
-            transform: function( content ) {
+            transform: function( attributes ) {
                 return createBlock( 'core/paragraph', {
-                    content,
+                    content: attributes.content,
                 } );
             },
         },
@@ -453,7 +486,7 @@ transforms: {
 
 * **Type:** `Array`
 
-Blocks are able to be inserted into blocks that use [`InnerBlocks`](https://github.com/WordPress/gutenberg/blob/master/packages/editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
+Blocks are able to be inserted into blocks that use [`InnerBlocks`](/packages/editor/src/components/inner-blocks/README.md) as nested content. Sometimes it is useful to restrict a block so that it is only available as a nested block. For example, you might want to allow an 'Add to Cart' block to only be available within a 'Product' block.
 
 Setting `parent` lets a block require that it is only available when nested within the specified blocks.
 
@@ -492,7 +525,7 @@ attributes: {
 }
 ```
 
-- `alignWide` (default `true`): This property allows to enable [wide alignment](../docs/extensibility/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+- `alignWide` (default `true`): This property allows to enable [wide alignment](/docs/designers-developers/developers/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 // Remove the support for wide alignment.

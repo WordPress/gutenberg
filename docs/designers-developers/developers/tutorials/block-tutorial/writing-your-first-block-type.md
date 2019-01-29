@@ -28,7 +28,9 @@ add_action( 'init', 'gutenberg_boilerplate_block' );
 Note the two script dependencies:
 
 - __`wp-blocks`__ includes block type registration and related functions
-- __`wp-element`__ includes the [WordPress Element abstraction](https://github.com/WordPress/gutenberg/tree/master/packages/element) for describing the structure of your blocks
+- __`wp-element`__ includes the [WordPress Element abstraction](/packages/element/README.md) for describing the structure of your blocks
+
+If you were to use a component from the `wp-editor` package, for example the RichText component, you would also need to add `wp-editor` to the dependency list.
 
 ## Registering the Block
 
@@ -80,7 +82,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-01', {
 ```
 {% end %}
 
-Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](https://wordpress.org/gutenberg/handbook/block-api/#icon-optional).
+Once a block is registered, you should immediately see that it becomes available as an option in the editor inserter dialog, using values from `title`, `icon`, and `category` to organize its display. You can choose an icon from any included in the built-in [Dashicons icon set](https://developer.wordpress.org/resource/dashicons/), or provide a [custom svg element](/docs/designers-developers/developers/block-api/block-registration.md#icon-optional).
 
 A block name must be prefixed with a namespace specific to your plugin. This helps prevent conflicts when more than one plugin registers a block with the same name.
 

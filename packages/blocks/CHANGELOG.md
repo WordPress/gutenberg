@@ -1,3 +1,17 @@
+## 6.1.0 (Unreleased)
+
+### New Feature
+
+- Blocks' `transforms` will receive `innerBlocks` as the second argument (or an array of each block's respective `innerBlocks` for a multi-transform).
+
+## 6.0.5 (2019-01-03)
+
+## 6.0.4 (2018-12-12)
+
+## 6.0.3 (2018-11-30)
+
+## 6.0.2 (2018-11-21)
+
 ## 6.0.1 (2018-11-20)
 
 ## 6.0.0 (2018-11-15)
