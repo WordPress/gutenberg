@@ -203,7 +203,9 @@ export const settings = {
 							const { body } = document.implementation.createHTMLDocument( '' );
 
 							body.innerHTML = shortcode.content;
-							body.removeChild( body.firstElementChild );
+							if ( body.firstElementChild ) {
+								body.removeChild( body.firstElementChild );
+							}
 
 							return body.innerHTML.trim();
 						},
