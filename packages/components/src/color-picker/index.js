@@ -46,6 +46,12 @@ import Saturation from './saturation';
 import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
 const toLowerCase = ( value ) => String( value ).toLowerCase();
+const isValueEmpty = ( data ) => ( data.source === 'hex' && ! data.hex ) ||
+	( data.source === 'rgb' && ( ! data.r || ! data.g || ! data.b ) ) ||
+	( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) );
+const isValidColor = ( data ) => data.hex ?
+	isValidHex( data.hex ) :
+	simpleCheckForValidColor( data );
 
 export default class ColorPicker extends Component {
 	constructor( { color = '0071a1' } ) {
@@ -63,7 +69,7 @@ export default class ColorPicker extends Component {
 
 	handleChange( data ) {
 		const { oldHue, onChangeComplete = noop } = this.props;
-		const isValid = data.hex ? isValidHex( data.hex ) : simpleCheckForValidColor( data );
+		const isValid = ! isValueEmpty( data ) && isValidColor( data );
 		if ( isValid ) {
 			const colors = colorToState( data, data.h || oldHue );
 			this.setState( {
