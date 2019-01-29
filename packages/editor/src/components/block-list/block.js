@@ -99,7 +99,7 @@ export class BlockListBlock extends Component {
 			this.focusTabbable( true );
 		}
 
-		// When triggering a multi-selection, smove the focus to the wrapper of the first selected block.
+		// When triggering a multi-selection, move the focus to the wrapper of the first selected block.
 		// This ensures that it is not possible to continue editing the initially selected block
 		// when a multi-selection is triggered.
 		if ( this.props.isFirstMultiSelected && ! prevProps.isFirstMultiSelected ) {
