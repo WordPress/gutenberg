@@ -47,8 +47,13 @@ import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
 const toLowerCase = ( value ) => String( value ).toLowerCase();
 const isValueEmpty = ( data ) => ( data.source === 'hex' && ! data.hex ) ||
-	( data.source === 'rgb' && ( ! data.r || ! data.g || ! data.b ) ) ||
-	( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) );
+	( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) ||
+	( data.source === 'rgb' && (
+		( ! data.r || ! data.g || ! data.b ) &&
+		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
+		( ! data.h || ! data.s || ! data.l || ! data.a )
+	) );
+
 const isValidColor = ( data ) => data.hex ?
 	isValidHex( data.hex ) :
 	simpleCheckForValidColor( data );
