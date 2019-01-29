@@ -6,25 +6,52 @@ When registering a block, the `edit` and `save` functions provide the interface 
 
 The `edit` function describes the structure of your block in the context of the editor. This represents what the editor will render when the block is used.
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// Defining the edit interface
+// A static div
 edit() {
-	return <hr />;
+	return wp.element.createElement(
+		'div',
+		null,
+		'Your block.'
+	);
 }
 ```
+{% ESNext %}
+```jsx
+edit() {
+	return <div> Your block. </div>;
+}
+```
+{% end %}
 
 The function receives the following properties through an object argument:
 
 ### attributes
 
-This property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
+This property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. See [attributes documentation](/docs/designers-developers/developers/block-api/block-attributes/) for how to specify attribute sources.
 
+In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
+
+{% codetabs %}
+{% ES5 %}
 ```js
-// Defining the edit interface
+edit( props ) {
+	return wp.element.createElement(
+		'div',
+		null,
+		props.attributes.content
+	);
+}
+```
+{% ESNext %}
+```js
 edit( { attributes } ) {
 	return <div>{ attributes.content }</div>;
 }
 ```
+{% end %}
 
 The value of `attributes.content` will be displayed inside the `div` when inserting the block in the editor.
 
@@ -32,23 +59,53 @@ The value of `attributes.content` will be displayed inside the `div` when insert
 
 This property returns the class name for the wrapper element. This is automatically added in the `save` method, but not on `edit`, as the root element may not correspond to what is _visually_ the main element of the block. You can request it to add it to the correct element in your function.
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// Defining the edit interface
+edit( props ) {
+	return wp.element.createElement(
+		'div',
+		{ className: props.className },
+		props.attributes.content
+	);
+}
+```
+{% ESNext %}
+```js
 edit( { attributes, className } ) {
 	return <div className={ className }>{ attributes.content }</div>;
 }
 ```
+{% end %}
 
 ### isSelected
 
 The isSelected property is an object that communicates whether the block is currently selected.
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// Defining the edit interface
+edit( props ) {
+	return wp.element.createElement(
+		'div',
+		{ className: props.className },
+		[
+			'Your block.',
+			props.isSelected ? wp.element.createElement(
+				'span',
+				null,
+				'Shows only when the block is selected.'
+			)
+		]
+	);
+}
+```
+{% ESNext %}
+```jsx
 edit( { attributes, className, isSelected } ) {
 	return (
 		<div className={ className }>
-			{ attributes.content }
+			Your block.
 			{ isSelected &&
 				<span>Shows only when the block is selected.</span>
 			}
@@ -56,13 +113,38 @@ edit( { attributes, className, isSelected } ) {
 	);
 }
 ```
+{% end %}
 
 ### setAttributes
 
 This function allows the block to update individual attributes based on user interactions.
 
+{% codetabs %}
+{% ES5 %}
 ```js
-// Defining the edit interface
+edit: ( props ) => {
+	// Simplify access to attributes
+	let content = props.attributes.content;
+	let mySetting = props.attributes.mySetting;
+
+	// Toggle a setting when the user clicks the button
+	let toggleSetting = () => props.setAttributes( { mySetting: ! mySetting } );
+	return wp.element.createElement(
+		'div',
+		{ className: props.className },
+		[
+			count,
+			props.isSelected ? wp.element.createElement(
+				'button',
+				{ onClick: toggleSetting },
+				'Toggle setting'
+			) : null
+		]
+	);
+},
+```
+{% ESNext %}
+```jsx
 edit( { attributes, setAttributes, className, isSelected } ) {
 	// Simplify access to attributes
 	const { content, mySetting } = attributes;
@@ -79,6 +161,7 @@ edit( { attributes, setAttributes, className, isSelected } ) {
 	);
 }
 ```
+{% end %}
 
 When using attributes that are objects or arrays it's a good idea to copy or clone the attribute prior to updating it:
 
@@ -93,7 +176,6 @@ const addListItem = ( newListItem ) => {
 	list.push( newListItem );
 	setAttributes( { list } );
 };
-
 ```
 
 Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, Gutenberg follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
@@ -106,13 +188,17 @@ The `save` function defines the way in which the different attributes should be 
 {% ES5 %}
 ```js
 save() {
-	return wp.element.createElement( 'hr' );
+	return wp.element.createElement(
+		'div',
+		null,
+		'Your block.'
+	);
 }
 ```
 {% ESNext %}
 ```jsx
 save() {
-	return <hr />;
+	return <div> Your block. </div>;
 }
 ```
 {% end %}
