@@ -233,6 +233,9 @@ export const others = [
 			title: 'Polldaddy',
 			icon: embedContentIcon,
 			description: __( 'Embed Polldaddy content.' ),
+			supports: {
+				inserter: false,
+			},
 		},
 		patterns: [],
 	},
