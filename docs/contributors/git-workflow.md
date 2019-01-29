@@ -8,7 +8,7 @@ While it is tempting to merge from `master` into your branch frequently, this le
 
 If you have a Pull Request branch that cannot be merged into `master` due to a conflict (this can happen for long-running Pull Request discussions), it's still best to rebase the branch (rather than merge) and resolve any conflicts on your local copy. 
 
-Once you have resolved any conflicts locally you can update the Pull Request with `git push --force-with-lease`. 
+Once you have resolved any conflicts locally you can update the Pull Request with `git push --force-with-lease`. Using `--force-with-lease` parameter is important to guarantee that you don't accidentally overwrite someone else's work.
 
 To sum it up, you need to fetch any new changes in the repository, rebase your branch on top of `master`, and push the result back to the repository. These are the corresponding commands:
 
