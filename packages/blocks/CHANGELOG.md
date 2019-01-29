@@ -4,6 +4,10 @@
 
 - Blocks' `transforms` will receive `innerBlocks` as the second argument (or an array of each block's respective `innerBlocks` for a multi-transform).
 
+### Bug Fixes
+
+- Block validation will now correctly validate character references, resolving some issues where a standalone ampersand `&` followed later in markup by a character reference (e.g. `&amp;`) could wrongly mark a block as being invalid. ([#13512](https://github.com/WordPress/gutenberg/pull/13512))
+
 ## 6.0.5 (2019-01-03)
 
 ## 6.0.4 (2018-12-12)
