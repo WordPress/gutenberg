@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, TextInput } from 'react-native';
+import { View, Image, TextInput, Text } from 'react-native';
 import {
 	subscribeMediaUpload,
 	onMediaLibraryPressed,
@@ -15,7 +15,7 @@ import {
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
@@ -31,6 +31,7 @@ export default class ImageEdit extends React.Component {
 		this.state = {
 			progress: 0,
 			isUploadInProgress: false,
+			isUploadFailed: false,
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -62,7 +63,7 @@ export default class ImageEdit extends React.Component {
 
 		switch ( payload.state ) {
 			case MEDIA_ULOAD_STATE_UPLOADING:
-				this.setState( { progress: payload.progress, isUploadInProgress: true } );
+				this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
 				break;
 			case MEDIA_ULOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
@@ -86,9 +87,7 @@ export default class ImageEdit extends React.Component {
 		const { setAttributes } = this.props;
 
 		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
-		this.setState( { isUploadInProgress: false } );
-
-		this.removeMediaUploadListener();
+		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
 	}
 
 	addMediaUploadListener() {
@@ -181,13 +180,17 @@ export default class ImageEdit extends React.Component {
 						}
 
 						return (
-							<View style={ { flex: 1 } } >
+							<View style={ { flex: 1, justifyContent: 'center', alignItems: 'center' } } >
 								<Image
 									style={ { width: finalWidth, height: finalHeight, opacity } }
 									resizeMethod="scale"
 									source={ { uri: url } }
 									key={ url }
 								/>
+								{this.state.isUploadFailed && <View style={ { position: 'absolute', flexDirection: 'column', alignItems: 'center'} }>
+									<Dashicon icon={ 'arrow-down-alt' }/>
+									<Text style={ { color: 'white', fontSize: 14, marginTop: 5 } }>{ __( 'Failed to insert media.Please tap for options.' ) }</Text>
+								</View>}
 							</View>
 						);
 					} }
