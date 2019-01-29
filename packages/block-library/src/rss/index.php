@@ -96,25 +96,16 @@ function register_block_core_rss() {
 	register_block_type( 'core/rss',
 		array(
 			'attributes'      => array(
-				'columns'        => array(
-					'type'    => 'number',
-					'default' => 2,
-				),
 				'blockLayout'    => array(
 					'type'    => 'string',
 					'default' => 'list',
 				),
-				'feedURL'        => array(
-					'type'    => 'string',
-					'default' => '',
+				'className'      => array(
+					'type' => 'string',
 				),
-				'itemsToShow'    => array(
+				'columns'        => array(
 					'type'    => 'number',
-					'default' => 5,
-				),
-				'displayExcerpt' => array(
-					'type'    => 'boolean',
-					'default' => false,
+					'default' => 2,
 				),
 				'displayAuthor'  => array(
 					'type'    => 'boolean',
@@ -124,9 +115,21 @@ function register_block_core_rss() {
 					'type'    => 'boolean',
 					'default' => false,
 				),
+				'displayExcerpt' => array(
+					'type'    => 'boolean',
+					'default' => false,
+				),
 				'excerptLength'  => array(
 					'type'    => 'number',
 					'default' => 55,
+				),
+				'feedURL'        => array(
+					'type'    => 'string',
+					'default' => '',
+				),
+				'itemsToShow'    => array(
+					'type'    => 'number',
+					'default' => 5,
 				),
 			),
 			'render_callback' => 'render_block_core_rss',
