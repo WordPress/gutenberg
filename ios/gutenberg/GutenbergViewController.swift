@@ -42,7 +42,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("↳ HTML: \(html)")
     }
 
-    func gutenbergDidRequestMedia(from source: MediaSource, with callback: @escaping MediaPickerDidPickMediaCallback) {
+    func gutenbergDidRequestMedia(from source: MediaPickerSource, with callback: @escaping MediaPickerDidPickMediaCallback) {
         switch source {
         case .mediaLibrary:
             print("Gutenberg did request media picker, passing a sample url in callback")
