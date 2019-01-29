@@ -21,9 +21,10 @@ import { getParentLineIndex } from './get-parent-line-index';
  */
 export function changeListType( value, newFormat ) {
 	const { text, formats, start, end } = value;
-	const startLineFormats = formats[ getLineIndex( value, start ) ] || [];
+	const startingLineIndex = getLineIndex( value, start );
+	const startLineFormats = formats[ startingLineIndex ] || [];
 	const endLineFormats = formats[ getLineIndex( value, end ) ] || [];
-	const startIndex = getParentLineIndex( value, start );
+	const startIndex = getParentLineIndex( value, startingLineIndex );
 	const newFormats = formats.slice( 0 );
 	const startCount = startLineFormats.length - 1;
 	const endCount = endLineFormats.length - 1;
