@@ -34,6 +34,9 @@
 	&.is-link {
 		margin-left: 4px;
 	}
+	&.is-default {
+		vertical-align: initial;
+	}
 }
 
 .components-notice__dismiss {

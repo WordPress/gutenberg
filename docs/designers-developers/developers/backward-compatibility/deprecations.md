@@ -23,6 +23,7 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `gutenberg_filter_post_type_labels` has been removed.
 - The PHP function `gutenberg_preload_api_request` has been removed. Use [`rest_preload_api_request`](https://developer.wordpress.org/reference/functions/rest_preload_api_request/) instead.
 - The PHP function `gutenberg_remove_wpcom_markdown_support` has been removed.
+- The PHP function `gutenberg_add_gutenberg_post_state` has been removed.
 - The PHP function `gutenberg_bulk_post_updated_messages` has been removed.
 - The PHP function `gutenberg_kses_allowedtags` has been removed.
 - The PHP function `gutenberg_add_responsive_body_class` has been removed.
@@ -37,6 +38,24 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The `gutenberg` theme support option has been removed. Use [`align-wide`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#wide-alignment) instead.
 - The PHP function `gutenberg_prepare_blocks_for_js` has been removed. Use [`get_block_editor_server_block_settings`](https://developer.wordpress.org/reference/functions/get_block_editor_server_block_settings/) instead.
 - The PHP function `gutenberg_load_list_reusable_blocks` has been removed.
+- The PHP function `_gutenberg_utf8_split` has been removed. Use `_mb_substr` instead.
+- The PHP function `gutenberg_disable_editor_settings_wpautop` has been removed.
+- The PHP function `gutenberg_add_rest_nonce_to_heartbeat_response_headers` has been removed.
+- The PHP function `gutenberg_check_if_classic_needs_warning_about_blocks` has been removed.
+- The PHP function `gutenberg_warn_classic_about_blocks` has been removed.
+- The PHP function `gutenberg_show_privacy_policy_help_text` has been removed.
+- The PHP function `gutenberg_common_scripts_and_styles` has been removed. Use [`wp_common_block_scripts_and_styles`](https://developer.wordpress.org/reference/functions/wp_common_block_scripts_and_styles/) instead.
+- The PHP function `gutenberg_enqueue_registered_block_scripts_and_styles` has been removed. Use [`wp_enqueue_registered_block_scripts_and_styles`](https://developer.wordpress.org/reference/functions/wp_enqueue_registered_block_scripts_and_styles/) instead.
+- The PHP function `gutenberg_meta_box_save` has been removed.
+- The PHP function `gutenberg_meta_box_save_redirect` has been removed.
+- The PHP function `gutenberg_filter_meta_boxes` has been removed.
+- The PHP function `gutenberg_intercept_meta_box_render` has been removed.
+- The PHP function `gutenberg_override_meta_box_callback` has been removed.
+- The PHP function `gutenberg_show_meta_box_warning` has been removed.
+- The PHP function `the_gutenberg_metaboxes` has been removed. Use [`the_block_editor_meta_boxes`](https://developer.wordpress.org/reference/functions/the_block_editor_meta_boxes/) instead.
+- The PHP function `gutenberg_meta_box_post_form_hidden_fields` has been removed. Use [`the_block_editor_meta_box_post_form_hidden_fields`](https://developer.wordpress.org/reference/functions/the_block_editor_meta_box_post_form_hidden_fields/) instead.
+- The PHP function `gutenberg_toggle_custom_fields` has been removed.
+- The PHP function `gutenberg_collect_meta_box_data` has been removed. Use [`register_and_do_post_meta_boxes`](https://developer.wordpress.org/reference/functions/register_and_do_post_meta_boxes/) instead.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
@@ -195,11 +214,11 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 ## 3.0.0
 
  - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
- - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://wordpress.org/gutenberg/handbook/block-api/rich-text-api/), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
+ - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](/packages/editor/src/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 
- - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See: https://github.com/WordPress/gutenberg/blob/master/components/autocomplete/README.md.
+ - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](/packages/components/src/autocomplete/README.md) for more info.
  - `getInserterItems`: the `allowedBlockTypes` argument is now mandatory.
  - `getFrecentInserterItems`: the `allowedBlockTypes` argument is now mandatory.
 
@@ -221,6 +240,6 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 
  - `wp.blocks.BlockDescription` component removed. Please use the `description` block property instead.
  - `wp.blocks.InspectorControls.*` components removed. Please use `wp.components.*` components instead.
- - `wp.blocks.source.*` matchers removed. Please use the declarative attributes instead. See: https://wordpress.org/gutenberg/handbook/block-api/attributes/.
+ - `wp.blocks.source.*` matchers removed. Please use the declarative attributes instead. See [block attributes](/docs/designers-developers/developers/block-api/block-attributes.md) for more info.
  - `wp.data.select( 'selector', ...args )` removed. Please use `wp.data.select( reducerKey' ).*` instead.
  - `wp.blocks.MediaUploadButton` component removed. Please use `wp.blocks.MediaUpload` component instead.
