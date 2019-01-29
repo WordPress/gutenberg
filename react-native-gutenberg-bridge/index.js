@@ -40,15 +40,15 @@ export function subscribeMediaUpload( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
 }
 
-export function onMediaLibraryPressed( callback ) {
+export function requestMediaPickFromMediaLibrary( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'SITE_MEDIA_LIBRARY', callback );
 }
 
-export function onMediaUploadPressed( callback ) {
+export function requestMediaPickFromDeviceLibrary( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_MEDIA_LIBRARY', callback );
 }
 
-export function onMediaCapturePressed( callback ) {
+export function requestMediaPickFromDeviceCamera( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', callback );
 }
 
