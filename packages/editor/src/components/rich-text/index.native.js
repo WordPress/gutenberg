@@ -146,13 +146,23 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
-		const newContent = this.valueToFormat( record );
-		this.setState( {
-			formatPlaceholder: record.formatPlaceholder,
-		} );
-		// we need to force a refresh on the native side so aztec can synchronize the active formats
-		this.lastContent = undefined;
-		this.props.onChange( newContent );
+		const hasSelection = this.state.start !== this.state.end;
+		let newContent;
+		if ( hasSelection ) {
+			newContent = this.valueToFormat( record );
+		} else {
+			this.setState( {
+				formatPlaceholder: record.formatPlaceholder,
+			} );
+			// make sure the component rerenders without refreshing the text on gutenberg
+			// (this can trigger other events that might update the active formats on aztec)
+			this.lastEventCount = 0;
+		}
+		if ( newContent && newContent !== this.props.value ) {
+			this.props.onChange( newContent );
+		} else {
+			this.forceUpdate();
+		}
 	}
 
 	/*
