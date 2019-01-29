@@ -19,7 +19,7 @@ function getTargetLevelLineIndex( { text, formats }, lineIndex ) {
 
 	let index = lineIndex;
 
-	while ( index-- ) {
+	while ( index-- >= 0 ) {
 		if ( text[ index ] !== LINE_SEPARATOR ) {
 			continue;
 		}
