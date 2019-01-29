@@ -17,7 +17,8 @@ export function getLastChildIndex( { text, formats }, lineIndex ) {
 	// Use the given line index in case there are no next children.
 	let childIndex = lineIndex;
 
-	for ( let index = lineIndex; index < text.length; index++ ) {
+	// `lineIndex` could be `undefined` if it's the first line.
+	for ( let index = lineIndex || 0; index < text.length; index++ ) {
 		// We're only interested in line indices.
 		if ( text[ index ] !== LINE_SEPARATOR ) {
 			continue;
