@@ -50,8 +50,8 @@ We put issues into [milestones](https://github.com/wordpress/gutenberg/milestone
 
 Here are some milestones you might see:
 
-- [WordPress X.X](https://github.com/WordPress/gutenberg/milestone/70): Tasks that should be done for future WordPress releases.
-- [X.X (Gutenberg)](https://github.com/WordPress/gutenberg/milestone/85): PRs targeted for the Gutenberg Plugin 5.0 release.
+- [WordPress X.Y](https://github.com/WordPress/gutenberg/milestone/70): Tasks that should be done for future WordPress releases.
+- [X.Y (Gutenberg)](https://github.com/WordPress/gutenberg/milestone/85): PRs targeted for the Gutenberg Plugin X.Y release.
 - [Future](https://github.com/WordPress/gutenberg/milestone/35): this is something that is confirmed by everyone as a good thing but doesn’t fall into other criteria.
 
 ### Triaging Issues
