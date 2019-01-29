@@ -17,7 +17,7 @@ wp.blocks.registerBlockStyle( 'core/quote', {
 
 The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
-By adding `isDefault: true`, you can make registered style variation to be active by default when a block is inserted.
+By adding `isDefault: true` you can mark the registered style variation as the one that is recognized as active when no custom class name is provided. It also means that there will be no custom class name added to the HTML output for the style that is marked as default.
 
 To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
 
