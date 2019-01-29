@@ -79,6 +79,7 @@ function BlockStyles( {
 	function updateClassName( style ) {
 		const updatedClassName = replaceActiveStyle( className, activeStyle, style );
 		onChangeClassName( updatedClassName );
+		onHoverClassName( null );
 		onSwitch();
 	}
 
