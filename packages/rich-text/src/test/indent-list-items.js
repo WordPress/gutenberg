@@ -140,16 +140,38 @@ describe( 'indentListItems', () => {
 			start: 6,
 			end: 6,
 		};
-		const expected = {
+
+		const result1 = indentListItems( deepFreeze( record ), ul );
+
+		expect( result1 ).not.toBe( record );
+		expect( getSparseArrayLength( result1.formats ) ).toBe( 3 );
+		expect( result1 ).toEqual( {
 			formats: [ , [ ul ], , [ ul, ul ], , [ ul ], , ],
 			text,
 			start: 6,
 			end: 6,
-		};
-		const result = indentListItems( deepFreeze( record ), ul );
+		} );
 
-		expect( result ).toEqual( expected );
-		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 3 );
+		const result2 = indentListItems( deepFreeze( result1 ), ul );
+
+		expect( result2 ).not.toBe( result1 );
+		expect( getSparseArrayLength( result2.formats ) ).toBe( 3 );
+		expect( result2 ).toEqual( {
+			formats: [ , [ ul ], , [ ul, ul ], , [ ul, ul ], , ],
+			text,
+			start: 6,
+			end: 6,
+		} );
+
+		const result3 = indentListItems( deepFreeze( result2 ), ul );
+
+		expect( result3 ).not.toBe( result2 );
+		expect( getSparseArrayLength( result3.formats ) ).toBe( 3 );
+		expect( result3 ).toEqual( {
+			formats: [ , [ ul ], , [ ul, ul ], , [ ul, ul, ul ], , ],
+			text,
+			start: 6,
+			end: 6,
+		} );
 	} );
 } );
