@@ -18,6 +18,27 @@ git rebase master
 git push --force-with-lease your-branch-name
 ```
 
+## Keeping Your Fork Up To Date
+
+Working on pull request starts with forking the Gutenberg repository, your separate working copy. Which can easily go out of sync as new pull requests are merged into the main repository. Here your working repository is `fork` and main Gutenberg repository is `upstream`. When working on new pull request you should always update your fork before you do `git checkout -b my-new-branch` to work on a feature or fix. 
+
+To sync your fork you need to fetch the upstream changes and merge them into your fork. These are the corresponding commands:
+
+``` sh
+git fetch upstream
+git checkout master
+git merge upstream/master
+```
+
+This will update you local copy to update your fork on github push your changes
+
+```
+git push
+```
+
+Above commands will update your `master` branch from upstream. To update any other branch replace `master` with respective branch. 
+
+
 ## References
 - https://git-scm.com/book/en/v2
 - https://help.github.com/categories/collaborating-with-issues-and-pull-requests/
