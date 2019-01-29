@@ -79,7 +79,7 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-    $class = 'wp-block-rss';
+	$class = 'wp-block-rss';
 
 	if ( 'grid' === $attributes['blockLayout'] ) {
 		$class .= ' is-grid columns-' . $attributes['columns'];
