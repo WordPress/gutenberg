@@ -89,27 +89,30 @@ public class WPAndroidGlueCode {
                 mGetContentCountDownLatch.countDown();
             }
 
-            @Override public void onMediaLibraryPressed(MediaSelectedCallback mediaSelectedCallback) {
+            @Override
+            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
                 onMediaLibraryButtonListener.onMediaLibraryButtonClicked();
             }
 
             @Override
-            public void onUploadMediaPressed(MediaUploadCallback mediaUploadCallback) {
+            public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onMediaLibraryButtonListener.onUploadMediaButtonClicked();
             }
 
             @Override
-            public void onCapturePhotoPressed(MediaUploadCallback mediaUploadCallback) {
+            public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
 
-            @Override public void onImageQueryReattach(MediaUploadCallback mediaUploadCallback) {
+            @Override
+            public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
+
         });
         return Arrays.asList(
                 new MainReactPackage(),
