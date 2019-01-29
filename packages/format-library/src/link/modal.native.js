@@ -4,7 +4,6 @@
 import React from 'react';
 import { Switch, Text, TextInput, View } from 'react-native';
 import Modal from 'react-native-modal';
-import { find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,7 +22,6 @@ import {
 	applyFormat,
 	getTextContent,
 	slice,
-	getActiveFormat,
 } from '@wordpress/rich-text';
 
 /**
@@ -46,7 +44,7 @@ class ModalLinkUI extends Component {
 
 		this.state = {
 			inputValue: props.activeAttributes.url || '',
-			text: getTextContent( slice( this.getLinkSelection() ) ),
+			text: getTextContent( slice( props.value ) ),
 			opensInNewWindow: false,
 		};
 	}
@@ -64,9 +62,8 @@ class ModalLinkUI extends Component {
 	}
 
 	submitLink() {
-		const { isActive, onChange, speak } = this.props;
+		const { isActive, onChange, speak, value } = this.props;
 		const { inputValue, opensInNewWindow, text } = this.state;
-		const link = this.getLinkSelection();
 		const url = prependHTTP( inputValue );
 		const linkText = text || inputValue;
 		const format = createLinkFormat( {
@@ -74,16 +71,16 @@ class ModalLinkUI extends Component {
 			opensInNewWindow,
 			text: linkText,
 		} );
-		const placeholderFormats = ( link.formatPlaceholder && link.formatPlaceholder.formats ) || [];
+		const placeholderFormats = ( value.formatPlaceholder && value.formatPlaceholder.formats ) || [];
 
-		if ( isCollapsed( link ) && ! isActive ) { // insert link
+		if ( isCollapsed( value ) && ! isActive ) { // insert link
 			const toInsert = applyFormat( create( { text: linkText } ), [ ...placeholderFormats, format ], 0, text.length );
-			onChange( insert( link, toInsert ) );
-		} else if ( text !== getTextContent( slice( link ) ) ) { // edit text in selected link
+			onChange( insert( value, toInsert ) );
+		} else if ( text !== getTextContent( slice( value ) ) ) { // edit text in selected link
 			const toInsert = applyFormat( create( { text } ), [ ...placeholderFormats, format ], 0, text.length );
-			onChange( insert( link, toInsert, link.start, link.end ) );
+			onChange( insert( value, toInsert, value.start, value.end ) );
 		} else { // transform selected text into link
-			onChange( applyFormat( link, [ ...placeholderFormats, format ] ) );
+			onChange( applyFormat( value, [ ...placeholderFormats, format ] ) );
 		}
 
 		if ( ! isValidHref( url ) ) {
@@ -100,36 +97,6 @@ class ModalLinkUI extends Component {
 	removeLink() {
 		this.props.onRemove();
 		this.props.onClose();
-	}
-
-	getLinkSelection() {
-		const { value, isActive } = this.props;
-		const startFormat = getActiveFormat( value, 'core/link' );
-
-		// if the link isn't selected, get the link manually by looking around the cursor
-		// TODO: handle partly selected links
-		if ( startFormat && isCollapsed( value ) && isActive ) {
-			let startIndex = value.start;
-			let endIndex = value.end;
-
-			while ( find( value.formats[ startIndex ], startFormat ) ) {
-				startIndex--;
-			}
-
-			endIndex++;
-
-			while ( find( value.formats[ endIndex ], startFormat ) ) {
-				endIndex++;
-			}
-
-			return {
-				...value,
-				start: startIndex + 1,
-				end: endIndex,
-			};
-		}
-
-		return value;
 	}
 
 	render() {

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -6,8 +11,10 @@ import { Component, Fragment } from '@wordpress/element';
 import { withSpokenMessages } from '@wordpress/components';
 import { RichTextToolbarButton } from '@wordpress/editor';
 import {
-	getTextContent,
 	applyFormat,
+	getActiveFormat,
+	getTextContent,
+	isCollapsed,
 	removeFormat,
 	slice,
 } from '@wordpress/rich-text';
@@ -56,15 +63,47 @@ export const link = {
 			this.setState( { addingLink: false } );
 		}
 
-		onRemoveFormat() {
-			const { value, onChange, speak } = this.props;
+		getLinkSelection() {
+			const { value, isActive } = this.props;
+			const startFormat = getActiveFormat( value, 'core/link' );
 
-			onChange( removeFormat( value, name ) );
+			// if the link isn't selected, get the link manually by looking around the cursor
+			// TODO: handle partly selected links
+			if ( startFormat && isCollapsed( value ) && isActive ) {
+				let startIndex = value.start;
+				let endIndex = value.end;
+
+				while ( find( value.formats[ startIndex ], startFormat ) ) {
+					startIndex--;
+				}
+
+				endIndex++;
+
+				while ( find( value.formats[ endIndex ], startFormat ) ) {
+					endIndex++;
+				}
+
+				return {
+					...value,
+					start: startIndex + 1,
+					end: endIndex,
+				};
+			}
+
+			return value;
+		}
+
+		onRemoveFormat() {
+			const { onChange, speak } = this.props;
+			const linkSelection = this.getLinkSelection();
+
+			onChange( removeFormat( linkSelection, name ) );
 			speak( __( 'Link removed.' ), 'assertive' );
 		}
 
 		render() {
-			const { isActive, activeAttributes, value, onChange } = this.props;
+			const { isActive, activeAttributes, onChange } = this.props;
+			const linkSelection = this.getLinkSelection();
 
 			return (
 				<Fragment>
@@ -76,7 +115,7 @@ export const link = {
 							onClose={ this.stopAddingLink }
 							onChange={ onChange }
 							onRemove={ this.onRemoveFormat }
-							value={ value }
+							value={ linkSelection }
 						/>
 					}
 					<RichTextToolbarButton
