@@ -38,9 +38,12 @@ export function outdentListItems( value ) {
 			continue;
 		}
 
+		// In the case of level 0, the formats at the index are undefined.
+		const currentFormats = newFormats[ index ] || [];
+
 		// Omit the indentation level where the selection starts.
 		newFormats[ index ] = parentFormats.concat(
-			newFormats[ index ].slice( parentFormats.length + 1 )
+			currentFormats.slice( parentFormats.length + 1 )
 		);
 
 		if ( newFormats[ index ].length === 0 ) {
