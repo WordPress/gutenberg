@@ -865,8 +865,6 @@ function gutenberg_get_available_image_sizes() {
  * @param string $hook Screen name.
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
-	$is_demo = isset( $_GET['gutenberg-demo'] );
-
 	global $wp_scripts, $wp_meta_boxes;
 
 	// Add "wp-hooks" as dependency of "heartbeat".
@@ -983,17 +981,7 @@ JS;
 
 	// Assign initial edits, if applicable. These are not initially assigned
 	// to the persisted post, but should be included in its save payload.
-	if ( $is_new_post && $is_demo ) {
-		// Prepopulate with some test content in demo.
-		ob_start();
-		include gutenberg_dir_path() . 'post-content.php';
-		$demo_content = ob_get_clean();
-
-		$initial_edits = array(
-			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			'content' => $demo_content,
-		);
-	} elseif ( $is_new_post ) {
+	if ( $is_new_post ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
