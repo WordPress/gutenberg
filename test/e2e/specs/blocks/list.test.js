@@ -262,4 +262,22 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should outdent with children', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'c' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
