@@ -214,11 +214,11 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 ## 3.0.0
 
  - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
- - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://wordpress.org/gutenberg/handbook/block-api/rich-text-api/), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
+ - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](/packages/editor/src/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 
- - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See: https://github.com/WordPress/gutenberg/blob/master/components/autocomplete/README.md.
+ - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](/packages/components/src/autocomplete/README.md) for more info.
  - `getInserterItems`: the `allowedBlockTypes` argument is now mandatory.
  - `getFrecentInserterItems`: the `allowedBlockTypes` argument is now mandatory.
 
@@ -240,6 +240,6 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 
  - `wp.blocks.BlockDescription` component removed. Please use the `description` block property instead.
  - `wp.blocks.InspectorControls.*` components removed. Please use `wp.components.*` components instead.
- - `wp.blocks.source.*` matchers removed. Please use the declarative attributes instead. See: https://wordpress.org/gutenberg/handbook/block-api/attributes/.
+ - `wp.blocks.source.*` matchers removed. Please use the declarative attributes instead. See [block attributes](/docs/designers-developers/developers/block-api/block-attributes.md) for more info.
  - `wp.data.select( 'selector', ...args )` removed. Please use `wp.data.select( reducerKey' ).*` instead.
  - `wp.blocks.MediaUploadButton` component removed. Please use `wp.blocks.MediaUpload` component instead.
