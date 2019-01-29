@@ -84,7 +84,13 @@ export default class ColorPicker extends Component {
 	}
 
 	handleInputChange( data ) {
-		if ( data.state === 'commit' ) {
+		if ( data.state === 'reset' ) {
+			this.setState( {
+				draftHex: this.state.hex,
+				draftHsl: this.state.hsl,
+				draftRgb: this.state.rgb,
+			} );
+		} else if ( data.state === 'commit' ) {
 			this.handleChange( data );
 		} else if ( data.state === 'draft' ) {
 			if ( data.source === 'hex' ) {

@@ -88,6 +88,7 @@ export class Inputs extends Component {
 		this.state = { view };
 
 		this.toggleViews = this.toggleViews.bind( this );
+		this.resetDraftValues = this.resetDraftValues.bind( this );
 		this.handleHEXChange = this.handleHEXChange.bind( this );
 		this.handleRChange = this.handleRChange.bind( this );
 		this.handleGChange = this.handleGChange.bind( this );
@@ -106,24 +107,30 @@ export class Inputs extends Component {
 
 	toggleViews() {
 		if ( this.state.view === 'hex' ) {
-			this.setState( { view: 'rgb' } );
+			this.setState( { view: 'rgb' }, this.resetDraftValues );
 
 			speak( __( 'RGB mode active' ) );
 		} else if ( this.state.view === 'rgb' ) {
-			this.setState( { view: 'hsl' } );
+			this.setState( { view: 'hsl' }, this.resetDraftValues );
 
 			speak( __( 'Hue/saturation/lightness mode active' ) );
 		} else if ( this.state.view === 'hsl' ) {
 			if ( this.props.hsl.a === 1 ) {
-				this.setState( { view: 'hex' } );
+				this.setState( { view: 'hex' }, this.resetDraftValues );
 
 				speak( __( 'Hex color mode active' ) );
 			} else {
-				this.setState( { view: 'rgb' } );
+				this.setState( { view: 'rgb' }, this.resetDraftValues );
 
 				speak( __( 'RGB mode active' ) );
 			}
 		}
+	}
+
+	resetDraftValues() {
+		return this.props.onChange( {
+			state: 'reset',
+		} );
 	}
 
 	handleHEXChange( data ) {
