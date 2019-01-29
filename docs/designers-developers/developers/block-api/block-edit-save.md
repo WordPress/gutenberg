@@ -30,7 +30,7 @@ The function receives the following properties through an object argument:
 
 ### attributes
 
-This property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. See [attributes documentation](/docs/designers-developers/developers/block-api/block-attributes/) for how to specify attribute sources.
+This property surfaces all the available attributes and their corresponding values, as described by the `attributes` property when the block type was registered. See [attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for how to specify attribute sources.
 
 In this case, assuming we had defined an attribute of `content` during block registration, we would receive and use that value in our edit function:
 
@@ -231,6 +231,12 @@ save( { attributes } ) {
 }
 ```
 {% end %}
+
+
+When saving your block, you want save the attributes in the same format specified by the attribute source definition.  If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
+
+For a full example, see the [Introducing Attributes and Editable Fields](/docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+
 
 ## Validation
 
