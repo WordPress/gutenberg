@@ -45,5 +45,5 @@ However, when using this command, please be sure to manually verify that the
 contents of the `.json` and `.serialized.html` files are as expected.
 
 See the
-[`full-content.spec.js`](/full-content.spec.js)
+[`full-content.spec.js`](../full-content.spec.js)
 test file for the code that runs these tests.
