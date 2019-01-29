@@ -23,7 +23,7 @@ function gutenberg_register_rest_routes() {
 /**
  * Handle a failing oEmbed proxy request to try embedding as a shortcode.
  *
- * @see https://core.trac.wordpress.org/ticket/45142
+ * @see https://core.trac.wordpress.org/ticket/46138
  *
  * @since 2.3.0
  *
