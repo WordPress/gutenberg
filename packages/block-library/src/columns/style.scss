@@ -35,7 +35,7 @@
 			margin-left: $grid-size-large * 2;
 		}
 	}
-	
+
 	@include break-medium() {
 
 		// When columns are in a single row, add space before all except the first.
