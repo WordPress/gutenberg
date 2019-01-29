@@ -14,11 +14,11 @@ public interface GutenbergBridgeJS2Parent {
         void onMediaFileUploadFailed(int mediaId);
     }
 
-    void onMediaLibraryPressed(MediaSelectedCallback mediaSelectedCallback);
+    void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback);
 
-    void onUploadMediaPressed(MediaUploadCallback mediaUploadCallback);
+    void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback);
     
-    void onCapturePhotoPressed(MediaUploadCallback mediaUploadCallback);
+    void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback);
 
-    void onImageQueryReattach(MediaUploadCallback mediaUploadCallback);
+    void mediaUploadSync(MediaUploadCallback mediaUploadCallback);
 }

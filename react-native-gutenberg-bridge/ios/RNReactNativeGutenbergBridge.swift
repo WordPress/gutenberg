@@ -11,24 +11,13 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed)
         }
     }
-
-    @objc
-    func onMediaLibraryPressed(_ callback: @escaping RCTResponseSenderBlock) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaPicker(with: { (mediaID, url) in
-                guard let url = url, let mediaID = mediaID else {
-                    callback(nil)
-                    return
-                }
-                callback([mediaID, url])
-            })
-        }
-    }
     
     @objc
-    func onUploadMediaPressed(_ callback: @escaping RCTResponseSenderBlock) {
+    func requestMediaPickFrom(_ source: String, callback: @escaping RCTResponseSenderBlock) {
+        let mediaSource: MediaPickerSource = MediaPickerSource(rawValue: source) ?? .deviceLibrary
+
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFromDevicePicker(with: { (mediaID, url) in
+            self.delegate?.gutenbergDidRequestMedia(from: mediaSource, with: { (mediaID, url) in
                 guard let url = url, let mediaID = mediaID else {
                     callback(nil)
                     return
@@ -39,20 +28,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func onCapturePhotoPressed(_ callback: @escaping RCTResponseSenderBlock) {
-        DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaFromCameraPicker(with: { (mediaID, url) in
-                guard let url = url, let mediaID = mediaID else {
-                    callback(nil)
-                    return
-                }
-                callback([mediaID, url])
-            })
-        }
-    }
-
-    @objc
-    func onImageQueryReattach() {
+    func mediaUploadSync() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaUploadSync()
         }

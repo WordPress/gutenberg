@@ -35,6 +35,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private static final int MEDIA_SERVER_ID_UNKNOWN = 0;
 
+    private static final String MEDIA_SOURCE_MEDIA_LIBRARY = "SITE_MEDIA_LIBRARY";
+    private static final String MEDIA_SOURCE_DEVICE_LIBRARY = "DEVICE_MEDIA_LIBRARY";
+    private static final String MEDIA_SOURCE_DEVICE_CAMERA = "DEVICE_CAMERA";
+
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
             GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
@@ -74,27 +78,27 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void onMediaLibraryPressed(final Callback onMediaSelected) {
-        mGutenbergBridgeJS2Parent.onMediaLibraryPressed(new MediaSelectedCallback() {
+    public void requestMediaPickFrom(String mediaSource, final Callback onUploadMediaSelected) {
+        if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
+            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(onUploadMediaSelected));
+        } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_LIBRARY)) {
+            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewUploadMediaCallback(onUploadMediaSelected));
+        } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
+            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewUploadMediaCallback(onUploadMediaSelected));
+        }
+    }
+
+    @ReactMethod
+    public void mediaUploadSync() {
+        mGutenbergBridgeJS2Parent.mediaUploadSync(getNewUploadMediaCallback(null));
+    }
+
+    private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {
+        return new MediaSelectedCallback() {
             @Override public void onMediaSelected(String mediaUrl) {
-                onMediaSelected.invoke(mediaUrl);
+                jsCallback.invoke(mediaUrl);
             }
-        });
-    }
-
-    @ReactMethod
-    public void onImageQueryReattach() {
-        mGutenbergBridgeJS2Parent.onImageQueryReattach(getNewUploadMediaCallback(null));
-    }
-
-    @ReactMethod
-    public void onUploadMediaPressed(final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.onUploadMediaPressed(getNewUploadMediaCallback(onUploadMediaSelected));
-    }
-
-    @ReactMethod
-    public void onCapturePhotoPressed(final Callback onPhotoCaptured) {
-        mGutenbergBridgeJS2Parent.onCapturePhotoPressed(getNewUploadMediaCallback(onPhotoCaptured));
+        };
     }
 
     private GutenbergBridgeJS2Parent.MediaUploadCallback getNewUploadMediaCallback(final Callback jsCallback) {
