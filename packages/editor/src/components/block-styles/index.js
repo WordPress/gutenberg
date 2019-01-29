@@ -11,6 +11,8 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
 import { ENTER, SPACE } from '@wordpress/keycodes';
+import { _x } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -68,11 +70,23 @@ function BlockStyles( {
 	onChangeClassName,
 	name,
 	attributes,
+	type,
 	onSwitch = noop,
 	onHoverClassName = noop,
 } ) {
 	if ( ! styles || styles.length === 0 ) {
 		return null;
+	}
+
+	if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
+		styles = [
+			{
+				name: 'default',
+				label: _x( 'Default', 'block style' ),
+				isDefault: true,
+			},
+			...styles,
+		];
 	}
 
 	const activeStyle = getActiveStyle( styles, className );
@@ -132,12 +146,14 @@ export default compose( [
 		const { getBlock } = select( 'core/editor' );
 		const { getBlockStyles } = select( 'core/blocks' );
 		const block = getBlock( clientId );
+		const blockType = getBlockType( block.name );
 
 		return {
 			name: block.name,
 			attributes: block.attributes,
 			className: block.attributes.className || '',
 			styles: getBlockStyles( block.name ),
+			type: blockType,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
