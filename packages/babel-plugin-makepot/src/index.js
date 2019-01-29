@@ -252,7 +252,7 @@ module.exports = function() {
 
 				// Create empty msgstr or array of empty msgstr by nplurals
 				if ( translation.msgid_plural ) {
-					translation.msgstr = Array.from( Array( nplurals ) ).map( () => '' );
+					translation.msgstr = Array.from( Array( parseInt( nplurals, 10 ) ) ).map( () => '' );
 				} else {
 					translation.msgstr = '';
 				}
