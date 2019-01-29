@@ -52,8 +52,8 @@ export function onMediaCapturePressed( callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', callback );
 }
 
-export function mediaUploadResync() {
-	return RNReactNativeGutenbergBridge.mediaUploadResync();
+export function mediaUploadSync() {
+	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
 
 export default RNReactNativeGutenbergBridge;

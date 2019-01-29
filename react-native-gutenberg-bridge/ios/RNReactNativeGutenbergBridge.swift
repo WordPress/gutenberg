@@ -28,7 +28,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func mediaUploadResync() {
+    func mediaUploadSync() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaUploadSync()
         }
