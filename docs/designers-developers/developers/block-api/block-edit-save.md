@@ -235,7 +235,125 @@ save( { attributes } ) {
 
 When saving your block, you want save the attributes in the same format specified by the attribute source definition.  If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
 
-For a full example, see the [Introducing Attributes and Editable Fields](/docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+## Examples
+
+Here are a couple examples of using attributes, edit, and save all together.  For a full working example, see the [Introducing Attributes and Editable Fields](/docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+
+### Saving Attributes to Child Elements
+
+{% codetabs %}
+{% ES5 %}
+```js
+attributes: {
+	content: {
+		type: 'string',
+		source: 'html',
+		selector: 'p'
+	}
+},
+
+edit: ( props ) => {
+	updateFieldValue = function( val ) {
+		props.setAttributes( { content: val } );
+	}
+	return wp.element.createElement(
+		wp.components.TextControl,
+		{
+			label: 'My Text Field',
+			value: props.attributes.content,
+			onChange: updateFieldValue,
+
+		}
+	);
+},
+
+save: ( props ) => {
+	return el( 'p', {}, props.attributes.content );
+},
+```
+{% ESNext %}
+```jsx
+attributes: {
+	content: {
+		type: 'string',
+		source: 'html',
+		selector: 'p'
+	}
+},
+
+edit: ( { attributes, setAttributes } ) => {
+	updateFieldValue = ( val ) {
+		setAttributes( { content: val } );
+	}
+	return <TextControl
+			label='My Text Field'
+			value={ attributes.content }
+			onChange={ updateFieldValue }
+		/>;
+},
+
+save: ( { attributes } ) => {
+	return <p> { attributes.content } </p>;
+},
+```
+{% end %}
+
+### Saving Attributes via Serialization
+
+Ideally, the attributes saved should be included in the markup. However, there are times when this is not practical, so if no attribute source is specified the attribute is serialized and saved to the block's comment delimiter.
+
+This example could be for a dynamic block, such as the [Latest Posts block](https://github.com/WordPress/gutenberg/blob/master/packages/block-library/src/latest-posts/index.js), which renders the markup server-side. The save function is still required, however in this case it simply returns null since the block is not saving content from the editor.
+
+{% codetabs %}
+{% ES5 %}
+```js
+attributes: {
+	postsToShow: {
+		type: 'number',
+	}
+},
+
+edit: ( props ) => {
+	return wp.element.createElement(
+		wp.components.TextControl,
+		{
+			label: 'Number Posts to Show',
+			value: props.attributes.postsToShow,
+			onChange: ( val ) => {
+				props.setAttributes( { postsToShow: parseInt( val ) } );
+			},
+		}
+	);
+},
+
+save: () => {
+	return null;
+}
+```
+{% ESNext %}
+```jsx
+attributes: {
+	postsToShow: {
+		type: 'number',
+	}
+},
+
+edit: ( { attributes, setAttributes } ) => {
+	return <TextControl
+			label='Number Posts to Show'
+			value={ attributes.postsToShow }
+			onChange={ ( val ) => {
+				setAttributes( { postsToShow: parseInt( val ) } );
+			}},
+		}
+	);
+},
+
+save: () => {
+	return null;
+}
+```
+{% end %}
 
 
 ## Validation
