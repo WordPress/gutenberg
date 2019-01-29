@@ -17,3 +17,7 @@ git fetch
 git rebase master
 git push --force-with-lease your-branch-name
 ```
+
+## References
+- https://git-scm.com/book/en/v2
+- https://help.github.com/categories/collaborating-with-issues-and-pull-requests/
