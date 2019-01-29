@@ -41,15 +41,15 @@ export function subscribeMediaUpload( callback ) {
 }
 
 export function onMediaLibraryPressed( callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom('SITE_MEDIA_LIBRARY', callback );
+	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'SITE_MEDIA_LIBRARY', callback );
 }
 
 export function onMediaUploadPressed( callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom('DEVICE_MEDIA_LIBRARY', callback );
+	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_MEDIA_LIBRARY', callback );
 }
 
 export function onMediaCapturePressed( callback ) {
-	return RNReactNativeGutenbergBridge.requestMediaPickFrom('DEVICE_CAMERA', callback );
+	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', callback );
 }
 
 export function mediaUploadResync() {
