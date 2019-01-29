@@ -89,7 +89,7 @@
 
 			// Beyond mobile, allow 2 columns.
 			@include break-small() {
-				flex-basis: calc(50% - #{$grid-size-large} - #{$block-padding * 1.5});
+				flex-basis: calc(50% - (#{$grid-size-large * 2} + #{$block-padding}));
 				flex-grow: 0;
 			}
 
@@ -98,14 +98,14 @@
 			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 			@include break-small() {
 				&:nth-child(even) {
-					margin-left: $grid-size-large * 2;
+					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
 				}
 			}
 
 			// When columns are in a single row, add space before all except the first.
 			@include break-medium() {
 				&:not(:first-child) {
-					margin-left: $grid-size-large * 2;
+					margin-left: calc(#{$grid-size-large * 2} + #{$block-padding});
 				}
 			}
 		}
