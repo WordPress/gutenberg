@@ -201,7 +201,7 @@ export default compose(
 	withSelect( ( select ) => {
 		const { getEntityRecords } = select( 'core' );
 		const { isResolving } = select( 'core/data' );
-		const query = { per_page: -1 };
+		const query = { per_page: -1, hide_empty: true };
 
 		return {
 			categories: getEntityRecords( 'taxonomy', 'category', query ),
