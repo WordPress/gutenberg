@@ -158,7 +158,7 @@ export const others = [
 					} );
 				},
 			} ],
-			description: __( 'Embed Crowdsignal content.' ),
+			description: __( 'Embed Crowdsignal (formerly Polldaddy) content.' ),
 		},
 		patterns: [ /^https?:\/\/((.+\.)?polldaddy\.com|poll\.fm|.+\.survey\.fm)\/.+/i ],
 	},
