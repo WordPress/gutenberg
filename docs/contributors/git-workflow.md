@@ -10,10 +10,10 @@ If you have a Pull Request branch that cannot be merged into `master` due to a c
 
 Once you have resolved any conflicts locally you can update the Pull Request with `git push --force-with-lease`. 
 
-This is how you can bring your branch up to date with the latest changes from `master` branch:
+To sum it up, you need to fetch any new changes in the repository, rebase your branch on top of `master`, and push the result back to the repository. These are the corresponding commands:
 
 ```sh
 git fetch
-git rebase origin/master
-git push --force-with-lease -u origin you-branch-name
+git rebase master
+git push --force-with-lease your-branch-name
 ```
