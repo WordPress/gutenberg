@@ -2,7 +2,7 @@
  * External dependencies
  */
 
-import { cloneDeep, differenceBy } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 /**
  * Internal dependencies
@@ -46,7 +46,7 @@ export function applyFormat(
 			end,
 			formatPlaceholder: {
 				index: start,
-				formats: cloneDeep( mergeFormats( activeFormats, formats ) ),
+				formats: mergeFormats( activeFormats, formats ),
 			},
 		};
 	}
@@ -61,13 +61,22 @@ export function applyFormat(
 }
 
 function mergeFormats( formats1, formats2 ) {
-	const formats2Without1 = differenceBy( formats2, formats1, 'type' );
-	return formats1.concat( formats2Without1 );
+	const formatsOut = cloneDeep( formats1 );
+	formats2.forEach( ( format2 ) => {
+		const format1In2 = formatsOut.find( ( format1 ) => format1.type === format2.type );
+		// update properties while keeping the formats ordered
+		if ( format1In2 ) {
+			Object.assign( format1In2, format2 );
+		} else {
+			formatsOut.push( cloneDeep( format2 ) );
+		}
+	} );
+	return formatsOut;
 }
 
 function applyFormats( formats, index, newFormats ) {
 	if ( formats[ index ] ) {
-		formats[ index ] = cloneDeep( mergeFormats( formats[ index ], newFormats ) );
+		formats[ index ] = mergeFormats( formats[ index ], newFormats );
 	} else {
 		formats[ index ] = cloneDeep( newFormats );
 	}

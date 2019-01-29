@@ -146,21 +146,24 @@ export class RichText extends Component {
 	}
 
 	onFormatChange( record ) {
-		const hasSelection = this.state.start !== this.state.end;
 		let newContent;
-		if ( hasSelection ) {
+		// valueToFormat might throw when converting the record to a tree structure
+		// let's ignore the event for now and force a render update so we're still in sync
+		try {
 			newContent = this.valueToFormat( record );
-		} else {
-			this.setState( {
-				formatPlaceholder: record.formatPlaceholder,
-			} );
-			// make sure the component rerenders without refreshing the text on gutenberg
-			// (this can trigger other events that might update the active formats on aztec)
-			this.lastEventCount = 0;
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.log( error );
 		}
+		this.setState( {
+			formatPlaceholder: record.formatPlaceholder,
+		} );
 		if ( newContent && newContent !== this.props.value ) {
 			this.props.onChange( newContent );
 		} else {
+			// make sure the component rerenders without refreshing the text on gutenberg
+			// (this can trigger other events that might update the active formats on aztec)
+			this.lastEventCount = 0;
 			this.forceUpdate();
 		}
 	}
