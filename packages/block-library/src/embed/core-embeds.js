@@ -149,7 +149,7 @@ export const others = [
 		settings: {
 			title: 'Crowdsignal',
 			icon: embedContentIcon,
-			keywords: [ 'polldaddy' ]
+			keywords: [ 'polldaddy' ],
 			transform: [ {
 				type: 'block',
 				blocks: [ 'core-embed/polldaddy' ],
