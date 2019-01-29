@@ -108,13 +108,7 @@ export const settings = {
 
 	deprecated: [
 		{
-			save() {
-				return (
-					<figure>
-						<audio controls />
-					</figure>
-				);
-			},
+			save: () => ( <figure><audio controls /></figure> ),
 		},
 	],
 };
