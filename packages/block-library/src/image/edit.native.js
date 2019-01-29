@@ -8,7 +8,7 @@ import {
 	onMediaLibraryPressed,
 	onMediaUploadPressed,
 	onMediaCapturePressed,
-	mediaUploadResync,
+	mediaUploadSync,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -45,7 +45,7 @@ export default class ImageEdit extends React.Component {
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
 			this.addMediaUploadListener();
-			mediaUploadResync();
+			mediaUploadSync();
 		}
 	}
 
