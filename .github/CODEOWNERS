@@ -57,7 +57,7 @@
 /packages/dom-ready                             @WordPress/gutenberg-core
 /packages/escape-html                           @WordPress/gutenberg-core
 /packages/html-entities                         @WordPress/gutenberg-core
-/packages/i18n                                  @WordPress/gutenberg-core
+/packages/i18n                                  @WordPress/gutenberg-core @swissspidy
 /packages/is-shallow-equal                      @WordPress/gutenberg-core
 /packages/keycodes                              @WordPress/gutenberg-core
 /packages/priority-queue                        @WordPress/gutenberg-core
