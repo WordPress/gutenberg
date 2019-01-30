@@ -14,7 +14,7 @@ import {
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
+import { MediaPlaceholder, RichText, BlockControls, InspectorControls } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
@@ -143,6 +143,10 @@ export default class ImageEdit extends React.Component {
 			);
 		}
 
+		const onImageSettingsButtonPressed = () => {
+
+		}
+
 		const toolbarEditButton = (
 			<Toolbar>
 				<ToolbarButton
@@ -151,6 +155,14 @@ export default class ImageEdit extends React.Component {
 					onClick={ onMediaLibraryButtonPressed }
 				/>
 			</Toolbar>
+		);
+
+		const inlineToolbarButtons = (
+			<ToolbarButton
+				label={ __( 'Image Settings' ) }
+				icon="admin-generic"
+				onClick={ onImageSettingsButtonPressed }
+			/>
 		);
 
 		const showSpinner = this.state.isUploadInProgress;
@@ -163,6 +175,9 @@ export default class ImageEdit extends React.Component {
 				<BlockControls>
 					{ toolbarEditButton }
 				</BlockControls>
+				<InspectorControls>
+					{ inlineToolbarButtons }
+				</InspectorControls>
 				<ImageSize src={ url } >
 					{ ( sizes ) => {
 						const {
