@@ -164,7 +164,7 @@ export function toTree( {
 				const { type, attributes = {}, unregisteredAttributes, object } = format;
 
 				if ( isEditableTree && ! object && format === deepestActiveFormat ) {
-					attributes[ 'data-mce-selected' ] = 'inline-boundary';
+					attributes[ 'data-rich-text-format-boundary' ] = 'true';
 				}
 
 				const parent = getParent( pointer );

@@ -21,7 +21,7 @@ exports[`core/paragraph block edit matches snapshot 1`] = `
             role="textbox"
           >
             <br
-              data-mce-bogus="1"
+              data-rich-text-padding="true"
             />
           </p>
           <p

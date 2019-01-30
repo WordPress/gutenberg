@@ -19,7 +19,7 @@ exports[`core/verse block edit matches snapshot 1`] = `
           role="textbox"
         >
           <br
-            data-mce-bogus="1"
+            data-rich-text-padding="true"
           />
         </pre>
         <pre

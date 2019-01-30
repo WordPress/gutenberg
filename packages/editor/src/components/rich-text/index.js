@@ -162,9 +162,6 @@ export class RichText extends Component {
 			range,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
-			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
-			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
@@ -175,11 +172,6 @@ export class RichText extends Component {
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			createLinePadding( doc ) {
-				const element = doc.createElement( 'br' );
-				element.setAttribute( 'data-mce-bogus', '1' );
-				return element;
-			},
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
@@ -740,11 +732,6 @@ export class RichText extends Component {
 			value,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			createLinePadding( doc ) {
-				const element = doc.createElement( 'br' );
-				element.setAttribute( 'data-mce-bogus', '1' );
-				return element;
-			},
 			prepareEditableTree: this.props.prepareEditableTree,
 		} ).body.innerHTML;
 	}

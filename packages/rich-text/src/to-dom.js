@@ -113,7 +113,13 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
+function createLinePadding( doc ) {
+	const element = doc.createElement( 'br' );
+	element.setAttribute( 'data-rich-text-padding', 'true' );
+	return element;
+}
+
+function padEmptyLines( { element, multilineWrapperTags } ) {
 	const length = element.childNodes.length;
 	const doc = element.ownerDocument;
 
@@ -135,7 +141,7 @@ function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
 				element.insertBefore( createLinePadding( doc ), child );
 			}
 
-			padEmptyLines( { element: child, createLinePadding, multilineWrapperTags } );
+			padEmptyLines( { element: child, multilineWrapperTags } );
 		}
 	}
 }
@@ -150,7 +156,6 @@ export function toDom( {
 	value,
 	multilineTag,
 	multilineWrapperTags,
-	createLinePadding,
 	prepareEditableTree,
 } ) {
 	let startPath = [];
@@ -180,9 +185,7 @@ export function toDom( {
 		isEditableTree: true,
 	} );
 
-	if ( createLinePadding ) {
-		padEmptyLines( { element: tree, createLinePadding, multilineWrapperTags } );
-	}
+	padEmptyLines( { element: tree, multilineWrapperTags } );
 
 	return {
 		body: tree,
@@ -205,7 +208,6 @@ export function apply( {
 	current,
 	multilineTag,
 	multilineWrapperTags,
-	createLinePadding,
 	prepareEditableTree,
 } ) {
 	// Construct a new element tree in memory.
@@ -213,7 +215,6 @@ export function apply( {
 		value,
 		multilineTag,
 		multilineWrapperTags,
-		createLinePadding,
 		prepareEditableTree,
 	} );
 

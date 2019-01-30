@@ -99,12 +99,6 @@ function toFormat( { type, attributes } ) {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?Function} $1.removeNode           Function to declare whether the
- *                                            given node should be removed.
- * @param {?Function} $1.unwrapNode           Function to declare whether the
- *                                            given node should be unwrapped.
- * @param {?Function} $1.removeAttribute      Wether to remove an attribute
- *                                            based on the name.
  *
  * @return {Object} A rich text value.
  */
@@ -115,9 +109,6 @@ export function create( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
-	removeNode,
-	unwrapNode,
-	removeAttribute,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -138,9 +129,6 @@ export function create( {
 		return createFromElement( {
 			element,
 			range,
-			removeNode,
-			unwrapNode,
-			removeAttribute,
 		} );
 	}
 
@@ -149,9 +137,6 @@ export function create( {
 		range,
 		multilineTag,
 		multilineWrapperTags,
-		removeNode,
-		unwrapNode,
-		removeAttribute,
 	} );
 }
 
@@ -267,12 +252,6 @@ function filterString( string ) {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?Function} $1.removeNode           Function to declare whether the
- *                                            given node should be removed.
- * @param {?Function} $1.unwrapNode           Function to declare whether the
- *                                            given node should be unwrapped.
- * @param {?Function} $1.removeAttribute      Wether to remove an attribute
- *                                            based on the name.
  *
  * @return {Object} A rich text value.
  */
@@ -282,9 +261,6 @@ function createFromElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
-	removeNode,
-	unwrapNode,
-	removeAttribute,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -319,10 +295,7 @@ function createFromElement( {
 			continue;
 		}
 
-		if (
-			( removeNode && removeNode( node ) ) ||
-			( unwrapNode && unwrapNode( node ) && ! node.hasChildNodes() )
-		) {
+		if ( node.getAttribute( 'data-rich-text-padding' ) ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			continue;
 		}
@@ -336,27 +309,23 @@ function createFromElement( {
 
 		const lastFormats = accumulator.formats[ accumulator.formats.length - 1 ];
 		const lastFormat = lastFormats && lastFormats[ lastFormats.length - 1 ];
+		const newFormat = toFormat( {
+			type,
+			attributes: getAttributes( { element: node } ),
+		} );
+
 		let format;
-		let value;
 
-		if ( ! unwrapNode || ! unwrapNode( node ) ) {
-			const newFormat = toFormat( {
-				type,
-				attributes: getAttributes( {
-					element: node,
-					removeAttribute,
-				} ),
-			} );
-
-			if ( newFormat ) {
-				// Reuse the last format if it's equal.
-				if ( isFormatEqual( newFormat, lastFormat ) ) {
-					format = lastFormat;
-				} else {
-					format = newFormat;
-				}
+		if ( newFormat ) {
+			// Reuse the last format if it's equal.
+			if ( isFormatEqual( newFormat, lastFormat ) ) {
+				format = lastFormat;
+			} else {
+				format = newFormat;
 			}
 		}
+
+		let value;
 
 		if ( multilineWrapperTags && multilineWrapperTags.indexOf( type ) !== -1 ) {
 			value = createFromMultilineElement( {
@@ -364,9 +333,6 @@ function createFromElement( {
 				range,
 				multilineTag,
 				multilineWrapperTags,
-				removeNode,
-				unwrapNode,
-				removeAttribute,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
 			} );
 			format = undefined;
@@ -376,9 +342,6 @@ function createFromElement( {
 				range,
 				multilineTag,
 				multilineWrapperTags,
-				removeNode,
-				unwrapNode,
-				removeAttribute,
 			} );
 		}
 
@@ -446,12 +409,6 @@ function createFromElement( {
  *                                            multiline.
  * @param {?Array}    $1.multilineWrapperTags Tags where lines can be found if
  *                                            nesting is possible.
- * @param {?Function} $1.removeNode           Function to declare whether the
- *                                            given node should be removed.
- * @param {?Function} $1.unwrapNode           Function to declare whether the
- *                                            given node should be unwrapped.
- * @param {?Function} $1.removeAttribute      Wether to remove an attribute
- *                                            based on the name.
  * @param {boolean}   $1.currentWrapperTags   Whether to prepend a line
  *                                            separator.
  *
@@ -462,9 +419,6 @@ function createFromMultilineElement( {
 	range,
 	multilineTag,
 	multilineWrapperTags,
-	removeNode,
-	unwrapNode,
-	removeAttribute,
 	currentWrapperTags = [],
 } ) {
 	const accumulator = createEmptyValue();
@@ -489,9 +443,6 @@ function createFromMultilineElement( {
 			multilineTag,
 			multilineWrapperTags,
 			currentWrapperTags,
-			removeNode,
-			unwrapNode,
-			removeAttribute,
 		} );
 
 		// If a line consists of one single line break (invisible), consider the
@@ -532,16 +483,11 @@ function createFromMultilineElement( {
  *
  * @param {Object}    $1                 Named argements.
  * @param {Element}   $1.element         Element to get attributes from.
- * @param {?Function} $1.removeAttribute Wether to remove an attribute based on
- *                                       the name.
  *
  * @return {?Object} Attribute object or `undefined` if the element has no
  *                   attributes.
  */
-function getAttributes( {
-	element,
-	removeAttribute,
-} ) {
+function getAttributes( { element } ) {
 	if ( ! element.hasAttributes() ) {
 		return;
 	}
@@ -553,7 +499,7 @@ function getAttributes( {
 	for ( let i = 0; i < length; i++ ) {
 		const { name, value } = element.attributes[ i ];
 
-		if ( removeAttribute && removeAttribute( name ) ) {
+		if ( name === 'data-rich-text-format-boundary' ) {
 			continue;
 		}
 

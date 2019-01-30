@@ -528,27 +528,6 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should remove with settings',
-		settings: {
-			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
-		},
-		html: '<strong data-mce-bogus="true"></strong>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 1,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0 ],
-		endPath: [ 0, 0 ],
-		record: {
-			start: 0,
-			end: 0,
-			formats: [],
-			text: '',
-		},
-	},
-	{
 		description: 'should ignore formats at line separator',
 		multilineTag: 'p',
 		startPath: [],
@@ -560,10 +539,7 @@ export const spec = [
 	},
 	{
 		description: 'should remove br with settings',
-		settings: {
-			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
-		},
-		html: '<br data-mce-bogus="true">',
+		html: '<br data-rich-text-padding="true">',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -580,53 +556,8 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should unwrap with settings',
-		settings: {
-			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
-		},
-		html: '<strong data-mce-bogus="true">te<em>st</em></strong>',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element,
-			endOffset: 1,
-			endContainer: element,
-		} ),
-		startPath: [ 0, 0 ],
-		endPath: [ 1, 0, 2 ],
-		record: {
-			start: 0,
-			end: 4,
-			formats: [ , , [ em ], [ em ] ],
-			text: 'test',
-		},
-	},
-	{
-		description: 'should remove with children with settings',
-		settings: {
-			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
-		},
-		html: '<strong data-mce-bogus="all">one</strong>two',
-		createRange: ( element ) => ( {
-			startOffset: 0,
-			startContainer: element.lastChild,
-			endOffset: 1,
-			endContainer: element.lastChild,
-		} ),
-		startPath: [ 0, 0 ],
-		endPath: [ 0, 1 ],
-		record: {
-			start: 0,
-			end: 1,
-			formats: [ , , , ],
-			text: 'two',
-		},
-	},
-	{
-		description: 'should filter format attributes with settings',
-		settings: {
-			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-		},
-		html: '<strong data-mce-selected="inline-boundary">test</strong>',
+		description: 'should filter format boundary attributes',
+		html: '<strong data-rich-text-format-boundary="true">test</strong>',
 		createRange: ( element ) => ( {
 			startOffset: 0,
 			startContainer: element,
@@ -643,10 +574,7 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should filter text with settings',
-		settings: {
-			filterString: ( string ) => string.replace( '\uFEFF', '' ),
-		},
+		description: 'should filter zero width space',
 		html: '&#65279;',
 		createRange: ( element ) => ( {
 			startOffset: 0,
@@ -664,10 +592,7 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should filter text at end with settings',
-		settings: {
-			filterString: ( string ) => string.replace( '\uFEFF', '' ),
-		},
+		description: 'should filter zero width space at end',
 		html: 'test&#65279;',
 		createRange: ( element ) => ( {
 			startOffset: 4,
@@ -685,10 +610,7 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should filter text in format with settings',
-		settings: {
-			filterString: ( string ) => string.replace( '\uFEFF', '' ),
-		},
+		description: 'should filter zero width space in format',
 		html: '<em>test&#65279;</em>',
 		createRange: ( element ) => ( {
 			startOffset: 5,
@@ -706,10 +628,7 @@ export const spec = [
 		},
 	},
 	{
-		description: 'should filter text outside format with settings',
-		settings: {
-			filterString: ( string ) => string.replace( '\uFEFF', '' ),
-		},
+		description: 'should filter zero width space outside format',
 		html: '<em>test</em>&#65279;',
 		createRange: ( element ) => ( {
 			startOffset: 1,

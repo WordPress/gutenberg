@@ -20,7 +20,7 @@ exports[`core/list block edit matches snapshot 1`] = `
         >
           <li>
             <br
-              data-mce-bogus="1"
+              data-rich-text-padding="true"
             />
           </li>
         </ul>
