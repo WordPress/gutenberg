@@ -78,6 +78,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
 
+    @ReactMethod
     public void requestMediaPickFrom(String mediaSource, final Callback onUploadMediaSelected) {
         if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
             mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(onUploadMediaSelected));
