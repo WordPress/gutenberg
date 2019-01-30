@@ -89,7 +89,7 @@
 
 			// Beyond mobile, allow 2 columns.
 			@include break-small() {
-				flex-basis: calc(50% - (#{$grid-size-large * 2} + #{$block-padding}));
+				flex-basis: calc(50% - (#{$grid-size-large} + #{$block-padding * 2}));
 				flex-grow: 0;
 			}
 
