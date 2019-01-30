@@ -40,6 +40,9 @@ public class WPAndroidGlueCode {
     private MediaSelectedCallback mPendingMediaSelectedCallback;
     private MediaUploadCallback mPendingMediaUploadCallback;
 
+    private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
+    private OnReattachQueryListener mOnReattachQueryListener;
+
     private String mContentHtml = "";
     private boolean mContentInitialized;
     private String mTitle = "";
@@ -78,8 +81,7 @@ public class WPAndroidGlueCode {
         void onQueryCurrentProgressForUploadingMedia();
     }
 
-    protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                             final OnReattachQueryListener onReattachQueryListener) {
+    protected List<ReactPackage> getPackages() {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
             public void responseHtml(String title, String html, boolean changed) {
@@ -94,27 +96,26 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
-                onMediaLibraryButtonListener.onMediaLibraryButtonClicked();
+                mOnMediaLibraryButtonListener.onMediaLibraryButtonClicked();
             }
 
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
-                onMediaLibraryButtonListener.onUploadMediaButtonClicked();
+                mOnMediaLibraryButtonListener.onUploadMediaButtonClicked();
             }
 
             @Override
             public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
-                onMediaLibraryButtonListener.onCapturePhotoButtonClicked();
+                mOnMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
 
             @Override
             public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
-                onReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+                mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
-
         });
         return Arrays.asList(
                 new MainReactPackage(),
@@ -125,8 +126,6 @@ public class WPAndroidGlueCode {
     }
 
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
-                             OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                             OnReattachQueryListener onReattachQueryListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost) {
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
@@ -135,7 +134,7 @@ public class WPAndroidGlueCode {
                 ReactInstanceManager.builder()
                                     .setApplication(application)
                                     .setJSMainModulePath("index")
-                                    .addPackages(getPackages(onMediaLibraryButtonListener, onReattachQueryListener))
+                                    .addPackages(getPackages())
                                     .setUseDeveloperSupport(isDebug)
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
@@ -162,9 +161,13 @@ public class WPAndroidGlueCode {
         mReactRootView.setAppProperties(initialProps);
     }
 
-    public void attachToContainer(ViewGroup viewGroup) {
+    public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+                                  OnReattachQueryListener onReattachQueryListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
+
+        mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
+        mOnReattachQueryListener = onReattachQueryListener;
 
         if (mReactRootView.getParent() != null) {
             ((ViewGroup) mReactRootView.getParent()).removeView(mReactRootView);
