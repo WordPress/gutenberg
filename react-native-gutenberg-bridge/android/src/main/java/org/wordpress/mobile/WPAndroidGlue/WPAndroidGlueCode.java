@@ -70,6 +70,7 @@ public class WPAndroidGlueCode {
         void onMediaLibraryButtonClicked();
         void onUploadMediaButtonClicked();
         void onCapturePhotoButtonClicked();
+        void onRetryUploadForMediaClicked(int mediaId);
     }
 
     public interface OnReattachQueryListener {
@@ -113,6 +114,10 @@ public class WPAndroidGlueCode {
                 onReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
 
+            @Override public void onImageFailedRetry(MediaUploadCallback mediaUploadCallback, int mediaId) {
+                mPendingMediaUploadCallback = mediaUploadCallback;
+                onMediaLibraryButtonListener.onRetryUploadForMediaClicked(mediaId);
+            }
         });
         return Arrays.asList(
                 new MainReactPackage(),

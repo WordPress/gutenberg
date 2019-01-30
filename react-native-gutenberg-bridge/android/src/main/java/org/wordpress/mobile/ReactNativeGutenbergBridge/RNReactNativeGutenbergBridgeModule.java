@@ -94,6 +94,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.mediaUploadSync(getNewUploadMediaCallback(null));
     }
 
+    @ReactMethod
+    public void onImageFailedRetry(final Callback onImageUploadRetry, final int mediaId) {
+        mGutenbergBridgeJS2Parent.onImageFailedRetry(getNewUploadMediaCallback(onImageUploadRetry), mediaId);
+    }
+
     private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {
         return new MediaSelectedCallback() {
             @Override public void onMediaSelected(int mediaId, String mediaUrl) {
