@@ -65,7 +65,7 @@ export const withInspectorControl = createHigherOrderComponent( ( BlockEdit ) =>
 							value={ props.attributes.className || '' }
 							onChange={ ( nextValue ) => {
 								props.setAttributes( {
-									className: nextValue,
+									className: nextValue !== '' ? nextValue : undefined,
 								} );
 							} }
 						/>
