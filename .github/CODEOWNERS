@@ -41,12 +41,12 @@
 /packages/scripts                               @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
 
 # UI Components
-/packages/components                            @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya @nosolosw
-/packages/compose                               @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
-/packages/element                               @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
-/packages/notices                               @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
-/packages/nux                                   @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
-/packages/viewport                              @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/components                            @WordPress/gutenberg-core @chrisvanpatten @ajitbohra @jaymanpandya @nosolosw
+/packages/compose                               @WordPress/gutenberg-core @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/element                               @WordPress/gutenberg-core @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/notices                               @WordPress/gutenberg-core @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/nux                                   @WordPress/gutenberg-core @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/viewport                              @WordPress/gutenberg-core @chrisvanpatten @ajitbohra @jaymanpandya
 
 # Utilities
 /packages/a11y                                  @WordPress/gutenberg-core
