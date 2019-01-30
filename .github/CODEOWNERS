@@ -1,0 +1,80 @@
+# Fallback Coverage
+*                                               @WordPress/gutenberg-core
+
+# Data
+/packages/api-fetch                             @WordPress/gutenberg-core @nerrad
+/packages/core-data                             @WordPress/gutenberg-core @nerrad
+/packages/data                                  @WordPress/gutenberg-core @nerrad
+/packages/redux-routine                         @WordPress/gutenberg-core @nerrad
+
+# Blocks
+/packages/block-library                         @WordPress/gutenberg-core @Soean @ajitbohra
+
+# Editor
+/packages/annotations                           @WordPress/gutenberg-core
+/packages/autop                                 @WordPress/gutenberg-core
+/packages/block-serialization-spec-parser       @WordPress/gutenberg-core
+/packages/block-serialization-default-parser    @WordPress/gutenberg-core
+/packages/blocks                                @WordPress/gutenberg-core
+/packages/edit-post                             @WordPress/gutenberg-core
+/packages/editor                                @WordPress/gutenberg-core @nosolosw
+/packages/list-reusable-blocks                  @WordPress/gutenberg-core
+/packages/rich-text                             @WordPress/gutenberg-core
+/packages/shortcode                             @WordPress/gutenberg-core
+
+# Tooling
+/bin                                            @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-import-jsx-pragma        @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-makepot                  @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/babel-preset-default                  @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/browserslist-config                   @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/custom-templated-path-webpack-plugin  @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/e2e-test-utils                        @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/e2e-tests                             @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/eslint-plugin                         @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/jest-console                          @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/jest-preset-default                   @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/jest-puppeteer-axe                    @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/library-export-default-webpack-plugin @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/npm-package-json-lint-config          @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/postcss-themes                        @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+/packages/scripts                               @WordPress/gutenberg-core @ntwb @nerrad @ajitbohra
+
+# UI Components
+/packages/components                            @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya @nosolosw
+/packages/compose                               @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/element                               @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/notices                               @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/nux                                   @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
+/packages/viewport                              @WordPress/gutenberg-core @jaymanpandya @chrisvanpatten @ajitbohra @jaymanpandya
+
+# Utilities
+/packages/a11y                                  @WordPress/gutenberg-core
+/packages/blob                                  @WordPress/gutenberg-core
+/packages/date                                  @WordPress/gutenberg-core
+/packages/deprecated                            @WordPress/gutenberg-core
+/packages/dom                                   @WordPress/gutenberg-core
+/packages/dom-ready                             @WordPress/gutenberg-core
+/packages/escape-html                           @WordPress/gutenberg-core
+/packages/html-entities                         @WordPress/gutenberg-core
+/packages/i18n                                  @WordPress/gutenberg-core
+/packages/is-shallow-equal                      @WordPress/gutenberg-core
+/packages/keycodes                              @WordPress/gutenberg-core
+/packages/priority-queue                        @WordPress/gutenberg-core
+/packages/token-list                            @WordPress/gutenberg-core
+/packages/url                                   @WordPress/gutenberg-core
+/packages/wordcount                             @WordPress/gutenberg-core
+
+# Extensibility
+/packages/hooks                                 @WordPress/gutenberg-core
+/packages/plugins                               @WordPress/gutenberg-core
+
+# Rich Text
+/packages/format-library                        @WordPress/gutenberg-core
+/packages/rich-text                             @WordPress/gutenberg-core
+
+# PHP
+/lib                                            @WordPress/gutenberg-core
+
+# Documentation
+/docs                                           @WordPress/gutenberg-core @chrisvanpatten @mkaz @ajitbohra @nosolosw
