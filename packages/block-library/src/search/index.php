@@ -6,78 +6,53 @@
  */
 
 /**
- * Renders the `core/search` block on server.
+ * Dynamically renders the `core/search` block.
  *
- * Copied from get_search_form() because the core
- * search form function doesn't allow to change markup (yet).
-
  * @param array $attributes The block attributes.
  *
- * @return string Returns the search form markup.
+ * @return string The search block markup.
  */
 function render_block_core_search( $attributes ) {
+	static $instance_id = 0;
 
-	$search_form_template = locate_template( 'searchform.php' );
-	if ( '' != $search_form_template ) {
-		ob_start();
-		require( $search_form_template );
-		$form = ob_get_clean();
-	} else {
+	$html = '
+		<form role="search" method="get" class="wp-block-search" action="%1$s">
+			<label for="%2$s" class="wp-block-search__label">%3$s</label>
+			<input id="%2$s" type="search" class="wp-block-search__input" placeholder="%4$s" value="%5$s" name="s" />
+		</form>
+	';
 
-		$defaults = array(
-			'label'       => _x( 'Search for:', 'label', 'gutenberg' ),
-			'placeholder' => esc_attr_x( 'Search &hellip;', 'placeholder', 'gutenberg' ),
-			'submitValue' => esc_attr_x( 'Search', 'submit button', 'gutenberg' ),
-		);
-
-		$args = wp_parse_args( $attributes, $defaults );
-
-		/**
-		 * Filters the arguments used for the search form.
-		 *
-		 * @since x.x.x
-		 *
-		 * @param array $args The search form markup arguments.
-		 */
-		$args = apply_filters( 'get_search_form_args', $args );
-
-		$form = '<form role="search" method="get" class="search-form" action="' . esc_url( home_url( '/' ) ) . '">
-			<label>
-				<span class="screen-reader-text">' . $args['label'] . '</span>
-				<input type="search" class="search-field" placeholder="' . esc_attr( $args['placeholder'] ) . '" value="' . get_search_query() . '" name="s" />
-			</label>
-			<input type="submit" class="search-submit" value="' . esc_attr( $args['submitValue'] ) . '" />
-		</form>';
-	}
-
-	/** This filter is documented in wp-includes/general-template.php */
-	$result = apply_filters( 'get_search_form', $form );
-
-	if ( null === $result ) {
-		$result = $form;
-	}
-
-	return $form;
+	return sprintf(
+		$html,
+		esc_url( home_url( '/' ) ),
+		'wp-block-search__input-' . ++$instance_id,
+		esc_html( $attributes['label'] ),
+		esc_attr( $attributes['placeholder'] ),
+		esc_attr( get_search_query() )
+	);
 }
 
-register_block_type(
-	'core/search',
-	array(
-		'attributes'      => array(
-			'label'       => array(
-				'type'    => 'string',
-				'default' => _x( 'Search for:', 'label', 'gutenberg' ),
+/**
+ * Registers the `core/search` block on the server.
+ */
+function register_block_core_search() {
+	register_block_type(
+		'core/search',
+		array(
+			'attributes'      => array(
+				'label'       => array(
+					'type'    => 'string',
+					'default' => __( 'Search' ),
+				),
+				'placeholder' => array(
+					'type'    => 'string',
+					'default' => __( 'Enter a search keyword or phrase' ),
+				),
 			),
-			'placeholder' => array(
-				'type'    => 'string',
-				'default' => esc_attr_x( 'Search &hellip;', 'placeholder', 'gutenberg' ),
-			),
-			'submitValue' => array(
-				'type'    => 'string',
-				'default' => esc_attr_x( 'Search', 'submit button', 'gutenberg' ),
-			),
-		),
 
-		'render_callback' => 'render_block_core_search',
-	)
-);
+			'render_callback' => 'render_block_core_search',
+		)
+	);
+}
+
+add_action( 'init', 'register_block_core_search' );

@@ -13,7 +13,7 @@ export const name = 'core/search';
 export const settings = {
 	title: __( 'Search' ),
 
-	description: __( 'A search form for your site.' ),
+	description: __( 'Help your visitors find your content.' ),
 
 	icon: 'search',
 

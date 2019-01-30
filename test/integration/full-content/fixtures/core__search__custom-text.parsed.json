@@ -1,0 +1,21 @@
+[
+    {
+        "blockName": "core/search",
+        "attrs": {
+            "label": "Custom label",
+            "placeholder": "Custom placeholder"
+        },
+        "innerBlocks": [],
+        "innerHTML": "",
+        "innerContent": []
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
