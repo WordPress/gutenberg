@@ -39,7 +39,7 @@ function example( number ) {
 
 	return number + foo;
 }`,
-			errors: [ { message: 'Declared variable `foo` is unused before a return path' } ],
+			errors: [ { message: 'Variables should not be assigned until just prior its first reference. An early return statement may leave this variable unused.' } ],
 		},
 	],
 } );
