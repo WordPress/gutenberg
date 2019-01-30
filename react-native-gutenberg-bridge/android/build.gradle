@@ -153,8 +153,13 @@ if (isJitPack) {
         println "Done copying the Android JS bundle to assets folder"
     }
 
+    task cleanupNodeModulesFolder(type: Delete) {
+        delete '../../node_modules'
+    }
+
     if (isJitPack) {
-        preBuild.dependsOn(copyJSBundle)
+        preBuild.dependsOn(cleanupNodeModulesFolder)
+        cleanupNodeModulesFolder.dependsOn(copyJSBundle)
         copyJSBundle.dependsOn(buildJSBundle)
         buildJSBundle.dependsOn(yarn_install, ensureAssetsDirectory)
     }
