@@ -1,0 +1,20 @@
+//Bottom Sheet
+
+.bottomSheetCell {
+    flex-direction: row;
+	min-height: 60;
+	justify-content: space-between;
+	padding-left: 12;
+	padding-right: 12;
+	align-items: center;
+}
+
+.bottomSheetCellLabel {
+	font-size: 18px;
+	color: black;
+}
+
+.bottomSheetCellValue {
+	font-size: 18px;
+	color: gray;
+}

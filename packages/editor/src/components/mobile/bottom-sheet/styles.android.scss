@@ -1,0 +1,131 @@
+//Bottom Sheet
+
+.bottomModal {
+    justify-content: flex-end;
+    margin: 0;
+}
+
+.dragIndicator {
+    background-color: $light-gray-400;
+    height: 4px;
+    width: 10%;
+    top: -12px;
+    margin: auto;
+    border-radius: 2px;
+}
+
+.separator {
+    background-color: $light-gray-400;
+    height: 1px;
+    width: 95%;
+    margin: auto;
+}
+
+.content {
+    background-color: $white;
+    padding: 18px 10px 5px 10px;
+    justify-content: center;
+    border-top-right-radius: 8px;
+    border-top-left-radius: 8px;
+    min-height: 200px;
+}
+
+.head {
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 5px;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+}
+
+.title {
+    color: $dark-gray-600;
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+    text-align: center;
+}
+
+// Modal
+
+.modal {
+    margin: 0;
+}
+
+.modalHead {
+    flex-direction: row;
+    width: 100%;
+    margin-bottom: 5px;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+}
+
+.modalContent {
+    background-color: $white;
+    padding: 18px 10px 5px 10px;
+    justify-content: center;
+    margin: 0px 20px 0px 20px
+}
+
+.modalTitle {
+    color: $dark-gray-600;
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+    margin-bottom: 10px;
+}
+
+.modalActionButton {
+    color: #0087be;
+    font-size: 17px;
+}
+
+// Button
+
+.buttonText {
+    font-size: 18px;
+    padding: 5px;
+}
+
+// Inline
+
+.inlineInput {
+    width: 100%;
+    margin: 0 0;
+}
+
+.inlineInputLabel {
+    color: $dark-gray-600;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.inlineInputValue {
+    font-size: 18px;
+    align-items: stretch;
+    padding: 4px;
+}
+
+.inlineInputValueSwitch {
+    padding: 5px;
+}
+
+// Cells
+
+.cellLabel {
+    padding: 10px 10px;
+    color: $dark-gray-600;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.cellValue {
+    flex-grow: 1;
+    font-size: 16px;
+    text-align: right;
+    align-items: stretch;
+    align-self: flex-end;
+    padding: 10px;
+}
