@@ -17,8 +17,10 @@
 	}
 }
 
-
 .wp-block-table {
+	width: 100%;
+	height: 100%;
+
 	td,
 	th {
 		padding: 0.5rem;
@@ -31,6 +33,18 @@
 		box-shadow: inset 0 0 0 1px $blue-medium-500;
 		border-style: double;
 	}
+
+
+}
+
+.block-library-table__resizable-box {
+	// Using display table is a hack to ensure wrapping resizable box can't be resized to smaller than the content.
+	display: table;
+	min-width: $break-mobile / 2;
+
+	& .components-resizable-box__handle {
+		display: block;
+	}
 }
 
 .block-library-table__dimensions__row {
@@ -42,4 +56,3 @@
 	// Use padding since it's hard to override the margin of the base control.
 	padding-right: 5px;
 }
-

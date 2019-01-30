@@ -23,6 +23,7 @@ import {
 	Button,
 	Toolbar,
 	DropdownMenu,
+	ResizableBox,
 } from '@wordpress/components';
 
 /**
@@ -35,7 +36,6 @@ import {
 	deleteRow,
 	insertColumn,
 	deleteColumn,
-	getTableStyles,
 	getStyleValue,
 	getStyleUnit,
 } from './state';
@@ -462,6 +462,8 @@ export class TableEdit extends Component {
 			className,
 			backgroundColor,
 			setBackgroundColor,
+			toggleSelection,
+			setAttributes,
 		} = this.props;
 		const { initialRowCount, initialColumnCount, widthUnit } = this.state;
 		const { hasFixedLayout, head, body, foot, width, height } = attributes;
@@ -565,11 +567,33 @@ export class TableEdit extends Component {
 						] }
 					/>
 				</InspectorControls>
-				<table className={ classes } style={ getTableStyles( attributes ) }>
-					<Section type="head" rows={ head } />
-					<Section type="body" rows={ body } />
-					<Section type="foot" rows={ foot } />
-				</table>
+				<ResizableBox
+					className="block-library-table__resizable-box"
+					size={ {
+						width,
+						height,
+					} }
+					enable={ {
+						right: true,
+						bottom: true,
+					} }
+					onResizeStart={ () => {
+						toggleSelection( false );
+					} }
+					onResizeStop={ ( event, direction, element ) => {
+						setAttributes( {
+							width: direction === 'right' ? element.style.width : width,
+							height: direction === 'bottom' ? element.style.height : height,
+						} );
+						toggleSelection( true );
+					} }
+				>
+					<table className={ classes }>
+						<Section type="head" rows={ head } />
+						<Section type="body" rows={ body } />
+						<Section type="foot" rows={ foot } />
+					</table>
+				</ResizableBox>
 			</Fragment>
 		);
 	}
