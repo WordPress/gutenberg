@@ -22,6 +22,8 @@
 
 .wp-embed-responsive {
 	.wp-block-embed {
+		min-width: 0;
+
 		// Add responsiveness to common aspect ratios.
 		&.wp-embed-aspect-21-9 .wp-block-embed__wrapper,
 		&.wp-embed-aspect-18-9 .wp-block-embed__wrapper,
