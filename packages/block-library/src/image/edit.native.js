@@ -5,10 +5,10 @@ import React from 'react';
 import { View, Image, TextInput, Text } from 'react-native';
 import {
 	subscribeMediaUpload,
-	onMediaLibraryPressed,
-	onUploadMediaPressed,
-	onCapturePhotoPressed,
-	onImageQueryReattach,
+	requestMediaPickFromMediaLibrary,
+	requestMediaPickFromDeviceLibrary,
+	requestMediaPickFromDeviceCamera,
+	mediaUploadSync,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -46,7 +46,7 @@ export default class ImageEdit extends React.Component {
 
 		if ( attributes.id && ! isURL( attributes.url ) ) {
 			this.addMediaUploadListener();
-			onImageQueryReattach();
+			mediaUploadSync();
 		}
 	}
 
@@ -107,7 +107,7 @@ export default class ImageEdit extends React.Component {
 		const { url, caption, height, width } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
-			onMediaLibraryPressed( ( mediaId, mediaUrl ) => {
+			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { id: mediaId, url: mediaUrl } );
 				}
@@ -115,8 +115,8 @@ export default class ImageEdit extends React.Component {
 		};
 
 		if ( ! url ) {
-			const onUploadMediaButtonPressed = () => {
-				onUploadMediaPressed( ( mediaId, mediaUri ) => {
+			const onMediaUploadButtonPressed = () => {
+				requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
 						this.addMediaUploadListener( );
 						setAttributes( { url: mediaUri, id: mediaId } );
@@ -124,8 +124,8 @@ export default class ImageEdit extends React.Component {
 				} );
 			};
 
-			const onCapturePhotoButtonPressed = () => {
-				onCapturePhotoPressed( ( mediaId, mediaUri ) => {
+			const onMediaCaptureButtonPressed = () => {
+				requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
 						this.addMediaUploadListener( );
 						setAttributes( { url: mediaUri, id: mediaId } );
@@ -135,9 +135,9 @@ export default class ImageEdit extends React.Component {
 
 			return (
 				<MediaPlaceholder
-					onUploadMediaPressed={ onUploadMediaButtonPressed }
+					onUploadMediaPressed={ onMediaUploadButtonPressed }
 					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
-					onCapturePhotoPressed={ onCapturePhotoButtonPressed }
+					onCapturePhotoPressed={ onMediaCaptureButtonPressed }
 				/>
 			);
 		}
