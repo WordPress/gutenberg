@@ -43,27 +43,10 @@ function gutenberg_url( $path ) {
  * @return string Conditional polyfill inline script.
  */
 function gutenberg_get_script_polyfill( $tests ) {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_get_script_polyfill' );
+
 	global $wp_scripts;
-
-	$polyfill = '';
-	foreach ( $tests as $test => $handle ) {
-		if ( ! array_key_exists( $handle, $wp_scripts->registered ) ) {
-			continue;
-		}
-
-		$polyfill .= (
-			// Test presence of feature...
-			'( ' . $test . ' ) || ' .
-			// ...appending polyfill on any failures. Cautious viewers may balk
-			// at the `document.write`. Its caveat of synchronous mid-stream
-			// blocking write is exactly the behavior we need though.
-			'document.write( \'<script src="' .
-			esc_url( $wp_scripts->registered[ $handle ]->src ) .
-			'"></scr\' + \'ipt>\' );'
-		);
-	}
-
-	return $polyfill;
+	return wp_get_script_polyfill( $wp_scripts, $tests );
 }
 
 if ( ! function_exists( 'register_tinymce_scripts' ) ) {
@@ -153,11 +136,14 @@ function gutenberg_register_packages_scripts() {
  * @since 0.1.0
  */
 function gutenberg_register_scripts_and_styles() {
+	global $wp_scripts;
+
 	gutenberg_register_vendor_scripts();
 
 	wp_add_inline_script(
 		'wp-polyfill',
-		gutenberg_get_script_polyfill(
+		wp_get_script_polyfill(
+			$wp_scripts,
 			array(
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
@@ -865,8 +851,6 @@ function gutenberg_get_available_image_sizes() {
  * @param string $hook Screen name.
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
-	$is_demo = isset( $_GET['gutenberg-demo'] );
-
 	global $wp_scripts, $wp_meta_boxes;
 
 	// Add "wp-hooks" as dependency of "heartbeat".
@@ -983,17 +967,7 @@ JS;
 
 	// Assign initial edits, if applicable. These are not initially assigned
 	// to the persisted post, but should be included in its save payload.
-	if ( $is_new_post && $is_demo ) {
-		// Prepopulate with some test content in demo.
-		ob_start();
-		include gutenberg_dir_path() . 'post-content.php';
-		$demo_content = ob_get_clean();
-
-		$initial_edits = array(
-			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			'content' => $demo_content,
-		);
-	} elseif ( $is_new_post ) {
+	if ( $is_new_post ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
@@ -1220,10 +1194,26 @@ JS;
 
 	$init_script = <<<JS
 	( function() {
-		window._wpLoadGutenbergEditor = window._wpLoadBlockEditor = new Promise( function( resolve ) {
+		window._wpLoadBlockEditor = new Promise( function( resolve ) {
 			wp.domReady( function() {
 				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 			} );
+		} );
+
+		Object.defineProperty( window, '_wpLoadGutenbergEditor', {
+			get: function() {
+				// TODO: Hello future maintainer. In removing this deprecation,
+				// ensure also to check whether `wp-editor`'s dependencies in
+				// `package-dependencies.php` still require `wp-deprecated`.
+				wp.deprecated( '`window._wpLoadGutenbergEditor`', {
+					plugin: 'Gutenberg',
+					version: '5.2',
+					alternative: '`window._wpLoadBlockEditor`',
+					hint: 'This is a private API, not intended for public use. It may be removed in the future.'
+				} );
+
+				return window._wpLoadBlockEditor;
+			}
 		} );
 } )();
 JS;
