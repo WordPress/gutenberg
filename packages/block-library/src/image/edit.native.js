@@ -204,8 +204,8 @@ export default class ImageEdit extends React.Component {
 										key={ url }
 									/>
 									{ this.state.isUploadFailed && <View style={ styles.uploadFailedContainer }>
-										<Dashicon icon={ 'arrow-down-alt' }/>
-										<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.Please tap for options.' ) }</Text>
+										<Dashicon icon={ 'image-rotate' } ariaPressed={'dashicon-active'}/>
+										<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
 									</View> }
 								</View>
 							);
