@@ -9,8 +9,8 @@ import {
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
 	mediaUploadSync,
-	onImageFailedRetry,
-	onImageUploadCancel
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -62,9 +62,9 @@ export default class ImageEdit extends React.Component {
 		const { attributes } = this.props;
 
 		if ( this.state.isUploadInProgress ) {
-			onImageUploadCancel( attributes.id )
+			requestImageUploadCancelDialog( attributes.id )
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
-			onImageFailedRetry( attributes.id );
+			requestImageFailedRetryDialog( attributes.id );
 		}
 	}
 
