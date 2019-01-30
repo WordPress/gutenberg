@@ -165,7 +165,6 @@ export class RichText extends Component {
 			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}

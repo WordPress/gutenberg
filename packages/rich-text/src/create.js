@@ -13,6 +13,7 @@ import { createElement } from './create-element';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
+	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
 /**
@@ -102,8 +103,6 @@ function toFormat( { type, attributes } ) {
  *                                            given node should be removed.
  * @param {?Function} $1.unwrapNode           Function to declare whether the
  *                                            given node should be unwrapped.
- * @param {?Function} $1.filterString         Function to filter the given
- *                                            string.
  * @param {?Function} $1.removeAttribute      Wether to remove an attribute
  *                                            based on the name.
  *
@@ -118,7 +117,6 @@ export function create( {
 	multilineWrapperTags,
 	removeNode,
 	unwrapNode,
-	filterString,
 	removeAttribute,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
@@ -142,7 +140,6 @@ export function create( {
 			range,
 			removeNode,
 			unwrapNode,
-			filterString,
 			removeAttribute,
 		} );
 	}
@@ -154,7 +151,6 @@ export function create( {
 		multilineWrapperTags,
 		removeNode,
 		unwrapNode,
-		filterString,
 		removeAttribute,
 	} );
 }
@@ -252,6 +248,15 @@ function filterRange( node, range, filter ) {
 	return { startContainer, startOffset, endContainer, endOffset };
 }
 
+function filterString( string ) {
+	// Reduce any whitespace used for HTML formatting to one space
+	// character, because it will also be displayed as such by the browser.
+	string = string.replace( /[\n\r\t]+/g, ' ' );
+	string = string.replace( new RegExp( ZERO_WIDTH_NO_BREAK_SPACE, 'g' ), '' );
+
+	return string;
+}
+
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
@@ -266,8 +271,6 @@ function filterRange( node, range, filter ) {
  *                                            given node should be removed.
  * @param {?Function} $1.unwrapNode           Function to declare whether the
  *                                            given node should be unwrapped.
- * @param {?Function} $1.filterString         Function to filter the given
- *                                            string.
  * @param {?Function} $1.removeAttribute      Wether to remove an attribute
  *                                            based on the name.
  *
@@ -281,7 +284,6 @@ function createFromElement( {
 	currentWrapperTags = [],
 	removeNode,
 	unwrapNode,
-	filterString,
 	removeAttribute,
 } ) {
 	const accumulator = createEmptyValue();
@@ -297,26 +299,14 @@ function createFromElement( {
 
 	const length = element.childNodes.length;
 
-	const filterStringComplete = ( string ) => {
-		// Reduce any whitespace used for HTML formatting to one space
-		// character, because it will also be displayed as such by the browser.
-		string = string.replace( /[\n\r\t]+/g, ' ' );
-
-		if ( filterString ) {
-			string = filterString( string );
-		}
-
-		return string;
-	};
-
 	// Optimise for speed.
 	for ( let index = 0; index < length; index++ ) {
 		const node = element.childNodes[ index ];
 		const type = node.nodeName.toLowerCase();
 
 		if ( node.nodeType === TEXT_NODE ) {
-			const text = filterStringComplete( node.nodeValue );
-			range = filterRange( node, range, filterStringComplete );
+			const text = filterString( node.nodeValue );
+			range = filterRange( node, range, filterString );
 			accumulateSelection( accumulator, node, range, { text } );
 			accumulator.text += text;
 			// Create a sparse array of the same length as `text`, in which
@@ -376,7 +366,6 @@ function createFromElement( {
 				multilineWrapperTags,
 				removeNode,
 				unwrapNode,
-				filterString,
 				removeAttribute,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
 			} );
@@ -389,7 +378,6 @@ function createFromElement( {
 				multilineWrapperTags,
 				removeNode,
 				unwrapNode,
-				filterString,
 				removeAttribute,
 			} );
 		}
@@ -462,8 +450,6 @@ function createFromElement( {
  *                                            given node should be removed.
  * @param {?Function} $1.unwrapNode           Function to declare whether the
  *                                            given node should be unwrapped.
- * @param {?Function} $1.filterString         Function to filter the given
- *                                            string.
  * @param {?Function} $1.removeAttribute      Wether to remove an attribute
  *                                            based on the name.
  * @param {boolean}   $1.currentWrapperTags   Whether to prepend a line
@@ -478,7 +464,6 @@ function createFromMultilineElement( {
 	multilineWrapperTags,
 	removeNode,
 	unwrapNode,
-	filterString,
 	removeAttribute,
 	currentWrapperTags = [],
 } ) {
@@ -506,7 +491,6 @@ function createFromMultilineElement( {
 			currentWrapperTags,
 			removeNode,
 			unwrapNode,
-			filterString,
 			removeAttribute,
 		} );
 
