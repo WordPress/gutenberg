@@ -130,7 +130,7 @@ export default class ImageEdit extends React.Component {
 			} );
 		};
 
-		if ( ! url ) {
+		if ( ! url && !this.state.isUploadFailed) {
 			const onMediaUploadButtonPressed = () => {
 				requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
