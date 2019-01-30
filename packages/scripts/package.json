@@ -38,7 +38,7 @@
 		"chalk": "^2.4.1",
 		"check-node-version": "^3.1.1",
 		"cross-spawn": "^5.1.0",
-		"eslint": "^4.19.1",
+		"eslint": "^5.12.1",
 		"jest": "^23.6.0",
 		"jest-puppeteer": "3.2.1",
 		"npm-package-json-lint": "^3.3.1",

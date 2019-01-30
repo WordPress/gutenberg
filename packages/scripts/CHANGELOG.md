@@ -1,4 +1,8 @@
-## 2.6.0 (Unreleased)
+## 3.0.0 (Unreleased)
+
+### Breaking Changes
+
+- The bundled `eslint` dependency has been updated from requiring `^4.19.1` to requiring `^5.12.1` (see [Migration Guide](https://eslint.org/docs/user-guide/migrating-to-5.0.0)).
 
 ### New Features
 
