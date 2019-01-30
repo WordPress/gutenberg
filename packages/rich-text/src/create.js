@@ -120,6 +120,7 @@ export function create( {
 	unwrapNode,
 	filterString,
 	removeAttribute,
+	filterWhiteSpaceChars = true,
 } = {} ) {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
@@ -144,6 +145,7 @@ export function create( {
 			unwrapNode,
 			filterString,
 			removeAttribute,
+			filterWhiteSpaceChars,
 		} );
 	}
 
@@ -156,6 +158,7 @@ export function create( {
 		unwrapNode,
 		filterString,
 		removeAttribute,
+		filterWhiteSpaceChars,
 	} );
 }
 
@@ -283,6 +286,7 @@ function createFromElement( {
 	unwrapNode,
 	filterString,
 	removeAttribute,
+	filterWhiteSpaceChars = true,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -298,9 +302,11 @@ function createFromElement( {
 	const length = element.childNodes.length;
 
 	const filterStringComplete = ( string ) => {
-		// Reduce any whitespace used for HTML formatting to one space
-		// character, because it will also be displayed as such by the browser.
-		string = string.replace( /[\n\r\t]+/g, ' ' );
+		if ( filterWhiteSpaceChars ) {
+			// Reduce any whitespace used for HTML formatting to one space
+			// character, because it will also be displayed as such by the browser.
+			string = string.replace( /[\n\r\t]+/g, ' ' );
+		}
 
 		if ( filterString ) {
 			string = filterString( string );
@@ -379,6 +385,7 @@ function createFromElement( {
 				filterString,
 				removeAttribute,
 				currentWrapperTags: [ ...currentWrapperTags, format ],
+				filterWhiteSpaceChars,
 			} );
 			format = undefined;
 		} else {
@@ -391,6 +398,7 @@ function createFromElement( {
 				unwrapNode,
 				filterString,
 				removeAttribute,
+				filterWhiteSpaceChars,
 			} );
 		}
 
@@ -481,6 +489,7 @@ function createFromMultilineElement( {
 	filterString,
 	removeAttribute,
 	currentWrapperTags = [],
+	filterWhiteSpaceChars = true,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -508,6 +517,7 @@ function createFromMultilineElement( {
 			unwrapNode,
 			filterString,
 			removeAttribute,
+			filterWhiteSpaceChars,
 		} );
 
 		// If a line consists of one single line break (invisible), consider the

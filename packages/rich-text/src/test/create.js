@@ -100,4 +100,14 @@ describe( 'create', () => {
 		const value = create( { html: '<a href="#">a</a><a href="#a">a</a>' } );
 		expect( value.formats[ 0 ][ 0 ] ).not.toBe( value.formats[ 1 ][ 0 ] );
 	} );
+
+	it( 'should remove new lines when filterWhiteSpaceChars is true', () => {
+		const value = create( { html: 'line1\nline2', filterWhiteSpaceChars: true } );
+		expect( value.text ).toBe( 'line1 line2' );
+	} );
+
+	it( 'should not remove new lines when filterWhiteSpaceChars is false', () => {
+		const value = create( { html: 'line1\nline2', filterWhiteSpaceChars: false } );
+		expect( value.text ).toBe( 'line1\nline2' );
+	} );
 } );

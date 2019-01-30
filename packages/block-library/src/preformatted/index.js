@@ -67,6 +67,7 @@ export const settings = {
 
 		return (
 			<RichText
+				filterWhiteSpaceChars={ false }
 				tagName="pre"
 				value={ content }
 				onChange={ ( nextContent ) => {

@@ -167,6 +167,7 @@ export class RichText extends Component {
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
 			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
 			prepareEditableTree: this.props.prepareEditableTree,
+			filterWhiteSpaceChars: this.props.filterWhiteSpaceChars,
 		} );
 	}
 
@@ -296,7 +297,10 @@ export class RichText extends Component {
 		} );
 
 		if ( typeof content === 'string' ) {
-			const recordToInsert = create( { html: content } );
+			const recordToInsert = create( {
+				html: content,
+				filterWhiteSpaceChars: this.props.filterWhiteSpaceChars,
+			} );
 			this.onChange( insert( record, recordToInsert ) );
 		} else if ( this.onSplit ) {
 			if ( ! content.length ) {
@@ -714,6 +718,7 @@ export class RichText extends Component {
 				html: children.toHTML( value ),
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				filterWhiteSpaceChars: this.props.filterWhiteSpaceChars,
 			} );
 		}
 
@@ -722,6 +727,7 @@ export class RichText extends Component {
 				html: value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				filterWhiteSpaceChars: this.props.filterWhiteSpaceChars,
 			} );
 		}
 
