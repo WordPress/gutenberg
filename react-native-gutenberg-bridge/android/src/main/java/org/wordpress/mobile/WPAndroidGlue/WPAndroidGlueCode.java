@@ -346,14 +346,12 @@ public class WPAndroidGlueCode {
     public void mediaFileUploadFailed(final int mediaId) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onMediaFileUploadFailed(mediaId);
-            mPendingMediaUploadCallback = null;
         }
     }
 
     public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
-            mPendingMediaUploadCallback = null;
         }
     }
 
