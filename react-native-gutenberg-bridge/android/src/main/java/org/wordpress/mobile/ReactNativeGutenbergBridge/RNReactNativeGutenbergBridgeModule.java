@@ -77,7 +77,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.responseHtml(title, html, changed);
     }
 
-    @ReactMethod
+
     public void requestMediaPickFrom(String mediaSource, final Callback onUploadMediaSelected) {
         if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
             mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(onUploadMediaSelected));
@@ -95,8 +95,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {
         return new MediaSelectedCallback() {
-            @Override public void onMediaSelected(String mediaUrl) {
-                jsCallback.invoke(mediaUrl);
+            @Override public void onMediaSelected(int mediaId, String mediaUrl) {
+                jsCallback.invoke(mediaId, mediaUrl);
             }
         };
     }
