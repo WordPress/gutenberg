@@ -162,9 +162,8 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderHeader() {
 		return (
-			<View>
+			<View style={ styles.titleContainer }>
 				<PostTitle
-					style={ styles.title }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
 					placeholder={ 'Add a Title' } />
