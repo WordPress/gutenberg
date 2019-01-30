@@ -72,43 +72,39 @@ describe( 'DatePicker', () => {
 		} );
 
 		it( 'should call onChange with hours, minutes, seconds of the current time when currentDate is undefined', () => {
-			const onChangeSpy = jest.fn();
+			let onChangeSpyArgument;
+			const onChangeSpy = ( arg ) => onChangeSpyArgument = arg;
 			const wrapper = shallow( <DatePicker onChange={ onChangeSpy } /> );
 			const newDate = moment( '1986-10-18T11:00:00' );
 			const current = moment();
+			const newDateWithCurrentTime = newDate
+				.clone()
+				.set( {
+					hours: current.hours(),
+					minutes: current.minutes(),
+					seconds: current.seconds(),
+				} );
 			wrapper.instance().onChangeMoment( newDate );
 
-			expect( onChangeSpy ).toHaveBeenCalledWith(
-				newDate
-					.clone()
-					.set( {
-						hours: current.hours(),
-						minutes: current.minutes(),
-						seconds: current.seconds(),
-					} )
-					.format( TIMEZONELESS_FORMAT )
-			);
+			expect( moment( onChangeSpyArgument ).isSame( newDateWithCurrentTime, 'minute' ) ).toBe( true );
 		} );
 
 		it( 'should call onChange with hours, minutes, seconds of the current time when currentDate is null', () => {
-			const onChangeSpy = jest.fn();
-			const wrapper = shallow(
-				<DatePicker currentDate={ null } onChange={ onChangeSpy } />
-			);
+			let onChangeSpyArgument;
+			const onChangeSpy = ( arg ) => onChangeSpyArgument = arg;
+			const wrapper = shallow( <DatePicker currentDate={ null } onChange={ onChangeSpy } /> );
 			const newDate = moment( '1986-10-18T11:00:00' );
 			const current = moment();
+			const newDateWithCurrentTime = newDate
+				.clone()
+				.set( {
+					hours: current.hours(),
+					minutes: current.minutes(),
+					seconds: current.seconds(),
+				} );
 			wrapper.instance().onChangeMoment( newDate );
 
-			expect( onChangeSpy ).toHaveBeenCalledWith(
-				newDate
-					.clone()
-					.set( {
-						hours: current.hours(),
-						minutes: current.minutes(),
-						seconds: current.seconds(),
-					} )
-					.format( TIMEZONELESS_FORMAT )
-			);
+			expect( moment( onChangeSpyArgument ).isSame( newDateWithCurrentTime, 'minute' ) ).toBe( true );
 		} );
 	} );
 } );
