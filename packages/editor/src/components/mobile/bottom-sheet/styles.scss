@@ -17,7 +17,7 @@
 .separator {
     background-color: $light-gray-400;
     height: 1px;
-    width: 95%;
+    width: 100%;
     margin: auto;
 }
 
@@ -45,37 +45,10 @@
     text-align: center;
 }
 
-// Modal
-
-.modal {
-    margin: 0;
-}
-
-.modalHead {
-    flex-direction: row;
-    width: 100%;
-    margin-bottom: 5px;
-    justify-content: space-between;
-    align-items: center;
+.titleContainer {
+    justify-content: center;
+    flex: 2;
     align-content: center;
-}
-
-.modalContent {
-	flex: 1;
-    background-color: $white;
-}
-
-.modalTitle {
-    color: $dark-gray-600;
-    font-size: 18px;
-    font-weight: 600;
-    flex: 1;
-    margin-bottom: 10px;
-}
-
-.modalActionButton {
-    color: #0087be;
-    font-size: 17px;
 }
 
 // Button
@@ -83,45 +56,4 @@
 .buttonText {
     font-size: 18px;
     padding: 5px;
-}
-
-// Inline
-
-.inlineInput {
-    width: 100%;
-    margin: 0 0;
-}
-
-.inlineInputLabel {
-    color: $dark-gray-600;
-    font-size: 14px;
-    font-weight: bold;
-}
-
-.inlineInputValue {
-    font-size: 18px;
-    align-items: stretch;
-    padding: 4px;
-}
-
-.inlineInputValueSwitch {
-    padding: 5px;
-}
-
-// Cells
-
-.cellLabel {
-    padding: 10px 10px;
-    color: $dark-gray-600;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.cellValue {
-    flex-grow: 1;
-    font-size: 16px;
-    text-align: right;
-    align-items: stretch;
-    align-self: flex-end;
-    padding: 10px;
 }

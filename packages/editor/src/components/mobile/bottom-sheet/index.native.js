@@ -1,27 +1,14 @@
 /**
  * External dependencies
  */
-import React from 'react';
-import { Switch, Text, TextInput, View } from 'react-native';
+import { Text, View } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { URLInput } from '@wordpress/editor';
-import { prependHTTP } from '@wordpress/url';
-
-import {
-	create,
-	insert,
-	isCollapsed,
-	applyFormat,
-	getTextContent,
-	slice,
-} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -48,19 +35,11 @@ class BottomSheet extends Component {
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
-	onLeftButtonPressed() {
-
-	}
-
-	onRightButtonPressed() {
-
-	}
-
-	headerButton(text, color, handler) {
-		return(
-			<Button onClick={ handler }>
-				<Text style={ { ...styles.buttonText, color: color } }>
-					{ text }
+	headerButton( config ) {
+		return (
+			<Button onPress={ config.onPress }>
+				<Text style={ { ...styles.buttonText, color: config.color } }>
+					{ config.text }
 				</Text>
 			</Button>
 		)
@@ -74,8 +53,7 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { isVisible } = this.props;
-		const { hideLeftButton, hideRightButton } = this.props;
+		const { isVisible, leftButtonConfig, rightButtonConfig } = this.props;
 
 		return (
 			<Modal
@@ -93,15 +71,15 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 						<View style={ styles.head }>
 							<View style={ { flex: 1 } }>
-								{ hideLeftButton || this.headerButton(__( "Remove" ), "red", this.onLeftButtonPressed) }
+								{ leftButtonConfig && this.headerButton(leftButtonConfig) }
 							</View>
-							<View style={{justifyContent: 'center', flex: 2, alignContent: 'center'}}>
+							<View style={ styles.titleContainer }>
 								<Text style={ styles.title }>
 									{ this.props.title }
 								</Text>
 							</View>
-							<View style={{ flex: 1 }}>
-								{ hideRightButton || this.headerButton(__("Done"), "#0087be", this.onRightButtonPressed) }
+							<View style={ { flex: 1 } }>
+								{ rightButtonConfig && this.headerButton(rightButtonConfig) }
 							</View>
 						</View>
 
@@ -110,28 +88,9 @@ class BottomSheet extends Component {
 						<View style={ { flexGrow: 1 } }></View>
 						<View style={ { height: this.state.safeAreaBottomInset } } />
 				</View>
-			</Modal> 
+			</Modal>
 		);
 	}
 }
 
 export default BottomSheet;
-
-export function TitleValueCell(props) {
-	const {
-		title,
-		value,
-		onPress,
-	} = props;
-
-	return (
-		<Button style={{ flexDirection: 'row', alignItems: 'center'}} onPress={ onPress }>
-			<Text style={ styles.cellLabel }>
-				{ title }
-			</Text>
-			<Text style={ styles.cellValue }>
-				{ value }
-			</Text>
-		</Button>
-	)
-}

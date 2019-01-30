@@ -176,6 +176,7 @@ export default class ImageEdit extends React.Component {
 				isVisible={ this.state.showSettings }
 				title={ __("Image Settings") }
 				onClose={ onImageSettingsClose }
+				rightButtonConfig={ { text: __("Done"), color: "#0087be", onPress: onImageSettingsClose } }
 			>
 				<TouchableOpacity style={ inspectorStyles.bottomSheetCell } onPress={ () => { } }>
 					<Text style={ inspectorStyles.bottomSheetCellLabel }>{ __( "Alt Text" ) }</Text>
