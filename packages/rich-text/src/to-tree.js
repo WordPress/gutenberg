@@ -3,7 +3,6 @@
  */
 
 import { getFormatType } from './get-format-type';
-import { getActiveFormat } from './get-active-format';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
@@ -44,6 +43,20 @@ function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	};
 }
 
+function getDeepestActiveFormat( { formats, start } ) {
+	if ( start === undefined ) {
+		return;
+	}
+
+	const formatsAtStart = formats[ start ];
+
+	if ( ! formatsAtStart ) {
+		return;
+	}
+
+	return formatsAtStart[ formatsAtStart.length - 1 ];
+}
+
 export function toTree( {
 	value,
 	multilineTag,
@@ -64,6 +77,7 @@ export function toTree( {
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
+	const deepestActiveFormat = getDeepestActiveFormat( value );
 
 	let lastSeparatorFormats;
 	let lastCharacterFormats;
@@ -149,12 +163,8 @@ export function toTree( {
 
 				const { type, attributes = {}, unregisteredAttributes, object } = format;
 
-				if ( isEditableTree && ! object ) {
-					const activeFormat = getActiveFormat( value, type );
-
-					if ( format === activeFormat ) {
-						attributes[ 'data-mce-selected' ] = 'inline-boundary';
-					}
+				if ( isEditableTree && ! object && format === deepestActiveFormat ) {
+					attributes[ 'data-mce-selected' ] = 'inline-boundary';
 				}
 
 				const parent = getParent( pointer );

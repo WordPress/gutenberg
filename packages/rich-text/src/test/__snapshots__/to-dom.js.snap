@@ -45,9 +45,7 @@ exports[`recordToDom should create a value with image object 1`] = `
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
-  <em
-    data-mce-selected="inline-boundary"
-  >
+  <em>
     <img
       src=""
     />
@@ -59,9 +57,7 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em
-    data-mce-selected="inline-boundary"
-  >
+  <em>
     <img
       src=""
     />
@@ -87,9 +83,7 @@ exports[`recordToDom should create a value with image object and text before 1`]
 
 exports[`recordToDom should create a value with nested formatting 1`] = `
 <body>
-  <em
-    data-mce-selected="inline-boundary"
-  >
+  <em>
     <strong
       data-mce-selected="inline-boundary"
     >
