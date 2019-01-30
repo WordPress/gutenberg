@@ -2,7 +2,9 @@
 
 exports[`recordToDom should create a value with formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-mce-selected="inline-boundary"
+  >
     test
   </em>
   
@@ -11,7 +13,9 @@ exports[`recordToDom should create a value with formatting 1`] = `
 
 exports[`recordToDom should create a value with formatting for split tags 1`] = `
 <body>
-  <em>
+  <em
+    data-mce-selected="inline-boundary"
+  >
     test
   </em>
   
@@ -21,6 +25,7 @@ exports[`recordToDom should create a value with formatting for split tags 1`] = 
 exports[`recordToDom should create a value with formatting with attributes 1`] = `
 <body>
   <a
+    data-mce-selected="inline-boundary"
     href="#"
   >
     test
@@ -40,7 +45,9 @@ exports[`recordToDom should create a value with image object 1`] = `
 
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-mce-selected="inline-boundary"
+  >
     <img
       src=""
     />
@@ -52,7 +59,9 @@ exports[`recordToDom should create a value with image object and formatting 1`] 
 
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
-  <em>
+  <em
+    data-mce-selected="inline-boundary"
+  >
     <img
       src=""
     />
@@ -78,8 +87,12 @@ exports[`recordToDom should create a value with image object and text before 1`]
 
 exports[`recordToDom should create a value with nested formatting 1`] = `
 <body>
-  <em>
-    <strong>
+  <em
+    data-mce-selected="inline-boundary"
+  >
+    <strong
+      data-mce-selected="inline-boundary"
+    >
       test
     </strong>
   </em>
@@ -109,7 +122,9 @@ exports[`recordToDom should create an empty value from empty tags 1`] = `
 
 exports[`recordToDom should filter format attributes with settings 1`] = `
 <body>
-  <strong>
+  <strong
+    data-mce-selected="inline-boundary"
+  >
     test
   </strong>
   
@@ -157,7 +172,9 @@ exports[`recordToDom should handle br 1`] = `
 
 exports[`recordToDom should handle br with formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-mce-selected="inline-boundary"
+  >
     
     <br />
     
@@ -325,7 +342,9 @@ exports[`recordToDom should preserve emoji 1`] = `
 
 exports[`recordToDom should preserve emoji in formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-mce-selected="inline-boundary"
+  >
     🍒
   </em>
   

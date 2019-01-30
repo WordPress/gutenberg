@@ -147,17 +147,21 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes = {}, object } = format;
-				const activeFormat = getActiveFormat( value, type );
+				const { type, attributes = {}, unregisteredAttributes, object } = format;
 
-				if ( format === activeFormat ) {
-					attributes[ 'data-mce-selected' ] = 'inline-boundary';
+				if ( isEditableTree && ! object ) {
+					const activeFormat = getActiveFormat( value, type );
+
+					if ( format === activeFormat ) {
+						attributes[ 'data-mce-selected' ] = 'inline-boundary';
+					}
 				}
 
 				const parent = getParent( pointer );
 				const newNode = append( parent, fromFormat( {
 					type,
 					attributes,
+					unregisteredAttributes,
 					object,
 				} ) );
 

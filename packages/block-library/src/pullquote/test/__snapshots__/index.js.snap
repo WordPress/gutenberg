@@ -17,7 +17,7 @@ exports[`core/pullquote block edit matches snapshot 1`] = `
               aria-autocomplete="list"
               aria-label="Write quote…"
               aria-multiline="true"
-              class="editor-rich-text__tinymce"
+              class="editor-rich-text__editable"
               contenteditable="true"
               data-is-placeholder-visible="true"
               role="textbox"
@@ -29,7 +29,7 @@ exports[`core/pullquote block edit matches snapshot 1`] = `
               </p>
             </div>
             <div
-              class="editor-rich-text__tinymce"
+              class="editor-rich-text__editable"
             >
               <p>
                 Write quote…

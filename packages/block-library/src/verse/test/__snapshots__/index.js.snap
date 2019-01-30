@@ -13,7 +13,7 @@ exports[`core/verse block edit matches snapshot 1`] = `
           aria-autocomplete="list"
           aria-label="Write…"
           aria-multiline="true"
-          class="editor-rich-text__tinymce"
+          class="editor-rich-text__editable"
           contenteditable="true"
           data-is-placeholder-visible="true"
           role="textbox"
@@ -23,7 +23,7 @@ exports[`core/verse block edit matches snapshot 1`] = `
           />
         </pre>
         <pre
-          class="editor-rich-text__tinymce"
+          class="editor-rich-text__editable"
         >
           Write…
         </pre>

@@ -176,6 +176,9 @@ export default class Editable extends Component {
 			onBlur,
 		} = this.props;
 
+		ariaProps.role = 'textbox';
+		ariaProps[ 'aria-multiline' ] = true;
+
 		return createElement( tagName, {
 			...ariaProps,
 			className: classnames( className, CLASS_NAME ),
