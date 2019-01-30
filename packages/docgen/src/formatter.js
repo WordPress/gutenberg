@@ -1,5 +1,5 @@
 const formatParams = ( params, docs ) => {
-	if ( params.length > 0 ) {
+	if ( params && params.length > 0 ) {
 		docs.push( '*Parameters*' );
 		docs.push( '\n' );
 		docs.push( ...params.map(
@@ -12,7 +12,7 @@ const formatParams = ( params, docs ) => {
 };
 
 const formatOutput = ( output, docs ) => {
-	if ( output.length === 1 ) {
+	if ( output && output.length === 1 ) {
 		docs.push( '*Output*' );
 		docs.push( '\n' );
 		docs.push( '\n' );
