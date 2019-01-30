@@ -79,7 +79,7 @@ class PostPublishPanelPostpublish extends Component {
 							/* translators: %s: post type singular name */
 							__( '%s address' ), postLabel
 						) }
-						value={ post.link }
+						value={ decodeURIComponent( post.link ) }
 						onFocus={ this.onSelectInput }
 					/>
 					<div className="post-publish-panel__postpublish-buttons">

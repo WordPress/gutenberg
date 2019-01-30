@@ -78,7 +78,7 @@ class PostPermalink extends Component {
 		const ariaLabel = isCopied ? __( 'Permalink copied' ) : __( 'Copy the permalink' );
 
 		const { prefix, suffix } = permalinkParts;
-		const slug = postSlug || cleanForSlug( postTitle ) || postID;
+		const slug = decodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
 		const samplePermalink = ( isEditable ) ? prefix + slug + suffix : prefix;
 
 		return (
