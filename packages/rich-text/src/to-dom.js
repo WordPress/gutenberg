@@ -157,6 +157,7 @@ export function toDom( {
 	multilineTag,
 	multilineWrapperTags,
 	prepareEditableTree,
+	isEditableTree = true,
 } ) {
 	let startPath = [];
 	let endPath = [];
@@ -182,10 +183,12 @@ export function toDom( {
 		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
 		},
-		isEditableTree: true,
+		isEditableTree,
 	} );
 
-	padEmptyLines( { element: tree, multilineWrapperTags } );
+	if ( isEditableTree ) {
+		padEmptyLines( { element: tree, multilineWrapperTags } );
+	}
 
 	return {
 		body: tree,

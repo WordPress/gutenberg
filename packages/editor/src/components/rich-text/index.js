@@ -771,6 +771,7 @@ export class RichText extends Component {
 				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				isEditableTree: false,
 			} ).body.childNodes );
 		}
 
