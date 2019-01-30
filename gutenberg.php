@@ -5,6 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Version: 5.1.1
  * Author: Gutenberg Team
+ * Text Domain: gutenberg
  *
  * @package gutenberg
  */
