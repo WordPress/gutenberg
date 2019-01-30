@@ -246,7 +246,7 @@ module.exports = function() {
 					// Attempt to exract nplurals from header
 					const pluralsMatch = ( baseData.headers[ 'plural-forms' ] || '' ).match( /nplurals\s*=\s*(\d+);/ );
 					if ( pluralsMatch ) {
-						nplurals = pluralsMatch[ 1 ];
+						nplurals = parseInt( pluralsMatch[ 1 ], 10 );
 					}
 				}
 

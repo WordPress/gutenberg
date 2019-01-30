@@ -1,3 +1,9 @@
+## v2.1.1 (Unreleased)
+
+### Bug Fix
+
+- Fixed Babel plugin for POT file generation to properly handle plural numbers specified in the passed header. ([#13577](https://github.com/WordPress/gutenberg/pull/13577))
+
 ## 2.1.0 (2018-09-05)
 
 ### New Feature
