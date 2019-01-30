@@ -20,7 +20,7 @@
 	padding-left: $block-padding;
 	padding-right: $block-padding;
 
-	@include break-small() {
+	@include break-medium() {
 		padding-left: $block-padding + $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
 		padding-right: $block-padding + $block-padding + $block-side-ui-width + $block-side-ui-clearance + $block-side-ui-clearance;
 	}
@@ -35,7 +35,7 @@
 		// Responsiveness: Allow wrapping on mobile.
 		flex-wrap: wrap;
 
-		@include break-small() {
+		@include break-medium() {
 			flex-wrap: nowrap;
 		}
 
@@ -43,7 +43,7 @@
 		> [data-type="core/column"] {
 			display: flex;
 			flex-direction: column;
-			flex: 1;
+			margin-bottom: calc(1em + #{$block-padding});
 
 			// The Column block is a child of the Columns block and is mostly a passthrough container.
 			// Therefore it shouldn't add additional paddings and margins, so we reset these, and compensate for margins.
@@ -85,33 +85,15 @@
 			overflow-wrap: break-word; // New standard.
 
 			// Responsiveness: Show at most one columns on mobile.
-			flex-basis: 100%;
+			width: 100%;
 
-			// Beyond mobile, allow 2 columns.
-			@include break-small() {
-				flex-basis: 50%;
-				flex-grow: 0;
-			}
-
-			// Add space between columns. Themes can customize this if they wish to work differently.
-			// This has to match the same padding applied in style.scss.
-			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
-			@include break-small() {
-				&:nth-child(odd) {
-					margin-right: $grid-size-large * 2;
-				}
-				&:nth-child(even) {
-					margin-left: $grid-size-large * 2;
-				}
-			}
-
-			@include break-small() {
+			@include break-medium() {
 				&:not(:first-child) {
-					margin-left: $grid-size-large * 2;
+					margin-left: $grid-size-large + $block-padding;
 				}
 
 				&:not(:last-child) {
-					margin-right: $grid-size-large * 2;
+					margin-right: $grid-size-large + $block-padding;
 				}
 			}
 		}
