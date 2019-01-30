@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, TextInput, TouchableWithoutFeedback } from 'react-native';
+import { View, Image, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -102,7 +102,7 @@ export default class ImageEdit extends React.Component {
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
-		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
+		setAttributes( { id: payload.mediaId } );
 		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
 	}
 
@@ -130,7 +130,7 @@ export default class ImageEdit extends React.Component {
 			} );
 		};
 
-		if ( ! url && !this.state.isUploadFailed) {
+		if ( ! url ) {
 			const onMediaUploadButtonPressed = () => {
 				requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
@@ -204,10 +204,10 @@ export default class ImageEdit extends React.Component {
 										source={ { uri: url } }
 										key={ url }
 									/>
-									{this.state.isUploadFailed && <Text style={ styles.uploadFailedContainer }>
+									{ this.state.isUploadFailed && <View style={ styles.uploadFailedContainer }>
 										<Dashicon icon={ 'arrow-down-alt' }/>
 										<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.Please tap for options.' ) }</Text>
-									</View>}
+									</View> }
 								</View>
 							);
 						} }
