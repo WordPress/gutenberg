@@ -56,12 +56,12 @@ export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
 
-export function onImageFailedRetry( mediaId ) {
-	return RNReactNativeGutenbergBridge.onImageFailedRetry( mediaId );
+export function requestImageFailedRetryDialog( mediaId ) {
+	return RNReactNativeGutenbergBridge.requestImageFailedRetryDialog( mediaId );
 }
 
-export function onImageUploadCancel( mediaId ) {
-	return RNReactNativeGutenbergBridge.onImageUploadCancel( mediaId );
+export function requestImageUploadCancelDialog( mediaId ) {
+	return RNReactNativeGutenbergBridge.requestImageUploadCancelDialog( mediaId );
 }
 
 export default RNReactNativeGutenbergBridge;

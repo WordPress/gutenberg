@@ -95,9 +95,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void onImageFailedRetry(final int mediaId) {
-        mGutenbergBridgeJS2Parent.onImageFailedRetry(mediaId);
+    public void requestImageFailedRetryDialog(final int mediaId) {
+        mGutenbergBridgeJS2Parent.requestImageFailedRetryDialog(mediaId);
     }
+
 
     private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {
         return new MediaSelectedCallback() {
