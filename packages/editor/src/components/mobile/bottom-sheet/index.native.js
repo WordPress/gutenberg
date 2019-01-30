@@ -92,18 +92,25 @@ class BottomSheet extends Component {
 				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
 					<View style={ styles.dragIndicator } />
 						<View style={ styles.head }>
-							{ hideLeftButton || this.headerButton(__( "Remove" ), "red", this.onLeftButtonPressed) }
-							<Text style={ styles.title }>
-								{ this.props.title }
-							</Text>
-							{ hideRightButton || this.headerButton(__("Done"), "#0087be", this.onRightButtonPressed) }
+							<View style={ { flex: 1 } }>
+								{ hideLeftButton || this.headerButton(__( "Remove" ), "red", this.onLeftButtonPressed) }
+							</View>
+							<View style={{justifyContent: 'center', flex: 2, alignContent: 'center'}}>
+								<Text style={ styles.title }>
+									{ this.props.title }
+								</Text>
+							</View>
+							<View style={{ flex: 1 }}>
+								{ hideRightButton || this.headerButton(__("Done"), "#0087be", this.onRightButtonPressed) }
+							</View>
 						</View>
+
 						<View style={ styles.separator } />
 						{ this.props.children }
 						<View style={ { flexGrow: 1 } }></View>
 						<View style={ { height: this.state.safeAreaBottomInset } } />
 				</View>
-			</Modal>
+			</Modal> 
 		);
 	}
 }

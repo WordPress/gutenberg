@@ -16,7 +16,7 @@
 				onPress={ onPress }
 				disabled={ disabled }
 			>
-				<View style={ { flexDirection: 'row' } }>
+				<View style={ { flexDirection: 'row', justifyContent: 'center' } }>
 					{ children }
 				</View>
 			</TouchableOpacity>
