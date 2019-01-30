@@ -246,13 +246,13 @@ module.exports = function() {
 					// Attempt to exract nplurals from header
 					const pluralsMatch = ( baseData.headers[ 'plural-forms' ] || '' ).match( /nplurals\s*=\s*(\d+);/ );
 					if ( pluralsMatch ) {
-						nplurals = pluralsMatch[ 1 ];
+						nplurals = parseInt( pluralsMatch[ 1 ], 10 );
 					}
 				}
 
 				// Create empty msgstr or array of empty msgstr by nplurals
 				if ( translation.msgid_plural ) {
-					translation.msgstr = Array.from( Array( parseInt( nplurals, 10 ) ) ).map( () => '' );
+					translation.msgstr = Array.from( Array( nplurals ) ).map( () => '' );
 				} else {
 					translation.msgstr = '';
 				}
