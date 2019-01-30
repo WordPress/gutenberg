@@ -4,7 +4,7 @@
 	position: relative;
 }
 
-.editor-rich-text__tinymce {
+.editor-rich-text__editable {
 	margin: 0;
 	position: relative;
 	line-height: $editor-line-height;
@@ -113,7 +113,7 @@
 	}
 
 	// Placeholder text.
-	& + .editor-rich-text__tinymce {
+	& + .editor-rich-text__editable {
 		pointer-events: none;
 
 		// Use opacity to work in various editor styles.
@@ -126,7 +126,7 @@
 
 	// Captions may have lighter (gray) text, or be shown on a range of different background luminosites.
 	// To ensure legibility, we increase the default placeholder opacity to ensure contrast.
-	&[data-is-placeholder-visible="true"] + figcaption.editor-rich-text__tinymce {
+	&[data-is-placeholder-visible="true"] + figcaption.editor-rich-text__editable {
 		opacity: 0.8;
 	}
 }

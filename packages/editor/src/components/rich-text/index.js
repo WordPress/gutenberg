@@ -55,7 +55,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
+import Editable from './editable';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
@@ -165,7 +165,7 @@ export class RichText extends Component {
 			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
 			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
 			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
+			filterString: ( string ) => string.replace( '\uFEFF', '' ),
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
@@ -814,13 +814,12 @@ export class RichText extends Component {
 			onTagNameChange,
 		} = this.props;
 
+		// Generating a key that includes `tagName` ensures that if the tag
+		// changes, we replace the relevant element. This is needed because we
+		// prevent Editable component updates.
+		const key = Tagname;
 		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
-
-		// Generating a key that includes `tagName` ensures that if the tag
-		// changes, we unmount and destroy the previous TinyMCE element, then
-		// mount and initialize a new child element in its place.
-		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
 		const record = this.getRecord();
@@ -855,7 +854,7 @@ export class RichText extends Component {
 				>
 					{ ( { listBoxId, activeId } ) => (
 						<Fragment>
-							<TinyMCE
+							<Editable
 								tagName={ Tagname }
 								style={ style }
 								record={ record }
@@ -880,7 +879,7 @@ export class RichText extends Component {
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
-									className={ classnames( 'editor-rich-text__tinymce', className ) }
+									className={ classnames( 'editor-rich-text__editable', className ) }
 									style={ style }
 								>
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
