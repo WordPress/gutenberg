@@ -49,14 +49,16 @@ if (isJitPack) {
         // If false, it will try to use globally installed node.
         download = true
 
+        def tmpdir = "${System.getenv('TMPDIR')}/jsbundle/${System.getenv('VERSION')}"
+
         // Set the work directory for unpacking node
-        workDir = file("${project.buildDir}/jsbundle/nodejs")
+        workDir = file("${tmpdir}/nodejs")
 
         // Set the work directory for NPM
-        npmWorkDir = file("${project.buildDir}/jsbundle/npm")
+        npmWorkDir = file("${tmpdir}/npm")
 
         // Set the work directory for Yarn
-        yarnWorkDir = file("${project.buildDir}/jsbundle/yarn")
+        yarnWorkDir = file("${tmpdir}/yarn")
 
         // Set the work directory where node_modules should be located
         nodeModulesDir = file("${project.projectDir}/../../")
