@@ -2,7 +2,7 @@
 	// Hide the Block UI when dragging the block.
 	// This ensures the page scroll properly (no sticky elements).
 	.editor-block-contextual-toolbar {
-		// I think important is fine here to avoid over complexing the selector.
+		// It's probably okay to use !important here to avoid over-complicating the selector.
 		display: none !important;
 	}
 }
@@ -570,8 +570,9 @@
 			}
 		}
 
-		// Don't show on hover.
-		&.is-hovered > .editor-block-list__block-edit > .editor-block-mover {
+		// Don't show on hover, or on the "ghost" when dragging.
+		&.is-hovered > .editor-block-list__block-edit > .editor-block-mover,
+		&.is-dragging > .editor-block-list__block-edit > .editor-block-mover {
 			display: none;
 		}
 	}
