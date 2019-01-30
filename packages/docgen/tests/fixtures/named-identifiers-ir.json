@@ -1,0 +1,23 @@
+[
+	{
+		"name": "functionDeclaration",
+		"description": "Function declaration example.",
+		"params": [],
+		"return": [],
+		"tags": []
+	},
+	{
+		"name": "variableDeclaration",
+		"description": "Variable declaration example.",
+		"params": [],
+		"return": [],
+		"tags": []
+	},
+	{
+		"name": "ClassDeclaration",
+		"description": "Class declaration example.",
+		"params": [],
+		"return": [],
+		"tags": []
+	}
+]

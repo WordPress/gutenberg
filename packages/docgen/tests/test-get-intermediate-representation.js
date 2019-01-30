@@ -307,12 +307,16 @@ test( 'IR - named (JSDoc in module dependency)', function( t ) {
 		'utf-8'
 	);
 	const getModuleImportNamed = () => JSON.parse( fs.readFileSync(
-		path.join( __dirname, './fixtures/named-function-ir.json' ),
+		path.join( __dirname, './fixtures/named-identifiers-ir.json' ),
 		'utf-8'
 	) );
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenImportNamed ), { body: [] }, getModuleImportNamed ),
-		[ { name: 'myDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[
+			{ name: 'functionDeclaration', description: 'Function declaration example.', params: [], return: [], tags: [] },
+			{ name: 'variableDeclaration', description: 'Variable declaration example.', params: [], return: [], tags: [] },
+			{ name: 'ClassDeclaration', description: 'Class declaration example.', params: [], return: [], tags: [] },
+		]
 	);
 	const tokenDefaultExported = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default-exported.json' ),

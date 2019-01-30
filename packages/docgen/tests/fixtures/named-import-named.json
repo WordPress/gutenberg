@@ -1,52 +1,110 @@
 {
 	"type": "ExportNamedDeclaration",
 	"start": 0,
-	"end": 49,
+	"end": 101,
 	"range": [
 		0,
-		49
+		101
 	],
 	"declaration": null,
 	"specifiers": [
 		{
 			"type": "ExportSpecifier",
-			"start": 9,
-			"end": 22,
+			"start": 10,
+			"end": 29,
 			"range": [
-				9,
-				22
+				10,
+				29
 			],
 			"local": {
 				"type": "Identifier",
-				"start": 9,
-				"end": 22,
+				"start": 10,
+				"end": 29,
 				"range": [
-					9,
-					22
+					10,
+					29
 				],
-				"name": "myDeclaration"
+				"name": "functionDeclaration"
 			},
 			"exported": {
 				"type": "Identifier",
-				"start": 9,
-				"end": 22,
+				"start": 10,
+				"end": 29,
 				"range": [
-					9,
-					22
+					10,
+					29
 				],
-				"name": "myDeclaration"
+				"name": "functionDeclaration"
+			}
+		},
+		{
+			"type": "ExportSpecifier",
+			"start": 32,
+			"end": 51,
+			"range": [
+				32,
+				51
+			],
+			"local": {
+				"type": "Identifier",
+				"start": 32,
+				"end": 51,
+				"range": [
+					32,
+					51
+				],
+				"name": "variableDeclaration"
+			},
+			"exported": {
+				"type": "Identifier",
+				"start": 32,
+				"end": 51,
+				"range": [
+					32,
+					51
+				],
+				"name": "variableDeclaration"
+			}
+		},
+		{
+			"type": "ExportSpecifier",
+			"start": 54,
+			"end": 70,
+			"range": [
+				54,
+				70
+			],
+			"local": {
+				"type": "Identifier",
+				"start": 54,
+				"end": 70,
+				"range": [
+					54,
+					70
+				],
+				"name": "ClassDeclaration"
+			},
+			"exported": {
+				"type": "Identifier",
+				"start": 54,
+				"end": 70,
+				"range": [
+					54,
+					70
+				],
+				"name": "ClassDeclaration"
 			}
 		}
 	],
 	"source": {
 		"type": "Literal",
-		"start": 30,
-		"end": 48,
+		"start": 79,
+		"end": 100,
 		"range": [
-			30,
-			48
+			79,
+			100
 		],
-		"value": "./named-function",
-		"raw": "'./named-function'"
+		"value": "./named-identifiers",
+		"raw": "'./named-identifiers'"
 	}
 }
