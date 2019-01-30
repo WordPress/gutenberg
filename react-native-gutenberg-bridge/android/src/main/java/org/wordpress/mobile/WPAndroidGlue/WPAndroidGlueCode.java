@@ -74,7 +74,12 @@ public class WPAndroidGlueCode {
         void onCapturePhotoButtonClicked();
     }
 
-    protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener) {
+    public interface OnReattachQueryListener {
+        void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+                                             final OnReattachQueryListener onReattachQueryListener) {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
             public void responseHtml(String title, String html, boolean changed) {
@@ -86,22 +91,30 @@ public class WPAndroidGlueCode {
                 mGetContentCountDownLatch.countDown();
             }
 
-            @Override public void onMediaLibraryPressed(MediaSelectedCallback mediaSelectedCallback) {
+            @Override
+            public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
                 onMediaLibraryButtonListener.onMediaLibraryButtonClicked();
             }
 
             @Override
-            public void onUploadMediaPressed(MediaUploadCallback mediaUploadCallback) {
+            public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onMediaLibraryButtonListener.onUploadMediaButtonClicked();
             }
 
             @Override
-            public void onCapturePhotoPressed(MediaUploadCallback mediaUploadCallback) {
+            public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 onMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
+
+            @Override
+            public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
+                mPendingMediaUploadCallback = mediaUploadCallback;
+                onReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+            }
+
         });
         return Arrays.asList(
                 new MainReactPackage(),
@@ -113,6 +126,7 @@ public class WPAndroidGlueCode {
 
     public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+                             OnReattachQueryListener onReattachQueryListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost) {
         mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
@@ -121,7 +135,7 @@ public class WPAndroidGlueCode {
                 ReactInstanceManager.builder()
                                     .setApplication(application)
                                     .setJSMainModulePath("index")
-                                    .addPackages(getPackages(onMediaLibraryButtonListener))
+                                    .addPackages(getPackages(onMediaLibraryButtonListener, onReattachQueryListener))
                                     .setUseDeveloperSupport(isDebug)
                                     .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
@@ -319,9 +333,9 @@ public class WPAndroidGlueCode {
         return "";
     }
 
-    public void appendMediaFile(final String mediaUrl) {
+    public void appendMediaFile(int mediaId, final String mediaUrl) {
         if (mPendingMediaSelectedCallback != null) {
-            mPendingMediaSelectedCallback.onMediaSelected(mediaUrl);
+            mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl);
             mPendingMediaSelectedCallback = null;
         }
     }

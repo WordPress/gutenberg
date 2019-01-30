@@ -35,6 +35,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private static final int MEDIA_SERVER_ID_UNKNOWN = 0;
 
+    private static final String MEDIA_SOURCE_MEDIA_LIBRARY = "SITE_MEDIA_LIBRARY";
+    private static final String MEDIA_SOURCE_DEVICE_LIBRARY = "DEVICE_MEDIA_LIBRARY";
+    private static final String MEDIA_SOURCE_DEVICE_CAMERA = "DEVICE_CAMERA";
+
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,
             GutenbergBridgeJS2Parent gutenbergBridgeJS2Parent) {
@@ -73,46 +77,38 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.responseHtml(title, html, changed);
     }
 
+
     @ReactMethod
-    public void onMediaLibraryPressed(final Callback onMediaSelected) {
-        mGutenbergBridgeJS2Parent.onMediaLibraryPressed(new MediaSelectedCallback() {
-            @Override public void onMediaSelected(String mediaUrl) {
-                onMediaSelected.invoke(mediaUrl);
-            }
-        });
+    public void requestMediaPickFrom(String mediaSource, final Callback onUploadMediaSelected) {
+        if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
+            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(onUploadMediaSelected));
+        } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_LIBRARY)) {
+            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewUploadMediaCallback(onUploadMediaSelected));
+        } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
+            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewUploadMediaCallback(onUploadMediaSelected));
+        }
     }
 
     @ReactMethod
-    public void onUploadMediaPressed(final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.onUploadMediaPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
-            @Override
-            public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
-                onUploadMediaSelected.invoke(mediaId, mediaUri, 0);
-            }
-
-            @Override
-            public void onMediaFileUploadProgress(int mediaId, float progress) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_UPLOADING, mediaId, null, progress);
-            }
-
-            @Override
-            public void onMediaFileUploadSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
-            }
-
-            @Override
-            public void onMediaFileUploadFailed(int mediaId) {
-                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0 );
-            }
-        });
+    public void mediaUploadSync() {
+        mGutenbergBridgeJS2Parent.mediaUploadSync(getNewUploadMediaCallback(null));
     }
 
-    @ReactMethod
-    public void onCapturePhotoPressed(final Callback onUploadMediaSelected) {
-        mGutenbergBridgeJS2Parent.onCapturePhotoPressed(new GutenbergBridgeJS2Parent.MediaUploadCallback() {
+    private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {
+        return new MediaSelectedCallback() {
+            @Override public void onMediaSelected(int mediaId, String mediaUrl) {
+                jsCallback.invoke(mediaId, mediaUrl);
+            }
+        };
+    }
+
+    private GutenbergBridgeJS2Parent.MediaUploadCallback getNewUploadMediaCallback(final Callback jsCallback) {
+        return new GutenbergBridgeJS2Parent.MediaUploadCallback() {
             @Override
             public void onUploadMediaFileSelected(int mediaId, String mediaUri) {
-                onUploadMediaSelected.invoke(mediaId, mediaUri, 0);
+                if (jsCallback != null) {
+                    jsCallback.invoke(mediaId, mediaUri, 0);
+                }
             }
 
             @Override
@@ -129,7 +125,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             public void onMediaFileUploadFailed(int mediaId) {
                 setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
             }
-        });
+        };
     }
 
     private void setMediaFileUploadDataInJS(int state, int mediaId, String mediaUrl, float progress) {

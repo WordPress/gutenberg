@@ -4,7 +4,7 @@ public interface GutenbergBridgeJS2Parent {
     void responseHtml(String title, String html, boolean changed);
 
     interface MediaSelectedCallback {
-        void onMediaSelected(String mediaUrl);
+        void onMediaSelected(int mediaId, String mediaUrl);
     }
 
     interface MediaUploadCallback {
@@ -14,9 +14,11 @@ public interface GutenbergBridgeJS2Parent {
         void onMediaFileUploadFailed(int mediaId);
     }
 
-    void onMediaLibraryPressed(MediaSelectedCallback mediaSelectedCallback);
+    void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback);
 
-    void onUploadMediaPressed(MediaUploadCallback mediaUploadCallback);
+    void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback);
     
-    void onCapturePhotoPressed(MediaUploadCallback mediaUploadCallback);
+    void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback);
+
+    void mediaUploadSync(MediaUploadCallback mediaUploadCallback);
 }
