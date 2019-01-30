@@ -59,7 +59,6 @@ export default class ImageEdit extends React.Component {
 
 	onImagePressed() {
 		const { attributes } = this.props;
-		debugger;
 
 		// TODO here check whether image is failed. If it is, then call onImageFailedRetry
 		// if it is not, then call onImageUploadCancel
