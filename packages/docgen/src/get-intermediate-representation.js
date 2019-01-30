@@ -136,9 +136,9 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 			ir.push( {
 				name: entry.exportName,
 				description: get( doc, [ 'description' ], UNDOCUMENTED ),
-				params: getTagsByName( doc.tags, 'param' ),
-				return: getTagsByName( doc.tags, 'return' ),
-				tags: doc.tags,
+				params: getTagsByName( get( doc, [ 'tags' ], [] ), 'param' ),
+				return: getTagsByName( get( doc, [ 'tags' ], [] ), 'return' ),
+				tags: get( doc, [ 'tags' ], [] ),
 			} );
 		}
 	} );
