@@ -145,7 +145,7 @@ export default class ImageEdit extends React.Component {
 
 		const onImageSettingsButtonPressed = () => {
 
-		}
+		};
 
 		const toolbarEditButton = (
 			<Toolbar>
