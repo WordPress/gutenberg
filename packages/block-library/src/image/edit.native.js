@@ -19,7 +19,7 @@ import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
-import inspectorStyles from './inspector-styles.scss'
+import inspectorStyles from './inspector-styles.scss';
 
 const MEDIA_ULOAD_STATE_UPLOADING = 1;
 const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
@@ -146,12 +146,12 @@ export default class ImageEdit extends React.Component {
 		}
 
 		const onImageSettingsButtonPressed = () => {
-			this.setState( { showSettings: true } )
+			this.setState( { showSettings: true } );
 		};
 
 		const onImageSettingsClose = () => {
-			this.setState( { showSettings: false } )
-		}
+			this.setState( { showSettings: false } );
+		};
 
 		const toolbarEditButton = (
 			<Toolbar>
@@ -172,18 +172,18 @@ export default class ImageEdit extends React.Component {
 		);
 
 		const getInspectorControls = () => (
-			<BottomSheet 
+			<BottomSheet
 				isVisible={ this.state.showSettings }
-				title={ __("Image Settings") }
+				title={ __( 'Image Settings' ) }
 				onClose={ onImageSettingsClose }
-				rightButtonConfig={ { text: __("Done"), color: "#0087be", onPress: onImageSettingsClose } }
+				rightButtonConfig={ { text: __( 'Done' ), color: '#0087be', onPress: onImageSettingsClose } }
 			>
 				<TouchableOpacity style={ inspectorStyles.bottomSheetCell } onPress={ () => { } }>
-					<Text style={ inspectorStyles.bottomSheetCellLabel }>{ __( "Alt Text" ) }</Text>
-					<Text style={ inspectorStyles.bottomSheetCellValue }>{ __( "None" ) }</Text>
+					<Text style={ inspectorStyles.bottomSheetCellLabel }>{ __( 'Alt Text' ) }</Text>
+					<Text style={ inspectorStyles.bottomSheetCellValue }>{ __( 'None' ) }</Text>
 				</TouchableOpacity>
 			</BottomSheet>
-		)
+		);
 
 		const showSpinner = this.state.isUploadInProgress;
 		const opacity = this.state.isUploadInProgress ? 0.3 : 1;

@@ -14,10 +14,10 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import Button from './button'
+import Button from './button';
 
 class BottomSheet extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		this.state = {
@@ -42,7 +42,7 @@ class BottomSheet extends Component {
 					{ config.text }
 				</Text>
 			</Button>
-		)
+		);
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
@@ -69,24 +69,24 @@ class BottomSheet extends Component {
 			>
 				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
 					<View style={ styles.dragIndicator } />
-						<View style={ styles.head }>
-							<View style={ { flex: 1 } }>
-								{ leftButtonConfig && this.headerButton(leftButtonConfig) }
-							</View>
-							<View style={ styles.titleContainer }>
-								<Text style={ styles.title }>
-									{ this.props.title }
-								</Text>
-							</View>
-							<View style={ { flex: 1 } }>
-								{ rightButtonConfig && this.headerButton(rightButtonConfig) }
-							</View>
+					<View style={ styles.head }>
+						<View style={ { flex: 1 } }>
+							{ leftButtonConfig && this.headerButton( leftButtonConfig ) }
 						</View>
+						<View style={ styles.titleContainer }>
+							<Text style={ styles.title }>
+								{ this.props.title }
+							</Text>
+						</View>
+						<View style={ { flex: 1 } }>
+							{ rightButtonConfig && this.headerButton( rightButtonConfig ) }
+						</View>
+					</View>
 
-						<View style={ styles.separator } />
-						{ this.props.children }
-						<View style={ { flexGrow: 1 } }></View>
-						<View style={ { height: this.state.safeAreaBottomInset } } />
+					<View style={ styles.separator } />
+					{ this.props.children }
+					<View style={ { flexGrow: 1 } }></View>
+					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</View>
 			</Modal>
 		);

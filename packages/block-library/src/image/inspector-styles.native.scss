@@ -1,7 +1,7 @@
 //Bottom Sheet
 
 .bottomSheetCell {
-    flex-direction: row;
+	flex-direction: row;
 	min-height: 60;
 	justify-content: space-between;
 	padding-left: 12;
@@ -11,10 +11,10 @@
 
 .bottomSheetCellLabel {
 	font-size: 18px;
-	color: black;
+	color: #000;
 }
 
 .bottomSheetCellValue {
 	font-size: 18px;
-	color: gray;
+	color: $dark-gray-400;
 }
