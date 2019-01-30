@@ -160,11 +160,6 @@ public class WPAndroidGlueCode {
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
         mReactRootView.setAppProperties(initialProps);
-
-        if (isNewPost) {
-            setTitle("");
-            setContent("");
-        }
     }
 
     public void attachToContainer(ViewGroup viewGroup) {
