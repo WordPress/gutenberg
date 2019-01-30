@@ -60,4 +60,8 @@ export function onImageFailedRetry( mediaId ) {
 	return RNReactNativeGutenbergBridge.onImageFailedRetry( mediaId );
 }
 
+export function onImageUploadCancel( mediaId ) {
+	return RNReactNativeGutenbergBridge.onImageUploadCancel( mediaId );
+}
+
 export default RNReactNativeGutenbergBridge;
