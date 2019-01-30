@@ -385,6 +385,10 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
+					fontFamily= { this.props.fontFamily }
+					fontSize= { this.props.fontSize }
+					fontWeight= { this.props.fontWeight }
+					fontStyle= { this.props.fontStyle }
 				/>
 			</View>
 		);
