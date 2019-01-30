@@ -19,6 +19,7 @@ import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
+import styles from './styles.scss';
 
 const MEDIA_ULOAD_STATE_UPLOADING = 1;
 const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
@@ -180,16 +181,16 @@ export default class ImageEdit extends React.Component {
 						}
 
 						return (
-							<View style={ { flex: 1, justifyContent: 'center', alignItems: 'center' } } >
+							<View style={ styles.imageContainer } >
 								<Image
 									style={ { width: finalWidth, height: finalHeight, opacity } }
 									resizeMethod="scale"
 									source={ { uri: url } }
 									key={ url }
 								/>
-								{this.state.isUploadFailed && <View style={ { position: 'absolute', flexDirection: 'column', alignItems: 'center'} }>
+								{this.state.isUploadFailed && <Text style={ styles.uploadFailedContainer }>
 									<Dashicon icon={ 'arrow-down-alt' }/>
-									<Text style={ { color: 'white', fontSize: 14, marginTop: 5 } }>{ __( 'Failed to insert media.Please tap for options.' ) }</Text>
+									<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.Please tap for options.' ) }</Text>
 								</View>}
 							</View>
 						);
