@@ -893,13 +893,6 @@ JS;
 		'after'
 	);
 
-	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
-	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
-	// are available in Gutenberg. Fixes
-	// https://github.com/WordPress/gutenberg/issues/5667.
-	$user_can_richedit = user_can_richedit();
-	add_filter( 'user_can_richedit', '__return_true' );
-
 	wp_enqueue_script( 'wp-edit-post' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
@@ -1134,7 +1127,7 @@ JS;
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
 		'imageSizes'             => gutenberg_get_available_image_sizes(),
-		'richEditingEnabled'     => $user_can_richedit,
+		'richEditingEnabled'     => user_can_richedit(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,
