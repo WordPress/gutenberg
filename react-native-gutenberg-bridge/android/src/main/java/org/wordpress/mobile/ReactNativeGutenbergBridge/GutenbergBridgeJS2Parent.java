@@ -22,5 +22,5 @@ public interface GutenbergBridgeJS2Parent {
 
     void mediaUploadSync(MediaUploadCallback mediaUploadCallback);
 
-    void onImageFailedRetry(MediaUploadCallback mediaUploadCallback, int mediaId);
+    void onImageFailedRetry(int mediaId);
 }

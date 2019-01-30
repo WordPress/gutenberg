@@ -114,8 +114,7 @@ public class WPAndroidGlueCode {
                 onReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
 
-            @Override public void onImageFailedRetry(MediaUploadCallback mediaUploadCallback, int mediaId) {
-                mPendingMediaUploadCallback = mediaUploadCallback;
+            @Override public void onImageFailedRetry(int mediaId) {
                 onMediaLibraryButtonListener.onRetryUploadForMediaClicked(mediaId);
             }
         });
