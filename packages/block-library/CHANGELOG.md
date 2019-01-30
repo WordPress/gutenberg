@@ -3,6 +3,7 @@
 ### New Feature
 
 - Add background color controls for the table block.
+- Add new `RSS` block (#7966)
 
 ## 2.2.12 (2019-01-03)
 
