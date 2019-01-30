@@ -316,9 +316,9 @@ public class WPAndroidGlueCode {
         return "";
     }
 
-    public void appendMediaFile(final String mediaUrl) {
+    public void appendMediaFile(int mediaId, final String mediaUrl) {
         if (mPendingMediaSelectedCallback != null) {
-            mPendingMediaSelectedCallback.onMediaSelected(mediaUrl);
+            mPendingMediaSelectedCallback.onMediaSelected(mediaId, mediaUrl);
             mPendingMediaSelectedCallback = null;
         }
     }
