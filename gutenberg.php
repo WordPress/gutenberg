@@ -201,8 +201,6 @@ function gutenberg_pre_init() {
  * @return bool   Whether Gutenberg was initialized.
  */
 function gutenberg_init( $return, $post ) {
-	global $title, $post_type;
-
 	if ( true === $return && current_filter() === 'replace_editor' ) {
 		return $return;
 	}
@@ -224,17 +222,6 @@ function gutenberg_init( $return, $post ) {
 	add_filter( 'screen_options_show_screen', '__return_false' );
 	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
-	$post_type_object = get_post_type_object( $post_type );
-
-	/*
-	 * Always force <title> to 'Edit Post' (or equivalent)
-	 * because it needs to be in a generic state for both
-	 * post-new.php and post.php?post=<id>.
-	 */
-	if ( ! empty( $post_type_object ) ) {
-		$title = $post_type_object->labels->edit_item;
-	}
-
 	/*
 	 * Remove the emoji script as it is incompatible with both React and any
 	 * contenteditable fields.
@@ -253,19 +240,6 @@ function gutenberg_init( $return, $post ) {
 
 	return true;
 }
-
-/**
- * Redirects the demo page to edit a new post.
- */
-function gutenberg_redirect_demo() {
-	global $pagenow;
-
-	if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'gutenberg' === $_GET['page'] ) {
-		wp_safe_redirect( admin_url( 'post-new.php?gutenberg-demo' ) );
-		exit;
-	}
-}
-add_action( 'admin_init', 'gutenberg_redirect_demo' );
 
 /**
  * Adds the filters to register additional links for the Gutenberg editor in

@@ -6,7 +6,7 @@ The Gutenberg project provides three sources of documentation:
 
 Learn how to build blocks and extend the editor, best practices for designing block interfaces, and how to create themes that make the most of the new features Gutenberg provides.
 
-[Visit the Designer & Developer Handbook](../docs/designers-developers/readme.md)
+[Visit the Designer & Developer Handbook](/docs/designers-developers/readme.md)
 
 ## User Handbook
 
@@ -17,4 +17,4 @@ Discover the new features Gutenberg offers, learn how your site will be affected
 
 Help make Gutenberg better by contributing ideas, code, testing, and more.
 
-[Visit the Contributor Handbook](../docs/contributors/readme.md)
+[Visit the Contributor Handbook](/docs/contributors/readme.md)

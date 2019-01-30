@@ -130,4 +130,48 @@ describe( 'indentListItems', () => {
 		expect( result ).not.toBe( record );
 		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
 	} );
+
+	it( 'should indent one level at a time', () => {
+		// As we're testing list formats, the text should remain the same.
+		const text = `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4`;
+		const record = {
+			formats: [ , [ ul ], , [ ul, ul ], , , , ],
+			text,
+			start: 6,
+			end: 6,
+		};
+
+		const result1 = indentListItems( deepFreeze( record ), ul );
+
+		expect( result1 ).not.toBe( record );
+		expect( getSparseArrayLength( result1.formats ) ).toBe( 3 );
+		expect( result1 ).toEqual( {
+			formats: [ , [ ul ], , [ ul, ul ], , [ ul ], , ],
+			text,
+			start: 6,
+			end: 6,
+		} );
+
+		const result2 = indentListItems( deepFreeze( result1 ), ul );
+
+		expect( result2 ).not.toBe( result1 );
+		expect( getSparseArrayLength( result2.formats ) ).toBe( 3 );
+		expect( result2 ).toEqual( {
+			formats: [ , [ ul ], , [ ul, ul ], , [ ul, ul ], , ],
+			text,
+			start: 6,
+			end: 6,
+		} );
+
+		const result3 = indentListItems( deepFreeze( result2 ), ul );
+
+		expect( result3 ).not.toBe( result2 );
+		expect( getSparseArrayLength( result3.formats ) ).toBe( 3 );
+		expect( result3 ).toEqual( {
+			formats: [ , [ ul ], , [ ul, ul ], , [ ul, ul, ul ], , ],
+			text,
+			start: 6,
+			end: 6,
+		} );
+	} );
 } );
