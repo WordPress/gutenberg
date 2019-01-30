@@ -54,9 +54,9 @@ class PostTitle extends Component {
 				style={ [ style, {
 					minHeight: Math.max( minHeight, this.state.aztecHeight ),
 				} ] }
-				fontFamily= { 'serif' }
-				fontSize= { 24 }
-				fontWeight= { 'bold' }
+				fontFamily={ 'serif' }
+				fontSize={ 24 }
+				fontWeight={ 'bold' }
 				onChange={ ( event ) => {
 					this.props.onUpdate( event.content );
 				} }
