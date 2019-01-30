@@ -286,7 +286,7 @@ describe( 'SolarSystem', () => {
 } );
 ```
 
-Reducer tests are also be a great fit for snapshots. They are often large, complex data structures that shouldn't change unexpectedly, exactly what snapshots excel at!
+Reducer tests are also a great fit for snapshots. They are often large, complex data structures that shouldn't change unexpectedly, exactly what snapshots excel at!
 
 #### Working with snapshots
 
