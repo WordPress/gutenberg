@@ -2,13 +2,14 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, TextInput, Text } from 'react-native';
+import { View, Image, TextInput, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
 	mediaUploadSync,
+	onImageFailedRetry,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -40,6 +41,7 @@ export default class ImageEdit extends React.Component {
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.onImagePressed = this.onImagePressed.bind( this );
 	}
 
 	componentDidMount() {
@@ -53,6 +55,19 @@ export default class ImageEdit extends React.Component {
 
 	componentWillUnmount() {
 		this.removeMediaUploadListener();
+	}
+
+	onImagePressed() {
+		const { attributes } = this.props;
+		debugger;
+
+		// TODO here check whether image is failed. If it is, then call onImageFailedRetry
+		// if it is not, then call onImageUploadCancel
+		if ( this.state.isUploadInProgress ) {
+			// TODO call onImageUploadCancel
+		} else if ( attributes.id && ! isURL( attributes.url ) ) {
+			onImageFailedRetry( attributes.id );
+		}
 	}
 
 	mediaUpload( payload ) {
@@ -115,7 +130,7 @@ export default class ImageEdit extends React.Component {
 			} );
 		};
 
-		if ( ! url ) {
+		if ( ! url && !this.state.isUploadFailed) {
 			const onMediaUploadButtonPressed = () => {
 				requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 					if ( mediaUri ) {
@@ -158,56 +173,58 @@ export default class ImageEdit extends React.Component {
 		const progress = this.state.progress * 100;
 
 		return (
-			<View style={ { flex: 1 } }>
-				{ showSpinner && <Spinner progress={ progress } /> }
-				<BlockControls>
-					{ toolbarEditButton }
-				</BlockControls>
-				<ImageSize src={ url } >
-					{ ( sizes ) => {
-						const {
-							imageWidthWithinContainer,
-							imageHeightWithinContainer,
-						} = sizes;
+			<TouchableWithoutFeedback onPress={ this.onImagePressed } >
+				<View style={ { flex: 1 } }>
+					{ showSpinner && <Spinner progress={ progress } /> }
+					<BlockControls>
+						{ toolbarEditButton }
+					</BlockControls>
+					<ImageSize src={ url } >
+						{ ( sizes ) => {
+							const {
+								imageWidthWithinContainer,
+								imageHeightWithinContainer,
+							} = sizes;
 
-						let finalHeight = imageHeightWithinContainer;
-						if ( height > 0 && height < imageHeightWithinContainer ) {
-							finalHeight = height;
-						}
+							let finalHeight = imageHeightWithinContainer;
+							if ( height > 0 && height < imageHeightWithinContainer ) {
+								finalHeight = height;
+							}
 
-						let finalWidth = imageWidthWithinContainer;
-						if ( width > 0 && width < imageWidthWithinContainer ) {
-							finalWidth = width;
-						}
+							let finalWidth = imageWidthWithinContainer;
+							if ( width > 0 && width < imageWidthWithinContainer ) {
+								finalWidth = width;
+							}
 
-						return (
-							<View style={ styles.imageContainer } >
-								<Image
-									style={ { width: finalWidth, height: finalHeight, opacity } }
-									resizeMethod="scale"
-									source={ { uri: url } }
-									key={ url }
-								/>
-								{this.state.isUploadFailed && <Text style={ styles.uploadFailedContainer }>
-									<Dashicon icon={ 'arrow-down-alt' }/>
-									<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.Please tap for options.' ) }</Text>
-								</View>}
-							</View>
-						);
-					} }
-				</ImageSize>
-				{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-					<View style={ { padding: 12, flex: 1 } }>
-						<TextInput
-							style={ { textAlign: 'center' } }
-							underlineColorAndroid="transparent"
-							value={ caption }
-							placeholder={ __( 'Write caption…' ) }
-							onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
-						/>
-					</View>
-				) }
-			</View>
+							return (
+								<View style={ styles.imageContainer } >
+									<Image
+										style={ { width: finalWidth, height: finalHeight, opacity } }
+										resizeMethod="scale"
+										source={ { uri: url } }
+										key={ url }
+									/>
+									{this.state.isUploadFailed && <Text style={ styles.uploadFailedContainer }>
+										<Dashicon icon={ 'arrow-down-alt' }/>
+										<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.Please tap for options.' ) }</Text>
+									</View>}
+								</View>
+							);
+						} }
+					</ImageSize>
+					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
+						<View style={ { padding: 12, flex: 1 } }>
+							<TextInput
+								style={ { textAlign: 'center' } }
+								underlineColorAndroid="transparent"
+								value={ caption }
+								placeholder={ __( 'Write caption…' ) }
+								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+							/>
+						</View>
+					) }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
