@@ -23,9 +23,10 @@ import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
 import styles from './styles.scss';
 
-const MEDIA_ULOAD_STATE_UPLOADING = 1;
-const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
-const MEDIA_ULOAD_STATE_FAILED = 3;
+const MEDIA_UPLOAD_STATE_UPLOADING = 1;
+const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
+const MEDIA_UPLOAD_STATE_FAILED = 3;
+const MEDIA_UPLOAD_STATE_RESET = 4;
 
 export default class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -76,14 +77,17 @@ export default class ImageEdit extends React.Component {
 		}
 
 		switch ( payload.state ) {
-			case MEDIA_ULOAD_STATE_UPLOADING:
+			case MEDIA_UPLOAD_STATE_UPLOADING:
 				this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
 				break;
-			case MEDIA_ULOAD_STATE_SUCCEEDED:
+			case MEDIA_UPLOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
 				break;
-			case MEDIA_ULOAD_STATE_FAILED:
+			case MEDIA_UPLOAD_STATE_FAILED:
 				this.finishMediaUploadWithFailure( payload );
+				break;
+			case MEDIA_UPLOAD_STATE_RESET:
+				this.mediaUploadStateReset( payload );
 				break;
 		}
 	}
@@ -102,6 +106,13 @@ export default class ImageEdit extends React.Component {
 
 		setAttributes( { id: payload.mediaId } );
 		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
+	}
+
+	mediaUploadStateReset( payload ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { id: payload.mediaId, url: null } );
+		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 	}
 
 	addMediaUploadListener() {
