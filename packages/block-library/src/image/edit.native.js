@@ -15,7 +15,7 @@ import {
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Spinner, TextareaControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
@@ -40,6 +40,7 @@ export default class ImageEdit extends React.Component {
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.updateAlt = this.updateAlt.bind( this );
 	}
 
 	componentDidMount() {
@@ -105,9 +106,13 @@ export default class ImageEdit extends React.Component {
 		}
 	}
 
+	updateAlt( newAlt ) {
+		this.props.setAttributes( { alt: newAlt } );
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width } = attributes;
+		const { url, caption, height, width, alt } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
 			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
@@ -172,8 +177,14 @@ export default class ImageEdit extends React.Component {
 			>
 				<TouchableOpacity style={ inspectorStyles.bottomSheetCell } onPress={ () => { } }>
 					<Text style={ inspectorStyles.bottomSheetCellLabel }>{ __( 'Alt Text' ) }</Text>
-					<Text style={ inspectorStyles.bottomSheetCellValue }>{ __( 'None' ) }</Text>
+					<Text style={ inspectorStyles.bottomSheetCellValue }>{ alt || __( 'None' ) }</Text>
 				</TouchableOpacity>
+				<TextareaControl
+					label={ __( 'Alt Text (Alternative Text)' ) }
+					value={ alt }
+					onChange={ this.updateAlt }
+					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+				/>
 			</BottomSheet>
 		);
 
