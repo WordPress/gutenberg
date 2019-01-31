@@ -65,6 +65,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestMediaUploadSync() {
         print("Gutenberg request for media uploads to be resync")
     }
+
+    func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int) {
+
+    }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {

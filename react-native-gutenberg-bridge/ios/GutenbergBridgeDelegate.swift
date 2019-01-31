@@ -29,6 +29,10 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaUploadSync()
 
+    /// Tells the delegate that an image block requested for the actions available for the media upload.
+    ///
+    func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int)
+
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///
     func gutenbergDidLoad()
