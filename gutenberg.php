@@ -220,7 +220,6 @@ function gutenberg_init( $return, $post ) {
 
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
-	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
 
 	/*
 	 * Remove the emoji script as it is incompatible with both React and any
@@ -299,18 +298,15 @@ function gutenberg_replace_default_add_new_button() {
  * Adds the block-editor-page class to the body tag on the Gutenberg page.
  *
  * @since 1.5.0
+ * @deprecated 5.0.0
  *
  * @param string $classes Space separated string of classes being added to the body tag.
  * @return string The $classes string, with block-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
-	// gutenberg-editor-page is left for backward compatibility.
-	if ( current_theme_supports( 'editor-styles' ) && current_theme_supports( 'dark-editor-style' ) ) {
-		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive is-dark-theme";
-	} else {
-		// Default to is-fullscreen-mode to avoid jumps in the UI.
-		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive";
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
+
+	return $classes;
 }
 
 /**
