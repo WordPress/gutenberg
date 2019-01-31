@@ -19,7 +19,6 @@
 /packages/edit-post                             @WordPress/gutenberg-core
 /packages/editor                                @WordPress/gutenberg-core @nosolosw
 /packages/list-reusable-blocks                  @WordPress/gutenberg-core
-/packages/rich-text                             @WordPress/gutenberg-core
 /packages/shortcode                             @WordPress/gutenberg-core
 
 # Tooling
