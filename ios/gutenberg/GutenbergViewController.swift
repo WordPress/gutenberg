@@ -76,7 +76,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("Gutenberg request for media uploads to be resync")
     }
 
-    func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int) {
+    func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int32) {
         guard let progress = mediaUploadCoordinator.progressForUpload(mediaID: mediaID) else {
             return
         }

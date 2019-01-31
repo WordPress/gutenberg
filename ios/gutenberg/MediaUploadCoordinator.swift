@@ -7,15 +7,15 @@ class MediaUploadCoordinator: NSObject {
   
   private let gutenberg: Gutenberg
 
-  private var activeUploads: [Int: Progress] = [:]
+  private var activeUploads: [Int32: Progress] = [:]
   
   init(gutenberg: Gutenberg) {
       self.gutenberg = gutenberg
   }
 
-  func upload(url: URL) -> Int? {
+  func upload(url: URL) -> Int32? {
     //Make sure the media is not larger than a 32 bits to number to avoid problems when bridging to JS
-    let mediaID = Int(Int32(truncatingIfNeeded:UUID().uuidString.hash))
+    let mediaID = Int32(truncatingIfNeeded:UUID().uuidString.hash)
     let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
     progress.totalUnitCount = 100
     activeUploads[mediaID] = progress
@@ -27,11 +27,11 @@ class MediaUploadCoordinator: NSObject {
     return mediaID
   }
 
-  func progressForUpload(mediaID: Int) -> Progress? {
+  func progressForUpload(mediaID: Int32) -> Progress? {
     return activeUploads[mediaID]
   }
 
-  func retryUpload(with mediaID: Int) {
+  func retryUpload(with mediaID: Int32) {
     guard let progress = activeUploads[mediaID] else {
       return
     }
@@ -39,7 +39,7 @@ class MediaUploadCoordinator: NSObject {
     Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerFireMethod(_:)), userInfo: progress, repeats: true)
   }
 
-  func cancelUpload(with mediaID: Int) {
+  func cancelUpload(with mediaID: Int32) {
     guard let progress = activeUploads[mediaID] else {
       return
     }
@@ -48,7 +48,7 @@ class MediaUploadCoordinator: NSObject {
   
   @objc func timerFireMethod(_ timer: Timer) {
     guard let progress = timer.userInfo as? Progress,
-      let mediaID = progress.userInfo[.mediaID] as? Int,
+      let mediaID = progress.userInfo[.mediaID] as? Int32,
       let mediaURL = progress.userInfo[.mediaURL] as? URL
       else {
         timer.invalidate()
