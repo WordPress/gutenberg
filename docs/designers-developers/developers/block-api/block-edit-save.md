@@ -21,7 +21,7 @@ edit() {
 {% ESNext %}
 ```jsx
 edit() {
-	return <div> Your block. </div>;
+	return <div>Your block.</div>;
 }
 ```
 {% end %}
