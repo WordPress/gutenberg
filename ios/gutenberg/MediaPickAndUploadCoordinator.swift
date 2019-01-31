@@ -8,6 +8,8 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
   private let presenter: UIViewController
   private let mediaCallback: MediaPickerDidPickMediaCallback
   private let gutenberg: Gutenberg
+
+  private var activeUploads: [String: Progress] = [:]
   
   init(presenter: UIViewController,
        gutenberg: Gutenberg,
@@ -62,7 +64,25 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
     mediaCallback(mediaID.hashValue, url.absoluteString)
     let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
     progress.totalUnitCount = 100
+    activeUploads[mediaID] = progress
+    let timer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerFireMethod(_:)), userInfo: progress, repeats: true)
+    progress.cancellationHandler = { () in
+      timer.invalidate()
+    }
+  }
+
+  func retryUpload(with mediaID: String) {
+    guard let progress = activeUploads[mediaID] else {
+      return
+    }
     Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerFireMethod(_:)), userInfo: progress, repeats: true)
+  }
+
+  func cancelUpload(with mediaID: String) {
+    guard let progress = activeUploads[mediaID] else {
+      return
+    }
+    progress.cancel()
   }
   
   @objc func timerFireMethod(_ timer: Timer) {
@@ -79,6 +99,7 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
       gutenberg.mediaUploadUpdate(id: mediaID.hashValue, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
     } else if progress.fractionCompleted >= 1 {
       timer.invalidate()
+      activeUploads[mediaID] = nil
       gutenberg.mediaUploadUpdate(id: mediaID.hashValue, state: .failed, progress: 1, url: nil, serverID: nil)
     }
   }
