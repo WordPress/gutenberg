@@ -233,7 +233,7 @@ save( { attributes } ) {
 {% end %}
 
 
-When saving your block, you want save the attributes in the same format specified by the attribute source definition.  If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
+When saving your block, you want to save the attributes in the same format specified by the attribute source definition. If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/designers-developers/developers/block-api/block-attributes.md) for more details.
 
 ## Examples
 
