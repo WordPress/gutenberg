@@ -77,7 +77,37 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     }
 
     func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int) {
-        
+        guard let progress = mediaUploadCoordinator.progressForUpload(mediaID: mediaID) else {
+            return
+        }
+
+        let title: String = "Media Options"
+        var message: String? = ""
+        let alertController = UIAlertController(title: title, message: nil, preferredStyle: .actionSheet)
+        let dismissAction = UIAlertAction(title: "Dismiss", style: .cancel) { (action) in
+
+        }
+        alertController.addAction(dismissAction)
+
+        if progress.fractionCompleted < 1 {
+            let cancelUploadAction = UIAlertAction(title: "Cancel upload", style: .destructive) { (action) in
+                self.mediaUploadCoordinator.cancelUpload(with: mediaID)
+            }
+            alertController.addAction(cancelUploadAction)
+        } else if let error = progress.userInfo[.mediaError] as? String {
+            message = error
+            let retryUploadAction = UIAlertAction(title: "Retry upload", style: .default) { (action) in
+                self.mediaUploadCoordinator.retryUpload(with: mediaID)
+            }
+            alertController.addAction(retryUploadAction)
+        }
+
+        alertController.title = title
+        alertController.message = message
+        alertController.popoverPresentationController?.sourceView = view
+        alertController.popoverPresentationController?.sourceRect = view.frame
+        alertController.popoverPresentationController?.permittedArrowDirections = .any
+        present(alertController, animated: true, completion: nil)
     }
 }
 

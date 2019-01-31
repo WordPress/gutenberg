@@ -110,6 +110,7 @@ extension Gutenberg {
         case uploading = 1
         case succeeded = 2
         case failed = 3
+        case reset = 4
     }
     
 }
