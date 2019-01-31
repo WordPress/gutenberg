@@ -55,7 +55,8 @@ class MediaUploadCoordinator: NSObject {
         return
     }
     progress.completedUnitCount += 1
-    let successfull = false
+    //Variable to switch upload final state from success to failure.
+    let successfull = true
     if progress.fractionCompleted < 1 {
       gutenberg.mediaUploadUpdate(id: mediaID, state: .uploading, progress: Float(progress.fractionCompleted), url: nil, serverID: nil)
     } else if progress.fractionCompleted >= 1 {
