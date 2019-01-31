@@ -22,7 +22,7 @@ registerPlugin( 'edit-post', {
 						<Fragment>
 							<MenuItem
 								role="menuitem"
-								href="edit.php?post_type=wp_block"
+								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 							>
 								{ __( 'Manage All Reusable Blocks' ) }
 							</MenuItem>
