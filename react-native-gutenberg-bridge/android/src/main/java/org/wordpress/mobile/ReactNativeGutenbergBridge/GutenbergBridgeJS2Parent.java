@@ -24,4 +24,6 @@ public interface GutenbergBridgeJS2Parent {
     void mediaUploadSync(MediaUploadCallback mediaUploadCallback);
 
     void requestImageFailedRetryDialog(int mediaId);
+
+    void requestImageUploadCancelDialog(int mediaId);
 }
