@@ -2,10 +2,12 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.support.annotation.Nullable;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 
 import com.facebook.infer.annotation.Assertions;
@@ -17,11 +19,14 @@ import com.facebook.react.uimanager.PixelUtil;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.UIManagerModule;
+import com.facebook.react.uimanager.ViewDefaults;
+import com.facebook.react.uimanager.ViewProps;
 import com.facebook.react.uimanager.annotations.ReactProp;
 import com.facebook.react.uimanager.events.EventDispatcher;
 import com.facebook.react.views.scroll.ScrollEvent;
 import com.facebook.react.views.scroll.ScrollEventType;
 import com.facebook.react.views.text.DefaultStyleValuesUtil;
+import com.facebook.react.views.text.ReactFontManager;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
 import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
@@ -48,6 +53,7 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
 
     private static final int FOCUS_TEXT_INPUT = 1;
     private static final int BLUR_TEXT_INPUT = 2;
+    private static final int UNSET = -1;
 
     // we define the same codes in ReactAztecText as they have for ReactNative's TextInput, so
     // it's easier to handle focus between Aztec and TextInput instances on the same screen.
@@ -187,6 +193,91 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
             view.setActiveFormats(new ArrayList<String>());
         }
     }
+
+    /*
+     The code below was taken from the class ReactTextInputManager
+     */
+    @ReactProp(name = ViewProps.FONT_SIZE, defaultFloat = ViewDefaults.FONT_SIZE_SP)
+    public void setFontSize(ReactAztecText view, float fontSize) {
+        view.setTextSize(
+                TypedValue.COMPLEX_UNIT_PX,
+                (int) Math.ceil(PixelUtil.toPixelFromSP(fontSize)));
+    }
+
+    @ReactProp(name = ViewProps.FONT_FAMILY)
+    public void setFontFamily(ReactAztecText view, String fontFamily) {
+        int style = Typeface.NORMAL;
+        if (view.getTypeface() != null) {
+            style = view.getTypeface().getStyle();
+        }
+        Typeface newTypeface = ReactFontManager.getInstance().getTypeface(
+                fontFamily,
+                style,
+                view.getContext().getAssets());
+        view.setTypeface(newTypeface);
+    }
+
+    /**
+     /* This code was taken from the method setFontWeight of the class ReactTextShadowNode
+     /* TODO: Factor into a common place they can both use
+     */
+    @ReactProp(name = ViewProps.FONT_WEIGHT)
+    public void setFontWeight(ReactAztecText view, @Nullable String fontWeightString) {
+        int fontWeightNumeric = fontWeightString != null ?
+                parseNumericFontWeight(fontWeightString) : -1;
+        int fontWeight = UNSET;
+        if (fontWeightNumeric >= 500 || "bold".equals(fontWeightString)) {
+            fontWeight = Typeface.BOLD;
+        } else if ("normal".equals(fontWeightString) ||
+                (fontWeightNumeric != -1 && fontWeightNumeric < 500)) {
+            fontWeight = Typeface.NORMAL;
+        }
+        Typeface currentTypeface = view.getTypeface();
+        if (currentTypeface == null) {
+            currentTypeface = Typeface.DEFAULT;
+        }
+        if (fontWeight != currentTypeface.getStyle()) {
+            view.setTypeface(currentTypeface, fontWeight);
+        }
+    }
+
+    /**
+     /* This code was taken from the method setFontStyle of the class ReactTextShadowNode
+     /* TODO: Factor into a common place they can both use
+     */
+    @ReactProp(name = ViewProps.FONT_STYLE)
+    public void setFontStyle(ReactAztecText view, @Nullable String fontStyleString) {
+        int fontStyle = UNSET;
+        if ("italic".equals(fontStyleString)) {
+            fontStyle = Typeface.ITALIC;
+        } else if ("normal".equals(fontStyleString)) {
+            fontStyle = Typeface.NORMAL;
+        }
+
+        Typeface currentTypeface = view.getTypeface();
+        if (currentTypeface == null) {
+            currentTypeface = Typeface.DEFAULT;
+        }
+        if (fontStyle != currentTypeface.getStyle()) {
+            view.setTypeface(currentTypeface, fontStyle);
+        }
+    }
+
+    /**
+     * This code was taken from the method parseNumericFontWeight of the class ReactTextShadowNode
+     * TODO: Factor into a common place they can both use
+     *
+     * Return -1 if the input string is not a valid numeric fontWeight (100, 200, ..., 900), otherwise
+     * return the weight.
+     */
+    private static int parseNumericFontWeight(String fontWeightString) {
+        // This should be much faster than using regex to verify input and Integer.parseInt
+        return fontWeightString.length() == 3 && fontWeightString.endsWith("00")
+                && fontWeightString.charAt(0) <= '9' && fontWeightString.charAt(0) >= '1' ?
+                100 * (fontWeightString.charAt(0) - '0') : -1;
+    }
+
+    /* End of the code taken from ReactTextInputManager */
 
     @ReactProp(name = "color", customType = "Color")
     public void setColor(ReactAztecText view, @Nullable Integer color) {

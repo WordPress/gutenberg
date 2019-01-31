@@ -7,7 +7,8 @@ class GutenbergViewController: UIViewController {
 
     fileprivate lazy var gutenberg = Gutenberg(dataSource: self)
     fileprivate var htmlMode = false
-
+    fileprivate var mediaPickAndUploadCoordinator: MediaPickAndUploadCoordinator?
+    
     override func loadView() {
         view = gutenberg.rootView
     }
@@ -29,22 +30,49 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
+
     func gutenbergDidLoad() {
-
+        
     }
 
-    func gutenbergDidProvideHTML(_ html: String, changed: Bool) {
-        print("Did receive HTML: \(html) changed: \(changed)")
+    func gutenbergDidProvideHTML(title: String, html: String, changed: Bool) {
+        print("didProvideHTML:")
+        print("↳ Content changed: \(changed)")
+        print("↳ Title: \(title)")
+        print("↳ HTML: \(html)")
     }
 
-    func gutenbergDidRequestMediaPicker(with callback: @escaping MediaPickerDidPickMediaCallback) {
-        print("Gutenberg did request media picker, passing a sample url in callback")
-        callback("https://cldup.com/cXyG__fTLN.jpg")
+    func gutenbergDidRequestMedia(from source: MediaPickerSource, with callback: @escaping MediaPickerDidPickMediaCallback) {
+        switch source {
+        case .mediaLibrary:
+            print("Gutenberg did request media picker, passing a sample url in callback")
+            callback(1, "https://cldup.com/cXyG__fTLN.jpg")
+        case .deviceLibrary:
+            print("Gutenberg did request a device media picker, opening the device picker")
+            mediaPickAndUploadCoordinator = MediaPickAndUploadCoordinator(presenter: self, gutenberg: gutenberg, mediaCallback: callback, finishCallback: {
+                self.mediaPickAndUploadCoordinator = nil
+            } )
+            mediaPickAndUploadCoordinator?.pickAndUpload(from: .savedPhotosAlbum)
+        case .deviceCamera:
+            print("Gutenberg did request a device media picker, opening the camera picker")
+            mediaPickAndUploadCoordinator = MediaPickAndUploadCoordinator(presenter: self, gutenberg: gutenberg, mediaCallback: callback, finishCallback: {
+                self.mediaPickAndUploadCoordinator = nil
+            } )
+            mediaPickAndUploadCoordinator?.pickAndUpload(from: .camera)
+        }
+    }
+
+    func gutenbergDidRequestMediaUploadSync() {
+        print("Gutenberg request for media uploads to be resync")
     }
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergInitialContent() -> String? {
+        return nil
+    }
+    
+    func gutenbergInitialTitle() -> String? {
         return nil
     }
 

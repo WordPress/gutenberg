@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>NotoSerif-BoldItalic.ttf</string>
+		<string>NotoSerif-Regular.ttf</string>
+		<string>NotoSerif-Italic.ttf</string>
+		<string>NotoSerif-Bold.ttf</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -39,9 +46,18 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>The app would like to add your location to posts on sites where you have enabled geotagging.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>To take photos or videos to use in your posts.</string>
+	<key>NSLocationUsageDescription</key>
+	<string>The app would like to add your location to posts on sites where you have enabled geotagging.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Enable microphone access to record sound in your videos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>To add photos or videos to your posts.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>To add photos or videos to your posts.</string>
 	<key>NSAppTransportSecurity</key>
-	<!--See http://ste.vn/2015/06/10/configuring-app-transport-security-ios-9-osx-10-11/ -->
 	<dict>
 		<key>NSExceptionDomains</key>
 		<dict>

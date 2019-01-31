@@ -28,8 +28,32 @@ export function subscribeParentToggleHTMLMode( callback ) {
 	return gutenbergBridgeEvents.addListener( 'toggleHTMLMode', callback );
 }
 
+export function subscribeSetTitle( callback ) {
+	return gutenbergBridgeEvents.addListener( 'setTitle', callback );
+}
+
 export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
+}
+
+export function subscribeMediaUpload( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
+}
+
+export function requestMediaPickFromMediaLibrary( callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'SITE_MEDIA_LIBRARY', callback );
+}
+
+export function requestMediaPickFromDeviceLibrary( callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_MEDIA_LIBRARY', callback );
+}
+
+export function requestMediaPickFromDeviceCamera( callback ) {
+	return RNReactNativeGutenbergBridge.requestMediaPickFrom( 'DEVICE_CAMERA', callback );
+}
+
+export function mediaUploadSync() {
+	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
 
 export default RNReactNativeGutenbergBridge;

@@ -6,18 +6,31 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     // MARK: - Messaging methods
 
     @objc
-    func provideToNative_Html(_ html: String, changed: Bool) {
+    func provideToNative_Html(_ html: String, title: String, changed: Bool) {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidProvideHTML(html, changed: changed)
+            self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed)
+        }
+    }
+    
+    @objc
+    func requestMediaPickFrom(_ source: String, callback: @escaping RCTResponseSenderBlock) {
+        let mediaSource: MediaPickerSource = MediaPickerSource(rawValue: source) ?? .deviceLibrary
+
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMedia(from: mediaSource, with: { (mediaID, url) in
+                guard let url = url, let mediaID = mediaID else {
+                    callback(nil)
+                    return
+                }
+                callback([mediaID, url])
+            })
         }
     }
 
     @objc
-    func onMediaLibraryPress(_ callback: @escaping RCTResponseSenderBlock) {
+    func mediaUploadSync() {
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidRequestMediaPicker(with: { (url) in
-                callback(self.optionalArray(from: url))
-            })
+            self.delegate?.gutenbergDidRequestMediaUploadSync()
         }
     }
 
@@ -36,7 +49,9 @@ extension RNReactNativeGutenbergBridge {
         return [
             Gutenberg.EventName.requestHTML,
             Gutenberg.EventName.toggleHTMLMode,
-            Gutenberg.EventName.updateHtml
+            Gutenberg.EventName.setTitle,
+            Gutenberg.EventName.updateHtml,
+            Gutenberg.EventName.mediaUpload
         ]
     }
 
@@ -57,10 +72,12 @@ extension RNReactNativeGutenbergBridge {
 // MARK: - Helpers
 
 extension RNReactNativeGutenbergBridge {
+    
     func optionalArray(from optionalString: String?) -> [String]? {
         guard let string = optionalString else {
             return nil
         }
         return [string]
     }
+
 }
