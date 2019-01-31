@@ -16,6 +16,7 @@ import { withInstanceId } from '@wordpress/compose';
 import ModalFrame from './frame';
 import ModalHeader from './header';
 import * as ariaHelper from './aria-helper';
+import IsolatedEventContainer from '../isolated-event-container';
 
 // Used to count the number of open modals.
 let parentElement,
@@ -26,7 +27,6 @@ class Modal extends Component {
 		super( props );
 
 		this.prepareDOM();
-		this.stopEventPropagationOutsideModal = this.stopEventPropagationOutsideModal.bind( this );
 	}
 
 	/**
@@ -103,14 +103,6 @@ class Modal extends Component {
 	}
 
 	/**
-	 * Stop all onMouseDown events propagating further - they should only go to the modal
- 	 * @param {string} ev Event object
-	 */
-	stopEventPropagationOutsideModal( ev ) {
-		ev.stopPropagation();
-	}
-
-	/**
 	 * Renders the modal.
 	 *
 	 * @return {WPElement} The modal element.
@@ -126,20 +118,18 @@ class Modal extends Component {
 			children,
 			aria,
 			instanceId,
+			isDismissable,
 			...otherProps
 		} = this.props;
 
-		const headingId = (
-			aria.labelledby ||
-			'components-modal-header-' + instanceId
-		);
+		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
 
-		// Disable reason: this stops mouse events from triggering tooltips and other elements underneath the modal overlay
+		// Disable reason: this stops mouse events from triggering tooltips and
+		// other elements underneath the modal overlay.
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		return createPortal(
-			<div
+			<IsolatedEventContainer
 				className={ classnames( 'components-modal__screen-overlay', overlayClassName ) }
-				onMouseDown={ this.stopEventPropagationOutsideModal }
 			>
 				<ModalFrame
 					className={ classnames(
@@ -151,19 +141,21 @@ class Modal extends Component {
 						labelledby: title ? headingId : null,
 						describedby: aria.describedby,
 					} }
-					{ ...otherProps } >
-					<ModalHeader
-						closeLabel={ closeButtonLabel }
-						onClose={ onRequestClose }
-						title={ title }
-						headingId={ headingId }
-						icon={ icon } />
-					<div
-						className={ 'components-modal__content' }>
+					{ ...otherProps }
+				>
+					<div className={ 'components-modal__content' } tabIndex="0">
+						<ModalHeader
+							closeLabel={ closeButtonLabel }
+							headingId={ headingId }
+							icon={ icon }
+							isDismissable={ isDismissable }
+							onClose={ onRequestClose }
+							title={ title }
+						/>
 						{ children }
 					</div>
 				</ModalFrame>
-			</div>,
+			</IsolatedEventContainer>,
 			this.node
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
@@ -178,6 +170,7 @@ Modal.defaultProps = {
 	focusOnMount: true,
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
+	isDismissable: true,
 	/* accessibility */
 	aria: {
 		labelledby: null,

@@ -29,7 +29,7 @@ export function ExternalLink( { href, children, className, rel = '', ...addition
 			<span className="screen-reader-text">
 				{
 					/* translators: accessibility text */
-					__( '(opens in a new window)' )
+					__( '(opens in a new tab)' )
 				}
 			</span>
 			<Dashicon icon="external" className="components-external-link__icon" />

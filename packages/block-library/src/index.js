@@ -5,6 +5,8 @@ import '@wordpress/core-data';
 import {
 	registerBlockType,
 	setDefaultBlockName,
+	setFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
 } from '@wordpress/blocks';
 
 /**
@@ -22,17 +24,21 @@ import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
 import * as column from './columns/column';
-import * as coverImage from './cover-image';
+import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
+import * as html from './html';
+import * as mediaText from './media-text';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
 import * as list from './list';
+import * as missing from './missing';
 import * as more from './more';
 import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
+import * as rss from './rss';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
@@ -42,6 +48,8 @@ import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+
+import * as classic from './classic';
 
 export const registerCoreBlocks = () => {
 	[
@@ -63,17 +71,22 @@ export const registerCoreBlocks = () => {
 		code,
 		columns,
 		column,
-		coverImage,
+		cover,
 		embed,
 		...embed.common,
 		...embed.others,
 		file,
+		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+		html,
+		mediaText,
 		latestComments,
 		latestPosts,
+		missing,
 		more,
 		nextpage,
 		preformatted,
 		pullquote,
+		rss,
 		separator,
 		reusableBlock,
 		spacer,
@@ -83,9 +96,17 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-	].forEach( ( { name, settings } ) => {
+	].forEach( ( block ) => {
+		if ( ! block ) {
+			return;
+		}
+		const { name, settings } = block;
 		registerBlockType( name, settings );
 	} );
 
 	setDefaultBlockName( paragraph.name );
+	if ( window.wp && window.wp.oldEditor ) {
+		setFreeformContentHandlerName( classic.name );
+	}
+	setUnregisteredTypeHandlerName( missing.name );
 };

@@ -3,23 +3,35 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Dropdown, IconButton } from '@wordpress/components';
-import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
+import { compose, ifCondition } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import InserterMenu from './menu';
 
-export { default as InserterResultsPortal } from './results-portal';
+const defaultRenderToggle = ( { onToggle, disabled, isOpen } ) => (
+	<IconButton
+		icon="insert"
+		label={ __( 'Add block' ) }
+		labelPosition="bottom"
+		onClick={ onToggle }
+		className="editor-inserter__toggle"
+		aria-haspopup="true"
+		aria-expanded={ isOpen }
+		disabled={ disabled }
+	/>
+);
 
 class Inserter extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.onToggle = this.onToggle.bind( this );
+		this.renderToggle = this.renderToggle.bind( this );
+		this.renderContent = this.renderContent.bind( this );
 	}
 
 	onToggle( isOpen ) {
@@ -31,20 +43,47 @@ class Inserter extends Component {
 		}
 	}
 
-	render() {
+	/**
+	 * Render callback to display Dropdown toggle element.
+	 *
+	 * @param {Function} options.onToggle Callback to invoke when toggle is
+	 *                                    pressed.
+	 * @param {boolean}  options.isOpen   Whether dropdown is currently open.
+	 *
+	 * @return {WPElement} Dropdown toggle element.
+	 */
+	renderToggle( { onToggle, isOpen } ) {
 		const {
-			items,
-			position,
-			title,
-			children,
-			onInsertBlock,
-			rootClientId,
 			disabled,
+			renderToggle = defaultRenderToggle,
 		} = this.props;
 
-		if ( items.length === 0 ) {
-			return null;
-		}
+		return renderToggle( { onToggle, isOpen, disabled } );
+	}
+
+	/**
+	 * Render callback to display Dropdown content element.
+	 *
+	 * @param {Function} options.onClose Callback to invoke when dropdown is
+	 *                                   closed.
+	 *
+	 * @return {WPElement} Dropdown content element.
+	 */
+	renderContent( { onClose } ) {
+		const { rootClientId, clientId, isAppender } = this.props;
+
+		return (
+			<InserterMenu
+				onSelect={ onClose }
+				rootClientId={ rootClientId }
+				clientId={ clientId }
+				isAppender={ isAppender }
+			/>
+		);
+	}
+
+	render() {
+		const { position, title } = this.props;
 
 		return (
 			<Dropdown
@@ -54,67 +93,24 @@ class Inserter extends Component {
 				onToggle={ this.onToggle }
 				expandOnMobile
 				headerTitle={ title }
-				renderToggle={ ( { onToggle, isOpen } ) => (
-					<IconButton
-						icon="insert"
-						label={ __( 'Add block' ) }
-						onClick={ onToggle }
-						className="editor-inserter__toggle"
-						aria-haspopup="true"
-						aria-expanded={ isOpen }
-						disabled={ disabled }
-					>
-						{ children }
-					</IconButton>
-				) }
-				renderContent={ ( { onClose } ) => {
-					const onSelect = ( item ) => {
-						onInsertBlock( item );
-
-						onClose();
-					};
-
-					return (
-						<InserterMenu
-							items={ items }
-							onSelect={ onSelect }
-							rootClientId={ rootClientId }
-						/>
-					);
-				} }
+				renderToggle={ this.renderToggle }
+				renderContent={ this.renderContent }
 			/>
 		);
 	}
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getEditedPostAttribute,
-			getBlockInsertionPoint,
-			getSelectedBlock,
-			getInserterItems,
+			hasInserterItems,
 		} = select( 'core/editor' );
-		const insertionPoint = getBlockInsertionPoint();
-		const { rootClientId } = insertionPoint;
+
 		return {
 			title: getEditedPostAttribute( 'title' ),
-			insertionPoint,
-			selectedBlock: getSelectedBlock(),
-			items: getInserterItems( rootClientId ),
-			rootClientId,
+			hasItems: hasInserterItems( rootClientId ),
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => ( {
-		onInsertBlock: ( item ) => {
-			const { insertionPoint, selectedBlock } = ownProps;
-			const { index, rootClientId, layout } = insertionPoint;
-			const { name, initialAttributes } = item;
-			const insertedBlock = createBlock( name, { ...initialAttributes, layout } );
-			if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
-				return dispatch( 'core/editor' ).replaceBlocks( selectedBlock.clientId, insertedBlock );
-			}
-			return dispatch( 'core/editor' ).insertBlock( insertedBlock, index, rootClientId );
-		},
-	} ) ),
+	ifCondition( ( { hasItems } ) => hasItems ),
 ] )( Inserter );

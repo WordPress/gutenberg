@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { getBlobByURL, revokeBlobURL } from '@wordpress/blob';
+import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
 	ClipboardButton,
 	IconButton,
@@ -19,6 +19,7 @@ import { Component, Fragment } from '@wordpress/element';
 import {
 	MediaUpload,
 	MediaPlaceholder,
+	MediaUploadCheck,
 	BlockControls,
 	RichText,
 	mediaUpload,
@@ -52,11 +53,10 @@ class FileEdit extends Component {
 		const { href } = attributes;
 
 		// Upload a file drag-and-dropped into the editor
-		if ( this.isBlobURL( href ) ) {
+		if ( isBlobURL( href ) ) {
 			const file = getBlobByURL( href );
 
 			mediaUpload( {
-				allowedType: '*',
 				filesList: [ file ],
 				onFileChange: ( [ media ] ) => this.onSelectFile( media ),
 				onError: ( message ) => {
@@ -86,10 +86,6 @@ class FileEdit extends Component {
 				id: media.id,
 			} );
 		}
-	}
-
-	isBlobURL( url = '' ) {
-		return url.indexOf( 'blob:' ) === 0;
 	}
 
 	confirmCopyURL() {
@@ -143,19 +139,18 @@ class FileEdit extends Component {
 					icon="media-default"
 					labels={ {
 						title: __( 'File' ),
-						name: __( 'a file' ),
+						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),
 					} }
 					onSelect={ this.onSelectFile }
 					notices={ noticeUI }
 					onError={ noticeOperations.createErrorNotice }
 					accept="*"
-					type="*"
 				/>
 			);
 		}
 
 		const classes = classnames( className, {
-			'is-transient': this.isBlobURL( href ),
+			'is-transient': isBlobURL( href ),
 		} );
 
 		return (
@@ -171,46 +166,44 @@ class FileEdit extends Component {
 					} }
 				/>
 				<BlockControls>
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectFile }
-							type="*"
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit file' ) }
-									onClick={ open }
-									icon="edit"
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectFile }
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit file' ) }
+										onClick={ open }
+										icon="edit"
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				</BlockControls>
 				<div className={ classes }>
-					<div className={ `${ className }__content-wrapper` }>
+					<div className={ 'wp-block-file__content-wrapper' }>
 						<RichText
-							wrapperClassName={ `${ className }__textlink` }
+							wrapperClassName={ 'wp-block-file__textlink' }
 							tagName="div" // must be block-level or else cursor disappears
-							format="string"
 							value={ fileName }
-							multiline="false"
 							placeholder={ __( 'Write file name…' ) }
 							keepPlaceholderOnFocus
 							formattingControls={ [] } // disable controls
 							onChange={ ( text ) => setAttributes( { fileName: text } ) }
 						/>
 						{ showDownloadButton &&
-							<div className={ `${ className }__button-richtext-wrapper` }>
+							<div className={ 'wp-block-file__button-richtext-wrapper' }>
 								{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
 								<RichText
 									tagName="div" // must be block-level or else cursor disappears
-									className={ `${ className }__button` }
+									className={ 'wp-block-file__button' }
 									value={ downloadButtonText }
 									formattingControls={ [] } // disable controls
 									placeholder={ __( 'Add text…' ) }
 									keepPlaceholderOnFocus
-									multiline="false"
 									onChange={ ( text ) => setAttributes( { downloadButtonText: text } ) }
 								/>
 							</div>
@@ -220,9 +213,10 @@ class FileEdit extends Component {
 						<ClipboardButton
 							isDefault
 							text={ href }
-							className={ `${ className }__copy-url-button` }
+							className={ 'wp-block-file__copy-url-button' }
 							onCopy={ this.confirmCopyURL }
 							onFinishCopy={ this.resetCopyConfirmation }
+							disabled={ isBlobURL( href ) }
 						>
 							{ showCopyConfirmation ? __( 'Copied!' ) : __( 'Copy URL' ) }
 						</ClipboardButton>

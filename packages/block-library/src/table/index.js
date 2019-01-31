@@ -6,9 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { getPhrasingContentSchema } from '@wordpress/blocks';
-import { RichText } from '@wordpress/editor';
+import { G, Path, SVG } from '@wordpress/components';
+import { RichText, getColorClassName } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -58,9 +59,8 @@ function getTableSectionAttributeSchema( section ) {
 				selector: 'td,th',
 				query: {
 					content: {
-						type: 'array',
-						default: [],
-						source: 'children',
+						type: 'string',
+						source: 'html',
 					},
 					tag: {
 						type: 'string',
@@ -77,8 +77,8 @@ export const name = 'core/table';
 
 export const settings = {
 	title: __( 'Table' ),
-	description: __( 'Insert a table -- perfect for sharing charts and data.' ),
-	icon: <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="none" d="M0 0h24v24H0V0z" /><g><path d="M20 3H5L3 5v14l2 2h15l2-2V5l-2-2zm0 2v3H5V5h15zm-5 14h-5v-9h5v9zM5 10h3v9H5v-9zm12 9v-9h3v9h-3z" /></g></svg>,
+	description: __( 'Insert a table — perfect for sharing charts and data.' ),
+	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M20 3H5L3 5v14l2 2h15l2-2V5l-2-2zm0 2v3H5V5h15zm-5 14h-5v-9h5v9zM5 10h3v9H5v-9zm12 9v-9h3v9h-3z" /></G></SVG>,
 	category: 'formatting',
 
 	attributes: {
@@ -86,10 +86,18 @@ export const settings = {
 			type: 'boolean',
 			default: false,
 		},
+		backgroundColor: {
+			type: 'string',
+		},
 		head: getTableSectionAttributeSchema( 'head' ),
 		body: getTableSectionAttributeSchema( 'body' ),
 		foot: getTableSectionAttributeSchema( 'foot' ),
 	},
+
+	styles: [
+		{ name: 'regular', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'stripes', label: __( 'Stripes' ) },
+	],
 
 	supports: {
 		align: true,
@@ -108,15 +116,24 @@ export const settings = {
 	edit,
 
 	save( { attributes } ) {
-		const { hasFixedLayout, head, body, foot } = attributes;
+		const {
+			hasFixedLayout,
+			head,
+			body,
+			foot,
+			backgroundColor,
+		} = attributes;
 		const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 		if ( isEmpty ) {
 			return null;
 		}
 
-		const classes = classnames( {
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+
+		const classes = classnames( backgroundClass, {
 			'has-fixed-layout': hasFixedLayout,
+			'has-background': !! backgroundClass,
 		} );
 
 		const Section = ( { type, rows } ) => {
@@ -128,13 +145,17 @@ export const settings = {
 
 			return (
 				<Tag>
-					{ rows.map( ( { cells }, rowIndex ) =>
+					{ rows.map( ( { cells }, rowIndex ) => (
 						<tr key={ rowIndex }>
 							{ cells.map( ( { content, tag }, cellIndex ) =>
-								<RichText.Content tagName={ tag } value={ content } key={ cellIndex } />
+								<RichText.Content
+									tagName={ tag }
+									value={ content }
+									key={ cellIndex }
+								/>
 							) }
 						</tr>
-					) }
+					) ) }
 				</Tag>
 			);
 		};

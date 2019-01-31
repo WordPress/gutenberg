@@ -1,16 +1,17 @@
 /**
+ * External dependencies
+ */
+import { times, unescape } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
 import { PanelBody, Placeholder, Spinner, ToggleControl } from '@wordpress/components';
+import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+import { InspectorControls } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { times, unescape } from 'lodash';
-import {
-	InspectorControls,
-	BlockControls,
-	BlockAlignmentToolbar,
-} from '@wordpress/editor';
 
 class CategoriesEdit extends Component {
 	constructor() {
@@ -56,8 +57,7 @@ class CategoriesEdit extends Component {
 	}
 
 	getCategoryListClassName( level ) {
-		const { className } = this.props;
-		return `${ className }__list ${ className }__list-level-${ level }`;
+		return `wp-block-categories__list wp-block-categories__list-level-${ level }`;
 	}
 
 	renderCategoryName( category ) {
@@ -88,7 +88,7 @@ class CategoriesEdit extends Component {
 			<li key={ category.id }>
 				<a href={ category.link } target="_blank">{ this.renderCategoryName( category ) }</a>
 				{ showPostCounts &&
-					<span className={ `${ this.props.className }__post-count` }>
+					<span className="wp-block-categories__post-count">
 						{ ' ' }({ category.count })
 					</span>
 				}
@@ -106,14 +106,20 @@ class CategoriesEdit extends Component {
 	}
 
 	renderCategoryDropdown() {
+		const { instanceId } = this.props;
 		const { showHierarchy } = this.props.attributes;
 		const parentId = showHierarchy ? 0 : null;
 		const categories = this.getCategories( parentId );
-
+		const selectId = `blocks-category-select-${ instanceId }`;
 		return (
-			<select className={ `${ this.props.className }__dropdown` }>
-				{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
-			</select>
+			<Fragment>
+				<label htmlFor={ selectId } className="screen-reader-text">
+					{ __( 'Categories' ) }
+				</label>
+				<select id={ selectId } className="wp-block-categories__dropdown">
+					{ categories.map( ( category ) => this.renderCategoryDropdownItem( category, 0 ) ) }
+				</select>
+			</Fragment>
 		);
 	}
 
@@ -139,8 +145,8 @@ class CategoriesEdit extends Component {
 	}
 
 	render() {
-		const { attributes, setAttributes, isRequesting } = this.props;
-		const { align, displayAsDropdown, showHierarchy, showPostCounts } = attributes;
+		const { attributes, isRequesting } = this.props;
+		const { displayAsDropdown, showHierarchy, showPostCounts } = attributes;
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -181,15 +187,6 @@ class CategoriesEdit extends Component {
 		return (
 			<Fragment>
 				{ inspectorControls }
-				<BlockControls>
-					<BlockAlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-						controls={ [ 'left', 'center', 'right', 'full' ] }
-					/>
-				</BlockControls>
 				<div className={ this.props.className }>
 					{
 						displayAsDropdown ?
@@ -201,14 +198,16 @@ class CategoriesEdit extends Component {
 		);
 	}
 }
+export default compose(
+	withSelect( ( select ) => {
+		const { getEntityRecords } = select( 'core' );
+		const { isResolving } = select( 'core/data' );
+		const query = { per_page: -1, hide_empty: true };
 
-export default withSelect( ( select ) => {
-	const { getEntityRecords } = select( 'core' );
-	const { isResolving } = select( 'core/data' );
-	const query = { per_page: -1 };
-
-	return {
-		categories: getEntityRecords( 'taxonomy', 'category', query ),
-		isRequesting: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', 'category', query ] ),
-	};
-} )( CategoriesEdit );
+		return {
+			categories: getEntityRecords( 'taxonomy', 'category', query ),
+			isRequesting: isResolving( 'core', 'getEntityRecords', [ 'taxonomy', 'category', query ] ),
+		};
+	} ),
+	withInstanceId
+)( CategoriesEdit );

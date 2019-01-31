@@ -2,7 +2,7 @@
 
 exports[`DotTip should render correctly 1`] = `
 <Popover
-  aria-label="Gutenberg tips"
+  aria-label="Editor tips"
   className="nux-dot-tip"
   focusOnMount="container"
   getAnchorRect={[Function]}

@@ -1,3 +1,13 @@
+## 1.2.0 (Unreleased)
+
+### New Feature
+
+- Type-specific variants are now exposed from the module root. In a WordPress context, this has the effect of making them available as `wp.isShallowEqual.isShallowEqualObjects` and `wp.isShallowEqual.isShallowEqualArrays`.
+
+### Internal
+
+- Development source code linting extends the `@wordpress/eslint-plugin/es5` ruleset.
+
 ## 1.1.0 (2018-07-12)
 
 ### New Feature

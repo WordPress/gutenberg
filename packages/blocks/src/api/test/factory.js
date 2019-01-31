@@ -15,7 +15,12 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '../factory';
-import { getBlockTypes, unregisterBlockType, setUnknownTypeHandlerName, registerBlockType } from '../registration';
+import {
+	getBlockType,
+	getBlockTypes,
+	registerBlockType,
+	unregisterBlockType,
+} from '../registration';
 
 describe( 'block factory', () => {
 	const defaultBlockSettings = {
@@ -35,7 +40,6 @@ describe( 'block factory', () => {
 	} );
 
 	afterEach( () => {
-		setUnknownTypeHandlerName( undefined );
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
@@ -77,6 +81,81 @@ describe( 'block factory', () => {
 			expect( block.innerBlocks ).toHaveLength( 1 );
 			expect( block.innerBlocks[ 0 ].name ).toBe( 'core/test-block' );
 			expect( typeof block.clientId ).toBe( 'string' );
+		} );
+
+		it( 'should cast children and node source attributes with default undefined', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [],
+			} );
+		} );
+
+		it( 'should cast children and node source attributes with string as default', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+						default: 'test',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [ 'test' ],
+			} );
+		} );
+
+		it( 'should cast children and node source attributes with unknown type as default', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						type: 'array',
+						source: 'children',
+						default: 1,
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block' );
+
+			expect( block.attributes ).toEqual( {
+				content: [],
+			} );
+		} );
+
+		it( 'should cast rich-text source attributes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					content: {
+						source: 'html',
+					},
+				},
+			} );
+
+			const block = createBlock( 'core/test-block', {
+				content: 'test',
+			} );
+
+			expect( block.attributes ).toEqual( {
+				content: 'test',
+			} );
 		} );
 	} );
 
@@ -1043,6 +1122,106 @@ describe( 'block factory', () => {
 				value: 'smoked ribs',
 			} );
 		} );
+
+		it( 'should pass through inner blocks to transform', () => {
+			registerBlockType( 'core/updated-columns-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/columns-block' ],
+						transform( attributes, innerBlocks ) {
+							return createBlock(
+								'core/updated-columns-block',
+								attributes,
+								innerBlocks.map( ( innerBlock ) => {
+									return cloneBlock( innerBlock, {
+										value: 'after',
+									} );
+								} ),
+							);
+						},
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated columns block',
+			} );
+			registerBlockType( 'core/columns-block', defaultBlockSettings );
+			registerBlockType( 'core/column-block', defaultBlockSettings );
+
+			const block = createBlock(
+				'core/columns-block',
+				{},
+				[ createBlock( 'core/column-block', { value: 'before' } ) ]
+			);
+
+			const transformedBlocks = switchToBlockType( block, 'core/updated-columns-block' );
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after' );
+		} );
+
+		it( 'should pass through inner blocks to transform (multi)', () => {
+			registerBlockType( 'core/updated-columns-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [ {
+						type: 'block',
+						blocks: [ 'core/columns-block' ],
+						isMultiBlock: true,
+						transform( blocksAttributes, blocksInnerBlocks ) {
+							return blocksAttributes.map( ( attributes, i ) => {
+								return createBlock(
+									'core/updated-columns-block',
+									attributes,
+									blocksInnerBlocks[ i ].map( ( innerBlock ) => {
+										return cloneBlock( innerBlock, {
+											value: 'after' + i,
+										} );
+									} ),
+								);
+							} );
+						},
+					} ],
+				},
+				save: noop,
+				category: 'common',
+				title: 'updated columns block',
+			} );
+			registerBlockType( 'core/columns-block', defaultBlockSettings );
+			registerBlockType( 'core/column-block', defaultBlockSettings );
+
+			const blocks = [
+				createBlock(
+					'core/columns-block',
+					{},
+					[ createBlock( 'core/column-block', { value: 'before' } ) ]
+				),
+				createBlock(
+					'core/columns-block',
+					{},
+					[ createBlock( 'core/column-block', { value: 'before' } ) ]
+				),
+			];
+
+			const transformedBlocks = switchToBlockType( blocks, 'core/updated-columns-block' );
+
+			expect( transformedBlocks ).toHaveLength( 2 );
+			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 0 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after0' );
+			expect( transformedBlocks[ 1 ].innerBlocks ).toHaveLength( 1 );
+			expect( transformedBlocks[ 1 ].innerBlocks[ 0 ].attributes.value ).toBe( 'after1' );
+		} );
 	} );
 
 	describe( 'getBlockTransforms', () => {
@@ -1099,6 +1278,20 @@ describe( 'block factory', () => {
 
 		it( 'should return single block type transforms of direction', () => {
 			const transforms = getBlockTransforms( 'from', 'core/transform-from-text-block-1' );
+
+			expect( transforms ).toEqual( [
+				{
+					blocks: [ 'core/text-block' ],
+					blockName: 'core/transform-from-text-block-1',
+				},
+			] );
+		} );
+
+		it( 'should return single block type transforms when passed as an object', () => {
+			const transforms = getBlockTransforms(
+				'from',
+				getBlockType( 'core/transform-from-text-block-1' )
+			);
 
 			expect( transforms ).toEqual( [
 				{

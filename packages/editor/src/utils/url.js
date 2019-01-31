@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { deburr, toLower, trim } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
@@ -18,20 +23,21 @@ export function getWPAdminURL( page, query ) {
 }
 
 /**
- * Returns a URL for display.
+ * Performs some basic cleanup of a string for use as a post slug
  *
- * @param {string} url Original URL.
+ * This replicates some of what santize_title() does in WordPress core, but
+ * is only designed to approximate what the slug will be.
  *
- * @return {string} Displayed URL.
+ * Converts whitespace, periods, forward slashes and underscores to hyphens.
+ * Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin
+ * letters. Removes combining diacritical marks. Converts remaining string
+ * to lowercase. It does not touch octets, HTML entities, or other encoded
+ * characters.
+ *
+ * @param {string} string Title or slug to be processed
+ *
+ * @return {string} Processed string
  */
-export function filterURLForDisplay( url ) {
-	// remove protocol and www prefixes
-	const filteredURL = url.replace( new RegExp( '^https?://(www\.)?' ), '' );
-
-	// ends with / and only has that single slash, strip it
-	if ( filteredURL.match( '^[^/]+/$' ) ) {
-		return filteredURL.replace( '/', '' );
-	}
-
-	return filteredURL;
+export function cleanForSlug( string ) {
+	return toLower( deburr( trim( string.replace( /[\s\./_]+/g, '-' ), '-' ) ) );
 }

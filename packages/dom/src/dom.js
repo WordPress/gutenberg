@@ -380,7 +380,6 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left;
 	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
-	const selection = window.getSelection();
 
 	let range = hiddenCaretRangeFromPoint( document, x, y, container );
 
@@ -413,6 +412,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 		}
 	}
 
+	const selection = window.getSelection();
 	selection.removeAllRanges();
 	selection.addRange( range );
 	container.focus();
@@ -433,13 +433,25 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
  * @return {boolean} True if the element is an text field, false if not.
  */
 export function isTextField( element ) {
-	const { nodeName, selectionStart, contentEditable } = element;
+	try {
+		const { nodeName, selectionStart, contentEditable } = element;
 
-	return (
-		( nodeName === 'INPUT' && selectionStart !== null ) ||
-		( nodeName === 'TEXTAREA' ) ||
-		contentEditable === 'true'
-	);
+		return (
+			( nodeName === 'INPUT' && selectionStart !== null ) ||
+			( nodeName === 'TEXTAREA' ) ||
+			contentEditable === 'true'
+		);
+	} catch ( error ) {
+		// Safari throws an exception when trying to get `selectionStart`
+		// on non-text <input> elements (which, understandably, don't
+		// have the text selection API). We catch this via a try/catch
+		// block, as opposed to a more explicit check of the element's
+		// input types, because of Safari's non-standard behavior. This
+		// also means we don't have to worry about the list of input
+		// types that support `selectionStart` changing as the HTML spec
+		// evolves over time.
+		return false;
+	}
 }
 
 /**
@@ -485,11 +497,25 @@ export function isEntirelySelected( element ) {
 
 	const { startContainer, endContainer, startOffset, endOffset } = range;
 
-	return (
+	if (
 		startContainer === element &&
 		endContainer === element &&
 		startOffset === 0 &&
 		endOffset === element.childNodes.length
+	) {
+		return true;
+	}
+
+	const lastChild = element.lastChild;
+	const lastChildContentLength = lastChild.nodeType === TEXT_NODE ?
+		lastChild.data.length :
+		lastChild.childNodes.length;
+
+	return (
+		startContainer === element.firstChild &&
+		endContainer === element.lastChild &&
+		startOffset === 0 &&
+		endOffset === lastChildContentLength
 	);
 }
 
@@ -608,12 +634,11 @@ export function unwrap( node ) {
  *
  * @param {Element}  node    The node to replace
  * @param {string}   tagName The new tag name.
- * @param {Document} doc     The document of the node.
  *
  * @return {Element} The new node.
  */
-export function replaceTag( node, tagName, doc ) {
-	const newNode = doc.createElement( tagName );
+export function replaceTag( node, tagName ) {
+	const newNode = node.ownerDocument.createElement( tagName );
 
 	while ( node.firstChild ) {
 		newNode.appendChild( node.firstChild );
@@ -622,4 +647,15 @@ export function replaceTag( node, tagName, doc ) {
 	node.parentNode.replaceChild( newNode, node );
 
 	return newNode;
+}
+
+/**
+ * Wraps the given node with a new node with the given tag name.
+ *
+ * @param {Element} newNode       The node to insert.
+ * @param {Element} referenceNode The node to wrap.
+ */
+export function wrap( newNode, referenceNode ) {
+	referenceNode.parentNode.insertBefore( newNode, referenceNode );
+	newNode.appendChild( referenceNode );
 }

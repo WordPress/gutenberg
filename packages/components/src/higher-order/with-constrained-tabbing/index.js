@@ -33,6 +33,13 @@ const withConstrainedTabbing = createHigherOrderComponent(
 			} else if ( ! event.shiftKey && event.target === lastTabbable ) {
 				event.preventDefault();
 				firstTabbable.focus();
+			/*
+			 * When pressing Tab and none of the tabbables has focus, the keydown
+			 * event happens on the wrapper div: move focus on the first tabbable.
+			 */
+			} else if ( ! tabbables.includes( event.target ) ) {
+				event.preventDefault();
+				firstTabbable.focus();
 			}
 		}
 
@@ -44,6 +51,7 @@ const withConstrainedTabbing = createHigherOrderComponent(
 				<div
 					onKeyDown={ this.handleTabBehaviour }
 					ref={ this.focusContainRef }
+					tabIndex="-1"
 				>
 					<WrappedComponent { ...this.props } />
 				</div>

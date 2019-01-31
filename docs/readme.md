@@ -1,24 +1,20 @@
-# Introduction
+# Gutenberg Handbook
 
-"Gutenberg" is the codename for the new WordPress editor focus. The goal of this focus is to create a new post and page editing experience that makes it easy for anyone to create rich post layouts. This was the kickoff goal:
+The Gutenberg project provides three sources of documentation:
 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
+## Designer & Developer Handbook
 
-Key take-aways from parsing that paragraph:
+Learn how to build blocks and extend the editor, best practices for designing block interfaces, and how to create themes that make the most of the new features Gutenberg provides.
 
-- Authoring richly laid out posts is a key strength of WordPress.
-- By embracing "the block", we can potentially unify multiple different interfaces into one. Instead of learning how to write shortcodes, custom HTML, or paste URLs to embed, you should do with just learning the block, and all the pieces should fall in place.
-- "Mystery meat" refers to hidden features in software, features that you have to discover. WordPress already supports a large number of blocks and 30+ embeds, so let's surface them.
+[Visit the Designer & Developer Handbook](/docs/designers-developers/readme.md)
 
-Gutenberg is being developed on [GitHub](https://github.com/WordPress/gutenberg), and you can try [an early beta version today from the plugin repository](https://wordpress.org/plugins/gutenberg/). Though keep in mind it's not fully functional, feature complete, or production ready.
+## User Handbook
 
-## Logo
-<img width="200px" src="https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/final-g-wapuu-black.svg?sanitize=true" alt="Gutenberg Logo" />
+Discover the new features Gutenberg offers, learn how your site will be affected by the new editor and how to keep using the old interface, and tips for creating beautiful posts and pages.
 
-Released under GPL license, made by [Cristel Rossignol](https://twitter.com/cristelrossi).
 
-[Download the SVG logo](https://github.com/WordPress/gutenberg/blob/master/docs/final-g-wapuu-black.svg).
+## Contributor Handbook
 
-## Mockups
+Help make Gutenberg better by contributing ideas, code, testing, and more.
 
-Mockup Sketch files are available in <a href="https://wordpress.org/gutenberg/handbook/reference/design-principles/#more-resources">the Design section</a>.
+[Visit the Contributor Handbook](/docs/contributors/readme.md)

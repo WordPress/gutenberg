@@ -1,9 +1,29 @@
-## 3.0.0 (Unreleased)
+## 3.0.4 (Unreleased)
+
+### Bug Fixes
+
+- Fix unhandled promise rejection error caused by returning null from registered generator ([#13314](https://github.com/WordPress/gutenberg/pull/13314))
+- The middleware will no longer attempt to coerce an error to an instance of `Error`, and instead passes through the thrown value directly. This resolves issues where an `Error` would be thrown when the underlying values were not of type `Error` or `string` (e.g. a thrown object) and the message would end up not being useful (e.g. `[Object object]`).
+([#13315](https://github.com/WordPress/gutenberg/pull/13315)) 
+
+## 3.0.3 (2018-10-19)
+
+## 3.0.2 (2018-10-18)
+
+### Bug Fix
+
+- Account for null value in redux-routine createRuntime (introduces `isAction` and `isActionOfType` methods to assist with that).
+
+## 3.0.0 (2018-09-30)
 
 ### Breaking change
 
 - The middleware returns a promise resolving once the runtime finishes iterating over the generator.
 - It's not possible to kill the execution of the runtime anymore by returning `undefined`
+
+## Bug Fixes
+
+- Fix running routines in Firefox.
 
 ## 2.0.0 (2018-09-05)
 

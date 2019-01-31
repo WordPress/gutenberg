@@ -30,9 +30,6 @@ export default {
 			<span key="slug" className="editor-autocompleters__user-slug">{ user.slug }</span>,
 		];
 	},
-	allowNode() {
-		return true;
-	},
 	getOptionCompletion( user ) {
 		return `@${ user.slug }`;
 	},

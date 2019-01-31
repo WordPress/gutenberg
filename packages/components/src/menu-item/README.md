@@ -1,5 +1,7 @@
 # MenuItem
 
+MenuItem is a component which renders a button intended to be used in combination with the [DropdownMenu component](/packages/components/src/dropdown-menu/README.md).
+
 ## Usage
 
 ```jsx
@@ -18,3 +20,56 @@ const MyMenuItem = withState( {
 	</MenuItem>
 ) );
 ```
+
+## Props
+
+MenuItem supports the following props. Any additional props are passed through to the underlying [Button](/packages/components/src/button/README.md) or [IconButton](/packages/components/src/icon-button/README.md) component.
+
+### `children`
+
+- Type: `WPElement`
+- Required: No
+
+Element to render as child of button.
+
+Element
+
+### `label`
+
+- Type: `string`
+- Required: No
+
+String to use as primary button label text, applied as `aria-label`. Useful in cases where an `info` prop is passed, where `label` should be the minimal text of the button, described in further detail by `info`.
+
+Defaults to the value of `children`, if `children` is passed as a string.
+
+### `info`
+
+- Type: `string`
+- Required: No
+
+Text to use as description for button text.
+
+Refer to documentation for [`label`](#label).
+
+### `icon`
+
+- Type: `string`
+- Required: No
+
+Refer to documentation for [IconButton's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+
+### `shortcut`
+
+- Type: `string`
+- Required: No
+
+Refer to documentation for [Shortcut's `shortcut` prop](/packages/components/src/shortcut/README.md#shortcut).
+
+### `role`
+
+- Type: `string`
+- Require: No
+- Default: `'menuitem'`
+
+[Aria Spec](https://www.w3.org/TR/wai-aria-1.1/#aria-checked). If you need to have selectable menu items use menuitemradio for single select, and menuitemcheckbox for multiselect.

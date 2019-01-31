@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, noop } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -9,9 +9,10 @@ import classnames from 'classnames';
  */
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
 import TokenList from '@wordpress/token-list';
+import { ENTER, SPACE } from '@wordpress/keycodes';
+import { _x } from '@wordpress/i18n';
+import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -69,17 +70,30 @@ function BlockStyles( {
 	onChangeClassName,
 	name,
 	attributes,
-	onSwitch,
-	onHoverClassName,
+	type,
+	onSwitch = noop,
+	onHoverClassName = noop,
 } ) {
-	if ( ! styles ) {
+	if ( ! styles || styles.length === 0 ) {
 		return null;
+	}
+
+	if ( ! type.styles && ! find( styles, 'isDefault' ) ) {
+		styles = [
+			{
+				name: 'default',
+				label: _x( 'Default', 'block style' ),
+				isDefault: true,
+			},
+			...styles,
+		];
 	}
 
 	const activeStyle = getActiveStyle( styles, className );
 	function updateClassName( style ) {
 		const updatedClassName = replaceActiveStyle( className, activeStyle, style );
 		onChangeClassName( updatedClassName );
+		onHoverClassName( null );
 		onSwitch();
 	}
 
@@ -87,7 +101,6 @@ function BlockStyles( {
 		<div className="editor-block-styles">
 			{ styles.map( ( style ) => {
 				const styleClassName = replaceActiveStyle( className, activeStyle, style );
-				/* eslint-disable jsx-a11y/click-events-have-key-events */
 				return (
 					<div
 						key={ style.name }
@@ -97,11 +110,17 @@ function BlockStyles( {
 							}
 						) }
 						onClick={ () => updateClassName( style ) }
+						onKeyDown={ ( event ) => {
+							if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
+								event.preventDefault();
+								updateClassName( style );
+							}
+						} }
 						onMouseEnter={ () => onHoverClassName( styleClassName ) }
 						onMouseLeave={ () => onHoverClassName( null ) }
 						role="button"
 						tabIndex="0"
-						aria-label={ sprintf( __( 'Apply style variation "%s"' ), style.label || style.name ) }
+						aria-label={ style.label || style.name }
 					>
 						<div className="editor-block-styles__item-preview">
 							<BlockPreviewContent
@@ -117,7 +136,6 @@ function BlockStyles( {
 						</div>
 					</div>
 				);
-				/* eslint-enable jsx-a11y/click-events-have-key-events */
 			} ) }
 		</div>
 	);
@@ -125,13 +143,17 @@ function BlockStyles( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const block = select( 'core/editor' ).getBlock( clientId );
+		const { getBlock } = select( 'core/editor' );
+		const { getBlockStyles } = select( 'core/blocks' );
+		const block = getBlock( clientId );
+		const blockType = getBlockType( block.name );
 
 		return {
 			name: block.name,
 			attributes: block.attributes,
 			className: block.attributes.className || '',
-			styles: get( getBlockType( block.name ), [ 'styles' ] ),
+			styles: getBlockStyles( block.name ),
+			type: blockType,
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {

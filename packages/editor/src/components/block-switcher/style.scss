@@ -3,15 +3,27 @@
 	height: $icon-button-size;
 }
 
+.components-icon-button.editor-block-switcher__toggle,
+.components-icon-button.editor-block-switcher__no-switcher-icon {
+	margin: 0;
+	display: block;
+	height: $icon-button-size;
+	padding: 3px;
+}
+
+
+.components-icon-button.editor-block-switcher__no-switcher-icon {
+	width: $icon-button-size + 6px + 6px;
+	.editor-block-icon {
+		margin-right: auto;
+		margin-left: auto;
+	}
+}
+
 // Style this the same as the block buttons in the library.
 // Needs specificiity to override the icon button.
 .components-icon-button.editor-block-switcher__toggle {
 	width: auto;
-	margin: 0;
-	display: block;
-	height: $icon-button-size;
-	padding: 6px 3px;
-
 	// Unset icon button styles.
 	&:active,
 	&:not(:disabled):not([aria-disabled="true"]):hover,
@@ -25,10 +37,10 @@
 	.editor-block-icon,
 	.editor-block-switcher__transform {
 		width: $icon-button-size + 3px + 3px;
+		height: $icon-button-size-small + 6px;
 		position: relative;
-		height: $icon-button-size-small;
-		margin: 0;
-		padding: 0 6px;
+		margin: 0 auto;
+		padding: 3px;
 		display: flex;
 		align-items: center;
 		transition: all 0.1s cubic-bezier(0.165, 0.84, 0.44, 1);
@@ -37,14 +49,11 @@
 	// Add a dropdown arrow indicator.
 	.editor-block-icon::after {
 		@include dropdown-arrow();
-		top: $icon-button-size-small / 2 - 1px;
 	}
 
 	.editor-block-switcher__transform {
-		margin-top: 6px + 3px;
+		margin-top: 6px;
 		border-radius: $radius-round-rectangle;
-		height: $icon-button-size-small + 6px;
-		padding: 3px 9px 3px 9px;
 	}
 
 	// Block hover and focus style.
@@ -65,7 +74,8 @@
 }
 
 .components-popover:not(.is-mobile).editor-block-switcher__popover .components-popover__content {
-	min-width: 320px;
+	min-width: 300px;
+	max-width: 340px;
 }
 
 .editor-block-switcher__popover .components-popover__content {

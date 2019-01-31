@@ -8,32 +8,39 @@ import {
 	mapValues,
 	sortBy,
 	throttle,
-	last,
 } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import {
+	withSelect,
+	withDispatch,
+	__experimentalAsyncModeProvider as AsyncModeProvider,
+} from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import IgnoreNestedEvents from './ignore-nested-events';
-import DefaultBlockAppender from '../default-block-appender';
+import BlockListAppender from '../block-list-appender';
+import { getBlockDOMNode } from '../../utils/dom';
 
+const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
+	return (
+		<AsyncModeProvider value={ false }>
+			<WrappedComponent { ...props } />
+		</AsyncModeProvider>
+	);
+};
 class BlockList extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.onSelectionStart = this.onSelectionStart.bind( this );
 		this.onSelectionEnd = this.onSelectionEnd.bind( this );
-		this.onShiftSelection = this.onShiftSelection.bind( this );
 		this.setBlockRef = this.setBlockRef.bind( this );
 		this.setLastClientY = this.setLastClientY.bind( this );
 		this.onPointerMove = throttle( this.onPointerMove.bind( this ), 100 );
@@ -83,8 +90,15 @@ class BlockList extends Component {
 			this.props.onStartMultiSelect();
 		}
 
-		const boundaries = this.nodes[ this.selectionAtStart ].getBoundingClientRect();
-		const y = clientY - boundaries.top;
+		const blockContentBoundaries = getBlockDOMNode( this.selectionAtStart ).getBoundingClientRect();
+
+		// prevent multi-selection from triggering when the selected block is a float
+		// and the cursor is still between the top and the bottom of the block.
+		if ( clientY >= blockContentBoundaries.top && clientY <= blockContentBoundaries.bottom ) {
+			return;
+		}
+
+		const y = clientY - blockContentBoundaries.top;
 		const key = findLast( this.coordMapKeys, ( coordY ) => coordY < y );
 
 		this.onSelectionChange( this.coordMap[ key ] );
@@ -174,71 +188,51 @@ class BlockList extends Component {
 		}
 	}
 
-	onShiftSelection( clientId ) {
-		if ( ! this.props.isSelectionEnabled ) {
-			return;
-		}
-
-		const { selectionStartClientId, onMultiSelect, onSelect } = this.props;
-
-		if ( selectionStartClientId ) {
-			onMultiSelect( selectionStartClientId, clientId );
-		} else {
-			onSelect( clientId );
-		}
-	}
-
 	render() {
 		const {
 			blockClientIds,
-			layout,
-			isGroupedByLayout,
 			rootClientId,
-			canInsertDefaultBlock,
 			isDraggable,
+			selectedBlockClientId,
+			multiSelectedBlockClientIds,
+			hasMultiSelection,
 		} = this.props;
 
-		let defaultLayout;
-		if ( isGroupedByLayout ) {
-			defaultLayout = layout;
-		}
-
-		const classes = classnames( 'editor-block-list__layout', {
-			[ `layout-${ layout }` ]: layout,
-		} );
-
 		return (
-			<div className={ classes }>
-				{ map( blockClientIds, ( clientId, blockIndex ) => (
-					<BlockListBlock
-						key={ 'block-' + clientId }
-						index={ blockIndex }
-						clientId={ clientId }
-						blockRef={ this.setBlockRef }
-						onSelectionStart={ this.onSelectionStart }
-						onShiftSelection={ this.onShiftSelection }
-						rootClientId={ rootClientId }
-						layout={ defaultLayout }
-						isFirst={ blockIndex === 0 }
-						isLast={ blockIndex === blockClientIds.length - 1 }
-						isDraggable={ isDraggable }
-					/>
-				) ) }
-				{ canInsertDefaultBlock && (
-					<IgnoreNestedEvents childHandledEvents={ [ 'onFocus', 'onClick', 'onKeyDown' ] }>
-						<DefaultBlockAppender
-							rootClientId={ rootClientId }
-							lastBlockClientId={ last( blockClientIds ) }
-							layout={ defaultLayout }
-						/>
-					</IgnoreNestedEvents>
-				) }
+			<div className="editor-block-list__layout">
+				{ map( blockClientIds, ( clientId, blockIndex ) => {
+					const isBlockInSelection = hasMultiSelection ?
+						multiSelectedBlockClientIds.includes( clientId ) :
+						selectedBlockClientId === clientId;
+
+					return (
+						<AsyncModeProvider
+							key={ 'block-' + clientId }
+							value={ ! isBlockInSelection }
+						>
+							<BlockListBlock
+								clientId={ clientId }
+								blockRef={ this.setBlockRef }
+								onSelectionStart={ this.onSelectionStart }
+								rootClientId={ rootClientId }
+								isFirst={ blockIndex === 0 }
+								isLast={ blockIndex === blockClientIds.length - 1 }
+								isDraggable={ isDraggable }
+							/>
+						</AsyncModeProvider>
+					);
+				} ) }
+				<BlockListAppender rootClientId={ rootClientId } />
 			</div>
 		);
 	}
 }
 
 export default compose( [
+	// This component needs to always be synchronous
+	// as it's the one changing the async mode
+	// depending on the block selection.
+	forceSyncUpdates,
 	withSelect( ( select, ownProps ) => {
 		const {
 			getBlockOrder,
@@ -246,8 +240,9 @@ export default compose( [
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
 			getMultiSelectedBlocksEndClientId,
-			getBlockSelectionStart,
-			canInsertBlockType,
+			getSelectedBlockClientId,
+			getMultiSelectedBlockClientIds,
+			hasMultiSelection,
 		} = select( 'core/editor' );
 		const { rootClientId } = ownProps;
 
@@ -255,10 +250,11 @@ export default compose( [
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectionStart: getMultiSelectedBlocksStartClientId(),
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
-			selectionStartClientId: getBlockSelectionStart(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
-			canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
+			selectedBlockClientId: getSelectedBlockClientId(),
+			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			hasMultiSelection: hasMultiSelection(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
@@ -266,14 +262,12 @@ export default compose( [
 			startMultiSelect,
 			stopMultiSelect,
 			multiSelect,
-			selectBlock,
 		} = dispatch( 'core/editor' );
 
 		return {
 			onStartMultiSelect: startMultiSelect,
 			onStopMultiSelect: stopMultiSelect,
 			onMultiSelect: multiSelect,
-			onSelect: selectBlock,
 		};
 	} ),
 ] )( BlockList );

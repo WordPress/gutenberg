@@ -23,22 +23,44 @@ import { withBlockEditContext } from '../block-edit/context';
 class InnerBlocks extends Component {
 	constructor() {
 		super( ...arguments );
-
+		this.state = {
+			templateInProcess: !! this.props.template,
+		};
 		this.updateNestedSettings();
+	}
+
+	getTemplateLock() {
+		const {
+			templateLock,
+			parentLock,
+		} = this.props;
+		return templateLock === undefined ? parentLock : templateLock;
 	}
 
 	componentDidMount() {
-		this.synchronizeBlocksWithTemplate();
+		const { innerBlocks } = this.props.block;
+		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
+		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+			this.synchronizeBlocksWithTemplate();
+		}
+		if ( this.state.templateInProcess ) {
+			this.setState( {
+				templateInProcess: false,
+			} );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {
-		const { template } = this.props;
+		const { template, block } = this.props;
+		const { innerBlocks } = block;
 
 		this.updateNestedSettings();
-
-		const hasTemplateChanged = ! isEqual( template, prevProps.template );
-		if ( hasTemplateChanged ) {
-			this.synchronizeBlocksWithTemplate();
+		// only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists
+		if ( innerBlocks.length === 0 || this.getTemplateLock() === 'all' ) {
+			const hasTemplateChanged = ! isEqual( template, prevProps.template );
+			if ( hasTemplateChanged ) {
+				this.synchronizeBlocksWithTemplate();
+			}
 		}
 	}
 
@@ -62,14 +84,12 @@ class InnerBlocks extends Component {
 		const {
 			blockListSettings,
 			allowedBlocks,
-			templateLock,
-			parentLock,
 			updateNestedSettings,
 		} = this.props;
 
 		const newSettings = {
 			allowedBlocks,
-			templateLock: templateLock === undefined ? parentLock : templateLock,
+			templateLock: this.getTemplateLock(),
 		};
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
@@ -80,13 +100,10 @@ class InnerBlocks extends Component {
 	render() {
 		const {
 			clientId,
-			layouts,
-			allowedBlocks,
-			templateLock,
-			template,
 			isSmallScreen,
 			isSelectedBlockInRoot,
 		} = this.props;
+		const { templateInProcess } = this.state;
 
 		const classes = classnames( 'editor-inner-blocks', {
 			'has-overlay': isSmallScreen && ! isSelectedBlockInRoot,
@@ -94,10 +111,11 @@ class InnerBlocks extends Component {
 
 		return (
 			<div className={ classes }>
-				<BlockList
-					rootClientId={ clientId }
-					{ ...{ layouts, allowedBlocks, templateLock, template } }
-				/>
+				{ ! templateInProcess && (
+					<BlockList
+						rootClientId={ clientId }
+					/>
+				) }
 			</div>
 		);
 	}
@@ -116,12 +134,12 @@ InnerBlocks = compose( [
 			getTemplateLock,
 		} = select( 'core/editor' );
 		const { clientId } = ownProps;
-		const parentClientId = getBlockRootClientId( clientId );
+		const rootClientId = getBlockRootClientId( clientId );
 		return {
 			isSelectedBlockInRoot: isBlockSelected( clientId ) || hasSelectedInnerBlock( clientId ),
 			block: getBlock( clientId ),
 			blockListSettings: getBlockListSettings( clientId ),
-			parentLock: getTemplateLock( parentClientId ),
+			parentLock: getTemplateLock( rootClientId ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
@@ -130,7 +148,7 @@ InnerBlocks = compose( [
 			insertBlocks,
 			updateBlockListSettings,
 		} = dispatch( 'core/editor' );
-		const { block, clientId } = ownProps;
+		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
 
 		return {
 			replaceInnerBlocks( blocks ) {
@@ -138,7 +156,7 @@ InnerBlocks = compose( [
 				if ( clientIds.length ) {
 					replaceBlocks( clientIds, blocks );
 				} else {
-					insertBlocks( blocks, undefined, clientId );
+					insertBlocks( blocks, undefined, clientId, templateInsertUpdatesSelection );
 				}
 			},
 			updateNestedSettings( settings ) {

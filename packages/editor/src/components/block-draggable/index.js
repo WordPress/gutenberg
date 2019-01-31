@@ -4,13 +4,12 @@
 import { Draggable } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
-const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, index, layout, onDragStart, onDragEnd } ) => {
+const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, index, onDragStart, onDragEnd } ) => {
 	const transferData = {
 		type: 'block',
-		fromIndex: index,
-		rootClientId,
-		clientId,
-		layout,
+		srcIndex: index,
+		srcRootClientId: rootClientId,
+		srcClientId: clientId,
 	};
 
 	return (
@@ -23,8 +22,8 @@ const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, ind
 			{
 				( { onDraggableStart, onDraggableEnd } ) => {
 					return children( {
-						onDraggableStart: onDraggableStart,
-						onDraggableEnd: onDraggableEnd,
+						onDraggableStart,
+						onDraggableEnd,
 					} );
 				}
 			}
@@ -34,8 +33,9 @@ const BlockDraggable = ( { children, clientId, rootClientId, blockElementId, ind
 
 export default withSelect( ( select, { clientId } ) => {
 	const { getBlockIndex, getBlockRootClientId } = select( 'core/editor' );
+	const rootClientId = getBlockRootClientId( clientId );
 	return {
-		index: getBlockIndex( clientId ),
-		rootClientId: getBlockRootClientId( clientId ),
+		index: getBlockIndex( clientId, rootClientId ),
+		rootClientId,
 	};
 } )( BlockDraggable );

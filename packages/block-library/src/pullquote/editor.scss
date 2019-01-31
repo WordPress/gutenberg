@@ -22,7 +22,25 @@
 
 	& blockquote > .block-library-pullquote__content .editor-rich-text__tinymce[data-is-empty="true"]::before,
 	& blockquote > .editor-rich-text p {
-		font-size: 24px;
+		font-size: 28px;
 		line-height: 1.6;
 	}
+}
+
+.wp-block-pullquote.is-style-solid-color {
+	margin-left: 0;
+	margin-right: 0;
+
+	& blockquote > .editor-rich-text p {
+		font-size: 32px;
+	}
+
+	.wp-block-pullquote__citation {
+		text-transform: none;
+		font-style: normal;
+	}
+}
+
+.wp-block-pullquote .wp-block-pullquote__citation {
+	color: inherit;
 }

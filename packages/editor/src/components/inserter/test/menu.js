@@ -93,7 +93,7 @@ const items = [
 
 const DEFAULT_PROPS = {
 	position: 'top center',
-	items: items,
+	items,
 	debouncedSpeak: noop,
 	fetchReusableBlocks: noop,
 	setTimeout: noop,
@@ -335,6 +335,12 @@ describe( 'searchItems', () => {
 	it( 'should search items using the keywords', () => {
 		expect( searchItems( items, 'GOOGL' ) ).toEqual(
 			[ youtubeItem ]
+		);
+	} );
+
+	it( 'should search items using the categories', () => {
+		expect( searchItems( items, 'LAYOUT' ) ).toEqual(
+			[ moreItem ]
 		);
 	} );
 

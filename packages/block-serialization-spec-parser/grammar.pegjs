@@ -50,19 +50,36 @@
 // The `maybeJSON` function is not needed in PHP because its return semantics
 // are the same as `json_decode`
 
+if ( ! function_exists( 'peg_empty_attrs' ) ) {
+     function peg_empty_attrs() {
+         static $empty_attrs = null;
+
+         if ( null === $empty_attrs ) {
+             $empty_attrs = json_decode( '{}', true );
+         }
+
+         return $empty_attrs;
+     }
+}
+
 // array arguments are backwards because of PHP
-if ( ! function_exists( 'peg_array_partition' ) ) {
-    function peg_array_partition( $array, $predicate ) {
-        $truthy = array();
-        $falsey = array();
+if ( ! function_exists( 'peg_process_inner_content' ) ) {
+    function peg_process_inner_content( $array ) {
+        $html = '';
+        $blocks = array();
+        $content = array();
 
         foreach ( $array as $item ) {
-            call_user_func( $predicate, $item )
-                ? $truthy[] = $item
-                : $falsey[] = $item;
+            if ( is_string( $item ) ) {
+                $html .= $item;
+                $content[] = $item;
+            } else {
+                $blocks[] = $item;
+                $content[] = null;
+            }
         }
 
-        return array( $truthy, $falsey );
+        return array( $html, $blocks, $content );
     }
 }
 
@@ -71,7 +88,13 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
         $blocks = array();
 
         if ( ! empty( $pre ) ) {
-            $blocks[] = array( 'attrs' => array(), 'innerHTML' => $pre );
+            $blocks[] = array(
+                'blockName' => null,
+                'attrs' => peg_empty_attrs(),
+                'innerBlocks' => array(),
+                'innerHTML' => $pre,
+                'innerContent' => array( $pre ),
+            );
         }
 
         foreach ( $tokens as $token ) {
@@ -80,12 +103,24 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
             $blocks[] = $token;
 
             if ( ! empty( $html ) ) {
-                $blocks[] = array( 'attrs' => array(), 'innerHTML' => $html );
+                $blocks[] = array(
+                    'blockName' => null,
+                    'attrs' => peg_empty_attrs(),
+                    'innerBlocks' => array(),
+                    'innerHTML' => $html,
+                    'innerContent' => array( $html ),
+                );
             }
         }
 
         if ( ! empty( $post ) ) {
-            $blocks[] = array( 'attrs' => array(), 'innerHTML' => $post );
+            $blocks[] = array(
+                'blockName' => null,
+                'attrs' => peg_empty_attrs(),
+                'innerBlocks' => array(),
+                'innerHTML' => $post,
+                'innerContent' => array( $post ),
+            );
         }
 
         return $blocks;
@@ -96,8 +131,11 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
 function freeform( s ) {
     return s.length && {
+        blockName: null,
         attrs: {},
-        innerHTML: s
+        innerBlocks: [],
+        innerHTML: s,
+        innerContent: [ s ],
     };
 }
 
@@ -134,22 +172,27 @@ function maybeJSON( s ) {
     }
 }
 
-function partition( predicate, list ) {
+function processInnerContent( list ) {
     var i, l, item;
-    var truthy = [];
-    var falsey = [];
+    var html = '';
+    var blocks = [];
+    var content = [];
 
     // nod to performance over a simpler reduce
     // and clone model we could have taken here
     for ( i = 0, l = list.length; i < l; i++ ) {
         item = list[ i ];
 
-        predicate( item )
-            ? truthy.push( item )
-            : falsey.push( item )
+        if ( 'string' === typeof item ) {
+            html += item;
+            content.push( item );
+        } else {
+            blocks.push( item );
+            content.push( null );
+        }
     };
 
-    return [ truthy, falsey ];
+    return [ html, blocks, content ];
 }
 
 }
@@ -180,44 +223,49 @@ Block_Void
   {
     /** <?php
     return array(
-      'blockName'  => $blockName,
-      'attrs'      => $attrs,
-      'innerBlocks' => array(),
-      'innerHTML' => '',
+      'blockName'    => $blockName,
+      'attrs'        => empty( $attrs ) ? peg_empty_attrs() : $attrs,
+      'innerBlocks'  => array(),
+      'innerHTML'    => '',
+      'innerContent' => array(),
     );
     ?> **/
 
     return {
       blockName: blockName,
-      attrs: attrs,
+      attrs: attrs || {},
       innerBlocks: [],
-      innerHTML: ''
+      innerHTML: '',
+      innerContent: []
     };
   }
 
 Block_Balanced
-  = s:Block_Start children:(Block / $(!Block_End .))* e:Block_End
+  = s:Block_Start children:(Block / $((!Block !Block_End .)+))* e:Block_End
   {
     /** <?php
-    list( $innerHTML, $innerBlocks ) = peg_array_partition( $children, 'is_string' );
+    list( $innerHTML, $innerBlocks, $innerContent ) = peg_process_inner_content( $children );
 
     return array(
-      'blockName'  => $s['blockName'],
-      'attrs'      => $s['attrs'],
+      'blockName'    => $s['blockName'],
+      'attrs'        => empty( $s['attrs'] ) ? peg_empty_attrs() : $s['attrs'],
       'innerBlocks'  => $innerBlocks,
-      'innerHTML'  => implode( '', $innerHTML ),
+      'innerHTML'    => $innerHTML,
+      'innerContent' => $innerContent,
     );
     ?> **/
 
-    var innerContent = partition( function( a ) { return 'string' === typeof a }, children );
-    var innerHTML = innerContent[ 0 ];
-    var innerBlocks = innerContent[ 1 ];
+    var innerParts = processInnerContent( children );
+    var innerHTML = innerParts[ 0 ];
+    var innerBlocks = innerParts[ 1 ];
+    var innerContent = innerParts[ 2 ];
 
     return {
       blockName: s.blockName,
       attrs: s.attrs,
       innerBlocks: innerBlocks,
-      innerHTML: innerHTML.join( '' )
+      innerHTML: innerHTML,
+      innerContent: innerContent,
     };
   }
 
@@ -230,13 +278,13 @@ Block_Start
     /** <?php
     return array(
       'blockName' => $blockName,
-      'attrs'     => $attrs,
+      'attrs'     => isset( $attrs ) ? $attrs : array(),
     );
     ?> **/
 
     return {
       blockName: blockName,
-      attrs: attrs
+      attrs: attrs || {}
     };
   }
 

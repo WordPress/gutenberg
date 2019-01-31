@@ -28,8 +28,19 @@ p {
 		text-transform: uppercase;
 		font-style: normal;
 	}
+
+	&.has-drop-cap:not(:focus)::after {
+		content: "";
+		display: table;
+		clear: both;
+		padding-top: $block-padding;
+	}
 }
 
 p.has-background {
 	padding: 20px 30px;
+}
+
+p.has-text-color a {
+	color: inherit;
 }

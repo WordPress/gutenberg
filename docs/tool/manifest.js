@@ -1,38 +1,29 @@
 /**
  * Node dependencies
  */
-const { camelCase, kebabCase, upperFirst } = require( 'lodash' );
+const { camelCase, kebabCase, nth, upperFirst } = require( 'lodash' );
+
+const fs = require( 'fs' );
 
 const baseRepoUrl = `https://raw.githubusercontent.com/WordPress/gutenberg/master`;
 
 /**
  * Generates the package manifest.
  *
- * @param {Object} packagesConfig Packages Docs Config
+ * @param {Array} packageFolderNames Package folder names.
  *
  * @return {Array} Manifest
  */
-function getPackageManifest( packagesConfig ) {
-	return [
-		{
-			title: 'Packages',
-			slug: 'packages',
-			markdown_source: `${ baseRepoUrl }/docs/packages.md`,
-			parent: null,
-		},
-	].concat(
-		Object.entries( packagesConfig ).map( ( [ folderName, config ] ) => {
-			const path = config.isNpmReady === false ?
-				`${ baseRepoUrl }/${ folderName }/README.md` :
-				`${ baseRepoUrl }/packages/${ folderName }/README.md`;
-			return {
-				title: `@wordpress/${ folderName }`,
-				slug: `packages-${ folderName }`,
-				markdown_source: path,
-				parent: 'packages',
-			};
-		} )
-	);
+function getPackageManifest( packageFolderNames ) {
+	return packageFolderNames.map( ( folderName ) => {
+		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
+		return {
+			title: `@wordpress/${ folderName }`,
+			slug: `packages-${ folderName }`,
+			markdown_source: path,
+			parent: 'packages',
+		};
+	} );
 }
 
 /**
@@ -43,24 +34,15 @@ function getPackageManifest( packagesConfig ) {
  * @return {Array} Manifest
  */
 function getComponentManifest( componentPaths ) {
-	return [
-		{
-			title: 'Components Package Reference',
-			slug: 'components',
-			markdown_source: `${ baseRepoUrl }/packages/components.md`,
-			parent: null,
-		},
-		...componentPaths
-			.map( ( filePath ) => {
-				const slug = filePath.split( '/' )[ 3 ];
-				return {
-					title: upperFirst( camelCase( slug ) ),
-					slug,
-					markdown_source: `${ baseRepoUrl }/${ filePath }`,
-					parent: 'components',
-				};
-			} ),
-	];
+	return componentPaths.map( ( filePath ) => {
+		const slug = nth( filePath.split( '/' ), -2 );
+		return {
+			title: upperFirst( camelCase( slug ) ),
+			slug,
+			markdown_source: `${ baseRepoUrl }/${ filePath }`,
+			parent: 'components',
+		};
+	} );
 }
 
 /**
@@ -71,26 +53,59 @@ function getComponentManifest( componentPaths ) {
  * @return {Array} Manifest
  */
 function getDataManifest( parsedNamespaces ) {
-	return [ {
-		title: 'Data Package Reference',
-		slug: 'data',
-		markdown_source: `${ baseRepoUrl }/docs/data/README.md`,
-		parent: null,
-	} ].concat(
-		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-			const slug = `data-${ kebabCase( parsedNamespace.name ) }`;
-			return {
-				title: parsedNamespace.title,
-				slug,
-				markdown_source: `${ baseRepoUrl }/docs/data/${ slug }.md`,
-				parent: 'data',
-			};
-		} )
-	);
+	return Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
+		const slug = `data-${ kebabCase( parsedNamespace.name ) }`;
+		return {
+			title: parsedNamespace.title,
+			slug,
+			markdown_source: `${ baseRepoUrl }/docs/designers-developers/developers/data/${ slug }.md`,
+			parent: 'data',
+		};
+	} );
+}
+
+function getRootManifest( tocFileName ) {
+	return generateRootManifestFromTOCItems( require( tocFileName ) );
+}
+
+function generateRootManifestFromTOCItems( items, parent = null ) {
+	let pageItems = [];
+	items.map( ( obj ) => {
+		const fileName = Object.keys( obj )[ 0 ];
+		const children = obj[ fileName ];
+
+		let slug = nth( fileName.split( '/' ), -1 ).replace( '.md', '' );
+		if ( 'readme' === slug.toLowerCase() ) {
+			slug = nth( fileName.split( '/' ), -2 );
+
+			// Special case - the root 'docs' readme needs the 'handbook' slug.
+			if ( parent === null && 'docs' === slug ) {
+				slug = 'handbook';
+			}
+		}
+		let title = upperFirst( camelCase( slug ) );
+		const markdownSource = fs.readFileSync( fileName, 'utf8' );
+		const titleMarkdown = markdownSource.match( /^#\s(.+)$/m );
+		if ( titleMarkdown ) {
+			title = titleMarkdown[ 1 ];
+		}
+
+		pageItems.push( {
+			title,
+			slug,
+			markdown_source: `${ baseRepoUrl }\/${ fileName }`,
+			parent,
+		} );
+		if ( Array.isArray( children ) && children.length ) {
+			pageItems = pageItems.concat( generateRootManifestFromTOCItems( children, slug ) );
+		}
+	} );
+	return pageItems;
 }
 
 module.exports = {
 	getPackageManifest,
 	getComponentManifest,
 	getDataManifest,
+	getRootManifest,
 };

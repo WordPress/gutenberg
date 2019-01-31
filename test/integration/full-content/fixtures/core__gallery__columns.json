@@ -8,13 +8,17 @@
                 {
                     "url": "https://cldup.com/uuUqE_dXzy.jpg",
                     "alt": "title",
-                    "caption": []
+                    "caption": ""
                 },
                 {
                     "url": "http://google.com/hi.png",
                     "alt": "title",
-                    "caption": []
+                    "caption": ""
                 }
+            ],
+            "ids": [
+                null,
+                null
             ],
             "columns": 1,
             "imageCrop": true,

@@ -10,10 +10,6 @@ import {
 import { Fragment } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/editor';
 
-function getDownloadButtonHelp( checked ) {
-	return checked ? __( 'The download button is visible.' ) : __( 'The download button is hidden.' );
-}
-
 export default function FileBlockInspector( {
 	hrefs,
 	openInNewWindow,
@@ -43,7 +39,7 @@ export default function FileBlockInspector( {
 						onChange={ changeLinkDestinationOption }
 					/>
 					<ToggleControl
-						label={ __( 'Open in New Window' ) }
+						label={ __( 'Open in New Tab' ) }
 						checked={ openInNewWindow }
 						onChange={ changeOpenInNewWindow }
 					/>
@@ -51,7 +47,6 @@ export default function FileBlockInspector( {
 				<PanelBody title={ __( 'Download Button Settings' ) }>
 					<ToggleControl
 						label={ __( 'Show Download Button' ) }
-						help={ getDownloadButtonHelp }
 						checked={ showDownloadButton }
 						onChange={ changeShowDownloadButton }
 					/>

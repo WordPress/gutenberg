@@ -4,6 +4,9 @@
 }
 
 .editor-post-publish-panel__content {
+	// Ensure the post-publish panel accounts for the header and footer height.
+	min-height: calc(100% - #{ $header-height + 84px });
+
 	.components-spinner {
 		display: block;
 		float: none;
@@ -35,8 +38,6 @@
 
 .editor-post-publish-panel__footer {
 	padding: 16px;
-	position: absolute;
-	bottom: 0;
 }
 
 .components-button.editor-post-publish-panel__toggle.is-primary {
@@ -85,18 +86,21 @@
 .post-publish-panel__postpublish-buttons {
 	display: flex;
 	align-content: space-between;
+	flex-wrap: wrap;
+	margin: -5px;
 
 	> * {
 		flex-grow: 1;
-		margin-right: 10px;
-
-		&:last-child {
-			margin-right: 0;
-		}
+		margin: 5px;
 	}
 
 	.components-button {
+		height: auto;
 		justify-content: center;
+		padding: 3px 10px 4px;
+		line-height: 1.6;
+		text-align: center;
+		white-space: normal;
 	}
 
 	.components-clipboard-button {
@@ -104,17 +108,23 @@
 	}
 }
 
-.post-publish-panel__postpublish-link-input[readonly] {
-	width: 100%;
-	padding: 10px;
-	margin: 15px 0;
-	background: $white;
-	overflow: hidden;
-	text-overflow: ellipsis;
+.post-publish-panel__postpublish-post-address {
+	margin-bottom: $grid-size-large;
+
+	input[readonly] {
+		padding: 10px;
+		background: $light-gray-400;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 }
 
 .post-publish-panel__postpublish-header {
 	font-weight: 500;
+}
+
+.post-publish-panel__postpublish-subheader {
+	margin: 0 0 $grid-size;
 }
 
 .post-publish-panel__tip {

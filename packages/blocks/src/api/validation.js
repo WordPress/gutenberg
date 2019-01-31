@@ -1,13 +1,26 @@
 /**
  * External dependencies
  */
-import { tokenize } from 'simple-html-tokenizer';
-import { xor, fromPairs, isEqual, includes, stubTrue } from 'lodash';
+import Tokenizer from 'simple-html-tokenizer/dist/es6/tokenizer';
+import {
+	identity,
+	xor,
+	fromPairs,
+	isEqual,
+	includes,
+	stubTrue,
+} from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
  */
 import { getSaveContent } from './serializer';
+import { normalizeBlockType } from './utils';
 
 /**
  * Globally matches any consecutive whitespace
@@ -57,6 +70,7 @@ const BOOLEAN_ATTRIBUTES = [
 	'default',
 	'defer',
 	'disabled',
+	'download',
 	'formnovalidate',
 	'hidden',
 	'ismap',
@@ -128,6 +142,107 @@ const MEANINGFUL_ATTRIBUTES = [
 ];
 
 /**
+ * Array of functions which receive a text string on which to apply normalizing
+ * behavior for consideration in text token equivalence, carefully ordered from
+ * least-to-most expensive operations.
+ *
+ * @type {Array}
+ */
+const TEXT_NORMALIZATIONS = [
+	identity,
+	getTextWithCollapsedWhitespace,
+];
+
+/**
+ * Regular expression matching a named character reference. In lieu of bundling
+ * a full set of references, the pattern covers the minimal necessary to test
+ * positively against the full set.
+ *
+ * "The ampersand must be followed by one of the names given in the named
+ * character references section, using the same case."
+ *
+ * Tested aginst "12.5 Named character references":
+ *
+ * ```
+ * const references = [ ...document.querySelectorAll(
+ *     '#named-character-references-table tr[id^=entity-] td:first-child'
+ * ) ].map( ( code ) => code.textContent )
+ * references.every( ( reference ) => /^[\da-z]+$/i.test( reference ) )
+ * ```
+ *
+ * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ * @link https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_NAMED_CHARACTER_REFERENCE = /^[\da-z]+$/i;
+
+/**
+ * Regular expression matching a decimal character reference.
+ *
+ * "The ampersand must be followed by a U+0023 NUMBER SIGN character (#),
+ * followed by one or more ASCII digits, representing a base-ten integer"
+ *
+ * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_DECIMAL_CHARACTER_REFERENCE = /^#\d+$/;
+
+/**
+ * Regular expression matching a hexadecimal character reference.
+ *
+ * "The ampersand must be followed by a U+0023 NUMBER SIGN character (#), which
+ * must be followed by either a U+0078 LATIN SMALL LETTER X character (x) or a
+ * U+0058 LATIN CAPITAL LETTER X character (X), which must then be followed by
+ * one or more ASCII hex digits, representing a hexadecimal integer"
+ *
+ * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_HEXADECIMAL_CHARACTER_REFERENCE = /^#x[\da-f]+$/i;
+
+/**
+ * Returns true if the given string is a valid character reference segment, or
+ * false otherwise. The text should be stripped of `&` and `;` demarcations.
+ *
+ * @param {string} text Text to test.
+ *
+ * @return {boolean} Whether text is valid character reference.
+ */
+export function isValidCharacterReference( text ) {
+	return (
+		REGEXP_NAMED_CHARACTER_REFERENCE.test( text ) ||
+		REGEXP_DECIMAL_CHARACTER_REFERENCE.test( text ) ||
+		REGEXP_HEXADECIMAL_CHARACTER_REFERENCE.test( text )
+	);
+}
+
+/**
+ * Subsitute EntityParser class for `simple-html-tokenizer` which uses the
+ * implementation of `decodeEntities` from `html-entities`, in order to avoid
+ * bundling a massive named character reference.
+ *
+ * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
+ */
+export class DecodeEntityParser {
+	/**
+	 * Returns a substitute string for an entity string sequence between `&`
+	 * and `;`, or undefined if no substitution should occur.
+	 *
+	 * @param {string} entity Entity fragment discovered in HTML.
+	 *
+	 * @return {?string} Entity substitute value.
+	 */
+	parse( entity ) {
+		if ( isValidCharacterReference( entity ) ) {
+			return decodeEntities( '&' + entity + ';' );
+		}
+	}
+}
+
+/**
  * Object of logger functions.
  */
 const log = ( () => {
@@ -179,6 +294,10 @@ export function getTextPiecesSplitOnWhitespace( text ) {
  * @return {string} Trimmed text with consecutive whitespace collapsed.
  */
 export function getTextWithCollapsedWhitespace( text ) {
+	// This is an overly simplified whitespace comparison. The specification is
+	// more prescriptive of whitespace behavior in inline and block contexts.
+	//
+	// See: https://medium.com/@patrickbrosset/when-does-white-space-matter-in-html-b90e8a7cdd33
 	return getTextPiecesSplitOnWhitespace( text ).join( ' ' );
 }
 
@@ -213,18 +332,28 @@ export function getMeaningfulAttributePairs( token ) {
  *
  * @return {boolean} Whether two text tokens are equivalent.
  */
-export function isEqualTextTokensWithCollapsedWhitespace( actual, expected ) {
-	// This is an overly simplified whitespace comparison. The specification is
-	// more prescriptive of whitespace behavior in inline and block contexts.
-	//
-	// See: https://medium.com/@patrickbrosset/when-does-white-space-matter-in-html-b90e8a7cdd33
-	const isEquivalentText = isEqual( ...[ actual.chars, expected.chars ].map( getTextWithCollapsedWhitespace ) );
+export function isEquivalentTextTokens( actual, expected ) {
+	// This function is intentionally written as syntactically "ugly" as a hot
+	// path optimization. Text is progressively normalized in order from least-
+	// to-most operationally expensive, until the earliest point at which text
+	// can be confidently inferred as being equal.
+	let actualChars = actual.chars;
+	let expectedChars = expected.chars;
 
-	if ( ! isEquivalentText ) {
-		log.warning( 'Expected text `%s`, saw `%s`.', expected.chars, actual.chars );
+	for ( let i = 0; i < TEXT_NORMALIZATIONS.length; i++ ) {
+		const normalize = TEXT_NORMALIZATIONS[ i ];
+
+		actualChars = normalize( actualChars );
+		expectedChars = normalize( expectedChars );
+
+		if ( actualChars === expectedChars ) {
+			return true;
+		}
 	}
 
-	return isEquivalentText;
+	log.warning( 'Expected text `%s`, saw `%s`.', expected.chars, actual.chars );
+
+	return false;
 }
 
 /**
@@ -352,8 +481,8 @@ export const isEqualTokensOfType = {
 			...[ actual, expected ].map( getMeaningfulAttributePairs )
 		);
 	},
-	Chars: isEqualTextTokensWithCollapsedWhitespace,
-	Comment: isEqualTextTokensWithCollapsedWhitespace,
+	Chars: isEquivalentTextTokens,
+	Comment: isEquivalentTextTokens,
 };
 
 /**
@@ -389,12 +518,34 @@ export function getNextNonWhitespaceToken( tokens ) {
  */
 function getHTMLTokens( html ) {
 	try {
-		return tokenize( html );
+		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
 	} catch ( e ) {
 		log.warning( 'Malformed HTML detected: %s', html );
 	}
 
 	return null;
+}
+
+/**
+ * Returns true if the next HTML token closes the current token.
+ *
+ * @param {Object} currentToken Current token to compare with.
+ * @param {Object|undefined} nextToken Next token to compare against.
+ *
+ * @return {boolean} true if `nextToken` closes `currentToken`, false otherwise
+ */
+export function isClosedByToken( currentToken, nextToken ) {
+	// Ensure this is a self closed token
+	if ( ! currentToken.selfClosing ) {
+		return false;
+	}
+
+	// Check token names and determine if nextToken is the closing tag for currentToken
+	if ( nextToken && nextToken.tagName === currentToken.tagName && nextToken.type === 'EndTag' ) {
+		return true;
+	}
+
+	return false;
 }
 
 /**
@@ -438,6 +589,18 @@ export function isEquivalentHTML( actual, expected ) {
 		if ( isEqualTokens && ! isEqualTokens( actualToken, expectedToken ) ) {
 			return false;
 		}
+
+		// Peek at the next tokens (actual and expected) to see if they close
+		// a self-closing tag
+		if ( isClosedByToken( actualToken, expectedTokens[ 0 ] ) ) {
+			// Consume the next expected token that closes the current actual
+			// self-closing token
+			getNextNonWhitespaceToken( expectedTokens );
+		} else if ( isClosedByToken( expectedToken, actualTokens[ 0 ] ) ) {
+			// Consume the next actual token that closes the current expected
+			// self-closing token
+			getNextNonWhitespaceToken( actualTokens );
+		}
 	}
 
 	if ( ( expectedToken = getNextNonWhitespaceToken( expectedTokens ) ) ) {
@@ -457,13 +620,14 @@ export function isEquivalentHTML( actual, expected ) {
  *
  * Logs to console in development environments when invalid.
  *
- * @param {string} innerHTML  Original block content.
- * @param {string} blockType  Block type.
- * @param {Object} attributes Parsed block attributes.
+ * @param {string|Object} blockTypeOrName Block type.
+ * @param {Object}        attributes      Parsed block attributes.
+ * @param {string}        innerHTML       Original block content.
  *
  * @return {boolean} Whether block is valid.
  */
-export function isValidBlock( innerHTML, blockType, attributes ) {
+export function isValidBlockContent( blockTypeOrName, attributes, innerHTML ) {
+	const blockType = normalizeBlockType( blockTypeOrName );
 	let saveContent;
 	try {
 		saveContent = getSaveContent( blockType, attributes );

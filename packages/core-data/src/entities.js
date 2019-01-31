@@ -4,15 +4,12 @@
 import { upperFirst, camelCase, map, find } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import apiFetch from '@wordpress/api-fetch';
-
-/**
  * Internal dependencies
  */
-import { getEntitiesByKind } from './selectors';
 import { addEntities } from './actions';
+import { apiFetch, select } from './controls';
+
+export const DEFAULT_ENTITY_KEY = 'id';
 
 export const defaultEntities = [
 	{ name: 'postType', kind: 'root', key: 'slug', baseURL: '/wp/v2/types' },
@@ -30,8 +27,8 @@ export const kinds = [
  *
  * @return {Promise} Entities promise
  */
-async function loadPostTypeEntities() {
-	const postTypes = await apiFetch( { path: '/wp/v2/types?context=edit' } );
+function* loadPostTypeEntities() {
+	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
 		return {
 			kind: 'postType',
@@ -46,8 +43,8 @@ async function loadPostTypeEntities() {
  *
  * @return {Promise} Entities promise
  */
-async function loadTaxonomyEntities() {
-	const taxonomies = await apiFetch( { path: '/wp/v2/taxonomies?context=edit' } );
+function* loadTaxonomyEntities() {
+	const taxonomies = yield apiFetch( { path: '/wp/v2/taxonomies?context=edit' } );
 	return map( taxonomies, ( taxonomy, name ) => {
 		return {
 			kind: 'taxonomy',
@@ -78,14 +75,12 @@ export const getMethodName = ( kind, name, prefix = 'get', usePlural = false ) =
 /**
  * Loads the kind entities into the store.
  *
- * @param {Object} state Global state
  * @param {string} kind  Kind
  *
  * @return {Array} Entities
  */
-export async function* getKindEntities( state, kind ) {
-	let entities = getEntitiesByKind( state, kind );
-
+export function* getKindEntities( kind ) {
+	let entities = yield select( 'getEntitiesByKind', kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}
@@ -95,7 +90,7 @@ export async function* getKindEntities( state, kind ) {
 		return [];
 	}
 
-	entities = await kindConfig.loadEntities();
+	entities = yield kindConfig.loadEntities();
 	yield addEntities( entities );
 
 	return entities;

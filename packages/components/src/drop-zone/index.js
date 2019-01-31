@@ -2,25 +2,43 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Dashicon from '../dashicon';
+import { DropZoneConsumer } from './provider';
 
-class DropZone extends Component {
+const DropZone = ( props ) => (
+	<DropZoneConsumer>
+		{ ( { addDropZone, removeDropZone } ) => (
+			<DropZoneComponent
+				addDropZone={ addDropZone }
+				removeDropZone={ removeDropZone }
+				{ ...props }
+			/>
+		) }
+	</DropZoneConsumer>
+);
+
+class DropZoneComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.setZoneNode = this.setZoneNode.bind( this );
-
+		this.dropZoneElement = createRef();
+		this.dropZone = {
+			element: null,
+			onDrop: this.props.onDrop,
+			onFilesDrop: this.props.onFilesDrop,
+			onHTMLDrop: this.props.onHTMLDrop,
+			setState: this.setState.bind( this ),
+		};
 		this.state = {
 			isDraggingOverDocument: false,
 			isDraggingOverElement: false,
@@ -30,21 +48,13 @@ class DropZone extends Component {
 	}
 
 	componentDidMount() {
-		this.context.dropzones.add( {
-			element: this.zone,
-			updateState: this.setState.bind( this ),
-			onDrop: this.props.onDrop,
-			onFilesDrop: this.props.onFilesDrop,
-			onHTMLDrop: this.props.onHTMLDrop,
-		} );
+		// Set element after the component has a node assigned in the DOM
+		this.dropZone.element = this.dropZoneElement.current;
+		this.props.addDropZone( this.dropZone );
 	}
 
 	componentWillUnmount() {
-		this.context.dropzones.remove( this.zone );
-	}
-
-	setZoneNode( node ) {
-		this.zone = node;
+		this.props.removeDropZone( this.dropZone );
 	}
 
 	render() {
@@ -61,32 +71,28 @@ class DropZone extends Component {
 			[ `is-dragging-${ type }` ]: !! type,
 		} );
 
-		return (
-			<div ref={ this.setZoneNode } className={ classes }>
+		let children;
+		if ( isDraggingOverElement ) {
+			children = (
 				<div className="components-drop-zone__content">
-					{ [
-						<Dashicon
-							key="icon"
-							icon="upload"
-							size="40"
-							className="components-drop-zone__content-icon"
-						/>,
-						<span
-							key="text"
-							className="components-drop-zone__content-text"
-						>
-							{ label ? label : __( 'Drop files to upload' ) }
-						</span>,
-					] }
+					<Dashicon
+						icon="upload"
+						size="40"
+						className="components-drop-zone__content-icon"
+					/>
+					<span className="components-drop-zone__content-text">
+						{ label ? label : __( 'Drop files to upload' ) }
+					</span>
 				</div>
+			);
+		}
+
+		return (
+			<div ref={ this.dropZoneElement } className={ classes }>
+				{ children }
 			</div>
 		);
 	}
 }
 
-DropZone.contextTypes = {
-	dropzones: noop,
-};
-
 export default DropZone;
-

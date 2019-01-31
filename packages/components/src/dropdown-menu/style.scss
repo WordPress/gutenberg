@@ -30,15 +30,9 @@
 			@include formatting-button-style__hover();
 		}
 
-		.components-dropdown-menu__indicator {
-			display: inline-block;
-			margin-left: 10px;
-
-			// Add a dropdown arrow indicator.
-			&::after {
-				@include dropdown-arrow();
-				top: $icon-button-size-small / 2 + 1px;
-			}
+		// Add a dropdown arrow indicator.
+		.components-dropdown-menu__indicator::after {
+			@include dropdown-arrow();
 		}
 	}
 }

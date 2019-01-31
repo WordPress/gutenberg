@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import TextareaAutosize from 'react-autosize-textarea';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
+import { compose, withState } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -25,14 +25,15 @@ export function DefaultBlockAppender( {
 	onAppend,
 	showPrompt,
 	placeholder,
-	layout,
 	rootClientId,
+	hovered,
+	setState,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Write your story' );
+	const value = decodeEntities( placeholder ) || __( 'Start writing or type / to choose a block' );
 
 	// The appender "button" is in-fact a text field so as to support
 	// transitions by WritingFlow occurring by arrow key press. WritingFlow
@@ -47,31 +48,37 @@ export function DefaultBlockAppender( {
 	//
 	// See: https://gist.github.com/cvrebert/68659d0333a578d75372
 
+	// The wp-block className is important for editor styles.
+
 	return (
-		<div data-root-client-id={ rootClientId || '' } className="editor-default-block-appender">
-			<BlockDropZone rootClientId={ rootClientId } layout={ layout } />
-			<input
+		<div
+			data-root-client-id={ rootClientId || '' }
+			className="wp-block editor-default-block-appender"
+			onMouseEnter={ () => setState( { hovered: true } ) }
+			onMouseLeave={ () => setState( { hovered: false } ) }
+		>
+			<BlockDropZone rootClientId={ rootClientId } />
+			<TextareaAutosize
 				role="button"
 				aria-label={ __( 'Add block' ) }
 				className="editor-default-block-appender__content"
-				type="text"
 				readOnly
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
-			<InserterWithShortcuts rootClientId={ rootClientId } layout={ layout } />
-			<Inserter position="top right" />
+			{ hovered && <InserterWithShortcuts rootClientId={ rootClientId } /> }
+			<Inserter rootClientId={ rootClientId } position="top right" isAppender />
 		</div>
 	);
 }
 export default compose(
+	withState( { hovered: false } ),
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlock, getEditorSettings, getTemplateLock } = select( 'core/editor' );
+		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const lastBlock = getBlock( ownProps.lastBlockClientId );
-		const isLastBlockDefault = get( lastBlock, [ 'name' ] ) === getDefaultBlockName();
-		const isLastBlockValid = get( lastBlock, [ 'isValid' ] );
+		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
+		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 		const { bodyPlaceholder } = getEditorSettings();
 
 		return {
@@ -89,14 +96,9 @@ export default compose(
 
 		return {
 			onAppend() {
-				const { layout, rootClientId } = ownProps;
+				const { rootClientId } = ownProps;
 
-				let attributes;
-				if ( layout ) {
-					attributes = { layout };
-				}
-
-				insertDefaultBlock( attributes, rootClientId );
+				insertDefaultBlock( undefined, rootClientId );
 				startTyping();
 			},
 		};

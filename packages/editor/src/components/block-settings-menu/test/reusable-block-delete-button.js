@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import ShallowRenderer from 'react-test-renderer/shallow';
 import { noop } from 'lodash';
 
 /**
@@ -10,11 +10,26 @@ import { noop } from 'lodash';
 import { ReusableBlockDeleteButton } from '../reusable-block-delete-button';
 
 describe( 'ReusableBlockDeleteButton', () => {
+	function getShallowRenderOutput( element ) {
+		const renderer = new ShallowRenderer();
+		renderer.render( element );
+		return renderer.getRenderOutput();
+	}
+
+	it( 'should not render when isVisible is false', () => {
+		const wrapper = getShallowRenderOutput(
+			<ReusableBlockDeleteButton isVisible={ false } />
+		);
+
+		expect( wrapper ).toBe( null );
+	} );
+
 	it( 'matches the snapshot', () => {
-		const wrapper = shallow(
+		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
 				role="menuitem"
-				reusableBlock={ { id: 123 } }
+				isVisible
+				isDisabled={ false }
 				onDelete={ noop }
 			/>
 		);
@@ -24,14 +39,15 @@ describe( 'ReusableBlockDeleteButton', () => {
 
 	it( 'should allow deleting a reusable block', () => {
 		const onDelete = jest.fn();
-		const wrapper = shallow(
+		const wrapper = getShallowRenderOutput(
 			<ReusableBlockDeleteButton
-				reusableBlock={ { id: 123 } }
+				isVisible
+				isDisabled={ false }
 				onDelete={ onDelete }
 			/>
 		);
 
-		wrapper.find( 'MenuItem' ).simulate( 'click' );
-		expect( onDelete ).toHaveBeenCalledWith( 123 );
+		wrapper.props.onClick();
+		expect( onDelete ).toHaveBeenCalled();
 	} );
 } );

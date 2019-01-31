@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getUnknownTypeHandlerName, rawHandler, serialize } from '@wordpress/blocks';
+import { getFreeformContentHandlerName, rawHandler, serialize } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -12,22 +12,17 @@ import BlockConvertButton from './block-convert-button';
 
 export default compose(
 	withSelect( ( select, { clientId } ) => {
-		const { canUserUseUnfilteredHTML, getBlock } = select( 'core/editor' );
-		const block = getBlock( clientId );
+		const block = select( 'core/editor' ).getBlock( clientId );
+
 		return {
 			block,
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			shouldRender: ( block && block.name === getUnknownTypeHandlerName() ),
+			shouldRender: ( block && block.name === getFreeformContentHandlerName() ),
 		};
 	} ),
-	withDispatch( ( dispatch, { block, canUserUseUnfilteredHTML } ) => ( {
+	withDispatch( ( dispatch, { block } ) => ( {
 		onClick: () => dispatch( 'core/editor' ).replaceBlocks(
 			block.clientId,
-			rawHandler( {
-				HTML: serialize( block ),
-				mode: 'BLOCKS',
-				canUserUseUnfilteredHTML,
-			} )
+			rawHandler( { HTML: serialize( block ) } )
 		),
 	} ) ),
 )( BlockConvertButton );

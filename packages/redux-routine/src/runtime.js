@@ -2,12 +2,13 @@
  * External dependencies
  */
 import { create } from 'rungen';
-import { map, isString } from 'lodash';
+import { map } from 'lodash';
+import isPromise from 'is-promise';
 
 /**
  * Internal dependencies
  */
-import castError from './cast-error';
+import { isActionOfType, isAction } from './is-action';
 
 /**
  * Create a co-routine runtime.
@@ -19,16 +20,13 @@ import castError from './cast-error';
  */
 export default function createRuntime( controls = {}, dispatch ) {
 	const rungenControls = map( controls, ( control, actionType ) => ( value, next, iterate, yieldNext, yieldError ) => {
-		if ( typeof value !== 'object' || value.type !== actionType ) {
+		if ( ! isActionOfType( value, actionType ) ) {
 			return false;
 		}
 		const routine = control( value );
-		if ( routine instanceof Promise ) {
+		if ( isPromise( routine ) ) {
 			// Async control routine awaits resolution.
-			routine.then(
-				next,
-				( error ) => yieldError( castError( error ) ),
-			);
+			routine.then( yieldNext, yieldError );
 		} else {
 			next( routine );
 		}
@@ -36,7 +34,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 	} );
 
 	const unhandledActionControl = ( value, next ) => {
-		if ( typeof value !== 'object' || ! isString( value.type ) ) {
+		if ( ! isAction( value ) ) {
 			return false;
 		}
 		dispatch( value );
@@ -49,7 +47,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 
 	return ( action ) => new Promise( ( resolve, reject ) =>
 		rungenRuntime( action, ( result ) => {
-			if ( typeof result === 'object' && isString( result.type ) ) {
+			if ( isAction( result ) ) {
 				dispatch( result );
 			}
 			resolve( result );

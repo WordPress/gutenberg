@@ -28,8 +28,8 @@ export const shortcuts = {
 		display: displayShortcut.primaryShift( 'd' ),
 	},
 	removeBlock: {
-		raw: rawShortcut.primaryAlt( 'backspace' ),
-		display: displayShortcut.primaryAlt( 'Backspace' ),
+		raw: rawShortcut.access( 'z' ),
+		display: displayShortcut.access( 'z' ),
 	},
 	insertBefore: {
 		raw: rawShortcut.primaryAlt( 't' ),
@@ -152,13 +152,12 @@ export default compose( [
 			getBlockOrder,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
-			isEditedPostDirty,
 			getBlockRootClientId,
 			getTemplateLock,
-			getSelectedBlock,
+			getSelectedBlockClientId,
 		} = select( 'core/editor' );
-		const block = getSelectedBlock();
-		const selectedBlockClientIds = block ? [ block.clientId ] : getMultiSelectedBlockClientIds();
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectedBlockClientIds = selectedBlockClientId ? [ selectedBlockClientId ] : getMultiSelectedBlockClientIds();
 
 		return {
 			rootBlocksClientIds: getBlockOrder(),
@@ -167,11 +166,10 @@ export default compose( [
 				selectedBlockClientIds,
 				( clientId ) => !! getTemplateLock( getBlockRootClientId( clientId ) )
 			),
-			isDirty: isEditedPostDirty(),
 			selectedBlockClientIds,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			clearSelectedBlock,
 			multiSelect,
@@ -185,11 +183,11 @@ export default compose( [
 			onSave() {
 				// TODO: This should be handled in the `savePost` effect in
 				// considering `isSaveable`. See note on `isEditedPostSaveable`
-				// selector about dirtiness and meta-boxes. When removing, also
-				// remember to remove `isDirty` prop passing from `withSelect`.
+				// selector about dirtiness and meta-boxes.
 				//
 				// See: `isEditedPostSaveable`
-				if ( ! ownProps.isDirty ) {
+				const { isEditedPostDirty } = select( 'core/editor' );
+				if ( ! isEditedPostDirty() ) {
 					return;
 				}
 

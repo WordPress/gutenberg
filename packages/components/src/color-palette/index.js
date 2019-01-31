@@ -2,13 +2,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { ChromePicker } from 'react-color';
 import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import Dashicon from '../dashicon';
 
 /**
  * Internal dependencies
@@ -16,6 +16,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
+import ColorPicker from '../color-picker';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
 	function applyOrUnset( color ) {
@@ -26,7 +27,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 	return (
 		<div className={ classes }>
 			{ map( colors, ( { color, name } ) => {
-				const style = { color: color };
+				const style = { color };
 				const itemClasses = classnames( 'components-color-palette__item', { 'is-active': value === color } );
 
 				return (
@@ -49,6 +50,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 								aria-pressed={ value === color }
 							/>
 						</Tooltip>
+						{ value === color && <Dashicon icon="saved" /> }
 					</div>
 				);
 			} ) }
@@ -71,7 +73,7 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						</Tooltip>
 					) }
 					renderContent={ () => (
-						<ChromePicker
+						<ColorPicker
 							color={ value }
 							onChangeComplete={ ( color ) => onChange( color.hex ) }
 							disableAlpha
