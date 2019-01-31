@@ -15,6 +15,7 @@ import { Component } from '@wordpress/element';
  */
 import styles from './styles.scss';
 import Button from './button';
+import Cell from './cell';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -84,4 +85,6 @@ class BottomSheet extends Component {
 }
 
 BottomSheet.Button = Button;
+BottomSheet.Cell = Cell;
+
 export default BottomSheet;
