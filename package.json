@@ -92,7 +92,7 @@
 		"is-plain-obj": "1.1.0",
 		"is-equal-shallow": "0.1.3",
 		"jsdom": "11.12.0",
-		"lerna": "3.4.3",
+		"lerna": "3.10.7",
 		"lint-staged": "7.3.0",
 		"lodash": "4.17.10",
 		"mkdirp": "0.5.1",
