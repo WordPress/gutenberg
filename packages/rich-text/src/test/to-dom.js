@@ -26,8 +26,6 @@ describe( 'recordToDom', () => {
 		multilineTag,
 		multilineWrapperTags,
 		record,
-		startPath,
-		endPath,
 	} ) => {
 		it( description, () => {
 			const { body, selection } = toDom( {
@@ -36,7 +34,7 @@ describe( 'recordToDom', () => {
 				multilineWrapperTags,
 			} );
 			expect( body ).toMatchSnapshot();
-			expect( selection ).toEqual( { startPath, endPath } );
+			expect( selection ).toMatchSnapshot();
 		} );
 	} );
 } );

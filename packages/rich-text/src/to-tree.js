@@ -48,7 +48,7 @@ function getDeepestActiveFormat( { formats, start } ) {
 		return;
 	}
 
-	const formatsAtStart = formats[ start ];
+	const formatsAtStart = formats[ start - 1 ];
 
 	if ( ! formatsAtStart ) {
 		return;
@@ -146,6 +146,25 @@ export function toTree( {
 			}
 		}
 
+		if ( isEditableTree && lastCharacterFormats ) {
+			let boundaryPointer = pointer;
+
+			lastCharacterFormats.forEach( ( format, formatIndex ) => {
+				boundaryPointer = getLastChild( boundaryPointer );
+
+				if (
+					characterFormats &&
+					format === characterFormats[ formatIndex ]
+				) {
+					return;
+				}
+
+				if ( ! format.object && character !== LINE_SEPARATOR ) {
+					append( getParent( getParent( boundaryPointer ) ), ZERO_WIDTH_NO_BREAK_SPACE );
+				}
+			} );
+		}
+
 		if ( characterFormats ) {
 			characterFormats.forEach( ( format, formatIndex ) => {
 				if (
@@ -163,7 +182,12 @@ export function toTree( {
 
 				const { type, attributes = {}, unregisteredAttributes, object } = format;
 
-				if ( isEditableTree && ! object && format === deepestActiveFormat ) {
+				if (
+					isEditableTree &&
+					! object &&
+					character !== LINE_SEPARATOR &&
+					format === deepestActiveFormat
+				) {
 					attributes[ 'data-rich-text-format-boundary' ] = 'true';
 				}
 
@@ -179,7 +203,17 @@ export function toTree( {
 					remove( pointer );
 				}
 
-				pointer = append( object ? parent : newNode, '' );
+				if ( isEditableTree ) {
+					if ( object ) {
+						pointer = append( parent, '' );
+					} else if ( character === LINE_SEPARATOR ) {
+						pointer = append( newNode, '' );
+					} else {
+						pointer = append( newNode, ZERO_WIDTH_NO_BREAK_SPACE );
+					}
+				} else {
+					pointer = append( object ? parent : newNode, '' );
+				}
 			} );
 		}
 
