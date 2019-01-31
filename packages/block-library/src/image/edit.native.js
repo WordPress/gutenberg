@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -10,7 +10,7 @@ import {
 	requestMediaPickFromDeviceCamera,
 	mediaUploadSync,
 	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog
+	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
 
 /**
@@ -63,7 +63,7 @@ export default class ImageEdit extends React.Component {
 		const { attributes } = this.props;
 
 		if ( this.state.isUploadInProgress ) {
-			requestImageUploadCancelDialog( attributes.id )
+			requestImageUploadCancelDialog( attributes.id );
 		} else if ( attributes.id && ! isURL( attributes.url ) ) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
@@ -201,7 +201,7 @@ export default class ImageEdit extends React.Component {
 						{ toolbarEditButton }
 					</BlockControls>
 					<InspectorControls>
-					{ inlineToolbarButtons }
+						{ inlineToolbarButtons }
 					</InspectorControls>
 					<ImageSize src={ url } >
 						{ ( sizes ) => {
@@ -221,17 +221,20 @@ export default class ImageEdit extends React.Component {
 							}
 
 							return (
-								<View style={ styles.imageContainer } >
-									<Image
+								<View style={ { flex: 1 } } >
+									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
 										source={ { uri: url } }
 										key={ url }
-									/>
-									{ this.state.isUploadFailed && <View style={ styles.uploadFailedContainer }>
-										<Dashicon icon={ 'image-rotate' } ariaPressed={'dashicon-active'}/>
-										<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
-									</View> }
+									>
+										{ this.state.isUploadFailed &&
+											<View style={ styles.imageContainer } >
+												<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
+												<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
+											</View>
+										}
+									</ImageBackground>
 								</View>
 							);
 						} }
