@@ -13,7 +13,7 @@ New blocks should be built in conjunction with any necessary REST API endpoints,
 ### attributes
 
 An object containing the attributes of the block to be server-side rendered.
-E.g: `{ displayAsDropdown:true }`, `{ showHierarchy :true }`, etc...
+E.g: `{ displayAsDropdown: true }`, `{ showHierarchy: true }`, etc...
 - Type: `Object`
 - Required: No
 
@@ -26,7 +26,7 @@ Examples: "core/archives", "core/latest-comments", "core/rss", etc...
 
 ### className
 
-A class added to the dom element that wraps the server side rendered block.
+A class added to the DOM element that wraps the server side rendered block.
 Examples: "my-custom-server-side-rendered".
 - Type: `String`
 - Required: No
