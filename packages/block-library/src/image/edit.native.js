@@ -200,7 +200,6 @@ export default class ImageEdit extends React.Component {
 				}
 			>
 				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ __( 'None' ) } onPress={ () => {} } />
-				<BottomSheet.Cell label={ __( 'Second' ) } value={ __( 'Something else' ) } onPress={ () => {} } />
 			</BottomSheet>
 		);
 
@@ -241,6 +240,7 @@ export default class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
+									{ getInspectorControls() }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
