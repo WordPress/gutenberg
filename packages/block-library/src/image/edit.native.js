@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, TextInput, Text, TouchableOpacity, Switch, Picker } from 'react-native';
+import { View, Image, TextInput } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -167,16 +167,16 @@ export default class ImageEdit extends React.Component {
 				isVisible={ this.state.showSettings }
 				title={ __( 'Image Settings' ) }
 				onClose={ onImageSettingsClose }
-				rightButton={ 
+				rightButton={
 					<BottomSheet.Button
 						text={ __( 'Done' ) }
 						color={ '#0087be' }
 						onPress={ onImageSettingsClose }
-					/> 
+					/>
 				}
 			>
-				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ __( 'None' ) } onPress={ ()=>{} } />
-				<BottomSheet.Cell label={ __( 'Second' ) } value={ __( 'Something else' ) } onPress={ ()=>{} } />
+				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ __( 'None' ) } onPress={ () => {} } />
+				<BottomSheet.Cell label={ __( 'Second' ) } value={ __( 'Something else' ) } onPress={ () => {} } />
 			</BottomSheet>
 		);
 

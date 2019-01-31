@@ -6,7 +6,7 @@ import { TouchableOpacity, Text } from 'react-native';
 /**
  * Internal dependencies
  */
-import styles from './styles.scss'
+import styles from './styles.scss';
 
 export default function Cell( props ) {
 	const {
@@ -20,5 +20,5 @@ export default function Cell( props ) {
 			<Text style={ styles.cellLabel }>{ label }</Text>
 			<Text style={ styles.cellValue }>{ value }</Text>
 		</TouchableOpacity>
-	)
+	);
 }

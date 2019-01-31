@@ -6,7 +6,7 @@ import { TouchableOpacity, View, Text } from 'react-native';
 /**
  * Internal dependencies
  */
-import styles from './styles.scss'
+import styles from './styles.scss';
 
 export default function Button( props ) {
 	const {
@@ -23,7 +23,7 @@ export default function Button( props ) {
 			disabled={ disabled }
 		>
 			<View style={ { flexDirection: 'row', justifyContent: 'center' } }>
-				<Text style={ { ...styles.buttonText, color: color } }>
+				<Text style={ { ...styles.buttonText, color } }>
 					{ text }
 				</Text>
 			</View>
