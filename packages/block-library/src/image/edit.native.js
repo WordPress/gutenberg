@@ -194,7 +194,7 @@ export default class ImageEdit extends React.Component {
 		const progress = this.state.progress * 100;
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ !isSelected }>
+			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
 				<View style={ { flex: 1 } }>
 					{ showSpinner && <Spinner progress={ progress } /> }
 					<BlockControls>
