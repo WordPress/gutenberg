@@ -32,6 +32,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final int MEDIA_UPLOAD_STATE_UPLOADING = 1;
     private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
     private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
+    private static final int MEDIA_UPLOAD_STATE_RESET = 4;
 
     private static final int MEDIA_SERVER_ID_UNKNOWN = 0;
 
@@ -115,6 +116,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 if (jsCallback != null) {
                     jsCallback.invoke(mediaId, mediaUri, 0);
                 }
+            }
+
+            @Override public void onUploadMediaFileClear(int mediaId) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_RESET, mediaId, null, 0);
             }
 
             @Override

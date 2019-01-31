@@ -355,6 +355,12 @@ public class WPAndroidGlueCode {
         }
     }
 
+    public void clearMediaFileURL(final int mediaId) {
+        if (isMediaUploadCallbackRegistered()) {
+            mPendingMediaUploadCallback.onUploadMediaFileClear(mediaId);
+        }
+    }
+
     private boolean isMediaUploadCallbackRegistered() {
         return mPendingMediaUploadCallback != null;
     }
