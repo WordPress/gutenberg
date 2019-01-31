@@ -2,36 +2,41 @@
  * External dependencies
  */
 import React from 'react';
-import { View, Image, TextInput } from 'react-native';
+import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
 	requestMediaPickFromDeviceLibrary,
 	requestMediaPickFromDeviceCamera,
 	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
+import styles from './styles.scss';
 
-const MEDIA_ULOAD_STATE_UPLOADING = 1;
-const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
-const MEDIA_ULOAD_STATE_FAILED = 3;
+const MEDIA_UPLOAD_STATE_UPLOADING = 1;
+const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
+const MEDIA_UPLOAD_STATE_FAILED = 3;
+const MEDIA_UPLOAD_STATE_RESET = 4;
 
 export default class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
+			showSettings: false,
 			progress: 0,
 			isUploadInProgress: false,
-			showSettings: false,
+			isUploadFailed: false,
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
@@ -39,6 +44,7 @@ export default class ImageEdit extends React.Component {
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.onImagePressed = this.onImagePressed.bind( this );
 	}
 
 	componentDidMount() {
@@ -54,6 +60,16 @@ export default class ImageEdit extends React.Component {
 		this.removeMediaUploadListener();
 	}
 
+	onImagePressed() {
+		const { attributes } = this.props;
+
+		if ( this.state.isUploadInProgress ) {
+			requestImageUploadCancelDialog( attributes.id );
+		} else if ( attributes.id && ! isURL( attributes.url ) ) {
+			requestImageFailedRetryDialog( attributes.id );
+		}
+	}
+
 	mediaUpload( payload ) {
 		const { attributes } = this.props;
 
@@ -62,14 +78,17 @@ export default class ImageEdit extends React.Component {
 		}
 
 		switch ( payload.state ) {
-			case MEDIA_ULOAD_STATE_UPLOADING:
-				this.setState( { progress: payload.progress, isUploadInProgress: true } );
+			case MEDIA_UPLOAD_STATE_UPLOADING:
+				this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
 				break;
-			case MEDIA_ULOAD_STATE_SUCCEEDED:
+			case MEDIA_UPLOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
 				break;
-			case MEDIA_ULOAD_STATE_FAILED:
+			case MEDIA_UPLOAD_STATE_FAILED:
 				this.finishMediaUploadWithFailure( payload );
+				break;
+			case MEDIA_UPLOAD_STATE_RESET:
+				this.mediaUploadStateReset( payload );
 				break;
 		}
 	}
@@ -86,10 +105,15 @@ export default class ImageEdit extends React.Component {
 	finishMediaUploadWithFailure( payload ) {
 		const { setAttributes } = this.props;
 
-		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
-		this.setState( { isUploadInProgress: false } );
+		setAttributes( { id: payload.mediaId } );
+		this.setState( { isUploadInProgress: false, isUploadFailed: true } );
+	}
 
-		this.removeMediaUploadListener();
+	mediaUploadStateReset( payload ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { id: payload.mediaId, url: null } );
+		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 	}
 
 	addMediaUploadListener() {
@@ -185,60 +209,68 @@ export default class ImageEdit extends React.Component {
 		const progress = this.state.progress * 100;
 
 		return (
-			<View style={ { flex: 1 } }>
-				{ showSpinner && <Spinner progress={ progress } /> }
-				<BlockControls>
-					{ toolbarEditButton }
-				</BlockControls>
-				<InspectorControls>
-					<ToolbarButton
-						label={ __( 'Image Settings' ) }
-						icon="admin-generic"
-						onClick={ onImageSettingsButtonPressed }
-					/>
-				</InspectorControls>
-				<ImageSize src={ url } >
-					{ ( sizes ) => {
-						const {
-							imageWidthWithinContainer,
-							imageHeightWithinContainer,
-						} = sizes;
-
-						let finalHeight = imageHeightWithinContainer;
-						if ( height > 0 && height < imageHeightWithinContainer ) {
-							finalHeight = height;
-						}
-
-						let finalWidth = imageWidthWithinContainer;
-						if ( width > 0 && width < imageWidthWithinContainer ) {
-							finalWidth = width;
-						}
-
-						return (
-							<View style={ { flex: 1 } } >
-								{ getInspectorControls() }
-								<Image
-									style={ { width: finalWidth, height: finalHeight, opacity } }
-									resizeMethod="scale"
-									source={ { uri: url } }
-									key={ url }
-								/>
-							</View>
-						);
-					} }
-				</ImageSize>
-				{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
-					<View style={ { padding: 12, flex: 1 } }>
-						<TextInput
-							style={ { textAlign: 'center' } }
-							underlineColorAndroid="transparent"
-							value={ caption }
-							placeholder={ __( 'Write caption…' ) }
-							onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+			<TouchableWithoutFeedback onPress={ this.onImagePressed } disabled={ ! isSelected }>
+				<View style={ { flex: 1 } }>
+					{ showSpinner && <Spinner progress={ progress } /> }
+					<BlockControls>
+						{ toolbarEditButton }
+					</BlockControls>
+					<InspectorControls>
+						<ToolbarButton
+							label={ __( 'Image Settings' ) }
+							icon="admin-generic"
+							onClick={ onImageSettingsButtonPressed }
 						/>
-					</View>
-				) }
-			</View>
+					</InspectorControls>
+					<ImageSize src={ url } >
+						{ ( sizes ) => {
+							const {
+								imageWidthWithinContainer,
+								imageHeightWithinContainer,
+							} = sizes;
+
+							let finalHeight = imageHeightWithinContainer;
+							if ( height > 0 && height < imageHeightWithinContainer ) {
+								finalHeight = height;
+							}
+
+							let finalWidth = imageWidthWithinContainer;
+							if ( width > 0 && width < imageWidthWithinContainer ) {
+								finalWidth = width;
+							}
+
+							return (
+								<View style={ { flex: 1 } } >
+									<ImageBackground
+										style={ { width: finalWidth, height: finalHeight, opacity } }
+										resizeMethod="scale"
+										source={ { uri: url } }
+										key={ url }
+									>
+										{ this.state.isUploadFailed &&
+											<View style={ styles.imageContainer } >
+												<Dashicon icon={ 'image-rotate' } ariaPressed={ 'dashicon-active' } />
+												<Text style={ styles.uploadFailedText }>{ __( 'Failed to insert media.\nPlease tap for options.' ) }</Text>
+											</View>
+										}
+									</ImageBackground>
+								</View>
+							);
+						} }
+					</ImageSize>
+					{ ( ! RichText.isEmpty( caption ) > 0 || isSelected ) && (
+						<View style={ { padding: 12, flex: 1 } }>
+							<TextInput
+								style={ { textAlign: 'center' } }
+								underlineColorAndroid="transparent"
+								value={ caption }
+								placeholder={ __( 'Write caption…' ) }
+								onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
+							/>
+						</View>
+					) }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
