@@ -29,7 +29,7 @@ export default function SearchEdit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Search Settings' ) }>
 					<TextControl
-						label={ __( 'Placeholder text' ) }
+						label={ __( 'Placeholder Text' ) }
 						value={ placeholder }
 						onChange={ ( text ) => setAttributes( { placeholder: text } ) }
 					/>
