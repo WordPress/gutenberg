@@ -1,10 +1,17 @@
 .wp-block-search {
+	display: flex;
+	flex-wrap: wrap;
+
 	.wp-block-search__label {
-		display: block;
 		font-weight: bold;
+		width: 100%;
 	}
 
 	.wp-block-search__input {
-		width: 100%;
+		flex-grow: 1;
+	}
+
+	.wp-block-search__button {
+		margin-left: 10px;
 	}
 }

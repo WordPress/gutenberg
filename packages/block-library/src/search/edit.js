@@ -1,40 +1,42 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
+import { RichText } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { RichText, InspectorControls } from '@wordpress/editor';
-import { PanelBody, TextControl } from '@wordpress/components';
 
-export default function SearchEdit( { attributes, setAttributes } ) {
-	const { label, placeholder } = attributes;
+export default function SearchEdit( { className, attributes, setAttributes } ) {
+	const { label, placeholder, buttonText } = attributes;
 
 	return (
-		<Fragment>
-			<div className="wp-block-search">
-				<RichText
-					tagName="div"
-					className="wp-block-search__label"
-					value={ label }
-					formattingControls={ [] }
-					onChange={ ( text ) => setAttributes( { label: text } ) }
-				/>
-				<input
-					type="search"
-					className="wp-block-search__input"
-					value=""
-					placeholder={ placeholder }
-				/>
-			</div>
-			<InspectorControls>
-				<PanelBody title={ __( 'Search Settings' ) }>
-					<TextControl
-						label={ __( 'Placeholder Text' ) }
-						value={ placeholder }
-						onChange={ ( text ) => setAttributes( { placeholder: text } ) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		</Fragment>
+		<div className={ classnames( className, 'wp-block-search' ) }>
+			<RichText
+				wrapperClassName="wp-block-search__label"
+				value={ label }
+				placeholder={ __( 'Add label' ) }
+				keepPlaceholderOnFocus
+				formattingControls={ [] }
+				onChange={ ( html ) => setAttributes( { label: html } ) }
+			/>
+			<input
+				className="wp-block-search__input"
+				value={ placeholder }
+				placeholder={ __( 'Optional placeholder' ) }
+				onChange={ ( event ) => setAttributes( { placeholder: event.target.value } ) }
+			/>
+			<RichText
+				wrapperClassName="wp-block-search__button"
+				className="wp-block-search__button-rich-text"
+				value={ buttonText }
+				placeholder={ __( 'Add button text' ) }
+				keepPlaceholderOnFocus
+				formattingControls={ [] }
+				onChange={ ( html ) => setAttributes( { buttonText: html } ) }
+			/>
+		</div>
 	);
 }

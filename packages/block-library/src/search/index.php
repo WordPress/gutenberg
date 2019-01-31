@@ -15,20 +15,34 @@
 function render_block_core_search( $attributes ) {
 	static $instance_id = 0;
 
-	$html = '
-		<form role="search" method="get" class="wp-block-search" action="%1$s">
-			<label for="%2$s" class="wp-block-search__label">%3$s</label>
-			<input id="%2$s" type="search" class="wp-block-search__input" placeholder="%4$s" value="%5$s" name="s" />
-		</form>
-	';
+	$input_id = 'wp-block-search__input-' . ++$instance_id;
+
+	if ( ! empty( $attributes['label'] ) ) {
+		$label_markup = sprintf(
+			'<label for="%s" class="wp-block-search__label">%s</label>',
+			$input_id,
+			$attributes['label']
+		);
+	}
+
+	$input_markup = sprintf(
+		'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" />',
+		$input_id,
+		esc_attr( get_search_query() ),
+		esc_attr( $attributes['placeholder'] )
+	);
+
+	if ( ! empty( $attributes['buttonText'] ) ) {
+		$button_markup = sprintf(
+			'<button type="submit" class="wp-block-search__button">%s</button>',
+			$attributes['buttonText']
+		);
+	}
 
 	return sprintf(
-		$html,
+		'<form class="wp-block-search" role="search" method="get" action="%s">%s</form>',
 		esc_url( home_url( '/' ) ),
-		'wp-block-search__input-' . ++$instance_id,
-		esc_html( $attributes['label'] ),
-		esc_attr( $attributes['placeholder'] ),
-		esc_attr( get_search_query() )
+		$label_markup . $input_markup . $button_markup
 	);
 }
 
@@ -46,7 +60,11 @@ function register_block_core_search() {
 				),
 				'placeholder' => array(
 					'type'    => 'string',
-					'default' => __( 'Enter a search keyword or phrase' ),
+					'default' => '',
+				),
+				'buttonText'  => array(
+					'type'    => 'string',
+					'default' => __( 'Search' ),
 				),
 			),
 
