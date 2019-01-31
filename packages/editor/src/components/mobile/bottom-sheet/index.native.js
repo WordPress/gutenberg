@@ -15,6 +15,7 @@ import { Component } from '@wordpress/element';
  */
 import styles from './styles.scss';
 import Button from './button';
+import Cell from './cell';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -35,16 +36,6 @@ class BottomSheet extends Component {
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
-	headerButton( config ) {
-		return (
-			<Button onPress={ config.onPress }>
-				<Text style={ { ...styles.buttonText, color: config.color } }>
-					{ config.text }
-				</Text>
-			</Button>
-		);
-	}
-
 	onSafeAreaInsetsUpdate( result ) {
 		const { safeAreaInsets } = result;
 		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
@@ -53,7 +44,7 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { isVisible, leftButtonConfig, rightButtonConfig } = this.props;
+		const { isVisible, leftButton, rightButton } = this.props;
 
 		return (
 			<Modal
@@ -71,7 +62,7 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 					<View style={ styles.head }>
 						<View style={ { flex: 1 } }>
-							{ leftButtonConfig && this.headerButton( leftButtonConfig ) }
+							{ leftButton }
 						</View>
 						<View style={ styles.titleContainer }>
 							<Text style={ styles.title }>
@@ -79,7 +70,7 @@ class BottomSheet extends Component {
 							</Text>
 						</View>
 						<View style={ { flex: 1 } }>
-							{ rightButtonConfig && this.headerButton( rightButtonConfig ) }
+							{ rightButton }
 						</View>
 					</View>
 
@@ -92,5 +83,8 @@ class BottomSheet extends Component {
 		);
 	}
 }
+
+BottomSheet.Button = Button;
+BottomSheet.Cell = Cell;
 
 export default BottomSheet;

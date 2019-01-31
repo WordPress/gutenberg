@@ -57,3 +57,26 @@
 	font-size: 18px;
 	padding: 5px;
 }
+
+// Cell
+
+//Bottom Sheet
+
+.cellContainer {
+	flex-direction: row;
+	min-height: 50;
+	justify-content: space-between;
+	padding-left: 12;
+	padding-right: 12;
+	align-items: center;
+}
+
+.cellLabel {
+	font-size: 18px;
+	color: #000;
+}
+
+.cellValue {
+	font-size: 18px;
+	color: $dark-gray-400;
+}
