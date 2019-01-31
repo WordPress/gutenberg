@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/editor';
@@ -13,7 +8,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 	const { label, placeholder, buttonText } = attributes;
 
 	return (
-		<div className={ classnames( className, 'wp-block-search' ) }>
+		<div className={ className }>
 			<RichText
 				wrapperClassName="wp-block-search__label"
 				value={ label }

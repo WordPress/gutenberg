@@ -39,8 +39,14 @@ function render_block_core_search( $attributes ) {
 		);
 	}
 
+	$class = 'wp-block-search';
+	if ( isset( $attributes['className'] ) ) {
+		$class .= ' ' . $attributes['className'];
+	}
+
 	return sprintf(
-		'<form class="wp-block-search" role="search" method="get" action="%s">%s</form>',
+		'<form class="%s" role="search" method="get" action="%s">%s</form>',
+		$class,
 		esc_url( home_url( '/' ) ),
 		$label_markup . $input_markup . $button_markup
 	);
