@@ -9,7 +9,7 @@ import { createElement } from './create-element';
  * Browser dependencies
  */
 
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+const { TEXT_NODE } = window.Node;
 
 /**
  * Creates a path as an array of indices from the given root node to the given
@@ -273,34 +273,11 @@ function isRangeEqual( a, b ) {
 export function applySelection( selection, current ) {
 	const { node: startContainer, offset: startOffset } = getNodeByPath( current, selection.startPath );
 	const { node: endContainer, offset: endOffset } = getNodeByPath( current, selection.endPath );
-
 	const windowSelection = window.getSelection();
 	const range = current.ownerDocument.createRange();
-	const collapsed = startContainer === endContainer && startOffset === endOffset;
 
-	if (
-		collapsed &&
-		startOffset === 0 &&
-		startContainer.previousSibling &&
-		startContainer.previousSibling.nodeType === ELEMENT_NODE &&
-		startContainer.previousSibling.nodeName !== 'BR'
-	) {
-		startContainer.insertData( 0, '\uFEFF' );
-		range.setStart( startContainer, 1 );
-		range.setEnd( endContainer, 1 );
-	} else if (
-		collapsed &&
-		startOffset === 0 &&
-		startContainer === TEXT_NODE &&
-		startContainer.nodeValue.length === 0
-	) {
-		startContainer.insertData( 0, '\uFEFF' );
-		range.setStart( startContainer, 1 );
-		range.setEnd( endContainer, 1 );
-	} else {
-		range.setStart( startContainer, startOffset );
-		range.setEnd( endContainer, endOffset );
-	}
+	range.setStart( startContainer, startOffset );
+	range.setEnd( endContainer, endOffset );
 
 	if ( windowSelection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
