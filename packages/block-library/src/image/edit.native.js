@@ -163,14 +163,6 @@ export default class ImageEdit extends React.Component {
 			</Toolbar>
 		);
 
-		const inlineToolbarButtons = (
-			<ToolbarButton
-				label={ __( 'Image Settings' ) }
-				icon="admin-generic"
-				onClick={ onImageSettingsButtonPressed }
-			/>
-		);
-
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
@@ -196,7 +188,11 @@ export default class ImageEdit extends React.Component {
 					{ toolbarEditButton }
 				</BlockControls>
 				<InspectorControls>
-					{ inlineToolbarButtons }
+					<ToolbarButton
+						label={ __( 'Image Settings' ) }
+						icon="admin-generic"
+						onClick={ onImageSettingsButtonPressed }
+					/>
 				</InspectorControls>
 				<ImageSize src={ url } >
 					{ ( sizes ) => {
