@@ -66,14 +66,15 @@
 	flex-direction: row;
 	min-height: 50;
 	justify-content: space-between;
-	padding-left: 12;
-	padding-right: 12;
+	margin-left: 12;
+	margin-right: 12;
 	align-items: center;
 }
 
 .cellLabel {
 	font-size: 18px;
 	color: #000;
+	margin-right: 12px;
 }
 
 .cellValue {

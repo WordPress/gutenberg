@@ -17,8 +17,8 @@ export default function Cell( props ) {
 
 	return (
 		<TouchableOpacity style={ styles.cellContainer } onPress={ onPress }>
-			<Text style={ styles.cellLabel }>{ label }</Text>
-			<Text style={ styles.cellValue }>{ value }</Text>
+			<Text numberOfLines={ 1 } style={ styles.cellLabel }>{ label }</Text>
+			<Text numberOfLines={ 1 } ellipsizeMode={ 'middle' } style={ styles.cellValue }>{ value }</Text>
 		</TouchableOpacity>
 	);
 }
