@@ -34,34 +34,41 @@ class MediaPickAndUploadCoordinator: NSObject, UIImagePickerControllerDelegate, 
     presenter.dismiss(animated: true, completion: nil)
     mediaCallback(nil, nil)
   }
-  
-  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-    presenter.dismiss(animated: true, completion: nil)
-    let mediaID = UUID().uuidString
-    let url = URL(fileURLWithPath: NSTemporaryDirectory() + mediaID + ".jpg")
-    guard
-      let image = info[UIImagePickerControllerOriginalImage] as? UIImage,
-      let data = UIImageJPEGRepresentation(image, 1.0)
-      else {
-        return
+
+  func save(image: UIImage, toTemporaryDirectoryUsingName name: String) -> URL? {
+    let url = URL(fileURLWithPath: NSTemporaryDirectory() + name + ".jpg")
+    guard let data = UIImageJPEGRepresentation(image, 1.0) else {
+      return nil
     }
     do {
       try data.write(to: url)
-      mediaCallback(mediaID.hashValue, url.absoluteString)
-      let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
-      progress.totalUnitCount = 100
-      
-      Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerFireMethod(_:)), userInfo: progress, repeats: true)
+      return url
     } catch {
-      mediaCallback(nil, nil)
+      return nil
     }
+  }
+
+  func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+    presenter.dismiss(animated: true, completion: nil)
+    let mediaID = UUID().uuidString
+    guard
+      let image = info[UIImagePickerControllerOriginalImage] as? UIImage,
+      let url = save(image: image, toTemporaryDirectoryUsingName: mediaID)
+    else {
+        mediaCallback(nil, nil)
+        return
+    }
+
+    mediaCallback(mediaID.hashValue, url.absoluteString)
+    let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
+    progress.totalUnitCount = 100
+    Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(timerFireMethod(_:)), userInfo: progress, repeats: true)
   }
   
   @objc func timerFireMethod(_ timer: Timer) {
     guard let progress = timer.userInfo as? Progress,
       let mediaID = progress.userInfo[.mediaID] as? String,
       let mediaURL = progress.userInfo[.mediaURL] as? URL
-      //let otherURL = URL(string: "https://cldup.com/cXyG__fTLN.jpg")
       else {
         timer.invalidate()
         return
