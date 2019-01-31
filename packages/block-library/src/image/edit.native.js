@@ -196,13 +196,6 @@ export default class ImageEdit extends React.Component {
 				isVisible={ this.state.showSettings }
 				title={ __( 'Image Settings' ) }
 				onClose={ onImageSettingsClose }
-				rightButton={
-					<BottomSheet.Button
-						text={ __( 'Done' ) }
-						color={ '#0087be' }
-						onPress={ onImageSettingsClose }
-					/>
-				}
 			>
 				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ alt || __( 'None' ) } onPress={ () => {} } />
 				<TextareaControl
