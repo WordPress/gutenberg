@@ -43,27 +43,10 @@ function gutenberg_url( $path ) {
  * @return string Conditional polyfill inline script.
  */
 function gutenberg_get_script_polyfill( $tests ) {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_get_script_polyfill' );
+
 	global $wp_scripts;
-
-	$polyfill = '';
-	foreach ( $tests as $test => $handle ) {
-		if ( ! array_key_exists( $handle, $wp_scripts->registered ) ) {
-			continue;
-		}
-
-		$polyfill .= (
-			// Test presence of feature...
-			'( ' . $test . ' ) || ' .
-			// ...appending polyfill on any failures. Cautious viewers may balk
-			// at the `document.write`. Its caveat of synchronous mid-stream
-			// blocking write is exactly the behavior we need though.
-			'document.write( \'<script src="' .
-			esc_url( $wp_scripts->registered[ $handle ]->src ) .
-			'"></scr\' + \'ipt>\' );'
-		);
-	}
-
-	return $polyfill;
+	return wp_get_script_polyfill( $wp_scripts, $tests );
 }
 
 if ( ! function_exists( 'register_tinymce_scripts' ) ) {
@@ -153,11 +136,14 @@ function gutenberg_register_packages_scripts() {
  * @since 0.1.0
  */
 function gutenberg_register_scripts_and_styles() {
+	global $wp_scripts;
+
 	gutenberg_register_vendor_scripts();
 
 	wp_add_inline_script(
 		'wp-polyfill',
-		gutenberg_get_script_polyfill(
+		wp_get_script_polyfill(
+			$wp_scripts,
 			array(
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
@@ -599,32 +585,21 @@ function gutenberg_register_vendor_scripts() {
  * @since 0.1.0
  */
 function gutenberg_vendor_script_filename( $handle, $src ) {
-	$match_tinymce_plugin = preg_match(
-		'@tinymce.*/plugins/([^/]+)/plugin(\.min)?\.js$@',
-		$src,
-		$tinymce_plugin_pieces
+	$filename = basename( $src );
+	$match    = preg_match(
+		'/^'
+		. '(?P<ignore>.*?)'
+		. '(?P<suffix>\.min)?'
+		. '(?P<extension>\.js)'
+		. '(?P<extra>.*)'
+		. '$/',
+		$filename,
+		$filename_pieces
 	);
-	if ( $match_tinymce_plugin ) {
-		$prefix = 'tinymce-plugin-' . $tinymce_plugin_pieces[1];
-		$suffix = isset( $tinymce_plugin_pieces[2] ) ? $tinymce_plugin_pieces[2] : '';
-	} else {
-		$filename = basename( $src );
-		$match    = preg_match(
-			'/^'
-			. '(?P<ignore>.*?)'
-			. '(?P<suffix>\.min)?'
-			. '(?P<extension>\.js)'
-			. '(?P<extra>.*)'
-			. '$/',
-			$filename,
-			$filename_pieces
-		);
 
-		$prefix = $handle;
-		$suffix = $match ? $filename_pieces['suffix'] : '';
-	}
-
-	$hash = substr( md5( $src ), 0, 8 );
+	$prefix = $handle;
+	$suffix = $match ? $filename_pieces['suffix'] : '';
+	$hash   = substr( md5( $src ), 0, 8 );
 
 	return "${prefix}${suffix}.${hash}.js";
 }
@@ -721,72 +696,26 @@ function gutenberg_prepare_blocks_for_js() {
  * are loaded last.
  *
  * @since 0.4.0
+ * @deprecated 5.0.0 wp_common_block_scripts_and_styles
  */
 function gutenberg_common_scripts_and_styles() {
-	if ( ! is_gutenberg_page() && is_admin() ) {
-		return;
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_common_block_scripts_and_styles' );
 
-	// Enqueue basic styles built out of Gutenberg through `npm build`.
-	wp_enqueue_style( 'wp-block-library' );
-
-	/*
-	 * Enqueue block styles built through plugins.  This lives in a separate
-	 * action for a couple of reasons: (1) we want to load these assets
-	 * (usually stylesheets) in *both* frontend and editor contexts, and (2)
-	 * one day we may need to be smarter about whether assets are included
-	 * based on whether blocks are actually present on the page.
-	 */
-
-	/**
-	 * Fires after enqueuing block assets for both editor and front-end.
-	 *
-	 * Call `add_action` on any hook before 'wp_enqueue_scripts'.
-	 *
-	 * In the function call you supply, simply use `wp_enqueue_script` and
-	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
-	 *
-	 * @since 0.4.0
-	 */
-	do_action( 'enqueue_block_assets' );
+	wp_common_block_scripts_and_styles();
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
-add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
 /**
  * Enqueues registered block scripts and styles, depending on current rendered
  * context (only enqueuing editor scripts while in context of the editor).
  *
  * @since 2.0.0
+ * @deprecated 5.0.0 wp_enqueue_registered_block_scripts_and_styles
  */
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
-	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_enqueue_registered_block_scripts_and_styles' );
 
-	$block_registry = WP_Block_Type_Registry::get_instance();
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
-		// Front-end styles.
-		if ( ! empty( $block_type->style ) ) {
-			wp_enqueue_style( $block_type->style );
-		}
-
-		// Front-end script.
-		if ( ! empty( $block_type->script ) ) {
-			wp_enqueue_script( $block_type->script );
-		}
-
-		// Editor styles.
-		if ( $is_editor && ! empty( $block_type->editor_style ) ) {
-			wp_enqueue_style( $block_type->editor_style );
-		}
-
-		// Editor script.
-		if ( $is_editor && ! empty( $block_type->editor_script ) ) {
-			wp_enqueue_script( $block_type->editor_script );
-		}
-	}
+	wp_enqueue_registered_block_scripts_and_styles();
 }
-add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
 /**
  * Assigns a default editor template with a default block by post format, if
@@ -922,8 +851,6 @@ function gutenberg_get_available_image_sizes() {
  * @param string $hook Screen name.
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
-	$is_demo = isset( $_GET['gutenberg-demo'] );
-
 	global $wp_scripts, $wp_meta_boxes;
 
 	// Add "wp-hooks" as dependency of "heartbeat".
@@ -965,13 +892,6 @@ JS;
 		$heartbeat_hooks,
 		'after'
 	);
-
-	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
-	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
-	// are available in Gutenberg. Fixes
-	// https://github.com/WordPress/gutenberg/issues/5667.
-	$user_can_richedit = user_can_richedit();
-	add_filter( 'user_can_richedit', '__return_true' );
 
 	wp_enqueue_script( 'wp-edit-post' );
 	wp_enqueue_script( 'wp-format-library' );
@@ -1040,17 +960,7 @@ JS;
 
 	// Assign initial edits, if applicable. These are not initially assigned
 	// to the persisted post, but should be included in its save payload.
-	if ( $is_new_post && $is_demo ) {
-		// Prepopulate with some test content in demo.
-		ob_start();
-		include gutenberg_dir_path() . 'post-content.php';
-		$demo_content = ob_get_clean();
-
-		$initial_edits = array(
-			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			'content' => $demo_content,
-		);
-	} elseif ( $is_new_post ) {
+	if ( $is_new_post ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
@@ -1074,10 +984,10 @@ JS;
 	$meta_box_url = admin_url( 'post.php' );
 	$meta_box_url = add_query_arg(
 		array(
-			'post'           => $post->ID,
-			'action'         => 'edit',
-			'classic-editor' => true,
-			'meta_box'       => true,
+			'post'            => $post->ID,
+			'action'          => 'edit',
+			'meta-box-loader' => true,
+			'_wpnonce'        => wp_create_nonce( 'meta-box-loader' ),
 		),
 		$meta_box_url
 	);
@@ -1217,7 +1127,7 @@ JS;
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
 		'imageSizes'             => gutenberg_get_available_image_sizes(),
-		'richEditingEnabled'     => $user_can_richedit,
+		'richEditingEnabled'     => user_can_richedit(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,
@@ -1277,10 +1187,26 @@ JS;
 
 	$init_script = <<<JS
 	( function() {
-		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
+		window._wpLoadBlockEditor = new Promise( function( resolve ) {
 			wp.domReady( function() {
 				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
 			} );
+		} );
+
+		Object.defineProperty( window, '_wpLoadGutenbergEditor', {
+			get: function() {
+				// TODO: Hello future maintainer. In removing this deprecation,
+				// ensure also to check whether `wp-editor`'s dependencies in
+				// `package-dependencies.php` still require `wp-deprecated`.
+				wp.deprecated( '`window._wpLoadGutenbergEditor`', {
+					plugin: 'Gutenberg',
+					version: '5.2',
+					alternative: '`window._wpLoadBlockEditor`',
+					hint: 'This is a private API, not intended for public use. It may be removed in the future.'
+				} );
+
+				return window._wpLoadBlockEditor;
+			}
 		} );
 } )();
 JS;

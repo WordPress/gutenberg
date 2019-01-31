@@ -1,69 +1,183 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import { View, Image, TextInput } from 'react-native';
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
+import {
+	subscribeMediaUpload,
+	requestMediaPickFromMediaLibrary,
+	requestMediaPickFromDeviceLibrary,
+	requestMediaPickFromDeviceCamera,
+	mediaUploadSync,
+} from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText, BlockControls } from '@wordpress/editor';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { MediaPlaceholder, RichText, BlockControls, InspectorControls } from '@wordpress/editor';
+import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
+import { isURL } from '@wordpress/url';
 
-class ImageEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.onMediaLibraryPress = this.onMediaLibraryPress.bind( this );
+const MEDIA_ULOAD_STATE_UPLOADING = 1;
+const MEDIA_ULOAD_STATE_SUCCEEDED = 2;
+const MEDIA_ULOAD_STATE_FAILED = 3;
+
+export default class ImageEdit extends React.Component {
+	constructor( props ) {
+		super( props );
+
+		this.state = {
+			progress: 0,
+			isUploadInProgress: false,
+		};
+
+		this.mediaUpload = this.mediaUpload.bind( this );
+		this.addMediaUploadListener = this.addMediaUploadListener.bind( this );
+		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 	}
 
-	onUploadPress() {
-		// This method should present an image picker from
-		// the device.
-		//TODO: Implement upload image method.
+	componentDidMount() {
+		const { attributes } = this.props;
+
+		if ( attributes.id && ! isURL( attributes.url ) ) {
+			this.addMediaUploadListener();
+			mediaUploadSync();
+		}
 	}
 
-	onMediaLibraryPress() {
-		RNReactNativeGutenbergBridge.onMediaLibraryPress( ( mediaUrl ) => {
-			if ( mediaUrl ) {
-				this.props.setAttributes( { url: mediaUrl } );
-			}
+	componentWillUnmount() {
+		this.removeMediaUploadListener();
+	}
+
+	mediaUpload( payload ) {
+		const { attributes } = this.props;
+
+		if ( payload.mediaId !== attributes.id ) {
+			return;
+		}
+
+		switch ( payload.state ) {
+			case MEDIA_ULOAD_STATE_UPLOADING:
+				this.setState( { progress: payload.progress, isUploadInProgress: true } );
+				break;
+			case MEDIA_ULOAD_STATE_SUCCEEDED:
+				this.finishMediaUploadWithSuccess( payload );
+				break;
+			case MEDIA_ULOAD_STATE_FAILED:
+				this.finishMediaUploadWithFailure( payload );
+				break;
+		}
+	}
+
+	finishMediaUploadWithSuccess( payload ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { url: payload.mediaUrl, id: payload.mediaServerId } );
+		this.setState( { isUploadInProgress: false } );
+
+		this.removeMediaUploadListener();
+	}
+
+	finishMediaUploadWithFailure( payload ) {
+		const { setAttributes } = this.props;
+
+		setAttributes( { url: payload.mediaUrl, id: payload.mediaId } );
+		this.setState( { isUploadInProgress: false } );
+
+		this.removeMediaUploadListener();
+	}
+
+	addMediaUploadListener() {
+		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
+			this.mediaUpload( payload );
 		} );
 	}
 
-	toolbarEditButton() {
-		return (
-			<Toolbar>
-				<ToolbarButton
-					className="components-toolbar__control"
-					label={ __( 'Edit image' ) }
-					icon="edit"
-					onClick={ this.onMediaLibraryPress }
-				/>
-			</Toolbar>
-		);
+	removeMediaUploadListener() {
+		if ( this.subscriptionParentMediaUpload ) {
+			this.subscriptionParentMediaUpload.remove();
+		}
 	}
 
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width } = attributes;
 
+		const onMediaLibraryButtonPressed = () => {
+			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
+				if ( mediaUrl ) {
+					setAttributes( { id: mediaId, url: mediaUrl } );
+				}
+			} );
+		};
+
 		if ( ! url ) {
+			const onMediaUploadButtonPressed = () => {
+				requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						this.addMediaUploadListener( );
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			};
+
+			const onMediaCaptureButtonPressed = () => {
+				requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
+					if ( mediaUri ) {
+						this.addMediaUploadListener( );
+						setAttributes( { url: mediaUri, id: mediaId } );
+					}
+				} );
+			};
+
 			return (
 				<MediaPlaceholder
-					onUploadPress={ this.onUploadPress }
-					onMediaLibraryPress={ this.onMediaLibraryPress }
+					onUploadMediaPressed={ onMediaUploadButtonPressed }
+					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
+					onCapturePhotoPressed={ onMediaCaptureButtonPressed }
 				/>
 			);
 		}
 
+		const onImageSettingsButtonPressed = () => {
+
+		};
+
+		const toolbarEditButton = (
+			<Toolbar>
+				<ToolbarButton
+					label={ __( 'Edit image' ) }
+					icon="edit"
+					onClick={ onMediaLibraryButtonPressed }
+				/>
+			</Toolbar>
+		);
+
+		const inlineToolbarButtons = (
+			<ToolbarButton
+				label={ __( 'Image Settings' ) }
+				icon="admin-generic"
+				onClick={ onImageSettingsButtonPressed }
+			/>
+		);
+
+		const showSpinner = this.state.isUploadInProgress;
+		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
+		const progress = this.state.progress * 100;
+
 		return (
 			<View style={ { flex: 1 } }>
+				{ showSpinner && <Spinner progress={ progress } /> }
 				<BlockControls>
-					{ this.toolbarEditButton() }
+					{ toolbarEditButton }
 				</BlockControls>
+				<InspectorControls>
+					{ inlineToolbarButtons }
+				</InspectorControls>
 				<ImageSize src={ url } >
 					{ ( sizes ) => {
 						const {
@@ -84,7 +198,7 @@ class ImageEdit extends Component {
 						return (
 							<View style={ { flex: 1 } } >
 								<Image
-									style={ { width: finalWidth, height: finalHeight } }
+									style={ { width: finalWidth, height: finalHeight, opacity } }
 									resizeMethod="scale"
 									source={ { uri: url } }
 									key={ url }
@@ -99,7 +213,7 @@ class ImageEdit extends Component {
 							style={ { textAlign: 'center' } }
 							underlineColorAndroid="transparent"
 							value={ caption }
-							placeholder={ 'Write caption…' }
+							placeholder={ __( 'Write caption…' ) }
 							onChangeText={ ( newCaption ) => setAttributes( { caption: newCaption } ) }
 						/>
 					</View>
@@ -108,5 +222,3 @@ class ImageEdit extends Component {
 		);
 	}
 }
-
-export default ImageEdit;

@@ -102,6 +102,12 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Accessibility",
+		"slug": "accessibility",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/accessibility.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
@@ -408,15 +414,21 @@
 		"parent": "develop"
 	},
 	{
-		"title": "Block Grammar",
-		"slug": "grammar",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/grammar.md",
-		"parent": "develop"
-	},
-	{
 		"title": "Testing Overview",
 		"slug": "testing-overview",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/testing-overview.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Git Workflow",
+		"slug": "git-workflow",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/git-workflow.md",
+		"parent": "develop"
+	},
+	{
+		"title": "Block Grammar",
+		"slug": "grammar",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/grammar.md",
 		"parent": "develop"
 	},
 	{
@@ -897,6 +909,12 @@
 		"title": "ExternalLink",
 		"slug": "external-link",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/external-link/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FocalPointPicker",
+		"slug": "focal-point-picker",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/focal-point-picker/README.md",
 		"parent": "components"
 	},
 	{
