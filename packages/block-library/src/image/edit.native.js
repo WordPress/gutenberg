@@ -14,7 +14,11 @@ import {
 /**
  * Internal dependencies
  */
+<<<<<<< HEAD
 import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
+=======
+import { MediaPlaceholder, RichText, BlockControls, InspectorControls } from '@wordpress/editor';
+>>>>>>> master
 import { Toolbar, ToolbarButton, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
@@ -146,11 +150,15 @@ export default class ImageEdit extends React.Component {
 		}
 
 		const onImageSettingsButtonPressed = () => {
+<<<<<<< HEAD
 			this.setState( { showSettings: true } );
 		};
 
 		const onImageSettingsClose = () => {
 			this.setState( { showSettings: false } );
+=======
+
+>>>>>>> master
 		};
 
 		const toolbarEditButton = (
@@ -163,6 +171,7 @@ export default class ImageEdit extends React.Component {
 			</Toolbar>
 		);
 
+<<<<<<< HEAD
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
@@ -175,6 +184,14 @@ export default class ImageEdit extends React.Component {
 					<Text style={ inspectorStyles.bottomSheetCellValue }>{ __( 'None' ) }</Text>
 				</TouchableOpacity>
 			</BottomSheet>
+=======
+		const inlineToolbarButtons = (
+			<ToolbarButton
+				label={ __( 'Image Settings' ) }
+				icon="admin-generic"
+				onClick={ onImageSettingsButtonPressed }
+			/>
+>>>>>>> master
 		);
 
 		const showSpinner = this.state.isUploadInProgress;
@@ -188,11 +205,15 @@ export default class ImageEdit extends React.Component {
 					{ toolbarEditButton }
 				</BlockControls>
 				<InspectorControls>
+<<<<<<< HEAD
 					<ToolbarButton
 						label={ __( 'Image Settings' ) }
 						icon="admin-generic"
 						onClick={ onImageSettingsButtonPressed }
 					/>
+=======
+					{ inlineToolbarButtons }
+>>>>>>> master
 				</InspectorControls>
 				<ImageSize src={ url } >
 					{ ( sizes ) => {
