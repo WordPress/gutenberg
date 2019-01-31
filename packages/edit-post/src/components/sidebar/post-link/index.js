@@ -12,6 +12,7 @@ import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
 import { cleanForSlug } from '@wordpress/editor';
+import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
  * Module Constants
@@ -33,7 +34,7 @@ function PostLink( {
 } ) {
 	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
-	const currentSlug = decodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
+	const currentSlug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
 	if ( isEditable ) {
 		prefixElement = prefix && (
 			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
