@@ -841,6 +841,48 @@ function gutenberg_get_available_image_sizes() {
 }
 
 /**
+ * Extends block editor settings to include Gutenberg's `editor-styles.css` as
+ * taking precedent those styles shipped with core.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_styles( $settings ) {
+	if ( empty( $settings['styles'] ) ) {
+		$settings['styles'] = array();
+	} else {
+		/*
+		 * By handling this filter at an earlier-than-default priority and with
+		 * an understanding that plugins should concatenate (not unshift) their
+		 * own custom styles, it's assumed that the first entry of the styles
+		 * setting should be the default (core) stylesheet.
+		 */
+		array_shift( $settings['styles'] );
+	}
+
+	/*
+	 * The default styles array would include the core `editor-styles.css` and
+	 * a separate style for the locale font family. To avoid overriding the
+	 * localized value, ensure that Gutenberg's editor styles assume the same
+	 * order as core styles (earlier than the font style assignment).
+	 *
+	 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L181
+	 */
+	array_unshift(
+		$settings['styles'],
+		array(
+			'css' => file_get_contents(
+				gutenberg_dir_path() . 'build/editor/editor-styles.css'
+			),
+		)
+	);
+
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles', 9 );
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1037,7 +1079,7 @@ JS;
 	$styles = array(
 		array(
 			'css' => file_get_contents(
-				gutenberg_dir_path() . 'build/editor/editor-styles.css'
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
 			),
 		),
 	);
