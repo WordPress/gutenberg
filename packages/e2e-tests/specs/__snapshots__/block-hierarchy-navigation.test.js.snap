@@ -24,7 +24,7 @@ exports[`Navigating the block hierarchy should navigate block hierarchy using on
 
 <!-- wp:column -->
 <div class=\\"wp-block-column\\"><!-- wp:paragraph -->
-<p>Third column</p>
+<p></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
