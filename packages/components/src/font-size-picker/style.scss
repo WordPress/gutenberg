@@ -1,4 +1,5 @@
 .components-font-size-picker__buttons {
+	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -7,6 +8,7 @@
 	.components-range-control__number {
 		height: 24px;
 		line-height: 22px;
+		margin-left: 0;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
