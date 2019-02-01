@@ -4,6 +4,9 @@
 
 * Expose the `className` property to style the `PluginSidebar` component.
 
+### Bug Fixes
+ - Fix 'save' keyboard shortcut not functioning in the Code Editor.
+
 ## 3.1.7 (2019-01-03)
 
 ## 3.1.6 (2018-12-18)
