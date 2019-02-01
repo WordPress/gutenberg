@@ -319,7 +319,7 @@ edit: ( props ) => {
 		{
 			label: 'Number Posts to Show',
 			value: props.attributes.postsToShow,
-			onChange: ( val ) => {
+			onChange: function( val ) {
 				props.setAttributes( { postsToShow: parseInt( val ) } );
 			},
 		}
