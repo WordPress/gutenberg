@@ -40,7 +40,7 @@ test( 'IR - undocumented', function( t ) {
 	t.end();
 } );
 
-test( 'IR - default (JSDoc in export statement)', function( t ) {
+test( 'IR - JSDoc in export statement (default export)', function( t ) {
 	const tokenClassAnonymous = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-anonymous.json' ),
 		'utf-8'
@@ -99,90 +99,7 @@ test( 'IR - default (JSDoc in export statement)', function( t ) {
 	t.end();
 } );
 
-test( 'IR - default (JSDoc in same file)', function( t ) {
-	const token = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-identifier.json' ),
-		'utf-8'
-	);
-	const ast = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-identifier-ast.json' ),
-		'utf-8'
-	);
-	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ) ), [ {
-		name: 'default',
-		description: 'Class declaration example.',
-		params: [],
-		return: [],
-		tags: [],
-	} ] );
-	const namedExport = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-named-export.json' ),
-		'utf-8'
-	);
-	const namedExportAST = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-named-export-ast.json' ),
-		'utf-8'
-	);
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( namedExport )[ 0 ], JSON.parse( namedExportAST ) ),
-		[ { name: 'functionDeclaration', description: 'Function declaration example.', params: [], return: [], tags: [] } ]
-	);
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( namedExport )[ 1 ], JSON.parse( namedExportAST ) ),
-		[ { name: 'default', description: 'Function declaration example.', params: [], return: [], tags: [] } ]
-	);
-	t.end();
-} );
-
-test( 'IR - default (JSDoc in module dependency)', function( t ) {
-	const tokenDefault = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-default.json' ),
-		'utf-8'
-	);
-	const astDefault = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-default-ast.json' ),
-		'utf-8'
-	);
-	const getModuleDefault = () => JSON.parse( fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-default-module-ir.json' ),
-		'utf-8'
-	) );
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokenDefault ), JSON.parse( astDefault ), getModuleDefault ),
-		[ {
-			name: 'default',
-			description: 'Function declaration.',
-			params: [],
-			return: [],
-			tags: [],
-		} ]
-	);
-	const tokenNamed = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-named.json' ),
-		'utf-8'
-	);
-	const astNamed = fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-named-ast.json' ),
-		'utf-8'
-	);
-	const getModuleNamed = () => JSON.parse( fs.readFileSync(
-		path.join( __dirname, './fixtures/default-import-named-module-ir.json' ),
-		'utf-8'
-	) );
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokenNamed ), JSON.parse( astNamed ), getModuleNamed ),
-		[ {
-			name: 'default',
-			description: 'Function declaration.',
-			params: [],
-			return: [],
-			tags: [],
-		} ]
-	);
-	t.end();
-} );
-
-test( 'IR - named (JSDoc in export statement)', function( t ) {
+test( 'IR - JSDoc in export statement (named export)', function( t ) {
 	const tokenClass = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-class.json' ),
 		'utf-8'
@@ -227,7 +144,47 @@ test( 'IR - named (JSDoc in export statement)', function( t ) {
 	t.end();
 } );
 
-test( 'IR - named (JSDoc in same file)', function( t ) {
+test( 'IR - JSDoc in export statement (namespace export)', function( t ) {
+	t.equals( true, false );
+	t.end();
+} );
+
+test( 'IR - JSDoc in same file (default export)', function( t ) {
+	const token = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-identifier.json' ),
+		'utf-8'
+	);
+	const ast = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-identifier-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ) ), [ {
+		name: 'default',
+		description: 'Class declaration example.',
+		params: [],
+		return: [],
+		tags: [],
+	} ] );
+	const namedExport = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-named-export.json' ),
+		'utf-8'
+	);
+	const namedExportAST = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-named-export-ast.json' ),
+		'utf-8'
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( namedExport )[ 0 ], JSON.parse( namedExportAST ) ),
+		[ { name: 'functionDeclaration', description: 'Function declaration example.', params: [], return: [], tags: [] } ]
+	);
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( namedExport )[ 1 ], JSON.parse( namedExportAST ) ),
+		[ { name: 'default', description: 'Function declaration example.', params: [], return: [], tags: [] } ]
+	);
+	t.end();
+} );
+
+test( 'IR - JSDoc in same file (named export)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifier.json' ),
 		'utf-8'
@@ -289,19 +246,7 @@ test( 'IR - named (JSDoc in same file)', function( t ) {
 	t.end();
 } );
 
-test( 'IR - named (JSDoc in module dependency)', function( t ) {
-	const tokenDefault = fs.readFileSync(
-		path.join( __dirname, './fixtures/named-default.json' ),
-		'utf-8'
-	);
-	const getModule = () => JSON.parse( fs.readFileSync(
-		path.join( __dirname, './fixtures/named-default-module-ir.json' ),
-		'utf-8'
-	) );
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokenDefault ), { body: [] }, getModule ),
-		[ { name: 'default', description: 'Module declaration.', params: [], return: [], tags: [] } ]
-	);
+test( 'IR - JSDoc in module dependency (named export)', function( t ) {
 	const tokenImportNamed = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-import-named.json' ),
 		'utf-8'
@@ -318,6 +263,22 @@ test( 'IR - named (JSDoc in module dependency)', function( t ) {
 			{ name: 'ClassDeclaration', description: 'Class declaration example.', params: [], return: [], tags: [] },
 		]
 	);
+	t.end();
+} );
+
+test( 'IR - JSDoc in module dependency (named default export)', function( t ) {
+	const tokenDefault = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-default.json' ),
+		'utf-8'
+	);
+	const getModule = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/named-default-module-ir.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenDefault ), { body: [] }, getModule ),
+		[ { name: 'default', description: 'Module declaration.', params: [], return: [], tags: [] } ]
+	);
 	const tokenDefaultExported = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default-exported.json' ),
 		'utf-8'
@@ -326,34 +287,11 @@ test( 'IR - named (JSDoc in module dependency)', function( t ) {
 		getIntermediateRepresentation( JSON.parse( tokenDefaultExported ), { body: [] }, getModule ),
 		[ { name: 'moduleName', description: 'Module declaration.', params: [], return: [], tags: [] } ]
 	);
-	const tokenImportNamespace = fs.readFileSync(
-		path.join( __dirname, './fixtures/named-import-namespace.json' ),
-		'utf-8'
-	);
-	const astImportNamespace = fs.readFileSync(
-		path.join( __dirname, './fixtures/named-import-namespace-ast.json' ),
-		'utf-8'
-	);
-	const getModuleImportNamespace = ( filePath ) => {
-		if ( filePath === './named-import-namespace-module' ) {
-			return JSON.parse( fs.readFileSync(
-				path.join( __dirname, './fixtures/named-import-namespace-module-ir.json' ),
-				'utf-8'
-			) );
-		}
-		return JSON.parse( fs.readFileSync(
-			path.join( __dirname, './fixtures/default-function-ir.json' ),
-			'utf-8'
-		) );
-	};
-	t.deepEqual(
-		getIntermediateRepresentation( JSON.parse( tokenImportNamespace ), JSON.parse( astImportNamespace ), getModuleImportNamespace ),
-		[ { name: 'variables', description: 'Undocumented declaration.', params: [], return: [], tags: [] } ]
-	);
+
 	t.end();
 } );
 
-test( 'IR - namespace (JSDoc in module dependency)', function( t ) {
+test( 'IR - JSDoc in module dependency (namespace export)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/namespace.json' ),
 		'utf-8'
@@ -381,6 +319,82 @@ test( 'IR - namespace (JSDoc in module dependency)', function( t ) {
 			{ name: 'myFunction', description: 'Named function.', params: [], return: [], tags: [] },
 			{ name: 'MyClass', description: 'Named class.', params: [], return: [], tags: [] },
 		]
+	);
+	t.end();
+} );
+
+test( 'IR - JSDoc in module dependency through import (default export)', function( t ) {
+	const tokenDefault = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-default.json' ),
+		'utf-8'
+	);
+	const astDefault = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-default-ast.json' ),
+		'utf-8'
+	);
+	const getModuleDefault = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-default-module-ir.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenDefault ), JSON.parse( astDefault ), getModuleDefault ),
+		[ {
+			name: 'default',
+			description: 'Function declaration.',
+			params: [],
+			return: [],
+			tags: [],
+		} ]
+	);
+	const tokenNamed = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-named.json' ),
+		'utf-8'
+	);
+	const astNamed = fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-named-ast.json' ),
+		'utf-8'
+	);
+	const getModuleNamed = () => JSON.parse( fs.readFileSync(
+		path.join( __dirname, './fixtures/default-import-named-module-ir.json' ),
+		'utf-8'
+	) );
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenNamed ), JSON.parse( astNamed ), getModuleNamed ),
+		[ {
+			name: 'default',
+			description: 'Function declaration.',
+			params: [],
+			return: [],
+			tags: [],
+		} ]
+	);
+	t.end();
+} );
+
+test( 'IR - JSDoc in module dependency through import (named export)', function( t ) {
+	const tokenImportNamespace = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-import-namespace.json' ),
+		'utf-8'
+	);
+	const astImportNamespace = fs.readFileSync(
+		path.join( __dirname, './fixtures/named-import-namespace-ast.json' ),
+		'utf-8'
+	);
+	const getModuleImportNamespace = ( filePath ) => {
+		if ( filePath === './named-import-namespace-module' ) {
+			return JSON.parse( fs.readFileSync(
+				path.join( __dirname, './fixtures/named-import-namespace-module-ir.json' ),
+				'utf-8'
+			) );
+		}
+		return JSON.parse( fs.readFileSync(
+			path.join( __dirname, './fixtures/default-function-ir.json' ),
+			'utf-8'
+		) );
+	};
+	t.deepEqual(
+		getIntermediateRepresentation( JSON.parse( tokenImportNamespace ), JSON.parse( astImportNamespace ), getModuleImportNamespace ),
+		[ { name: 'variables', description: 'Undocumented declaration.', params: [], return: [], tags: [] } ]
 	);
 	t.end();
 } );
