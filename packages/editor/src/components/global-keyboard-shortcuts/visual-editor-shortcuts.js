@@ -11,11 +11,13 @@ import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
+import SaveShortcut from './save-shortcut';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -41,13 +43,12 @@ export const shortcuts = {
 	},
 };
 
-class EditorGlobalKeyboardShortcuts extends Component {
+class VisualEditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
 		super( ...arguments );
 
 		this.selectAll = this.selectAll.bind( this );
 		this.undoOrRedo = this.undoOrRedo.bind( this );
-		this.save = this.save.bind( this );
 		this.deleteSelectedBlocks = this.deleteSelectedBlocks.bind( this );
 		this.clearMultiSelection = this.clearMultiSelection.bind( this );
 	}
@@ -68,11 +69,6 @@ class EditorGlobalKeyboardShortcuts extends Component {
 		}
 
 		event.preventDefault();
-	}
-
-	save( event ) {
-		event.preventDefault();
-		this.props.onSave();
 	}
 
 	deleteSelectedBlocks( event ) {
@@ -110,12 +106,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 						escape: this.clearMultiSelection,
 					} }
 				/>
-				<KeyboardShortcuts
-					bindGlobal
-					shortcuts={ {
-						[ rawShortcut.primary( 's' ) ]: this.save,
-					} }
-				/>
+				<SaveShortcut />
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
 						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
@@ -146,7 +137,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 }
 
-export default compose( [
+const EnhancedVisualEditorGlobalKeyboardShortcuts = compose( [
 	withSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -169,30 +160,16 @@ export default compose( [
 			selectedBlockClientIds,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps, { select } ) => {
+	withDispatch( ( dispatch ) => {
 		const {
 			clearSelectedBlock,
 			multiSelect,
 			redo,
 			undo,
 			removeBlocks,
-			savePost,
 		} = dispatch( 'core/editor' );
 
 		return {
-			onSave() {
-				// TODO: This should be handled in the `savePost` effect in
-				// considering `isSaveable`. See note on `isEditedPostSaveable`
-				// selector about dirtiness and meta-boxes.
-				//
-				// See: `isEditedPostSaveable`
-				const { isEditedPostDirty } = select( 'core/editor' );
-				if ( ! isEditedPostDirty() ) {
-					return;
-				}
-
-				savePost();
-			},
 			clearSelectedBlock,
 			onMultiSelect: multiSelect,
 			onRedo: redo,
@@ -200,4 +177,15 @@ export default compose( [
 			onRemove: removeBlocks,
 		};
 	} ),
-] )( EditorGlobalKeyboardShortcuts );
+] )( VisualEditorGlobalKeyboardShortcuts );
+
+export default EnhancedVisualEditorGlobalKeyboardShortcuts;
+
+export function EditorGlobalKeyboardShortcuts() {
+	deprecated( 'EditorGlobalKeyboardShortcuts', {
+		alternative: 'VisualEditorGlobalKeyboardShortcuts',
+		plugin: 'Gutenberg',
+	} );
+
+	return <EnhancedVisualEditorGlobalKeyboardShortcuts />;
+}
