@@ -1,7 +1,7 @@
 /**
 * External dependencies
 */
-import { TouchableOpacity, Text, View } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -18,16 +18,27 @@ export default function Cell( props ) {
 		onPress,
 		label,
 		value,
+		valuePlaceholder = '',
 		drawSeparator = true,
 		icon,
 		labelStyle = {},
 		valueStyle = {},
+		onChangeValue,
 	} = props;
 
-	const defaultLabelStyle = value ? styles.cellLabel : styles.cellLabelCentered;
+	const showValue = value !== undefined;
+	const isValueEditable = onChangeValue !== undefined;
+	const defaultLabelStyle = showValue ? styles.cellLabel : styles.cellLabelCentered;
+	let valueTextInput;
+
+	const onCellPress = () => {
+		isValueEditable ? 
+			valueTextInput.focus() :
+			onPress();
+	}
 
 	return (
-		<TouchableOpacity onPress={ onPress }>
+		<TouchableOpacity onPress={ onCellPress }>
 			<View style={ styles.cellContainer }>
 				<View style={ styles.cellRowContainer }>
 					{ icon && (
@@ -40,10 +51,16 @@ export default function Cell( props ) {
 						{ label }
 					</Text>
 				</View>
-				{ value && (
-					<Text numberOfLines={ 1 } ellipsizeMode={ 'middle' } style={ { ...styles.cellValue, ...valueStyle } }>
-						{ value }
-					</Text>
+				{ showValue && (
+					<TextInput 
+						ref={ (c) => valueTextInput = c }
+						numberOfLines={ 1 } 
+						style={ { ...styles.cellValue, ...valueStyle } }
+						value={ value }
+						placeholder={ valuePlaceholder }
+						onChangeText={ onChangeValue }
+						editable={ isValueEditable }
+					/>
 				) }
 			</View>
 			{ drawSeparator && (

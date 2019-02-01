@@ -200,14 +200,10 @@ export default class ImageEdit extends React.Component {
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
-					value={ alt || __( 'None' ) }
+					value={ alt || '' }
+					valuePlaceholder={ __( 'None' ) }
+					onChangeValue={ this.updateAlt }
 					onPress={ () => {} }
-				/>
-				<TextareaControl
-					label={ __( 'Alt Text (Alternative Text)' ) }
-					value={ alt }
-					onChange={ this.updateAlt }
-					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Reset to original' ) }

@@ -81,7 +81,6 @@ class BottomSheet extends Component {
 							<View style={ styles.separator } />
 						</View>
 					) }
-
 					{ this.props.children }
 					<View style={ { flexGrow: 1 } }></View>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
