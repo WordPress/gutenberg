@@ -11,6 +11,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 		<div className={ className }>
 			<RichText
 				wrapperClassName="wp-block-search__label"
+				aria-label={ __( 'Label text' ) }
 				placeholder={ __( 'Add label' ) }
 				keepPlaceholderOnFocus
 				formattingControls={ [] }
@@ -19,7 +20,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 			/>
 			<input
 				className="wp-block-search__input"
-				aria-label={ __( 'Optional placeholder' ) }
+				aria-label={ __( 'Optional placeholder text' ) }
 				placeholder={ __( 'Optional placeholder' ) }
 				value={ placeholder }
 				onChange={ ( event ) => setAttributes( { placeholder: event.target.value } ) }
@@ -27,6 +28,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 			<RichText
 				wrapperClassName="wp-block-search__button"
 				className="wp-block-search__button-rich-text"
+				aria-label={ __( 'Button text' ) }
 				placeholder={ __( 'Add button text' ) }
 				keepPlaceholderOnFocus
 				formattingControls={ [] }
