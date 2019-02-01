@@ -3,6 +3,9 @@
 */
 import { TouchableOpacity, Text, View } from 'react-native';
 
+/**
+ * WordPress dependencies
+ */
 import { Dashicon } from '@wordpress/components';
 
 /**
