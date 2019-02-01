@@ -31,6 +31,10 @@ const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
 };
 
+const unescapeSpaces = ( text ) => {
+	return text.replace( /&nbsp;|&#160;/gi, ' ');
+}
+
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
 	'core/italic': 'italic',
@@ -184,7 +188,7 @@ export class RichText extends Component {
 	 */
 	onChange( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
+		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 		this.lastContent = contentWithoutRootTag;
 		this.props.onChange( this.lastContent );
 	}
@@ -208,7 +212,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		this.splitContent( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+		this.splitContent( unescapeSpaces ( event.nativeEvent.text ), event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -257,7 +261,7 @@ export class RichText extends Component {
 		} );
 		// we don't want to refresh aztec as no content can have changed from this event
 		// let's update lastContent to prevent that in shouldComponentUpdate
-		this.lastContent = this.removeRootTagsProduceByAztec( text );
+		this.lastContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
 		this.props.onChange( this.lastContent );
 	}
 
