@@ -62,22 +62,22 @@ class BottomSheet extends Component {
 					<View style={ styles.dragIndicator } />
 					{ hideHeader || (
 						<View>
-						<View style={ styles.head }>
-							<View style={ { flex: 1 } }>
-								{ leftButton }
+							<View style={ styles.head }>
+								<View style={ { flex: 1 } }>
+									{ leftButton }
+								</View>
+								<View style={ styles.titleContainer }>
+									<Text style={ styles.title }>
+										{ title }
+									</Text>
+								</View>
+								<View style={ { flex: 1 } }>
+									{ rightButton }
+								</View>
 							</View>
-							<View style={ styles.titleContainer }>
-								<Text style={ styles.title }>
-									{ title }
-								</Text>
-							</View>
-							<View style={ { flex: 1 } }>
-								{ rightButton }
-							</View>
+							<View style={ styles.separator } />
 						</View>
-						<View style={ styles.separator } />
-						</View>
-					)}
+					) }
 
 					{ this.props.children }
 					<View style={ { flexGrow: 1 } }></View>

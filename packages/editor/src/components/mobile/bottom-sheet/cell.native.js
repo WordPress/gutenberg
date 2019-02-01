@@ -30,7 +30,7 @@ export default function Cell( props ) {
 					{ icon && (
 						<View style={ styles.cellRowContainer }>
 							<Dashicon icon={ icon } size={ 30 } />
-							<View style={ { width: 12 } }/>
+							<View style={ { width: 12 } } />
 						</View>
 					) }
 					<Text style={ { ...defaultLabelStyle, ...labelStyle } }>{ label }</Text>
@@ -41,7 +41,7 @@ export default function Cell( props ) {
 			</View>
 			{ drawSeparator && (
 				<View style={ styles.separator } />
-			)}
+			) }
 		</TouchableOpacity>
 	);
 }
