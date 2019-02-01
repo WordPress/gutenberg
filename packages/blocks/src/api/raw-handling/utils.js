@@ -239,9 +239,21 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 						if ( require.length && ! node.querySelector( require.join( ',' ) ) ) {
 							cleanNodeList( node.childNodes, doc, schema, inline );
 							unwrap( node );
-						}
+						// If the node is at the top, phrasing content, and
+						// contains children that are block content, unwrap
+						// the node because it is invalid.
+						} else if (
+							node.parentNode.nodeName === 'BODY' &&
+							isPhrasingContent( node )
+						) {
+							cleanNodeList( node.childNodes, doc, schema, inline );
 
-						cleanNodeList( node.childNodes, doc, children, inline );
+							if ( Array.from( node.childNodes ).some( ( child ) => ! isPhrasingContent( child ) ) ) {
+								unwrap( node );
+							}
+						} else {
+							cleanNodeList( node.childNodes, doc, children, inline );
+						}
 					// Remove children if the node is not supposed to have any.
 					} else {
 						while ( node.firstChild ) {
