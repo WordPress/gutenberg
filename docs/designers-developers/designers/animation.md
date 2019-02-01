@@ -40,10 +40,6 @@ This is a "pulsing fade" animation that is used when an element is _transient_. 
 
 This is the most basic fade in animation. It simply fades from transparent to opaque.
 
-### `components-popover__appear-animation`
-
-This animation is meant for popover content, such as menus appearing. It shows the popover scaling from 0 to full size, from its point of origin. Be sure to combine it with the correct point of origin. For example the Block Library opens down and to the right, which means it needs a `transform-origin: top left;` to scale diagonally from the top left corner.
-
 ### `components-button__busy-animation`
 
 When a button is working, there's a set of diagonal stripes that animate from left to right. 

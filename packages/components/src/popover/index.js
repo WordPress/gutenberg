@@ -22,6 +22,7 @@ import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
+import Animate from '../animate';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
@@ -258,6 +259,7 @@ class Popover extends Component {
 			focusOnMount,
 			getAnchorRect,
 			expandOnMobile,
+			animate = true,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
@@ -289,36 +291,40 @@ class Popover extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		let content = (
 			<PopoverDetectOutside onClickOutside={ onClickOutside }>
-				<IsolatedEventContainer
-					className={ classes }
-					style={ {
-						top: ! isMobile && popoverTop ? popoverTop + 'px' : undefined,
-						left: ! isMobile && popoverLeft ? popoverLeft + 'px' : undefined,
-						visibility: popoverSize ? undefined : 'hidden',
-					} }
-					{ ...contentProps }
-					onKeyDown={ this.maybeClose }
-				>
-					{ isMobile && (
-						<div className="components-popover__header">
-							<span className="components-popover__header-title">
-								{ headerTitle }
-							</span>
-							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
-						</div>
+				<Animate type={ animate ? 'appear' : null } options={ { origin: position } }>
+					{ ( { className: animateClassName } ) => (
+						<IsolatedEventContainer
+							className={ classnames( classes, animateClassName ) }
+							style={ {
+								top: ! isMobile && popoverTop ? popoverTop + 'px' : undefined,
+								left: ! isMobile && popoverLeft ? popoverLeft + 'px' : undefined,
+								visibility: popoverSize ? undefined : 'hidden',
+							} }
+							{ ...contentProps }
+							onKeyDown={ this.maybeClose }
+						>
+							{ isMobile && (
+								<div className="components-popover__header">
+									<span className="components-popover__header-title">
+										{ headerTitle }
+									</span>
+									<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+								</div>
+							) }
+							<div
+								ref={ this.contentNode }
+								className="components-popover__content"
+								style={ {
+									maxHeight: ! isMobile && contentHeight ? contentHeight + 'px' : undefined,
+									maxWidth: ! isMobile && contentWidth ? contentWidth + 'px' : undefined,
+								} }
+								tabIndex="-1"
+							>
+								{ children }
+							</div>
+						</IsolatedEventContainer>
 					) }
-					<div
-						ref={ this.contentNode }
-						className="components-popover__content"
-						style={ {
-							maxHeight: ! isMobile && contentHeight ? contentHeight + 'px' : undefined,
-							maxWidth: ! isMobile && contentWidth ? contentWidth + 'px' : undefined,
-						} }
-						tabIndex="-1"
-					>
-						{ children }
-					</div>
-				</IsolatedEventContainer>
+				</Animate>
 			</PopoverDetectOutside>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
