@@ -17,11 +17,10 @@ For a quick start, you can use one of the examples from the [Gutenberg Examples 
 Both Webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
 
 First, you need to set up node for your development environment. The steps required change depending on your operating system, but if you have a package manager installed, setup can be as straightforward as:
-```
-macOS: brew install node
-Windows: choco install node
-Ubuntu: apt install node
-```
+
+- Ubuntu: `apt install node`
+- macOS: `brew install node`
+- Windows: `choco install node`
 
 Additionally, the [Node.js download page](https://nodejs.org/en/download/) includes installers and binaries.
 
@@ -32,6 +31,7 @@ Additionally, the [Node.js download page](https://nodejs.org/en/download/) inclu
 The Node Package Manager (npm) is a tool included with node. npm allows you to install and manage JavaScript packages. npm can also generate and process a special file called `package.json`, which contains some information about your project and the packages your project uses.
 
 To start a new node project, first create a directory to work in.
+
 ```
 mkdir myguten-block
 ```
@@ -77,6 +77,7 @@ Run `npm install --save webpack`
 After installing, a `node_modules` directory is created with the webpack module and its dependencies.
 
 Also, if you look at package.json file it will include a new section:
+
 ```json
 "dependencies": {
 	"webpack": "^4.29.0"
@@ -119,11 +120,13 @@ module.exports = {
 ```
 
 Next, you need to install babel, the webpack loader, and the JSX plugin using:
+
 ```
 npm install --save babel-loader babel-core babel-plugin-transform-react-jsx
 ```
 
 You configure babel by creating a `.babelrc` file:
+
 ```
 {
 	"plugins": [
@@ -133,6 +136,7 @@ You configure babel by creating a `.babelrc` file:
 	]
 }
 ```
+
 The pragma setting replaces the function JSX uses for transformation, the `wp.element.createElement` is an equivalent wrapper of `React.createElement` which is the default function for JSX.
 
 With both configs in place, you can now run webpack.
@@ -156,6 +160,7 @@ registerBlockType( 'myguten/test-block', {
 ```
 
 To configure npm to run a script, you use the scripts section in `package.json` webpack:
+
 ```json
   "scripts": {
     "build": "webpack"
@@ -173,8 +178,6 @@ After the build finishes, you will see the built file created at `block.build.js
 The basics are in place to build. You might of noticed the webpack.config.js set a default mode to "development". Webpack has the ability to run in a "production" mode which shrinks the code down, but makes it difficult to read.
 
 The mode is setup so it can be configured using environment variables, which can be added in the scripts section of `package.json`.
-
-Update scripts section to:
 
 ```json
   "scripts": {
@@ -228,5 +231,4 @@ With a setup in place, the standard workflow is:
 - Start development builds: `npm run dev`
 - Develop. Test. Repeat.
 - Create production build: `npm run build`
-
 
