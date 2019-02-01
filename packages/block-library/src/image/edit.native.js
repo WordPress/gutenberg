@@ -203,7 +203,6 @@ export default class ImageEdit extends React.Component {
 					value={ alt || '' }
 					valuePlaceholder={ __( 'None' ) }
 					onChangeValue={ this.updateAlt }
-					onPress={ () => {} }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Reset to original' ) }
