@@ -50,8 +50,6 @@
 	}
 }
 
-// maybe add an additional animation that just animates upwards and down, and then the content inside uses scale
-
 @keyframes components-popover__appear-animation {
 	from {
 		transform: translateY(-2em) scaleY(0) scaleX(0);
