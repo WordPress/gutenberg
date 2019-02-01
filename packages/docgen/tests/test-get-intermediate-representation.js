@@ -144,11 +144,6 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 	t.end();
 } );
 
-test( 'IR - JSDoc in export statement (namespace export)', function( t ) {
-	t.equals( true, false );
-	t.end();
-} );
-
 test( 'IR - JSDoc in same file (default export)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-identifier.json' ),
