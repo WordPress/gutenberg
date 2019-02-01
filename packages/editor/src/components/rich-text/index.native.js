@@ -386,7 +386,7 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
-					fontFamily={ this.props.fontFamily || styles['editor-rich-text'].fontFamily }
+					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
