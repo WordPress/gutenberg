@@ -58,8 +58,8 @@ class BottomSheet extends Component {
 				onSwipe={ this.props.onClose }
 				swipeDirection="down"
 			>
-				<KeyboardAvoidingView 
-					behavior={ Platform.OS === 'ios' && "padding" } 
+				<KeyboardAvoidingView
+					behavior={ Platform.OS === 'ios' && 'padding' }
 					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }
 				>
 					<View style={ styles.dragIndicator } />
@@ -83,7 +83,7 @@ class BottomSheet extends Component {
 					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>
-			
+
 		);
 	}
 }

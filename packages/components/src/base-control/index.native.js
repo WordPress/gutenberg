@@ -3,12 +3,11 @@
  */
 import { Text, View } from 'react-native';
 
-export default function BaseControl( { id, label, help, className, children } ) {
+export default function BaseControl( { label, help, children } ) {
 	return (
 		<View
 			accessible={ true }
 			accessibilityLabel={ label }
-			style={ {fles: 1} }
 		>
 			{ label && <Text>{ label }</Text> }
 			{ children }
