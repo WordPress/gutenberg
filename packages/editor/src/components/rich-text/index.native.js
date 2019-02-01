@@ -291,6 +291,12 @@ export class RichText extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		if ( this._editor.isFocused() ) {
+			this._editor.blur();
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
@@ -373,6 +379,7 @@ export class RichText extends Component {
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					isSelected={ this.props.isSelected }
 					blockType={ { tag: tagName } }
 					color={ 'black' }

@@ -48,11 +48,11 @@
 			width: 100%;
 			max-height: 100%;
 			overflow: auto;
-			padding: 40px 10px 5px;
+			padding: 40px 10px 9px;
 			color: $white;
 			text-align: center;
 			font-size: $default-font-size;
-			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 60%, transparent);
+			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 
 			img {
 				display: inline;
@@ -101,6 +101,13 @@
 			&.columns-#{ $i } .blocks-gallery-item {
 				width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i });
 				margin-right: 16px;
+
+				// Rules inside this query are only run by Microsoft Edge.
+				// Edge miscalculates `calc`, so we have to add some buffer.
+				// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/15637241/
+				@supports (-ms-ime-align:auto) {
+					width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i } - 1px);
+				}
 			}
 		}
 

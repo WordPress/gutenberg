@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import jQuery from 'jquery';
 import { get } from 'lodash';
 
 /**
@@ -12,7 +11,8 @@ import { Modal, Button } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import { Component } from '@wordpress/element';
-import { compose, withGlobalEvents } from '@wordpress/compose';
+import { addAction, removeAction } from '@wordpress/hooks';
+import { compose, withGlobalEvents, withInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,17 +30,30 @@ class PostLockedModal extends Component {
 	}
 
 	componentDidMount() {
+		const hookName = this.getHookName();
+
 		// Details on these events on the Heartbeat API docs
 		// https://developer.wordpress.org/plugins/javascript/heartbeat-api/
-		jQuery( document )
-			.on( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.on( 'heartbeat-tick.refresh-lock', this.receivePostLock );
+		addAction( 'heartbeat.send', hookName, this.sendPostLock );
+		addAction( 'heartbeat.tick', hookName, this.receivePostLock );
 	}
 
 	componentWillUnmount() {
-		jQuery( document )
-			.off( 'heartbeat-send.refresh-lock', this.sendPostLock )
-			.off( 'heartbeat-tick.refresh-lock', this.receivePostLock );
+		const hookName = this.getHookName();
+
+		removeAction( 'heartbeat.send', hookName );
+		removeAction( 'heartbeat.tick', hookName );
+	}
+
+	/**
+	 * Returns a `@wordpress/hooks` hook name specific to the instance of the
+	 * component.
+	 *
+	 * @return {string} Hook name prefix.
+	 */
+	getHookName() {
+		const { instanceId } = this.props;
+		return 'core/editor/post-locked-modal-' + instanceId;
 	}
 
 	/**
@@ -49,10 +62,9 @@ class PostLockedModal extends Component {
 	 * When the user does not send a heartbeat in a heartbeat-tick
 	 * the user is no longer editing and another user can start editing.
 	 *
-	 * @param {Object} event Event.
-	 * @param {Object} data  Data to send in the heartbeat request.
+	 * @param {Object} data Data to send in the heartbeat request.
 	 */
-	sendPostLock( event, data ) {
+	sendPostLock( data ) {
 		const { isLocked, activePostLock, postId } = this.props;
 		if ( isLocked ) {
 			return;
@@ -67,10 +79,9 @@ class PostLockedModal extends Component {
 	/**
 	 * Refresh post locks: update the lock string or show the dialog if somebody has taken over editing.
 	 *
-	 * @param {Object} event Event.
-	 * @param {Object} data  Data received in the heartbeat request
+	 * @param {Object} data Data received in the heartbeat request
 	 */
-	receivePostLock( event, data ) {
+	receivePostLock( data ) {
 		if ( ! data[ 'wp-refresh-post-lock' ] ) {
 			return;
 		}
@@ -104,18 +115,15 @@ class PostLockedModal extends Component {
 			return;
 		}
 
-		const data = {
-			action: 'wp-remove-post-lock',
-			_wpnonce: postLockUtils.unlockNonce,
-			post_ID: postId,
-			active_post_lock: activePostLock,
-		};
+		const data = new window.FormData();
+		data.append( 'action', 'wp-remove-post-lock' );
+		data.append( '_wpnonce', postLockUtils.unlockNonce );
+		data.append( 'post_ID', postId );
+		data.append( 'active_post_lock', activePostLock );
 
-		jQuery.post( {
-			async: false,
-			url: postLockUtils.ajaxUrl,
-			data,
-		} );
+		const xhr = new window.XMLHttpRequest();
+		xhr.open( 'POST', postLockUtils.ajaxUrl, false );
+		xhr.send( data );
 	}
 
 	render() {
@@ -232,6 +240,7 @@ export default compose(
 			updatePostLock,
 		};
 	} ),
+	withInstanceId,
 	withGlobalEvents( {
 		beforeunload: 'releasePostLock',
 	} )

@@ -1,3 +1,5 @@
+/* eslint-disable @wordpress/no-unused-vars-before-return */
+
 // Adapted from https://github.com/reworkcss/css
 // because we needed to remove source map support.
 
@@ -34,7 +36,7 @@ export default function( css, options ) {
    */
 
 	function position() {
-		const start = { line: lineno, column: column };
+		const start = { line: lineno, column };
 		return function( node ) {
 			node.position = new Position( start );
 			whitespace();
@@ -48,7 +50,7 @@ export default function( css, options ) {
 
 	function Position( start ) {
 		this.start = start;
-		this.end = { line: lineno, column: column };
+		this.end = { line: lineno, column };
 		this.source = options.source;
 	}
 
@@ -349,8 +351,8 @@ export default function( css, options ) {
 
 		return pos( {
 			type: 'keyframes',
-			name: name,
-			vendor: vendor,
+			name,
+			vendor,
 			keyframes: frames,
 		} );
 	}
@@ -380,7 +382,7 @@ export default function( css, options ) {
 
 		return pos( {
 			type: 'supports',
-			supports: supports,
+			supports,
 			rules: style,
 		} );
 	}
@@ -438,7 +440,7 @@ export default function( css, options ) {
 
 		return pos( {
 			type: 'media',
-			media: media,
+			media,
 			rules: style,
 		} );
 	}
@@ -525,7 +527,7 @@ export default function( css, options ) {
 		return pos( {
 			type: 'document',
 			document: doc,
-			vendor: vendor,
+			vendor,
 			rules: style,
 		} );
 	}
