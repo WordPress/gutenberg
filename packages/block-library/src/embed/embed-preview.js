@@ -64,6 +64,7 @@ const EmbedPreview = class extends Component {
 		const sandboxClassnames = classnames( type, className, 'wp-block-embed__wrapper' );
 
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		const embedWrapper = 'wp-embed' === type ? (
 			<WpEmbedPreview
 				html={ html }
@@ -78,11 +79,11 @@ const EmbedPreview = class extends Component {
 					onFocus={ this.hideOverlay }
 				/>
 				{ ! interactive && <div
-					role="dialog"
 					className="wp-block-embed-interactive-overlay"
 					onMouseUp={ this.hideOverlay } /> }
 			</div>
 		);
+		/* eslint-enable jsx-a11y/no-static-element-interactions */
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 
 		return (
