@@ -1,8 +1,13 @@
 ## 9.1.0 (Unreleased)
 
-### New Feature
+### New Features
 
 - Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
+- Added a new `TextEditorGlobalKeyboardShortcuts` component.
+
+### Deprecations
+
+- `EditorGlobalKeyboardShortcuts` has been deprecated in favor of `VisualEditorGlobalKeyboardShortcuts`.
 
 ### Bug Fixes
 
