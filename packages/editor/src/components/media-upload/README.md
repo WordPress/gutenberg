@@ -20,7 +20,7 @@ addFilter(
 );
 ```
 
-You can check how this component is implemented for the edit post page using `wp.media` module in [edit-post](../../../../edit-post/src/hooks/components/media-upload/index.js).
+You can check how this component is implemented for the edit post page using `wp.media` module in [edit-post](https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/src/hooks/components/media-upload/index.js).
 
 ## Usage
 

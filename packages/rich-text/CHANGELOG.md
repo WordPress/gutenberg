@@ -1,3 +1,11 @@
+## 3.0.4 (2019-01-03)
+
+## 3.0.3 (2018-12-12)
+
+### Internal
+
+- Internal performance optimizations to avoid excessive expensive creation of DOM documents.
+
 ## 3.0.2 (2018-11-21)
 
 ## 3.0.1 (2018-11-20)

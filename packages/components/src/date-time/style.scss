@@ -1,5 +1,8 @@
-// We can't reference this package with ~ because of how Lerna handles packages. 😩
+// We can't reference this package with ~ because of how Lerna handles packages.
+// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
+/*rtl:begin:ignore*/
 @import "node_modules/react-dates/lib/css/_datepicker";
+/*rtl:end:ignore*/
 
 .components-datetime {
 	.components-datetime__calendar-help {
@@ -139,7 +142,7 @@
 	}
 
 	// Makes the month appear before the day if time format uses AM/PM
-	// We are assuming MM-DD-YYY corelates with AM/PM
+	// We are assuming MM-DD-YYY correlates with AM/PM
 	&.is-12-hour {
 		.components-datetime__time-field-day input {
 			margin: 0 -4px 0 0 !important;
@@ -147,12 +150,6 @@
 		}
 		.components-datetime__time-field-year input {
 			border-radius: 0 $radius-round-rectangle $radius-round-rectangle 0 !important;
-		}
-	}
-
-	&.is-24-hour {
-		.components-datetime__time-field-day {
-			order: 0 !important;
 		}
 	}
 }
