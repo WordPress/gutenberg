@@ -189,8 +189,8 @@ export default class ImageEdit extends React.Component {
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
-				title={ __( 'Image Settings' ) }
 				onClose={ onImageSettingsClose }
+				hideHeader
 				rightButton={
 					<BottomSheet.Button
 						text={ __( 'Done' ) }
