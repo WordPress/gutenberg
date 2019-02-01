@@ -99,7 +99,6 @@ class ParagraphEdit extends Component {
 						...style,
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
-					fontFamily={ 'NotoSerif' }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
 						const newParaBlock = parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
