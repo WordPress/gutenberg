@@ -181,12 +181,6 @@
 	}
 }
 
-@keyframes edit-post-layout__slide-in-animation {
-	100% {
-		transform: translateX(0%);
-	}
-}
-
 .edit-post-layout .editor-post-publish-panel__header-publish-button {
 	// Match the size of the Publish... button.
 	.components-button.is-large {

@@ -11,6 +11,17 @@
 	height: 100vh;
 	overflow: hidden;
 
+
+	// Animate in the sidebar
+	transform: translateX(+100%);
+
+	.is-sidebar-opened & {
+		@include break-medium() {
+			animation: edit-post-layout__slide-in-animation 0.1s cubic-bezier(0, 0, 0.2, 1);
+			animation-fill-mode: forwards;
+		}
+	}
+
 	@include break-small() {
 		top: $admin-bar-height-big + $header-height;
 		z-index: z-index(".edit-post-sidebar {greater than small}");
