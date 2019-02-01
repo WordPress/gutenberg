@@ -14,7 +14,11 @@ import {
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	withSelect,
+	withDispatch,
+	__experimentalAsyncModeProvider as AsyncModeProvider,
+} from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
@@ -24,6 +28,13 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { getBlockDOMNode } from '../../utils/dom';
 
+const forceSyncUpdates = ( WrappedComponent ) => ( props ) => {
+	return (
+		<AsyncModeProvider value={ false }>
+			<WrappedComponent { ...props } />
+		</AsyncModeProvider>
+	);
+};
 class BlockList extends Component {
 	constructor( props ) {
 		super( props );
@@ -182,23 +193,35 @@ class BlockList extends Component {
 			blockClientIds,
 			rootClientId,
 			isDraggable,
+			selectedBlockClientId,
+			multiSelectedBlockClientIds,
+			hasMultiSelection,
 		} = this.props;
 
 		return (
 			<div className="editor-block-list__layout">
-				{ map( blockClientIds, ( clientId, blockIndex ) => (
-					<BlockListBlock
-						key={ 'block-' + clientId }
-						index={ blockIndex }
-						clientId={ clientId }
-						blockRef={ this.setBlockRef }
-						onSelectionStart={ this.onSelectionStart }
-						rootClientId={ rootClientId }
-						isFirst={ blockIndex === 0 }
-						isLast={ blockIndex === blockClientIds.length - 1 }
-						isDraggable={ isDraggable }
-					/>
-				) ) }
+				{ map( blockClientIds, ( clientId, blockIndex ) => {
+					const isBlockInSelection = hasMultiSelection ?
+						multiSelectedBlockClientIds.includes( clientId ) :
+						selectedBlockClientId === clientId;
+
+					return (
+						<AsyncModeProvider
+							key={ 'block-' + clientId }
+							value={ ! isBlockInSelection }
+						>
+							<BlockListBlock
+								clientId={ clientId }
+								blockRef={ this.setBlockRef }
+								onSelectionStart={ this.onSelectionStart }
+								rootClientId={ rootClientId }
+								isFirst={ blockIndex === 0 }
+								isLast={ blockIndex === blockClientIds.length - 1 }
+								isDraggable={ isDraggable }
+							/>
+						</AsyncModeProvider>
+					);
+				} ) }
 				<BlockListAppender rootClientId={ rootClientId } />
 			</div>
 		);
@@ -206,6 +229,10 @@ class BlockList extends Component {
 }
 
 export default compose( [
+	// This component needs to always be synchronous
+	// as it's the one changing the async mode
+	// depending on the block selection.
+	forceSyncUpdates,
 	withSelect( ( select, ownProps ) => {
 		const {
 			getBlockOrder,
@@ -213,6 +240,9 @@ export default compose( [
 			isMultiSelecting,
 			getMultiSelectedBlocksStartClientId,
 			getMultiSelectedBlocksEndClientId,
+			getSelectedBlockClientId,
+			getMultiSelectedBlockClientIds,
+			hasMultiSelection,
 		} = select( 'core/editor' );
 		const { rootClientId } = ownProps;
 
@@ -222,6 +252,9 @@ export default compose( [
 			selectionEnd: getMultiSelectedBlocksEndClientId(),
 			isSelectionEnabled: isSelectionEnabled(),
 			isMultiSelecting: isMultiSelecting(),
+			selectedBlockClientId: getSelectedBlockClientId(),
+			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			hasMultiSelection: hasMultiSelection(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

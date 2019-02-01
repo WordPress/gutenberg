@@ -6,7 +6,6 @@ import { flow, map } from 'lodash';
 /**
  * WordPress Dependencies
  */
-import { compose } from '@wordpress/compose';
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
@@ -15,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { traverse, wrap, urlRewrite } from '../../editor-styles';
+import transformStyles from '../../editor-styles';
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -51,14 +50,9 @@ class EditorProvider extends Component {
 			return;
 		}
 
-		map( this.props.settings.styles, ( { css, baseURL } ) => {
-			const transforms = [
-				wrap( '.editor-styles-wrapper' ),
-			];
-			if ( baseURL ) {
-				transforms.push( urlRewrite( baseURL ) );
-			}
-			const updatedCSS = traverse( css, compose( transforms ) );
+		const updatedStyles = transformStyles( this.props.settings.styles, '.editor-styles-wrapper' );
+
+		map( updatedStyles, ( updatedCSS ) => {
 			if ( updatedCSS ) {
 				const node = document.createElement( 'style' );
 				node.innerHTML = updatedCSS;

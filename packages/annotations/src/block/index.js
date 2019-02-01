@@ -17,7 +17,7 @@ const addAnnotationClassName = ( OriginalComponent ) => {
 		return {
 			className: annotations.map( ( annotation ) => {
 				return 'is-annotated-by-' + annotation.source;
-			} ),
+			} ).join( ' ' ),
 		};
 	} )( OriginalComponent );
 };

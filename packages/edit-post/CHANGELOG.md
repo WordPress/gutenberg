@@ -1,3 +1,25 @@
+## 3.2.0 (Next)
+
+### Polish
+
+* Expose the `className` property to style the `PluginSidebar` component.
+
+### Bug Fixes
+ - Fix 'save' keyboard shortcut not functioning in the Code Editor.
+
+## 3.1.7 (2019-01-03)
+
+## 3.1.6 (2018-12-18)
+
+## 3.1.5 (2018-12-12)
+
+### Bug Fixes
+ - Fix saving WYSIWYG Meta Boxes
+
+## 3.1.4 (2018-11-30)
+
+## 3.1.3 (2018-11-30)
+
 ## 3.1.2 (2018-11-22)
 
 ## 3.1.1 (2018-11-21)

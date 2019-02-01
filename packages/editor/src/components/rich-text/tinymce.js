@@ -200,16 +200,11 @@ export default class TinyMCE extends Component {
 			lists_indent_on_tab: false,
 		};
 
-		if ( multilineTag === 'li' ) {
-			settings.plugins.push( 'lists' );
-		}
-
 		tinymce.init( {
 			...settings,
 			target: this.editorNode,
 			setup: ( editor ) => {
 				this.editor = editor;
-				this.props.onSetup( editor );
 
 				// TinyMCE resets the element content on initialization, even
 				// when it's already identical to what exists currently. This
@@ -342,13 +337,15 @@ export default class TinyMCE extends Component {
 		const {
 			tagName = 'div',
 			style,
-			defaultValue,
+			record,
+			valueToEditableHTML,
 			className,
 			isPlaceholderVisible,
 			onPaste,
 			onInput,
 			onKeyDown,
 			onCompositionEnd,
+			onBlur,
 		} = this.props;
 
 		/*
@@ -372,10 +369,11 @@ export default class TinyMCE extends Component {
 			ref: this.bindEditorNode,
 			style,
 			suppressContentEditableWarning: true,
-			dangerouslySetInnerHTML: { __html: defaultValue },
+			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			onPaste,
 			onInput,
 			onFocus: this.onFocus,
+			onBlur,
 			onKeyDown,
 			onCompositionEnd,
 		} );

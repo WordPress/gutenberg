@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/viewport",
-	"version": "2.0.12",
+	"version": "2.1.1",
 	"description": "Viewport module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,10 +25,6 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/element": "file:../element",
 		"lodash": "^4.17.10"
-	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"

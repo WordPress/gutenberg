@@ -28,10 +28,11 @@ const EmbedPreview = ( props ) => {
 	const { scripts } = preview;
 
 	const html = 'photo' === type ? getPhotoHtml( preview ) : preview.html;
-	const parsedUrl = parse( url );
-	const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedUrl.host.replace( /^www\./, '' ) );
+	const parsedHost = parse( url ).host.split( '.' );
+	const parsedHostBaseUrl = parsedHost.splice( parsedHost.length - 2, parsedHost.length - 1 ).join( '.' );
+	const cannotPreview = includes( HOSTS_NO_PREVIEWS, parsedHostBaseUrl );
 	// translators: %s: host providing embed content e.g: www.youtube.com
-	const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedUrl.host );
+	const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedHostBaseUrl );
 	const sandboxClassnames = classnames( type, className, 'wp-block-embed__wrapper' );
 
 	const embedWrapper = 'wp-embed' === type ? (
@@ -54,7 +55,7 @@ const EmbedPreview = ( props ) => {
 			{ ( cannotPreview ) ? (
 				<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
 					<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-					<p className="components-placeholder__error">{ __( 'Previews for this are unavailable in the editor, sorry!' ) }</p>
+					<p className="components-placeholder__error">{ __( 'Sorry, we cannot preview this embedded content in the editor.' ) }</p>
 				</Placeholder>
 			) : embedWrapper }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (

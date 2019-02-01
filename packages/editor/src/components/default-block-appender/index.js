@@ -7,7 +7,7 @@ import TextareaAutosize from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
+import { compose, withState } from '@wordpress/compose';
 import { getDefaultBlockName } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -26,6 +26,8 @@ export function DefaultBlockAppender( {
 	showPrompt,
 	placeholder,
 	rootClientId,
+	hovered,
+	setState,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
@@ -49,7 +51,12 @@ export function DefaultBlockAppender( {
 	// The wp-block className is important for editor styles.
 
 	return (
-		<div data-root-client-id={ rootClientId || '' } className="wp-block editor-default-block-appender">
+		<div
+			data-root-client-id={ rootClientId || '' }
+			className="wp-block editor-default-block-appender"
+			onMouseEnter={ () => setState( { hovered: true } ) }
+			onMouseLeave={ () => setState( { hovered: false } ) }
+		>
 			<BlockDropZone rootClientId={ rootClientId } />
 			<TextareaAutosize
 				role="button"
@@ -59,12 +66,13 @@ export function DefaultBlockAppender( {
 				onFocus={ onAppend }
 				value={ showPrompt ? value : '' }
 			/>
-			<InserterWithShortcuts rootClientId={ rootClientId } />
-			<Inserter position="top right" />
+			{ hovered && <InserterWithShortcuts rootClientId={ rootClientId } /> }
+			<Inserter rootClientId={ rootClientId } position="top right" isAppender />
 		</div>
 	);
 }
 export default compose(
+	withState( { hovered: false } ),
 	withSelect( ( select, ownProps ) => {
 		const { getBlockCount, getBlockName, isBlockValid, getEditorSettings, getTemplateLock } = select( 'core/editor' );
 

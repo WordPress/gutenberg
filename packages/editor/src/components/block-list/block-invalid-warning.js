@@ -9,7 +9,8 @@ import {
 	createBlock,
 	rawHandler,
 } from '@wordpress/blocks';
-import { withDispatch } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -35,11 +36,12 @@ export class BlockInvalidWarning extends Component {
 	}
 
 	render() {
-		const { convertToHTML, convertToBlocks, convertToClassic, block } = this.props;
+		const { convertToHTML, convertToBlocks, convertToClassic, attemptBlockRecovery, block } = this.props;
 		const hasHTMLBlock = !! getBlockType( 'core/html' );
 		const { compare } = this.state;
 		const hiddenActions = [
 			{ title: __( 'Convert to Classic Block' ), onClick: convertToClassic },
+			{ title: __( 'Attempt Block Recovery' ), onClick: attemptBlockRecovery },
 		];
 
 		if ( compare ) {
@@ -95,19 +97,28 @@ const blockToHTML = ( block ) => createBlock( 'core/html', {
 const blockToBlocks = ( block ) => rawHandler( {
 	HTML: block.originalContent,
 } );
+const recoverBlock = ( { name, attributes, innerBlocks } ) => createBlock( name, attributes, innerBlocks );
 
-export default withDispatch( ( dispatch, { block } ) => {
-	const { replaceBlock } = dispatch( 'core/editor' );
+export default compose( [
+	withSelect( ( select, { clientId } ) => ( {
+		block: select( 'core/editor' ).getBlock( clientId ),
+	} ) ),
+	withDispatch( ( dispatch, { block } ) => {
+		const { replaceBlock } = dispatch( 'core/editor' );
 
-	return {
-		convertToClassic() {
-			replaceBlock( block.clientId, blockToClassic( block ) );
-		},
-		convertToHTML() {
-			replaceBlock( block.clientId, blockToHTML( block ) );
-		},
-		convertToBlocks() {
-			replaceBlock( block.clientId, blockToBlocks( block ) );
-		},
-	};
-} )( BlockInvalidWarning );
+		return {
+			convertToClassic() {
+				replaceBlock( block.clientId, blockToClassic( block ) );
+			},
+			convertToHTML() {
+				replaceBlock( block.clientId, blockToHTML( block ) );
+			},
+			convertToBlocks() {
+				replaceBlock( block.clientId, blockToBlocks( block ) );
+			},
+			attemptBlockRecovery() {
+				replaceBlock( block.clientId, recoverBlock( block ) );
+			},
+		};
+	} ),
+] )( BlockInvalidWarning );

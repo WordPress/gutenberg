@@ -60,3 +60,10 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
 
 - Type: `bool`
 - Required: No
+
+### isInvalidDate
+
+A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
+
+- Type: `Function`
+- Required: No

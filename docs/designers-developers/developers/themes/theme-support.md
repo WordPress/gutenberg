@@ -4,7 +4,7 @@ The new Blocks include baseline support in all themes, enhancements to opt-in to
 
 There are a few new concepts to consider when building themes:
 
-- **Editor Color Palette** - A default set of colors is provided, but themes and register their own and optionally lock users into picking from the defined palette.
+- **Editor Color Palette** - A default set of colors is provided, but themes can register their own and optionally lock users into picking from the defined palette.
 - **Editor Text Size Palette** - A default set of sizes is provided, but themes and register their own and optionally lock users into picking from preselected sizes.
 - **Responsive Embeds** - Themes must opt-in to responsive embeds.
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
@@ -137,28 +137,24 @@ Blocks may allow the user to configure the font sizes they use, e.g., the paragr
 ```php
 add_theme_support( 'editor-font-sizes', array(
 	array(
-		'name' => __( 'small', 'themeLangDomain' ),
-		'shortName' => __( 'S', 'themeLangDomain' ),
+		'name' => __( 'Small', 'themeLangDomain' ),
 		'size' => 12,
 		'slug' => 'small'
 	),
 	array(
-		'name' => __( 'regular', 'themeLangDomain' ),
-		'shortName' => __( 'M', 'themeLangDomain' ),
+		'name' => __( 'Normal', 'themeLangDomain' ),
 		'size' => 16,
-		'slug' => 'regular'
+		'slug' => 'normal'
 	),
 	array(
-		'name' => __( 'large', 'themeLangDomain' ),
-		'shortName' => __( 'L', 'themeLangDomain' ),
+		'name' => __( 'Large', 'themeLangDomain' ),
 		'size' => 36,
 		'slug' => 'large'
 	),
 	array(
-		'name' => __( 'larger', 'themeLangDomain' ),
-		'shortName' => __( 'XL', 'themeLangDomain' ),
+		'name' => __( 'Huge', 'themeLangDomain' ),
 		'size' => 50,
-		'slug' => 'larger'
+		'slug' => 'huge'
 	)
 ) );
 ```
@@ -270,7 +266,7 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
-Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
+Further reading: [Applying Styles with Stylesheets](/docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md).
 
 ## Default block styles
 
