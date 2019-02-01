@@ -116,8 +116,11 @@ const blockShortcuts = {
 		{
 			keyCombination: '/',
 			description: __( 'Change the block type after adding a new paragraph.' ),
-			/* translators: The forward-slash character. e.g. '/'. */
 			ariaLabel: __( 'Forward-slash' ),
+		},
+		{
+			keyCombination: primaryAlt( 'v' ),
+			description: __( 'Toggle block between Editor and Html' ),
 		},
 	],
 };

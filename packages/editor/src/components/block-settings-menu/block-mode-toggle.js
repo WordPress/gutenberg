@@ -11,7 +11,7 @@ import { MenuItem } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { shortcuts } from '../editor-global-keyboard-shortcuts';
+import { shortcuts } from '../global-keyboard-shortcuts/visual-editor-shortcuts.js';
 
 export function BlockModeToggle( { blockType, mode, onToggleMode, small = false } ) {
 	if ( ! hasBlockSupport( blockType, 'html', true ) ) {
