@@ -43,18 +43,29 @@ function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	};
 }
 
-function getDeepestActiveFormat( { formats, start } ) {
+function getDeepestActiveFormat( { formats, start, selectedFormat } ) {
 	if ( start === undefined ) {
 		return;
 	}
 
-	const formatsAtStart = formats[ start - 1 ];
+	const formatsAtStart = formats[ start ] || [];
+	const formatsAtBeforeStart = formats[ start - 1 ] || [];
 
-	if ( ! formatsAtStart ) {
+	let f = formatsAtStart;
+
+	if ( formatsAtBeforeStart.length > formatsAtStart.length ) {
+		f = formatsAtBeforeStart;
+	}
+
+	if ( ! f.length ) {
 		return;
 	}
 
-	return formatsAtStart[ formatsAtStart.length - 1 ];
+	if ( selectedFormat === undefined ) {
+		return f[ formatsAtStart.length - 1 ];
+	}
+
+	return f[ selectedFormat - 1 ];
 }
 
 export function toTree( {

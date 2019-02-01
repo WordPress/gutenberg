@@ -2,7 +2,9 @@
 
 exports[`recordToDom should create a value with formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     ﻿test
   </em>
   ﻿
@@ -27,7 +29,9 @@ Object {
 
 exports[`recordToDom should create a value with formatting for split tags 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     ﻿test
   </em>
   ﻿
@@ -53,6 +57,7 @@ Object {
 exports[`recordToDom should create a value with formatting with attributes 1`] = `
 <body>
   <a
+    data-rich-text-format-boundary="true"
     href="#"
   >
     ﻿test
@@ -189,7 +194,9 @@ exports[`recordToDom should create a value with nested formatting 1`] = `
 <body>
   <em>
     ﻿
-    <strong>
+    <strong
+      data-rich-text-format-boundary="true"
+    >
       ﻿test
     </strong>
     ﻿
@@ -281,7 +288,9 @@ Object {
 
 exports[`recordToDom should filter format boundary attributes 1`] = `
 <body>
-  <strong>
+  <strong
+    data-rich-text-format-boundary="true"
+  >
     ﻿test
   </strong>
   ﻿
@@ -374,9 +383,7 @@ Object {
 
 exports[`recordToDom should filter zero width space outside format 1`] = `
 <body>
-  <em
-    data-rich-text-format-boundary="true"
-  >
+  <em>
     ﻿test
   </em>
   ﻿
@@ -422,7 +429,9 @@ Object {
 
 exports[`recordToDom should handle br with formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     ﻿
     <br />
     
@@ -809,7 +818,9 @@ Object {
 
 exports[`recordToDom should preserve emoji in formatting 1`] = `
 <body>
-  <em>
+  <em
+    data-rich-text-format-boundary="true"
+  >
     ﻿🍒
   </em>
   ﻿

@@ -149,9 +149,9 @@ export class RichText extends Component {
 	 */
 	getRecord() {
 		const { formats, text } = this.formatToValue( this.props.value );
-		const { start, end } = this.state;
+		const { start, end, selectedFormat } = this.state;
 
-		return { formats, text, start, end };
+		return { formats, text, start, end, selectedFormat };
 	}
 
 	createRecord() {
@@ -370,7 +370,7 @@ export class RichText extends Component {
 	 */
 	onSelectionChange() {
 		const value = this.createRecord();
-		const { start, end, formats } = value;
+		const { start, end, formats, selectedFormat } = value;
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
@@ -380,7 +380,7 @@ export class RichText extends Component {
 				this.props.onExitFormattedText();
 			}
 
-			this.setState( { start, end } );
+			this.setState( { start, end, selectedFormat } );
 
 			const selection = getSelection();
 			const range = selection.getRangeAt( 0 );
@@ -397,6 +397,9 @@ export class RichText extends Component {
 			} else {
 				this.applyRecord( value );
 			}
+		} else if ( selectedFormat !== this.state.selectedFormat ) {
+			this.setState( { start, end, selectedFormat } );
+			this.applyRecord( value, true );
 		}
 	}
 
@@ -424,13 +427,13 @@ export class RichText extends Component {
 	onChange( record, { withoutHistory } = {} ) {
 		this.applyRecord( record );
 
-		const { start, end } = record;
+		const { start, end, selectedFormat } = record;
 
 		this.onChangeEditableValue( record );
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
-		this.setState( { start, end } );
+		this.setState( { start, end, selectedFormat } );
 
 		if ( ! withoutHistory ) {
 			this.onCreateUndoLevel();

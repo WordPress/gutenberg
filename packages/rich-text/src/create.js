@@ -144,12 +144,13 @@ export function create( {
  * Helper to accumulate the value's selection start and end from the current
  * node and range.
  *
- * @param {Object} accumulator Object to accumulate into.
- * @param {Node}   node        Node to create value with.
- * @param {Range}  range       Range to create value with.
- * @param {Object} value       Value that is being accumulated.
+ * @param {Object}  accumulator Object to accumulate into.
+ * @param {Node}    node        Node to create value with.
+ * @param {Range}   range       Range to create value with.
+ * @param {Object}  value       Value that is being accumulated.
+ * @param {boolean} depth       Depth of the format.
  */
-function accumulateSelection( accumulator, node, range, value ) {
+function accumulateSelection( accumulator, node, range, value, depth ) {
 	if ( ! range ) {
 		return;
 	}
@@ -161,9 +162,24 @@ function accumulateSelection( accumulator, node, range, value ) {
 	// Selection can be extracted from value.
 	if ( value.start !== undefined ) {
 		accumulator.start = currentLength + value.start;
+
+		if ( value.selectedFormat !== undefined ) {
+			accumulator.selectedFormat = value.selectedFormat;
+		}
 	// Range indicates that the current node has selection.
 	} else if ( node === startContainer && node.nodeType === TEXT_NODE ) {
 		accumulator.start = currentLength + startOffset;
+
+		if (
+			startOffset === 0 &&
+			node.data[ startOffset ] === ZERO_WIDTH_NO_BREAK_SPACE
+		) {
+			accumulator.selectedFormat = depth;
+		}
+
+		if ( filterString( node.data ).length === startOffset ) {
+			accumulator.selectedFormat = depth;
+		}
 	// Range indicates that the current node is selected.
 	} else if (
 		parentNode === startContainer &&
@@ -261,6 +277,7 @@ function createFromElement( {
 	multilineTag,
 	multilineWrapperTags,
 	currentWrapperTags = [],
+	depth = 0,
 } ) {
 	const accumulator = createEmptyValue();
 
@@ -283,7 +300,7 @@ function createFromElement( {
 		if ( node.nodeType === TEXT_NODE ) {
 			const text = filterString( node.nodeValue );
 			range = filterRange( node, range, filterString );
-			accumulateSelection( accumulator, node, range, { text } );
+			accumulateSelection( accumulator, node, range, { text }, depth );
 			accumulator.text += text;
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
@@ -296,12 +313,12 @@ function createFromElement( {
 		}
 
 		if ( node.getAttribute( 'data-rich-text-padding' ) ) {
-			accumulateSelection( accumulator, node, range, createEmptyValue() );
+			accumulateSelection( accumulator, node, range, createEmptyValue(), depth );
 			continue;
 		}
 
 		if ( type === 'br' ) {
-			accumulateSelection( accumulator, node, range, createEmptyValue() );
+			accumulateSelection( accumulator, node, range, createEmptyValue(), depth );
 			accumulator.text += '\n';
 			accumulator.formats.length += 1;
 			continue;
@@ -342,13 +359,14 @@ function createFromElement( {
 				range,
 				multilineTag,
 				multilineWrapperTags,
+				depth: depth + 1,
 			} );
 		}
 
 		const text = value.text;
 		const start = accumulator.text.length;
 
-		accumulateSelection( accumulator, node, range, value );
+		accumulateSelection( accumulator, node, range, value, depth );
 
 		// Don't apply the element as formatting if it has no content.
 		if ( isEmpty( value ) && format && ! format.attributes ) {
