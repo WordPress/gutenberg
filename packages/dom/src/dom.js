@@ -380,7 +380,6 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left;
 	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
-	const selection = window.getSelection();
 
 	let range = hiddenCaretRangeFromPoint( document, x, y, container );
 
@@ -413,6 +412,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 		}
 	}
 
+	const selection = window.getSelection();
 	selection.removeAllRanges();
 	selection.addRange( range );
 	container.focus();

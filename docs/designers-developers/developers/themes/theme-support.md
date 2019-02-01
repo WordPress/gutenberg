@@ -137,24 +137,24 @@ Blocks may allow the user to configure the font sizes they use, e.g., the paragr
 ```php
 add_theme_support( 'editor-font-sizes', array(
 	array(
-		'name' => __( 'small', 'themeLangDomain' ),
+		'name' => __( 'Small', 'themeLangDomain' ),
 		'size' => 12,
 		'slug' => 'small'
 	),
 	array(
-		'name' => __( 'regular', 'themeLangDomain' ),
+		'name' => __( 'Normal', 'themeLangDomain' ),
 		'size' => 16,
-		'slug' => 'regular'
+		'slug' => 'normal'
 	),
 	array(
-		'name' => __( 'large', 'themeLangDomain' ),
+		'name' => __( 'Large', 'themeLangDomain' ),
 		'size' => 36,
 		'slug' => 'large'
 	),
 	array(
-		'name' => __( 'larger', 'themeLangDomain' ),
+		'name' => __( 'Huge', 'themeLangDomain' ),
 		'size' => 50,
-		'slug' => 'larger'
+		'slug' => 'huge'
 	)
 ) );
 ```
@@ -266,7 +266,7 @@ To change the main column width of the editor, add the following CSS to `style-e
 
 You can use those editor widths to match those in your theme. You can use any CSS width unit, including `%` or `px`.
 
-Further reading: [Applying Styles with Stylesheets](https://wordpress.org/gutenberg/handbook/blocks/applying-styles-with-stylesheets/).
+Further reading: [Applying Styles with Stylesheets](/docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md).
 
 ## Default block styles
 

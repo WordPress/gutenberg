@@ -170,6 +170,11 @@ export function isValidFragment( fragment ) {
  * @return {string} URL with arguments applied.
  */
 export function addQueryArgs( url = '', args ) {
+	// If no arguments are to be appended, return original URL.
+	if ( ! args || ! Object.keys( args ).length ) {
+		return url;
+	}
+
 	let baseUrl = url;
 
 	// Determine whether URL already had query arguments.

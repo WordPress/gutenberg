@@ -93,7 +93,7 @@ const items = [
 
 const DEFAULT_PROPS = {
 	position: 'top center',
-	items: items,
+	items,
 	debouncedSpeak: noop,
 	fetchReusableBlocks: noop,
 	setTimeout: noop,

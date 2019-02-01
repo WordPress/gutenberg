@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/deprecated",
-	"version": "2.0.3",
+	"version": "2.0.5",
 	"description": "Deprecation utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

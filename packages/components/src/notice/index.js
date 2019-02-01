@@ -36,17 +36,35 @@ function Notice( {
 		<div className={ classes }>
 			<div className="components-notice__content">
 				{ children }
-				{ actions.map( ( { label, url, onClick }, index ) => (
-					<Button
-						key={ index }
-						href={ url }
-						isLink={ !! url }
-						onClick={ onClick }
-						className="components-notice__action"
-					>
-						{ label }
-					</Button>
-				) ) }
+				{ actions.map(
+					(
+						{
+							className: buttonCustomClasses,
+							label,
+							noDefaultClasses = false,
+							onClick,
+							url,
+						},
+						index
+					) => {
+						return (
+							<Button
+								key={ index }
+								href={ url }
+								isDefault={ ! noDefaultClasses && ! url }
+								isLink={ ! noDefaultClasses && !! url }
+								onClick={ url ? undefined : onClick }
+								className={ classnames(
+									'components-notice__action',
+									buttonCustomClasses
+								) }
+							>
+								{ label }
+							</Button>
+						);
+					}
+
+				) }
 			</div>
 			{ isDismissible && (
 				<IconButton

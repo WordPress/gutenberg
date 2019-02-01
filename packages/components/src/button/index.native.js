@@ -37,16 +37,16 @@ const styles = StyleSheet.create( {
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft: marginLeft,
-		marginBottom: marginBottom,
+		marginLeft,
+		marginBottom,
 	},
 	subscriptActive: {
 		color: 'white',
 		fontWeight: 'bold',
 		fontSize: 13,
 		alignSelf: 'flex-end',
-		marginLeft: marginLeft,
-		marginBottom: marginBottom,
+		marginLeft,
+		marginBottom,
 	},
 } );
 

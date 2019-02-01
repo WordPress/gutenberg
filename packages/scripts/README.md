@@ -36,9 +36,27 @@ _Example:_
 
 ## Available Scripts
 
+### `build`
+
+Builds the code to the designated `build` folder in the configuration file. It correctly bundles code in production mode and optimizes the build for the best performance. Your code is ready to be deployed. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"build": "wp-scripts build"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+* `npm run build` - builds the code for production.
+
+
 ### `check-engines`
 
-Check if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
+Checks if the current `node`, `npm` (or `yarn`) versions match the given [semantic version](https://semver.org/) ranges. If the given version is not satisfied, information about installing the needed version is printed and the program exits with an error code. It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version).
 
 _Example:_
 
@@ -125,9 +143,26 @@ _Example:_
 This is how you execute the script with presented setup:
 * `npm run lint:css` - lints CSS files in the whole project's directory.
 
+### `start`
+
+Builds the code for development to the designated `build` folder in the configuration file. The script will automatically rebuild if you make changes to the code. You will see the build errors in the console. It uses [Webpack](https://webpack.js.org/) behind the scenes and you still need to provide your own config as described in the [documentation](https://webpack.js.org/concepts/configuration/).
+
+_Example:_
+
+```json
+{
+	"scripts": {
+		"start": "wp-scripts start"
+	}
+}
+```
+
+This is how you execute the script with presented setup:
+* `npm start` - starts the build for development.
+
 ### `test-e2e`
 
-Launches the End-To-End (E2E) test runner. It uses [Jest](https://facebook.github.io/jest/) behind the scenes and you are able to utilize all of its [CLI options](https://facebook.github.io/jest/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as presented below) to view all of the available options.
+Launches the End-To-End (E2E) test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test:e2e --help` or `npm run test:e2e:help` (as presented below) to view all of the available options.
 
 Writing tests can be done using Puppeteer API:
  
@@ -157,7 +192,7 @@ We enforce that all tests run serially in the current process using [--runInBand
 
 _Alias_: `test-unit-jest` 
 
-Launches the unit test runner. It uses [Jest](https://facebook.github.io/jest/) behind the scenes and you are able to utilize all of its [CLI options](https://facebook.github.io/jest/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:unit:help` (as presented below) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration).
+Launches the unit test runner. It uses [Jest](https://jestjs.io/) behind the scenes and you are able to utilize all of its [CLI options](https://jestjs.io/docs/en/cli.html). You can also run `./node_modules/.bin/wp-scripts test-unit-js --help` or `npm run test:unit:help` (as presented below) to view all of the available options. By default, it uses the set of recommended options defined in [@wordpress/jest-preset-default](https://www.npmjs.com/package/@wordpress/jest-preset-default) npm package. You can override them with your own options as described in [Jest documentation](https://jestjs.io/docs/en/configuration).
 
 _Example:_
 
