@@ -44,7 +44,7 @@ export function MenuGroup( {
 					{ label }
 				</div>
 			}
-			<NavigableMenu orientation="vertical" aria-labelledby={ labelId } role={ role } useEventToOffset={ useEventToOffset }>
+			<NavigableMenu orientation="vertical" aria-labelledby={ label ? labelId : null } role={ role } useEventToOffset={ useEventToOffset }>
 				{ children }
 			</NavigableMenu>
 		</div>

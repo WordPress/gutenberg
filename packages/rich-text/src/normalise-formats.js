@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { find } from 'lodash';
+
+/**
  * Internal dependencies
  */
 
@@ -12,25 +18,22 @@ import { isFormatEqual } from './is-format-equal';
  * @return {Object} New value with normalised formats.
  */
 export function normaliseFormats( { formats, text, start, end } ) {
-	const newFormats = formats.slice( 0 );
+	const refs = [];
+	const newFormats = formats.map( ( formatsAtIndex ) =>
+		formatsAtIndex.map( ( format ) => {
+			const equalRef = find( refs, ( ref ) =>
+				isFormatEqual( ref, format )
+			);
 
-	newFormats.forEach( ( formatsAtIndex, index ) => {
-		const lastFormatsAtIndex = newFormats[ index - 1 ];
+			if ( equalRef ) {
+				return equalRef;
+			}
 
-		if ( lastFormatsAtIndex ) {
-			const newFormatsAtIndex = formatsAtIndex.slice( 0 );
+			refs.push( format );
 
-			newFormatsAtIndex.forEach( ( format, formatIndex ) => {
-				const lastFormat = lastFormatsAtIndex[ formatIndex ];
-
-				if ( isFormatEqual( format, lastFormat ) ) {
-					newFormatsAtIndex[ formatIndex ] = lastFormat;
-				}
-			} );
-
-			newFormats[ index ] = newFormatsAtIndex;
-		}
-	} );
+			return format;
+		} )
+	);
 
 	return { formats: newFormats, text, start, end };
 }

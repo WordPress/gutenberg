@@ -11,6 +11,7 @@ import {
 	getEntityRecords,
 	getEmbedPreview,
 	isPreviewEmbedFallback,
+	canUser,
 } from '../selectors';
 
 describe( 'getEntityRecord', () => {
@@ -115,5 +116,32 @@ describe( 'isPreviewEmbedFallback()', () => {
 			},
 		} );
 		expect( isPreviewEmbedFallback( state, 'http://example.com/' ) ).toEqual( true );
+	} );
+} );
+
+describe( 'canUser', () => {
+	it( 'returns undefined by default', () => {
+		const state = deepFreeze( {
+			userPermissions: {},
+		} );
+		expect( canUser( state, 'create', 'media' ) ).toBe( undefined );
+	} );
+
+	it( 'returns whether an action can be performed', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'create/media': false,
+			},
+		} );
+		expect( canUser( state, 'create', 'media' ) ).toBe( false );
+	} );
+
+	it( 'returns whether an action can be performed for a given resource', () => {
+		const state = deepFreeze( {
+			userPermissions: {
+				'create/media/123': false,
+			},
+		} );
+		expect( canUser( state, 'create', 'media', 123 ) ).toBe( false );
 	} );
 } );

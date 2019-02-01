@@ -51,7 +51,7 @@ export const isFromWordPress = ( html ) => {
 
 export const getPhotoHtml = ( photo ) => {
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-	// acually the full size photo.
+	// actually the full size photo.
 	const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
 	return renderToString( photoPreview );
 };

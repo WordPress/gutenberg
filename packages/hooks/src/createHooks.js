@@ -34,8 +34,8 @@ function createHooks() {
 		doingFilter: createDoingHook( filters ),
 		didAction: createDidHook( actions ),
 		didFilter: createDidHook( filters ),
-		actions: actions,
-		filters: filters,
+		actions,
+		filters,
 	};
 }
 

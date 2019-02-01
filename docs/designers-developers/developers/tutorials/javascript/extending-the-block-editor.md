@@ -1,6 +1,6 @@
 # Extending the Block Editor
 
-Let's look at using the [Block Style Variation example](../../../../../docs/designers-developers/developers/filters/block-filters.md#block-style-variations) to extend the editor. This example allows you to add your own custom CSS class name to any core block type.
+Let's look at using the [Block Style Variation example](/docs/designers-developers/developers/filters/block-filters.md#block-style-variations) to extend the editor. This example allows you to add your own custom CSS class name to any core block type.
 
 Replace the existing `console.log()` code in your `myguten.js` file with:
 
@@ -30,7 +30,7 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 
 The last argument in the `wp_enqueue_script()` function is an array of dependencies. WordPress makes packages available under the `wp` namespace. In the example, you use `wp.blocks` to access the items that the blocks package exports (in this case the `registerBlockStyle()` function).
 
-See [Packages](../../../../../docs/designers-developers/developers/packages.md) for list of available packages and what objects they export.
+See [Packages](/docs/designers-developers/developers/packages.md) for list of available packages and what objects they export.
 
 After you have updated both JavaScript and PHP files, go to the Block Editor and create a new post.
 
