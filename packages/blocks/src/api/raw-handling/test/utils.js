@@ -186,6 +186,12 @@ describe( 'removeInvalidHTML', () => {
 		const output = '<p>test</p>test';
 		expect( removeInvalidHTML( input, schema ) ).toBe( output );
 	} );
+
+	it( 'should remove invalid phrasing content', () => {
+		const input = '<strong><p>test</p></strong>';
+		const output = '<p>test</p>';
+		expect( removeInvalidHTML( input, schema ) ).toEqual( output );
+	} );
 } );
 
 describe( 'getBlockContentSchema', () => {
