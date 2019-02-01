@@ -21,7 +21,8 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 			<input
 				className="wp-block-search__input"
 				aria-label={ __( 'Optional placeholder text' ) }
-				placeholder={ placeholder || __( 'Optional placeholder…' ) }
+				placeholder={ __( 'Optional placeholder…' ) }
+				value={ placeholder }
 				onChange={ ( event ) => setAttributes( { placeholder: event.target.value } ) }
 			/>
 			<RichText
