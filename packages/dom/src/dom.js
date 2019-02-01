@@ -25,7 +25,7 @@ const {
  *
  * @return {boolean} Whether the selection is forward.
  */
-function isSelectionForward( selection ) {
+export function isSelectionForward( selection ) {
 	const {
 		anchorNode,
 		focusNode,

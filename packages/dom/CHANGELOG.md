@@ -1,4 +1,8 @@
-## 2.0.9 (Unreleased)
+## 2.1.0 (Unreleased)
+
+### New Feature
+
+- New function: `isSelectionForward( selection: Selection )`
 
 ### Bug Fix
 
