@@ -68,11 +68,11 @@ About to write to /home/mkaz/src/wp/scratch/package.json:
 Is this OK? (yes) yes
 ```
 
-## Webpack & Babel
+### Using npm to install packages
 
-The next step is to install webpack. You can install packages using the npm command `npm install`. If you pass the `--save` parameter, npm will write the package as a dependency in package.json file.
+The next step is to install the packages required. You can install packages using the npm command `npm install`. If you pass the `--save-dev` parameter, npm will write the package as a dev dependency in the package.json file.
 
-Run `npm install --save webpack`
+Run `npm install --save-dev webpack`
 
 After installing, a `node_modules` directory is created with the webpack module and its dependencies.
 
@@ -84,7 +84,9 @@ Also, if you look at package.json file it will include a new section:
 }
 ```
 
-Next, you configure webpack to process the `block.js` file and run babel to transform the JSX.
+## Webpack & Babel
+
+You configure webpack to process the `block.js` file and run babel to transform the JSX.
 
 Create the file `webpack.config.js`
 
