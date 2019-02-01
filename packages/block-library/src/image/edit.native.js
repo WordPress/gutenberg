@@ -16,7 +16,7 @@ import {
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText, BlockControls, InspectorControls } from '@wordpress/editor';
+import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
@@ -33,6 +33,7 @@ export default class ImageEdit extends React.Component {
 		super( props );
 
 		this.state = {
+			showSettings: false,
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
@@ -168,7 +169,11 @@ export default class ImageEdit extends React.Component {
 		}
 
 		const onImageSettingsButtonPressed = () => {
+			this.setState( { showSettings: true } );
+		};
 
+		const onImageSettingsClose = () => {
+			this.setState( { showSettings: false } );
 		};
 
 		const toolbarEditButton = (
@@ -181,12 +186,21 @@ export default class ImageEdit extends React.Component {
 			</Toolbar>
 		);
 
-		const inlineToolbarButtons = (
-			<ToolbarButton
-				label={ __( 'Image Settings' ) }
-				icon="admin-generic"
-				onClick={ onImageSettingsButtonPressed }
-			/>
+		const getInspectorControls = () => (
+			<BottomSheet
+				isVisible={ this.state.showSettings }
+				title={ __( 'Image Settings' ) }
+				onClose={ onImageSettingsClose }
+				rightButton={
+					<BottomSheet.Button
+						text={ __( 'Done' ) }
+						color={ '#0087be' }
+						onPress={ onImageSettingsClose }
+					/>
+				}
+			>
+				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ __( 'None' ) } onPress={ () => {} } />
+			</BottomSheet>
 		);
 
 		const showSpinner = this.state.isUploadInProgress;
@@ -201,7 +215,11 @@ export default class ImageEdit extends React.Component {
 						{ toolbarEditButton }
 					</BlockControls>
 					<InspectorControls>
-						{ inlineToolbarButtons }
+						<ToolbarButton
+							label={ __( 'Image Settings' ) }
+							icon="admin-generic"
+							onClick={ onImageSettingsButtonPressed }
+						/>
 					</InspectorControls>
 					<ImageSize src={ url } >
 						{ ( sizes ) => {
@@ -222,6 +240,7 @@ export default class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
+									{ getInspectorControls() }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
