@@ -47,7 +47,7 @@ export default class PlainText extends Component {
 				} }
 				onFocus={ this.props.onFocus } // always assign onFocus as a props
 				onBlur={ this.props.onBlur } // always assign onBlur as a props
-				fontFamily={ this.props.fontFamily || 'serif' }
+				fontFamily={ this.props.fontFamily || 'NotoSerif' }
 				fontSize={ this.props.fontSize }
 				fontWeight={ this.props.fontWeight }
 				fontStyle={ this.props.fontStyle }
