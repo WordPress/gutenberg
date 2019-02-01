@@ -16,6 +16,7 @@ import WritingMenu from '../writing-menu';
 
 const ariaClosed = __( 'Show more tools & options' );
 const ariaOpen = __( 'Hide more tools & options' );
+const menuLabel = __( 'Tools & Options' );
 
 const MoreMenu = () => (
 	<Dropdown
@@ -33,7 +34,7 @@ const MoreMenu = () => (
 		) }
 		renderContent={ ( { onClose } ) => (
 			<Fragment>
-				<MenuGroup>
+				<MenuGroup label={ menuLabel } isScreenReaderLabel={ true }>
 					<WritingMenu onClose={ onClose } />
 					<ModeSwitcher onSelect={ onClose } />
 					<PluginMoreMenuGroup.Slot fillProps={ { onClose } } />
