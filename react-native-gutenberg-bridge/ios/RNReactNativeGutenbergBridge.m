@@ -5,6 +5,8 @@
 RCT_EXTERN_METHOD(provideToNative_Html:(NSString *)html title:(NSString *)title changed:(BOOL)changed)
 RCT_EXTERN_METHOD(requestMediaPickFrom:(NSString *)source callback:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(mediaUploadSync)
+RCT_EXTERN_METHOD(requestImageFailedRetryDialog:(int)mediaID)
+RCT_EXTERN_METHOD(requestImageUploadCancelDialog:(int)mediaID)
 RCT_EXTERN_METHOD(editorDidLayout)
 
 @end

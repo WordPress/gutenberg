@@ -32,6 +32,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final int MEDIA_UPLOAD_STATE_UPLOADING = 1;
     private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
     private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
+    private static final int MEDIA_UPLOAD_STATE_RESET = 4;
 
     private static final int MEDIA_SERVER_ID_UNKNOWN = 0;
 
@@ -94,6 +95,16 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.mediaUploadSync(getNewUploadMediaCallback(null));
     }
 
+    @ReactMethod
+    public void requestImageFailedRetryDialog(final int mediaId) {
+        mGutenbergBridgeJS2Parent.requestImageFailedRetryDialog(mediaId);
+    }
+
+    @ReactMethod
+    public void requestImageUploadCancelDialog(final int mediaId) {
+        mGutenbergBridgeJS2Parent.requestImageUploadCancelDialog(mediaId);
+    }
+
     private MediaSelectedCallback getNewMediaSelectedCallback(final Callback jsCallback) {
         return new MediaSelectedCallback() {
             @Override public void onMediaSelected(int mediaId, String mediaUrl) {
@@ -109,6 +120,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 if (jsCallback != null) {
                     jsCallback.invoke(mediaId, mediaUri, 0);
                 }
+            }
+
+            @Override public void onUploadMediaFileClear(int mediaId) {
+                setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_RESET, mediaId, null, 0);
             }
 
             @Override
