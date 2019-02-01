@@ -166,13 +166,14 @@ export class RichText extends Component {
 		} );
 	}
 
-	applyRecord( record ) {
+	applyRecord( record, domOnly ) {
 		apply( {
 			value: record,
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
+			domOnly,
 		} );
 	}
 
@@ -380,7 +381,22 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end } );
-			this.applyRecord( value );
+
+			const selection = getSelection();
+			const range = selection.getRangeAt( 0 );
+
+			// Prevent the browser selection from being overwritten if at a zero
+			// width space.
+			if (
+				range.collapsed &&
+				range.startContainer.nodeType === window.Node.TEXT_NODE &&
+				range.startOffset === 1 &&
+				range.startContainer.data[ 0 ] === '\ufeff'
+			) {
+				this.applyRecord( value, true );
+			} else {
+				this.applyRecord( value );
+			}
 		}
 	}
 

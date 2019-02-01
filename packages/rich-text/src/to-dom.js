@@ -212,6 +212,7 @@ export function apply( {
 	multilineTag,
 	multilineWrapperTags,
 	prepareEditableTree,
+	domOnly,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
@@ -223,7 +224,7 @@ export function apply( {
 
 	applyValue( body, current );
 
-	if ( value.start !== undefined ) {
+	if ( value.start !== undefined && ! domOnly ) {
 		applySelection( selection, current );
 	}
 }
@@ -238,7 +239,38 @@ export function applyValue( future, current ) {
 		if ( ! currentChild ) {
 			current.appendChild( futureChild );
 		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
-			current.replaceChild( futureChild, currentChild );
+			if (
+				currentChild.nodeName !== futureChild.nodeName ||
+				( currentChild.nodeType === TEXT_NODE && currentChild.data !== futureChild.data )
+			) {
+				current.replaceChild( futureChild, currentChild );
+			} else {
+				const currentAttributes = currentChild.attributes;
+				const futureAttributes = futureChild.attributes;
+
+				if ( currentAttributes ) {
+					for ( let ii = 0; ii < currentAttributes.length; ii++ ) {
+						const { name } = currentAttributes[ ii ];
+
+						if ( ! futureChild.getAttribute( name ) ) {
+							currentChild.removeAttribute( name );
+						}
+					}
+				}
+
+				if ( futureAttributes ) {
+					for ( let ii = 0; ii < futureAttributes.length; ii++ ) {
+						const { name, value } = futureAttributes[ ii ];
+
+						if ( currentChild.getAttribute( name ) !== value ) {
+							currentChild.setAttribute( name, value );
+						}
+					}
+				}
+
+				applyValue( futureChild, currentChild );
+				future.removeChild( futureChild );
+			}
 		} else {
 			future.removeChild( futureChild );
 		}
