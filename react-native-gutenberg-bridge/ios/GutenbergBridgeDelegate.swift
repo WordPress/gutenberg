@@ -1,4 +1,4 @@
-public typealias MediaPickerDidPickMediaCallback = (_ id: Int?, _ url: String?) -> Void
+public typealias MediaPickerDidPickMediaCallback = (_ id: Int32?, _ url: String?) -> Void
 
 public enum MediaPickerSource: String {
     case mediaLibrary = "SITE_MEDIA_LIBRARY"
@@ -28,6 +28,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that an image block requested to reconnect with media uploads coordinator.
     ///
     func gutenbergDidRequestMediaUploadSync()
+
+    /// Tells the delegate that an image block requested for the actions available for the media upload.
+    ///
+    func gutenbergDidRequestMediaUploadActionDialog(for mediaID: Int32)
 
     /// Tells the delegate that the Gutenberg module has finished loading.
     ///

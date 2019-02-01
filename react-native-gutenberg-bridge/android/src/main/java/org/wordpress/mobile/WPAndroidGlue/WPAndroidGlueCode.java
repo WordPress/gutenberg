@@ -75,6 +75,8 @@ public class WPAndroidGlueCode {
         void onMediaLibraryButtonClicked();
         void onUploadMediaButtonClicked();
         void onCapturePhotoButtonClicked();
+        void onRetryUploadForMediaClicked(int mediaId);
+        void onCancelUploadForMediaClicked(int mediaId);
     }
 
     public interface OnReattachQueryListener {
@@ -115,6 +117,14 @@ public class WPAndroidGlueCode {
             public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
                 mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+            }
+
+            @Override public void requestImageFailedRetryDialog(int mediaId) {
+                onMediaLibraryButtonListener.onRetryUploadForMediaClicked(mediaId);
+            }
+
+            @Override public void requestImageUploadCancelDialog(int mediaId) {
+                onMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
             }
         });
         return Arrays.asList(
@@ -357,14 +367,18 @@ public class WPAndroidGlueCode {
     public void mediaFileUploadFailed(final int mediaId) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onMediaFileUploadFailed(mediaId);
-            mPendingMediaUploadCallback = null;
         }
     }
 
     public void mediaFileUploadSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
         if (isMediaUploadCallbackRegistered()) {
             mPendingMediaUploadCallback.onMediaFileUploadSucceeded(mediaId, mediaUrl, serverMediaId);
-            mPendingMediaUploadCallback = null;
+        }
+    }
+
+    public void clearMediaFileURL(final int mediaId) {
+        if (isMediaUploadCallbackRegistered()) {
+            mPendingMediaUploadCallback.onUploadMediaFileClear(mediaId);
         }
     }
 
