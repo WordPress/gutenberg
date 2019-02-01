@@ -62,7 +62,6 @@ class HeadingEdit extends Component {
 					style={ {
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
-					fontFamily={ 'serif' }
 					onChange={ ( event ) => {
 						// Create a React Tree from the new HTML
 						const newParaBlock = parse( `<!-- wp:heading {"level":${ level }} --><${ tagName }>${ event.content }</${ tagName }><!-- /wp:heading -->` )[ 0 ];
