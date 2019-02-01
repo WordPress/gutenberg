@@ -28,6 +28,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import styles from './style.scss';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -385,7 +386,7 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
-					fontFamily={ this.props.fontFamily || ( Platform.OS === 'ios' ? 'NotoSerif' : 'serif' ) }
+					fontFamily={ this.props.fontFamily || styles['editor-rich-text'].fontFamily }
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }

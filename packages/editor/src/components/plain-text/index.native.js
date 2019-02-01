@@ -46,6 +46,7 @@ export default class PlainText extends Component {
 					this.props.onChange( event.nativeEvent.text );
 				} }
 				onFocus={ this.props.onFocus } // always assign onFocus as a props
+				onBlur={ this.props.onBlur } // always assign onBlur as a props
 				fontFamily={ ( styles[ 'editor-plain-text' ].fontFamily ) }
 				fontSize={ this.props.fontSize }
 				fontWeight={ this.props.fontWeight }
