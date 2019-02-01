@@ -137,4 +137,19 @@ describe( 'Multi-block selection', () => {
 		const speakTextContent = await page.$eval( '#a11y-speak-assertive', ( element ) => element.textContent );
 		expect( speakTextContent.trim() ).toEqual( '3 blocks selected.' );
 	} );
+
+	it( 'should multi-select from the collapsed edge of a block', async () => {
+		// Explanation: Ensure that WritingFlow's consideration of a navigable
+		// edge of a block doesn't wrongly prevent multi-selection.
+		await clickBlockAppender();
+		await page.keyboard.type( 'First' );
+		await page.keyboard.press( 'Enter' );
+
+		// In a new paragraph, the selection is collapsed at the leading edge
+		// of the node. Shift+ArrowUp should multi-select with the prior block.
+		await pressKeyWithModifier( 'shift', 'ArrowUp' );
+
+		const count = await page.$$eval( '.is-multi-selected', ( blocks ) => blocks.length );
+		expect( count ).toBe( 2 );
+	} );
 } );

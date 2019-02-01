@@ -16,6 +16,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
+	isSelectionForward,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -281,13 +282,41 @@ class WritingFlow extends Component {
 			this.verticalRect = computeCaretRect( target );
 		}
 
-		if ( isShift && ( hasMultiSelection || (
-			this.isTabbableEdge( target, isReverse ) &&
-			isNavEdge( target, isReverse )
-		) ) ) {
-			// Shift key is down, and there is multi selection or we're at the end of the current block.
-			this.expandSelection( isReverse );
-			event.preventDefault();
+		if ( isShift ) {
+			/**
+			 * Returns true if the current selection should be considered at
+			 * the navigable edge, considering that Shift modifier is held.
+			 *
+			 * @return {boolean} Whether selection is at navigable edge.
+			 */
+			const isSelectionAtShiftEdge = () => {
+				// For a non-collapsed selection, consider that the direction
+				// of the selection should align with the direction of the key
+				// considered for it to be considered at the edge.
+				//
+				// For example, if holding Shift while a forward selection has
+				// been made, pressing ArrowUp should inherit default browser
+				// behavior, _not_ expand the block selection.
+				const selection = getSelection();
+				if (
+					! selection.isCollapsed &&
+					isSelectionForward( selection ) !== ! isReverse
+				) {
+					return false;
+				}
+
+				return (
+					this.isTabbableEdge( target, isReverse ) &&
+					isNavEdge( target, isReverse )
+				);
+			};
+
+			if ( hasMultiSelection || isSelectionAtShiftEdge() ) {
+				// Shift key is down, and there is multi selection or we're at
+				// the end of the current block.
+				this.expandSelection( isReverse );
+				event.preventDefault();
+			}
 		} else if ( hasMultiSelection ) {
 			// Moving from block multi-selection to single block selection
 			this.moveSelection( isReverse );

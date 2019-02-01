@@ -161,3 +161,19 @@ exports[`adding blocks should not delete surrounding space when deleting a word 
 <p>1 2 3</p>
 <!-- /wp:paragraph -->"
 `;
+
+exports[`adding blocks should respect non-collapsed selection directionality in determining edge 1`] = `
+"<!-- wp:paragraph -->
+<p>As I expected</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should respect non-collapsed selection directionality in determining edge 2`] = `
+"<!-- wp:paragraph -->
+<p>As I expected</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>A<br>B- After B<br>C</p>
+<!-- /wp:paragraph -->"
+`;

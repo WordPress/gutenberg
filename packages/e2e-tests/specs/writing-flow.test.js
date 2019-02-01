@@ -7,6 +7,7 @@ import {
 	createNewPost,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
@@ -288,6 +289,57 @@ describe( 'adding blocks', () => {
 		await pressKeyTimes( 'Enter', 10 );
 
 		// Check that none of the paragraph blocks have <br> in them.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should respect non-collapsed selection directionality in determining edge', async () => {
+		// Bug: When a user selects a text fragment in a forward direction by
+		// holding shift and, while continuing to hold shift, presses ArrowUp
+		// or ArrowLeft, no attempt should be made to expand block selection.
+		await clickBlockAppender();
+		await page.keyboard.type( 'As expected' );
+
+		// Move caret before "expected" and create a forward selection.
+		await pressKeyTimes( 'ArrowLeft', 8 );
+		await page.keyboard.down( 'Shift' );
+		await pressKeyTimes( 'ArrowRight', 8 );
+
+		// Verify ArrowUp behavior should simply collapse the selection, by
+		// confirming that a continuation of typing would occur at the non-
+		// collapsed selection preceding "expected".
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.type( 'I ' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Variation: In a paragraph consisting of multiple lines of text, it
+		// should similarly progressively collapse selection when pressing
+		// Shift+Arrow in the reverse while multiple lines are selected.
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'A' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( 'B' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( 'C' );
+
+		// Create selection, this time in reverse (assure adequate coverage for
+		// both directions of selection). The caret at the time of selection
+		// should be after the "C" of the last line. Thus, Shift+ArrowUp would
+		// select to the end of the prior line of text.
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Verify ArrowDown behavior should collapse the selection to the
+		// second line. First collapse while Shift is held should collapse to
+		// the second line. Verify by uncollapsing selection at the extent (by
+		// pressing ArrowLeft) and typing where it should be at second line.
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '- After B' );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );
