@@ -680,7 +680,7 @@ export const editor = flow( [
 /**
  * Reducer returning the initial edits state. With matching shape to that of
  * `editor.edits`, the initial edits are those applied programmatically, are
- * not considered in prmopting the user for unsaved changes, and are included
+ * not considered in prompting the user for unsaved changes, and are included
  * in (and reset by) the next save payload.
  *
  * @param {Object} state  Current state.
@@ -1300,17 +1300,23 @@ export function autosave( state = null, action ) {
 }
 
 /**
- * Reducer returning the poost preview link
+ * Reducer returning the post preview link.
  *
- * @param  {string?} state  The preview link
- * @param  {Object} action Dispatched action.
+ * @param {string?} state  The preview link
+ * @param {Object}  action Dispatched action.
  *
  * @return {string?} Updated state.
  */
 export function previewLink( state = null, action ) {
 	switch ( action.type ) {
 		case 'REQUEST_POST_UPDATE_SUCCESS':
-			return action.post.preview_link || addQueryArgs( action.post.link, { preview: true } );
+			if ( action.post.preview_link ) {
+				return action.post.preview_link;
+			} else if ( action.post.link ) {
+				return addQueryArgs( action.post.link, { preview: true } );
+			}
+
+			return state;
 
 		case 'REQUEST_POST_UPDATE_START':
 			// Invalidate known preview link when autosave starts.

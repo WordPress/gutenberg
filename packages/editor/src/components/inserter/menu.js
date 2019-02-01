@@ -132,8 +132,7 @@ export class InserterMenu extends Component {
 
 		const { showInsertionPoint, hideInsertionPoint } = this.props;
 		if ( item ) {
-			const { rootClientId, index } = this.props;
-			showInsertionPoint( rootClientId, index );
+			showInsertionPoint();
 		} else {
 			hideInsertionPoint();
 		}
@@ -225,7 +224,7 @@ export class InserterMenu extends Component {
 			resultCount
 		);
 
-		debouncedSpeak( resultsFoundMessage, 'assertive' );
+		debouncedSpeak( resultsFoundMessage );
 	}
 
 	onKeyDown( event ) {
@@ -347,8 +346,6 @@ export class InserterMenu extends Component {
 export default compose(
 	withSelect( ( select, { rootClientId } ) => {
 		const {
-			getEditedPostAttribute,
-			getSelectedBlock,
 			getInserterItems,
 			getBlockName,
 		} = select( 'core/editor' );
@@ -359,36 +356,80 @@ export default compose(
 		const rootBlockName = getBlockName( rootClientId );
 
 		return {
-			selectedBlock: getSelectedBlock(),
 			rootChildBlocks: getChildBlockNames( rootBlockName ),
-			title: getEditedPostAttribute( 'title' ),
 			items: getInserterItems( rootClientId ),
 			rootClientId,
 		};
 	} ),
-	withDispatch( ( dispatch, ownProps ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 			showInsertionPoint,
 			hideInsertionPoint,
 		} = dispatch( 'core/editor' );
 
+		// To avoid duplication, getInsertionPoint is extracted and used in two event handlers
+		// This breaks the withDispatch not containing any logic rule.
+		// Since it's a function only called when the event handlers are called,
+		// it's fine to extract it.
+		// eslint-disable-next-line no-restricted-syntax
+		function getInsertionPoint() {
+			const {
+				getBlockIndex,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+				getBlockOrder,
+			} = select( 'core/editor' );
+			const { clientId, rootClientId, isAppender } = ownProps;
+
+			// If the clientId is defined, we insert at the position of the block.
+			if ( clientId ) {
+				return {
+					index: getBlockIndex( clientId, rootClientId ),
+					rootClientId,
+				};
+			}
+
+			// If there a selected block, we insert after the selected block.
+			const end = getBlockSelectionEnd();
+			if ( ! isAppender && end ) {
+				const selectedBlockRootClientId = getBlockRootClientId( end ) || undefined;
+				return {
+					index: getBlockIndex( end, selectedBlockRootClientId ) + 1,
+					rootClientId: selectedBlockRootClientId,
+				};
+			}
+
+			// Otherwise, we insert at the end of the current rootClientId
+			return {
+				index: getBlockOrder( rootClientId ).length,
+				rootClientId,
+			};
+		}
+
 		return {
 			fetchReusableBlocks,
-			showInsertionPoint,
+			showInsertionPoint() {
+				const { index, rootClientId } = getInsertionPoint();
+				showInsertionPoint( rootClientId, index );
+			},
 			hideInsertionPoint,
 			onSelect( item ) {
 				const {
 					replaceBlocks,
 					insertBlock,
 				} = dispatch( 'core/editor' );
-				const { selectedBlock, index, rootClientId } = ownProps;
+				const {
+					getSelectedBlock,
+				} = select( 'core/editor' );
+				const { isAppender } = ownProps;
 				const { name, initialAttributes } = item;
-
+				const selectedBlock = getSelectedBlock();
 				const insertedBlock = createBlock( name, initialAttributes );
-				if ( selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
+				if ( ! isAppender && selectedBlock && isUnmodifiedDefaultBlock( selectedBlock ) ) {
 					replaceBlocks( selectedBlock.clientId, insertedBlock );
 				} else {
+					const { index, rootClientId } = getInsertionPoint();
 					insertBlock( insertedBlock, index, rootClientId );
 				}
 

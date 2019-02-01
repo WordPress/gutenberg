@@ -36,14 +36,13 @@ class DatePicker extends Component {
 	}
 
 	render() {
-		const { currentDate } = this.props;
+		const { currentDate, isInvalidDate } = this.props;
 
 		const momentDate = currentDate ? moment( currentDate ) : moment();
 
 		return (
 			<div className="components-datetime__date">
 				<DayPickerSingleDateController
-					block
 					date={ momentDate }
 					daySize={ 30 }
 					focused
@@ -57,6 +56,9 @@ class DatePicker extends Component {
 					transitionDuration={ 0 }
 					weekDayFormat="ddd"
 					isRTL={ isRTL() }
+					isOutsideRange={ ( date ) => {
+						return isInvalidDate && isInvalidDate( date.toDate() );
+					} }
 				/>
 			</div>
 		);

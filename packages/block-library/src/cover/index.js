@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
+	FocalPointPicker,
 	IconButton,
 	PanelBody,
 	RangeControl,
@@ -23,7 +24,6 @@ import { compose } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
-	BlockAlignmentToolbar,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
@@ -34,8 +34,6 @@ import {
 	getColorClassName,
 } from '@wordpress/editor';
 
-const validAlignments = [ 'left', 'center', 'right', 'wide', 'full' ];
-
 const blockAttributes = {
 	title: {
 		type: 'string',
@@ -43,9 +41,6 @@ const blockAttributes = {
 		selector: 'p',
 	},
 	url: {
-		type: 'string',
-	},
-	align: {
 		type: 'string',
 	},
 	contentAlign: {
@@ -73,6 +68,9 @@ const blockAttributes = {
 		type: 'string',
 		default: 'image',
 	},
+	focalPoint: {
+		type: 'object',
+	},
 };
 
 export const name = 'core/cover';
@@ -91,6 +89,10 @@ export const settings = {
 	category: 'common',
 
 	attributes: blockAttributes,
+
+	supports: {
+		align: true,
+	},
 
 	transforms: {
 		from: [
@@ -168,29 +170,21 @@ export const settings = {
 		],
 	},
 
-	getEditWrapperProps( attributes ) {
-		const { align } = attributes;
-		if ( -1 !== validAlignments.indexOf( align ) ) {
-			return { 'data-align': align };
-		}
-	},
-
 	edit: compose( [
 		withColors( { overlayColor: 'background-color' } ),
 		withNotices,
 	] )(
 		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
 			const {
-				align,
 				backgroundType,
 				contentAlign,
 				dimRatio,
+				focalPoint,
 				hasParallax,
 				id,
 				title,
 				url,
 			} = attributes;
-			const updateAlignment = ( nextAlign ) => setAttributes( { align: nextAlign } );
 			const onSelectMedia = ( media ) => {
 				if ( ! media || ! media.url ) {
 					setAttributes( { url: undefined, id: undefined } );
@@ -235,23 +229,13 @@ export const settings = {
 				backgroundColor: overlayColor.color,
 			};
 
-			const classes = classnames(
-				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
-				dimRatioToClass( dimRatio ),
-				{
-					'has-background-dim': dimRatio !== 0,
-					'has-parallax': hasParallax,
-				}
-			);
+			if ( focalPoint ) {
+				style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+			}
 
 			const controls = (
 				<Fragment>
 					<BlockControls>
-						<BlockAlignmentToolbar
-							value={ align }
-							onChange={ updateAlignment }
-						/>
 						{ !! url && (
 							<Fragment>
 								<AlignmentToolbar
@@ -288,6 +272,14 @@ export const settings = {
 										label={ __( 'Fixed Background' ) }
 										checked={ hasParallax }
 										onChange={ toggleParallax }
+									/>
+								) }
+								{ IMAGE_BACKGROUND_TYPE === backgroundType && ! hasParallax && (
+									<FocalPointPicker
+										label={ __( 'Focal Point Picker' ) }
+										url={ url }
+										value={ focalPoint }
+										onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
 									/>
 								) }
 								<PanelColorSettings
@@ -346,6 +338,16 @@ export const settings = {
 				);
 			}
 
+			const classes = classnames(
+				className,
+				contentAlign !== 'center' && `has-${ contentAlign }-content`,
+				dimRatioToClass( dimRatio ),
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+				}
+			);
+
 			return (
 				<Fragment>
 					{ controls }
@@ -381,11 +383,11 @@ export const settings = {
 
 	save( { attributes } ) {
 		const {
-			align,
 			backgroundType,
 			contentAlign,
 			customOverlayColor,
 			dimRatio,
+			focalPoint,
 			hasParallax,
 			overlayColor,
 			title,
@@ -398,6 +400,9 @@ export const settings = {
 		if ( ! overlayColorClass ) {
 			style.backgroundColor = customOverlayColor;
 		}
+		if ( focalPoint && ! hasParallax ) {
+			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+		}
 
 		const classes = classnames(
 			dimRatioToClass( dimRatio ),
@@ -407,7 +412,6 @@ export const settings = {
 				'has-parallax': hasParallax,
 				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
-			align ? `align${ align }` : null,
 		);
 
 		return (
@@ -429,6 +433,9 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+			},
 		},
 
 		supports: {
@@ -466,6 +473,9 @@ export const settings = {
 	}, {
 		attributes: {
 			...blockAttributes,
+			align: {
+				type: 'string',
+			},
 			title: {
 				type: 'string',
 				source: 'html',
