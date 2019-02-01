@@ -189,8 +189,8 @@ export default class ImageEdit extends React.Component {
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
-				title={ __( 'Image Settings' ) }
 				onClose={ onImageSettingsClose }
+				hideHeader
 				rightButton={
 					<BottomSheet.Button
 						text={ __( 'Done' ) }
@@ -199,7 +199,18 @@ export default class ImageEdit extends React.Component {
 					/>
 				}
 			>
-				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ __( 'None' ) } onPress={ () => {} } />
+				<BottomSheet.Cell
+					icon={ 'editor-textcolor' }
+					label={ __( 'Alt Text' ) }
+					value={ __( 'None' ) }
+					onPress={ () => {} }
+				/>
+				<BottomSheet.Cell
+					label={ __( 'Reset to original' ) }
+					labelStyle={ { color: 'red' } }
+					drawSeparator={ false }
+					onPress={ () => {} }
+				/>
 			</BottomSheet>
 		);
 
