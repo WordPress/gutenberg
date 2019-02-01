@@ -10,7 +10,7 @@ The `edit` function describes the structure of your block in the context of the 
 {% ES5 %}
 ```js
 // A static div
-edit() {
+edit: function() {
 	return wp.element.createElement(
 		'div',
 		null,
@@ -20,7 +20,7 @@ edit() {
 ```
 {% ESNext %}
 ```jsx
-edit() {
+edit: () => {
 	return <div>Your block.</div>;
 }
 ```
@@ -37,7 +37,7 @@ In this case, assuming we had defined an attribute of `content` during block reg
 {% codetabs %}
 {% ES5 %}
 ```js
-edit( props ) {
+edit: function( props ) {
 	return wp.element.createElement(
 		'div',
 		null,
@@ -47,7 +47,7 @@ edit( props ) {
 ```
 {% ESNext %}
 ```js
-edit( { attributes } ) {
+edit: ( { attributes } ) => {
 	return <div>{ attributes.content }</div>;
 }
 ```
@@ -62,7 +62,7 @@ This property returns the class name for the wrapper element. This is automatica
 {% codetabs %}
 {% ES5 %}
 ```js
-edit( props ) {
+edit: function( props ) {
 	return wp.element.createElement(
 		'div',
 		{ className: props.className },
@@ -72,7 +72,7 @@ edit( props ) {
 ```
 {% ESNext %}
 ```js
-edit( { attributes, className } ) {
+edit: ( { attributes, className } ) => {
 	return <div className={ className }>{ attributes.content }</div>;
 }
 ```
@@ -85,7 +85,7 @@ The isSelected property is an object that communicates whether the block is curr
 {% codetabs %}
 {% ES5 %}
 ```js
-edit( props ) {
+edit: function( props ) {
 	return wp.element.createElement(
 		'div',
 		{ className: props.className },
@@ -102,7 +102,7 @@ edit( props ) {
 ```
 {% ESNext %}
 ```jsx
-edit( { attributes, className, isSelected } ) {
+edit: ( { attributes, className, isSelected } ) => {
 	return (
 		<div className={ className }>
 			Your block.
@@ -122,7 +122,7 @@ This function allows the block to update individual attributes based on user int
 {% codetabs %}
 {% ES5 %}
 ```js
-edit: ( props ) => {
+edit: function( props ) {
 	// Simplify access to attributes
 	let content = props.attributes.content;
 	let mySetting = props.attributes.mySetting;
@@ -145,7 +145,7 @@ edit: ( props ) => {
 ```
 {% ESNext %}
 ```jsx
-edit( { attributes, setAttributes, className, isSelected } ) {
+edit: ( { attributes, setAttributes, className, isSelected } ) => {
 	// Simplify access to attributes
 	const { content, mySetting } = attributes;
 
@@ -187,7 +187,7 @@ The `save` function defines the way in which the different attributes should be 
 {% codetabs %}
 {% ES5 %}
 ```js
-save() {
+save: function() {
 	return wp.element.createElement(
 		'div',
 		null,
@@ -197,7 +197,7 @@ save() {
 ```
 {% ESNext %}
 ```jsx
-save() {
+save: () => {
 	return <div> Your block. </div>;
 }
 ```
@@ -216,7 +216,7 @@ As with `edit`, the `save` function also receives an object argument including a
 {% codetabs %}
 {% ES5 %}
 ```js
-save( props ) {
+save: function( props ) {
 	return wp.element.createElement(
 		'div',
 		null,
@@ -226,7 +226,7 @@ save( props ) {
 ```
 {% ESNext %}
 ```jsx
-save( { attributes } ) {
+save: ( { attributes } ) => {
 	return <div>{ attributes.content }</div>;
 }
 ```
@@ -252,7 +252,7 @@ attributes: {
 	}
 },
 
-edit: ( props ) => {
+edit: function( props ) {
 	var updateFieldValue = function( val ) {
 		props.setAttributes( { content: val } );
 	}
@@ -267,7 +267,7 @@ edit: ( props ) => {
 	);
 },
 
-save: ( props ) => {
+save: function( props ) {
 	return el( 'p', {}, props.attributes.content );
 },
 ```
@@ -313,7 +313,7 @@ attributes: {
 	}
 },
 
-edit: ( props ) => {
+edit: function( props ) {
 	return wp.element.createElement(
 		wp.components.TextControl,
 		{
@@ -326,7 +326,7 @@ edit: ( props ) => {
 	);
 },
 
-save: () => {
+save: function() {
 	return null;
 }
 ```
