@@ -38,7 +38,9 @@ export function MenuGroup( {
 		<div className={ classNames }>
 			{ label &&
 				<div
-					className={ `components-menu-group__label ${ ( isScreenReaderLabel ) ? 'screen-reader-text' : '' }` }
+					className={ classnames( 'components-menu-group__label', {
+						'screen-reader-text': isScreenReaderLabel,
+					} ) }
 					{ ...labelRole }
 					id={ labelId }>
 					{ label }
