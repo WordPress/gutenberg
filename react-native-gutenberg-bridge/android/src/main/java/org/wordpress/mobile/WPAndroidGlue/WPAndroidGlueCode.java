@@ -119,12 +119,14 @@ public class WPAndroidGlueCode {
                 mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
 
-            @Override public void requestImageFailedRetryDialog(int mediaId) {
-                onMediaLibraryButtonListener.onRetryUploadForMediaClicked(mediaId);
+            @Override
+            public void requestImageFailedRetryDialog(int mediaId) {
+                mOnMediaLibraryButtonListener.onRetryUploadForMediaClicked(mediaId);
             }
 
-            @Override public void requestImageUploadCancelDialog(int mediaId) {
-                onMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
+            @Override
+            public void requestImageUploadCancelDialog(int mediaId) {
+                mOnMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
             }
         });
         return Arrays.asList(
