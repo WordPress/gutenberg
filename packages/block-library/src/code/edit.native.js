@@ -36,7 +36,7 @@ export default function CodeEdit( props ) {
 				isSelected={ props.isSelected }
 				onFocus={ onFocus }
 				onBlur={ onBlur }
-				fontFamily={ 'Courier' }
+				fontFamily={ ( Platform.OS === 'ios' ? 'Courier' : 'monospace' ) }
 			/>
 		</View>
 	);
