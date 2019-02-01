@@ -26,9 +26,9 @@ export default function Cell( props ) {
 	return (
 		<TouchableOpacity onPress={ onPress }>
 			<View style={ styles.cellContainer }>
-				<View style={ { flexDirection: 'row', alignItems: 'center' } }>
+				<View style={ styles.cellRowContainer }>
 					{ icon && (
-						<View style={ { flexDirection: 'row', alignItems: 'center' } }>
+						<View style={ styles.cellRowContainer }>
 							<Dashicon icon={ icon } size={ 30 } />
 							<View style={ { width: 12 } }/>
 						</View>
