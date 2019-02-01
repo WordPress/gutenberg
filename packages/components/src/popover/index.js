@@ -56,6 +56,11 @@ class Popover extends Component {
 			contentWidth: null,
 			isMobile: false,
 			popoverSize: null,
+
+			// Delay the animation after the initial render
+			// because the animation have impact on the height of the popover
+			// causing the computed position to be wrong.
+			isReadyToAnimate: false,
 		};
 
 		// Property used keep track of the previous anchor rect
@@ -151,7 +156,7 @@ class Popover extends Component {
 			popoverSize.height !== this.state.popoverSize.height
 		);
 		if ( didPopoverSizeChange ) {
-			this.setState( { popoverSize } );
+			this.setState( { popoverSize, isReadyToAnimate: true } );
 		}
 		this.anchorRect = anchorRect;
 		this.computePopoverPosition( popoverSize, anchorRect );
@@ -272,7 +277,20 @@ class Popover extends Component {
 			contentWidth,
 			popoverSize,
 			isMobile,
+			isReadyToAnimate,
 		} = this.state;
+
+		// Compute the animation position
+		const yAxisMapping = {
+			top: 'bottom',
+			bottom: 'top',
+		};
+		const xAxisMapping = {
+			left: 'right',
+			right: 'left',
+		};
+		const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
+		const animateXAxis = xAxisMapping[ xAxis ] || 'center';
 
 		const classes = classnames(
 			'components-popover',
@@ -291,7 +309,10 @@ class Popover extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		let content = (
 			<PopoverDetectOutside onClickOutside={ onClickOutside }>
-				<Animate type={ animate ? 'appear' : null } options={ { origin: position } }>
+				<Animate
+					type={ animate && isReadyToAnimate ? 'appear' : null }
+					options={ { origin: animateYAxis + ' ' + animateXAxis } }
+				>
 					{ ( { className: animateClassName } ) => (
 						<IsolatedEventContainer
 							className={ classnames( classes, animateClassName ) }

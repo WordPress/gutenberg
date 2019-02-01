@@ -3,7 +3,7 @@
  */
 import classnames from 'classnames';
 
-function Animate( { type, options, children } ) {
+function Animate( { type, options = {}, children } ) {
 	if ( type === 'appear' ) {
 		const { origin = 'top' } = options;
 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
