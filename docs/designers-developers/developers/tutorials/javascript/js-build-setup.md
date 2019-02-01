@@ -1,6 +1,8 @@
 # JavaScript Build Setup
 
-This page covers how to setup your development environment to use the ESNext syntax. This documentation covers development for your plugin to work with Gutenberg, to setup a development environment to work directly on Gutenberg, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
+This page covers how to set up your development environment to use the ESNext syntax. We call ESNext to JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short) or that includes custom syntax such as [JSX](https://reactjs.org/docs/introducing-jsx.html).
+
+This documentation covers development for your plugin to work with Gutenberg, to setup a development environment to work directly on Gutenberg, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
 
 For simpler code, you can write JavaScript using ESNext and JSX syntax. This requires a transformation step to convert that syntax which a web browser may not understand, to one that it will.  Webpack and babel are the tools that perform this transformation step.
 
@@ -14,7 +16,7 @@ For a quick start, you can use one of the examples from the [Gutenberg Examples 
 
 Both Webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
 
-First step is setting up node for your development environment. This is dependent on your operating system, there are node packages available for most package systems. If you are using one of the package systems, setup can be as straight-forward as:
+First, you need to set up node for your development environment. The steps required change depending on your operating system, but if you have a package manager installed, setup can be as straightforward as:
 ```
 macOS: brew install node
 Windows: choco install node
@@ -25,16 +27,16 @@ Additionally, the [Node.js download page](https://nodejs.org/en/download/) inclu
 
 **Note:** The build tools and process occur on the command-line, so some basic familiarity using a terminal application is required. Some text editors have a terminal built-in which is fine to use, Visual Studio Code editor is one popular example.
 
-### Node Package Manager
+### Node Package Manager (npm)
 
-The Node Package Manager (npm) is a tool included with node. NPM allows you to install and manage JavaScript packages using the package.json definition file.
+The Node Package Manager (npm) is a tool included with node. npm allows you to install and manage JavaScript packages. npm can also generate and process a special file called `package.json`, which contains some information about your project and the packages your project uses.
 
-First, create a directory to work in.
+To start a new node project, first create a directory to work in.
 ```
 mkdir myguten-block
 ```
 
-You create a new package.json using: `npm init`.  This will walk you through creating a file.
+You create a new package.json using `npm init`.  This will walk you through creating your package.json file:
 
 ```
 $ npm init
@@ -68,9 +70,9 @@ Is this OK? (yes) yes
 
 ## Webpack & Babel
 
-The next step is to install webpack. You can install packages using the npm command: `npm install`. If you pass the `--save` parameter, npm will write the package as a dependency in package.json file.
+The next step is to install webpack. You can install packages using the npm command `npm install`. If you pass the `--save` parameter, npm will write the package as a dependency in package.json file.
 
-Run: `npm install --save webpack`
+Run `npm install --save webpack`
 
 After installing, a `node_modules` directory is created with the webpack module and its dependencies.
 
@@ -135,7 +137,7 @@ The pragma setting replaces the function JSX uses for transformation, the `wp.el
 
 With both configs in place, you can now run webpack.
 
-First you need a basic block.js to build. Create `block.js`
+First you need a basic block.js to build. Create `block.js` with the following content:
 
 ```js
 const { registerBlockType } = wp.blocks;
@@ -162,7 +164,7 @@ To configure npm to run a script, you use the scripts section in `package.json` 
 
 You can then run the build using: `npm run build`
 
-Afterwards, you will see the build file created at: `block.build.js`
+After the build finishes, you will see the built file created at `block.build.js`.
 
 ## Finishing Touches
 
@@ -170,7 +172,7 @@ Afterwards, you will see the build file created at: `block.build.js`
 
 The basics are in place to build. You might of noticed the webpack.config.js set a default mode to "development". Webpack has the ability to run in a "production" mode which shrinks the code down, but makes it difficult to read.
 
-The mode is setup so it can be configured using environment variables, this is easiest to add in the scripts section of `package.json`.
+The mode is setup so it can be configured using environment variables, which can be added in the scripts section of `package.json`.
 
 Update scripts section to:
 
@@ -181,21 +183,23 @@ Update scripts section to:
   },
 ```
 
-This sets the environment variables, but different environment handle setting in different ways, so using the `cross-env` helper module handles this. Be sure to install using: `npm install --save cross-env`
+This sets the environment variables, but different environments handle these setting in different ways. Using the `cross-env` helper module can help to handle this. Be sure to install the `cross-env` package using `npm install --save cross-env`.
 
-Additionally, webpack has a `--watch` flag that will keep the process running, watching for any changes to the `block.js` file and update as changes occur. This is useful during development, you start the build running using `npm run dev` in a terminal. You can then edit away in your text editor and each save, webpack will automatically build. You can then use the familiar edit-save,-reload development process.
+Additionally, webpack has a `--watch` flag that will keep the process running, watching for any changes to the `block.js` file and re-building as changes occur. This is useful during development, when you might have a lot of changes in progress.
 
-**Note:** keep an eye on your terminal for any errors. If you make a typo, or syntax error, the build will fail and the error will be in the terminal.
+You can start the watcher by running `npm run dev` in a terminal. You can then edit away in your text editor; after each save, webpack will automatically build. You can then use the familiar edit/save/reload development process.
 
-### Babel Browser TargetingT
+**Note:** keep an eye on your terminal for any errors. If you make a typo or syntax error, the build will fail and the error will be in the terminal.
 
-Babel has the ability to build JavaScript using rules that target certain browsers and versions. By setting a reasonable set of modern browsers allows Babel to optimize the JavaScript it generates.
+### Babel Browser Targeting
+
+Babel has the ability to build JavaScript using rules that target certain browsers and versions. By setting a reasonable set of modern browsers, Babel can optimize the JavaScript it generates.
 
 WordPress has a preset default you can use to target the minimum supported browsers by WordPress.
 
 Install the module using: `npm install --save @wordpress/babel-preset-default`
 
-You then update `.babelrc` adding a "presets" section:
+You then update `.babelrc` by adding a "presets" section:
 
 ```
 {
@@ -210,13 +214,13 @@ You then update `.babelrc` adding a "presets" section:
 
 ### Source Control
 
-You should exclude `node_modules/` from your source control, the files can be recreated any time by running `npm install`.
+Because a typical `node_modules` folder will contain thousands of files that change with every software update, you should exclude `node_modules/` from your source control. If you ever start from a fresh clone, simply run `npm install` in the same folder your `package.json` is located to pull your required packages.
 
-Likewise, you do not need to include `node_modules` or any of the above configuration files in your plugin. **Be sure to enqueue the `block.build.js` file** in your plugin PHP. This is the only JavaScript file needed for your block to run.
+Likewise, you do not need to include `node_modules` or any of the above configuration files in your plugin because they will be bundled inside the file that webpack builds. **Be sure to enqueue the `block.build.js` file** in your plugin PHP. This is the only JavaScript file needed for your block to run.
 
 ## Summary
 
-Yes, the initial setup is rather tedious, there are numerous different tools and configs. However, as the quick start alluded to, copying an existing config is the typical way most people start.
+Yes, the initial setup is rather tedious, and there are a number of different tools and configs to learn. However, as the quick start alluded to, copying an existing config is the typical way most people start.
 
 With a setup in place, the standard workflow is:
 
