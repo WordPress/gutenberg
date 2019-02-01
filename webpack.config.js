@@ -106,8 +106,9 @@ const config = {
 		],
 	},
 	plugins: [
-		// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 		new DefinePlugin( {
+			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
+			// eslint-disable-next-line @wordpress/gutenberg-phase
 			'window.GUTENBERG_PHASE': JSON.stringify( process.env.GUTENBERG_PHASE || 1 ),
 		} ),
 		// Create RTL files with a -rtl suffix
