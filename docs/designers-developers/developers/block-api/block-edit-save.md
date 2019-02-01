@@ -253,7 +253,7 @@ attributes: {
 },
 
 edit: ( props ) => {
-	updateFieldValue = function( val ) {
+	var updateFieldValue = function( val ) {
 		props.setAttributes( { content: val } );
 	}
 	return wp.element.createElement(
