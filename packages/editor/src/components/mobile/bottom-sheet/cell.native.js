@@ -17,7 +17,11 @@ export default function Cell( props ) {
 		value,
 		drawSeparator = true,
 		icon,
+		labelStyle = {},
+		valueStyle = {},
 	} = props;
+
+	const defaultLabelStyle = value ? styles.cellLabel : styles.cellLabelCentered;
 
 	return (
 		<TouchableOpacity onPress={ onPress }>
@@ -29,10 +33,10 @@ export default function Cell( props ) {
 							<View style={ { width: 12 } }/>
 						</View>
 					) }
-					<Text style={ value ? styles.cellLabel : styles.cellLabelCentered }>{ label }</Text>
+					<Text style={ { ...defaultLabelStyle, ...labelStyle } }>{ label }</Text>
 				</View>
 				{ value && (
-					<Text style={ styles.cellValue }>{ value }</Text>
+					<Text style={ { ...styles.cellValue, ...valueStyle } }>{ value }</Text>
 				) }
 			</View>
 			{ drawSeparator && (
