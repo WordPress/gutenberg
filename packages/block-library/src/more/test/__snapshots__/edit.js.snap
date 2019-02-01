@@ -6,7 +6,8 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
     <ForwardRef(PanelBody)>
       <WithInstanceId(ToggleControl)
         checked={false}
-        label="Hide the teaser before the \\"More\\" tag"
+        help={[Function]}
+        label="Hide the excerpt on the full content page"
         onChange={[Function]}
       />
     </ForwardRef(PanelBody)>
@@ -31,7 +32,8 @@ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
     <ForwardRef(PanelBody)>
       <WithInstanceId(ToggleControl)
         checked={true}
-        label="Hide the teaser before the \\"More\\" tag"
+        help={[Function]}
+        label="Hide the excerpt on the full content page"
         onChange={[Function]}
       />
     </ForwardRef(PanelBody)>
