@@ -32,8 +32,8 @@ const isRichTextValueEmpty = ( value ) => {
 };
 
 const unescapeSpaces = ( text ) => {
-	return text.replace( /&nbsp;|&#160;/gi, ' ');
-}
+	return text.replace( /&nbsp;|&#160;/gi, ' ' );
+};
 
 const gutenbergFormatNamesToAztec = {
 	'core/bold': 'bold',
@@ -212,7 +212,7 @@ export class RichText extends Component {
 			return;
 		}
 
-		this.splitContent( unescapeSpaces ( event.nativeEvent.text ), event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+		this.splitContent( unescapeSpaces( event.nativeEvent.text ), event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
 	}
 
 	// eslint-disable-next-line no-unused-vars
