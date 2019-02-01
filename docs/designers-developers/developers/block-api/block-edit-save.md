@@ -282,7 +282,7 @@ attributes: {
 },
 
 edit: ( { attributes, setAttributes } ) => {
-	updateFieldValue = ( val ) {
+	const updateFieldValue = ( val ) => {
 		setAttributes( { content: val } );
 	}
 	return <TextControl
