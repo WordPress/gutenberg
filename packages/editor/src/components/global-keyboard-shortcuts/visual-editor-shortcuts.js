@@ -11,12 +11,13 @@ import { KeyboardShortcuts } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
-import EditorSaveKeyboardShortcut from './editor-save-keyboard-shortcut';
+import SaveShortcut from './save-shortcut';
 
 const preventDefault = ( event ) => {
 	event.preventDefault();
@@ -42,7 +43,7 @@ export const shortcuts = {
 	},
 };
 
-class EditorGlobalKeyboardShortcuts extends Component {
+class VisualEditorGlobalKeyboardShortcuts extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -105,7 +106,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 						escape: this.clearMultiSelection,
 					} }
 				/>
-				<EditorSaveKeyboardShortcut />
+				<SaveShortcut />
 				{ selectedBlockClientIds.length > 0 && (
 					<BlockActions clientIds={ selectedBlockClientIds }>
 						{ ( { onDuplicate, onRemove, onInsertAfter, onInsertBefore } ) => (
@@ -136,7 +137,7 @@ class EditorGlobalKeyboardShortcuts extends Component {
 	}
 }
 
-export default compose( [
+const EnhancedVisualEditorGlobalKeyboardShortcuts = compose( [
 	withSelect( ( select ) => {
 		const {
 			getBlockOrder,
@@ -176,4 +177,15 @@ export default compose( [
 			onRemove: removeBlocks,
 		};
 	} ),
-] )( EditorGlobalKeyboardShortcuts );
+] )( VisualEditorGlobalKeyboardShortcuts );
+
+export default EnhancedVisualEditorGlobalKeyboardShortcuts;
+
+export function EditorGlobalKeyboardShortcuts() {
+	deprecated( 'EditorGlobalKeyboardShortcuts', {
+		alternative: 'VisualEditorGlobalKeyboardShortcuts',
+		plugin: 'Gutenberg',
+	} );
+
+	return <EnhancedVisualEditorGlobalKeyboardShortcuts />;
+}

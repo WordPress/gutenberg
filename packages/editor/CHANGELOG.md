@@ -1,16 +1,17 @@
 ## 9.1.0 (Unreleased)
 
-### New Feature
+### New Features
 
 - Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
+- Added a new `TextEditorGlobalKeyboardShortcuts` component.
+
+### Deprecations
+
+- `EditorGlobalKeyboardShortcuts` has been deprecated in favor of `VisualEditorGlobalKeyboardShortcuts`.
 
 ### Bug Fixes
 
 - BlockSwitcher will now consistently render an icon for block multi-selections.
-
-### New feature
-
-- Added new `EditorSaveKeyboardShortcut` component, which was refactored out from the `EditorGlobalKeyboardShortcuts` component.
 
 ### Internal
 

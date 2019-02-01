@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { PostTextEditor, PostTitle, EditorSaveKeyboardShortcut } from '@wordpress/editor';
+import {
+	PostTextEditor,
+	PostTitle,
+	TextEditorGlobalKeyboardShortcuts,
+} from '@wordpress/editor';
 import { IconButton } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -21,7 +25,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 					>
 						{ __( 'Exit Code Editor' ) }
 					</IconButton>
-					<EditorSaveKeyboardShortcut />
+					<TextEditorGlobalKeyboardShortcuts />
 				</div>
 			)	}
 			<div className="edit-post-text-editor__body">

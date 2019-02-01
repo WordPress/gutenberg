@@ -6,7 +6,7 @@ import { rawShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function EditorSaveKeyboardShortcut( { onSave } ) {
+export function SaveShortcut( { onSave } ) {
 	return (
 		<KeyboardShortcuts
 			bindGlobal
@@ -49,4 +49,4 @@ export default compose( [
 			},
 		};
 	} ),
-] )( EditorSaveKeyboardShortcut );
+] )( SaveShortcut );
