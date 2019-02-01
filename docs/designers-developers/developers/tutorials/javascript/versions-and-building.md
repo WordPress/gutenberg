@@ -8,4 +8,5 @@ ES5 code is compatible with WordPress's minimum [target for browser support](htt
 
 Additionally, the ESNext code examples in the Gutenberg handbook include [JSX syntax](https://reactjs.org/docs/introducing-jsx.html), a syntax that blends HTML and JavaScript. It makes it easier to read and write markup code, but likewise requires the build step using webpack and babel to transform into compatible code.
 
-For simplicity, this tutorial uses the ES5 definition of JavaScript, without JSX. This code can run straight in your browser and does not require an additional build step.
+For simplicity, the JavaScript tutorial uses the ES5 definition, without JSX. This code can run straight in your browser and does not require an additional build step. See the [JavaScript Build Setup documentation](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax.
+
