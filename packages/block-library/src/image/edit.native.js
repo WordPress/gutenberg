@@ -199,7 +199,8 @@ export default class ImageEdit extends React.Component {
 					/>
 				}
 			>
-				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ __( 'None' ) } onPress={ () => {} } />
+				<BottomSheet.Cell icon={ 'editor-textcolor' } label={ __( 'Alt Text' ) } value={ __( 'None' ) } onPress={ () => {} } />
+				<BottomSheet.Cell label={ __( 'Reset to original' ) } drawSeparator={ false } onPress={ () => {} } />
 			</BottomSheet>
 		);
 
