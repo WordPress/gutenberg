@@ -1,7 +1,12 @@
 /**
 * External dependencies
 */
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -13,12 +18,37 @@ export default function Cell( props ) {
 		onPress,
 		label,
 		value,
+		drawSeparator = true,
+		icon,
+		labelStyle = {},
+		valueStyle = {},
 	} = props;
 
+	const defaultLabelStyle = value ? styles.cellLabel : styles.cellLabelCentered;
+
 	return (
-		<TouchableOpacity style={ styles.cellContainer } onPress={ onPress }>
-			<Text numberOfLines={ 1 } style={ styles.cellLabel }>{ label }</Text>
-			<Text numberOfLines={ 1 } ellipsizeMode={ 'middle' } style={ styles.cellValue }>{ value }</Text>
+		<TouchableOpacity onPress={ onPress }>
+			<View style={ styles.cellContainer }>
+				<View style={ styles.cellRowContainer }>
+					{ icon && (
+						<View style={ styles.cellRowContainer }>
+							<Dashicon icon={ icon } size={ 30 } />
+							<View style={ { width: 12 } } />
+						</View>
+					) }
+					<Text numberOfLines={ 1 } style={ { ...defaultLabelStyle, ...labelStyle } }>
+						{ label }
+					</Text>
+				</View>
+				{ value && (
+					<Text numberOfLines={ 1 } ellipsizeMode={ 'middle' } style={ { ...styles.cellValue, ...valueStyle } }>
+						{ value }
+					</Text>
+				) }
+			</View>
+			{ drawSeparator && (
+				<View style={ styles.separator } />
+			) }
 		</TouchableOpacity>
 	);
 }

@@ -194,15 +194,26 @@ export default class ImageEdit extends React.Component {
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
-				title={ __( 'Image Settings' ) }
 				onClose={ onImageSettingsClose }
+				hideHeader
 			>
-				<BottomSheet.Cell label={ __( 'Alt Text' ) } value={ alt || __( 'None' ) } onPress={ () => {} } />
+				<BottomSheet.Cell
+					icon={ 'editor-textcolor' }
+					label={ __( 'Alt Text' ) }
+					value={ alt || __( 'None' ) }
+					onPress={ () => {} }
+				/>
 				<TextareaControl
 					label={ __( 'Alt Text (Alternative Text)' ) }
 					value={ alt }
 					onChange={ this.updateAlt }
 					help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
+				/>
+				<BottomSheet.Cell
+					label={ __( 'Reset to original' ) }
+					labelStyle={ { color: 'red' } }
+					drawSeparator={ false }
+					onPress={ () => {} }
 				/>
 			</BottomSheet>
 		);
