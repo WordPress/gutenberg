@@ -18,7 +18,6 @@
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
-	margin: auto;
 }
 
 .content {
@@ -74,6 +73,13 @@
 .cellLabel {
 	font-size: 18px;
 	color: #000;
+}
+
+.cellLabelCentered {
+	font-size: 18px;
+	color: #000;
+	flex: 1;
+	text-align: center;
 }
 
 .cellValue {

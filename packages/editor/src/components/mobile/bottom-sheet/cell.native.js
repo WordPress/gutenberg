@@ -1,7 +1,7 @@
 /**
 * External dependencies
 */
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 
 /**
  * Internal dependencies
@@ -13,12 +13,20 @@ export default function Cell( props ) {
 		onPress,
 		label,
 		value,
+		drawSeparator = true,
 	} = props;
 
 	return (
-		<TouchableOpacity style={ styles.cellContainer } onPress={ onPress }>
-			<Text style={ styles.cellLabel }>{ label }</Text>
-			<Text style={ styles.cellValue }>{ value }</Text>
+		<TouchableOpacity onPress={ onPress }>
+			<View style={ styles.cellContainer }>
+				<Text style={ value ? styles.cellLabel : styles.cellLabelCentered }>{ label }</Text>
+				{ value && (
+					<Text style={ styles.cellValue }>{ value }</Text>
+				)}
+			</View>
+			{ drawSeparator && (
+				<View style={ styles.separator } />
+			)}
 		</TouchableOpacity>
 	);
 }
