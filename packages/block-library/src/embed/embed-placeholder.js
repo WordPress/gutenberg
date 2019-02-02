@@ -24,7 +24,7 @@ const EmbedPlaceholder = ( props ) => {
 				</Button>
 				{ cannotEmbed &&
 					<p className="components-placeholder__error">
-						{ __( 'Sorry, this content could not be embed.' ) }<br />
+						{ __( 'Sorry, this content could not be embedded.' ) }<br />
 						<Button isLarge onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isLarge onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
 					</p>
 				}
