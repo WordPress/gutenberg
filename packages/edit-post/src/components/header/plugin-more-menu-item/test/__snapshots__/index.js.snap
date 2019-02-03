@@ -5,7 +5,7 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
   className="components-menu-group"
 >
   <div
-    className="components-menu-group__label "
+    className="components-menu-group__label"
     id="components-menu-group-label-0"
     role="presentation"
   >

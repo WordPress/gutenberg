@@ -67,12 +67,13 @@ class NavigableContainer extends Component {
 
 		const { getFocusableContext } = this;
 		const { cycle = true, eventToOffset, onNavigate = noop, stopNavigationEvents } = this.props;
-		let offset;
 
-		// Prevent an error if eventToOffset is null or not a function.
-		if ( typeof eventToOffset === 'function' ) {
-			offset = eventToOffset( event );
+		// This avoids a console error when eventToOffset is null
+		if ( ! eventToOffset ) {
+			return;
 		}
+
+		const offset = eventToOffset( event );
 
 		// eventToOffset returns undefined if the event is not handled by the component
 		if ( offset !== undefined && stopNavigationEvents ) {
