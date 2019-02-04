@@ -15,4 +15,5 @@ export { default as PostTitle } from './post-title';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as InspectorControls } from './inspector-controls';
+export { default as BottomSheet } from './mobile/bottom-sheet';
 export { default as URLInput } from './url-input';
