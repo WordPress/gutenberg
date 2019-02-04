@@ -13,14 +13,19 @@ import {
 	ToggleControl,
 	SelectControl,
 	ServerSideRender,
+	Toolbar,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/editor';
+import { BlockControls, InspectorControls } from '@wordpress/editor';
 
 class TagCloudEdit extends Component {
 	constructor() {
 		super( ...arguments );
+
+		this.state = {
+			editing: ! this.props.attributes.taxonomy,
+		};
 
 		this.setTaxonomy = this.setTaxonomy.bind( this );
 		this.toggleShowTagCounts = this.toggleShowTagCounts.bind( this );
@@ -45,6 +50,8 @@ class TagCloudEdit extends Component {
 	setTaxonomy( taxonomy ) {
 		const { setAttributes } = this.props;
 
+		this.setState( { editing: false } );
+
 		setAttributes( { taxonomy } );
 	}
 
@@ -56,9 +63,24 @@ class TagCloudEdit extends Component {
 	}
 
 	render() {
+		const { editing } = this.state;
 		const { attributes } = this.props;
 		const { taxonomy, showTagCounts } = attributes;
 		const taxonomyOptions = this.getTaxonomyOptions();
+
+		const toolbarControls = [
+			{
+				icon: 'edit',
+				title: __( 'Edit Taxonomy' ),
+				onClick: () => this.setState( { editing: true } ),
+			},
+		];
+
+		const blockControls = (
+			<BlockControls>
+				<Toolbar controls={ toolbarControls } />
+			</BlockControls>
+		);
 
 		const inspectorControls = (
 			<InspectorControls>
@@ -70,7 +92,7 @@ class TagCloudEdit extends Component {
 						onChange={ this.setTaxonomy }
 					/>
 					<ToggleControl
-						label={ __( 'Show tag counts' ) }
+						label={ __( 'Show post counts' ) }
 						checked={ showTagCounts }
 						onChange={ this.toggleShowTagCounts }
 					/>
@@ -78,7 +100,7 @@ class TagCloudEdit extends Component {
 			</InspectorControls>
 		);
 
-		if ( ! taxonomy ) {
+		if ( ! taxonomy || editing ) {
 			return (
 				<Fragment>
 					{ inspectorControls }
@@ -86,9 +108,9 @@ class TagCloudEdit extends Component {
 						key="placeholder"
 						icon="tag"
 						label={ __( 'Tag Cloud' ) }
-						instructions={ __( 'Select a Taxonomy' ) }
 					>
 						<SelectControl
+							label={ __( 'Select a Taxonomy' ) }
 							options={ taxonomyOptions }
 							onChange={ this.setTaxonomy }
 						/>
@@ -99,6 +121,7 @@ class TagCloudEdit extends Component {
 
 		return (
 			<Fragment>
+				{ blockControls }
 				{ inspectorControls }
 				<ServerSideRender
 					key="tag-cloud"
