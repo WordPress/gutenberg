@@ -9,14 +9,24 @@ import {
 	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
-function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
+function fromFormat( { type, attributes, unregisteredAttributes, object, boundaryClass } ) {
 	const formatType = getFormatType( type );
 
-	if ( ! formatType ) {
-		return { type, attributes, object };
+	let elementAttributes = {};
+
+	if ( boundaryClass ) {
+		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
 	}
 
-	const elementAttributes = { ...unregisteredAttributes };
+	if ( ! formatType ) {
+		if ( attributes ) {
+			elementAttributes = { ...attributes, ...elementAttributes };
+		}
+
+		return { type, attributes: elementAttributes, object };
+	}
+
+	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
 
 	for ( const name in attributes ) {
 		const key = formatType.attributes ? formatType.attributes[ name ] : false;
@@ -195,16 +205,14 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes = {}, unregisteredAttributes, object } = format;
+				const { type, attributes, unregisteredAttributes, object } = format;
 
-				if (
+				const boundaryClass = (
 					isEditableTree &&
 					! object &&
 					character !== LINE_SEPARATOR &&
 					format === deepestActiveFormat
-				) {
-					attributes[ 'data-rich-text-format-boundary' ] = 'true';
-				}
+				);
 
 				const parent = getParent( pointer );
 				const newNode = append( parent, fromFormat( {
@@ -212,6 +220,7 @@ export function toTree( {
 					attributes,
 					unregisteredAttributes,
 					object,
+					boundaryClass,
 				} ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
