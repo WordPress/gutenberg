@@ -29,6 +29,7 @@ export default function Cell( props ) {
 	const showValue = value !== undefined;
 	const isValueEditable = onChangeValue !== undefined;
 	const defaultLabelStyle = showValue ? styles.cellLabel : styles.cellLabelCentered;
+	const separatorStyle = showValue ? styles.cellSeparator : styles.separator;
 	let valueTextInput;
 
 	const onCellPress = () => {
@@ -38,12 +39,12 @@ export default function Cell( props ) {
 	}
 
 	return (
-		<TouchableOpacity onPress={ onCellPress }>
+		<TouchableOpacity onPress={ onCellPress } disabled={ onPress === undefined }>
 			<View style={ styles.cellContainer }>
 				<View style={ styles.cellRowContainer }>
 					{ icon && (
 						<View style={ styles.cellRowContainer }>
-							<Dashicon icon={ icon } size={ 30 } />
+							<Dashicon icon={ icon } size={ 24 } />
 							<View style={ { width: 12 } } />
 						</View>
 					) }
@@ -58,13 +59,14 @@ export default function Cell( props ) {
 						style={ { ...styles.cellValue, ...valueStyle } }
 						value={ value }
 						placeholder={ valuePlaceholder }
+						placeholderTextColor={ '#87a6bc' }
 						onChangeText={ onChangeValue }
 						editable={ isValueEditable }
 					/>
 				) }
 			</View>
 			{ drawSeparator && (
-				<View style={ styles.separator } />
+				<View style={ separatorStyle } />
 			) }
 		</TouchableOpacity>
 	);

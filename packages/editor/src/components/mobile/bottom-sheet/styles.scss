@@ -3,6 +3,7 @@
 .bottomModal {
 	justify-content: flex-end;
 	margin: 0;
+	padding: 0;
 }
 
 .dragIndicator {
@@ -63,11 +64,18 @@
 
 .cellContainer {
 	flex-direction: row;
-	min-height: 50;
+	min-height: 48;
 	justify-content: space-between;
-	margin-left: 12;
-	margin-right: 12;
+	margin-left: 16;
+	margin-right: 16;
 	align-items: center;
+}
+
+.cellSeparator {
+	background-color: #c8d7e1;
+	height: 1px;
+	width: 100%;
+	margin-left: 52px;
 }
 
 .cellRowContainer {
@@ -80,20 +88,20 @@
 }
 
 .cellLabel {
-	font-size: 18px;
-	color: #000;
+	font-size: 17px;
+	color: #2e4453;
 	margin-right: 12px;
 }
 
 .cellLabelCentered {
-	font-size: 18px;
-	color: #000;
+	font-size: 17px;
+	color: #2e4453;
 	flex: 1;
 	text-align: center;
 }
 
 .cellValue {
-	font-size: 18px;
-	color: $dark-gray-400;
+	font-size: 17px;
+	color: #2e4453;
 	text-align: right;
 }

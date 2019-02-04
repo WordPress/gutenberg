@@ -223,7 +223,7 @@ export default class ImageEdit extends React.Component {
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Reset to original' ) }
-					labelStyle={ { color: 'red' } }
+					labelStyle={ { color: '#d94f4f' } }
 					drawSeparator={ false }
 					onPress={ () => {} }
 				/>
