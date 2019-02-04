@@ -213,6 +213,7 @@ export default class ImageEdit extends React.Component {
 					value={ href || '' }
 					valuePlaceholder={ __( 'Add URL' ) }
 					onChangeValue={ this.onSetLinkDestination }
+					autoCapitalize={ 'none' }
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }

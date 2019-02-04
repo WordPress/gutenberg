@@ -24,6 +24,7 @@ export default function Cell( props ) {
 		labelStyle = {},
 		valueStyle = {},
 		onChangeValue,
+		...valueProps
 	} = props;
 
 	const showValue = value !== undefined;
@@ -64,6 +65,7 @@ export default function Cell( props ) {
 						placeholderTextColor={ '#87a6bc' }
 						onChangeText={ onChangeValue }
 						editable={ isValueEditable }
+						{ ...valueProps }
 					/>
 				) }
 			</View>

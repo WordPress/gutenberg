@@ -17,6 +17,7 @@
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
+	margin-bottom: 14px;
 }
 
 .content {
@@ -57,8 +58,6 @@
 
 // Cell
 
-//Bottom Sheet
-
 .cellContainer {
 	flex-direction: row;
 	min-height: 48;
@@ -84,6 +83,7 @@
 .cellLabel {
 	font-size: 17px;
 	color: #2e4453;
+	margin-right: 12px;
 }
 
 .cellLabelCentered {
