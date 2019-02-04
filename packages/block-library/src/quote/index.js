@@ -17,15 +17,18 @@ import {
 import { join, split, create, toHTMLString } from '@wordpress/rich-text';
 import { G, Path, SVG } from '@wordpress/components';
 
+const ATTRIBUTE_QUOTE = 'value';
+const ATTRIBUTE_CITATION = 'citation';
+
 const blockAttributes = {
-	value: {
+	[ ATTRIBUTE_QUOTE ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'blockquote',
 		multiline: 'p',
 		default: '',
 	},
-	citation: {
+	[ ATTRIBUTE_CITATION ]: {
 		type: 'string',
 		source: 'html',
 		selector: 'cite',
@@ -87,9 +90,9 @@ export const settings = {
 				} ),
 			},
 			{
-				type: 'pattern',
-				regExp: /^>\s/,
-				transform: ( { content } ) => {
+				type: 'prefix',
+				prefix: '>',
+				transform: ( content ) => {
 					return createBlock( 'core/quote', {
 						value: `<p>${ content }</p>`,
 					} );
@@ -97,11 +100,38 @@ export const settings = {
 			},
 			{
 				type: 'raw',
-				selector: 'blockquote',
+				isMatch: ( node ) => {
+					const isParagraphOrSingleCite = ( () => {
+						let hasCitation = false;
+						return ( child ) => {
+							// Child is a paragraph.
+							if ( child.nodeName === 'P' ) {
+								return true;
+							}
+							// Child is a cite and no other cite child exists before it.
+							if (
+								! hasCitation &&
+								child.nodeName === 'CITE'
+							) {
+								hasCitation = true;
+								return true;
+							}
+						};
+					} )();
+					return node.nodeName === 'BLOCKQUOTE' &&
+					// The quote block can only handle multiline paragraph
+					// content with an optional cite child.
+					Array.from( node.childNodes ).every(
+						isParagraphOrSingleCite
+					);
+				},
 				schema: {
 					blockquote: {
 						children: {
 							p: {
+								children: getPhrasingContentSchema(),
+							},
+							cite: {
 								children: getPhrasingContentSchema(),
 							},
 						},
@@ -201,6 +231,7 @@ export const settings = {
 				</BlockControls>
 				<blockquote className={ className } style={ { textAlign: align } }>
 					<RichText
+						identifier={ ATTRIBUTE_QUOTE }
 						multiline
 						value={ value }
 						onChange={
@@ -222,6 +253,7 @@ export const settings = {
 					/>
 					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
+							identifier={ ATTRIBUTE_CITATION }
 							value={ citation }
 							onChange={
 								( nextCitation ) => setAttributes( {

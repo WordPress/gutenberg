@@ -9,7 +9,7 @@
 	z-index: z-index(".components-modal__screen-overlay");
 
 	// This animates the appearance of the white background.
-	@include fade-in();
+	@include edit-post__fade-in-animation();
 }
 
 // The modal window element.
@@ -40,7 +40,17 @@
 		transform: translate(-50%, -50%);
 
 		// Animate the modal frame/contents appearing on the page.
-		@include modal_appear();
+		animation: components-modal__appear-animation 0.1s ease-out;
+		animation-fill-mode: forwards;
+	}
+}
+
+@keyframes components-modal__appear-animation {
+	from {
+		margin-top: $grid-size * 4;
+	}
+	to {
+		margin-top: 0;
 	}
 }
 
@@ -56,16 +66,23 @@
 	justify-content: space-between;
 	background: $white;
 	align-items: center;
-	box-sizing: border-box;
 	height: $header-height;
 	position: sticky;
 	top: 0;
 	z-index: z-index(".components-modal__header");
 	margin: 0 -#{ $grid-size-large } $grid-size-large;
 
+	// Rules inside this query are only run by Microsoft Edge.
+	// Edge has bugs around position: sticky;, so it needs a separate top rule.
+	// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
+	@supports (-ms-ime-align:auto) {
+		position: fixed;
+		width: 100%;
+	}
+
 	.components-modal__header-heading {
 		font-size: 1em;
-		font-weight: normal;
+		font-weight: 400;
 	}
 
 	h1 {
@@ -97,4 +114,10 @@
 	box-sizing: border-box;
 	height: 100%;
 	padding: 0 $grid-size-large $grid-size-large;
+
+	// Rules inside this query are only run by Microsoft Edge.
+	// This is a companion top padding to the fixed rule in line 77.
+	@supports (-ms-ime-align:auto) {
+		padding-top: $header-height;
+	}
 }

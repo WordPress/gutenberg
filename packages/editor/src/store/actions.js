@@ -1,30 +1,27 @@
 /**
  * External Dependencies
  */
-import { partial, castArray } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import {
-	getDefaultBlockName,
-	createBlock,
-} from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
-import { dispatch } from '@wordpress/data';
+import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 /**
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post Post object.
+ * @param {Object} post  Post object.
+ * @param {Object} edits Initial edited attributes object.
  *
  * @return {Object} Action object.
  */
-export function setupEditor( post ) {
+export function setupEditor( post, edits ) {
 	return {
 		type: 'SETUP_EDITOR',
 		post,
+		edits,
 	};
 }
 
@@ -76,18 +73,16 @@ export function updatePost( edits ) {
 /**
  * Returns an action object used to setup the editor state when first opening an editor.
  *
- * @param {Object}  post            Post object.
- * @param {Array}   blocks          Array of blocks.
- * @param {Object}  edits           Initial edited attributes object.
+ * @param {Object} post   Post object.
+ * @param {Array}  blocks Array of blocks.
  *
  * @return {Object} Action object.
  */
-export function setupEditorState( post, blocks, edits ) {
+export function setupEditorState( post, blocks ) {
 	return {
 		type: 'SETUP_EDITOR_STATE',
 		post,
 		blocks,
-		edits,
 	};
 }
 
@@ -295,35 +290,36 @@ export function moveBlockToPosition( clientId, fromRootClientId, toRootClientId,
  * Returns an action object used in signalling that a single block should be
  * inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object}  block        Block object to insert.
- * @param {?number} index        Index at which block should be inserted.
- * @param {?string} rootClientId Optional root client ID of block list on which
- *                               to insert.
+ * @param {Object}  block            Block object to insert.
+ * @param {?number} index            Index at which block should be inserted.
+ * @param {?string} rootClientId     Optional root client ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlock( block, index, rootClientId ) {
-	return insertBlocks( [ block ], index, rootClientId );
+export function insertBlock( block, index, rootClientId, updateSelection = true ) {
+	return insertBlocks( [ block ], index, rootClientId, updateSelection );
 }
 
 /**
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks       Block objects to insert.
- * @param {?number}  index        Index at which block should be inserted.
- * @param {?string}  rootClientId Optional root client ID of block list on
- *                                which to insert.
+ * @param {Object[]} blocks          Block objects to insert.
+ * @param {?number}  index           Index at which block should be inserted.
+ * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
  *
  * @return {Object} Action object.
  */
-export function insertBlocks( blocks, index, rootClientId ) {
+export function insertBlocks( blocks, index, rootClientId, updateSelection = true ) {
 	return {
 		type: 'INSERT_BLOCKS',
 		blocks: castArray( blocks ),
 		index,
 		rootClientId,
 		time: Date.now(),
+		updateSelection,
 	};
 }
 
@@ -381,6 +377,14 @@ export function synchronizeTemplate() {
 	};
 }
 
+/**
+ * Returns an action object used in signalling that attributes of the post have
+ * been edited.
+ *
+ * @param {Object} edits Post attributes to edit.
+ *
+ * @return {Object} Action object.
+ */
 export function editPost( edits ) {
 	return {
 		type: 'EDIT_POST',
@@ -392,7 +396,7 @@ export function editPost( edits ) {
  * Returns an action object to save the post.
  *
  * @param {Object}  options          Options for the save.
- * @param {boolean} options.autosave Perform an autosave if true.
+ * @param {boolean} options.isAutosave Perform an autosave if true.
  *
  * @return {Object} Action object.
  */
@@ -435,10 +439,12 @@ export function mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 /**
  * Returns an action object used in signalling that the post should autosave.
  *
+ * @param {Object?} options Extra flags to identify the autosave.
+ *
  * @return {Object} Action object.
  */
-export function autosave() {
-	return savePost( { autosave: true } );
+export function autosave( options ) {
+	return savePost( { isAutosave: true, ...options } );
 }
 
 /**
@@ -777,114 +783,4 @@ export function unlockPostSaving( lockName ) {
 		type: 'UNLOCK_POST_SAVING',
 		lockName,
 	};
-}
-
-//
-// Deprecated
-//
-
-export function createNotice( status, content, options ) {
-	deprecated( 'createNotice action (`core/editor` store)', {
-		alternative: 'createNotice action (`core/notices` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	dispatch( 'core/notices' ).createNotice( status, content, options );
-
-	return { type: '__INERT__' };
-}
-
-export function removeNotice( id ) {
-	deprecated( 'removeNotice action (`core/editor` store)', {
-		alternative: 'removeNotice action (`core/notices` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	dispatch( 'core/notices' ).removeNotice( id );
-
-	return { type: '__INERT__' };
-}
-
-export const createSuccessNotice = partial( createNotice, 'success' );
-export const createInfoNotice = partial( createNotice, 'info' );
-export const createErrorNotice = partial( createNotice, 'error' );
-export const createWarningNotice = partial( createNotice, 'warning' );
-
-//
-// Deprecated
-//
-
-export function fetchReusableBlocks( id ) {
-	deprecated( "wp.data.dispatch( 'core/editor' ).fetchReusableBlocks( id )", {
-		alternative: "wp.data.select( 'core' ).getEntityRecords( 'postType', 'wp_block' )",
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return __experimentalFetchReusableBlocks( id );
-}
-
-export function receiveReusableBlocks( results ) {
-	deprecated( "wp.data.dispatch( 'core/editor' ).receiveReusableBlocks( results )", {
-		alternative: "wp.data.select( 'core' ).getEntityRecords( 'postType', 'wp_block' )",
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return __experimentalReceiveReusableBlocks( results );
-}
-
-export function saveReusableBlock( id ) {
-	deprecated( "wp.data.dispatch( 'core/editor' ).saveReusableBlock( id )", {
-		alternative: "wp.data.dispatch( 'core' ).saveEntityRecord( 'postType', 'wp_block', reusableBlock )",
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return __experimentalSaveReusableBlock( id );
-}
-
-export function deleteReusableBlock( id ) {
-	deprecated( 'deleteReusableBlock action (`core/editor` store)', {
-		alternative: '__experimentalDeleteReusableBlock action (`core/edtior` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
-	} );
-
-	return __experimentalDeleteReusableBlock( id );
-}
-
-export function updateReusableBlockTitle( id, title ) {
-	deprecated( "wp.data.dispatch( 'core/editor' ).updateReusableBlockTitle( id, title )", {
-		alternative: "wp.data.dispatch( 'core' ).saveEntityRecord( 'postType', 'wp_block', reusableBlock )",
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-	} );
-
-	return __experimentalUpdateReusableBlockTitle( id, title );
-}
-
-export function convertBlockToStatic( id ) {
-	deprecated( 'convertBlockToStatic action (`core/editor` store)', {
-		alternative: '__experimentalConvertBlockToStatic action (`core/edtior` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
-	} );
-
-	return __experimentalConvertBlockToStatic( id );
-}
-
-export function convertBlockToReusable( id ) {
-	deprecated( 'convertBlockToReusable action (`core/editor` store)', {
-		alternative: '__experimentalConvertBlockToReusable action (`core/edtior` store)',
-		plugin: 'Gutenberg',
-		version: '4.4.0',
-		hint: 'Using experimental APIs is strongly discouraged as they are subject to removal without notice.',
-	} );
-
-	return __experimentalConvertBlockToReusable( id );
 }

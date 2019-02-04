@@ -17,6 +17,8 @@ import {
 	ToggleControl,
 	Toolbar,
 } from '@wordpress/components';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -27,13 +29,44 @@ import {
 } from '@wordpress/editor';
 import { withSelect } from '@wordpress/data';
 
+/**
+ * Module Constants
+ */
+const CATEGORIES_LIST_QUERY = {
+	per_page: -1,
+};
 const MAX_POSTS_COLUMNS = 6;
 
 class LatestPostsEdit extends Component {
 	constructor() {
 		super( ...arguments );
-
+		this.state = {
+			categoriesList: [],
+		};
 		this.toggleDisplayPostDate = this.toggleDisplayPostDate.bind( this );
+	}
+
+	componentWillMount() {
+		this.isStillMounted = true;
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/categories`, CATEGORIES_LIST_QUERY ),
+		} ).then(
+			( categoriesList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { categoriesList } );
+				}
+			}
+		).catch(
+			() => {
+				if ( this.isStillMounted ) {
+					this.setState( { categoriesList: [] } );
+				}
+			}
+		);
+	}
+
+	componentWillUnmount() {
+		this.isStillMounted = false;
 	}
 
 	toggleDisplayPostDate() {
@@ -44,7 +77,8 @@ class LatestPostsEdit extends Component {
 	}
 
 	render() {
-		const { attributes, categoriesList, setAttributes, latestPosts } = this.props;
+		const { attributes, setAttributes, latestPosts } = this.props;
+		const { categoriesList } = this.state;
 		const { displayPostDate, align, postLayout, columns, order, orderBy, categories, postsToShow } = attributes;
 
 		const inspectorControls = (
@@ -127,7 +161,6 @@ class LatestPostsEdit extends Component {
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
-						controls={ [ 'center', 'wide', 'full' ] }
 					/>
 					<Toolbar controls={ layoutControls } />
 				</BlockControls>
@@ -142,7 +175,7 @@ class LatestPostsEdit extends Component {
 						<li key={ i }>
 							<a href={ post.link } target="_blank">{ decodeEntities( post.title.rendered.trim() ) || __( '(Untitled)' ) }</a>
 							{ displayPostDate && post.date_gmt &&
-								<time dateTime={ format( 'c', post.date_gmt ) } className={ `${ this.props.className }__post-date` }>
+								<time dateTime={ format( 'c', post.date_gmt ) } className="wp-block-latest-posts__post-date">
 									{ dateI18n( dateFormat, post.date_gmt ) }
 								</time>
 							}
@@ -163,11 +196,7 @@ export default withSelect( ( select, props ) => {
 		orderby: orderBy,
 		per_page: postsToShow,
 	}, ( value ) => ! isUndefined( value ) );
-	const categoriesListQuery = {
-		per_page: 100,
-	};
 	return {
 		latestPosts: getEntityRecords( 'postType', 'post', latestPostsQuery ),
-		categoriesList: getEntityRecords( 'taxonomy', 'category', categoriesListQuery ),
 	};
 } )( LatestPostsEdit );

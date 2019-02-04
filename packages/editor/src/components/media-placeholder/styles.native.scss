@@ -9,7 +9,7 @@
 
 .emptyStateTitle {
 	text-align: center;
-	font-weight: bold;
+	font-weight: 600;
 	padding-bottom: 12;
 }
 
@@ -18,6 +18,9 @@
 }
 
 .emptyStateButtonsContainer {
+	margin-top: 15;
+	margin-bottom: 15;
 	flex-direction: row;
-	align-items: center;
+	justify-content: space-evenly;
+	width: 100%;
 }

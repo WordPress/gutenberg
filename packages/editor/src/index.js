@@ -16,3 +16,4 @@ import './hooks';
 
 export * from './components';
 export * from './utils';
+export { default as transformStyles } from './editor-styles';

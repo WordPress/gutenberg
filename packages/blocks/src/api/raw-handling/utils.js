@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mergeWith, includes, noop } from 'lodash';
+import { mapValues, mergeWith, includes, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,28 +27,53 @@ const { ELEMENT_NODE, TEXT_NODE } = window.Node;
  * @return {Object} A complete block content schema.
  */
 export function getBlockContentSchema( transforms ) {
-	const schemas = transforms.map( ( { blockName, schema } ) => {
-		// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
-		if ( hasBlockSupport( blockName, 'anchor' ) ) {
-			for ( const tag in schema ) {
-				if ( ! schema[ tag ].attributes ) {
-					schema[ tag ].attributes = [];
-				}
-				schema[ tag ].attributes.push( 'id' );
-			}
+	const schemas = transforms.map( ( { isMatch, blockName, schema } ) => {
+		const hasAnchorSupport = hasBlockSupport( blockName, 'anchor' );
+		// If the block does not has anchor support and the transform does not
+		// provides an isMatch we can return the schema right away.
+		if ( ! hasAnchorSupport && ! isMatch ) {
+			return schema;
 		}
-		return schema;
+
+		return mapValues( schema, ( value ) => {
+			let attributes = value.attributes || [];
+			// If the block supports the "anchor" functionality, it needs to keep its ID attribute.
+			if ( hasAnchorSupport ) {
+				attributes = [ ...attributes, 'id' ];
+			}
+			return {
+				...value,
+				attributes,
+				isMatch: isMatch ? isMatch : undefined,
+			};
+		} );
 	} );
 
 	return mergeWith( {}, ...schemas, ( objValue, srcValue, key ) => {
-		if ( key === 'children' ) {
-			if ( objValue === '*' || srcValue === '*' ) {
-				return '*';
-			}
+		switch ( key ) {
+			case 'children': {
+				if ( objValue === '*' || srcValue === '*' ) {
+					return '*';
+				}
 
-			return { ...objValue, ...srcValue };
-		} else if ( key === 'attributes' || key === 'require' ) {
-			return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+				return { ...objValue, ...srcValue };
+			}
+			case 'attributes':
+			case 'require': {
+				return [ ...( objValue || [] ), ...( srcValue || [] ) ];
+			}
+			case 'isMatch': {
+				// If one of the values being merge is undefined (matches everything),
+				// the result of the merge will be undefined.
+				if ( ! objValue || ! srcValue ) {
+					return undefined;
+				}
+				// When merging two isMatch functions, the result is a new function
+				// that returns if one of the source functions returns true.
+				return ( ...args ) => {
+					return objValue( ...args ) || srcValue( ...args );
+				};
+			}
 		}
 	} );
 }
@@ -153,8 +178,12 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 	Array.from( nodeList ).forEach( ( node ) => {
 		const tag = node.nodeName.toLowerCase();
 
-		// It's a valid child.
-		if ( schema.hasOwnProperty( tag ) ) {
+		// It's a valid child, if the tag exists in the schema without an isMatch
+		// function, or with an isMatch function that matches the node.
+		if (
+			schema.hasOwnProperty( tag ) &&
+			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
+		) {
 			if ( node.nodeType === ELEMENT_NODE ) {
 				const { attributes = [], classes = [], children, require = [] } = schema[ tag ];
 
@@ -210,9 +239,21 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 						if ( require.length && ! node.querySelector( require.join( ',' ) ) ) {
 							cleanNodeList( node.childNodes, doc, schema, inline );
 							unwrap( node );
-						}
+						// If the node is at the top, phrasing content, and
+						// contains children that are block content, unwrap
+						// the node because it is invalid.
+						} else if (
+							node.parentNode.nodeName === 'BODY' &&
+							isPhrasingContent( node )
+						) {
+							cleanNodeList( node.childNodes, doc, schema, inline );
 
-						cleanNodeList( node.childNodes, doc, children, inline );
+							if ( Array.from( node.childNodes ).some( ( child ) => ! isPhrasingContent( child ) ) ) {
+								unwrap( node );
+							}
+						} else {
+							cleanNodeList( node.childNodes, doc, children, inline );
+						}
 					// Remove children if the node is not supposed to have any.
 					} else {
 						while ( node.firstChild ) {

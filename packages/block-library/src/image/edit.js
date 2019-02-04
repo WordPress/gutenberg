@@ -6,15 +6,16 @@ import {
 	get,
 	isEmpty,
 	map,
+	last,
 	pick,
-	startCase,
-	keyBy,
+	compact,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { getPath } from '@wordpress/url';
+import { __, sprintf } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
 import {
@@ -24,6 +25,7 @@ import {
 	PanelBody,
 	ResizableBox,
 	SelectControl,
+	Spinner,
 	TextControl,
 	TextareaControl,
 	Toolbar,
@@ -37,6 +39,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
+	MediaUploadCheck,
 	BlockAlignmentToolbar,
 	mediaUpload,
 } from '@wordpress/editor';
@@ -46,6 +49,7 @@ import { compose } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { createUpgradedEmbedBlock } from '../embed/util';
 import ImageSize from './image-size';
 
 /**
@@ -56,10 +60,13 @@ const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
 const LINK_DESTINATION_CUSTOM = 'custom';
+const NEW_TAB_REL = 'noreferrer noopener';
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 export const pickRelevantMediaFiles = ( image ) => {
-	return pick( image, [ 'alt', 'id', 'link', 'url', 'caption' ] );
+	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
+	imageProps.url = get( image, [ 'sizes', 'large', 'url' ] ) || get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) || image.url;
+	return imageProps;
 };
 
 /**
@@ -98,9 +105,14 @@ class ImageEdit extends Component {
 		this.updateHeight = this.updateHeight.bind( this );
 		this.updateDimensions = this.updateDimensions.bind( this );
 		this.onSetCustomHref = this.onSetCustomHref.bind( this );
+		this.onSetLinkClass = this.onSetLinkClass.bind( this );
+		this.onSetLinkRel = this.onSetLinkRel.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
+		this.onSetNewTab = this.onSetNewTab.bind( this );
+		this.getFilename = this.getFilename.bind( this );
 		this.toggleIsEditing = this.toggleIsEditing.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
+		this.onImageError = this.onImageError.bind( this );
 
 		this.state = {
 			captionFocused: false,
@@ -109,7 +121,7 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, setAttributes, noticeOperations } = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -122,6 +134,10 @@ class ImageEdit extends Component {
 						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
+					onError: ( message ) => {
+						noticeOperations.createErrorNotice( message );
+						this.setState( { isEditing: true } );
+					},
 				} );
 			}
 		}
@@ -206,8 +222,43 @@ class ImageEdit extends Component {
 		} );
 	}
 
+	onImageError( url ) {
+		// Check if there's an embed block that handles this URL.
+		const embedBlock = createUpgradedEmbedBlock(
+			{ attributes: { url } }
+		);
+		if ( undefined !== embedBlock ) {
+			this.props.onReplace( embedBlock );
+		}
+	}
+
 	onSetCustomHref( value ) {
 		this.props.setAttributes( { href: value } );
+	}
+
+	onSetLinkClass( value ) {
+		this.props.setAttributes( { linkClass: value } );
+	}
+
+	onSetLinkRel( value ) {
+		this.props.setAttributes( { rel: value } );
+	}
+
+	onSetNewTab( value ) {
+		const { rel } = this.props.attributes;
+		const linkTarget = value ? '_blank' : undefined;
+
+		let updatedRel = rel;
+		if ( linkTarget && ! rel ) {
+			updatedRel = NEW_TAB_REL;
+		} else if ( ! linkTarget && rel === NEW_TAB_REL ) {
+			updatedRel = undefined;
+		}
+
+		this.props.setAttributes( {
+			linkTarget,
+			rel: updatedRel,
+		} );
 	}
 
 	onFocusCaption() {
@@ -255,8 +306,11 @@ class ImageEdit extends Component {
 		};
 	}
 
-	getImageSizes() {
-		return get( this.props.image, [ 'media_details', 'sizes' ], {} );
+	getFilename( url ) {
+		const path = getPath( url );
+		if ( path ) {
+			return last( path.split( '/' ) );
+		}
 	}
 
 	getLinkDestinationOptions() {
@@ -274,6 +328,20 @@ class ImageEdit extends Component {
 		} );
 	}
 
+	getImageSizeOptions() {
+		const { imageSizes, image } = this.props;
+		return compact( map( imageSizes, ( { name, slug } ) => {
+			const sizeUrl = get( image, [ 'media_details', 'sizes', slug, 'source_url' ] );
+			if ( ! sizeUrl ) {
+				return null;
+			}
+			return {
+				value: sizeUrl,
+				label: name,
+			};
+		} ) );
+	}
+
 	render() {
 		const { isEditing } = this.state;
 		const {
@@ -286,11 +354,22 @@ class ImageEdit extends Component {
 			noticeUI,
 			toggleSelection,
 			isRTL,
-			availableImageSizes,
 		} = this.props;
-		const { url, alt, caption, align, id, href, linkDestination, width, height, linkTarget } = attributes;
+		const {
+			url,
+			alt,
+			caption,
+			align,
+			id,
+			href,
+			rel,
+			linkClass,
+			linkDestination,
+			width,
+			height,
+			linkTarget,
+		} = attributes;
 		const isExternal = isExternalImage( id, url );
-		const availableImageSizesBySlug = keyBy( availableImageSizes, 'slug' );
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -307,21 +386,23 @@ class ImageEdit extends Component {
 				);
 			} else {
 				toolbarEditButton = (
-					<Toolbar>
-						<MediaUpload
-							onSelect={ this.onSelectImage }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							value={ id }
-							render={ ( { open } ) => (
-								<IconButton
-									className="components-toolbar__control"
-									label={ __( 'Edit image' ) }
-									icon="edit"
-									onClick={ open }
-								/>
-							) }
-						/>
-					</Toolbar>
+					<MediaUploadCheck>
+						<Toolbar>
+							<MediaUpload
+								onSelect={ this.onSelectImage }
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								value={ id }
+								render={ ( { open } ) => (
+									<IconButton
+										className="components-toolbar__control"
+										label={ __( 'Edit image' ) }
+										icon="edit"
+										onClick={ open }
+									/>
+								) }
+							/>
+						</Toolbar>
+					</MediaUploadCheck>
 				);
 			}
 		}
@@ -336,7 +417,7 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( isEditing ) {
+		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
 			return (
 				<Fragment>
@@ -362,9 +443,9 @@ class ImageEdit extends Component {
 			'is-focused': isSelected,
 		} );
 
-		const imageSizes = this.getImageSizes();
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
-		const isLinkURLInputDisabled = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const imageSizeOptions = this.getImageSizeOptions();
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -375,14 +456,11 @@ class ImageEdit extends Component {
 						onChange={ this.updateAlt }
 						help={ __( 'Alternative text describes your image to people who can’t see it. Add a short description with its key details.' ) }
 					/>
-					{ ! isEmpty( imageSizes ) && (
+					{ ! isEmpty( imageSizeOptions ) && (
 						<SelectControl
 							label={ __( 'Image Size' ) }
 							value={ url }
-							options={ map( imageSizes, ( size, slug ) => ( {
-								value: size.source_url,
-								label: availableImageSizesBySlug[ slug ] ? availableImageSizesBySlug[ slug ].name : startCase( slug ),
-							} ) ) }
+							options={ imageSizeOptions }
 							onChange={ this.updateImageURL }
 						/>
 					) }
@@ -396,8 +474,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : '' }
-									placeholder={ imageWidth }
+									value={ width !== undefined ? width : imageWidth }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -405,8 +482,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : '' }
-									placeholder={ imageHeight }
+									value={ height !== undefined ? height : imageHeight }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>
@@ -455,13 +531,23 @@ class ImageEdit extends Component {
 								label={ __( 'Link URL' ) }
 								value={ href || '' }
 								onChange={ this.onSetCustomHref }
-								placeholder={ ! isLinkURLInputDisabled ? 'https://' : undefined }
-								disabled={ isLinkURLInputDisabled }
+								placeholder={ ! isLinkURLInputReadOnly ? 'https://' : undefined }
+								readOnly={ isLinkURLInputReadOnly }
 							/>
 							<ToggleControl
 								label={ __( 'Open in New Tab' ) }
-								onChange={ () => setAttributes( { linkTarget: ! linkTarget ? '_blank' : undefined } ) }
+								onChange={ this.onSetNewTab }
 								checked={ linkTarget === '_blank' } />
+							<TextControl
+								label={ __( 'Link CSS Class' ) }
+								value={ linkClass || '' }
+								onChange={ this.onSetLinkClass }
+							/>
+							<TextControl
+								label={ __( 'Link Rel' ) }
+								value={ rel || '' }
+								onChange={ this.onSetLinkRel }
+							/>
 						</Fragment>
 					) }
 				</PanelBody>
@@ -483,10 +569,26 @@ class ImageEdit extends Component {
 								imageHeight,
 							} = sizes;
 
-							// Disable reason: Image itself is not meant to be
-							// interactive, but should direct focus to block
-							// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
-							const img = <img src={ url } alt={ alt } onClick={ this.onImageClick } />;
+							const filename = this.getFilename( url );
+							let defaultedAlt;
+							if ( alt ) {
+								defaultedAlt = alt;
+							} else if ( filename ) {
+								defaultedAlt = sprintf( __( 'This image has an empty alt attribute; its file name is %s' ), filename );
+							} else {
+								defaultedAlt = __( 'This image has an empty alt attribute' );
+							}
+
+							const img = (
+								// Disable reason: Image itself is not meant to be interactive, but
+								// should direct focus to block.
+								/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+								<Fragment>
+									<img src={ url } alt={ defaultedAlt } onClick={ this.onImageClick } onError={ () => this.onImageError( url ) } />
+									{ isBlobURL( url ) && <Spinner /> }
+								</Fragment>
+								/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
+							);
 
 							if ( ! isResizable || ! imageWidthWithinContainer ) {
 								return (
@@ -505,6 +607,13 @@ class ImageEdit extends Component {
 							const ratio = imageWidth / imageHeight;
 							const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
 							const minHeight = imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
+
+							// With the current implementation of ResizableBox, an image needs an explicit pixel value for the max-width.
+							// In absence of being able to set the content-width, this max-width is currently dictated by the vanilla editor style.
+							// The following variable adds a buffer to this vanilla style, so 3rd party themes have some wiggleroom.
+							// This does, in most cases, allow you to scale the image beyond the width of the main column, though not infinitely.
+							// @todo It would be good to revisit this once a content-width variable becomes available.
+							const maxWidthBuffer = maxWidth * 2.5;
 
 							let showRightHandle = false;
 							let showLeftHandle = false;
@@ -546,9 +655,9 @@ class ImageEdit extends Component {
 											} : undefined
 										}
 										minWidth={ minWidth }
-										maxWidth={ maxWidth }
+										maxWidth={ maxWidthBuffer }
 										minHeight={ minHeight }
-										maxHeight={ maxWidth / ratio }
+										maxHeight={ maxWidthBuffer / ratio }
 										lockAspectRatio
 										enable={ {
 											top: false,
@@ -596,13 +705,13 @@ export default compose( [
 		const { getMedia } = select( 'core' );
 		const { getEditorSettings } = select( 'core/editor' );
 		const { id } = props.attributes;
-		const { maxWidth, isRTL, availableImageSizes } = getEditorSettings();
+		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 
 		return {
 			image: id ? getMedia( id ) : null,
 			maxWidth,
 			isRTL,
-			availableImageSizes,
+			imageSizes,
 		};
 	} ),
 	withViewportMatch( { isLargeViewport: 'medium' } ),

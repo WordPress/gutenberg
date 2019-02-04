@@ -17,7 +17,7 @@ function generateTableOfContent( parsedNamespaces ) {
 		'# Data Module Reference',
 		'',
 		Object.values( parsedNamespaces ).map( ( parsedNamespace ) => {
-			return ` - [**${ parsedNamespace.name }**: ${ parsedNamespace.title }](../../docs/data/data-${ kebabCase( parsedNamespace.name ) }.md)`;
+			return ` - [**${ parsedNamespace.name }**: ${ parsedNamespace.title }](/docs/designers-developers/developers/data/data-${ kebabCase( parsedNamespace.name ) }.md)`;
 		} ).join( '\n' ),
 	].join( '\n' );
 }
@@ -32,10 +32,16 @@ function generateTableOfContent( parsedNamespaces ) {
  */
 function generateFunctionDocs( parsedFunc, generateDocsForReturn = true ) {
 	return [
-		`### ${ parsedFunc.name }`,
+		`### ${ parsedFunc.name }${ parsedFunc.deprecated ? ' (deprecated)' : '' }`,
 		parsedFunc.description ? [
 			'',
 			parsedFunc.description,
+		].join( '\n' ) : null,
+		parsedFunc.deprecated ? [
+			'',
+			'*Deprecated*',
+			'',
+			`Deprecated ${ parsedFunc.deprecated.description }`,
 		].join( '\n' ) : null,
 		parsedFunc.params.length ? [
 			'',

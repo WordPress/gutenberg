@@ -16,7 +16,6 @@ export * from './font-sizes';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as PanelColor } from './panel-color';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';
 export {
@@ -28,6 +27,7 @@ export {
 export { default as ServerSideRender } from './server-side-render';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
+export { default as MediaUploadCheck } from './media-upload/check';
 export { default as URLInput } from './url-input';
 export { default as URLInputButton } from './url-input/button';
 export { default as URLPopover } from './url-popover';
@@ -36,7 +36,11 @@ export { default as URLPopover } from './url-popover';
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
-export { default as EditorGlobalKeyboardShortcuts } from './editor-global-keyboard-shortcuts';
+export {
+	default as VisualEditorGlobalKeyboardShortcuts,
+	EditorGlobalKeyboardShortcuts,
+} from './global-keyboard-shortcuts/visual-editor-shortcuts';
+export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
 export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorNotices } from './editor-notices';
@@ -63,7 +67,6 @@ export { default as PostPreviewButton } from './post-preview-button';
 export { default as PostPublishButton } from './post-publish-button';
 export { default as PostPublishButtonLabel } from './post-publish-button/label';
 export { default as PostPublishPanel } from './post-publish-panel';
-export { default as PostPublishPanelToggle } from './post-publish-panel/toggle';
 export { default as PostSavedState } from './post-saved-state';
 export { default as PostSchedule } from './post-schedule';
 export { default as PostScheduleCheck } from './post-schedule/check';

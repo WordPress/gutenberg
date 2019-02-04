@@ -61,7 +61,6 @@ describe( 'MenuItem', () => {
 			</MenuItem>
 		);
 
-		expect( wrapper.prop( 'aria-label' ) ).not.toBeUndefined();
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
@@ -71,5 +70,27 @@ describe( 'MenuItem', () => {
 		);
 
 		expect( wrapper.prop( 'aria-label' ) ).toBeUndefined();
+	} );
+
+	it( 'should avoid using aria-checked if only menuitem is set as aria-role', () => {
+		const wrapper = shallow(
+			<MenuItem role="menuitem" isSelected={ true }><div /></MenuItem>
+		);
+
+		expect( wrapper.prop( 'aria-checked' ) ).toBeUndefined();
+	} );
+
+	it( 'should use aria-checked if menuitemradio or menuitemcheckbox is set as aria-role', () => {
+		let wrapper = shallow(
+			<MenuItem role="menuitemradio" isSelected={ true }><div /></MenuItem>
+		);
+
+		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
+
+		wrapper = shallow(
+			<MenuItem role="menuitemcheckbox" isSelected={ true }><div /></MenuItem>
+		);
+
+		expect( wrapper.prop( 'aria-checked' ) ).toBe( true );
 	} );
 } );

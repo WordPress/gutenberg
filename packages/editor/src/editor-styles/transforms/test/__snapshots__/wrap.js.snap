@@ -8,9 +8,9 @@ src: url(sansation_light.woff);
 `;
 
 exports[`CSS selector wrap should ignore keyframes 1`] = `
-"@keyframes move_background {
+"@keyframes edit-post__fade-in-animation {
 from {
-background-position: 0 0;
+opacity: 0;
 }
 }"
 `;
@@ -39,5 +39,11 @@ color: red;
 exports[`CSS selector wrap should wrap regular selectors 1`] = `
 ".my-namespace h1 {
 color: red;
+}"
+`;
+
+exports[`CSS selector wrap should replace :root selectors 1`] = `
+".my-namespace {
+--my-color: #ff0000;
 }"
 `;

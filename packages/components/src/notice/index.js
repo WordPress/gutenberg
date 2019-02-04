@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { RawHTML } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,26 +22,49 @@ function Notice( {
 	onRemove = noop,
 	isDismissible = true,
 	actions = [],
+	__unstableHTML,
 } ) {
 	const classes = classnames( className, 'components-notice', 'is-' + status, {
 		'is-dismissible': isDismissible,
 	} );
 
+	if ( __unstableHTML ) {
+		children = <RawHTML>{ children }</RawHTML>;
+	}
+
 	return (
 		<div className={ classes }>
 			<div className="components-notice__content">
 				{ children }
-				{ actions.map( ( { label, url, onClick }, index ) => (
-					<Button
-						key={ index }
-						href={ url }
-						isLink={ !! url }
-						onClick={ onClick }
-						className="components-notice__action"
-					>
-						{ label }
-					</Button>
-				) ) }
+				{ actions.map(
+					(
+						{
+							className: buttonCustomClasses,
+							label,
+							noDefaultClasses = false,
+							onClick,
+							url,
+						},
+						index
+					) => {
+						return (
+							<Button
+								key={ index }
+								href={ url }
+								isDefault={ ! noDefaultClasses && ! url }
+								isLink={ ! noDefaultClasses && !! url }
+								onClick={ url ? undefined : onClick }
+								className={ classnames(
+									'components-notice__action',
+									buttonCustomClasses
+								) }
+							>
+								{ label }
+							</Button>
+						);
+					}
+
+				) }
 			</div>
 			{ isDismissible && (
 				<IconButton

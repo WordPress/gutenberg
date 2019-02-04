@@ -76,7 +76,7 @@ export const settings = {
 							content: nextContent,
 						} );
 					} }
-					style={ { textAlign: textAlign } }
+					style={ { textAlign } }
 					placeholder={ __( 'Write…' ) }
 					wrapperClassName={ className }
 					onMerge={ mergeBlocks }
@@ -85,14 +85,13 @@ export const settings = {
 		);
 	},
 
-	save( { attributes, className } ) {
+	save( { attributes } ) {
 		const { textAlign, content } = attributes;
 
 		return (
 			<RichText.Content
 				tagName="pre"
-				className={ className }
-				style={ { textAlign: textAlign } }
+				style={ { textAlign } }
 				value={ content }
 			/>
 		);

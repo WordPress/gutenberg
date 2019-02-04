@@ -17,7 +17,6 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
           >
             <p
               aria-autocomplete="list"
-              aria-expanded="false"
               aria-label="New Column"
               aria-multiline="true"
               class="editor-rich-text__tinymce"
@@ -52,7 +51,6 @@ exports[`core/text-columns block edit matches snapshot 1`] = `
           >
             <p
               aria-autocomplete="list"
-              aria-expanded="false"
               aria-label="New Column"
               aria-multiline="true"
               class="editor-rich-text__tinymce"

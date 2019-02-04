@@ -29,7 +29,6 @@ const MyDateTimePicker = withState( {
 		<DateTimePicker
 			currentDate={ date }
 			onChange={ ( date ) => setState( { date } ) }
-			locale={ settings.l10n.locale }
 			is12Hour={ is12HourTime }
 		/>
 	);
@@ -55,16 +54,16 @@ The function called when a new date or time has been selected. It is passed the 
 - Required: No
 - Default: `noop`
 
-### locale
-
-The localization for the display of the date and time.
-
-- Type: `string`
-- Required: No
-
 ### is12Hour
 
 Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY.
 
 - Type: `bool`
+- Required: No
+
+### isInvalidDate
+
+A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
+
+- Type: `Function`
 - Required: No

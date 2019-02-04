@@ -209,4 +209,48 @@ describe( 'Slot', () => {
 
 		expect( testRenderer.toJSON() ).toMatchSnapshot();
 	} );
+
+	[ false, true ].forEach( ( bubblesVirtually ) => {
+		describe( 'bubblesVirtually ' + bubblesVirtually, () => {
+			it( 'should subsume another slot by the same name', () => {
+				const testRenderer = ReactTestRenderer.create(
+					<Provider>
+						<div data-position="first">
+							<Slot name="egg" bubblesVirtually={ bubblesVirtually } />
+						</div>
+						<div data-position="second"></div>
+						<Fill name="egg">Content</Fill>
+					</Provider>
+				);
+
+				testRenderer.update(
+					<Provider>
+						<div data-position="first">
+							<Slot name="egg" bubblesVirtually={ bubblesVirtually } />
+						</div>
+						<div data-position="second">
+							<Slot name="egg" bubblesVirtually={ bubblesVirtually } />
+						</div>
+						<Fill name="egg">Content</Fill>
+					</Provider>
+				);
+
+				expect( testRenderer.toJSON() ).toMatchSnapshot();
+
+				testRenderer.update(
+					<Provider>
+						<div data-position="first"></div>
+						<div data-position="second">
+							<Slot name="egg" bubblesVirtually={ bubblesVirtually } />
+						</div>
+						<Fill name="egg">Content</Fill>
+					</Provider>
+				);
+
+				expect( testRenderer.toJSON() ).toMatchSnapshot();
+
+				expect( testRenderer.getInstance().slots ).toHaveProperty( 'egg' );
+			} );
+		} );
+	} );
 } );

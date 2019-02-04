@@ -4,15 +4,15 @@
 import { Component } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 import { documentHasSelection } from '@wordpress/dom';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 class CopyHandler extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onCopy = this.onCopy.bind( this );
-		this.onCut = this.onCut.bind( this );
+		this.onCopy = ( event ) => this.props.onCopy( event );
+		this.onCut = ( event ) => this.props.onCut( event );
 	}
 
 	componentDidMount() {
@@ -25,55 +25,56 @@ class CopyHandler extends Component {
 		document.removeEventListener( 'cut', this.onCut );
 	}
 
-	onCopy( event ) {
-		const { multiSelectedBlocks, selectedBlock } = this.props;
-
-		if ( ! multiSelectedBlocks.length && ! selectedBlock ) {
-			return;
-		}
-
-		// Let native copy behaviour take over in input fields.
-		if ( selectedBlock && documentHasSelection() ) {
-			return;
-		}
-
-		const serialized = serialize( selectedBlock || multiSelectedBlocks );
-
-		event.clipboardData.setData( 'text/plain', serialized );
-		event.clipboardData.setData( 'text/html', serialized );
-
-		event.preventDefault();
-	}
-
-	onCut( event ) {
-		const { multiSelectedBlockClientIds } = this.props;
-
-		this.onCopy( event );
-
-		if ( multiSelectedBlockClientIds.length ) {
-			this.props.onRemove( multiSelectedBlockClientIds );
-		}
-	}
-
 	render() {
 		return null;
 	}
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
 		const {
-			getMultiSelectedBlocks,
+			getBlocksByClientId,
 			getMultiSelectedBlockClientIds,
-			getSelectedBlock,
+			getSelectedBlockClientId,
+			hasMultiSelection,
 		} = select( 'core/editor' );
+		const { removeBlocks } = dispatch( 'core/editor' );
+
+		const onCopy = ( event ) => {
+			const selectedBlockClientIds = getSelectedBlockClientId() ?
+				[ getSelectedBlockClientId() ] :
+				getMultiSelectedBlockClientIds();
+
+			if ( selectedBlockClientIds.length === 0 ) {
+				return;
+			}
+
+			// Let native copy behaviour take over in input fields.
+			if ( ! hasMultiSelection() && documentHasSelection() ) {
+				return;
+			}
+
+			const serialized = serialize( getBlocksByClientId( selectedBlockClientIds ) );
+
+			event.clipboardData.setData( 'text/plain', serialized );
+			event.clipboardData.setData( 'text/html', serialized );
+
+			event.preventDefault();
+		};
+
 		return {
-			multiSelectedBlocks: getMultiSelectedBlocks(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			selectedBlock: getSelectedBlock(),
+			onCopy,
+			onCut( event ) {
+				onCopy( event );
+
+				if ( hasMultiSelection() ) {
+					const selectedBlockClientIds = getSelectedBlockClientId() ?
+						[ getSelectedBlockClientId() ] :
+						getMultiSelectedBlockClientIds();
+
+					removeBlocks( selectedBlockClientIds );
+				}
+			},
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		onRemove: dispatch( 'core/editor' ).removeBlocks,
-	} ) ),
 ] )( CopyHandler );

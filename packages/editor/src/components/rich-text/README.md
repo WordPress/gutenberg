@@ -25,10 +25,6 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 *Optional.* By default, a line break will be inserted on <kbd>Enter</kbd>. If the editable field can contain multiple paragraphs, this property can be set to create new paragraphs on <kbd>Enter</kbd>.
 
-### `onSplit( before: Array|String, after: Array|String, ...blocks: Object ): Function`
-
-*Optional.* Called when the content can be split with `before` and `after`. There might be blocks present, which should be inserted in between.
-
 ### `onReplace( blocks: Array ): Function`
 
 *Optional.* Called when the `RichText` instance is empty and it can be replaced with the given blocks.
@@ -123,6 +119,51 @@ registerBlockType( /* ... */, {
 	save( { attributes } ) {
 		return <RichText.Content tagName="h2" value={ attributes.content } />;
 	}
+} );
+```
+{% end %}
+
+## RichTextToolbarButton
+
+Slot to extend the format toolbar. Use it in the edit function of a `registerFormatType` call to surface the format to the UI.
+
+### Example
+
+{% codetabs %}
+{% ES5 %}
+```js
+wp.richText.registerFormatType( /* ... */, {
+	/* ... */
+	edit: function( props ) {
+		return wp.element.createElement(
+			wp.editor.RichTextToolbarButton, {
+				icon: 'editor-code',
+				title: 'My formatting button',
+				onClick: function() { /* ... */ }
+				isActive: props.isActive,
+			} );
+	},
+	/* ... */
+} );
+```
+{% ESNext %}
+```js
+import { registerFormatType } from 'wp-rich-text';
+import { richTextToolbarButton } from 'wp-editor';
+
+registerFormatType( /* ... */, {
+	/* ... */
+	edit( { isActive } ) {
+		return (
+			<RichTextToolbarButton
+				icon={ 'editor-code' }
+				title={ 'My formatting button' }
+				onClick={ /* ... */ }
+				isActive={ isActive }
+				/>
+		);
+	},
+	/* ... */
 } );
 ```
 {% end %}

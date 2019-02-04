@@ -40,9 +40,9 @@ describe( 'CSS selector wrap', () => {
 	it( 'should ignore keyframes', () => {
 		const callback = wrap( '.my-namespace' );
 		const input = `
-		@keyframes move_background {
+		@keyframes edit-post__fade-in-animation {
 			from {
-				background-position: 0 0;
+				opacity: 0;
 			}
 		}`;
 		const output = traverse( input, callback );
@@ -56,6 +56,17 @@ describe( 'CSS selector wrap', () => {
 		@font-face {
 			font-family: myFirstFont;
 			src: url(sansation_light.woff);
+		}`;
+		const output = traverse( input, callback );
+
+		expect( output ).toMatchSnapshot();
+	} );
+
+	it( 'should replace :root selectors', () => {
+		const callback = wrap( '.my-namespace' );
+		const input = `
+		:root {
+			--my-color: #ff0000;
 		}`;
 		const output = traverse( input, callback );
 

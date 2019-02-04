@@ -8,6 +8,16 @@
 	margin: 0;
 	position: relative;
 	line-height: $editor-line-height;
+	// In HTML, leading and trailing spaces are not visible, and multiple spaces
+	// elsewhere are visually reduced to one space. This rule prevents spaces
+	// from collapsing so all space is visible in the editor and can be removed.
+	// It also prevents some browsers from inserting non-breaking spaces at the
+	// end of a line to prevent the space from visually disappearing. Sometimes
+	// these non breaking spaces can linger in the editor causing unwanted non
+	// breaking spaces in between words. If also prevent Firefox from inserting
+	// a trailing `br` node to visualise any trailing space, causing the element
+	// to be saved.
+	white-space: pre-wrap;
 
 	> p:empty {
 		min-height: $editor-font-size * $editor-line-height;
@@ -97,6 +107,9 @@
 		& > p {
 			margin-top: 0;
 		}
+
+		// Ensure that if placeholder wraps (mobile/nested contexts) the clickable area is full-height.
+		height: 100%;
 	}
 
 	// Placeholder text.

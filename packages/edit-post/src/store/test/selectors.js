@@ -1,7 +1,7 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import deprecated from '@wordpress/deprecated';
+import deepFreeze from 'deep-freeze';
 
 /**
  * Internal dependencies
@@ -21,15 +21,10 @@ import {
 	getActiveMetaBoxLocations,
 	isMetaBoxLocationActive,
 	isEditorPanelEnabled,
+	isEditorPanelRemoved,
 } from '../selectors';
 
-jest.mock( '@wordpress/deprecated', () => jest.fn() );
-
 describe( 'selectors', () => {
-	beforeEach( () => {
-		deprecated.mockClear();
-	} );
-
 	describe( 'getEditorMode', () => {
 		it( 'should return the selected editor mode', () => {
 			const state = {
@@ -206,6 +201,26 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( 'isEditorPanelRemoved', () => {
+		it( 'should return false by default', () => {
+			const state = deepFreeze( {
+				removedPanels: [],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return true when panel was removed', () => {
+			const state = deepFreeze( {
+				removedPanels: [
+					'post-status',
+				],
+			} );
+
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'isEditorPanelEnabled', () => {
 		it( 'should return true by default', () => {
 			const state = {
@@ -237,6 +252,21 @@ describe( 'selectors', () => {
 					},
 				},
 			};
+
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+		} );
+
+		it( 'should return false when a panel is enabled but removed', () => {
+			const state = deepFreeze( {
+				preferences: {
+					panels: {
+						'post-status': {
+							enabled: true,
+						},
+					},
+				},
+				removedPanels: [ 'post-status' ],
+			} );
 
 			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
 		} );

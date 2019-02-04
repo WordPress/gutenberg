@@ -2,13 +2,12 @@
  * External dependencies
  */
 import { create } from 'rungen';
-import { map, isString } from 'lodash';
+import { map } from 'lodash';
 import isPromise from 'is-promise';
 
 /**
  * Internal dependencies
  */
-import castError from './cast-error';
 import { isActionOfType, isAction } from './is-action';
 
 /**
@@ -27,10 +26,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 		const routine = control( value );
 		if ( isPromise( routine ) ) {
 			// Async control routine awaits resolution.
-			routine.then(
-				yieldNext,
-				( error ) => yieldError( castError( error ) ),
-			);
+			routine.then( yieldNext, yieldError );
 		} else {
 			next( routine );
 		}
@@ -51,7 +47,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 
 	return ( action ) => new Promise( ( resolve, reject ) =>
 		rungenRuntime( action, ( result ) => {
-			if ( typeof result === 'object' && isString( result.type ) ) {
+			if ( isAction( result ) ) {
 				dispatch( result );
 			}
 			resolve( result );

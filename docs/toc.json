@@ -1,0 +1,100 @@
+[
+	{"docs/readme.md": []},
+	{"docs/designers-developers/readme.md": [
+		{"docs/designers-developers/key-concepts.md": []},
+		{"docs/designers-developers/developers/README.md": [
+			{"docs/designers-developers/developers/block-api/README.md": [
+				{"docs/designers-developers/developers/block-api/block-registration.md": []},
+				{"docs/designers-developers/developers/block-api/block-edit-save.md": []},
+				{"docs/designers-developers/developers/block-api/block-attributes.md": []},
+				{"docs/designers-developers/developers/block-api/block-deprecation.md": []},
+				{"docs/designers-developers/developers/block-api/block-templates.md": []},
+				{"docs/designers-developers/developers/block-api/block-annotations.md": []}
+			]},
+			{"docs/designers-developers/developers/filters/README.md": [
+				{"docs/designers-developers/developers/filters/block-filters.md": []},
+				{"docs/designers-developers/developers/filters/editor-filters.md": []},
+				{"docs/designers-developers/developers/filters/parser-filters.md": []},
+				{"docs/designers-developers/developers/filters/autocomplete-filters.md": []}
+			]},
+			{"docs/designers-developers/developers/internationalization.md": []},
+			{"docs/designers-developers/developers/accessibility.md": []},
+			{"docs/designers-developers/developers/data/README.md": "{{data}}"},
+			{"docs/designers-developers/developers/packages.md": "{{packages}}"},
+			{"packages/components/README.md": "{{components}}"},
+			{"docs/designers-developers/developers/themes/README.md": [
+				{"docs/designers-developers/developers/themes/theme-support.md": []}
+			]},
+			{"docs/designers-developers/developers/backward-compatibility/README.md": [
+				{"docs/designers-developers/developers/backward-compatibility/deprecations.md": []},
+				{"docs/designers-developers/developers/backward-compatibility/meta-box.md": []}
+			]},
+			{"docs/designers-developers/developers/tutorials/readme.md": [
+				{"docs/designers-developers/developers/tutorials/block-tutorial/readme.md" :[
+					{"docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/applying-styles-with-stylesheets.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/introducing-attributes-and-editable-fields.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/block-controls-toolbars-and-inspector.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md" :[]},
+					{"docs/designers-developers/developers/tutorials/block-tutorial/generate-blocks-with-wp-cli.md" :[]}
+				]},
+				{"docs/designers-developers/developers/tutorials/javascript/readme.md": [
+					{"docs/designers-developers/developers/tutorials/javascript/plugins-background.md": []},
+					{"docs/designers-developers/developers/tutorials/javascript/loading-javascript.md": []},
+					{"docs/designers-developers/developers/tutorials/javascript/extending-the-block-editor.md": []},
+					{"docs/designers-developers/developers/tutorials/javascript/troubleshooting.md": []},
+					{"docs/designers-developers/developers/tutorials/javascript/versions-and-building.md": []},
+					{"docs/designers-developers/developers/tutorials/javascript/scope-your-code.md": []}
+				]},
+				{"docs/designers-developers/developers/tutorials/metabox/readme.md": [
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-1-intro.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-2-register-meta.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-4-use-data.md": []},
+					{"docs/designers-developers/developers/tutorials/metabox/meta-block-5-finishing.md": []}
+				]},
+				{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md": [
+					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-1-up-and-running.md": []},
+					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-2-styles-and-controls.md": []},
+					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md": []},
+					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md": []},
+					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md": []},
+					{"docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md": []}
+				]},
+				{"docs/designers-developers/developers/tutorials/format-api/README.md": [
+					{"docs/designers-developers/developers/tutorials/format-api/1-register-format.md": []},
+					{"docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": []},
+					{"docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": []}
+				]}
+			]}
+		]},
+		{"docs/designers-developers/designers/README.md": [
+			{"docs/designers-developers/designers/block-design.md": []},
+			{"docs/designers-developers/designers/design-patterns.md": []},
+			{"docs/designers-developers/designers/design-resources.md": []}
+		]}
+	]},
+	{"docs/contributors/readme.md": [
+		{"docs/contributors/principles.md": []},
+		{"docs/contributors/design.md": [
+			{"docs/contributors/principles/the-block.md": []},
+			{"docs/contributors/reference.md": []}
+		]},
+		{"docs/contributors/develop.md": [
+			{"docs/contributors/coding-guidelines.md": []},
+			{"docs/contributors/testing-overview.md": []},
+			{"docs/contributors/git-workflow.md": []},
+			{"docs/contributors/grammar.md": []},
+			{"docs/contributors/scripts.md": []},
+			{"docs/contributors/release.md": []}
+		]},
+		{"docs/contributors/document.md": [
+			{"docs/contributors/copy-guide.md": []}
+		]},
+		{"docs/contributors/history.md": []},
+		{"docs/designers-developers/glossary.md": []},
+		{"docs/designers-developers/faq.md": []},
+		{"docs/contributors/repository-management.md": []},
+		{"docs/contributors/outreach.md": []}
+	]}
+]

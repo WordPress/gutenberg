@@ -2,10 +2,12 @@
  * Internal dependencies
  */
 import {
+	isValidCharacterReference,
+	DecodeEntityParser,
 	getTextPiecesSplitOnWhitespace,
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
-	isEqualTextTokensWithCollapsedWhitespace,
+	isEquivalentTextTokens,
 	getNormalizedStyleValue,
 	getStyleProperties,
 	isEqualAttributesOfName,
@@ -37,6 +39,42 @@ describe( 'validation', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
+		} );
+	} );
+
+	describe( 'isValidCharacterReference', () => {
+		it( 'returns true for a named character reference', () => {
+			const result = isValidCharacterReference( 'blk12' );
+
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true for a decimal character reference', () => {
+			const result = isValidCharacterReference( '#33' );
+
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true for a hexadecimal character reference', () => {
+			const result = isValidCharacterReference( '#xC6' );
+
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false for an invalid character reference', () => {
+			const result = isValidCharacterReference( ' Test</h2><h2>Test &amp' );
+
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'DecodeEntityParser', () => {
+		it( 'can be constructed', () => {
+			expect( new DecodeEntityParser() instanceof DecodeEntityParser ).toBe( true );
+		} );
+
+		it( 'returns parse as decoded value', () => {
+			expect( new DecodeEntityParser().parse( 'quot' ) ).toBe( '"' );
 		} );
 	} );
 
@@ -98,9 +136,9 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'isEqualTextTokensWithCollapsedWhitespace()', () => {
+	describe( 'isEquivalentTextTokens()', () => {
 		it( 'should return false if not equal with collapsed whitespace', () => {
-			const isEqual = isEqualTextTokensWithCollapsedWhitespace(
+			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
 				{ chars: 'a \n c \t b  ' },
 			);
@@ -110,7 +148,7 @@ describe( 'validation', () => {
 		} );
 
 		it( 'should return true if equal with collapsed whitespace', () => {
-			const isEqual = isEqualTextTokensWithCollapsedWhitespace(
+			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
 				{ chars: 'a \n b \t c  ' },
 			);
@@ -379,8 +417,22 @@ describe( 'validation', () => {
 
 		it( 'should return true for effectively equivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
-				'<div>&quot; Hello<span   class="b a" id="foo"> World!</  span>  "</div>',
-				'<div  >" Hello\n<span id="foo" class="a  b">World!</span>"</div>'
+				'<div>&quot; Hello<span   class="b a" id="foo" data-foo="here &mdash; there"> World! &#128517;</  span>  "</div>',
+				'<div  >" Hello\n<span id="foo" class="a  b" data-foo="here — there">World! 😅</span>"</div>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
+		it( 'should account for character reference validity', () => {
+			// Regression: Previously the validator would wrongly evaluate the
+			// segment of text ` Test</h2><h2>Test &amp` as a character
+			// reference, as it's between an opening `&` and terminating `;`.
+			//
+			// See: https://github.com/WordPress/gutenberg/issues/12448
+			const isEquivalent = isEquivalentHTML(
+				'<h2>Test &amp; Test</h2><h2>Test &amp; Test</h2>',
+				'<h2>Test & Test</h2><h2>Test &amp; Test</h2>'
 			);
 
 			expect( isEquivalent ).toBe( true );
@@ -558,7 +610,7 @@ describe( 'validation', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const isValid = isValidBlockContent(
-				getBlockType( 'core/test-block' ),
+				'core/test-block',
 				{ fruit: 'Bananas' },
 				'Apples'
 			);
@@ -577,7 +629,7 @@ describe( 'validation', () => {
 			} );
 
 			const isValid = isValidBlockContent(
-				getBlockType( 'core/test-block' ),
+				'core/test-block',
 				{ fruit: 'Bananas' },
 				'Bananas'
 			);
@@ -587,6 +639,18 @@ describe( 'validation', () => {
 		} );
 
 		it( 'returns true is block is valid', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+
+			const isValid = isValidBlockContent(
+				'core/test-block',
+				{ fruit: 'Bananas' },
+				'Bananas'
+			);
+
+			expect( isValid ).toBe( true );
+		} );
+
+		it( 'works also when block type object is passed as object', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
 			const isValid = isValidBlockContent(

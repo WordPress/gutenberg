@@ -11,7 +11,6 @@ import {
 	createBlock,
 	getPhrasingContentSchema,
 	getBlockAttributes,
-	getBlockType,
 } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 import {
@@ -101,25 +100,23 @@ export const settings = {
 				transform( node ) {
 					return createBlock( 'core/heading', {
 						...getBlockAttributes(
-							getBlockType( 'core/heading' ),
+							'core/heading',
 							node.outerHTML
 						),
 						level: getLevelFromHeadingNodeName( node.nodeName ),
 					} );
 				},
 			},
-			{
-				type: 'pattern',
-				regExp: /^(#{2,6})\s/,
-				transform: ( { content, match } ) => {
-					const level = match[ 1 ].length;
-
+			...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+				type: 'prefix',
+				prefix: Array( level + 1 ).join( '#' ),
+				transform( content ) {
 					return createBlock( 'core/heading', {
 						level,
 						content,
 					} );
 				},
-			},
+			} ) ),
 		],
 		to: [
 			{

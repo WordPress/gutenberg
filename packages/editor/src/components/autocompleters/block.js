@@ -40,8 +40,9 @@ function defaultGetInserterItems( rootClientId ) {
  *                   block is selected.
  */
 function defaultGetSelectedBlockName() {
-	const selectedBlock = select( 'core/editor' ).getSelectedBlock();
-	return selectedBlock ? selectedBlock.name : null;
+	const { getSelectedBlockClientId, getBlockName } = select( 'core/editor' );
+	const selectedBlockClientId = getSelectedBlockClientId();
+	return selectedBlockClientId ? getBlockName( selectedBlockClientId ) : null;
 }
 
 /**
@@ -67,8 +68,8 @@ export function createBlockCompleter( {
 			);
 		},
 		getOptionKeywords( inserterItem ) {
-			const { title, keywords = [] } = inserterItem;
-			return [ ...keywords, title ];
+			const { title, keywords = [], category } = inserterItem;
+			return [ category, ...keywords, title ];
 		},
 		getOptionLabel( inserterItem ) {
 			const { icon, title } = inserterItem;

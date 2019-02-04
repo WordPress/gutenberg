@@ -6,3 +6,10 @@
  * @type {string}
  */
 export const DEFAULT_CONTEXT = 'global';
+
+/**
+ * Default notice status.
+ *
+ * @type {string}
+ */
+export const DEFAULT_STATUS = 'info';
