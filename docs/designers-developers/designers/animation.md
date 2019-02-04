@@ -20,7 +20,7 @@ Animation can help reinforce a sense of hierarchy and spatial orientation. This 
 ### Simple
 
 - Don't bounce if the material isn't made of rubber.
-- Don't rotate, fold, or animate on a curve. Keep it simple.
+- Don't rotate, fold, or animate on a curved path. Keep it simple.
 
 ### Consistency
 
