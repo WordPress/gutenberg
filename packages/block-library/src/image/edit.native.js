@@ -209,7 +209,7 @@ export default class ImageEdit extends React.Component {
 			>
 				<BottomSheet.Cell
 					icon={ 'admin-links' }
-					label={ __( 'Link to:' ) }
+					label={ __( 'Link To' ) }
 					value={ href || '' }
 					valuePlaceholder={ __( 'Add URL' ) }
 					onChangeValue={ this.onSetLinkDestination }
@@ -224,7 +224,7 @@ export default class ImageEdit extends React.Component {
 					onChangeValue={ this.updateAlt }
 				/>
 				<BottomSheet.Cell
-					label={ __( 'Reset to original' ) }
+					label={ __( 'Reset to Original' ) }
 					labelStyle={ { color: '#d94f4f' } }
 					drawSeparator={ false }
 					onPress={ () => {} }
