@@ -203,6 +203,50 @@ class RCTAztecView: Aztec.TextView {
     func updatePlaceholderVisibility() {
         placeholderLabel.isHidden = !self.text.isEmpty
     }
+    
+    // MARK: - Font
+    
+    @objc func setFontFamily(_ family: String) {
+        
+        let fullRange = NSRange(location: 0, length: textStorage.length)
+        
+        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
+            let oldFont = attributes[.font] as? UIFont ?? defaultFont
+            let oldDescriptor = oldFont.fontDescriptor
+            
+            var newDescriptor = UIFontDescriptor(name: family, size: oldFont.pointSize)
+            newDescriptor = newDescriptor.withSymbolicTraits(oldDescriptor.symbolicTraits) ?? newDescriptor
+            
+            let newFont = UIFont(descriptor: newDescriptor, size: oldFont.pointSize)
+            
+            textStorage.addAttribute(.font, value: newFont, range: subrange)
+        }
+    }
+    
+    @objc func setFontSize(_ size: CGFloat) {
+        let fullRange = NSRange(location: 0, length: textStorage.length)
+        
+        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
+            let oldFont = attributes[.font] as? UIFont ?? defaultFont
+            let newFont = oldFont.withSize(size)
+            
+            textStorage.addAttribute(.font, value: newFont, range: subrange)
+        }
+    }
+    
+    @objc func setFontWeight(_ weight: String) {
+        
+        let fullRange = NSRange(location: 0, length: textStorage.length)
+        
+        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
+            let oldFont = attributes[.font] as? UIFont ?? defaultFont
+            let oldDescriptor = oldFont.fontDescriptor
+            let newDescriptor = oldDescriptor.withFace(weight)
+            let newFont = UIFont(descriptor: newDescriptor, size: oldFont.pointSize)
+            
+            textStorage.addAttribute(.font, value: newFont, range: subrange)
+        }
+    }
 
     // MARK: - Formatting interface
 
