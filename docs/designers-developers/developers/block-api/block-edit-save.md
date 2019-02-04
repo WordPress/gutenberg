@@ -168,12 +168,8 @@ When using attributes that are objects or arrays it's a good idea to copy or clo
 {% codetabs %}
 {% ES5 %}
 ```js
-// Good - cloning the old list to a new array and then adding item
-
-var listObj = Object.assign( {}, attributes.list );
-
-// convert listObj back to array
-var newList = Object.keys( listObj ).map( i => listObj[i] );
+// Good - cloning the old list
+var newList = attributes.list.slice();
 
 var addListItem = function( newListItem ) {
 	setAttributes( { list: newList.concat( [ newListItem ] ) } );
