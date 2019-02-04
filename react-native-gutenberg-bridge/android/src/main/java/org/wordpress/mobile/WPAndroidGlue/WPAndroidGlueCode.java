@@ -5,7 +5,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.MutableContextWrapper;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
 
@@ -27,6 +30,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -50,6 +54,7 @@ public class WPAndroidGlueCode {
     private boolean mContentChanged;
     private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
+    private WeakReference<View> mLastFocusedView = null;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
@@ -187,10 +192,32 @@ public class WPAndroidGlueCode {
 
         viewGroup.addView(mReactRootView, 0,
                 new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        refocus();
+    }
+
+    private void refocus() {
+        if (mLastFocusedView != null) {
+            // schedule a request for focus
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override public void run() {
+                    // Check if View reference is still alive and in the view hierarchy
+                    if (mLastFocusedView != null
+                            && mLastFocusedView.get() != null
+                            && mLastFocusedView.get().getParent() != null) {
+                        // request focus to the last focused child
+                        mLastFocusedView.get().requestFocus();
+                    }
+                }
+            });
+        }
     }
 
     public void onPause(Activity activity) {
         if (mReactInstanceManager != null) {
+            // get the focused view so we re-focus it later if needed. WeakReference so we don't leak it.
+            mLastFocusedView = new WeakReference<>(mReactRootView.findFocus());
+
             mReactInstanceManager.onHostPause(activity);
         }
     }
