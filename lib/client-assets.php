@@ -851,47 +851,12 @@ function gutenberg_get_available_image_sizes() {
  * @param string $hook Screen name.
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
-	global $wp_scripts, $wp_meta_boxes;
-
-	// Add "wp-hooks" as dependency of "heartbeat".
-	$heartbeat_script = $wp_scripts->query( 'heartbeat', 'registered' );
-	if ( $heartbeat_script && ! in_array( 'wp-hooks', $heartbeat_script->deps ) ) {
-		$heartbeat_script->deps[] = 'wp-hooks';
-	}
+	global $wp_meta_boxes;
 
 	// Enqueue heartbeat separately as an "optional" dependency of the editor.
 	// Heartbeat is used for automatic nonce refreshing, but some hosts choose
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
-
-	// Transforms heartbeat jQuery events into equivalent hook actions. This
-	// avoids a dependency on jQuery for listening to the event.
-	$heartbeat_hooks = <<<JS
-( function() {
-	jQuery( document ).on( [
-		'heartbeat-send',
-		'heartbeat-tick',
-		'heartbeat-error',
-		'heartbeat-connection-lost',
-		'heartbeat-connection-restored',
-		'heartbeat-nonces-expired',
-	].join( ' ' ), function( event ) {
-		var actionName = event.type.replace( /-/g, '.' ),
-			args;
-
-		// Omit the event argument in applying arguments to the hook callback.
-		// The remaining arguments are passed to the hook.
-		args = Array.prototype.slice.call( arguments, 1 );
-
-		wp.hooks.doAction.apply( null, [ actionName ].concat( args ) );
-	} );
-} )();
-JS;
-	wp_add_inline_script(
-		'heartbeat',
-		$heartbeat_hooks,
-		'after'
-	);
 
 	wp_enqueue_script( 'wp-edit-post' );
 	wp_enqueue_script( 'wp-format-library' );
