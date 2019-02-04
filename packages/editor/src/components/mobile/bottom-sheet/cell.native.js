@@ -33,10 +33,12 @@ export default function Cell( props ) {
 	let valueTextInput;
 
 	const onCellPress = () => {
-		isValueEditable ? 
-			valueTextInput.focus() :
+		if ( isValueEditable ) {
+			valueTextInput.focus();
+		} else {
 			onPress && onPress();
-	}
+		}
+	};
 
 	return (
 		<TouchableOpacity onPress={ onCellPress } >
@@ -54,8 +56,8 @@ export default function Cell( props ) {
 				</View>
 				{ showValue && (
 					<TextInput
-						ref={ (c) => valueTextInput = c }
-						numberOfLines={ 1 } 
+						ref={ ( c ) => valueTextInput = c }
+						numberOfLines={ 1 }
 						style={ { ...styles.cellValue, ...valueStyle } }
 						value={ value }
 						placeholder={ valuePlaceholder }

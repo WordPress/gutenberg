@@ -17,7 +17,7 @@ import {
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner, Dashicon, TextareaControl } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
