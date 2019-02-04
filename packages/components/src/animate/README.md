@@ -11,8 +11,8 @@ const MyAnimatedNotice = () => (
 	<Animate todo="Add missing props">
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
-        	    <p>Animation finished.</p>
-            </Notice>
+                <p>Animation finished.</p>
+			</Notice>
 		) }
 	</Animate>
 );
