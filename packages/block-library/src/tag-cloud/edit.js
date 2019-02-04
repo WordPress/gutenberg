@@ -111,6 +111,7 @@ class TagCloudEdit extends Component {
 					>
 						<SelectControl
 							label={ __( 'Select a Taxonomy' ) }
+							value={ taxonomy }
 							options={ taxonomyOptions }
 							onChange={ this.setTaxonomy }
 						/>

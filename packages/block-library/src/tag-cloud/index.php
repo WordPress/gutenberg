@@ -50,7 +50,7 @@ function register_block_core_tag_cloud() {
 			'attributes'      => array(
 				'taxonomy'      => array(
 					'type'    => 'string',
-					'default' => 'tags',
+					'default' => 'post_tag',
 				),
 				'className'     => array(
 					'type' => 'string',
