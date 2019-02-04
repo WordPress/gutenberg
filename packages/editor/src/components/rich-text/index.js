@@ -397,7 +397,10 @@ export class RichText extends Component {
 			} else {
 				this.applyRecord( value );
 			}
-		} else if ( selectedFormat !== this.state.selectedFormat ) {
+		} else if (
+			this.state.selectedFormat !== undefined &&
+			selectedFormat !== this.state.selectedFormat
+		) {
 			this.setState( { start, end, selectedFormat } );
 			this.applyRecord( value, true );
 		}
