@@ -35,6 +35,20 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func requestImageFailedRetryDialog(_ mediaID: Int32) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaUploadActionDialog(for: mediaID)
+        }
+    }
+
+    @objc
+    func requestImageUploadCancelDialog(_ mediaID: Int32) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaUploadActionDialog(for: mediaID)
+        }
+    }
+
+    @objc
     func editorDidLayout() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidLayout()
