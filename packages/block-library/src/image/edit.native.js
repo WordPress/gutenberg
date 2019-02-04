@@ -44,6 +44,7 @@ export default class ImageEdit extends React.Component {
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.updateAlt = this.updateAlt.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 	}
 
@@ -128,9 +129,13 @@ export default class ImageEdit extends React.Component {
 		}
 	}
 
+	updateAlt( newAlt ) {
+		this.props.setAttributes( { alt: newAlt } );
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width } = attributes;
+		const { url, caption, height, width, alt } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
 			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
@@ -191,19 +196,13 @@ export default class ImageEdit extends React.Component {
 				isVisible={ this.state.showSettings }
 				onClose={ onImageSettingsClose }
 				hideHeader
-				rightButton={
-					<BottomSheet.Button
-						text={ __( 'Done' ) }
-						color={ '#0087be' }
-						onPress={ onImageSettingsClose }
-					/>
-				}
 			>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
-					value={ __( 'None' ) }
-					onPress={ () => {} }
+					value={ alt || '' }
+					valuePlaceholder={ __( 'None' ) }
+					onChangeValue={ this.updateAlt }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Reset to original' ) }
