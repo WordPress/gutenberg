@@ -810,6 +810,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "Animate",
+		"slug": "animate",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/animate/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Autocomplete",
 		"slug": "autocomplete",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/autocomplete/README.md",
