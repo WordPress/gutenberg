@@ -28,6 +28,8 @@ const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 const MEDIA_UPLOAD_STATE_FAILED = 3;
 const MEDIA_UPLOAD_STATE_RESET = 4;
 
+const LINK_DESTINATION_CUSTOM = 'custom';
+
 export default class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
@@ -45,6 +47,7 @@ export default class ImageEdit extends React.Component {
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
+		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 	}
 
@@ -133,9 +136,16 @@ export default class ImageEdit extends React.Component {
 		this.props.setAttributes( { alt: newAlt } );
 	}
 
+	onSetLinkDestination( href ) {
+		this.props.setAttributes( {
+			linkDestination: LINK_DESTINATION_CUSTOM,
+			href,
+		} );
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
-		const { url, caption, height, width, alt } = attributes;
+		const { url, caption, height, width, alt, href } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
 			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
@@ -197,6 +207,13 @@ export default class ImageEdit extends React.Component {
 				onClose={ onImageSettingsClose }
 				hideHeader
 			>
+				<BottomSheet.Cell
+					icon={ 'admin-links' }
+					label={ __( 'Link to:' ) }
+					value={ href || '' }
+					valuePlaceholder={ __( 'Add URL' ) }
+					onChangeValue={ this.onSetLinkDestination }
+				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
