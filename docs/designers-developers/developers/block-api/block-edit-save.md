@@ -133,7 +133,7 @@ edit: function( props ) {
 		'div',
 		{ className: props.className },
 		[
-			count,
+			content,
 			props.isSelected ? wp.element.createElement(
 				'button',
 				{ onClick: toggleSetting },
