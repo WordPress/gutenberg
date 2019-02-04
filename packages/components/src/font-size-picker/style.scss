@@ -1,15 +1,14 @@
 .components-font-size-picker__buttons {
+	max-width: $sidebar-width - ( 2 * $panel-padding );
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 
-	// Apply the same height as the font size picker dropdown.
+	// Apply the same height as the isSmall Reset button.
 	.components-range-control__number {
-		height: 30px;
-		line-height: 28px;
-		margin: 0;
-		padding: 0 !important;
-		text-align: center;
+		height: 24px;
+		line-height: 22px;
+		margin-left: 0;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
