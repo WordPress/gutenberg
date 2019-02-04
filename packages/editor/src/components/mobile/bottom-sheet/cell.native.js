@@ -36,8 +36,8 @@ export default function Cell( props ) {
 	const onCellPress = () => {
 		if ( isValueEditable ) {
 			valueTextInput.focus();
-		} else {
-			onPress && onPress();
+		} else if ( onPress !== undefined ) {
+			onPress();
 		}
 	};
 
