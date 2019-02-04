@@ -55,7 +55,7 @@ const EmbedPreview = ( props ) => {
 			{ ( cannotPreview ) ? (
 				<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
 					<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-					<p className="components-placeholder__error">{ __( 'Sorry, this embedded content cannot be previewed in the editor.' ) }</p>
+					<p className="components-placeholder__error">{ __( 'Sorry, we cannot preview this embedded content in the editor.' ) }</p>
 				</Placeholder>
 			) : embedWrapper }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
