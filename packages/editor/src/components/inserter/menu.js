@@ -32,6 +32,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose, withSafeTimeout } from '@wordpress/compose';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -323,7 +324,7 @@ export class InserterMenu extends Component {
 							<BlockTypesList items={ reusableItems } onSelect={ onSelect } onHover={ this.onHover } />
 							<a
 								className="editor-inserter__manage-reusable-blocks"
-								href="edit.php?post_type=wp_block"
+								href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 							>
 								{ __( 'Manage All Reusable Blocks' ) }
 							</a>
