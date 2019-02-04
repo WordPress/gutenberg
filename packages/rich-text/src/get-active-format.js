@@ -15,10 +15,29 @@ import { find } from 'lodash';
  *
  * @return {?Object} Active format object of the specified type, or undefined.
  */
-export function getActiveFormat( { formats, start }, formatType ) {
+export function getActiveFormat( { formats, start, selectedFormat }, formatType ) {
 	if ( start === undefined ) {
 		return;
 	}
 
-	return find( formats[ start ], { type: formatType } );
+	const formatsAtStart = formats[ start ] || [];
+	const formatsAtBeforeStart = formats[ start - 1 ] || [];
+
+	let f = formatsAtStart;
+
+	if ( formatsAtBeforeStart.length > formatsAtStart.length ) {
+		f = formatsAtBeforeStart;
+	}
+
+	if ( ! f.length ) {
+		return;
+	}
+
+	f = f.slice( 0, selectedFormat );
+
+	if ( ! f.length ) {
+		return;
+	}
+
+	return find( f, { type: formatType } );
 }

@@ -26,6 +26,6 @@ describe( 'getActiveFormat', () => {
 			end: 1,
 		};
 
-		expect( getActiveFormat( record, 'em' ) ).toBe( undefined );
+		expect( getActiveFormat( record, 'em' ) ).toBe( em );
 	} );
 } );
