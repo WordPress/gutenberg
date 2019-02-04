@@ -163,6 +163,10 @@ export function toTree( {
 			lastCharacterFormats.forEach( ( format, formatIndex ) => {
 				boundaryPointer = getLastChild( boundaryPointer );
 
+				if ( ! boundaryPointer ) {
+					return;
+				}
+
 				if (
 					characterFormats &&
 					format === characterFormats[ formatIndex ]
