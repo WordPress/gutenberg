@@ -74,3 +74,6 @@
 
 # Documentation
 /docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw
+
+# Native
+*.native.js                                     @daniloercoli @diegoreymendez @etoledom @hypest @koke @marecar3 @mzorz @pinarol @SergioEstevao @tug
