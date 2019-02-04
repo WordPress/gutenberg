@@ -34,6 +34,7 @@ export default class ImageEdit extends React.Component {
 
 		this.state = {
 			showSettings: false,
+			showMediaOptions: false,
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
@@ -133,6 +134,7 @@ export default class ImageEdit extends React.Component {
 		const { url, caption, height, width } = attributes;
 
 		const onMediaLibraryButtonPressed = () => {
+			this.setState( { showMediaOptions: false } );
 			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { id: mediaId, url: mediaUrl } );
@@ -140,33 +142,25 @@ export default class ImageEdit extends React.Component {
 			} );
 		};
 
-		if ( ! url ) {
-			const onMediaUploadButtonPressed = () => {
-				requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
-					if ( mediaUri ) {
-						this.addMediaUploadListener( );
-						setAttributes( { url: mediaUri, id: mediaId } );
-					}
-				} );
-			};
+		const onMediaUploadButtonPressed = () => {
+			this.setState( { showMediaOptions: false } );
+			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
+				if ( mediaUri ) {
+					this.addMediaUploadListener( );
+					setAttributes( { url: mediaUri, id: mediaId } );
+				}
+			} );
+		};
 
-			const onMediaCaptureButtonPressed = () => {
-				requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
-					if ( mediaUri ) {
-						this.addMediaUploadListener( );
-						setAttributes( { url: mediaUri, id: mediaId } );
-					}
-				} );
-			};
-
-			return (
-				<MediaPlaceholder
-					onUploadMediaPressed={ onMediaUploadButtonPressed }
-					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
-					onCapturePhotoPressed={ onMediaCaptureButtonPressed }
-				/>
-			);
-		}
+		const onMediaCaptureButtonPressed = () => {
+			this.setState( { showMediaOptions: false } );
+			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
+				if ( mediaUri ) {
+					this.addMediaUploadListener( );
+					setAttributes( { url: mediaUri, id: mediaId } );
+				}
+			} );
+		};
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -176,12 +170,20 @@ export default class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
+		const onMediaOptionsButtonPressed = () => {
+			this.setState( { showMediaOptions: true } );
+		};
+
+		const onMediaOptionsClose = () => {
+			this.setState( { showMediaOptions: false } );
+		};
+
 		const toolbarEditButton = (
 			<Toolbar>
 				<ToolbarButton
 					label={ __( 'Edit image' ) }
 					icon="edit"
-					onClick={ onMediaLibraryButtonPressed }
+					onClick={ onMediaOptionsButtonPressed }
 				/>
 			</Toolbar>
 		);
@@ -213,6 +215,47 @@ export default class ImageEdit extends React.Component {
 				/>
 			</BottomSheet>
 		);
+
+		const getMediaOptions = () => (
+			<BottomSheet
+				isVisible={ this.state.showMediaOptions }
+				onClose={ onMediaOptionsClose }
+				hideHeader
+			>
+				<BottomSheet.Cell
+					label={ __( 'Choose from device' ) }
+					labelStyle={ { color: '#00aadc'} }
+					onPress={ onMediaUploadButtonPressed }
+				/>
+				<BottomSheet.Cell
+					label={ __( 'Take a Photo' ) }
+					labelStyle={ { color: '#00aadc'} }
+					onPress={ onMediaCaptureButtonPressed }
+				/>
+				<BottomSheet.Cell
+					label={ __( 'WordPress Media Library' ) }
+					labelStyle={ { color: '#00aadc'} }
+					onPress={ onMediaLibraryButtonPressed }
+				/>
+				<BottomSheet.Cell
+					label={ __( 'Dismiss' ) }
+					labelStyle={ { color: '#00aadc', fontWeight: 'bold' } }
+					drawSeparator={ false }
+					onPress={ onMediaOptionsClose }
+				/>
+			</BottomSheet>
+		);
+
+		if ( ! url) {
+			return (
+				<View style={ { flex: 1 } } >
+				{ getMediaOptions() }
+				<MediaPlaceholder
+					onMediaOptionsPressed={ onMediaOptionsButtonPressed }
+				/>
+				</View>
+			);
+		}
 
 		const showSpinner = this.state.isUploadInProgress;
 		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
@@ -252,6 +295,7 @@ export default class ImageEdit extends React.Component {
 							return (
 								<View style={ { flex: 1 } } >
 									{ getInspectorControls() }
+									{ getMediaOptions() }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
