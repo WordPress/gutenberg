@@ -147,6 +147,7 @@ export default compose( [
 		const { getBlockStyles } = select( 'core/blocks' );
 		const block = getBlock( clientId );
 
+		// Return null if block no longer exist.
 		if ( ! block ) {
 			return null;
 		}
