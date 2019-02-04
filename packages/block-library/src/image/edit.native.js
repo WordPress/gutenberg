@@ -224,35 +224,35 @@ export default class ImageEdit extends React.Component {
 			>
 				<BottomSheet.Cell
 					label={ __( 'Choose from device' ) }
-					labelStyle={ { color: '#00aadc'} }
+					labelStyle={ { color: '#00aadc' } }
 					onPress={ onMediaUploadButtonPressed }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Take a Photo' ) }
-					labelStyle={ { color: '#00aadc'} }
+					labelStyle={ { color: '#00aadc' } }
 					onPress={ onMediaCaptureButtonPressed }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'WordPress Media Library' ) }
-					labelStyle={ { color: '#00aadc'} }
+					labelStyle={ { color: '#00aadc' } }
 					onPress={ onMediaLibraryButtonPressed }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Dismiss' ) }
-					labelStyle={ { color: '#00aadc', fontWeight: 'bold' } }
+					labelStyle={ { color: '#00aadc ', fontWeight: 'bold' } }
 					drawSeparator={ false }
 					onPress={ onMediaOptionsClose }
 				/>
 			</BottomSheet>
 		);
 
-		if ( ! url) {
+		if ( ! url ) {
 			return (
 				<View style={ { flex: 1 } } >
-				{ getMediaOptions() }
-				<MediaPlaceholder
-					onMediaOptionsPressed={ onMediaOptionsButtonPressed }
-				/>
+					{ getMediaOptions() }
+					<MediaPlaceholder
+						onMediaOptionsPressed={ onMediaOptionsButtonPressed }
+					/>
 				</View>
 			);
 		}
