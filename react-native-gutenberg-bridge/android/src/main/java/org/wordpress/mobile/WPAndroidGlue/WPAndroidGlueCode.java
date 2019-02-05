@@ -3,9 +3,14 @@ package org.wordpress.mobile.WPAndroidGlue;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.MutableContextWrapper;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout.LayoutParams;
 
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactInstanceManagerBuilder;
@@ -25,6 +30,7 @@ import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 
+import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -38,6 +44,9 @@ public class WPAndroidGlueCode {
     private MediaSelectedCallback mPendingMediaSelectedCallback;
     private MediaUploadCallback mPendingMediaUploadCallback;
 
+    private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
+    private OnReattachQueryListener mOnReattachQueryListener;
+
     private String mContentHtml = "";
     private boolean mContentInitialized;
     private String mTitle = "";
@@ -45,6 +54,7 @@ public class WPAndroidGlueCode {
     private boolean mContentChanged;
     private boolean mShouldUpdateContent;
     private CountDownLatch mGetContentCountDownLatch;
+    private WeakReference<View> mLastFocusedView = null;
 
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
@@ -78,8 +88,7 @@ public class WPAndroidGlueCode {
         void onQueryCurrentProgressForUploadingMedia();
     }
 
-    protected List<ReactPackage> getPackages(final OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                             final OnReattachQueryListener onReattachQueryListener) {
+    protected List<ReactPackage> getPackages() {
         mRnReactNativeGutenbergBridgePackage = new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
             @Override
             public void responseHtml(String title, String html, boolean changed) {
@@ -94,33 +103,35 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {
                 mPendingMediaSelectedCallback = mediaSelectedCallback;
-                onMediaLibraryButtonListener.onMediaLibraryButtonClicked();
+                mOnMediaLibraryButtonListener.onMediaLibraryButtonClicked();
             }
 
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
-                onMediaLibraryButtonListener.onUploadMediaButtonClicked();
+                mOnMediaLibraryButtonListener.onUploadMediaButtonClicked();
             }
 
             @Override
             public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
-                onMediaLibraryButtonListener.onCapturePhotoButtonClicked();
+                mOnMediaLibraryButtonListener.onCapturePhotoButtonClicked();
             }
 
             @Override
             public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {
                 mPendingMediaUploadCallback = mediaUploadCallback;
-                onReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+                mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
 
-            @Override public void requestImageFailedRetryDialog(int mediaId) {
-                onMediaLibraryButtonListener.onRetryUploadForMediaClicked(mediaId);
+            @Override
+            public void requestImageFailedRetryDialog(int mediaId) {
+                mOnMediaLibraryButtonListener.onRetryUploadForMediaClicked(mediaId);
             }
 
-            @Override public void requestImageUploadCancelDialog(int mediaId) {
-                onMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
+            @Override
+            public void requestImageUploadCancelDialog(int mediaId) {
+                mOnMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
             }
         });
         return Arrays.asList(
@@ -131,20 +142,18 @@ public class WPAndroidGlueCode {
                 mRnReactNativeGutenbergBridgePackage);
     }
 
-    public void onCreateView(View reactRootView, boolean htmlModeEnabled,
-                             OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                             OnReattachQueryListener onReattachQueryListener,
+    public void onCreateView(Context initContext, boolean htmlModeEnabled,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
                              boolean isNewPost) {
-        mReactRootView = (ReactRootView) reactRootView;
+        mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
 
         ReactInstanceManagerBuilder builder =
                 ReactInstanceManager.builder()
                                     .setApplication(application)
                                     .setJSMainModulePath("index")
-                                    .addPackages(getPackages(onMediaLibraryButtonListener, onReattachQueryListener))
+                                    .addPackages(getPackages())
                                     .setUseDeveloperSupport(isDebug)
-                                    .setInitialLifecycleState(LifecycleState.RESUMED);
+                                    .setInitialLifecycleState(LifecycleState.BEFORE_CREATE);
         if (!buildGutenbergFromSource) {
             builder.setBundleAssetName("index.android.bundle");
         }
@@ -167,15 +176,48 @@ public class WPAndroidGlueCode {
         // The string here (e.g. "MyReactNativeApp") has to match
         // the string in AppRegistry.registerComponent() in index.js
         mReactRootView.setAppProperties(initialProps);
+    }
 
-        if (isNewPost) {
-            setTitle("");
-            setContent("");
+    public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
+                                  OnReattachQueryListener onReattachQueryListener) {
+        MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
+        contextWrapper.setBaseContext(viewGroup.getContext());
+
+        mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
+        mOnReattachQueryListener = onReattachQueryListener;
+
+        if (mReactRootView.getParent() != null) {
+            ((ViewGroup) mReactRootView.getParent()).removeView(mReactRootView);
+        }
+
+        viewGroup.addView(mReactRootView, 0,
+                new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        refocus();
+    }
+
+    private void refocus() {
+        if (mLastFocusedView != null) {
+            // schedule a request for focus
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override public void run() {
+                    // Check if View reference is still alive and in the view hierarchy
+                    if (mLastFocusedView != null
+                            && mLastFocusedView.get() != null
+                            && mLastFocusedView.get().getParent() != null) {
+                        // request focus to the last focused child
+                        mLastFocusedView.get().requestFocus();
+                    }
+                }
+            });
         }
     }
 
     public void onPause(Activity activity) {
         if (mReactInstanceManager != null) {
+            // get the focused view so we re-focus it later if needed. WeakReference so we don't leak it.
+            mLastFocusedView = new WeakReference<>(mReactRootView.findFocus());
+
             mReactInstanceManager.onHostPause(activity);
         }
     }
@@ -213,7 +255,6 @@ public class WPAndroidGlueCode {
         mReactInstanceManager.showDevOptionsDialog();
     }
 
-
     public void setTitle(String title) {
         mTitleInitialized = true;
         mTitle = title;
@@ -226,6 +267,10 @@ public class WPAndroidGlueCode {
         setContent(mTitle, mContentHtml);
     }
 
+    public boolean hasReceivedInitialTitleAndContent() {
+        return mTitleInitialized && mContentInitialized;
+    }
+
     private void setContent(String title, String postContent) {
         if (mReactRootView == null) {
             return;
@@ -233,7 +278,7 @@ public class WPAndroidGlueCode {
 
         // wait for both title and content to have been set at least once. Legacy editor implementation had the two as
         // separate calls but, we only want a single call to correctly boot the GB editor
-        if (!mTitleInitialized || !mContentInitialized) {
+        if (!hasReceivedInitialTitleAndContent()) {
             return;
         }
 
