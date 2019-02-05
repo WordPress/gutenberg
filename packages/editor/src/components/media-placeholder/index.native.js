@@ -12,12 +12,12 @@ function MediaPlaceholder( props ) {
 	return (
 		<TouchableWithoutFeedback onPress={ props.onMediaOptionsPressed }>
 			<View style={ styles.emptyStateContainer }>
-				<Dashicon icon={ 'cover-image' } />
+				<Dashicon icon={ 'format-image' } />
 				<Text style={ styles.emptyStateTitle }>
 					{ __( 'Image' ) }
 				</Text>
 				<Text style={ styles.emptyStateDescription }>
-					{ __( 'SELECT IMAGE' ) }
+					{ __( 'CHOOSE IMAGE' ) }
 				</Text>
 			</View>
 		</TouchableWithoutFeedback>

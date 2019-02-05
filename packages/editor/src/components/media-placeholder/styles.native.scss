@@ -1,5 +1,9 @@
 .emptyStateContainer {
+	flex: 1;
+	height: 142;
+	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	background-color: #f2f2f2;
 	padding-left: 12;
 	padding-right: 12;
@@ -9,19 +13,15 @@
 
 .emptyStateTitle {
 	text-align: center;
-	font-weight: 600;
-	padding-bottom: 12;
+	margin-top: 8;
+	margin-bottom: 10;
+	font-size: 14;
+	color: #2e4453;
 }
 
 .emptyStateDescription {
 	text-align: center;
 	color: #0087be;
-}
-
-.emptyStateButtonsContainer {
-	margin-top: 15;
-	margin-bottom: 15;
-	flex-direction: row;
-	justify-content: space-evenly;
-	width: 100%;
+	font-size: 14;
+	font-weight: 500;
 }
