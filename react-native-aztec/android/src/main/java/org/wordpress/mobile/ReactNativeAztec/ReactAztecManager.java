@@ -380,6 +380,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
         view.shouldHandleOnBackspace = onBackspaceHandling;
     }
 
+    @ReactProp(name = "onPaste", defaultBoolean = false)
+    public void setOnPasteHandling(final ReactAztecText view, boolean onPasteHandling) {
+        view.shouldHandleOnPaste = onPasteHandling;
+    }
+
     @Override
     public Map<String, Integer> getCommandsMap() {
         return MapBuilder.<String, Integer>builder()
