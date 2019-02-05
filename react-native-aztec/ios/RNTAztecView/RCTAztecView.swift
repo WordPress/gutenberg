@@ -259,17 +259,21 @@ class RCTAztecView: Aztec.TextView {
                 newFontSize = oldFont.pointSize
             }
             
+            var newTraits = oldDescriptor.symbolicTraits
+            
+            if let fontWeight = fontWeight {
+                if (fontWeight == "bold") {
+                    newTraits.update(with: .traitBold)
+                }
+            }
+            
             var newDescriptor: UIFontDescriptor
             
             if let fontFamily = fontFamily {
                 newDescriptor = UIFontDescriptor(name: fontFamily, size: newFontSize)
-                newDescriptor = newDescriptor.withSymbolicTraits(oldDescriptor.symbolicTraits) ?? newDescriptor
+                newDescriptor = newDescriptor.withSymbolicTraits(newTraits) ?? newDescriptor
             } else {
                 newDescriptor = oldDescriptor
-            }
-            
-            if let fontWeight = fontWeight {
-                newDescriptor = newDescriptor.withFace(fontWeight)
             }
             
             let newFont = UIFont(descriptor: newDescriptor, size: newFontSize)
