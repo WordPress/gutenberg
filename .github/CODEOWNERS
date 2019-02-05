@@ -62,8 +62,8 @@
 /packages/wordcount                             @youknowriad @gziolo @aduth
 
 # Extensibility
-/packages/hooks                                 @youknowriad @gziolo @aduth
-/packages/plugins                               @youknowriad @gziolo @aduth
+/packages/hooks                                 @youknowriad @gziolo @aduth @adamsilverstein
+/packages/plugins                               @youknowriad @gziolo @aduth @adamsilverstein
 
 # Rich Text
 /packages/format-library                        @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
@@ -75,5 +75,6 @@
 # Documentation
 /docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw
 
-# Native
-*.native.js                                     @daniloercoli @diegoreymendez @etoledom @hypest @koke @marecar3 @mzorz @pinarol @SergioEstevao @tug
+# Native (Unowned)
+*.native.js                                     @ghost
+*.native.scss                                   @ghost
