@@ -1,18 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { wrap, unwrap, replaceTag } from '@wordpress/dom';
+import { wrap, replaceTag } from '@wordpress/dom';
 
-/**
- * Internal dependencies
- */
-import { isPhrasingContent } from './phrasing-content';
-
-function isBlockContent( node, schema = {} ) {
-	return schema.hasOwnProperty( node.nodeName.toLowerCase() );
-}
-
-export default function( node, doc, schema ) {
+export default function( node, doc ) {
 	if ( node.nodeName === 'SPAN' ) {
 		const {
 			fontWeight,
@@ -49,13 +40,5 @@ export default function( node, doc, schema ) {
 			node.removeAttribute( 'target' );
 			node.removeAttribute( 'rel' );
 		}
-	}
-
-	if (
-		isPhrasingContent( node ) &&
-		node.hasChildNodes() &&
-		Array.from( node.childNodes ).some( ( child ) => isBlockContent( child, schema ) )
-	) {
-		unwrap( node );
 	}
 }
