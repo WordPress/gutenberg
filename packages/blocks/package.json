@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "6.0.3",
+	"version": "6.0.6",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -40,9 +40,6 @@
 		"simple-html-tokenizer": "^0.4.1",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
-	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1"
 	},
 	"publishConfig": {
 		"access": "public"

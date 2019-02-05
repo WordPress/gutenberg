@@ -28,7 +28,7 @@
 		}
 	}
 
-	// on mobile, toolbars behave differently
+	// On mobile, toolbars behave differently.
 	@include break-small {
 		padding-top: $header-height;
 	}
@@ -38,7 +38,7 @@
 			padding-top: $block-controls-height;
 		}
 
-		// on mobile, toolbars behave differently
+		// On mobile, toolbars behave differently.
 		@include break-small {
 			padding-top: $header-height + $block-toolbar-height;
 
@@ -68,10 +68,58 @@
 }
 
 .edit-post-layout__content {
-	position: relative;
 	display: flex;
-	min-height: 100%;
 	flex-direction: column;
+
+	// These rules are specific to mobile and small breakpoints.
+	min-height: 100%;
+	position: relative;
+
+	// We scroll the main editing canvas, the sidebar, and the block library separately to prevent scroll bleed.
+	// Because the navigation sidebar menu has "flyout" menus, we can't yet, scroll that independently, but as soon
+	// as we can, we should simplify these rules.
+	// In the mean time, if a user has a small screen and lots of plugin-added menu items in the navigation menu,
+	// they have to be able to scroll. To accommodate the flyout menus, we scroll the `body` element for this.
+	@include break-medium() {
+		// Because the body element scrolls the navigation sidebar, we have to use position fixed here.
+		// Otherwise you would scroll the editing canvas out of view when you scroll the sidebar.
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+
+		// Because this is scoped to break-medium and larger, the admin-bar is always this height.
+		top: $header-height + $admin-bar-height;
+
+		// Sadly, `position: fixed;` do not inherit boundaries from a relative parent. Due to that we have to compensate using `calc`.
+		min-height: calc(100% - #{ $header-height + $admin-bar-height });
+		height: auto; // This overrides the 100% height the element inherits from line 3.
+
+		// In this matrix, we compensate for any configurations for the presence and width of the navigation sidebar.
+		// This is similar to the code in the @editor-left mixin, but uses margins instead.
+		// Because we are beyond the medium breakpoint, we only have to worry about folded, auto-folded, and default.
+		margin-left: $admin-sidebar-width;
+
+		// Auto fold is when on smaller breakpoints, nav menu auto colllapses.
+		body.auto-fold & {
+			margin-left: $admin-sidebar-width-collapsed;
+
+			@include break-large() {
+				margin-left: $admin-sidebar-width;
+			}
+		}
+
+		// Sidebar manually collapsed.
+		body.folded & {
+			margin-left: $admin-sidebar-width-collapsed;
+		}
+
+		// Provide special rules for fullscreen mode.
+		body.is-fullscreen-mode & {
+			margin-left: 0 !important;
+			top: $header-height;
+		}
+	}
 
 	// Pad the scroll box so content on the bottom can be scrolled up.
 	padding-bottom: 50vh;
@@ -95,7 +143,7 @@
 	}
 
 	.edit-post-visual-editor {
-		flex-grow: 1;
+		flex: 1 1 auto;
 
 		// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.
 		// But it works as expected without it.
@@ -118,10 +166,6 @@
 	right: 0;
 	left: 0;
 	overflow: auto;
-
-	body.is-fullscreen-mode & {
-		top: 0;
-	}
 
 	@include break-medium() {
 		top: $admin-bar-height;

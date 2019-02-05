@@ -76,7 +76,7 @@ export const settings = {
 							content: nextContent,
 						} );
 					} }
-					style={ { textAlign: textAlign } }
+					style={ { textAlign } }
 					placeholder={ __( 'Add verse content' ) }
 					aria-label={ __( 'Verse' ) }
 					wrapperClassName={ className }
@@ -92,7 +92,7 @@ export const settings = {
 		return (
 			<RichText.Content
 				tagName="pre"
-				style={ { textAlign: textAlign } }
+				style={ { textAlign } }
 				value={ content }
 			/>
 		);

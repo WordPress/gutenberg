@@ -103,7 +103,24 @@ function createReduxStore( reducer, key, registry ) {
  * @return {Object}           Selectors mapped to the redux store provided.
  */
 function mapSelectors( selectors, store ) {
-	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
+	const createStateSelector = ( selector ) => function runSelector() {
+		// This function is an optimized implementation of:
+		//
+		//   selector( store.getState(), ...arguments )
+		//
+		// Where the above would incur an `Array#concat` in its application,
+		// the logic here instead efficiently constructs an arguments array via
+		// direct assignment.
+		const argsLength = arguments.length;
+		const args = new Array( argsLength + 1 );
+		args[ 0 ] = store.getState();
+		for ( let i = 0; i < argsLength; i++ ) {
+			args[ i + 1 ] = arguments[ i ];
+		}
+
+		return selector( ...args );
+	};
+
 	return mapValues( selectors, createStateSelector );
 }
 

@@ -91,6 +91,13 @@ removeFormat( value: Object, formatType: string, ?startIndex: number, ?endIndex:
 
 Remove any format object from a Rich Text value by type from the given `startIndex` to the given `endIndex`. Indices are retrieved from the selection if none are provided.
 
+### toggleFormat
+
+```js
+toggleFormat( value: Object, format: Object ): Object
+```
+
+Toggles a format object to a Rich Text value at the current selection, and returns a new value with the format applied or removed.
 
 ### getActiveFormat
 
@@ -131,6 +138,19 @@ insert( value: Object, valueToInsert: Object | string, ?startIndex: number, ?end
 ```
 
 Insert a Rich Text value, an HTML string, or a plain text string, into a Rich Text value at the given `startIndex`. Any content between `startIndex` and `endIndex` will be removed. Indices are retrieved from the selection if none are provided.
+
+### registerFormatType
+
+```js
+registerFormatType( name: String, settings: Object ): ?WPformat
+```
+
+Registers a new format provided a unique name and an object defining its behavior. Settings object:
+
+- `tagName`: String. The HTML tag this format will wrap the selection with.
+- `className`: String || null. A class to match the format.
+- `title`: String. Name of the format.
+- `edit`: function. Should return a component for the user to interact with the new registered format.
 
 ### remove
 

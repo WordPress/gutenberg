@@ -120,10 +120,6 @@ body.block-editor-page {
 		bottom: 0;
 		left: 0;
 		min-height: calc(100vh - #{ $admin-bar-height-big });
-
-		body.is-fullscreen-mode & {
-			min-height: 100vh;
-		}
 	}
 
 	// The WP header height changes at this breakpoint
@@ -178,9 +174,14 @@ body.block-editor-page {
 	select,
 	textarea {
 		font-family: $default-font;
-		font-size: $default-font-size;
 		padding: 6px 8px;
 		@include input-style__neutral();
+
+		/* Fonts smaller than 16px causes mobile safari to zoom. */
+		font-size: $mobile-text-min-font-size;
+		@include break-small {
+			font-size: $default-font-size;
+		}
 
 		&:focus {
 			@include input-style__focus();

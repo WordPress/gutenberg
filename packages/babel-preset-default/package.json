@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "3.0.1",
+	"version": "3.0.2",
 	"description": "Default Babel preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,6 +23,7 @@
 	},
 	"main": "index.js",
 	"dependencies": {
+		"@babel/core": "^7.0.0",
 		"@babel/plugin-proposal-async-generator-functions": "^7.0.0",
 		"@babel/plugin-proposal-object-rest-spread": "^7.0.0",
 		"@babel/plugin-transform-react-jsx": "^7.0.0",

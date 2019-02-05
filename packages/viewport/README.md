@@ -1,6 +1,6 @@
 # Viewport
 
-Viewport is a module for responding to changes in the browser viewport size. It registers its own [data module](https://github.com/WordPress/gutenberg/tree/master/packages/data), updated in response to browser media queries on a standard set of supported breakpoints. This data and the included higher-order components can be used in your own modules and components to implement viewport-dependent behaviors.
+Viewport is a module for responding to changes in the browser viewport size. It registers its own [data module](/packages/data/README.md), updated in response to browser media queries on a standard set of supported breakpoints. This data and the included higher-order components can be used in your own modules and components to implement viewport-dependent behaviors.
 
 ## Installation
 
@@ -72,3 +72,5 @@ function MyComponent( { isMobile } ) {
 
 MyComponent = withViewportMatch( { isMobile: '< small' } )( MyComponent );
 ```
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

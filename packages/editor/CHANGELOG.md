@@ -1,8 +1,36 @@
-## 9.0.5 (Unreleased)
+## 9.1.0 (Unreleased)
+
+### New Features
+
+- Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
+- Added a new `TextEditorGlobalKeyboardShortcuts` component.
+
+### Deprecations
+
+- `EditorGlobalKeyboardShortcuts` has been deprecated in favor of `VisualEditorGlobalKeyboardShortcuts`.
+
+### Bug Fixes
+
+- BlockSwitcher will now consistently render an icon for block multi-selections.
+
+### Internal
+
+- Removed `jQuery` dependency
+
+## 9.0.7 (2019-01-03)
+
+## 9.0.6 (2018-12-18)
+
+### Bug Fixes
+
+- Restore the `block` prop in the `BlockListBlock` filter.
+
+## 9.0.5 (2018-12-12)
 
 ### Bug Fixes
 
 - `getEditedPostAttribute` now correctly returns the merged result of edits as a partial change when given `'meta'` as the `attributeName`.
+- Fixes an error and unrecoverable state which occurs on autosave completion for a `'publicly_queryable' => false` post type.
 
 ## 9.0.4 (2018-11-30)
 

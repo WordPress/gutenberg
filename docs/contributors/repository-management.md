@@ -1,6 +1,6 @@
 # Repository Management
 
-The goal is for this to be a living document explaining how we collaboratively manage the Gutenberg repository. If you’d like to suggest a change, please open an issue for discussion or submit a pull request to the document.
+This is a living document explaining how we collaboratively manage the Gutenberg repository. If you’d like to suggest a change, please open an issue for discussion or submit a pull request to the document.
 
 This document covers:
 
@@ -17,15 +17,25 @@ This document covers:
 
 ## Issues
 
-A healthy issue backlog is one where issues are relevant and actionable. *Relevant* in the sense that they relate to the project’s current priorities. *Actionable* in the sense that it’s clear what action(s) need to be taken to resolve the issue.
+A healthy issue list is one where issues are relevant and actionable. *Relevant* in the sense that they relate to the project’s current priorities. *Actionable* in the sense that it’s clear what action(s) need to be taken to resolve the issue.
 
-Any issues that are irrelevant or not actionable should be closed, because they get in the way of making progress on the project. Imagine the issue backlog as a desk: the more clutter you have on it, the more difficult it is to use the space to get work done.
+Any issues that are irrelevant or not actionable should be closed, because they get in the way of making progress on the project. Imagine the issue list as a desk: the more clutter you have on it, the more difficult it is to use the space to get work done.
 
 ### Labels
 
-To better organize the issue backlog, all issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels). Here are some you might commonly see:
+All issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels). 
 
-- [Accessibility](https://github.com/WordPress/gutenberg/labels/Accessibility) - Changes that impact accessibility and need corresponding review (e.g. markup changes).
+Workflow labels start with “Needs” and may be applied as needed. Ideally, each workflow label will have a group that follows it, such as the Accessibility Team for `Needs Accessibility Feedback`, the Testing Team for `Needs Testing`, etc.
+
+[Priority High](https://github.com/WordPress/gutenberg/labels/Priority%20High) and [Priority OMGWTFBBQ](https://github.com/WordPress/gutenberg/labels/Priority%20OMGWTFBBQ) issues should have an assignee and/or be in an active milestone.
+
+Help requests or 'how to' questions should be posted in a relevant support forum as a first step. If something might be a bug but it's not clear, the Support Team or a forum volunteer can help troubleshoot the case to help get all the right information needed for an effective bug report.
+
+Here are some labels you might commonly see:
+
+- [Good First Issue](https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue) - Issues identified as good for new contributors to work on. Comment to note that you intend to work on the issue and reference the issue number in the pull request you submit.
+- [Good First Review](https://github.com/WordPress/gutenberg/labels/Good%20First%20Review) - Pull requests identified as good for new contributors who are interested in doing code reviews.
+- [Needs Accessibility Feedback](https://github.com/WordPress/gutenberg/labels/Accessibility) - Changes that impact accessibility and need corresponding review (e.g. markup changes).
 - [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) - Changes that modify the design or user experience in some way and need sign-off.
 - [[Type] Bug](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Bug) - An existing feature is broken in some way.
 - [[Type] Enhancement](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Enhancement) - Gutenberg would be better with this improvement added.
@@ -36,51 +46,42 @@ To better organize the issue backlog, all issues should have [one or more labels
 
 ### Milestones
 
-We put issues into [milestones](https://github.com/wordpress/gutenberg/milestones) to better categorize them. Here are some you might see:
+We put issues into [milestones](https://github.com/wordpress/gutenberg/milestones) to better categorize them. Issues are added to milestones starting with `WordPress` and pull requests are added to milestones ending in `(Gutenberg)`.
 
-- The next 2 releases we have milestones for (e.g. 2.2, 2.3).
-- [Feature Complete](https://github.com/WordPress/gutenberg/milestone/8): This includes big features and is what will be managing the vision of Gutenberg. All of this would be done before even merge proposal is thought about. Examples here include nesting, drag and drop and extensibility API.
-- [Merge Proposal: Editor](https://github.com/WordPress/gutenberg/milestone/22): All issues related to merge proposal for the editor.
-- [Merge Proposal: Rest API](https://github.com/WordPress/gutenberg/milestone/39): All issues related to merge proposal for the Rest API
-- [Merge Proposal: Accessibility](https://github.com/WordPress/gutenberg/milestone/43): All accessibility issues related to merge proposal.
-- [Merge Proposal: Media](https://github.com/WordPress/gutenberg/milestone/42): All issues related to merge proposal for the media component.
-- [Merge Proposal: Documentation](https://github.com/WordPress/gutenberg/milestone/50): All issues related to documentation for the merge proposal.
-- [Merge Proposal: i18n](https://github.com/WordPress/gutenberg/milestone/49): All translation issues for the merge proposal.
-- [Merge Proposal: Customization](https://github.com/WordPress/gutenberg/milestone/44): All Customization issues for the merge proposal.
-- [Merge Proposal: Plugin](https://github.com/WordPress/gutenberg/milestone/48): All plugin and extensibility issues for the merge proposal.
-- [Merge Proposal: Back Compat](https://github.com/WordPress/gutenberg/milestone/47): All back compatibility issues for the merge proposal.
-- [Merge Proposal: Themes](https://github.com/WordPress/gutenberg/milestone/48): All theme issues for the merge proposal.
-- [Merge Proposal: Core](https://github.com/WordPress/gutenberg/milestone/45): All core issues for the merge proposal that don't fit other merge proposal milestones.
-- [Bonus Features](https://github.com/WordPress/gutenberg/milestone/32): Again likely not part of triage and includes nice to haves for the project, if time before merge. A few examples include collaborative editing and footnotes.
+Here are some milestones you might see:
+
+- [WordPress X.Y](https://github.com/WordPress/gutenberg/milestone/70): Tasks that should be done for future WordPress releases.
+- [X.Y (Gutenberg)](https://github.com/WordPress/gutenberg/milestone/85): PRs targeted for the Gutenberg Plugin X.Y release.
 - [Future](https://github.com/WordPress/gutenberg/milestone/35): this is something that is confirmed by everyone as a good thing but doesn’t fall into other criteria.
 
 ### Triaging Issues
 
-To keep the issue backlog healthy, it needs to be triaged regularly. *Triage* is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information they need.
+To keep the issue list healthy, it needs to be triaged regularly. *Triage* is the practice of reviewing existing issues to make sure they’re relevant, actionable, and have all the information they need.
 
-Anyone can help triage the backlog, although you’ll need contributor permission on the Gutenberg repository to modify an issue’s labels or edit its title.
+Anyone can help triage, although you’ll need contributor permission on the Gutenberg repository to modify an issue’s labels or edit its title.
 
 Here are a couple places you can start:
 
-- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel)
-- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc)
+- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel).
+- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc).
 
-When reviewing the issue backlog, here are some steps you can perform:
+When reviewing issues, here are some steps you can perform:
 
-- If it’s a bug report, test to confirm the report. If there is not enough information to confirm the report, add the `[Status] Needs More Info` label.
-- If the issue is missing labels, add some to better categorize it.
-- If the issue is duplicate of another already in the backlog, close the issue by commenting with “Duplicate of #<original-id>”. Add any relevant new details to the existing issue.
+- First search for duplicates. If the issue is duplicate, close it by commenting with “Duplicate of #<original-id>” and add any relevant new details to the existing issue.
+- If the issue is missing labels, add some to better categorize it (requires proper permissions).
+- If the title doesn’t communicate the issue, edit it for clarity (requires proper permissions).
+- If it’s a bug report, test to confirm the report or add the `Needs Testing` label. If there is not enough information to confirm the report, add the `[Status] Needs More Info` label and ask for the details needed.
+- Remove the `[Status] Needs More Info` if the author of the issue has responded with enough details.
+- Close the issue with a note if it has a `[Status] Needs More Info` label but the author didn't respond in 2+ weeks.
 - If there was conversation on the issue but no actionable steps identified, follow up with the participants to see what’s actionable.
-- If the title doesn’t communicate the issue, edit it for clarity.
 - If you feel comfortable triaging the issue further, then you can also:
   - Check that the bug report is valid by debugging it to see if you can track down the technical specifics.
-  - Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a GIF.
+  - Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a screenshot or GIF.
 
 
 ## Pull Requests
 
 Gutenberg follows a feature branch pull request workflow for all code and documentation changes. At a high-level, the process looks like this:
-
 
 1. Check out a new feature branch locally.
 2. Make your changes, testing thoroughly.
@@ -125,6 +126,7 @@ A pull request can generally be merged once it is:
 - Vetted against all potential edge cases.
 - Changelog entries were properly added.
 - Reviewed by someone other than the original author.
+- [Rebased](/docs/contributors/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
@@ -154,6 +156,6 @@ We use [GitHub projects](https://github.com/WordPress/gutenberg/projects) to kee
 
 Some key projects include:
 
-* [Customization](https://github.com/WordPress/gutenberg/projects/13) - Blocks and tasks needed for customization in Gutenberg.
-* [Extensibility](https://github.com/WordPress/gutenberg/projects/14) - Comprises the entirety of extensibility APIs. See [Native Gutenberg Extensibility Overview](https://github.com/WordPress/gutenberg/issues/3330) for more details.
-* [Third-Party Compatibility](https://github.com/WordPress/gutenberg/projects/15) - Issue that impact Gutenberg's adoption in the real world.
+* [Phase 2](https://github.com/WordPress/gutenberg/projects/13) - Development tasks needed for Phase 2 of Gutenberg.
+* [Phase 2 design](https://github.com/WordPress/gutenberg/projects/21) - Tasks for design in Phase 2. Note: specific projects may have their own boards.
+* [Ideas](https://github.com/WordPress/gutenberg/projects/8) - Project containing tickets that, while closed for the time being, can be revisited in the future.

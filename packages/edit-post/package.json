@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "3.1.4",
+	"version": "3.1.10",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -41,10 +41,6 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.10",
 		"refx": "^3.0.0"
-	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.7.0"
 	},
 	"publishConfig": {
 		"access": "public"

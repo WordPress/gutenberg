@@ -91,7 +91,6 @@ export class RichText extends Component {
 			this.onSplit = this.props.unstableOnSplit;
 		}
 
-		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -129,20 +128,12 @@ export class RichText extends Component {
 		this.lastHistoryValue = value;
 	}
 
-	setRef( node ) {
-		this.editableRef = node;
+	componentWillUnmount() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
-	/**
-	 * Handles the onSetup event for the TinyMCE component.
-	 *
-	 * Will setup event handlers for the TinyMCE instance.
-	 * An `onSetup` function in the props will be called if it is present.
-	 *
-	 * @param {tinymce} editor The editor instance as passed by TinyMCE.
-	 */
-	onSetup( editor ) {
-		this.editor = editor;
+	setRef( node ) {
+		this.editableRef = node;
 	}
 
 	setFocusedElement() {
@@ -214,7 +205,6 @@ export class RichText extends Component {
 		items = isNil( items ) ? [] : items;
 		files = isNil( files ) ? [] : files;
 
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		let plainText = '';
 		let html = '';
 
@@ -243,6 +233,7 @@ export class RichText extends Component {
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = pasteHandler( {
@@ -604,12 +595,11 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		const record = this.createRecord();
-
 		if ( ! this.onSplit ) {
 			return;
 		}
 
+		const record = this.createRecord();
 		let [ before, after ] = split( record );
 
 		// In case split occurs at the trailing or leading edge of the field,
@@ -691,9 +681,12 @@ export class RichText extends Component {
 		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
 
-			// Maintain the previous selection:
-			record.start = this.state.start;
-			record.end = this.state.end;
+			// Maintain the previous selection if the instance is currently
+			// selected.
+			if ( isSelected ) {
+				record.start = this.state.start;
+				record.end = this.state.end;
+			}
 
 			this.applyRecord( record );
 		}
@@ -834,12 +827,12 @@ export class RichText extends Component {
 			<div className={ classes }
 				onFocus={ this.setFocusedElement }
 			>
-				{ isSelected && this.editor && this.multilineTag === 'li' && (
+				{ isSelected && this.multilineTag === 'li' && (
 					<ListEdit
-						editor={ this.editor }
 						onTagNameChange={ onTagNameChange }
 						tagName={ Tagname }
-						onSyncDOM={ () => this.onChange( this.createRecord() ) }
+						value={ record }
+						onChange={ this.onChange }
 					/>
 				) }
 				{ isSelected && ! inlineToolbar && (
@@ -862,7 +855,6 @@ export class RichText extends Component {
 						<Fragment>
 							<TinyMCE
 								tagName={ Tagname }
-								onSetup={ this.onSetup }
 								style={ style }
 								record={ record }
 								valueToEditableHTML={ this.valueToEditableHTML }

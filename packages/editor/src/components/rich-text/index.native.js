@@ -2,7 +2,7 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import {
 	forEach,
 	merge,
@@ -40,11 +40,12 @@ const FORMATTING_CONTROLS = [
 		title: __( 'Italic' ),
 		format: 'italic',
 	},
-	{
-		icon: 'admin-links',
-		title: __( 'Link' ),
-		format: 'link',
-	},
+	// TODO: get this back after alpha
+	// {
+	// 	icon: 'admin-links',
+	// 	title: __( 'Link' ),
+	// 	format: 'link',
+	// },
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
@@ -66,6 +67,7 @@ export function getFormatValue( formatName ) {
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
+		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
@@ -274,8 +276,8 @@ export class RichText extends Component {
 
 		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
 		// we need to make sure the native is updated as well
-		if ( nextProps.value &&
-			this.lastContent &&
+		if ( ( typeof nextProps.value !== 'undefined' ) &&
+			( typeof this.lastContent !== 'undefined' ) &&
 			nextProps.value !== this.lastContent ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
@@ -289,9 +291,17 @@ export class RichText extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		if ( this._editor.isFocused() ) {
+			this._editor.blur();
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
 		if ( this.props.isSelected && ! prevProps.isSelected ) {
 			this._editor.focus();
+		} else if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+			this._editor.blur();
 		}
 	}
 
@@ -369,7 +379,9 @@ export class RichText extends Component {
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					isSelected={ this.props.isSelected }
+					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }

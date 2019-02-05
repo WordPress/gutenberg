@@ -200,16 +200,11 @@ export default class TinyMCE extends Component {
 			lists_indent_on_tab: false,
 		};
 
-		if ( multilineTag === 'li' ) {
-			settings.plugins.push( 'lists' );
-		}
-
 		tinymce.init( {
 			...settings,
 			target: this.editorNode,
 			setup: ( editor ) => {
 				this.editor = editor;
-				this.props.onSetup( editor );
 
 				// TinyMCE resets the element content on initialization, even
 				// when it's already identical to what exists currently. This

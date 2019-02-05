@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, get, noop, startsWith } from 'lodash';
+import { every, get, noop, startsWith, defaultTo } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -258,10 +258,10 @@ export class MediaPlaceholder extends Component {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { hasUploadPermissions } = select( 'core' );
+	const { canUser } = select( 'core' );
 
 	return {
-		hasUploadPermissions: hasUploadPermissions(),
+		hasUploadPermissions: defaultTo( canUser( 'create', 'media' ), true ),
 	};
 } );
 
