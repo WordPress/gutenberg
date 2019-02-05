@@ -4,13 +4,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
 <WithInstanceId(Modal)
   className="edit-post-options-modal"
   closeLabel="Close"
-  title={
-    <span
-      className="edit-post-options-modal__title"
-    >
-      Options
-    </span>
-  }
+  title="Options"
 >
   <Section
     title="General"
