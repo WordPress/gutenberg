@@ -36,8 +36,16 @@ class RCTAztecView: Aztec.TextView {
     
     // MARK: - Font
     
+    /// Font family for all contents  Once this is set, it will always override the font family for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
     private var fontFamily: String? = nil
+    
+    /// Font size for all contents.  Once this is set, it will always override the font size for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
     private var fontSize: CGFloat? = nil
+    
+    /// Font weight for all contents.  Once this is set, it will always override the font weight for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
     private var fontWeight: String? = nil
 
     // MARK: - Formats
@@ -230,6 +238,9 @@ class RCTAztecView: Aztec.TextView {
         refreshFont()
     }
     
+    /// This method refreshes the font for the whole view if the font-family, the font-size or the font-weight
+    /// were ever set.
+    ///
     func refreshFont() {
         guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
             return
