@@ -17,7 +17,7 @@ function MediaPlaceholder( props ) {
 					{ __( 'Image' ) }
 				</Text>
 				<Text style={ styles.emptyStateDescription }>
-					{ __( 'UPLOAD IMAGE' ) }
+					{ __( 'SELECT IMAGE' ) }
 				</Text>
 			</View>
 		</TouchableWithoutFeedback>
