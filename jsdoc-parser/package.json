@@ -1,0 +1,42 @@
+{
+  "_args": [
+    [
+      "github:herregroen/jsdoc-parser",
+      "/home/andres/src/gutenberg"
+    ]
+  ],
+  "_development": true,
+  "_from": "github:herregroen/jsdoc-parser",
+  "_id": "jsdoc-parser@github:herregroen/jsdoc-parser#8a04b088c96e8d6cf09c867e37a082d2537b1a58",
+  "_inBundle": false,
+  "_integrity": "",
+  "_location": "/jsdoc-parser",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "git",
+    "raw": "github:herregroen/jsdoc-parser",
+    "rawSpec": "github:herregroen/jsdoc-parser",
+    "saveSpec": "github:herregroen/jsdoc-parser",
+    "fetchSpec": null,
+    "gitCommittish": null
+  },
+  "_requiredBy": [
+    "#DEV:/"
+  ],
+  "_resolved": "github:herregroen/jsdoc-parser#8a04b088c96e8d6cf09c867e37a082d2537b1a58",
+  "_spec": "github:herregroen/jsdoc-parser",
+  "_where": "/home/andres/src/gutenberg",
+  "author": "",
+  "dependencies": {
+    "get-line-from-pos": "^1.0.0",
+    "taffydb": "^2.7.3"
+  },
+  "description": "Parses JSDoc to a JSON file that can be imported by the WordPress phpdoc-parser",
+  "license": "ISC",
+  "main": "index.js",
+  "name": "jsdoc-parser",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.0"
+}
