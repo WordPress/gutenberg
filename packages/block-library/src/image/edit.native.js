@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback, Platform } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -148,6 +148,8 @@ export default class ImageEdit extends React.Component {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href } = attributes;
 
+		const isiOS = Platform.OS === 'ios';
+
 		const onMediaLibraryButtonPressed = () => {
 			this.setState( { showMediaOptions: false } );
 			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
@@ -241,26 +243,32 @@ export default class ImageEdit extends React.Component {
 				hideHeader
 			>
 				<BottomSheet.Cell
+					icon={ isiOS ? undefined : 'wordpress-alt' }
 					label={ __( 'Choose from device' ) }
+					value={ isiOS ? undefined : '' }
 					labelStyle={ { color: '#00aadc' } }
 					onPress={ onMediaUploadButtonPressed }
 				/>
 				<BottomSheet.Cell
+					icon={ isiOS ? undefined : 'camera' }
 					label={ __( 'Take a Photo' ) }
+					value={ isiOS ? undefined : '' }
 					labelStyle={ { color: '#00aadc' } }
 					onPress={ onMediaCaptureButtonPressed }
 				/>
 				<BottomSheet.Cell
+					icon={ isiOS ? undefined : 'format-image' }
 					label={ __( 'WordPress Media Library' ) }
+					value={ isiOS ? undefined : '' }
 					labelStyle={ { color: '#00aadc' } }
 					onPress={ onMediaLibraryButtonPressed }
 				/>
-				<BottomSheet.Cell
+				{ isiOS && <BottomSheet.Cell
 					label={ __( 'Dismiss' ) }
 					labelStyle={ { color: '#00aadc', fontWeight: 'bold' } }
 					drawSeparator={ false }
 					onPress={ onMediaOptionsClose }
-				/>
+				/> }
 			</BottomSheet>
 		);
 
