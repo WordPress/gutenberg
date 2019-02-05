@@ -59,7 +59,7 @@
     "bundle:ios": "mkdir -p bundle/ios && yarn react-native bundle --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
     "i18n-cache": "node i18n-cache/index.js",
     "prestart": "yarn i18n-cache",
-    "prebundle": "yarn i18n-cache",
+    "prebundle": "cross-env REFRESH_I18N_CACHE=1 yarn i18n-cache",
     "pretest": "yarn i18n-cache",
     "android": "react-native run-android",
     "prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
