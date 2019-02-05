@@ -222,7 +222,7 @@ class GalleryEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon=<BlockIcon icon={ icon } />
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
 						labels={ {
 							title: __( 'Gallery' ),

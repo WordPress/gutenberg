@@ -425,7 +425,7 @@ class ImageEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon=<BlockIcon icon={ icon } />
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }

@@ -142,7 +142,7 @@ class FileEdit extends Component {
 		if ( ! href || hasError ) {
 			return (
 				<MediaPlaceholder
-					icon=<BlockIcon icon={ icon } />
+					icon={ <BlockIcon icon={ icon } /> }
 					labels={ {
 						title: __( 'File' ),
 						instructions: __( 'Drag a file, upload a new one or select a file from your library.' ),

@@ -73,7 +73,7 @@ class MediaContainer extends Component {
 		const { onSelectMedia, className } = this.props;
 		return (
 			<MediaPlaceholder
-				icon=<BlockIcon icon={ icon } />
+				icon={ <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: __( 'Media area' ),
 				} }

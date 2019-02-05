@@ -121,7 +121,7 @@ class AudioEdit extends Component {
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
-					icon=<BlockIcon icon={ icon } />
+					icon={ <BlockIcon icon={ icon } /> }
 					className={ className }
 					onSelect={ onSelectAudio }
 					onSelectURL={ this.onSelectURL }
