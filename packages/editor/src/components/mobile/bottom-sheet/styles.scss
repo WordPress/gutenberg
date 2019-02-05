@@ -18,7 +18,6 @@
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
-	margin: auto;
 }
 
 .content {
@@ -66,17 +65,35 @@
 	flex-direction: row;
 	min-height: 50;
 	justify-content: space-between;
-	padding-left: 12;
-	padding-right: 12;
+	margin-left: 12;
+	margin-right: 12;
 	align-items: center;
+}
+
+.cellRowContainer {
+	flex-direction: row;
+	align-items: center;
+}
+
+.cellIcon {
+	padding-right: 30;
 }
 
 .cellLabel {
 	font-size: 18px;
 	color: #000;
+	margin-right: 12px;
+}
+
+.cellLabelCentered {
+	font-size: 18px;
+	color: #000;
+	flex: 1;
+	text-align: center;
 }
 
 .cellValue {
 	font-size: 18px;
 	color: $dark-gray-400;
+	text-align: right;
 }

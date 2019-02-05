@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View } from 'react-native';
+import { Text, View, KeyboardAvoidingView, Platform } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -44,7 +44,7 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { isVisible, leftButton, rightButton } = this.props;
+		const { title = '', isVisible, leftButton, rightButton, hideHeader } = this.props;
 
 		return (
 			<Modal
@@ -58,28 +58,35 @@ class BottomSheet extends Component {
 				onSwipe={ this.props.onClose }
 				swipeDirection="down"
 			>
-				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
+				<KeyboardAvoidingView
+					behavior={ Platform.OS === 'ios' && 'padding' }
+					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }
+				>
 					<View style={ styles.dragIndicator } />
-					<View style={ styles.head }>
-						<View style={ { flex: 1 } }>
-							{ leftButton }
+					{ hideHeader || (
+						<View>
+							<View style={ styles.head }>
+								<View style={ { flex: 1 } }>
+									{ leftButton }
+								</View>
+								<View style={ styles.titleContainer }>
+									<Text style={ styles.title }>
+										{ title }
+									</Text>
+								</View>
+								<View style={ { flex: 1 } }>
+									{ rightButton }
+								</View>
+							</View>
+							<View style={ styles.separator } />
 						</View>
-						<View style={ styles.titleContainer }>
-							<Text style={ styles.title }>
-								{ this.props.title }
-							</Text>
-						</View>
-						<View style={ { flex: 1 } }>
-							{ rightButton }
-						</View>
-					</View>
-
-					<View style={ styles.separator } />
+					) }
 					{ this.props.children }
 					<View style={ { flexGrow: 1 } }></View>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
-				</View>
+				</KeyboardAvoidingView>
 			</Modal>
+
 		);
 	}
 }
