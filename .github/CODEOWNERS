@@ -62,8 +62,8 @@
 /packages/wordcount                             @youknowriad @gziolo @aduth
 
 # Extensibility
-/packages/hooks                                 @youknowriad @gziolo @aduth
-/packages/plugins                               @youknowriad @gziolo @aduth
+/packages/hooks                                 @youknowriad @gziolo @aduth @adamsilverstein
+/packages/plugins                               @youknowriad @gziolo @aduth @adamsilverstein
 
 # Rich Text
 /packages/format-library                        @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
