@@ -45,7 +45,7 @@ export default class AppProvider extends React.Component<PropsType> {
 		}
 	}
 
-	setLocale( locale = 'fr' ) {
+	setLocale( locale ) {
 		setLocaleData( getTranslation( locale ) );
 	}
 
