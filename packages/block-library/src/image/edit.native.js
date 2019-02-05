@@ -238,7 +238,7 @@ export default class ImageEdit extends React.Component {
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Dismiss' ) }
-					labelStyle={ { color: '#00aadc ', fontWeight: 'bold' } }
+					labelStyle={ { color: '#00aadc', fontWeight: 'bold' } }
 					drawSeparator={ false }
 					onPress={ onMediaOptionsClose }
 				/>
