@@ -19,7 +19,7 @@ import createResolversCacheMiddleware from './resolvers-cache-middleware';
  *
  * @param {string} key              Identifying string used for namespace and redex dev tools.
  * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
- * @param {Object} registry         registry reference.
+ * @param {Object} registry         Registry reference.
  *
  * @return {Object} Store Object.
  */
@@ -100,7 +100,7 @@ function createReduxStore( reducer, key, registry ) {
  *                            public facing API. Selectors will get passed the
  *                            state as first argument.
  * @param {Object} store      The redux store to which the selectors should be mapped.
- * @param {Object} registry         registry reference.
+ * @param {Object} registry   Registry reference.
  *
  * @return {Object}           Selectors mapped to the redux store provided.
  */
