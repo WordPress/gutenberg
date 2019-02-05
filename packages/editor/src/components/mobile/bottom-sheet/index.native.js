@@ -55,6 +55,7 @@ class BottomSheet extends Component {
 				backdropTransitionInTiming={ 500 }
 				backdropTransitionOutTiming={ 500 }
 				onBackdropPress={ this.props.onClose }
+				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
 				swipeDirection="down"
 			>
