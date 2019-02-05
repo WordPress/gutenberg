@@ -33,7 +33,15 @@ class RCTAztecView: Aztec.TextView {
         let label = UILabel(frame: .zero)
         return label
     }()
+    
+    // MARK: - Font
+    
+    private var fontFamily: String? = nil
+    private var fontSize: CGFloat? = nil
+    private var fontWeight: String? = nil
 
+    // MARK: - Formats
+    
     private let formatStringMap: [FormattingIdentifier: String] = [
         .bold: "bold",
         .italic: "italic",
@@ -177,6 +185,7 @@ class RCTAztecView: Aztec.TextView {
 
         setHTML(html)
         updatePlaceholderVisibility()
+        refreshFont()
     }
 
     // MARK: - Placeholder
@@ -207,42 +216,52 @@ class RCTAztecView: Aztec.TextView {
     // MARK: - Font
     
     @objc func setFontFamily(_ family: String) {
-        
-        let fullRange = NSRange(location: 0, length: textStorage.length)
-        
-        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
-            let oldFont = attributes[.font] as? UIFont ?? defaultFont
-            let oldDescriptor = oldFont.fontDescriptor
-            
-            var newDescriptor = UIFontDescriptor(name: family, size: oldFont.pointSize)
-            newDescriptor = newDescriptor.withSymbolicTraits(oldDescriptor.symbolicTraits) ?? newDescriptor
-            
-            let newFont = UIFont(descriptor: newDescriptor, size: oldFont.pointSize)
-            
-            textStorage.addAttribute(.font, value: newFont, range: subrange)
-        }
+        fontFamily = family
+        refreshFont()
     }
     
     @objc func setFontSize(_ size: CGFloat) {
-        let fullRange = NSRange(location: 0, length: textStorage.length)
-        
-        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
-            let oldFont = attributes[.font] as? UIFont ?? defaultFont
-            let newFont = oldFont.withSize(size)
-            
-            textStorage.addAttribute(.font, value: newFont, range: subrange)
-        }
+        fontSize = size
+        refreshFont()
     }
     
     @objc func setFontWeight(_ weight: String) {
+        fontWeight = weight
+        refreshFont()
+    }
+    
+    func refreshFont() {
+        guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
+            return
+        }
         
         let fullRange = NSRange(location: 0, length: textStorage.length)
         
         textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
             let oldFont = attributes[.font] as? UIFont ?? defaultFont
             let oldDescriptor = oldFont.fontDescriptor
-            let newDescriptor = oldDescriptor.withFace(weight)
-            let newFont = UIFont(descriptor: newDescriptor, size: oldFont.pointSize)
+            let newFontSize: CGFloat
+            
+            if let fontSize = fontSize {
+                newFontSize = fontSize
+            } else {
+                newFontSize = oldFont.pointSize
+            }
+            
+            var newDescriptor: UIFontDescriptor
+            
+            if let fontFamily = fontFamily {
+                newDescriptor = UIFontDescriptor(name: fontFamily, size: newFontSize)
+                newDescriptor = newDescriptor.withSymbolicTraits(oldDescriptor.symbolicTraits) ?? newDescriptor
+            } else {
+                newDescriptor = oldDescriptor
+            }
+            
+            if let fontWeight = fontWeight {
+                newDescriptor = newDescriptor.withFace(fontWeight)
+            }
+            
+            let newFont = UIFont(descriptor: newDescriptor, size: newFontSize)
             
             textStorage.addAttribute(.font, value: newFont, range: subrange)
         }
