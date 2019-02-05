@@ -131,6 +131,11 @@ public class ReactAztecManager extends SimpleViewManager<ReactAztecText> {
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onBackspace")))
                 .put(
+                        "topTextInputPaste",
+                        MapBuilder.of(
+                                "phasedRegistrationNames",
+                                MapBuilder.of("bubbled", "onPaste")))
+                .put(
                         "topFocus",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
