@@ -18,4 +18,10 @@ public protocol GutenbergBridgeDataSource: class {
     ///
     /// - Returns: An object conforming to TextViewAttachmentDelegate.
     func aztecAttachmentDelegate() -> TextViewAttachmentDelegate
+
+    /// Asks the data source for the locale to be used by the editor.
+    /// Return `nil` to show the default one (`en`).
+    ///
+    /// - Returns: The locale slug value or nil.
+    func gutenbergLocale() -> String?
 }
