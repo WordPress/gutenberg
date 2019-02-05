@@ -33,7 +33,23 @@ class RCTAztecView: Aztec.TextView {
         let label = UILabel(frame: .zero)
         return label
     }()
+    
+    // MARK: - Font
+    
+    /// Font family for all contents  Once this is set, it will always override the font family for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
+    private var fontFamily: String? = nil
+    
+    /// Font size for all contents.  Once this is set, it will always override the font size for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
+    private var fontSize: CGFloat? = nil
+    
+    /// Font weight for all contents.  Once this is set, it will always override the font weight for all of its
+    /// contents, regardless of what HTML is provided to Aztec.
+    private var fontWeight: String? = nil
 
+    // MARK: - Formats
+    
     private let formatStringMap: [FormattingIdentifier: String] = [
         .bold: "bold",
         .italic: "italic",
@@ -177,6 +193,7 @@ class RCTAztecView: Aztec.TextView {
 
         setHTML(html)
         updatePlaceholderVisibility()
+        refreshFont()
     }
 
     // MARK: - Placeholder
@@ -202,6 +219,67 @@ class RCTAztecView: Aztec.TextView {
 
     func updatePlaceholderVisibility() {
         placeholderLabel.isHidden = !self.text.isEmpty
+    }
+    
+    // MARK: - Font
+    
+    @objc func setFontFamily(_ family: String) {
+        fontFamily = family
+        refreshFont()
+    }
+    
+    @objc func setFontSize(_ size: CGFloat) {
+        fontSize = size
+        refreshFont()
+    }
+    
+    @objc func setFontWeight(_ weight: String) {
+        fontWeight = weight
+        refreshFont()
+    }
+    
+    /// This method refreshes the font for the whole view if the font-family, the font-size or the font-weight
+    /// were ever set.
+    ///
+    func refreshFont() {
+        guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
+            return
+        }
+        
+        let fullRange = NSRange(location: 0, length: textStorage.length)
+        
+        textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
+            let oldFont = attributes[.font] as? UIFont ?? defaultFont
+            let oldDescriptor = oldFont.fontDescriptor
+            let newFontSize: CGFloat
+            
+            if let fontSize = fontSize {
+                newFontSize = fontSize
+            } else {
+                newFontSize = oldFont.pointSize
+            }
+            
+            var newTraits = oldDescriptor.symbolicTraits
+            
+            if let fontWeight = fontWeight {
+                if (fontWeight == "bold") {
+                    newTraits.update(with: .traitBold)
+                }
+            }
+            
+            var newDescriptor: UIFontDescriptor
+            
+            if let fontFamily = fontFamily {
+                newDescriptor = UIFontDescriptor(name: fontFamily, size: newFontSize)
+                newDescriptor = newDescriptor.withSymbolicTraits(newTraits) ?? newDescriptor
+            } else {
+                newDescriptor = oldDescriptor
+            }
+            
+            let newFont = UIFont(descriptor: newDescriptor, size: newFontSize)
+            
+            textStorage.addAttribute(.font, value: newFont, range: subrange)
+        }
     }
 
     // MARK: - Formatting interface
