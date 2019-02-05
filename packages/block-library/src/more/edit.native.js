@@ -28,6 +28,8 @@ export default class MoreEdit extends Component {
 			defaultText: __( 'Read more' ),
 		};
 	}
+	
+	// test
 
 	onChangeInput( newValue ) {
 		// Detect Enter.key and add new empty block after.
