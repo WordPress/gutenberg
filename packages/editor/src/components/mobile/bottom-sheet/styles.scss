@@ -1,0 +1,101 @@
+//Bottom Sheet
+
+.bottomModal {
+	justify-content: flex-end;
+	margin: 0;
+}
+
+.dragIndicator {
+	background-color: $light-gray-400;
+	height: 4px;
+	width: 10%;
+	margin: auto;
+	border-radius: 2px;
+}
+
+.separator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+	margin-bottom: 14px;
+}
+
+.content {
+	padding: 6px 16px 0 16px;
+	background-color: $white;
+	border-top-right-radius: 8px;
+	border-top-left-radius: 8px;
+}
+
+.head {
+	flex-direction: row;
+	width: 100%;
+	margin-bottom: 5px;
+	justify-content: space-between;
+	align-items: center;
+	align-content: center;
+}
+
+.title {
+	color: $dark-gray-600;
+	font-size: 18px;
+	font-weight: 600;
+	text-align: center;
+}
+
+.titleContainer {
+	justify-content: center;
+	flex: 2;
+	align-content: center;
+}
+
+// Button
+
+.buttonText {
+	font-size: 18px;
+	padding: 5px;
+}
+
+// Cell
+
+.cellContainer {
+	flex-direction: row;
+	min-height: 48;
+	align-items: center;
+}
+
+.cellSeparator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+	margin-left: 36px;
+}
+
+.cellRowContainer {
+	flex-direction: row;
+	align-items: center;
+}
+
+.cellIcon {
+	padding-right: 0;
+}
+
+.cellLabel {
+	font-size: 17px;
+	color: #2e4453;
+	margin-right: 12px;
+}
+
+.cellLabelCentered {
+	font-size: 17px;
+	color: #2e4453;
+	flex: 1;
+	text-align: center;
+}
+
+.cellValue {
+	font-size: 17px;
+	color: #2e4453;
+	text-align: right;
+	flex: 1;
+}

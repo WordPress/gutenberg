@@ -346,9 +346,12 @@ export function switchToBlockType( blocks, name ) {
 
 	let transformationResults;
 	if ( transformation.isMultiBlock ) {
-		transformationResults = transformation.transform( blocksArray.map( ( currentBlock ) => currentBlock.attributes ) );
+		transformationResults = transformation.transform(
+			blocksArray.map( ( currentBlock ) => currentBlock.attributes ),
+			blocksArray.map( ( currentBlock ) => currentBlock.innerBlocks )
+		);
 	} else {
-		transformationResults = transformation.transform( firstBlock.attributes );
+		transformationResults = transformation.transform( firstBlock.attributes, firstBlock.innerBlocks );
 	}
 
 	// Ensure that the transformation function returned an object or an array

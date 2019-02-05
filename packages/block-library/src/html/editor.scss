@@ -1,10 +1,15 @@
 .wp-block-html .editor-plain-text {
 	font-family: $editor-html-font;
-	font-size: $text-editor-font-size;
 	color: $dark-gray-800;
 	padding: 0.8em 1em;
 	border: 1px solid $light-gray-500;
 	border-radius: 4px;
+
+	/* Fonts smaller than 16px causes mobile safari to zoom. */
+	font-size: $mobile-text-min-font-size;
+	@include break-small {
+		font-size: $default-font-size;
+	}
 
 	&:focus {
 		box-shadow: none;

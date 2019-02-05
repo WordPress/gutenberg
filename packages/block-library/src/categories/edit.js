@@ -106,7 +106,8 @@ class CategoriesEdit extends Component {
 	}
 
 	renderCategoryDropdown() {
-		const { showHierarchy, instanceId } = this.props;
+		const { instanceId } = this.props;
+		const { showHierarchy } = this.props.attributes;
 		const parentId = showHierarchy ? 0 : null;
 		const categories = this.getCategories( parentId );
 		const selectId = `blocks-category-select-${ instanceId }`;
@@ -201,7 +202,7 @@ export default compose(
 	withSelect( ( select ) => {
 		const { getEntityRecords } = select( 'core' );
 		const { isResolving } = select( 'core/data' );
-		const query = { per_page: -1 };
+		const query = { per_page: -1, hide_empty: true };
 
 		return {
 			categories: getEntityRecords( 'taxonomy', 'category', query ),

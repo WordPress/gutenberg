@@ -1,0 +1,21 @@
+.imageContainer {
+	flex: 1;
+	justify-content: center;
+	align-items: center;
+}
+
+.uploadFailedText {
+	color: #fff;
+	font-size: 14;
+	margin-top: 5;
+}
+
+.uploadFailedContainer {
+	position: absolute;
+	flex-direction: column;
+	align-items: center;
+}
+
+.resetSettingsButton {
+	color: $alert-red;
+}
