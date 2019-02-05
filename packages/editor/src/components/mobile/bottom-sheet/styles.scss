@@ -9,7 +9,6 @@
 	background-color: $light-gray-400;
 	height: 4px;
 	width: 10%;
-	top: -12px;
 	margin: auto;
 	border-radius: 2px;
 }
@@ -18,12 +17,12 @@
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
+	margin-bottom: 14px;
 }
 
 .content {
+	padding: 6px 16px 0 16px;
 	background-color: $white;
-	padding: 18px 10px 5px 10px;
-	justify-content: center;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
 }
@@ -59,15 +58,17 @@
 
 // Cell
 
-//Bottom Sheet
-
 .cellContainer {
 	flex-direction: row;
-	min-height: 50;
-	justify-content: space-between;
-	margin-left: 12;
-	margin-right: 12;
+	min-height: 48;
 	align-items: center;
+}
+
+.cellSeparator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+	margin-left: 36px;
 }
 
 .cellRowContainer {
@@ -76,24 +77,25 @@
 }
 
 .cellIcon {
-	padding-right: 30;
+	padding-right: 0;
 }
 
 .cellLabel {
-	font-size: 18px;
-	color: #000;
+	font-size: 17px;
+	color: #2e4453;
 	margin-right: 12px;
 }
 
 .cellLabelCentered {
-	font-size: 18px;
-	color: #000;
+	font-size: 17px;
+	color: #2e4453;
 	flex: 1;
 	text-align: center;
 }
 
 .cellValue {
-	font-size: 18px;
-	color: $dark-gray-400;
+	font-size: 17px;
+	color: #2e4453;
 	text-align: right;
+	flex: 1;
 }
