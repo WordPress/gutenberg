@@ -1,57 +1,124 @@
-// External dependencies
 const fs = require( 'fs' );
 const path = require( 'path' );
-const fetch = require("node-fetch");
-
-// Internal dependencies
-const languages = require( './languages' );
+const fetch = require( 'node-fetch' );
 
 const defaultLocale = 'en';
+const supportedLocales = [
+	'ar',         // Arabic
+	'bg',         // Bulgarian
+	'cs',         // Czech
+	'cy',         // Welsh
+	'da',         // Danish
+	'de',         // German
+	'en-au',      // English (Australia)
+	'en-ca',      // English (Canada)
+	'en-gb',      // English (UK)
+	'es',         // Spanish
+	'fr',         // French
+	'he',         // Hebrew
+	'hr',         // Croatian
+	'hu',         // Hungarian
+	'id',         // Indonesian
+	'is',         // Icelandic
+	'it',         // Italian
+	'ja',         // Japanese
+	'ko',         // Korean
+	'nb',         // Norwegian (Bokmål)
+	'nl',         // Dutch
+	'pl',         // Polish
+	'pt',         // Portuguese
+	'pt-br',      // Portuguese (Brazil)
+	'ro',         // Romainian
+	'ru',         // Russian
+	'sk',         // Slovak
+	'sq',         // Albanian
+	'sv',         // Swedish
+	'th',         // Thai
+	'tr',         // Turkish
+	'zh-cn',      // Chinese (China)
+	'zh-tw',      // Chinese (Taiwan)
+];
 
 const getLanguageUrl = locale => `https://widgets.wp.com/languages/gutenberg/${ locale }.json`;
+const getTranslationFilePath = locale => `./data/${ locale }.json`;
 
-const getLocaleFilePath = locale => path.resolve( __dirname, 'data', `${ locale }.json` );
+const getTranslation = locale => require( getTranslationFilePath( locale ) );
 
 const fetchTranslation = locale => {
-	if ( ! process.env.REFRESH_I18N_CACHE && fs.existsSync( getLocaleFilePath( locale ) ) ) {
-		console.log( `Using cached locale data for ${ locale }` );
-		return;
+	if ( ! process.env.REFRESH_I18N_CACHE ) {
+		try {
+			const localData = getTranslation( locale );
+			console.log( `Using cached locale data for ${ locale }` );
+			return Promise.resolve( { response: localData, locale, inCache: true } );
+		} catch ( error ) {
+			// translation not found, let's fetch it
+		}
 	}
 
 	console.log( 'fetching', getLanguageUrl( locale ) );
-	return fetch( getLanguageUrl( locale ) ).then( ( response ) => response.json() ).then( ( body ) => {
+	const localeUrl = getLanguageUrl( locale );
+	return fetch( localeUrl ).then( ( response ) => response.json() ).then( ( body ) => {
 		return { response: body, locale };
+	} ).catch( () => {
+		console.error( `Could not find translation file ${ localeUrl }` );
 	} );
-};
-
-const getTranslation = locale => {
-	const filePath = getLocaleFilePath( locale );
-
-	if ( fs.existsSync( filePath ) ) {
-		return JSON.parse( fs.readFileSync( filePath, 'utf8' ) );
-	}
 };
 
 const fetchTranslations = () => {
-	const fetchPromises = languages
-		.filter( language => language.langSlug !== defaultLocale )
-		.map( language => fetchTranslation( language.langSlug ) );
+	const fetchPromises = supportedLocales.map( locale => fetchTranslation( locale ) );
 
 	return Promise.all( fetchPromises ).then( ( results ) => {
-		const translationFilePromises = results.map( languageResult => {
-			return fs.writeFileSync( getLocaleFilePath( languageResult.locale ), JSON.stringify( languageResult.response ), 'utf8' );
+		const fetchedTranslations = results.filter( Boolean );
+		const translationFilePromises = fetchedTranslations.map( languageResult => {
+			return new Promise( ( resolve, reject ) => {
+				const translationRelativePath = getTranslationFilePath( languageResult.locale );
+				const translationAbsolutePath = path.resolve( __dirname, translationRelativePath );
+
+				if ( languageResult.inCache && ! process.env.REFRESH_I18N_CACHE ) {
+					languageResult.path = translationRelativePath;
+					resolve( translationRelativePath );
+					return;
+				}
+
+				fs.writeFile( translationAbsolutePath, JSON.stringify( languageResult.response ), 'utf8', ( err ) => {
+					if ( err ) {
+						reject( err );
+					} else {
+						languageResult.path = translationRelativePath;
+						resolve( translationRelativePath );
+					}
+				} );
+			} );
 		} );
-		return Promise.all( translationFilePromises );
+		return Promise.all( translationFilePromises ).then( () => fetchedTranslations );
 	} );
 };
-
-if ( require.main === module ) {
-	fetchTranslations().then( () => {
-		console.log( 'Done.' );
-	} );
-}
 
 module.exports = {
 	getTranslation,
-	fetchTranslations
 };
+
+// if run as a script
+if ( require.main === module ) {
+	fetchTranslations().then( ( translations ) => {
+		const indexNative = `/* THIS IS A GENERATED FILE. DO NOT EDIT DIRECTLY. */
+const translations = {
+${
+	translations.filter( Boolean ).map( ( translation ) => {
+		return `\t"${ translation.locale }": require( "${ translation.path }" ),`
+	} ).join( '\n' )
+}
+};
+
+export const getTranslation = ( locale ) => translations[ locale ];
+`;
+
+		fs.writeFile( path.join( __dirname, 'index.native.js' ), indexNative, 'utf8', ( error ) => {
+			if ( error ) {
+				console.error( error );
+				return;
+			}
+			console.log( 'Done.' );
+		} );
+	} );
+}

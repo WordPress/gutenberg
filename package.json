@@ -57,6 +57,9 @@
     "bundle": "yarn bundle:android && yarn bundle:ios",
     "bundle:android": "mkdir -p bundle/android && yarn react-native bundle --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.js --sourcemap-output bundle/android/App.js.map",
     "bundle:ios": "mkdir -p bundle/ios && yarn react-native bundle --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
+    "i18n-cache": "node i18n-cache/index.js",
+    "prestart": "yarn i18n-cache",
+    "prebundle": "yarn i18n-cache",
     "android": "react-native run-android",
     "prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
     "wpandroid": "yarn android --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
@@ -81,6 +84,7 @@
     "clean:node": "rm -rf node_modules",
     "clean:watchman": "command -v watchman >/dev/null 2>&1 && watchman watch-del-all; true",
     "clean:babel-cache": "rm -rf ./node_modules/.cache/babel-loader/*",
+    "clean:i18n-cache": "rm -rf ./i18n-cache/data/*.json && rm -f ./i18n-cache/index.native.js",
     "lint": "eslint . --ext .js",
     "lint:fix": "yarn lint --fix",
     "version": "yarn bundle && git add -A bundle"
