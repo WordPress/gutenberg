@@ -53,7 +53,7 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 		expect( string ).toBe( 'import { createElement } from "@wordpress/element";\nlet foo = <bar />;' );
 	} );
 
-	it( 'does nothing if there scope variable already defined when using custom options', () => {
+	it( 'does nothing if the scope variable is already defined when using custom options', () => {
 		const original = 'const { createElement } = wp.element;\nlet foo = <bar />;';
 		const string = getTransformedCode( original, {
 			scopeVariable: 'createElement',
