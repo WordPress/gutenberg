@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
-import removeURLHash from './remove-url-hash.js';
 
 const TableOfContentsItem = ( {
 	children,
@@ -29,10 +28,7 @@ const TableOfContentsItem = ( {
 		<a
 			href={ href }
 			className="document-outline__button"
-			onClick={ ( e ) => {
-				removeURLHash();
-				onSelect( e );
-			} }
+			onClick={ onSelect }
 		>
 			<span className="document-outline__emdash" aria-hidden="true"></span>
 			{
