@@ -76,7 +76,7 @@ export const DocumentOutline = ( { blocks = [], title, onSelect, isTitleSupporte
 
 	// Not great but it's the simplest way to locate the title right now.
 	const titleNode = document.querySelector( '.editor-post-title__input' );
-	const hasTitle = isTitleSupported && title;
+	const hasTitle = isTitleSupported && title && titleNode;
 	const countByLevel = countBy( headings, 'level' );
 	const hasMultipleH1 = countByLevel[ 1 ] > 1;
 
