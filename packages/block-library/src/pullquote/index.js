@@ -66,7 +66,7 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: SOLID_COLOR_STYLE_NAME, label: __( 'Solid Color' ) },
 	],
 
