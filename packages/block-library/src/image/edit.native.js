@@ -225,7 +225,7 @@ export default class ImageEdit extends React.Component {
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Reset to Original' ) }
-					labelStyle={ { color: '#d94f4f' } }
+					labelStyle={ styles.resetSettingsButton }
 					drawSeparator={ false }
 					onPress={ () => {} }
 				/>
