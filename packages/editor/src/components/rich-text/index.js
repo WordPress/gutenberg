@@ -381,28 +381,7 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end, selectedFormat } );
-
-			const selection = getSelection();
-			const range = selection.getRangeAt( 0 );
-
-			// Prevent the browser selection from being overwritten if at a zero
-			// width space.
-			if (
-				range.collapsed &&
-				range.startContainer.nodeType === window.Node.TEXT_NODE &&
-				range.startOffset === 1 &&
-				range.startContainer.data[ 0 ] === '\ufeff'
-			) {
-				this.applyRecord( value, true );
-			} else {
-				this.applyRecord( value );
-			}
-		} else if (
-			this.state.selectedFormat !== undefined &&
-			selectedFormat !== this.state.selectedFormat
-		) {
-			this.setState( { start, end, selectedFormat } );
-			this.applyRecord( value, true );
+			this.applyRecord( value );
 		}
 	}
 

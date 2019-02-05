@@ -167,29 +167,6 @@ export function toTree( {
 			}
 		}
 
-		if ( isEditableTree && lastCharacterFormats ) {
-			let boundaryPointer = pointer;
-
-			lastCharacterFormats.forEach( ( format, formatIndex ) => {
-				boundaryPointer = getLastChild( boundaryPointer );
-
-				if ( ! boundaryPointer ) {
-					return;
-				}
-
-				if (
-					characterFormats &&
-					format === characterFormats[ formatIndex ]
-				) {
-					return;
-				}
-
-				if ( ! format.object && character !== LINE_SEPARATOR ) {
-					append( getParent( getParent( boundaryPointer ) ), ZERO_WIDTH_NO_BREAK_SPACE );
-				}
-			} );
-		}
-
 		if ( characterFormats ) {
 			characterFormats.forEach( ( format, formatIndex ) => {
 				if (
@@ -227,17 +204,7 @@ export function toTree( {
 					remove( pointer );
 				}
 
-				if ( isEditableTree ) {
-					if ( object ) {
-						pointer = append( parent, '' );
-					} else if ( character === LINE_SEPARATOR ) {
-						pointer = append( newNode, '' );
-					} else {
-						pointer = append( newNode, ZERO_WIDTH_NO_BREAK_SPACE );
-					}
-				} else {
-					pointer = append( object ? parent : newNode, '' );
-				}
+				pointer = append( format.object ? parent : newNode, '' );
 			} );
 		}
 
