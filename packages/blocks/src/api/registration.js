@@ -1,4 +1,4 @@
-/* eslint no-console: [ 'error', { allow: [ 'error', 'warn' ] } ] */
+/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
 
 /**
  * External dependencies
@@ -138,13 +138,6 @@ export function registerBlockType( name, settings ) {
 			'The icon should be a string, an element, a function, or an object following the specifications documented in https://wordpress.org/gutenberg/handbook/designers-developers/developers/block-api/block-registration/#icon-optional'
 		);
 		return;
-	}
-
-	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
-		console.warn(
-			'The block "' + name + '" can have a maximum of 3 keywords.'
-		);
-		settings.keywords = settings.keywords.slice( 0, 3 );
 	}
 
 	dispatch( 'core/blocks' ).addBlockTypes( settings );
