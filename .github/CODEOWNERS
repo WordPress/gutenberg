@@ -1,22 +1,22 @@
 # Data
-/packages/api-fetch                             @youknowriad @gziolo @aduth @nerrad @mmtr
+/packages/api-fetch                             @youknowriad @aduth @nerrad @mmtr
 /packages/core-data                             @youknowriad @gziolo @aduth @nerrad
-/packages/data                                  @youknowriad @gziolo @aduth @nerrad @coderkevin
-/packages/redux-routine                         @youknowriad @gziolo @aduth @nerrad
+/packages/data                                  @youknowriad @aduth @nerrad @coderkevin
+/packages/redux-routine                         @youknowriad @aduth @nerrad
 
 # Blocks
 /packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta
 
 # Editor
 /packages/annotations                           @youknowriad @gziolo @aduth
-/packages/autop                                 @youknowriad @gziolo @aduth
+/packages/autop                                 @youknowriad @aduth
 /packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth
 /packages/block-serialization-default-parser    @youknowriad @gziolo @aduth
 /packages/blocks                                @youknowriad @gziolo @aduth
 /packages/edit-post                             @youknowriad @gziolo
 /packages/editor                                @youknowriad @gziolo @nosolosw
-/packages/list-reusable-blocks                  @youknowriad @gziolo @aduth
-/packages/shortcode                             @youknowriad @gziolo @aduth
+/packages/list-reusable-blocks                  @youknowriad @aduth
+/packages/shortcode                             @youknowriad @aduth
 
 # Tooling
 /bin                                            @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
@@ -53,7 +53,7 @@
 /packages/dom-ready                             @youknowriad @gziolo @aduth
 /packages/escape-html                           @youknowriad @gziolo @aduth
 /packages/html-entities                         @youknowriad @gziolo @aduth
-/packages/i18n                                  @youknowriad @gziolo @aduth @swissspidy
+/packages/i18n                                  @youknowriad @aduth @swissspidy
 /packages/is-shallow-equal                      @youknowriad @gziolo @aduth
 /packages/keycodes                              @youknowriad @gziolo @aduth
 /packages/priority-queue                        @youknowriad @gziolo @aduth
