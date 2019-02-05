@@ -143,4 +143,6 @@ A purely dynamic block that is to be server rendered before display could look l
 
 ## The Gutenberg Lifecycle
 
-In summary, the workflow for editing a Gutenberg post starts with using token delimeters to generate an in-memory tree from the persisted version of the document. The process ends by reversing the serialization of blocks into the `post_content`. During editing, all manipulations happen within the block tree. Alternatively, a Gutenberg post is built and manipulated using an isomorphically persistied, in-memory data structure. Although Gutenberg post persistence is currently achieved using a serialization/parser pair, in hypothetical scenarios the post data structure could also be stored using a plugin or retreived from a remote JSON file.
+In summary, the Gutenberg workflow parses the saved document to an in-memory tree of blocks, using token delimiters to help. During editing, all manipulations happen within the block tree. The process ends by serializing the blocks back to the `post_content`.
+
+The workflow process relies on a serialization/parser pair to persist posts. Hypothetically, the post data structure could be stored using a plugin or retrieved from a remote JSON file to be converted to the block tree.
