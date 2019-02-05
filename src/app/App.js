@@ -40,13 +40,13 @@ export default class AppProvider extends React.Component<PropsType> {
 		this.setLocale( props.locale );
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate( prevProps: PropsType ) {
 		if ( prevProps.locale !== this.props.locale ) {
-			this.setLocale( this.props.locale )
+			this.setLocale( this.props.locale );
 		}
 	}
 
-	setLocale( locale ) {
+	setLocale( locale: ?string ) {
 		setLocaleData( getTranslation( locale ) );
 	}
 
