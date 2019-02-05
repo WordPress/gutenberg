@@ -76,7 +76,7 @@ const fetchTranslations = () => {
 				const translationRelativePath = getTranslationFilePath( languageResult.locale );
 				const translationAbsolutePath = path.resolve( __dirname, translationRelativePath );
 
-				if ( languageResult.inCache && ! process.env.REFRESH_I18N_CACHE ) {
+				if ( languageResult.inCache ) {
 					languageResult.path = translationRelativePath;
 					resolve( translationRelativePath );
 					return;
