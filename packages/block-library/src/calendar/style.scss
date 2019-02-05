@@ -1,0 +1,62 @@
+.wp-block-calendar {
+	text-align: center;
+	border: 2px solid $light-gray-500;
+
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		font-family: $default-font;
+	}
+
+	table thead {
+		display: table-row-group;
+	}
+
+	table tfoot {
+		display: table-header-group;
+		border-bottom: 2px solid $light-gray-500;
+	}
+
+	table tfoot,
+	caption {
+		font-weight: 600;
+		background: $light-gray-300;
+	}
+
+	table tfoot tr td#prev a,
+	table tfoot tr td#next a {
+		color: transparent;
+		overflow: hidden;
+		max-height: 40px;
+		width: 16px;
+
+	}
+
+	table tfoot tr td#prev a::before,
+	table tfoot tr td#next a::after {
+		// Disabling lint because in this case we need dashicons and not
+		// a generic font.
+		/* stylelint-disable */
+		font-family: dashicons;
+		/* stylelint-enable */
+		display: inline-block;
+		color: $black;
+	}
+
+	table tfoot tr td#prev a::before {
+		content: "\f141";
+	}
+
+	table tfoot tr td#next a::after {
+		content: "\f139";
+	}
+
+	table td,
+	table th {
+		border: none;
+	}
+
+	a {
+		text-decoration: underline;
+	}
+}
