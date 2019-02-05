@@ -106,7 +106,7 @@ icon: {
 
 * **Type:** `Array`
 
-Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated). It is only allowed to add as much as three terms per block.
+Sometimes a block could have aliases that help users discover it while searching. For example, an `image` block could also want to be discovered by `photo`. You can do so by providing an array of terms (which can be translated).
 
 ```js
 // Make it easier to discover a block with keyword aliases.
@@ -124,18 +124,18 @@ Block styles can be used to provide alternative styles to block. It works by add
 // Register block styles.
 styles: [
 	// Mark style as default.
-	{ 
-		name: 'default', 
-		label: __( 'Rounded' ), 
-		isDefault: true 
+	{
+		name: 'default',
+		label: __( 'Rounded' ),
+		isDefault: true
 	},
-	{ 
-		name: 'outline', 
-		label: __( 'Outline' ) 
+	{
+		name: 'outline',
+		label: __( 'Outline' )
 	},
-	{ 
-		name: 'squared', 
-		label: __( 'Squared' ) 
+	{
+		name: 'squared',
+		label: __( 'Squared' )
 	},
 ],
 ```
