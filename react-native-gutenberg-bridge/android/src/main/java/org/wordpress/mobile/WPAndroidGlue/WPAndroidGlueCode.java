@@ -49,6 +49,7 @@ public class WPAndroidGlueCode {
     private static final String PROP_NAME_INITIAL_DATA = "initialData";
     private static final String PROP_NAME_INITIAL_TITLE = "initialTitle";
     private static final String PROP_NAME_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled";
+    private static final String PROP_NAME_LOCALE = "locale";
 
     public void onCreate(Context context) {
         SoLoader.init(context, /* native exopackage */ false);
@@ -135,7 +136,7 @@ public class WPAndroidGlueCode {
                              OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                              OnReattachQueryListener onReattachQueryListener,
                              Application application, boolean isDebug, boolean buildGutenbergFromSource,
-                             boolean isNewPost) {
+                             boolean isNewPost, String locale) {
         mReactRootView = (ReactRootView) reactRootView;
 
         ReactInstanceManagerBuilder builder =
@@ -162,6 +163,7 @@ public class WPAndroidGlueCode {
         initialProps.putString(PROP_NAME_INITIAL_DATA, "");
         initialProps.putString(PROP_NAME_INITIAL_TITLE, "");
         initialProps.putBoolean(PROP_NAME_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled);
+        initialProps.putString(PROP_NAME_LOCALE, locale);
 
 
         // The string here (e.g. "MyReactNativeApp") has to match

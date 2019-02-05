@@ -73,6 +73,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_UPDATE_TITLE, writableMap);
     }
 
+
+    public void setLocaleInJS(String locale) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putString(MAP_KEY_UPDATE_TITLE, locale);
+        emitToJS(EVENT_NAME_UPDATE_TITLE, writableMap);
+    }
+
     @ReactMethod
     public void provideToNative_Html(String html, String title, boolean changed) {
         mGutenbergBridgeJS2Parent.responseHtml(title, html, changed);
