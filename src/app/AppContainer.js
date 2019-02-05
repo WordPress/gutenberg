@@ -15,7 +15,10 @@ type PropsType = {
 	initialHtmlModeEnabled: boolean,
 	showHtml: boolean,
 	editedPostContent: string,
+	title: string,
+	initialTitle: string,
 	initialHtml: string,
+	editTitle: string => mixed,
 	resetBlocks: Array<BlockType> => mixed,
 	setupEditor: ( mixed, ?mixed ) => mixed,
 	toggleBlockMode: ?string => mixed,
@@ -25,20 +28,25 @@ type PropsType = {
 
 class AppContainer extends React.Component<PropsType> {
 	lastHtml: ?string;
+	lastTitle: ?string;
 
 	constructor( props: PropsType ) {
 		super( props );
 
 		const post = props.post || {
 			id: 1,
+			title: {
+				raw: props.initialTitle,
+			},
 			content: {
 				raw: props.initialHtml,
 			},
 			type: 'draft',
 		};
 
-		this.props.setupEditor( post );
+		props.setupEditor( post );
 		this.lastHtml = serialize( parse( props.initialHtml ) );
+		this.lastTitle = props.initialTitle;
 
 		if ( props.initialHtmlModeEnabled && ! props.showHtml ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
@@ -50,13 +58,24 @@ class AppContainer extends React.Component<PropsType> {
 		if ( this.props.showHtml ) {
 			this.updateHtmlAction( this.props.editedPostContent );
 		}
+
 		const html = serialize( this.props.getBlocks() );
-		RNReactNativeGutenbergBridge.provideToNative_Html( html, this.lastHtml !== html );
+		const title = this.props.title;
+
+		const hasChanges = title !== this.lastTitle || html !== this.lastHtml;
+
+		RNReactNativeGutenbergBridge.provideToNative_Html( html, title, hasChanges );
+
+		this.lastTitle = title;
 		this.lastHtml = html;
 	};
 
 	toggleHtmlModeAction = () => {
 		this.props.toggleBlockMode( this.props.rootClientId );
+	};
+
+	setTitleAction = ( title: string ) => {
+		this.props.editTitle( title );
 	};
 
 	updateHtmlAction = ( html: string = '' ) => {
@@ -70,7 +89,9 @@ class AppContainer extends React.Component<PropsType> {
 				rootClientId={ this.props.rootClientId }
 				serializeToNativeAction={ this.serializeToNativeAction }
 				toggleHtmlModeAction={ this.toggleHtmlModeAction }
+				setTitleAction={ this.setTitleAction }
 				updateHtmlAction={ this.updateHtmlAction }
+				title={ this.props.title }
 			/>
 		);
 	}
@@ -82,22 +103,28 @@ export default compose( [
 			getBlocks,
 			getBlockMode,
 			getEditedPostContent,
+			getEditedPostAttribute,
 		} = select( 'core/editor' );
 
 		return {
 			getBlocks,
 			showHtml: getBlockMode( rootClientId ) === 'html',
 			editedPostContent: getEditedPostContent(),
+			title: getEditedPostAttribute( 'title' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
+			editPost,
 			resetBlocks,
 			setupEditor,
 			toggleBlockMode,
 		} = dispatch( 'core/editor' );
 
 		return {
+			editTitle( title ) {
+				editPost( { title: title } );
+			},
 			resetBlocks,
 			setupEditor,
 			toggleBlockMode,

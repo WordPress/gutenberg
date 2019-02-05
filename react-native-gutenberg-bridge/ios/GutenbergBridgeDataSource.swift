@@ -6,6 +6,12 @@ public protocol GutenbergBridgeDataSource: class {
     ///
     /// - Returns: The HTML initial content or nil.
     func gutenbergInitialContent() -> String?
+    
+    /// Asks the data source for the initial title to be presented by the editor.
+    /// Return `nil` to show the example content.
+    ///
+    /// - Returns: The HTML initial title or nil.
+    func gutenbergInitialTitle() -> String?
 
     /// Asks the data source for an object conforming to `TextViewAttachmentDelegate`
     /// to handle media loading.
