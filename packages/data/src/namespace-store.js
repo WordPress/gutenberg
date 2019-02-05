@@ -19,7 +19,7 @@ import createResolversCacheMiddleware from './resolvers-cache-middleware';
  *
  * @param {string} key              Identifying string used for namespace and redex dev tools.
  * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
- * @param {Object} registry         Temporary registry reference, required for namespace updates.
+ * @param {Object} registry         registry reference.
  *
  * @return {Object} Store Object.
  */
@@ -32,7 +32,7 @@ export default function createNamespace( key, options, registry ) {
 		actions = mapActions( options.actions, store );
 	}
 	if ( options.selectors ) {
-		selectors = mapSelectors( options.selectors, store );
+		selectors = mapSelectors( options.selectors, store, registry );
 	}
 	if ( options.resolvers ) {
 		const fulfillment = getCoreDataFulfillment( registry, key );
@@ -100,10 +100,14 @@ function createReduxStore( reducer, key, registry ) {
  *                            public facing API. Selectors will get passed the
  *                            state as first argument.
  * @param {Object} store      The redux store to which the selectors should be mapped.
+ * @param {Object} registry         registry reference.
+ *
  * @return {Object}           Selectors mapped to the redux store provided.
  */
-function mapSelectors( selectors, store ) {
-	const createStateSelector = ( selector ) => function runSelector() {
+function mapSelectors( selectors, store, registry ) {
+	const createStateSelector = ( registeredSelector ) => function runSelector() {
+		const selector = registeredSelector.isRegistrySelector ? registeredSelector( registry ) : registeredSelector;
+
 		// This function is an optimized implementation of:
 		//
 		//   selector( store.getState(), ...arguments )
