@@ -60,6 +60,7 @@
     "i18n-cache": "node i18n-cache/index.js",
     "prestart": "yarn i18n-cache",
     "prebundle": "yarn i18n-cache",
+    "pretest": "yarn i18n-cache",
     "android": "react-native run-android",
     "prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
     "wpandroid": "yarn android --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
