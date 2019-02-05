@@ -24,22 +24,13 @@ import { Component } from '@wordpress/element';
  */
 import WpEmbedPreview from './wp-embed-preview';
 
-const EmbedPreview = class extends Component {
+class EmbedPreview extends Component {
 	constructor() {
 		super( ...arguments );
 		this.hideOverlay = this.hideOverlay.bind( this );
 		this.state = {
-			interactve: false,
+			interactive: false,
 		};
-	}
-
-	hideOverlay() {
-		// This is called onMouseUp on the overlay. We can't respond to the `isSelected` prop
-		// changing, because that happens on mouse down, and the overlay immediately disappears,
-		// and the mouse event can end up in the preview content. We can't use onClick on
-		// the overlay to hide it either, because then Gutenberg misses the mouseup event, and
-		// thinks we're multi-selecting blocks.
-		this.setState( { interactive: true } );
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
@@ -49,6 +40,15 @@ const EmbedPreview = class extends Component {
 			// happens on mouseup when the overlay is clicked.
 			return { interactive: false };
 		}
+	}
+
+	hideOverlay() {
+		// This is called onMouseUp on the overlay. We can't respond to the `isSelected` prop
+		// changing, because that happens on mouse down, and the overlay immediately disappears,
+		// and the mouse event can end up in the preview content. We can't use onClick on
+		// the overlay to hide it either, because then the editor misses the mouseup event, and
+		// thinks we're multi-selecting blocks.
+		this.setState( { interactive: true } );
 	}
 
 	render() {
@@ -64,6 +64,9 @@ const EmbedPreview = class extends Component {
 		const iframeTitle = sprintf( __( 'Embedded content from %s' ), parsedHostBaseUrl );
 		const sandboxClassnames = classnames( type, className, 'wp-block-embed__wrapper' );
 
+		// Disabled because the overlay div doesn't actually have a role or functionality
+		// as far as the user is concerned. We're just catching the first click so that
+		// the block can be selected without interacting with the embed preview that the overlay covers.
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		const embedWrapper = 'wp-embed' === type ? (
@@ -80,7 +83,7 @@ const EmbedPreview = class extends Component {
 					onFocus={ this.hideOverlay }
 				/>
 				{ ! interactive && <div
-					className="wp-block-embed-interactive-overlay"
+					className="block-library-embed__interactive-overlay"
 					onMouseUp={ this.hideOverlay } /> }
 			</div>
 		);
@@ -107,6 +110,6 @@ const EmbedPreview = class extends Component {
 			</figure>
 		);
 	}
-};
+}
 
 export default EmbedPreview;
