@@ -8,7 +8,7 @@
 /packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta
 
 # Editor
-/packages/annotations                           @youknowriad @gziolo @aduth
+/packages/annotations                           @youknowriad @gziolo @aduth @atimmer
 /packages/autop                                 @youknowriad @aduth
 /packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth
 /packages/block-serialization-default-parser    @youknowriad @gziolo @aduth
