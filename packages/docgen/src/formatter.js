@@ -10,7 +10,7 @@ const formatParams = ( params, docs ) => {
 		docs.push( '**Parameters**' );
 		docs.push( '\n' );
 		docs.push( ...params.map(
-			( param ) => `\n- **${ param.name }** \`(${ getParamType( param ) })\`: ${ cleanSpaces( param.description ) }`
+			( param ) => `\n- **${ param.name }** \`${ getParamType( param ) }\`: ${ cleanSpaces( param.description ) }`
 		) );
 	}
 };
