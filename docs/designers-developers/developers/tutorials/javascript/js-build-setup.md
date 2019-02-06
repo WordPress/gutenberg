@@ -4,7 +4,7 @@ This page covers how to set up your development environment to use the ESNext sy
 
 This documentation covers development for your plugin to work with Gutenberg, to setup a development environment to work directly on Gutenberg, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
 
-For simpler code, you can write JavaScript using ESNext and JSX syntax. This requires a transformation step to convert that syntax which a web browser may not understand, to one that it will.  Webpack and babel are the tools that perform this transformation step.
+For simpler code, you can write JavaScript using ESNext and JSX syntax. This requires a transformation step to convert that syntax, which a web browser may not understand, to one that it will. Webpack and Babel are the tools that perform this transformation step.
 
 [Webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to Webpack to transform both ESNext and JSX to JavaScript.
 
@@ -153,10 +153,10 @@ registerBlockType( 'myguten/test-block', {
 	icon: 'smiley',
 	category: 'layout',
 	edit() {
-		return <div>Hola mundo!</div>;
+		return <div>Hola, mundo!</div>;
 	},
 	save() {
-		return <div>Hola mundo!</div>;
+		return <div>Hola, mundo!</div>;
 	},
 } );
 ```
