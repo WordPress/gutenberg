@@ -14,7 +14,7 @@ For a quick start, you can use one of the examples from the [Gutenberg Examples 
 
 ## Setup
 
-Both Webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
+Both Webpack and Babel are tools written in JavaScript and run using [Node.js](https://nodejs.org/) (node). Node.js is a runtime environment for JavaScript outside of a browser. Simply put, node allows you to run JavaScript code on the command-line.
 
 First, you need to set up node for your development environment. The steps required change depending on your operating system, but if you have a package manager installed, setup can be as straightforward as:
 
@@ -36,10 +36,10 @@ To start a new node project, first create a directory to work in.
 mkdir myguten-block
 ```
 
-You create a new package.json using `npm init`.  This will walk you through creating your package.json file:
+You create a new package.json running `npm init` in your terminal.  This will walk you through creating your package.json file:
 
 ```
-$ npm init
+npm init
 
 package name: (myguten-block) myguten-block
 version: (1.0.0)
@@ -139,7 +139,7 @@ You configure babel by creating a `.babelrc` file:
 }
 ```
 
-The pragma setting replaces the function JSX uses for transformation, the `wp.element.createElement` is an equivalent wrapper of `React.createElement` which is the default function for JSX.
+This pragma setting instructs Babel that any JSX syntax such as `<Hello />` should be transformed into `wp.element.createElement( Hello )`. The name of the setting (`transform-react-jsx`) is derived from the fact that it overrides the default assumption to transform to `React.createElement( Hello )`.
 
 With both configs in place, you can now run webpack.
 
