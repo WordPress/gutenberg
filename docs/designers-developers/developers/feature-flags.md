@@ -1,6 +1,6 @@
 # Feature Flags
 
-With phase 2 of the Gutenberg project there's a need for improved control over how code changes are released. Newer features developed for phase 2 should only be released to the Gutenberg plugin, while improvements and bug fixes should still continue to make their way into core releases.
+With phase 2 of the Gutenberg project there's a need for improved control over how code changes are released. Newer features developed for phase 2 and beyond should only be released to the Gutenberg plugin, while improvements and bug fixes should still continue to make their way into core releases.
 
 The technique for handling this is known as a 'feature flag'. 
 
@@ -64,33 +64,26 @@ The minification process will remove the entire `if` statement including the bod
 
 ## Basic Use
 
-As a simple rule, try to avoid executing any code for a phase 2 feature by using the following techniques:
+A phase 2 function or constant should be exported using the following ternary syntax:
 
-### Simple if statement
-
-If you're enhancing existing code with a phase 2 feature, try extracting phase 2 code into a separate function as much as possible, and avoid calling that function:
 ```js
+function myPhaseTwoFeature() {
+	// implementation
+}
+
+export const phaseTwoFeature = window.GUTENBERG_PHASE === 2 ? myPhaseTwoFeature : undefined;
+```
+
+In phase 1 environments the `phaseTwoFeature` export will be `undefined`.
+
+If you're attempting to import and call a phase 2 feature, be sure to wrap the call to the function in an if statement to avoid an error:
+```js
+import { phaseTwoFeature } from '@wordpress/foo';
+
 if ( window.GUTENBERG_PHASE === 2) {
-	myPhaseTwoFeature();
+	phaseTwoFeature();
 }
 ```
-
-### Early return
-
-Alternatively, inside a function, return as early as possible before any phase 2 code can be executed:
-
-```js
-export default function myPhaseTwoFeature() {
-	if ( window.GUTENBERG_PHASE !== 2 ) {
-		return;
-	}
-
-	// implementation of feature
-}
-```
-
-An early return may have to be used for a function that is exported since `export` statements can't be dynamic.
-
 
 ## FAQ
 

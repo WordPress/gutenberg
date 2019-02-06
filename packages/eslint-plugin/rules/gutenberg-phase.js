@@ -113,22 +113,25 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
  * @param {Object} node    The GUTENBERG_PHASE identifier node.
  * @param {Object} context The eslint context object.
  */
-function testIsUsedInIfStatement( node, context ) {
-	const ifParent = findParent( node, ( candidate ) => candidate.type === 'IfStatement' );
+function testIsUsedInIfOrTernary( node, context ) {
+	const conditionalParent = findParent(
+		node,
+		( candidate ) => [ 'IfStatement', 'ConditionalExpression' ].includes( candidate.type )
+	);
 	const binaryParent = findParent( node, ( candidate ) => candidate.type === 'BinaryExpression' );
 
-	if ( ifParent &&
+	if ( conditionalParent &&
 		binaryParent &&
-		ifParent.test &&
-		ifParent.test.start === binaryParent.start &&
-		ifParent.test.end === binaryParent.end
+		conditionalParent.test &&
+		conditionalParent.test.start === binaryParent.start &&
+		conditionalParent.test.end === binaryParent.end
 	) {
 		return;
 	}
 
 	context.report(
 		node,
-		'The `GUTENBERG_PHASE` constant should only be used as part of an expression that is the only condition of an if statement.',
+		'The `GUTENBERG_PHASE` constant should only be used as part of the condition in an if statement or ternary expression.',
 	);
 }
 
@@ -147,7 +150,7 @@ module.exports = {
 
 				testIsAccessedViaWindowObject( node, context );
 				testIsUsedInStrictBinaryExpression( node, context );
-				testIsUsedInIfStatement( node, context );
+				testIsUsedInIfOrTernary( node, context );
 			},
 			Literal( node ) {
 				// Bypass any identifiers with a node value different to `GUTENBERG_PHASE`.
