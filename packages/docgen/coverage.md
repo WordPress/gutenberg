@@ -16,47 +16,69 @@ Packages outside of scope:
 - postcss-themes. CommonJS module.
 - scripts. CommonJS module.
 
+TO REVIEW:
+
+- [ ] dom-ready
+- [ ] e2e-test-utils
+- [ ] edit-post
+- [ ] editor
+
+TODO:
+
+- [ ] autop
+  - [ ] description contains HTML
+- [ ] babel-plugin-import-jsx-pragma - missing `@see` tag
+- [ ] blocks
+  - [ ] `getBlockSupport`, `isValidIcon`, `parseWithAttributeSchema` have `*` as param.type
+  - [ ] `getPhrasingContentSchema` misses `@see` tag
+  - [ ] `pastHandler` has optional params
+  - [ ] `setCategories` has `Object []` as a param type
+  - [ ] `unstable__*` should this be docummented?
+- [ ] date
+  - [ ] `format`, `date` have a null param.type
+- [ ] deprecated - missing `@type` tag
+- [ ] dom - missing `@see` tag in `caretRangeFromPoint`
+- [ ] element
+  - [ ] missing `@see` tag
+  - [ ] `isEmptyElement` has `*` as param.type
+- [ ] escape-html - missing `@link` tag `escapeAttribute`
+- [ ] i18n - missing `@see` tag
+- [ ] keycodes - has constants, missing `@type` tag
+- [ ] rich-text
+  - [ ] `concat` type param is `{...[object]}`
+  - [ ] `indentListItems` has param.description = null
+  - [ ] `LINE_SEPARATOR` is a constant
+  - [ ] `toHTMLString` a param is an object (create table?)
+  - [ ] `unstableToDom` is this supposed to go undocumented?
+- [ ] shortcode
+  - [ ] `string` has param.description = null
+  - [ ] description contains numbered list that is flattened
+- [ ] token-list - missing `@link` tag
+- [ ] viewport - missing `@see` tag
+
 DONE:
 
 - [x] a11y
 - [x] annotations
 - [x] api-fetch
-- [x] autop
-- [x] babel-plugin-import-jsx-pragma
 - [x] blob
 - [x] block-library
 - [x] block-serialization-default-parser
 - [x] block-serialization-spec-parser
-- [x] blocks
 - [x] components
 - [x] compose
 - [x] core-data
 - [x] data
-- [x] date
-- [x] deprecated
-- [x] dom
-- [x] dom-ready
-- [x] e2e-test-utils
-- [x] edit-post
-- [x] editor
-- [x] element
-- [x] escape-html
 - [x] format-library
 - [x] hooks
 - [x] html-entities
-- [x] i18n
 - [x] jest-console
 - [x] jest-puppeteer-axe
-- [x] keycodes
 - [x] list-reusable-blocks
 - [x] notices
 - [x] nux
 - [x] plugins
 - [x] priority-queue
 - [x] redux-routine
-- [x] rich-text
-- [x] shortcode
-- [x] token-list
 - [x] url
-- [x] viewport
 - [x] wordcount
