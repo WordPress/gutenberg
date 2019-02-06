@@ -1,24 +1,24 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
 import classnames from 'classnames';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Path, SVG } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { createBlock } from '@wordpress/blocks';
 import {
 	InnerBlocks,
 	getColorClassName,
 } from '@wordpress/editor';
-import { createBlock } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
+import icon from './icon';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
@@ -73,7 +73,7 @@ export const settings = {
 
 	description: __( 'Set media and words side-by-side for a richer layout.' ),
 
-	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M13 17h8v-2h-8v2zM3 19h8V5H3v14zM13 9h8V7h-8v2zm0 4h8v-2h-8v2z" /></SVG>,
+	icon,
 
 	category: 'layout',
 

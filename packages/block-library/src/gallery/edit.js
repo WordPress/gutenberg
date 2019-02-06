@@ -7,12 +7,10 @@ import { filter, pick, map, get } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
 import {
-	IconButton,
 	DropZone,
 	FormFileUpload,
+	IconButton,
 	PanelBody,
 	RangeControl,
 	SelectControl,
@@ -22,16 +20,20 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	MediaUpload,
+	BlockIcon,
 	MediaPlaceholder,
+	MediaUpload,
 	InspectorControls,
 	mediaUpload,
 } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
+import icon from './icon';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -220,7 +222,7 @@ class GalleryEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon="format-gallery"
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
 						labels={ {
 							title: __( 'Gallery' ),
