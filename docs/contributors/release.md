@@ -114,13 +114,17 @@ Creating a release involves:
 
 1. Checkout the release branch `git checkout release/x.x`.
 
-**Note:** This branch should never be removed or rebased. This means in case of conflicts when creating PRs from this branch, create temporary branches in order to merge these PRs and avoid touching the release branch.
+**Note:** This branch should never be removed or rebased. When we want to merge something from it to master and conflicts exist/may exist we use a temporary branch `bump/x.x`.
 
 2. Create [a commit like this](https://github.com/WordPress/gutenberg/commit/00d01049685f11f9bb721ad3437cb928814ab2a2#diff-b9cfc7f2cdf78a7f4b91a753d10865a2), removing the `-rc.X` from the version number in `gutenberg.php`, `package.json`, and `package-lock.json`.
-3. Create a Pull Request from the release branch into `master` using the changelog as a description and ensure the tests pass properly.
-4. Tag the version. `git tag vx.x.0` from the release branch.
-5. Push the tag `git push --tags`.
-6. Merge the version bump pull request and avoid removing the release branch.
+3. Create a new branch called `bump/x.x` from `release/x.x` and switch to it: `git checkout -b bump/x.x`.
+4. Create a pull request from `bump/x.x` to `master`. Verify the continuous integrations tests pass, before continuing to the next step even if conflicts exist.
+5. Rebase `bump/x.x` against `origin/master` using `git fetch origin && git rebase origin/master`.
+6. Force push the branch `bump/x.x` using `git push --force-with-lease`.
+7. Switch to the `release/x.x` branch. Tag the version from the release branch `git tag vx.x.0`.
+8. Push the tag `git push --tags`.
+9. Merge the version bump pull request.
+
 
 ##### Build the Plugin
 
