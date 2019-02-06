@@ -1,5 +1,7 @@
 // @format
 
+@import "variables.scss";
+
 .block-library-nextpage__container {
 	align-items: center;
 	padding: 4px 4px 4px 4px;
@@ -12,4 +14,5 @@
 
 .block-library-nextpage__text {
 	text-decoration-style: solid;
+	font-family: $default-regular-font;
 }

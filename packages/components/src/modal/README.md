@@ -17,7 +17,7 @@ const MyModal = withState( {
 } )( ( { isOpen, setState } ) => (
 	<div>
 		<Button isDefault onClick={ () => setState( { isOpen: true } ) }>Open Modal</Button>
-		{ isOpen ?
+		{ isOpen && (
 			<Modal
 				title="This is my modal"
 				onRequestClose={ () => setState( { isOpen: false } ) }>
@@ -25,7 +25,7 @@ const MyModal = withState( {
 					My custom close button
 				</Button>
 			</Modal>
-			: null }
+		) }
 	</div>
 ) );
 ```
