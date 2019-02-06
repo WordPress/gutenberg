@@ -23,6 +23,17 @@ const cleanSpaces = ( paragraph ) =>
 		''
 	).trim();
 
+const formatExample = ( example, docs ) => {
+	if ( example && example.length === 1 ) {
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '**Example**' );
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( example[ 0 ].description );
+	}
+};
+
 const formatOutput = ( output, docs ) => {
 	if ( output && output.length === 1 ) {
 		docs.push( '\n' );
@@ -55,6 +66,7 @@ module.exports = function( artifacts ) {
 			docs.push( '\n' );
 			docs.push( '\n' );
 			docs.push( cleanSpaces( artifact.description ) );
+			formatExample( artifact.tags.filter( ( tag ) => tag.title === 'example' ), docs );
 			formatParams( artifact.params, docs );
 			formatOutput( artifact.return, docs );
 			docs.push( '\n' );
