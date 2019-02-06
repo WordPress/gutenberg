@@ -3,21 +3,18 @@
  */
 import classnames from 'classnames';
 import {
+	compact,
 	get,
 	isEmpty,
 	map,
 	last,
 	pick,
-	compact,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getPath } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	Button,
 	ButtonGroup,
@@ -26,30 +23,35 @@ import {
 	ResizableBox,
 	SelectControl,
 	Spinner,
-	TextControl,
 	TextareaControl,
+	TextControl,
+	ToggleControl,
 	Toolbar,
 	withNotices,
-	ToggleControl,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	RichText,
+	BlockAlignmentToolbar,
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
-	BlockAlignmentToolbar,
+	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import icon from './icon';
 import ImageSize from './image-size';
 
 /**
@@ -423,7 +425,7 @@ class ImageEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon="format-image"
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
