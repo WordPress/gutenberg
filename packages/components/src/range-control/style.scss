@@ -117,10 +117,15 @@
 	}
 }
 
-.components-range-control__number {
+input.components-range-control__number {
 	display: inline-block;
 	margin-left: $grid-size;
 	font-weight: 500;
+	height: 30px;
 	width: 54px;
-	padding: 3px 5px !important;
+}
+
+// Space before number inputs next to an unwrapped input like a range slider.
+input + .components-range-control__number {
+	margin-left: $grid-size;
 }
