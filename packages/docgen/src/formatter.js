@@ -4,19 +4,26 @@ const formatParams = ( params, docs ) => {
 		docs.push( '\n' );
 		docs.push( ...params.map(
 			( param ) => {
-				return `\n * ${ param.name }: ${ param.description }`;
+				return `\n * ${ param.name }: ${ cleanSpaces( param.description ) }`;
 			} )
 		);
 		docs.push( '\n' );
 	}
 };
 
+const cleanSpaces = ( paragraph ) =>
+	paragraph.split( '\n' ).map(
+		( sentence ) => sentence.trim()
+	).reduce(
+		( acc, current ) => acc + ' ' + current, ''
+	);
+
 const formatOutput = ( output, docs ) => {
 	if ( output && output.length === 1 ) {
 		docs.push( '*Output*' );
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( output[ 0 ].description.replace( '\n', ' ' ) );
+		docs.push( cleanSpaces( output[ 0 ].description ) );
 		docs.push( '\n' );
 	}
 };
@@ -30,7 +37,7 @@ module.exports = function( artifacts ) {
 			docs.push( `## ${ artifact.name }` );
 			docs.push( '\n' );
 			docs.push( '\n' );
-			docs.push( artifact.description.replace( '\n', ' ' ) );
+			docs.push( cleanSpaces( artifact.description ) );
 			docs.push( '\n' );
 			docs.push( '\n' );
 			formatParams( artifact.params, docs );
