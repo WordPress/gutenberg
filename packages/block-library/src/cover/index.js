@@ -6,6 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import HeadingToolbar from '../heading/heading-toolbar';
+
 import {
 	FocalPointPicker,
 	IconButton,
@@ -38,7 +40,11 @@ const blockAttributes = {
 	title: {
 		type: 'string',
 		source: 'html',
-		selector: 'p',
+		selector: 'h1, h2, h3, h4, h5, h6',
+	},
+	level: {
+		type: 'number',
+		default: 2,
 	},
 	url: {
 		type: 'string',
@@ -184,6 +190,7 @@ export const settings = {
 				id,
 				title,
 				url,
+				level,
 			} = attributes;
 			const onSelectMedia = ( media ) => {
 				if ( ! media || ! media.url ) {
@@ -219,6 +226,8 @@ export const settings = {
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
 			const setTitle = ( newTitle ) => setAttributes( { title: newTitle } );
+
+			const tagName = 'h' + level;
 
 			const style = {
 				...(
@@ -266,7 +275,10 @@ export const settings = {
 					</BlockControls>
 					{ !! url && (
 						<InspectorControls>
-							<PanelBody title={ __( 'Cover Settings' ) }>
+							<PanelBody title={ __( 'Cover Heading Settings' ) }>
+								<HeadingToolbar label={ __( 'Heading level' ) } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
+							</PanelBody>
+							<PanelBody title={ __( 'Cover Background Settings' ) }>
 								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
 									<ToggleControl
 										label={ __( 'Fixed Background' ) }
@@ -367,7 +379,7 @@ export const settings = {
 						) }
 						{ ( ! RichText.isEmpty( title ) || isSelected ) && (
 							<RichText
-								tagName="p"
+								tagName={ tagName }
 								className="wp-block-cover-text"
 								placeholder={ __( 'Write title…' ) }
 								value={ title }
@@ -392,7 +404,10 @@ export const settings = {
 			overlayColor,
 			title,
 			url,
+			level,
 		} = attributes;
+
+		const tagName = 'h' + level;
 		const overlayColorClass = getColorClassName( 'background-color', overlayColor );
 		const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
 			backgroundImageStyles( url ) :
@@ -424,7 +439,7 @@ export const settings = {
 					src={ url }
 				/> ) }
 				{ ! RichText.isEmpty( title ) && (
-					<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
+					<RichText.Content tagName={ tagName } className="wp-block-cover-text" value={ title } />
 				) }
 			</div>
 		);
@@ -499,6 +514,62 @@ export const settings = {
 				<section className={ classes } style={ style }>
 					<RichText.Content tagName="h2" value={ title } />
 				</section>
+			);
+		},
+	}, {
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+		},
+
+		save( { attributes } ) {
+			const {
+				align,
+				backgroundType,
+				contentAlign,
+				customOverlayColor,
+				dimRatio,
+				hasParallax,
+				overlayColor,
+				title,
+				url,
+			} = attributes;
+			const overlayColorClass = getColorClassName( 'background-color', overlayColor );
+			const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
+				backgroundImageStyles( url ) :
+				{};
+			if ( ! overlayColorClass ) {
+				style.backgroundColor = customOverlayColor;
+			}
+
+			const classes = classnames(
+				dimRatioToClass( dimRatio ),
+				overlayColorClass,
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				},
+				align ? `align${ align }` : null,
+			);
+
+			return (
+				<div className={ classes } style={ style }>
+					{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+					/> ) }
+					{ ! RichText.isEmpty( title ) && (
+						<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
+					) }
+				</div>
 			);
 		},
 	} ],
