@@ -16,7 +16,6 @@ import {
 	Spinner,
 	ToggleControl,
 	Toolbar,
-	DropdownMenu
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -84,6 +83,21 @@ class LatestPostsEdit extends Component {
 
 		const inspectorControls = (
 			<InspectorControls>
+				<PanelBody title={ __( 'Display Settings' ) }>
+					<QueryControls
+						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
+					/>
+					{ postLayout === 'grid' &&
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ columns }
+							onChange={ ( value ) => setAttributes( { columns: value } ) }
+							min={ 2 }
+							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
+						/>
+					}
+				</PanelBody>
+
 				<PanelBody title={ __( 'Post Meta Settings' ) }>
 					<ToggleControl
 						label={ __( 'Display post date' ) }
@@ -101,18 +115,7 @@ class LatestPostsEdit extends Component {
 						onOrderChange={ ( value ) => setAttributes( { order: value } ) }
 						onOrderByChange={ ( value ) => setAttributes( { orderBy: value } ) }
 						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
-						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
 					/>
-
-					{ postLayout === 'grid' &&
-						<RangeControl
-							label={ __( 'Columns' ) }
-							value={ columns }
-							onChange={ ( value ) => setAttributes( { columns: value } ) }
-							min={ 2 }
-							max={ ! hasPosts ? MAX_POSTS_COLUMNS : Math.min( MAX_POSTS_COLUMNS, latestPosts.length ) }
-						/>
-					}
 				</PanelBody>
 			</InspectorControls>
 		);
