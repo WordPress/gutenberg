@@ -234,9 +234,15 @@ export default class ImageEdit extends React.Component {
 		);
 
 		const closeBottomSheetAndExecuteWithDelay = ( method ) => {
-			this.setState( { showMediaOptions: false }, () => {
+			this.setState( { showMediaOptions: false } );
+			// On iOS we need to delay the execution of the method or else the modal dismissal of the bottom sheet can overlap with other modal presentation
+			if ( isiOS ) {
+				setTimeout( function() {
+					method();
+				}, 750 );
+			} else {
 				method();
-			} );
+			}
 		};
 
 		const getMediaOptions = () => (
