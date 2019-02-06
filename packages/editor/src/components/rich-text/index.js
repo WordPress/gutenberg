@@ -68,17 +68,6 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 const { getSelection } = window;
 
-function getOuterFormat( { formats, start, end } ) {
-	if ( start === undefined || start !== end ) {
-		return;
-	}
-
-	const formatsBefore = formats[ start - 1 ] || [];
-	const formatsAfter = formats[ start ] || [];
-
-	return Math.min( formatsBefore.length, formatsAfter.length );
-}
-
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
@@ -178,14 +167,13 @@ export class RichText extends Component {
 		} );
 	}
 
-	applyRecord( record, domOnly ) {
+	applyRecord( record ) {
 		apply( {
 			value: record,
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
-			domOnly,
 		} );
 	}
 
@@ -414,13 +402,22 @@ export class RichText extends Component {
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
+
 			if ( ! isCaretWithinFormattedText && formats[ start ] ) {
 				this.props.onEnterFormattedText();
 			} else if ( isCaretWithinFormattedText && ! formats[ start ] ) {
 				this.props.onExitFormattedText();
 			}
 
-			const selectedFormat = getOuterFormat( value );
+			let selectedFormat;
+
+			if ( isCollapsed( value ) ) {
+				const formatsBefore = formats[ start - 1 ] || [];
+				const formatsAfter = formats[ start ] || [];
+
+				selectedFormat = Math.min( formatsBefore.length, formatsAfter.length );
+			}
+
 			this.setState( { start, end, selectedFormat } );
 			this.applyRecord( { ...value, selectedFormat } );
 
