@@ -64,11 +64,6 @@
 		margin: 0 1em 0 0;
 	}
 
-	input[type="number"].components-text-control__input { // Needs specificity to override padding.
-		max-width: 4em;
-		padding: 6px 4px;
-	}
-
 	span {
 		margin: 0 0 0 0.2em;
 	}
