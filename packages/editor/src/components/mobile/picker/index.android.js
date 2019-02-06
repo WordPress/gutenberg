@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { Text, View, TouchableOpacity } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -10,13 +10,6 @@ import { Text, View, TouchableOpacity } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { BottomSheet } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
-import styles from './styles';
-
-const CANCEL_VALUE = 'cancel';
 
 export default class Picker extends Component {
 	constructor() {
@@ -38,9 +31,7 @@ export default class Picker extends Component {
 	}
 
 	onCellPress( value ) {
-		if ( value !== CANCEL_VALUE ) {
-			this.props.onChange( value );
-		}
+		this.props.onChange( value );
 		this.onClose();
 	}
 
@@ -53,13 +44,13 @@ export default class Picker extends Component {
 			>
 				<View>
 					{ this.props.options.map( ( option, index ) =>
-						<BottomSheet.Cell 
+						<BottomSheet.Cell
 							key={ index }
 							label={ option.label }
 							onPress={ () => this.onCellPress( option.value ) }
 						/>
 					) }
-					<BottomSheet.Cell 
+					<BottomSheet.Cell
 						label={ __( 'Cancel' ) }
 						onPress={ this.onClose }
 						drawSeparator={ false }
