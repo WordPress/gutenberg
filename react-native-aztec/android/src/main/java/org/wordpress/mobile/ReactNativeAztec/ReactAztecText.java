@@ -1,5 +1,7 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
@@ -26,6 +28,8 @@ import org.wordpress.aztec.plugins.IToolbarButton;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+
+import static android.content.ClipData.*;
 
 public class ReactAztecText extends AztecText {
 
@@ -317,6 +321,39 @@ public class ReactAztecText extends AztecText {
         // TODO: isRTL? Should be passed here?
         eventDispatcher.dispatchEvent(
                 new ReactAztecBackspaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+        );
+        return true;
+    }
+
+    private boolean onPaste() {
+        ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(
+                Context.CLIPBOARD_SERVICE);
+
+        StringBuilder text = new StringBuilder();
+        StringBuilder html = new StringBuilder();
+
+        if (clipboardManager != null && clipboardManager.hasPrimaryClip()) {
+            ClipData clipData = clipboardManager.getPrimaryClip();
+            int itemCount = clipData.getItemCount();
+
+            for (int i = 0; i < itemCount; i++) {
+                Item item = clipData.getItemAt(i);
+                text.append(item.coerceToText(getContext()));
+                html.append(item.coerceToHtmlText(getContext()));
+            }
+        }
+
+        // temporarily disable listener during call to toHtml()
+        disableTextChangedListener();
+        String content = toHtml(false);
+        int cursorPositionStart = getSelectionStart();
+        int cursorPositionEnd = getSelectionEnd();
+        enableTextChangedListener();
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class)
+                .getEventDispatcher();
+        eventDispatcher.dispatchEvent(new ReactAztecPasteEvent(getId(), content,
+                cursorPositionStart, cursorPositionEnd, text.toString(), html.toString())
         );
         return true;
     }
