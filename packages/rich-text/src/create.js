@@ -13,7 +13,6 @@ import { createElement } from './create-element';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
-	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
 /**
@@ -236,10 +235,7 @@ function filterRange( node, range, filter ) {
 function filterString( string ) {
 	// Reduce any whitespace used for HTML formatting to one space
 	// character, because it will also be displayed as such by the browser.
-	string = string.replace( /[\n\r\t]+/g, ' ' );
-	string = string.replace( new RegExp( ZERO_WIDTH_NO_BREAK_SPACE, 'g' ), '' );
-
-	return string;
+	return string.replace( /[\n\r\t]+/g, ' ' );
 }
 
 /**

@@ -359,12 +359,17 @@ export class RichText extends Component {
 			return;
 		}
 
+		let { selectedFormat } = this.state;
 		const { formats, text, start, end } = this.patterns.reduce(
 			( accumlator, transform ) => transform( accumlator ),
 			this.createRecord()
 		);
 
-		if ( this.state.selectedFormat ) {
+		if ( this.formatPlaceholder ) {
+			formats[ this.state.start ] = formats[ this.state.start ] || [];
+			formats[ this.state.start ].push( this.formatPlaceholder );
+			selectedFormat = formats[ this.state.start ].length;
+		} else if ( selectedFormat ) {
 			const formatsBefore = formats[ start - 1 ] || [];
 			const formatsAfter = formats[ start ] || [];
 
@@ -374,13 +379,13 @@ export class RichText extends Component {
 				source = formatsAfter;
 			}
 
-			source = source.slice( 0, this.state.selectedFormat );
+			source = source.slice( 0, selectedFormat );
 			formats[ this.state.start ] = source;
 		} else {
 			delete formats[ this.state.start ];
 		}
 
-		this.onChange( { formats, text, start, end }, {
+		this.onChange( { formats, text, start, end, selectedFormat }, {
 			withoutHistory: true,
 		} );
 
@@ -418,6 +423,8 @@ export class RichText extends Component {
 			const selectedFormat = getOuterFormat( value );
 			this.setState( { start, end, selectedFormat } );
 			this.applyRecord( { ...value, selectedFormat } );
+
+			delete this.formatPlaceholder;
 		}
 	}
 
@@ -445,13 +452,14 @@ export class RichText extends Component {
 	onChange( record, { withoutHistory } = {} ) {
 		this.applyRecord( record );
 
-		const { start, end } = record;
+		const { start, end, formatPlaceholder, selectedFormat } = record;
 
+		this.formatPlaceholder = formatPlaceholder;
 		this.onChangeEditableValue( record );
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
-		this.setState( { start, end } );
+		this.setState( { start, end, selectedFormat } );
 
 		if ( ! withoutHistory ) {
 			this.onCreateUndoLevel();
@@ -627,6 +635,8 @@ export class RichText extends Component {
 		const { selectedFormat } = this.state;
 		const collapsed = isCollapsed( value );
 		const isReverse = event.keyCode === LEFT;
+
+		delete this.formatPlaceholder;
 
 		// If the selection is collapsed and at the very start, do nothing if
 		// navigating backward.
