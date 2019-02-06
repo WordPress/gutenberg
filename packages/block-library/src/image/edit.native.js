@@ -204,7 +204,7 @@ export default class ImageEdit extends React.Component {
 
 		const getInspectorControls = () => (
 			<BottomSheet
-				isVisible={ this.state.showSettings }
+				isVisible={ true }
 				onClose={ onImageSettingsClose }
 				hideHeader
 			>
@@ -247,7 +247,7 @@ export default class ImageEdit extends React.Component {
 
 		const getMediaOptions = () => (
 			<BottomSheet
-				isVisible={ this.state.showMediaOptions }
+				isVisible={ true }
 				onClose={ onMediaOptionsClose }
 				hideHeader
 			>
@@ -290,7 +290,7 @@ export default class ImageEdit extends React.Component {
 		if ( ! url ) {
 			return (
 				<View style={ { flex: 1 } } >
-					{ getMediaOptions() }
+					{ this.state.showMediaOptions && getMediaOptions() }
 					<MediaPlaceholder
 						onMediaOptionsPressed={ onMediaOptionsButtonPressed }
 					/>
@@ -335,8 +335,8 @@ export default class ImageEdit extends React.Component {
 
 							return (
 								<View style={ { flex: 1 } } >
-									{ getInspectorControls() }
-									{ getMediaOptions() }
+									{ this.state.showSettings && getInspectorControls() }
+									{ this.state.showMediaOptions && getMediaOptions() }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
