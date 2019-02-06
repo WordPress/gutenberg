@@ -9,6 +9,7 @@ export { default as Spinner } from './spinner';
 export { createSlotFill, Slot, Fill, Provider as SlotFillProvider } from './slot-fill';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
+export { default as SelectControl } from './select-control';
 
 // Higher-Order Components
 export { default as withFilters } from './higher-order/with-filters';
