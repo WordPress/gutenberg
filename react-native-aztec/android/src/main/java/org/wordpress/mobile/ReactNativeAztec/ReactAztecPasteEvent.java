@@ -12,16 +12,16 @@ class ReactAztecPasteEvent extends Event<ReactAztecPasteEvent> {
 
     private static final String EVENT_NAME = "topTextInputPaste";
 
-    private String mText;
+    private String mCurrentContent;
     private int mSelectionStart;
     private int mSelectionEnd;
     private String mPastedText;
     private String mPastedHtml;
 
-    public ReactAztecPasteEvent(int viewId, String text, int selectionStart, int selectionEnd,
-    String pastedText, String pastedHtml) {
+    public ReactAztecPasteEvent(int viewId, String currentContent, int selectionStart,
+                                int selectionEnd, String pastedText, String pastedHtml) {
         super(viewId);
-        mText = text;
+        mCurrentContent = currentContent;
         mSelectionStart = selectionStart;
         mSelectionEnd = selectionEnd;
         mPastedText = pastedText;
@@ -46,7 +46,7 @@ class ReactAztecPasteEvent extends Event<ReactAztecPasteEvent> {
     private WritableMap serializeEventData() {
         WritableMap eventData = Arguments.createMap();
         eventData.putInt("target", getViewTag());
-        eventData.putString("text", mText);
+        eventData.putString("currentContent", mCurrentContent);
         eventData.putInt("selectionStart", mSelectionStart);
         eventData.putInt("selectionEnd", mSelectionEnd);
         eventData.putString("pastedText", mPastedText);
