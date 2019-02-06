@@ -5,7 +5,7 @@ const getType = function( param ) {
 		return getType( param.expression );
 	} else if ( param.elements ) {
 		const types = param.elements.map( ( element ) => getType( element ) );
-		return types.join( ', ' );
+		return types.join( ' | ' );
 	}
 
 	return param.name;
