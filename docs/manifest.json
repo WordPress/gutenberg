@@ -282,6 +282,12 @@
 		"parent": "metabox"
 	},
 	{
+		"title": "Displaying Notices from Your Plugin or Theme",
+		"slug": "notices",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/notices/README.md",
+		"parent": "tutorials"
+	},
+	{
 		"title": "Creating a sidebar for your plugin",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
