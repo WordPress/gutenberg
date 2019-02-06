@@ -53,6 +53,7 @@ public class ReactAztecText extends AztecText {
     String lastSentFormattingOptionsEventString = "";
     boolean shouldHandleOnEnter = false;
     boolean shouldHandleOnBackspace = false;
+    boolean shouldHandleOnPaste = false;
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
 
@@ -101,6 +102,15 @@ public class ReactAztecText extends AztecText {
         super.getPlugins().add(plugin);
         if (plugin instanceof IToolbarButton && getToolbar() != null ) {
             getToolbar().addButton((IToolbarButton)plugin);
+        }
+    }
+
+    @Override
+    public boolean onTextContextMenuItem(int id) {
+        if (id == android.R.id.paste && shouldHandleOnPaste) {
+            return onPaste();
+        } else {
+            return super.onTextContextMenuItem(id);
         }
     }
 
