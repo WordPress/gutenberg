@@ -1,21 +1,21 @@
 # Data
 /packages/api-fetch                             @youknowriad @aduth @nerrad @mmtr
-/packages/core-data                             @youknowriad @gziolo @aduth @nerrad
+/packages/core-data                             @youknowriad @gziolo @aduth @nerrad @noisysocks
 /packages/data                                  @youknowriad @aduth @nerrad @coderkevin
 /packages/redux-routine                         @youknowriad @aduth @nerrad
 
 # Blocks
-/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta
+/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan @noisysocks
 
 # Editor
 /packages/annotations                           @youknowriad @gziolo @aduth @atimmer
 /packages/autop                                 @youknowriad @aduth
 /packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth
 /packages/block-serialization-default-parser    @youknowriad @gziolo @aduth
-/packages/blocks                                @youknowriad @gziolo @aduth
-/packages/edit-post                             @youknowriad @gziolo
-/packages/editor                                @youknowriad @gziolo @nosolosw
-/packages/list-reusable-blocks                  @youknowriad @aduth
+/packages/blocks                                @youknowriad @gziolo @aduth @noisysocks
+/packages/edit-post                             @youknowriad @gziolo @talldan @noisysocks
+/packages/editor                                @youknowriad @gziolo @nosolosw @talldan @noisysocks
+/packages/list-reusable-blocks                  @youknowriad @aduth @noisysocks
 /packages/shortcode                             @youknowriad @aduth
 
 # Tooling
@@ -26,7 +26,7 @@
 /packages/browserslist-config                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/custom-templated-path-webpack-plugin  @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/e2e-test-utils                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
+/packages/e2e-tests                             @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @talldan
 /packages/eslint-plugin                         @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
@@ -37,12 +37,12 @@
 /packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 
 # UI Components
-/packages/components                            @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @nosolosw @jorgefilipecosta
-/packages/compose                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/element                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/notices                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/nux                                   @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta
-/packages/viewport                              @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta
+/packages/components                            @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @nosolosw @jorgefilipecosta @talldan @noisysocks
+/packages/compose                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/element                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/notices                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/nux                                   @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/viewport                              @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
 
 # Utilities
 /packages/a11y                                  @youknowriad @gziolo @aduth
@@ -55,10 +55,10 @@
 /packages/html-entities                         @youknowriad @gziolo @aduth
 /packages/i18n                                  @youknowriad @aduth @swissspidy
 /packages/is-shallow-equal                      @youknowriad @gziolo @aduth
-/packages/keycodes                              @youknowriad @gziolo @aduth
+/packages/keycodes                              @youknowriad @gziolo @aduth @talldan
 /packages/priority-queue                        @youknowriad @gziolo @aduth
 /packages/token-list                            @youknowriad @gziolo @aduth
-/packages/url                                   @youknowriad @gziolo @aduth
+/packages/url                                   @youknowriad @gziolo @aduth @talldan
 /packages/wordcount                             @youknowriad @gziolo @aduth
 
 # Extensibility
