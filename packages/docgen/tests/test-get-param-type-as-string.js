@@ -50,7 +50,6 @@ test( 'getParamType from RestType', ( t ) => {
 				type: 'NameExpression',
 				name: 'Function',
 			},
-			prefix: true,
 		},
 		name: 'paramName',
 	} );
@@ -58,3 +57,22 @@ test( 'getParamType from RestType', ( t ) => {
 	t.end();
 } );
 
+test( 'getParamType from RestType with UnionType', ( t ) => {
+	const type = getParamType( {
+		title: 'param',
+		description: 'description',
+		type: {
+			type: 'RestType',
+			expression: {
+				type: 'UnionType',
+				elements: [
+					{ type: 'NameExpression', name: 'Object' },
+					{ type: 'NameExpression', name: 'string' },
+				],
+			},
+		},
+		name: 'paramName',
+	} );
+	t.equal( type, 'Object, string' );
+	t.end();
+} );
