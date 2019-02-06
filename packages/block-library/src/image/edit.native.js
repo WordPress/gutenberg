@@ -151,7 +151,6 @@ export default class ImageEdit extends React.Component {
 		const isiOS = Platform.OS === 'ios';
 
 		const onMediaLibraryButtonPressed = () => {
-			this.setState( { showMediaOptions: false } );
 			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
 				if ( mediaUrl ) {
 					setAttributes( { id: mediaId, url: mediaUrl } );
@@ -160,7 +159,6 @@ export default class ImageEdit extends React.Component {
 		};
 
 		const onMediaUploadButtonPressed = () => {
-			this.setState( { showMediaOptions: false } );
 			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
 					this.addMediaUploadListener( );
@@ -170,7 +168,6 @@ export default class ImageEdit extends React.Component {
 		};
 
 		const onMediaCaptureButtonPressed = () => {
-			this.setState( { showMediaOptions: false } );
 			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
 				if ( mediaUri ) {
 					this.addMediaUploadListener( );
@@ -236,6 +233,18 @@ export default class ImageEdit extends React.Component {
 			</BottomSheet>
 		);
 
+		const closeBottomSheetAndExecuteWithDelay = ( method ) => {
+			this.setState( { showMediaOptions: false } );
+			// On iOS we need to delay the execution of the method or else the modal dismissal of the bottom sheet can overlap with other modal presentation
+			if ( isiOS ) {
+				setTimeout( function() {
+					method();
+				}, 750 );
+			} else {
+				method();
+			}
+		};
+
 		const getMediaOptions = () => (
 			<BottomSheet
 				isVisible={ this.state.showMediaOptions }
@@ -247,21 +256,27 @@ export default class ImageEdit extends React.Component {
 					label={ __( 'Choose from device' ) }
 					value={ isiOS ? undefined : '' }
 					labelStyle={ { color: '#00aadc' } }
-					onPress={ onMediaUploadButtonPressed }
+					onPress={ () => {
+						closeBottomSheetAndExecuteWithDelay( onMediaUploadButtonPressed );
+					} }
 				/>
 				<BottomSheet.Cell
 					icon={ isiOS ? undefined : 'camera' }
 					label={ __( 'Take a Photo' ) }
 					value={ isiOS ? undefined : '' }
 					labelStyle={ { color: '#00aadc' } }
-					onPress={ onMediaCaptureButtonPressed }
+					onPress={ () => {
+						closeBottomSheetAndExecuteWithDelay( onMediaCaptureButtonPressed );
+					} }
 				/>
 				<BottomSheet.Cell
 					icon={ isiOS ? undefined : 'format-image' }
 					label={ __( 'WordPress Media Library' ) }
 					value={ isiOS ? undefined : '' }
 					labelStyle={ { color: '#00aadc' } }
-					onPress={ onMediaLibraryButtonPressed }
+					onPress={ () => {
+						closeBottomSheetAndExecuteWithDelay( onMediaLibraryButtonPressed );
+					} }
 				/>
 				{ isiOS && <BottomSheet.Cell
 					label={ __( 'Dismiss' ) }
