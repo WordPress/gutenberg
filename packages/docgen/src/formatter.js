@@ -1,17 +1,14 @@
-const getType = ( param ) => {
-	if ( param.type.type === 'NullableType' ) {
-		return param.type.expression.name;
-	}
-
-	return param.type.name;
-};
+/**
+ * Internal dependencies
+ */
+const getParamType = require( './get-param-type-as-string' );
 
 const formatParams = ( params, docs ) => {
 	if ( params && params.length > 0 ) {
 		docs.push( '*Parameters*' );
 		docs.push( '\n' );
 		docs.push( ...params.map(
-			( param ) => `\n * ${ param.name } (${ getType( param ) }): ${ cleanSpaces( param.description ) }`
+			( param ) => `\n * ${ param.name } (${ getParamType( param ) }): ${ cleanSpaces( param.description ) }`
 		) );
 		docs.push( '\n' );
 	}
