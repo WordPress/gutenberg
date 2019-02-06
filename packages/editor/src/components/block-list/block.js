@@ -519,25 +519,25 @@ export class BlockListBlock extends Component {
 								clientId={ clientId }
 								rootClientId={ rootClientId }
 							/>
-							{ shouldRenderMovers && (
-								<BlockMover
-									clientIds={ clientId }
-									blockElementId={ blockElementId }
-									isFirst={ isFirst }
-									isLast={ isLast }
-									isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
-									isDraggable={
-										isDraggable !== false &&
-										( ! isPartOfMultiSelection && isMovable )
-									}
-									onDragStart={ this.onDragStart }
-									onDragEnd={ this.onDragEnd }
-								/>
-							) }
 							{ isFirstMultiSelected && (
 								<BlockMultiControls rootClientId={ rootClientId } />
 							) }
 							<div className="editor-block-list__block-edit">
+								{ shouldRenderMovers && (
+									<BlockMover
+										clientIds={ clientId }
+										blockElementId={ blockElementId }
+										isFirst={ isFirst }
+										isLast={ isLast }
+										isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+										isDraggable={
+											isDraggable !== false &&
+											( ! isPartOfMultiSelection && isMovable )
+										}
+										onDragStart={ this.onDragStart }
+										onDragEnd={ this.onDragEnd }
+									/>
+								) }
 								{ shouldShowBreadcrumb && (
 									<BlockBreadcrumb
 										clientId={ clientId }
