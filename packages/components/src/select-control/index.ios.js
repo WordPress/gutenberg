@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 class SelectControl extends Component {
-	presentPicker() {
+	presentSelector() {
 		const  { options, onChange } = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( "Cancel" ) ].concat( labels );

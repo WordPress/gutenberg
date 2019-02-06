@@ -1,36 +1,73 @@
 /**
  * External dependencies
  */
-import { Picker } from 'react-native';
+import React from 'react';
+import { Text, View, TouchableOpacity } from 'react-native';
+
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
+import styles from './style.scss';
+import Modal from '../modal';
 
-function SelectControl( { label, options, value, onChange, rows = 4, help = "" } ) {
+const CANCEL_VALUE = "cancel";
 
-	const onValueChange = ( { itemValue } ) => {
-		onChange( itemValue )
+export default class SelectControl extends Component {
+	constructor( props ) {
+		super( ...arguments );
+		this.onClose = this.onClose.bind( this );
+		this.onCellPress = this.onCellPress.bind( this );
+
+		this.state = {
+			isVisible: false,
+		};
 	}
 
-	return (
-		<BaseControl label={ label } help={ help } >
-			<Picker
-				mode='dialog'
-				selectedValue={ value }
-				onValueChange={ onValueChange }
-			>
-				{ options.map( ( option, index ) =>
-					<Picker.Item 
-						key={ `${ option.label }-${ option.value }-${ index }` } 
-						label={ option.label } 
-						value={ option.value } 
-					/>
-				) }
-			</Picker>
-		</BaseControl>
-	);
-}
+	presentSelector() {
+		this.setState( { isVisible: true } );
+	}
 
-export default SelectControl;
+	onClose() {
+		this.setState( { isVisible: false } );
+	}
+
+	onCellPress( value ) {
+		if ( value !== CANCEL_VALUE ) {
+			this.props.onChange( value );
+		}
+		this.onClose();
+	} 
+
+	render() {
+		const  { options, onChange } = this.props;
+		const fullOptions = options.concat( { label: __( "Cancel" ), value: CANCEL_VALUE } );
+
+		return ( 
+			<Modal
+				title={ __( "Image Alt Text" ) }
+				isVisible={ this.state.isVisible }
+				onClose={ this.onClose }
+			>
+				<View style={ { flex: 1 } }>
+					{ fullOptions.map( ( option, index ) =>
+						<TouchableOpacity 
+							style={ styles.cellContainer } 
+							onPress={ () => this.onCellPress( option.value ) } 
+							key={ index } 
+						>
+							<Text style={ styles.cellLabel } numberOfLines={ 1 } >
+								{ option.label }
+							</Text>
+						</TouchableOpacity> 
+					) }
+				</View>
+			</Modal>
+		)
+	}
+}

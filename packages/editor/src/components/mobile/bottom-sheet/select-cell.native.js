@@ -34,7 +34,7 @@ export default function Cell( props ) {
 	let picker;
 
 	const onCellPress = () => {
-		picker.presentPicker();
+		picker.presentSelector();
 	};
 
 	const onChange = ( value ) => {
