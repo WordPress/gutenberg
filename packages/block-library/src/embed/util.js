@@ -123,16 +123,27 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
  * @param {boolean} allowResponsive    If the responsive class names should be added, or removed.
  * @return {string} Deduped class names.
  */
-export function getClassNames( html, existingClassNames = '', allowResponsive = true ) {
+export function getClassNames( html, existingClassNames, allowResponsive = true ) {
+	// If responsive embeds are not supported, remove any existing responsive
+	// class names.
 	if ( ! allowResponsive ) {
-		// Remove all of the aspect ratio related class names.
+		// If there were no class names to begin with, there is nothing to do.
+		// This also provides a normalizing behavior for existing class names
+		// as either the empty string or as `undefined`, ensuring that the same
+		// value is returned.
+		if ( ! existingClassNames ) {
+			return existingClassNames;
+		}
+
 		const aspectRatioClassNames = {
 			'wp-has-aspect-ratio': false,
 		};
+
 		for ( let ratioIndex = 0; ratioIndex < ASPECT_RATIOS.length; ratioIndex++ ) {
 			const aspectRatioToRemove = ASPECT_RATIOS[ ratioIndex ];
 			aspectRatioClassNames[ aspectRatioToRemove.className ] = false;
 		}
+
 		return classnames(
 			existingClassNames,
 			aspectRatioClassNames
