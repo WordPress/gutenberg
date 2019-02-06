@@ -9,6 +9,8 @@ import { Text, View, TouchableOpacity } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import BottomSheet from '../../../editor/src/components/mobile/bottom-sheet';
+// import { BottomSheet } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -45,29 +47,27 @@ export default class SelectControl extends Component {
 	}
 
 	render() {
-		const { options } = this.props;
-		const fullOptions = options.concat( { label: __( 'Cancel' ), value: CANCEL_VALUE } );
-
 		return (
-			<Modal
-				title={ __( 'Image Alt Text' ) }
+			<BottomSheet
 				isVisible={ this.state.isVisible }
 				onClose={ this.onClose }
+				hideHeader
 			>
-				<View style={ { flex: 1 } }>
-					{ fullOptions.map( ( option, index ) =>
-						<TouchableOpacity
-							style={ styles.cellContainer }
-							onPress={ () => this.onCellPress( option.value ) }
+				<View>
+					{ this.props.options.map( ( option, index ) =>
+						<BottomSheet.Cell 
 							key={ index }
-						>
-							<Text style={ styles.cellLabel } numberOfLines={ 1 } >
-								{ option.label }
-							</Text>
-						</TouchableOpacity>
+							label={ option.label }
+							onPress={ () => this.onCellPress( option.value ) }
+						/>
 					) }
+					<BottomSheet.Cell 
+						label={ __( 'Cancel' ) }
+						onPress={ this.onClose }
+						drawSeparator={ false }
+					/>
 				</View>
-			</Modal>
+			</BottomSheet>
 		);
 	}
 }
