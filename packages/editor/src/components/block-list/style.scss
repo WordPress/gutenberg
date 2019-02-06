@@ -131,6 +131,7 @@
 	&.is-selected > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
 		outline: $border-width solid $dark-opacity-200;
+		@include outline-fade-animation();
 
 		.is-dark-theme & {
 			outline-color: $light-opacity-300;
@@ -302,7 +303,7 @@
 		// Position toolbar better on mobile.
 		.editor-block-contextual-toolbar {
 			width: auto;
-			border-bottom: $border-width solid $light-gray-500;
+			border-bottom: $border-width solid $dark-opacity-200;
 			bottom: auto;
 		}
 	}
@@ -563,8 +564,9 @@
 		margin-top: $block-toolbar-height;
 		margin-right: -$block-padding;
 		margin-left: -$block-padding;
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $dark-opacity-200;
 		height: $block-toolbar-height;
+		@include outline-fade-animation();
 
 		@include break-small() {
 			display: none;
@@ -765,7 +767,9 @@
 		right: -$block-padding;
 
 		// Paint the borders on the toolbar itself on mobile.
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $dark-opacity-200;
+		@include outline-fade-animation();
+
 		.components-toolbar {
 			border-top: none;
 			border-bottom: none;
@@ -774,8 +778,8 @@
 		@include break-small() {
 			border-top: none;
 			.components-toolbar {
-				border-top: $border-width solid $light-gray-500;
-				border-bottom: $border-width solid $light-gray-500;
+				border-top: $border-width solid $dark-opacity-200;
+				border-bottom: $border-width solid $dark-opacity-200;
 			}
 		}
 	}

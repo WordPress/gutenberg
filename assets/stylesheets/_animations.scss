@@ -6,3 +6,23 @@
 	animation: edit-post__fade-in-animation $speed ease-out $delay;
 	animation-fill-mode: forwards;
 }
+
+/**
+ * Outline animation
+ */
+
+@keyframes outline-fade-animation {
+	from {
+		outline-color: $dark-opacity-200;
+		border-color: $dark-opacity-200;
+	}
+	to {
+		outline-color: $dark-opacity-light-500;
+		border-color: $dark-opacity-light-500;
+	}
+}
+
+@mixin outline-fade-animation($speed: 0.2s, $delay: 1s) {
+	animation: outline-fade-animation $speed ease-out $delay;
+	animation-fill-mode: forwards;
+}
