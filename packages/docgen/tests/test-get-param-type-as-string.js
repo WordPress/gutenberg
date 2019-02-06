@@ -39,3 +39,22 @@ test( 'getParamType from NullableType', ( t ) => {
 	t.equal( type, 'string' );
 	t.end();
 } );
+
+test( 'getParamType from RestType', ( t ) => {
+	const type = getParamType( {
+		title: 'param',
+		description: 'description',
+		type: {
+			type: 'RestType',
+			expression: {
+				type: 'NameExpression',
+				name: 'Function',
+			},
+			prefix: true,
+		},
+		name: 'paramName',
+	} );
+	t.equal( type, 'Function' );
+	t.end();
+} );
+
