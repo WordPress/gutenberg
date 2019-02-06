@@ -1,4 +1,7 @@
+@import "variables.scss";
+
 .editor-plain-text {
+	font-family: $default-regular-font;
 	box-shadow: none;
 
 	border-width: 0;

@@ -16,6 +16,7 @@
 
 .edit-post-text-editor {
 	width: 100%;
+	max-width: calc(100% - #{$grid-size-large * 2});
 	margin-left: $grid-size-large;
 	margin-right: $grid-size-large;
 
