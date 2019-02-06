@@ -30,8 +30,11 @@ export function getActiveFormat( { formats, formatPlaceholder, start, end }, for
 		return find( formatPlaceholder.formats, { type: formatType } );
 	}
 
+	// if we're at the start of text, use the first char to pick up the formats
+	const startPos = start == 0 ? 0 : start -1;
+
 	// otherwise get the previous character format
-	const previousLetterFormat = find( formats[ start - 1 ], { type: formatType } );
+	const previousLetterFormat = find( formats[ startPos ], { type: formatType } );
 
 	if ( previousLetterFormat ) {
 		return previousLetterFormat;
