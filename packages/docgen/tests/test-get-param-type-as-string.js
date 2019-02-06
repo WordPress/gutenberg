@@ -36,7 +36,7 @@ test( 'getParamType from NullableType', ( t ) => {
 		},
 		name: 'paramName',
 	} );
-	t.equal( type, 'string' );
+	t.equal( type, '?string' );
 	t.end();
 } );
 
