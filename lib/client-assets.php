@@ -1110,7 +1110,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );
 	if ( $post_autosave ) {
 		$editor_settings['autosave'] = array(
-			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
+			'editLink' => get_edit_post_link( $post_autosave->ID ),
 		);
 	}
 
