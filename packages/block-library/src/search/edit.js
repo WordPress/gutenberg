@@ -24,7 +24,7 @@ export default function SearchEdit( { className, attributes, setAttributes } ) {
 				// We hide the placeholder field's placeholder when there is a value. This
 				// stops screen readers from reading the placeholder field's placeholder
 				// which is confusing.
-				placeholder={ ! placeholder && __( 'Optional placeholder…' ) }
+				placeholder={ placeholder ? undefined : __( 'Optional placeholder…' ) }
 				value={ placeholder }
 				onChange={ ( event ) => setAttributes( { placeholder: event.target.value } ) }
 			/>
