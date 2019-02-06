@@ -358,7 +358,7 @@ export default class ImageEdit extends React.Component {
 						<View style={ { padding: 12, flex: 1 } }>
 							<TextInput
 								style={ { textAlign: 'center' } }
-								fontFamily={ 'serif' }
+								fontFamily={ this.props.fontFamily || ( styles[ 'caption-text' ].fontFamily ) }
 								underlineColorAndroid="transparent"
 								value={ caption }
 								placeholder={ __( 'Write caption…' ) }
