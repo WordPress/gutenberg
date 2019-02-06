@@ -1,10 +1,12 @@
 # JavaScript Build Setup
 
-This page covers how to set up your development environment to use the ESNext syntax. We call ESNext to JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short) or that includes custom syntax such as [JSX](https://reactjs.org/docs/introducing-jsx.html).
+This page covers how to set up your development environment to use the ESNext syntax. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short) or that includes custom syntax such as [JSX](https://reactjs.org/docs/introducing-jsx.html).
 
-This documentation covers development for your plugin to work with Gutenberg, to setup a development environment to work directly on Gutenberg, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
+This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
 
-For simpler code, you can write JavaScript using ESNext and JSX syntax. This requires a transformation step to convert that syntax, which a web browser may not understand, to one that it will. Webpack and Babel are the tools that perform this transformation step.
+ESNext and JSX syntaxes are not valid JavaScript that all browsers can interpret and run. This requires a transformation step to convert to valid code a browser can run. There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
+
+Webpack and Babel are the tools that perform this transformation or build step.
 
 [Webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to Webpack to transform both ESNext and JSX to JavaScript.
 
