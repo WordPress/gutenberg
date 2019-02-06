@@ -16,6 +16,7 @@ import {
 	Spinner,
 	ToggleControl,
 	Toolbar,
+	DropdownMenu
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -83,7 +84,15 @@ class LatestPostsEdit extends Component {
 
 		const inspectorControls = (
 			<InspectorControls>
-				<PanelBody title={ __( 'Latest Posts Settings' ) }>
+				<PanelBody title={ __( 'Post Meta Settings' ) }>
+					<ToggleControl
+						label={ __( 'Display post date' ) }
+						checked={ displayPostDate }
+						onChange={ this.toggleDisplayPostDate }
+					/>
+				</PanelBody>
+
+				<PanelBody title={ __( 'Sorting and Filtering' ) }>
 					<QueryControls
 						{ ...{ order, orderBy } }
 						numberOfItems={ postsToShow }
@@ -94,11 +103,7 @@ class LatestPostsEdit extends Component {
 						onCategoryChange={ ( value ) => setAttributes( { categories: '' !== value ? value : undefined } ) }
 						onNumberOfItemsChange={ ( value ) => setAttributes( { postsToShow: value } ) }
 					/>
-					<ToggleControl
-						label={ __( 'Display post date' ) }
-						checked={ displayPostDate }
-						onChange={ this.toggleDisplayPostDate }
-					/>
+
 					{ postLayout === 'grid' &&
 						<RangeControl
 							label={ __( 'Columns' ) }
@@ -157,12 +162,16 @@ class LatestPostsEdit extends Component {
 				{ inspectorControls }
 				<BlockControls>
 					<BlockAlignmentToolbar
+						isCollapsed={ true }
 						value={ align }
 						onChange={ ( nextAlign ) => {
 							setAttributes( { align: nextAlign } );
 						} }
 					/>
-					<Toolbar controls={ layoutControls } />
+					<Toolbar
+						isCollapsed={ true }
+						controls={ layoutControls }
+					/>
 				</BlockControls>
 				<ul
 					className={ classnames( this.props.className, {
