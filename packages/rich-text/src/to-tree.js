@@ -58,24 +58,24 @@ function getDeepestActiveFormat( { formats, start, selectedFormat } ) {
 		return;
 	}
 
-	const formatsAtStart = formats[ start ] || [];
-	const formatsAtBeforeStart = formats[ start - 1 ] || [];
+	const formatsAfter = formats[ start ] || [];
+	const formatsBefore = formats[ start - 1 ] || [];
 
-	let f = formatsAtStart;
+	let source = formatsAfter;
 
-	if ( formatsAtBeforeStart.length > formatsAtStart.length ) {
-		f = formatsAtBeforeStart;
+	if ( formatsBefore.length > formatsAfter.length ) {
+		source = formatsBefore;
 	}
 
-	if ( ! f.length ) {
+	if ( ! source.length ) {
 		return;
 	}
 
 	if ( selectedFormat === undefined ) {
-		return f[ formatsAtStart.length - 1 ];
+		return source[ formatsAfter.length - 1 ];
 	}
 
-	return f[ selectedFormat - 1 ];
+	return source[ selectedFormat - 1 ];
 }
 
 export function toTree( {

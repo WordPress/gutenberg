@@ -19,7 +19,7 @@ import memize from 'memize';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -68,6 +68,17 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 
 const { getSelection } = window;
 
+function getOuterFormat( { formats, start, end } ) {
+	if ( start === undefined || start !== end ) {
+		return;
+	}
+
+	const formatsBefore = formats[ start - 1 ] || [];
+	const formatsAfter = formats[ start ] || [];
+
+	return Math.min( formatsBefore.length, formatsAfter.length );
+}
+
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
 		super( ...arguments );
@@ -109,6 +120,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
+		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -347,10 +359,28 @@ export class RichText extends Component {
 			return;
 		}
 
-		const record = this.createRecord();
-		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
+		const { formats, text, start, end } = this.patterns.reduce(
+			( accumlator, transform ) => transform( accumlator ),
+			this.createRecord()
+		);
 
-		this.onChange( transformed, {
+		if ( this.state.selectedFormat ) {
+			const formatsBefore = formats[ start - 1 ] || [];
+			const formatsAfter = formats[ start ] || [];
+
+			let source = formatsBefore;
+
+			if ( formatsAfter.length > formatsBefore.length ) {
+				source = formatsAfter;
+			}
+
+			source = source.slice( 0, this.state.selectedFormat );
+			formats[ this.state.start ] = source;
+		} else {
+			delete formats[ this.state.start ];
+		}
+
+		this.onChange( { formats, text, start, end }, {
 			withoutHistory: true,
 		} );
 
@@ -369,8 +399,13 @@ export class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
+		if ( this.ignoreSelectionChange ) {
+			delete this.ignoreSelectionChange;
+			return;
+		}
+
 		const value = this.createRecord();
-		const { start, end, formats, selectedFormat } = value;
+		const { start, end, formats } = value;
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
@@ -380,8 +415,9 @@ export class RichText extends Component {
 				this.props.onExitFormattedText();
 			}
 
+			const selectedFormat = getOuterFormat( value );
 			this.setState( { start, end, selectedFormat } );
-			this.applyRecord( value );
+			this.applyRecord( { ...value, selectedFormat } );
 		}
 	}
 
@@ -409,13 +445,13 @@ export class RichText extends Component {
 	onChange( record, { withoutHistory } = {} ) {
 		this.applyRecord( record );
 
-		const { start, end, selectedFormat } = record;
+		const { start, end } = record;
 
 		this.onChangeEditableValue( record );
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
-		this.setState( { start, end, selectedFormat } );
+		this.setState( { start, end } );
 
 		if ( ! withoutHistory ) {
 			this.onCreateUndoLevel();
@@ -488,7 +524,14 @@ export class RichText extends Component {
 	 * @param {KeyboardEvent} event The keydown event.
 	 */
 	onKeyDown( event ) {
-		const { keyCode } = event;
+		const { keyCode, shiftKey, altKey, metaKey } = event;
+
+		if (
+			! shiftKey && ! altKey && ! metaKey &&
+			( keyCode === LEFT || keyCode === RIGHT )
+		) {
+			this.handleHorizontalNavigation( event );
+		}
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const value = this.createRecord();
@@ -576,6 +619,83 @@ export class RichText extends Component {
 				this.splitContent();
 			}
 		}
+	}
+
+	handleHorizontalNavigation( event ) {
+		const value = this.createRecord();
+		const { formats, text, start, end } = value;
+		const { selectedFormat } = this.state;
+		const collapsed = isCollapsed( value );
+		const isReverse = event.keyCode === LEFT;
+
+		// If the selection is collapsed and at the very start, do nothing if
+		// navigating backward.
+		// If the selection is collapsed and at the very end, do nothing if
+		// navigating forward.
+		if ( collapsed && selectedFormat === 0 ) {
+			if ( start === 0 && isReverse ) {
+				return;
+			}
+
+			if ( end === text.length && ! isReverse ) {
+				return;
+			}
+		}
+
+		// If the selection is not collapsed, let the browser handle collapsing
+		// the selection for now. Later we could expand this logic to set
+		// boundary positions if needed.
+		if ( ! collapsed ) {
+			return;
+		}
+
+		// In all other cases, prevent default behaviour.
+		event.preventDefault();
+
+		// Ignore the selection change handler when setting selection, all state
+		// will be set here.
+		this.ignoreSelectionChange = true;
+
+		const formatsBefore = formats[ start - 1 ] || [];
+		const formatsAfter = formats[ start ] || [];
+
+		let newSelectedFormat = selectedFormat;
+
+		// If the amount of formats before the caret and after the caret is
+		// different, the caret is at a format boundary.
+		if ( formatsBefore.length < formatsAfter.length ) {
+			if ( ! isReverse && selectedFormat < formatsAfter.length ) {
+				newSelectedFormat++;
+			}
+
+			if ( isReverse && selectedFormat > formatsBefore.length ) {
+				newSelectedFormat--;
+			}
+		} else if ( formatsBefore.length > formatsAfter.length ) {
+			if ( ! isReverse && selectedFormat > formatsAfter.length ) {
+				newSelectedFormat--;
+			}
+
+			if ( isReverse && selectedFormat < formatsBefore.length ) {
+				newSelectedFormat++;
+			}
+		}
+
+		if ( newSelectedFormat !== selectedFormat ) {
+			this.applyRecord( { ...value, selectedFormat: newSelectedFormat } );
+			this.setState( { selectedFormat: newSelectedFormat } );
+			return;
+		}
+
+		const newPos = value.start + ( isReverse ? -1 : 1 );
+
+		this.setState( { start: newPos, end: newPos } );
+		this.applyRecord( {
+			...value,
+			start: newPos,
+			end: newPos,
+			selectedFormat: isReverse ? formatsBefore.length : formatsAfter.length,
+		} );
 	}
 
 	/**

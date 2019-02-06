@@ -5,9 +5,8 @@ exports[`recordToDom should create a value with formatting 1`] = `
   <em
     data-rich-text-format-boundary="true"
   >
-    ﻿test
+    test
   </em>
-  ﻿
   
 </body>
 `;
@@ -17,12 +16,12 @@ Object {
   "endPath": Array [
     0,
     0,
-    5,
+    4,
   ],
   "startPath": Array [
     0,
     0,
-    1,
+    0,
   ],
 }
 `;
@@ -32,9 +31,8 @@ exports[`recordToDom should create a value with formatting for split tags 1`] = 
   <em
     data-rich-text-format-boundary="true"
   >
-    ﻿test
+    test
   </em>
-  ﻿
   
 </body>
 `;
@@ -44,12 +42,12 @@ Object {
   "endPath": Array [
     0,
     0,
-    3,
+    2,
   ],
   "startPath": Array [
     0,
     0,
-    1,
+    0,
   ],
 }
 `;
@@ -60,9 +58,8 @@ exports[`recordToDom should create a value with formatting with attributes 1`] =
     data-rich-text-format-boundary="true"
     href="#"
   >
-    ﻿test
+    test
   </a>
-  ﻿
   
 </body>
 `;
@@ -72,12 +69,12 @@ Object {
   "endPath": Array [
     0,
     0,
-    5,
+    4,
   ],
   "startPath": Array [
     0,
     0,
-    1,
+    0,
   ],
 }
 `;
@@ -107,13 +104,11 @@ Object {
 exports[`recordToDom should create a value with image object and formatting 1`] = `
 <body>
   <em>
-    ﻿
     <img
       src=""
     />
     
   </em>
-  ﻿
   
 </body>
 `;
@@ -122,12 +117,12 @@ exports[`recordToDom should create a value with image object and formatting 2`] 
 Object {
   "endPath": Array [
     0,
-    2,
+    1,
     0,
   ],
   "startPath": Array [
     0,
-    2,
+    1,
     0,
   ],
 }
@@ -136,13 +131,11 @@ Object {
 exports[`recordToDom should create a value with image object and text after 1`] = `
 <body>
   <em>
-    ﻿
     <img
       src=""
     />
     te
   </em>
-  ﻿
   st
 </body>
 `;
@@ -150,12 +143,12 @@ exports[`recordToDom should create a value with image object and text after 1`] 
 exports[`recordToDom should create a value with image object and text after 2`] = `
 Object {
   "endPath": Array [
-    2,
+    1,
     2,
   ],
   "startPath": Array [
     0,
-    2,
+    1,
     0,
   ],
 }
@@ -165,13 +158,12 @@ exports[`recordToDom should create a value with image object and text before 1`]
 <body>
   te
   <em>
-    ﻿st
+    st
     <img
       src=""
     />
     
   </em>
-  ﻿
   
 </body>
 `;
@@ -193,15 +185,12 @@ Object {
 exports[`recordToDom should create a value with nested formatting 1`] = `
 <body>
   <em>
-    ﻿
     <strong
       data-rich-text-format-boundary="true"
     >
-      ﻿test
+      test
     </strong>
-    ﻿
   </em>
-  ﻿
   
 </body>
 `;
@@ -210,15 +199,15 @@ exports[`recordToDom should create a value with nested formatting 2`] = `
 Object {
   "endPath": Array [
     0,
-    1,
     0,
-    5,
+    0,
+    4,
   ],
   "startPath": Array [
     0,
-    1,
     0,
-    1,
+    0,
+    0,
   ],
 }
 `;
@@ -291,9 +280,8 @@ exports[`recordToDom should filter format boundary attributes 1`] = `
   <strong
     data-rich-text-format-boundary="true"
   >
-    ﻿test
+    test
   </strong>
-  ﻿
   
 </body>
 `;
@@ -303,12 +291,12 @@ Object {
   "endPath": Array [
     0,
     0,
-    5,
+    4,
   ],
   "startPath": Array [
     0,
     0,
-    1,
+    0,
   ],
 }
 `;
@@ -356,12 +344,9 @@ Object {
 
 exports[`recordToDom should filter zero width space in format 1`] = `
 <body>
-  <em
-    data-rich-text-format-boundary="true"
-  >
-    ﻿test
+  <em>
+    test
   </em>
-  ﻿
   
 </body>
 `;
@@ -371,12 +356,12 @@ Object {
   "endPath": Array [
     0,
     0,
-    5,
+    4,
   ],
   "startPath": Array [
     0,
     0,
-    5,
+    4,
   ],
 }
 `;
@@ -384,9 +369,8 @@ Object {
 exports[`recordToDom should filter zero width space outside format 1`] = `
 <body>
   <em>
-    ﻿test
+    test
   </em>
-  ﻿
   
 </body>
 `;
@@ -396,12 +380,12 @@ Object {
   "endPath": Array [
     0,
     0,
-    5,
+    4,
   ],
   "startPath": Array [
     0,
     0,
-    5,
+    4,
   ],
 }
 `;
@@ -432,11 +416,10 @@ exports[`recordToDom should handle br with formatting 1`] = `
   <em
     data-rich-text-format-boundary="true"
   >
-    ﻿
+    
     <br />
     
   </em>
-  ﻿
   
 </body>
 `;
@@ -451,7 +434,7 @@ Object {
   "startPath": Array [
     0,
     0,
-    1,
+    0,
   ],
 }
 `;
@@ -778,14 +761,14 @@ exports[`recordToDom should ignore formats at line separator 1`] = `
 <body>
   <p>
     <em>
-      ﻿one
+      one
     </em>
   </p>
   <p>
     <em>
-      ﻿two
+      two
     </em>
-    ﻿
+    
   </p>
 </body>
 `;
@@ -821,9 +804,8 @@ exports[`recordToDom should preserve emoji in formatting 1`] = `
   <em
     data-rich-text-format-boundary="true"
   >
-    ﻿🍒
+    🍒
   </em>
-  ﻿
   
 </body>
 `;
@@ -833,12 +815,12 @@ Object {
   "endPath": Array [
     0,
     0,
-    3,
+    2,
   ],
   "startPath": Array [
     0,
     0,
-    1,
+    0,
   ],
 }
 `;

@@ -539,7 +539,6 @@ export const spec = [
 		record: {
 			start: 4,
 			end: 4,
-			selectedFormat: 0,
 			formats: [ , , , , ],
 			text: 'test',
 		},
@@ -556,7 +555,6 @@ export const spec = [
 		record: {
 			start: 4,
 			end: 4,
-			selectedFormat: 1,
 			formats: [ [ em ], [ em ], [ em ], [ em ] ],
 			text: 'test',
 		},
@@ -573,7 +571,6 @@ export const spec = [
 		record: {
 			start: 4,
 			end: 4,
-			selectedFormat: 0,
 			formats: [ [ em ], [ em ], [ em ], [ em ] ],
 			text: 'test',
 		},
