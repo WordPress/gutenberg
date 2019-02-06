@@ -19,7 +19,7 @@ import Modal from '../modal';
 const CANCEL_VALUE = "cancel";
 
 export default class SelectControl extends Component {
-	constructor( props ) {
+	constructor() {
 		super( ...arguments );
 		this.onClose = this.onClose.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
@@ -45,7 +45,7 @@ export default class SelectControl extends Component {
 	} 
 
 	render() {
-		const  { options, onChange } = this.props;
+		const  { options } = this.props;
 		const fullOptions = options.concat( { label: __( "Cancel" ), value: CANCEL_VALUE } );
 
 		return ( 

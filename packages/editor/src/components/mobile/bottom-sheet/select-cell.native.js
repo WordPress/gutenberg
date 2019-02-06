@@ -1,15 +1,12 @@
 /**
 * External dependencies
 */
-import { TouchableOpacity, Text, View, ActionSheetIOS } from 'react-native';
-import { map } from 'lodash';
+import { TouchableOpacity, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Dashicon, SelectControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,7 +23,6 @@ export default function Cell( props ) {
 		labelStyle = {},
 		valueStyle = {},
 		onChangeValue,
-		onPress,
 		...valueProps
 	} = props;
 
@@ -37,8 +33,8 @@ export default function Cell( props ) {
 		picker.presentSelector();
 	};
 
-	const onChange = ( value ) => {
-		onChangeValue( value );
+	const onChange = ( newValue ) => {
+		onChangeValue( newValue );
 	}
 
 	return (

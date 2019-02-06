@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback, ActionSheetIOS } from 'react-native';
+import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -21,7 +21,7 @@ import {
  * Internal dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner, Dashicon, SelectControl } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
@@ -338,7 +338,6 @@ class ImageEdit extends React.Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getEditorSettings } = select( 'core/editor' );
-		const { id } = props.attributes;
 		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 
 		return {

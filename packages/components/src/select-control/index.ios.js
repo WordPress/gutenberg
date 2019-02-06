@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { ActionSheetIOS } from 'react-native';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +20,7 @@ class SelectControl extends Component {
 				cancelButtonIndex: 0,
 			},
 			(buttonIndex) => {
-				if (buttonIndex == 0) {
+				if (buttonIndex === 0) {
 					return;
 				}
 				const selected = options[buttonIndex - 1];
