@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import icon from './icon';
+import icon from './media-container-icon';
 
 /**
  * Constants
