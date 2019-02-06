@@ -4,6 +4,8 @@ const getType = function( param ) {
 	} else if ( param.expression ) {
 		if ( param.type === 'RestType' ) {
 			return `...${ getType( param.expression ) }`;
+		} else if ( param.type === 'NullableType' ) {
+			return `?${ getType( param.expression ) }`;
 		}
 		return getType( param.expression );
 	} else if ( param.elements ) {
