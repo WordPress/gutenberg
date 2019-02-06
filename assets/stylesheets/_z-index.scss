@@ -5,7 +5,6 @@
 $z-layers: (
 	".editor-block-list__block-edit::before": 0,
 	".editor-block-switcher__arrow": 1,
-	".editor-block-list__block {core/image aligned left or right}": 20,
 	".editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 10,
 	".editor-block-list__layout .reusable-block-indicator": 1,
@@ -48,9 +47,12 @@ $z-layers: (
 	".components-drop-zone": 100,
 	".components-drop-zone__content": 110,
 
-	// Block controls, particularly in nested contexts, floats aside block and
+	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
-	".editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}": 80,
+	".editor-block-list__block.is-{selected,hovered} .editor-block-mover": 80,
+
+	// The block mover for floats should overlap the controls of adjacent blocks.
+	".editor-block-list__block {core/image aligned left or right}": 81,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
