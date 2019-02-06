@@ -33,8 +33,8 @@ function createRunHook( hooks, returnFirstArg ) {
 		// The following code can be stripped from production builds.
 		/* develblock:start */
 		// Handle any 'all' hooks registered.
-		if ( hooks.all ) {
-			handlers.push( hooks.all.handlers );
+		if ( 'hookAdded' !== hookName && hooks.all ) {
+			handlers.push( ...hooks.all.handlers );
 		}
 		/* develblock:end */
 
