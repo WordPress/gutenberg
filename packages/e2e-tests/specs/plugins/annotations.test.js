@@ -80,7 +80,7 @@ describe( 'Using Plugins API', () => {
 	 * @return {Promise<string>} Inner HTML.
 	 */
 	async function getRichTextInnerHTML() {
-		const htmlContent = await page.$$( '.editor-rich-text__tinymce' );
+		const htmlContent = await page.$$( '*[contenteditable]' );
 		return await page.evaluate( ( el ) => {
 			return el.innerHTML;
 		}, htmlContent[ 0 ] );
@@ -124,7 +124,7 @@ describe( 'Using Plugins API', () => {
 			await page.keyboard.type( 'D' );
 
 			await removeAnnotations();
-			const htmlContent = await page.$$( '.editor-rich-text__tinymce' );
+			const htmlContent = await page.$$( '*[contenteditable]' );
 			const html = await page.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );
