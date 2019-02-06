@@ -12,7 +12,7 @@ buildscript {
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
 
-        aztecVersion = 'v1.3.18'
+        aztecVersion = '6c147179afacd519ccce744708980941812bf24b'
     }
 
     repositories {
