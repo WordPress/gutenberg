@@ -9,18 +9,16 @@ import { Text, View, TouchableOpacity } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import BottomSheet from '../../../editor/src/components/mobile/bottom-sheet';
-// import { BottomSheet } from '@wordpress/editor';
+import { BottomSheet } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
-import Modal from '../modal';
+import styles from './styles';
 
 const CANCEL_VALUE = 'cancel';
 
-export default class SelectControl extends Component {
+export default class Picker extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onClose = this.onClose.bind( this );

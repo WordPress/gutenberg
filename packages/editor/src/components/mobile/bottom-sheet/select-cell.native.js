@@ -6,12 +6,13 @@ import { TouchableOpacity, Text, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Dashicon, SelectControl } from '@wordpress/components';
+import { Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import Picker from '../picker';
 
 export default function Cell( props ) {
 	const {
@@ -39,7 +40,7 @@ export default function Cell( props ) {
 
 	return (
 		<TouchableOpacity onPress={ onCellPress } >
-			<SelectControl
+			<Picker
 				ref={ ( instance ) => picker = instance }
 				options={ options }
 				onChange={ onChange }

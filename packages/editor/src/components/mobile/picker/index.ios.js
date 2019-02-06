@@ -9,7 +9,7 @@ import { ActionSheetIOS } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
-class SelectControl extends Component {
+class Picker extends Component {
 	presentSelector() {
 		const { options, onChange } = this.props;
 		const labels = options.map( ( { label } ) => label );
@@ -34,4 +34,4 @@ class SelectControl extends Component {
 	}
 }
 
-export default SelectControl;
+export default Picker;
