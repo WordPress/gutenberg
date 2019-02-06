@@ -53,7 +53,7 @@ test( 'getParamType from RestType', ( t ) => {
 		},
 		name: 'paramName',
 	} );
-	t.equal( type, 'Function' );
+	t.equal( type, '...Function' );
 	t.end();
 } );
 
@@ -73,6 +73,6 @@ test( 'getParamType from RestType with UnionType', ( t ) => {
 		},
 		name: 'paramName',
 	} );
-	t.equal( type, 'Object | string' );
+	t.equal( type, '...(Object | string)' );
 	t.end();
 } );
