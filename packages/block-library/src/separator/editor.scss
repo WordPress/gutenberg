@@ -1,0 +1,13 @@
+.wp-block-separator {
+	// Make the separator hit area bigger, to make it more easy to select.
+	&::after {
+		content: "";
+		display: block;
+		padding-bottom: $icon-button-size-small;
+		position: relative;
+		top: ($icon-button-size-small / 2);
+	}
+	margin-top: -($icon-button-size-small / 2);
+	margin-bottom: -$icon-button-size-small / 2;
+	transform: translateY(-$icon-button-size-small / 2);
+}
