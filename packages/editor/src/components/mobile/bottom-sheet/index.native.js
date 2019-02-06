@@ -61,6 +61,7 @@ class BottomSheet extends Component {
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
 					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }
+					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
 					{ hideHeader || (
