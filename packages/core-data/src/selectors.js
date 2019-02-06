@@ -7,7 +7,7 @@ import { map, find, get, filter, compact, defaultTo } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
+import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 
 /**
@@ -15,19 +15,6 @@ import deprecated from '@wordpress/deprecated';
  */
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
-
-/**
- * Returns true if resolution is in progress for the core selector of the given
- * name and arguments.
- *
- * @param {string} selectorName Core data selector name.
- * @param {...*}   args         Arguments passed to selector.
- *
- * @return {boolean} Whether resolution is in progress.
- */
-function isResolving( selectorName, ...args ) {
-	return select( 'core/data' ).isResolving( REDUCER_KEY, selectorName, args );
-}
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -38,9 +25,9 @@ function isResolving( selectorName, ...args ) {
  *
  * @return {boolean} Whether a request is in progress for an embed preview.
  */
-export function isRequestingEmbedPreview( state, url ) {
-	return isResolving( 'getEmbedPreview', url );
-}
+export const isRequestingEmbedPreview = createRegistrySelector( ( registry ) => ( state, url ) => {
+	return registry.select( 'core/data' ).isResolving( REDUCER_KEY, 'getEmbedPreview', [ url ] );
+} );
 
 /**
  * Returns all available authors.
