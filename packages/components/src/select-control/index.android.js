@@ -8,7 +8,7 @@ import { Picker } from 'react-native';
  */
 import BaseControl from '../base-control';
 
-function TextareaControl( { label, options, value, onChange, rows = 4 } ) {
+function SelectControl( { label, options, value, onChange, rows = 4, help = "" } ) {
 
 	const onValueChange = ( { itemValue } ) => {
 		onChange( itemValue )
@@ -33,4 +33,4 @@ function TextareaControl( { label, options, value, onChange, rows = 4 } ) {
 	);
 }
 
-export default TextareaControl;
+export default SelectControl;
