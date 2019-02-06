@@ -11,21 +11,21 @@ import { Component } from '@wordpress/element';
 
 class SelectControl extends Component {
 	presentSelector() {
-		const  { options, onChange } = this.props;
+		const { options, onChange } = this.props;
 		const labels = options.map( ( { label } ) => label );
-		const fullOptions = [ __( "Cancel" ) ].concat( labels );
+		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
 
 		ActionSheetIOS.showActionSheetWithOptions( {
-				options: fullOptions,
-				cancelButtonIndex: 0,
-			},
-			(buttonIndex) => {
-				if (buttonIndex === 0) {
-					return;
-				}
-				const selected = options[buttonIndex - 1];
-				onChange( selected.value );
-			},
+			options: fullOptions,
+			cancelButtonIndex: 0,
+		},
+		( buttonIndex ) => {
+			if ( buttonIndex === 0 ) {
+				return;
+			}
+			const selected = options[ buttonIndex - 1 ];
+			onChange( selected.value );
+		},
 		);
 	}
 

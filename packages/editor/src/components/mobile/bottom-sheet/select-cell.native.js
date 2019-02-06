@@ -15,9 +15,9 @@ import styles from './styles.scss';
 
 export default function Cell( props ) {
 	const {
-		label, 
+		label,
 		value,
-		options, 
+		options,
 		drawSeparator = true,
 		icon,
 		labelStyle = {},
@@ -35,11 +35,11 @@ export default function Cell( props ) {
 
 	const onChange = ( newValue ) => {
 		onChangeValue( newValue );
-	}
+	};
 
 	return (
 		<TouchableOpacity onPress={ onCellPress } >
-			<SelectControl 
+			<SelectControl
 				ref={ ( instance ) => picker = instance }
 				options={ options }
 				onChange={ onChange }
@@ -67,7 +67,7 @@ export default function Cell( props ) {
 			{ drawSeparator && (
 				<View style={ styles.cellSeparator } />
 			) }
-			
+
 		</TouchableOpacity>
 	);
 }

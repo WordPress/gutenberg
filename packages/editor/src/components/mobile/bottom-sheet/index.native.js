@@ -16,7 +16,7 @@ import { Component } from '@wordpress/element';
 import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
-import SelectCell from './select-cell'
+import SelectCell from './select-cell';
 
 class BottomSheet extends Component {
 	constructor() {

@@ -16,7 +16,7 @@ import { Component } from '@wordpress/element';
 import styles from './style.scss';
 import Modal from '../modal';
 
-const CANCEL_VALUE = "cancel";
+const CANCEL_VALUE = 'cancel';
 
 export default class SelectControl extends Component {
 	constructor() {
@@ -42,32 +42,32 @@ export default class SelectControl extends Component {
 			this.props.onChange( value );
 		}
 		this.onClose();
-	} 
+	}
 
 	render() {
-		const  { options } = this.props;
-		const fullOptions = options.concat( { label: __( "Cancel" ), value: CANCEL_VALUE } );
+		const { options } = this.props;
+		const fullOptions = options.concat( { label: __( 'Cancel' ), value: CANCEL_VALUE } );
 
-		return ( 
+		return (
 			<Modal
-				title={ __( "Image Alt Text" ) }
+				title={ __( 'Image Alt Text' ) }
 				isVisible={ this.state.isVisible }
 				onClose={ this.onClose }
 			>
 				<View style={ { flex: 1 } }>
 					{ fullOptions.map( ( option, index ) =>
-						<TouchableOpacity 
-							style={ styles.cellContainer } 
-							onPress={ () => this.onCellPress( option.value ) } 
-							key={ index } 
+						<TouchableOpacity
+							style={ styles.cellContainer }
+							onPress={ () => this.onCellPress( option.value ) }
+							key={ index }
 						>
 							<Text style={ styles.cellLabel } numberOfLines={ 1 } >
 								{ option.label }
 							</Text>
-						</TouchableOpacity> 
+						</TouchableOpacity>
 					) }
 				</View>
 			</Modal>
-		)
+		);
 	}
 }

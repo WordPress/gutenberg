@@ -16,22 +16,22 @@ export default function CustomModal( props ) {
 		isVisible,
 	} = props;
 
-	function fadeAnimation(from, to) {
+	function fadeAnimation( from, to ) {
 		return {
 			from: {
-				['opacity']: from
+				opacity: from,
 			},
 			to: {
-				['opacity']: to
-			}
+				opacity: to,
+			},
 		};
 	}
 
 	return (
 		<Modal
 			isVisible={ isVisible }
-			animationIn={ fadeAnimation(0,1) }
-			animationOut={ fadeAnimation(1,0) }
+			animationIn={ fadeAnimation( 0, 1 ) }
+			animationOut={ fadeAnimation( 1, 0 ) }
 			backdropOpacity={ 0.1 }
 			animationInTiming={ 400 }
 			animationOutTiming={ 400 }
@@ -43,5 +43,5 @@ export default function CustomModal( props ) {
 				{ props.children }
 			</View>
 		</Modal>
-	)
+	);
 }

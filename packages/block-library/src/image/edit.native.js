@@ -158,8 +158,8 @@ class ImageEdit extends React.Component {
 		const { imageSizes } = this.props;
 		return compact( map( imageSizes, ( { label, slug } ) => {
 			return {
-				value: this.props.attributes.url+slug, //temporary url
-				label: label,
+				value: this.props.attributes.url + slug, //temporary url
+				label,
 			};
 		} ) );
 	}
@@ -240,7 +240,7 @@ class ImageEdit extends React.Component {
 					autoCorrect={ false }
 				/>
 				<BottomSheet.SelectCell
-					icon='editor-expand'
+					icon="editor-expand"
 					label={ __( 'Image Size' ) }
 					value={ 'Large' }
 					options={ sizeOptions }
@@ -336,7 +336,7 @@ class ImageEdit extends React.Component {
 }
 
 export default compose( [
-	withSelect( ( select, props ) => {
+	withSelect( ( select ) => {
 		const { getEditorSettings } = select( 'core/editor' );
 		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
 
