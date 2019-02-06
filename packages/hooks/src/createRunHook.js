@@ -30,6 +30,14 @@ function createRunHook( hooks, returnFirstArg ) {
 
 		const handlers = hooks[ hookName ].handlers;
 
+		// The following code can be stripped from production builds.
+		/* develblock:start */
+		// Handle any 'all' hooks registered.
+		if ( hooks.all ) {
+			handlers.push( hooks.all.handlers );
+		}
+		/* develblock:end */
+
 		if ( ! handlers || ! handlers.length ) {
 			return returnFirstArg ?
 				args[ 0 ] :
