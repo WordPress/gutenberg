@@ -16,12 +16,14 @@ const formatParams = ( params, docs ) => {
 };
 
 const cleanSpaces = ( paragraph ) =>
-	paragraph.split( '\n' ).map(
-		( sentence ) => sentence.trim()
-	).reduce(
-		( acc, current ) => acc + ' ' + current,
-		''
-	).trim();
+	paragraph ?
+		paragraph.split( '\n' ).map(
+			( sentence ) => sentence.trim()
+		).reduce(
+			( acc, current ) => acc + ' ' + current,
+			''
+		).trim() :
+		'';
 
 const formatExample = ( example, docs ) => {
 	if ( example && example.length === 1 ) {
