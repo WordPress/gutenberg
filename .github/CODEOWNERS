@@ -38,11 +38,11 @@
 
 # UI Components
 /packages/components                            @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @nosolosw @jorgefilipecosta @talldan @noisysocks
-/packages/compose                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
-/packages/element                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
-/packages/notices                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
-/packages/nux                                   @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
-/packages/viewport                              @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @noisysocks
+/packages/compose                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/element                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/notices                               @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/nux                                   @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
+/packages/viewport                              @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
 
 # Utilities
 /packages/a11y                                  @youknowriad @gziolo @aduth
