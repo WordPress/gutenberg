@@ -80,7 +80,6 @@ export class RichText extends Component {
 		this.state = {
 			formats: {},
 			selectedNodeId: 0,
-			height: 0,
 		};
 	}
 
@@ -194,8 +193,6 @@ export class RichText extends Component {
 
 	onContentSizeChange( contentSize ) {
 		const contentHeight = contentSize.height;
-		this.state.height = contentHeight;
-		//this.forceUpdate(); // force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
 		this.props.onContentSizeChange( {
 			aztecHeight: contentHeight,
 		}
@@ -386,7 +383,7 @@ export class RichText extends Component {
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
-					style={ [style, { minHeight: this.state.height } ]}
+					style={ style }
 				/>
 			</View>
 		);
