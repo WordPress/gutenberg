@@ -4,12 +4,14 @@ $toggle-border-width: 2px;
 
 .components-form-toggle {
 	position: relative;
+	display: inline-block;
 
 	// On/Off icon indicators.
 	.components-form-toggle__on,
 	.components-form-toggle__off {
 		position: absolute;
 		top: $toggle-border-width * 3;
+		box-sizing: border-box;
 	}
 
 	.components-form-toggle__off {
@@ -26,6 +28,7 @@ $toggle-border-width: 2px;
 	.components-form-toggle__track {
 		content: "";
 		display: inline-block;
+		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
 		border: $toggle-border-width solid $dark-gray-300;
@@ -38,6 +41,7 @@ $toggle-border-width: 2px;
 	.components-form-toggle__thumb {
 		display: block;
 		position: absolute;
+		box-sizing: border-box;
 		top: $toggle-border-width * 2;
 		left: $toggle-border-width * 2;
 		width: $toggle-height - ($toggle-border-width * 4);

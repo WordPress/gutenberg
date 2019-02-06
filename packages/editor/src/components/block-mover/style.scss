@@ -87,6 +87,8 @@
 .editor-block-mover__control-drag-handle:not(:disabled):not([aria-disabled="true"]):not(.is-default),
 .editor-block-mover__control {
 	@include break-small() {
+		.editor-block-list__layout [data-align="right"] &,
+		.editor-block-list__layout [data-align="left"] &,
 		.editor-block-list__layout .editor-block-list__layout & {
 			background: $white;
 			box-shadow: inset 0 0 0 1px $light-gray-500;

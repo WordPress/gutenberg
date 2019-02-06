@@ -27,6 +27,8 @@ import { children } from '@wordpress/blocks';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
 
+import styles from './style.scss';
+
 const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
 };
@@ -373,6 +375,10 @@ export class RichText extends Component {
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
+					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
+					fontSize={ this.props.fontSize }
+					fontWeight={ this.props.fontWeight }
+					fontStyle={ this.props.fontStyle }
 				/>
 				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
