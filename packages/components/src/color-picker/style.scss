@@ -35,7 +35,7 @@
 	position: relative;
 }
 .components-color-picker__body {
-	padding: $grid-size-large 0 #{ $grid-size-small * 3 };
+	padding: $grid-size-large $grid-size-large #{ $grid-size-small * 3 };
 }
 .components-color-picker__controls {
 	display: flex;
