@@ -360,8 +360,12 @@ export class RichText extends Component {
 			} ) );
 
 		// Save back to HTML from React tree
+		let html = '<' + tagName + '>' + value + '</' + tagName + '>';
 		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
-		const html = this.props.placeholder && ( value === undefined || value === '' ) ? '' : '<' + tagName + '>' + value + '</' + tagName + '>';
+		if ( this.props.placeholder && ( value === undefined || value === '' ) ) {
+			html = '';
+			this.lastEventCount = undefined; // force a refresh on the native side
+		}
 
 		return (
 			<View>
