@@ -38,6 +38,7 @@
 		"rememo": "^3.0.0",
 		"showdown": "^1.8.6",
 		"simple-html-tokenizer": "^0.4.1",
+		"sprintf-js": "^1.1.1",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^3.3.2"
 	},
