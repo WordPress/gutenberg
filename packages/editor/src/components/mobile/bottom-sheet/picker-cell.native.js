@@ -1,17 +1,6 @@
 /**
-* External dependencies
-*/
-import { TouchableOpacity, Text, View } from 'react-native';
-
-/**
- * WordPress dependencies
- */
-import { Dashicon } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
-import styles from './styles.scss';
 import Cell from './cell';
 import Picker from '../picker';
 
@@ -22,7 +11,6 @@ export default function PickerCell( props ) {
 		...cellProps
 	} = props;
 
-	const defaultLabelStyle = styles.cellLabel;
 	let picker;
 
 	const onCellPress = () => {

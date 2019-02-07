@@ -46,22 +46,22 @@ export default function Cell( props ) {
 	const getValueComponent = () => {
 		return isValueEditable ? (
 			<TextInput
-					ref={ ( c ) => valueTextInput = c }
-					numberOfLines={ 1 }
-					style={ { ...styles.cellValue, ...valueStyle } }
-					value={ value }
-					placeholder={ valuePlaceholder }
-					placeholderTextColor={ '#87a6bc' }
-					onChangeText={ onChangeValue }
-					editable={ isValueEditable }
-					{ ...valueProps }
-				/>
+				ref={ ( c ) => valueTextInput = c }
+				numberOfLines={ 1 }
+				style={ { ...styles.cellValue, ...valueStyle } }
+				value={ value }
+				placeholder={ valuePlaceholder }
+				placeholderTextColor={ '#87a6bc' }
+				onChangeText={ onChangeValue }
+				editable={ isValueEditable }
+				{ ...valueProps }
+			/>
 		) : (
 			<Text style={ { ...styles.cellValue, ...valueStyle } }>
 				{ value }
 			</Text>
-		)
-	}
+		);
+	};
 
 	return (
 		<TouchableOpacity onPress={ onCellPress } >
