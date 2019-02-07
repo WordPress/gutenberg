@@ -33,7 +33,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 	return (
 		<Modal
 			className="edit-post-options-modal"
-			title={ <span className="edit-post-options-modal__title">{ __( 'Options' ) }</span> }
+			title={ __( 'Options' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
