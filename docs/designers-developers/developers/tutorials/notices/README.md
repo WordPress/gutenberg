@@ -17,7 +17,7 @@ Producing an equivalent "Post draft updated" notice would require code like this
  * Hook into the 'admin_notices' action to render
  * a generic HTML notice.
  */
-add_action( 'admin_notices', function() {
+function myguten_admin_notice() {
 	$screen = get_current_screen();
 	// Only render this notice in the post editor.
 	if ( ! $screen || 'post' !== $screen->base ) {
@@ -29,7 +29,8 @@ add_action( 'admin_notices', function() {
 	echo '<div class="notice notice-success is-dismissible"><p>';
 	echo sprintf( __( 'Post draft updated. <a href="%s" target="_blank">Preview post</a>' ), get_preview_post_link() );
 	echo '</p></div>';
-} );
+};
+add_action( 'admin_notices', 'myguten_admin_notice' );
 ```
 
 Importantly, the `admin_notices` hook allows a developer to render whatever HTML they'd like. One advantage is that the developer has a great amount of flexibility. The key disadvantage is that arbitrary HTML makes future iterations on notices more difficult, if not possible, because the iterations need to accommodate for arbitrary HTML. This is why the Block Editor has a formal API.
