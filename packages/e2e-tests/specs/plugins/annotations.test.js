@@ -140,6 +140,8 @@ describe( 'Using Plugins API', () => {
 
 			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowLeft' );
+			await page.keyboard.press( 'ArrowLeft' );
 
 			// Put an 1 after the A, it should not be annotated.
 			await page.keyboard.type( '1' );
@@ -158,6 +160,7 @@ describe( 'Using Plugins API', () => {
 
 			await annotateFirstBlock( 1, 2 );
 
+			await page.keyboard.press( 'ArrowLeft' );
 			await page.keyboard.press( 'ArrowLeft' );
 
 			// Put an 1 after the A, it should not be annotated.
