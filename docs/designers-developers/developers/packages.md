@@ -22,7 +22,7 @@ const { PlainText } = wp.editor;
 
 ```
 
-## Using the Packages via NPM
+## Using the Packages via npm
 
 All the packages are also available on [npm](https://www.npmjs.com/org/wordpress) if you want to bundle them in your code.
 
