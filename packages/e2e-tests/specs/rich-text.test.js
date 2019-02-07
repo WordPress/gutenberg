@@ -68,6 +68,13 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not format text after code backtick', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'A `backtick` and more.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should only mutate text data on input', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
