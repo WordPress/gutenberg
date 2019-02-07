@@ -17,6 +17,8 @@ const getType = function( param ) {
 		return `(${ types.join( '|' ) })`;
 	} else if ( param.type === 'AllLiteral' ) {
 		return '*';
+	} else if ( param.type === 'NullLiteral' ) {
+		return 'null';
 	}
 
 	return param.name;

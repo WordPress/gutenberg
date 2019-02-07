@@ -18,18 +18,24 @@ Packages outside of scope:
 
 Fix JSDoc manually:
 
-- [ ] rich-text `concat` type `@param` is `{...[object]}`
 - [ ] autop `description` contains HTML
+- [ ] rich-text `concat` type `@param` is `{...[object]}`. Should be
 
-WIP:
-
-- [ ] rich-text `toHTMLString` `@param` is an object (create table?)
+```js
+/**
+ * Combine all Rich Text values into one. This is similar to
+ * `String.prototype.concat`.
+ *
+ * @param {...Object} values Objects to combine.
+ *
+ * @return {Object} A new value combining all given records.
+ */
+```
 
 TODO:
 
 - [ ] blocks `pastHandler` has optional `@param`
 - [ ] blocks `unstable__*` should this be docummented?
-- [ ] date `format`, `date` have a null `@param`.type
 - [ ] e2e-test-utils `mockOrTransform` contains undefined as a `@param`.type
 - [ ] e2e-test-utils `setUpResponseMocking` has example mixed with description
 - [ ] keycodes `CONSTANTS`
@@ -52,6 +58,7 @@ DONE:
 - [x] compose
 - [x] core-data
 - [x] data
+- [x] date
 - [x] deprecated
 - [x] dom
 - [x] dom-ready
