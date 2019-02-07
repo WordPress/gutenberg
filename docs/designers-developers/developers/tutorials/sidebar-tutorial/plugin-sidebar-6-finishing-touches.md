@@ -1,4 +1,4 @@
-# Finishing touches
+# Finishing Touches
 
 Your JavaScript code now works as expected, here are a few ways to simplify and make it easier to change in the future.
 

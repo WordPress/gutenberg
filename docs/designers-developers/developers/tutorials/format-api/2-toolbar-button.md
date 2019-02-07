@@ -1,4 +1,4 @@
-# Add a button to the toolbar
+# Add a Button to the Toolbar
 
 Now that the format is avaible, the next step is to surface it to the UI. You can make use of the [`RichTextToolbarButton`](/packages/editor/src/components/rich-text/README.md#RichTextToolbarButton) component to extend the format toolbar.
 
