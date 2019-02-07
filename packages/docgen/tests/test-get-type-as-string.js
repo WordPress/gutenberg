@@ -8,7 +8,7 @@ const test = require( 'tape' );
  */
 const getType = require( '../src/get-type-as-string' );
 
-test( 'getParamType from NameExpression', ( t ) => {
+test( 'getType from NameExpression', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -22,7 +22,20 @@ test( 'getParamType from NameExpression', ( t ) => {
 	t.end();
 } );
 
-test( 'getParamType from NullableType', ( t ) => {
+test( 'getType from AllLiteral', ( t ) => {
+	const type = getType( {
+		title: 'param',
+		description: 'description',
+		type: {
+			type: 'AllLiteral',
+		},
+		name: 'paramName',
+	} );
+	t.equal( type, '*' );
+	t.end();
+} );
+
+test( 'getType from NullableType', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -40,7 +53,7 @@ test( 'getParamType from NullableType', ( t ) => {
 	t.end();
 } );
 
-test( 'getParamType from RestType', ( t ) => {
+test( 'getType from RestType', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',
@@ -57,7 +70,7 @@ test( 'getParamType from RestType', ( t ) => {
 	t.end();
 } );
 
-test( 'getParamType from RestType with UnionType', ( t ) => {
+test( 'getType from RestType with UnionType', ( t ) => {
 	const type = getType( {
 		title: 'param',
 		description: 'description',

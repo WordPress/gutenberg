@@ -11,6 +11,8 @@ const getType = function( param ) {
 	} else if ( param.elements ) {
 		const types = param.elements.map( ( element ) => getType( element ) );
 		return `(${ types.join( '|' ) })`;
+	} else if ( param.type === 'AllLiteral' ) {
+		return '*';
 	}
 
 	return param.name;

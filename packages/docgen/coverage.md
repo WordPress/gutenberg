@@ -18,19 +18,15 @@ Packages outside of scope:
 
 WIP:
 
-
-
 TODO:
 
 - [ ] autop `description` contains HTML
-- [ ] blocks `getBlockSupport`, `isValidIcon`, `parseWithAttributeSchema` have `*` as `@param`.type
 - [ ] blocks `pastHandler` has optional `@param`
 - [ ] blocks `setCategories` has `Object []` as a `@param` type
 - [ ] blocks `unstable__*` should this be docummented?
 - [ ] date `format`, `date` have a null `@param`.type
 - [ ] e2e-test-utils `mockOrTransform` contains undefined as a `@param`.type
 - [ ] e2e-test-utils `setUpResponseMocking` has example mixed with description
-- [ ] element `isEmptyElement` has `*` as `@param`.type
 - [ ] keycodes `CONSTANTS`
 - [ ] i18n `sprintf` has `string[]` as a `@param` type
 - [ ] rich-text `concat` type `@param` is `{...[object]}`
@@ -59,6 +55,7 @@ DONE:
 - [x] dom-ready
 - [x] edit-post
 - [x] editor
+- [x] element
 - [x] escape-html
 - [x] format-library
 - [x] hooks
