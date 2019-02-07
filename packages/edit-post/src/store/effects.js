@@ -28,11 +28,13 @@ import { onChangeListener } from './utils';
 
 const VIEW_AS_LINK_SELECTOR = '#wp-admin-bar-view a';
 
-function updateMetaBoxes( promise, { isPreview, isAutosave } ) {
+function updateMetaBoxes( updatePost, { isPreview, isAutosave } ) {
+	// Don't carry out a MetaBox update for automated autosaves.
 	if ( isAutosave && ! isPreview ) {
-		return;
+		return updatePost;
 	}
 
+	// Inidicate that the MetaBox update process has started.
 	dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
 
 	// Saves the wp_editor fields
@@ -70,13 +72,17 @@ function updateMetaBoxes( promise, { isPreview, isAutosave } ) {
 	additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 	// Save the metaboxes
-	return promise.then( () => {
-		return apiFetch( {
-			url: window._wpMetaBoxUrl,
-			method: 'POST',
-			body: formData,
-			parse: false,
-		} ).then( () => dispatch( 'core/edit-post' ).metaBoxUpdatesSuccess() );
+	const metaBoxUpdatePromise = apiFetch( {
+		url: window._wpMetaBoxUrl,
+		method: 'POST',
+		body: formData,
+		parse: false,
+	} );
+
+	// Return a function that defers the post update until after MetaBoxes have been saved.
+	return () => metaBoxUpdatePromise.then( () => {
+		dispatch( 'core/edit-post' ).metaBoxUpdatesSuccess();
+		updatePost();
 	} );
 }
 
@@ -96,7 +102,7 @@ const effects = {
 
 		if ( hasMetaBoxes( store.getState() ) ) {
 			addFilter(
-				'editor.beforePostUpdate',
+				'editor.updatePost',
 				'core/edit-post/store/effects/update-meta-boxes',
 				updateMetaBoxes
 			);

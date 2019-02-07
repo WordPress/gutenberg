@@ -41,26 +41,9 @@ import { resolveSelector } from './utils';
 export const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 
-/**
- * Request Post Update Effect handler
- *
- * @param {Object} action  the fetchReusableBlocks action object.
- * @param {Object} store   Redux Store.
- */
-export const requestPostUpdate = async ( action, store ) => {
+const handlePostUpdate = async ( action, store ) => {
 	const { dispatch, getState } = store;
 	const state = getState();
-
-	// Prevent save if not saveable.
-	// We don't check for dirtiness here as this can be overridden in the UI.
-	if ( ! isEditedPostSaveable( state ) ) {
-		return;
-	}
-
-	const promise = applyFilters( 'editor.beforePostUpdate', Promise.resolve(), action.options );
-	if ( promise ) {
-		await promise;
-	}
 
 	let edits = getPostEdits( state );
 	const isAutosave = !! action.options.isAutosave;
@@ -168,6 +151,30 @@ export const requestPostUpdate = async ( action, store ) => {
 			options: action.options,
 		} );
 	}
+};
+
+/**
+ * Request Post Update Effect handler
+ *
+ * @param {Object} action  the fetchReusableBlocks action object.
+ * @param {Object} store   Redux Store.
+ */
+export const requestPostUpdate = async ( action, store ) => {
+	const state = store.getState();
+
+	// Prevent save if not saveable.
+	// We don't check for dirtiness here as this can be overridden in the UI.
+	if ( ! isEditedPostSaveable( state ) ) {
+		return;
+	}
+
+	const filteredUpdatePost = applyFilters( 'editor.updatePost', () => handlePostUpdate( action, store ), action.options );
+
+	if ( ! filteredUpdatePost ) {
+		throw new Error( 'editor.updatePost filter must return a function that wraps the provided updatePost function.' );
+	}
+
+	filteredUpdatePost();
 };
 
 /**
