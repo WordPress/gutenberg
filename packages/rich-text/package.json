@@ -23,6 +23,8 @@
 		"@babel/runtime": "^7.3.1",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/dom": "file:../dom",
+		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"lodash": "^4.17.11",
 		"rememo": "^3.0.0"

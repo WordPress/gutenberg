@@ -23,13 +23,13 @@ import {
 	applyFormat,
 	getTextContent,
 	slice,
+	PositionedAtSelection,
 } from '@wordpress/rich-text';
 import { URLInput, URLPopover } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import PositionedAtSelection from './positioned-at-selection';
 import { isValidHref } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();

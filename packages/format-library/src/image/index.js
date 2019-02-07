@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG } from '@wordpress/components';
+import { Path, SVG, TextControl, Popover } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { insertObject } from '@wordpress/rich-text';
+import { insertObject, PositionedAtSelection } from '@wordpress/rich-text';
 import { MediaUpload, RichTextInserterItem, MediaUploadCheck } from '@wordpress/editor';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -43,7 +43,8 @@ export const image = {
 		}
 
 		render() {
-			const { value, onChange } = this.props;
+			const { value, onChange, isActive, activeAttributes } = this.props;
+			const { style } = activeAttributes;
 
 			return (
 				<MediaUploadCheck>
@@ -73,6 +74,38 @@ export const image = {
 							return null;
 						} }
 					/> }
+					{ isActive && <PositionedAtSelection key={ value.start }>
+						<Popover
+							className="image-format-popover"
+							position="bottom center"
+							focusOnMount={ false }
+						>
+							<TextControl
+								type="number"
+								label={ __( 'Width' ) }
+								value={ style.replace( /\D/g, '' ) }
+								min={ 1 }
+								onChange={ ( newWidth ) => {
+									const newFormats = value.formats.slice( 0 );
+
+									newFormats[ value.start ] = [ {
+										type: name,
+										attributes: {
+											...activeAttributes,
+											style: `width: ${ newWidth }px;`,
+										},
+									} ];
+
+									onChange( {
+										...value,
+										formats: newFormats,
+									}, {
+										noFocusReturn: true,
+									} );
+								} }
+							/>
+						</Popover>
+					</PositionedAtSelection> }
 				</MediaUploadCheck>
 			);
 		}
