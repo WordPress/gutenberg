@@ -1,0 +1,22 @@
+[
+    {
+        "blockName": "core/search",
+        "attrs": {
+            "buttonText": "Custom button text",
+            "label": "Custom label",
+            "placeholder": "Custom placeholder"
+        },
+        "innerBlocks": [],
+        "innerHTML": "",
+        "innerContent": []
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]
