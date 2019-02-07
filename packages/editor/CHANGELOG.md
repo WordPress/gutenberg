@@ -4,6 +4,7 @@
 
 - Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
 - Added a new `TextEditorGlobalKeyboardShortcuts` component.
+- Added `editor.updatePost` filter.
 
 ### Deprecations
 

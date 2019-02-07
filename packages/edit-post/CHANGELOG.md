@@ -6,6 +6,7 @@
 
 ### Bug Fixes
  - Fix 'save' keyboard shortcut not functioning in the Code Editor.
+ - Fix issue with preview not displaying unsaved changes when MetaBoxes are active.
 
 ## 3.1.7 (2019-01-03)
 
