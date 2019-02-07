@@ -47,14 +47,16 @@ const formatReturnTag = ( output, docs ) => {
 	}
 };
 
-const formatSeeTag = ( tag, docs ) => {
-	if ( tag && tag.length === 1 ) {
+const formatSeeAndLinkTags = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
 		docs.push( '**Related**' );
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( `- ${ tag[ 0 ].description }` );
+		docs.push( ...tags.map(
+			( tag ) => `\n- ${ tag.description }`
+		) );
 	}
 };
 
@@ -79,7 +81,10 @@ module.exports = function( artifacts ) {
 			docs.push( '\n' );
 			docs.push( '\n' );
 			docs.push( cleanSpaces( artifact.description ) );
-			formatSeeTag( artifact.tags.filter( ( tag ) => tag.title === 'see' ), docs );
+			formatSeeAndLinkTags(
+				artifact.tags.filter( ( tag ) => ( tag.title === 'see' ) || ( tag.title === 'link' ) ),
+				docs
+			);
 			formatExampleTag( artifact.tags.filter( ( tag ) => tag.title === 'example' ), docs );
 			formatParamTags( artifact.params, docs );
 			formatReturnTag( artifact.return, docs );

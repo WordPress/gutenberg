@@ -31,7 +31,6 @@ TODO:
   - [ ] `setUpResponseMocking` has long description mixed with example
 - [ ] editor - `userMentionsCompleter` - missing `@type` tag
 - [ ] element - `isEmptyElement` has `*` as param.type
-- [ ] escape-html - missing `@link` tag `escapeAttribute`
 - [ ] i18n - `sprintf` has `string[]` as a param type
 - [ ] keycodes - has constants, missing `@type` tag
 - [ ] rich-text
@@ -43,7 +42,6 @@ TODO:
 - [ ] shortcode
   - [ ] `string` has param.description = null
   - [ ] description contains numbered list that is flattened
-- [ ] token-list - missing `@link` tag
 
 DONE:
 
@@ -62,6 +60,7 @@ DONE:
 - [x] dom
 - [x] dom-ready
 - [x] edit-post
+- [x] escape-html
 - [x] format-library
 - [x] hooks
 - [x] html-entities
@@ -73,6 +72,7 @@ DONE:
 - [x] plugins
 - [x] priority-queue
 - [x] redux-routine
+- [x] token-list
 - [x] url
 - [x] viewport
 - [x] wordcount
