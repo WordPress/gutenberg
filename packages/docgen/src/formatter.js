@@ -25,14 +25,16 @@ const formatParamTags = ( params, docs ) => {
 	}
 };
 
-const formatExampleTag = ( example, docs ) => {
-	if ( example && example.length === 1 ) {
+const formatExampleTag = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( '**Example**' );
+		docs.push( '**Usage**' );
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( example[ 0 ].description );
+		docs.push( ...tags.map(
+			( tag ) => `${ tag.description }`
+		).join( '\n\n' ) );
 	}
 };
 
