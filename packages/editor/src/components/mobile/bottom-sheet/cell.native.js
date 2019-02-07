@@ -24,11 +24,13 @@ export default function Cell( props ) {
 		labelStyle = {},
 		valueStyle = {},
 		onChangeValue,
+		children,
+		editable = true,
 		...valueProps
 	} = props;
 
 	const showValue = value !== undefined;
-	const isValueEditable = onChangeValue !== undefined;
+	const isValueEditable = editable && onChangeValue !== undefined;
 	const defaultLabelStyle = showValue ? styles.cellLabel : styles.cellLabelCentered;
 	const separatorStyle = showValue ? styles.cellSeparator : styles.separator;
 	let valueTextInput;
@@ -39,6 +41,26 @@ export default function Cell( props ) {
 		} else if ( onPress !== undefined ) {
 			onPress();
 		}
+	};
+
+	const getValueComponent = () => {
+		return isValueEditable ? (
+			<TextInput
+				ref={ ( c ) => valueTextInput = c }
+				numberOfLines={ 1 }
+				style={ { ...styles.cellValue, ...valueStyle } }
+				value={ value }
+				placeholder={ valuePlaceholder }
+				placeholderTextColor={ '#87a6bc' }
+				onChangeText={ onChangeValue }
+				editable={ isValueEditable }
+				{ ...valueProps }
+			/>
+		) : (
+			<Text style={ { ...styles.cellValue, ...valueStyle } }>
+				{ value }
+			</Text>
+		);
 	};
 
 	return (
@@ -55,19 +77,8 @@ export default function Cell( props ) {
 						{ label }
 					</Text>
 				</View>
-				{ showValue && (
-					<TextInput
-						ref={ ( c ) => valueTextInput = c }
-						numberOfLines={ 1 }
-						style={ { ...styles.cellValue, ...valueStyle } }
-						value={ value }
-						placeholder={ valuePlaceholder }
-						placeholderTextColor={ '#87a6bc' }
-						onChangeText={ onChangeValue }
-						editable={ isValueEditable }
-						{ ...valueProps }
-					/>
-				) }
+				{ showValue && getValueComponent() }
+				{ children }
 			</View>
 			{ drawSeparator && (
 				<View style={ separatorStyle } />
