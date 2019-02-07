@@ -130,6 +130,10 @@ export default class ImageEdit extends React.Component {
 	}
 
 	addMediaUploadListener() {
+		//if we already have a subscription not worth doing it again
+		if ( this.subscriptionParentMediaUpload ) {
+			return;
+		}
 		this.subscriptionParentMediaUpload = subscribeMediaUpload( ( payload ) => {
 			this.mediaUpload( payload );
 		} );
