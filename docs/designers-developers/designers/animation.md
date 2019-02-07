@@ -30,4 +30,4 @@ Reuse animations if one already exists for your task.
 
 ## Inventory of Reused Animations
 
-The generic `Animate` component is used to animate different parts of the interface. See [the component documentation](/packages/components/src/Animate/README.md) for more details about the available animations. 
+The generic `Animate` component is used to animate different parts of the interface. See [the component documentation](/packages/components/src/animate/README.md) for more details about the available animations. 
