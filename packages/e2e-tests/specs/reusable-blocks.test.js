@@ -7,6 +7,7 @@ import {
 	pressKeyWithModifier,
 	searchForBlock,
 	getEditedPostContent,
+	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -41,6 +42,7 @@ describe( 'Reusable Blocks', () => {
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
@@ -88,6 +90,7 @@ describe( 'Reusable Blocks', () => {
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
@@ -165,6 +168,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Convert block to a regular block
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);
@@ -188,6 +192,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Delete the block and accept the confirmation dialog
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const deleteButton = await page.waitForXPath( '//button[text()="Remove from Reusable Blocks"]' );
 		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
 
@@ -229,6 +234,7 @@ describe( 'Reusable Blocks', () => {
 		// Convert block to a reusable block
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const convertButton = await page.waitForXPath( '//button[text()="Add to Reusable Blocks"]' );
 		await convertButton.click();
 
@@ -270,6 +276,7 @@ describe( 'Reusable Blocks', () => {
 
 		// Convert block to a regular block
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const convertButton = await page.waitForXPath(
 			'//button[text()="Convert to Regular Block"]'
 		);
