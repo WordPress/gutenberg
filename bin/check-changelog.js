@@ -1,20 +1,7 @@
 /**
- * Given a set of file paths as arguments, checks whether the file paths also
- * include a requisite CHANGELOG entry. The file paths should include packages
- * maintained with a CHANGELOG at, e.g. `packages/i18n/CHANGELOG.md`.
- *
- * Example (Error):
- *
- * ```
- * node bin/check-changelog.js /Gutenberg/packages/i18n/src/index.js
- * ```
- *
- * Example (Success):
- *
- * ```
- * node bin/check-changelog.js /Gutenberg/packages/i18n/src/index.js \
- *  /Gutenberg/packages/i18n/CHANGELOG.md
- * ```
+ * Optionally given a set of file paths as arguments, checks whether all files
+ * modified on the current branch (including those passed as arguments) include
+ * a requisite CHANGELOG entry.
  */
 
 /**
@@ -23,12 +10,23 @@
 
 const { relative, sep, join } = require( 'path' );
 const minimatch = require( 'minimatch' );
+const { execSync } = require( 'child_process' );
+const { flow, toString, trim } = require( 'lodash' );
 
 /**
  * Internal dependencies
  */
 
 const { ignoreChanges = [] } = require( '../lerna' );
+
+/**
+ * Utility function to trim the result of an execSync string result.
+ *
+ * @param {string} command Command to exec.
+ *
+ * @return {string} Result of exec.
+ */
+const exec = flow( execSync, toString, trim );
 
 /**
  * Returns true if the given path is ignored by the Lerna `ignoreChanges`
@@ -43,13 +41,31 @@ function isIgnored( path ) {
 }
 
 /**
+ * Merge base commit SHA on which to perform git file diff.
+ *
+ * @type {string}
+ */
+const base = exec( 'git merge-base master HEAD' );
+
+/**
+ * Set of files to consider as changed, as a combination of those already
+ * changed on the current branch and those passed in as file arguments.
+ *
+ * @type {string[]}
+ */
+const files = [
+	...exec( `git diff --name-only ${ base }` ).split( '\n' ),
+	...process.argv.slice( 2 ),
+];
+
+/**
  * An array of file paths relative the `packages` directory.
  *
  * @type {string[]}
  */
-const paths = process.argv
-	.slice( 2 )
-	.map( ( path ) => relative( 'packages', path ) );
+const paths = files
+	.map( ( path ) => relative( 'packages', path ) )
+	.filter( ( path ) => path[ 0 ] !== '.' );
 
 /**
  * The set of verified package names, i.e. those which have been confirmed to
