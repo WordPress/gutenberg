@@ -68,6 +68,7 @@
 # Rich Text
 /packages/format-library                        @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
 /packages/rich-text                             @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
+/packages/editor/src/components/rich-text       @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
