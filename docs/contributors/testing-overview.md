@@ -220,7 +220,7 @@ However, if the change was intentional, follow these steps to update the snapsho
    npm run test-unit -- --updateSnapshot --testPathPattern path/to/tests
    ```
 1. Review the diff and ensure the changes are expected and intentional.
-1. Commit.
+2. Commit.
 
 #### What are snapshots?
 
