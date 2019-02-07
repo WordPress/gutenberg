@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const getParamType = require( './get-param-type-as-string' );
+const getType = require( './get-param-type-as-string' );
 
 const cleanSpaces = ( paragraph ) =>
 	paragraph ?
@@ -20,7 +20,7 @@ const formatParamTags = ( params, docs ) => {
 		docs.push( '**Parameters**' );
 		docs.push( '\n' );
 		docs.push( ...params.map(
-			( param ) => `\n- **${ param.name }** \`${ getParamType( param ) }\`: ${ cleanSpaces( param.description ) }`
+			( param ) => `\n- **${ param.name }** \`${ getType( param ) }\`: ${ cleanSpaces( param.description ) }`
 		) );
 	}
 };
@@ -38,14 +38,25 @@ const formatExampleTag = ( tags, docs ) => {
 	}
 };
 
-const formatReturnTag = ( output, docs ) => {
-	if ( output && output.length === 1 ) {
+const formatReturnTag = ( tag, docs ) => {
+	if ( tag && tag.length === 1 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
 		docs.push( '**Returns**' );
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( `\`${ getParamType( output[ 0 ] ) }\` ${ cleanSpaces( output[ 0 ].description ) }` );
+		docs.push( `\`${ getType( tag[ 0 ] ) }\` ${ cleanSpaces( tag[ 0 ].description ) }` );
+	}
+};
+
+const formatTypeTag = ( tag, docs ) => {
+	if ( tag && tag.length === 1 ) {
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '**Type**' );
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( `\`${ getType( tag[ 0 ] ) }\` ${ cleanSpaces( tag[ 0 ].description ) }` );
 	}
 };
 
@@ -88,6 +99,7 @@ module.exports = function( artifacts ) {
 				docs
 			);
 			formatExampleTag( artifact.tags.filter( ( tag ) => tag.title === 'example' ), docs );
+			formatTypeTag( artifact.tags.filter( ( tag ) => tag.title === 'type' ), docs );
 			formatParamTags( artifact.params, docs );
 			formatReturnTag( artifact.return, docs );
 			docs.push( '\n' );

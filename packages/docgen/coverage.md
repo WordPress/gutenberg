@@ -16,32 +16,29 @@ Packages outside of scope:
 - postcss-themes. CommonJS module.
 - scripts. CommonJS module.
 
+WIP:
+
+
+
 TODO:
 
-- [ ] autop - description contains HTML
-- [ ] blocks
-  - [ ] `getBlockSupport`, `isValidIcon`, `parseWithAttributeSchema` have `*` as param.type
-  - [ ] `pastHandler` has optional params
-  - [ ] `setCategories` has `Object []` as a param type
-  - [ ] `unstable__*` should this be docummented?
-- [ ] date - `format`, `date` have a null param.type
-- [ ] deprecated - missing `@type` tag
-- [ ] e2e-test-utils
-  - [ ] `mockOrTransform` contains undefined as a param.type
-  - [ ] `setUpResponseMocking` has long description mixed with example
-- [ ] editor - `userMentionsCompleter` - missing `@type` tag
-- [ ] element - `isEmptyElement` has `*` as param.type
-- [ ] i18n - `sprintf` has `string[]` as a param type
-- [ ] keycodes - has constants, missing `@type` tag
-- [ ] rich-text
-  - [ ] `concat` type param is `{...[object]}`
-  - [ ] `indentListItems` has param.description = null
-  - [ ] `LINE_SEPARATOR` is a constant
-  - [ ] `toHTMLString` a param is an object (create table?)
-  - [ ] `unstableToDom` is this supposed to go undocumented?
-- [ ] shortcode
-  - [ ] `string` has param.description = null
-  - [ ] description contains numbered list that is flattened
+- [ ] autop `description` contains HTML
+- [ ] blocks `getBlockSupport`, `isValidIcon`, `parseWithAttributeSchema` have `*` as `@param`.type
+- [ ] blocks `pastHandler` has optional `@param`
+- [ ] blocks `setCategories` has `Object []` as a `@param` type
+- [ ] blocks `unstable__*` should this be docummented?
+- [ ] date `format`, `date` have a null `@param`.type
+- [ ] e2e-test-utils `mockOrTransform` contains undefined as a `@param`.type
+- [ ] e2e-test-utils `setUpResponseMocking` has example mixed with description
+- [ ] element `isEmptyElement` has `*` as `@param`.type
+- [ ] keycodes `CONSTANTS`
+- [ ] i18n `sprintf` has `string[]` as a `@param` type
+- [ ] rich-text `concat` type `@param` is `{...[object]}`
+- [ ] rich-text `indentListItems` has `@param`.description = null
+- [ ] rich-text `LINE_SEPARATOR` is a constant
+- [ ] rich-text `toHTMLString` `@param` is an object (create table?)
+- [ ] rich-text `unstableToDom` is this supposed to go undocumented?
+- [ ] shortcode `string` has `@param`.description = null
 
 DONE:
 
@@ -57,15 +54,18 @@ DONE:
 - [x] compose
 - [x] core-data
 - [x] data
+- [x] deprecated
 - [x] dom
 - [x] dom-ready
 - [x] edit-post
+- [x] editor
 - [x] escape-html
 - [x] format-library
 - [x] hooks
 - [x] html-entities
 - [x] jest-console
 - [x] jest-puppeteer-axe
+- [x] keycodes
 - [x] list-reusable-blocks
 - [x] notices
 - [x] nux
