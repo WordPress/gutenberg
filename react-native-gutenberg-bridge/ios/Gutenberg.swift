@@ -79,7 +79,7 @@ public class Gutenberg: NSObject {
         if let serverID = serverID {
             data["mediaServerId"] = serverID
         }
-        bridgeModule.sendEvent(withName: EventName.mediaUpload, body: data)
+        bridgeModule.sendEventIfNeeded(name: EventName.mediaUpload, body: data)
     }
 }
 

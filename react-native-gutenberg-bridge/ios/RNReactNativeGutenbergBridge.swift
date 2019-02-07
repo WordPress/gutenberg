@@ -2,7 +2,7 @@
 public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     weak var delegate: GutenbergBridgeDelegate?
     private var isJSLoading = true
-
+    private var hasObservers = false
     // MARK: - Messaging methods
 
     @objc
@@ -52,6 +52,28 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     func editorDidLayout() {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidLayout()
+        }
+    }
+
+    override public func startObserving() {
+        super.startObserving()
+        hasObservers = true
+    }
+
+    override public func stopObserving() {
+        super.stopObserving()
+        hasObservers = false
+    }
+
+
+    /// Sends events to the JS side only if there is observers listening
+    ///
+    /// - Parameters:
+    ///   - name: name of the event
+    ///   - body: data for the event
+    public func sendEventIfNeeded(name: String, body: Any!) {
+        if ( hasObservers ) {
+            self.sendEvent(withName: name, body: body)
         }
     }
 }
