@@ -16,13 +16,6 @@ Packages outside of scope:
 - postcss-themes. CommonJS module.
 - scripts. CommonJS module.
 
-TO REVIEW:
-
-- [ ] dom-ready
-- [ ] e2e-test-utils
-- [ ] edit-post
-- [ ] editor
-
 TODO:
 
 - [ ] autop
@@ -38,6 +31,11 @@ TODO:
   - [ ] `format`, `date` have a null param.type
 - [ ] deprecated - missing `@type` tag
 - [ ] dom - missing `@see` tag in `caretRangeFromPoint`
+- [ ] e2e-test-utils
+  - [ ] `mockOrTransform` contains undefined as a param.type
+  - [ ] `setUpResponseMocking` has long description mixed with example
+- [ ] editor
+  - [ ] `userMentionsCompleter` - missing `@type` tag
 - [ ] element
   - [ ] missing `@see` tag
   - [ ] `isEmptyElement` has `*` as param.type
@@ -69,6 +67,8 @@ DONE:
 - [x] compose
 - [x] core-data
 - [x] data
+- [x] dom-ready
+- [x] edit-post
 - [x] format-library
 - [x] hooks
 - [x] html-entities
