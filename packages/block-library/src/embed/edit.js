@@ -23,7 +23,7 @@ import classnames from 'classnames';
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
-export function getEmbedEditComponent( title, icon, responsive = true ) {
+export function getEmbedEditComponent( title, icon, responsive = true, previewable = true ) {
 	return class extends Component {
 		constructor() {
 			super( ...arguments );
@@ -225,6 +225,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 					/>
 					<EmbedPreview
 						preview={ preview }
+						previewable={ previewable }
 						className={ className }
 						url={ url }
 						type={ type }
