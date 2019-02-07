@@ -33,13 +33,15 @@ class EmbedPreview extends Component {
 		};
 	}
 
-	static getDerivedStateFromProps( nextProps ) {
-		if ( ! nextProps.isSelected ) {
+	static getDerivedStateFromProps( nextProps, state ) {
+		if ( ! nextProps.isSelected && state.interactive ) {
 			// We only want to change this when the block is not selected, because changing it when
 			// the block becomes selected makes the overlap disappear too early. Hiding the overlay
 			// happens on mouseup when the overlay is clicked.
 			return { interactive: false };
 		}
+
+		return null;
 	}
 
 	hideOverlay() {
