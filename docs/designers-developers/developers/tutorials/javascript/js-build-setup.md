@@ -1,12 +1,14 @@
 # JavaScript Build Setup
 
-This page covers how to set up your development environment to use the ESNext syntax. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short) or that includes custom syntax such as [JSX](https://reactjs.org/docs/introducing-jsx.html).
+This page covers how to set up your development environment to use the ESNext syntax. ESNext is JavaScript code written using features that are only available in a specification greater than ECMAScript 5 (ES5 for short) or that includes a custom syntax such as [JSX](https://reactjs.org/docs/introducing-jsx.html).
 
-This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
+This documentation covers development for your plugin to work with Gutenberg. If you want to setup a development environment for developing Gutenberg itself, see the [CONTRIBUTING.md](https://github.com/WordPress/gutenberg/blob/master/CONTRIBUTING.md) documentation.
 
-ESNext and JSX syntaxes are not valid JavaScript that all browsers can interpret and run. This requires a transformation step to convert to valid code a browser can run. There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
+Most browsers can not interpret or run ESNext and JSX syntaxes, so we use a transformation step to convert these syntaxes to code that browsers can understand.
 
-Webpack and Babel are the tools that perform this transformation or build step.
+There are a few reasons to use ESNext and the extra step. First, it makes for simpler code that is easier to read and write. Using a transformation step allows for tools to optimize the code to work on the widest variety of browsers. Also, by using a build step you can organize your code into smaller modules and files that can be bundled together into a single download.
+
+There are many tools that can perform this transformation or build step, but in this tutorial we will focus on Webpack and Babel.
 
 [Webpack](https://webpack.js.org/) is a pluggable tool that processes JavaScript creating a compiled bundle that runs in a browser. [Babel](https://babeljs.io/) transforms JavaScript from one format to another. You use Babel as a plugin to Webpack to transform both ESNext and JSX to JavaScript.
 
