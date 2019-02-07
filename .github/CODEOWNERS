@@ -77,4 +77,8 @@
 
 # Native (Unowned)
 *.native.js                                     @ghost
+*.android.js                                    @ghost
+*.ios.js                                        @ghost
 *.native.scss                                   @ghost
+*.android.scss                                  @ghost
+*.ios.scss                                      @ghost
