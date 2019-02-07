@@ -113,13 +113,13 @@ export const image = {
 					/> }
 					{ isActive && <PositionedAtSelection key={ key }>
 						<Popover
-							className="image-format-popover"
 							position="bottom center"
 							focusOnMount={ false }
 						>
 							{ // Disable reason: KeyPress must be suppressed so the block doesn't hide the toolbar
 							/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */ }
 							<form
+								className="editor-format-toolbar__image-container-content"
 								onKeyPress={ stopKeyPropagation }
 								onKeyDown={ this.onKeyDown }
 								onSubmit={ ( event ) => {
@@ -142,6 +142,7 @@ export const image = {
 								} }
 							>
 								<TextControl
+									className="editor-format-toolbar__image-container-value"
 									type="number"
 									label={ __( 'Width' ) }
 									value={ this.state.width }
