@@ -275,7 +275,7 @@ describe( 'state', () => {
 
 		it( 'should set saving flag to true', () => {
 			const action = {
-				type: 'REQUEST_META_BOX_UPDATES',
+				type: 'META_BOX_UPDATES_START',
 			};
 			const actual = isSavingMetaBoxes( false, action );
 

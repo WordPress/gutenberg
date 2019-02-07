@@ -352,6 +352,10 @@ what Meta boxes are available in which location.
 
 Returns an action object used to request meta box update.
 
+### metaBoxUpdatesStart
+
+Returns an action object used signal meta box updates have begun.
+
 ### metaBoxUpdatesSuccess
 
 Returns an action object used signal a successful meta box update.
