@@ -160,7 +160,7 @@ const handlePostUpdate = async ( action, store ) => {
 };
 
 /**
- * Request Post Update Effect handler
+ * Request Post Update Effect handler.
  *
  * @param {Object} action The fetchReusableBlocks action object.
  * @param {Object} store  Redux Store.
