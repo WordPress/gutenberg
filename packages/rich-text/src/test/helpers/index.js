@@ -19,6 +19,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
 		record: {
 			start: 0,
 			end: 0,
@@ -35,6 +37,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 1 ],
 		record: {
 			start: 0,
 			end: 1,
@@ -51,6 +55,8 @@ export const spec = [
 			endOffset: 5,
 			endContainer: element.firstChild,
 		} ),
+		startPath: [ 0, 5 ],
+		endPath: [ 0, 5 ],
 		record: {
 			start: 5,
 			end: 5,
@@ -67,6 +73,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
 		record: {
 			start: 0,
 			end: 0,
@@ -83,6 +91,8 @@ export const spec = [
 			endOffset: 4,
 			endContainer: element.firstChild,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 4 ],
 		record: {
 			start: 0,
 			end: 4,
@@ -99,6 +109,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 2 ],
 		record: {
 			start: 0,
 			end: 2,
@@ -115,6 +127,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 2 ],
 		record: {
 			start: 0,
 			end: 2,
@@ -131,6 +145,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element.firstChild,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 4 ],
 		record: {
 			start: 0,
 			end: 4,
@@ -147,6 +163,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0, 0, 0 ],
+		endPath: [ 0, 0, 0, 4 ],
 		record: {
 			start: 0,
 			end: 4,
@@ -163,6 +181,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element.querySelector( 'em' ),
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 2 ],
 		record: {
 			start: 0,
 			end: 2,
@@ -179,6 +199,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 4 ],
 		record: {
 			start: 0,
 			end: 4,
@@ -195,6 +217,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 1, 0 ],
+		endPath: [ 1, 0 ],
 		record: {
 			start: 0,
 			end: 0,
@@ -211,6 +235,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element.querySelector( 'img' ),
 		} ),
+		startPath: [ 0, 1, 0 ],
+		endPath: [ 0, 1, 0 ],
 		record: {
 			start: 0,
 			end: 1,
@@ -227,6 +253,8 @@ export const spec = [
 			endOffset: 2,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 1, 2, 0 ],
 		record: {
 			start: 0,
 			end: 5,
@@ -243,6 +271,8 @@ export const spec = [
 			endOffset: 2,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 1, 0 ],
+		endPath: [ 1, 2 ],
 		record: {
 			start: 0,
 			end: 5,
@@ -259,6 +289,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
 		record: {
 			start: 0,
 			end: 0,
@@ -275,6 +307,8 @@ export const spec = [
 			endOffset: 2,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 2 ],
+		endPath: [ 2, 0 ],
 		record: {
 			start: 2,
 			end: 3,
@@ -291,6 +325,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 2, 0 ],
 		record: {
 			start: 0,
 			end: 1,
@@ -307,6 +343,8 @@ export const spec = [
 			endOffset: 3,
 			endContainer: element,
 		} ),
+		startPath: [ 2, 0 ],
+		endPath: [ 4, 0 ],
 		record: {
 			formats: [ , , , , ],
 			text: 'a\n\nb',
@@ -323,6 +361,8 @@ export const spec = [
 			endOffset: 2,
 			endContainer: element,
 		} ),
+		startPath: [ 2, 0 ],
+		endPath: [ 2, 0 ],
 		record: {
 			formats: [ , , , , ],
 			text: 'a\n\nb',
@@ -340,6 +380,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.firstChild,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 0 ],
 		record: {
 			start: 0,
 			end: 0,
@@ -357,6 +399,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.lastChild,
 		} ),
+		startPath: [ 0, 0, 1 ],
+		endPath: [ 1, 0, 0 ],
 		record: {
 			start: 1,
 			end: 4,
@@ -375,6 +419,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element.querySelector( 'ol > li' ).firstChild,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 1, 1, 1, 0, 0, 1 ],
 		record: {
 			start: 0,
 			end: 9,
@@ -393,6 +439,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.firstChild,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 0 ],
 		record: {
 			start: 0,
 			end: 0,
@@ -411,6 +459,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.querySelector( 'ul > li' ),
 		} ),
+		startPath: [ 0, 0, 0, 0, 0 ],
+		endPath: [ 0, 0, 0, 0, 0 ],
 		record: {
 			start: 1,
 			end: 1,
@@ -429,6 +479,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.firstChild.nextSibling,
 		} ),
+		startPath: [ 1, 0, 0 ],
+		endPath: [ 1, 0, 0 ],
 		record: {
 			start: 1,
 			end: 1,
@@ -446,6 +498,8 @@ export const spec = [
 			endOffset: 0,
 			endContainer: element.lastChild,
 		} ),
+		startPath: [ 1, 0, 0 ],
+		endPath: [ 1, 0, 0 ],
 		record: {
 			start: 4,
 			end: 4,
@@ -464,6 +518,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element.firstChild,
 		} ),
+		startPath: [ 0, 0, 3 ],
+		endPath: [ 0, 0, 3 ],
 		record: {
 			start: 3,
 			end: 3,
@@ -474,13 +530,15 @@ export const spec = [
 	{
 		description: 'should ignore formats at line separator',
 		multilineTag: 'p',
+		startPath: [],
+		endPath: [],
 		record: {
 			formats: [ [ em ], [ em ], [ em ], [ em ], [ em ], [ em ], [ em ] ],
 			text: 'one\u2028two',
 		},
 	},
 	{
-		description: 'should remove br with settings',
+		description: 'should remove padding',
 		html: '<br data-rich-text-padding="true">',
 		createRange: ( element ) => ( {
 			startOffset: 0,
@@ -488,6 +546,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0 ],
+		endPath: [ 0, 0 ],
 		record: {
 			start: 0,
 			end: 0,
@@ -504,6 +564,8 @@ export const spec = [
 			endOffset: 1,
 			endContainer: element,
 		} ),
+		startPath: [ 0, 0, 0 ],
+		endPath: [ 0, 0, 4 ],
 		record: {
 			start: 0,
 			end: 4,
