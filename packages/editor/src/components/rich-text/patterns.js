@@ -1,18 +1,18 @@
 /**
- * External dependencies
- */
-import { filter } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { remove, applyFormat, getTextContent } from '@wordpress/rich-text';
+import {
+	remove,
+	applyFormat,
+	getTextContent,
+	getSelectionStart,
+	slice,
+} from '@wordpress/rich-text';
 
-export function getPatterns( { onReplace, multiline, valueToFormat } ) {
-	const patterns = filter( getBlockTransforms( 'from' ), ( { type, trigger } ) => {
-		return type === 'pattern' && trigger === undefined;
-	} );
+export function getPatterns( { onReplace, valueToFormat, onCreateUndoLevel, onChange } ) {
+	const prefixTransforms = getBlockTransforms( 'from' )
+		.filter( ( { type } ) => type === 'prefix' );
 
 	return [
 		( record ) => {
@@ -20,50 +20,61 @@ export function getPatterns( { onReplace, multiline, valueToFormat } ) {
 				return record;
 			}
 
+			const start = getSelectionStart( record );
 			const text = getTextContent( record );
-			const transformation = findTransform( patterns, ( item ) => {
-				return item.regExp.test( text );
+			const characterBefore = text.slice( start - 1, start );
+
+			if ( ! /\s/.test( characterBefore ) ) {
+				return record;
+			}
+
+			const trimmedTextBefore = text.slice( 0, start ).trim();
+			const transformation = findTransform( prefixTransforms, ( { prefix } ) => {
+				return trimmedTextBefore === prefix;
 			} );
 
 			if ( ! transformation ) {
 				return record;
 			}
 
-			const result = text.match( transformation.regExp );
+			const content = valueToFormat( slice( record, start, text.length ) );
+			const block = transformation.transform( content );
 
-			const block = transformation.transform( {
-				content: valueToFormat( remove( record, 0, result[ 0 ].length ) ),
-				match: result,
-			} );
-
+			onCreateUndoLevel();
 			onReplace( [ block ] );
 
 			return record;
 		},
 		( record ) => {
-			if ( multiline ) {
-				return record;
-			}
-
+			const BACKTICK = '`';
+			const start = getSelectionStart( record );
 			const text = getTextContent( record );
+			const characterBefore = text.slice( start - 1, start );
 
 			// Quick check the text for the necessary character.
-			if ( text.indexOf( '`' ) === -1 ) {
+			if ( characterBefore !== BACKTICK ) {
 				return record;
 			}
 
-			const match = text.match( /`([^`]+)`/ );
+			const textBefore = text.slice( 0, start - 1 );
+			const indexBefore = textBefore.lastIndexOf( BACKTICK );
 
-			if ( ! match ) {
+			if ( indexBefore === -1 ) {
 				return record;
 			}
 
-			const start = match.index;
-			const end = start + match[ 1 ].length;
+			const startIndex = indexBefore;
+			const endIndex = start - 2;
 
-			record = remove( record, start, start + 1 );
-			record = remove( record, end, end + 1 );
-			record = applyFormat( record, { type: 'code' }, start, end );
+			if ( startIndex === endIndex ) {
+				return record;
+			}
+
+			onChange( record );
+
+			record = remove( record, startIndex, startIndex + 1 );
+			record = remove( record, endIndex, endIndex + 1 );
+			record = applyFormat( record, { type: 'code' }, startIndex, endIndex );
 
 			return record;
 		},

@@ -12,7 +12,7 @@ import babelPlugin from '../src';
 describe( 'babel-plugin', () => {
 	const {
 		getNodeAsString,
-		getTranslatorComment,
+		getExtractedComment,
 		isValidTranslationKey,
 		isSameTranslation,
 	} = babelPlugin;
@@ -43,12 +43,12 @@ describe( 'babel-plugin', () => {
 		} );
 	} );
 
-	describe( '.getTranslatorComment()', () => {
+	describe( '.getExtractedComment()', () => {
 		function getCommentFromString( string ) {
 			let comment;
 			traverse( transformSync( string, { ast: true } ).ast, {
 				CallExpression( path ) {
-					comment = getTranslatorComment( path );
+					comment = getExtractedComment( path );
 				},
 			} );
 

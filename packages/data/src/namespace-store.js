@@ -19,40 +19,20 @@ import createResolversCacheMiddleware from './resolvers-cache-middleware';
  *
  * @param {string} key              Identifying string used for namespace and redex dev tools.
  * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
- * @param {Object} registry         Temporary registry reference, required for namespace updates.
+ * @param {Object} registry         Registry reference.
  *
  * @return {Object} Store Object.
  */
 export default function createNamespace( key, options, registry ) {
-	// TODO: After register[Reducer|Actions|Selectors|Resolvers] are deprecated and removed,
-	//       this function can be greatly simplified because it should no longer be called to modify
-	//       a namespace, but only to create one, and only once for each namespace.
+	const reducer = options.reducer;
+	const store = createReduxStore( reducer, key, registry );
 
-	// TODO: After removing `registry.namespaces`and making stores immutable after create,
-	//       reducer, store, actinos, selectors, and resolvers can all be removed from here.
-	let {
-		reducer,
-		store,
-		actions,
-		selectors,
-		resolvers,
-	} = registry.namespaces[ key ] || {};
-
-	if ( options.reducer ) {
-		reducer = options.reducer;
-		store = createReduxStore( reducer, key, registry );
-	}
+	let selectors, actions, resolvers;
 	if ( options.actions ) {
-		if ( ! store ) {
-			throw new TypeError( 'Cannot specify actions when no reducer is present' );
-		}
 		actions = mapActions( options.actions, store );
 	}
 	if ( options.selectors ) {
-		if ( ! store ) {
-			throw new TypeError( 'Cannot specify selectors when no reducer is present' );
-		}
-		selectors = mapSelectors( options.selectors, store );
+		selectors = mapSelectors( options.selectors, store, registry );
 	}
 	if ( options.resolvers ) {
 		const fulfillment = getCoreDataFulfillment( registry, key );
@@ -79,6 +59,8 @@ export default function createNamespace( key, options, registry ) {
 		} );
 	};
 
+	// This can be simplified to just { subscribe, getSelectors, getActions }
+	// Once we remove the use function.
 	return {
 		reducer,
 		store,
@@ -118,10 +100,31 @@ function createReduxStore( reducer, key, registry ) {
  *                            public facing API. Selectors will get passed the
  *                            state as first argument.
  * @param {Object} store      The redux store to which the selectors should be mapped.
+ * @param {Object} registry   Registry reference.
+ *
  * @return {Object}           Selectors mapped to the redux store provided.
  */
-function mapSelectors( selectors, store ) {
-	const createStateSelector = ( selector ) => ( ...args ) => selector( store.getState(), ...args );
+function mapSelectors( selectors, store, registry ) {
+	const createStateSelector = ( registeredSelector ) => function runSelector() {
+		const selector = registeredSelector.isRegistrySelector ? registeredSelector( registry ) : registeredSelector;
+
+		// This function is an optimized implementation of:
+		//
+		//   selector( store.getState(), ...arguments )
+		//
+		// Where the above would incur an `Array#concat` in its application,
+		// the logic here instead efficiently constructs an arguments array via
+		// direct assignment.
+		const argsLength = arguments.length;
+		const args = new Array( argsLength + 1 );
+		args[ 0 ] = store.getState();
+		for ( let i = 0; i < argsLength; i++ ) {
+			args[ i + 1 ] = arguments[ i ];
+		}
+
+		return selector( ...args );
+	};
+
 	return mapValues( selectors, createStateSelector );
 }
 

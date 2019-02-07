@@ -2,7 +2,7 @@
  * External dependencies
  */
 import RCTAztecView from 'react-native-aztec';
-import { View } from 'react-native';
+import { View, Platform } from 'react-native';
 import {
 	forEach,
 	merge,
@@ -28,6 +28,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import styles from './style.scss';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -40,11 +41,12 @@ const FORMATTING_CONTROLS = [
 		title: __( 'Italic' ),
 		format: 'italic',
 	},
-	{
-		icon: 'admin-links',
-		title: __( 'Link' ),
-		format: 'link',
-	},
+	// TODO: get this back after alpha
+	// {
+	// 	icon: 'admin-links',
+	// 	title: __( 'Link' ),
+	// 	format: 'link',
+	// },
 	{
 		icon: 'editor-strikethrough',
 		title: __( 'Strikethrough' ),
@@ -66,6 +68,7 @@ export function getFormatValue( formatName ) {
 export class RichText extends Component {
 	constructor() {
 		super( ...arguments );
+		this.isIOS = Platform.OS === 'ios';
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
@@ -268,24 +271,39 @@ export class RichText extends Component {
 			this.lastContent = undefined;
 			return true;
 		}
-		// The check below allows us to avoid updating the content right after an `onChange` call.
-		// The first time the component is drawn `lastContent` and `lastEventCount ` are both undefined
-		if ( this.lastEventCount &&
-			nextProps.value &&
-			this.lastContent &&
-			nextProps.value === this.lastContent ) {
-			return false;
-		}
 
-		// If the component is changed React side (merging/splitting/custom text actions) we need to make sure
-		// the native is updated as well
-		if ( nextProps.value &&
-			this.lastContent &&
+		// TODO: Please re-introduce the check to avoid updating the content right after an `onChange` call.
+		// It was removed in https://github.com/WordPress/gutenberg/pull/12417 to fix undo/redo problem.
+
+		// If the component is changed React side (undo/redo/merging/splitting/custom text actions)
+		// we need to make sure the native is updated as well
+		if ( ( typeof nextProps.value !== 'undefined' ) &&
+			( typeof this.lastContent !== 'undefined' ) &&
 			nextProps.value !== this.lastContent ) {
 			this.lastEventCount = undefined; // force a refresh on the native side
 		}
 
 		return true;
+	}
+
+	componentDidMount() {
+		if ( this.props.isSelected ) {
+			this._editor.focus();
+		}
+	}
+
+	componentWillUnmount() {
+		if ( this._editor.isFocused() ) {
+			this._editor.blur();
+		}
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( this.props.isSelected && ! prevProps.isSelected ) {
+			this._editor.focus();
+		} else if ( ! this.props.isSelected && prevProps.isSelected && this.isIOS ) {
+			this._editor.blur();
+		}
 	}
 
 	isFormatActive( format ) {
@@ -342,7 +360,12 @@ export class RichText extends Component {
 			} ) );
 
 		// Save back to HTML from React tree
-		const html = '<' + tagName + '>' + value + '</' + tagName + '>';
+		let html = '<' + tagName + '>' + value + '</' + tagName + '>';
+		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
+		if ( value === undefined || value === '' ) {
+			html = '';
+			this.lastEventCount = undefined; // force a refresh on the native side
+		}
 
 		return (
 			<View>
@@ -355,15 +378,25 @@ export class RichText extends Component {
 					}
 					}
 					text={ { text: html, eventCount: this.lastEventCount } }
+					placeholder={ this.props.placeholder }
+					placeholderTextColor={ this.props.placeholderTextColor || 'lightgrey' }
 					onChange={ this.onChange }
+					onFocus={ this.props.onFocus }
+					onBlur={ this.props.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					isSelected={ this.props.isSelected }
+					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
+					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
+					fontSize={ this.props.fontSize }
+					fontWeight={ this.props.fontWeight }
+					fontStyle={ this.props.fontStyle }
 				/>
 			</View>
 		);

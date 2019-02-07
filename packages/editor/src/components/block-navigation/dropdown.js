@@ -5,6 +5,7 @@ import { Fragment } from '@wordpress/element';
 import { IconButton, Dropdown, SVG, Path, KeyboardShortcuts } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,24 +18,26 @@ const MenuIcon = (
 	</SVG>
 );
 
-function BlockNavigationDropdown() {
+function BlockNavigationDropdown( { hasBlocks, isTextModeEnabled } ) {
 	return	(
 		<Dropdown
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Fragment>
-					<KeyboardShortcuts
+					{ hasBlocks && ! isTextModeEnabled && <KeyboardShortcuts
 						bindGlobal
 						shortcuts={ {
 							[ rawShortcut.access( 'o' ) ]: onToggle,
 						} }
 					/>
+					}
 					<IconButton
 						icon={ MenuIcon }
 						aria-expanded={ isOpen }
-						onClick={ onToggle }
+						onClick={ hasBlocks ? onToggle : undefined }
 						label={ __( 'Block Navigation' ) }
 						className="editor-block-navigation"
 						shortcut={ displayShortcut.access( 'o' ) }
+						disabled={ ! hasBlocks || isTextModeEnabled }
 					/>
 				</Fragment>
 			) }
@@ -45,4 +48,9 @@ function BlockNavigationDropdown() {
 	);
 }
 
-export default BlockNavigationDropdown;
+export default withSelect( ( select ) => {
+	return {
+		hasBlocks: !! select( 'core/editor' ).getBlockCount(),
+		isTextModeEnabled: select( 'core/edit-post' ).getEditorMode() === 'text',
+	};
+} )( BlockNavigationDropdown );

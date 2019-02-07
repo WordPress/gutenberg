@@ -37,6 +37,7 @@ import {
 	blockListSettings,
 	autosave,
 	postSavingLock,
+	previewLink,
 } from '../reducer';
 import { INITIAL_EDITS_DEFAULTS } from '../defaults';
 
@@ -489,8 +490,11 @@ describe( 'state', () => {
 			expect( state.present.blocks.byClientId.chicken ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
-				attributes: { content: 'ribs' },
 				isValid: true,
+			} );
+
+			expect( state.present.blocks.attributes.chicken ).toEqual( {
+				content: 'ribs',
 			} );
 		} );
 
@@ -517,10 +521,11 @@ describe( 'state', () => {
 			expect( state.present.blocks.byClientId.chicken ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/block',
-				attributes: {
-					ref: 3,
-				},
 				isValid: false,
+			} );
+
+			expect( state.present.blocks.attributes.chicken ).toEqual( {
+				ref: 3,
 			} );
 		} );
 
@@ -790,8 +795,10 @@ describe( 'state', () => {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
-					attributes: {},
 				},
+			} );
+			expect( state.present.blocks.attributes ).toEqual( {
+				ribs: {},
 			} );
 		} );
 
@@ -827,8 +834,10 @@ describe( 'state', () => {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
-					attributes: {},
 				},
+			} );
+			expect( state.present.blocks.attributes ).toEqual( {
+				ribs: {},
 			} );
 		} );
 
@@ -1040,6 +1049,90 @@ describe( 'state', () => {
 				} );
 			} );
 
+			it( 'should merge object values', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						meta: {
+							a: 1,
+						},
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'EDIT_POST',
+					edits: {
+						meta: {
+							b: 2,
+						},
+					},
+				} );
+
+				expect( state.present.edits ).toEqual( {
+					meta: {
+						a: 1,
+						b: 2,
+					},
+				} );
+			} );
+
+			it( 'return state by reference on unchanging update', () => {
+				const original = editor( undefined, {} );
+
+				const state = editor( original, {
+					type: 'UPDATE_POST',
+					edits: {},
+				} );
+
+				expect( state.present.edits ).toBe( original.present.edits );
+			} );
+
+			it( 'unset reset post values which match by canonical value', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						title: 'modified title',
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'RESET_POST',
+					post: {
+						title: {
+							raw: 'modified title',
+						},
+					},
+				} );
+
+				expect( state.present.edits ).toEqual( {} );
+			} );
+
+			it( 'unset reset post values by deep match', () => {
+				const original = editor( undefined, {
+					type: 'EDIT_POST',
+					edits: {
+						title: 'modified title',
+						meta: {
+							a: 1,
+							b: 2,
+						},
+					},
+				} );
+
+				const state = editor( original, {
+					type: 'UPDATE_POST',
+					edits: {
+						title: 'modified title',
+						meta: {
+							a: 1,
+							b: 2,
+						},
+					},
+				} );
+
+				expect( state.present.edits ).toEqual( {} );
+			} );
+
 			it( 'should omit content when resetting', () => {
 				// Use case: When editing in Text mode, we defer to content on
 				// the property, but we reset blocks by parse when switching
@@ -1074,52 +1167,59 @@ describe( 'state', () => {
 		} );
 
 		describe( 'blocks', () => {
-			describe( 'byClientId', () => {
-				it( 'should return with attribute block updates', () => {
-					const original = deepFreeze( editor( undefined, {
+			it( 'should not reset any blocks that are not in the post', () => {
+				const actions = [
+					{
 						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {},
-							innerBlocks: [],
-						} ],
-					} ) );
-					const state = editor( original, {
-						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
-						attributes: {
-							updated: true,
-						},
-					} );
-
-					expect( state.present.blocks.byClientId.kumquat.attributes.updated ).toBe( true );
-				} );
-
-				it( 'should accumulate attribute block updates', () => {
-					const original = deepFreeze( editor( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {
-								updated: true,
+						blocks: [
+							{
+								clientId: 'block1',
+								innerBlocks: [
+									{ clientId: 'block11', innerBlocks: [] },
+									{ clientId: 'block12', innerBlocks: [] },
+								],
 							},
-							innerBlocks: [],
-						} ],
-					} ) );
-					const state = editor( original, {
-						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
-						attributes: {
-							moreUpdated: true,
-						},
-					} );
+						],
+					},
+					{
+						type: 'RECEIVE_BLOCKS',
+						blocks: [
+							{
+								clientId: 'block2',
+								innerBlocks: [
+									{ clientId: 'block21', innerBlocks: [] },
+									{ clientId: 'block22', innerBlocks: [] },
+								],
+							},
+						],
+					},
+				];
+				const original = deepFreeze( actions.reduce( editor, undefined ) );
 
-					expect( state.present.blocks.byClientId.kumquat.attributes ).toEqual( {
-						updated: true,
-						moreUpdated: true,
-					} );
+				const state = editor( original, {
+					type: 'RESET_BLOCKS',
+					blocks: [
+						{
+							clientId: 'block3',
+							innerBlocks: [
+								{ clientId: 'block31', innerBlocks: [] },
+								{ clientId: 'block32', innerBlocks: [] },
+							],
+						},
+					],
 				} );
 
+				expect( state.present.blocks.byClientId ).toEqual( {
+					block2: { clientId: 'block2' },
+					block21: { clientId: 'block21' },
+					block22: { clientId: 'block22' },
+					block3: { clientId: 'block3' },
+					block31: { clientId: 'block31' },
+					block32: { clientId: 'block32' },
+				} );
+			} );
+
+			describe( 'byClientId', () => {
 				it( 'should ignore updates to non-existent block', () => {
 					const original = deepFreeze( editor( undefined, {
 						type: 'RESET_BLOCKS',
@@ -1156,6 +1256,91 @@ describe( 'state', () => {
 					} );
 
 					expect( state.present.blocks.byClientId ).toBe( state.present.blocks.byClientId );
+				} );
+			} );
+
+			describe( 'attributes', () => {
+				it( 'should return with attribute block updates', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {},
+							innerBlocks: [],
+						} ],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes.kumquat.updated ).toBe( true );
+				} );
+
+				it( 'should accumulate attribute block updates', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {
+								updated: true,
+							},
+							innerBlocks: [],
+						} ],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							moreUpdated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes.kumquat ).toEqual( {
+						updated: true,
+						moreUpdated: true,
+					} );
+				} );
+
+				it( 'should ignore updates to non-existent block', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes ).toBe( original.present.blocks.attributes );
+				} );
+
+				it( 'should return with same reference if no changes in updates', () => {
+					const original = deepFreeze( editor( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [ {
+							clientId: 'kumquat',
+							attributes: {
+								updated: true,
+							},
+							innerBlocks: [],
+						} ],
+					} ) );
+					const state = editor( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientId: 'kumquat',
+						attributes: {
+							updated: true,
+						},
+					} );
+
+					expect( state.present.blocks.attributes ).toBe( state.present.blocks.attributes );
 				} );
 			} );
 		} );
@@ -1625,6 +1810,25 @@ describe( 'state', () => {
 			} );
 		} );
 
+		it( 'should not replace the selected block if we keep it when replacing blocks', () => {
+			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
+			const state = blockSelection( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/freeform',
+					},
+					{
+						clientId: 'wings',
+						name: 'core/freeform',
+					} ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
 		it( 'should reset if replacing with empty set', () => {
 			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
@@ -1807,6 +2011,7 @@ describe( 'state', () => {
 				requesting: true,
 				successful: false,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1818,6 +2023,7 @@ describe( 'state', () => {
 				requesting: false,
 				successful: true,
 				error: null,
+				options: {},
 			} );
 		} );
 
@@ -1836,6 +2042,7 @@ describe( 'state', () => {
 					code: 'pretend_error',
 					message: 'update failed',
 				},
+				options: {},
 			} );
 		} );
 	} );
@@ -2283,7 +2490,6 @@ describe( 'state', () => {
 						raw: 'The Excerpt',
 					},
 					status: 'draft',
-					preview_link: 'https://wordpress.org/?p=1&preview=true',
 				},
 			} );
 
@@ -2291,7 +2497,6 @@ describe( 'state', () => {
 				title: 'The Title',
 				content: 'The Content',
 				excerpt: 'The Excerpt',
-				preview_link: 'https://wordpress.org/?p=1&preview=true',
 			} );
 		} );
 	} );
@@ -2338,6 +2543,71 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'previewLink', () => {
+		it( 'returns null by default', () => {
+			const state = previewLink( undefined, {} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns preview link from save success', () => {
+			const state = previewLink( null, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: {
+					preview_link: 'https://example.com/?p=2611&preview=true',
+				},
+			} );
+
+			expect( state ).toBe( 'https://example.com/?p=2611&preview=true' );
+		} );
+
+		it( 'returns post link with query arg from save success if no preview link', () => {
+			const state = previewLink( null, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: {
+					link: 'https://example.com/sample-post/',
+				},
+			} );
+
+			expect( state ).toBe( 'https://example.com/sample-post/?preview=true' );
+		} );
+
+		it( 'returns same state if save success without preview link or post link', () => {
+			// Bug: This can occur for post types which are defined as
+			// `publicly_queryable => false` (non-viewable).
+			//
+			// See: https://github.com/WordPress/gutenberg/issues/12677
+			const state = previewLink( null, {
+				type: 'REQUEST_POST_UPDATE_SUCCESS',
+				post: {
+					preview_link: '',
+				},
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns resets on preview start', () => {
+			const state = previewLink( 'https://example.com/sample-post/', {
+				type: 'REQUEST_POST_UPDATE_START',
+				options: {
+					isPreview: true,
+				},
+			} );
+
+			expect( state ).toBe( null );
+		} );
+
+		it( 'returns state on non-preview save start', () => {
+			const state = previewLink( 'https://example.com/sample-post/', {
+				type: 'REQUEST_POST_UPDATE_START',
+				options: {},
+			} );
+
+			expect( state ).toBe( 'https://example.com/sample-post/' );
 		} );
 	} );
 } );

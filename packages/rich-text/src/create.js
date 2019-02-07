@@ -57,10 +57,6 @@ function toFormat( { type, attributes } ) {
 		return attributes ? { type, attributes } : { type };
 	}
 
-	if ( formatType.__experimentalCreatePrepareEditableTree ) {
-		return null;
-	}
-
 	if ( ! attributes ) {
 		return { type: formatType.name };
 	}
@@ -128,7 +124,7 @@ export function create( {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
-			text: text,
+			text,
 		};
 	}
 
@@ -301,11 +297,10 @@ function createFromElement( {
 
 	const length = element.childNodes.length;
 
-	// Remove any line breaks in text nodes. They are not content, but used to
-	// format the HTML. Line breaks in HTML are stored as BR elements.
-	// See https://www.w3.org/TR/html5/syntax.html#newlines.
 	const filterStringComplete = ( string ) => {
-		string = string.replace( /[\r\n]/g, '' );
+		// Reduce any whitespace used for HTML formatting to one space
+		// character, because it will also be displayed as such by the browser.
+		string = string.replace( /[\n\r\t]+/g, ' ' );
 
 		if ( filterString ) {
 			string = filterString( string );

@@ -5,7 +5,6 @@
 $z-layers: (
 	".editor-block-list__block-edit::before": 0,
 	".editor-block-switcher__arrow": 1,
-	".editor-block-list__block {core/image aligned left or right}": 20,
 	".editor-block-list__block {core/image aligned wide or fullwide}": 20,
 	".block-library-classic__toolbar": 10,
 	".editor-block-list__layout .reusable-block-indicator": 1,
@@ -37,9 +36,6 @@ $z-layers: (
 	// Active pill button
 	".components-button.is-button {:focus or .is-primary}": 1,
 
-	// Reusable blocks UI, needs to be above sibling inserter.
-	".editor-block-list__layout .reusable-block-edit-panel": 7,
-
 	// The draggable element should show up above the entire UI
 	".components-draggable__clone": 1000000000,
 
@@ -51,9 +47,12 @@ $z-layers: (
 	".components-drop-zone": 100,
 	".components-drop-zone__content": 110,
 
-	// Block controls, particularly in nested contexts, floats aside block and
+	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
-	".editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}": 80,
+	".editor-block-list__block.is-{selected,hovered} .editor-block-mover": 80,
+
+	// The block mover for floats should overlap the controls of adjacent blocks.
+	".editor-block-list__block {core/image aligned left or right}": 81,
 
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
@@ -85,6 +84,8 @@ $z-layers: (
 
 	// Shows above edit post sidebar; Specificity needs to be higher than 3 classes.
 	".block-editor__container .components-popover.components-color-palette__picker.is-bottom": 100001,
+	".block-editor__container .components-popover.components-font-size-picker__dropdown-content.is-bottom": 100001,
+	".edit-post-post-visibility__dialog.components-popover.is-bottom": 100001,
 
 	".components-autocomplete__results": 1000000,
 

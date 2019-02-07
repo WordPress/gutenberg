@@ -51,7 +51,7 @@ export const isFromWordPress = ( html ) => {
 
 export const getPhotoHtml = ( photo ) => {
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
-	// acually the full size photo.
+	// actually the full size photo.
 	const photoPreview = <p><img src={ photo.thumbnail_url } alt={ photo.title } width="100%" /></p>;
 	return renderToString( photoPreview );
 };
@@ -162,4 +162,18 @@ export function getClassNames( html, existingClassNames = '', allowResponsive = 
 	}
 
 	return existingClassNames;
+}
+
+/**
+ * Fallback behaviour for unembeddable URLs.
+ * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
+ *
+ * @param {string}   url       The URL that could not be embedded.
+ * @param {function} onReplace Function to call with the created fallback block.
+ */
+export function fallback( url, onReplace ) {
+	const link = <a href={ url }>{ url }</a>;
+	onReplace(
+		createBlock( 'core/paragraph', { content: renderToString( link ) } )
+	);
 }

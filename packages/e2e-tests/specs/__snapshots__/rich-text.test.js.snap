@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`RichText should apply formatting when selection is collapsed 1`] = `
+"<!-- wp:paragraph -->
+<p>Some <strong>bold</strong>.</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should apply formatting with access shortcut 1`] = `
+"<!-- wp:paragraph -->
+<p><del>test</del></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should apply formatting with primary shortcut 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>test</strong></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should handle change in tag name gracefully 1`] = `
+"<!-- wp:heading {\\"level\\":3} -->
+<h3></h3>
+<!-- /wp:heading -->"
+`;
+
+exports[`RichText should only mutate text data on input 1`] = `
+"<!-- wp:paragraph -->
+<p>1<strong>2</strong>34</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should transform backtick to code 1`] = `
+"<!-- wp:paragraph -->
+<p>A <code>backtick</code></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should transform backtick to code 2`] = `
+"<!-- wp:paragraph -->
+<p>A \`backtick\`</p>
+<!-- /wp:paragraph -->"
+`;

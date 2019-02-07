@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isFromWordPress, createUpgradedEmbedBlock, getClassNames } from './util';
+import { isFromWordPress, createUpgradedEmbedBlock, getClassNames, fallback } from './util';
 import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
@@ -55,10 +55,11 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		componentDidUpdate( prevProps ) {
 			const hasPreview = undefined !== this.props.preview;
 			const hadPreview = undefined !== prevProps.preview;
-			const switchedPreview = this.props.preview && this.props.attributes.url !== prevProps.attributes.url;
+			const previewChanged = prevProps.preview && this.props.preview && this.props.preview.html !== prevProps.preview.html;
+			const switchedPreview = previewChanged || ( hasPreview && ! hadPreview );
 			const switchedURL = this.props.attributes.url !== prevProps.attributes.url;
 
-			if ( ( hasPreview && ! hadPreview ) || switchedPreview || switchedURL ) {
+			if ( switchedPreview || switchedURL ) {
 				if ( this.props.cannotEmbed ) {
 					// Can't embed this URL, and we've just received or switched the preview.
 					return;
@@ -140,7 +141,7 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 		render() {
 			const { url, editingURL } = this.state;
 			const { caption, type, allowResponsive } = this.props.attributes;
-			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, themeSupportsResponsive } = this.props;
+			const { fetching, setAttributes, isSelected, className, preview, cannotEmbed, themeSupportsResponsive, tryAgain } = this.props;
 
 			if ( fetching ) {
 				return (
@@ -161,6 +162,8 @@ export function getEmbedEditComponent( title, icon, responsive = true ) {
 						value={ url }
 						cannotEmbed={ cannotEmbed }
 						onChange={ ( event ) => this.setState( { url: event.target.value } ) }
+						fallback={ () => fallback( url, this.props.onReplace ) }
+						tryAgain={ tryAgain }
 					/>
 				);
 			}

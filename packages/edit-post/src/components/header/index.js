@@ -51,7 +51,10 @@ function Header( {
 						forceIsSaving={ isSaving }
 					/>
 				) }
-				<PostPreviewButton />
+				<PostPreviewButton
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
@@ -66,7 +69,7 @@ function Header( {
 						shortcut={ shortcuts.toggleSidebar }
 					/>
 					<DotTip tipId="core/editor.settings">
-						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
+						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click the cog icon to toggle the sidebar open and closed.' ) }
 					</DotTip>
 				</div>
 				<PinnedPlugins.Slot />
@@ -79,18 +82,17 @@ function Header( {
 export default compose(
 	withSelect( ( select ) => ( {
 		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		hasBlockSelection: !! select( 'core/editor' ).getBlockSelectionStart(),
 		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
 		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
 		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 	} ) ),
-	withDispatch( ( dispatch, { hasBlockSelection } ) => {
+	withDispatch( ( dispatch, ownProps, { select } ) => {
+		const { getBlockSelectionStart } = select( 'core/editor' );
 		const { openGeneralSidebar, closeGeneralSidebar } = dispatch( 'core/edit-post' );
-		const sidebarToOpen = hasBlockSelection ? 'edit-post/block' : 'edit-post/document';
+
 		return {
-			openGeneralSidebar: () => openGeneralSidebar( sidebarToOpen ),
-			closeGeneralSidebar: closeGeneralSidebar,
-			hasBlockSelection: undefined,
+			openGeneralSidebar: () => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' ),
+			closeGeneralSidebar,
 		};
 	} ),
 )( Header );

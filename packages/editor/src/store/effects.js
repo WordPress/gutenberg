@@ -14,7 +14,7 @@ import {
 	doBlocksMatchTemplate,
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
-import { __, sprintf } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -158,7 +158,6 @@ export default {
 		const state = store.getState();
 		const [ firstBlockClientId, secondBlockClientId ] = action.blocks;
 		const blockA = getBlock( state, firstBlockClientId );
-		const blockB = getBlock( state, secondBlockClientId );
 		const blockType = getBlockType( blockA.name );
 
 		// Only focus the previous block if it's not mergeable
@@ -169,6 +168,7 @@ export default {
 
 		// We can only merge blocks with similar types
 		// thus, we transform the block to merge first
+		const blockB = getBlock( state, secondBlockClientId );
 		const blocksWithTheSameType = blockA.name === blockB.name ?
 			[ blockB ] :
 			switchToBlockType( blockB, blockA.name );
@@ -267,6 +267,7 @@ export default {
 	MULTI_SELECT: ( action, { getState } ) => {
 		const blockCount = getSelectedBlockCount( getState() );
 
-		speak( sprintf( __( '%s blocks selected.' ), blockCount ), 'assertive' );
+		/* translators: %s: number of selected blocks */
+		speak( sprintf( _n( '%s block selected.', '%s blocks selected.', blockCount ), blockCount ), 'assertive' );
 	},
 };

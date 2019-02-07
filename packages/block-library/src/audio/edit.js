@@ -1,25 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import {
 	Disabled,
 	IconButton,
 	PanelBody,
 	SelectControl,
-	Toolbar,
 	ToggleControl,
+	Toolbar,
 	withNotices,
 } from '@wordpress/components';
-import { Component, Fragment } from '@wordpress/element';
 import {
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { Component, Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import icon from './icon';
+
+/**
+ * Internal dependencies
+ */
+import { createUpgradedEmbedBlock } from '../embed/util';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -73,6 +84,14 @@ class AudioEdit extends Component {
 		// Set the block's src from the edit component's state, and switch off
 		// the editing UI.
 		if ( newSrc !== src ) {
+			// Check if there's an embed block that handles this URL.
+			const embedBlock = createUpgradedEmbedBlock(
+				{ attributes: { url: newSrc } }
+			);
+			if ( undefined !== embedBlock ) {
+				this.props.onReplace( embedBlock );
+				return;
+			}
 			setAttributes( { src: newSrc, id: undefined } );
 		}
 
@@ -102,7 +121,7 @@ class AudioEdit extends Component {
 		if ( editing ) {
 			return (
 				<MediaPlaceholder
-					icon="media-audio"
+					icon={ <BlockIcon icon={ icon } /> }
 					className={ className }
 					onSelect={ onSelectAudio }
 					onSelectURL={ this.onSelectURL }

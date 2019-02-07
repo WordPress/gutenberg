@@ -1,8 +1,8 @@
 .editor-block-list__layout .components-draggable__clone {
-	// Hide the Block UI when dragging the block
-	// This ensures the page scroll properly (no sticky elements)
+	// Hide the Block UI when dragging the block.
+	// This ensures the page scroll properly (no sticky elements).
 	.editor-block-contextual-toolbar {
-		// I think important is fine here to avoid over complexing the selector
+		// It's probably okay to use !important here to avoid over-complicating the selector.
 		display: none !important;
 	}
 }
@@ -127,7 +127,7 @@
 		}
 	}
 
-	// Selected style
+	// Selected style.
 	&.is-selected > .editor-block-list__block-edit::before {
 		// Use opacity to work in various editor styles.
 		outline: $border-width solid $dark-opacity-light-500;
@@ -137,12 +137,12 @@
 		}
 	}
 
-	// Hover style
+	// Hover style.
 	&.is-hovered > .editor-block-list__block-edit::before {
 		outline: $border-width solid theme(outlines);
 	}
 
-	// Spotlight mode
+	// Spotlight mode.
 	&.is-focus-mode:not(.is-multi-selected) {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;
@@ -168,7 +168,7 @@
 		background-color: $blue-medium-highlight;
 	}
 
-	// selection style for multiple blocks
+	// Selection style for multiple blocks.
 	&.is-multi-selected *::selection {
 		background-color: transparent;
 	}
@@ -179,7 +179,7 @@
 		// Use opacity to work in various editor styles.
 		mix-blend-mode: multiply;
 
-		// Collapse extra vertical padding on selection
+		// Collapse extra vertical padding on selection.
 		top: -$block-padding;
 		bottom: -$block-padding;
 
@@ -250,12 +250,12 @@
 	&.is-typing .editor-block-list__empty-block-inserter,
 	&.is-typing .editor-block-list__side-inserter {
 		opacity: 0;
+		animation: none;
 	}
 
 	.editor-block-list__empty-block-inserter,
 	.editor-block-list__side-inserter {
-		opacity: 1;
-		transition: opacity 0.2s;
+		@include edit-post__fade-in-animation;
 	}
 
 	// Reusable blocks
@@ -291,12 +291,6 @@
 		// Keep a 1px margin to compensate for the border/outline.
 		.editor-block-contextual-toolbar {
 			margin-bottom: $border-width;
-		}
-
-		// Hide all additional UI on floats.
-		.editor-block-mover,
-		.editor-block-list__block-mobile-toolbar {
-			display: none;
 		}
 
 		// Position toolbar better on mobile.
@@ -506,7 +500,8 @@
 .editor-block-list__block {
 
 	// Left and right block settings and mover.
-	> .editor-block-mover {
+	&.is-multi-selected > .editor-block-mover,
+	> .editor-block-list__block-edit > .editor-block-mover {
 		position: absolute;
 		width: $block-side-ui-width + $block-side-ui-clearance;
 
@@ -516,7 +511,8 @@
 	}
 
 	// Position depending on whether selected or not.
-	> .editor-block-mover {
+	&.is-multi-selected > .editor-block-mover,
+	> .editor-block-list__block-edit > .editor-block-mover {
 		top: -$block-padding - $border-width;
 	}
 
@@ -526,22 +522,58 @@
 		&.is-selected,
 		&.is-hovered {
 			.editor-block-mover {
-				z-index: z-index(".editor-block-list__block.is-{selected,hovered} .editor-block-{settings-menu,mover}");
+				z-index: z-index(".editor-block-list__block.is-{selected,hovered} .editor-block-mover");
 			}
 		}
 	}
 
 	// Left side UI.
-	> .editor-block-mover {
+	&.is-multi-selected > .editor-block-mover,
+	> .editor-block-list__block-edit > .editor-block-mover {
 		padding-right: $block-side-ui-clearance;
 
-		// Position for top level blocks
-		left: -$block-side-ui-width - $block-side-ui-clearance;
+		// Position for top level blocks.
+		left: -$block-side-ui-width - $block-side-ui-clearance - $block-padding - $border-width;
 
-		// Mobile
+		// Hide on mobile, as mobile has a separate solution.
 		display: none;
 		@include break-small() {
 			display: block;
+		}
+	}
+
+	&.is-multi-selected > .editor-block-mover {
+		left: -$block-side-ui-width - $block-side-ui-clearance;
+	}
+
+	// For floats, show block mover when block is selected, and never on hover.
+	&[data-align="left"],
+	&[data-align="right"] {
+		// Show always when the block is selected.
+		&.is-selected > .editor-block-list__block-edit > .editor-block-mover {
+			// Don't show on mobile, allow the special mobile toolbar to work there.
+			display: none;
+			@include break-small() {
+				display: block;
+				opacity: 1;
+				animation: none;
+
+				// Make wider and taller to make "safe" hover area bigger.
+				// The intent is to make it less likely that you hover float-adjacent
+				// blocks that visually appear below the block.
+				width: $block-side-ui-width + $block-side-ui-clearance + $block-padding + $border-width;
+				height: auto;
+				padding-bottom: $block-padding;
+
+				// Unset the negative top margin, or it might overlap the block toolbar.
+				margin-top: 0;
+			}
+		}
+
+		// Don't show on hover, or on the "ghost" when dragging.
+		&.is-hovered > .editor-block-list__block-edit > .editor-block-mover,
+		&.is-dragging > .editor-block-list__block-edit > .editor-block-mover {
+			display: none;
 		}
 	}
 }
@@ -686,7 +718,8 @@
 // Don't show the sibling inserter before the selected block.
 .edit-post-layout:not(.has-fixed-toolbar) {
 	// The child selector is necessary for this to work properly in nested contexts.
-	.is-selected > .editor-block-list__insertion-point-inserter {
+	.is-selected > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter,
+	.is-focused > .editor-block-list__insertion-point > .editor-block-list__insertion-point-inserter {
 		opacity: 0;
 		pointer-events: none;
 
@@ -869,7 +902,7 @@
 		// Hide right border on desktop, where the .components-toolbar instead has a right border.
 		border-right: none;
 
-		// This prevents floats from messing up the position.
+		// This prevents floats from messing up the position of the block toolbar on floats-adjacent blocks when selected.
 		position: absolute;
 		left: 0;
 	}
@@ -905,11 +938,6 @@
 			opacity: 0;
 			@include edit-post__fade-in-animation(60ms, 0.5s);
 		}
-	}
-
-	&.is-light .components-toolbar {
-		background: rgba($white, 0.5);
-		color: $dark-gray-700;
 	}
 
 	// Position the breadcrumb closer on mobile.

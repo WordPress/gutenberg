@@ -16,6 +16,7 @@ const defaultRenderToggle = ( { onToggle, disabled, isOpen } ) => (
 	<IconButton
 		icon="insert"
 		label={ __( 'Add block' ) }
+		labelPosition="bottom"
 		onClick={ onToggle }
 		className="editor-inserter__toggle"
 		aria-haspopup="true"
@@ -69,13 +70,14 @@ class Inserter extends Component {
 	 * @return {WPElement} Dropdown content element.
 	 */
 	renderContent( { onClose } ) {
-		const { rootClientId, index } = this.props;
+		const { rootClientId, clientId, isAppender } = this.props;
 
 		return (
 			<InserterMenu
 				onSelect={ onClose }
 				rootClientId={ rootClientId }
-				index={ index }
+				clientId={ clientId }
+				isAppender={ isAppender }
 			/>
 		);
 	}
@@ -99,27 +101,15 @@ class Inserter extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { rootClientId, index } ) => {
+	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getEditedPostAttribute,
-			getBlockInsertionPoint,
 			hasInserterItems,
 		} = select( 'core/editor' );
-
-		if ( rootClientId === undefined && index === undefined ) {
-			// Unless explicitly provided, the default insertion point provided
-			// by the store occurs immediately following the selected block.
-			// Otherwise, the default behavior for an undefined index is to
-			// append block to the end of the rootClientId context.
-			const insertionPoint = getBlockInsertionPoint();
-			( { rootClientId, index } = insertionPoint );
-		}
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
 			hasItems: hasInserterItems( rootClientId ),
-			rootClientId,
-			index,
 		};
 	} ),
 	ifCondition( ( { hasItems } ) => hasItems ),

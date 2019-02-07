@@ -62,5 +62,17 @@ describe( 'anchor', () => {
 
 			expect( extraProps.id ).toBe( 'foo' );
 		} );
+
+		it( 'should remove an anchor attribute ID when feild is cleared', () => {
+			const attributes = { anchor: '' };
+			const extraProps = getSaveContentExtraProps( {}, {
+				...blockSettings,
+				supports: {
+					anchor: true,
+				},
+			}, attributes );
+
+			expect( extraProps.id ).toBe( null );
+		} );
 	} );
 } );

@@ -4,13 +4,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
 <WithInstanceId(Modal)
   className="edit-post-options-modal"
   closeLabel="Close"
-  title={
-    <span
-      className="edit-post-options-modal__title"
-    >
-      Options
-    </span>
-  }
+  title="Options"
 >
   <Section
     title="General"
@@ -28,20 +22,31 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     <WithSelect(PostTaxonomies)
       taxonomyWrapper={[Function]}
     />
-    <WithSelect(IfCondition(WithDispatch(BaseOption)))
-      label="Featured Image"
-      panelName="featured-image"
-    />
+    <PostFeaturedImageCheck>
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Featured Image"
+        panelName="featured-image"
+      />
+    </PostFeaturedImageCheck>
     <PostExcerptCheck>
       <WithSelect(IfCondition(WithDispatch(BaseOption)))
         label="Excerpt"
         panelName="post-excerpt"
       />
     </PostExcerptCheck>
-    <WithSelect(IfCondition(WithDispatch(BaseOption)))
-      label="Discussion"
-      panelName="discussion-panel"
-    />
+    <WithSelect(PostTypeSupportCheck)
+      supportKeys={
+        Array [
+          "comments",
+          "trackbacks",
+        ]
+      }
+    >
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Discussion"
+        panelName="discussion-panel"
+      />
+    </WithSelect(PostTypeSupportCheck)>
     <WithSelect(PageAttributesCheck)>
       <WithSelect(IfCondition(WithDispatch(BaseOption)))
         label="Page Attributes"

@@ -4,12 +4,14 @@ $toggle-border-width: 2px;
 
 .components-form-toggle {
 	position: relative;
+	display: inline-block;
 
 	// On/Off icon indicators.
 	.components-form-toggle__on,
 	.components-form-toggle__off {
 		position: absolute;
 		top: $toggle-border-width * 3;
+		box-sizing: border-box;
 	}
 
 	.components-form-toggle__off {
@@ -26,6 +28,7 @@ $toggle-border-width: 2px;
 	.components-form-toggle__track {
 		content: "";
 		display: inline-block;
+		box-sizing: border-box;
 		vertical-align: top;
 		background-color: $white;
 		border: $toggle-border-width solid $dark-gray-300;
@@ -38,6 +41,7 @@ $toggle-border-width: 2px;
 	.components-form-toggle__thumb {
 		display: block;
 		position: absolute;
+		box-sizing: border-box;
 		top: $toggle-border-width * 2;
 		left: $toggle-border-width * 2;
 		width: $toggle-height - ($toggle-border-width * 4);
@@ -63,7 +67,7 @@ $toggle-border-width: 2px;
 		}
 	}
 
-	// checked state
+	// Checked state.
 	&.is-checked .components-form-toggle__track {
 		background-color: theme(toggle);
 		border: $toggle-border-width solid theme(toggle);
@@ -86,9 +90,15 @@ $toggle-border-width: 2px;
 			border: $toggle-border-width solid theme(toggle);
 		}
 	}
+
+	// Disabled state:
+	.components-disabled & {
+		opacity: 0.3;
+	}
 }
 
-.components-form-toggle__input[type="checkbox"] {
+// This needs specificity to override inherited checkbox styles.
+.components-form-toggle input.components-form-toggle__input[type="checkbox"] {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -98,6 +108,17 @@ $toggle-border-width: 2px;
 	margin: 0;
 	padding: 0;
 	z-index: z-index(".components-form-toggle__input");
+
+	// This overrides a border style that is inherited from parent checkbox styles.
+	border: none;
+	&:checked {
+		background: none;
+	}
+
+	// Don't show custom checkbox checkmark.
+	&::before {
+		content: "";
+	}
 }
 
 // Ensure on indicator works in normal and Windows high contrast mode both.

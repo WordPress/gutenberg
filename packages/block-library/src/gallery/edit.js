@@ -1,17 +1,16 @@
 /**
  * External Dependencies
  */
-import { filter, pick, get } from 'lodash';
+import classnames from 'classnames';
+import { filter, pick, map, get } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
 import {
-	IconButton,
 	DropZone,
 	FormFileUpload,
+	IconButton,
 	PanelBody,
 	RangeControl,
 	SelectControl,
@@ -21,16 +20,20 @@ import {
 } from '@wordpress/components';
 import {
 	BlockControls,
-	MediaUpload,
+	BlockIcon,
 	MediaPlaceholder,
+	MediaUpload,
 	InspectorControls,
 	mediaUpload,
 } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
+import icon from './icon';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -63,10 +66,26 @@ class GalleryEdit extends Component {
 		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.addFiles = this.addFiles.bind( this );
 		this.uploadFromFiles = this.uploadFromFiles.bind( this );
+		this.setAttributes = this.setAttributes.bind( this );
 
 		this.state = {
 			selectedImage: null,
 		};
+	}
+
+	setAttributes( attributes ) {
+		if ( attributes.ids ) {
+			throw new Error( 'The "ids" attribute should not be changed directly. It is managed automatically when "images" attribute changes' );
+		}
+
+		if ( attributes.images ) {
+			attributes = {
+				...attributes,
+				ids: map( attributes.images, 'id' ),
+			};
+		}
+
+		this.props.setAttributes( attributes );
 	}
 
 	onSelectImage( index ) {
@@ -84,7 +103,7 @@ class GalleryEdit extends Component {
 			const images = filter( this.props.attributes.images, ( img, i ) => index !== i );
 			const { columns } = this.props.attributes;
 			this.setState( { selectedImage: null } );
-			this.props.setAttributes( {
+			this.setAttributes( {
 				images,
 				columns: columns ? Math.min( images.length, columns ) : columns,
 			} );
@@ -92,21 +111,23 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( images ) {
-		this.props.setAttributes( {
+		const { columns } = this.props.attributes;
+		this.setAttributes( {
 			images: images.map( ( image ) => pickRelevantMediaFiles( image ) ),
+			columns: columns ? Math.min( images.length, columns ) : columns,
 		} );
 	}
 
 	setLinkTo( value ) {
-		this.props.setAttributes( { linkTo: value } );
+		this.setAttributes( { linkTo: value } );
 	}
 
 	setColumnsNumber( value ) {
-		this.props.setAttributes( { columns: value } );
+		this.setAttributes( { columns: value } );
 	}
 
 	toggleImageCrop() {
-		this.props.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
+		this.setAttributes( { imageCrop: ! this.props.attributes.imageCrop } );
 	}
 
 	getImageCropHelp( checked ) {
@@ -114,7 +135,8 @@ class GalleryEdit extends Component {
 	}
 
 	setImageAttributes( index, attributes ) {
-		const { attributes: { images }, setAttributes } = this.props;
+		const { attributes: { images } } = this.props;
+		const { setAttributes } = this;
 		if ( ! images[ index ] ) {
 			return;
 		}
@@ -136,7 +158,8 @@ class GalleryEdit extends Component {
 
 	addFiles( files ) {
 		const currentImages = this.props.attributes.images || [];
-		const { noticeOperations, setAttributes } = this.props;
+		const { noticeOperations } = this.props;
+		const { setAttributes } = this;
 		mediaUpload( {
 			allowedTypes: ALLOWED_MEDIA_TYPES,
 			filesList: files,
@@ -183,7 +206,7 @@ class GalleryEdit extends Component {
 							render={ ( { open } ) => (
 								<IconButton
 									className="components-toolbar__control"
-									label={ __( 'Edit Gallery' ) }
+									label={ __( 'Edit gallery' ) }
 									icon="edit"
 									onClick={ open }
 								/>
@@ -199,7 +222,7 @@ class GalleryEdit extends Component {
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon="format-gallery"
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
 						labels={ {
 							title: __( 'Gallery' ),
@@ -243,7 +266,16 @@ class GalleryEdit extends Component {
 					</PanelBody>
 				</InspectorControls>
 				{ noticeUI }
-				<ul className={ `${ className } align${ align } columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }` }>
+				<ul
+					className={ classnames(
+						className,
+						{
+							[ `align${ align }` ]: align,
+							[ `columns-${ columns }` ]: columns,
+							'is-cropped': imageCrop,
+						}
+					) }
+				>
 					{ dropZone }
 					{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */

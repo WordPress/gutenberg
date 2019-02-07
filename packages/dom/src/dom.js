@@ -380,7 +380,6 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 	const editableRect = container.getBoundingClientRect();
 	const x = rect.left;
 	const y = isReverse ? ( editableRect.bottom - buffer ) : ( editableRect.top + buffer );
-	const selection = window.getSelection();
 
 	let range = hiddenCaretRangeFromPoint( document, x, y, container );
 
@@ -413,6 +412,7 @@ export function placeCaretAtVerticalEdge( container, isReverse, rect, mayUseScro
 		}
 	}
 
+	const selection = window.getSelection();
 	selection.removeAllRanges();
 	selection.addRange( range );
 	container.focus();
@@ -497,11 +497,25 @@ export function isEntirelySelected( element ) {
 
 	const { startContainer, endContainer, startOffset, endOffset } = range;
 
-	return (
+	if (
 		startContainer === element &&
 		endContainer === element &&
 		startOffset === 0 &&
 		endOffset === element.childNodes.length
+	) {
+		return true;
+	}
+
+	const lastChild = element.lastChild;
+	const lastChildContentLength = lastChild.nodeType === TEXT_NODE ?
+		lastChild.data.length :
+		lastChild.childNodes.length;
+
+	return (
+		startContainer === element.firstChild &&
+		endContainer === element.lastChild &&
+		startOffset === 0 &&
+		endOffset === lastChildContentLength
 	);
 }
 

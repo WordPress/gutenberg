@@ -8,10 +8,10 @@ import { get } from 'lodash';
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { PanelBody, TextControl } from '@wordpress/components';
+import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
-import { addQueryArgs } from '@wordpress/url';
+import { cleanForSlug } from '@wordpress/editor';
 
 /**
  * Module Constants
@@ -27,15 +27,19 @@ function PostLink( {
 	editPermalink,
 	forceEmptyField,
 	setState,
+	postTitle,
+	postSlug,
+	postID,
 } ) {
-	const { prefix, postName, suffix } = permalinkParts;
+	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
+	const currentSlug = postSlug || cleanForSlug( postTitle ) || postID;
 	if ( isEditable ) {
 		prefixElement = prefix && (
 			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
 		);
-		postNameElement = postName && (
-			<span className="edit-post-post-link__link-post-name">{ postName }</span>
+		postNameElement = currentSlug && (
+			<span className="edit-post-post-link__link-post-name">{ currentSlug }</span>
 		);
 		suffixElement = suffix && (
 			<span className="edit-post-post-link__link-suffix">{ suffix }</span>
@@ -51,7 +55,7 @@ function PostLink( {
 			{ isEditable && (
 				<TextControl
 					label={ __( 'URL' ) }
-					value={ forceEmptyField ? '' : postName }
+					value={ forceEmptyField ? '' : currentSlug }
 					onChange={ ( newValue ) => {
 						editPermalink( newValue );
 						// When we delete the field the permalink gets
@@ -72,12 +76,20 @@ function PostLink( {
 							} );
 						}
 					} }
+					onBlur={ ( event ) => {
+						editPermalink( cleanForSlug( event.target.value ) );
+						if ( forceEmptyField ) {
+							setState( {
+								forceEmptyField: false,
+							} );
+						}
+					} }
 				/>
 			) }
 			<p className="edit-post-post-link__preview-label">
 				{ __( 'Preview' ) }
 			</p>
-			<a
+			<ExternalLink
 				className="edit-post-post-link__link"
 				href={ postLink }
 				target="_blank"
@@ -88,14 +100,7 @@ function PostLink( {
 					</Fragment> ) :
 					postLink
 				}
-			</a>
-			<a
-				className="edit-post-post-link__permalink-settings"
-				href={ addQueryArgs( 'options-permalink.php' ) }
-				target="_blank"
-			>
-				{ __( 'Permalink Settings' ) }
-			</a>
+			</ExternalLink>
 		</PanelBody>
 	);
 }
@@ -111,15 +116,18 @@ export default compose( [
 			getEditedPostAttribute,
 		} = select( 'core/editor' );
 		const {
+			isEditorPanelEnabled,
 			isEditorPanelOpened,
 		} = select( 'core/edit-post' );
 		const {
 			getPostType,
 		} = select( 'core' );
 
-		const { link } = getCurrentPost();
+		const { link, id } = getCurrentPost();
+
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
+
 		return {
 			isNew: isEditedPostNew(),
 			postLink: link,
@@ -127,11 +135,15 @@ export default compose( [
 			isPublished: isCurrentPostPublished(),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
 			permalinkParts: getPermalinkParts(),
+			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
+			postTitle: getEditedPostAttribute( 'title' ),
+			postSlug: getEditedPostAttribute( 'slug' ),
+			postID: id,
 		};
 	} ),
-	ifCondition( ( { isNew, postLink, isViewable } ) => {
-		return ! isNew && postLink && isViewable;
+	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
+		return isEnabled && ! isNew && postLink && isViewable && permalinkParts;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );

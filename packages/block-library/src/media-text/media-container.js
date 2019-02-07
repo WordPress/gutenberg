@@ -1,14 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
 import { IconButton, ResizableBox, Toolbar } from '@wordpress/components';
 import {
 	BlockControls,
+	BlockIcon,
 	MediaPlaceholder,
 	MediaUpload,
 } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import icon from './media-container-icon';
 
 /**
  * Constants
@@ -28,7 +34,7 @@ class MediaContainer extends Component {
 						render={ ( { open } ) => (
 							<IconButton
 								className="components-toolbar__control"
-								label={ __( 'Edit Media' ) }
+								label={ __( 'Edit media' ) }
 								icon="edit"
 								onClick={ open }
 							/>
@@ -67,7 +73,7 @@ class MediaContainer extends Component {
 		const { onSelectMedia, className } = this.props;
 		return (
 			<MediaPlaceholder
-				icon="format-image"
+				icon={ <BlockIcon icon={ icon } /> }
 				labels={ {
 					title: __( 'Media area' ),
 				} }

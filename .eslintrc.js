@@ -19,14 +19,8 @@ const majorMinorRegExp = escapeRegExp( version.replace( /\.\d+$/, '' ) ) + '(\\.
 module.exports = {
 	root: true,
 	extends: [
-		'./eslint/config.js',
-		'plugin:jest/recommended'
-	],
-	env: {
-		'jest/globals': true,
-	},
-	plugins: [
-		'jest',
+		'plugin:@wordpress/eslint-plugin/recommended',
+		'plugin:jest/recommended',
 	],
 	rules: {
 		'no-restricted-syntax': [
@@ -165,6 +159,10 @@ module.exports = {
 				selector: 'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
 				message: 'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
 			},
+			{
+				selector: 'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
+				message: 'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+			},
 		],
 		'react/forbid-elements': [ 'error', {
 			forbid: [
@@ -184,10 +182,14 @@ module.exports = {
 	},
 	overrides: [
 		{
-			files: [ 'test/e2e/**/*.js' ],
-			globals: {
-				page: true,
+			files: [ 'packages/e2e-test*/**/*.js' ],
+			env: {
 				browser: true,
+			},
+			globals: {
+				browser: true,
+				page: true,
+				wp: true,
 			},
 		},
 	],

@@ -45,15 +45,22 @@ function createAddHook( hooks ) {
 		if ( hooks[ hookName ] ) {
 			// Find the correct insert index of the new hook.
 			const handlers = hooks[ hookName ].handlers;
-			let i = 0;
-			while ( i < handlers.length ) {
-				if ( handlers[ i ].priority > priority ) {
+
+			let i;
+			for ( i = handlers.length; i > 0; i-- ) {
+				if ( priority >= handlers[ i - 1 ].priority ) {
 					break;
 				}
-				i++;
 			}
-			// Insert (or append) the new hook.
-			handlers.splice( i, 0, handler );
+
+			if ( i === handlers.length ) {
+				// If append, operate via direct assignment.
+				handlers[ i ] = handler;
+			} else {
+				// Otherwise, insert before index via splice.
+				handlers.splice( i, 0, handler );
+			}
+
 			// We may also be currently executing this hook.  If the callback
 			// we're adding would come after the current callback, there's no
 			// problem; otherwise we need to increase the execution index of

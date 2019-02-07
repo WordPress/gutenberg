@@ -11,7 +11,6 @@ exports[`core/preformatted block edit matches snapshot 1`] = `
       >
         <pre
           aria-autocomplete="list"
-          aria-expanded="false"
           aria-label="Write preformatted text…"
           aria-multiline="true"
           class="editor-rich-text__tinymce"

@@ -66,16 +66,23 @@
 	justify-content: space-between;
 	background: $white;
 	align-items: center;
-	box-sizing: border-box;
 	height: $header-height;
 	position: sticky;
 	top: 0;
 	z-index: z-index(".components-modal__header");
 	margin: 0 -#{ $grid-size-large } $grid-size-large;
 
+	// Rules inside this query are only run by Microsoft Edge.
+	// Edge has bugs around position: sticky;, so it needs a separate top rule.
+	// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/17555420/.
+	@supports (-ms-ime-align:auto) {
+		position: fixed;
+		width: 100%;
+	}
+
 	.components-modal__header-heading {
-		font-size: 1em;
-		font-weight: 400;
+		font-size: 1rem;
+		font-weight: 600;
 	}
 
 	h1 {
@@ -107,4 +114,10 @@
 	box-sizing: border-box;
 	height: 100%;
 	padding: 0 $grid-size-large $grid-size-large;
+
+	// Rules inside this query are only run by Microsoft Edge.
+	// This is a companion top padding to the fixed rule in line 77.
+	@supports (-ms-ime-align:auto) {
+		padding-top: $header-height;
+	}
 }
