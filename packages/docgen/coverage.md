@@ -19,6 +19,7 @@ Packages outside of scope:
 Fix JSDoc manually:
 
 - [ ] autop `description` contains HTML
+- [ ] e2e-test-utils `setUpResponseMocking` has example mixed with description
 - [ ] rich-text `concat` type `@param` is `{...[object]}`. Should be
 
 ```js
@@ -34,15 +35,10 @@ Fix JSDoc manually:
 
 TODO:
 
-- [ ] blocks `pastHandler` has optional `@param`
 - [ ] blocks `unstable__*` should this be docummented?
-- [ ] e2e-test-utils `mockOrTransform` contains undefined as a `@param`.type
-- [ ] e2e-test-utils `setUpResponseMocking` has example mixed with description
 - [ ] keycodes `CONSTANTS`
-- [ ] rich-text `indentListItems` has `@param`.description = null
 - [ ] rich-text `LINE_SEPARATOR` is a constant
 - [ ] rich-text `unstableToDom` is this supposed to go undocumented?
-- [ ] shortcode `string` has `@param`.description = null
 
 DONE:
 
@@ -62,6 +58,7 @@ DONE:
 - [x] deprecated
 - [x] dom
 - [x] dom-ready
+- [x] e2e-test-utils
 - [x] edit-post
 - [x] editor
 - [x] element
@@ -79,6 +76,7 @@ DONE:
 - [x] plugins
 - [x] priority-queue
 - [x] redux-routine
+- [x] shortcode
 - [x] token-list
 - [x] url
 - [x] viewport

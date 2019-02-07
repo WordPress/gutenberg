@@ -12,7 +12,11 @@ module.exports = function( token ) {
 	let jsdoc;
 	const comments = getLeadingComments( token );
 	if ( comments && comments.startsWith( '*\n' ) ) {
-		jsdoc = doctrine.parse( comments, { unwrap: true, recoverable: true } );
+		jsdoc = doctrine.parse( comments, {
+			unwrap: true,
+			recoverable: true,
+			sloppy: true,
+		} );
 	}
 	return jsdoc;
 };
