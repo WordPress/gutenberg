@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { clickBlockAppender, createNewPost, switchEditorModeTo } from '@wordpress/e2e-test-utils';
+import {
+	clickBlockAppender,
+	createNewPost,
+	switchEditorModeTo,
+	waitForAnimation,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
 	beforeEach( async () => {
@@ -21,6 +26,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// Change editing mode from "Visual" to "HTML".
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		let changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -34,6 +40,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// Change editing mode from "HTML" back to "Visual".
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		changeModeButton = await page.waitForXPath( '//button[text()="Edit visually"]' );
 		await changeModeButton.click();
 
@@ -49,6 +56,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// Change editing mode from "Visual" to "HTML".
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 
@@ -65,6 +73,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		// Change editing mode from "Visual" to "HTML".
 		await page.waitForSelector( 'button[aria-label="More options"]' );
 		await page.click( 'button[aria-label="More options"]' );
+		await waitForAnimation();
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );
 		await changeModeButton.click();
 

@@ -4,6 +4,11 @@
 import { first } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import { waitForAnimation } from './wait-for-animation';
+
+/**
  * Clicks on More Menu item, searches for the button with the text provided and clicks it.
  *
  * @param {string} buttonLabel The label to search the button for.
@@ -12,6 +17,7 @@ export async function clickOnMoreMenuItem( buttonLabel ) {
 	await expect( page ).toClick(
 		'.edit-post-more-menu [aria-label="Show more tools & options"]'
 	);
+	await waitForAnimation();
 	const moreMenuContainerSelector =
 		'//*[contains(concat(" ", @class, " "), " edit-post-more-menu__content ")]';
 	let elementToClick = first( await page.$x(

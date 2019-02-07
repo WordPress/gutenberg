@@ -8,6 +8,7 @@ import {
 	pressKeyWithModifier,
 	pressKeyTimes,
 	insertBlock,
+	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -40,6 +41,7 @@ describe( 'Links', () => {
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -64,6 +66,7 @@ describe( 'Links', () => {
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -88,6 +91,7 @@ describe( 'Links', () => {
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -130,6 +134,7 @@ describe( 'Links', () => {
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -151,6 +156,7 @@ describe( 'Links', () => {
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -207,6 +213,7 @@ describe( 'Links', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Text' );
 		await page.click( 'button[aria-label="Link"]' );
+		await waitForAnimation();
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
@@ -229,6 +236,7 @@ describe( 'Links', () => {
 		await moveMouse();
 		await page.waitForSelector( 'button[aria-label="Link"]' );
 		await page.click( 'button[aria-label="Link"]' );
+		await waitForAnimation();
 
 		// Typing "left" should not close the dialog
 		await page.keyboard.press( 'ArrowLeft' );
@@ -285,12 +293,14 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await page.click( 'button[aria-label="Link"]' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
 		await page.waitForSelector( '.editor-url-input__suggestion' );
+		await waitForAnimation();
 		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
 
 		// Expect there to be some autocomplete suggestions.
@@ -327,12 +337,14 @@ describe( 'Links', () => {
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
 
 		await page.keyboard.type( titleText );
 		await page.waitForSelector( '.editor-url-input__suggestion' );
+		await waitForAnimation();
 		const autocompleteSuggestions = await page.$x( `//*[contains(@class, "editor-url-input__suggestion")]//button[contains(text(), '${ titleText }')]` );
 
 		// Expect there to be some autocomplete suggestions.
@@ -363,6 +375,7 @@ describe( 'Links', () => {
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -371,6 +384,7 @@ describe( 'Links', () => {
 		// Trigger the autocomplete suggestion list and select the first suggestion.
 		await page.keyboard.type( titleText );
 		await page.waitForSelector( '.editor-url-input__suggestion' );
+		await waitForAnimation();
 		await page.keyboard.press( 'ArrowDown' );
 
 		// Expect the the escape key to dismiss the popover when the autocomplete suggestion list is open.
@@ -379,6 +393,7 @@ describe( 'Links', () => {
 
 		// Press Cmd+K to insert a link
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -412,6 +427,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 		await waitForAutoFocus();
 		await page.keyboard.type( URL );
 		await page.keyboard.press( 'Enter' );
@@ -429,6 +445,7 @@ describe( 'Links', () => {
 		// Press Cmd+K to edit the link and the url-input should become
 		// focused with the value previously inserted.
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 		await waitForAutoFocus();
 		const activeElementParentClasses = await page.evaluate( () => Object.values( document.activeElement.parentElement.classList ) );
 		expect( activeElementParentClasses ).toContain( 'editor-url-input' );
@@ -441,6 +458,7 @@ describe( 'Links', () => {
 		await page.keyboard.type( 'This is Gutenberg' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'K' );
+		await waitForAnimation();
 		await waitForAutoFocus();
 		await page.keyboard.type( 'http://#test.com' );
 		await page.keyboard.press( 'Enter' );
@@ -464,6 +482,7 @@ describe( 'Links', () => {
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
+		await waitForAnimation();
 
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
@@ -491,6 +510,7 @@ describe( 'Links', () => {
 		// Select "WordPress".
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
 		await pressKeyWithModifier( 'primary', 'k' );
+		await waitForAnimation();
 		await waitForAutoFocus();
 		await page.keyboard.type( 'w.org' );
 		// Navigate to the settings toggle.
