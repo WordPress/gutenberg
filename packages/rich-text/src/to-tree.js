@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 
+import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
@@ -52,29 +53,15 @@ function fromFormat( { type, attributes, unregisteredAttributes, object, boundar
 	};
 }
 
-function getDeepestActiveFormat( { formats, start, selectedFormat } ) {
-	if ( start === undefined ) {
-		return;
-	}
-
-	const formatsAfter = formats[ start ] || [];
-	const formatsBefore = formats[ start - 1 ] || [];
-
-	let source = formatsAfter;
-
-	if ( formatsBefore.length > formatsAfter.length ) {
-		source = formatsBefore;
-	}
-
-	if ( ! source.length ) {
-		return;
-	}
+function getDeepestActiveFormat( value ) {
+	const activeFormats = getActiveFormats( value );
+	const { selectedFormat } = value;
 
 	if ( selectedFormat === undefined ) {
-		return source[ formatsAfter.length - 1 ];
+		return activeFormats[ activeFormats.length - 1 ];
 	}
 
-	return source[ selectedFormat - 1 ];
+	return activeFormats[ selectedFormat - 1 ];
 }
 
 export function toTree( {
