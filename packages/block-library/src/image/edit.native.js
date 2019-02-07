@@ -14,13 +14,28 @@ import {
 } from 'react-native-gutenberg-bridge';
 
 /**
+ * WordPress dependencies
+ */
+import {
+	Toolbar,
+	ToolbarButton,
+	Spinner,
+	Dashicon,
+} from '@wordpress/components';
+import {
+	MediaPlaceholder,
+	RichText,
+	BlockControls,
+	InspectorControls,
+	BottomSheet,
+} from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
+import { isURL } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
-import { isURL } from '@wordpress/url';
 import styles from './styles.scss';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
