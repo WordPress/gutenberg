@@ -288,7 +288,7 @@
 		"parent": "tutorials"
 	},
 	{
-		"title": "Creating a sidebar for your plugin",
+		"title": "Creating a Sidebar for Your Plugin",
 		"slug": "plugin-sidebar-0",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-0.md",
 		"parent": "tutorials"
