@@ -26,7 +26,7 @@ The new script package is registered with WordPress as `wp-i18n` and should be d
 
 Depending on your developer workflow, you might want to use WP-CLI's `wp i18n make-pot` command or a build tool for Babel called `@wordpress/babel-plugin-makepot` to create the necessary translation file. The latter approach integrates with Babel to extract the I18N methods.
 
-### Common methods in wp.i18n (may look similar)
+### Common Methods in wp.i18n (May Look Similar)
 
 - `setLocaleData( data: Object, domain: string )`: Creates a new I18N instance providing translation data for a domain.
 - `__( 'Hello World', 'my-text-domain' )`: Translate a certain string.
