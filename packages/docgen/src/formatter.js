@@ -82,7 +82,7 @@ module.exports = function( artifacts ) {
 			docs.push( `## ${ artifact.name }` );
 			docs.push( '\n' );
 			docs.push( '\n' );
-			docs.push( cleanSpaces( artifact.description ) );
+			docs.push( artifact.description );
 			formatSeeAndLinkTags(
 				artifact.tags.filter( ( tag ) => ( tag.title === 'see' ) || ( tag.title === 'link' ) ),
 				docs
