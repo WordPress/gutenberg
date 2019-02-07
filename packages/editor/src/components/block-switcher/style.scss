@@ -11,13 +11,21 @@
 	padding: 3px;
 }
 
-
 .components-icon-button.editor-block-switcher__no-switcher-icon {
 	width: $icon-button-size + 6px + 6px;
+
 	.editor-block-icon {
 		margin-right: auto;
 		margin-left: auto;
 	}
+}
+
+// When the block switcher does not have any transformations, we show it but as disabled.
+// The background and opacity change helps make the icon legible, despite being disabled.
+.components-button.editor-block-switcher__no-switcher-icon:disabled {
+	background: $light-gray-100;
+	border-radius: 0;
+	opacity: 0.8;
 }
 
 // Style this the same as the block buttons in the library.
