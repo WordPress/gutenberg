@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-const getType = require( './get-param-type-as-string' );
+const getType = require( './get-type-as-string' );
 
 const cleanSpaces = ( paragraph ) =>
 	paragraph ?

@@ -32,6 +32,6 @@
 		"test:formatter": "tape tests/test-formatter-markdown.js | faucet",
 		"test:get-export-entries": "tape tests/test-get-export-entries.js | faucet",
 		"test:get-intermediate-representation": "tape tests/test-get-intermediate-representation.js | faucet",
-		"test:get-param-type-as-string": "tape tests/test-get-param-type-as-string.js | faucet"
+		"test:get-type-as-string": "tape tests/test-get-type-as-string.js | faucet"
 	}
 }
