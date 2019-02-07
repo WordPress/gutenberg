@@ -241,7 +241,7 @@ Here is a brief animation illustrating how to find and use the keyboard shortcut
 
 ## Is Gutenberg built on top of TinyMCE?
 
-No. [TinyMCE](https://www.tinymce.com/) is one of the best tools for enabling rich text on the web. In Gutenberg, TinyMCE does exactly that. Nearly every text field you'll find is augmented with TinyMCE for rich text. Whether it be text, lists, or even just a single caption, TinyMCE can be invoked on blocks for rich text enhancements.
+No. [TinyMCE](https://www.tinymce.com/) is only used for the "Classic" block.
 
 ## What browsers will Gutenberg support?
 
@@ -320,7 +320,7 @@ We realize it's a big change. We also think there will be many new opportunities
 
 ## Will I be able to opt out of Gutenberg for my site?
 
-There is a “Classic” block, which is virtually the same as the current editor, except in block form. 
+There is a “Classic” block, which is virtually the same as the current editor, except in block form.
 
 There is also the [Classic Editor Plugin](https://wordpress.org/plugins/classic-editor/) which restores the previous editor, see the plugin for more information. The WordPress Core team has committed to supporting the Classic Editor Plugin [until December 2021](https://make.wordpress.org/core/2018/11/07/classic-editor-plugin-support-window/).
 

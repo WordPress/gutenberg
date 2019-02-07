@@ -102,7 +102,6 @@ return array(
 	),
 	'wp-dom'                                => array(
 		'lodash',
-		'wp-tinymce',
 	),
 	'wp-dom-ready'                          => array(),
 	'wp-edit-post'                          => array(
