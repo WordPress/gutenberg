@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 
 class Picker extends Component {
-	presentSelector() {
+	presentPicker() {
 		const { options, onChange } = this.props;
 		const labels = options.map( ( { label } ) => label );
 		const fullOptions = [ __( 'Cancel' ) ].concat( labels );

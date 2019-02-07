@@ -22,7 +22,7 @@ export default class Picker extends Component {
 		};
 	}
 
-	presentSelector() {
+	presentPicker() {
 		this.setState( { isVisible: true } );
 	}
 

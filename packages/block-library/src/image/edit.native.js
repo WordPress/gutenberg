@@ -239,12 +239,12 @@ class ImageEdit extends React.Component {
 					autoCapitalize="none"
 					autoCorrect={ false }
 				/>
-				<BottomSheet.SelectCell
+				<BottomSheet.PickerCell
 					icon="editor-expand"
 					label={ __( 'Image Size' ) }
-					value={ 'Large' }
+					value={ 'Large' } // Temporary for UI implementation.
 					options={ sizeOptions }
-					onChangeValue={ this.updateImageURL }
+					onChangeValue={ () => {} } // Temporary for UI implementation.
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }

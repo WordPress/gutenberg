@@ -16,7 +16,7 @@ import { Component } from '@wordpress/element';
 import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
-import SelectCell from './select-cell';
+import PickerCell from './picker-cell';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -96,6 +96,6 @@ class BottomSheet extends Component {
 
 BottomSheet.Button = Button;
 BottomSheet.Cell = Cell;
-BottomSheet.SelectCell = SelectCell;
+BottomSheet.PickerCell = PickerCell;
 
 export default BottomSheet;
