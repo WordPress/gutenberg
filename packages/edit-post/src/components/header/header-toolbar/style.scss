@@ -38,6 +38,12 @@
 		border-bottom: none;
 	}
 
+	.editor-block-toolbar,
+	.components-toolbar {
+		border-color: $dark-opacity-light-500;
+		animation: none;
+	}
+
 	.is-sidebar-opened & {
 		display: none;
 	}
