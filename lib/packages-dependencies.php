@@ -153,7 +153,6 @@ return array(
 		'wp-notices',
 		'wp-nux',
 		'wp-rich-text',
-		'wp-tinymce',
 		'wp-token-list',
 		'wp-url',
 		'wp-viewport',
