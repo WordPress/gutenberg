@@ -1,5 +1,9 @@
 ## 7.1.0 (Unreleased)
 
+### New Features
+
+- Added a new `Animate` component.
+
 ### Improvements
 
 - `withFilters` has been optimized to avoid binding hook handlers for each mounted instance of the component, instead using a single centralized hook delegator.

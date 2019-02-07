@@ -378,6 +378,12 @@
 		"parent": "designers"
 	},
 	{
+		"title": "Animation",
+		"slug": "animation",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/animation.md",
+		"parent": "designers"
+	},
+	{
 		"title": "Contributors Guide",
 		"slug": "contributors",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/readme.md",
@@ -814,6 +820,12 @@
 		"slug": "packages-wordcount",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/wordcount/README.md",
 		"parent": "packages"
+	},
+	{
+		"title": "Animate",
+		"slug": "animate",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/src/animate/README.md",
+		"parent": "components"
 	},
 	{
 		"title": "Autocomplete",
