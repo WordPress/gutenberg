@@ -50,7 +50,8 @@
 	&:not(.is-focus-mode) {
 		&.is-selected .editor-post-title__input {
 			// use opacity to work in various editor styles
-			border-color: $dark-opacity-light-500;
+			border-color: $dark-opacity-200;
+			@include outline-fade-animation();
 
 			.is-dark-theme & {
 				border-color: $light-opacity-light-500;
