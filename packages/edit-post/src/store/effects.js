@@ -28,14 +28,9 @@ import { onChangeListener } from './utils';
 
 const VIEW_AS_LINK_SELECTOR = '#wp-admin-bar-view a';
 
-function updateMetaBoxes( updatePost, { isPreview, isAutosave } ) {
-	// Don't carry out a MetaBox update for automated autosaves.
-	if ( isAutosave && ! isPreview ) {
-		return updatePost;
-	}
-
+function updateMetaBoxes() {
 	// Inidicate that the MetaBox update process has started.
-	dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
+	dispatch( 'core/edit-post' ).metaBoxUpdatesStart();
 
 	// Saves the wp_editor fields
 	if ( window.tinyMCE ) {
@@ -72,21 +67,42 @@ function updateMetaBoxes( updatePost, { isPreview, isAutosave } ) {
 	additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
 
 	// Save the metaboxes
-	const metaBoxUpdatePromise = apiFetch( {
+	return apiFetch( {
 		url: window._wpMetaBoxUrl,
 		method: 'POST',
 		body: formData,
 		parse: false,
 	} );
+}
+
+/**
+ * A function used in a filter to defer post updates until after MetaBoxes
+ * have been updated.
+ *
+ * @param {function} updatePost A function that when called, updates the post.
+ * @param {Object}   options    An object providing options about the post
+ * 								udpate.
+ *
+ * @return {function} A function that when called updates MetaBoxes (if needed)
+ * 					  and then updates the post.
+ */
+function updateMetaBoxesFilter( updatePost, { isPreview, isAutosave } ) {
+	// Don't carry out a MetaBox update for automated autosaves.
+	if ( isAutosave && ! isPreview ) {
+		return updatePost;
+	}
 
 	// Return a function that defers the post update until after MetaBoxes have been saved.
-	return () => metaBoxUpdatePromise.then( () => {
+	return () => updateMetaBoxes().then( () => {
 		dispatch( 'core/edit-post' ).metaBoxUpdatesSuccess();
 		updatePost();
 	} );
 }
 
 const effects = {
+	REQUEST_META_BOX_UPDATES() {
+		updateMetaBoxes();
+	},
 	SET_META_BOXES_PER_LOCATIONS( action, store ) {
 		// Allow toggling metaboxes panels
 		// We need to wait for all scripts to load
@@ -104,7 +120,7 @@ const effects = {
 			addFilter(
 				'editor.updatePost',
 				'core/edit-post/store/effects/update-meta-boxes',
-				updateMetaBoxes
+				updateMetaBoxesFilter
 			);
 		}
 	},

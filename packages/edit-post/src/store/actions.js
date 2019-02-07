@@ -187,6 +187,17 @@ export function requestMetaBoxUpdates() {
 }
 
 /**
+ * Returns an action object used signal meta box updates have begun.
+ *
+ * @return {Object} Action object.
+ */
+export function metaBoxUpdatesStart() {
+	return {
+		type: 'META_BOX_UPDATES_START',
+	};
+}
+
+/**
  * Returns an action object used signal a successful meta box update.
  *
  * @return {Object} Action object.

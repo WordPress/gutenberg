@@ -188,7 +188,7 @@ export function publishSidebarActive( state = false, action ) {
  */
 export function isSavingMetaBoxes( state = false, action ) {
 	switch ( action.type ) {
-		case 'REQUEST_META_BOX_UPDATES':
+		case 'META_BOX_UPDATES_START':
 			return true;
 		case 'META_BOX_UPDATES_SUCCESS':
 			return false;
