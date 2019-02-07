@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 // refactoring editor actions to yielded controls, or replacing direct dispatch
 // on the editor store with action creators (e.g. `REQUEST_POST_UPDATE_START`).
 import { dispatch as dataDispatch } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -54,6 +55,11 @@ export const requestPostUpdate = async ( action, store ) => {
 	// We don't check for dirtiness here as this can be overridden in the UI.
 	if ( ! isEditedPostSaveable( state ) ) {
 		return;
+	}
+
+	const promise = applyFilters( 'editor.beforePostUpdate', Promise.resolve(), action.options );
+	if ( promise ) {
+		await promise;
 	}
 
 	let edits = getPostEdits( state );

@@ -10,24 +10,75 @@ import { select, subscribe, dispatch } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import {
-	metaBoxUpdatesSuccess,
-	requestMetaBoxUpdates,
 	openGeneralSidebar,
 	closeGeneralSidebar,
 } from './actions';
 import {
-	getActiveMetaBoxLocations,
 	getActiveGeneralSidebarName,
+	hasMetaBoxes,
 } from './selectors';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { onChangeListener } from './utils';
 
 const VIEW_AS_LINK_SELECTOR = '#wp-admin-bar-view a';
+
+function updateMetaBoxes( promise, { isPreview, isAutosave } ) {
+	if ( isAutosave && ! isPreview ) {
+		return;
+	}
+
+	dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
+
+	// Saves the wp_editor fields
+	if ( window.tinyMCE ) {
+		window.tinyMCE.triggerSave();
+	}
+
+	// Additional data needed for backward compatibility.
+	// If we do not provide this data, the post will be overridden with the default values.
+	const post = select( 'core/editor' ).getCurrentPost();
+	const additionalData = [
+		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
+		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
+		post.sticky ? [ 'sticky', post.sticky ] : false,
+		[ 'post_author', post.author ],
+	].filter( Boolean );
+
+	// We gather all the metaboxes locations data and the base form data
+	const baseFormData = new window.FormData( document.querySelector( '.metabox-base-form' ) );
+	const activeMetaBoxLocations = select( 'core/edit-post' ).getActiveMetaBoxLocations();
+	const formDataToMerge = [
+		baseFormData,
+		...activeMetaBoxLocations.map( ( location ) => (
+			new window.FormData( getMetaBoxContainer( location ) )
+		) ),
+	];
+
+	// Merge all form data objects into a single one.
+	const formData = reduce( formDataToMerge, ( memo, currentFormData ) => {
+		for ( const [ key, value ] of currentFormData ) {
+			memo.append( key, value );
+		}
+		return memo;
+	}, new window.FormData() );
+	additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
+
+	// Save the metaboxes
+	return promise.then( () => {
+		return apiFetch( {
+			url: window._wpMetaBoxUrl,
+			method: 'POST',
+			body: formData,
+			parse: false,
+		} ).then( () => dispatch( 'core/edit-post' ).metaBoxUpdatesSuccess() );
+	} );
+}
 
 const effects = {
 	SET_META_BOXES_PER_LOCATIONS( action, store ) {
@@ -43,78 +94,13 @@ const effects = {
 			}
 		} );
 
-		let wasSavingPost = select( 'core/editor' ).isSavingPost();
-		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-		let wasPreviewingPost = select( 'core/editor' ).isPreviewingPost();
-		// Save metaboxes when performing a full save on the post.
-		subscribe( () => {
-			const isSavingPost = select( 'core/editor' ).isSavingPost();
-			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
-			const isPreviewingPost = select( 'core/editor' ).isPreviewingPost();
-			const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
-
-			// Save metaboxes on save completion, except for autosaves that are not a post preview.
-			const shouldTriggerMetaboxesSave = (
-				hasActiveMetaBoxes && (
-					( wasSavingPost && ! isSavingPost && ! wasAutosavingPost ) ||
-					( wasAutosavingPost && wasPreviewingPost && ! isPreviewingPost )
-				)
+		if ( hasMetaBoxes( store.getState() ) ) {
+			addFilter(
+				'editor.beforePostUpdate',
+				'core/edit-post/store/effects/update-meta-boxes',
+				updateMetaBoxes
 			);
-
-			// Save current state for next inspection.
-			wasSavingPost = isSavingPost;
-			wasAutosavingPost = isAutosavingPost;
-			wasPreviewingPost = isPreviewingPost;
-
-			if ( shouldTriggerMetaboxesSave ) {
-				store.dispatch( requestMetaBoxUpdates() );
-			}
-		} );
-	},
-	REQUEST_META_BOX_UPDATES( action, store ) {
-		// Saves the wp_editor fields
-		if ( window.tinyMCE ) {
-			window.tinyMCE.triggerSave();
 		}
-
-		const state = store.getState();
-
-		// Additional data needed for backward compatibility.
-		// If we do not provide this data, the post will be overridden with the default values.
-		const post = select( 'core/editor' ).getCurrentPost( state );
-		const additionalData = [
-			post.comment_status ? [ 'comment_status', post.comment_status ] : false,
-			post.ping_status ? [ 'ping_status', post.ping_status ] : false,
-			post.sticky ? [ 'sticky', post.sticky ] : false,
-			[ 'post_author', post.author ],
-		].filter( Boolean );
-
-		// We gather all the metaboxes locations data and the base form data
-		const baseFormData = new window.FormData( document.querySelector( '.metabox-base-form' ) );
-		const formDataToMerge = [
-			baseFormData,
-			...getActiveMetaBoxLocations( state ).map( ( location ) => (
-				new window.FormData( getMetaBoxContainer( location ) )
-			) ),
-		];
-
-		// Merge all form data objects into a single one.
-		const formData = reduce( formDataToMerge, ( memo, currentFormData ) => {
-			for ( const [ key, value ] of currentFormData ) {
-				memo.append( key, value );
-			}
-			return memo;
-		}, new window.FormData() );
-		additionalData.forEach( ( [ key, value ] ) => formData.append( key, value ) );
-
-		// Save the metaboxes
-		apiFetch( {
-			url: window._wpMetaBoxUrl,
-			method: 'POST',
-			body: formData,
-			parse: false,
-		} )
-			.then( () => store.dispatch( metaBoxUpdatesSuccess() ) );
 	},
 	SWITCH_MODE( action ) {
 		// Unselect blocks when we switch to the code editor.
