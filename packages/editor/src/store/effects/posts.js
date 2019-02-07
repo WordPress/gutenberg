@@ -41,6 +41,12 @@ import { resolveSelector } from './utils';
 export const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';
 const TRASH_POST_NOTICE_ID = 'TRASH_POST_NOTICE_ID';
 
+/**
+ * Update the post using the REST API.
+ *
+ * @param {Object} action Action object.
+ * @param {Object} store  Redux Store.
+ */
 const handlePostUpdate = async ( action, store ) => {
 	const { dispatch, getState } = store;
 	const state = getState();
@@ -156,8 +162,8 @@ const handlePostUpdate = async ( action, store ) => {
 /**
  * Request Post Update Effect handler
  *
- * @param {Object} action  the fetchReusableBlocks action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action The fetchReusableBlocks action object.
+ * @param {Object} store  Redux Store.
  */
 export const requestPostUpdate = async ( action, store ) => {
 	const state = store.getState();
@@ -180,8 +186,8 @@ export const requestPostUpdate = async ( action, store ) => {
 /**
  * Request Post Update Success Effect handler
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action Action object.
+ * @param {Object} store  Redux Store.
  */
 export const requestPostUpdateSuccess = ( action ) => {
 	const { previousPost, post, postType } = action;
@@ -240,7 +246,7 @@ export const requestPostUpdateSuccess = ( action ) => {
 /**
  * Request Post Update Failure Effect handler
  *
- * @param {Object} action  action object.
+ * @param {Object} action Action object.
  */
 export const requestPostUpdateFailure = ( action ) => {
 	const { post, edits, error } = action;
@@ -272,8 +278,8 @@ export const requestPostUpdateFailure = ( action ) => {
 /**
  * Trash Post Effect handler
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action Action object.
+ * @param {Object} store  Redux Store.
  */
 export const trashPost = async ( action, store ) => {
 	const { dispatch, getState } = store;
@@ -301,8 +307,8 @@ export const trashPost = async ( action, store ) => {
 /**
  * Trash Post Failure Effect handler
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action Action object.
+ * @param {Object} store  Redux Store.
  */
 export const trashPostFailure = ( action ) => {
 	const message = action.error.message && action.error.code !== 'unknown_error' ? action.error.message : __( 'Trashing failed' );
@@ -314,8 +320,8 @@ export const trashPostFailure = ( action ) => {
 /**
  * Refresh Post Effect handler
  *
- * @param {Object} action  action object.
- * @param {Object} store   Redux Store.
+ * @param {Object} action Action object.
+ * @param {Object} store  Redux Store.
  */
 export const refreshPost = async ( action, store ) => {
 	const { dispatch, getState } = store;

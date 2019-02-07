@@ -30,3 +30,21 @@ var customPreviewMessage = function() {
 wp.hooks.addFilter( 'editor.PostPreview.interstitialMarkup', 'my-plugin/custom-preview-message', customPreviewMessage );
 ```
 
+## `editor.updatePost`
+
+Used to perform other steps before, during or after the post update process.
+
+The filter recieves a function `updatePost` that when called triggers the post update. It should return a function that wraps `updatePost` (or returns `updatePost` itself if no actions need to be performed).
+
+_Example:_
+
+```js
+var updatePostFilter = function( updatePost ) {
+	return function() {
+		// make an API request prior to updating the post.
+		myApiRequest().then( updatePost );
+	};
+};
+
+wp.hooks.addFilter( 'editor.updatePost', 'my-plugin/update-post-filter', updatePostFilter );
+```

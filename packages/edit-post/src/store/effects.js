@@ -28,6 +28,12 @@ import { onChangeListener } from './utils';
 
 const VIEW_AS_LINK_SELECTOR = '#wp-admin-bar-view a';
 
+/**
+ * Updates MetaBoxes by making a POST request to post.php.
+ *
+ * @return {Promise} A promise when the request to update MetaBoxes is
+ * 				     complete.
+ */
 function updateMetaBoxes() {
 	// Inidicate that the MetaBox update process has started.
 	dispatch( 'core/edit-post' ).metaBoxUpdatesStart();
