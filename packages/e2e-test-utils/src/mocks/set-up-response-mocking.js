@@ -10,10 +10,13 @@ let requestMocks = [];
 
 /**
  * Sets up mock checks and responses. Accepts a list of mock settings with the following properties:
- *   - match: function to check if a request should be mocked.
- *   - onRequestMatch: async function to respond to the request.
  *
- * Example:
+ * - `match`: function to check if a request should be mocked.
+ * - `onRequestMatch`: async function to respond to the request.
+ *
+ * @example
+ *
+ *```js
  *   const MOCK_RESPONSES = [
  *     {
  *       match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
@@ -25,6 +28,7 @@ let requestMocks = [];
  *     }
  *  ];
  *  setUpResponseMocking( MOCK_RESPONSES );
+ *```
  *
  * If none of the mock settings match the request, the request is allowed to continue.
  *
