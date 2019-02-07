@@ -396,6 +396,8 @@ export class RichText extends Component {
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
+					placeholder={ this.props.placeholder }
+					placeholderTextColor={ this.props.placeholderTextColor || 'lightgrey' }
 				/>
 			</View>
 		);
