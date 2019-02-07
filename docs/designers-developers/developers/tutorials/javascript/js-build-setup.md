@@ -26,7 +26,7 @@ First, you need to set up node for your development environment. The steps requi
 
 Additionally, the [Node.js download page](https://nodejs.org/en/download/) includes installers and binaries.
 
-**Note:** The build tools and process occur on the command-line, so some basic familiarity using a terminal application is required. Some text editors have a terminal built-in which is fine to use, Visual Studio Code editor is one popular example.
+**Note:** The build tools and process occur on the command-line, so some basic familiarity using a terminal application is required. Some text editors have a terminal built-in which is fine to use; Visual Studio Code and PhpStorm are two popular options.
 
 ### Node Package Manager (npm)
 
@@ -88,7 +88,7 @@ Also, if you look at package.json file it will include a new section:
 
 ## Webpack & Babel
 
-You configure webpack to process the `block.js` file and run babel to transform the JSX.
+Next, we will configure webpack to process the `block.js` file and run babel to transform the JSX within it.
 
 Create the file `webpack.config.js`
 
@@ -171,7 +171,7 @@ To configure npm to run a script, you use the scripts section in `package.json` 
   },
 ```
 
-You can then run the build using: `npm run build`
+You can then run the build using: `npm run build`.
 
 After the build finishes, you will see the built file created at `block.build.js`.
 
@@ -179,7 +179,7 @@ After the build finishes, you will see the built file created at `block.build.js
 
 ### Development Mode
 
-The basics are in place to build. You might of noticed the webpack.config.js set a default mode to "development". Webpack has the ability to run in a "production" mode which shrinks the code down, but makes it difficult to read.
+The basics are in place to build. You might have noticed the webpack.config.js sets a default mode of "development". Webpack can also run in a "production" mode, which shrinks the code down so it downloads faster, but makes it difficult to read.
 
 The mode is setup so it can be configured using environment variables, which can be added in the scripts section of `package.json`.
 
@@ -190,7 +190,7 @@ The mode is setup so it can be configured using environment variables, which can
   },
 ```
 
-This sets the environment variables, but different environments handle these setting in different ways. Using the `cross-env` helper module can help to handle this. Be sure to install the `cross-env` package using `npm install --save cross-env`.
+This sets the environment variables, but different environments handle these settings in different ways. Using the `cross-env` helper module can help to handle this. Be sure to install the `cross-env` package using `npm install --save cross-env`.
 
 Additionally, webpack has a `--watch` flag that will keep the process running, watching for any changes to the `block.js` file and re-building as changes occur. This is useful during development, when you might have a lot of changes in progress.
 
@@ -235,4 +235,3 @@ With a setup in place, the standard workflow is:
 - Start development builds: `npm run dev`
 - Develop. Test. Repeat.
 - Create production build: `npm run build`
-
