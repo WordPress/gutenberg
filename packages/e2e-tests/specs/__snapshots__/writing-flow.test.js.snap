@@ -122,6 +122,18 @@ exports[`adding blocks should navigate around inline boundaries 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`adding blocks should navigate around nested inline boundaries 1`] = `
+"<!-- wp:paragraph -->
+<p><strong><em>1</em> <em>2</em></strong></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks should navigate around nested inline boundaries 2`] = `
+"<!-- wp:paragraph -->
+<p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`adding blocks should not delete surrounding space when deleting a selected word 1`] = `
 "<!-- wp:paragraph -->
 <p>alpha  gamma</p>

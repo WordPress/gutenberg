@@ -7,6 +7,7 @@ import {
 	createNewPost,
 	pressKeyTimes,
 	pressKeyWithModifier,
+	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
@@ -137,6 +138,42 @@ describe( 'adding blocks', () => {
 		// the last paragraph
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'Before' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should navigate around nested inline boundaries', async () => {
+		await setPostContent( `
+			<!-- wp:paragraph -->
+			<p><strong><em>1</em> <em>2</em></strong></p>
+			<!-- /wp:paragraph -->
+		` );
+
+		await page.click( '[data-type="core/paragraph"] [contenteditable]' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyTimes( 'ArrowLeft', 9 );
+
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'd' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'e' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'f' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'g' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'h' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'i' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'j' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
