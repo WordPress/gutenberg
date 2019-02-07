@@ -74,4 +74,4 @@ To better understand the specific code example above:
 
 The Block Editor offers a complete API for generating notices. The official documentation is a great place to review what's possible.
 
-For a full list of the available actions and selectors, refer to the [Notices Data Handbook](/docs//designers-developers/developers/data/data-core-notices/) page.
+For a full list of the available actions and selectors, refer to the [Notices Data Handbook](/docs/designers-developers/developers/data/data-core-notices.md) page.
