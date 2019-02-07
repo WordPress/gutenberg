@@ -35,6 +35,7 @@ const MEDIA_UPLOAD_STATE_FAILED = 3;
 const MEDIA_UPLOAD_STATE_RESET = 4;
 
 const LINK_DESTINATION_CUSTOM = 'custom';
+const LINK_DESTINATION_NONE = 'none';
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -56,6 +57,7 @@ class ImageEdit extends React.Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
+		this.onRevertSettings = this.onRevertSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -151,6 +153,14 @@ class ImageEdit extends React.Component {
 		this.props.setAttributes( {
 			linkDestination: LINK_DESTINATION_CUSTOM,
 			href,
+		} );
+	}
+
+	onRevertSettings() {
+		this.props.setAttributes( {
+			alt: '',
+			linkDestination: LINK_DESTINATION_NONE,
+			href: undefined,
 		} );
 	}
 
@@ -257,7 +267,7 @@ class ImageEdit extends React.Component {
 					label={ __( 'Reset to Original' ) }
 					labelStyle={ styles.resetSettingsButton }
 					drawSeparator={ false }
-					onPress={ () => {} }
+					onPress={ this.onRevertSettings }
 				/>
 			</BottomSheet>
 		);
