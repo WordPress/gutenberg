@@ -46,6 +46,7 @@ export default class ImageEdit extends React.Component {
 		this.removeMediaUploadListener = this.removeMediaUploadListener.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
@@ -83,7 +84,7 @@ export default class ImageEdit extends React.Component {
 
 		switch ( payload.state ) {
 			case MEDIA_UPLOAD_STATE_UPLOADING:
-				this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
+				this.updateMediaProgress( payload );
 				break;
 			case MEDIA_UPLOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
@@ -94,6 +95,14 @@ export default class ImageEdit extends React.Component {
 			case MEDIA_UPLOAD_STATE_RESET:
 				this.mediaUploadStateReset( payload );
 				break;
+		}
+	}
+
+	updateMediaProgress( payload ) {
+		const { setAttributes } = this.props;
+		this.setState( { progress: payload.progress, isUploadInProgress: true, isUploadFailed: false } );
+		if ( payload.mediaUrl !== undefined ) {
+			setAttributes( { url: payload.mediaUrl } );
 		}
 	}
 
