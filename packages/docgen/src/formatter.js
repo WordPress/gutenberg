@@ -3,7 +3,17 @@
  */
 const getParamType = require( './get-param-type-as-string' );
 
-const formatParams = ( params, docs ) => {
+const cleanSpaces = ( paragraph ) =>
+	paragraph ?
+		paragraph.split( '\n' ).map(
+			( sentence ) => sentence.trim()
+		).reduce(
+			( acc, current ) => acc + ' ' + current,
+			''
+		).trim() :
+		'';
+
+const formatParamTags = ( params, docs ) => {
 	if ( params && params.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
@@ -15,17 +25,7 @@ const formatParams = ( params, docs ) => {
 	}
 };
 
-const cleanSpaces = ( paragraph ) =>
-	paragraph ?
-		paragraph.split( '\n' ).map(
-			( sentence ) => sentence.trim()
-		).reduce(
-			( acc, current ) => acc + ' ' + current,
-			''
-		).trim() :
-		'';
-
-const formatExample = ( example, docs ) => {
+const formatExampleTag = ( example, docs ) => {
 	if ( example && example.length === 1 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
@@ -36,7 +36,7 @@ const formatExample = ( example, docs ) => {
 	}
 };
 
-const formatOutput = ( output, docs ) => {
+const formatReturnTag = ( output, docs ) => {
 	if ( output && output.length === 1 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
@@ -44,6 +44,17 @@ const formatOutput = ( output, docs ) => {
 		docs.push( '\n' );
 		docs.push( '\n' );
 		docs.push( `\`${ getParamType( output[ 0 ] ) }\` ${ cleanSpaces( output[ 0 ].description ) }` );
+	}
+};
+
+const formatSeeTag = ( tag, docs ) => {
+	if ( tag && tag.length === 1 ) {
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( '**Related**' );
+		docs.push( '\n' );
+		docs.push( '\n' );
+		docs.push( `- ${ tag[ 0 ].description }` );
 	}
 };
 
@@ -68,9 +79,10 @@ module.exports = function( artifacts ) {
 			docs.push( '\n' );
 			docs.push( '\n' );
 			docs.push( cleanSpaces( artifact.description ) );
-			formatExample( artifact.tags.filter( ( tag ) => tag.title === 'example' ), docs );
-			formatParams( artifact.params, docs );
-			formatOutput( artifact.return, docs );
+			formatSeeTag( artifact.tags.filter( ( tag ) => tag.title === 'see' ), docs );
+			formatExampleTag( artifact.tags.filter( ( tag ) => tag.title === 'example' ), docs );
+			formatParamTags( artifact.params, docs );
+			formatReturnTag( artifact.return, docs );
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );

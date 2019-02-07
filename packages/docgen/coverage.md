@@ -18,29 +18,21 @@ Packages outside of scope:
 
 TODO:
 
-- [ ] autop
-  - [ ] description contains HTML
-- [ ] babel-plugin-import-jsx-pragma - missing `@see` tag
+- [ ] autop - description contains HTML
 - [ ] blocks
   - [ ] `getBlockSupport`, `isValidIcon`, `parseWithAttributeSchema` have `*` as param.type
-  - [ ] `getPhrasingContentSchema` misses `@see` tag
   - [ ] `pastHandler` has optional params
   - [ ] `setCategories` has `Object []` as a param type
   - [ ] `unstable__*` should this be docummented?
-- [ ] date
-  - [ ] `format`, `date` have a null param.type
+- [ ] date - `format`, `date` have a null param.type
 - [ ] deprecated - missing `@type` tag
-- [ ] dom - missing `@see` tag in `caretRangeFromPoint`
 - [ ] e2e-test-utils
   - [ ] `mockOrTransform` contains undefined as a param.type
   - [ ] `setUpResponseMocking` has long description mixed with example
-- [ ] editor
-  - [ ] `userMentionsCompleter` - missing `@type` tag
-- [ ] element
-  - [ ] missing `@see` tag
-  - [ ] `isEmptyElement` has `*` as param.type
+- [ ] editor - `userMentionsCompleter` - missing `@type` tag
+- [ ] element - `isEmptyElement` has `*` as param.type
 - [ ] escape-html - missing `@link` tag `escapeAttribute`
-- [ ] i18n - missing `@see` tag
+- [ ] i18n - `sprintf` has `string[]` as a param type
 - [ ] keycodes - has constants, missing `@type` tag
 - [ ] rich-text
   - [ ] `concat` type param is `{...[object]}`
@@ -52,13 +44,13 @@ TODO:
   - [ ] `string` has param.description = null
   - [ ] description contains numbered list that is flattened
 - [ ] token-list - missing `@link` tag
-- [ ] viewport - missing `@see` tag
 
 DONE:
 
 - [x] a11y
 - [x] annotations
 - [x] api-fetch
+- [x] babel-plugin-import-jsx-pragma
 - [x] blob
 - [x] block-library
 - [x] block-serialization-default-parser
@@ -67,6 +59,7 @@ DONE:
 - [x] compose
 - [x] core-data
 - [x] data
+- [x] dom
 - [x] dom-ready
 - [x] edit-post
 - [x] format-library
@@ -81,4 +74,5 @@ DONE:
 - [x] priority-queue
 - [x] redux-routine
 - [x] url
+- [x] viewport
 - [x] wordcount
