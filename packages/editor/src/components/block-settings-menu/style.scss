@@ -10,14 +10,14 @@
 	}
 
 	.editor-block-settings-menu__content {
-		padding: $grid-size - $border-width;
+		padding: ($grid-size - $border-width) 0;
 	}
 
 	.editor-block-settings-menu__separator {
 		margin-top: $grid-size;
 		margin-bottom: $grid-size;
-		margin-left: -$grid-size + $border-width;
-		margin-right: -$grid-size + $border-width;
+		margin-left: 0;
+		margin-right: 0;
 		border-top: $border-width solid $light-gray-500;
 
 		// Check if the separator is the last child in the node and if so, hide itself
@@ -36,7 +36,6 @@
 	.editor-block-settings-menu__control {
 		width: 100%;
 		justify-content: flex-start;
-		padding: 8px;
 		background: none;
 		outline: none;
 		border-radius: 0;
