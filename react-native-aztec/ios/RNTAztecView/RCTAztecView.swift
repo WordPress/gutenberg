@@ -274,7 +274,7 @@ class RCTAztecView: Aztec.TextView {
     
     /// Returns the font from the specified attributes, or the default font if no specific one is set.
     ///
-    private func font(from attributes: [NSAttributedStringKey: Any]) -> UIFont {
+    private func font(from attributes: [NSAttributedString.Key: Any]) -> UIFont {
         return attributes[.font] as? UIFont ?? defaultFont
     }
     
