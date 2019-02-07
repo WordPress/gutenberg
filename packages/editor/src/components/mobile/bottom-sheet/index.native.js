@@ -29,14 +29,19 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.eventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	componentWillUnmount() {
+		this.eventSubscription.remove();
+		this.eventSubscription = null;
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
+		if ( this.eventSubscription === null ) {
+			return;
+		}
 		const { safeAreaInsets } = result;
 		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
 			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
