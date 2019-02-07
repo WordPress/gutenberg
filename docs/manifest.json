@@ -234,7 +234,7 @@
 		"parent": "javascript"
 	},
 	{
-		"title": "Javascript Versions and Build Step",
+		"title": "JavaScript Versions and Build Step",
 		"slug": "versions-and-building",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/javascript/versions-and-building.md",
 		"parent": "javascript"
