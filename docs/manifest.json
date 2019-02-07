@@ -372,6 +372,12 @@
 		"parent": "designers"
 	},
 	{
+		"title": "Animation",
+		"slug": "animation",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/designers/animation.md",
+		"parent": "designers"
+	},
+	{
 		"title": "Contributors Guide",
 		"slug": "contributors",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/contributors/readme.md",
