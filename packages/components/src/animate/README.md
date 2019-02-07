@@ -36,4 +36,4 @@ This animation is meant for popover/modal content, such as menus appearing. It s
 
 Name | Type | Default | Description
 --- | --- | --- | ---
-`origin` | `string` | `top center` | Point of origin ( `top`|`bottom`|`middle right`|`left`|`center`).
+`origin` | `string` | `top center` | Point of origin (`top`, `bottom`,` middle right`, `left`, `center`).
