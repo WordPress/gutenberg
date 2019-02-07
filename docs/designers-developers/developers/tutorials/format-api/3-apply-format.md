@@ -1,4 +1,4 @@
-# Apply the format when the button is clicked
+# Apply the Format When the Button Is Clicked
 
 So far, your custom button doesn't modify the text selected, it only renders a message in the console. Let's change that.
 
