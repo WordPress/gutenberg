@@ -35,6 +35,32 @@ test( 'getType from AllLiteral', ( t ) => {
 	t.end();
 } );
 
+test( 'getType with applications', ( t ) => {
+	const type = getType( {
+		title: 'param',
+		description: 'description',
+		type: {
+			type: 'TypeApplication',
+			expression: {
+				type: 'NameExpression',
+				name: 'Array',
+			},
+			applications: [
+				{
+					type: 'NameExpression',
+					name: 'Object',
+				},
+				{
+					type: 'NameExpression',
+					name: 'String',
+				},
+			],
+		},
+	} );
+	t.equal( type, 'Array<Object,String>' );
+	t.end();
+} );
+
 test( 'getType from NullableType', ( t ) => {
 	const type = getType( {
 		title: 'param',

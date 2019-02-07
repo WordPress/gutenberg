@@ -16,23 +16,25 @@ Packages outside of scope:
 - postcss-themes. CommonJS module.
 - scripts. CommonJS module.
 
+Fix JSDoc manually:
+
+- [ ] rich-text `concat` type `@param` is `{...[object]}`
+- [ ] autop `description` contains HTML
+
 WIP:
+
+- [ ] rich-text `toHTMLString` `@param` is an object (create table?)
 
 TODO:
 
-- [ ] autop `description` contains HTML
 - [ ] blocks `pastHandler` has optional `@param`
-- [ ] blocks `setCategories` has `Object []` as a `@param` type
 - [ ] blocks `unstable__*` should this be docummented?
 - [ ] date `format`, `date` have a null `@param`.type
 - [ ] e2e-test-utils `mockOrTransform` contains undefined as a `@param`.type
 - [ ] e2e-test-utils `setUpResponseMocking` has example mixed with description
 - [ ] keycodes `CONSTANTS`
-- [ ] i18n `sprintf` has `string[]` as a `@param` type
-- [ ] rich-text `concat` type `@param` is `{...[object]}`
 - [ ] rich-text `indentListItems` has `@param`.description = null
 - [ ] rich-text `LINE_SEPARATOR` is a constant
-- [ ] rich-text `toHTMLString` `@param` is an object (create table?)
 - [ ] rich-text `unstableToDom` is this supposed to go undocumented?
 - [ ] shortcode `string` has `@param`.description = null
 
@@ -60,6 +62,7 @@ DONE:
 - [x] format-library
 - [x] hooks
 - [x] html-entities
+- [x] i18n
 - [x] jest-console
 - [x] jest-puppeteer-axe
 - [x] keycodes

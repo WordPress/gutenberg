@@ -6,6 +6,10 @@ const getType = function( param ) {
 			return `...${ getType( param.expression ) }`;
 		} else if ( param.type === 'NullableType' ) {
 			return `?${ getType( param.expression ) }`;
+		} else if ( param.type === 'TypeApplication' ) {
+			return `${ getType( param.expression ) }<${
+				param.applications.map( ( application ) => getType( application ) ).join( ',' )
+			}>`;
 		}
 		return getType( param.expression );
 	} else if ( param.elements ) {
