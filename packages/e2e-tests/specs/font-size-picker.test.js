@@ -6,7 +6,6 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyTimes,
-	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Font Size Picker', () => {
@@ -19,7 +18,6 @@ describe( 'Font Size Picker', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
 		await page.click( '.components-font-size-picker__selector' );
-		await waitForAnimation();
 		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
 		await changeSizeButton.click();
 
