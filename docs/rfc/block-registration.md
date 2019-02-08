@@ -51,7 +51,7 @@ To register a new block type, start by creating a `block.json` file. This file:
 
 * Gives a name to the block type.
 * Defines some important metadata about the registered block type (title, category, icon, description, keywords).
-* Defines the attributes of your block type.
+* Defines the attributes of the block type.
 * Links to the editor implementation of your block type, the save function and any other context-aware property.
 
 **Example:**
