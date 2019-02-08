@@ -464,7 +464,6 @@ describe( 'Links', () => {
 
 		// Click on the Link button
 		await page.click( 'button[aria-label="Link"]' );
-
 		// Wait for the URL field to auto-focus
 		await waitForAutoFocus();
 

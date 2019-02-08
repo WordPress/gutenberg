@@ -17,7 +17,6 @@ describe( 'Font Size Picker', () => {
 		// Create a paragraph block with some content.
 		await clickBlockAppender();
 		await page.keyboard.type( 'Paragraph to be made "large"' );
-
 		await page.click( '.components-font-size-picker__selector' );
 		const changeSizeButton = await page.waitForSelector( '.components-button.is-font-large' );
 		await changeSizeButton.click();
