@@ -1,3 +1,11 @@
+## 3.1.0 (Unreleased)
+
+- Added format boundaries.
+- Removed parameters from `create` to filter out content.
+- Removed the `createLinePadding` from `apply`, which is now built in.
+- Improved format placeholder.
+- Improved dom diffing.
+
 ## 3.0.4 (2019-01-03)
 
 ## 3.0.3 (2018-12-12)
