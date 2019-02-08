@@ -13,14 +13,14 @@ const cleanSpaces = ( paragraph ) =>
 		).trim() :
 		'';
 
-const formatParamTags = ( params, docs ) => {
-	if ( params && params.length > 0 ) {
+const formatParamTags = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
 		docs.push( '**Parameters**' );
 		docs.push( '\n' );
-		docs.push( ...params.map(
-			( param ) => `\n- **${ param.name }** \`${ getType( param ) }\`: ${ cleanSpaces( param.description ) }`
+		docs.push( ...tags.map(
+			( tag ) => `\n- **${ tag.name }** \`${ getType( tag ) }\`: ${ cleanSpaces( tag.description ) }`
 		) );
 	}
 };
@@ -110,8 +110,8 @@ module.exports = function( artifacts ) {
 			);
 			formatExampleTag( artifact.tags.filter( ( tag ) => tag.title === 'example' ), docs );
 			formatTypeTag( artifact.tags.filter( ( tag ) => tag.title === 'type' ), docs );
-			formatParamTags( artifact.params, docs );
-			formatReturnTag( artifact.return, docs );
+			formatParamTags( artifact.tags.filter( ( tag ) => tag.title === 'param' ), docs );
+			formatReturnTag( artifact.tags.filter( ( tag ) => tag.title === 'return' ), docs );
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );

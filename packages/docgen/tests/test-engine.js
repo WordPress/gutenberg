@@ -34,9 +34,9 @@ test( 'Engine - many exports at once', ( t ) => {
 	t.deepEqual(
 		ir,
 		[
-			{ name: 'firstDeclaration', description: 'First declaration example.', params: [], return: [], tags: [] },
-			{ name: 'secondDeclaration', description: 'Second declaration example.', params: [], return: [], tags: [] },
-			{ name: 'default', description: 'Default declaration example.', params: [], return: [], tags: [] },
+			{ name: 'firstDeclaration', description: 'First declaration example.', tags: [] },
+			{ name: 'secondDeclaration', description: 'Second declaration example.', tags: [] },
+			{ name: 'default', description: 'Default declaration example.', tags: [] },
 		]
 	);
 	t.end();
@@ -53,7 +53,7 @@ test( 'Engine - named export (function)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'myDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -69,7 +69,7 @@ test( 'Engine - named export (variable)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'myDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -87,7 +87,7 @@ test( 'Engine - named export (single identifier)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'myDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -105,7 +105,7 @@ test( 'Engine - named export (single identifier) using JSDoc from declaration', 
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'myDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -131,8 +131,8 @@ test( 'Engine - named export (multiple identifiers) using JSDoc from declaration
 	t.deepEqual(
 		ir,
 		[
-			{ name: 'firstDeclaration', description: 'First declaration example.', params: [], return: [], tags: [] },
-			{ name: 'secondDeclaration', description: 'Second declaration example.', params: [], return: [], tags: [] },
+			{ name: 'firstDeclaration', description: 'First declaration example.', tags: [] },
+			{ name: 'secondDeclaration', description: 'Second declaration example.', tags: [] },
 		]
 	);
 	t.end();
@@ -153,7 +153,7 @@ test( 'Engine - named export (single identifier) using JSDoc from dependency', (
 	);
 	t.deepEqual(
 		ir,
-		[ { name: 'myDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'myDeclaration', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -169,7 +169,7 @@ test( 'Engine - default export (named function)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'default', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -185,7 +185,7 @@ test( 'Engine - default export (anonymous function)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'default', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -203,7 +203,7 @@ test( 'Engine - default export (identifier)', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'default', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -221,7 +221,7 @@ test( 'Engine - default export (identifier) using JSDoc from function', ( t ) =>
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'default', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -239,7 +239,7 @@ test( 'Engine - default export (identifier) using JSDoc from variable', ( t ) =>
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'default', description: 'My declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'My declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -254,7 +254,7 @@ test( 'Engine - undocumented export', ( t ) => {
 ` );
 	t.deepEqual(
 		ir,
-		[ { name: 'default', description: 'Undocumented declaration.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'Undocumented declaration.', tags: [] } ]
 	);
 	t.end();
 } );

@@ -22,8 +22,6 @@ test( 'IR - undocumented', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ) ), [ {
 		name: 'default',
 		description: 'Undocumented declaration.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenOneliner = fs.readFileSync(
@@ -33,8 +31,6 @@ test( 'IR - undocumented', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenOneliner ) ), [ {
 		name: 'default',
 		description: 'Undocumented declaration.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	t.end();
@@ -48,8 +44,6 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenClassAnonymous ) ), [ {
 		name: 'default',
 		description: 'Class declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenClassNamed = fs.readFileSync(
@@ -59,8 +53,6 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenClassNamed ) ), [ {
 		name: 'default',
 		description: 'Class declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenFnAnonymous = fs.readFileSync(
@@ -70,8 +62,6 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenFnAnonymous ) ), [ {
 		name: 'default',
 		description: 'Function declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenFnNamed = fs.readFileSync(
@@ -81,8 +71,6 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenFnNamed ) ), [ {
 		name: 'default',
 		description: 'Function declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenVariable = fs.readFileSync(
@@ -92,8 +80,6 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenVariable ) ), [ {
 		name: 'default',
 		description: 'Variable declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	t.end();
@@ -107,8 +93,6 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenClass ) ), [ {
 		name: 'MyDeclaration',
 		description: 'My declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenFn = fs.readFileSync(
@@ -118,8 +102,6 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenFn ) ), [ {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenVariable = fs.readFileSync(
@@ -129,8 +111,6 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenVariable ) ), [ {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const tokenVariables = fs.readFileSync(
@@ -138,8 +118,8 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 		'utf-8'
 	);
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenVariables ) ), [
-		{ name: 'firstDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] },
-		{ name: 'secondDeclaration', description: 'My declaration example.', params: [], return: [], tags: [] },
+		{ name: 'firstDeclaration', description: 'My declaration example.', tags: [] },
+		{ name: 'secondDeclaration', description: 'My declaration example.', tags: [] },
 	] );
 	t.end();
 } );
@@ -156,8 +136,6 @@ test( 'IR - JSDoc in same file (default export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ) ), [ {
 		name: 'default',
 		description: 'Class declaration example.',
-		params: [],
-		return: [],
 		tags: [],
 	} ] );
 	const namedExport = fs.readFileSync(
@@ -170,11 +148,11 @@ test( 'IR - JSDoc in same file (default export)', function( t ) {
 	);
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( namedExport )[ 0 ], JSON.parse( namedExportAST ) ),
-		[ { name: 'functionDeclaration', description: 'Function declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'functionDeclaration', description: 'Function declaration example.', tags: [] } ]
 	);
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( namedExport )[ 1 ], JSON.parse( namedExportAST ) ),
-		[ { name: 'default', description: 'Function declaration example.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'Function declaration example.', tags: [] } ]
 	);
 	t.end();
 } );
@@ -191,8 +169,6 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ) ), [ {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
-		params: [],
-		return: [],
 		tags: [] },
 	] );
 	const tokenObject = fs.readFileSync(
@@ -206,8 +182,6 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenObject ), JSON.parse( astObject ) ), [ {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
-		params: [],
-		return: [],
 		tags: [] },
 	] );
 	const tokens = fs.readFileSync(
@@ -219,9 +193,9 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 		'utf-8'
 	);
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokens ), JSON.parse( asts ) ), [
-		{ name: 'functionDeclaration', description: 'Function declaration example.', params: [], return: [], tags: [] },
-		{ name: 'variableDeclaration', description: 'Variable declaration example.', params: [], return: [], tags: [] },
-		{ name: 'ClassDeclaration', description: 'Class declaration example.', params: [], return: [], tags: [] },
+		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
+		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
+		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
 	] );
 	const foo = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifiers-and-inline.json' ),
@@ -232,11 +206,11 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 		'utf-8'
 	);
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( foo )[ 0 ], JSON.parse( bar ) ), [
-		{ name: 'functionDeclaration', description: 'Function declaration example.', params: [], return: [], tags: [] },
-		{ name: 'ClassDeclaration', description: 'Class declaration example.', params: [], return: [], tags: [] },
+		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
+		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
 	] );
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( foo )[ 1 ], JSON.parse( bar ) ), [
-		{ name: 'variableDeclaration', description: 'Variable declaration example.', params: [], return: [], tags: [] },
+		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
 	] );
 	t.end();
 } );
@@ -253,9 +227,9 @@ test( 'IR - JSDoc in module dependency (named export)', function( t ) {
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenImportNamed ), { body: [] }, getModuleImportNamed ),
 		[
-			{ name: 'functionDeclaration', description: 'Function declaration example.', params: [], return: [], tags: [] },
-			{ name: 'variableDeclaration', description: 'Variable declaration example.', params: [], return: [], tags: [] },
-			{ name: 'ClassDeclaration', description: 'Class declaration example.', params: [], return: [], tags: [] },
+			{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
+			{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
+			{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
 		]
 	);
 	t.end();
@@ -272,7 +246,7 @@ test( 'IR - JSDoc in module dependency (named default export)', function( t ) {
 	) );
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenDefault ), { body: [] }, getModule ),
-		[ { name: 'default', description: 'Module declaration.', params: [], return: [], tags: [] } ]
+		[ { name: 'default', description: 'Module declaration.', tags: [] } ]
 	);
 	const tokenDefaultExported = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default-exported.json' ),
@@ -280,7 +254,7 @@ test( 'IR - JSDoc in module dependency (named default export)', function( t ) {
 	);
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenDefaultExported ), { body: [] }, getModule ),
-		[ { name: 'moduleName', description: 'Module declaration.', params: [], return: [], tags: [] } ]
+		[ { name: 'moduleName', description: 'Module declaration.', tags: [] } ]
 	);
 
 	t.end();
@@ -298,9 +272,9 @@ test( 'IR - JSDoc in module dependency (namespace export)', function( t ) {
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( token ), { body: [] }, getModule ),
 		[
-			{ name: 'myVariable', description: 'Named variable.', params: [], return: [], tags: [] },
-			{ name: 'myFunction', description: 'Named function.', params: [], return: [], tags: [] },
-			{ name: 'MyClass', description: 'Named class.', params: [], return: [], tags: [] },
+			{ name: 'myVariable', description: 'Named variable.', tags: [] },
+			{ name: 'myFunction', description: 'Named function.', tags: [] },
+			{ name: 'MyClass', description: 'Named class.', tags: [] },
 		]
 	);
 	const tokenCommented = fs.readFileSync(
@@ -310,9 +284,9 @@ test( 'IR - JSDoc in module dependency (namespace export)', function( t ) {
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenCommented ), { body: [] }, getModule ),
 		[
-			{ name: 'myVariable', description: 'Named variable.', params: [], return: [], tags: [] },
-			{ name: 'myFunction', description: 'Named function.', params: [], return: [], tags: [] },
-			{ name: 'MyClass', description: 'Named class.', params: [], return: [], tags: [] },
+			{ name: 'myVariable', description: 'Named variable.', tags: [] },
+			{ name: 'myFunction', description: 'Named function.', tags: [] },
+			{ name: 'MyClass', description: 'Named class.', tags: [] },
 		]
 	);
 	t.end();
@@ -336,8 +310,6 @@ test( 'IR - JSDoc in module dependency through import (default export)', functio
 		[ {
 			name: 'default',
 			description: 'Function declaration.',
-			params: [],
-			return: [],
 			tags: [],
 		} ]
 	);
@@ -358,8 +330,6 @@ test( 'IR - JSDoc in module dependency through import (default export)', functio
 		[ {
 			name: 'default',
 			description: 'Function declaration.',
-			params: [],
-			return: [],
 			tags: [],
 		} ]
 	);
@@ -389,7 +359,7 @@ test( 'IR - JSDoc in module dependency through import (named export)', function(
 	};
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenImportNamespace ), JSON.parse( astImportNamespace ), getModuleImportNamespace ),
-		[ { name: 'variables', description: 'Undocumented declaration.', params: [], return: [], tags: [] } ]
+		[ { name: 'variables', description: 'Undocumented declaration.', tags: [] } ]
 	);
 	t.end();
 } );
