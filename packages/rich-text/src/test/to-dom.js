@@ -34,7 +34,6 @@ describe( 'recordToDom', () => {
 				value: record,
 				multilineTag,
 				multilineWrapperTags,
-				createLinePadding: ( doc ) => doc.createElement( 'br' ),
 			} );
 			expect( body ).toMatchSnapshot();
 			expect( selection ).toEqual( { startPath, endPath } );

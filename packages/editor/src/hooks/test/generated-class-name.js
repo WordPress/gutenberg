@@ -4,7 +4,7 @@
 import { noop } from 'lodash';
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import { applyFilters } from '@wordpress/hooks';
 

@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { cloneElement, createElement, Component, isValidElement } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import { Dashicon, SVG } from '../';
 
 function Icon( { icon = null, size, className } ) {

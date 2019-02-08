@@ -3,6 +3,7 @@ module.exports = {
 		'@wordpress',
 	],
 	rules: {
+		'@wordpress/dependency-group': 'error',
 		'@wordpress/no-unused-vars-before-return': 'error',
 		'no-restricted-syntax': [
 			'error',
