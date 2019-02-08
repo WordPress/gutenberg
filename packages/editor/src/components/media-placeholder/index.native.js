@@ -3,9 +3,15 @@
  */
 import { View, Text, Button } from 'react-native';
 
-import styles from './styles.scss';
-
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
 	return (

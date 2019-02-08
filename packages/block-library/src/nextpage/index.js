@@ -5,6 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { G, Path, SVG } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
 import edit from './edit';
 
 export const name = 'core/nextpage';

@@ -1,6 +1,6 @@
 /**
-* External dependencies
-*/
+ * External dependencies
+ */
 import { TouchableOpacity, View, Text } from 'react-native';
 
 /**

@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { LINE_SEPARATOR } from './special-characters';
 
 /**
