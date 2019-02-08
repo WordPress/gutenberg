@@ -12,6 +12,11 @@
 	align-items: center;
 	overflow: hidden;
 
+	.wp-block-cover-text {
+		font-size: 2em;
+		line-height: 1.25;
+	}
+
 	&.has-left-content {
 		justify-content: flex-start;
 	}
@@ -71,7 +76,7 @@
 		font-size: 0;
 		min-height: inherit;
 
-		// IE doesn't support flex so omit that.
+		// Omit the pseudo-element if flex isn't supported.
 		@supports (position: sticky) {
 			content: none;
 		}
@@ -80,8 +85,6 @@
 
 .wp-block-cover-text {
 	color: inherit;
-	font-size: 2em;
-	line-height: 1.25;
 	z-index: 1;
 	margin-bottom: 0;
 	max-width: $content-width;
@@ -98,7 +101,6 @@
 
 .has-left-content {
 
-	h2,
 	.wp-block-cover-text {
 		margin-left: 0;
 		text-align: left;
@@ -107,7 +109,6 @@
 
 .has-right-content {
 
-	h2,
 	.wp-block-cover-text {
 		margin-right: 0;
 		text-align: right;
