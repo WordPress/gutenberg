@@ -21,6 +21,7 @@
 		// use opacity to work in various editor styles
 		background: $dark-opacity-light-200;
 		min-height: 200px;
+		color: inherit;
 
 		.is-dark-theme & {
 			background: $light-opacity-light-200;
