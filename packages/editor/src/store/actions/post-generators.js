@@ -233,3 +233,34 @@ export function* trashPost() {
 		);
 	}
 }
+
+/**
+ * Action generator for handling refreshing the current post.
+ */
+export function* refreshPost() {
+	const post = yield select(
+		MODULE_KEY,
+		'getCurrentPost'
+	);
+	const postTypeSlug = yield select(
+		MODULE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield select(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
+	const newPost = yield apiFetch(
+		{
+			// Timestamp arg allows caller to bypass browser caching, which is
+			// expected for this specific function.
+			path: `/wp/v2/${ postType.rest_base }/${ post.id }?context=edit&_timestamp=${ Date.now() }`,
+		}
+	);
+	yield dispatch(
+		MODULE_KEY,
+		'resetPost',
+		newPost
+	);
+}
