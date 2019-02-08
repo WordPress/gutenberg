@@ -23,7 +23,7 @@ class IconButton extends Component {
 		const { icon, children, label, className, tooltip, shortcut, labelPosition, ...additionalProps } = this.props;
 		const { 'aria-pressed': ariaPressed } = this.props;
 		const classes = classnames( 'components-icon-button', className, {
-			'has-text': children,
+			'has-text': children && children.length > 2,
 		} );
 		const tooltipText = tooltip || label;
 
