@@ -1,4 +1,4 @@
-# Creating a sidebar for your plugin
+# Creating a Sidebar for Your Plugin
 
 This tutorial starts with you having an existing plugin setup and ready to add PHP and JavaScript code. Please, refer to [Getting started with JavaScript](/docs/designers-developers/developers/tutorials/javascript/) tutorial for an introduction to WordPress plugins and how to use JavaScript to extend the block editor.
 

@@ -5,7 +5,7 @@
 /packages/redux-routine                         @youknowriad @aduth @nerrad
 
 # Blocks
-/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan @noisysocks
+/packages/block-library                         @youknowriad @gziolo @Soean @ajitbohra @jorgefilipecosta @talldan @noisysocks @notnownikki
 
 # Editor
 /packages/annotations                           @youknowriad @gziolo @aduth @atimmer
@@ -68,13 +68,18 @@
 # Rich Text
 /packages/format-library                        @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
 /packages/rich-text                             @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
+/packages/editor/src/components/rich-text       @youknowriad @gziolo @aduth @iseulde @jorgefilipecosta
 
 # PHP
 /lib                                            @youknowriad @gziolo @aduth
 
 # Documentation
-/docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw
+/docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 
 # Native (Unowned)
 *.native.js                                     @ghost
+*.android.js                                    @ghost
+*.ios.js                                        @ghost
 *.native.scss                                   @ghost
+*.android.scss                                  @ghost
+*.ios.scss                                      @ghost

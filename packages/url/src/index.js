@@ -214,7 +214,7 @@ export function getQueryArg( url, arg ) {
  * @param {string} url URL
  * @param {string} arg Query arg name
  *
- * @return {boolean} Whether or not the URL contains the query aeg.
+ * @return {boolean} Whether or not the URL contains the query arg.
  */
 export function hasQueryArg( url, arg ) {
 	return getQueryArg( url, arg ) !== undefined;

@@ -3,6 +3,7 @@
 ### Bug Fix
 
 - Fixed Babel plugin for POT file generation to properly handle plural numbers specified in the passed header. ([#13577](https://github.com/WordPress/gutenberg/pull/13577))
+- Fix extracted translator comments to be written as prefixed by `#.` ([#9440](https://github.com/WordPress/gutenberg/pull/9440))
 
 ## 2.1.0 (2018-09-05)
 

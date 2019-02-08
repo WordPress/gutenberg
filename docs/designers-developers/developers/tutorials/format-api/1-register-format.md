@@ -1,4 +1,4 @@
-# Register a new format
+# Register a New Format
 
 The first thing you're going to do in this tutorial is to register the new format that the plugin intends to apply. WordPress has the [`registerFormatType`](/packages/rich-text/README.md#registerFormatType) function to do so.
 

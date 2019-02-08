@@ -347,7 +347,13 @@ export class RichText extends Component {
 
 		const record = this.getRecord();
 		// Save back to HTML from React tree
-		const html = `<${ tagName }>${ this.valueToFormat( record ) }</${ tagName }>`;
+		const value = this.valueToFormat( record );
+		let html = `<${ tagName }>${ value }</${ tagName }>`;
+		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
+		if ( value === undefined || value === '' ) {
+			html = '';
+			this.lastEventCount = undefined; // force a refresh on the native side
+		}
 
 		return (
 			<View>
@@ -361,6 +367,8 @@ export class RichText extends Component {
 						this._editor = ref;
 					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
+					placeholder={ this.props.placeholder }
+					placeholderTextColor={ this.props.placeholderTextColor || 'lightgrey' }
 					onChange={ this.onChange }
 					onFocus={ this.props.onFocus }
 					onBlur={ this.props.onBlur }

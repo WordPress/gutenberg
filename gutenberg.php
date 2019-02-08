@@ -31,21 +31,11 @@ function the_gutenberg_project() {
 	<noscript>
 		<div class="error" style="position:absolute;top:32px;z-index:40"><p>
 		<?php
-		// Using Gutenberg as Plugin.
-		if ( is_plugin_active( 'gutenberg/gutenberg.php' ) ) {
-			$current_url = esc_url( add_query_arg( 'classic-editor', true, $_SERVER['REQUEST_URI'] ) );
-			printf(
-				// Translators: link is to current page specify classic editor.
-				__( 'The Block Editor requires JavaScript. You can use the <a href="%s">Classic Editor</a>.', 'gutenberg' ),
-				$current_url
-			);
-		} else { // Using Gutenberg in Core.
-			printf(
-				/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
-				__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-				__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
-			);
-		}
+		printf(
+			/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
+			__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+			__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
+		);
 		?>
 		</p></div>
 	</noscript>
@@ -125,10 +115,6 @@ function is_gutenberg_page() {
 	}
 
 	if ( get_current_screen()->base !== 'post' ) {
-		return false;
-	}
-
-	if ( isset( $_GET['classic-editor'] ) ) {
 		return false;
 	}
 
