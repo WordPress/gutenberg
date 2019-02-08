@@ -12,6 +12,7 @@ import { View, Image } from 'react-native';
  * Internal dependencies
  */
 import { calculatePreferedImageSize } from './utils';
+import { Dashicon } from '@wordpress/components';
 
 class ImageSize extends Component {
 	constructor() {
@@ -76,6 +77,14 @@ class ImageSize extends Component {
 			imageWidthWithinContainer: this.state.width,
 			imageHeightWithinContainer: this.state.height,
 		};
+		if ( this.state.width === undefined ) {
+			const width = 300;
+			return (
+				<View onLayout={ this.onLayout } style={ { flex: 1, flexDirection: 'row', justifyContent: 'center' } }>
+					<Dashicon icon={ 'format-image' } size={ width } />
+				</View>
+			);
+		}
 		return (
 			<View onLayout={ this.onLayout }>
 				{ this.props.children( sizes ) }
