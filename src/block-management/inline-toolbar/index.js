@@ -6,6 +6,7 @@ import { View } from 'react-native';
 import InlineToolbarActions from './actions';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { InspectorControls } from '@wordpress/editor';
 
 type PropsType = {
 	clientId: string,
@@ -58,6 +59,8 @@ export default class InlineToolbar extends React.Component<PropsType> {
 				/>
 
 				<View style={ styles.spacer } />
+
+				<InspectorControls.Slot />
 
 				<ToolbarButton
 					label={ __( 'Remove content' ) }

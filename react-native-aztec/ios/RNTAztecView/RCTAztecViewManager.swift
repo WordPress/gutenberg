@@ -59,7 +59,7 @@ public class RCTAztecViewManager: RCTViewManager {
         }
     }
 
-    private var defaultFont: UIFont {
+    private var defaultFont: UIFont {        
         if let font = UIFont(name: "NotoSerif", size: 16) {
             return font
         }

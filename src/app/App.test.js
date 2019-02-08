@@ -2,11 +2,14 @@
 
 import renderer from 'react-test-renderer';
 
+import { setupApp } from '..';
 import App from './App';
 import BlockHolder from '../block-management/block-holder';
 import { dispatch, select } from '@wordpress/data';
 
 describe( 'App', () => {
+	beforeAll( setupApp );
+
 	it( 'renders without crashing', () => {
 		const app = renderer.create( <App /> );
 		const rendered = app.toJSON();
@@ -46,7 +49,7 @@ describe( 'App', () => {
 			.forEach( ( blockHolder ) => {
 				if ( 'core/heading' === blockHolder.props.name ) {
 					const aztec = blockHolder.findByType( 'RCTAztecView' );
-					expect( aztec.props.text.text ).toBe( '<h2>Welcome to Gutenberg</h2>' );
+					expect( aztec.props.text.text ).toBe( '<h2>What is Gutenberg?</h2>' );
 				}
 			} );
 	} );
