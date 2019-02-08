@@ -59,10 +59,7 @@ export function applyFormat(
 				text,
 				start,
 				end,
-				formatPlaceholder: {
-					index: startIndex,
-					format: hasType ? undefined : format,
-				},
+				formatPlaceholder: hasType ? undefined : format,
 			};
 		}
 	} else {
