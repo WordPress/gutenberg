@@ -7,7 +7,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import { visibilityOptions } from './utils';
 

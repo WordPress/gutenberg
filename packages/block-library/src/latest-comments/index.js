@@ -1,11 +1,11 @@
 /**
- * WordPress dependencies.
+ * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { G, Path, SVG } from '@wordpress/components';
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import edit from './edit';
 

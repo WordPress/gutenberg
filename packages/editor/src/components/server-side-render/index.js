@@ -1,5 +1,5 @@
 /**
- * WordPress dependencies.
+ * WordPress dependencies
  */
 import { ServerSideRender } from '@wordpress/components';
 import { select } from '@wordpress/data';
