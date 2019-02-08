@@ -9,6 +9,11 @@ import {
 	pressKeyWithModifier,
 } from '@wordpress/e2e-test-utils';
 
+const moveMouse = async () => {
+	await page.mouse.move( 200, 300, { steps: 10 } );
+	await page.mouse.move( 250, 350, { steps: 10 } );
+};
+
 describe( 'RichText', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -52,6 +57,21 @@ describe( 'RichText', () => {
 		await page.keyboard.type( 'bold' );
 		// All following characters should no longer be bold.
 		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should return focus when pressing formatting button', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Some ' );
+		// Sets isTyping to false.
+		await moveMouse();
+		await page.click( '[aria-label="Bold"]' );
+		await page.keyboard.type( 'bold' );
+		// Sets isTyping to false.
+		await moveMouse();
+		await page.click( '[aria-label="Bold"]' );
 		await page.keyboard.type( '.' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

@@ -301,24 +301,30 @@ function isRangeEqual( a, b ) {
 	);
 }
 
-export function applySelection( selection, current ) {
-	const { node: startContainer, offset: startOffset } = getNodeByPath( current, selection.startPath );
-	const { node: endContainer, offset: endOffset } = getNodeByPath( current, selection.endPath );
-	const windowSelection = window.getSelection();
-	const range = current.ownerDocument.createRange();
+export function applySelection( { startPath, endPath }, current ) {
+	const { node: startContainer, offset: startOffset } = getNodeByPath( current, startPath );
+	const { node: endContainer, offset: endOffset } = getNodeByPath( current, endPath );
+	const selection = window.getSelection();
+	const { ownerDocument } = current;
+	const range = ownerDocument.createRange();
 
 	range.setStart( startContainer, startOffset );
 	range.setEnd( endContainer, endOffset );
 
-	if ( windowSelection.rangeCount > 0 ) {
+	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
 		// need to remove the live range and add the equivalent range.
-		if ( isRangeEqual( range, windowSelection.getRangeAt( 0 ) ) ) {
+		if ( isRangeEqual( range, selection.getRangeAt( 0 ) ) ) {
+			// Set back focus if focus is lost.
+			if ( ownerDocument.activeElement !== current ) {
+				current.focus();
+			}
+
 			return;
 		}
 
-		windowSelection.removeAllRanges();
+		selection.removeAllRanges();
 	}
 
-	windowSelection.addRange( range );
+	selection.addRange( range );
 }

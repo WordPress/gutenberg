@@ -36,6 +36,12 @@ exports[`RichText should only mutate text data on input 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should return focus when pressing formatting button 1`] = `
+"<!-- wp:paragraph -->
+<p>Some <strong>bold</strong>.</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should transform backtick to code 1`] = `
 "<!-- wp:paragraph -->
 <p>A <code>backtick</code></p>
