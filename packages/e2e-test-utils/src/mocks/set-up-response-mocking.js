@@ -16,19 +16,19 @@ let requestMocks = [];
  *
  * @example
  *
- *```js
- *   const MOCK_RESPONSES = [
- *     {
- *       match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
- *       onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
- *     },
- *     {
- *       match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
- *       onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
- *     }
- *  ];
- *  setUpResponseMocking( MOCK_RESPONSES );
- *```
+ * ```js
+ * const MOCK_RESPONSES = [
+ *   {
+ *     match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
+ *     onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+ *   },
+ *   {
+ *     match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
+ *     onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+ *   }
+ * ];
+ * setUpResponseMocking( MOCK_RESPONSES );
+ * ```
  *
  * If none of the mock settings match the request, the request is allowed to continue.
  *
