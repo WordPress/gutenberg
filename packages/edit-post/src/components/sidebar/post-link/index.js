@@ -55,7 +55,7 @@ function PostLink( {
 			{ isEditable && (
 				<div className="editor-post-link">
 					<TextControl
-						label={ __( 'URL Slug:' ) }
+						label={ __( 'URL Slug' ) }
 						value={ forceEmptyField ? '' : currentSlug }
 						onChange={ ( newValue ) => {
 							editPermalink( newValue );
