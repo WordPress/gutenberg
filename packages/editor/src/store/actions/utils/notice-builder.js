@@ -6,7 +6,7 @@ import { get, includes } from 'lodash';
 /**
  * Internal imports
  */
-import { SAVE_POST_NOTICE_ID } from '../../constants';
+import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../../constants';
 
 /**
  * WordPress imports
@@ -20,7 +20,7 @@ import { __ } from '@wordpress/i18n';
  * @return {Array}  Arguments for dispatch. An empty array signals no
  * notification should be sent.
  */
-export function getNotifyOnSuccessNotificationArguments( data ) {
+export function getNotificationArgumentsForSaveSuccess( data ) {
 	const { previousPost, post, postType } = data;
 	// Autosaves are neither shown a notice nor redirected.
 	if ( get( data.options, [ 'isAutosave' ] ) ) {
@@ -80,7 +80,7 @@ export function getNotifyOnSuccessNotificationArguments( data ) {
  * @return {Array} Arguments for dispatch. An empty array signals no
  * notification should be sent.
  */
-export function getNotifyOnFailNotificationArguments( data ) {
+export function getNotificationArgumentsForSaveFail( data ) {
 	const { post, edits, error } = data;
 
 	if ( error && 'rest_autosave_no_changes' === error.code ) {
@@ -103,4 +103,19 @@ export function getNotifyOnFailNotificationArguments( data ) {
 		__( 'Updating failed' );
 
 	return [ noticeMessage, { id: SAVE_POST_NOTICE_ID } ];
+}
+
+/**
+ * Builds the trash fail notifiation arguments for dispatch.
+ *
+ * @param {Object} data
+ * @return {Array} Arguments for dispatch.
+ */
+export function getNotificationArgumentsForTrashFail( data ) {
+	return [
+		data.error.message && data.error.code !== 'unknown_error' ?
+			data.error.message :
+			__( 'Trashing failed' ),
+		{ id: TRASH_POST_NOTICE_ID },
+	];
 }

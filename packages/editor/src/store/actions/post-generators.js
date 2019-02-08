@@ -7,14 +7,19 @@ import { pick } from 'lodash';
  * Internal dependencies
  */
 import { select, dispatch, apiFetch } from '../controls';
-import { MODULE_KEY, SAVE_POST_NOTICE_ID } from '../constants';
 import {
-	getNotifyOnSuccessNotificationArguments,
-	getNotifyOnFailNotificationArguments,
+	MODULE_KEY,
+	SAVE_POST_NOTICE_ID,
+	TRASH_POST_NOTICE_ID,
+} from '../constants';
+import {
+	getNotificationArgumentsForSaveSuccess,
+	getNotificationArgumentsForSaveFail,
+	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
 
 /**
- * Action generator for saving a post.
+ * Action generator for saving the current post in the editor.
  *
  * @param {Object} options
  */
@@ -150,7 +155,7 @@ export function* savePost( options = {} ) {
 			}
 		);
 
-		const notifySuccessArgs = getNotifyOnSuccessNotificationArguments( {
+		const notifySuccessArgs = getNotificationArgumentsForSaveSuccess( {
 			previousPost: post,
 			post: newPost,
 			postType,
@@ -168,7 +173,7 @@ export function* savePost( options = {} ) {
 			'requestPostUpdateFailure',
 			{ post, edits, error, options }
 		);
-		const notifyFailArgs = getNotifyOnFailNotificationArguments( {
+		const notifyFailArgs = getNotificationArgumentsForSaveFail( {
 			post,
 			edits,
 			error,
@@ -180,5 +185,51 @@ export function* savePost( options = {} ) {
 				...notifyFailArgs
 			);
 		}
+	}
+}
+
+/**
+ * Action generator for trashing the current post in the editor.
+ */
+export function* trashPost() {
+	const postTypeSlug = yield select(
+		MODULE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield select(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
+	yield dispatch(
+		'core/notices',
+		'removeNotice',
+		TRASH_POST_NOTICE_ID
+	);
+	try {
+		const post = yield select(
+			MODULE_KEY,
+			'getCurrentPost'
+		);
+		yield apiFetch(
+			{
+				path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
+				method: 'DELETE',
+			}
+		);
+
+		// TODO: This should be an updatePost action (updating subsets of post properties),
+		// But right now editPost is tied with change detection.
+		yield dispatch(
+			MODULE_KEY,
+			'resetPost',
+			{ ...post, status: 'trash' }
+		);
+	} catch ( error ) {
+		yield dispatch(
+			'core/notices',
+			'createErrorNotice',
+			getNotificationArgumentsForTrashFail( { error } ),
+		);
 	}
 }
