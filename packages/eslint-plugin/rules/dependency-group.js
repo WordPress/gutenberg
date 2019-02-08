@@ -6,6 +6,7 @@ module.exports = {
 			url: 'https://github.com/WordPress/gutenberg/blob/master/packages/eslint-plugin/docs/rules/dependency-group.md',
 		},
 		schema: [],
+		fixable: true,
 	},
 	create( context ) {
 		const comments = context.getSourceCode().getAllComments();
@@ -92,33 +93,26 @@ module.exports = {
 			} );
 		}
 
-		/**
-		 * Given an import source string and node occurrence from which the
-		 * source is derived, tests that the package source is satisfied by a
-		 * preceding comment block of appropriate locality.
-		 *
-		 * @param {string}      source Import source string.
-		 * @param {espree.Node} node   Node from which import source derived.
-		 */
-		function testPackage( source, node ) {
-			const locality = getPackageLocality( source );
-			if ( ! isPrecededByDependencyBlock( node, locality ) ) {
-				context.report( {
-					node,
-					message: `Expected preceding "${ locality } dependencies" comment block`,
-				} );
-			}
-		}
-
 		return {
 			Program( node ) {
+				/**
+				 * The set of package localities which have been reported for
+				 * the current program. Each locality is reported at most one
+				 * time, since otherwise the fixer would insert a comment
+				 * block for each individual import statement.
+				 *
+				 * @type {Set<WPPackageLocality>}
+				 */
+				const reported = new Set();
+
 				// Since we only care to enforce imports which occur at the
 				// top-level scope, match on Program and test its children,
 				// rather than matching the import nodes directly.
 				node.body.forEach( ( child ) => {
+					let source;
 					switch ( child.type ) {
 						case 'ImportDeclaration':
-							testPackage( child.source.value, child );
+							source = child.source.value;
 							break;
 
 						case 'CallExpression':
@@ -129,10 +123,35 @@ module.exports = {
 								args[ 0 ].type === 'Literal' &&
 								typeof args[ 0 ].value === 'string'
 							) {
-								testPackage( args[ 0 ].value, child );
+								source = args[ 0 ].value;
 							}
 							break;
 					}
+
+					if ( ! source ) {
+						return;
+					}
+
+					const locality = getPackageLocality( source );
+					if (
+						reported.has( locality ) ||
+						isPrecededByDependencyBlock( child, locality )
+					) {
+						return;
+					}
+
+					reported.add( locality );
+
+					context.report( {
+						node: child,
+						message: `Expected preceding "${ locality } dependencies" comment block`,
+						fix( fixer ) {
+							return fixer.insertTextBefore(
+								child,
+								`/**\n * ${ locality } dependencies\n */\n`
+							);
+						},
+					} );
 				} );
 			},
 		};

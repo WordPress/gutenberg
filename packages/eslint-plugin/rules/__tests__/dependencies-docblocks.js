@@ -40,6 +40,7 @@ import edit from './edit';`,
 		{
 			code: `
 import { get } from 'lodash';
+import classnames from 'classnames';
 import { Component } from '@wordpress/element';
 import edit from './edit';`,
 			errors: [
@@ -47,6 +48,20 @@ import edit from './edit';`,
 				{ message: 'Expected preceding "WordPress dependencies" comment block' },
 				{ message: 'Expected preceding "Internal dependencies" comment block' },
 			],
+			output: `
+/**
+ * External dependencies
+ */
+import { get } from 'lodash';
+import classnames from 'classnames';
+/**
+ * WordPress dependencies
+ */
+import { Component } from '@wordpress/element';
+/**
+ * Internal dependencies
+ */
+import edit from './edit';`,
 		},
 	],
 } );
