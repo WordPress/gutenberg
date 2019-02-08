@@ -4,7 +4,6 @@
 import {
 	createNewPost,
 	clickBlockAppender,
-	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
@@ -20,7 +19,6 @@ describe( 'invalid blocks', () => {
 		// Click the 'more options'
 		await page.mouse.move( 200, 300, { steps: 10 } );
 		await page.click( 'button[aria-label="More options"]' );
-		await waitForAnimation();
 
 		// Change to HTML mode and close the options
 		const changeModeButton = await page.waitForXPath( '//button[text()="Edit as HTML"]' );

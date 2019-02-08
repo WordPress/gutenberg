@@ -40,7 +40,6 @@ export { toggleScreenOption } from './toggle-screen-option';
 export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
-export { waitForAnimation } from './wait-for-animation';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
 
 export * from './mocks';

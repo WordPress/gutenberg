@@ -8,7 +8,6 @@ import {
 	getEditedPostContent,
 	insertBlock,
 	switchEditorModeTo,
-	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'InnerBlocks Template Sync', () => {
@@ -80,7 +79,6 @@ describe( 'Container block without paragraph support', () => {
 
 		// Open the specific appender used when there's no paragraph support.
 		await page.click( '.editor-inner-blocks .block-list-appender .block-list-appender__toggle' );
-		await waitForAnimation();
 
 		// Insert an image block.
 		await page.click( '.editor-inserter__results button[aria-label="Image"]' );
