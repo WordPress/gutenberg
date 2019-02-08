@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import './store';
 
 export { applyFormat } from './apply-format';
