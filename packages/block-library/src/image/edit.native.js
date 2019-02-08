@@ -2,7 +2,7 @@
  * External dependencies
  */
 import React from 'react';
-import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, ImageBackground, TextInput, Text, TouchableWithoutFeedback } from 'react-native';
 import {
 	subscribeMediaUpload,
 	requestMediaPickFromMediaLibrary,
@@ -20,7 +20,7 @@ import {
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
+import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet, Picker } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
@@ -34,6 +34,10 @@ const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 const MEDIA_UPLOAD_STATE_FAILED = 3;
 const MEDIA_UPLOAD_STATE_RESET = 4;
 
+const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
+const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO = 'take_photo';
+const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
+
 const LINK_DESTINATION_CUSTOM = 'custom';
 
 class ImageEdit extends React.Component {
@@ -42,7 +46,6 @@ class ImageEdit extends React.Component {
 
 		this.state = {
 			showSettings: false,
-			showMediaOptions: false,
 			progress: 0,
 			isUploadInProgress: false,
 			isUploadFailed: false,
@@ -165,11 +168,17 @@ class ImageEdit extends React.Component {
 		} ) );
 	}
 
+	getMediaOptionsItems() {
+		return [
+			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
+			{ icon: 'camera', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO, label: __( 'Take a Photo' ) },
+			{ icon: 'format-image', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
+		];
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href } = attributes;
-
-		const isiOS = Platform.OS === 'ios';
 
 		const onMediaLibraryButtonPressed = () => {
 			requestMediaPickFromMediaLibrary( ( mediaId, mediaUrl ) => {
@@ -205,12 +214,10 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
-		const onMediaOptionsButtonPressed = () => {
-			this.setState( { showMediaOptions: true } );
-		};
+		let picker;
 
-		const onMediaOptionsClose = () => {
-			this.setState( { showMediaOptions: false } );
+		const onMediaOptionsButtonPressed = () => {
+			picker.presentPicker();
 		};
 
 		const toolbarEditButton = (
@@ -245,7 +252,7 @@ class ImageEdit extends React.Component {
 					label={ __( 'Image Size' ) }
 					value={ 'Large' } // Temporary for UI implementation.
 					options={ sizeOptions }
-					onChangeValue={ () => {} } // Temporary for UI implementation.
+					onChangeValue={ ( ) => { } } // Temporary for UI implementation.
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
@@ -263,58 +270,23 @@ class ImageEdit extends React.Component {
 			</BottomSheet>
 		);
 
-		const closeBottomSheetAndExecuteWithDelay = ( method ) => {
-			this.setState( { showMediaOptions: false } );
-			// On iOS we need to delay the execution of the method or else the modal dismissal of the bottom sheet can overlap with other modal presentation
-			if ( isiOS ) {
-				setTimeout( function() {
-					method();
-				}, 750 );
-			} else {
-				method();
-			}
-		};
+		const mediaOptions = this.getMediaOptionsItems();
 
 		const getMediaOptions = () => (
-			<BottomSheet
-				isVisible={ this.state.showMediaOptions }
-				onClose={ onMediaOptionsClose }
-				hideHeader
-			>
-				<BottomSheet.Cell
-					icon={ isiOS ? undefined : 'wordpress-alt' }
-					label={ __( 'Choose from device' ) }
-					value={ isiOS ? undefined : '' }
-					labelStyle={ { color: '#00aadc' } }
-					onPress={ () => {
-						closeBottomSheetAndExecuteWithDelay( onMediaUploadButtonPressed );
-					} }
-				/>
-				<BottomSheet.Cell
-					icon={ isiOS ? undefined : 'camera' }
-					label={ __( 'Take a Photo' ) }
-					value={ isiOS ? undefined : '' }
-					labelStyle={ { color: '#00aadc' } }
-					onPress={ () => {
-						closeBottomSheetAndExecuteWithDelay( onMediaCaptureButtonPressed );
-					} }
-				/>
-				<BottomSheet.Cell
-					icon={ isiOS ? undefined : 'format-image' }
-					label={ __( 'WordPress Media Library' ) }
-					value={ isiOS ? undefined : '' }
-					labelStyle={ { color: '#00aadc' } }
-					onPress={ () => {
-						closeBottomSheetAndExecuteWithDelay( onMediaLibraryButtonPressed );
-					} }
-				/>
-				{ isiOS && <BottomSheet.Cell
-					label={ __( 'Dismiss' ) }
-					labelStyle={ { color: '#00aadc', fontWeight: 'bold' } }
-					drawSeparator={ false }
-					onPress={ onMediaOptionsClose }
-				/> }
-			</BottomSheet>
+			<Picker
+				hideCancelButton={ true }
+				ref={ ( instance ) => picker = instance }
+				options={ mediaOptions }
+				onChange={ ( value ) => {
+					if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
+						onMediaUploadButtonPressed();
+					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO ) {
+						onMediaCaptureButtonPressed();
+					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
+						onMediaLibraryButtonPressed();
+					}
+				} }
+			/>
 		);
 
 		if ( ! url ) {
