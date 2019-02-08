@@ -3,6 +3,8 @@
  */
 const getType = require( './get-type-as-string' );
 
+const getTagsByName = ( tags, ...names ) => tags.filter( ( tag ) => names.some( ( name ) => name === tag.title ) );
+
 const cleanSpaces = ( paragraph ) =>
 	paragraph ?
 		paragraph.split( '\n' ).map(
@@ -13,19 +15,17 @@ const cleanSpaces = ( paragraph ) =>
 		).trim() :
 		'';
 
-const formatParamTags = ( tags, docs ) => {
+const formatTag = ( title, tags, formatter, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
-		docs.push( '**Parameters**' );
+		docs.push( `**${ title }**` );
 		docs.push( '\n' );
-		docs.push( ...tags.map(
-			( tag ) => `\n- **${ tag.name }** \`${ getType( tag ) }\`: ${ cleanSpaces( tag.description ) }`
-		) );
+		docs.push( ...tags.map( formatter ) );
 	}
 };
 
-const formatExampleTag = ( tags, docs ) => {
+const formatExamples = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
 		docs.push( '\n' );
@@ -38,41 +38,6 @@ const formatExampleTag = ( tags, docs ) => {
 	}
 };
 
-const formatReturnTag = ( tag, docs ) => {
-	if ( tag && tag.length === 1 ) {
-		docs.push( '\n' );
-		docs.push( '\n' );
-		docs.push( '**Returns**' );
-		docs.push( '\n' );
-		docs.push( '\n' );
-		docs.push( `\`${ getType( tag[ 0 ] ) }\` ${ cleanSpaces( tag[ 0 ].description ) }` );
-	}
-};
-
-const formatTypeTag = ( tag, docs ) => {
-	if ( tag && tag.length === 1 ) {
-		docs.push( '\n' );
-		docs.push( '\n' );
-		docs.push( '**Type**' );
-		docs.push( '\n' );
-		docs.push( '\n' );
-		docs.push( `\`${ getType( tag[ 0 ] ) }\` ${ cleanSpaces( tag[ 0 ].description ) }` );
-	}
-};
-
-const formatSeeAndLinkTags = ( tags, docs ) => {
-	if ( tags && tags.length > 0 ) {
-		docs.push( '\n' );
-		docs.push( '\n' );
-		docs.push( '**Related**' );
-		docs.push( '\n' );
-		docs.push( '\n' );
-		docs.push( ...tags.map(
-			( tag ) => `\n- ${ tag.description }`
-		) );
-	}
-};
-
 const formatDeprecated = ( tags, docs ) => {
 	if ( tags && tags.length > 0 ) {
 		docs.push( '\n' );
@@ -82,11 +47,17 @@ const formatDeprecated = ( tags, docs ) => {
 	}
 };
 
-module.exports = function( artifacts ) {
+const formatDescription = ( description, docs ) => {
+	docs.push( '\n' );
+	docs.push( '\n' );
+	docs.push( description );
+};
+
+module.exports = function( symbols ) {
 	const docs = [ '# API' ];
 	docs.push( '\n' );
 	docs.push( '\n' );
-	artifacts.sort( ( first, second ) => {
+	symbols.sort( ( first, second ) => {
 		const firstName = first.name.toUpperCase();
 		const secondName = second.name.toUpperCase();
 		if ( firstName < secondName ) {
@@ -97,21 +68,36 @@ module.exports = function( artifacts ) {
 		}
 		return 0;
 	} );
-	if ( artifacts && artifacts.length > 0 ) {
-		artifacts.forEach( ( artifact ) => {
-			docs.push( `## ${ artifact.name }` );
-			formatDeprecated( artifact.tags.filter( ( tag ) => tag.title === 'deprecated' ), docs );
-			docs.push( '\n' );
-			docs.push( '\n' );
-			docs.push( artifact.description );
-			formatSeeAndLinkTags(
-				artifact.tags.filter( ( tag ) => ( tag.title === 'see' ) || ( tag.title === 'link' ) ),
+	if ( symbols && symbols.length > 0 ) {
+		symbols.forEach( ( symbol ) => {
+			docs.push( `## ${ symbol.name }` );
+			formatDeprecated( getTagsByName( symbol.tags, 'deprecated' ), docs );
+			formatDescription( symbol.description, docs );
+			formatTag(
+				'Related',
+				getTagsByName( symbol.tags, 'see', 'link' ),
+				( tag ) => `\n- ${ tag.description }`,
 				docs
 			);
-			formatExampleTag( artifact.tags.filter( ( tag ) => tag.title === 'example' ), docs );
-			formatTypeTag( artifact.tags.filter( ( tag ) => tag.title === 'type' ), docs );
-			formatParamTags( artifact.tags.filter( ( tag ) => tag.title === 'param' ), docs );
-			formatReturnTag( artifact.tags.filter( ( tag ) => tag.title === 'return' ), docs );
+			formatExamples( getTagsByName( symbol.tags, 'example' ), docs );
+			formatTag(
+				'Type',
+				getTagsByName( symbol.tags, 'type' ),
+				( tag ) => `\n\`${ getType( tag ) }\` ${ cleanSpaces( tag.description ) }`,
+				docs
+			);
+			formatTag(
+				'Parameters',
+				getTagsByName( symbol.tags, 'param' ),
+				( tag ) => `\n- **${ tag.name }** \`${ getType( tag ) }\`: ${ cleanSpaces( tag.description ) }`,
+				docs
+			);
+			formatTag(
+				'Returns',
+				getTagsByName( symbol.tags, 'return' ),
+				( tag ) => `\n\`${ getType( tag ) }\` ${ cleanSpaces( tag.description ) }`,
+				docs
+			);
 			docs.push( '\n' );
 			docs.push( '\n' );
 		} );
