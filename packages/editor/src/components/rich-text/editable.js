@@ -96,13 +96,6 @@ export default class Editable extends Component {
 	constructor() {
 		super();
 		this.bindEditorNode = this.bindEditorNode.bind( this );
-		this.onFocus = this.onFocus.bind( this );
-	}
-
-	onFocus() {
-		if ( this.props.onFocus ) {
-			this.props.onFocus();
-		}
 	}
 
 	// We must prevent rerenders because the browser will modify the DOM. React
@@ -173,6 +166,7 @@ export default class Editable extends Component {
 			onInput,
 			onKeyDown,
 			onCompositionEnd,
+			onFocus,
 			onBlur,
 		} = this.props;
 
@@ -190,7 +184,7 @@ export default class Editable extends Component {
 			dangerouslySetInnerHTML: { __html: valueToEditableHTML( record ) },
 			onPaste,
 			onInput,
-			onFocus: this.onFocus,
+			onFocus,
 			onBlur,
 			onKeyDown,
 			onCompositionEnd,
