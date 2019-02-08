@@ -17,7 +17,8 @@ describe( 'RichText', () => {
 	it( 'should handle change in tag name gracefully', async () => {
 		// Regression test: The heading block changes the tag name of its
 		// RichText element. Historically this has been prone to breakage,
-		// specifically in destroying / reinitializing the TinyMCE instance.
+		// because the Editable component prevents rerenders, so React cannot
+		// update the element by itself.
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/3091
 		await insertBlock( 'Heading' );
@@ -57,6 +58,19 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should return focus when pressing formatting button', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'Some ' );
+		await page.keyboard.press( 'Escape' );
+		await page.click( '[aria-label="Bold"]' );
+		await page.keyboard.type( 'bold' );
+		await page.keyboard.press( 'Escape' );
+		await page.click( '[aria-label="Bold"]' );
+		await page.keyboard.type( '.' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should transform backtick to code', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'A `backtick`' );
@@ -64,6 +78,13 @@ describe( 'RichText', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await pressKeyWithModifier( 'primary', 'z' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should not format text after code backtick', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'A `backtick` and more.' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

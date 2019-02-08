@@ -6,7 +6,6 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
-	pressKeyTimes,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
@@ -244,7 +243,8 @@ describe( 'Links', () => {
 	it( 'can be edited with collapsed selection', async () => {
 		await createAndReselectLink();
 		// Make a collapsed selection inside the link
-		await pressKeyTimes( 'ArrowRight', 3 );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
 		await moveMouse();
 		await page.click( 'button[aria-label="Edit"]' );
 		await waitForAutoFocus();
