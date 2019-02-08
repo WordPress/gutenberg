@@ -170,13 +170,13 @@ export class RichText extends Component {
 	 */
 
 	removeRootTagsProduceByAztec( html ) {
-		var result = this.removeRootTag(this.props.tagName, html)
+		let result = this.removeRootTag( this.props.tagName, html );
 		if ( this.props.rootTagsToEliminate ) {
-			this.props.rootTagsToEliminate.forEach(element => {
-				result = this.removeRootTag(element, result)
-			});
+			this.props.rootTagsToEliminate.forEach( ( element ) => {
+				result = this.removeRootTag( element, result );
+			} );
 		}
-		return result
+		return result;
 	}
 
 	removeRootTag( tag, html ) {
