@@ -31,44 +31,29 @@ require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/widgets-page.php';
 
 /**
- * Unregisters the core set of blocks. This should occur on the default
- * priority, immediately prior to Gutenberg's own action binding.
+ * Discovers block files from the plugin built artifact, unregistering the
+ * equivalent in core if already defined, then includes the block file.
  */
-function gutenberg_unregister_core_block_types() {
-	$registry    = WP_Block_Type_Registry::get_instance();
-	$block_names = array(
-		'core/archives',
-		'core/block',
-		'core/calendar',
-		'core/categories',
-		'core/latest-comments',
-		'core/latest-posts',
-		'core/legacy-widget',
-		'core/rss',
-		'core/shortcode',
-		'core/search',
-		'core/tag-cloud',
-	);
-
-	foreach ( $block_names as $block_name ) {
+function gutenberg_reregister_core_block_types() {
+	// Blocks directory may not exist if working from a fresh clone.
+	$blocks_dir = dirname( __FILE__ ) . '/../build/block-library/blocks/';
+	if ( ! file_exists( $blocks_dir ) ) {
+		return;
+	}
+	$registry = WP_Block_Type_Registry::get_instance();
+	$files = scandir( $blocks_dir );
+	foreach ( $files as $file ) {
+		$parts = pathinfo( $file );
+		// Ignore all non-PHP files, subdirectories, path traversal.
+		if ( 'php' !== $parts['extension'] ) {
+			continue;
+		}
+		// Derive the assumed block name by file path.
+		$block_name = 'core/' . $parts['filename'];
 		if ( $registry->is_registered( $block_name ) ) {
 			$registry->unregister( $block_name );
 		}
+		require $blocks_dir . $file;
 	}
 }
-
-if ( file_exists( dirname( __FILE__ ) . '/../build/block-library/blocks' ) ) {
-	add_action( 'init', 'gutenberg_unregister_core_block_types' );
-
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/archives.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/block.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/calendar.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/categories.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/latest-comments.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/latest-posts.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/legacy-widget.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/rss.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/shortcode.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/search.php';
-	require dirname( __FILE__ ) . '/../build/block-library/blocks/tag-cloud.php';
-}
+add_action( 'init', 'gutenberg_reregister_core_block_types' );
