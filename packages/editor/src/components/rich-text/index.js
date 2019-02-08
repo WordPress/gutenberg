@@ -499,9 +499,9 @@ export class RichText extends Component {
 		const empty = this.isEmpty();
 
 		// It is important to consider emptiness because an empty container
-		// will include a bogus TinyMCE BR node _after_ the caret, so in a
-		// forward deletion the isHorizontalEdge function will incorrectly
-		// interpret the presence of the bogus node as not being at the edge.
+		// will include a padding BR node _after_ the caret, so in a forward
+		// deletion the isHorizontalEdge function will incorrectly interpret the
+		// presence of the BR node as not being at the edge.
 		const isEdge = ( empty || isHorizontalEdge( this.editableRef, isReverse ) );
 
 		if ( ! isEdge ) {

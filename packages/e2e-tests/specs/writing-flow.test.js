@@ -93,17 +93,6 @@ describe( 'adding blocks', () => {
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
-		//
-		// See native behavior example: http://fiddle.tinymce.com/kvgaab
-		//
-		//  1. Select all of second paragraph, end to beginning
-		//  2. Press ArrowLeft
-		//  3. Type
-		//  4. Note that text is not bolded
-		//
-		// This is technically different than how other word processors treat
-		// the collapse while a bolded segment is selected, but our behavior
-		// is consistent with TinyMCE.
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( 'After' );
@@ -175,23 +164,6 @@ describe( 'adding blocks', () => {
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'j' );
 
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-	} );
-
-	it( 'should clean TinyMCE content', async () => {
-		// Ensure no zero-width space character. Notably, this can occur when
-		// save occurs while at an inline boundary edge.
-		await clickBlockAppender();
-		await pressKeyWithModifier( 'primary', 'b' );
-		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		// Backspace to remove the content in this block, resetting it.
-		await page.keyboard.press( 'Backspace' );
-
-		// Ensure no data-mce-selected. Notably, this can occur when content
-		// is saved while typing within an inline boundary.
-		await pressKeyWithModifier( 'primary', 'b' );
-		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
