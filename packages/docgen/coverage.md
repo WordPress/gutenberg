@@ -16,29 +16,27 @@ Packages outside of scope:
 - postcss-themes. CommonJS module.
 - scripts. CommonJS module.
 
-Fix JSDoc manually:
-
-- [ ] autop `description` contains HTML
-- [ ] e2e-test-utils `setUpResponseMocking` has example mixed with description
-- [ ] rich-text `concat` type `@param` is `{...[object]}`. Should be
-
-```js
-/**
- * Combine all Rich Text values into one. This is similar to
- * `String.prototype.concat`.
- *
- * @param {...Object} values Objects to combine.
- *
- * @return {Object} A new value combining all given records.
- */
-```
-
 TODO:
 
-- [ ] blocks `unstable__*` should this be docummented?
-- [ ] keycodes `CONSTANTS`
-- [ ] rich-text `LINE_SEPARATOR` is a constant
-- [ ] rich-text `unstableToDom` is this supposed to go undocumented?
+These either happen in private API, aren't relevant, or pend of decission.
+
+- [ ] go undocummented: `unstable__*`, rich-text `unstableToDom`, `experimental__`
+- [ ] `constants` keycodes, rich-text `LINE_SEPARATOR`
+- [ ] `{?{ time: number, count: number }}`packages/editor/src/store/selectors.js
+- [ ] `{type=}` packages/block-library/src/image/edit.js
+- [ ] `@api` packages/editor/src/editor-styles/ast/stringify/compiler.js
+- [ ] `@callback` packages/components/src/autocomplete/index.js
+- [ ] `@cite` packages/block-serialization-default-parser/src/index.js
+- [ ] `@class` packages/edit-post/src/hooks/components/media-upload/index.js
+- [ ] `@const` packages/editor/src/editor-styles/transforms/wrap.js
+- [ ] `@constant` packages/editor/src/hooks/align.js
+- [ ] `@constructor` packages/edit-post/src/hooks/components/media-upload/index.js
+- [ ] `@inheritdoc` packages/edit-post/src/components/meta-boxes/meta-boxes-area/index.js
+- [ ] `@private` packages/editor/src/components/rich-text/index.js
+- [ ] `@property` babel-plugin-import-jsx-pragma
+- [ ] `@since` packages/block-serialization-default-parser/src/index.js
+- [ ] `@throws` packages/blocks/src/api/node.js
+- [ ] `@typedef` packages/blocks/src/api/registration.js
 
 DONE:
 
@@ -50,6 +48,7 @@ DONE:
 - [x] block-library
 - [x] block-serialization-default-parser
 - [x] block-serialization-spec-parser
+- [x] blocks
 - [x] components
 - [x] compose
 - [x] core-data
@@ -76,6 +75,7 @@ DONE:
 - [x] plugins
 - [x] priority-queue
 - [x] redux-routine
+- [x] rich-text
 - [x] shortcode
 - [x] token-list
 - [x] url
