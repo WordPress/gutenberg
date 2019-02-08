@@ -11,7 +11,7 @@ This folder contains all paste specific logic (filters, converters, normalisers.
 | MS Word          | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
 | Open Office      | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
 | Libre Office     | ✓          | ✓        | ✓     | ✓     | n/a       | ✓     |
-| MS Word Online   | ✓          | ✘ [2]    | ✓     | ✓     | n/a       | ✓     |
+| MS Word Online   | ✓          | ✘        | ✓     | ✓     | n/a       | ✓     |
 | Evernote         | ✓          | ✘ [3]    | ✓     | ✓     | ✓         | ✓     |
 | Markdown         | ✓          | ✓        | ✓     | ✓     | ✓         | ✓     |
 | Legacy WordPress | ✓          | ✓        | ✓     | … [4] | ✓         | ✓     |
