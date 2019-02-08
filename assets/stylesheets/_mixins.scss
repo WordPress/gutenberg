@@ -252,7 +252,7 @@
 		}
 	}
 
-	.auto-fold #{$selector} { /* Auto fold is when on smaller breakpoints, nav menu auto colllapses. */
+	.auto-fold #{$selector} { /* Auto fold is when on smaller breakpoints, nav menu auto collapses. */
 		@include break-medium() {
 			left: $admin-sidebar-width-collapsed;
 		}
@@ -278,7 +278,7 @@
 		}
 	}
 
-	/* In small screens with resposive menu expanded there is small white space. */
+	/* In small screens with responsive menu expanded there is small white space. */
 	@media (max-width: #{ ($break-small) }) {
 		.auto-fold .wp-responsive-open #{$selector} {
 			margin-left: -18px;

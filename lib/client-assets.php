@@ -43,52 +43,23 @@ function gutenberg_url( $path ) {
  * @return string Conditional polyfill inline script.
  */
 function gutenberg_get_script_polyfill( $tests ) {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_get_script_polyfill' );
+
 	global $wp_scripts;
-
-	$polyfill = '';
-	foreach ( $tests as $test => $handle ) {
-		if ( ! array_key_exists( $handle, $wp_scripts->registered ) ) {
-			continue;
-		}
-
-		$polyfill .= (
-			// Test presence of feature...
-			'( ' . $test . ' ) || ' .
-			// ...appending polyfill on any failures. Cautious viewers may balk
-			// at the `document.write`. Its caveat of synchronous mid-stream
-			// blocking write is exactly the behavior we need though.
-			'document.write( \'<script src="' .
-			esc_url( $wp_scripts->registered[ $handle ]->src ) .
-			'"></scr\' + \'ipt>\' );'
-		);
-	}
-
-	return $polyfill;
+	return wp_get_script_polyfill( $wp_scripts, $tests );
 }
 
 if ( ! function_exists( 'register_tinymce_scripts' ) ) {
 	/**
 	 * Registers the main TinyMCE scripts.
+	 *
+	 * @deprecated 5.0.0 wp_register_tinymce_scripts
 	 */
 	function register_tinymce_scripts() {
-		global $tinymce_version, $concatenate_scripts, $compress_scripts;
-		if ( ! isset( $concatenate_scripts ) ) {
-			script_concat_settings();
-		}
-		$suffix     = SCRIPT_DEBUG ? '' : '.min';
-		$compressed = $compress_scripts && $concatenate_scripts && isset( $_SERVER['HTTP_ACCEPT_ENCODING'] )
-			&& false !== stripos( $_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip' );
-		// Load tinymce.js when running from /src, otherwise load wp-tinymce.js.gz (in production) or
-		// tinymce.min.js (when SCRIPT_DEBUG is true).
-		$mce_suffix = false !== strpos( get_bloginfo( 'version' ), '-src' ) ? '' : '.min';
-		if ( $compressed ) {
-			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . 'wp-tinymce.php', array(), $tinymce_version );
-		} else {
-			gutenberg_override_script( 'wp-tinymce-root', includes_url( 'js/tinymce/' ) . "tinymce{$mce_suffix}.js", array(), $tinymce_version );
-			gutenberg_override_script( 'wp-tinymce', includes_url( 'js/tinymce/' ) . "plugins/compat3x/plugin{$suffix}.js", array( 'wp-tinymce-root' ), $tinymce_version );
-		}
+		_deprecated_function( __FUNCTION__, '5.0.0', 'wp_register_tinymce_scripts' );
 
-		gutenberg_override_script( 'wp-tinymce-lists', includes_url( 'js/tinymce/' ) . "plugins/lists/plugin{$suffix}.js", array( 'wp-tinymce' ), $tinymce_version );
+		global $wp_scripts;
+		return wp_register_tinymce_scripts( $wp_scripts );
 	}
 }
 
@@ -165,13 +136,14 @@ function gutenberg_register_packages_scripts() {
  * @since 0.1.0
  */
 function gutenberg_register_scripts_and_styles() {
-	gutenberg_register_vendor_scripts();
+	global $wp_scripts;
 
-	register_tinymce_scripts();
+	gutenberg_register_vendor_scripts();
 
 	wp_add_inline_script(
 		'wp-polyfill',
-		gutenberg_get_script_polyfill(
+		wp_get_script_polyfill(
+			$wp_scripts,
 			array(
 				'\'fetch\' in window' => 'wp-polyfill-fetch',
 				'document.contains'   => 'wp-polyfill-node-contains',
@@ -185,10 +157,31 @@ function gutenberg_register_scripts_and_styles() {
 	gutenberg_register_packages_scripts();
 
 	// Inline scripts.
+	global $wp_scripts;
+	if ( isset( $wp_scripts->registered['wp-api-fetch'] ) ) {
+		$wp_scripts->registered['wp-api-fetch']->deps[] = 'wp-hooks';
+	}
 	wp_add_inline_script(
 		'wp-api-fetch',
 		sprintf(
-			'wp.apiFetch.use( wp.apiFetch.createNonceMiddleware( "%s" ) );',
+			implode(
+				"\n",
+				array(
+					'( function() {',
+					'	var nonceMiddleware = wp.apiFetch.createNonceMiddleware( "%s" );',
+					'	wp.apiFetch.use( nonceMiddleware );',
+					'	wp.hooks.addAction(',
+					'		"heartbeat.tick",',
+					'		"core/api-fetch/create-nonce-middleware",',
+					'		function( response ) {',
+					'			if ( response[ "rest_nonce" ] ) {',
+					'				nonceMiddleware.nonce = response[ "rest_nonce" ];',
+					'			}',
+					'		}',
+					'	)',
+					'} )()',
+				)
+			),
 			( wp_installing() && ! is_multisite() ) ? '' : wp_create_nonce( 'wp_rest' )
 		),
 		'after'
@@ -501,24 +494,6 @@ function gutenberg_register_scripts_and_styles() {
 			$live_reload_url
 		);
 	}
-
-	// Temporary backward compatibility for `wp-polyfill-ecmascript`, which has
-	// since been absorbed into `wp-polyfill`.
-	//
-	// [TODO][REMOVEME] To be removed in Gutenberg v4.5.
-	gutenberg_override_script(
-		'wp-polyfill-ecmascript',
-		null,
-		array(
-			'wp-polyfill',
-			'wp-deprecated',
-		)
-	);
-	wp_script_add_data(
-		'wp-polyfill-ecmascript',
-		'data',
-		'wp.deprecated( "wp-polyfill-ecmascript script handle", { plugin: "Gutenberg", version: "4.5" } );'
-	);
 }
 add_action( 'wp_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
 add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 );
@@ -528,68 +503,16 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_register_scripts_and_styles', 5 
  * data to be attached to the page. Expected to be called in the context of
  * `array_reduce`.
  *
+ * @deprecated 5.0.0 rest_preload_api_request
+ *
  * @param  array  $memo Reduce accumulator.
  * @param  string $path REST API path to preload.
  * @return array        Modified reduce accumulator.
  */
 function gutenberg_preload_api_request( $memo, $path ) {
+	_deprecated_function( __FUNCTION__, '5.0.0', 'rest_preload_api_request' );
 
-	// array_reduce() doesn't support passing an array in PHP 5.2
-	// so we need to make sure we start with one.
-	if ( ! is_array( $memo ) ) {
-		$memo = array();
-	}
-
-	if ( empty( $path ) ) {
-		return $memo;
-	}
-
-	$method = 'GET';
-	if ( is_array( $path ) && 2 === count( $path ) ) {
-		$method = end( $path );
-		$path   = reset( $path );
-
-		if ( ! in_array( $method, array( 'GET', 'OPTIONS' ), true ) ) {
-			$method = 'GET';
-		}
-	}
-
-	$path_parts = parse_url( $path );
-	if ( false === $path_parts ) {
-		return $memo;
-	}
-
-	$request = new WP_REST_Request( $method, $path_parts['path'] );
-	if ( ! empty( $path_parts['query'] ) ) {
-		parse_str( $path_parts['query'], $query_params );
-		$request->set_query_params( $query_params );
-	}
-
-	$response = rest_do_request( $request );
-	if ( 200 === $response->status ) {
-		$server = rest_get_server();
-		$data   = (array) $response->get_data();
-		$links  = $server->get_compact_response_links( $response );
-		if ( ! empty( $links ) ) {
-			$data['_links'] = $links;
-		}
-
-		if ( 'OPTIONS' === $method ) {
-			$response = rest_send_allow_header( $response, $server, $request );
-
-			$memo[ $method ][ $path ] = array(
-				'body'    => $data,
-				'headers' => $response->headers,
-			);
-		} else {
-			$memo[ $path ] = array(
-				'body'    => $data,
-				'headers' => $response->headers,
-			);
-		}
-	}
-
-	return $memo;
+	return rest_preload_api_request( $memo, $path );
 }
 
 /**
@@ -625,7 +548,7 @@ function gutenberg_register_vendor_scripts() {
 	);
 	gutenberg_register_vendor_script(
 		'lodash',
-		'https://unpkg.com/lodash@4.17.5/lodash' . $suffix . '.js'
+		'https://unpkg.com/lodash@4.17.10/lodash' . $suffix . '.js'
 	);
 	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
 	gutenberg_register_vendor_script(
@@ -662,32 +585,21 @@ function gutenberg_register_vendor_scripts() {
  * @since 0.1.0
  */
 function gutenberg_vendor_script_filename( $handle, $src ) {
-	$match_tinymce_plugin = preg_match(
-		'@tinymce.*/plugins/([^/]+)/plugin(\.min)?\.js$@',
-		$src,
-		$tinymce_plugin_pieces
+	$filename = basename( $src );
+	$match    = preg_match(
+		'/^'
+		. '(?P<ignore>.*?)'
+		. '(?P<suffix>\.min)?'
+		. '(?P<extension>\.js)'
+		. '(?P<extra>.*)'
+		. '$/',
+		$filename,
+		$filename_pieces
 	);
-	if ( $match_tinymce_plugin ) {
-		$prefix = 'tinymce-plugin-' . $tinymce_plugin_pieces[1];
-		$suffix = isset( $tinymce_plugin_pieces[2] ) ? $tinymce_plugin_pieces[2] : '';
-	} else {
-		$filename = basename( $src );
-		$match    = preg_match(
-			'/^'
-			. '(?P<ignore>.*?)'
-			. '(?P<suffix>\.min)?'
-			. '(?P<extension>\.js)'
-			. '(?P<extra>.*)'
-			. '$/',
-			$filename,
-			$filename_pieces
-		);
 
-		$prefix = $handle;
-		$suffix = $match ? $filename_pieces['suffix'] : '';
-	}
-
-	$hash = substr( md5( $src ), 0, 8 );
+	$prefix = $handle;
+	$suffix = $match ? $filename_pieces['suffix'] : '';
+	$hash   = substr( md5( $src ), 0, 8 );
 
 	return "${prefix}${suffix}.${hash}.js";
 }
@@ -765,28 +677,14 @@ function gutenberg_register_vendor_script( $handle, $src, $deps = array() ) {
  * array of registered block data keyed by block name. Data includes properties
  * of a block relevant for client registration.
  *
+ * @deprecated 5.0.0 get_block_editor_server_block_settings
+ *
  * @return array An associative array of registered block data.
  */
 function gutenberg_prepare_blocks_for_js() {
-	$block_registry = WP_Block_Type_Registry::get_instance();
-	$blocks         = array();
-	$keys_to_pick   = array( 'title', 'description', 'icon', 'category', 'keywords', 'supports', 'attributes' );
+	_deprecated_function( __FUNCTION__, '5.0.0', 'get_block_editor_server_block_settings' );
 
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
-		foreach ( $keys_to_pick as $key ) {
-			if ( ! isset( $block_type->{ $key } ) ) {
-				continue;
-			}
-
-			if ( ! isset( $blocks[ $block_name ] ) ) {
-				$blocks[ $block_name ] = array();
-			}
-
-			$blocks[ $block_name ][ $key ] = $block_type->{ $key };
-		}
-	}
-
-	return $blocks;
+	return get_block_editor_server_block_settings();
 }
 
 /**
@@ -798,72 +696,26 @@ function gutenberg_prepare_blocks_for_js() {
  * are loaded last.
  *
  * @since 0.4.0
+ * @deprecated 5.0.0 wp_common_block_scripts_and_styles
  */
 function gutenberg_common_scripts_and_styles() {
-	if ( ! is_gutenberg_page() && is_admin() ) {
-		return;
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_common_block_scripts_and_styles' );
 
-	// Enqueue basic styles built out of Gutenberg through `npm build`.
-	wp_enqueue_style( 'wp-block-library' );
-
-	/*
-	 * Enqueue block styles built through plugins.  This lives in a separate
-	 * action for a couple of reasons: (1) we want to load these assets
-	 * (usually stylesheets) in *both* frontend and editor contexts, and (2)
-	 * one day we may need to be smarter about whether assets are included
-	 * based on whether blocks are actually present on the page.
-	 */
-
-	/**
-	 * Fires after enqueuing block assets for both editor and front-end.
-	 *
-	 * Call `add_action` on any hook before 'wp_enqueue_scripts'.
-	 *
-	 * In the function call you supply, simply use `wp_enqueue_script` and
-	 * `wp_enqueue_style` to add your functionality to the Gutenberg editor.
-	 *
-	 * @since 0.4.0
-	 */
-	do_action( 'enqueue_block_assets' );
+	wp_common_block_scripts_and_styles();
 }
-add_action( 'wp_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
-add_action( 'admin_enqueue_scripts', 'gutenberg_common_scripts_and_styles' );
 
 /**
  * Enqueues registered block scripts and styles, depending on current rendered
  * context (only enqueuing editor scripts while in context of the editor).
  *
  * @since 2.0.0
+ * @deprecated 5.0.0 wp_enqueue_registered_block_scripts_and_styles
  */
 function gutenberg_enqueue_registered_block_scripts_and_styles() {
-	$is_editor = ( 'enqueue_block_editor_assets' === current_action() );
+	_deprecated_function( __FUNCTION__, '5.0.0', 'wp_enqueue_registered_block_scripts_and_styles' );
 
-	$block_registry = WP_Block_Type_Registry::get_instance();
-	foreach ( $block_registry->get_all_registered() as $block_name => $block_type ) {
-		// Front-end styles.
-		if ( ! empty( $block_type->style ) ) {
-			wp_enqueue_style( $block_type->style );
-		}
-
-		// Front-end script.
-		if ( ! empty( $block_type->script ) ) {
-			wp_enqueue_script( $block_type->script );
-		}
-
-		// Editor styles.
-		if ( $is_editor && ! empty( $block_type->editor_style ) ) {
-			wp_enqueue_style( $block_type->editor_style );
-		}
-
-		// Editor script.
-		if ( $is_editor && ! empty( $block_type->editor_script ) ) {
-			wp_enqueue_script( $block_type->editor_script );
-		}
-	}
+	wp_enqueue_registered_block_scripts_and_styles();
 }
-add_action( 'enqueue_block_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_registered_block_scripts_and_styles' );
 
 /**
  * Assigns a default editor template with a default block by post format, if
@@ -938,45 +790,15 @@ function gutenberg_get_autosave_newer_than_post_save( $post ) {
  * Returns all the block categories.
  *
  * @since 2.2.0
+ * @deprecated 5.0.0 get_block_categories
  *
  * @param  WP_Post $post Post object.
  * @return Object[] Block categories.
  */
 function gutenberg_get_block_categories( $post ) {
-	$default_categories = array(
-		array(
-			'slug'  => 'common',
-			'title' => __( 'Common Blocks', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'formatting',
-			'title' => __( 'Formatting', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'layout',
-			'title' => __( 'Layout Elements', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'widgets',
-			'title' => __( 'Widgets', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'embed',
-			'title' => __( 'Embeds', 'gutenberg' ),
-			'icon'  => null,
-		),
-		array(
-			'slug'  => 'reusable',
-			'title' => __( 'Reusable Blocks', 'gutenberg' ),
-			'icon'  => null,
-		),
-	);
+	_deprecated_function( __FUNCTION__, '5.0.0', 'get_block_categories' );
 
-	return apply_filters( 'block_categories', $default_categories, $post );
+	return get_block_categories( $post );
 }
 
 /**
@@ -1029,35 +851,12 @@ function gutenberg_get_available_image_sizes() {
  * @param string $hook Screen name.
  */
 function gutenberg_editor_scripts_and_styles( $hook ) {
-	$is_demo = isset( $_GET['gutenberg-demo'] );
-
-	global $wp_scripts;
-
-	// Add "wp-hooks" as dependency of "heartbeat".
-	$heartbeat_script = $wp_scripts->query( 'heartbeat', 'registered' );
-	if ( $heartbeat_script && ! in_array( 'wp-hooks', $heartbeat_script->deps ) ) {
-		$heartbeat_script->deps[] = 'wp-hooks';
-	}
+	global $wp_meta_boxes;
 
 	// Enqueue heartbeat separately as an "optional" dependency of the editor.
 	// Heartbeat is used for automatic nonce refreshing, but some hosts choose
 	// to disable it outright.
 	wp_enqueue_script( 'heartbeat' );
-
-	// Transform a "heartbeat-tick" jQuery event into "heartbeat.tick" hook action.
-	// This removes the need of using jQuery for listening to the event.
-	wp_add_inline_script(
-		'heartbeat',
-		'jQuery( document ).on( "heartbeat-tick", function ( event, response ) { wp.hooks.doAction( "heartbeat.tick", response ) } );',
-		'after'
-	);
-
-	// Ignore Classic Editor's `rich_editing` user option, aka "Disable visual
-	// editor". Forcing this to be true guarantees that TinyMCE and its plugins
-	// are available in Gutenberg. Fixes
-	// https://github.com/WordPress/gutenberg/issues/5667.
-	$user_can_richedit = user_can_richedit();
-	add_filter( 'user_can_richedit', '__return_true' );
 
 	wp_enqueue_script( 'wp-edit-post' );
 	wp_enqueue_script( 'wp-format-library' );
@@ -1083,6 +882,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		sprintf( '/wp/v2/types/%s?context=edit', $post_type ),
 		sprintf( '/wp/v2/users/me?post_type=%s&context=edit', $post_type ),
 		array( '/wp/v2/media', 'OPTIONS' ),
+		array( '/wp/v2/blocks', 'OPTIONS' ),
 	);
 
 	/**
@@ -1104,7 +904,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	$preload_data = array_reduce(
 		$preload_paths,
-		'gutenberg_preload_api_request',
+		'rest_preload_api_request',
 		array()
 	);
 
@@ -1119,23 +919,13 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( $post ) ) ),
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
 		'after'
 	);
 
 	// Assign initial edits, if applicable. These are not initially assigned
 	// to the persisted post, but should be included in its save payload.
-	if ( $is_new_post && $is_demo ) {
-		// Prepopulate with some test content in demo.
-		ob_start();
-		include gutenberg_dir_path() . 'post-content.php';
-		$demo_content = ob_get_clean();
-
-		$initial_edits = array(
-			'title'   => __( 'Welcome to the Gutenberg Editor', 'gutenberg' ),
-			'content' => $demo_content,
-		);
-	} elseif ( $is_new_post ) {
+	if ( $is_new_post ) {
 		// Override "(Auto Draft)" new post default title with empty string,
 		// or filtered value.
 		$initial_edits = array(
@@ -1152,17 +942,17 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . json_encode( gutenberg_prepare_blocks_for_js() ) . ');'
+		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
 
 	// Get admin url for handling meta boxes.
 	$meta_box_url = admin_url( 'post.php' );
 	$meta_box_url = add_query_arg(
 		array(
-			'post'           => $post->ID,
-			'action'         => 'edit',
-			'classic-editor' => true,
-			'meta_box'       => true,
+			'post'            => $post->ID,
+			'action'          => 'edit',
+			'meta-box-loader' => true,
+			'_wpnonce'        => wp_create_nonce( 'meta-box-loader' ),
 		),
 		$meta_box_url
 	);
@@ -1173,6 +963,11 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$align_wide              = get_theme_support( 'align-wide' );
 	$color_palette           = current( (array) get_theme_support( 'editor-color-palette' ) );
 	$font_sizes              = current( (array) get_theme_support( 'editor-font-sizes' ) );
+
+	if ( ! empty( $gutenberg_theme_support ) ) {
+		wp_enqueue_script( 'wp-deprecated' );
+		wp_add_inline_script( 'wp-deprecated', 'wp.deprecated( "`gutenberg` theme support", { plugin: "Gutenberg", version: "5.2", alternative: "`align-wide` theme support" } );' );
+	}
 
 	/**
 	 * Filters the allowed block types for the editor, defaulting to true (all
@@ -1297,7 +1092,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		'allowedMimeTypes'       => get_allowed_mime_types(),
 		'styles'                 => $styles,
 		'imageSizes'             => gutenberg_get_available_image_sizes(),
-		'richEditingEnabled'     => $user_can_richedit,
+		'richEditingEnabled'     => user_can_richedit(),
 
 		// Ideally, we'd remove this and rely on a REST API endpoint.
 		'postLock'               => $lock_details,
@@ -1315,7 +1110,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$post_autosave = gutenberg_get_autosave_newer_than_post_save( $post );
 	if ( $post_autosave ) {
 		$editor_settings['autosave'] = array(
-			'editLink' => add_query_arg( 'gutenberg', true, get_edit_post_link( $post_autosave->ID ) ),
+			'editLink' => get_edit_post_link( $post_autosave->ID ),
 		);
 	}
 
@@ -1332,15 +1127,18 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['templateLock'] = ! empty( $post_type_object->template_lock ) ? $post_type_object->template_lock : false;
 	}
 
-	$init_script = <<<JS
-	( function() {
-		window._wpLoadGutenbergEditor = new Promise( function( resolve ) {
-			wp.domReady( function() {
-				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
-			} );
-		} );
-} )();
-JS;
+	$current_screen  = get_current_screen();
+	$core_meta_boxes = array();
+
+	// Make sure the current screen is set as well as the normal core metaboxes.
+	if ( isset( $current_screen->id ) && isset( $wp_meta_boxes[ $current_screen->id ]['normal']['core'] ) ) {
+		$core_meta_boxes = $wp_meta_boxes[ $current_screen->id ]['normal']['core'];
+	}
+
+	// Check if the Custom Fields meta box has been removed at some point.
+	if ( ! isset( $core_meta_boxes['postcustom'] ) || ! $core_meta_boxes['postcustom'] ) {
+		unset( $editor_settings['enableCustomFields'] );
+	}
 
 	/**
 	 * Filters the settings to pass to the block editor.
@@ -1351,6 +1149,32 @@ JS;
 	 * @param WP_Post $post            Post being edited.
 	 */
 	$editor_settings = apply_filters( 'block_editor_settings', $editor_settings, $post );
+
+	$init_script = <<<JS
+	( function() {
+		window._wpLoadBlockEditor = new Promise( function( resolve ) {
+			wp.domReady( function() {
+				resolve( wp.editPost.initializeEditor( 'editor', "%s", %d, %s, %s ) );
+			} );
+		} );
+
+		Object.defineProperty( window, '_wpLoadGutenbergEditor', {
+			get: function() {
+				// TODO: Hello future maintainer. In removing this deprecation,
+				// ensure also to check whether `wp-editor`'s dependencies in
+				// `package-dependencies.php` still require `wp-deprecated`.
+				wp.deprecated( '`window._wpLoadGutenbergEditor`', {
+					plugin: 'Gutenberg',
+					version: '5.2',
+					alternative: '`window._wpLoadBlockEditor`',
+					hint: 'This is a private API, not intended for public use. It may be removed in the future.'
+				} );
+
+				return window._wpLoadBlockEditor;
+			}
+		} );
+} )();
+JS;
 
 	$script = sprintf(
 		$init_script,
@@ -1392,14 +1216,8 @@ JS;
 /**
  * Enqueue the reusable blocks listing page's script
  *
- * @param string $hook Screen name.
+ * @deprecated 5.0.0
  */
-function gutenberg_load_list_reusable_blocks( $hook ) {
-	$is_reusable_blocks_list_page = 'edit.php' === $hook && isset( $_GET['post_type'] ) && 'wp_block' === $_GET['post_type'];
-	if ( $is_reusable_blocks_list_page ) {
-		gutenberg_load_locale_data();
-		wp_enqueue_script( 'wp-list-reusable-blocks' );
-		wp_enqueue_style( 'wp-list-reusable-blocks' );
-	}
+function gutenberg_load_list_reusable_blocks() {
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 }
-add_action( 'admin_enqueue_scripts', 'gutenberg_load_list_reusable_blocks' );

@@ -26,13 +26,16 @@
 }
 
 .components-notice__content {
-	margin: 1em 0;
+	margin: 1em #{ $icon-button-size-small + $border-width } 1em 0;
 }
 
 .components-notice__action.components-button {
 	&,
 	&.is-link {
 		margin-left: 4px;
+	}
+	&.is-default {
+		vertical-align: initial;
 	}
 }
 

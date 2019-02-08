@@ -28,6 +28,13 @@ p {
 		text-transform: uppercase;
 		font-style: normal;
 	}
+
+	&.has-drop-cap:not(:focus)::after {
+		content: "";
+		display: table;
+		clear: both;
+		padding-top: $block-padding;
+	}
 }
 
 p.has-background {

@@ -1,8 +1,8 @@
 # Packages
 
-Gutenberg exposes a list of JavaScript packages and tools for WordPress development.
+WordPress exposes a list of JavaScript packages and tools for WordPress development.
 
-## Using the packages via WordPress global
+## Using the Packages via WordPress Global
 
 JavaScript packages are available as a registered script in WordPress and can be accessed using the `wp` global variable.
 
@@ -22,7 +22,7 @@ const { PlainText } = wp.editor;
 
 ```
 
-## Using the packages via npm
+## Using the Packages via npm
 
 All the packages are also available on [npm](https://www.npmjs.com/org/wordpress) if you want to bundle them in your code.
 

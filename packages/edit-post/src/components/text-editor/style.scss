@@ -3,10 +3,6 @@
 
 	@include break-small() {
 		padding-top: ($grid-size * 5) + $admin-bar-height-big;
-
-		body.is-fullscreen-mode & {
-			padding-top: $grid-size * 5;
-		}
 	}
 
 	@include break-medium() {
@@ -20,6 +16,7 @@
 
 .edit-post-text-editor {
 	width: 100%;
+	max-width: calc(100% - #{$grid-size-large * 2});
 	margin-left: $grid-size-large;
 	margin-right: $grid-size-large;
 

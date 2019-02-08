@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { default as triggerApiFetch } from '@wordpress/api-fetch';
-import { select as selectData } from '@wordpress/data';
+import { createRegistryControl } from '@wordpress/data';
 
 /**
  * Trigger an API Fetch request.
@@ -37,9 +37,9 @@ const controls = {
 		return triggerApiFetch( request );
 	},
 
-	SELECT( { selectorName, args } ) {
-		return selectData( 'core' )[ selectorName ]( ...args );
-	},
+	SELECT: createRegistryControl( ( registry ) => ( { selectorName, args } ) => {
+		return registry.select( 'core' )[ selectorName ]( ...args );
+	} ),
 };
 
 export default controls;
