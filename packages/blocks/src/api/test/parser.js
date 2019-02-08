@@ -551,7 +551,7 @@ describe( 'block parser', () => {
 					{
 						attributes: {
 							fruit: {
-								type: 'number',
+								type: 'string',
 								default: 'Bananas',
 							},
 						},
