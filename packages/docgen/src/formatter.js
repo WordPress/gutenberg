@@ -73,6 +73,15 @@ const formatSeeAndLinkTags = ( tags, docs ) => {
 	}
 };
 
+const formatDeprecated = ( tags, docs ) => {
+	if ( tags && tags.length > 0 ) {
+		docs.push( '\n' );
+		docs.push( ...tags.map(
+			( tag ) => `\n> **Deprecated** ${ cleanSpaces( tag.description ) }`
+		) );
+	}
+};
+
 module.exports = function( artifacts ) {
 	const docs = [ '# API' ];
 	docs.push( '\n' );
@@ -91,6 +100,7 @@ module.exports = function( artifacts ) {
 	if ( artifacts && artifacts.length > 0 ) {
 		artifacts.forEach( ( artifact ) => {
 			docs.push( `## ${ artifact.name }` );
+			formatDeprecated( artifact.tags.filter( ( tag ) => tag.title === 'deprecated' ), docs );
 			docs.push( '\n' );
 			docs.push( '\n' );
 			docs.push( artifact.description );
