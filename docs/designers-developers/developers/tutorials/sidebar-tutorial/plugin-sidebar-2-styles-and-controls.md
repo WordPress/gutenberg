@@ -2,7 +2,7 @@
 
 After the sidebar is up and running, the next step is to fill it up with the necessary components and basic styling.
 
-To visualize and edit the meta field value you'll use an input component. The `@wordpress/components` package contains many components available for you to reuse, and, specifically, the [TextControl](../../../../../docs/designers-developers/developers/components/text-control/) is aimed at creating an input field:
+To visualize and edit the meta field value you'll use an input component. The `@wordpress/components` package contains many components available for you to reuse, and, specifically, the [TextControl](/packages/components/src/text-control/README.md) is aimed at creating an input field:
 
 ```js
 ( function( wp ) {

@@ -1,3 +1,11 @@
+## 2.3.0 (Unreleased)
+
+### New Feature
+
+- Add background color controls for the table block.
+- Add new `RSS` block ([#7966](https://github.com/WordPress/gutenberg/pull/7966)).
+- Add new `Search` block ([#13583](https://github.com/WordPress/gutenberg/pull/13583)).
+
 ## 2.2.12 (2019-01-03)
 
 ## 2.2.11 (2018-12-18)

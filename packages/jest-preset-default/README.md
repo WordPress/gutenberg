@@ -1,6 +1,6 @@
 # Jest Preset Default
 
-Default [Jest](https://facebook.github.io/jest/) preset for WordPress development.
+Default [Jest](https://jestjs.io/) preset for WordPress development.
 
 ## Installation
 
@@ -29,7 +29,7 @@ npm install @wordpress/jest-preset-default --save-dev
 * `setupFiles` - runs code before each test which sets up global variables required in the testing environment.
 * `setupTestFrameworkScriptFile` - runs code which adds improved support for `Console` object and `React` components to the testing framework before each test.
 * `testMatch`- includes `/test/` subfolder in the glob patterns Jest uses to detect test files. It detects only test files containing `.js` extension.
-* `timers` - use of [fake timers](https://facebook.github.io/jest/docs/en/timer-mocks.html) for functions such as `setTimeout` is enabled.
+* `timers` - use of [fake timers](https://jestjs.io/docs/en/timer-mocks.html) for functions such as `setTimeout` is enabled.
 * `transform` - adds support for [PEG.js]( https://github.com/pegjs/pegjs#javascript-api) transformed necessary for WordPress blocks. It also keeps the default [babel-jest](https://github.com/facebook/jest/tree/master/packages/babel-jest) transformer.
 * `verbose` - each individual test won't be reported during the run.
 

@@ -2,7 +2,7 @@
 
 With the meta field registered in the previous step, next you will create a new block used to display the field value to the user. See the [Block Tutorial](/docs/designers-developers/developers/tutorials/block-tutorial/readme.md) for a deeper understanding of creating custom blocks.
 
-For this block, you will use the TextControl component, which is similar to an HTML input text field. For additional components, check out the [components](https://github.com/WordPress/gutenberg/tree/master/packages/components/src) and [editor](https://github.com/WordPress/gutenberg/tree/master/packages/editor/src/components) packages repositories.
+For this block, you will use the TextControl component, which is similar to an HTML input text field. For additional components, check out the [components](/packages/components/src) and [editor](/packages/editor/src/components) packages repositories.
 
 Attributes are the information displayed in blocks. As shown in the block tutorial, the source of attributes come from the text or HTML a user writes in the editor. For your meta block, the attribute will come from the post meta field.
 
@@ -11,48 +11,50 @@ By specifying the source of the attributes as `meta`, the Block Editor automatic
 Add this code to your JavaScript file (this tutorial will call the file `myguten.js`):
 
 ```js
-var el = wp.element.createElement;
-var registerBlockType = wp.blocks.registerBlockType;
-var TextField = wp.components.TextControl;
+( function( wp ) {
+	var el = wp.element.createElement;
+	var registerBlockType = wp.blocks.registerBlockType;
+	var TextField = wp.components.TextControl;
 
-registerBlockType("myguten/meta-block", {
-	title: "Meta Block",
-	icon: "smiley",
-	category: "common",
+	registerBlockType("myguten/meta-block", {
+		title: "Meta Block",
+		icon: "smiley",
+		category: "common",
 
-	attributes: {
-		blockValue: {
-			type: "string",
-			source: "meta",
-			meta: "myguten_meta_block_field"
+		attributes: {
+			blockValue: {
+				type: "string",
+				source: "meta",
+				meta: "myguten_meta_block_field"
+			}
+		},
+
+		edit: function(props) {
+			var className = props.className;
+			var setAttributes = props.setAttributes;
+
+			function updateBlockValue( blockValue ) {
+				setAttributes({ blockValue });
+			}
+
+		return el(
+				"div",
+				{ className: className },
+				el( TextField, {
+					label: "Meta Block Field",
+					value: props.attributes.blockValue,
+					onChange: updateBlockValue
+				} )
+			);
+		},
+
+		// No information saved to the block
+		// Data is saved to post meta via attributes
+		save: function() {
+			return null;
 		}
-	},
-
-	edit: function(props) {
-		var className = props.className;
-		var setAttributes = props.setAttributes;
-
-		function updateBlockValue( blockValue ) {
-			setAttributes({ blockValue });
-		}
-
-	return el(
-			"div",
-			{ className: className },
-			el( TextField, {
-				label: "Meta Block Field",
-				value: props.attributes.blockValue,
-				onChange: updateBlockValue
-			} )
-		);
-	},
-
-	// No information saved to the block
-	// Data is saved to post meta via attributes
-	save: function() {
-		return null;
-	}
-});
+	});
+})( window.wp );
 ```
 
 **Important:** Before you test, you need to enqueue your JavaScript file and its dependencies. Note the WordPress packages used above are `wp.element`, `wp.blocks`, and `wp.components`. Each of these need to be included in the array of dependencies. Update the `myguten-meta-block.php` file adding the enqueue function:

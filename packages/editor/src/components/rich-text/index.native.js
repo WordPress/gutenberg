@@ -28,6 +28,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import styles from './style.scss';
 
 const FORMATTING_CONTROLS = [
 	{
@@ -169,8 +170,19 @@ export class RichText extends Component {
 	 */
 
 	removeRootTagsProduceByAztec( html ) {
-		const openingTagRegexp = RegExp( '^<' + this.props.tagName + '>', 'gim' );
-		const closingTagRegexp = RegExp( '</' + this.props.tagName + '>$', 'gim' );
+		let result = this.removeRootTag( this.props.tagName, html );
+		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
+		if ( this.props.rootTagsToEliminate ) {
+			this.props.rootTagsToEliminate.forEach( ( element ) => {
+				result = this.removeRootTag( element, result );
+			} );
+		}
+		return result;
+	}
+
+	removeRootTag( tag, html ) {
+		const openingTagRegexp = RegExp( '^<' + tag + '>', 'gim' );
+		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
 
@@ -359,7 +371,12 @@ export class RichText extends Component {
 			} ) );
 
 		// Save back to HTML from React tree
-		const html = '<' + tagName + '>' + value + '</' + tagName + '>';
+		let html = '<' + tagName + '>' + value + '</' + tagName + '>';
+		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
+		if ( value === undefined || value === '' ) {
+			html = '';
+			this.lastEventCount = undefined; // force a refresh on the native side
+		}
 
 		return (
 			<View>
@@ -372,6 +389,8 @@ export class RichText extends Component {
 					}
 					}
 					text={ { text: html, eventCount: this.lastEventCount } }
+					placeholder={ this.props.placeholder }
+					placeholderTextColor={ this.props.placeholderTextColor || 'lightgrey' }
 					onChange={ this.onChange }
 					onFocus={ this.props.onFocus }
 					onBlur={ this.props.onBlur }
@@ -379,11 +398,16 @@ export class RichText extends Component {
 					onBackspace={ this.onBackspace }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
+					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
 					isSelected={ this.props.isSelected }
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
 					style={ style }
+					fontFamily={ this.props.fontFamily || styles[ 'editor-rich-text' ].fontFamily }
+					fontSize={ this.props.fontSize }
+					fontWeight={ this.props.fontWeight }
+					fontStyle={ this.props.fontStyle }
 				/>
 			</View>
 		);

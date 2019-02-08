@@ -42,7 +42,7 @@ describe( 'BlockSwitcher', () => {
 			level: 3,
 		},
 		isValid: true,
-		name: 'core/paragraph',
+		name: 'core/heading',
 		originalContent: '<h3>I am the greatest!</h3>',
 		clientId: 'c2403fd2-4e63-5ffa-b71c-1e0ea656c5b0',
 	};
@@ -54,11 +54,19 @@ describe( 'BlockSwitcher', () => {
 			edit: () => { },
 			save: () => {},
 			transforms: {
-				to: [ {
-					type: 'block',
-					blocks: [ 'core/paragraph' ],
-					transform: () => {},
-				} ],
+				to: [
+					{
+						type: 'block',
+						blocks: [ 'core/paragraph' ],
+						transform: () => {},
+					},
+					{
+						type: 'block',
+						blocks: [ 'core/paragraph' ],
+						transform: () => {},
+						isMultiBlock: true,
+					},
+				],
 			},
 		} );
 
@@ -93,6 +101,7 @@ describe( 'BlockSwitcher', () => {
 			headingBlock1,
 		];
 		const inserterItems = [
+			{ name: 'core/heading', frecency: 1 },
 			{ name: 'core/paragraph', frecency: 1 },
 		];
 
@@ -101,24 +110,28 @@ describe( 'BlockSwitcher', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	test( 'should not render block switcher with multi block of different types.', () => {
-		const blocks = [
-			headingBlock1,
-			textBlock,
+	test( 'should render disabled block switcher with multi block of different types when no transforms', () => {
+		const blocks = [ headingBlock1, textBlock ];
+		const inserterItems = [
+			{ name: 'core/heading', frecency: 1 },
+			{ name: 'core/paragraph', frecency: 1 },
 		];
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } /> );
 
-		expect( wrapper.html() ).toBeNull();
+		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	test( 'should not render a component when the multi selected types of blocks match.', () => {
-		const blocks = [
-			headingBlock1,
-			headingBlock2,
+	test( 'should render enabled block switcher with multi block when transforms exist', () => {
+		const blocks = [ headingBlock1, headingBlock2 ];
+		const inserterItems = [
+			{ name: 'core/heading', frecency: 1 },
+			{ name: 'core/paragraph', frecency: 1 },
 		];
-		const wrapper = shallow( <BlockSwitcher blocks={ blocks } /> );
 
-		expect( wrapper.html() ).toBeNull();
+		const wrapper = shallow( <BlockSwitcher blocks={ blocks } inserterItems={ inserterItems } /> );
+
+		expect( wrapper ).toMatchSnapshot();
 	} );
 
 	describe( 'Dropdown', () => {

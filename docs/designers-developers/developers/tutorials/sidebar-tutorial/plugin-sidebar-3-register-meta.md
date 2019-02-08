@@ -1,4 +1,4 @@
-# Register the meta field
+# Register the Meta Field
 
 To work with fields in the `post_meta` table, WordPress has a function called [register_meta](https://developer.wordpress.org/reference/functions/register_meta/). You're going to use it to register a new field called `sidebar_plugin_meta_block_field`, which will be a single string. Note that this field needs to be available through the [REST API](https://developer.wordpress.org/rest-api/) because that's how the block editor access data.
 
@@ -12,7 +12,7 @@ register_meta( 'post', 'sidebar_plugin_meta_block_field', array(
 ) );
 ```
 
-To make sure the field has been loaded, query the block editor [internal data structures](../../../../../docs/designers-developers/developers/data/), also known as _stores_. Open your browser's console, and execute this piece of code:
+To make sure the field has been loaded, query the block editor [internal data structures](/docs/designers-developers/developers/data/), also known as _stores_. Open your browser's console, and execute this piece of code:
 
 ```js
 wp.data.select( 'core/editor' ).getCurrentPost().meta;

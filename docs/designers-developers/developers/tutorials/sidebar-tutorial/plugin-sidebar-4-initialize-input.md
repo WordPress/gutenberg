@@ -1,4 +1,4 @@
-# Initialize the input control
+# Initialize the Input Control
 
 Now that the field is available in the editor store, it can be surfaced to the UI. The first step will be to extract the input control to a separate function so you can expand its functionality while the code stays clear.
 
@@ -39,7 +39,7 @@ Now that the field is available in the editor store, it can be surfaced to the U
 
 Now you can focus solely on the `MetaBlockField` component. The goal is to initialize it with the value of `sidebar_plugin_meta_block_field`, but also to keep it updated when that value changes.
 
-WordPress has [some utilities to work with data](../../../../../docs/designers-developers/developers/packages/packages-data/) from the stores. The first you're going to use is [withSelect](../../../../../docs/designers-developers/developers/packages/packages-data/#withselect-mapselecttoprops-function-function), whose signature is:
+WordPress has [some utilities to work with data](/packages/data/README.md) from the stores. The first you're going to use is [withSelect](/packages/data/README.md#withselect-mapselecttoprops-function-function), whose signature is:
 
 ```js
 withSelect(
@@ -105,7 +105,7 @@ This is how the code changes from the previous section:
 
 * The `MetaBlockField` function has now a `props` argument as input. It contains the data object returned by the `mapSelectToProps` function, which it uses to initialize its value property.
 * The component rendered within the `div` element was also updated, the plugin now uses `MetaBlockFieldWithData`. This will be updated every time the original data changes.
-* [getEditedPostAttribute](../../../../../docs/designers-developers/developers/data/data-core-editor/#geteditedpostattribute) is used to retrieve data instead of [getCurrentPost](../../../../../docs/designers-developers/developers/data/data-core-editor/#getcurrentpost) because it returns the most recent values of the post, including user editions that haven't been yet saved.
+* [getEditedPostAttribute](/docs/designers-developers/developers/data/data-core-editor.md#geteditedpostattribute) is used to retrieve data instead of [getCurrentPost](/docs/designers-developers/developers/data/data-core-editor.md#getcurrentpost) because it returns the most recent values of the post, including user editions that haven't been yet saved.
 
 Update the code and open the sidebar. The input's content is no longer `Initial value` but a void string. Users can't type values yet, but let's check that the component is updated if the value in the store changes. Open the browser's console, execute
 

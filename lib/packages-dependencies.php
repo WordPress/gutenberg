@@ -16,7 +16,6 @@ return array(
 		'wp-rich-text',
 	),
 	'wp-api-fetch'                          => array(
-		'wp-hooks',
 		'wp-i18n',
 		'wp-url',
 	),
@@ -84,6 +83,7 @@ return array(
 		'lodash',
 		'wp-api-fetch',
 		'wp-data',
+		'wp-deprecated',
 		'wp-url',
 	),
 	'wp-data'                               => array(
@@ -91,6 +91,7 @@ return array(
 		'wp-compose',
 		'wp-element',
 		'wp-is-shallow-equal',
+		'wp-priority-queue',
 		'wp-redux-routine',
 	),
 	'wp-date'                               => array(
@@ -132,7 +133,6 @@ return array(
 	),
 	'wp-editor'                             => array(
 		'lodash',
-		'wp-tinymce-lists',
 		'wp-a11y',
 		'wp-api-fetch',
 		'wp-blob',
@@ -211,6 +211,7 @@ return array(
 		'wp-element',
 		'wp-hooks',
 	),
+	'wp-priority-queue'                     => array(),
 	'wp-redux-routine'                      => array(),
 	'wp-rich-text'                          => array(
 		'lodash',

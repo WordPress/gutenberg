@@ -19,7 +19,7 @@
 	},
 	"main": "index.js",
 	"peerDependencies": {
-		"npm-package-json-lint": ">= 3.3.1"
+		"npm-package-json-lint": ">=3.3.1"
 	},
 	"publishConfig": {
 		"access": "public"
