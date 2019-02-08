@@ -6,8 +6,8 @@ body {
 }
 
 p {
-	font-size: $editor-font-size;
-	line-height: $editor-line-height;
+	font-size: inherit;
+	line-height: inherit;
 }
 
 ul,
