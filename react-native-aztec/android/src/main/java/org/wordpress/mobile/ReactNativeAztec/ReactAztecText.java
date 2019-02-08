@@ -107,11 +107,16 @@ public class ReactAztecText extends AztecText {
 
     @Override
     public boolean onTextContextMenuItem(int id) {
-        if (id == android.R.id.paste && shouldHandleOnPaste) {
-            return onPaste();
-        } else {
-            return super.onTextContextMenuItem(id);
+        if (shouldHandleOnPaste) {
+            switch (id) {
+                case android.R.id.paste:
+                    return onPaste(false);
+                case android.R.id.pasteAsPlainText:
+                    return onPaste(true);
+            }
         }
+
+        return super.onTextContextMenuItem(id);
     }
 
     // VisibleForTesting from {@link TextInputEventsTestCase}.
@@ -335,7 +340,16 @@ public class ReactAztecText extends AztecText {
         return true;
     }
 
-    private boolean onPaste() {
+    /**
+     * Handle paste action by retrieving clipboard contents and dispatching a
+     * {@link ReactAztecPasteEvent} with the data
+     *
+     * @param   isPastedAsPlainText boolean indicating whether the paste action chosen was
+     *                         "PASTE AS PLAIN TEXT"
+     *
+     * @return  boolean to indicate that the action was handled (always true)
+     */
+    private boolean onPaste(boolean isPastedAsPlainText) {
         ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(
                 Context.CLIPBOARD_SERVICE);
 
@@ -349,7 +363,9 @@ public class ReactAztecText extends AztecText {
             for (int i = 0; i < itemCount; i++) {
                 Item item = clipData.getItemAt(i);
                 text.append(item.coerceToText(getContext()));
-                html.append(item.coerceToHtmlText(getContext()));
+                if (!isPastedAsPlainText) {
+                    html.append(item.coerceToHtmlText(getContext()));
+                }
             }
         }
 
