@@ -7,7 +7,6 @@ import {
 	createNewPost,
 	pressKeyTimes,
 	pressKeyWithModifier,
-	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'adding blocks', () => {
@@ -132,17 +131,22 @@ describe( 'adding blocks', () => {
 	} );
 
 	it( 'should navigate around nested inline boundaries', async () => {
-		await setPostContent( `
-			<!-- wp:paragraph -->
-			<p><strong><em>1</em> <em>2</em></strong></p>
-			<!-- /wp:paragraph -->
-		` );
-
-		await page.click( '[data-type="core/paragraph"] [contenteditable]' );
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1 2' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.press( 'ArrowLeft' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
-
-		await pressKeyTimes( 'ArrowLeft', 9 );
 
 		await page.keyboard.type( 'a' );
 		await page.keyboard.press( 'ArrowRight' );
