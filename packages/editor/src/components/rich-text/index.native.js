@@ -171,6 +171,7 @@ export class RichText extends Component {
 
 	removeRootTagsProduceByAztec( html ) {
 		let result = this.removeRootTag( this.props.tagName, html );
+		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
 		if ( this.props.rootTagsToEliminate ) {
 			this.props.rootTagsToEliminate.forEach( ( element ) => {
 				result = this.removeRootTag( element, result );
