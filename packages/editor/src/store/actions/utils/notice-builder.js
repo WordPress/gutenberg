@@ -1,10 +1,10 @@
 /**
- * External imports
+ * External dependencies
  */
 import { get, includes } from 'lodash';
 
 /**
- * Internal imports
+ * Internal dependencies
  */
 import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../../constants';
 
