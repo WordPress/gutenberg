@@ -128,8 +128,8 @@ export function isHorizontalEdge( container, isReverse ) {
 	}
 
 	// If confirmed to be at extent, traverse up through DOM, verifying that
-	// the node is at first or last child for reverse or forward respectively.
-	// Continue until container is reached.
+	// the node is at first or last child for reverse or forward respectively
+	// (ignoring empty text nodes). Continue until container is reached.
 	const order = isReverse ? 'previous' : 'next';
 
 	while ( node !== container ) {
