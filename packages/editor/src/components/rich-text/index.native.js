@@ -407,7 +407,6 @@ export class RichText extends Component {
 					fontSize={ this.props.fontSize }
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
-					contentType={ this.props.contentType }
 				/>
 			</View>
 		);
