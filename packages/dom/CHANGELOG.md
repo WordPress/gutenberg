@@ -1,5 +1,7 @@
 ## 2.0.9 (Unreleased)
 
+### Bug Fix
+
 - Update `isHorizontalEdge` to account for empty text nodes.
 
 ## 2.0.8 (2019-01-03)

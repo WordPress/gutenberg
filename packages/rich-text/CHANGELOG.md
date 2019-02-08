@@ -1,5 +1,7 @@
 ## 3.1.0 (Unreleased)
 
+### Enhancement
+
 - Added format boundaries.
 - Removed parameters from `create` to filter out content.
 - Removed the `createLinePadding` from `apply`, which is now built in.
