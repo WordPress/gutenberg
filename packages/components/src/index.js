@@ -1,6 +1,7 @@
 // Components
 export * from './primitives';
 // eslint-disable-next-line camelcase
+export { default as Animate } from './animate';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as Button } from './button';

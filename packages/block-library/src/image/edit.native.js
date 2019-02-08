@@ -12,6 +12,10 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
+import {
+	map,
+	compact,
+} from 'lodash';
 
 /**
  * Internal dependencies
@@ -22,6 +26,8 @@ import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
 import styles from './styles.scss';
+import { compose } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
@@ -30,7 +36,7 @@ const MEDIA_UPLOAD_STATE_RESET = 4;
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 
-export default class ImageEdit extends React.Component {
+class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
@@ -48,6 +54,7 @@ export default class ImageEdit extends React.Component {
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
 		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
+		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 	}
@@ -137,11 +144,25 @@ export default class ImageEdit extends React.Component {
 		this.props.setAttributes( { alt: newAlt } );
 	}
 
+	updateImageURL( url ) {
+		this.props.setAttributes( { url, width: undefined, height: undefined } );
+	}
+
 	onSetLinkDestination( href ) {
 		this.props.setAttributes( {
 			linkDestination: LINK_DESTINATION_CUSTOM,
 			href,
 		} );
+	}
+
+	getImageSizeOptions() {
+		const { imageSizes } = this.props;
+		return compact( map( imageSizes, ( { label, slug } ) => {
+			return {
+				value: this.props.attributes.url + slug, //temporary url
+				label,
+			};
+		} ) );
 	}
 
 	render() {
@@ -202,6 +223,8 @@ export default class ImageEdit extends React.Component {
 			</Toolbar>
 		);
 
+		const sizeOptions = this.getImageSizeOptions();
+
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
@@ -216,6 +239,13 @@ export default class ImageEdit extends React.Component {
 					onChangeValue={ this.onSetLinkDestination }
 					autoCapitalize="none"
 					autoCorrect={ false }
+				/>
+				<BottomSheet.PickerCell
+					icon="editor-expand"
+					label={ __( 'Image Size' ) }
+					value={ 'Large' } // Temporary for UI implementation.
+					options={ sizeOptions }
+					onChangeValue={ () => {} } // Temporary for UI implementation.
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
@@ -371,3 +401,16 @@ export default class ImageEdit extends React.Component {
 		);
 	}
 }
+
+export default compose( [
+	withSelect( ( select ) => {
+		const { getEditorSettings } = select( 'core/editor' );
+		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
+
+		return {
+			maxWidth,
+			isRTL,
+			imageSizes,
+		};
+	} ),
+] )( ImageEdit );
