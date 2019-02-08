@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "4.0.1",
+	"version": "4.2.1",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,17 +25,13 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/priority-queue": "file:../priority-queue",
 		"@wordpress/redux-routine": "file:../redux-routine",
 		"equivalent-key-map": "^0.2.2",
 		"is-promise": "^2.1.0",
 		"lodash": "^4.17.10",
 		"redux": "^4.0.0",
 		"turbo-combine-reducers": "^1.0.2"
-	},
-	"devDependencies": {
-		"deep-freeze": "^0.0.1",
-		"enzyme": "^3.7.0",
-		"react-test-renderer": "^16.6.3"
 	},
 	"publishConfig": {
 		"access": "public"

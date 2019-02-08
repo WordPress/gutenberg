@@ -19,7 +19,7 @@ import memize from 'memize';
 import { Component, Fragment, RawHTML } from '@wordpress/element';
 import { isHorizontalEdge } from '@wordpress/dom';
 import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT } from '@wordpress/keycodes';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
 import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
@@ -55,7 +55,7 @@ import Autocomplete from '../autocomplete';
 import BlockFormatControls from '../block-format-controls';
 import FormatEdit from './format-edit';
 import FormatToolbar from './format-toolbar';
-import TinyMCE, { TINYMCE_ZWSP } from './tinymce';
+import Editable from './editable';
 import { pickAriaProps } from './aria';
 import { getPatterns } from './patterns';
 import { withBlockEditContext } from '../block-edit/context';
@@ -91,7 +91,6 @@ export class RichText extends Component {
 			this.onSplit = this.props.unstableOnSplit;
 		}
 
-		this.onSetup = this.onSetup.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.onBlur = this.onBlur.bind( this );
 		this.onChange = this.onChange.bind( this );
@@ -110,6 +109,7 @@ export class RichText extends Component {
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
+		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -129,17 +129,12 @@ export class RichText extends Component {
 		this.lastHistoryValue = value;
 	}
 
-	setRef( node ) {
-		this.editableRef = node;
+	componentWillUnmount() {
+		document.removeEventListener( 'selectionchange', this.onSelectionChange );
 	}
 
-	/**
-	 * Sets a reference to the TinyMCE editor instance.
-	 *
-	 * @param {Editor} editor The editor instance as passed by TinyMCE.
-	 */
-	onSetup( editor ) {
-		this.editor = editor;
+	setRef( node ) {
+		this.editableRef = node;
 	}
 
 	setFocusedElement() {
@@ -155,9 +150,9 @@ export class RichText extends Component {
 	 */
 	getRecord() {
 		const { formats, text } = this.formatToValue( this.props.value );
-		const { start, end } = this.state;
+		const { start, end, selectedFormat } = this.state;
 
-		return { formats, text, start, end };
+		return { formats, text, start, end, selectedFormat };
 	}
 
 	createRecord() {
@@ -168,10 +163,6 @@ export class RichText extends Component {
 			range,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			removeNode: ( node ) => node.getAttribute( 'data-mce-bogus' ) === 'all',
-			unwrapNode: ( node ) => !! node.getAttribute( 'data-mce-bogus' ),
-			removeAttribute: ( attribute ) => attribute.indexOf( 'data-mce-' ) === 0,
-			filterString: ( string ) => string.replace( TINYMCE_ZWSP, '' ),
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
@@ -182,11 +173,6 @@ export class RichText extends Component {
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			createLinePadding( doc ) {
-				const element = doc.createElement( 'br' );
-				element.setAttribute( 'data-mce-bogus', '1' );
-				return element;
-			},
 			prepareEditableTree: this.props.prepareEditableTree,
 		} );
 	}
@@ -211,7 +197,6 @@ export class RichText extends Component {
 		items = isNil( items ) ? [] : items;
 		files = isNil( files ) ? [] : files;
 
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		let plainText = '';
 		let html = '';
 
@@ -240,6 +225,7 @@ export class RichText extends Component {
 
 		// Only process file if no HTML is present.
 		// Note: a pasted file may have the URL as plain text.
+		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 		if ( item && ! html ) {
 			const file = item.getAsFile ? item.getAsFile() : item;
 			const content = pasteHandler( {
@@ -361,10 +347,33 @@ export class RichText extends Component {
 			return;
 		}
 
-		const record = this.createRecord();
-		const transformed = this.patterns.reduce( ( accumlator, transform ) => transform( accumlator ), record );
+		let { selectedFormat } = this.state;
+		const { formats, text, start, end } = this.patterns.reduce(
+			( accumlator, transform ) => transform( accumlator ),
+			this.createRecord()
+		);
 
-		this.onChange( transformed, {
+		if ( this.formatPlaceholder ) {
+			formats[ this.state.start ] = formats[ this.state.start ] || [];
+			formats[ this.state.start ].push( this.formatPlaceholder );
+			selectedFormat = formats[ this.state.start ].length;
+		} else if ( selectedFormat ) {
+			const formatsBefore = formats[ start - 1 ] || [];
+			const formatsAfter = formats[ start ] || [];
+
+			let source = formatsBefore;
+
+			if ( formatsAfter.length > formatsBefore.length ) {
+				source = formatsAfter;
+			}
+
+			source = source.slice( 0, selectedFormat );
+			formats[ this.state.start ] = source;
+		} else {
+			delete formats[ this.state.start ];
+		}
+
+		this.onChange( { formats, text, start, end, selectedFormat }, {
 			withoutHistory: true,
 		} );
 
@@ -383,17 +392,36 @@ export class RichText extends Component {
 	 * Handles the `selectionchange` event: sync the selection to local state.
 	 */
 	onSelectionChange() {
-		const { start, end, formats } = this.createRecord();
+		if ( this.ignoreSelectionChange ) {
+			delete this.ignoreSelectionChange;
+			return;
+		}
+
+		const value = this.createRecord();
+		const { start, end, formats } = value;
 
 		if ( start !== this.state.start || end !== this.state.end ) {
 			const isCaretWithinFormattedText = this.props.isCaretWithinFormattedText;
+
 			if ( ! isCaretWithinFormattedText && formats[ start ] ) {
 				this.props.onEnterFormattedText();
 			} else if ( isCaretWithinFormattedText && ! formats[ start ] ) {
 				this.props.onExitFormattedText();
 			}
 
-			this.setState( { start, end } );
+			let selectedFormat;
+
+			if ( isCollapsed( value ) ) {
+				const formatsBefore = formats[ start - 1 ] || [];
+				const formatsAfter = formats[ start ] || [];
+
+				selectedFormat = Math.min( formatsBefore.length, formatsAfter.length );
+			}
+
+			this.setState( { start, end, selectedFormat } );
+			this.applyRecord( { ...value, selectedFormat } );
+
+			delete this.formatPlaceholder;
 		}
 	}
 
@@ -421,13 +449,14 @@ export class RichText extends Component {
 	onChange( record, { withoutHistory } = {} ) {
 		this.applyRecord( record );
 
-		const { start, end } = record;
+		const { start, end, formatPlaceholder, selectedFormat } = record;
 
+		this.formatPlaceholder = formatPlaceholder;
 		this.onChangeEditableValue( record );
 
 		this.savedContent = this.valueToFormat( record );
 		this.props.onChange( this.savedContent );
-		this.setState( { start, end } );
+		this.setState( { start, end, selectedFormat } );
 
 		if ( ! withoutHistory ) {
 			this.onCreateUndoLevel();
@@ -470,9 +499,9 @@ export class RichText extends Component {
 		const empty = this.isEmpty();
 
 		// It is important to consider emptiness because an empty container
-		// will include a bogus TinyMCE BR node _after_ the caret, so in a
-		// forward deletion the isHorizontalEdge function will incorrectly
-		// interpret the presence of the bogus node as not being at the edge.
+		// will include a padding BR node _after_ the caret, so in a forward
+		// deletion the isHorizontalEdge function will incorrectly interpret the
+		// presence of the BR node as not being at the edge.
 		const isEdge = ( empty || isHorizontalEdge( this.editableRef, isReverse ) );
 
 		if ( ! isEdge ) {
@@ -500,7 +529,14 @@ export class RichText extends Component {
 	 * @param {KeyboardEvent} event The keydown event.
 	 */
 	onKeyDown( event ) {
-		const { keyCode } = event;
+		const { keyCode, shiftKey, altKey, metaKey } = event;
+
+		if (
+			! shiftKey && ! altKey && ! metaKey &&
+			( keyCode === LEFT || keyCode === RIGHT )
+		) {
+			this.handleHorizontalNavigation( event );
+		}
 
 		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const value = this.createRecord();
@@ -590,6 +626,85 @@ export class RichText extends Component {
 		}
 	}
 
+	handleHorizontalNavigation( event ) {
+		const value = this.createRecord();
+		const { formats, text, start, end } = value;
+		const { selectedFormat } = this.state;
+		const collapsed = isCollapsed( value );
+		const isReverse = event.keyCode === LEFT;
+
+		delete this.formatPlaceholder;
+
+		// If the selection is collapsed and at the very start, do nothing if
+		// navigating backward.
+		// If the selection is collapsed and at the very end, do nothing if
+		// navigating forward.
+		if ( collapsed && selectedFormat === 0 ) {
+			if ( start === 0 && isReverse ) {
+				return;
+			}
+
+			if ( end === text.length && ! isReverse ) {
+				return;
+			}
+		}
+
+		// If the selection is not collapsed, let the browser handle collapsing
+		// the selection for now. Later we could expand this logic to set
+		// boundary positions if needed.
+		if ( ! collapsed ) {
+			return;
+		}
+
+		// In all other cases, prevent default behaviour.
+		event.preventDefault();
+
+		// Ignore the selection change handler when setting selection, all state
+		// will be set here.
+		this.ignoreSelectionChange = true;
+
+		const formatsBefore = formats[ start - 1 ] || [];
+		const formatsAfter = formats[ start ] || [];
+
+		let newSelectedFormat = selectedFormat;
+
+		// If the amount of formats before the caret and after the caret is
+		// different, the caret is at a format boundary.
+		if ( formatsBefore.length < formatsAfter.length ) {
+			if ( ! isReverse && selectedFormat < formatsAfter.length ) {
+				newSelectedFormat++;
+			}
+
+			if ( isReverse && selectedFormat > formatsBefore.length ) {
+				newSelectedFormat--;
+			}
+		} else if ( formatsBefore.length > formatsAfter.length ) {
+			if ( ! isReverse && selectedFormat > formatsAfter.length ) {
+				newSelectedFormat--;
+			}
+
+			if ( isReverse && selectedFormat < formatsBefore.length ) {
+				newSelectedFormat++;
+			}
+		}
+
+		if ( newSelectedFormat !== selectedFormat ) {
+			this.applyRecord( { ...value, selectedFormat: newSelectedFormat } );
+			this.setState( { selectedFormat: newSelectedFormat } );
+			return;
+		}
+
+		const newPos = value.start + ( isReverse ? -1 : 1 );
+
+		this.setState( { start: newPos, end: newPos } );
+		this.applyRecord( {
+			...value,
+			start: newPos,
+			end: newPos,
+			selectedFormat: isReverse ? formatsBefore.length : formatsAfter.length,
+		} );
+	}
+
 	/**
 	 * Splits the content at the location of the selection.
 	 *
@@ -601,12 +716,11 @@ export class RichText extends Component {
 	 * @param {Object} context The context for splitting.
 	 */
 	splitContent( blocks = [], context = {} ) {
-		const record = this.createRecord();
-
 		if ( ! this.onSplit ) {
 			return;
 		}
 
+		const record = this.createRecord();
 		let [ before, after ] = split( record );
 
 		// In case split occurs at the trailing or leading edge of the field,
@@ -688,9 +802,12 @@ export class RichText extends Component {
 		if ( shouldReapply ) {
 			const record = this.formatToValue( value );
 
-			// Maintain the previous selection:
-			record.start = this.state.start;
-			record.end = this.state.end;
+			// Maintain the previous selection if the instance is currently
+			// selected.
+			if ( isSelected ) {
+				record.start = this.state.start;
+				record.end = this.state.end;
+			}
 
 			this.applyRecord( record );
 		}
@@ -743,11 +860,6 @@ export class RichText extends Component {
 			value,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
-			createLinePadding( doc ) {
-				const element = doc.createElement( 'br' );
-				element.setAttribute( 'data-mce-bogus', '1' );
-				return element;
-			},
 			prepareEditableTree: this.props.prepareEditableTree,
 		} ).body.innerHTML;
 	}
@@ -787,6 +899,7 @@ export class RichText extends Component {
 				value,
 				multilineTag: this.multilineTag,
 				multilineWrapperTags: this.multilineWrapperTags,
+				isEditableTree: false,
 			} ).body.childNodes );
 		}
 
@@ -816,13 +929,12 @@ export class RichText extends Component {
 			onTagNameChange,
 		} = this.props;
 
+		// Generating a key that includes `tagName` ensures that if the tag
+		// changes, we replace the relevant element. This is needed because we
+		// prevent Editable component updates.
+		const key = Tagname;
 		const MultilineTag = this.multilineTag;
 		const ariaProps = pickAriaProps( this.props );
-
-		// Generating a key that includes `tagName` ensures that if the tag
-		// changes, we unmount and destroy the previous TinyMCE element, then
-		// mount and initialize a new child element in its place.
-		const key = [ 'editor', Tagname ].join();
 		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
 		const classes = classnames( wrapperClassName, 'editor-rich-text' );
 		const record = this.getRecord();
@@ -831,12 +943,12 @@ export class RichText extends Component {
 			<div className={ classes }
 				onFocus={ this.setFocusedElement }
 			>
-				{ isSelected && this.editor && this.multilineTag === 'li' && (
+				{ isSelected && this.multilineTag === 'li' && (
 					<ListEdit
-						editor={ this.editor }
 						onTagNameChange={ onTagNameChange }
 						tagName={ Tagname }
-						onSyncDOM={ () => this.onChange( this.createRecord() ) }
+						value={ record }
+						onChange={ this.onChange }
 					/>
 				) }
 				{ isSelected && ! inlineToolbar && (
@@ -857,9 +969,8 @@ export class RichText extends Component {
 				>
 					{ ( { listBoxId, activeId } ) => (
 						<Fragment>
-							<TinyMCE
+							<Editable
 								tagName={ Tagname }
-								onSetup={ this.onSetup }
 								style={ style }
 								record={ record }
 								valueToEditableHTML={ this.valueToEditableHTML }
@@ -883,7 +994,7 @@ export class RichText extends Component {
 							/>
 							{ isPlaceholderVisible &&
 								<Tagname
-									className={ classnames( 'editor-rich-text__tinymce', className ) }
+									className={ classnames( 'editor-rich-text__editable', className ) }
 									style={ style }
 								>
 									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }

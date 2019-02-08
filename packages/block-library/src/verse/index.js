@@ -1,5 +1,5 @@
 /**
- * WordPress
+ * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
@@ -76,7 +76,7 @@ export const settings = {
 							content: nextContent,
 						} );
 					} }
-					style={ { textAlign: textAlign } }
+					style={ { textAlign } }
 					placeholder={ __( 'Write…' ) }
 					wrapperClassName={ className }
 					onMerge={ mergeBlocks }
@@ -91,7 +91,7 @@ export const settings = {
 		return (
 			<RichText.Content
 				tagName="pre"
-				style={ { textAlign: textAlign } }
+				style={ { textAlign } }
 				value={ content }
 			/>
 		);

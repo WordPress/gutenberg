@@ -41,12 +41,21 @@ class SlotFillProvider extends Component {
 	}
 
 	registerSlot( name, slot ) {
+		const previousSlot = this.slots[ name ];
 		this.slots[ name ] = slot;
 		this.forceUpdateFills( name );
 
 		// Sometimes the fills are registered after the initial render of slot
 		// But before the registerSlot call, we need to rerender the slot
 		this.forceUpdateSlot( name );
+
+		// If a new instance of a slot is being mounted while another with the
+		// same name exists, force its update _after_ the new slot has been
+		// assigned into the instance, such that its own rendering of children
+		// will be empty (the new Slot will subsume all fills for this name).
+		if ( previousSlot ) {
+			previousSlot.forceUpdate();
+		}
 	}
 
 	registerFill( name, instance ) {
@@ -57,7 +66,14 @@ class SlotFillProvider extends Component {
 		this.forceUpdateSlot( name );
 	}
 
-	unregisterSlot( name ) {
+	unregisterSlot( name, instance ) {
+		// If a previous instance of a Slot by this name unmounts, do nothing,
+		// as the slot and its fills should only be removed for the current
+		// known instance.
+		if ( this.slots[ name ] !== instance ) {
+			return;
+		}
+
 		delete this.slots[ name ];
 		this.forceUpdateFills( name );
 	}
@@ -75,7 +91,13 @@ class SlotFillProvider extends Component {
 		return this.slots[ name ];
 	}
 
-	getFills( name ) {
+	getFills( name, slotInstance ) {
+		// Fills should only be returned for the current instance of the slot
+		// in which they occupy.
+		if ( this.slots[ name ] !== slotInstance ) {
+			return [];
+		}
+
 		return sortBy( this.fills[ name ], 'occurrence' );
 	}
 

@@ -29,7 +29,6 @@ describe( 'create', () => {
 		description,
 		multilineTag,
 		multilineWrapperTags,
-		settings,
 		html,
 		createRange,
 		record,
@@ -46,7 +45,6 @@ describe( 'create', () => {
 				range,
 				multilineTag,
 				multilineWrapperTags,
-				...settings,
 			} );
 			const formatsLength = getSparseArrayLength( record.formats );
 			const createdFormatsLength = getSparseArrayLength( createdRecord.formats );

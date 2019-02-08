@@ -48,7 +48,7 @@ ul.wp-block-gallery li {
 		}
 
 		// Make extra space for the inline toolbar.
-		.editor-rich-text__tinymce {
+		figcaption {
 			padding-top: 48px;
 		}
 	}
@@ -78,12 +78,12 @@ ul.wp-block-gallery li {
 		}
 	}
 
-	.editor-rich-text .editor-rich-text__tinymce {
+	.editor-rich-text figcaption {
 		a {
 			color: $white;
 		}
 
-		&:focus a[data-mce-selected] {
+		&:focus a[data-rich-text-format-boundary] {
 			color: rgba(0, 0, 0, 0.2);
 		}
 	}

@@ -1,3 +1,12 @@
+## 2.3.3 (2019-01-03)
+
+### Bug Fixes
+
+- `addQueryArgs` will return only the querystring fragment if the passed `url` is undefined. Previously, an uncaught error would be thrown.
+- `addQueryArgs` will not append (or remove) a `?` if there are no query arguments to be added. Previously, `?` would be wrongly appended even if there was no querystring generated.
+
+## 2.3.2 (2018-12-12)
+
 ## 2.3.1 (2018-11-20)
 
 ### Bug fixes

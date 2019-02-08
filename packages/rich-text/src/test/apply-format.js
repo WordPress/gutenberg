@@ -61,10 +61,7 @@ describe( 'applyFormat', () => {
 		};
 		const expected = {
 			...record,
-			formatPlaceholder: {
-				format: a2,
-				index: 0,
-			},
+			formatPlaceholder: a2,
 		};
 		const result = applyFormat( deepFreeze( record ), a2 );
 

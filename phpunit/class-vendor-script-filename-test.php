@@ -19,16 +19,6 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 				'https://unpkg.com/react-dom@16.6.3/umd/react-dom.development.js',
 				'react-dom-handle.HASH.js',
 			),
-			array(
-				'tinymce-handle',
-				'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.js',
-				'tinymce-handle.HASH.js',
-			),
-			array(
-				'tinymce-plugin-handle',
-				'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin.js',
-				'tinymce-plugin-lists.HASH.js',
-			),
 			// Production mode scripts.
 			array(
 				'react-handle',
@@ -39,16 +29,6 @@ class Vendor_Script_Filename_Test extends WP_UnitTestCase {
 				'react-dom-handle',
 				'https://unpkg.com/react-dom@16.6.3/umd/react-dom.production.min.js',
 				'react-dom-handle.min.HASH.js',
-			),
-			array(
-				'tinymce-handle',
-				'https://fiddle.azurewebsites.net/tinymce/nightly/tinymce.min.js',
-				'tinymce-handle.min.HASH.js',
-			),
-			array(
-				'tinymce-plugin-handle',
-				'https://fiddle.azurewebsites.net/tinymce/nightly/plugins/lists/plugin.min.js',
-				'tinymce-plugin-lists.min.HASH.js',
 			),
 			// Other cases.
 			array(

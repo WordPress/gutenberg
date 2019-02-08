@@ -10,12 +10,12 @@ import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { RichText, mediaUpload } from '@wordpress/editor';
 import { createBlobURL } from '@wordpress/blob';
-import { G, Path, SVG } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { default as edit, defaultColumnsNumber, pickRelevantMediaFiles } from './edit';
+import icon from './icon';
 
 const blockAttributes = {
 	images: {
@@ -84,7 +84,7 @@ const parseShortcodeIds = ( ids ) => {
 export const settings = {
 	title: __( 'Gallery' ),
 	description: __( 'Display multiple images in a rich gallery.' ),
-	icon: <SVG viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><Path fill="none" d="M0 0h24v24H0V0z" /><G><Path d="M20 4v12H8V4h12m0-2H8L6 4v12l2 2h12l2-2V4l-2-2z" /><Path d="M12 12l1 2 3-3 3 4H9z" /><Path d="M2 6v14l2 2h14v-2H4V6H2z" /></G></SVG>,
+	icon,
 	category: 'common',
 	keywords: [ __( 'images' ), __( 'photos' ) ],
 	attributes: blockAttributes,
@@ -99,14 +99,18 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ 'core/image' ],
 				transform: ( attributes ) => {
+					// Init the align attribute from the first item which may be either the placeholder or an image.
+					let { align } = attributes[ 0 ];
+					// Loop through all the images and check if they have the same align.
+					align = every( attributes, [ 'align', align ] ) ? align : undefined;
+
 					const validImages = filter( attributes, ( { id, url } ) => id && url );
-					if ( validImages.length > 0 ) {
-						return createBlock( 'core/gallery', {
-							images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
-							ids: validImages.map( ( { id } ) => id ),
-						} );
-					}
-					return createBlock( 'core/gallery' );
+
+					return createBlock( 'core/gallery', {
+						images: validImages.map( ( { id, url, alt, caption } ) => ( { id, url, alt, caption } ) ),
+						ids: validImages.map( ( { id } ) => id ),
+						align,
+					} );
 				},
 			},
 			{
@@ -174,11 +178,11 @@ export const settings = {
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
-				transform: ( { images } ) => {
+				transform: ( { images, align } ) => {
 					if ( images.length > 0 ) {
-						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption } ) );
+						return images.map( ( { id, url, alt, caption } ) => createBlock( 'core/image', { id, url, alt, caption, align } ) );
 					}
-					return createBlock( 'core/image' );
+					return createBlock( 'core/image', { align } );
 				},
 			},
 		],
