@@ -17,9 +17,7 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-WordPress will fall back to the Classic editor, where the meta box will continue working as before.
-
-Explicitly setting `__block_editor_compatible_meta_box` to `true` will cause WordPress to stay in Gutenberg (assuming another meta box doesn't cause a fallback).
+WordPress won't show the meta box but a message saying that it isn't compatible with the block editor, including a link to the Classic Editor plugin. By default, `__block_editor_compatible_meta_box` is `true`.
 
 After a meta box is converted to a block, it can be declared as existing for backward compatibility:
 
@@ -32,7 +30,7 @@ add_meta_box( 'my-meta-box', 'My Meta Box', 'my_meta_box_callback',
 );
 ```
 
-When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor, should some other meta box cause a fallback.
+When Gutenberg is used, this meta box will no longer be displayed in the meta box area, as it now only exists for backward compatibility purposes. It will continue to display correctly in the Classic editor.
 
 ### Meta Box Data Collection
 
