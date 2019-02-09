@@ -52,10 +52,7 @@ export default function HeadingEdit( {
 					insertBlocksAfter ?
 						( before, after, ...blocks ) => {
 							setAttributes( { content: before } );
-							if ( ! before.text && after.text ) {
-								onReplace( createBlock( 'core/paragraph', { content: before } ) );
-							}
-							if ( after.text ) {
+							if ( after ) {
 								insertBlocksAfter( [
 									...blocks,
 									createBlock( 'core/heading', { content: after } ),
@@ -65,6 +62,9 @@ export default function HeadingEdit( {
 									...blocks,
 									createBlock( 'core/paragraph', { content: after } ),
 								] );
+							}
+							if ( ! before && after ) {
+								onReplace( createBlock( 'core/paragraph', { content: before } ) );
 							}
 						} :
 						undefined
