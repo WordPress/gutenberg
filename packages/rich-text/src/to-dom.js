@@ -9,7 +9,7 @@ import { createElement } from './create-element';
  * Browser dependencies
  */
 
-const { TEXT_NODE, ELEMENT_NODE } = window.Node;
+const { TEXT_NODE } = window.Node;
 
 /**
  * Creates a path as an array of indices from the given root node to the given
@@ -113,7 +113,13 @@ function remove( node ) {
 	return node.parentNode.removeChild( node );
 }
 
-function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
+function createLinePadding( doc ) {
+	const element = doc.createElement( 'br' );
+	element.setAttribute( 'data-rich-text-padding', 'true' );
+	return element;
+}
+
+function padEmptyLines( { element, multilineWrapperTags } ) {
 	const length = element.childNodes.length;
 	const doc = element.ownerDocument;
 
@@ -135,7 +141,7 @@ function padEmptyLines( { element, createLinePadding, multilineWrapperTags } ) {
 				element.insertBefore( createLinePadding( doc ), child );
 			}
 
-			padEmptyLines( { element: child, createLinePadding, multilineWrapperTags } );
+			padEmptyLines( { element: child, multilineWrapperTags } );
 		}
 	}
 }
@@ -150,8 +156,8 @@ export function toDom( {
 	value,
 	multilineTag,
 	multilineWrapperTags,
-	createLinePadding,
 	prepareEditableTree,
+	isEditableTree = true,
 } ) {
 	let startPath = [];
 	let endPath = [];
@@ -177,11 +183,11 @@ export function toDom( {
 		onEndIndex( body, pointer ) {
 			endPath = createPathToNode( pointer, body, [ pointer.nodeValue.length ] );
 		},
-		isEditableTree: true,
+		isEditableTree,
 	} );
 
-	if ( createLinePadding ) {
-		padEmptyLines( { element: tree, createLinePadding, multilineWrapperTags } );
+	if ( isEditableTree ) {
+		padEmptyLines( { element: tree, multilineWrapperTags } );
 	}
 
 	return {
@@ -205,7 +211,6 @@ export function apply( {
 	current,
 	multilineTag,
 	multilineWrapperTags,
-	createLinePadding,
 	prepareEditableTree,
 } ) {
 	// Construct a new element tree in memory.
@@ -213,7 +218,6 @@ export function apply( {
 		value,
 		multilineTag,
 		multilineWrapperTags,
-		createLinePadding,
 		prepareEditableTree,
 	} );
 
@@ -234,7 +238,38 @@ export function applyValue( future, current ) {
 		if ( ! currentChild ) {
 			current.appendChild( futureChild );
 		} else if ( ! currentChild.isEqualNode( futureChild ) ) {
-			current.replaceChild( futureChild, currentChild );
+			if (
+				currentChild.nodeName !== futureChild.nodeName ||
+				( currentChild.nodeType === TEXT_NODE && currentChild.data !== futureChild.data )
+			) {
+				current.replaceChild( futureChild, currentChild );
+			} else {
+				const currentAttributes = currentChild.attributes;
+				const futureAttributes = futureChild.attributes;
+
+				if ( currentAttributes ) {
+					for ( let ii = 0; ii < currentAttributes.length; ii++ ) {
+						const { name } = currentAttributes[ ii ];
+
+						if ( ! futureChild.getAttribute( name ) ) {
+							currentChild.removeAttribute( name );
+						}
+					}
+				}
+
+				if ( futureAttributes ) {
+					for ( let ii = 0; ii < futureAttributes.length; ii++ ) {
+						const { name, value } = futureAttributes[ ii ];
+
+						if ( currentChild.getAttribute( name ) !== value ) {
+							currentChild.setAttribute( name, value );
+						}
+					}
+				}
+
+				applyValue( futureChild, currentChild );
+				future.removeChild( futureChild );
+			}
 		} else {
 			future.removeChild( futureChild );
 		}
@@ -266,47 +301,30 @@ function isRangeEqual( a, b ) {
 	);
 }
 
-export function applySelection( selection, current ) {
-	const { node: startContainer, offset: startOffset } = getNodeByPath( current, selection.startPath );
-	const { node: endContainer, offset: endOffset } = getNodeByPath( current, selection.endPath );
+export function applySelection( { startPath, endPath }, current ) {
+	const { node: startContainer, offset: startOffset } = getNodeByPath( current, startPath );
+	const { node: endContainer, offset: endOffset } = getNodeByPath( current, endPath );
+	const selection = window.getSelection();
+	const { ownerDocument } = current;
+	const range = ownerDocument.createRange();
 
-	const windowSelection = window.getSelection();
-	const range = current.ownerDocument.createRange();
-	const collapsed = startContainer === endContainer && startOffset === endOffset;
+	range.setStart( startContainer, startOffset );
+	range.setEnd( endContainer, endOffset );
 
-	if (
-		collapsed &&
-		startOffset === 0 &&
-		startContainer.previousSibling &&
-		startContainer.previousSibling.nodeType === ELEMENT_NODE &&
-		startContainer.previousSibling.nodeName !== 'BR'
-	) {
-		startContainer.insertData( 0, '\uFEFF' );
-		range.setStart( startContainer, 1 );
-		range.setEnd( endContainer, 1 );
-	} else if (
-		collapsed &&
-		startOffset === 0 &&
-		startContainer === TEXT_NODE &&
-		startContainer.nodeValue.length === 0
-	) {
-		startContainer.insertData( 0, '\uFEFF' );
-		range.setStart( startContainer, 1 );
-		range.setEnd( endContainer, 1 );
-	} else {
-		range.setStart( startContainer, startOffset );
-		range.setEnd( endContainer, endOffset );
-	}
-
-	if ( windowSelection.rangeCount > 0 ) {
+	if ( selection.rangeCount > 0 ) {
 		// If the to be added range and the live range are the same, there's no
 		// need to remove the live range and add the equivalent range.
-		if ( isRangeEqual( range, windowSelection.getRangeAt( 0 ) ) ) {
+		if ( isRangeEqual( range, selection.getRangeAt( 0 ) ) ) {
+			// Set back focus if focus is lost.
+			if ( ownerDocument.activeElement !== current ) {
+				current.focus();
+			}
+
 			return;
 		}
 
-		windowSelection.removeAllRanges();
+		selection.removeAllRanges();
 	}
 
-	windowSelection.addRange( range );
+	selection.addRange( range );
 }
