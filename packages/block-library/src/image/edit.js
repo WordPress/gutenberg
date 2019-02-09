@@ -188,6 +188,9 @@ class ImageEdit extends Component {
 			width: undefined,
 			height: undefined,
 		} );
+
+		// Update target link in case the default has been changed (e.g. by a plugin).
+		this.onSetLinkDestination( this.props.attributes.linkDestination );
 	}
 
 	onSetLinkDestination( value ) {
