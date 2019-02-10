@@ -10,6 +10,8 @@ Note that this component may sometimes be confused with the Button block, which 
 
 Renders a button with default style.
 
+{% codetabs %}
+{% ESNext %}
 ```jsx
 import { Button } from "@wordpress/components";
 
@@ -19,6 +21,7 @@ const MyButton = () => (
 	</Button>
 );
 ```
+{% end %}
 
 ## Props
 
