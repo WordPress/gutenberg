@@ -1,4 +1,11 @@
+/**
+ * External dependencies
+ */
 import { extend, flow } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
 import { defaultSettings } from './defaultSettings';
 import stripTags from './stripTags';
 import transposeAstralsToCountableChar from './transposeAstralsToCountableChar';

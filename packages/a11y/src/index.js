@@ -1,6 +1,13 @@
+/**
+ * WordPress dependencies
+ */
+import domReady from '@wordpress/dom-ready';
+
+/**
+ * Internal dependencies
+ */
 import addContainer from './addContainer';
 import clear from './clear';
-import domReady from '@wordpress/dom-ready';
 import filterMessage from './filterMessage';
 
 /**

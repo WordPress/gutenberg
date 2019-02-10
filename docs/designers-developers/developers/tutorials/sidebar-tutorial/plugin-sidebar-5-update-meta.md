@@ -1,4 +1,4 @@
-# Update the meta field when the input's content changes
+# Update the Meta Field When the Input's Content Changes
 
 The last step in the journey is to update the meta field when the input content changes. To do that, you'll use another utility from the `@wordpress/data` package, [withDispatch](/packages/data/README.md#withdispatch-mapdispatchtoprops-function-function).
 

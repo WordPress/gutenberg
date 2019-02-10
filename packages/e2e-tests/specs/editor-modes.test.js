@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { clickBlockAppender, createNewPost, switchEditorModeTo } from '@wordpress/e2e-test-utils';
+import {
+	clickBlockAppender,
+	createNewPost,
+	switchEditorModeTo,
+} from '@wordpress/e2e-test-utils';
 
 describe( 'Editing modes (visual/HTML)', () => {
 	beforeEach( async () => {
