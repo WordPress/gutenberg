@@ -136,7 +136,6 @@ export class PostAuthor extends Component {
 					id={ selectId }
 					minLength={ 2 }
 					showAllValues={ true }
-					autoselect={ true }
 					defaultValue={ postAuthor ? postAuthor.name : '' }
 					displayMenu="overlay"
 					onConfirm={ this.setAuthorId }
