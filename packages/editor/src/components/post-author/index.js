@@ -154,6 +154,7 @@ export class PostAuthor extends Component {
 							' ' + contentSelectedOption
 						);
 					} }
+					cssNamespace="components-post-author__autocomplete"
 
 				/>;
 		}

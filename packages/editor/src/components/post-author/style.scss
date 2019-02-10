@@ -1,9 +1,9 @@
-.autocomplete__wrapper {
+.components-post-author__autocomplete__wrapper {
 	position: relative;
 }
 
-.autocomplete__hint,
-.autocomplete__input {
+.components-post-author__autocomplete__hint,
+.components-post-author__autocomplete__input {
 	-webkit-appearance: none;
 	border: 2px solid;
 	border-radius: 0; /* Safari 10 on iOS adds implicit border rounding. */
@@ -14,20 +14,20 @@
 	width: 100%;
 }
 
-.autocomplete__input {
+.components-post-author__autocomplete__input {
 	background-color: transparent;
 	position: relative;
 }
 
-.autocomplete__hint {
+.components-post-author__autocomplete__hint {
 	position: absolute;
 }
 
-.autocomplete__dropdown-arrow-down {
+.components-post-author__autocomplete__dropdown-arrow-down {
 	display: none;
 }
 
-.autocomplete__menu {
+.components-post-author__autocomplete__menu {
 	background: $white;
 	border-top: 0;
 	color: $dark-gray-300;
@@ -39,16 +39,16 @@
 	transition: all 0.15s ease-in-out;
 	width: calc(100% + 2px);
 
-	&.autocomplete__menu--visible {
+	&.components-post-author__autocomplete__menu--visible {
 		display: block;
 	}
 
-	&.autocomplete__menu--hidden {
+	&.components-post-author__autocomplete__menu--hidden {
 		display: none;
 	}
 }
 
-.autocomplete__menu--overlay {
+.components-post-author__autocomplete__menu--overlay {
 	box-shadow: $shadow-popover;
 	border: $border-width solid $light-gray-500;
 	left: 0;
@@ -57,11 +57,11 @@
 	z-index: 100;
 }
 
-.autocomplete__menu--inline {
+.components-post-author__autocomplete__menu--inline {
 	position: relative;
 }
 
-.autocomplete__option {
+.components-post-author__autocomplete__option {
 	font-size: $default-font-size;
 	padding: #{$grid-size-small / 2} $grid-size;
 	margin-bottom: 0;
@@ -78,15 +78,15 @@
 	}
 
 	&:focus,
-	&.autocomplete__option--focused
-	&.autocomplete__option--focused:hover {
+	&.components-post-author__autocomplete__option--focused
+	&.components-post-author__autocomplete__option--focused:hover {
 		background: color(theme(primary) shade(15%));
 		color: $white;
 		outline: none;
 	}
 
-	&.autocomplete__option--no-results,
-	&.autocomplete__option--no-results:hover {
+	&.components-post-author__autocomplete__option--no-results,
+	&.components-post-author__autocomplete__option--no-results:hover {
 		background: $white;
 		font-style: italic;
 		cursor: not-allowed;
