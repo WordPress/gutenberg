@@ -149,11 +149,10 @@ export class PostAuthor extends Component {
 					tStatusNoResults={ () => __( 'No search results' ) }
 					tStatusSelectedOption={ ( selectedOption, length ) => __( `${ selectedOption } (1 of ${ length }) is selected` ) }
 					tStatusResults={ ( length, contentSelectedOption ) => {
-						const words = {
-							result: _n( 'result', 'results', length ),
-							is: _n( 'is', 'are', length ),
-						};
-						return <span>{ length } { words.result } { words.is } available. { contentSelectedOption }</span>;
+						return (
+							_n( '%d result is available.', '%d results are available.', length ) +
+							' ' + contentSelectedOption
+						);
 					} }
 
 				/>;
