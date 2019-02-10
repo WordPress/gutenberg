@@ -343,7 +343,7 @@ export class RichText extends Component {
 		// (CJK), do not trigger a change if characters are being composed.
 		// Browsers setting `isComposing` to `true` will usually emit a final
 		// `input` event when the characters are composed.
-		if ( event.nativeEvent.isComposing ) {
+		if ( event && event.nativeEvent.isComposing ) {
 			return;
 		}
 
@@ -385,7 +385,7 @@ export class RichText extends Component {
 	onCompositionEnd() {
 		// Ensure the value is up-to-date for browsers that don't emit a final
 		// input event after composition.
-		this.onChange( this.createRecord() );
+		this.onInput();
 	}
 
 	/**
