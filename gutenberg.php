@@ -3,7 +3,7 @@
  * Plugin Name: Gutenberg
  * Plugin URI: https://github.com/WordPress/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
- * Version: 4.9.0
+ * Version: 5.0.0
  * Author: Gutenberg Team
  *
  * @package gutenberg
@@ -31,21 +31,11 @@ function the_gutenberg_project() {
 	<noscript>
 		<div class="error" style="position:absolute;top:32px;z-index:40"><p>
 		<?php
-		// Using Gutenberg as Plugin.
-		if ( is_plugin_active( 'gutenberg/gutenberg.php' ) ) {
-			$current_url = esc_url( add_query_arg( 'classic-editor', true, $_SERVER['REQUEST_URI'] ) );
-			printf(
-				// Translators: link is to current page specify classic editor.
-				__( 'The Block Editor requires JavaScript. You can use the <a href="%s">Classic Editor</a>.', 'gutenberg' ),
-				$current_url
-			);
-		} else { // Using Gutenberg in Core.
-			printf(
-				/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
-				__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
-				__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
-			);
-		}
+		printf(
+			/* translators: %s: https://wordpress.org/plugins/classic-editor/ */
+			__( 'The Block Editor requires JavaScript. Please try the <a href="%s">Classic Editor plugin</a>.', 'gutenberg' ),
+			__( 'https://wordpress.org/plugins/classic-editor/', 'gutenberg' )
+		);
 		?>
 		</p></div>
 	</noscript>
@@ -128,10 +118,6 @@ function is_gutenberg_page() {
 		return false;
 	}
 
-	if ( isset( $_GET['classic-editor'] ) ) {
-		return false;
-	}
-
 	if ( ! gutenberg_can_edit_post( $post ) ) {
 		return false;
 	}
@@ -201,8 +187,6 @@ function gutenberg_pre_init() {
  * @return bool   Whether Gutenberg was initialized.
  */
 function gutenberg_init( $return, $post ) {
-	global $title, $post_type;
-
 	if ( true === $return && current_filter() === 'replace_editor' ) {
 		return $return;
 	}
@@ -222,18 +206,6 @@ function gutenberg_init( $return, $post ) {
 
 	add_action( 'admin_enqueue_scripts', 'gutenberg_editor_scripts_and_styles' );
 	add_filter( 'screen_options_show_screen', '__return_false' );
-	add_filter( 'admin_body_class', 'gutenberg_add_admin_body_class' );
-
-	$post_type_object = get_post_type_object( $post_type );
-
-	/*
-	 * Always force <title> to 'Edit Post' (or equivalent)
-	 * because it needs to be in a generic state for both
-	 * post-new.php and post.php?post=<id>.
-	 */
-	if ( ! empty( $post_type_object ) ) {
-		$title = $post_type_object->labels->edit_item;
-	}
 
 	/*
 	 * Remove the emoji script as it is incompatible with both React and any
@@ -253,19 +225,6 @@ function gutenberg_init( $return, $post ) {
 
 	return true;
 }
-
-/**
- * Redirects the demo page to edit a new post.
- */
-function gutenberg_redirect_demo() {
-	global $pagenow;
-
-	if ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'gutenberg' === $_GET['page'] ) {
-		wp_safe_redirect( admin_url( 'post-new.php?gutenberg-demo' ) );
-		exit;
-	}
-}
-add_action( 'admin_init', 'gutenberg_redirect_demo' );
 
 /**
  * Adds the filters to register additional links for the Gutenberg editor in
@@ -325,18 +284,15 @@ function gutenberg_replace_default_add_new_button() {
  * Adds the block-editor-page class to the body tag on the Gutenberg page.
  *
  * @since 1.5.0
+ * @deprecated 5.0.0
  *
  * @param string $classes Space separated string of classes being added to the body tag.
  * @return string The $classes string, with block-editor-page appended.
  */
 function gutenberg_add_admin_body_class( $classes ) {
-	// gutenberg-editor-page is left for backward compatibility.
-	if ( current_theme_supports( 'editor-styles' ) && current_theme_supports( 'dark-editor-style' ) ) {
-		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive is-dark-theme";
-	} else {
-		// Default to is-fullscreen-mode to avoid jumps in the UI.
-		return "$classes block-editor-page gutenberg-editor-page is-fullscreen-mode wp-embed-responsive";
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
+
+	return $classes;
 }
 
 /**

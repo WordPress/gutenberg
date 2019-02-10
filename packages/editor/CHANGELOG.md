@@ -1,8 +1,13 @@
 ## 9.1.0 (Unreleased)
 
-### New Feature
+### New Features
 
 - Added `createCustomColorsHOC` for creating a higher order `withCustomColors` component.
+- Added a new `TextEditorGlobalKeyboardShortcuts` component.
+
+### Deprecations
+
+- `EditorGlobalKeyboardShortcuts` has been deprecated in favor of `VisualEditorGlobalKeyboardShortcuts`.
 
 ### Bug Fixes
 
@@ -10,7 +15,9 @@
 
 ### Internal
 
-- Removed `jQuery` dependency
+- Removed `jQuery` dependency.
+- Removed `TinyMCE` dependency.
+- RichText: improve format boundaries.
 
 ## 9.0.7 (2019-01-03)
 

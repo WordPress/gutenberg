@@ -22,7 +22,7 @@ require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/plugin-compat.php';
 require dirname( __FILE__ ) . '/i18n.php';
 require dirname( __FILE__ ) . '/register.php';
-
+require dirname( __FILE__ ) . '/demo.php';
 
 // Register server-side code for individual blocks.
 if ( ! function_exists( 'render_block_core_archives' ) ) {
@@ -48,4 +48,7 @@ if ( ! function_exists( 'render_block_core_rss' ) ) {
 }
 if ( ! function_exists( 'render_block_core_shortcode' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/shortcode/index.php';
+}
+if ( ! function_exists( 'render_block_core_search' ) ) {
+	require dirname( __FILE__ ) . '/../packages/block-library/src/search/index.php';
 }

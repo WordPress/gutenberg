@@ -99,8 +99,9 @@ export class BlockListBlock extends Component {
 			this.focusTabbable( true );
 		}
 
-		// When triggering a multi-selection,
-		// move the focus to the wrapper of the first selected block.
+		// When triggering a multi-selection, move the focus to the wrapper of the first selected block.
+		// This ensures that it is not possible to continue editing the initially selected block
+		// when a multi-selection is triggered.
 		if ( this.props.isFirstMultiSelected && ! prevProps.isFirstMultiSelected ) {
 			this.wrapperNode.focus();
 		}
@@ -301,6 +302,8 @@ export class BlockListBlock extends Component {
 	deleteOrInsertAfterWrapper( event ) {
 		const { keyCode, target } = event;
 
+		// These block shortcuts should only trigger if the wrapper of the block is selected
+		// And when it's not a multi-selection to avoid conflicting with RichText/Inputs and multiselection.
 		if (
 			! this.props.isSelected ||
 			target !== this.wrapperNode ||
@@ -516,25 +519,25 @@ export class BlockListBlock extends Component {
 								clientId={ clientId }
 								rootClientId={ rootClientId }
 							/>
-							{ shouldRenderMovers && (
-								<BlockMover
-									clientIds={ clientId }
-									blockElementId={ blockElementId }
-									isFirst={ isFirst }
-									isLast={ isLast }
-									isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
-									isDraggable={
-										isDraggable !== false &&
-										( ! isPartOfMultiSelection && isMovable )
-									}
-									onDragStart={ this.onDragStart }
-									onDragEnd={ this.onDragEnd }
-								/>
-							) }
 							{ isFirstMultiSelected && (
 								<BlockMultiControls rootClientId={ rootClientId } />
 							) }
 							<div className="editor-block-list__block-edit">
+								{ shouldRenderMovers && (
+									<BlockMover
+										clientIds={ clientId }
+										blockElementId={ blockElementId }
+										isFirst={ isFirst }
+										isLast={ isLast }
+										isHidden={ ! ( isHovered || isSelected ) || hoverArea !== 'left' }
+										isDraggable={
+											isDraggable !== false &&
+											( ! isPartOfMultiSelection && isMovable )
+										}
+										onDragStart={ this.onDragStart }
+										onDragEnd={ this.onDragEnd }
+									/>
+								) }
 								{ shouldShowBreadcrumb && (
 									<BlockBreadcrumb
 										clientId={ clientId }

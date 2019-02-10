@@ -110,7 +110,7 @@ registerBlockType( 'gutenberg-boilerplate-esnext/hello-world-step-03', {
 ```
 {% end %}
 
-When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](../../../../../docs/designers-developers/developers/block-api/block-attributes.md) to find the desired value from the markup of the block.
+When registering a new block type, the `attributes` property describes the shape of the attributes object you'd like to receive in the `edit` and `save` functions. Each value is a [source function](/docs/designers-developers/developers/block-api/block-attributes.md) to find the desired value from the markup of the block.
 
 In the code snippet above, when loading the editor, we will extract the `content` value as the HTML of the paragraph element in the saved post's markup.
 
@@ -118,7 +118,7 @@ In the code snippet above, when loading the editor, we will extract the `content
 
 Earlier examples used the `createElement` function to create DOM nodes, but it's also possible to encapsulate this behavior into ["components"](). This abstraction helps as a pattern to share common behaviors and to hide complexity into self-contained units. There are a number of components available to use in implementing your blocks. You can see one such component in the snippet above: the [`RichText` component]().
 
-The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc. It is not too much unlike the single editor region of the legacy post editor, and is in fact powered by the same TinyMCE library.
+The `RichText` component can be considered as a super-powered `textarea` element, enabling rich content editing including bold, italics, hyperlinks, etc.
 
 To use the `RichText` component, add `wp-editor` to the array of registered script handles when calling `wp_register_script`.
 
@@ -126,9 +126,9 @@ To use the `RichText` component, add `wp-editor` to the array of registered scri
 wp_register_script(
 	'gutenberg-boilerplate-es5-step03',
 	plugins_url( 'step-03/block.js', __FILE__ ),
-	array( 
-		'wp-blocks', 
-		'wp-element', 
+	array(
+		'wp-blocks',
+		'wp-element',
 		'wp-editor', // Note the addition of wp-editor to the dependencies
 	)
 );

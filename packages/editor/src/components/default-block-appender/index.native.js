@@ -11,6 +11,9 @@ import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
 import styles from './style.scss';
 
 export function DefaultBlockAppender( {

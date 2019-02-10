@@ -2,6 +2,12 @@
 
 The Gutenberg project's deprecation policy is intended to support backward compatibility for releases, when possible. The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 5.3.0
+
+- The PHP function `gutenberg_redirect_to_classic_editor_when_saving_posts` has been removed.
+- The PHP function `gutenberg_revisions_link_to_editor` has been removed.
+- The PHP function `gutenberg_remember_classic_editor_when_saving_posts` has been removed.
+
 ## 5.2.0
 
 - The PHP function `gutenberg_parse_blocks` has been removed. Use [`parse_blocks`](https://developer.wordpress.org/reference/functions/parse_blocks/) instead.
@@ -56,6 +62,9 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 - The PHP function `gutenberg_meta_box_post_form_hidden_fields` has been removed. Use [`the_block_editor_meta_box_post_form_hidden_fields`](https://developer.wordpress.org/reference/functions/the_block_editor_meta_box_post_form_hidden_fields/) instead.
 - The PHP function `gutenberg_toggle_custom_fields` has been removed.
 - The PHP function `gutenberg_collect_meta_box_data` has been removed. Use [`register_and_do_post_meta_boxes`](https://developer.wordpress.org/reference/functions/register_and_do_post_meta_boxes/) instead.
+- `window._wpLoadGutenbergEditor` has been removed. Use `window._wpLoadBlockEditor` instead. Note: This is a private API, not intended for public use. It may be removed in the future.
+- The PHP function `gutenberg_get_script_polyfill` has been removed. Use [`wp_get_script_polyfill`](https://developer.wordpress.org/reference/functions/wp_get_script_polyfill/) instead.
+- The PHP function `gutenberg_add_admin_body_class` has been removed. Use the `.block-editor-page` class selector in your stylesheets if you need to scope styles to the block editor screen.
 
 ## 4.5.0
 - `Dropdown.refresh()` has been deprecated as the contained `Popover` is now automatically refreshed.
@@ -214,11 +223,11 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 ## 3.0.0
 
  - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
- - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://wordpress.org/gutenberg/handbook/block-api/rich-text-api/), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
+ - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](/packages/editor/src/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 
- - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See: https://github.com/WordPress/gutenberg/blob/master/components/autocomplete/README.md.
+ - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](/packages/components/src/autocomplete/README.md) for more info.
  - `getInserterItems`: the `allowedBlockTypes` argument is now mandatory.
  - `getFrecentInserterItems`: the `allowedBlockTypes` argument is now mandatory.
 
@@ -240,6 +249,6 @@ The Gutenberg project's deprecation policy is intended to support backward compa
 
  - `wp.blocks.BlockDescription` component removed. Please use the `description` block property instead.
  - `wp.blocks.InspectorControls.*` components removed. Please use `wp.components.*` components instead.
- - `wp.blocks.source.*` matchers removed. Please use the declarative attributes instead. See: https://wordpress.org/gutenberg/handbook/block-api/attributes/.
+ - `wp.blocks.source.*` matchers removed. Please use the declarative attributes instead. See [block attributes](/docs/designers-developers/developers/block-api/block-attributes.md) for more info.
  - `wp.data.select( 'selector', ...args )` removed. Please use `wp.data.select( reducerKey' ).*` instead.
  - `wp.blocks.MediaUploadButton` component removed. Please use `wp.blocks.MediaUpload` component instead.

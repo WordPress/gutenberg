@@ -102,7 +102,6 @@ return array(
 	),
 	'wp-dom'                                => array(
 		'lodash',
-		'wp-tinymce',
 	),
 	'wp-dom-ready'                          => array(),
 	'wp-edit-post'                          => array(
@@ -133,7 +132,6 @@ return array(
 	),
 	'wp-editor'                             => array(
 		'lodash',
-		'wp-tinymce-lists',
 		'wp-a11y',
 		'wp-api-fetch',
 		'wp-blob',
@@ -154,7 +152,6 @@ return array(
 		'wp-notices',
 		'wp-nux',
 		'wp-rich-text',
-		'wp-tinymce',
 		'wp-token-list',
 		'wp-url',
 		'wp-viewport',
