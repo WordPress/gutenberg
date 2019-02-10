@@ -47,6 +47,9 @@ $z-layers: (
 	".components-drop-zone": 100,
 	".components-drop-zone__content": 110,
 
+	// Autocomplete dropdown shows over other sidebar elements.
+	".autocomplete__menu--overlay": 100,
+
 	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
 	".editor-block-list__block.is-{selected,hovered} .editor-block-mover": 80,

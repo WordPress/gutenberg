@@ -24,13 +24,7 @@
 }
 
 .autocomplete__dropdown-arrow-down {
-	z-index: -1;
-	display: inline-block;
-	position: absolute;
-	right: $grid-size;
-	width: $icon-button-size-small;
-	height: $icon-button-size-small;
-	top: #{$grid-size + 2};
+	display: none;
 }
 
 .autocomplete__menu {
