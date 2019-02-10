@@ -161,7 +161,7 @@ export class PostAuthor extends Component {
 		return (
 			<PostAuthorCheck>
 				<label htmlFor={ selectId }>{ __( 'Author' ) }</label>
-				{ postAuthor && selector }
+				{ selector }
 			</PostAuthorCheck>
 		);
 		/* eslint-enable jsx-a11y/no-onchange */
