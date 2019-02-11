@@ -1,5 +1,5 @@
 /**
- * Node dependencies
+ * External dependencies
  */
 import { join } from 'path';
 import { URL } from 'url';

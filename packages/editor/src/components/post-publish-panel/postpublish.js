@@ -1,10 +1,10 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { get } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { PanelBody, Button, ClipboardButton, TextControl } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';

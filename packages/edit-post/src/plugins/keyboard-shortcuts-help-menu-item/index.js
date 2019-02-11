@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';

@@ -11,7 +11,7 @@ import {
 } from '@wordpress/components';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 

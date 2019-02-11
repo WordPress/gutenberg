@@ -1,5 +1,5 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 import { filter, pick, map, get } from 'lodash';
