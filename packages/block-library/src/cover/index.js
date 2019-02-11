@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -18,9 +19,9 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import {
-	AlignmentToolbar,
 	BlockControls,
 	BlockIcon,
+	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
@@ -39,17 +40,8 @@ import { __ } from '@wordpress/i18n';
 import icon from './icon';
 
 const blockAttributes = {
-	title: {
-		type: 'string',
-		source: 'html',
-		selector: 'p',
-	},
 	url: {
 		type: 'string',
-	},
-	contentAlign: {
-		type: 'string',
-		default: 'center',
 	},
 	id: {
 		type: 'number',
@@ -82,6 +74,14 @@ export const name = 'core/cover';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const IMAGE_BACKGROUND_TYPE = 'image';
 const VIDEO_BACKGROUND_TYPE = 'video';
+const INNER_BLOCKS_TEMPLATE = [
+	[ 'core/paragraph', {
+		align: 'center',
+		fontSize: 'large',
+		placeholder: __( 'Write title…' ),
+	} ],
+];
+const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
 
 export const settings = {
 	title: __( 'Cover' ),
@@ -100,13 +100,6 @@ export const settings = {
 
 	transforms: {
 		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/heading' ],
-				transform: ( { content } ) => (
-					createBlock( 'core/cover', { title: content } )
-				),
-			},
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
@@ -134,13 +127,6 @@ export const settings = {
 			},
 		],
 		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/heading' ],
-				transform: ( { title } ) => (
-					createBlock( 'core/heading', { content: title } )
-				),
-			},
 			{
 				type: 'block',
 				blocks: [ 'core/image' ],
@@ -178,15 +164,13 @@ export const settings = {
 		withColors( { overlayColor: 'background-color' } ),
 		withNotices,
 	] )(
-		( { attributes, setAttributes, isSelected, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
+		( { attributes, setAttributes, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
 			const {
 				backgroundType,
-				contentAlign,
 				dimRatio,
 				focalPoint,
 				hasParallax,
 				id,
-				title,
 				url,
 			} = attributes;
 			const onSelectMedia = ( media ) => {
@@ -222,7 +206,6 @@ export const settings = {
 			};
 			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
 			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-			const setTitle = ( newTitle ) => setAttributes( { title: newTitle } );
 
 			const style = {
 				...(
@@ -242,12 +225,6 @@ export const settings = {
 					<BlockControls>
 						{ !! url && (
 							<Fragment>
-								<AlignmentToolbar
-									value={ contentAlign }
-									onChange={ ( nextAlign ) => {
-										setAttributes( { contentAlign: nextAlign } );
-									} }
-								/>
 								<MediaUploadCheck>
 									<Toolbar>
 										<MediaUpload
@@ -311,16 +288,8 @@ export const settings = {
 			);
 
 			if ( ! url ) {
-				const hasTitle = ! RichText.isEmpty( title );
-				const placeholderIcon = hasTitle ? undefined : <BlockIcon icon={ icon } />;
-				const label = hasTitle ? (
-					<RichText
-						tagName="h2"
-						value={ title }
-						onChange={ setTitle }
-						inlineToolbar
-					/>
-				) : __( 'Cover' );
+				const placeholderIcon = <BlockIcon icon={ icon } />;
+				const label = __( 'Cover' );
 
 				return (
 					<Fragment>
@@ -344,7 +313,6 @@ export const settings = {
 
 			const classes = classnames(
 				className,
-				contentAlign !== 'center' && `has-${ contentAlign }-content`,
 				dimRatioToClass( dimRatio ),
 				{
 					'has-background-dim': dimRatio !== 0,
@@ -369,16 +337,12 @@ export const settings = {
 								src={ url }
 							/>
 						) }
-						{ ( ! RichText.isEmpty( title ) || isSelected ) && (
-							<RichText
-								tagName="p"
-								className="wp-block-cover-text"
-								placeholder={ __( 'Write title…' ) }
-								value={ title }
-								onChange={ setTitle }
-								inlineToolbar
+						<div className="wp-block-cover__inner-container">
+							<InnerBlocks
+								template={ INNER_BLOCKS_TEMPLATE }
+								allowedBlocks={ INNER_BLOCKS_ALLOWED_BLOCKS }
 							/>
-						) }
+						</div>
 					</div>
 				</Fragment>
 			);
@@ -388,13 +352,11 @@ export const settings = {
 	save( { attributes } ) {
 		const {
 			backgroundType,
-			contentAlign,
 			customOverlayColor,
 			dimRatio,
 			focalPoint,
 			hasParallax,
 			overlayColor,
-			title,
 			url,
 		} = attributes;
 		const overlayColorClass = getColorClassName( 'background-color', overlayColor );
@@ -414,7 +376,6 @@ export const settings = {
 			{
 				'has-background-dim': dimRatio !== 0,
 				'has-parallax': hasParallax,
-				[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
 			},
 		);
 
@@ -427,9 +388,9 @@ export const settings = {
 					loop
 					src={ url }
 				/> ) }
-				{ ! RichText.isEmpty( title ) && (
-					<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
-				) }
+				<div className="wp-block-cover__inner-container">
+					<InnerBlocks.Content />
+				</div>
 			</div>
 		);
 	},
@@ -437,6 +398,98 @@ export const settings = {
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
+		},
+
+		supports: {
+			align: true,
+		},
+
+		save( { attributes } ) {
+			const {
+				backgroundType,
+				contentAlign,
+				customOverlayColor,
+				dimRatio,
+				focalPoint,
+				hasParallax,
+				overlayColor,
+				title,
+				url,
+			} = attributes;
+			const overlayColorClass = getColorClassName( 'background-color', overlayColor );
+			const style = backgroundType === IMAGE_BACKGROUND_TYPE ?
+				backgroundImageStyles( url ) :
+				{};
+			if ( ! overlayColorClass ) {
+				style.backgroundColor = customOverlayColor;
+			}
+			if ( focalPoint && ! hasParallax ) {
+				style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+			}
+
+			const classes = classnames(
+				dimRatioToClass( dimRatio ),
+				overlayColorClass,
+				{
+					'has-background-dim': dimRatio !== 0,
+					'has-parallax': hasParallax,
+					[ `has-${ contentAlign }-content` ]: contentAlign !== 'center',
+				},
+			);
+
+			return (
+				<div className={ classes } style={ style }>
+					{ VIDEO_BACKGROUND_TYPE === backgroundType && url && ( <video
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+					/> ) }
+					{ ! RichText.isEmpty( title ) && (
+						<RichText.Content tagName="p" className="wp-block-cover-text" value={ title } />
+					) }
+				</div>
+			);
+		},
+
+		migrate( attributes ) {
+			return [
+				omit( attributes, [ 'title', 'contentAlign' ] ),
+				[
+					createBlock(
+						'core/paragraph',
+						{
+							content: attributes.title,
+							align: attributes.contentAlign,
+							fontSize: 'large',
+							placeholder: __( 'Write title…' ),
+						}
+					),
+				],
+			];
+		},
+	}, {
+		attributes: {
+			...blockAttributes,
+			title: {
+				type: 'string',
+				source: 'html',
+				selector: 'p',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
+			},
 			align: {
 				type: 'string',
 			},
@@ -484,6 +537,10 @@ export const settings = {
 				type: 'string',
 				source: 'html',
 				selector: 'h2',
+			},
+			contentAlign: {
+				type: 'string',
+				default: 'center',
 			},
 		},
 
