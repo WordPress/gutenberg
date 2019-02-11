@@ -58,7 +58,7 @@ const formatDescription = ( description, docs ) => {
 	docs.push( description );
 };
 
-module.exports = function( symbols ) {
+module.exports = function( rootDir, docPath, symbols ) {
 	const docs = [ '# API' ];
 	docs.push( '\n' );
 	docs.push( '\n' );
@@ -75,7 +75,13 @@ module.exports = function( symbols ) {
 	} );
 	if ( symbols && symbols.length > 0 ) {
 		symbols.forEach( ( symbol ) => {
-			const symbolPath = path.basename( symbol.path );
+			const symbolPath = path.join(
+				path.relative(
+					path.dirname( docPath ),
+					path.join( rootDir, path.dirname( symbol.path ) )
+				),
+				path.basename( symbol.path ),
+			);
 			const symbolPathWithLines = `${ symbolPath }#L${ symbol.lineStart }-L${ symbol.lineEnd }`;
 			docs.push( `## ${ symbol.name }` );
 			docs.push( `\n\n[${ symbolPathWithLines }](${ symbolPathWithLines })` );

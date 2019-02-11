@@ -67,6 +67,11 @@ const processFile = ( rootDir, inputFile ) => {
 const optionator = require( 'optionator' )( {
 	prepend: 'Usage: node <path-to-docgen> <relative-path-to-entry-point>',
 	options: [ {
+		option: 'output',
+		alias: 'o',
+		type: 'String',
+		description: 'Markdown file to contain API docs',
+	}, {
 		option: 'debug',
 		type: 'Boolean',
 		default: false,
@@ -76,41 +81,43 @@ const optionator = require( 'optionator' )( {
 
 const options = optionator.parseArgv( process.argv );
 
-// Prepare input
+// Input: process CLI args, prepare files, etc
 const processDir = process.cwd();
-let initialInputFile = options._[ 0 ];
-if ( initialInputFile === undefined ) {
+let sourceFile = options._[ 0 ];
+if ( sourceFile === undefined ) {
 	process.stdout.write( '\n' );
 	process.stdout.write( optionator.generateHelp() );
 	process.stdout.write( '\n\n' );
 	process.exit( 1 );
 }
-initialInputFile = path.join( processDir, initialInputFile );
+sourceFile = path.join( processDir, sourceFile );
 
 const debugMode = options.debug ? true : false;
 
+const inputBase = path.join(
+	path.dirname( sourceFile ),
+	path.basename( sourceFile, path.extname( sourceFile ) )
+);
+const ast = inputBase + '-ast.json';
+const tokens = inputBase + '-exports.json';
+const ir = inputBase + '-ir.json';
+const doc = options.output ?
+	path.join( processDir, options.output ) :
+	inputBase + '-api.md';
+
 // Process
 const currentFileStack = []; // To keep track of file being processed.
-const result = processFile( processDir, initialInputFile );
+const result = processFile( processDir, sourceFile );
 
 // Ouput
-const inputBase = path.join(
-	path.dirname( initialInputFile ),
-	path.basename( initialInputFile, path.extname( initialInputFile ) )
-);
-const doc = inputBase + '-api.md';
-const ir = inputBase + '-ir.json';
-const tokens = inputBase + '-exports.json';
-const ast = inputBase + '-ast.json';
-
 if ( result === undefined ) {
 	process.stdout.write( '\nFile was processed, but contained no ES6 module exports:' );
-	process.stdout.write( `\n${ initialInputFile }` );
+	process.stdout.write( `\n${ sourceFile }` );
 	process.stdout.write( '\n\n' );
 	process.exit( 0 );
 }
 
-fs.writeFileSync( doc, formatter( result.ir ) );
+fs.writeFileSync( doc, formatter( processDir, doc, result.ir ) );
 if ( debugMode ) {
 	fs.writeFileSync( ir, JSON.stringify( result.ir ) );
 	fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
