@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
+/**
  * External dependencies
  */
 import { get, includes } from 'lodash';
@@ -9,12 +14,7 @@ import { get, includes } from 'lodash';
 import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../../constants';
 
 /**
- * WordPress imports
- */
-import { __ } from '@wordpress/i18n';
-
-/**
- * Builds the arguments for a success notifiation dispatch.
+ * Builds the arguments for a success notification dispatch.
  *
  * @param {Object} data Incoming data to build the arguments from.
  * @return {Array}  Arguments for dispatch. An empty array signals no
@@ -82,7 +82,6 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
  */
 export function getNotificationArgumentsForSaveFail( data ) {
 	const { post, edits, error } = data;
-
 	if ( error && 'rest_autosave_no_changes' === error.code ) {
 		// Autosave requested a new autosave, but there were no changes. This shouldn't
 		// result in an error notice for the user.

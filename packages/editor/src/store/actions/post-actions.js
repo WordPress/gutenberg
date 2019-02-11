@@ -9,12 +9,42 @@ import { BEGIN, COMMIT, REVERT } from 'redux-optimist';
 import { POST_UPDATE_TRANSACTION_ID } from '../constants';
 
 /**
- * Optimistic action for requesting post update start.
+ * Returns an action object used in signalling that the latest version of the
+ * post has been received, either by initialization or save.
+ *
+ * @param {Object} post Post object.
+ *
+ * @return {Object} Action object.
+ */
+export function resetPost( post ) {
+	return {
+		type: 'RESET_POST',
+		post,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the latest autosave of the
+ * post has been received, by initialization or autosave.
+ *
+ * @param {Object} post Autosave post object.
+ *
+ * @return {Object} Action object.
+ */
+export function resetAutosave( post ) {
+	return {
+		type: 'RESET_AUTOSAVE',
+		post,
+	};
+}
+
+/**
+ * Optimistic action for dispatching that a post update request has started.
  *
  * @param {Object} options
  * @return {Object} An action object
  */
-export function requestPostUpdateStart( options = {} ) {
+export function __experimentalRequestPostUpdateStart( options = {} ) {
 	return {
 		type: 'REQUEST_POST_UPDATE_START',
 		optimist: { type: BEGIN, id: POST_UPDATE_TRANSACTION_ID },
@@ -23,7 +53,8 @@ export function requestPostUpdateStart( options = {} ) {
 }
 
 /**
- * Optimistic action for requesting post update success.
+ * Optimistic action for indicating that the request post update has completed
+ * successfully.
  *
  * @param {Object} previousPost The previous post prior to update.
  * @param {Object} post	The new post after update
@@ -33,7 +64,7 @@ export function requestPostUpdateStart( options = {} ) {
  * @param {Object} postType The post type object.
  * @return {Object} Action object.
  */
-export function requestPostUpdateSuccess( {
+export function __experimentalRequestPostUpdateSuccess( {
 	previousPost,
 	post,
 	isRevision,
@@ -58,7 +89,8 @@ export function requestPostUpdateSuccess( {
 }
 
 /**
- * Optimistic action for requesting post update failure.
+ * Optimistic action for indicating that the request post update has completed
+ * with a failure.
  *
  * @param {Object} post The post that failed updating.
  * @param {Object} edits The fields that were being updated.
@@ -67,7 +99,7 @@ export function requestPostUpdateSuccess( {
  * dispatch.
  * @return {Object} An action object
  */
-export function requestPostUpdateFailure( {
+export function __experimentalRequestPostUpdateFailure( {
 	post,
 	edits,
 	error,
@@ -99,15 +131,58 @@ export function updatePost( edits ) {
 }
 
 /**
+ * Returns an action object used in signalling that attributes of the post have
+ * been edited.
+ *
+ * @param {Object} edits Post attributes to edit.
+ *
+ * @return {Object} Action object.
+ */
+export function editPost( edits ) {
+	return {
+		type: 'EDIT_POST',
+		edits,
+	};
+}
+
+/**
  * Returns action object produced by the updatePost creator augmented by
  * an optimist option that signals optimistically applying updates.
  *
  * @param {Object} edits  Updated post fields.
  * @return {Object} Action object.
  */
-export function optimisticUpdatePost( edits ) {
+export function __experimentalOptimisticUpdatePost( edits ) {
 	return {
 		...updatePost( edits ),
 		optimist: { id: POST_UPDATE_TRANSACTION_ID },
+	};
+}
+
+/**
+ * Returns an action object used to signal that post saving is locked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function lockPostSaving( lockName ) {
+	return {
+		type: 'LOCK_POST_SAVING',
+		lockName,
+	};
+}
+
+/**
+ * Returns an action object used to signal that post saving is unlocked.
+ *
+ * @param  {string} lockName The lock name.
+ *
+ * @return {Object} Action object
+ */
+export function unlockPostSaving( lockName ) {
+	return {
+		type: 'UNLOCK_POST_SAVING',
+		lockName,
 	};
 }

@@ -90,7 +90,7 @@ export function* savePost( options = {} ) {
 
 	yield dispatch(
 		MODULE_KEY,
-		'requestPostUpdateStart',
+		'__experimentalRequestPostUpdateStart',
 		options,
 	);
 
@@ -99,7 +99,7 @@ export function* savePost( options = {} ) {
 	// if the autosave is applied as a revision.
 	yield dispatch(
 		MODULE_KEY,
-		'optimisticUpdatePost',
+		'__experimentalOptimisticUpdatePost',
 		toSend
 	);
 
@@ -142,7 +142,7 @@ export function* savePost( options = {} ) {
 
 		yield dispatch(
 			MODULE_KEY,
-			'requestPostUpdateSuccess',
+			'__experimentalRequestPostUpdateSuccess',
 			{
 				previousPost: post,
 				post: newPost,
@@ -159,6 +159,7 @@ export function* savePost( options = {} ) {
 			previousPost: post,
 			post: newPost,
 			postType,
+			options,
 		} );
 		if ( notifySuccessArgs.length > 0 ) {
 			yield dispatch(
@@ -170,7 +171,7 @@ export function* savePost( options = {} ) {
 	} catch ( error ) {
 		yield dispatch(
 			MODULE_KEY,
-			'requestPostUpdateFailure',
+			'__experimentalRequestPostUpdateFailure',
 			{ post, edits, error, options }
 		);
 		const notifyFailArgs = getNotificationArgumentsForSaveFail( {
@@ -186,6 +187,15 @@ export function* savePost( options = {} ) {
 			);
 		}
 	}
+}
+
+/**
+ * Action generator used in signalling that the post should autosave.
+ *
+ * @param {Object?} options Extra flags to identify the autosave.
+ */
+export function* autosave( options ) {
+	yield* actions.savePost( { isAutosave: true, ...options } );
 }
 
 /**
@@ -218,8 +228,8 @@ export function* trashPost() {
 			}
 		);
 
-		// TODO: This should be an updatePost action (updating subsets of post properties),
-		// But right now editPost is tied with change detection.
+		// TODO: This should be an updatePost action (updating subsets of post
+		// properties), but right now editPost is tied with change detection.
 		yield dispatch(
 			MODULE_KEY,
 			'resetPost',
@@ -229,7 +239,7 @@ export function* trashPost() {
 		yield dispatch(
 			'core/notices',
 			'createErrorNotice',
-			getNotificationArgumentsForTrashFail( { error } ),
+			...getNotificationArgumentsForTrashFail( { error } ),
 		);
 	}
 }
@@ -264,3 +274,12 @@ export function* refreshPost() {
 		newPost
 	);
 }
+
+const actions = {
+	savePost,
+	autosave,
+	trashPost,
+	refreshPost,
+};
+
+export default actions;

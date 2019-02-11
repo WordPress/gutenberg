@@ -14,7 +14,7 @@ import {
 	trashPost,
 	redo,
 	undo,
-} from '../actions';
+} from '../actions.js';
 
 describe( 'actions', () => {
 	describe( 'setupEditor', () => {

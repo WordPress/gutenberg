@@ -44,9 +44,52 @@ export function resetPost( post ) {
 
 /**
  * Returns an action object used in signalling that the latest autosave of the
- * post has been received, by initialization or autosave.
+ * specified client ID has been selected, optionally accepting a position
+ * value reflecting its selection directionality. An initialPosition of -1
+ * reflects a reverse selection.
  *
- * @param {Object} post Autosave post object.
+ * @param {string}  clientId        Block client ID.
+ * @param {?number} initialPosition Optional initial position. Pass as -1 to
+ *                                  reflect reverse selection.
+ *
+ * @return {Object} Action object.
+ */
+export function selectBlock( clientId, initialPosition = null ) {
+	return {
+		type: 'SELECT_BLOCK',
+		initialPosition,
+		clientId,
+	};
+}
+
+export function startMultiSelect() {
+	return {
+		type: 'START_MULTI_SELECT',
+	};
+}
+
+export function stopMultiSelect() {
+	return {
+		type: 'STOP_MULTI_SELECT',
+	};
+}
+
+export function multiSelect( start, end ) {
+	return {
+		type: 'MULTI_SELECT',
+		start,
+		end,
+	};
+}
+
+export function clearSelectedBlock() {
+	return {
+		type: 'CLEAR_SELECTED_BLOCK',
+	};
+}
+
+/**
+ * Returns an action object that enables or disables block selection.
  *
  * @return {Object} Action object.
  */
@@ -125,8 +168,6 @@ export function refreshPost() {
 export function trashPost( postId, postType ) {
 	return {
 		type: 'TRASH_POST',
-		postId,
-		postType,
 	};
 }
 
