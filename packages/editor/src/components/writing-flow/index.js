@@ -237,7 +237,8 @@ class WritingFlow extends Component {
 
 		// This logic inside this condition needs to be checked before
 		// the check for event.nativeEvent.defaultPrevented.
-		// The logic handles meta+a keypress and this event is default prevented by TinyMCE.
+		// The logic handles meta+a keypress and this event is default prevented
+		// by RichText.
 		if ( ! isNav ) {
 			// Set immediately before the meta+a combination can be pressed.
 			if ( isKeyboardEvent.primary( event ) ) {
@@ -246,8 +247,8 @@ class WritingFlow extends Component {
 
 			if ( isKeyboardEvent.primary( event, 'a' ) ) {
 				// When the target is contentEditable, selection will already
-				// have been set by TinyMCE earlier in this call stack. We need
-				// check the previous result, otherwise all blocks will be
+				// have been set by the browser earlier in this call stack. We
+				// need check the previous result, otherwise all blocks will be
 				// selected right away.
 				if ( target.isContentEditable ? this.isEntirelySelected : isEntirelySelected( target ) ) {
 					onMultiSelect( first( blocks ), last( blocks ) );
@@ -262,7 +263,7 @@ class WritingFlow extends Component {
 			return;
 		}
 
-		// Abort if navigation has already been handled (e.g. TinyMCE inline
+		// Abort if navigation has already been handled (e.g. RichText inline
 		// boundaries).
 		if ( event.nativeEvent.defaultPrevented ) {
 			return;

@@ -35,13 +35,13 @@
 	}
 
 	// Adjust line spacing for larger headings.
-	h1.editor-rich-text__tinymce,
-	h2.editor-rich-text__tinymce,
-	h3.editor-rich-text__tinymce {
+	h1,
+	h2,
+	h3 {
 		line-height: 1.4;
 	}
 
-	h4.editor-rich-text__tinymce {
+	h4 {
 		line-height: 1.5;
 	}
 }

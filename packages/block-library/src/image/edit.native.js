@@ -18,16 +18,20 @@ import {
 } from 'lodash';
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
 import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet, Picker } from '@wordpress/editor';
 import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import ImageSize from './image-size';
 import { isURL } from '@wordpress/url';
-import styles from './styles.scss';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import ImageSize from './image-size';
+import styles from './styles.scss';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;

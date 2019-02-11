@@ -1,3 +1,24 @@
+/**
+ * External dependencies
+ */
+import crossSpawn from 'cross-spawn';
+
+/**
+ * Internal dependencies
+ */
+import {
+	hasCliArg,
+	hasProjectFile,
+	spawnScript,
+} from '../';
+import {
+	getPackagePath as getPackagePathMock,
+} from '../package';
+import {
+	exit as exitMock,
+	getCliArgs as getCliArgsMock,
+} from '../process';
+
 jest.mock( '../package', () => {
 	const module = require.requireActual( '../package' );
 
@@ -13,22 +34,6 @@ jest.mock( '../process', () => {
 
 	return module;
 } );
-/**
- * Internal dependencies
- */
-import crossSpawn from 'cross-spawn';
-import {
-	hasCliArg,
-	hasProjectFile,
-	spawnScript,
-} from '../';
-import {
-	getPackagePath as getPackagePathMock,
-} from '../package';
-import {
-	exit as exitMock,
-	getCliArgs as getCliArgsMock,
-} from '../process';
 
 describe( 'utils', () => {
 	const crossSpawnMock = jest.spyOn( crossSpawn, 'sync' );

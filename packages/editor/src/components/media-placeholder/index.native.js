@@ -3,10 +3,16 @@
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
-import styles from './styles.scss';
-
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { Dashicon } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
 	return (
