@@ -96,7 +96,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 	const error = { code: '42' };
 	const post = { status: 'publish' };
 	const edits = { status: 'publish' };
-	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID, actions: [] };
+	const defaultExpectedAction = { id: SAVE_POST_NOTICE_ID };
 	[
 		[
 			'when error code is `rest_autosave_no_changes`',
@@ -149,29 +149,32 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 	} );
 } );
 describe( 'getNotificationArgumentsForTrashFail()', () => {
-	const defaultExpectedAction = { id: TRASH_POST_NOTICE_ID };
 	[
 		[
 			'when there is an error message and the error code is not "unknown_error"',
 			{ message: 'foo', code: '' },
-			[ 'foo', defaultExpectedAction ],
+			'foo',
 		],
 		[
 			'when there is an error message and the error code is "unknown error"',
 			{ message: 'foo', code: 'unknown_error' },
-			[ 'Trashing failed', defaultExpectedAction ],
+			'Trashing failed',
 		],
 		[
 			'when there is not an error message',
 			{ code: 42 },
-			[ 'Trashing failed', defaultExpectedAction ],
+			'Trashing failed',
 		],
 	].forEach( ( [
 		description,
 		error,
-		expectedValue,
+		message,
 	] ) => {
 		it( description, () => {
+			const expectedValue = [
+				message,
+				{ id: TRASH_POST_NOTICE_ID },
+			];
 			expect( getNotificationArgumentsForTrashFail( { error } ) )
 				.toEqual( expectedValue );
 		} );
