@@ -15,7 +15,7 @@ import { ClipboardButton, Button, ExternalLink } from '@wordpress/components';
 import { safeDecodeURI } from '@wordpress/url';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostPermalinkEditor from './editor.js';
 import { getWPAdminURL, cleanForSlug } from '../../utils/url';

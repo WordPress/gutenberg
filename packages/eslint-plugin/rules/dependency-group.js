@@ -19,6 +19,28 @@ module.exports = {
 		 */
 
 		/**
+		 * Object describing a dependency block correction to be made.
+		 *
+		 * @property {?espree.Node} comment Comment node on which to replace
+		 *                                  value, if one can be salvaged.
+		 * @property {string}       value   Expected comment node value.
+		 *
+		 * @typedef {Object} WPDependencyBlockCorrection
+		 */
+
+		/**
+		 * Given a desired locality, generates the expected comment node value
+		 * property.
+		 *
+		 * @param {WPPackageLocality} locality Desired package locality.
+		 *
+		 * @return {string} Expected comment node value.
+		 */
+		function getCommentValue( locality ) {
+			return `*\n * ${ locality } dependencies\n `;
+		}
+
+		/**
 		 * Given an import source string, returns the locality classification
 		 * of the import sort.
 		 *
@@ -51,7 +73,7 @@ module.exports = {
 				return false;
 			}
 
-			// (Temporary) Tolerances:
+			// Tolerances:
 			// - Normalize `/**` and `/*`
 			// - Case insensitive "Dependencies" vs. "dependencies"
 			// - Ending period
@@ -61,7 +83,7 @@ module.exports = {
 				locality = '(External|Node)';
 			}
 
-			const pattern = new RegExp( `^\\*?\\n \\* ${ locality } [dD]ependencies\\.?\\n $` );
+			const pattern = new RegExp( `^\\*?\\n \\* ${ locality } dependencies\\.?\\n $`, 'i' );
 			return pattern.test( value );
 		}
 
@@ -79,18 +101,44 @@ module.exports = {
 		}
 
 		/**
-		 * Returns true if a given node is preceded by a comment block
-		 * satisfying a locality requirement, or false otherwise.
+		 * Tests source comments to determine whether a comment exists which
+		 * satisfies the desired locality. If a match is found and requires no
+		 * updates, the function returns undefined. Otherwise, it will return
+		 * a WPDependencyBlockCorrection object describing a correction.
 		 *
 		 * @param {espree.Node}       node     Node to test.
 		 * @param {WPPackageLocality} locality Desired package locality.
 		 *
-		 * @return {boolean} Whether node preceded by locality comment block.
+		 * @return {?WPDependencyBlockCorrection} Correction, if applicable.
 		 */
-		function isPrecededByDependencyBlock( node, locality ) {
-			return comments.some( ( comment ) => {
-				return isLocalityDependencyBlock( comment, locality ) && isBefore( comment, node );
-			} );
+		function getDependencyBlockCorrection( node, locality ) {
+			const value = getCommentValue( locality );
+
+			let comment;
+			for ( let i = 0; i < comments.length; i++ ) {
+				comment = comments[ i ];
+
+				if ( ! isBefore( comment, node ) ) {
+					// Exhausted options.
+					break;
+				}
+
+				if ( ! isLocalityDependencyBlock( comment, locality ) ) {
+					// Not usable (either not an block comment, or not one
+					// matching a tolerable pattern).
+					continue;
+				}
+
+				if ( comment.value === value ) {
+					// No change needed. (OK)
+					return;
+				}
+
+				// Found a comment needing correction.
+				return { comment, value };
+			}
+
+			return { value };
 		}
 
 		return {
@@ -103,7 +151,7 @@ module.exports = {
 				 *
 				 * @type {Set<WPPackageLocality>}
 				 */
-				const reported = new Set();
+				const verified = new Set();
 
 				// Since we only care to enforce imports which occur at the
 				// top-level scope, match on Program and test its children,
@@ -133,23 +181,31 @@ module.exports = {
 					}
 
 					const locality = getPackageLocality( source );
-					if (
-						reported.has( locality ) ||
-						isPrecededByDependencyBlock( child, locality )
-					) {
+					if ( verified.has( locality ) ) {
 						return;
 					}
 
-					reported.add( locality );
+					// Avoid verifying any other imports for the locality,
+					// regardless whether a correction must be made.
+					verified.add( locality );
+
+					// Determine whether a correction must be made.
+					const correction = getDependencyBlockCorrection( child, locality );
+					if ( ! correction ) {
+						return;
+					}
 
 					context.report( {
 						node: child,
 						message: `Expected preceding "${ locality } dependencies" comment block`,
 						fix( fixer ) {
-							return fixer.insertTextBefore(
-								child,
-								`/**\n * ${ locality } dependencies\n */\n`
-							);
+							const { comment, value } = correction;
+							const text = `/*${ value }*/`;
+							if ( comment ) {
+								return fixer.replaceText( comment, text );
+							}
+
+							return fixer.insertTextBefore( child, text + '\n' );
 						},
 					} );
 				} );
