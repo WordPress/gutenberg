@@ -64,7 +64,6 @@
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
 		"@wordpress/browserslist-config": "file:packages/browserslist-config",
-		"@wordpress/build-config": "file:packages/build-config",
 		"@wordpress/custom-templated-path-webpack-plugin": "file:packages/custom-templated-path-webpack-plugin",
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
@@ -76,6 +75,7 @@
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
+		"@wordpress/webpack-config": "file:packages/webpack-config",
 		"babel-loader": "8.0.5",
 		"benchmark": "2.1.4",
 		"browserslist": "4.4.1",
@@ -118,9 +118,6 @@
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
-		"webpack": "4.8.3",
-		"webpack-bundle-analyzer": "3.0.2",
-		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
 	},
 	"npmPackageJsonLintConfig": {

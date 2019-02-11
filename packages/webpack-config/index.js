@@ -1,36 +1,8 @@
 /**
  * External dependencies
  */
-const WebpackRTLPlugin = require( 'webpack-rtl-plugin' );
-const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
-
-const { get } = require( 'lodash' );
-const { basename } = require( 'path' );
-
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-
-/**
- * WordPress dependencies
- */
-const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
-const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
-
-/**
- * Given a string, returns a new string with dash separators converted to
- * camelCase equivalent. This is not as aggressive as `_.camelCase` in
- * converting to uppercase, where Lodash will also capitalize letters
- * following numbers.
- *
- * @param {string} string Input dash-delimited string.
- *
- * @return {string} Camel-cased string.
- */
-function camelCaseDash( string ) {
-	return string.replace(
-		/-([a-z])/g,
-		( match, letter ) => letter.toUpperCase()
-	);
-}
+const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 
 /**
  * Converts @wordpress require into window reference
@@ -66,8 +38,6 @@ const externals = [
 		jquery: 'jQuery',
 		lodash: 'lodash',
 		'lodash-es': 'lodash',
-		electron: 'electron',
-		wp: 'wp',
 	},
 	wordpressExternals,
 ];
@@ -86,7 +56,7 @@ const config = {
 	externals,
 	resolve: {
 		modules: [
-			__dirname,
+			process.cwd(),
 			'node_modules',
 		],
 		alias: {
@@ -112,40 +82,6 @@ const config = {
 		],
 	},
 	plugins: [
-		// Create RTL files with a -rtl suffix
-		new WebpackRTLPlugin( {
-			suffix: '-rtl',
-			minify: process.env.NODE_ENV === 'production' ? { safe: true } : false,
-		} ),
-		new CustomTemplatedPathPlugin( {
-			basename( path, data ) {
-				let rawRequest;
-
-				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
-				switch ( entryModule.type ) {
-					case 'javascript/auto':
-						rawRequest = entryModule.rawRequest;
-						break;
-
-					case 'javascript/esm':
-						rawRequest = entryModule.rootModule.rawRequest;
-						break;
-				}
-
-				if ( rawRequest ) {
-					return basename( rawRequest );
-				}
-
-				return path;
-			},
-		} ),
-		new LibraryExportDefaultPlugin( [
-			'api-fetch',
-			'deprecated',
-			'dom-ready',
-			'redux-routine',
-			'token-list',
-		].map( camelCaseDash ) ),
 		// GUTENBERG_BUNDLE_ANALYZER global variable enables utility that represents bundle content
 		// as convenient interactive zoomable treemap.
 		process.env.GUTENBERG_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
