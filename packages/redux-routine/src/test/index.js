@@ -144,7 +144,7 @@ describe( 'createMiddleware', () => {
 		expect( store.getState() ).toBe( 2 );
 	} );
 
-	it( 'does not recurse when for action like returns from a sync ' +
+	it( 'does not recurse when action like object returns from a sync ' +
 		'control', () => {
 		const post = { type: 'post' };
 		const middleware = createMiddleware( {
