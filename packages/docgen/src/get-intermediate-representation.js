@@ -46,18 +46,6 @@ const hasImportWithName = ( node, name ) =>
 
 const isImportDeclaration = ( node ) => node.type === 'ImportDeclaration';
 
-// const someSpecifierMatchesName = ( name, node ) => node.specifiers.some( ( specifier ) => {
-// 	if ( specifier.type === 'ImportDefaultSpecifier' ) {
-// 		return name === 'default';
-// 	} else if (
-// 		specifier.type === 'ExportSpecifier' ||
-// 		specifier.type === 'ImportNamespaceSpecifier'
-// 	) {
-// 		return name === specifier.local.name;
-// 	}
-// 	return name === specifier.imported.name;
-// } );
-
 const someImportMatchesName = ( name, token ) => {
 	let matches = false;
 	token.specifiers.forEach( ( specifier ) => {
@@ -125,6 +113,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
  * the identifier declaration will be looked up in the file or dependency
  * if an `ast` and `parseDependency` callback are provided.
  *
+ * @param {string} path Path to file being processed.
  * @param {Object} token Espree export token.
  * @param {Object} [ast] Espree ast of the file being parsed.
  * @param {Function} [parseDependency] Function that takes a path
@@ -132,7 +121,7 @@ const getJSDoc = ( token, entry, ast, parseDependency ) => {
  *
  * @return {Object} Intermediate Representation in JSON.
  */
-module.exports = function( token, ast = { body: [] }, parseDependency = () => {} ) {
+module.exports = function( path, token, ast = { body: [] }, parseDependency = () => {} ) {
 	const exportEntries = getExportEntries( token );
 	const ir = [];
 	exportEntries.forEach( ( entry ) => {
@@ -140,6 +129,7 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 		if ( entry.localName === NAMESPACE_EXPORT ) {
 			doc.forEach( ( namedExport ) => {
 				ir.push( {
+					path,
 					name: namedExport.name,
 					description: namedExport.description,
 					tags: namedExport.tags,
@@ -149,6 +139,7 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 			} );
 		} else {
 			ir.push( {
+				path,
 				name: entry.exportName,
 				description: get( doc, [ 'description' ], UNDOCUMENTED ),
 				tags: get( doc, [ 'tags' ], [] ),

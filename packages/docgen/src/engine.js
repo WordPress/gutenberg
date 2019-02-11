@@ -27,12 +27,13 @@ const getExportTokens = ( ast ) => ast.body.filter(
 	].some( ( declaration ) => declaration === node.type )
 );
 
-const engine = ( code, getIRFromPath = () => {} ) => {
+const engine = ( path, code, getIRFromPath = () => {} ) => {
 	const result = {};
 	result.ast = getAST( code );
 	result.tokens = getExportTokens( result.ast );
 	result.ir = flatten( result.tokens.map(
 		( token ) => getIntermediateRepresentation(
+			path,
 			token,
 			result.ast,
 			getIRFromPath

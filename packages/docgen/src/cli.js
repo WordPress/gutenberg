@@ -40,20 +40,21 @@ const relativeToAbsolute = ( basePath, relativePath ) => {
 	process.exit( 1 );
 };
 
-const getIRFromRelativePath = ( basePath ) => ( relativePath ) => {
+const getIRFromRelativePath = ( rootDir, basePath ) => ( relativePath ) => {
 	if ( ! relativePath.startsWith( './' ) ) {
 		return [];
 	}
 	const absolutePath = relativeToAbsolute( basePath, relativePath );
-	const result = processFile( absolutePath );
+	const result = processFile( rootDir, absolutePath );
 	return result.ir || undefined;
 };
 
-const processFile = ( inputFile ) => {
+const processFile = ( rootDir, inputFile ) => {
 	try {
 		const data = fs.readFileSync( inputFile, 'utf8' );
 		currentFileStack.push( inputFile );
-		const result = engine( data, getIRFromRelativePath( last( currentFileStack ) ) );
+		const relativePath = path.relative( rootDir, inputFile );
+		const result = engine( relativePath, data, getIRFromRelativePath( rootDir, last( currentFileStack ) ) );
 		currentFileStack.pop( inputFile );
 		return result;
 	} catch ( e ) {
@@ -68,19 +69,20 @@ const processFile = ( inputFile ) => {
  */
 
 // Prepare input
+const processDir = process.cwd();
 let initialInputFile = process.argv[ 2 ];
 if ( initialInputFile === undefined ) {
 	process.stdout.write( '\nUsage: <path-to-docgen> <relative-path-to-entry-point.js>' );
 	process.stdout.write( '\n\n' );
 	process.exit( 1 );
 }
-initialInputFile = path.join( process.cwd(), initialInputFile );
+initialInputFile = path.join( processDir, initialInputFile );
 
 const debugMode = process.argv[ 3 ] === '--debug' ? true : false;
 
 // Process
 const currentFileStack = []; // To keep track of file being processed.
-const result = processFile( initialInputFile );
+const result = processFile( processDir, initialInputFile );
 
 // Ouput
 const inputBase = path.join(
