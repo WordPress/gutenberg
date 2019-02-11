@@ -60,6 +60,18 @@ const processFile = ( rootDir, inputFile ) => {
 	}
 };
 
+const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols ) => {
+	try {
+		const customFormatter = require( customFormatterFile );
+		return customFormatter( rootDir, doc, symbols );
+	} catch ( e ) {
+		process.stdout.write( `\n${ e }` );
+		process.stdout.write( '\n\n' );
+		process.exit( 1 );
+	}
+	return 'custom formatter';
+};
+
 /**
  * Start up processing.
  */
@@ -67,15 +79,20 @@ const processFile = ( rootDir, inputFile ) => {
 const optionator = require( 'optionator' )( {
 	prepend: 'Usage: node <path-to-docgen> <relative-path-to-entry-point>',
 	options: [ {
+		option: 'formatter',
+		alias: 'f',
+		type: 'String',
+		description: 'A custom function to format the generated documentation.',
+	}, {
 		option: 'output',
 		alias: 'o',
 		type: 'String',
-		description: 'Markdown file to contain API docs',
+		description: 'Output file to will contain the API documentation.',
 	}, {
 		option: 'debug',
 		type: 'Boolean',
 		default: false,
-		description: 'run in debug mode, which outputs intermediate files',
+		description: 'Run in debug mode, which outputs some intermediate files useful for debugging.',
 	} ],
 } );
 
@@ -117,7 +134,12 @@ if ( result === undefined ) {
 	process.exit( 0 );
 }
 
-fs.writeFileSync( doc, formatter( processDir, doc, result.ir ) );
+const outputContents = options.formatter ?
+	runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, result, ir ) :
+	formatter( processDir, doc, result.ir );
+
+fs.writeFileSync( doc, outputContents );
+
 if ( debugMode ) {
 	fs.writeFileSync( ir, JSON.stringify( result.ir ) );
 	fs.writeFileSync( tokens, JSON.stringify( result.tokens ) );
