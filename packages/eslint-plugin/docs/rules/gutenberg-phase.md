@@ -4,14 +4,14 @@ To enable the use of feature flags in Gutenberg, the GUTENBERG_PHASE global cons
 
 There are a few rules around using this constant:
 
-- Only access `GUTENBERG_PHASE` via the window object, e.g. `window.GUTENBERG_PHASE`. This ensures that environments that do not inject the variable at build time do not encounter an error due to an undefined global variable (`window.GUTENBERG_PHASE` evaluates as undefined, while `GUTENBERG_PHASE` throws an error.). The webpack configuration will also only replace exact matches of `window.GUTENBERG_PHASE`.
-- The `GUTENBERG_PHASE` variable should only be used in a strict equality comparison with a number, e.g. `window.GUTENBERG_PHASE === 2` or `window.GUTENBERG_PHASE !== 2`. The value of the injected variable should always be a number, so this ensures the correct evaluation of the expression. Furthermore, when `GUTENBERG_PHASE` is undefined this comparison still returns either true (for `!==`) or false (for `===`), whereas both the `<` and `>` operators will always return false.
-- `GUTENBERG_PHASE` should only be used within the condition of an if statement, e.g. `if ( window.GUTENBERG_PHASE === 2 ) { // implement feature here }`. This rule ensure that where the expression `window.GUTENBERG_PHASE === 2` resolves to false, the entire if statement and its body is removed through dead code elimination.
+- Only access `GUTENBERG_PHASE` via `process.env`, e.g. `process.env.GUTENBERG_PHASE`. This is required since webpack's define plugin only replaces exact matches of `process.env.GUTENBERG_PHASE` in the codebase.
+- The `GUTENBERG_PHASE` variable should only be used in a strict equality comparison with a number, e.g. `process.env.GUTENBERG_PHASE === 2` or `process.env.GUTENBERG_PHASE !== 2`. The value of the injected variable should always be a number, so this ensures the correct evaluation of the expression. Furthermore, when `process.env.GUTENBERG_PHASE` is undefined this comparison still returns either true (for `!==`) or false (for `===`), whereas both the `<` and `>` operators will always return false.
+- `GUTENBERG_PHASE` should only be used within the condition of an if statement, e.g. `if ( process.env.GUTENBERG_PHASE === 2 ) { // implement feature here }` or ternary `process.env.GUTENBERG_PHASE === 2 ? something : somethingElse`. This rule ensures code that is disabled through a feature flag is removed by dead code elimination.
 
 
 ## Rule details
 
-The following patterns are considered warnings:
+Examples of **incorrect** code for this rule:
 
 ```js
 if ( GUTENBERG_PHASE === 2 ) {
@@ -26,37 +26,37 @@ if ( window[ 'GUTENBERG_PHASE' ] === 2 ) {
 ```
 
 ```js
-if ( window.GUTENBERG_PHASE === '2' ) {
+if ( process.env.GUTENBERG_PHASE === '2' ) {
 	// implement feature here.
 }
 ```
 
 ```js
-if ( window.GUTENBERG_PHASE > 2 ) {
+if ( process.env.GUTENBERG_PHASE > 2 ) {
 	// implement feature here.
 }
 ```
 
 ```js
-if ( true || window.GUTENBERG_PHASE > 2 ) {
+if ( true || process.env.GUTENBERG_PHASE > 2 ) {
 	// implement feature here.
 }
 ```
 
 ```js
-const isMyFeatureActive = window.GUTENBERG_PHASE === 2;
+const isMyFeatureActive = process.env.GUTENBERG_PHASE === 2;
 ```
 
-The following patterns are not considered warnings:
+Examples of **correct** code for this rule:
 
 ```js
-if ( window.GUTENBERG_PHASE === 2 ) {
+if ( process.env.GUTENBERG_PHASE === 2 ) {
 	// implement feature here.
 }
 ```
 
 ```js
-if ( window.GUTENBERG_PHASE !== 2 ) {
+if ( process.env.GUTENBERG_PHASE !== 2 ) {
 	return;
 }
 ```

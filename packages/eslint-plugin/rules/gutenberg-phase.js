@@ -21,13 +21,13 @@ function findParent( sourceNode, predicate ) {
 }
 
 /**
- * Tests whether the GUTENBERG_PHASE variable is accessed via the global window
- * object, triggering a violation if not.
+ * Tests whether the GUTENBERG_PHASE variable is accessed via
+ * `process.env.GUTENBERG_PHASE`.
  *
  * @example
  * ```js
  * // good
- * if ( window.GUTENBERG_PHASE === 2 ) {
+ * if ( process.env.GUTENBERG_PHASE === 2 ) {
  *
  * // bad
  * if ( GUTENBERG_PHASE === 2 ) {
@@ -36,15 +36,13 @@ function findParent( sourceNode, predicate ) {
  * @param {Object} node    The GUTENBERG_PHASE identifier node.
  * @param {Object} context The eslint context object.
  */
-function testIsAccessedViaWindowObject( node, context ) {
+function testIsAccessedViaProcessEnv( node, context ) {
 	const parent = node.parent;
 
 	if (
 		parent &&
-		node.type === 'Identifier' &&
 		parent.type === 'MemberExpression' &&
-		parent.object.name === 'window' &&
-		! parent.computed
+		context.getSource( parent ) === 'process.env.GUTENBERG_PHASE'
 
 	) {
 		return;
@@ -52,7 +50,7 @@ function testIsAccessedViaWindowObject( node, context ) {
 
 	context.report(
 		node,
-		'The `GUTENBERG_PHASE` constant should only be accessed as a property of the `window` object using dot notation.',
+		'The `GUTENBERG_PHASE` constant should be accessed using `process.env.GUTENBERG_PHASE`.',
 	);
 }
 
@@ -64,10 +62,10 @@ function testIsAccessedViaWindowObject( node, context ) {
  * @example
  * ```js
  * // good
- * if ( window.GUTENBERG_PHASE === 2 ) {
+ * if ( process.env.GUTENBERG_PHASE === 2 ) {
  *
  * // bad
- * if ( window.GUTENBERG_PHASE >= '2' ) {
+ * if ( process.env.GUTENBERG_PHASE >= '2' ) {
  * ```
  *
  * @param {Object} node    The GUTENBERG_PHASE identifier node.
@@ -79,7 +77,7 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
 	if ( parent ) {
 		const comparisonNode = node.parent.type === 'MemberExpression' ? node.parent : node;
 
-		// Test for window.GUTENBERG_PHASE === <number> or <number> === window.GUTENBERG_PHASE
+		// Test for process.env.GUTENBERG_PHASE === <number> or <number> === process.env.GUTENBERG_PHASE
 		const hasCorrectOperator = [ '===', '!==' ].includes( parent.operator );
 		const hasCorrectOperands = (
 			( parent.left === comparisonNode && typeof parent.right.value === 'number' ) ||
@@ -104,10 +102,10 @@ function testIsUsedInStrictBinaryExpression( node, context ) {
  * @example
  * ```js
  * // good
- * if ( window.GUTENBERG_PHASE === 2 ) {
+ * if ( process.env.GUTENBERG_PHASE === 2 ) {
  *
  * // bad
- * const isFeatureActive = window.GUTENBERG_PHASE === 2;
+ * const isFeatureActive = process.env.GUTENBERG_PHASE === 2;
  * ```
  *
  * @param {Object} node    The GUTENBERG_PHASE identifier node.
@@ -148,7 +146,7 @@ module.exports = {
 					return;
 				}
 
-				testIsAccessedViaWindowObject( node, context );
+				testIsAccessedViaProcessEnv( node, context );
 				testIsUsedInStrictBinaryExpression( node, context );
 				testIsUsedInIfOrTernary( node, context );
 			},
@@ -159,7 +157,7 @@ module.exports = {
 				}
 
 				if ( node.parent && node.parent.type === 'MemberExpression' ) {
-					testIsAccessedViaWindowObject( node, context );
+					testIsAccessedViaProcessEnv( node, context );
 				}
 			},
 		};
