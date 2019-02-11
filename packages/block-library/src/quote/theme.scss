@@ -13,6 +13,7 @@
 		font-style: normal;
 	}
 
+	&[style*="text-align:right"],
 	&[style*="text-align: right"] {
 		border-left: none;
 		border-right: 4px solid $black;
