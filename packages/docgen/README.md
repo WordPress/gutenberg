@@ -13,6 +13,15 @@ Some characteristics:
 
 This command will generate a file named `entry-point-api.md` containing all the exports and its JSDoc comments.
 
+### CLI options
+
+* **--formatter** or **-f** `(String)`: An optional custom formatter to control the contents of the output file. It should be a CommonJS module that exports a function that takes as input:
+  * *rootDir* `(String)`: current working directory as seen by docgen.
+  * *docPath* `(String)`: path of the output document to generate.
+  * *symbols* `(Array)`: the symbols found.
+* **--output** or **-o** `(String)`: Output file that will contain the API documentation.
+* **--debug**: Run in debug mode, which outputs some intermediate files useful for debugging
+
 ## Examples
 
 ### Default export
