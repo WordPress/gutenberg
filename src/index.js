@@ -8,7 +8,7 @@ const gutenbergSetup = () => {
 	const apiFetch = require( '@wordpress/api-fetch' ).default;
 	const wpData = require( '@wordpress/data' );
 
-	I18nManager.forceRTL(false); // Change to `true` to debug RTL layout easily.
+	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 
 	// wp-api-fetch
 	apiFetch.use( apiFetch.createRootURLMiddleware( 'https://public-api.wordpress.com/' ) );
