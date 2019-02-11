@@ -1,5 +1,9 @@
 ## 7.1.0 (Unreleased)
 
+### New Features
+
+- Added a new `Animate` component.
+
 ### Improvements
 
 - `withFilters` has been optimized to avoid binding hook handlers for each mounted instance of the component, instead using a single centralized hook delegator.
@@ -14,6 +18,7 @@
 
 - `Dropdown` now has a `focusOnMount` prop which is passed directly to the contained `Popover`.
 - `DatePicker` has new prop `isInvalidDate` exposing react-dates' `isOutsideRange`.
+- `DatePicker` allows `null` as accepted value for `currentDate` prop to signify no date selection.
 
 ## 7.0.5 (2019-01-03)
 
