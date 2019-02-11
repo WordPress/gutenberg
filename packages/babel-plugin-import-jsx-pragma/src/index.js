@@ -69,9 +69,18 @@ export default function( babel ) {
 					}
 				} );
 			},
+			VariableDeclaration( path, state ) {
+				if ( state.hasDeclaredScopeVariable ) {
+					return;
+				}
+
+				const { scopeVariable } = getOptions( state );
+
+				state.hasDeclaredScopeVariable = ! path.scope.parent && path.scope.hasOwnBinding( scopeVariable );
+			},
 			Program: {
 				exit( path, state ) {
-					if ( ! state.hasJSX || state.hasImportedScopeVariable ) {
+					if ( ! state.hasJSX || state.hasImportedScopeVariable || state.hasDeclaredScopeVariable ) {
 						return;
 					}
 

@@ -35,11 +35,18 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 		expect( string ).toBe( original );
 	} );
 
+	it( 'does nothing if the scope variable is already defined', () => {
+		const original = 'const React = require("react");\n\nlet foo = <bar />;';
+		const string = getTransformedCode( original );
+
+		expect( string ).toBe( original );
+	} );
+
 	it( 'adds import for scope variable', () => {
 		const original = 'let foo = <bar />;';
 		const string = getTransformedCode( original );
 
-		expect( string ).toBe( 'import React from "react";\nlet foo = <bar />;' );
+		expect( string ).toBe( 'import React from "react";\n' + original );
 	} );
 
 	it( 'allows options customization', () => {
@@ -50,15 +57,24 @@ describe( 'babel-plugin-import-jsx-pragma', () => {
 			isDefault: false,
 		} );
 
-		expect( string ).toBe( 'import { createElement } from "@wordpress/element";\nlet foo = <bar />;' );
+		expect( string ).toBe( 'import { createElement } from "@wordpress/element";\n' + original );
 	} );
 
-	it( 'does nothing if the scope variable is already defined when using custom options', () => {
-		const original = 'const { createElement } = wp.element;\nlet foo = <bar />;';
+	it( 'adds import for scope variable even when defined inside the local scope', () => {
+		const original = 'let foo = <bar />;\n\nfunction local() {\n  const createElement = wp.element.createElement;\n}';
 		const string = getTransformedCode( original, {
 			scopeVariable: 'createElement',
 			source: '@wordpress/element',
 			isDefault: false,
+		} );
+
+		expect( string ).toBe( 'import { createElement } from "@wordpress/element";\n' + original );
+	} );
+
+	it( 'does nothing if the scope variable is already defined when using custom options', () => {
+		const original = 'const {\n  createElement\n} = wp.element;\nlet foo = <bar />;';
+		const string = getTransformedCode( original, {
+			scopeVariable: 'createElement',
 		} );
 
 		expect( string ).toBe( original );
