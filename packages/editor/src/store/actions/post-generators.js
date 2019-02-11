@@ -252,10 +252,6 @@ export function* refreshPost() {
 		MODULE_KEY,
 		'getCurrentPost'
 	);
-	if ( ! post.id ) {
-		// bail because there's no current post yet so nothing to refresh.
-		return;
-	}
 	const postTypeSlug = yield select(
 		MODULE_KEY,
 		'getCurrentPostType'
