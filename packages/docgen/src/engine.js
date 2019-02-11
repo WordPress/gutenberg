@@ -11,6 +11,7 @@ const getIntermediateRepresentation = require( './get-intermediate-representatio
 
 const getAST = ( source ) => espree.parse( source, {
 	attachComment: true,
+	loc: true,
 	ecmaVersion: 2018,
 	ecmaFeatures: {
 		jsx: true,

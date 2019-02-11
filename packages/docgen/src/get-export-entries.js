@@ -15,6 +15,8 @@ const { get } = require( 'lodash' );
  *    localName: 'localName',
  *    exportName: 'exportedName',
  *    module: null,
+ *    lineStart: 2,
+ *    lineEnd: 3,
  * } ]
  */
 module.exports = function( token ) {
@@ -39,6 +41,8 @@ module.exports = function( token ) {
 			localName: getLocalName( token ),
 			exportName: 'default',
 			module: null,
+			lineStart: token.loc.start.line,
+			lineEnd: token.loc.end.line,
 		} ];
 	}
 
@@ -47,6 +51,8 @@ module.exports = function( token ) {
 			localName: '*',
 			exportName: null,
 			module: token.source.value,
+			lineStart: token.loc.start.line,
+			lineEnd: token.loc.end.line,
 		} ];
 	}
 
@@ -56,6 +62,8 @@ module.exports = function( token ) {
 			localName: specifier.local.name,
 			exportName: specifier.exported.name,
 			module: get( token.source, [ 'value' ], null ),
+			lineStart: specifier.loc.start.line,
+			lineEnd: specifier.loc.end.line,
 		} ) );
 		return name;
 	}
@@ -67,6 +75,8 @@ module.exports = function( token ) {
 				localName: token.declaration.id.name,
 				exportName: token.declaration.id.name,
 				module: null,
+				lineStart: token.declaration.loc.start.line,
+				lineEnd: token.declaration.loc.end.line,
 			} );
 			break;
 
@@ -76,6 +86,8 @@ module.exports = function( token ) {
 					localName: declaration.id.name,
 					exportName: declaration.id.name,
 					module: null,
+					lineStart: token.declaration.loc.start.line,
+					lineEnd: token.declaration.loc.end.line,
 				} );
 			} );
 			break;
