@@ -254,7 +254,7 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.updateAlt }
 				/>
 				<BottomSheet.Cell
-					label={ __( 'Reset to Original' ) }
+					label={ __( 'Clear All Settings' ) }
 					labelStyle={ styles.resetSettingsButton }
 					drawSeparator={ false }
 					onPress={ this.onRevertSettings }
