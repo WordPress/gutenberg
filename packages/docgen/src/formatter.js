@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+const path = require( 'path' );
+
+/**
  * Internal dependencies
  */
 const getType = require( './get-type-as-string' );
@@ -70,7 +75,10 @@ module.exports = function( symbols ) {
 	} );
 	if ( symbols && symbols.length > 0 ) {
 		symbols.forEach( ( symbol ) => {
+			const symbolPath = path.basename( symbol.path );
+			const symbolPathWithLines = `${ symbolPath }#L${ symbol.lineStart }-L${ symbol.lineEnd }`;
 			docs.push( `## ${ symbol.name }` );
+			docs.push( `\n\n[${ symbolPathWithLines }](${ symbolPathWithLines })` );
 			formatDeprecated( getTagsByName( symbol.tags, 'deprecated' ), docs );
 			formatDescription( symbol.description, docs );
 			formatTag(
