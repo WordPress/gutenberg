@@ -23,6 +23,8 @@ test( 'IR - undocumented', function( t ) {
 		name: 'default',
 		description: 'Undocumented declaration.',
 		tags: [],
+		lineStart: 3,
+		lineEnd: 3,
 	} ] );
 	const tokenOneliner = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-undocumented-oneliner.json' ),
@@ -32,6 +34,8 @@ test( 'IR - undocumented', function( t ) {
 		name: 'default',
 		description: 'Undocumented declaration.',
 		tags: [],
+		lineStart: 2,
+		lineEnd: 2,
 	} ] );
 	t.end();
 } );
@@ -45,6 +49,8 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 		name: 'default',
 		description: 'Class declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	const tokenClassNamed = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-named.json' ),
@@ -54,6 +60,8 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 		name: 'default',
 		description: 'Class declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	const tokenFnAnonymous = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-function-anonymous.json' ),
@@ -63,6 +71,8 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 		name: 'default',
 		description: 'Function declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	const tokenFnNamed = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-function-named.json' ),
@@ -72,6 +82,8 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 		name: 'default',
 		description: 'Function declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	const tokenVariable = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-variable.json' ),
@@ -81,6 +93,8 @@ test( 'IR - JSDoc in export statement (default export)', function( t ) {
 		name: 'default',
 		description: 'Variable declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	t.end();
 } );
@@ -94,6 +108,8 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 		name: 'MyDeclaration',
 		description: 'My declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	const tokenFn = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-function.json' ),
@@ -103,6 +119,8 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	const tokenVariable = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-variable.json' ),
@@ -112,14 +130,16 @@ test( 'IR - JSDoc in export statement (named export)', function( t ) {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
 		tags: [],
+		lineStart: 4,
+		lineEnd: 4,
 	} ] );
 	const tokenVariables = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-variables.json' ),
 		'utf-8'
 	);
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenVariables ) ), [
-		{ name: 'firstDeclaration', description: 'My declaration example.', tags: [] },
-		{ name: 'secondDeclaration', description: 'My declaration example.', tags: [] },
+		{ name: 'firstDeclaration', description: 'My declaration example.', tags: [], lineStart: 4, lineEnd: 5 },
+		{ name: 'secondDeclaration', description: 'My declaration example.', tags: [], lineStart: 4, lineEnd: 5 },
 	] );
 	t.end();
 } );
@@ -137,6 +157,8 @@ test( 'IR - JSDoc in same file (default export)', function( t ) {
 		name: 'default',
 		description: 'Class declaration example.',
 		tags: [],
+		lineStart: 6,
+		lineEnd: 6,
 	} ] );
 	const namedExport = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-named-export.json' ),
@@ -148,11 +170,11 @@ test( 'IR - JSDoc in same file (default export)', function( t ) {
 	);
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( namedExport )[ 0 ], JSON.parse( namedExportAST ) ),
-		[ { name: 'functionDeclaration', description: 'Function declaration example.', tags: [] } ]
+		[ { name: 'functionDeclaration', description: 'Function declaration example.', tags: [], lineStart: 4, lineEnd: 4 } ]
 	);
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( namedExport )[ 1 ], JSON.parse( namedExportAST ) ),
-		[ { name: 'default', description: 'Function declaration example.', tags: [] } ]
+		[ { name: 'default', description: 'Function declaration example.', tags: [], lineStart: 6, lineEnd: 6 } ]
 	);
 	t.end();
 } );
@@ -169,8 +191,10 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( token ), JSON.parse( ast ) ), [ {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
-		tags: [] },
-	] );
+		tags: [],
+		lineStart: 6,
+		lineEnd: 6,
+	} ] );
 	const tokenObject = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifier-destructuring.json' ),
 		'utf-8'
@@ -182,8 +206,10 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokenObject ), JSON.parse( astObject ) ), [ {
 		name: 'myDeclaration',
 		description: 'My declaration example.',
-		tags: [] },
-	] );
+		tags: [],
+		lineStart: 6,
+		lineEnd: 6,
+	} ] );
 	const tokens = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifiers.json' ),
 		'utf-8'
@@ -193,9 +219,9 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 		'utf-8'
 	);
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( tokens ), JSON.parse( asts ) ), [
-		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
-		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
-		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
+		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [], lineStart: 16, lineEnd: 16 },
+		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [], lineStart: 16, lineEnd: 16 },
+		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [], lineStart: 16, lineEnd: 16 },
 	] );
 	const foo = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-identifiers-and-inline.json' ),
@@ -206,11 +232,11 @@ test( 'IR - JSDoc in same file (named export)', function( t ) {
 		'utf-8'
 	);
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( foo )[ 0 ], JSON.parse( bar ) ), [
-		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
-		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
+		{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [], lineStart: 11, lineEnd: 11 },
+		{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [], lineStart: 11, lineEnd: 11 },
 	] );
 	t.deepEqual( getIntermediateRepresentation( JSON.parse( foo )[ 1 ], JSON.parse( bar ) ), [
-		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
+		{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [], lineStart: 16, lineEnd: 16 },
 	] );
 	t.end();
 } );
@@ -227,9 +253,9 @@ test( 'IR - JSDoc in module dependency (named export)', function( t ) {
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenImportNamed ), { body: [] }, getModuleImportNamed ),
 		[
-			{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [] },
-			{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [] },
-			{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [] },
+			{ name: 'functionDeclaration', description: 'Function declaration example.', tags: [], lineStart: 2, lineEnd: 2 },
+			{ name: 'variableDeclaration', description: 'Variable declaration example.', tags: [], lineStart: 3, lineEnd: 3 },
+			{ name: 'ClassDeclaration', description: 'Class declaration example.', tags: [], lineStart: 4, lineEnd: 4 },
 		]
 	);
 	t.end();
@@ -246,7 +272,7 @@ test( 'IR - JSDoc in module dependency (named default export)', function( t ) {
 	) );
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenDefault ), { body: [] }, getModule ),
-		[ { name: 'default', description: 'Module declaration.', tags: [] } ]
+		[ { name: 'default', description: 'Module declaration.', tags: [], lineStart: 1, lineEnd: 1 } ]
 	);
 	const tokenDefaultExported = fs.readFileSync(
 		path.join( __dirname, './fixtures/named-default-exported.json' ),
@@ -254,7 +280,7 @@ test( 'IR - JSDoc in module dependency (named default export)', function( t ) {
 	);
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenDefaultExported ), { body: [] }, getModule ),
-		[ { name: 'moduleName', description: 'Module declaration.', tags: [] } ]
+		[ { name: 'moduleName', description: 'Module declaration.', tags: [], lineStart: 1, lineEnd: 1 } ]
 	);
 
 	t.end();
@@ -311,6 +337,8 @@ test( 'IR - JSDoc in module dependency through import (default export)', functio
 			name: 'default',
 			description: 'Function declaration.',
 			tags: [],
+			lineStart: 3,
+			lineEnd: 3,
 		} ]
 	);
 	const tokenNamed = fs.readFileSync(
@@ -331,6 +359,8 @@ test( 'IR - JSDoc in module dependency through import (default export)', functio
 			name: 'default',
 			description: 'Function declaration.',
 			tags: [],
+			lineStart: 3,
+			lineEnd: 3,
 		} ]
 	);
 	t.end();
@@ -359,7 +389,7 @@ test( 'IR - JSDoc in module dependency through import (named export)', function(
 	};
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenImportNamespace ), JSON.parse( astImportNamespace ), getModuleImportNamespace ),
-		[ { name: 'variables', description: 'Undocumented declaration.', tags: [] } ]
+		[ { name: 'variables', description: 'Undocumented declaration.', tags: [], lineStart: 3, lineEnd: 3 } ]
 	);
 	t.end();
 } );

@@ -143,6 +143,8 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 					name: namedExport.name,
 					description: namedExport.description,
 					tags: namedExport.tags,
+					lineStart: namedExport.lineStart,
+					lineEnd: namedExport.lineEnd,
 				} );
 			} );
 		} else {
@@ -150,6 +152,8 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 				name: entry.exportName,
 				description: get( doc, [ 'description' ], UNDOCUMENTED ),
 				tags: get( doc, [ 'tags' ], [] ),
+				lineStart: entry.lineStart,
+				lineEnd: entry.lineEnd,
 			} );
 		}
 	} );
