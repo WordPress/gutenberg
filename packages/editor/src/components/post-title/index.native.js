@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { createElement, Component, forwardRef } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
@@ -10,7 +10,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
 
 const minHeight = 53;
 
-class PostTitle extends Component {
+class PostTitleComponent extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -90,8 +90,25 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-export default compose(
-	applyWithDispatch,
-	withInstanceId,
-	withFocusOutside
-)( PostTitle );
+export function PostTitle(props, ref) {
+/*
+	const component = (
+		<PostTitleComponent
+			{ ...props }
+			ref={ ref } />
+	);*/
+
+	//const component = PostTitleComponent({ ...props, ref })
+
+	//console.log("Component: " + JSON.stringify(component));
+
+	return compose(
+		applyWithDispatch,
+		withInstanceId,
+		withFocusOutside
+	)( PostTitleComponent );
+};
+
+
+
+export default forwardRef( PostTitle );
