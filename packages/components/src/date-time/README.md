@@ -41,10 +41,11 @@ The component accepts the following props:
 
 ### currentDate
 
-The current date and time at initialization.
+The current date and time at initialization. Optionally pass in a `null` value to specify no date is currently selected.
 
 - Type: `string`
-- Required: Yes
+- Required: No
+- Default: today's date
 
 ### onChange
 
@@ -59,4 +60,11 @@ The function called when a new date or time has been selected. It is passed the 
 Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is displayed and the time format is assumed to be MM-DD-YYYY.
 
 - Type: `bool`
+- Required: No
+
+### isInvalidDate
+
+A callback function which receives a Date object representing a day as an argument, and should return a Boolean to signify if the day is valid or not.
+
+- Type: `Function`
 - Required: No

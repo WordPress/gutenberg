@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import IconButton from '../icon-button';
 

@@ -1,16 +1,16 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import classnames from 'classnames';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import KeyboardShortcuts from '../../keyboard-shortcuts';
 

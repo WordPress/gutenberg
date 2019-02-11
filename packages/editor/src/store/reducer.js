@@ -680,7 +680,7 @@ export const editor = flow( [
 /**
  * Reducer returning the initial edits state. With matching shape to that of
  * `editor.edits`, the initial edits are those applied programmatically, are
- * not considered in prmopting the user for unsaved changes, and are included
+ * not considered in prompting the user for unsaved changes, and are included
  * in (and reset by) the next save payload.
  *
  * @param {Object} state  Current state.

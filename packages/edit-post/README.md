@@ -112,6 +112,7 @@ The callback function to be executed when the user clicks the menu item.
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
 
 If you wish to display the sidebar, you can with use the [`PluginSidebarMoreMenuItem`](#pluginsidebarmoremenuitem) component or the `wp.data.dispatch` API:
+
 ```js
 wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'plugin-name/sidebar-name' );
 ```
@@ -173,6 +174,13 @@ A string identifying the sidebar. Must be unique for every sidebar registered wi
 
 - Type: `String`
 - Required: Yes
+
+##### className
+
+An optional class name added to the sidebar body.
+
+- Type: `String`
+- Required: No
 
 ##### title
 

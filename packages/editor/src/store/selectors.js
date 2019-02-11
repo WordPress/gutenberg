@@ -583,7 +583,7 @@ export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
 	const status = getEditedPostAttribute( state, 'status' );
-	if ( status === 'draft' || status === 'auto-draft' ) {
+	if ( status === 'draft' || status === 'auto-draft' || status === 'pending' ) {
 		return date === modified;
 	}
 	return false;
@@ -1819,7 +1819,7 @@ export const canInsertBlockType = createSelector(
  * @param {string} id    A string which identifies the insert, e.g. 'core/block/12'
  *
  * @return {?{ time: number, count: number }} An object containing `time` which is when the last
- *                                            insert occured as a UNIX epoch, and `count` which is
+ *                                            insert occurred as a UNIX epoch, and `count` which is
  *                                            the number of inserts that have occurred.
  */
 function getInsertUsage( state, id ) {

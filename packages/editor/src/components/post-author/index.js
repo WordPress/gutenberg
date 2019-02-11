@@ -4,7 +4,6 @@
 import { __ } from '@wordpress/i18n';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-import { withFilters } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -64,5 +63,4 @@ export default compose( [
 		},
 	} ) ),
 	withInstanceId,
-	withFilters( 'editor.PostAuthor' ),
 ] )( PostAuthor );
