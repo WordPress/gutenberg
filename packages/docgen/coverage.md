@@ -1,6 +1,6 @@
 # Coverage
 
-Packages outside of scope:
+## Packages outside of scope
 
 - babel-plugin-makepot. CommonJS module. Babel plugin.
 - babel-preset-default. CommonJS module. Babel preset.
@@ -16,9 +16,9 @@ Packages outside of scope:
 - postcss-themes. CommonJS module.
 - scripts. CommonJS module.
 
-TODO:
+## TODO
 
-These either happen in private API, aren't relevant, or pend of decission.
+These either happen in private API, aren't relevant, or are pending of decission.
 
 - [ ] go undocummented: `unstable__*`, rich-text `unstableToDom`, `experimental__`
 - [ ] `constants` keycodes, rich-text `LINE_SEPARATOR`
@@ -38,7 +38,7 @@ These either happen in private API, aren't relevant, or pend of decission.
 - [ ] `@throws` packages/blocks/src/api/node.js
 - [ ] `@typedef` packages/blocks/src/api/registration.js
 
-DONE:
+## DONE
 
 - [x] a11y
 - [x] annotations
