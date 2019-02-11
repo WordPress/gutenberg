@@ -1,16 +1,12 @@
 /**
- * Node dependencies.
+ * External dependencies
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-
-/**
- * External dependencies.
- */
 const { last } = require( 'lodash' );
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 const engine = require( './engine' );
 const formatter = require( './formatter' );
@@ -68,17 +64,30 @@ const processFile = ( rootDir, inputFile ) => {
  * Start up processing.
  */
 
+const optionator = require( 'optionator' )( {
+	prepend: 'Usage: node <path-to-docgen> <relative-path-to-entry-point>',
+	options: [ {
+		option: 'debug',
+		type: 'Boolean',
+		default: false,
+		description: 'run in debug mode, which outputs intermediate files',
+	} ],
+} );
+
+const options = optionator.parseArgv( process.argv );
+
 // Prepare input
 const processDir = process.cwd();
-let initialInputFile = process.argv[ 2 ];
+let initialInputFile = options._[ 0 ];
 if ( initialInputFile === undefined ) {
-	process.stdout.write( '\nUsage: <path-to-docgen> <relative-path-to-entry-point.js>' );
+	process.stdout.write( '\n' );
+	process.stdout.write( optionator.generateHelp() );
 	process.stdout.write( '\n\n' );
 	process.exit( 1 );
 }
 initialInputFile = path.join( processDir, initialInputFile );
 
-const debugMode = process.argv[ 3 ] === '--debug' ? true : false;
+const debugMode = options.debug ? true : false;
 
 // Process
 const currentFileStack = []; // To keep track of file being processed.

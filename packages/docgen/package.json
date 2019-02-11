@@ -19,6 +19,9 @@
 	"bin": {
 		"docgen": "./src/cli.js"
 	},
+	"dependencies": {
+		"optionator": "0.8.2"
+	},
 	"devDependencies": {
 		"faucet": "0.0.1",
 		"tape": "4.9.2"
