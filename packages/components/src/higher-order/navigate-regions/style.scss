@@ -18,8 +18,21 @@
 		}
 
 		&:focus {
+			outline-style: solid;
+			outline-color: $blue-medium-400;
 			animation: editor-animation__region-focus 0.2s ease-out;
 			animation-fill-mode: forwards;
 		}
+	}
+}
+
+@keyframes editor-animation__region-focus {
+	from {
+		outline-width: 0;
+		outline-offset: 0;
+	}
+	to {
+		outline-width: 4px;
+		outline-offset: -4px;
 	}
 }

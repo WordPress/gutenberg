@@ -215,6 +215,7 @@
 	z-index: z-index(".edit-post-toggle-publish-panel");
 	padding: 10px 10px 10px 0;
 	width: $sidebar-width;
+	background-color: $white;
 
 	&:focus {
 		top: auto;
