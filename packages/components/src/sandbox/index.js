@@ -198,7 +198,7 @@ class Sandbox extends Component {
 	}
 
 	render() {
-		const { title } = this.props;
+		const { title, onFocus } = this.props;
 
 		return (
 			<FocusableIframe
@@ -207,6 +207,7 @@ class Sandbox extends Component {
 				className="components-sandbox"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
+				onFocus={ onFocus }
 				width={ Math.ceil( this.state.width ) }
 				height={ Math.ceil( this.state.height ) } />
 		);

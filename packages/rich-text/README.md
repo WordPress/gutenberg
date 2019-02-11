@@ -24,14 +24,10 @@ create( {
 	?range: Range,
 	?multilineTag: string,
 	?multilineWrapperTags: Array,
-	?removeNode: Function,
-	?unwrapNode: Function,
-	?filterString: Function,
-	?removeAttribute: Function,
 } ): Object
 ```
 
-Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any arguments, an empty value will be created. If `multilineTag` is provided, any content of direct children whose type matches `multilineTag` will be separated by a line separator. The remaining parameters can be used to filter out content.
+Create a RichText value from an `Element` tree (DOM), an HTML string or a plain text string, with optionally a `Range` object to set the selection. If called without any arguments, an empty value will be created. If `multilineTag` is provided, any content of direct children whose type matches `multilineTag` will be separated by a line separator.
 
 ### toHTMLString
 
@@ -53,7 +49,6 @@ apply( {
 	current: Element,
 	?multilineTag: string
 	?multilineWrapperTags: Array,
-	?createLinePadding: Function,
 } ): void
 ```
 
