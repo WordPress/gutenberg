@@ -6,11 +6,34 @@ The technique for handling this is known as a 'feature flag'.
 
 ## Introducing `process.env.GUTENBERG_PHASE`
 
-The `process.env.GUTENBERG_PHASE` is an environment variable containing a number that reprsents the phase. When the codebase is built for the plugin, this variable will be set to `2`. When building for core, it will be set to `1`.
+The `process.env.GUTENBERG_PHASE` is an environment variable containing a number that represents the phase. When the codebase is built for the plugin, this variable will be set to `2`. When building for core, it will be set to `1`.
+
+## Basic Use
+
+A phase 2 function or constant should be exported using the following ternary syntax:
+
+```js
+function myPhaseTwoFeature() {
+	// implementation
+}
+
+export const phaseTwoFeature = process.env.GUTENBERG_PHASE === 2 ? myPhaseTwoFeature : undefined;
+```
+
+In phase 1 environments the `phaseTwoFeature` export will be `undefined`.
+
+If you're attempting to import and call a phase 2 feature, be sure to wrap the call to the function in an if statement to avoid an error:
+```js
+import { phaseTwoFeature } from '@wordpress/foo';
+
+if ( process.env.GUTENBERG_PHASE === 2) {
+	phaseTwoFeature();
+}
+```
 
 ### How it works
 
-More precisely, the `GUTENBERG_PHASE` variable isn't actually set to a value. Instead, any instances of `process.env.GUTENBERG_PHASE` in the codebase will be replaced during the webpack build by webpack's define plugin (https://webpack.js.org/plugins/define-plugin/).
+During the webpack build, any instances of `process.env.GUTENBERG_PHASE` will be replaced using webpack's define plugin (https://webpack.js.org/plugins/define-plugin/).
 
 If you write the following code:
 ```js
@@ -61,29 +84,6 @@ if ( 1 === 2 ) {
 ```
 
 The minification process will remove the entire `if` statement including the body, ensuring code destined for phase 2 is not included in the built JavaScript intended for core.
-
-## Basic Use
-
-A phase 2 function or constant should be exported using the following ternary syntax:
-
-```js
-function myPhaseTwoFeature() {
-	// implementation
-}
-
-export const phaseTwoFeature = process.env.GUTENBERG_PHASE === 2 ? myPhaseTwoFeature : undefined;
-```
-
-In phase 1 environments the `phaseTwoFeature` export will be `undefined`.
-
-If you're attempting to import and call a phase 2 feature, be sure to wrap the call to the function in an if statement to avoid an error:
-```js
-import { phaseTwoFeature } from '@wordpress/foo';
-
-if ( process.env.GUTENBERG_PHASE === 2) {
-	phaseTwoFeature();
-}
-```
 
 ## FAQ
 
