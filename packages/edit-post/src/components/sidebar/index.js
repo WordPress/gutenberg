@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { createSlotFill, withFocusReturn } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';

@@ -4,7 +4,7 @@
 import { flow, map } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { createElement, Component } from '@wordpress/element';
 import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';

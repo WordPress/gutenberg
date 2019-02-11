@@ -2,7 +2,7 @@
 // because we needed to remove source map support.
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import Compressed from './compress';
 import Identity from './identity';

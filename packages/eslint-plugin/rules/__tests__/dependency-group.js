@@ -19,18 +19,18 @@ ruleTester.run( 'dependency-group', rule, {
 	valid: [
 		{
 			code: `
-/*
+/**
  * External dependencies
  */
 import { get } from 'lodash';
 import classnames from 'classnames';
 
-/*
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 
-/*
+/**
  * Internal dependencies
  */
 import edit from './edit';`,
@@ -41,6 +41,9 @@ import edit from './edit';`,
 			code: `
 import { get } from 'lodash';
 import classnames from 'classnames';
+/*
+ * wordpress dependencies.
+ */
 import { Component } from '@wordpress/element';
 import edit from './edit';`,
 			errors: [
