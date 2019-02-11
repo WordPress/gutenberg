@@ -1,12 +1,7 @@
 [
 	{
-		"name": "myVariable",
-		"description": "Named variable.",
-		"tags": []
-	},
-	{
-		"name": "myFunction",
-		"description": "Named function.",
+		"name": "default",
+		"description": "Default variable declaration.",
 		"tags": []
 	},
 	{
@@ -15,8 +10,13 @@
 		"tags": []
 	},
 	{
-		"name": "default",
-		"description": "Default variable declaration.",
+		"name": "myFunction",
+		"description": "Named function.",
+		"tags": []
+	},
+	{
+		"name": "myVariable",
+		"description": "Named variable.",
 		"tags": []
 	}
 ]

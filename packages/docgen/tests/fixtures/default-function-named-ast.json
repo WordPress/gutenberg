@@ -2,6 +2,16 @@
 	"type": "Program",
 	"start": 0,
 	"end": 84,
+	"loc": {
+		"start": {
+			"line": 4,
+			"column": 0
+		},
+		"end": {
+			"line": 4,
+			"column": 42
+		}
+	},
 	"range": [
 		41,
 		83
@@ -11,6 +21,16 @@
 			"type": "ExportDefaultDeclaration",
 			"start": 41,
 			"end": 83,
+			"loc": {
+				"start": {
+					"line": 4,
+					"column": 0
+				},
+				"end": {
+					"line": 4,
+					"column": 42
+				}
+			},
 			"range": [
 				41,
 				83
@@ -19,6 +39,16 @@
 				"type": "FunctionDeclaration",
 				"start": 56,
 				"end": 83,
+				"loc": {
+					"start": {
+						"line": 4,
+						"column": 15
+					},
+					"end": {
+						"line": 4,
+						"column": 42
+					}
+				},
 				"range": [
 					56,
 					83
@@ -27,6 +57,16 @@
 					"type": "Identifier",
 					"start": 65,
 					"end": 78,
+					"loc": {
+						"start": {
+							"line": 4,
+							"column": 24
+						},
+						"end": {
+							"line": 4,
+							"column": 37
+						}
+					},
 					"range": [
 						65,
 						78
@@ -41,6 +81,16 @@
 					"type": "BlockStatement",
 					"start": 81,
 					"end": 83,
+					"loc": {
+						"start": {
+							"line": 4,
+							"column": 40
+						},
+						"end": {
+							"line": 4,
+							"column": 42
+						}
+					},
 					"range": [
 						81,
 						83
@@ -57,7 +107,17 @@
 					"range": [
 						0,
 						40
-					]
+					],
+					"loc": {
+						"start": {
+							"line": 1,
+							"column": 0
+						},
+						"end": {
+							"line": 3,
+							"column": 3
+						}
+					}
 				}
 			]
 		}
@@ -72,7 +132,17 @@
 			"range": [
 				0,
 				40
-			]
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 3
+				}
+			}
 		}
 	]
 }

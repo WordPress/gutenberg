@@ -2,6 +2,16 @@
 	"type": "Program",
 	"start": 0,
 	"end": 92,
+	"loc": {
+		"start": {
+			"line": 1,
+			"column": 0
+		},
+		"end": {
+			"line": 3,
+			"column": 29
+		}
+	},
 	"range": [
 		0,
 		91
@@ -11,6 +21,16 @@
 			"type": "ImportDeclaration",
 			"start": 0,
 			"end": 60,
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 1,
+					"column": 60
+				}
+			},
 			"range": [
 				0,
 				60
@@ -20,6 +40,16 @@
 					"type": "ImportDefaultSpecifier",
 					"start": 7,
 					"end": 20,
+					"loc": {
+						"start": {
+							"line": 1,
+							"column": 7
+						},
+						"end": {
+							"line": 1,
+							"column": 20
+						}
+					},
 					"range": [
 						7,
 						20
@@ -28,6 +58,16 @@
 						"type": "Identifier",
 						"start": 7,
 						"end": 20,
+						"loc": {
+							"start": {
+								"line": 1,
+								"column": 7
+							},
+							"end": {
+								"line": 1,
+								"column": 20
+							}
+						},
 						"range": [
 							7,
 							20
@@ -40,6 +80,16 @@
 				"type": "Literal",
 				"start": 26,
 				"end": 59,
+				"loc": {
+					"start": {
+						"line": 1,
+						"column": 26
+					},
+					"end": {
+						"line": 1,
+						"column": 59
+					}
+				},
 				"range": [
 					26,
 					59
@@ -52,6 +102,16 @@
 			"type": "ExportDefaultDeclaration",
 			"start": 62,
 			"end": 91,
+			"loc": {
+				"start": {
+					"line": 3,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 29
+				}
+			},
 			"range": [
 				62,
 				91
@@ -60,6 +120,16 @@
 				"type": "Identifier",
 				"start": 77,
 				"end": 90,
+				"loc": {
+					"start": {
+						"line": 3,
+						"column": 15
+					},
+					"end": {
+						"line": 3,
+						"column": 28
+					}
+				},
 				"range": [
 					77,
 					90

@@ -1,26 +1,56 @@
 {
 	"type": "ExportNamedDeclaration",
-	"start": 46,
-	"end": 100,
+	"start": 35,
+	"end": 69,
+	"loc": {
+		"start": {
+			"line": 4,
+			"column": 0
+		},
+		"end": {
+			"line": 4,
+			"column": 34
+		}
+	},
 	"range": [
-		46,
-		100
+		35,
+		69
 	],
 	"declaration": {
 		"type": "FunctionDeclaration",
-		"start": 53,
-		"end": 100,
+		"start": 42,
+		"end": 69,
+		"loc": {
+			"start": {
+				"line": 4,
+				"column": 7
+			},
+			"end": {
+				"line": 4,
+				"column": 34
+			}
+		},
 		"range": [
-			53,
-			100
+			42,
+			69
 		],
 		"id": {
 			"type": "Identifier",
-			"start": 62,
-			"end": 75,
+			"start": 51,
+			"end": 64,
+			"loc": {
+				"start": {
+					"line": 4,
+					"column": 16
+				},
+				"end": {
+					"line": 4,
+					"column": 29
+				}
+			},
 			"range": [
-				62,
-				75
+				51,
+				64
 			],
 			"name": "myDeclaration"
 		},
@@ -30,11 +60,21 @@
 		"params": [],
 		"body": {
 			"type": "BlockStatement",
-			"start": 78,
-			"end": 100,
+			"start": 67,
+			"end": 69,
+			"loc": {
+				"start": {
+					"line": 4,
+					"column": 32
+				},
+				"end": {
+					"line": 4,
+					"column": 34
+				}
+			},
 			"range": [
-				78,
-				100
+				67,
+				69
 			],
 			"body": []
 		}
@@ -44,13 +84,23 @@
 	"leadingComments": [
 		{
 			"type": "Block",
-			"value": "*\n \t\t * My declaration example.\n \t\t ",
-			"start": 3,
-			"end": 43,
+			"value": "*\n * My declaration example.\n ",
+			"start": 0,
+			"end": 34,
 			"range": [
-				3,
-				43
-			]
+				0,
+				34
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 3
+				}
+			}
 		}
 	]
 }

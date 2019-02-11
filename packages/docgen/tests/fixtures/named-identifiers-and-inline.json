@@ -3,6 +3,16 @@
 		"type": "ExportNamedDeclaration",
 		"start": 141,
 		"end": 190,
+		"loc": {
+			"start": {
+				"line": 11,
+				"column": 0
+			},
+			"end": {
+				"line": 11,
+				"column": 49
+			}
+		},
 		"range": [
 			141,
 			190
@@ -13,6 +23,16 @@
 				"type": "ExportSpecifier",
 				"start": 150,
 				"end": 169,
+				"loc": {
+					"start": {
+						"line": 11,
+						"column": 9
+					},
+					"end": {
+						"line": 11,
+						"column": 28
+					}
+				},
 				"range": [
 					150,
 					169
@@ -21,6 +41,16 @@
 					"type": "Identifier",
 					"start": 150,
 					"end": 169,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 9
+						},
+						"end": {
+							"line": 11,
+							"column": 28
+						}
+					},
 					"range": [
 						150,
 						169
@@ -31,6 +61,16 @@
 					"type": "Identifier",
 					"start": 150,
 					"end": 169,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 9
+						},
+						"end": {
+							"line": 11,
+							"column": 28
+						}
+					},
 					"range": [
 						150,
 						169
@@ -42,6 +82,16 @@
 				"type": "ExportSpecifier",
 				"start": 171,
 				"end": 187,
+				"loc": {
+					"start": {
+						"line": 11,
+						"column": 30
+					},
+					"end": {
+						"line": 11,
+						"column": 46
+					}
+				},
 				"range": [
 					171,
 					187
@@ -50,6 +100,16 @@
 					"type": "Identifier",
 					"start": 171,
 					"end": 187,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 30
+						},
+						"end": {
+							"line": 11,
+							"column": 46
+						}
+					},
 					"range": [
 						171,
 						187
@@ -60,6 +120,16 @@
 					"type": "Identifier",
 					"start": 171,
 					"end": 187,
+					"loc": {
+						"start": {
+							"line": 11,
+							"column": 30
+						},
+						"end": {
+							"line": 11,
+							"column": 46
+						}
+					},
 					"range": [
 						171,
 						187
@@ -78,7 +148,17 @@
 				"range": [
 					192,
 					232
-				]
+				],
+				"loc": {
+					"start": {
+						"line": 13,
+						"column": 0
+					},
+					"end": {
+						"line": 15,
+						"column": 3
+					}
+				}
 			}
 		]
 	},
@@ -86,6 +166,16 @@
 		"type": "ExportNamedDeclaration",
 		"start": 233,
 		"end": 273,
+		"loc": {
+			"start": {
+				"line": 16,
+				"column": 0
+			},
+			"end": {
+				"line": 16,
+				"column": 40
+			}
+		},
 		"range": [
 			233,
 			273
@@ -94,6 +184,16 @@
 			"type": "VariableDeclaration",
 			"start": 240,
 			"end": 273,
+			"loc": {
+				"start": {
+					"line": 16,
+					"column": 7
+				},
+				"end": {
+					"line": 16,
+					"column": 40
+				}
+			},
 			"range": [
 				240,
 				273
@@ -103,6 +203,16 @@
 					"type": "VariableDeclarator",
 					"start": 246,
 					"end": 272,
+					"loc": {
+						"start": {
+							"line": 16,
+							"column": 13
+						},
+						"end": {
+							"line": 16,
+							"column": 39
+						}
+					},
 					"range": [
 						246,
 						272
@@ -111,6 +221,16 @@
 						"type": "Identifier",
 						"start": 246,
 						"end": 265,
+						"loc": {
+							"start": {
+								"line": 16,
+								"column": 13
+							},
+							"end": {
+								"line": 16,
+								"column": 32
+							}
+						},
 						"range": [
 							246,
 							265
@@ -121,6 +241,16 @@
 						"type": "Literal",
 						"start": 268,
 						"end": 272,
+						"loc": {
+							"start": {
+								"line": 16,
+								"column": 35
+							},
+							"end": {
+								"line": 16,
+								"column": 39
+							}
+						},
 						"range": [
 							268,
 							272
@@ -143,7 +273,17 @@
 				"range": [
 					192,
 					232
-				]
+				],
+				"loc": {
+					"start": {
+						"line": 13,
+						"column": 0
+					},
+					"end": {
+						"line": 15,
+						"column": 3
+					}
+				}
 			}
 		]
 	}

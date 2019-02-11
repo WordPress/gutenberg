@@ -2,6 +2,16 @@
 	"type": "ExportNamedDeclaration",
 	"start": 63,
 	"end": 84,
+	"loc": {
+		"start": {
+			"line": 3,
+			"column": 0
+		},
+		"end": {
+			"line": 3,
+			"column": 21
+		}
+	},
 	"range": [
 		63,
 		84
@@ -12,6 +22,16 @@
 			"type": "ExportSpecifier",
 			"start": 72,
 			"end": 81,
+			"loc": {
+				"start": {
+					"line": 3,
+					"column": 9
+				},
+				"end": {
+					"line": 3,
+					"column": 18
+				}
+			},
 			"range": [
 				72,
 				81
@@ -20,6 +40,16 @@
 				"type": "Identifier",
 				"start": 72,
 				"end": 81,
+				"loc": {
+					"start": {
+						"line": 3,
+						"column": 9
+					},
+					"end": {
+						"line": 3,
+						"column": 18
+					}
+				},
 				"range": [
 					72,
 					81
@@ -30,6 +60,16 @@
 				"type": "Identifier",
 				"start": 72,
 				"end": 81,
+				"loc": {
+					"start": {
+						"line": 3,
+						"column": 9
+					},
+					"end": {
+						"line": 3,
+						"column": 18
+					}
+				},
 				"range": [
 					72,
 					81

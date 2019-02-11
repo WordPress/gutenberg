@@ -2,6 +2,16 @@
 	"type": "ExportDefaultDeclaration",
 	"start": 41,
 	"end": 69,
+	"loc": {
+		"start": {
+			"line": 4,
+			"column": 0
+		},
+		"end": {
+			"line": 4,
+			"column": 28
+		}
+	},
 	"range": [
 		41,
 		69
@@ -10,6 +20,16 @@
 		"type": "FunctionDeclaration",
 		"start": 56,
 		"end": 69,
+		"loc": {
+			"start": {
+				"line": 4,
+				"column": 15
+			},
+			"end": {
+				"line": 4,
+				"column": 28
+			}
+		},
 		"range": [
 			56,
 			69
@@ -23,6 +43,16 @@
 			"type": "BlockStatement",
 			"start": 67,
 			"end": 69,
+			"loc": {
+				"start": {
+					"line": 4,
+					"column": 26
+				},
+				"end": {
+					"line": 4,
+					"column": 28
+				}
+			},
 			"range": [
 				67,
 				69
@@ -39,7 +69,17 @@
 			"range": [
 				0,
 				40
-			]
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 3
+				}
+			}
 		}
 	]
 }

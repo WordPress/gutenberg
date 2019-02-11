@@ -2,6 +2,16 @@
 	"type": "ExportAllDeclaration",
 	"start": 43,
 	"end": 78,
+	"loc": {
+		"start": {
+			"line": 4,
+			"column": 0
+		},
+		"end": {
+			"line": 4,
+			"column": 35
+		}
+	},
 	"range": [
 		43,
 		78
@@ -10,6 +20,16 @@
 		"type": "Literal",
 		"start": 57,
 		"end": 77,
+		"loc": {
+			"start": {
+				"line": 4,
+				"column": 14
+			},
+			"end": {
+				"line": 4,
+				"column": 34
+			}
+		},
 		"range": [
 			57,
 			77
@@ -26,7 +46,17 @@
 			"range": [
 				0,
 				42
-			]
+			],
+			"loc": {
+				"start": {
+					"line": 1,
+					"column": 0
+				},
+				"end": {
+					"line": 3,
+					"column": 3
+				}
+			}
 		}
 	]
 }

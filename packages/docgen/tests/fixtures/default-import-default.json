@@ -2,6 +2,16 @@
 	"type": "ExportDefaultDeclaration",
 	"start": 62,
 	"end": 91,
+	"loc": {
+		"start": {
+			"line": 3,
+			"column": 0
+		},
+		"end": {
+			"line": 3,
+			"column": 29
+		}
+	},
 	"range": [
 		62,
 		91
@@ -10,6 +20,16 @@
 		"type": "Identifier",
 		"start": 77,
 		"end": 90,
+		"loc": {
+			"start": {
+				"line": 3,
+				"column": 15
+			},
+			"end": {
+				"line": 3,
+				"column": 28
+			}
+		},
 		"range": [
 			77,
 			90
