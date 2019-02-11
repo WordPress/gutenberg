@@ -143,8 +143,8 @@ module.exports = function( token, ast = { body: [] }, parseDependency = () => {}
 					name: namedExport.name,
 					description: namedExport.description,
 					tags: namedExport.tags,
-					lineStart: namedExport.lineStart,
-					lineEnd: namedExport.lineEnd,
+					lineStart: entry.lineStart,
+					lineEnd: entry.lineEnd,
 				} );
 			} );
 		} else {

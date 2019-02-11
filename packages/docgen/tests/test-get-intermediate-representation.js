@@ -298,9 +298,9 @@ test( 'IR - JSDoc in module dependency (namespace export)', function( t ) {
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( token ), { body: [] }, getModule ),
 		[
-			{ name: 'MyClass', description: 'Named class.', tags: [] },
-			{ name: 'myFunction', description: 'Named function.', tags: [] },
-			{ name: 'myVariable', description: 'Named variable.', tags: [] },
+			{ name: 'MyClass', description: 'Named class.', tags: [], lineStart: 1, lineEnd: 1 },
+			{ name: 'myFunction', description: 'Named function.', tags: [], lineStart: 1, lineEnd: 1 },
+			{ name: 'myVariable', description: 'Named variable.', tags: [], lineStart: 1, lineEnd: 1 },
 		]
 	);
 	const tokenCommented = fs.readFileSync(
@@ -310,9 +310,9 @@ test( 'IR - JSDoc in module dependency (namespace export)', function( t ) {
 	t.deepEqual(
 		getIntermediateRepresentation( JSON.parse( tokenCommented ), { body: [] }, getModule ),
 		[
-			{ name: 'MyClass', description: 'Named class.', tags: [] },
-			{ name: 'myFunction', description: 'Named function.', tags: [] },
-			{ name: 'myVariable', description: 'Named variable.', tags: [] },
+			{ name: 'MyClass', description: 'Named class.', tags: [], lineStart: 4, lineEnd: 4 },
+			{ name: 'myFunction', description: 'Named function.', tags: [], lineStart: 4, lineEnd: 4 },
+			{ name: 'myVariable', description: 'Named variable.', tags: [], lineStart: 4, lineEnd: 4 },
 		]
 	);
 	t.end();
