@@ -14,7 +14,7 @@ const test = require( 'tape' );
  */
 const getExportEntries = require( '../src/get-export-entries' );
 
-test( 'Export entries: default class (anonymous)', function( t ) {
+test( 'Export entries - default class (anonymous)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-anonymous.json' ),
 		'utf-8'
@@ -30,7 +30,7 @@ test( 'Export entries: default class (anonymous)', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default class (named)', function( t ) {
+test( 'Export entries - default class (named)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-class-named.json' ),
 		'utf-8'
@@ -46,7 +46,7 @@ test( 'Export entries: default class (named)', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default function (anonymous)', function( t ) {
+test( 'Export entries - default function (anonymous)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-function-anonymous.json' ),
 		'utf-8'
@@ -62,7 +62,7 @@ test( 'Export entries: default function (anonymous)', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default function (named)', function( t ) {
+test( 'Export entries - default function (named)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-function-named.json' ),
 		'utf-8'
@@ -78,7 +78,7 @@ test( 'Export entries: default function (named)', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default identifier', function( t ) {
+test( 'Export entries - default identifier', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-identifier.json' ),
 		'utf-8'
@@ -94,7 +94,7 @@ test( 'Export entries: default identifier', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default import (named)', function( t ) {
+test( 'Export entries - default import (named)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-import-named.json' ),
 		'utf-8'
@@ -110,7 +110,7 @@ test( 'Export entries: default import (named)', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default import (default)', function( t ) {
+test( 'Export entries - default import (default)', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-import-default.json' ),
 		'utf-8'
@@ -126,7 +126,7 @@ test( 'Export entries: default import (default)', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default named export', function( t ) {
+test( 'Export entries - default named export', function( t ) {
 	const tokens = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-named-export.json' ),
 		'utf-8'
@@ -150,7 +150,7 @@ test( 'Export entries: default named export', function( t ) {
 	t.end();
 } );
 
-test( 'Export entries: default variable', function( t ) {
+test( 'Export entries - default variable', function( t ) {
 	const token = fs.readFileSync(
 		path.join( __dirname, './fixtures/default-variable.json' ),
 		'utf-8'
