@@ -4,7 +4,7 @@ To avoid wastefully computing the result of a function call when assigning a var
 
 ## Rule details
 
-The following patterns are considered warnings:
+Examples of **incorrect** code for this rule:
 
 ```js
 function example( number ) {
@@ -17,7 +17,7 @@ function example( number ) {
 }
 ```
 
-The following patterns are not considered warnings:
+Examples of **correct** code for this rule:
 
 ```js
 function example( number ) {

@@ -18,6 +18,9 @@ import {
 } from '@wordpress/data';
 import { Path, Polygon, SVG } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
 import {
 	default as edit,
 	SOLID_COLOR_STYLE_NAME,

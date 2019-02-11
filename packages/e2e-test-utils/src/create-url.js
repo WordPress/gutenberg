@@ -4,6 +4,9 @@
 import { join } from 'path';
 import { URL } from 'url';
 
+/**
+ * Internal dependencies
+ */
 import { WP_BASE_URL } from './shared/config';
 
 /**

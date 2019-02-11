@@ -83,7 +83,7 @@ wp.blocks.registerBlockType( /* ... */, {
 		} );
 	},
 
-	save: function() {
+	save: function( props ) {
 		return wp.element.createElement( wp.editor.RichText.Content, {
 			tagName: 'h2', value: props.attributes.content
 		} );

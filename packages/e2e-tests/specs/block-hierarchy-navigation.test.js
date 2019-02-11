@@ -7,12 +7,10 @@ import {
 	getEditedPostContent,
 	pressKeyTimes,
 	pressKeyWithModifier,
-	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 async function openBlockNavigator() {
 	await pressKeyWithModifier( 'access', 'o' );
-	await waitForAnimation();
 }
 
 describe( 'Navigating the block hierarchy', () => {
@@ -28,7 +26,6 @@ describe( 'Navigating the block hierarchy', () => {
 
 		// Navigate to the columns blocks.
 		await page.click( '[aria-label="Block Navigation"]' );
-		await waitForAnimation();
 		const columnsBlockMenuItem = ( await page.$x( "//button[contains(@class,'editor-block-navigation__item') and contains(text(), 'Columns')]" ) )[ 0 ];
 		await columnsBlockMenuItem.click();
 
