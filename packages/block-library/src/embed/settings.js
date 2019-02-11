@@ -11,7 +11,7 @@ import classnames from 'classnames/dedupe';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { RichText } from '@wordpress/editor';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -38,8 +38,7 @@ const embedAttributes = {
 };
 
 export function getEmbedBlockSettings( { title, description, icon, category = 'embed', transforms, keywords = [], supports = {}, responsive = true } ) {
-	// translators: %s: Name of service (e.g. VideoPress, YouTube)
-	const blockDescription = description || sprintf( __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' ), title );
+	const blockDescription = description || __( 'Add a block that displays content pulled from other sites, like Twitter, Instagram or YouTube.' );
 	const edit = getEmbedEditComponent( title, icon, responsive );
 	return {
 		title,

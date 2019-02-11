@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * WordPress dependencies
@@ -10,6 +9,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies

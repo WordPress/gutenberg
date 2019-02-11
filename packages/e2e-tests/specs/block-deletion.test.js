@@ -6,7 +6,6 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	pressKeyWithModifier,
-	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 const addThreeParagraphsToNewPost = async () => {
@@ -22,7 +21,6 @@ const addThreeParagraphsToNewPost = async () => {
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
 	await expect( page ).toClick( '.editor-block-settings-menu__toggle' );
-	await waitForAnimation();
 	const itemButton = ( await page.$x( `//*[contains(@class, "editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
 	await itemButton.click();
 };

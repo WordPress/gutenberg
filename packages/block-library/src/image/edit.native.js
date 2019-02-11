@@ -12,22 +12,31 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
+
+/**
+ * WordPress dependencies
+ */
 import {
-	map,
-	compact,
-} from 'lodash';
+	Toolbar,
+	ToolbarButton,
+	Spinner,
+	Dashicon,
+} from '@wordpress/components';
+import {
+	MediaPlaceholder,
+	RichText,
+	BlockControls,
+	InspectorControls,
+	BottomSheet,
+} from '@wordpress/editor';
+import { __ } from '@wordpress/i18n';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 import ImageSize from './image-size';
-import { isURL } from '@wordpress/url';
 import styles from './styles.scss';
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
 
 const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
@@ -164,16 +173,6 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	getImageSizeOptions() {
-		const { imageSizes } = this.props;
-		return compact( map( imageSizes, ( { label, slug } ) => {
-			return {
-				value: this.props.attributes.url + slug, //temporary url
-				label,
-			};
-		} ) );
-	}
-
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href } = attributes;
@@ -232,8 +231,6 @@ class ImageEdit extends React.Component {
 			</Toolbar>
 		);
 
-		const sizeOptions = this.getImageSizeOptions();
-
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
@@ -248,13 +245,6 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.onSetLinkDestination }
 					autoCapitalize="none"
 					autoCorrect={ false }
-				/>
-				<BottomSheet.PickerCell
-					icon="editor-expand"
-					label={ __( 'Image Size' ) }
-					value={ 'Large' } // Temporary for UI implementation.
-					options={ sizeOptions }
-					onChangeValue={ () => {} } // Temporary for UI implementation.
 				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
@@ -345,15 +335,4 @@ class ImageEdit extends React.Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditorSettings } = select( 'core/editor' );
-		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
-
-		return {
-			maxWidth,
-			isRTL,
-			imageSizes,
-		};
-	} ),
-] )( ImageEdit );
+export default ImageEdit;

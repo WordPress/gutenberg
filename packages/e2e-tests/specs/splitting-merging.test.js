@@ -139,7 +139,7 @@ describe( 'splitting and merging blocks', () => {
 	} );
 
 	it( 'should forward delete from an empty paragraph', async () => {
-		// Regression test: Bogus nodes in a TinyMCE container can interfere
+		// Regression test: Bogus nodes in a RichText container can interfere
 		// with isHorizontalEdge detection, preventing forward deletion.
 		//
 		// See: https://github.com/WordPress/gutenberg/issues/8731

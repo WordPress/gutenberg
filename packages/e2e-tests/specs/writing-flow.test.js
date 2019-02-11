@@ -92,17 +92,6 @@ describe( 'adding blocks', () => {
 
 		// Arrow left from selected bold should collapse to before the inline
 		// boundary. Arrow once more to traverse into first paragraph.
-		//
-		// See native behavior example: http://fiddle.tinymce.com/kvgaab
-		//
-		//  1. Select all of second paragraph, end to beginning
-		//  2. Press ArrowLeft
-		//  3. Type
-		//  4. Note that text is not bolded
-		//
-		// This is technically different than how other word processors treat
-		// the collapse while a bolded segment is selected, but our behavior
-		// is consistent with TinyMCE.
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.type( 'After' );
@@ -141,20 +130,44 @@ describe( 'adding blocks', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'should clean TinyMCE content', async () => {
-		// Ensure no zero-width space character. Notably, this can occur when
-		// save occurs while at an inline boundary edge.
+	it( 'should navigate around nested inline boundaries', async () => {
 		await clickBlockAppender();
 		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1 2' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.up( 'Shift' );
+		await pressKeyWithModifier( 'primary', 'i' );
+		await page.keyboard.press( 'ArrowLeft' );
+
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		// Backspace to remove the content in this block, resetting it.
-		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'd' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'e' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'f' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'g' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'h' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'i' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.type( 'j' );
 
-		// Ensure no data-mce-selected. Notably, this can occur when content
-		// is saved while typing within an inline boundary.
-		await pressKeyWithModifier( 'primary', 'b' );
-		await page.keyboard.type( 'Inside' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

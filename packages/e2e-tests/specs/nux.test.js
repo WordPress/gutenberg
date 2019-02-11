@@ -7,7 +7,6 @@ import {
 	createNewPost,
 	saveDraft,
 	toggleScreenOption,
-	waitForAnimation,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'New User Experience (NUX)', () => {
@@ -18,7 +17,6 @@ describe( 'New User Experience (NUX)', () => {
 
 		for ( let i = 1; i < numberOfTips; i++ ) {
 			await page.click( '.nux-dot-tip .components-button.is-link' );
-			await waitForAnimation();
 		}
 
 		return { numberOfTips, tips };
