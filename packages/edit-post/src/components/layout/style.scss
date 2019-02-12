@@ -34,29 +34,13 @@
 		}
 	}
 
-	// On mobile, toolbars behave differently.
+	// Beyond the mobile breakpoint, the editor bar is fixed, so make room for it eabove the layout content.
 	@include break-small {
 		padding-top: $header-height;
 	}
 
-	&.has-fixed-toolbar {
-		.edit-post-layout__content {
-			padding-top: $block-controls-height;
-		}
-
-		// On mobile, toolbars behave differently.
-		@include break-small {
-			padding-top: $header-height + $block-toolbar-height;
-
-			.edit-post-layout__content {
-				padding-top: 0;
-			}
-		}
-
-		@include break-large {
-			padding-top: $header-height;
-		}
-	}
+	// Beyond the medium breakpoint, the main scrolling area itself becomes fixed so the padding then becomes
+	// unnecessary, but until then it's still needed.
 }
 
 .edit-post-layout__metaboxes:not(:empty) {
@@ -121,6 +105,19 @@
 		body.is-fullscreen-mode & {
 			margin-left: 0 !important;
 			top: $header-height;
+		}
+	}
+
+	// For users with the Top Toolbar option enabled, special rules apply to the height of the content area.
+	.has-fixed-toolbar & {
+		// From the medium breakpoint it sits below the editor bar.
+		@include break-medium() {
+			top: $header-height + $admin-bar-height + $block-controls-height;
+		}
+
+		// From the xlarge breakpoint it sits in the editor bar.
+		@include break-xlarge() {
+			top: $header-height + $admin-bar-height;
 		}
 	}
 
