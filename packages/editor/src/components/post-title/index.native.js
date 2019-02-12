@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createElement, Component, forwardRef } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { RichText } from '@wordpress/editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withDispatch } from '@wordpress/data';
@@ -10,7 +10,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
 
 const minHeight = 53;
 
-class PostTitleComponent extends Component {
+class PostTitle extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -48,7 +48,6 @@ class PostTitleComponent extends Component {
 		return (
 			<RichText
 				tagName={ 'p' }
-				rootTagsToEliminate={ [ 'strong' ] }
 				onFocus={ this.onSelect }
 				onBlur={ this.props.onBlur } // always assign onBlur as a props
 				multiline={ false }
@@ -90,25 +89,8 @@ const applyWithDispatch = withDispatch( ( dispatch ) => {
 	};
 } );
 
-export function PostTitle(props, ref) {
-/*
-	const component = (
-		<PostTitleComponent
-			{ ...props }
-			ref={ ref } />
-	);*/
-
-	//const component = PostTitleComponent({ ...props, ref })
-
-	//console.log("Component: " + JSON.stringify(component));
-
-	return compose(
-		applyWithDispatch,
-		withInstanceId,
-		withFocusOutside
-	)( PostTitleComponent );
-};
-
-
-
-export default forwardRef( PostTitle );
+export default compose(
+	applyWithDispatch,
+	withInstanceId,
+	withFocusOutside
+)( PostTitle );
