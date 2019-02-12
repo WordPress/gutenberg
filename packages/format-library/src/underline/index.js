@@ -35,11 +35,8 @@ export const underline = {
 					onUse={ onToggle }
 				/>
 				<RichTextInputEvent
-					onInput={ ( { inputType } ) => {
-						if ( inputType === 'formatUnderline' ) {
-							onToggle();
-						}
-					} }
+					inputType="formatUnderline"
+					onInput={ onToggle }
 				/>
 			</Fragment>
 		);

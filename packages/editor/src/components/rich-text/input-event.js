@@ -11,7 +11,9 @@ export class RichTextInputEvent extends Component {
 	}
 
 	onInput( event ) {
-		this.props.onInput( event );
+		if ( event.inputType === this.props.inputType ) {
+			this.props.onInput();
+		}
 	}
 
 	componentWillMount() {

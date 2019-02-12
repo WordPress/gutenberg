@@ -33,11 +33,8 @@ export const bold = {
 					shortcutCharacter="b"
 				/>
 				<RichTextInputEvent
-					onInput={ ( { inputType } ) => {
-						if ( inputType === 'formatBold' ) {
-							onToggle();
-						}
-					} }
+					inputType="formatBold"
+					onInput={ onToggle }
 				/>
 			</Fragment>
 		);

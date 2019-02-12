@@ -33,11 +33,8 @@ export const italic = {
 					shortcutCharacter="i"
 				/>
 				<RichTextInputEvent
-					onInput={ ( { inputType } ) => {
-						if ( inputType === 'formatItalic' ) {
-							onToggle();
-						}
-					} }
+					inputType="formatItalic"
+					onInput={ onToggle }
 				/>
 			</Fragment>
 		);
