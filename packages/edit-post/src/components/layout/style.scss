@@ -81,6 +81,9 @@
 	// In the mean time, if a user has a small screen and lots of plugin-added menu items in the navigation menu,
 	// they have to be able to scroll. To accommodate the flyout menus, we scroll the `body` element for this.
 	@include break-medium() {
+		transition: margin-right 0.1s cubic-bezier(0, 0, 0.2, 1);
+		will-change: transform;
+
 		// Because the body element scrolls the navigation sidebar, we have to use position fixed here.
 		// Otherwise you would scroll the editing canvas out of view when you scroll the sidebar.
 		position: fixed;
@@ -173,7 +176,7 @@
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
 		transform: translateX(+100%);
-		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
+		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards cubic-bezier(0, 0, 0.2, 1);
 
 		body.is-fullscreen-mode & {
 			top: 0;
