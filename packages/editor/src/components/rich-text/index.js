@@ -748,7 +748,7 @@ export class RichText extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { tagName, value } = this.props;
+		const { tagName, value, isSelected } = this.props;
 
 		if (
 			tagName === prevProps.tagName &&
