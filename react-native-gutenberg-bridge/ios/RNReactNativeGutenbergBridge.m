@@ -8,5 +8,6 @@ RCT_EXTERN_METHOD(mediaUploadSync)
 RCT_EXTERN_METHOD(requestImageFailedRetryDialog:(int)mediaID)
 RCT_EXTERN_METHOD(requestImageUploadCancelDialog:(int)mediaID)
 RCT_EXTERN_METHOD(editorDidLayout)
+RCT_EXTERN_METHOD(editorDidMount:(BOOL)hasUnsupportedBlocks)
 
 @end

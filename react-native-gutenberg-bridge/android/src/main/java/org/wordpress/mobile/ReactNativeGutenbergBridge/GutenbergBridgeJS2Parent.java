@@ -3,6 +3,8 @@ package org.wordpress.mobile.ReactNativeGutenbergBridge;
 public interface GutenbergBridgeJS2Parent {
     void responseHtml(String title, String html, boolean changed);
 
+    void editorDidMount(boolean hasUnsupportedBlocks);
+
     interface MediaSelectedCallback {
         void onMediaSelected(int mediaId, String mediaUrl);
     }

@@ -78,6 +78,10 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         mGutenbergBridgeJS2Parent.responseHtml(title, html, changed);
     }
 
+    @ReactMethod
+    public void editorDidMount(boolean hasUnsupportedBlocks) {
+        mGutenbergBridgeJS2Parent.editorDidMount(hasUnsupportedBlocks);
+    }
 
     @ReactMethod
     public void requestMediaPickFrom(String mediaSource, final Callback onUploadMediaSelected) {
