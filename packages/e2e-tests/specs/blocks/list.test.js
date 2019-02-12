@@ -95,6 +95,21 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not transform lines in block when transforming multiple blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'one' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '...' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.keyboard.up( 'Shift' );
+		await transformBlockTo( 'List' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be converted to paragraphs', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
