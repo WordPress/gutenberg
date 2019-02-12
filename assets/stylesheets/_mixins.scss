@@ -209,6 +209,7 @@
 	color: $dark-gray-900;
 	border: none;
 	box-shadow: none;
+	background: $light-gray-200;
 }
 
 @mixin menu-style__focus() {

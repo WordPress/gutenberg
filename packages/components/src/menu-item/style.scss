@@ -23,7 +23,6 @@
 		// See: https://github.com/WordPress/gutenberg/pull/10333
 		@include break-medium() {
 			@include menu-style__hover;
-			background: $light-gray-200;
 		}
 
 		.components-menu-item__shortcut {
