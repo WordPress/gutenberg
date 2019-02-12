@@ -1118,7 +1118,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['colors'] = $color_palette;
 	}
 
-	if ( ! empty( $font_sizes ) ) {
+	if ( false !== $font_sizes ) {
 		$editor_settings['fontSizes'] = $font_sizes;
 	}
 
