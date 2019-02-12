@@ -183,33 +183,41 @@ class ImageEdit extends Component {
 			isEditing: false,
 		} );
 
+		const mediaAttributes = pickRelevantMediaFiles( media );
+		const linkAttributes = this.buildLinkAttributes(
+			this.props.attributes.linkDestination,
+			{ ...this.props.attributes, ...mediaAttributes }
+		);
+
 		this.props.setAttributes( {
-			...pickRelevantMediaFiles( media ),
+			...mediaAttributes,
+			...linkAttributes,
 			width: undefined,
 			height: undefined,
 		} );
-
-		// Update target link in case the default has been changed (e.g. by a plugin).
-		this.onSetLinkDestination( this.props.attributes.linkDestination );
 	}
 
 	onSetLinkDestination( value ) {
+		this.props.setAttributes( this.buildLinkAttributes( value, this.props.attributes ) );
+	}
+
+	buildLinkAttributes( destination, attributes ) {
 		let href;
 
-		if ( value === LINK_DESTINATION_NONE ) {
+		if ( destination === LINK_DESTINATION_NONE ) {
 			href = undefined;
-		} else if ( value === LINK_DESTINATION_MEDIA ) {
-			href = ( this.props.image && this.props.image.source_url ) || this.props.attributes.url;
-		} else if ( value === LINK_DESTINATION_ATTACHMENT ) {
-			href = this.props.image && this.props.image.link;
+		} else if ( destination === LINK_DESTINATION_MEDIA ) {
+			href = attributes.source_url || attributes.url;
+		} else if ( destination === LINK_DESTINATION_ATTACHMENT ) {
+			href = attributes.link;
 		} else {
 			href = this.props.attributes.href;
 		}
 
-		this.props.setAttributes( {
-			linkDestination: value,
+		return {
+			linkDestination: destination,
 			href,
-		} );
+		};
 	}
 
 	onSelectURL( newURL ) {
