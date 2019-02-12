@@ -19,6 +19,7 @@ export { removeFormat } from './remove-format';
 export { remove } from './remove';
 export { replace } from './replace';
 export { insert } from './insert';
+export { insertLineBreak } from './insert-line-break';
 export { insertLineSeparator } from './insert-line-separator';
 export { insertObject } from './insert-object';
 export { slice } from './slice';
