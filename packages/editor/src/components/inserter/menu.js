@@ -204,6 +204,12 @@ export class InserterMenu extends Component {
 				const firstCategory = find( getCategories(), ( { slug } ) => itemsPerCategory[ slug ] && itemsPerCategory[ slug ].length );
 				openPanels = [ firstCategory.slug ];
 			}
+
+			// Each time filter value changes if a filter exists make sure inline panel is open.
+			// If no inline items exist nothing will be rendered.
+			if ( filterValue ) {
+				openPanels.push( 'inline' );
+			}
 		}
 
 		this.setState( {
@@ -291,7 +297,21 @@ export class InserterMenu extends Component {
 						</PanelBody>
 					}
 
-					<InserterInlineElements filterValue={ filterValue } />
+					<InserterInlineElements
+						filterValue={ filterValue }
+						panelRef={ this.bindPanel( 'inline' ) }
+						onPanelToggle={ this.onTogglePanel( 'inline' ) }
+						panelOpened={ isPanelOpen( 'inline' ) }
+						whenEmpty={
+							isEmpty( suggestedItems ) &&
+							isEmpty( reusableItems ) &&
+							isEmpty( itemsPerCategory ) && (
+								<p className="editor-inserter__no-results">
+									{ __( 'No blocks found.' ) }
+								</p>
+							)
+						}
+					/>
 
 					{ map( getCategories(), ( category ) => {
 						const categoryItems = itemsPerCategory[ category.slug ];
@@ -329,9 +349,6 @@ export class InserterMenu extends Component {
 								{ __( 'Manage All Reusable Blocks' ) }
 							</a>
 						</PanelBody>
-					) }
-					{ isEmpty( suggestedItems ) && isEmpty( reusableItems ) && isEmpty( itemsPerCategory ) && (
-						<p className="editor-inserter__no-results">{ __( 'No blocks found.' ) }</p>
 					) }
 				</div>
 

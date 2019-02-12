@@ -14,20 +14,33 @@ import { PanelBody, Slot } from '@wordpress/components';
  */
 import BlockTypesList from '../block-types-list';
 
-const InserterInlineElements = ( { filterValue } ) => {
+const InserterInlineElements = ( {
+	filterValue,
+	onPanelToggle,
+	panelOpened,
+	panelRef,
+	whenEmpty,
+} ) => {
 	return (
 		<Slot name="Inserter.InlineElements" fillProps={ { filterValue } }>
-			{ ( fills ) => ! isEmpty( fills ) && (
-				<PanelBody
-					title={ __( 'Inline Elements' ) }
-					initialOpen={ false }
-					className="editor-inserter__inline-elements"
-				>
-					<BlockTypesList>
-						{ fills }
-					</BlockTypesList>
-				</PanelBody>
-			) }
+			{ ( fills ) => {
+				if ( isEmpty( fills ) ) {
+					return whenEmpty;
+				}
+				return (
+					<PanelBody
+						title={ __( 'Inline Elements' ) }
+						opened={ panelOpened }
+						onToggle={ onPanelToggle }
+						ref={ panelRef }
+						className="editor-inserter__inline-elements"
+					>
+						<BlockTypesList>
+							{ fills }
+						</BlockTypesList>
+					</PanelBody>
+				);
+			} }
 		</Slot>
 	);
 };
