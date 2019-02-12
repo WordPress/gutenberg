@@ -33,6 +33,7 @@ import {
 	toHTMLString,
 	getTextContent,
 	insert,
+	insertLineBreak,
 	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
@@ -600,43 +601,14 @@ export class RichText extends Component {
 
 			if ( this.multilineTag ) {
 				if ( event.shiftKey ) {
-					const text = getTextContent( record );
-					const end = getSelectionEnd( record );
-					const length = text.length;
-					let toInsert = '\n';
-
-					// If the caret is at the end of the text, and there is no
-					// trailing line break or no text at all, we have to insert two
-					// line breaks in order to create a new line visually and place
-					// the caret there.
-					if ( ( end === length || charAt( record, end ) === LINE_SEPARATOR ) && (
-						text.charAt( end - 1 ) !== '\n' || length === 0
-					) ) {
-						toInsert = '\n\n';
-					}
-
-					this.onChange( insert( record, toInsert ) );
+					this.onChange( insertLineBreak( record ) );
 				} else if ( this.onSplit && isEmptyLine( record ) ) {
 					this.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
 					this.onChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.onSplit ) {
-				const text = getTextContent( record );
-				const length = text.length;
-				let toInsert = '\n';
-
-				// If the caret is at the end of the text, and there is no
-				// trailing line break or no text at all, we have to insert two
-				// line breaks in order to create a new line visually and place
-				// the caret there.
-				if ( record.end === length && (
-					text.charAt( length - 1 ) !== '\n' || length === 0
-				) ) {
-					toInsert = '\n\n';
-				}
-
-				this.onChange( insert( record, toInsert ) );
+				this.onChange( insertLineBreak( record ) );
 			} else {
 				this.splitContent();
 			}
