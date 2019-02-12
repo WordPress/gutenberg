@@ -165,7 +165,9 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return (
 			<View style={ styles.titleContainer }>
 				<PostTitle
-					ref={ ref => this.titleRef = ref }
+					setRef={ ref => {
+						ref && ref.focus();
+					} }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
 					placeholder={ 'Add a Title' } />
