@@ -5,6 +5,9 @@ import { createElement } from '@wordpress/element';
 import jsdom from 'jsdom-jscore';
 import jsdomLevel1Core from 'jsdom-jscore/lib/jsdom/level1/core';
 
+// Import for side-effects: Patches for jsdom-jscore.
+import './jsdom-patches';
+
 global.wp = {
 	element: {
 		createElement, // load the element creation function, needed by Gutenberg-web
