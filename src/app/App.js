@@ -9,9 +9,10 @@ type PropsType = {
 	initialData: string,
 	initialHtmlModeEnabled: boolean,
 	initialTitle: string,
+	translations: mixed,
 };
 
-const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: PropsType ) => {
+const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled, translations }: PropsType ) => {
 	if ( initialData === undefined ) {
 		initialData = initialHtml;
 	}
@@ -19,6 +20,7 @@ const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: Pro
 	if ( initialTitle === undefined ) {
 		initialTitle = 'Welcome to Gutenberg!';
 	}
+	console.log( 'translations', translations );
 
 	return (
 		<AppContainer
