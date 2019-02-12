@@ -80,14 +80,16 @@ const optionator = require( 'optionator' )( {
 	prepend: 'Usage: node <path-to-docgen> <relative-path-to-entry-point>',
 	options: [ {
 		option: 'formatter',
-		alias: 'f',
 		type: 'String',
 		description: 'A custom function to format the generated documentation.',
 	}, {
 		option: 'output',
-		alias: 'o',
 		type: 'String',
 		description: 'Output file to will contain the API documentation.',
+	}, {
+		option: 'ignore',
+		type: 'RegExp',
+		description: 'A regular expression used to ignore symbols whose name match it.',
 	}, {
 		option: 'debug',
 		type: 'Boolean',
@@ -125,6 +127,7 @@ const doc = options.output ?
 // Process
 const currentFileStack = []; // To keep track of file being processed.
 const result = processFile( processDir, sourceFile );
+const filteredIr = result.ir.filter( ( { name } ) => options.ignore ? ! name.match( options.ignore ) : true );
 
 // Ouput
 if ( result === undefined ) {
@@ -135,8 +138,8 @@ if ( result === undefined ) {
 }
 
 const outputContents = options.formatter ?
-	runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, result, ir ) :
-	formatter( processDir, doc, result.ir );
+	runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIr ) :
+	formatter( processDir, doc, filteredIr );
 
 fs.writeFileSync( doc, outputContents );
 
