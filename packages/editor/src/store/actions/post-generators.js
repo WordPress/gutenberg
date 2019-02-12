@@ -104,6 +104,7 @@ export function* savePost( options = {} ) {
 	);
 
 	let path = `/wp/v2/${ postType.rest_base }/${ post.id }`;
+	let method = 'PUT';
 	if ( isAutosave ) {
 		const autoSavePost = yield select(
 			MODULE_KEY,
@@ -117,6 +118,7 @@ export function* savePost( options = {} ) {
 			...toSend,
 		};
 		path += '/autosaves';
+		method = 'POST';
 	} else {
 		yield dispatch(
 			'core/notices',
@@ -133,7 +135,7 @@ export function* savePost( options = {} ) {
 	try {
 		const newPost = yield apiFetch( {
 			path,
-			method: 'PUT',
+			method,
 			data: toSend,
 		} );
 		const resetAction = isAutosave ? 'resetAutosave' : 'resetPost';

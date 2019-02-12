@@ -1,5 +1,5 @@
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import actions, {
 	savePost,
@@ -339,7 +339,7 @@ describe( 'Post generator actions', () => {
 						apiFetch(
 							{
 								path: `/wp/v2/${ postType.rest_base }/${ editPostToSendOptimistic().id }${ path }`,
-								method: 'PUT',
+								method: isAutosave ? 'POST' : 'PUT',
 								data,
 							}
 						)
