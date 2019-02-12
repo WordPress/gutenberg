@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View, TextInput } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -44,11 +44,14 @@ export default function Cell( props ) {
 	};
 
 	const getValueComponent = () => {
+		const styleRTL = I18nManager.isRTL && styles.cellValueRTL;
+		const style = { ...styles.cellValue, ...valueStyle, ...styleRTL };
+
 		return isValueEditable ? (
 			<TextInput
 				ref={ ( c ) => valueTextInput = c }
 				numberOfLines={ 1 }
-				style={ { ...styles.cellValue, ...valueStyle } }
+				style={ style }
 				value={ value }
 				placeholder={ valuePlaceholder }
 				placeholderTextColor={ '#87a6bc' }
