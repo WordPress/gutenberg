@@ -1,10 +1,10 @@
 /**
- * External dependencies.
+ * External dependencies
  */
 import { isEqual, debounce } from 'lodash';
 
 /**
- * WordPress dependencies.
+ * WordPress dependencies
  */
 import {
 	Component,
@@ -15,7 +15,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import Placeholder from '../placeholder';
 import Spinner from '../spinner';

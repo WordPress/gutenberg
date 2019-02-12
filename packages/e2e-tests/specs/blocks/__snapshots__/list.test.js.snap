@@ -144,6 +144,24 @@ exports[`List should indent and outdent level 2 3`] = `
 <!-- /wp:list -->"
 `;
 
+exports[`List should insert a line break on shift+enter 1`] = `
+"<!-- wp:list -->
+<ul><li>a<br><br></li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should insert a line break on shift+enter in a non trailing list item 1`] = `
+"<!-- wp:list -->
+<ul><li>a</li><li>b<br><br></li><li>c</li></ul>
+<!-- /wp:list -->"
+`;
+
+exports[`List should not transform lines in block when transforming multiple blocks 1`] = `
+"<!-- wp:list -->
+<ul><li>one<br>...</li><li>two</li></ul>
+<!-- /wp:list -->"
+`;
+
 exports[`List should outdent with children 1`] = `
 "<!-- wp:list -->
 <ul><li>a<ul><li>b<ul><li>c</li></ul></li></ul></li></ul>
