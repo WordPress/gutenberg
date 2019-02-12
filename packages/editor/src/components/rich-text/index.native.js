@@ -205,7 +205,6 @@ export class RichText extends Component {
 
 	onContentSizeChange( contentSize ) {
 		const contentHeight = contentSize.height;
-		this.forceUpdate(); // force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
 		this.props.onContentSizeChange( {
 			aztecHeight: contentHeight,
 		}
