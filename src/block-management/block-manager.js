@@ -56,6 +56,7 @@ type StateType = {
 
 export class BlockManager extends React.Component<PropsType, StateType> {
 	scrollViewRef: Object;
+	titleRef: PostTitle;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -164,6 +165,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		return (
 			<View style={ styles.titleContainer }>
 				<PostTitle
+					ref={ ref => this.titleRef = ref }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
 					placeholder={ 'Add a Title' } />
