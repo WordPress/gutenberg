@@ -8,7 +8,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostVisibility from '../post-visibility';
 import PostTrash from '../post-trash';

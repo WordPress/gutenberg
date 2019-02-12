@@ -4,7 +4,7 @@
 import { find, get, includes } from 'lodash';
 
 /**
- * WordPress dependencies.
+ * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { ifCondition, compose } from '@wordpress/compose';
@@ -12,7 +12,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { Button, PanelBody } from '@wordpress/components';
 
 /**
- * Internal dependencies.
+ * Internal dependencies
  */
 import { POST_FORMATS } from '../post-format';
 

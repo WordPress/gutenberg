@@ -8,7 +8,7 @@ import { BlockInspector } from '@wordpress/editor';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import Sidebar from '../';
 import SettingsHeader from '../settings-header';

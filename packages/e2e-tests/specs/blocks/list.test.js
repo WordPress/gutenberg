@@ -95,6 +95,21 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not transform lines in block when transforming multiple blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'one' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '...' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.keyboard.up( 'Shift' );
+		await transformBlockTo( 'List' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be converted to paragraphs', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
@@ -200,6 +215,104 @@ describe( 'List', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await pressKeyWithModifier( 'primary', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should change the base list type', async () => {
+		await insertBlock( 'List' );
+		await page.click( 'button[aria-label="Convert to ordered list"]' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should change the indented list type', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+
+		// Pointer device is needed. Shift+Tab won't focus the toolbar.
+		// To do: fix so Shift+Tab works.
+		await page.mouse.move( 200, 300, { steps: 10 } );
+		await page.mouse.move( 250, 350, { steps: 10 } );
+
+		await page.click( 'button[aria-label="Convert to ordered list"]' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should indent and outdent level 1', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should indent and outdent level 2', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'i' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should outdent with children', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await pressKeyWithModifier( 'primary', 'm' );
+		await page.keyboard.type( 'c' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert a line break on shift+enter', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert a line break on shift+enter in a non trailing list item', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

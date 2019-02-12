@@ -11,6 +11,7 @@ exports[`Notice should match snapshot 1`] = `
     <ForwardRef(Button)
       className="components-notice__action"
       href="https://example.com"
+      isDefault={false}
       isLink={true}
     >
       View

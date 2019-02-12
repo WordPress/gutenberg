@@ -2,7 +2,7 @@
 
 Thank you for taking the time to contribute.
 
-The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](../../CONTRIBUTING.md).
+The following is a set of guidelines for contributing to the `@wordpress/components` package to be considered in addition to the general ones described in our [Contributing Policy](/CONTRIBUTING.md).
 
 ## Examples
 

@@ -17,7 +17,6 @@ exports[`PluginMoreMenuItem renders menu item as button properly 1`] = `
     role="menu"
   >
     <button
-      aria-label="My plugin button menu item"
       className="components-button components-icon-button components-menu-item__button has-icon has-text"
       onClick={[Function]}
       role="menuitem"

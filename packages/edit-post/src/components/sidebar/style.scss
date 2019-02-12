@@ -17,10 +17,6 @@
 		height: auto;
 		overflow: auto;
 		-webkit-overflow-scrolling: touch;
-
-		body.is-fullscreen-mode & {
-			top: $header-height;
-		}
 	}
 
 	@include break-medium() {
@@ -41,17 +37,17 @@
 		margin-top: -1px;
 		margin-bottom: -1px;
 
-		body.is-fullscreen-mode & {
-			max-height: calc(100vh - #{ $panel-header-height });
-			@include break-small() {
-				max-height: none;
-			}
-		}
-
 		@include break-small() {
 			overflow: inherit;
 			height: auto;
 			max-height: none;
+		}
+
+		@include break-medium() {
+
+			body.is-fullscreen-mode & {
+				max-height: calc(100vh - #{ $panel-header-height });
+			}
 		}
 	}
 

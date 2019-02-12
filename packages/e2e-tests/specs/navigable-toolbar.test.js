@@ -26,7 +26,7 @@ describe( 'block toolbar', () => {
 		} );
 
 		const isInRichTextEditable = () => page.evaluate( () => (
-			document.activeElement.classList.contains( 'editor-rich-text__tinymce' )
+			document.activeElement.contentEditable === 'true'
 		) );
 
 		const isInBlockToolbar = () => page.evaluate( () => (

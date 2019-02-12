@@ -114,11 +114,10 @@
 			margin-left: $admin-sidebar-width-collapsed;
 		}
 
-		// Undo the above rules for fullscreen mode.
+		// Provide special rules for fullscreen mode.
 		body.is-fullscreen-mode & {
 			margin-left: 0 !important;
-			position: relative;
-			top: inherit;
+			top: $header-height;
 		}
 	}
 
@@ -168,17 +167,13 @@
 	left: 0;
 	overflow: auto;
 
-	body.is-fullscreen-mode & {
-		top: 0;
-	}
-
 	@include break-medium() {
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
 		transform: translateX(+100%);
-		animation: edit-post-layout__slide-in-animation 0.1s forwards;
+		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
 
 		body.is-fullscreen-mode & {
 			top: 0;
@@ -186,7 +181,7 @@
 	}
 }
 
-@keyframes edit-post-layout__slide-in-animation {
+@keyframes edit-post-post-publish-panel__slide-in-animation {
 	100% {
 		transform: translateX(0%);
 	}

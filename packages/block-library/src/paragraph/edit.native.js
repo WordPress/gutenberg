@@ -12,7 +12,7 @@ import { parse, createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
 /**
- * Import style
+ * Internal dependencies
  */
 import styles from './style.scss';
 

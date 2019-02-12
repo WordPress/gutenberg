@@ -1,5 +1,5 @@
 /**
- * Node dependencies
+ * External dependencies
  */
 import { URL } from 'url';
 
