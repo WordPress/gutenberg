@@ -4,14 +4,14 @@
 import { __ } from '@wordpress/i18n';
 
 /**
- * External dependencies
- */
-import { get, includes } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../../constants';
+
+/**
+ * External dependencies
+ */
+import { get, includes } from 'lodash';
 
 /**
  * Builds the arguments for a success notification dispatch.

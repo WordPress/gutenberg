@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { select, dispatch, apiFetch } from '../controls';
@@ -17,6 +12,11 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
+
+/**
+ * External dependencies
+ */
+import { pick } from 'lodash';
 
 /**
  * Action generator for saving the current post in the editor.
