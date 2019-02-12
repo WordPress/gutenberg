@@ -349,10 +349,6 @@
 			bottom: auto;
 		}
 
-		// Clear floats of centered block when previous sibling block has left/right float.
-		& + .editor-block-list__block[data-align="center"] {
-			clear: both;
-		}
 	}
 
 	// Unlike most explicit left/right alignments, this one should be flipped by the auto-RTL system.
@@ -414,6 +410,11 @@
 				/*!rtl:end:ignore*/
 			}
 		}
+	}
+
+	// Center
+	&[data-align="center"] {
+		clear: both;
 	}
 
 	// Wide and full-wide
