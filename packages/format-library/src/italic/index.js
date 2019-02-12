@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextToolbarButton, RichTextShortcut } from '@wordpress/editor';
+import { RichTextToolbarButton, RichTextShortcut, RichTextInputEvent } from '@wordpress/editor';
 
 const name = 'core/italic';
 
@@ -31,6 +31,13 @@ export const italic = {
 					isActive={ isActive }
 					shortcutType="primary"
 					shortcutCharacter="i"
+				/>
+				<RichTextInputEvent
+					onInput={ ( { inputType } ) => {
+						if ( inputType === 'formatItalic' ) {
+							onToggle();
+						}
+					} }
 				/>
 			</Fragment>
 		);

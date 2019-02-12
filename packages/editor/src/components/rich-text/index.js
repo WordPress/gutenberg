@@ -348,6 +348,21 @@ export class RichText extends Component {
 			return;
 		}
 
+		if ( event ) {
+			const { inputType } = event.nativeEvent;
+
+			// The browser formatted something or tried to insert a list.
+			// Overwrite it. It will be handled later by the format library if
+			// needed.
+			if (
+				inputType.indexOf( 'format' ) === 0 ||
+				( inputType.indexOf( 'insert' ) === 0 && inputType !== 'insertText' )
+			) {
+				this.applyRecord( this.getRecord() );
+				return;
+			}
+		}
+
 		let { selectedFormat } = this.state;
 		const { formats, text, start, end } = this.patterns.reduce(
 			( accumlator, transform ) => transform( accumlator ),
@@ -1104,3 +1119,4 @@ export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { RichTextInserterItem } from './inserter-list-item';
+export { RichTextInputEvent } from './input-event';
