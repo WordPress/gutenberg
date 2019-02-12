@@ -66,7 +66,7 @@ class ImageEdit extends React.Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
-		this.onRevertSettings = this.onRevertSettings.bind( this );
+		this.onClearSettings = this.onClearSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -165,7 +165,7 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	onRevertSettings() {
+	onClearSettings() {
 		this.props.setAttributes( {
 			alt: '',
 			linkDestination: LINK_DESTINATION_NONE,
@@ -255,9 +255,9 @@ class ImageEdit extends React.Component {
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Clear All Settings' ) }
-					labelStyle={ styles.resetSettingsButton }
+					labelStyle={ styles.clearSettingsButton }
 					drawSeparator={ false }
-					onPress={ this.onRevertSettings }
+					onPress={ this.onClearSettings }
 				/>
 			</BottomSheet>
 		);
