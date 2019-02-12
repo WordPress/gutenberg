@@ -37,3 +37,13 @@ This animation is meant for popover/modal content, such as menus appearing. It s
 Name | Type | Default | Description
 --- | --- | --- | ---
 `origin` | `string` | `top center` | Point of origin (`top`, `bottom`,` middle right`, `left`, `center`).
+
+### slide-in
+
+This animation is meant for sidebars and sliding menus. It shows the height and width of the animated element moving from a hidden position to its normal one.
+
+#### Options
+
+Name | Type | Default | Description
+--- | --- | --- | ---
+`origin` | `string` | `left` | Point of origin (`left`).

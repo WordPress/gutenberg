@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { createSlotFill, withFocusReturn } from '@wordpress/components';
+import { createSlotFill, withFocusReturn, Animate } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { ifCondition, compose } from '@wordpress/compose';
 
@@ -15,14 +20,18 @@ const { Fill, Slot } = createSlotFill( 'Sidebar' );
 const Sidebar = ( { children, label } ) => {
 	return (
 		<Fill>
-			<div
-				className="edit-post-sidebar"
-				role="region"
-				aria-label={ label }
-				tabIndex="-1"
-			>
-				{ children }
-			</div>
+			<Animate type="slide-in" options={ { origin: 'left' } }>
+				{ ( { className } ) => (
+					<div
+						className={ classnames( 'edit-post-sidebar', className ) }
+						role="region"
+						aria-label={ label }
+						tabIndex="-1"
+					>
+						{ children }
+					</div>
+				) }
+			</Animate>
 		</Fill>
 	);
 };
