@@ -167,6 +167,7 @@ dependencies {
     implementation project(':react-native-svg')
 	implementation project(':react-native-aztec')
 	implementation project(':react-native-recyclerview-list')
+    implementation project(':react-native-gutenberg-bridge')
     // compile fileTree(dir: "libs", include: ["*.jar"])
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "org.wordpress:utils:$wordpressUtilsVersion"
