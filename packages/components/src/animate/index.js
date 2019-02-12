@@ -19,6 +19,17 @@ function Animate( { type, options = {}, children } ) {
 		} );
 	}
 
+	if ( type === 'slide-in' ) {
+		const { origin = 'left' } = options;
+
+		return children( {
+			className: classnames(
+				'components-animate__slide-in',
+				'is-from-' + origin,
+			),
+		} );
+	}
+
 	return children( {} );
 }
 
