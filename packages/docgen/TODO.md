@@ -4,8 +4,10 @@
 - [x] CLI: allow for passing the output file.
 - [x] CLI: allow for passing a formatter.
 - [x] CLI: allow for filtering specific names that should go undocumented.
-- [ ] IR: make it independent from doctrine output & offer a better alternative to type description?
-- [ ] Find alternative to `doctrine`.
-- [ ] Chore: update examples in README.
+- [ ] Find alternative to `doctrine` & make IR independent from doctrine output
+- [ ] IR: offer a better alternative to type description?
+- [ ] IR: support `../` dependencies.
+- [ ] Review `/** Internal dependencies`. Context: https://wordpress.slack.com/archives/C5UNMSU4R/p1549980709040800
+- [x] Chore: update examples in README.
 - [ ] Chore: register the package with lerna.
 - [ ] See [coverage](coverage.md#TODO)

@@ -32,6 +32,10 @@ Entry point:
 ```js
 /**
  * Adds two numbers.
+ *
+ * @param {number} term1 First number.
+ * @param {number} term2 Second number.
+ * @return {number} The result of adding the two numbers.
  */
 export default function addition( term1, term2 ) {
 	// Implementation would go here.
@@ -41,12 +45,22 @@ export default function addition( term1, term2 ) {
 Output:
 
 ```markdown
-
 # API
 
 ## default
 
+[example.js#L8-L10](example.js#L8-L10)
+
 Adds two numbers.
+
+**Parameters**
+
+- **term1** `number`: First number.
+- **term2** `number`: Second number.
+
+**Returns**
+
+`number` The result of adding the two numbers.
 ```
 
 ### Named export
@@ -56,61 +70,164 @@ Entry point:
 ```js
 /**
  * Adds two numbers.
+ *
+ * @param {number} term1 First number.
+ * @param {number} term2 Second number.
+ * @return {number} The result of adding the two numbers.
  */
 function addition( term1, term2 ) {
-	// Implementation would go here.
-}
-
-export { count };
-```
-
-Output:
-
-```markdown
-
-# API
-
-## count
-
-Adds two numbers.
-```
-
-### Namespace export
-
-Let `count/index.js` be:
-
-```js
-/**
- * Substracts two numbers.
- */
-export function substraction( term1, term2 ) {
-	// Implementation would go here.
+	return term1 + term2;
 }
 
 /**
  * Adds two numbers.
+ *
+ * @deprecated Use `addition` instead.
+ *
+ * @param {number} term1 First number.
+ * @param {number} term2 Second number.
+ * @return {number} The result of adding the two numbers.
  */
-export function addition( term1, term2 ) {
-	// Implementation would go here.
+function count( term1, term2 ) {
+	return term1 + term2;
 }
+
+export { count, addition };
 ```
 
-And the entry point:
-
-```js
-export * from './count';
-```
-
-Output would be:
+Output:
 
 ```markdown
 # API
 
 ## addition
 
+[example.js#L25-L25](example.js#L25-L25)
+
 Adds two numbers.
+
+**Parameters**
+
+- **term1** `number`: First number.
+- **term2** `number`: Second number.
+
+**Returns**
+
+`number` The result of adding the two numbers.
+
+## count
+
+[example.js#L25-L25](example.js#L25-L25)
+
+> **Deprecated** Use `addition` instead.
+
+Adds two numbers.
+
+**Parameters**
+
+- **term1** `number`: First number.
+- **term2** `number`: Second number.
+
+**Returns**
+
+`number` The result of adding the two numbers.
+```
+
+### Namespace export
+
+Let the entry point be:
+
+```js
+export * from './count';
+```
+
+with `./count/index.js` contents being:
+
+```js
+/**
+ * Substracts two numbers.
+ *
+ * @example
+ *
+ * ```js
+ * const result = substraction( 5, 2 );
+ * console.log( result ); // Will log 3
+ * ```
+ *
+ * @param {number} term1 First number.
+ * @param {number} term2 Second number.
+ * @return {number} The result of subtracting the two numbers.
+ */
+export function substraction( term1, term2 ) {
+	return term1 - term2;
+}
+
+/**
+ * Adds two numbers.
+ *
+  * @example
+ *
+ * ```js
+ * const result = addition( 5, 2 );
+ * console.log( result ); // Will log 7
+ * ```
+ *
+ * @param {number} term1 First number.
+ * @param {number} term2 Second number.
+ * @return {number} The result of adding the two numbers.
+ */
+export function addition( term1, term2 ) {
+	// Implementation would go here.
+	return term1 - term2;
+}
+```
+
+Output would be:
+
+````markdown
+# API
+
+## addition
+
+[example-module.js#L1-L1](example-module.js#L1-L1)
+
+Adds two numbers.
+
+**Usage**
+
+```js
+const result = addition( 5, 2 );
+console.log( result ); // Will log 7
+```
+
+**Parameters**
+
+- **term1** `number`: First number.
+- **term2** `number`: Second number.
+
+**Returns**
+
+`number` The result of adding the two numbers.
 
 ## substraction
 
+[example-module.js#L1-L1](example-module.js#L1-L1)
+
 Substracts two numbers.
+
+**Usage**
+
+```js
+const result = substraction( 5, 2 );
+console.log( result ); // Will log 3
 ```
+
+**Parameters**
+
+- **term1** `number`: First number.
+- **term2** `number`: Second number.
+
+**Returns**
+
+`number` The result of subtracting the two numbers.
+````
