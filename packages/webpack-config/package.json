@@ -23,6 +23,8 @@
 	},
 	"main": "index.js",
 	"dependencies": {
+		"babel-loader": "^8.0.5",
+		"source-map-loader": "^0.2.4",
 		"webpack-bundle-analyzer": "^3.0.3",
 		"webpack-livereload-plugin": "^2.2.0"
 	},
