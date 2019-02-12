@@ -16,4 +16,13 @@ module.exports = {
 	blockContainerFocused: {
 		paddingBottom: 0,
 	},
+	blockCode: {
+		fontFamily: 'serif',
+	},
+	'editor-rich-text': {
+		fontFamily: 'serif',
+	},
+	'editor-plain-text': {
+		fontFamily: 'serif',
+	},
 };
