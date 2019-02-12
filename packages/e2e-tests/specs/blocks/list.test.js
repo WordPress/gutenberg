@@ -280,4 +280,25 @@ describe( 'List', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should insert a line break on shift+enter', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert a line break on shift+enter in a non trailing list item', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
