@@ -173,7 +173,7 @@
 		width: $sidebar-width;
 		border-left: $border-width solid $light-gray-500;
 		transform: translateX(+100%);
-		animation: edit-post-layout__slide-in-animation 0.1s forwards;
+		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
 
 		body.is-fullscreen-mode & {
 			top: 0;
@@ -181,7 +181,7 @@
 	}
 }
 
-@keyframes edit-post-layout__slide-in-animation {
+@keyframes edit-post-post-publish-panel__slide-in-animation {
 	100% {
 		transform: translateX(0%);
 	}
