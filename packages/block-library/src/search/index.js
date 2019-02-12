@@ -8,22 +8,26 @@ import { __ } from '@wordpress/i18n';
  */
 import edit from './edit';
 
-export const name = 'core/search';
+export let name;
+export let settings;
 
-export const settings = {
-	title: __( 'Search' ),
+if ( process.env.GUTENBERG_PHASE === 2 ) {
+	name = 'core/search';
+	settings = {
+		title: __( 'Search' ),
 
-	description: __( 'Help visitors find your content.' ),
+		description: __( 'Help visitors find your content.' ),
 
-	icon: 'search',
+		icon: 'search',
 
-	category: 'widgets',
+		category: 'widgets',
 
-	keywords: [ __( 'find' ) ],
+		keywords: [ __( 'find' ) ],
 
-	edit,
+		edit,
 
-	save() {
-		return null;
-	},
-};
+		save() {
+			return null;
+		},
+	};
+}
