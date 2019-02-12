@@ -44,6 +44,7 @@ const MEDIA_UPLOAD_STATE_FAILED = 3;
 const MEDIA_UPLOAD_STATE_RESET = 4;
 
 const LINK_DESTINATION_CUSTOM = 'custom';
+const LINK_DESTINATION_NONE = 'none';
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -65,6 +66,7 @@ class ImageEdit extends React.Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
+		this.onClearSettings = this.onClearSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -163,6 +165,14 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
+	onClearSettings() {
+		this.props.setAttributes( {
+			alt: '',
+			linkDestination: LINK_DESTINATION_NONE,
+			href: undefined,
+		} );
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href } = attributes;
@@ -244,10 +254,10 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.updateAlt }
 				/>
 				<BottomSheet.Cell
-					label={ __( 'Reset to Original' ) }
-					labelStyle={ styles.resetSettingsButton }
+					label={ __( 'Clear All Settings' ) }
+					labelStyle={ styles.clearSettingsButton }
 					drawSeparator={ false }
-					onPress={ () => {} }
+					onPress={ this.onClearSettings }
 				/>
 			</BottomSheet>
 		);
