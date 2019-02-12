@@ -10,8 +10,8 @@
 # Editor
 /packages/annotations                           @youknowriad @gziolo @aduth @atimmer
 /packages/autop                                 @youknowriad @aduth
-/packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth
-/packages/block-serialization-default-parser    @youknowriad @gziolo @aduth
+/packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth @dmsnell
+/packages/block-serialization-default-parser    @youknowriad @gziolo @aduth @dmsnell
 /packages/blocks                                @youknowriad @gziolo @aduth @noisysocks
 /packages/edit-post                             @youknowriad @gziolo @talldan @noisysocks
 /packages/editor                                @youknowriad @gziolo @talldan @noisysocks
