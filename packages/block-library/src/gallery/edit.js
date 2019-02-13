@@ -279,7 +279,7 @@ class GalleryEdit extends Component {
 					{ dropZone }
 					{ images.map( ( img, index ) => {
 						/* translators: %1$d is the order number of the image, %2$d is the total number of images. */
-						const ariaLabel = __( sprintf( 'image %1$d of %2$d in gallery', ( index + 1 ), images.length ) );
+						const ariaLabel = sprintf( __( 'image %1$d of %2$d in gallery' ), ( index + 1 ), images.length );
 
 						return (
 							<li className="blocks-gallery-item" key={ img.id || img.url }>
