@@ -119,13 +119,6 @@ describe( 'blocks', () => {
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should reject blocks with more than 3 keywords', () => {
-			const blockType = { save: noop, keywords: [ 'apple', 'orange', 'lemon', 'pineapple' ], category: 'common', title: 'block title' },
-				block = registerBlockType( 'my-plugin/fancy-block-7', blockType );
-			expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-7" can have a maximum of 3 keywords.' );
-			expect( block ).toBeUndefined();
-		} );
-
 		it( 'should reject blocks without category', () => {
 			const blockType = { settingName: 'settingValue', save: noop, title: 'block title' },
 				block = registerBlockType( 'my-plugin/fancy-block-8', blockType );
