@@ -221,7 +221,7 @@ class RCTAztecView: Aztec.TextView {
         placeholderLabel.isHidden = !self.text.isEmpty
     }
     
-    // MARK: - Font
+    // MARK: - Font Setters
     
     @objc func setFontFamily(_ family: String) {
         fontFamily = family
@@ -238,10 +238,50 @@ class RCTAztecView: Aztec.TextView {
         refreshFont()
     }
     
+    // MARK: - Font Refreshing
+    
+    /// Applies the family, size and weight constraints to the provided font.
+    ///
+    private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
+        let oldDescriptor = baseFont.fontDescriptor
+        let newFontSize: CGFloat
+        
+        if let fontSize = fontSize {
+            newFontSize = fontSize
+        } else {
+            newFontSize = baseFont.pointSize
+        }
+        
+        var newTraits = oldDescriptor.symbolicTraits
+        
+        if let fontWeight = fontWeight {
+            if (fontWeight == "bold") {
+                newTraits.update(with: .traitBold)
+            }
+        }
+        
+        var newDescriptor: UIFontDescriptor
+        
+        if let fontFamily = fontFamily {
+            newDescriptor = UIFontDescriptor(name: fontFamily, size: newFontSize)
+            newDescriptor = newDescriptor.withSymbolicTraits(newTraits) ?? newDescriptor
+        } else {
+            newDescriptor = oldDescriptor
+        }
+        
+        return UIFont(descriptor: newDescriptor, size: newFontSize)
+    }
+    
+    /// Returns the font from the specified attributes, or the default font if no specific one is set.
+    ///
+    private func font(from attributes: [NSAttributedString.Key: Any]) -> UIFont {
+        return attributes[.font] as? UIFont ?? defaultFont
+    }
+    
     /// This method refreshes the font for the whole view if the font-family, the font-size or the font-weight
     /// were ever set.
     ///
-    func refreshFont() {
+    private func refreshFont() {
         guard fontFamily != nil || fontSize != nil || fontWeight != nil else {
             return
         }
@@ -249,37 +289,24 @@ class RCTAztecView: Aztec.TextView {
         let fullRange = NSRange(location: 0, length: textStorage.length)
         
         textStorage.enumerateAttributes(in: fullRange, options: []) { (attributes, subrange, stop) in
-            let oldFont = attributes[.font] as? UIFont ?? defaultFont
-            let oldDescriptor = oldFont.fontDescriptor
-            let newFontSize: CGFloat
-            
-            if let fontSize = fontSize {
-                newFontSize = fontSize
-            } else {
-                newFontSize = oldFont.pointSize
-            }
-            
-            var newTraits = oldDescriptor.symbolicTraits
-            
-            if let fontWeight = fontWeight {
-                if (fontWeight == "bold") {
-                    newTraits.update(with: .traitBold)
-                }
-            }
-            
-            var newDescriptor: UIFontDescriptor
-            
-            if let fontFamily = fontFamily {
-                newDescriptor = UIFontDescriptor(name: fontFamily, size: newFontSize)
-                newDescriptor = newDescriptor.withSymbolicTraits(newTraits) ?? newDescriptor
-            } else {
-                newDescriptor = oldDescriptor
-            }
-            
-            let newFont = UIFont(descriptor: newDescriptor, size: newFontSize)
+            let oldFont = font(from: attributes)
+            let newFont = applyFontConstraints(to: oldFont)
             
             textStorage.addAttribute(.font, value: newFont, range: subrange)
         }
+        
+        refreshTypingAttributesAndPlaceholderFont()
+    }
+    
+    /// This method refreshes the font for the palceholder field and typing attributes.
+    /// This method should not be called directly.  Call `refreshFont()` instead.
+    ///
+    private func refreshTypingAttributesAndPlaceholderFont() {
+        let oldFont = font(from: typingAttributesSwifted)
+        let newFont = applyFontConstraints(to: oldFont)
+        
+        typingAttributesSwifted[.font] = newFont
+        placeholderLabel.font = newFont
     }
 
     // MARK: - Formatting interface
