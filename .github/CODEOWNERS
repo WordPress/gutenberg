@@ -76,6 +76,9 @@
 # Documentation
 /docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 
+# Styles (Unowned)
+*.scss                                          @ghost
+
 # Native (Unowned)
 *.native.js                                     @ghost
 *.android.js                                    @ghost
