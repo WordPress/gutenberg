@@ -1,5 +1,25 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`splitting and merging blocks should create a paragraph block above when pressing enter at start of heading 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Abc</h2>
+<!-- /wp:heading -->"
+`;
+
+exports[`splitting and merging blocks should create a paragraph block below when pressing enter at end of heading 1`] = `
+"<!-- wp:heading -->
+<h2>Abc</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`splitting and merging blocks should delete an empty first line 1`] = `
 "<!-- wp:paragraph -->
 <p>First</p>

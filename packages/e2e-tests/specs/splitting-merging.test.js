@@ -210,4 +210,24 @@ describe( 'splitting and merging blocks', () => {
 
 		expect( isInDefaultBlock ).toBe( true );
 	} );
+
+	it( 'should create a paragraph block above when pressing enter at start of heading', async () => {
+		await insertBlock( 'Heading' );
+		await page.keyboard.type( 'Abc' );
+		await pressKeyTimes( 'ArrowLeft', 3 );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'ArrowUp' );
+
+		const activeElementClassList = await page.evaluate( () => document.activeElement.classList );
+		expect( Object.values( activeElementClassList ) ).toContain( 'wp-block-paragraph' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should create a paragraph block below when pressing enter at end of heading', async () => {
+		await insertBlock( 'Heading' );
+		await page.keyboard.type( 'Abc' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
