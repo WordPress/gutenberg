@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableOpacity, Text, View, TextInput } from 'react-native';
+import { TouchableOpacity, Text, View, TextInput, I18nManager } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -77,6 +77,9 @@ export default class Cell extends Component {
 		};
 
 		const getValueComponent = () => {
+			const styleRTL = I18nManager.isRTL && styles.cellValueRTL;
+			const style = { ...styles.cellValue, ...valueStyle, ...styleRTL };
+
 			// To be able to show the `middle` ellipsizeMode on editable cells
 			// we show the TextInput just when the user wants to edit the value,
 			// and the Text component to display it.
@@ -86,7 +89,7 @@ export default class Cell extends Component {
 				<TextInput
 					ref={ ( c ) => this._valueTextInput = c }
 					numberOfLines={ 1 }
-					style={ { ...styles.cellValue, ...valueStyle } }
+					style={ style }
 					value={ value }
 					placeholder={ valuePlaceholder }
 					placeholderTextColor={ '#87a6bc' }
