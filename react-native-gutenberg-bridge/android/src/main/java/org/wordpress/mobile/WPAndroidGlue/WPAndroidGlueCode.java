@@ -189,7 +189,8 @@ public class WPAndroidGlueCode {
     }
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener, OnEditorMountListener onEditorMountListener) {
+                                  OnReattachQueryListener onReattachQueryListener,
+                                  OnEditorMountListener onEditorMountListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
