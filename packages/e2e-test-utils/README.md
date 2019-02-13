@@ -13,3 +13,526 @@ npm install @wordpress/e2e-test-utils --save-dev
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
 
 ## API
+
+### activatePlugin
+
+[src/index.js#L1-L1](src/index.js#L1-L1)
+
+Activates an installed plugin.
+
+**Parameters**
+
+-   **slug** `string`: Plugin slug.
+
+### arePrePublishChecksEnabled
+
+[src/index.js#L2-L2](src/index.js#L2-L2)
+
+Verifies if publish checks are enabled.
+
+**Returns**
+
+`boolean` Boolean which represents the state of prepublish checks.
+
+### clearLocalStorage
+
+[src/index.js#L3-L3](src/index.js#L3-L3)
+
+Clears the local storage.
+
+### clickBlockAppender
+
+[src/index.js#L4-L4](src/index.js#L4-L4)
+
+Clicks the default block appender.
+
+### clickButton
+
+[src/index.js#L5-L5](src/index.js#L5-L5)
+
+Clicks a button based on the text on the button.
+
+**Parameters**
+
+-   **buttonText** `string`: The text that appears on the button to click.
+
+### clickOnCloseModalButton
+
+[src/index.js#L6-L6](src/index.js#L6-L6)
+
+Click on the close button of an open modal.
+
+**Parameters**
+
+-   **modalClassName** `?string`: Class name for the modal to close
+
+### clickOnMoreMenuItem
+
+[src/index.js#L7-L7](src/index.js#L7-L7)
+
+Clicks on More Menu item, searches for the button with the text provided and clicks it.
+
+**Parameters**
+
+-   **buttonLabel** `string`: The label to search the button for.
+
+### createEmbeddingMatcher
+
+[src/index.js#L45-L45](src/index.js#L45-L45)
+
+Creates a function to determine if a request is embedding a certain URL.
+
+**Parameters**
+
+-   **url** `string`: The URL to check against a request.
+
+**Returns**
+
+`function` Function that determines if a request is for the embed API, embedding a specific URL.
+
+### createJSONResponse
+
+[src/index.js#L45-L45](src/index.js#L45-L45)
+
+Respond to a request with a JSON response.
+
+**Parameters**
+
+-   **mockResponse** `string`: The mock object to wrap in a JSON response.
+
+**Returns**
+
+`Promise` Promise that responds to a request with the mock JSON response.
+
+### createNewPost
+
+[src/index.js#L8-L8](src/index.js#L8-L8)
+
+Creates new post.
+
+**Parameters**
+
+-   **obj** `Object`: Object to create new post, along with tips enabling option.
+
+### createURL
+
+[src/index.js#L9-L9](src/index.js#L9-L9)
+
+Creates new URL by parsing base URL, WPPath and query string.
+
+**Parameters**
+
+-   **WPPath** `string`: String to be serialized as pathname.
+-   **query** `?string`: String to be serialized as query portion of URL.
+
+**Returns**
+
+`string` String which represents full URL.
+
+### createURLMatcher
+
+[src/index.js#L45-L45](src/index.js#L45-L45)
+
+Creates a function to determine if a request is calling a URL with the substring present.
+
+**Parameters**
+
+-   **substring** `string`: The substring to check for.
+
+**Returns**
+
+`function` Function that determines if a request's URL contains substring.
+
+### deactivatePlugin
+
+[src/index.js#L10-L10](src/index.js#L10-L10)
+
+Deactivates an active plugin.
+
+**Parameters**
+
+-   **slug** `string`: Plugin slug.
+
+### disablePrePublishChecks
+
+[src/index.js#L11-L11](src/index.js#L11-L11)
+
+Disables Pre-publish checks.
+
+### enablePageDialogAccept
+
+[src/index.js#L12-L12](src/index.js#L12-L12)
+
+Enables even listener which accepts a page dialog which
+may appear when navigating away from Gutenberg.
+
+### enablePrePublishChecks
+
+[src/index.js#L13-L13](src/index.js#L13-L13)
+
+Enables Pre-publish checks.
+
+### ensureSidebarOpened
+
+[src/index.js#L14-L14](src/index.js#L14-L14)
+
+Verifies that the edit post sidebar is opened, and if it is not, opens it.
+
+**Returns**
+
+`Promise` Promise resolving once the edit post sidebar is opened.
+
+### findSidebarPanelWithTitle
+
+[src/index.js#L15-L15](src/index.js#L15-L15)
+
+Finds a sidebar panel with the provided title.
+
+**Parameters**
+
+-   **panelTitle** `string`: The name of sidebar panel.
+
+**Returns**
+
+`?ElementHandle` Object that represents an in-page DOM element.
+
+### getAllBlocks
+
+[src/index.js#L16-L16](src/index.js#L16-L16)
+
+Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/editor' ).getBlocks();
+
+**Returns**
+
+`Promise` Promise resolving with an array containing all blocks in the document.
+
+### getAvailableBlockTransforms
+
+[src/index.js#L17-L17](src/index.js#L17-L17)
+
+Returns an array of strings with all block titles,
+that the current selected block can be transformed into.
+
+**Returns**
+
+`Promise` Promise resolving with an array containing all possible block transforms
+
+### getEditedPostContent
+
+[src/index.js#L18-L18](src/index.js#L18-L18)
+
+Returns a promise which resolves with the edited post content (HTML string).
+
+**Returns**
+
+`Promise` Promise resolving with post content markup.
+
+### hasBlockSwitcher
+
+[src/index.js#L19-L19](src/index.js#L19-L19)
+
+Returns a boolean indicating if the current selected block has a block switcher or not.
+
+**Returns**
+
+`Promise` Promise resolving with a boolean.
+
+### insertBlock
+
+[src/index.js#L20-L20](src/index.js#L20-L20)
+
+Opens the inserter, searches for the given term, then selects the first
+result that appears.
+
+**Parameters**
+
+-   **searchTerm** `string`: The text to search the inserter for.
+-   **panelName** `string`: The inserter panel to open (if it's closed by default).
+
+### installPlugin
+
+[src/index.js#L21-L21](src/index.js#L21-L21)
+
+Installs a plugin from the WP.org repository.
+
+**Parameters**
+
+-   **slug** `string`: Plugin slug.
+-   **searchTerm** `?string`: If the plugin is not findable by its slug use an alternative term to search.
+
+### isCurrentURL
+
+[src/index.js#L22-L22](src/index.js#L22-L22)
+
+Checks if current URL is a WordPress path.
+
+**Parameters**
+
+-   **WPPath** `string`: String to be serialized as pathname.
+-   **query** `?string`: String to be serialized as query portion of URL.
+
+**Returns**
+
+`boolean` Boolean represents whether current URL is or not a WordPress path.
+
+### loginUser
+
+[src/index.js#L23-L23](src/index.js#L23-L23)
+
+Performs log in with specified username and password.
+
+**Parameters**
+
+-   **username** `?string`: String to be used as user credential.
+-   **password** `?string`: String to be used as user credential.
+
+### mockOrTransform
+
+[src/index.js#L45-L45](src/index.js#L45-L45)
+
+Mocks a request with the supplied mock object, or allows it to run with an optional transform, based on the
+deserialised JSON response for the request.
+
+**Parameters**
+
+-   **mockCheck** `function`: function that returns true if the request should be mocked.
+-   **mock** `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
+-   **responseObjectTransform** `(function|undefined)`: An optional function that transforms the response's object before the response is used.
+
+**Returns**
+
+`Promise` Promise that uses `mockCheck` to see if a request should be mocked with `mock`, and optionally transforms the response with `responseObjectTransform`.
+
+### observeFocusLoss
+
+[src/index.js#L24-L24](src/index.js#L24-L24)
+
+Binds to the document on page load which throws an error if a `focusout`
+event occurs without a related target (i.e. focus loss).
+
+### openDocumentSettingsSidebar
+
+[src/index.js#L25-L25](src/index.js#L25-L25)
+
+Clicks on the button in the header which opens Document Settings sidebar when it is closed.
+
+### openPublishPanel
+
+[src/index.js#L26-L26](src/index.js#L26-L26)
+
+Opens the publish panel.
+
+### pressKeyTimes
+
+[src/index.js#L27-L27](src/index.js#L27-L27)
+
+Presses the given keyboard key a number of times in sequence.
+
+**Parameters**
+
+-   **key** `string`: Key to press.
+-   **count** `number`: Number of times to press.
+
+**Returns**
+
+`Promise` Promise resolving when key presses complete.
+
+### pressKeyWithModifier
+
+[src/index.js#L28-L28](src/index.js#L28-L28)
+
+Performs a key press with modifier (Shift, Control, Meta, Alt), where each modifier
+is normalized to platform-specific modifier.
+
+**Parameters**
+
+-   **modifier** `string`: Modifier key.
+-   **key** `string`: Key to press while modifier held.
+
+### publishPost
+
+[src/index.js#L29-L29](src/index.js#L29-L29)
+
+Publishes the post, resolving once the request is complete (once a notice
+is displayed).
+
+**Returns**
+
+`Promise` Promise resolving when publish is complete.
+
+### publishPostWithPrePublishChecksDisabled
+
+[src/index.js#L30-L30](src/index.js#L30-L30)
+
+Publishes the post without the pre-publish checks,
+resolving once the request is complete (once a notice is displayed).
+
+**Returns**
+
+`Promise` Promise resolving when publish is complete.
+
+### saveDraft
+
+[src/index.js#L31-L31](src/index.js#L31-L31)
+
+Saves the post as a draft, resolving once the request is complete (once the
+"Saved" indicator is displayed).
+
+**Returns**
+
+`Promise` Promise resolving when draft save is complete.
+
+### searchForBlock
+
+[src/index.js#L32-L32](src/index.js#L32-L32)
+
+Search for block in the global inserter
+
+**Parameters**
+
+-   **searchTerm** `string`: The text to search the inserter for.
+
+### selectBlockByClientId
+
+[src/index.js#L33-L33](src/index.js#L33-L33)
+
+Given the clientId of a block, selects the block on the editor.
+
+**Parameters**
+
+-   **clientId** `string`: Identified of the block.
+
+### setBrowserViewport
+
+[src/index.js#L34-L34](src/index.js#L34-L34)
+
+Sets browser viewport to specified type.
+
+**Parameters**
+
+-   **type** `string`: String to represent dimensions type; can be either small or large.
+
+### setPostContent
+
+[src/index.js#L35-L35](src/index.js#L35-L35)
+
+Sets code editor content
+
+**Parameters**
+
+-   **content** `string`: New code editor content.
+
+**Returns**
+
+`Promise` Promise resolving with an array containing all blocks in the document.
+
+### setUpResponseMocking
+
+[src/index.js#L45-L45](src/index.js#L45-L45)
+
+Sets up mock checks and responses. Accepts a list of mock settings with the following properties:
+
+-   `match`: function to check if a request should be mocked.
+-   `onRequestMatch`: async function to respond to the request.
+
+**Usage**
+
+```js
+const MOCK_RESPONSES = [
+  {
+    match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/' ),
+    onRequestMatch: JSONResponse( MOCK_BAD_WORDPRESS_RESPONSE ),
+  },
+  {
+    match: isEmbedding( 'https://wordpress.org/gutenberg/handbook/block-api/attributes/' ),
+    onRequestMatch: JSONResponse( MOCK_EMBED_WORDPRESS_SUCCESS_RESPONSE ),
+  }
+];
+setUpResponseMocking( MOCK_RESPONSES );
+```
+
+If none of the mock settings match the request, the request is allowed to continue.
+
+**Parameters**
+
+-   **mocks** `Array`: Array of mock settings.
+
+### switchEditorModeTo
+
+[src/index.js#L36-L36](src/index.js#L36-L36)
+
+Switches editor mode.
+
+**Parameters**
+
+-   **mode** `string`: String editor mode.
+
+### switchUserToAdmin
+
+[src/index.js#L37-L37](src/index.js#L37-L37)
+
+Switches the current user to the admin user (if the user
+running the test is not already the admin user).
+
+### switchUserToTest
+
+[src/index.js#L38-L38](src/index.js#L38-L38)
+
+Switches the current user to whichever user we should be
+running the tests as (if we're not already that user).
+
+### toggleScreenOption
+
+[src/index.js#L39-L39](src/index.js#L39-L39)
+
+Toggles the screen option with the given label.
+
+**Parameters**
+
+-   **label** `string`: The label of the screen option, e.g. 'Show Tips'.
+-   **shouldBeChecked** `?boolean`: If true, turns the option on. If false, off. If undefined, the option will be toggled.
+
+### transformBlockTo
+
+[src/index.js#L40-L40](src/index.js#L40-L40)
+
+Converts editor's block type.
+
+**Parameters**
+
+-   **name** `string`: Block name.
+
+### uninstallPlugin
+
+[src/index.js#L41-L41](src/index.js#L41-L41)
+
+Uninstalls a plugin.
+
+**Parameters**
+
+-   **slug** `string`: Plugin slug.
+
+### visitAdminPage
+
+[src/index.js#L42-L42](src/index.js#L42-L42)
+
+Visits admin page; if user is not logged in then it logging in it first, then visits admin page.
+
+**Parameters**
+
+-   **adminPath** `string`: String to be serialized as pathname.
+-   **query** `string`: String to be serialized as query portion of URL.
+
+### waitForWindowDimensions
+
+[src/index.js#L43-L43](src/index.js#L43-L43)
+
+Function that waits until the page viewport has the required dimensions.
+It is being used to address a problem where after using setViewport the execution may continue,
+without the new dimensions being applied.
+<https://github.com/GoogleChrome/puppeteer/issues/1751>
+
+**Parameters**
+
+-   **width** `number`: Width of the window.
+-   **height** `height`: Height of the window.
