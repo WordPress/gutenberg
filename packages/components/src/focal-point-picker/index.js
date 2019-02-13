@@ -14,6 +14,7 @@ import { withInstanceId, compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import NumberControl from "../number-control";
 import withFocusOutside from '../higher-order/with-focus-outside';
 import { Path, SVG } from '../primitives';
 
@@ -210,27 +211,31 @@ export class FocalPointPicker extends Component {
 				</div>
 				<div className="components-focal-point-picker_position-display-container">
 					<BaseControl label={ __( 'Horizontal Pos.' ) }>
-						<input
-							className="components-text-control__input"
-							id={ horizontalPositionId }
-							max={ TEXTCONTROL_MAX }
-							min={ TEXTCONTROL_MIN }
-							onChange={ this.horizontalPositionChanged }
-							type="number"
-							value={ this.fractionToPercentage( percentages.x ) }
-						/>
+
+					<NumberControl
+						className="components-foval-point-control__number"
+						id={ horizontalPositionId }
+						max={ TEXTCONTROL_MAX }
+						min={ TEXTCONTROL_MIN }
+						aria-label={label}
+						value={ this.fractionToPercentage( percentages.x ) }
+						onChange={ this.horizontalPositionChanged }
+					/>
+
 						<span>%</span>
 					</BaseControl>
 					<BaseControl label={ __( 'Vertical Pos.' ) }>
-						<input
-							className="components-text-control__input"
-							id={ verticalPositionId }
-							max={ TEXTCONTROL_MAX }
-							min={ TEXTCONTROL_MIN }
-							onChange={ this.verticalPositionChanged }
-							type="number"
-							value={ this.fractionToPercentage( percentages.y ) }
-						/>
+
+					<NumberControl
+						className="components-foval-point-control__number"
+						id={ verticalPositionId }
+						max={ TEXTCONTROL_MAX }
+						min={ TEXTCONTROL_MIN }
+						aria-label={label}
+						value={ this.fractionToPercentage( percentages.y ) }
+						onChange={ this.verticalPositionChanged }
+					/>
+
 						<span>%</span>
 					</BaseControl>
 				</div>
