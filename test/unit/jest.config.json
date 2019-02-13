@@ -7,7 +7,7 @@
 	"preset": "@wordpress/jest-preset-default",
 	"setupFiles": [
 		"core-js/fn/symbol/async-iterator",
-		"./test/unit/setup/gutenberg-phase.js"
+		"<rootDir>/test/unit/setup/gutenberg-phase.js"
 	],
 	"testURL": "http://localhost",
 	"testPathIgnorePatterns": [
