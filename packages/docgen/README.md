@@ -7,6 +7,14 @@ Some characteristics:
 * If the export statement doesn't contain any JSDoc, it'll look up for JSDoc up to the declaration.
 * It can resolve relative dependencies, either files or directories. For example, `import default from './dependency'` will find `dependency.js` or `dependency/index.js`
 
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/docgen --save-dev
+```
+
 ## Usage
 
 `node src/cli.js <entry-point.js>`
@@ -232,3 +240,5 @@ console.log( result ); // Will log 3
 
 `number` The result of subtracting the two numbers.
 ````
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

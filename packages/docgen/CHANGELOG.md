@@ -1,3 +1,3 @@
-## 1.0.0 (next)
+## 1.0.0 (Unreleased)
 
-TBD
+- Initial release
