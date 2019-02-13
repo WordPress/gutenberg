@@ -37,7 +37,7 @@ describe( 'RangeControl', () => {
 			);
 			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
 				wrapper,
-				'components-range-control__number'
+				'components-number-control__input'
 			);
 			TestUtils.Simulate.change(
 				rangeInputElement(),
