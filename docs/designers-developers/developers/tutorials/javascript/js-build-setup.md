@@ -74,9 +74,9 @@ Is this OK? (yes) yes
 
 ### Using npm to install packages
 
-The next step is to install the packages required. You can install packages using the npm command `npm install`. If you pass the `--save-dev` parameter, npm will write the package as a dev dependency in the package.json file.
+The next step is to install the packages required. You can install packages using the npm command `npm install`. If you pass the `--save-dev` parameter, npm will write the package as a dev dependency in the package.json file. The `--save-exact` parameter instructs npm to save an exact version of a dependency, not a range of valid versions. See [npm install documentation](https://docs.npmjs.com/cli/install) for more details.
 
-Run `npm install --save-dev webpack`
+Run `npm install --save-dev --save-exact webpack webpack-cli`
 
 After installing, a `node_modules` directory is created with the webpack module and its dependencies.
 
@@ -84,7 +84,7 @@ Also, if you look at package.json file it will include a new section:
 
 ```json
 "dependencies": {
-	"webpack": "^4.29.0"
+	"webpack": "4.29.0"
 }
 ```
 
@@ -127,16 +127,14 @@ module.exports = {
 
 Next, you need to install babel, the webpack loader, and the JSX plugin using:
 
-```
-npm install --save babel-loader babel-core babel-plugin-transform-react-jsx
-```
+> npm install --save-dev --save-exact babel-loader @babel/core @babel/plugin-transform-react-jsx
 
 You configure babel by creating a `.babelrc` file:
 
-```
+```json
 {
 	"plugins": [
-		[ "transform-react-jsx", {
+		[ "@bable/plugin-transform-react-jsx", {
 			"pragma": "wp.element.createElement"
 		} ]
 	]
@@ -192,7 +190,7 @@ The mode is setup so it can be configured using environment variables, which can
   },
 ```
 
-This sets the environment variables, but different environments handle these settings in different ways. Using the `cross-env` helper module can help to handle this. Be sure to install the `cross-env` package using `npm install --save cross-env`.
+This sets the environment variables, but different environments handle these settings in different ways. Using the `cross-env` helper module can help to handle this. Be sure to install the `cross-env` package using `npm install --save-dev --save-exact cross-env`.
 
 Additionally, webpack has a `--watch` flag that will keep the process running, watching for any changes to the `block.js` file and re-building as changes occur. This is useful during development, when you might have a lot of changes in progress.
 
@@ -206,7 +204,7 @@ Babel has the ability to build JavaScript using rules that target certain browse
 
 WordPress has a preset default you can use to target the minimum supported browsers by WordPress.
 
-Install the module using: `npm install --save @wordpress/babel-preset-default`
+Install the module using: `npm install --save-dev --save-exact @wordpress/babel-preset-default`
 
 You then update `.babelrc` by adding a "presets" section:
 
@@ -214,7 +212,7 @@ You then update `.babelrc` by adding a "presets" section:
 {
 	"presets": [ "@wordpress/babel-preset-default" ],
 	"plugins": [
-		[ "transform-react-jsx", {
+		[ "@babel/plugin-transform-react-jsx", {
 			"pragma": "wp.element.createElement"
 		} ]
 	]
