@@ -1,5 +1,5 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { castArray, defaults, pick } from 'lodash';
 

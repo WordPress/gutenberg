@@ -12,20 +12,25 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 } from 'react-native-gutenberg-bridge';
-import {
-	map,
-	compact,
-} from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { MediaPlaceholder, RichText, BlockControls, InspectorControls, BottomSheet } from '@wordpress/editor';
-import { Toolbar, ToolbarButton, Spinner, Dashicon } from '@wordpress/components';
+import {
+	Toolbar,
+	ToolbarButton,
+	Spinner,
+	Dashicon,
+} from '@wordpress/components';
+import {
+	MediaPlaceholder,
+	RichText,
+	BlockControls,
+	InspectorControls,
+	BottomSheet,
+} from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,6 +44,7 @@ const MEDIA_UPLOAD_STATE_FAILED = 3;
 const MEDIA_UPLOAD_STATE_RESET = 4;
 
 const LINK_DESTINATION_CUSTOM = 'custom';
+const LINK_DESTINATION_NONE = 'none';
 
 class ImageEdit extends React.Component {
 	constructor( props ) {
@@ -60,6 +66,7 @@ class ImageEdit extends React.Component {
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
+		this.onClearSettings = this.onClearSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -158,14 +165,12 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
-	getImageSizeOptions() {
-		const { imageSizes } = this.props;
-		return compact( map( imageSizes, ( { label, slug } ) => {
-			return {
-				value: this.props.attributes.url + slug, //temporary url
-				label,
-			};
-		} ) );
+	onClearSettings() {
+		this.props.setAttributes( {
+			alt: '',
+			linkDestination: LINK_DESTINATION_NONE,
+			href: undefined,
+		} );
 	}
 
 	render() {
@@ -226,8 +231,6 @@ class ImageEdit extends React.Component {
 			</Toolbar>
 		);
 
-		const sizeOptions = this.getImageSizeOptions();
-
 		const getInspectorControls = () => (
 			<BottomSheet
 				isVisible={ this.state.showSettings }
@@ -243,13 +246,6 @@ class ImageEdit extends React.Component {
 					autoCapitalize="none"
 					autoCorrect={ false }
 				/>
-				<BottomSheet.PickerCell
-					icon="editor-expand"
-					label={ __( 'Image Size' ) }
-					value={ 'Large' } // Temporary for UI implementation.
-					options={ sizeOptions }
-					onChangeValue={ () => {} } // Temporary for UI implementation.
-				/>
 				<BottomSheet.Cell
 					icon={ 'editor-textcolor' }
 					label={ __( 'Alt Text' ) }
@@ -258,10 +254,10 @@ class ImageEdit extends React.Component {
 					onChangeValue={ this.updateAlt }
 				/>
 				<BottomSheet.Cell
-					label={ __( 'Reset to Original' ) }
-					labelStyle={ styles.resetSettingsButton }
+					label={ __( 'Clear All Settings' ) }
+					labelStyle={ styles.clearSettingsButton }
 					drawSeparator={ false }
-					onPress={ () => {} }
+					onPress={ this.onClearSettings }
 				/>
 			</BottomSheet>
 		);
@@ -339,15 +335,4 @@ class ImageEdit extends React.Component {
 	}
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditorSettings } = select( 'core/editor' );
-		const { maxWidth, isRTL, imageSizes } = getEditorSettings();
-
-		return {
-			maxWidth,
-			isRTL,
-			imageSizes,
-		};
-	} ),
-] )( ImageEdit );
+export default ImageEdit;
