@@ -90,7 +90,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnEditorMountListener {
-        void onEditorDidMount(Boolean hasUnsupportedBlocks);
+        void onEditorDidMount(boolean hasUnsupportedBlocks);
     }
 
     protected List<ReactPackage> getPackages() {
@@ -140,7 +140,7 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void editorDidMount(Boolean hasUnsupportedBlocks) {
+            public void editorDidMount(boolean hasUnsupportedBlocks) {
                 mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
             }
         });
@@ -189,7 +189,8 @@ public class WPAndroidGlueCode {
     }
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener, OnEditorMountListener onEditorMountListener) {
+                                  OnReattachQueryListener onReattachQueryListener,
+                                  OnEditorMountListener onEditorMountListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
