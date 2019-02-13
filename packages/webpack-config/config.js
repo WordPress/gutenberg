@@ -10,30 +10,37 @@ const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
 const { camelCaseDash } = require( './utils' );
 
 /**
- * Converts @wordpress require into window reference.
+ * Converts @wordpress/* string request into request object.
  *
  * Note this isn't the same as camel case because of the
  * way that numbers don't trigger the capitalized next letter.
  *
  * @example
- * wordpressRequire( '@wordpress/api-fetch' ) = 'wp.apiFetch'
- * wordpressRequire( '@wordpress/i18n' ) = 'wp.i18n'
+ * formatRequest( '@wordpress/api-fetch' );
+ * // { this: [ 'wp', 'apiFetch' ] }
+ * formatRequest( '@wordpress/i18n' );
+ * // { this: [ 'wp', 'i18n' ] }
  *
- * @param {string} request import name
- * @return {string} global variable reference for import
+ * @param {string} request Request name from import statement.
+ * @return {Object} Request object formatted for further processing.
  */
-const wordpressRequire = ( request ) => {
-	// @wordpress/components -> [ @wordpress, components ]
+const formatRequest = ( request ) => {
+	// '@wordpress/api-fetch' -> [ '@wordpress', 'api-fetch' ]
 	const [ , name ] = request.split( '/' );
 
-	// components -> wp.components
-	return `wp.${ camelCaseDash( name ) }`;
+	// { this: [ 'wp', 'apiFetch' ] }
+	return {
+		this: [ 'wp', camelCaseDash( name ) ],
+	};
 };
 
-const wordpressExternals = ( context, request, callback ) =>
-	/^@wordpress\//.test( request ) ?
-		callback( null, `root ${ wordpressRequire( request ) }` ) :
+const wordpressExternals = ( context, request, callback ) => {
+	if ( /^@wordpress\//.test( request ) ) {
+		callback( null, formatRequest( request ), 'this' );
+	} else {
 		callback();
+	}
+};
 
 const externals = [
 	{
