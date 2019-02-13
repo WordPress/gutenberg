@@ -22,6 +22,7 @@ class ParagraphEdit extends Component {
 	constructor( props ) {
 		super( props );
 		this.splitBlock = this.splitBlock.bind( this );
+		this.onReplace = this.onReplace.bind( this );
 
 		this.state = {
 			aztecHeight: 0,
@@ -71,6 +72,20 @@ class ParagraphEdit extends Component {
 		}
 	}
 
+	onReplace( blocks ) {
+		const { attributes, onReplace } = this.props;
+		onReplace( blocks.map( ( block, index ) => (
+			index === 0 && block.name === name ?
+				{ ...block,
+					attributes: {
+						...attributes,
+						...block.attributes,
+					},
+				} :
+				block
+		) ) );
+	}
+
 	render() {
 		const {
 			attributes,
@@ -109,6 +124,7 @@ class ParagraphEdit extends Component {
 					} }
 					onSplit={ this.splitBlock }
 					onMerge={ mergeBlocks }
+					onReplace={ this.onReplace }
 					onContentSizeChange={ ( event ) => {
 						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
