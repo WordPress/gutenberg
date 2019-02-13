@@ -76,6 +76,9 @@
 # Documentation
 /docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 
+# Styles (Unowned)
+*.scss                                          @ghost
+
 # Native (Unowned)
 *.native.js                                     @ghost
 *.android.js                                    @ghost
@@ -83,3 +86,6 @@
 *.native.scss                                   @ghost
 *.android.scss                                  @ghost
 *.ios.scss                                      @ghost
+
+# Project Management
+/.github                                        @youknowriad @mapk @karmatosed
