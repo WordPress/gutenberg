@@ -20,6 +20,10 @@
 		margin-left: 0;
 		flex: 1;
 	}
+
+	&__number {
+		margin-left: $grid-size;
+	}
 }
 
 // creating mixin because we can't do multiline variables, and we can't comma-group the selectors for styling the range slider
