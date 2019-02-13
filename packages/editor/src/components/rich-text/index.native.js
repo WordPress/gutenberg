@@ -92,25 +92,15 @@ export class RichText extends Component {
 	 * handler.
 	 *
 	 */
-	splitContent( htmlText, start, end ) {
+	splitContent( currentRecord, blocks = [] , isPasted = false ) {
 		const { onSplit } = this.props;
 
 		if ( ! onSplit ) {
 			return;
 		}
 
-		const record = create( {
-			html: htmlText,
-			range: null,
-			multilineTag: false,
-			removeNode: null,
-			unwrapNode: null,
-			removeAttribute: null,
-			filterString: null,
-		} );
-
 		// TODO : Fix the index position in AztecNative for Android
-		let [ before, after ] = split( { start, end, ...record } );
+		let [ before, after ] = split( currentRecord );
 
 		// In case split occurs at the trailing or leading edge of the field,
 		// assume that the before/after values respectively reflect the current
@@ -218,7 +208,12 @@ export class RichText extends Component {
 			return;
 		}
 
-		this.splitContent( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+		const currentRecord = this.createRecord( {
+			...event.nativeEvent,
+			currentContent: event.nativeEvent.text,
+		} );
+
+		this.splitContent( currentRecord );
 	}
 
 	// eslint-disable-next-line no-unused-vars
