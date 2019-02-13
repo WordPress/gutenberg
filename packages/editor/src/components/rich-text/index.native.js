@@ -98,7 +98,7 @@ export class RichText extends Component {
 	 * handler.
 	 *
 	 */
-	splitContent( currentRecord, blocks = [] , isPasted = false ) {
+	splitContent( currentRecord, blocks = [], isPasted = false ) {
 		const { onSplit } = this.props;
 
 		if ( ! onSplit ) {
@@ -114,9 +114,9 @@ export class RichText extends Component {
 		// determine whether the before/after value has changed using a trivial
 		//  strict equality operation.
 		if ( isEmpty( after ) ) {
-			before = record;
+			before = currentRecord;
 		} else if ( isEmpty( before ) ) {
-			after = record;
+			after = currentRecord;
 		}
 
 		// If pasting and the split would result in no content other than the
@@ -269,13 +269,12 @@ export class RichText extends Component {
 		event.preventDefault();
 
 		// There is a selection, check if a URL is pasted.
-		if (!isCollapsed(currentRecord)) {
-			const trimmedText = (pastedHtml || pastedText).replace(/<[^>]+>/g, '')
+		if ( ! isCollapsed( currentRecord ) ) {
+			const trimmedText = ( pastedHtml || pastedText ).replace( /<[^>]+>/g, '' )
 				.trim();
 
 			// A URL was pasted, turn the selection into a link
 			if ( isURL( trimmedText ) ) {
-
 				const linkedRecord = applyFormat( currentRecord, {
 					type: 'a',
 					attributes: {
@@ -283,9 +282,9 @@ export class RichText extends Component {
 					},
 				} );
 				this.lastContent = this.valueToFormat( linkedRecord );
- 				this.props.onChange({
+				this.props.onChange( {
 					content: this.lastContent,
-				});
+				} );
 
 				// Allows us to ask for this information when we get a report.
 				window.console.log( 'Created link:\n\n', trimmedText );
@@ -314,14 +313,13 @@ export class RichText extends Component {
 
 		if ( typeof pastedContent === 'string' ) {
 			const recordToInsert = create( { html: pastedContent } );
-			// this.onChange( insert( currentRecord, recordToInsert ) );
-			this.lastEventCount = undefined;
 			const insertedContent = insert( currentRecord, recordToInsert );
 			const newContent = this.valueToFormat( insertedContent );
+			this.lastEventCount = undefined;
 			this.lastContent = newContent;
-			this.props.onChange({
+			this.props.onChange( {
 				content: this.lastContent,
-			});
+			} );
 		} else if ( onSplit ) {
 			if ( ! pastedContent.length ) {
 				return;
@@ -343,23 +341,23 @@ export class RichText extends Component {
 	 * Creates a RichText value "record" from native content and selection
 	 * information
 	 *
-	 * @param {String} currentContent The content (usually an HTML string) from
+	 * @param {string} currentContent The content (usually an HTML string) from
 	 *                                the native component.
-	 * @param {int}    selectionStart The start of the selection.
-	 * @param {int}      selectionEnd The end of the selection (same as start if 
+	 * @param {number}    selectionStart The start of the selection.
+	 * @param {number}      selectionEnd The end of the selection (same as start if
 	 *                                cursor instead of selection).
-	 * 
+	 *
    * @return {Object} A RichText value with formats and selection.
 	 */
 	createRecord( { currentContent, selectionStart, selectionEnd } ) {
 		// strip outer <p> tags
-		const innerContent = this.removeRootTagsProduceByAztec(currentContent);
+		const innerContent = this.removeRootTagsProduceByAztec( currentContent );
 
 		// create record (with selection) from current contents
 		const currentRecord = {
 			start: selectionStart,
 			end: selectionEnd,
-			...create({
+			...create( {
 				html: innerContent,
 				range: null,
 				multilineTag: false,
@@ -367,7 +365,7 @@ export class RichText extends Component {
 				unwrapNode: null,
 				removeAttribute: null,
 				filterString: null,
-			})
+			} ),
 		};
 
 		return currentRecord;
