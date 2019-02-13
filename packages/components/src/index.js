@@ -37,6 +37,7 @@ export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
+export { default as NumberControl } from './number-control';
 export { default as Panel } from './panel';
 export { default as PanelBody } from './panel/body';
 export { default as PanelHeader } from './panel/header';
