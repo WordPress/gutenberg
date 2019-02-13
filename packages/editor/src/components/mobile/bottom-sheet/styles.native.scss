@@ -63,6 +63,10 @@
 	align-items: center;
 }
 
+.clipToBounds {
+	overflow: hidden;
+}
+
 .cellSeparator {
 	background-color: $light-gray-400;
 	height: 1px;

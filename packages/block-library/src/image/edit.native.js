@@ -251,12 +251,13 @@ class ImageEdit extends React.Component {
 					label={ __( 'Alt Text' ) }
 					value={ alt || '' }
 					valuePlaceholder={ __( 'None' ) }
+					separatorType={ 'fullWidth' }
 					onChangeValue={ this.updateAlt }
 				/>
 				<BottomSheet.Cell
 					label={ __( 'Clear All Settings' ) }
 					labelStyle={ styles.clearSettingsButton }
-					drawSeparator={ false }
+					separatorType={ 'none' }
 					onPress={ this.onClearSettings }
 				/>
 			</BottomSheet>
