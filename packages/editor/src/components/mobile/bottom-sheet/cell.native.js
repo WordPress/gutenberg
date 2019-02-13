@@ -15,11 +15,14 @@ import { Component } from '@wordpress/element';
 import styles from './styles.scss';
 
 export default class Cell extends Component {
-	state = {
-		isEditingValue: false,
-	}
-
 	_valueTextInput = undefined;
+
+	constructor() {
+		super( ...arguments );
+		this.state = {
+			isEditingValue: false,
+		};
+	}
 
 	componentDidUpdate() {
 		if ( this.state.isEditingValue ) {
