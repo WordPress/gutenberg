@@ -22,7 +22,7 @@ export default class Cell extends Component {
 	_valueTextInput = undefined;
 
 	componentDidUpdate() {
-		if (this.state.isEditingValue) {
+		if ( this.state.isEditingValue ) {
 			this._valueTextInput.focus();
 		}
 	}
@@ -46,22 +46,22 @@ export default class Cell extends Component {
 		const showValue = value !== undefined;
 		const isValueEditable = editable && onChangeValue !== undefined;
 		const defaultLabelStyle = showValue ? styles.cellLabel : styles.cellLabelCentered;
-		const drawSeparator = separatorType && separatorType !== 'none' || separatorStyle === undefined; 
+		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
-				this.setState( { isEditingValue: true } )
+				this.setState( { isEditingValue: true } );
 			} else if ( onPress !== undefined ) {
 				onPress();
 			}
 		};
 
 		const finishEditing = () => {
-			this.setState( { isEditingValue: false } )
-		}
+			this.setState( { isEditingValue: false } );
+		};
 
 		const separatorStyle = () => {
-			switch (separatorType) {
+			switch ( separatorType ) {
 				case 'leftMargin':
 					return styles.cellSeparator;
 				case 'fullWidth':
@@ -71,14 +71,15 @@ export default class Cell extends Component {
 				case undefined:
 					return showValue ? styles.cellSeparator : styles.separator;
 			}
-		}
+		};
 
 		const getValueComponent = () => {
 			// To be able to show the `middle` ellipsizeMode on editable cells
 			// we show the TextInput just when the user wants to edit the value,
 			// and the Text component to display it.
 			// We also show the TextInput to display placeholder.
-			return this.state.isEditingValue || (isValueEditable && value === '') ? (
+			const shouldShowPlaceholder = isValueEditable && value === '';
+			return this.state.isEditingValue || shouldShowPlaceholder ? (
 				<TextInput
 					ref={ ( c ) => this._valueTextInput = c }
 					numberOfLines={ 1 }
@@ -93,7 +94,7 @@ export default class Cell extends Component {
 					{ ...valueProps }
 				/>
 			) : (
-				<Text 
+				<Text
 					style={ { ...styles.cellValue, ...valueStyle } }
 					numberOfLines={ 1 }
 					ellipsizeMode={ 'middle' }
@@ -105,7 +106,7 @@ export default class Cell extends Component {
 
 		return (
 			<TouchableOpacity onPress={ onCellPress } style={ styles.clipToBounds } >
-				<View style={ styles.cellContainer }> 
+				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (
 							<View style={ styles.cellRowContainer }>
