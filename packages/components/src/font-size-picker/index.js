@@ -16,6 +16,7 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Dropdown from '../dropdown';
 import RangeControl from '../range-control';
+import NumberControl from '../number-control';
 import { NavigableMenu } from '../navigable-container';
 
 function FontSizePicker( {
@@ -88,12 +89,11 @@ function FontSizePicker( {
 					/>
 				}
 				{ ( ! withSlider && ! disableCustomFontSizes ) &&
-					<input
-						className="components-range-control__number"
-						type="number"
-						onChange={ onChangeValue }
+					<NumberControl
+						className="components-font-size-control__number"
 						aria-label={ __( 'Custom font size' ) }
 						value={ value || '' }
+						onChange={ onChangeValue }
 					/>
 				}
 				<Button
