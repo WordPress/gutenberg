@@ -19,6 +19,10 @@
 	width: 100%;
 }
 
+.emptyHeaderSpace {
+	height: 14;
+}
+
 .content {
 	padding: 6px 16px 0 16px;
 	background-color: $white;
@@ -33,6 +37,7 @@
 	justify-content: space-between;
 	align-items: center;
 	align-content: center;
+	min-height: 48;
 }
 
 .title {

@@ -66,7 +66,9 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader || (
+					{ hideHeader ? (
+						<View style={ styles.emptyHeaderSpace } />
+					) : (
 						<View>
 							<View style={ styles.head }>
 								<View style={ { flex: 1 } }>
