@@ -58,8 +58,11 @@ const formatDescription = ( description, docs ) => {
 	docs.push( description );
 };
 
-module.exports = function( rootDir, docPath, symbols ) {
-	const docs = [ '# API' ];
+module.exports = function( rootDir, docPath, symbols, headingTitle ) {
+	const docs = [ ];
+	if ( headingTitle ) {
+		docs.push( `# ${ headingTitle }` );
+	}
 	docs.push( '\n' );
 	docs.push( '\n' );
 	symbols.sort( ( first, second ) => {

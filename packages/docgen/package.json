@@ -24,7 +24,11 @@
 	},
 	"devDependencies": {
 		"faucet": "0.0.1",
-		"tape": "4.9.2"
+		"mdast-util-inject": "1.1.0",
+		"remark": "9.0.0",
+		"remark-parse": "6.0.3",
+		"tape": "4.9.2",
+		"unified": "7.1.0"
 	},
 	"publishConfig": {
 		"access": "public"

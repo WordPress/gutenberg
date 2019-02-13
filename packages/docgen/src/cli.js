@@ -4,6 +4,10 @@
 const fs = require( 'fs' );
 const path = require( 'path' );
 const { last } = require( 'lodash' );
+const remark = require( 'remark' );
+const unified = require( 'unified' );
+const remarkParser = require( 'remark-parse' );
+const inject = require( 'mdast-util-inject' );
 
 /**
  * Internal dependencies
@@ -60,10 +64,10 @@ const processFile = ( rootDir, inputFile ) => {
 	}
 };
 
-const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols ) => {
+const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols, headingTitle ) => {
 	try {
 		const customFormatter = require( customFormatterFile );
-		return customFormatter( rootDir, doc, symbols );
+		return customFormatter( rootDir, doc, symbols, headingTitle );
 	} catch ( e ) {
 		process.stdout.write( `\n${ e }` );
 		process.stdout.write( '\n\n' );
@@ -90,6 +94,10 @@ const optionator = require( 'optionator' )( {
 		option: 'ignore',
 		type: 'RegExp',
 		description: 'A regular expression used to ignore symbols whose name match it.',
+	}, {
+		option: 'append',
+		type: 'String',
+		description: 'Markdown section title to append documentation to.',
 	}, {
 		option: 'debug',
 		type: 'Boolean',
@@ -137,11 +145,35 @@ if ( result === undefined ) {
 	process.exit( 0 );
 }
 
-const outputContents = options.formatter ?
-	runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIr ) :
-	formatter( processDir, doc, filteredIr );
+// wrap the inject utility as an remark plugin
+const appendContents = ( { heading, newContents } ) => {
+	return function transform( targetAst, file, next ) {
+		if ( ! inject( heading, targetAst, newContents ) ) {
+			return next( new Error( `Heading ${ heading } not found.` ) );
+		}
+		next();
+	};
+};
 
-fs.writeFileSync( doc, outputContents );
+if ( options.append ) {
+	const currentReadmeFile = fs.readFileSync( options.output, 'utf8' );
+	const contentsAST = unified().use( remarkParser ).parse( formatter( processDir, doc, filteredIr, null ) );
+	remark()
+		.use( { settings: { commonmark: true } } )
+		.use( appendContents, { heading: options.append, newContents: contentsAST } )
+		.process( currentReadmeFile, function( err, file ) {
+			if ( err ) {
+				throw err;
+			}
+			fs.writeFileSync( doc, file );
+		} );
+} else {
+	const outputContents = options.formatter ?
+		runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIr, 'API' ) :
+		formatter( processDir, doc, filteredIr, 'API' );
+
+	fs.writeFileSync( doc, outputContents );
+}
 
 if ( debugMode ) {
 	fs.writeFileSync( ir, JSON.stringify( result.ir ) );

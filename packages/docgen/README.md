@@ -15,13 +15,14 @@ This command will generate a file named `entry-point-api.md` containing all the 
 
 ### CLI options
 
-* **--formatter** `(String)`: An optional custom formatter to control the contents of the output file. It should be a CommonJS module that exports a function that takes as input:
+* **--formatter** `(String)`: A path to a custom formatter to control the contents of the output file. It should be a CommonJS module that exports a function that takes as input:
   * *rootDir* `(String)`: current working directory as seen by docgen.
   * *docPath* `(String)`: path of the output document to generate.
   * *symbols* `(Array)`: the symbols found.
 * **--ignore** `(RegExp)`: A regular expression used to ignore symbols whose name match it.
 * **--output** `(String)`: Output file that will contain the API documentation.
 * **--debug**: Run in debug mode, which outputs some intermediate files useful for debugging
+* **--append** `(String)`: Title of the Markdown section to append the generated documentation to. It takes precedence over and bypasses the *--formatter* option.
 
 ## Examples
 
