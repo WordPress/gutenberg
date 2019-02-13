@@ -13,7 +13,7 @@ import { withInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { BaseControl, Button, Dashicon } from '../';
+import { BaseControl, Button, Dashicon, NumberControl } from '../';
 
 function RangeControl( {
 	className,
@@ -57,9 +57,9 @@ function RangeControl( {
 				aria-describedby={ !! help ? id + '__help' : undefined }
 				{ ...props } />
 			{ afterIcon && <Dashicon icon={ afterIcon } /> }
-			<input
+
+			<NumberControl
 				className="components-range-control__number"
-				type="number"
 				onChange={ onChangeValue }
 				aria-label={ label }
 				value={ value }

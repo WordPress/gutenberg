@@ -116,11 +116,3 @@
 		@include range-track();
 	}
 }
-
-.components-range-control__number {
-	display: inline-block;
-	margin-left: $grid-size;
-	font-weight: 500;
-	width: 50px;
-	padding: 3px 5px !important;
-}
