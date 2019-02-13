@@ -70,7 +70,7 @@ class FlatTermSelector extends Component {
 		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
 		this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
 		this.state = {
-			loading: false,
+			loading: ! isEmpty( this.props.terms ),
 			availableTerms: [],
 			selectedTerms: [],
 		};
@@ -78,7 +78,6 @@ class FlatTermSelector extends Component {
 
 	componentDidMount() {
 		if ( ! isEmpty( this.props.terms ) ) {
-			this.setState( { loading: true } );
 			this.initRequest = this.fetchTerms( {
 				include: this.props.terms.join( ',' ),
 				per_page: -1,
