@@ -38,6 +38,14 @@
 		top: calc(50% - 10px);
 		left: 10px;
 	}
+
+	&:hover {
+		@include menu-style__hover;
+	}
+
+	&:focus {
+		@include menu-style__focus;
+	}
 }
 
 .components-font-size-picker__buttons .components-font-size-picker__selector {
