@@ -86,3 +86,6 @@
 *.native.scss                                   @ghost
 *.android.scss                                  @ghost
 *.ios.scss                                      @ghost
+
+# Project Management
+/.github                                        @youknowriad @mapk
