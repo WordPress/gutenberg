@@ -220,7 +220,7 @@ export class FocalPointPicker extends Component {
 				<div className="components-focal-point-picker_position-display-container">
 					<BaseControl label={ __( 'Horizontal Pos.' ) }>
 						<NumberControl
-							className="components-foval-point-control__number"
+							className="components-focal-point-control__number"
 							id={ horizontalPositionId }
 							max={ TEXTCONTROL_MAX }
 							min={ TEXTCONTROL_MIN }
@@ -233,7 +233,7 @@ export class FocalPointPicker extends Component {
 					</BaseControl>
 					<BaseControl label={ __( 'Vertical Pos.' ) }>
 						<NumberControl
-							className="components-foval-point-control__number"
+							className="components-focal-point-control__number"
 							id={ verticalPositionId }
 							max={ TEXTCONTROL_MAX }
 							min={ TEXTCONTROL_MIN }
