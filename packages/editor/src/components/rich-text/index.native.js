@@ -16,13 +16,18 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { Toolbar } from '@wordpress/components';
 import { BlockFormatControls } from '@wordpress/editor';
 import {
+	applyFormat,
 	isEmpty,
 	create,
 	split,
 	toHTMLString,
+	insert,
+	isCollapsed,
 } from '@wordpress/rich-text';
+import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE } from '@wordpress/keycodes';
-import { children } from '@wordpress/blocks';
+import { pasteHandler, children } from '@wordpress/blocks';
+import { isURL } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -72,6 +77,7 @@ export class RichText extends Component {
 		this.onChange = this.onChange.bind( this );
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
+		this.onPaste = this.onPaste.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
 		this.changeFormats = this.changeFormats.bind( this );
 		this.toggleFormat = this.toggleFormat.bind( this );
@@ -113,6 +119,13 @@ export class RichText extends Component {
 			after = record;
 		}
 
+		// If pasting and the split would result in no content other than the
+		// pasted blocks, remove the before and after blocks.
+		if ( isPasted ) {
+			before = isEmpty( before ) ? null : before;
+			after = isEmpty( after ) ? null : after;
+		}
+
 		if ( before ) {
 			before = this.valueToFormat( before );
 		}
@@ -127,7 +140,7 @@ export class RichText extends Component {
 		// always update when provided with new content.
 		this.lastEventCount = undefined;
 
-		onSplit( before, after );
+		onSplit( before, after, ...blocks );
 	}
 
 	valueToFormat( { formats, text } ) {
@@ -238,6 +251,87 @@ export class RichText extends Component {
 		// causing destruction of two fields (merge, then removed merged).
 		if ( onRemove && empty && isReverse ) {
 			onRemove( ! isReverse );
+		}
+	}
+
+	/**
+	 * Handles a paste event from the native Aztec Wrapper.
+	 *
+	 * @param {PasteEvent} event The paste event which wraps `nativeEvent`.
+	 */
+	onPaste( event ) {
+		const isPasted = true;
+		const { onSplit } = this.props;
+
+		const { pastedText, pastedHtml } = event.nativeEvent;
+		const currentRecord = this.createRecord( event.nativeEvent );
+
+		event.preventDefault();
+
+		// There is a selection, check if a URL is pasted.
+		if (!isCollapsed(currentRecord)) {
+			const trimmedText = (pastedHtml || pastedText).replace(/<[^>]+>/g, '')
+				.trim();
+
+			// A URL was pasted, turn the selection into a link
+			if ( isURL( trimmedText ) ) {
+
+				const linkedRecord = applyFormat( currentRecord, {
+					type: 'a',
+					attributes: {
+						href: decodeEntities( trimmedText ),
+					},
+				} );
+				this.lastContent = this.valueToFormat( linkedRecord );
+ 				this.props.onChange({
+					content: this.lastContent,
+				});
+
+				// Allows us to ask for this information when we get a report.
+				window.console.log( 'Created link:\n\n', trimmedText );
+
+				return;
+			}
+		}
+
+		const shouldReplace = this.props.onReplace && this.isEmpty();
+
+		let mode = 'INLINE';
+
+		if ( shouldReplace ) {
+			mode = 'BLOCKS';
+		} else if ( onSplit ) {
+			mode = 'AUTO';
+		}
+
+		const pastedContent = pasteHandler( {
+			HTML: pastedHtml,
+			plainText: pastedText,
+			mode,
+			tagName: this.props.tagName,
+			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
+		} );
+
+		if ( typeof pastedContent === 'string' ) {
+			const recordToInsert = create( { html: pastedContent } );
+			// this.onChange( insert( currentRecord, recordToInsert ) );
+			this.lastEventCount = undefined;
+			const insertedContent = insert( currentRecord, recordToInsert );
+			const newContent = this.valueToFormat( insertedContent );
+			this.lastContent = newContent;
+			this.props.onChange({
+				content: this.lastContent,
+			});
+		} else if ( onSplit ) {
+			if ( ! pastedContent.length ) {
+				return;
+			}
+
+			if ( shouldReplace ) {
+				this.props.onReplace( pastedContent );
+			} else {
+				this.splitContent( currentRecord, pastedContent, isPasted );
+			}
 		}
 	}
 
@@ -424,6 +518,7 @@ export class RichText extends Component {
 					onBlur={ this.props.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
+					onPaste={ this.onPaste }
 					onContentSizeChange={ this.onContentSizeChange }
 					onActiveFormatsChange={ this.onActiveFormatsChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
