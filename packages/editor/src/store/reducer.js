@@ -7,6 +7,7 @@ import {
 	reduce,
 	omit,
 	mapValues,
+	keys,
 	isEqual,
 	last,
 } from 'lodash';
@@ -26,6 +27,7 @@ import {
 } from './defaults';
 import { EDIT_MERGE_PROPERTIES } from './constants';
 import withChangeDetection from '../utils/with-change-detection';
+import withHistory from '../utils/with-history';
 
 /**
  * Returns a post attribute value, flattening nested rendered content using its
@@ -61,6 +63,54 @@ function getMutateSafeObject( original, working ) {
 }
 
 /**
+ * Returns true if the two object arguments have the same keys, or false
+ * otherwise.
+ *
+ * @param {Object} a First object.
+ * @param {Object} b Second object.
+ *
+ * @return {boolean} Whether the two objects have the same keys.
+ */
+export function hasSameKeys( a, b ) {
+	return isEqual( keys( a ), keys( b ) );
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are editing the same post property, or
+ * false otherwise.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether actions are updating the same post property.
+ */
+export function isUpdatingSamePostProperty( action, previousAction ) {
+	return (
+		action.type === 'EDIT_POST' &&
+		hasSameKeys( action.edits, previousAction.edits )
+	);
+}
+
+/**
+ * Returns true if, given the currently dispatching action and the previously
+ * dispatched action, the two actions are modifying the same property such that
+ * undo history should be batched.
+ *
+ * @param {Object} action         Currently dispatching action.
+ * @param {Object} previousAction Previously dispatched action.
+ *
+ * @return {boolean} Whether to overwrite present state.
+ */
+export function shouldOverwriteState( action, previousAction ) {
+	if ( ! previousAction || action.type !== previousAction.type ) {
+		return false;
+	}
+
+	return isUpdatingSamePostProperty( action, previousAction );
+}
+
+/**
  * Undoable reducer returning the editor post state, including blocks parsed
  * from current HTML markup.
  *
@@ -76,6 +126,12 @@ function getMutateSafeObject( original, working ) {
  */
 export const editor = flow( [
 	combineReducers,
+
+	withHistory( {
+		resetTypes: [ 'SETUP_EDITOR_STATE' ],
+		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		shouldOverwriteState,
+	} ),
 ] )( {
 	// Track whether changes exist, resetting at each post save. Relies on
 	// editor initialization firing post reset as an effect.

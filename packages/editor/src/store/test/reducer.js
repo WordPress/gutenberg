@@ -7,6 +7,9 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import {
+	hasSameKeys,
+	isUpdatingSamePostProperty,
+	shouldOverwriteState,
 	getPostRawValue,
 	initialEdits,
 	editor,
@@ -21,6 +24,125 @@ import {
 import { INITIAL_EDITS_DEFAULTS } from '../defaults';
 
 describe( 'state', () => {
+	describe( 'hasSameKeys()', () => {
+		it( 'returns false if two objects do not have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { bar: 10 };
+
+			expect( hasSameKeys( a, b ) ).toBe( false );
+		} );
+
+		it( 'returns false if two objects have the same keys', () => {
+			const a = { foo: 10 };
+			const b = { foo: 20 };
+
+			expect( hasSameKeys( a, b ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isUpdatingSamePostProperty()', () => {
+		it( 'should return false if not editing post', () => {
+			const action = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				attributes: {
+					foo: 10,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if not editing the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					bar: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating the same post properties', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'shouldOverwriteState()', () => {
+		it( 'should return false if no previous action', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = undefined;
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return false if the action types are different', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_DIFFERENT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+		} );
+
+		it( 'should return true if updating same post property', () => {
+			const action = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 10,
+				},
+			};
+			const previousAction = {
+				type: 'EDIT_POST',
+				edits: {
+					foo: 20,
+				},
+			};
+
+			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+		} );
+	} );
+
 	describe( 'getPostRawValue', () => {
 		it( 'returns original value for non-rendered content', () => {
 			const value = getPostRawValue( '' );
@@ -36,6 +158,24 @@ describe( 'state', () => {
 	} );
 
 	describe( 'editor()', () => {
+		describe( 'blocks()', () => {
+			it( 'should set its value by RESET_EDITOR_BLOCKS', () => {
+				const blocks = [ {
+					clientId: 'block3',
+					innerBlocks: [
+						{ clientId: 'block31', innerBlocks: [] },
+						{ clientId: 'block32', innerBlocks: [] },
+					],
+				} ];
+				const state = editor( undefined, {
+					type: 'RESET_EDITOR_BLOCKS',
+					blocks,
+				} );
+
+				expect( state.present.blocks.value ).toBe( blocks );
+			} );
+		} );
+
 		describe( 'edits()', () => {
 			it( 'should save newly edited properties', () => {
 				const original = editor( undefined, {
@@ -53,7 +193,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {
+				expect( state.present.edits ).toEqual( {
 					status: 'draft',
 					title: 'post title',
 					tags: [ 1 ],
@@ -76,7 +216,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toBe( original.edits );
+				expect( state.present.edits ).toBe( original.present.edits );
 			} );
 
 			it( 'should save modified properties', () => {
@@ -97,7 +237,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {
+				expect( state.present.edits ).toEqual( {
 					status: 'draft',
 					title: 'modified title',
 					tags: [ 2 ],
@@ -123,7 +263,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {
+				expect( state.present.edits ).toEqual( {
 					meta: {
 						a: 1,
 						b: 2,
@@ -139,7 +279,7 @@ describe( 'state', () => {
 					edits: {},
 				} );
 
-				expect( state.edits ).toBe( original.edits );
+				expect( state.present.edits ).toBe( original.present.edits );
 			} );
 
 			it( 'unset reset post values which match by canonical value', () => {
@@ -159,7 +299,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {} );
+				expect( state.present.edits ).toEqual( {} );
 			} );
 
 			it( 'unset reset post values by deep match', () => {
@@ -185,7 +325,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toEqual( {} );
+				expect( state.present.edits ).toEqual( {} );
 			} );
 
 			it( 'should omit content when resetting', () => {
@@ -200,7 +340,7 @@ describe( 'state', () => {
 					},
 				} );
 
-				expect( state.edits ).toHaveProperty( 'content' );
+				expect( state.present.edits ).toHaveProperty( 'content' );
 
 				state = editor( original, {
 					type: 'RESET_EDITOR_BLOCKS',
@@ -217,7 +357,7 @@ describe( 'state', () => {
 					} ],
 				} );
 
-				expect( state.edits ).not.toHaveProperty( 'content' );
+				expect( state.present.edits ).not.toHaveProperty( 'content' );
 			} );
 		} );
 	} );

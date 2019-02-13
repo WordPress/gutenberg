@@ -7,31 +7,40 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
 class BlockEditorProvider extends Component {
-	constructor( props ) {
-		super( ...arguments );
-		props.updateEditorSettings( props.settings );
-		props.initBlocks( props.value );
-		this.persistedValue = props.select( 'core/block-editor' ).getBlocks();
+	componentDidMount() {
+		this.props.updateEditorSettings( this.props.settings );
+		this.props.resetBlocks( this.props.value );
+
+		this.isSyncingBlockValue = true;
 	}
 
 	componentDidUpdate( prevProps ) {
-		if ( this.props.settings !== prevProps.settings ) {
-			this.props.updateEditorSettings( this.props.settings );
+		const {
+			settings,
+			updateEditorSettings,
+			value,
+			resetBlocks,
+			blocks,
+			onChange,
+		} = this.props;
+
+		if ( settings !== prevProps.settings ) {
+			updateEditorSettings( settings );
 		}
 
-		if (
-			this.props.blocks !== prevProps.blocks &&
-			this.props.blocks !== this.persistedValue
-		) {
-			this.persistedValue = this.props.blocks;
-			this.props.onChange( this.props.blocks );
+		if ( this.isSyncingBlockValue ) {
+			this.isSyncingBlockValue = false;
+		} else if ( blocks !== prevProps.blocks ) {
+			onChange( blocks );
+			this.isSyncingBlockValue = true;
+		} else if ( value !== prevProps.value ) {
+			resetBlocks( value );
+			this.isSyncingBlockValue = true;
 		}
 	}
 
 	render() {
-		const {
-			children,
-		} = this.props;
+		const { children } = this.props;
 
 		return (
 			<SlotFillProvider>
@@ -45,20 +54,21 @@ class BlockEditorProvider extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
+		const { getBlocks } = select( 'core/block-editor' );
+
 		return {
-			blocks: select( 'core/block-editor' ).getBlocks(),
-			select,
+			blocks: getBlocks(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
 		const {
 			updateEditorSettings,
-			__unstableInitBlocks: initBlocks,
+			resetBlocks,
 		} = dispatch( 'core/block-editor' );
 
 		return {
 			updateEditorSettings,
-			initBlocks,
+			resetBlocks,
 		};
 	} ),
 ] )( BlockEditorProvider );

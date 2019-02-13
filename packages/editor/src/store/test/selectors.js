@@ -24,6 +24,8 @@ import * as selectors from '../selectors';
 import { PREFERENCES_DEFAULTS } from '../defaults';
 
 const {
+	hasEditorUndo,
+	hasEditorRedo,
 	isEditedPostNew,
 	hasChangedContent,
 	isEditedPostDirty,
@@ -157,6 +159,54 @@ describe( 'selectors', () => {
 		setDefaultBlockName( undefined );
 	} );
 
+	describe( 'hasEditorUndo', () => {
+		it( 'should return true when the past history is not empty', () => {
+			const state = {
+				editor: {
+					past: [
+						{},
+					],
+				},
+			};
+
+			expect( hasEditorUndo( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when the past history is empty', () => {
+			const state = {
+				editor: {
+					past: [],
+				},
+			};
+
+			expect( hasEditorUndo( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'hasEditorRedo', () => {
+		it( 'should return true when the future history is not empty', () => {
+			const state = {
+				editor: {
+					future: [
+						{},
+					],
+				},
+			};
+
+			expect( hasEditorRedo( state ) ).toBe( true );
+		} );
+
+		it( 'should return false when the future history is empty', () => {
+			const state = {
+				editor: {
+					future: [],
+				},
+			};
+
+			expect( hasEditorRedo( state ) ).toBe( false );
+		} );
+	} );
+
 	describe( 'isEditedPostNew', () => {
 		it( 'should return true when the post is new', () => {
 			const state = {
@@ -199,11 +249,12 @@ describe( 'selectors', () => {
 		it( 'should return false if no dirty blocks nor content property edit', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 			};
 
@@ -213,11 +264,13 @@ describe( 'selectors', () => {
 		it( 'should return true if dirty blocks', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: true,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: true,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 			};
 
@@ -227,12 +280,14 @@ describe( 'selectors', () => {
 		it( 'should return true if content property edit', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
-					},
-					edits: {
-						content: 'text mode edited',
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {
+							content: 'text mode edited',
+						},
 					},
 				},
 			};
@@ -246,11 +301,13 @@ describe( 'selectors', () => {
 			const state = {
 				optimist: [],
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 			};
 
@@ -261,11 +318,13 @@ describe( 'selectors', () => {
 			const state = {
 				optimist: [],
 				editor: {
-					blocks: {
-						isDirty: true,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: true,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 			};
 
@@ -276,12 +335,14 @@ describe( 'selectors', () => {
 			const state = {
 				optimist: [],
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
-					},
-					edits: {
-						excerpt: 'hello world',
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {
+							excerpt: 'hello world',
+						},
 					},
 				},
 			};
@@ -295,21 +356,25 @@ describe( 'selectors', () => {
 					{
 						beforeState: {
 							editor: {
-								blocks: {
-									isDirty: true,
-									value: [],
+								present: {
+									blocks: {
+										isDirty: true,
+										value: [],
+									},
+									edits: {},
 								},
-								edits: {},
 							},
 						},
 					},
 				],
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 			};
 
@@ -321,11 +386,13 @@ describe( 'selectors', () => {
 		it( 'should return true when the post is not dirty and has not been saved before', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					id: 1,
@@ -342,11 +409,13 @@ describe( 'selectors', () => {
 		it( 'should return false when the post is not dirty but the post has been saved', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					id: 1,
@@ -363,11 +432,13 @@ describe( 'selectors', () => {
 		it( 'should return false when the post is dirty but the post has not been saved', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: true,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: true,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					id: 1,
@@ -443,7 +514,9 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: { slug: 'post slug' },
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -455,8 +528,10 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: { slug: 'old slug' },
 				editor: {
-					edits: {
-						slug: 'new slug',
+					present: {
+						edits: {
+							slug: 'new slug',
+						},
 					},
 				},
 				initialEdits: {},
@@ -471,7 +546,9 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				editor: {
-					edits: { status: 'private' },
+					present: {
+						edits: { status: 'private' },
+					},
 				},
 				initialEdits: {},
 			};
@@ -485,7 +562,9 @@ describe( 'selectors', () => {
 					title: 'sassel',
 				},
 				editor: {
-					edits: { title: 'youcha' },
+					present: {
+						edits: { title: 'youcha' },
+					},
 				},
 				initialEdits: {},
 			};
@@ -497,7 +576,9 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -514,9 +595,11 @@ describe( 'selectors', () => {
 					},
 				},
 				editor: {
-					edits: {
-						meta: {
-							b: 2,
+					present: {
+						edits: {
+							meta: {
+								b: 2,
+							},
 						},
 					},
 				},
@@ -634,7 +717,9 @@ describe( 'selectors', () => {
 		it( 'should return the post edits', () => {
 			const state = {
 				editor: {
-					edits: { title: 'terga' },
+					present: {
+						edits: { title: 'terga' },
+					},
 				},
 				initialEdits: {},
 			};
@@ -645,7 +730,9 @@ describe( 'selectors', () => {
 		it( 'should return value from initial edits', () => {
 			const state = {
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: { title: 'terga' },
 			};
@@ -656,7 +743,9 @@ describe( 'selectors', () => {
 		it( 'should prefer value from edits over initial edits', () => {
 			const state = {
 				editor: {
-					edits: { title: 'werga' },
+					present: {
+						edits: { title: 'werga' },
+					},
 				},
 				initialEdits: { title: 'terga' },
 			};
@@ -687,7 +776,9 @@ describe( 'selectors', () => {
 					status: 'draft',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -701,7 +792,9 @@ describe( 'selectors', () => {
 					status: 'private',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -716,7 +809,9 @@ describe( 'selectors', () => {
 					password: 'chicken',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -731,9 +826,11 @@ describe( 'selectors', () => {
 					password: 'chicken',
 				},
 				editor: {
-					edits: {
-						status: 'private',
-						password: null,
+					present: {
+						edits: {
+							status: 'private',
+							password: null,
+						},
 					},
 				},
 				initialEdits: {},
@@ -862,11 +959,13 @@ describe( 'selectors', () => {
 		it( 'should return true for pending posts', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					status: 'pending',
@@ -882,11 +981,13 @@ describe( 'selectors', () => {
 		it( 'should return true for draft posts', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					status: 'draft',
@@ -902,11 +1003,13 @@ describe( 'selectors', () => {
 		it( 'should return false for published posts', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					status: 'publish',
@@ -922,11 +1025,13 @@ describe( 'selectors', () => {
 		it( 'should return true for published, dirty posts', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: true,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: true,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					status: 'publish',
@@ -942,11 +1047,13 @@ describe( 'selectors', () => {
 		it( 'should return false for private posts', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					status: 'private',
@@ -962,11 +1069,13 @@ describe( 'selectors', () => {
 		it( 'should return false for scheduled posts', () => {
 			const state = {
 				editor: {
-					blocks: {
-						isDirty: false,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: false,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					status: 'future',
@@ -985,11 +1094,13 @@ describe( 'selectors', () => {
 					status: 'private',
 				},
 				editor: {
-					blocks: {
-						isDirty: true,
-						value: [],
+					present: {
+						blocks: {
+							isDirty: true,
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				saving: {
 					requesting: false,
@@ -1026,10 +1137,12 @@ describe( 'selectors', () => {
 		it( 'should return false if the post has no title, excerpt, content', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1042,10 +1155,12 @@ describe( 'selectors', () => {
 		it( 'should return false if the post has a title but save already in progress', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1062,10 +1177,12 @@ describe( 'selectors', () => {
 		it( 'should return true if the post has a title', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1080,13 +1197,15 @@ describe( 'selectors', () => {
 		it( 'should return true if the post has an excerpt', () => {
 			const state = {
 				editor: {
-					blocks: {
-						byClientId: {},
-						attributes: {},
-						order: {},
-						value: [],
+					present: {
+						blocks: {
+							byClientId: {},
+							attributes: {},
+							order: {},
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1101,19 +1220,21 @@ describe( 'selectors', () => {
 		it( 'should return true if the post has content', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 123,
-								name: 'core/test-block-a',
-								isValid: true,
-								attributes: {
-									text: '',
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-block-a',
+									isValid: true,
+									attributes: {
+										text: '',
+									},
 								},
-							},
-						],
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1126,19 +1247,21 @@ describe( 'selectors', () => {
 		it( 'should return false if the post has no title, excerpt and empty classic block', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							},
-						],
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1151,19 +1274,21 @@ describe( 'selectors', () => {
 		it( 'should return true if the post has a title and empty classic block', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							},
-						],
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1180,10 +1305,12 @@ describe( 'selectors', () => {
 		it( 'should return false if the post is not saveable', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1203,10 +1330,12 @@ describe( 'selectors', () => {
 		it( 'should return true if there is not yet an autosave', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1222,11 +1351,13 @@ describe( 'selectors', () => {
 		it( 'should return false if none of title, excerpt, or content have changed', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
-						isDirty: false,
+					present: {
+						blocks: {
+							value: [],
+							isDirty: false,
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1246,11 +1377,13 @@ describe( 'selectors', () => {
 		it( 'should return true if content has changes', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
-						isDirty: true,
+					present: {
+						blocks: {
+							value: [],
+							isDirty: true,
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				currentPost: {
 					title: 'foo',
@@ -1271,11 +1404,13 @@ describe( 'selectors', () => {
 				for ( const constantField of without( [ 'title', 'excerpt' ], variantField ) ) {
 					const state = {
 						editor: {
-							blocks: {
-								isDirty: false,
-								value: [],
+							present: {
+								blocks: {
+									isDirty: false,
+									value: [],
+								},
+								edits: {},
 							},
-							edits: {},
 						},
 						initialEdits: {},
 						currentPost: {
@@ -1342,10 +1477,12 @@ describe( 'selectors', () => {
 		it( 'should return true if no blocks and no content', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1357,17 +1494,19 @@ describe( 'selectors', () => {
 		it( 'should return false if blocks', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [ {
-							clientId: 123,
-							name: 'core/test-block-a',
-							isValid: true,
-							attributes: {
-								text: '',
-							},
-						} ],
+					present: {
+						blocks: {
+							value: [ {
+								clientId: 123,
+								name: 'core/test-block-a',
+								isValid: true,
+								attributes: {
+									text: '',
+								},
+							} ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1384,16 +1523,18 @@ describe( 'selectors', () => {
 			// See: https://github.com/WordPress/gutenberg/pull/13086
 			const state = {
 				editor: {
-					blocks: {
-						value: [ {
-							clientId: 'block1',
-							name: 'core/test-default',
-							attributes: {
-								modified: false,
-							},
-						} ],
+					present: {
+						blocks: {
+							value: [ {
+								clientId: 'block1',
+								name: 'core/test-default',
+								attributes: {
+									modified: false,
+								},
+							} ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1405,18 +1546,20 @@ describe( 'selectors', () => {
 		it( 'should return true if blocks, but empty content edit', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [ {
-							clientId: 123,
-							name: 'core/test-block-a',
-							isValid: true,
-							attributes: {
-								text: '',
-							},
-						} ],
-					},
-					edits: {
-						content: '',
+					present: {
+						blocks: {
+							value: [ {
+								clientId: 123,
+								name: 'core/test-block-a',
+								isValid: true,
+								attributes: {
+									text: '',
+								},
+							} ],
+						},
+						edits: {
+							content: '',
+						},
 					},
 				},
 				initialEdits: {},
@@ -1431,10 +1574,12 @@ describe( 'selectors', () => {
 		it( 'should return true if the post has an empty content property', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1448,11 +1593,13 @@ describe( 'selectors', () => {
 		it( 'should return false if edits include a non-empty content property', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
-					},
-					edits: {
-						content: 'sassel',
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {
+							content: 'sassel',
+						},
 					},
 				},
 				initialEdits: {},
@@ -1465,17 +1612,19 @@ describe( 'selectors', () => {
 		it( 'should return true if empty classic block', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [ {
-							clientId: 123,
-							name: 'core/test-freeform',
-							isValid: true,
-							attributes: {
-								content: '',
-							},
-						} ],
+					present: {
+						blocks: {
+							value: [ {
+								clientId: 123,
+								name: 'core/test-freeform',
+								isValid: true,
+								attributes: {
+									content: '',
+								},
+							} ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1487,17 +1636,19 @@ describe( 'selectors', () => {
 		it( 'should return true if empty content freeform block', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [ {
-							clientId: 123,
-							name: 'core/test-freeform',
-							isValid: true,
-							attributes: {
-								content: '',
-							},
-						} ],
+					present: {
+						blocks: {
+							value: [ {
+								clientId: 123,
+								name: 'core/test-freeform',
+								isValid: true,
+								attributes: {
+									content: '',
+								},
+							} ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1511,17 +1662,19 @@ describe( 'selectors', () => {
 		it( 'should return false if non-empty content freeform block', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [ {
-							clientId: 123,
-							name: 'core/test-freeform',
-							isValid: true,
-							attributes: {
-								content: 'Test Data',
-							},
-						} ],
+					present: {
+						blocks: {
+							value: [ {
+								clientId: 123,
+								name: 'core/test-freeform',
+								isValid: true,
+								attributes: {
+									content: 'Test Data',
+								},
+							} ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1535,27 +1688,29 @@ describe( 'selectors', () => {
 		it( 'should return false for multiple empty freeform blocks', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 123,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 123,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							},
-							{
-								clientId: 456,
-								name: 'core/test-freeform',
-								isValid: true,
-								attributes: {
-									content: '',
+								{
+									clientId: 456,
+									name: 'core/test-freeform',
+									isValid: true,
+									attributes: {
+										content: '',
+									},
 								},
-							},
-						],
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {
@@ -1573,7 +1728,9 @@ describe( 'selectors', () => {
 			const date = new Date( time );
 			const state = {
 				editor: {
-					edits: { date: date.toUTCString() },
+					present: {
+						edits: { date: date.toUTCString() },
+					},
 				},
 				initialEdits: {},
 			};
@@ -1584,7 +1741,9 @@ describe( 'selectors', () => {
 		it( 'should return false for posts with an old date', () => {
 			const state = {
 				editor: {
-					edits: { date: '2016-05-30T17:21:39' },
+					present: {
+						edits: { date: '2016-05-30T17:21:39' },
+					},
 				},
 				initialEdits: {},
 			};
@@ -1602,7 +1761,9 @@ describe( 'selectors', () => {
 					status: 'draft',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -1618,7 +1779,9 @@ describe( 'selectors', () => {
 					status: 'auto-draft',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -1634,7 +1797,9 @@ describe( 'selectors', () => {
 					status: 'draft',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -1650,7 +1815,9 @@ describe( 'selectors', () => {
 					status: 'auto-draft',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -1666,7 +1833,9 @@ describe( 'selectors', () => {
 					status: 'publish',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -1763,10 +1932,12 @@ describe( 'selectors', () => {
 		it( 'returns null if cannot be determined', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [],
+					present: {
+						blocks: {
+							value: [],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1778,21 +1949,23 @@ describe( 'selectors', () => {
 		it( 'returns null if there is more than one block in the post', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 123,
-								name: 'core/image',
-								attributes: {},
-							},
-							{
-								clientId: 456,
-								name: 'core/quote',
-								attributes: {},
-							},
-						],
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 123,
+									name: 'core/image',
+									attributes: {},
+								},
+								{
+									clientId: 456,
+									name: 'core/quote',
+									attributes: {},
+								},
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1804,16 +1977,18 @@ describe( 'selectors', () => {
 		it( 'returns Image if the first block is of type `core/image`', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 123,
-								name: 'core/image',
-								attributes: {},
-							},
-						],
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 123,
+									name: 'core/image',
+									attributes: {},
+								},
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1825,16 +2000,18 @@ describe( 'selectors', () => {
 		it( 'returns Quote if the first block is of type `core/quote`', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 456,
-								name: 'core/quote',
-								attributes: {},
-							},
-						],
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 456,
+									name: 'core/quote',
+									attributes: {},
+								},
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1846,16 +2023,18 @@ describe( 'selectors', () => {
 		it( 'returns Video if the first block is of type `core-embed/youtube`', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 567,
-								name: 'core-embed/youtube',
-								attributes: {},
-							},
-						],
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 567,
+									name: 'core-embed/youtube',
+									attributes: {},
+								},
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1867,21 +2046,23 @@ describe( 'selectors', () => {
 		it( 'returns Quote if the first block is of type `core/quote` and second is of type `core/paragraph`', () => {
 			const state = {
 				editor: {
-					blocks: {
-						value: [
-							{
-								clientId: 456,
-								name: 'core/quote',
-								attributes: {},
-							},
-							{
-								clientId: 789,
-								name: 'core/paragraph',
-								attributes: {},
-							},
-						],
+					present: {
+						blocks: {
+							value: [
+								{
+									clientId: 456,
+									name: 'core/quote',
+									attributes: {},
+								},
+								{
+									clientId: 789,
+									name: 'core/paragraph',
+									attributes: {},
+								},
+							],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1923,11 +2104,13 @@ describe( 'selectors', () => {
 
 			const state = {
 				editor: {
-					blocks: {
-						value: [ block ],
-					},
-					edits: {
-						content: 'custom edit',
+					present: {
+						blocks: {
+							value: [ block ],
+						},
+						edits: {
+							content: 'custom edit',
+						},
 					},
 				},
 				initialEdits: {},
@@ -1944,10 +2127,12 @@ describe( 'selectors', () => {
 
 			const state = {
 				editor: {
-					blocks: {
-						value: [ block ],
+					present: {
+						blocks: {
+							value: [ block ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1964,10 +2149,12 @@ describe( 'selectors', () => {
 			} );
 			const state = {
 				editor: {
-					blocks: {
-						value: [ unknownBlock ],
+					present: {
+						blocks: {
+							value: [ unknownBlock ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -1987,10 +2174,12 @@ describe( 'selectors', () => {
 			} );
 			const state = {
 				editor: {
-					blocks: {
-						value: [ firstUnknown, secondUnknown ],
+					present: {
+						blocks: {
+							value: [ firstUnknown, secondUnknown ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -2005,10 +2194,12 @@ describe( 'selectors', () => {
 			const defaultBlock = createBlock( getDefaultBlockName() );
 			const state = {
 				editor: {
-					blocks: {
-						value: [ defaultBlock ],
+					present: {
+						blocks: {
+							value: [ defaultBlock ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -2023,16 +2214,18 @@ describe( 'selectors', () => {
 			const defaultBlock = createBlock( getDefaultBlockName() );
 			const state = {
 				editor: {
-					blocks: {
-						value: [ {
-							...defaultBlock,
-							attributes: {
-								...defaultBlock.attributes,
-								modified: true,
-							},
-						} ],
+					present: {
+						blocks: {
+							value: [ {
+								...defaultBlock,
+								attributes: {
+									...defaultBlock.attributes,
+									modified: true,
+								},
+							} ],
+						},
+						edits: {},
 					},
-					edits: {},
 				},
 				initialEdits: {},
 				currentPost: {},
@@ -2361,7 +2554,9 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: { permalink_template: '' },
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2373,7 +2568,9 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%baz%/' },
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2385,7 +2582,9 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%postname%/' },
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2397,7 +2596,9 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: { permalink_template: 'http://foo.test/bar/%pagename%/' },
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2412,7 +2613,9 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: { permalink_template: url },
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2427,7 +2630,9 @@ describe( 'selectors', () => {
 					slug: 'baz',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2438,7 +2643,9 @@ describe( 'selectors', () => {
 		it( 'should return null if the post has no permalink template', () => {
 			const state = {
 				currentPost: {},
-				editor: {},
+				editor: {
+					present: {},
+				},
 			};
 
 			expect( getPermalink( state ) ).toBeNull();
@@ -2458,7 +2665,9 @@ describe( 'selectors', () => {
 					slug: 'baz',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2477,7 +2686,9 @@ describe( 'selectors', () => {
 					slug: 'baz',
 				},
 				editor: {
-					edits: {},
+					present: {
+						edits: {},
+					},
 				},
 				initialEdits: {},
 			};
@@ -2488,7 +2699,11 @@ describe( 'selectors', () => {
 		it( 'should return null if the post has no permalink template', () => {
 			const state = {
 				currentPost: {},
-				editor: {},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
 			};
 
 			expect( getPermalinkParts( state ) ).toBeNull();

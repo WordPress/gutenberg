@@ -50,6 +50,29 @@ const ONE_MINUTE_IN_MS = 60 * 1000;
 const EMPTY_OBJECT = {};
 
 /**
+ * Returns true if any past editor history snapshots exist, or false otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether undo history exists.
+ */
+export function hasEditorUndo( state ) {
+	return state.editor.past.length > 0;
+}
+
+/**
+ * Returns true if any future editor history snapshots exist, or false
+ * otherwise.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether redo history exists.
+ */
+export function hasEditorRedo( state ) {
+	return state.editor.future.length > 0;
+}
+
+/**
  * Returns true if the currently edited post is yet to be saved, or false if
  * the post has been saved.
  *
@@ -70,14 +93,14 @@ export function isEditedPostNew( state ) {
  */
 export function hasChangedContent( state ) {
 	return (
-		state.editor.blocks.isDirty ||
+		state.editor.present.blocks.isDirty ||
 
 		// `edits` is intended to contain only values which are different from
 		// the saved post, so the mere presence of a property is an indicator
 		// that the value is different than what is known to be saved. While
 		// content in Visual mode is represented by the blocks state, in Text
 		// mode it is tracked by `edits.content`.
-		'content' in state.editor.edits
+		'content' in state.editor.present.edits
 	);
 }
 
@@ -97,7 +120,7 @@ export function isEditedPostDirty( state ) {
 	// Edits should contain only fields which differ from the saved post (reset
 	// at initial load and save complete). Thus, a non-empty edits state can be
 	// inferred to contain unsaved values.
-	if ( Object.keys( state.editor.edits ).length > 0 ) {
+	if ( Object.keys( state.editor.present.edits ).length > 0 ) {
 		return true;
 	}
 
@@ -192,11 +215,11 @@ export const getPostEdits = createSelector(
 	( state ) => {
 		return {
 			...state.initialEdits,
-			...state.editor.edits,
+			...state.editor.present.edits,
 		};
 	},
 	( state ) => [
-		state.editor.edits,
+		state.editor.present.edits,
 		state.initialEdits,
 	]
 );
@@ -262,7 +285,7 @@ const getNestedEditedPostProperty = createSelector(
 		};
 	},
 	( state, attributeName ) => [
-		get( state.editor.edits, [ attributeName ], EMPTY_OBJECT ),
+		get( state.editor.present.edits, [ attributeName ], EMPTY_OBJECT ),
 		get( state.currentPost, [ attributeName ], EMPTY_OBJECT ),
 	]
 );
@@ -442,7 +465,7 @@ export function isEditedPostEmpty( state ) {
 	// condition of the mere existence of blocks. Note that the value of edited
 	// content takes precedent over block content, and must fall through to the
 	// default logic.
-	const blocks = state.editor.blocks.value;
+	const blocks = state.editor.present.blocks.value;
 
 	if ( blocks.length && ! ( 'content' in getPostEdits( state ) ) ) {
 		// Pierce the abstraction of the serializer in knowing that blocks are
@@ -655,7 +678,7 @@ export function getEditedPostPreviewLink( state ) {
  * @return {?string} Suggested post format.
  */
 export function getSuggestedPostFormat( state ) {
-	const blocks = state.editor.blocks.value;
+	const blocks = state.editor.present.blocks.value;
 
 	let name;
 	// If there is only one block in the content of the post grab its name
@@ -703,7 +726,7 @@ export function getSuggestedPostFormat( state ) {
  * @return {WPBlock[]} Filtered set of blocks for save.
  */
 export function getBlocksForSerialization( state ) {
-	const blocks = state.editor.blocks.value;
+	const blocks = state.editor.present.blocks.value;
 
 	// WARNING: Any changes to the logic of this function should be verified
 	// against the implementation of isEditedPostEmpty, which bypasses this
@@ -757,8 +780,8 @@ export const getEditedPostContent = createSelector(
 		return content;
 	},
 	( state ) => [
-		state.editor.blocks.value,
-		state.editor.edits.content,
+		state.editor.present.blocks.value,
+		state.editor.present.edits.content,
 		state.initialEdits.content,
 	],
 );
@@ -1054,7 +1077,7 @@ export function isPublishSidebarEnabled( state ) {
  * @return {Array} Block list.
  */
 export function getEditorBlocks( state ) {
-	return state.editor.blocks.value;
+	return state.editor.present.blocks.value;
 }
 
 /**
@@ -1129,7 +1152,5 @@ export const getTemplateLock = getBlockEditorSelector( 'getTemplateLock' );
 export const canInsertBlockType = getBlockEditorSelector( 'canInsertBlockType' );
 export const getInserterItems = getBlockEditorSelector( 'getInserterItems' );
 export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
-export const hasEditorUndo = getBlockEditorSelector( 'hasEditorUndo' );
-export const hasEditorRedo = getBlockEditorSelector( 'hasEditorRedo' );
 export const getEditorSettings = getBlockEditorSelector( 'getEditorSettings' );
 export const getBlockListSettings = getBlockEditorSelector( 'getBlockListSettings' );

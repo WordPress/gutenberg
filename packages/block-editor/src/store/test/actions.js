@@ -23,8 +23,6 @@ import {
 	showInsertionPoint,
 	hideInsertionPoint,
 	mergeBlocks,
-	redo,
-	undo,
 	removeBlocks,
 	removeBlock,
 	toggleBlockMode,
@@ -203,22 +201,6 @@ describe( 'actions', () => {
 			expect( mergeBlocks( firstBlockClientId, secondBlockClientId ) ).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ firstBlockClientId, secondBlockClientId ],
-			} );
-		} );
-	} );
-
-	describe( 'redo', () => {
-		it( 'should return REDO action', () => {
-			expect( redo() ).toEqual( {
-				type: 'REDO',
-			} );
-		} );
-	} );
-
-	describe( 'undo', () => {
-		it( 'should return UNDO action', () => {
-			expect( undo() ).toEqual( {
-				type: 'UNDO',
 			} );
 		} );
 	} );

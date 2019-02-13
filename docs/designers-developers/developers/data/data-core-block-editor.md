@@ -749,43 +749,7 @@ Returns the editor settings.
 
 The editor settings object.
 
-### hasEditorUndo
-
-Returns true if any past editor history snapshots exist, or false otherwise.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Whether undo history exists.
-
-### hasEditorRedo
-
-Returns true if any future editor history snapshots exist, or false
-otherwise.
-
-*Parameters*
-
- * state: Global application state.
-
-*Returns*
-
-Whether redo history exists.
-
 ## Actions
-
-### __unstableInitBlocks
-
-Returns an action object used in signalling that blocks state should be
-intialized using a specified array of blocks,
-
-This action reset the undo/redo history
-
-*Parameters*
-
- * blocks: Array of blocks.
 
 ### resetBlocks
 
@@ -1056,20 +1020,6 @@ Returns an action object used in signalling that the editor settings have been u
 *Parameters*
 
  * settings: Updated settings
-
-### redo
-
-Returns an action object used in signalling that undo history should
-restore last popped state.
-
-### undo
-
-Returns an action object used in signalling that undo history should pop.
-
-### createUndoLevel
-
-Returns an action object used in signalling that undo history record should
-be created.
 
 ### __unstableSaveReusableBlock
 

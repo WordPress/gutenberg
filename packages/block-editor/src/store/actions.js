@@ -15,23 +15,6 @@ import { select } from './controls';
 
 /**
  * Returns an action object used in signalling that blocks state should be
- * intialized using a specified array of blocks,
- *
- * This action reset the undo/redo history
- *
- * @param {Array} blocks Array of blocks.
- *
- * @return {Object} Action object.
- */
-export function __unstableInitBlocks( blocks ) {
-	return {
-		type: 'INIT_BLOCKS',
-		blocks,
-	};
-}
-
-/**
- * Returns an action object used in signalling that blocks state should be
  * reset to the specified array of blocks, taking precedence over any other
  * content reflected as an edit in state.
  *
@@ -531,35 +514,6 @@ export function updateEditorSettings( settings ) {
 		type: 'UPDATE_EDITOR_SETTINGS',
 		settings,
 	};
-}
-
-/**
- * Returns an action object used in signalling that undo history should
- * restore last popped state.
- *
- * @return {Object} Action object.
- */
-export function redo() {
-	return { type: 'REDO' };
-}
-
-/**
- * Returns an action object used in signalling that undo history should pop.
- *
- * @return {Object} Action object.
- */
-export function undo() {
-	return { type: 'UNDO' };
-}
-
-/**
- * Returns an action object used in signalling that undo history record should
- * be created.
- *
- * @return {Object} Action object.
- */
-export function createUndoLevel() {
-	return { type: 'CREATE_UNDO_LEVEL' };
 }
 
 /**

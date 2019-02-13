@@ -9,7 +9,6 @@ import {
 	omit,
 	without,
 	mapValues,
-	keys,
 	isEqual,
 	isEmpty,
 } from 'lodash';
@@ -23,7 +22,6 @@ import { isReusableBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import withHistory from '../utils/with-history';
 import {
 	PREFERENCES_DEFAULTS,
 	EDITOR_SETTINGS_DEFAULTS,
@@ -143,55 +141,6 @@ function getMutateSafeObject( original, working ) {
 }
 
 /**
- * Returns true if the two object arguments have the same keys, or false
- * otherwise.
- *
- * @param {Object} a First object.
- * @param {Object} b Second object.
- *
- * @return {boolean} Whether the two objects have the same keys.
- */
-export function hasSameKeys( a, b ) {
-	return isEqual( keys( a ), keys( b ) );
-}
-
-/**
- * Returns true if, given the currently dispatching action and the previously
- * dispatched action, the two actions are updating the same block attribute, or
- * false otherwise.
- *
- * @param {Object} action         Currently dispatching action.
- * @param {Object} previousAction Previously dispatched action.
- *
- * @return {boolean} Whether actions are updating the same block attribute.
- */
-export function isUpdatingSameBlockAttribute( action, previousAction ) {
-	return (
-		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
-		action.clientId === previousAction.clientId &&
-		hasSameKeys( action.attributes, previousAction.attributes )
-	);
-}
-
-/**
- * Returns true if, given the currently dispatching action and the previously
- * dispatched action, the two actions are modifying the same property such that
- * undo history should be batched.
- *
- * @param {Object} action         Currently dispatching action.
- * @param {Object} previousAction Previously dispatched action.
- *
- * @return {boolean} Whether to overwrite present state.
- */
-export function shouldOverwriteState( action, previousAction ) {
-	if ( ! previousAction || action.type !== previousAction.type ) {
-		return false;
-	}
-
-	return isUpdatingSameBlockAttribute( action, previousAction );
-}
-
-/**
  * Higher-order reducer targeting the combined editor reducer, augmenting
  * block client IDs in remove action to include cascade of inner blocks.
  *
@@ -226,10 +175,7 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  * @return {Function} Enhanced reducer function.
  */
 const withBlockReset = ( reducer ) => ( state, action ) => {
-	if (
-		state &&
-		( action.type === 'RESET_BLOCKS' || action.type === 'INIT_BLOCKS' )
-	) {
+	if ( state && action.type === 'RESET_BLOCKS' ) {
 		const visibleClientIds = getNestedBlockClientIds( state.order );
 		return {
 			...state,
@@ -289,13 +235,8 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 };
 
 /**
- * Undoable reducer returning the editor post state, including blocks parsed
- * from current HTML markup.
- *
- * Handles the following state keys:
- *  - edits: an object describing changes to be made to the current post, in
- *           the format accepted by the WP REST API
- *  - blocks: post content blocks
+ * Reducer returning the editor post state, including blocks parsed from
+ * current HTML markup.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -306,13 +247,6 @@ export const editor = flow( [
 	combineReducers,
 
 	withInnerBlocksRemoveCascade,
-
-	// Track undo history, starting at editor initialization.
-	withHistory( {
-		resetTypes: [ 'INIT_BLOCKS' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS' ],
-		shouldOverwriteState,
-	} ),
 ] )( {
 	blocks: flow(
 		combineReducers,
@@ -321,6 +255,9 @@ export const editor = flow( [
 	)( {
 		byClientId( state = {}, action ) {
 			switch ( action.type ) {
+				case 'RESET_BLOCKS':
+					return getFlattenedBlocksWithoutAttributes( action.blocks );
+
 				case 'RECEIVE_BLOCKS':
 					return {
 						...state,
@@ -372,6 +309,9 @@ export const editor = flow( [
 
 		attributes( state = {}, action ) {
 			switch ( action.type ) {
+				case 'RESET_BLOCKS':
+					return getFlattenedBlockAttributes( action.blocks );
+
 				case 'RECEIVE_BLOCKS':
 					return {
 						...state,
@@ -445,6 +385,9 @@ export const editor = flow( [
 
 		order( state = {}, action ) {
 			switch ( action.type ) {
+				case 'RESET_BLOCKS':
+					return mapBlockOrder( action.blocks );
+
 				case 'RECEIVE_BLOCKS':
 					return {
 						...state,

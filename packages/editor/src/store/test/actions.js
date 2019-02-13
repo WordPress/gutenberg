@@ -12,6 +12,8 @@ import {
 	editPost,
 	savePost,
 	trashPost,
+	redo,
+	undo,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -71,6 +73,22 @@ describe( 'actions', () => {
 				type: 'TRASH_POST',
 				postId,
 				postType,
+			} );
+		} );
+	} );
+
+	describe( 'redo', () => {
+		it( 'should return REDO action', () => {
+			expect( redo() ).toEqual( {
+				type: 'REDO',
+			} );
+		} );
+	} );
+
+	describe( 'undo', () => {
+		it( 'should return UNDO action', () => {
+			expect( undo() ).toEqual( {
+				type: 'UNDO',
 			} );
 		} );
 	} );

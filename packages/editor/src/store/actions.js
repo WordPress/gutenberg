@@ -142,6 +142,35 @@ export function autosave( options ) {
 }
 
 /**
+ * Returns an action object used in signalling that undo history should
+ * restore last popped state.
+ *
+ * @return {Object} Action object.
+ */
+export function redo() {
+	return { type: 'REDO' };
+}
+
+/**
+ * Returns an action object used in signalling that undo history should pop.
+ *
+ * @return {Object} Action object.
+ */
+export function undo() {
+	return { type: 'UNDO' };
+}
+
+/**
+ * Returns an action object used in signalling that undo history record should
+ * be created.
+ *
+ * @return {Object} Action object.
+ */
+export function createUndoLevel() {
+	return { type: 'CREATE_UNDO_LEVEL' };
+}
+
+/**
  * Returns an action object used to lock the editor.
  *
  * @param {Object}  lock Details about the post lock status, user, and nonce.
@@ -365,6 +394,3 @@ export const exitFormattedText = getBlockEditorAction( 'exitFormattedText' );
 export const insertDefaultBlock = getBlockEditorAction( 'insertDefaultBlock' );
 export const updateBlockListSettings = getBlockEditorAction( 'updateBlockListSettings' );
 export const updateEditorSettings = getBlockEditorAction( 'updateEditorSettings' );
-export const undo = getBlockEditorAction( 'undo' );
-export const redo = getBlockEditorAction( 'redo' );
-export const createUndoLevel = getBlockEditorAction( 'createUndoLevel' );

@@ -17,9 +17,6 @@ import {
  * Internal dependencies
  */
 import {
-	hasSameKeys,
-	isUpdatingSameBlockAttribute,
-	shouldOverwriteState,
 	editor,
 	isTyping,
 	isCaretWithinFormattedText,
@@ -32,143 +29,6 @@ import {
 } from '../reducer';
 
 describe( 'state', () => {
-	describe( 'hasSameKeys()', () => {
-		it( 'returns false if two objects do not have the same keys', () => {
-			const a = { foo: 10 };
-			const b = { bar: 10 };
-
-			expect( hasSameKeys( a, b ) ).toBe( false );
-		} );
-
-		it( 'returns false if two objects have the same keys', () => {
-			const a = { foo: 10 };
-			const b = { foo: 20 };
-
-			expect( hasSameKeys( a, b ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'isUpdatingSameBlockAttribute()', () => {
-		it( 'should return false if not updating block attributes', () => {
-			const action = {
-				type: 'EDIT_POST',
-				edits: {},
-			};
-			const previousAction = {
-				type: 'EDIT_POST',
-				edits: {},
-			};
-
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
-		} );
-
-		it( 'should return false if not updating the same block', () => {
-			const action = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 10,
-				},
-			};
-			const previousAction = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-				attributes: {
-					foo: 20,
-				},
-			};
-
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
-		} );
-
-		it( 'should return false if not updating the same block attributes', () => {
-			const action = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 10,
-				},
-			};
-			const previousAction = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					bar: 20,
-				},
-			};
-
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
-		} );
-
-		it( 'should return true if updating the same block attributes', () => {
-			const action = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 10,
-				},
-			};
-			const previousAction = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 20,
-				},
-			};
-
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'shouldOverwriteState()', () => {
-		it( 'should return false if no previous action', () => {
-			const action = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 10,
-				},
-			};
-			const previousAction = undefined;
-
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
-		} );
-
-		it( 'should return false if the action types are different', () => {
-			const action = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 10,
-				},
-			};
-			const previousAction = {
-				type: 'REPLACE_BLOCKS',
-			};
-
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
-		} );
-
-		it( 'should return true if updating same block attribute', () => {
-			const action = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 10,
-				},
-			};
-			const previousAction = {
-				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-				attributes: {
-					foo: 20,
-				},
-			};
-
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
-		} );
-	} );
-
 	describe( 'editor()', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/test-block', {
@@ -183,27 +43,29 @@ describe( 'state', () => {
 			unregisterBlockType( 'core/test-block' );
 		} );
 
-		it( 'should return history (empty edits, blocks) by default', () => {
+		it( 'should return empty edits, blocks by default', () => {
 			const state = editor( undefined, {} );
 
-			expect( state.past ).toEqual( [] );
-			expect( state.future ).toEqual( [] );
-			expect( state.present.blocks.byClientId ).toEqual( {} );
-			expect( state.present.blocks.order ).toEqual( {} );
+			expect( state.blocks.byClientId ).toEqual( {} );
+			expect( state.blocks.order ).toEqual( {} );
 		} );
 
 		it( 'should key by reset blocks clientId', () => {
-			const original = editor( undefined, {} );
-			const state = editor( original, {
-				type: 'RESET_BLOCKS',
-				blocks: [ { clientId: 'bananas', innerBlocks: [] } ],
-			} );
+			[
+				undefined,
+				editor( undefined, {} ),
+			].forEach( ( original ) => {
+				const state = editor( original, {
+					type: 'RESET_BLOCKS',
+					blocks: [ { clientId: 'bananas', innerBlocks: [] } ],
+				} );
 
-			expect( Object.keys( state.present.blocks.byClientId ) ).toHaveLength( 1 );
-			expect( values( state.present.blocks.byClientId )[ 0 ].clientId ).toBe( 'bananas' );
-			expect( state.present.blocks.order ).toEqual( {
-				'': [ 'bananas' ],
-				bananas: [],
+				expect( Object.keys( state.blocks.byClientId ) ).toHaveLength( 1 );
+				expect( values( state.blocks.byClientId )[ 0 ].clientId ).toBe( 'bananas' );
+				expect( state.blocks.order ).toEqual( {
+					'': [ 'bananas' ],
+					bananas: [],
+				} );
 			} );
 		} );
 
@@ -217,8 +79,8 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( state.present.blocks.byClientId ) ).toHaveLength( 2 );
-			expect( state.present.blocks.order ).toEqual( {
+			expect( Object.keys( state.blocks.byClientId ) ).toHaveLength( 2 );
+			expect( state.blocks.order ).toEqual( {
 				'': [ 'bananas' ],
 				apples: [],
 				bananas: [ 'apples' ],
@@ -244,9 +106,9 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( state.present.blocks.byClientId ) ).toHaveLength( 2 );
-			expect( values( state.present.blocks.byClientId )[ 1 ].clientId ).toBe( 'ribs' );
-			expect( state.present.blocks.order ).toEqual( {
+			expect( Object.keys( state.blocks.byClientId ) ).toHaveLength( 2 );
+			expect( values( state.blocks.byClientId )[ 1 ].clientId ).toBe( 'ribs' );
+			expect( state.blocks.order ).toEqual( {
 				'': [ 'chicken', 'ribs' ],
 				chicken: [],
 				ribs: [],
@@ -273,10 +135,10 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( state.present.blocks.byClientId ) ).toHaveLength( 1 );
-			expect( values( state.present.blocks.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
-			expect( values( state.present.blocks.byClientId )[ 0 ].clientId ).toBe( 'wings' );
-			expect( state.present.blocks.order ).toEqual( {
+			expect( Object.keys( state.blocks.byClientId ) ).toHaveLength( 1 );
+			expect( values( state.blocks.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( state.blocks.byClientId )[ 0 ].clientId ).toBe( 'wings' );
+			expect( state.blocks.order ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
 			} );
@@ -297,7 +159,7 @@ describe( 'state', () => {
 				blocks: [ replacementBlock ],
 			} );
 
-			expect( state.present.blocks.order ).toEqual( {
+			expect( state.blocks.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementBlock.clientId ],
 				[ replacementBlock.clientId ]: [],
@@ -324,11 +186,11 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( replacedState.present.blocks.byClientId ) ).toHaveLength( 1 );
-			expect( values( originalState.present.blocks.byClientId )[ 0 ].name ).toBe( 'core/test-block' );
-			expect( values( replacedState.present.blocks.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
-			expect( values( replacedState.present.blocks.byClientId )[ 0 ].clientId ).toBe( 'chicken' );
-			expect( replacedState.present.blocks.order ).toEqual( {
+			expect( Object.keys( replacedState.blocks.byClientId ) ).toHaveLength( 1 );
+			expect( values( originalState.blocks.byClientId )[ 0 ].name ).toBe( 'core/test-block' );
+			expect( values( replacedState.blocks.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( replacedState.blocks.byClientId )[ 0 ].clientId ).toBe( 'chicken' );
+			expect( replacedState.blocks.order ).toEqual( {
 				'': [ 'chicken' ],
 				chicken: [],
 			} );
@@ -358,14 +220,14 @@ describe( 'state', () => {
 				blocks: [ replacementNestedBlock ],
 			} );
 
-			expect( replacedNestedState.present.blocks.order ).toEqual( {
+			expect( replacedNestedState.blocks.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ replacementNestedBlock.clientId ],
 				[ replacementNestedBlock.clientId ]: [],
 			} );
 
-			expect( originalNestedState.present.blocks.byClientId.chicken.name ).toBe( 'core/test-block' );
-			expect( replacedNestedState.present.blocks.byClientId.chicken.name ).toBe( 'core/freeform' );
+			expect( originalNestedState.blocks.byClientId.chicken.name ).toBe( 'core/test-block' );
+			expect( replacedNestedState.blocks.byClientId.chicken.name ).toBe( 'core/freeform' );
 		} );
 
 		it( 'should update the block', () => {
@@ -388,13 +250,13 @@ describe( 'state', () => {
 				},
 			} );
 
-			expect( state.present.blocks.byClientId.chicken ).toEqual( {
+			expect( state.blocks.byClientId.chicken ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				isValid: true,
 			} );
 
-			expect( state.present.blocks.attributes.chicken ).toEqual( {
+			expect( state.blocks.attributes.chicken ).toEqual( {
 				content: 'ribs',
 			} );
 		} );
@@ -419,13 +281,13 @@ describe( 'state', () => {
 				updatedId: 3,
 			} );
 
-			expect( state.present.blocks.byClientId.chicken ).toEqual( {
+			expect( state.blocks.byClientId.chicken ).toEqual( {
 				clientId: 'chicken',
 				name: 'core/block',
 				isValid: false,
 			} );
 
-			expect( state.present.blocks.attributes.chicken ).toEqual( {
+			expect( state.blocks.attributes.chicken ).toEqual( {
 				ref: 3,
 			} );
 		} );
@@ -450,7 +312,7 @@ describe( 'state', () => {
 				clientIds: [ 'ribs' ],
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should move the nested block up', () => {
@@ -467,7 +329,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.present.blocks.order ).toEqual( {
+			expect( state.blocks.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ movedBlock.clientId, siblingBlock.clientId ],
 				[ movedBlock.clientId ]: [],
@@ -500,7 +362,7 @@ describe( 'state', () => {
 				clientIds: [ 'ribs', 'veggies' ],
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'ribs', 'veggies', 'chicken' ] );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'ribs', 'veggies', 'chicken' ] );
 		} );
 
 		it( 'should move multiple nested blocks up', () => {
@@ -518,7 +380,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.present.blocks.order ).toEqual( {
+			expect( state.blocks.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ movedBlockA.clientId, movedBlockB.clientId, siblingBlock.clientId ],
 				[ movedBlockA.clientId ]: [],
@@ -547,7 +409,7 @@ describe( 'state', () => {
 				clientIds: [ 'chicken' ],
 			} );
 
-			expect( state.present.blocks.order ).toBe( original.present.blocks.order );
+			expect( state.blocks.order ).toBe( original.blocks.order );
 		} );
 
 		it( 'should move the block down', () => {
@@ -570,7 +432,7 @@ describe( 'state', () => {
 				clientIds: [ 'chicken' ],
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'ribs', 'chicken' ] );
 		} );
 
 		it( 'should move the nested block down', () => {
@@ -587,7 +449,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.present.blocks.order ).toEqual( {
+			expect( state.blocks.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ siblingBlock.clientId, movedBlock.clientId ],
 				[ movedBlock.clientId ]: [],
@@ -620,7 +482,7 @@ describe( 'state', () => {
 				clientIds: [ 'chicken', 'ribs' ],
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'veggies', 'chicken', 'ribs' ] );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'veggies', 'chicken', 'ribs' ] );
 		} );
 
 		it( 'should move multiple nested blocks down', () => {
@@ -638,7 +500,7 @@ describe( 'state', () => {
 				rootClientId: wrapperBlock.clientId,
 			} );
 
-			expect( state.present.blocks.order ).toEqual( {
+			expect( state.blocks.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
 				[ wrapperBlock.clientId ]: [ siblingBlock.clientId, movedBlockA.clientId, movedBlockB.clientId ],
 				[ movedBlockA.clientId ]: [],
@@ -667,7 +529,7 @@ describe( 'state', () => {
 				clientIds: [ 'ribs' ],
 			} );
 
-			expect( state.present.blocks.order ).toBe( original.present.blocks.order );
+			expect( state.blocks.order ).toBe( original.blocks.order );
 		} );
 
 		it( 'should remove the block', () => {
@@ -690,15 +552,15 @@ describe( 'state', () => {
 				clientIds: [ 'chicken' ],
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.present.blocks.order ).not.toHaveProperty( 'chicken' );
-			expect( state.present.blocks.byClientId ).toEqual( {
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'ribs' ] );
+			expect( state.blocks.order ).not.toHaveProperty( 'chicken' );
+			expect( state.blocks.byClientId ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
 				},
 			} );
-			expect( state.present.blocks.attributes ).toEqual( {
+			expect( state.blocks.attributes ).toEqual( {
 				ribs: {},
 			} );
 		} );
@@ -728,16 +590,16 @@ describe( 'state', () => {
 				clientIds: [ 'chicken', 'veggies' ],
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'ribs' ] );
-			expect( state.present.blocks.order ).not.toHaveProperty( 'chicken' );
-			expect( state.present.blocks.order ).not.toHaveProperty( 'veggies' );
-			expect( state.present.blocks.byClientId ).toEqual( {
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'ribs' ] );
+			expect( state.blocks.order ).not.toHaveProperty( 'chicken' );
+			expect( state.blocks.order ).not.toHaveProperty( 'veggies' );
+			expect( state.blocks.byClientId ).toEqual( {
 				ribs: {
 					clientId: 'ribs',
 					name: 'core/test-block',
 				},
 			} );
-			expect( state.present.blocks.attributes ).toEqual( {
+			expect( state.blocks.attributes ).toEqual( {
 				ribs: {},
 			} );
 		} );
@@ -759,8 +621,8 @@ describe( 'state', () => {
 				clientIds: [ block.clientId ],
 			} );
 
-			expect( state.present.blocks.byClientId ).toEqual( {} );
-			expect( state.present.blocks.order ).toEqual( {
+			expect( state.blocks.byClientId ).toEqual( {} );
+			expect( state.blocks.order ).toEqual( {
 				'': [],
 			} );
 		} );
@@ -791,8 +653,8 @@ describe( 'state', () => {
 				} ],
 			} );
 
-			expect( Object.keys( state.present.blocks.byClientId ) ).toHaveLength( 3 );
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
+			expect( Object.keys( state.blocks.byClientId ) ).toHaveLength( 3 );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
 		} );
 
 		it( 'should move block to lower index', () => {
@@ -821,7 +683,7 @@ describe( 'state', () => {
 				index: 0,
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'ribs', 'chicken', 'veggies' ] );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'ribs', 'chicken', 'veggies' ] );
 		} );
 
 		it( 'should move block to higher index', () => {
@@ -850,7 +712,7 @@ describe( 'state', () => {
 				index: 2,
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'chicken', 'veggies', 'ribs' ] );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'chicken', 'veggies', 'ribs' ] );
 		} );
 
 		it( 'should not move block if passed same index', () => {
@@ -879,7 +741,7 @@ describe( 'state', () => {
 				index: 1,
 			} );
 
-			expect( state.present.blocks.order[ '' ] ).toEqual( [ 'chicken', 'ribs', 'veggies' ] );
+			expect( state.blocks.order[ '' ] ).toEqual( [ 'chicken', 'ribs', 'veggies' ] );
 		} );
 
 		describe( 'blocks', () => {
@@ -925,7 +787,7 @@ describe( 'state', () => {
 					],
 				} );
 
-				expect( state.present.blocks.byClientId ).toEqual( {
+				expect( state.blocks.byClientId ).toEqual( {
 					block2: { clientId: 'block2' },
 					block21: { clientId: 'block21' },
 					block22: { clientId: 'block22' },
@@ -949,7 +811,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.present.blocks.byClientId ).toBe( original.present.blocks.byClientId );
+					expect( state.blocks.byClientId ).toBe( original.blocks.byClientId );
 				} );
 
 				it( 'should return with same reference if no changes in updates', () => {
@@ -971,7 +833,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.present.blocks.byClientId ).toBe( state.present.blocks.byClientId );
+					expect( state.blocks.byClientId ).toBe( state.blocks.byClientId );
 				} );
 			} );
 
@@ -993,7 +855,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.present.blocks.attributes.kumquat.updated ).toBe( true );
+					expect( state.blocks.attributes.kumquat.updated ).toBe( true );
 				} );
 
 				it( 'should accumulate attribute block updates', () => {
@@ -1015,7 +877,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.present.blocks.attributes.kumquat ).toEqual( {
+					expect( state.blocks.attributes.kumquat ).toEqual( {
 						updated: true,
 						moreUpdated: true,
 					} );
@@ -1034,7 +896,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.present.blocks.attributes ).toBe( original.present.blocks.attributes );
+					expect( state.blocks.attributes ).toBe( original.blocks.attributes );
 				} );
 
 				it( 'should return with same reference if no changes in updates', () => {
@@ -1056,76 +918,8 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.present.blocks.attributes ).toBe( state.present.blocks.attributes );
+					expect( state.blocks.attributes ).toBe( state.blocks.attributes );
 				} );
-			} );
-		} );
-
-		describe( 'withHistory', () => {
-			it( 'should overwrite present history if updating same attributes', () => {
-				let state;
-
-				state = editor( state, {
-					type: 'RESET_BLOCKS',
-					blocks: [ {
-						clientId: 'kumquat',
-						attributes: {},
-						innerBlocks: [],
-					} ],
-				} );
-
-				expect( state.past ).toHaveLength( 1 );
-
-				state = editor( state, {
-					type: 'UPDATE_BLOCK_ATTRIBUTES',
-					clientId: 'kumquat',
-					attributes: {
-						test: 1,
-					},
-				} );
-
-				state = editor( state, {
-					type: 'UPDATE_BLOCK_ATTRIBUTES',
-					clientId: 'kumquat',
-					attributes: {
-						test: 2,
-					},
-				} );
-
-				expect( state.past ).toHaveLength( 2 );
-			} );
-
-			it( 'should not overwrite present history if updating different attributes', () => {
-				let state;
-
-				state = editor( state, {
-					type: 'RESET_BLOCKS',
-					blocks: [ {
-						clientId: 'kumquat',
-						attributes: {},
-						innerBlocks: [],
-					} ],
-				} );
-
-				expect( state.past ).toHaveLength( 1 );
-
-				state = editor( state, {
-					type: 'UPDATE_BLOCK_ATTRIBUTES',
-					clientId: 'kumquat',
-					attributes: {
-						test: 1,
-					},
-				} );
-
-				state = editor( state, {
-					type: 'UPDATE_BLOCK_ATTRIBUTES',
-					clientId: 'kumquat',
-					attributes: {
-						other: 1,
-					},
-				} );
-
-				expect( state.past ).toHaveLength( 3 );
 			} );
 		} );
 	} );

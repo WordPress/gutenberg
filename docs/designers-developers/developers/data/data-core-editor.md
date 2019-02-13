@@ -2,6 +2,27 @@
 
 ## Selectors
 
+### hasEditorUndo
+
+Returns true if any past editor history snapshots exist, or false otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+
+### hasEditorRedo
+
+Returns true if any future editor history snapshots exist, or false
+otherwise.
+
+*Parameters*
+
+ * state: Global application state.
+
+*Returns*
+
+Whether redo history exists.
+
 ### isEditedPostNew
 
 Returns true if the currently edited post is yet to be saved, or false if
@@ -10,6 +31,10 @@ the post has been saved.
 *Parameters*
 
  * state: Global application state.
+
+*Returns*
+
+Whether the post is new.
 
 ### hasChangedContent
 
@@ -766,6 +791,20 @@ Returns an action object used in signalling that the post should autosave.
 *Parameters*
 
  * options: Extra flags to identify the autosave.
+
+### redo
+
+Returns an action object used in signalling that undo history should
+restore last popped state.
+
+### undo
+
+Returns an action object used in signalling that undo history should pop.
+
+### createUndoLevel
+
+Returns an action object used in signalling that undo history record should
+be created.
 
 ### updatePostLock
 

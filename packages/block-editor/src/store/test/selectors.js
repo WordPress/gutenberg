@@ -19,8 +19,6 @@ import { RawHTML } from '@wordpress/element';
 import * as selectors from '../selectors';
 
 const {
-	hasEditorUndo,
-	hasEditorRedo,
 	getBlockDependantsCacheBust,
 	getBlockName,
 	getBlock,
@@ -137,54 +135,6 @@ describe( 'selectors', () => {
 		setFreeformContentHandlerName( undefined );
 	} );
 
-	describe( 'hasEditorUndo', () => {
-		it( 'should return true when the past history is not empty', () => {
-			const state = {
-				editor: {
-					past: [
-						{},
-					],
-				},
-			};
-
-			expect( hasEditorUndo( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when the past history is empty', () => {
-			const state = {
-				editor: {
-					past: [],
-				},
-			};
-
-			expect( hasEditorUndo( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'hasEditorRedo', () => {
-		it( 'should return true when the future history is not empty', () => {
-			const state = {
-				editor: {
-					future: [
-						{},
-					],
-				},
-			};
-
-			expect( hasEditorRedo( state ) ).toBe( true );
-		} );
-
-		it( 'should return false when the future history is empty', () => {
-			const state = {
-				editor: {
-					future: [],
-				},
-			};
-
-			expect( hasEditorRedo( state ) ).toBe( false );
-		} );
-	} );
-
 	describe( 'getBlockDependantsCacheBust', () => {
 		const rootBlock = { clientId: 123, name: 'core/paragraph' };
 		const rootBlockAttributes = {};
@@ -196,21 +146,19 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-							},
-							attributes: {
-								123: rootBlockAttributes,
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -218,21 +166,19 @@ describe( 'selectors', () => {
 			const nextState = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-							},
-							attributes: {
-								123: rootBlockAttributes,
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -246,21 +192,19 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-							},
-							attributes: {
-								123: rootBlockAttributes,
-							},
-							order: {
-								'': rootOrder,
-								123: [],
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+						},
+						order: {
+							'': rootOrder,
+							123: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -268,24 +212,22 @@ describe( 'selectors', () => {
 			const nextState = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-								456: { clientId: 456, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: rootBlockAttributes,
-								456: {},
-							},
-							order: {
-								'': rootOrder,
-								123: [ 456 ],
-								456: [],
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
+							456: { clientId: 456, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+							456: {},
+						},
+						order: {
+							'': rootOrder,
+							123: [ 456 ],
+							456: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -304,24 +246,22 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-								456: childBlock,
-							},
-							attributes: {
-								123: rootBlockAttributes,
-								456: childBlockAttributes,
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-								456: childBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
+							456: childBlock,
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+							456: childBlockAttributes,
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -329,24 +269,22 @@ describe( 'selectors', () => {
 			const nextState = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-								456: childBlock,
-							},
-							attributes: {
-								123: rootBlockAttributes,
-								456: childBlockAttributes,
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-								456: childBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
+							456: childBlock,
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+							456: childBlockAttributes,
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -363,24 +301,22 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-								456: { clientId: 456, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: rootBlockAttributes,
-								456: {},
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-								456: childBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
+							456: { clientId: 456, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+							456: {},
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -388,24 +324,22 @@ describe( 'selectors', () => {
 			const nextState = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-								456: { clientId: 456, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: rootBlockAttributes,
-								456: { content: [ 'foo' ] },
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-								456: childBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
+							456: { clientId: 456, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+							456: { content: [ 'foo' ] },
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -425,27 +359,25 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-								456: childBlock,
-								789: { clientId: 789, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: rootBlockAttributes,
-								456: childBlockAttributes,
-								789: {},
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-								456: childBlockOrder,
-								789: grandChildBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
+							456: childBlock,
+							789: { clientId: 789, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+							456: childBlockAttributes,
+							789: {},
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+							789: grandChildBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -453,27 +385,25 @@ describe( 'selectors', () => {
 			const nextState = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: rootBlock,
-								456: childBlock,
-								789: { clientId: 789, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: rootBlockAttributes,
-								456: childBlockAttributes,
-								789: { content: [ 'foo' ] },
-							},
-							order: {
-								'': rootOrder,
-								123: rootBlockOrder,
-								456: childBlockOrder,
-								789: grandChildBlockOrder,
-							},
+					blocks: {
+						byClientId: {
+							123: rootBlock,
+							456: childBlock,
+							789: { clientId: 789, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							123: rootBlockAttributes,
+							456: childBlockAttributes,
+							789: { content: [ 'foo' ] },
+						},
+						order: {
+							'': rootOrder,
+							123: rootBlockOrder,
+							456: childBlockOrder,
+							789: grandChildBlockOrder,
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -489,14 +419,12 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-							order: {},
-						},
-						edits: {},
+					blocks: {
+						byClientId: {},
+						attributes: {},
+						order: {},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -510,24 +438,22 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
-									clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-									name: 'core/paragraph',
-								},
-							},
-							attributes: {
-								'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {},
-							},
-							order: {
-								'': [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
-								'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': [],
+					blocks: {
+						byClientId: {
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+								clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+								name: 'core/paragraph',
 							},
 						},
-						edits: {},
+						attributes: {
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {},
+						},
+						order: {
+							'': [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+							'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -543,21 +469,19 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: { clientId: 123, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: {},
-							},
-							order: {
-								'': [ 123 ],
-								123: [],
-							},
+					blocks: {
+						byClientId: {
+							123: { clientId: 123, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							123: {},
+						},
+						order: {
+							'': [ 123 ],
+							123: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -574,14 +498,12 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-							order: {},
-						},
-						edits: {},
+					blocks: {
+						byClientId: {},
+						attributes: {},
+						order: {},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -593,24 +515,22 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: { clientId: 123, name: 'core/paragraph' },
-								456: { clientId: 456, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: {},
-								456: {},
-							},
-							order: {
-								'': [ 123 ],
-								123: [ 456 ],
-								456: [],
-							},
+					blocks: {
+						byClientId: {
+							123: { clientId: 123, name: 'core/paragraph' },
+							456: { clientId: 456, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							123: {},
+							456: {},
+						},
+						order: {
+							'': [ 123 ],
+							123: [ 456 ],
+							456: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -651,21 +571,19 @@ describe( 'selectors', () => {
 					},
 				},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: { clientId: 123, name: 'core/meta-block' },
-							},
-							attributes: {
-								123: {},
-							},
-							order: {
-								'': [ 123 ],
-								123: [],
-							},
+					blocks: {
+						byClientId: {
+							123: { clientId: 123, name: 'core/meta-block' },
 						},
-						edits: {},
+						attributes: {
+							123: {},
+						},
+						order: {
+							'': [ 123 ],
+							123: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -688,22 +606,20 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading' },
-								123: { clientId: 123, name: 'core/paragraph' },
-							},
-							attributes: {
-								23: {},
-								123: {},
-							},
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						byClientId: {
+							23: { clientId: 23, name: 'core/heading' },
+							123: { clientId: 123, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							23: {},
+							123: {},
+						},
+						order: {
+							'': [ 123, 23 ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -720,62 +636,60 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
-								'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
-								'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
-								'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
-								'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
-								'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
-								'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
-								'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
-								'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
-								'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
-								'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
-								'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
-								'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
-								'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
-								'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
-							},
-							attributes: {
-								'uuid-2': {},
-								'uuid-4': {},
-								'uuid-6': {},
-								'uuid-8': {},
-								'uuid-10': {},
-								'uuid-12': {},
-								'uuid-14': {},
-								'uuid-16': {},
-								'uuid-18': {},
-								'uuid-20': {},
-								'uuid-22': {},
-								'uuid-24': {},
-								'uuid-26': {},
-								'uuid-28': {},
-								'uuid-30': {},
-							},
-							order: {
-								'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
-								'uuid-2': [ ],
-								'uuid-4': [ ],
-								'uuid-6': [ ],
-								'uuid-8': [ ],
-								'uuid-10': [ 'uuid-12', 'uuid-14' ],
-								'uuid-12': [ 'uuid-16' ],
-								'uuid-14': [ 'uuid-18' ],
-								'uuid-16': [ ],
-								'uuid-18': [ 'uuid-24' ],
-								'uuid-20': [ ],
-								'uuid-22': [ ],
-								'uuid-24': [ 'uuid-26', 'uuid-28' ],
-								'uuid-26': [ ],
-								'uuid-28': [ 'uuid-30' ],
-							},
+					blocks: {
+						byClientId: {
+							'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
+							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
+							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
+							'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
+							'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
+							'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
+							'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
+							'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
+							'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
+							'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
+							'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
+							'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
+							'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
+							'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
+							'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							'uuid-2': {},
+							'uuid-4': {},
+							'uuid-6': {},
+							'uuid-8': {},
+							'uuid-10': {},
+							'uuid-12': {},
+							'uuid-14': {},
+							'uuid-16': {},
+							'uuid-18': {},
+							'uuid-20': {},
+							'uuid-22': {},
+							'uuid-24': {},
+							'uuid-26': {},
+							'uuid-28': {},
+							'uuid-30': {},
+						},
+						order: {
+							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
+							'uuid-2': [ ],
+							'uuid-4': [ ],
+							'uuid-6': [ ],
+							'uuid-8': [ ],
+							'uuid-10': [ 'uuid-12', 'uuid-14' ],
+							'uuid-12': [ 'uuid-16' ],
+							'uuid-14': [ 'uuid-18' ],
+							'uuid-16': [ ],
+							'uuid-18': [ 'uuid-24' ],
+							'uuid-20': [ ],
+							'uuid-22': [ ],
+							'uuid-24': [ 'uuid-26', 'uuid-28' ],
+							'uuid-26': [ ],
+							'uuid-28': [ 'uuid-30' ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -797,62 +711,60 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
-								'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
-								'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
-								'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
-								'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
-								'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
-								'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
-								'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
-								'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
-								'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
-								'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
-								'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
-								'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
-								'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
-								'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
-							},
-							attributes: {
-								'uuid-2': {},
-								'uuid-4': {},
-								'uuid-6': {},
-								'uuid-8': {},
-								'uuid-10': {},
-								'uuid-12': {},
-								'uuid-14': {},
-								'uuid-16': {},
-								'uuid-18': {},
-								'uuid-20': {},
-								'uuid-22': {},
-								'uuid-24': {},
-								'uuid-26': {},
-								'uuid-28': {},
-								'uuid-30': {},
-							},
-							order: {
-								'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
-								'uuid-2': [ ],
-								'uuid-4': [ ],
-								'uuid-6': [ ],
-								'uuid-8': [ ],
-								'uuid-10': [ 'uuid-12', 'uuid-14' ],
-								'uuid-12': [ 'uuid-16' ],
-								'uuid-14': [ 'uuid-18' ],
-								'uuid-16': [ ],
-								'uuid-18': [ 'uuid-24' ],
-								'uuid-20': [ ],
-								'uuid-22': [ ],
-								'uuid-24': [ 'uuid-26', 'uuid-28' ],
-								'uuid-26': [ ],
-								'uuid-28': [ 'uuid-30' ],
-							},
+					blocks: {
+						byClientId: {
+							'uuid-2': { clientId: 'uuid-2', name: 'core/image' },
+							'uuid-4': { clientId: 'uuid-4', name: 'core/paragraph' },
+							'uuid-6': { clientId: 'uuid-6', name: 'core/paragraph' },
+							'uuid-8': { clientId: 'uuid-8', name: 'core/block' },
+							'uuid-10': { clientId: 'uuid-10', name: 'core/columns' },
+							'uuid-12': { clientId: 'uuid-12', name: 'core/column' },
+							'uuid-14': { clientId: 'uuid-14', name: 'core/column' },
+							'uuid-16': { clientId: 'uuid-16', name: 'core/quote' },
+							'uuid-18': { clientId: 'uuid-18', name: 'core/block' },
+							'uuid-20': { clientId: 'uuid-20', name: 'core/gallery' },
+							'uuid-22': { clientId: 'uuid-22', name: 'core/block' },
+							'uuid-24': { clientId: 'uuid-24', name: 'core/columns' },
+							'uuid-26': { clientId: 'uuid-26', name: 'core/column' },
+							'uuid-28': { clientId: 'uuid-28', name: 'core/column' },
+							'uuid-30': { clientId: 'uuid-30', name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							'uuid-2': {},
+							'uuid-4': {},
+							'uuid-6': {},
+							'uuid-8': {},
+							'uuid-10': {},
+							'uuid-12': {},
+							'uuid-14': {},
+							'uuid-16': {},
+							'uuid-18': {},
+							'uuid-20': {},
+							'uuid-22': {},
+							'uuid-24': {},
+							'uuid-26': {},
+							'uuid-28': {},
+							'uuid-30': {},
+						},
+						order: {
+							'': [ 'uuid-6', 'uuid-8', 'uuid-10', 'uuid-22' ],
+							'uuid-2': [ ],
+							'uuid-4': [ ],
+							'uuid-6': [ ],
+							'uuid-8': [ ],
+							'uuid-10': [ 'uuid-12', 'uuid-14' ],
+							'uuid-12': [ 'uuid-16' ],
+							'uuid-14': [ 'uuid-18' ],
+							'uuid-16': [ ],
+							'uuid-18': [ 'uuid-24' ],
+							'uuid-20': [ ],
+							'uuid-22': [ ],
+							'uuid-24': [ 'uuid-26', 'uuid-28' ],
+							'uuid-26': [ ],
+							'uuid-28': [ 'uuid-30' ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 			};
@@ -877,19 +789,17 @@ describe( 'selectors', () => {
 		it( 'should return the number of top-level blocks in the post', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading' },
-								123: { clientId: 123, name: 'core/paragraph' },
-							},
-							attributes: {
-								23: {},
-								123: {},
-							},
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						byClientId: {
+							23: { clientId: 23, name: 'core/heading' },
+							123: { clientId: 123, name: 'core/paragraph' },
+						},
+						attributes: {
+							23: {},
+							123: {},
+						},
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -901,22 +811,20 @@ describe( 'selectors', () => {
 		it( 'should return the number of blocks in a nested context', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								123: { clientId: 123, name: 'core/columns' },
-								456: { clientId: 456, name: 'core/paragraph' },
-								789: { clientId: 789, name: 'core/paragraph' },
-							},
-							attributes: {
-								123: {},
-								456: {},
-								789: {},
-							},
-							order: {
-								'': [ 123 ],
-								123: [ 456, 789 ],
-							},
+					blocks: {
+						byClientId: {
+							123: { clientId: 123, name: 'core/columns' },
+							456: { clientId: 456, name: 'core/paragraph' },
+							789: { clientId: 789, name: 'core/paragraph' },
+						},
+						attributes: {
+							123: {},
+							456: {},
+							789: {},
+						},
+						order: {
+							'': [ 123 ],
+							123: [ 456, 789 ],
 						},
 					},
 				},
@@ -964,21 +872,19 @@ describe( 'selectors', () => {
 	describe( 'getGlobalBlockCount', () => {
 		const state = {
 			editor: {
-				present: {
-					blocks: {
-						byClientId: {
-							123: { clientId: 123, name: 'core/heading' },
-							456: { clientId: 456, name: 'core/paragraph' },
-							789: { clientId: 789, name: 'core/paragraph' },
-						},
-						attributes: {
-							123: {},
-							456: {},
-							789: {},
-						},
-						order: {
-							'': [ 123, 456 ],
-						},
+				blocks: {
+					byClientId: {
+						123: { clientId: 123, name: 'core/heading' },
+						456: { clientId: 456, name: 'core/paragraph' },
+						789: { clientId: 789, name: 'core/paragraph' },
+					},
+					attributes: {
+						123: {},
+						456: {},
+						789: {},
+					},
+					order: {
+						'': [ 123, 456 ],
 					},
 				},
 			},
@@ -995,12 +901,10 @@ describe( 'selectors', () => {
 		it( 'should return 0 if no blocks exist', () => {
 			const emptyState = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-							order: {},
-						},
+					blocks: {
+						byClientId: {},
+						attributes: {},
+						order: {},
 					},
 				},
 			};
@@ -1028,7 +932,15 @@ describe( 'selectors', () => {
 
 		it( 'should return the selected block ClientId', () => {
 			const state = {
-				editor: { present: { blocks: { byClientId: { 23: { name: 'fake block' } } } } },
+				editor: {
+					blocks: {
+						byClientId: {
+							23: {
+								name: 'fake block',
+							},
+						},
+					},
+				},
 				blockSelection: { start: 23, end: 23 },
 			};
 
@@ -1041,24 +953,22 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading' },
-								123: { clientId: 123, name: 'core/paragraph' },
-							},
-							attributes: {
-								23: {},
-								123: {},
-							},
-							order: {
-								'': [ 23, 123 ],
-								23: [],
-								123: [],
-							},
+					blocks: {
+						byClientId: {
+							23: { clientId: 23, name: 'core/heading' },
+							123: { clientId: 123, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							23: {},
+							123: {},
+						},
+						order: {
+							'': [ 23, 123 ],
+							23: [],
+							123: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				blockSelection: { start: null, end: null },
@@ -1071,24 +981,22 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading' },
-								123: { clientId: 123, name: 'core/paragraph' },
-							},
-							attributes: {
-								23: {},
-								123: {},
-							},
-							order: {
-								'': [ 23, 123 ],
-								23: [],
-								123: [],
-							},
+					blocks: {
+						byClientId: {
+							23: { clientId: 23, name: 'core/heading' },
+							123: { clientId: 123, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							23: {},
+							123: {},
+						},
+						order: {
+							'': [ 23, 123 ],
+							23: [],
+							123: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				blockSelection: { start: 23, end: 123 },
@@ -1101,24 +1009,22 @@ describe( 'selectors', () => {
 			const state = {
 				currentPost: {},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								23: { clientId: 23, name: 'core/heading' },
-								123: { clientId: 123, name: 'core/paragraph' },
-							},
-							attributes: {
-								23: {},
-								123: {},
-							},
-							order: {
-								'': [ 23, 123 ],
-								23: [],
-								123: [],
-							},
+					blocks: {
+						byClientId: {
+							23: { clientId: 23, name: 'core/heading' },
+							123: { clientId: 123, name: 'core/paragraph' },
 						},
-						edits: {},
+						attributes: {
+							23: {},
+							123: {},
+						},
+						order: {
+							'': [ 23, 123 ],
+							23: [],
+							123: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				blockSelection: { start: 23, end: 23 },
@@ -1137,10 +1043,8 @@ describe( 'selectors', () => {
 		it( 'should return null if the block does not exist', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {},
-						},
+					blocks: {
+						order: {},
 					},
 				},
 			};
@@ -1151,12 +1055,10 @@ describe( 'selectors', () => {
 		it( 'should return root ClientId relative the block ClientId', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456, 56 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
 						},
 					},
 				},
@@ -1170,10 +1072,8 @@ describe( 'selectors', () => {
 		it( 'should return the given block if the block has no parents', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {},
-						},
+					blocks: {
+						order: {},
 					},
 				},
 			};
@@ -1184,12 +1084,10 @@ describe( 'selectors', () => {
 		it( 'should return root ClientId relative the block ClientId', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456, 56 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
 						},
 					},
 				},
@@ -1201,13 +1099,11 @@ describe( 'selectors', () => {
 		it( 'should return the top level root ClientId relative the block ClientId', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ '123', '23' ],
-								123: [ '456', '56' ],
-								56: [ '12' ],
-							},
+					blocks: {
+						order: {
+							'': [ '123', '23' ],
+							123: [ '456', '56' ],
+							56: [ '12' ],
 						},
 					},
 				},
@@ -1221,11 +1117,9 @@ describe( 'selectors', () => {
 		it( 'should return empty if there is no multi selection', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -1238,11 +1132,9 @@ describe( 'selectors', () => {
 		it( 'should return selected block clientIds if there is multi selection', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 5, 4, 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							'': [ 5, 4, 3, 2, 1 ],
 						},
 					},
 				},
@@ -1255,12 +1147,10 @@ describe( 'selectors', () => {
 		it( 'should return selected block clientIds if there is multi selection (nested context)', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 5, 4, 3, 2, 1 ],
-								4: [ 9, 8, 7, 6 ],
-							},
+					blocks: {
+						order: {
+							'': [ 5, 4, 3, 2, 1 ],
+							4: [ 9, 8, 7, 6 ],
 						},
 					},
 				},
@@ -1275,14 +1165,12 @@ describe( 'selectors', () => {
 		it( 'should return the same reference on subsequent invocations of empty selection', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-							order: {},
-						},
-						edits: {},
+					blocks: {
+						byClientId: {},
+						attributes: {},
+						order: {},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				blockSelection: { start: null, end: null },
@@ -1335,11 +1223,9 @@ describe( 'selectors', () => {
 		it( 'should return the ordered block ClientIds of top-level blocks by default', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -1351,12 +1237,10 @@ describe( 'selectors', () => {
 		it( 'should return the ordered block ClientIds at a specified rootClientId', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456 ],
 						},
 					},
 				},
@@ -1370,11 +1254,9 @@ describe( 'selectors', () => {
 		it( 'should return the block order', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -1386,12 +1268,10 @@ describe( 'selectors', () => {
 		it( 'should return the block order (nested context)', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456, 56 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
 						},
 					},
 				},
@@ -1405,11 +1285,9 @@ describe( 'selectors', () => {
 		it( 'should return the previous block', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -1421,12 +1299,10 @@ describe( 'selectors', () => {
 		it( 'should return the previous block (nested context)', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456, 56 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
 						},
 					},
 				},
@@ -1438,11 +1314,9 @@ describe( 'selectors', () => {
 		it( 'should return null for the first block', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -1454,12 +1328,10 @@ describe( 'selectors', () => {
 		it( 'should return null for the first block (nested context)', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456, 56 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
 						},
 					},
 				},
@@ -1473,11 +1345,9 @@ describe( 'selectors', () => {
 		it( 'should return the following block', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -1489,12 +1359,10 @@ describe( 'selectors', () => {
 		it( 'should return the following block (nested context)', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456, 56 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
 						},
 					},
 				},
@@ -1506,11 +1374,9 @@ describe( 'selectors', () => {
 		it( 'should return null for the last block', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
 						},
 					},
 				},
@@ -1522,12 +1388,10 @@ describe( 'selectors', () => {
 		it( 'should return null for the last block (nested context)', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 123, 23 ],
-								123: [ 456, 56 ],
-							},
+					blocks: {
+						order: {
+							'': [ 123, 23 ],
+							123: [ 456, 56 ],
 						},
 					},
 				},
@@ -1568,11 +1432,9 @@ describe( 'selectors', () => {
 			const state = {
 				blockSelection: { start: 5, end: 5 },
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								4: [ 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							4: [ 3, 2, 1 ],
 						},
 					},
 				},
@@ -1585,11 +1447,9 @@ describe( 'selectors', () => {
 			const state = {
 				blockSelection: { start: 3, end: 3 },
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								4: [ 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							4: [ 3, 2, 1 ],
 						},
 					},
 				},
@@ -1601,11 +1461,9 @@ describe( 'selectors', () => {
 		it( 'should return true if a multi selection exists that contains children of the block with the given ClientId', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								6: [ 5, 4, 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							6: [ 5, 4, 3, 2, 1 ],
 						},
 					},
 				},
@@ -1617,12 +1475,10 @@ describe( 'selectors', () => {
 		it( 'should return false if a multi selection exists bot does not contains children of the block with the given ClientId', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								3: [ 2, 1 ],
-								6: [ 5, 4 ],
-							},
+					blocks: {
+						order: {
+							3: [ 2, 1 ],
+							6: [ 5, 4 ],
 						},
 					},
 				},
@@ -1637,11 +1493,9 @@ describe( 'selectors', () => {
 			const state = {
 				blockSelection: { start: 5, end: 3 },
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 5, 4, 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							'': [ 5, 4, 3, 2, 1 ],
 						},
 					},
 				},
@@ -1654,11 +1508,9 @@ describe( 'selectors', () => {
 			const state = {
 				blockSelection: { start: 5, end: 3 },
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 5, 4, 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							'': [ 5, 4, 3, 2, 1 ],
 						},
 					},
 				},
@@ -1671,11 +1523,9 @@ describe( 'selectors', () => {
 			const state = {
 				blockSelection: { start: 5, end: 3 },
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 5, 4, 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							'': [ 5, 4, 3, 2, 1 ],
 						},
 					},
 				},
@@ -1688,11 +1538,9 @@ describe( 'selectors', () => {
 			const state = {
 				blockSelection: {},
 				editor: {
-					present: {
-						blocks: {
-							order: {
-								'': [ 5, 4, 3, 2, 1 ],
-							},
+					blocks: {
+						order: {
+							'': [ 5, 4, 3, 2, 1 ],
 						},
 					},
 				},
@@ -1740,11 +1588,9 @@ describe( 'selectors', () => {
 	describe( 'isBlockMultiSelected', () => {
 		const state = {
 			editor: {
-				present: {
-					blocks: {
-						order: {
-							'': [ 5, 4, 3, 2, 1 ],
-						},
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
 					},
 				},
 			},
@@ -1763,11 +1609,9 @@ describe( 'selectors', () => {
 	describe( 'isFirstMultiSelectedBlock', () => {
 		const state = {
 			editor: {
-				present: {
-					blocks: {
-						order: {
-							'': [ 5, 4, 3, 2, 1 ],
-						},
+				blocks: {
+					order: {
+						'': [ 5, 4, 3, 2, 1 ],
 					},
 				},
 			},
@@ -1871,24 +1715,22 @@ describe( 'selectors', () => {
 					end: 'clientId2',
 				},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								clientId1: { clientId: 'clientId1' },
-								clientId2: { clientId: 'clientId2' },
-							},
-							attributes: {
-								clientId1: {},
-								clientId2: {},
-							},
-							order: {
-								'': [ 'clientId1' ],
-								clientId1: [ 'clientId2' ],
-								clientId2: [],
-							},
+					blocks: {
+						byClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
 						},
-						edits: {},
+						attributes: {
+							clientId1: {},
+							clientId2: {},
+						},
+						order: {
+							'': [ 'clientId1' ],
+							clientId1: [ 'clientId2' ],
+							clientId2: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				insertionPoint: {
@@ -1912,21 +1754,19 @@ describe( 'selectors', () => {
 					end: 'clientId1',
 				},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								clientId1: { clientId: 'clientId1' },
-							},
-							attributes: {
-								clientId1: {},
-							},
-							order: {
-								'': [ 'clientId1' ],
-								clientId1: [],
-							},
+					blocks: {
+						byClientId: {
+							clientId1: { clientId: 'clientId1' },
 						},
-						edits: {},
+						attributes: {
+							clientId1: {},
+						},
+						order: {
+							'': [ 'clientId1' ],
+							clientId1: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				insertionPoint: null,
@@ -1947,24 +1787,22 @@ describe( 'selectors', () => {
 					end: 'clientId2',
 				},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								clientId1: { clientId: 'clientId1' },
-								clientId2: { clientId: 'clientId2' },
-							},
-							attributes: {
-								clientId1: {},
-								clientId2: {},
-							},
-							order: {
-								'': [ 'clientId1' ],
-								clientId1: [ 'clientId2' ],
-								clientId2: [],
-							},
+					blocks: {
+						byClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
 						},
-						edits: {},
+						attributes: {
+							clientId1: {},
+							clientId2: {},
+						},
+						order: {
+							'': [ 'clientId1' ],
+							clientId1: [ 'clientId2' ],
+							clientId2: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				insertionPoint: null,
@@ -1985,24 +1823,22 @@ describe( 'selectors', () => {
 					end: 'clientId2',
 				},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								clientId1: { clientId: 'clientId1' },
-								clientId2: { clientId: 'clientId2' },
-							},
-							attributes: {
-								clientId1: {},
-								clientId2: {},
-							},
-							order: {
-								'': [ 'clientId1', 'clientId2' ],
-								clientId1: [],
-								clientId2: [],
-							},
+					blocks: {
+						byClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
 						},
-						edits: {},
+						attributes: {
+							clientId1: {},
+							clientId2: {},
+						},
+						order: {
+							'': [ 'clientId1', 'clientId2' ],
+							clientId1: [],
+							clientId2: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				insertionPoint: null,
@@ -2023,24 +1859,22 @@ describe( 'selectors', () => {
 					end: null,
 				},
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								clientId1: { clientId: 'clientId1' },
-								clientId2: { clientId: 'clientId2' },
-							},
-							attributes: {
-								clientId1: {},
-								clientId2: {},
-							},
-							order: {
-								'': [ 'clientId1', 'clientId2' ],
-								clientId1: [],
-								clientId2: [],
-							},
+					blocks: {
+						byClientId: {
+							clientId1: { clientId: 'clientId1' },
+							clientId2: { clientId: 'clientId2' },
 						},
-						edits: {},
+						attributes: {
+							clientId1: {},
+							clientId2: {},
+						},
+						order: {
+							'': [ 'clientId1', 'clientId2' ],
+							clientId1: [],
+							clientId2: [],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				insertionPoint: null,
@@ -2078,11 +1912,9 @@ describe( 'selectors', () => {
 		it( 'should deny blocks that are not registered', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-						},
+					blocks: {
+						byClientId: {},
+						attributes: {},
 					},
 				},
 				blockListSettings: {},
@@ -2094,11 +1926,9 @@ describe( 'selectors', () => {
 		it( 'should deny blocks that are not allowed by the editor', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-						},
+					blocks: {
+						byClientId: {},
+						attributes: {},
 					},
 				},
 				blockListSettings: {},
@@ -2112,11 +1942,9 @@ describe( 'selectors', () => {
 		it( 'should allow blocks that are allowed by the editor', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-						},
+					blocks: {
+						byClientId: {},
+						attributes: {},
 					},
 				},
 				blockListSettings: {},
@@ -2130,11 +1958,9 @@ describe( 'selectors', () => {
 		it( 'should deny blocks when the editor has a template lock', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-						},
+					blocks: {
+						byClientId: {},
+						attributes: {},
 					},
 				},
 				blockListSettings: {},
@@ -2148,11 +1974,9 @@ describe( 'selectors', () => {
 		it( 'should deny blocks that restrict parent from being inserted into the root', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-						},
+					blocks: {
+						byClientId: {},
+						attributes: {},
 					},
 				},
 				blockListSettings: {},
@@ -2164,14 +1988,12 @@ describe( 'selectors', () => {
 		it( 'should deny blocks that restrict parent from being inserted into a restricted parent', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-a' },
-							},
-							attributes: {
-								block1: {},
-							},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-a' },
+						},
+						attributes: {
+							block1: {},
 						},
 					},
 				},
@@ -2184,14 +2006,12 @@ describe( 'selectors', () => {
 		it( 'should allow blocks that restrict parent to be inserted into an allowed parent', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-b' },
-							},
-							attributes: {
-								block1: {},
-							},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-b' },
+						},
+						attributes: {
+							block1: {},
 						},
 					},
 				},
@@ -2204,14 +2024,12 @@ describe( 'selectors', () => {
 		it( 'should deny restricted blocks from being inserted into a block that restricts allowedBlocks', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-a' },
-							},
-							attributes: {
-								block1: {},
-							},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-a' },
+						},
+						attributes: {
+							block1: {},
 						},
 					},
 				},
@@ -2228,14 +2046,12 @@ describe( 'selectors', () => {
 		it( 'should allow allowed blocks to be inserted into a block that restricts allowedBlocks', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-a' },
-							},
-							attributes: {
-								block1: {},
-							},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-a' },
+						},
+						attributes: {
+							block1: {},
 						},
 					},
 				},
@@ -2252,14 +2068,12 @@ describe( 'selectors', () => {
 		it( 'should prioritise parent over allowedBlocks', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-b' },
-							},
-							attributes: {
-								block1: {},
-							},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-b' },
+						},
+						attributes: {
+							block1: {},
 						},
 					},
 				},
@@ -2278,18 +2092,16 @@ describe( 'selectors', () => {
 		it( 'should properly list block type and reusable block items', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-a' },
-							},
-							attributes: {
-								block1: {},
-							},
-							order: {},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-a' },
 						},
-						edits: {},
+						attributes: {
+							block1: {},
+						},
+						order: {},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				settings: {
@@ -2340,31 +2152,29 @@ describe( 'selectors', () => {
 		it( 'should not list a reusable block item if it is being inserted inside it self', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1ref: {
-									name: 'core/block',
-									clientId: 'block1ref',
-								},
-								itselfBlock1: { name: 'core/test-block-a' },
-								itselfBlock2: { name: 'core/test-block-b' },
+					blocks: {
+						byClientId: {
+							block1ref: {
+								name: 'core/block',
+								clientId: 'block1ref',
 							},
-							attributes: {
-								block1ref: {
-									attributes: {
-										ref: 1,
-									},
-								},
-								itselfBlock1: {},
-								itselfBlock2: {},
-							},
-							order: {
-								'': [ 'block1ref' ],
-							},
+							itselfBlock1: { name: 'core/test-block-a' },
+							itselfBlock2: { name: 'core/test-block-b' },
 						},
-						edits: {},
+						attributes: {
+							block1ref: {
+								attributes: {
+									ref: 1,
+								},
+							},
+							itselfBlock1: {},
+							itselfBlock2: {},
+						},
+						order: {
+							'': [ 'block1ref' ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				settings: {
@@ -2401,37 +2211,35 @@ describe( 'selectors', () => {
 		it( 'should not list a reusable block item if it is being inserted inside a descendent', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block2ref: {
-									name: 'core/block',
-									clientId: 'block1ref',
-								},
-								referredBlock1: { name: 'core/test-block-a' },
-								referredBlock2: { name: 'core/test-block-b' },
-								childReferredBlock2: { name: 'core/test-block-a' },
-								grandchildReferredBlock2: { name: 'core/test-block-b' },
+					blocks: {
+						byClientId: {
+							block2ref: {
+								name: 'core/block',
+								clientId: 'block1ref',
 							},
-							attributes: {
-								block2ref: {
-									attributes: {
-										ref: 2,
-									},
-								},
-								referredBlock1: {},
-								referredBlock2: {},
-								childReferredBlock2: {},
-								grandchildReferredBlock2: {},
-							},
-							order: {
-								'': [ 'block2ref' ],
-								referredBlock2: [ 'childReferredBlock2' ],
-								childReferredBlock2: [ 'grandchildReferredBlock2' ],
-							},
+							referredBlock1: { name: 'core/test-block-a' },
+							referredBlock2: { name: 'core/test-block-b' },
+							childReferredBlock2: { name: 'core/test-block-a' },
+							grandchildReferredBlock2: { name: 'core/test-block-b' },
 						},
-						edits: {},
+						attributes: {
+							block2ref: {
+								attributes: {
+									ref: 2,
+								},
+							},
+							referredBlock1: {},
+							referredBlock2: {},
+							childReferredBlock2: {},
+							grandchildReferredBlock2: {},
+						},
+						order: {
+							'': [ 'block2ref' ],
+							referredBlock2: [ 'childReferredBlock2' ],
+							childReferredBlock2: [ 'grandchildReferredBlock2' ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				settings: {
@@ -2467,20 +2275,18 @@ describe( 'selectors', () => {
 		it( 'should order items by descending utility and frecency', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-a' },
-								block2: { name: 'core/test-block-a' },
-							},
-							attributes: {
-								block1: {},
-								block2: {},
-							},
-							order: {},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-a' },
 						},
-						edits: {},
+						attributes: {
+							block1: {},
+							block2: {},
+						},
+						order: {},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				settings: {
@@ -2511,26 +2317,24 @@ describe( 'selectors', () => {
 		it( 'should correctly cache the return values', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-a' },
-								block2: { name: 'core/test-block-a' },
-								block3: { name: 'core/test-block-a' },
-								block4: { name: 'core/test-block-a' },
-							},
-							attributes: {
-								block1: {},
-								block2: {},
-								block3: {},
-								block4: {},
-							},
-							order: {
-								'': [ 'block3', 'block4' ],
-							},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-a' },
+							block2: { name: 'core/test-block-a' },
+							block3: { name: 'core/test-block-a' },
+							block4: { name: 'core/test-block-a' },
 						},
-						edits: {},
+						attributes: {
+							block1: {},
+							block2: {},
+							block3: {},
+							block4: {},
+						},
+						order: {
+							'': [ 'block3', 'block4' ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				settings: {
@@ -2583,20 +2387,18 @@ describe( 'selectors', () => {
 		it( 'should set isDisabled when a block with `multiple: false` has been used', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { clientId: 'block1', name: 'core/test-block-b' },
-							},
-							attributes: {
-								block1: { attribute: {} },
-							},
-							order: {
-								'': [ 'block1' ],
-							},
+					blocks: {
+						byClientId: {
+							block1: { clientId: 'block1', name: 'core/test-block-b' },
 						},
-						edits: {},
+						attributes: {
+							block1: { attribute: {} },
+						},
+						order: {
+							'': [ 'block1' ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				reusableBlocks: {
@@ -2617,14 +2419,12 @@ describe( 'selectors', () => {
 		it( 'should give common blocks a low utility', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-							order: {},
-						},
-						edits: {},
+					blocks: {
+						byClientId: {},
+						attributes: {},
+						order: {},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				reusableBlocks: {
@@ -2645,14 +2445,12 @@ describe( 'selectors', () => {
 		it( 'should give used blocks a medium utility and set a frecency', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {},
-							attributes: {},
-							order: {},
-						},
-						edits: {},
+					blocks: {
+						byClientId: {},
+						attributes: {},
+						order: {},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				reusableBlocks: {
@@ -2676,20 +2474,18 @@ describe( 'selectors', () => {
 		it( 'should give contextual blocks a high utility', () => {
 			const state = {
 				editor: {
-					present: {
-						blocks: {
-							byClientId: {
-								block1: { name: 'core/test-block-b' },
-							},
-							attributes: {
-								block1: { attribute: {} },
-							},
-							order: {
-								'': [ 'block1' ],
-							},
+					blocks: {
+						byClientId: {
+							block1: { name: 'core/test-block-b' },
 						},
-						edits: {},
+						attributes: {
+							block1: { attribute: {} },
+						},
+						order: {
+							'': [ 'block1' ],
+						},
 					},
+					edits: {},
 				},
 				initialEdits: {},
 				reusableBlocks: {
