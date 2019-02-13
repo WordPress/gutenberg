@@ -134,7 +134,7 @@ You configure babel by creating a `.babelrc` file:
 ```json
 {
 	"plugins": [
-		[ "@bable/plugin-transform-react-jsx", {
+		[ "@babel/plugin-transform-react-jsx", {
 			"pragma": "wp.element.createElement"
 		} ]
 	]
