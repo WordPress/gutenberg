@@ -619,7 +619,7 @@ export class RichText extends Component {
 			}
 		}
 
-		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+		if ( keyCode === DELETE || keyCode === BACKSPACE || ( ctrlKey && keyCode === 68 ) ) {
 			const value = this.createRecord();
 			const { replacements, text, start, end } = value;
 
