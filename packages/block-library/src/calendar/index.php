@@ -13,14 +13,22 @@
  * @return string Returns the block content.
  */
 function render_block_core_calendar( $attributes ) {
-	global $monthnum, $year;
+	global $monthnum, $year, $post;
+	$previous_monthnum;
+	$previous_year;
+
+	// phpcs:disable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	if ( isset( $attributes['month'] ) ) {
-		$monthnum = $attributes['month'];
+		$previous_monthnum = $monthnum;
+		$monthnum          = $attributes['month'];
 	}
 
 	if ( isset( $attributes['year'] ) ) {
-		$year = $attributes['year'];
+		$previous_year = $year;
+		$year          = $attributes['year'];
 	}
+	// phpcs:enable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+
 	$custom_class_name = empty( $attributes['className'] ) ? '' : ' ' . $attributes['className'];
 	$align_class_name  = empty( $attributes['align'] ) ? '' : ' ' . "align{$attributes['align']}";
 
@@ -29,6 +37,16 @@ function render_block_core_calendar( $attributes ) {
 		esc_attr( 'wp-block-calendar' . $custom_class_name . $align_class_name ),
 		get_calendar( true, false )
 	);
+
+	// phpcs:disable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+	if ( isset( $attributes['month'] ) ) {
+		$monthnum = $previous_monthnum;
+	}
+
+	if ( isset( $attributes['year'] ) ) {
+		$year = $previous_year;
+	}
+	// phpcs:enable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 }
 
 /**
@@ -45,7 +63,7 @@ function register_block_core_calendar() {
 				'className' => array(
 					'type' => 'string',
 				),
-				'month'  => array(
+				'month'     => array(
 					'type' => 'integer',
 				),
 				'year'      => array(
