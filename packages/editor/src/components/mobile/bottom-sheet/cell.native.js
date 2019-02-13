@@ -15,10 +15,9 @@ import { Component } from '@wordpress/element';
 import styles from './styles.scss';
 
 export default class Cell extends Component {
-	_valueTextInput = undefined;
-
 	constructor() {
 		super( ...arguments );
+		this._valueTextInput = undefined;
 		this.state = {
 			isEditingValue: false,
 		};
