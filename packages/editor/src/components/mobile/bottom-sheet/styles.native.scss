@@ -3,6 +3,7 @@
 .bottomModal {
 	justify-content: flex-end;
 	margin: 0;
+	align-items: center;
 }
 
 .dragIndicator {
@@ -24,6 +25,7 @@
 	background-color: $white;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
+	max-width: 512;
 }
 
 .head {

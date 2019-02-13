@@ -85,7 +85,6 @@ class BottomSheet extends Component {
 						</View>
 					) }
 					{ this.props.children }
-					<View style={ { flexGrow: 1 } }></View>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>
