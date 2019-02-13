@@ -23,14 +23,16 @@
 	flex-grow: 1;
 	flex-shrink: 0;
 	align-items: center;
-	padding: 6px;
+	padding: 6px 8px;
+	margin-left: -3px;
+	margin-right: -3px;
 	text-align: left;
 
 	&.is-selected {
-		@include button-style__focus-active;
+		@include menu-style__focus;
 	}
 
 	&:hover {
-		@include button-style__hover;
+		@include menu-style__hover;
 	}
 }
