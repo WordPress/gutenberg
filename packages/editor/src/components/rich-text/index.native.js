@@ -250,6 +250,40 @@ export class RichText extends Component {
 		return isEmpty( this.formatToValue( this.props.value ) );
 	}
 
+	/**
+	 * Creates a RichText value "record" from native content and selection
+	 * information
+	 *
+	 * @param {String} currentContent The content (usually an HTML string) from
+	 *                                the native component.
+	 * @param {int}    selectionStart The start of the selection.
+	 * @param {int}      selectionEnd The end of the selection (same as start if 
+	 *                                cursor instead of selection).
+	 * 
+   * @return {Object} A RichText value with formats and selection.
+	 */
+	createRecord( { currentContent, selectionStart, selectionEnd } ) {
+		// strip outer <p> tags
+		const innerContent = this.removeRootTagsProduceByAztec(currentContent);
+
+		// create record (with selection) from current contents
+		const currentRecord = {
+			start: selectionStart,
+			end: selectionEnd,
+			...create({
+				html: innerContent,
+				range: null,
+				multilineTag: false,
+				removeNode: null,
+				unwrapNode: null,
+				removeAttribute: null,
+				filterString: null,
+			})
+		};
+
+		return currentRecord;
+	}
+
 	formatToValue( value ) {
 		// Handle deprecated `children` and `node` sources.
 		if ( Array.isArray( value ) ) {
