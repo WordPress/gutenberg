@@ -175,7 +175,7 @@ export class Saturation extends Component {
 						className="screen-reader-text"
 						id={ `color-picker-saturation-${ instanceId }` }>
 						{ __(
-							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to increase saturation, and right to decrease saturation.'
+							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
 						) }
 					</div>
 				</div>

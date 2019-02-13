@@ -110,11 +110,13 @@ class Sandbox extends Component {
 				// the iframe root and interfere with our mechanism for
 				// determining the unconstrained page bounds.
 				function removeViewportStyles( ruleOrNode ) {
-					[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
-						if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
-							ruleOrNode.style[ style ] = '';
-						}
-					} );
+					if( ruleOrNode.style ) {
+						[ 'width', 'height', 'minHeight', 'maxHeight' ].forEach( function( style ) {
+							if ( /^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] ) ) {
+								ruleOrNode.style[ style ] = '';
+							}
+						} );
+					}
 				}
 
 				Array.prototype.forEach.call( document.querySelectorAll( '[style]' ), removeViewportStyles );
@@ -165,6 +167,9 @@ class Sandbox extends Component {
 				<head>
 					<title>{ this.props.title }</title>
 					<style dangerouslySetInnerHTML={ { __html: style } } />
+					{ ( this.props.styles && this.props.styles.map(
+						( rules, i ) => <style key={ i } dangerouslySetInnerHTML={ { __html: rules } } />
+					) ) }
 				</head>
 				<body data-resizable-iframe-connected="data-resizable-iframe-connected" className={ this.props.type }>
 					<div dangerouslySetInnerHTML={ { __html: this.props.html } } />
@@ -193,7 +198,7 @@ class Sandbox extends Component {
 	}
 
 	render() {
-		const { title } = this.props;
+		const { title, onFocus } = this.props;
 
 		return (
 			<FocusableIframe
@@ -202,6 +207,7 @@ class Sandbox extends Component {
 				className="components-sandbox"
 				sandbox="allow-scripts allow-same-origin allow-presentation"
 				onLoad={ this.trySandbox }
+				onFocus={ onFocus }
 				width={ Math.ceil( this.state.width ) }
 				height={ Math.ceil( this.state.height ) } />
 		);

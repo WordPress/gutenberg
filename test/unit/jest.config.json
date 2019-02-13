@@ -11,7 +11,7 @@
 	"testURL": "http://localhost",
 	"testPathIgnorePatterns": [
 		"/node_modules/",
-		"/test/e2e",
+		"/packages/e2e-tests",
 		"<rootDir>/.*/build/",
 		"<rootDir>/.*/build-module/"
 	],

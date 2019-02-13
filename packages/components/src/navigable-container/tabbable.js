@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';

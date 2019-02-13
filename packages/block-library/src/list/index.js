@@ -73,9 +73,17 @@ export const settings = {
 				transform: ( blockAttributes ) => {
 					return createBlock( 'core/list', {
 						values: toHTMLString( {
-							value: join( blockAttributes.map( ( { content } ) =>
-								replace( create( { html: content } ), /\n/g, LINE_SEPARATOR )
-							), LINE_SEPARATOR ),
+							value: join( blockAttributes.map( ( { content } ) => {
+								const value = create( { html: content } );
+
+								if ( blockAttributes.length > 1 ) {
+									return value;
+								}
+
+								// When converting only one block, transform
+								// every line to a list item.
+								return replace( value, /\n/g, LINE_SEPARATOR );
+							} ), LINE_SEPARATOR ),
 							multilineTag: 'li',
 						} ),
 					} );

@@ -28,15 +28,11 @@ Individual blocks are handled by the `VisualBlock` component, which attaches eve
 
 ## Components
 
-Because many blocks share the same complex behaviors, reusable components
-are made available to simplify implementations of your block's `edit` function.
+Because many blocks share the same complex behaviors, reusable components are made available to simplify implementations of your block's `edit` function.
 
 ### `BlockControls`
 
-When returned by your block's `edit` implementation, renders a toolbar of icon
-buttons. This is useful for block-level modifications to be made available when
-a block is selected. For example, if your block supports alignment, you may
-want to display alignment options in the selected block's toolbar.
+When returned by your block's `edit` implementation, renders a toolbar of icon buttons. This is useful for block-level modifications to be made available when a block is selected. For example, if your block supports alignment, you may want to display alignment options in the selected block's toolbar.
 
 Example:
 
@@ -70,32 +66,20 @@ Example:
 );
 ```
 
-Note in this example that we render `AlignmentToolbar` as a child of the
-`BlockControls` element. This is another pre-configured component you can use
-to simplify block text alignment.
+Note in this example that we render `AlignmentToolbar` as a child of the `BlockControls` element. This is another pre-configured component you can use to simplify block text alignment.
 
-Alternatively, you can create your own toolbar controls by passing an array of
-`controls` as a prop to the `BlockControls` component. Each control should be
-an object with the following properties:
+Alternatively, you can create your own toolbar controls by passing an array of `controls` as a prop to the `BlockControls` component. Each control should be an object with the following properties:
 
 - `icon: string` - Slug of the Dashicon to be shown in the control's toolbar button
 - `title: string` - A human-readable localized text to be shown as the tooltip label of the control's button
 - `subscript: ?string` - Optional text to be shown adjacent the button icon as subscript (for example, heading levels)
 - `isActive: ?boolean` - Whether the control should be considered active / selected. Defaults to `false`.
 
-To create divisions between sets of controls within the same `BlockControls`
-element, passing `controls` instead as a nested array (array of arrays of
-objects). A divider will be shown between each set of controls.
+To create divisions between sets of controls within the same `BlockControls` element, passing `controls` instead as a nested array (array of arrays of objects). A divider will be shown between each set of controls.
 
 ### `RichText`
 
-Render a rich
-[`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content),
-providing users the option to add emphasis to content or links to content. It
-behaves similarly to a
-[controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components),
-except that `onChange` is triggered less frequently than would be expected from
-a traditional `input` field, usually when the user exits the field.
+Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Editable_content), providing users the option to add emphasis to content or links to content. It behaves similarly to a [controlled component](https://facebook.github.io/react/docs/forms.html#controlled-components), except that `onChange` is triggered less frequently than would be expected from a traditional `input` field, usually when the user exits the field.
 
 The following properties (non-exhaustive list) are made available:
 
@@ -136,3 +120,5 @@ Example:
 	window.wp.element
 );
 ```
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

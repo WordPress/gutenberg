@@ -1,5 +1,5 @@
 /**
- * WordPress
+ * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';

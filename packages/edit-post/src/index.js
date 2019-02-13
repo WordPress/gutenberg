@@ -68,6 +68,13 @@ export function initializeEditor( id, postType, postId, settings, initialEdits )
 
 	registerCoreBlocks();
 
+	// Show a console log warning if the browser is not in Standards rendering mode.
+	const documentMode = document.compatMode === 'CSS1Compat' ? 'Standards' : 'Quirks';
+	if ( documentMode !== 'Standards' ) {
+		// eslint-disable-next-line no-console
+		console.warn( "Your browser is using Quirks Mode. \nThis can cause rendering issues such as blocks overlaying meta boxes in the editor. Quirks Mode can be triggered by PHP errors or HTML code appearing before the opening <!DOCTYPE html>. Try checking the raw page source or your site's PHP error log and resolving errors there, removing any HTML before the doctype, or disabling plugins." );
+	}
+
 	dispatch( 'core/nux' ).triggerGuide( [
 		'core/editor.inserter',
 		'core/editor.settings',

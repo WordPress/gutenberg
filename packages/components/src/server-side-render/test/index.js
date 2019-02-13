@@ -1,3 +1,6 @@
+/**
+ * Internal dependencies
+ */
 import { rendererPath } from '../index';
 
 describe( 'rendererPath', function() {

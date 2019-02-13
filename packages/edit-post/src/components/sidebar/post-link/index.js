@@ -53,38 +53,46 @@ function PostLink( {
 			onToggle={ onTogglePanel }
 		>
 			{ isEditable && (
-				<TextControl
-					label={ __( 'URL' ) }
-					value={ forceEmptyField ? '' : currentSlug }
-					onChange={ ( newValue ) => {
-						editPermalink( newValue );
-						// When we delete the field the permalink gets
-						// reverted to the original value.
-						// The forceEmptyField logic allows the user to have
-						// the field temporarily empty while typing.
-						if ( ! newValue ) {
-							if ( ! forceEmptyField ) {
+				<div className="editor-post-link">
+					<TextControl
+						label={ __( 'URL Slug' ) }
+						value={ forceEmptyField ? '' : currentSlug }
+						onChange={ ( newValue ) => {
+							editPermalink( newValue );
+							// When we delete the field the permalink gets
+							// reverted to the original value.
+							// The forceEmptyField logic allows the user to have
+							// the field temporarily empty while typing.
+							if ( ! newValue ) {
+								if ( ! forceEmptyField ) {
+									setState( {
+										forceEmptyField: true,
+									} );
+								}
+								return;
+							}
+							if ( forceEmptyField ) {
 								setState( {
-									forceEmptyField: true,
+									forceEmptyField: false,
 								} );
 							}
-							return;
-						}
-						if ( forceEmptyField ) {
-							setState( {
-								forceEmptyField: false,
-							} );
-						}
-					} }
-					onBlur={ ( event ) => {
-						editPermalink( cleanForSlug( event.target.value ) );
-						if ( forceEmptyField ) {
-							setState( {
-								forceEmptyField: false,
-							} );
-						}
-					} }
-				/>
+						} }
+						onBlur={ ( event ) => {
+							editPermalink( cleanForSlug( event.target.value ) );
+							if ( forceEmptyField ) {
+								setState( {
+									forceEmptyField: false,
+								} );
+							}
+						} }
+					/>
+					<p>
+						{ __( 'The last part of the URL. ' ) }
+						<ExternalLink href="https://codex.wordpress.org/Posts_Add_New_Screen">
+							{ __( 'Read about permalinks' ) }
+						</ExternalLink>
+					</p>
+				</div>
 			) }
 			<p className="edit-post-post-link__preview-label">
 				{ __( 'Preview' ) }
@@ -124,8 +132,10 @@ export default compose( [
 		} = select( 'core' );
 
 		const { link, id } = getCurrentPost();
+
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
+
 		return {
 			isNew: isEditedPostNew(),
 			postLink: link,
@@ -140,8 +150,8 @@ export default compose( [
 			postID: id,
 		};
 	} ),
-	ifCondition( ( { isEnabled, isNew, postLink, isViewable } ) => {
-		return isEnabled && ! isNew && postLink && isViewable;
+	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
+		return isEnabled && ! isNew && postLink && isViewable && permalinkParts;
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );

@@ -3,21 +3,18 @@
  */
 import classnames from 'classnames';
 import {
+	compact,
 	get,
 	isEmpty,
 	map,
 	last,
 	pick,
-	compact,
 } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { getPath } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
-import { Component, Fragment } from '@wordpress/element';
-import { getBlobByURL, revokeBlobURL, isBlobURL } from '@wordpress/blob';
+import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	Button,
 	ButtonGroup,
@@ -26,30 +23,35 @@ import {
 	ResizableBox,
 	SelectControl,
 	Spinner,
-	TextControl,
 	TextareaControl,
+	TextControl,
+	ToggleControl,
 	Toolbar,
 	withNotices,
-	ToggleControl,
 } from '@wordpress/components';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	RichText,
+	BlockAlignmentToolbar,
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
-	BlockAlignmentToolbar,
+	RichText,
 	mediaUpload,
 } from '@wordpress/editor';
+import { Component, Fragment } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { getPath } from '@wordpress/url';
 import { withViewportMatch } from '@wordpress/viewport';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import icon from './icon';
 import ImageSize from './image-size';
 
 /**
@@ -121,7 +123,7 @@ class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, setAttributes, noticeOperations } = this.props;
 		const { id, url = '' } = attributes;
 
 		if ( isTemporaryImage( id, url ) ) {
@@ -134,6 +136,10 @@ class ImageEdit extends Component {
 						setAttributes( pickRelevantMediaFiles( image ) );
 					},
 					allowedTypes: ALLOWED_MEDIA_TYPES,
+					onError: ( message ) => {
+						noticeOperations.createErrorNotice( message );
+						this.setState( { isEditing: true } );
+					},
 				} );
 			}
 		}
@@ -366,7 +372,6 @@ class ImageEdit extends Component {
 			linkTarget,
 		} = attributes;
 		const isExternal = isExternalImage( id, url );
-		const imageSizeOptions = this.getImageSizeOptions();
 
 		let toolbarEditButton;
 		if ( url ) {
@@ -414,13 +419,13 @@ class ImageEdit extends Component {
 			</BlockControls>
 		);
 
-		if ( isEditing ) {
+		if ( isEditing || ! url ) {
 			const src = isExternal ? url : undefined;
 			return (
 				<Fragment>
 					{ controls }
 					<MediaPlaceholder
-						icon="format-image"
+						icon={ <BlockIcon icon={ icon } /> }
 						className={ className }
 						onSelect={ this.onSelectImage }
 						onSelectURL={ this.onSelectURL }
@@ -442,6 +447,7 @@ class ImageEdit extends Component {
 
 		const isResizable = [ 'wide', 'full' ].indexOf( align ) === -1 && isLargeViewport;
 		const isLinkURLInputReadOnly = linkDestination !== LINK_DESTINATION_CUSTOM;
+		const imageSizeOptions = this.getImageSizeOptions();
 
 		const getInspectorControls = ( imageWidth, imageHeight ) => (
 			<InspectorControls>
@@ -470,8 +476,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__width"
 									label={ __( 'Width' ) }
-									value={ width !== undefined ? width : '' }
-									placeholder={ imageWidth }
+									value={ width !== undefined ? width : imageWidth }
 									min={ 1 }
 									onChange={ this.updateWidth }
 								/>
@@ -479,8 +484,7 @@ class ImageEdit extends Component {
 									type="number"
 									className="block-library-image__dimensions__height"
 									label={ __( 'Height' ) }
-									value={ height !== undefined ? height : '' }
-									placeholder={ imageHeight }
+									value={ height !== undefined ? height : imageHeight }
 									min={ 1 }
 									onChange={ this.updateHeight }
 								/>

@@ -1,10 +1,10 @@
 /**
- * External Dependencies
+ * External dependencies
  */
 import { omit, noop, isFunction } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';

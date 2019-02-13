@@ -1,4 +1,14 @@
+/**
+ * WordPress dependencies
+ */
+import domReady from '@wordpress/dom-ready';
+
+/**
+ * Internal dependencies
+ */
 import { setup, speak } from '../';
+import clear from '../clear';
+import filterMessage from '../filterMessage';
 
 jest.mock( '../clear', () => {
 	return jest.fn();
@@ -13,10 +23,6 @@ jest.mock( '../filterMessage', () => {
 		return message;
 	} );
 } );
-
-import clear from '../clear';
-import domReady from '@wordpress/dom-ready';
-import filterMessage from '../filterMessage';
 
 describe( 'speak', () => {
 	let containerPolite = document.getElementById( 'a11y-speak-polite' );

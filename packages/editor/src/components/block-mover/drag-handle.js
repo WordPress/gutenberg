@@ -4,7 +4,7 @@
 import classnames from 'classnames';
 
 /**
- * WordPress dependencies
+ * Internal dependencies
  */
 import BlockDraggable from '../block-draggable';
 
