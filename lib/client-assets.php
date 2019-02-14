@@ -859,7 +859,6 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		return $settings;
 	}
 
-	$i = 0;
 	if ( empty( $settings['styles'] ) ) {
 		$settings['styles'] = array();
 	} else {
@@ -877,21 +876,26 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 
 		/*
 		 * Iterate backwards from the end of the array since the preferred
-		 * insertion point in case not found is as the first entry.
+		 * insertion point in case not found is prepended as first entry.
 		 */
-
-		$i = count( $settings['styles'] );
-		while ( --$i >= 0 ) {
+		for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
 			if ( isset( $settings['styles'][ $i ]['css'] ) &&
-					$settings['styles'][ $i ]['css'] === $default_styles ) {
+					$default_styles === $settings['styles'][ $i ]['css'] ) {
 				break;
 			}
 		}
 	}
 
-	$settings['styles'][ $i ] = array(
+	$editor_styles = array(
 		'css' => file_get_contents( $editor_styles_file ),
 	);
+
+	// Substitute default styles if found. Otherwise, prepend to setting array.
+	if ( isset( $i ) && $i >= 0 ) {
+		$settings['styles'][ $i ] = $editor_styles;
+	} else {
+		array_unshift( $settings['styles'], $editor_styles );
+	}
 
 	return $settings;
 }
