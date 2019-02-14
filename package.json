@@ -10,6 +10,9 @@
 		"WordPress",
 		"editor"
 	],
+	"config": {
+		"GUTENBERG_PHASE": 2
+	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
@@ -155,7 +158,7 @@
 		"precheck-local-changes": "npm run docs:build",
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && exit 1 );",
 		"predev": "npm run check-engines",
-		"dev": "npm run build:packages && concurrently \"cross-env GUTENBERG_PHASE=2 wp-scripts start\" \"npm run dev:packages\"",
+		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
 		"docs:build": "node docs/tool",
 		"fixtures:clean": "rimraf \"test/integration/full-content/fixtures/*.+(json|serialized.html)\"",
@@ -169,7 +172,7 @@
 		"lint-pkg-json": "wp-scripts lint-pkg-json ./packages",
 		"lint-css": "wp-scripts lint-style '**/*.scss'",
 		"lint-css:fix": "npm run lint-css -- --fix",
-		"package-plugin": "cross-env GUTENBERG_PHASE=2 ./bin/build-plugin-zip.sh",
+		"package-plugin": "./bin/build-plugin-zip.sh",
 		"postinstall": "npm run check-licenses && npm run build:packages",
 		"pot-to-php": "./bin/pot-to-php.js",
 		"precommit": "lint-staged",
@@ -178,7 +181,7 @@
 		"publish:prod": "npm run build:packages && lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"pretest-e2e": "./bin/reset-e2e-tests.sh",
-		"test-e2e": "cross-env GUTENBERG_PHASE=2 wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
+		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-php": "npm run lint-php && npm run test-unit-php",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.json",
