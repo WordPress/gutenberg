@@ -30,7 +30,7 @@ function render_block_core_tag_cloud( $attributes ) {
 	$tag_cloud = wp_tag_cloud( $args );
 
 	if ( ! $tag_cloud ) {
-		$tag_cloud = esc_html( __( 'No taxonomies to show.' ) );
+		$tag_cloud = esc_html( __( 'No terms to show.' ) );
 	}
 
 	return sprintf(
