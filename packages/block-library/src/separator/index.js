@@ -19,7 +19,7 @@ export const settings = {
 	keywords: [ __( 'horizontal-line' ), 'hr', __( 'divider' ) ],
 
 	styles: [
-		{ name: 'default', label: __( 'Short Line' ), isDefault: true },
+		{ name: 'default', label: __( 'Default' ), isDefault: true },
 		{ name: 'wide', label: __( 'Wide Line' ) },
 		{ name: 'dots', label: __( 'Dots' ) },
 	],
