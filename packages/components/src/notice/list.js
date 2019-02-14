@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import { noop, omit } from 'lodash';
 
 /**
@@ -18,8 +19,10 @@ import Notice from './';
 * @param  {Object}   $0.children  Array of children to be rendered inside the notice list.
 * @return {Object}                The rendered notices list.
 */
-function NoticeList( { notices, onRemove = noop, className = 'components-notice-list', children } ) {
+function NoticeList( { notices, onRemove = noop, className, children } ) {
 	const removeNotice = ( id ) => () => onRemove( id );
+
+	className = classnames( 'components-notice-list', className );
 
 	return (
 		<div className={ className }>
