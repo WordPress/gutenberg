@@ -849,38 +849,53 @@ function gutenberg_get_available_image_sizes() {
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_styles( $settings ) {
+	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+
+	/*
+	 * If, for whatever reason, the built editor styles do not exist, avoid
+	 * override and fall back to the default.
+	 */
+	if ( ! file_exists( $editor_styles_file ) ) {
+		return $settings;
+	}
+
+	$i = 0;
 	if ( empty( $settings['styles'] ) ) {
 		$settings['styles'] = array();
 	} else {
 		/*
-		 * By handling this filter at an earlier-than-default priority and with
-		 * an understanding that plugins should concatenate (not unshift) their
-		 * own custom styles, it's assumed that the first entry of the styles
-		 * setting should be the default (core) stylesheet.
+		 * The styles setting is an array of CSS strings, so there is no direct
+		 * way to find the default styles. To maximize stability, load (again)
+		 * the default styles from disk and find its place in the array.
+		 *
+		 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L175
 		 */
-		array_shift( $settings['styles'] );
+
+		$default_styles = file_get_contents(
+			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+		);
+
+		/*
+		 * Iterate backwards from the end of the array since the preferred
+		 * insertion point in case not found is as the first entry.
+		 */
+
+		$i = count( $settings['styles'] );
+		while ( --$i >= 0 ) {
+			if ( isset( $settings['styles'][ $i ]['css'] ) &&
+					$settings['styles'][ $i ]['css'] === $default_styles ) {
+				break;
+			}
+		}
 	}
 
-	/*
-	 * The default styles array would include the core `editor-styles.css` and
-	 * a separate style for the locale font family. To avoid overriding the
-	 * localized value, ensure that Gutenberg's editor styles assume the same
-	 * order as core styles (earlier than the font style assignment).
-	 *
-	 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L181
-	 */
-	array_unshift(
-		$settings['styles'],
-		array(
-			'css' => file_get_contents(
-				gutenberg_dir_path() . 'build/editor/editor-styles.css'
-			),
-		)
+	$settings['styles'][ $i ] = array(
+		'css' => file_get_contents( $editor_styles_file ),
 	);
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles', 9 );
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
  * Scripts & Styles.
