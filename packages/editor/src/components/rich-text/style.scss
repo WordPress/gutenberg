@@ -19,16 +19,8 @@
 	// to be saved.
 	white-space: pre-wrap;
 
-	> p:empty {
-		min-height: $editor-font-size * $editor-line-height;
-	}
-
 	> p:first-child {
 		margin-top: 0;
-	}
-
-	&:focus {
-		outline: none;
 	}
 
 	a {
@@ -49,6 +41,9 @@
 	}
 
 	&:focus {
+		// Removes outline added by the browser.
+		outline: none;
+
 		*[data-rich-text-format-boundary] {
 			border-radius: 2px;
 			box-shadow: 0 0 0 1px $light-gray-400;
