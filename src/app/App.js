@@ -12,7 +12,7 @@ type PropsType = {
 	focusTitle: boolean,
 };
 
-const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled, focusTitle }: PropsType ) => {
+const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: PropsType ) => {
 	if ( initialData === undefined ) {
 		initialData = initialHtml;
 	}
@@ -21,16 +21,11 @@ const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled, focus
 		initialTitle = 'Welcome to Gutenberg!';
 	}
 
-	if ( focusTitle === undefined ) {
-		focusTitle = false;
-	}
-
 	return (
 		<AppContainer
 			initialHtml={ initialData }
 			initialHtmlModeEnabled={ initialHtmlModeEnabled }
-			initialTitle={ initialTitle }
-			focusTitle={ focusTitle } />
+			initialTitle={ initialTitle } />
 	);
 };
 

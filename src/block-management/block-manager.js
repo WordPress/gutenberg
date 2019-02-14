@@ -45,7 +45,6 @@ type PropsType = {
 	isBlockSelected: string => boolean,
 	showHtml: boolean,
 	title: string,
-	focusTitle: boolean,
 };
 
 type StateType = {
@@ -163,7 +162,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderHeader() {
-		const focusTitle = this.props.focusTitle;
+		const focusTitle = this.props.title === '' && this.props.blockCount === 0;
 
 		return (
 			<View style={ styles.titleContainer }>

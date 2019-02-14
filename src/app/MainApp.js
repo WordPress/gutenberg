@@ -21,7 +21,6 @@ type PropsType = {
 	setTitleAction: string => void,
 	updateHtmlAction: string => void,
 	title: string,
-	focusTitle: boolean,
 };
 
 type StateType = {};
