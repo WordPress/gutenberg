@@ -14,20 +14,18 @@
  */
 function render_block_core_calendar( $attributes ) {
 	global $monthnum, $year, $post;
-	$previous_monthnum;
-	$previous_year;
+	$previous_monthnum = $monthnum;
+	$previous_year     = $year;
 
-	// phpcs:disable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 	if ( isset( $attributes['month'] ) ) {
-		$previous_monthnum = $monthnum;
-		$monthnum          = $attributes['month'];
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		$monthnum = $attributes['month'];
 	}
 
 	if ( isset( $attributes['year'] ) ) {
-		$previous_year = $year;
-		$year          = $attributes['year'];
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+		$year = $attributes['year'];
 	}
-	// phpcs:enable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
 
 	$custom_class_name = empty( $attributes['className'] ) ? '' : ' ' . $attributes['className'];
 	$align_class_name  = empty( $attributes['align'] ) ? '' : ' ' . "align{$attributes['align']}";
@@ -38,15 +36,10 @@ function render_block_core_calendar( $attributes ) {
 		get_calendar( true, false )
 	);
 
-	// phpcs:disable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
-	if ( isset( $attributes['month'] ) ) {
-		$monthnum = $previous_monthnum;
-	}
-
-	if ( isset( $attributes['year'] ) ) {
-		$year = $previous_year;
-	}
-	// phpcs:enable WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+	$monthnum = $previous_monthnum;
+	// phpcs:ignore WordPress.WP.GlobalVariablesOverride.OverrideProhibited
+	$year = $previous_year;
 }
 
 /**
