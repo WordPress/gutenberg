@@ -136,6 +136,6 @@ class TagCloudEdit extends Component {
 
 export default withSelect( ( select ) => {
 	return {
-		taxonomies: select( 'core' ).getTaxonomies( { per_page: -1 } ),
+		taxonomies: select( 'core' ).getTaxonomies(),
 	};
 } )( TagCloudEdit );
