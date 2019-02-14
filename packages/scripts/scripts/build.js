@@ -8,6 +8,7 @@ const { sync: resolveBin } = require( 'resolve-bin' );
  * Internal dependencies
  */
 const {
+	fromConfigRoot,
 	getCliArgs,
 	hasCliArg,
 	hasProjectFile,
@@ -28,7 +29,13 @@ if ( hasWebpackConfig ) {
 	);
 	process.exit( status );
 } else {
-	// eslint-disable-next-line no-console
-	console.log( 'Webpack config file is missing.' );
-	process.exit( 1 );
+	// Sets environment to production.
+	process.env.NODE_ENV = 'production';
+
+	const { status } = spawn(
+		resolveBin( 'webpack' ),
+		[ '--config', fromConfigRoot( 'webpack.config.js' ) ],
+		{ stdio: 'inherit' }
+	);
+	process.exit( status );
 }
