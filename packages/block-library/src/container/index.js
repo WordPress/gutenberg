@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Path, SVG } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InnerBlocks } from '@wordpress/editor';
+import { InnerBlocks, getColorClassName } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -27,9 +32,30 @@ export const settings = {
 		align: [ 'wide', 'full' ],
 	},
 
+	attributes: {
+		backgroundColor: {
+			type: 'string',
+		},
+	},
+
 	edit,
 
-	save() {
-		return <div><InnerBlocks.Content /></div>;
+	save( { attributes } ) {
+		const { backgroundColor, customBackgroundColor } = attributes;
+
+		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
+		const className = classnames( backgroundClass, {
+			'has-background': backgroundColor || customBackgroundColor,
+		} );
+
+		const styles = {
+			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
+		};
+
+		return (
+			<div className={ className } style={ styles }>
+				<InnerBlocks.Content />
+			</div>
+		);
 	},
 };
