@@ -37,6 +37,7 @@ export const settings = {
 
 	supports: {
 		align: true,
+		alignWide: false,
 		html: false,
 	},
 

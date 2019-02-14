@@ -21,10 +21,6 @@ describe( 'phrasingContentReducer', () => {
 		expect( deepFilterHTML( '<span style="font-style:italic;font-weight:bold">test</span>', [ phrasingContentReducer ], {} ) ).toEqual( '<strong><em><span style="font-style:italic;font-weight:bold">test</span></em></strong>' );
 	} );
 
-	it( 'should remove invalid phrasing content', () => {
-		expect( deepFilterHTML( '<strong><p>test</p></strong>', [ phrasingContentReducer ], { p: {} } ) ).toEqual( '<p>test</p>' );
-	} );
-
 	it( 'should normalise the rel attribute', () => {
 		const input = '<a href="https://wordpress.org" target="_blank">WordPress</a>';
 		const output = '<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener">WordPress</a>';

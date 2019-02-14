@@ -133,6 +133,9 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
         type="button"
       />
     </Tooltip>
+    <Dashicon
+      icon="saved"
+    />
   </div>
   <div
     className="components-color-palette__item-wrapper"
@@ -212,6 +215,9 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
         type="button"
       />
     </Tooltip>
+    <Dashicon
+      icon="saved"
+    />
   </div>
   <div
     className="components-color-palette__item-wrapper"

@@ -21,14 +21,13 @@
  * plugins Jetpack, JP-Markdown, and WP Editor.MD
  *
  * @since 1.3.0
+ * @deprecated 5.0.0
  *
  * @param  array $post      Post object which contains content to check for block.
  * @return array $post      Post object.
  */
 function gutenberg_remove_wpcom_markdown_support( $post ) {
-	if ( class_exists( 'WPCom_Markdown' ) && has_blocks( $post['post_content'] ) ) {
-		WPCom_Markdown::get_instance()->unload_markdown_for_posts();
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
+
 	return $post;
 }
-add_filter( 'wp_insert_post_data', 'gutenberg_remove_wpcom_markdown_support', 9 );

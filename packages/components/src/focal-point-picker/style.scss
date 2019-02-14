@@ -1,0 +1,75 @@
+.components-focal-point-picker-wrapper {
+	background-color: transparent;
+	border: 1px solid $light-gray-500;
+	height: 200px;
+	width: 100%;
+	padding: 14px;
+}
+
+.components-focal-point-picker {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	position: relative;
+	width: 100%;
+
+	img {
+		height: auto;
+		max-height: 100%;
+		max-width: 100%;
+		width: auto;
+		user-select: none;
+	}
+}
+
+.components-focal-point-picker__icon_container {
+	background-color: transparent;
+	cursor: grab;
+	height: 30px;
+	opacity: 0.8;
+	position: absolute;
+	will-change: transform;
+	width: 30px;
+	z-index: 10000;
+
+	&.is-dragging {
+		cursor: grabbing;
+	}
+}
+
+.components-focal-point-picker__icon {
+	display: block;
+	height: 100%;
+	left: -15px;
+	position: absolute;
+	top: -15px;
+	width: 100%;
+
+	.components-focal-point-picker__icon-outline {
+		fill: $white;
+	}
+
+	.components-focal-point-picker__icon-fill {
+		fill: theme(primary);
+	}
+}
+
+.components-focal-point-picker_position-display-container {
+	margin: 1em 0;
+	display: flex;
+
+	.components-base-control__field {
+		margin: 0 1em 0 0;
+	}
+
+	input[type="number"].components-text-control__input { // Needs specificity to override padding.
+		max-width: 4em;
+		padding: 6px 4px;
+	}
+
+	span {
+		margin: 0 0 0 0.2em;
+	}
+}

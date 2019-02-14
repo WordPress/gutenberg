@@ -154,24 +154,91 @@ const TEXT_NORMALIZATIONS = [
 ];
 
 /**
- * Subsitute EntityParser class for `simple-html-tokenizer` which bypasses
- * entity substitution in favor of validator's internal normalization.
+ * Regular expression matching a named character reference. In lieu of bundling
+ * a full set of references, the pattern covers the minimal necessary to test
+ * positively against the full set.
+ *
+ * "The ampersand must be followed by one of the names given in the named
+ * character references section, using the same case."
+ *
+ * Tested aginst "12.5 Named character references":
+ *
+ * ```
+ * const references = [ ...document.querySelectorAll(
+ *     '#named-character-references-table tr[id^=entity-] td:first-child'
+ * ) ].map( ( code ) => code.textContent )
+ * references.every( ( reference ) => /^[\da-z]+$/i.test( reference ) )
+ * ```
+ *
+ * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ * @link https://html.spec.whatwg.org/multipage/named-characters.html#named-character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_NAMED_CHARACTER_REFERENCE = /^[\da-z]+$/i;
+
+/**
+ * Regular expression matching a decimal character reference.
+ *
+ * "The ampersand must be followed by a U+0023 NUMBER SIGN character (#),
+ * followed by one or more ASCII digits, representing a base-ten integer"
+ *
+ * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_DECIMAL_CHARACTER_REFERENCE = /^#\d+$/;
+
+/**
+ * Regular expression matching a hexadecimal character reference.
+ *
+ * "The ampersand must be followed by a U+0023 NUMBER SIGN character (#), which
+ * must be followed by either a U+0078 LATIN SMALL LETTER X character (x) or a
+ * U+0058 LATIN CAPITAL LETTER X character (X), which must then be followed by
+ * one or more ASCII hex digits, representing a hexadecimal integer"
+ *
+ * @link https://html.spec.whatwg.org/multipage/syntax.html#character-references
+ *
+ * @type {RegExp}
+ */
+const REGEXP_HEXADECIMAL_CHARACTER_REFERENCE = /^#x[\da-f]+$/i;
+
+/**
+ * Returns true if the given string is a valid character reference segment, or
+ * false otherwise. The text should be stripped of `&` and `;` demarcations.
+ *
+ * @param {string} text Text to test.
+ *
+ * @return {boolean} Whether text is valid character reference.
+ */
+export function isValidCharacterReference( text ) {
+	return (
+		REGEXP_NAMED_CHARACTER_REFERENCE.test( text ) ||
+		REGEXP_DECIMAL_CHARACTER_REFERENCE.test( text ) ||
+		REGEXP_HEXADECIMAL_CHARACTER_REFERENCE.test( text )
+	);
+}
+
+/**
+ * Subsitute EntityParser class for `simple-html-tokenizer` which uses the
+ * implementation of `decodeEntities` from `html-entities`, in order to avoid
+ * bundling a massive named character reference.
  *
  * @see https://github.com/tildeio/simple-html-tokenizer/tree/master/src/entity-parser.ts
  */
-export class IdentityEntityParser {
+export class DecodeEntityParser {
 	/**
 	 * Returns a substitute string for an entity string sequence between `&`
 	 * and `;`, or undefined if no substitution should occur.
-	 *
-	 * In this implementation, undefined is always returned.
 	 *
 	 * @param {string} entity Entity fragment discovered in HTML.
 	 *
 	 * @return {?string} Entity substitute value.
 	 */
 	parse( entity ) {
-		return decodeEntities( '&' + entity + ';' );
+		if ( isValidCharacterReference( entity ) ) {
+			return decodeEntities( '&' + entity + ';' );
+		}
 	}
 }
 
@@ -451,7 +518,7 @@ export function getNextNonWhitespaceToken( tokens ) {
  */
 function getHTMLTokens( html ) {
 	try {
-		return new Tokenizer( new IdentityEntityParser() ).tokenize( html );
+		return new Tokenizer( new DecodeEntityParser() ).tokenize( html );
 	} catch ( e ) {
 		log.warning( 'Malformed HTML detected: %s', html );
 	}

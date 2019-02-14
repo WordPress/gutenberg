@@ -1,6 +1,6 @@
-# Update the meta field when the input's content changes
+# Update the Meta Field When the Input's Content Changes
 
-The last step in the journey is to update the meta field when the input content changes. To do that, you'll use another utility from the `@wordpress/data` package, [withDispatch](../../../../../docs/designers-developers/developers/packages/packages-data/#withdispatch-mapdispatchtoprops-function-function).
+The last step in the journey is to update the meta field when the input content changes. To do that, you'll use another utility from the `@wordpress/data` package, [withDispatch](/packages/data/README.md#withdispatch-mapdispatchtoprops-function-function).
 
 `withDispatch` works similarly to `withSelect`. It takes two functions, the first returns an object with data, and the second takes that data object as input and returns a new UI component. Let's see how to use it:
 

@@ -6,14 +6,19 @@ body {
 }
 
 p {
-	font-size: $editor-font-size;
-	line-height: $editor-line-height;
+	font-size: inherit;
+	line-height: inherit;
 }
 
 ul,
 ol {
 	margin: 0;
 	padding: 0;
+
+	li {
+		// This overrides a bottom margin globally applied to list items in wp-admin.
+		margin-bottom: initial;
+	}
 }
 
 ul {

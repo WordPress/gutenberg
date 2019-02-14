@@ -212,7 +212,6 @@ class BlockList extends Component {
 						>
 							<BlockListBlock
 								clientId={ clientId }
-								index={ blockIndex }
 								blockRef={ this.setBlockRef }
 								onSelectionStart={ this.onSelectionStart }
 								rootClientId={ rootClientId }

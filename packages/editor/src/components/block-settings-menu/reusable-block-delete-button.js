@@ -12,8 +12,8 @@ import { __ } from '@wordpress/i18n';
 import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 
-export function ReusableBlockDeleteButton( { reusableBlock, onDelete } ) {
-	if ( ! reusableBlock ) {
+export function ReusableBlockDeleteButton( { isVisible, isDisabled, onDelete } ) {
+	if ( ! isVisible ) {
 		return null;
 	}
 
@@ -21,8 +21,8 @@ export function ReusableBlockDeleteButton( { reusableBlock, onDelete } ) {
 		<MenuItem
 			className="editor-block-settings-menu__control"
 			icon="no"
-			disabled={ reusableBlock.isTemporary }
-			onClick={ () => onDelete( reusableBlock.id ) }
+			disabled={ isDisabled }
+			onClick={ () => onDelete() }
 		>
 			{ __( 'Remove from Reusable Blocks' ) }
 		</MenuItem>
@@ -35,18 +35,27 @@ export default compose( [
 			getBlock,
 			__experimentalGetReusableBlock: getReusableBlock,
 		} = select( 'core/editor' );
+		const { canUser } = select( 'core' );
+
 		const block = getBlock( clientId );
+
+		const reusableBlock = block && isReusableBlock( block ) ?
+			getReusableBlock( block.attributes.ref ) :
+			null;
+
 		return {
-			reusableBlock: block && isReusableBlock( block ) ? getReusableBlock( block.attributes.ref ) : null,
+			isVisible: !! reusableBlock && !! canUser( 'delete', 'blocks', reusableBlock.id ),
+			isDisabled: reusableBlock && reusableBlock.isTemporary,
 		};
 	} ),
-	withDispatch( ( dispatch, { onToggle = noop } ) => {
+	withDispatch( ( dispatch, { clientId, onToggle = noop }, { select } ) => {
 		const {
 			__experimentalDeleteReusableBlock: deleteReusableBlock,
 		} = dispatch( 'core/editor' );
+		const { getBlock } = select( 'core/editor' );
 
 		return {
-			onDelete( id ) {
+			onDelete() {
 				// TODO: Make this a <Confirm /> component or similar
 				// eslint-disable-next-line no-alert
 				const hasConfirmed = window.confirm( __(
@@ -55,7 +64,8 @@ export default compose( [
 				) );
 
 				if ( hasConfirmed ) {
-					deleteReusableBlock( id );
+					const block = getBlock( clientId );
+					deleteReusableBlock( block.attributes.ref );
 					onToggle();
 				}
 			},

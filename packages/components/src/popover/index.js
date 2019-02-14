@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * WordPress dependencies
@@ -10,6 +9,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { Component, createRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -22,6 +22,7 @@ import IconButton from '../icon-button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, Consumer } from '../slot-fill';
+import Animate from '../animate';
 
 const FocusManaged = withConstrainedTabbing( withFocusReturn( ( { children } ) => children ) );
 
@@ -55,6 +56,11 @@ class Popover extends Component {
 			contentWidth: null,
 			isMobile: false,
 			popoverSize: null,
+
+			// Delay the animation after the initial render
+			// because the animation have impact on the height of the popover
+			// causing the computed position to be wrong.
+			isReadyToAnimate: false,
 		};
 
 		// Property used keep track of the previous anchor rect
@@ -150,7 +156,7 @@ class Popover extends Component {
 			popoverSize.height !== this.state.popoverSize.height
 		);
 		if ( didPopoverSizeChange ) {
-			this.setState( { popoverSize } );
+			this.setState( { popoverSize, isReadyToAnimate: true } );
 		}
 		this.anchorRect = anchorRect;
 		this.computePopoverPosition( popoverSize, anchorRect );
@@ -258,6 +264,7 @@ class Popover extends Component {
 			focusOnMount,
 			getAnchorRect,
 			expandOnMobile,
+			animate = true,
 			/* eslint-enable no-unused-vars */
 			...contentProps
 		} = this.props;
@@ -270,7 +277,20 @@ class Popover extends Component {
 			contentWidth,
 			popoverSize,
 			isMobile,
+			isReadyToAnimate,
 		} = this.state;
+
+		// Compute the animation position
+		const yAxisMapping = {
+			top: 'bottom',
+			bottom: 'top',
+		};
+		const xAxisMapping = {
+			left: 'right',
+			right: 'left',
+		};
+		const animateYAxis = yAxisMapping[ yAxis ] || 'middle';
+		const animateXAxis = xAxisMapping[ xAxis ] || 'center';
 
 		const classes = classnames(
 			'components-popover',
@@ -289,36 +309,43 @@ class Popover extends Component {
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
 		let content = (
 			<PopoverDetectOutside onClickOutside={ onClickOutside }>
-				<IsolatedEventContainer
-					className={ classes }
-					style={ {
-						top: ! isMobile && popoverTop ? popoverTop + 'px' : undefined,
-						left: ! isMobile && popoverLeft ? popoverLeft + 'px' : undefined,
-						visibility: popoverSize ? undefined : 'hidden',
-					} }
-					{ ...contentProps }
-					onKeyDown={ this.maybeClose }
+				<Animate
+					type={ animate && isReadyToAnimate ? 'appear' : null }
+					options={ { origin: animateYAxis + ' ' + animateXAxis } }
 				>
-					{ isMobile && (
-						<div className="components-popover__header">
-							<span className="components-popover__header-title">
-								{ headerTitle }
-							</span>
-							<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
-						</div>
+					{ ( { className: animateClassName } ) => (
+						<IsolatedEventContainer
+							className={ classnames( classes, animateClassName ) }
+							style={ {
+								top: ! isMobile && popoverTop ? popoverTop + 'px' : undefined,
+								left: ! isMobile && popoverLeft ? popoverLeft + 'px' : undefined,
+								visibility: popoverSize ? undefined : 'hidden',
+							} }
+							{ ...contentProps }
+							onKeyDown={ this.maybeClose }
+						>
+							{ isMobile && (
+								<div className="components-popover__header">
+									<span className="components-popover__header-title">
+										{ headerTitle }
+									</span>
+									<IconButton className="components-popover__close" icon="no-alt" onClick={ onClose } />
+								</div>
+							) }
+							<div
+								ref={ this.contentNode }
+								className="components-popover__content"
+								style={ {
+									maxHeight: ! isMobile && contentHeight ? contentHeight + 'px' : undefined,
+									maxWidth: ! isMobile && contentWidth ? contentWidth + 'px' : undefined,
+								} }
+								tabIndex="-1"
+							>
+								{ children }
+							</div>
+						</IsolatedEventContainer>
 					) }
-					<div
-						ref={ this.contentNode }
-						className="components-popover__content"
-						style={ {
-							maxHeight: ! isMobile && contentHeight ? contentHeight + 'px' : undefined,
-							maxWidth: ! isMobile && contentWidth ? contentWidth + 'px' : undefined,
-						} }
-						tabIndex="-1"
-					>
-						{ children }
-					</div>
-				</IsolatedEventContainer>
+				</Animate>
 			</PopoverDetectOutside>
 		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */

@@ -6,32 +6,37 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import {
+	FocalPointPicker,
 	IconButton,
 	PanelBody,
 	RangeControl,
 	ToggleControl,
 	Toolbar,
 	withNotices,
-	SVG,
-	Path,
 } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import {
+	AlignmentToolbar,
 	BlockControls,
+	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadCheck,
-	AlignmentToolbar,
 	PanelColorSettings,
 	RichText,
-	withColors,
 	getColorClassName,
+	withColors,
 } from '@wordpress/editor';
+import { Fragment } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import icon from './icon';
 
 const blockAttributes = {
 	title: {
@@ -67,6 +72,9 @@ const blockAttributes = {
 		type: 'string',
 		default: 'image',
 	},
+	focalPoint: {
+		type: 'object',
+	},
 };
 
 export const name = 'core/cover';
@@ -80,7 +88,7 @@ export const settings = {
 
 	description: __( 'Add an image or video with a text overlay — great for headers.' ),
 
-	icon: <SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><Path d="M4 4h7V2H4c-1.1 0-2 .9-2 2v7h2V4zm6 9l-4 5h12l-3-4-2.03 2.71L10 13zm7-4.5c0-.83-.67-1.5-1.5-1.5S14 7.67 14 8.5s.67 1.5 1.5 1.5S17 9.33 17 8.5zM20 2h-7v2h7v7h2V4c0-1.1-.9-2-2-2zm0 18h-7v2h7c1.1 0 2-.9 2-2v-7h-2v7zM4 13H2v7c0 1.1.9 2 2 2h7v-2H4v-7z" /><Path d="M0 0h24v24H0z" fill="none" /></SVG>,
+	icon,
 
 	category: 'common',
 
@@ -175,6 +183,7 @@ export const settings = {
 				backgroundType,
 				contentAlign,
 				dimRatio,
+				focalPoint,
 				hasParallax,
 				id,
 				title,
@@ -224,6 +233,10 @@ export const settings = {
 				backgroundColor: overlayColor.color,
 			};
 
+			if ( focalPoint ) {
+				style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+			}
+
 			const controls = (
 				<Fragment>
 					<BlockControls>
@@ -265,6 +278,14 @@ export const settings = {
 										onChange={ toggleParallax }
 									/>
 								) }
+								{ IMAGE_BACKGROUND_TYPE === backgroundType && ! hasParallax && (
+									<FocalPointPicker
+										label={ __( 'Focal Point Picker' ) }
+										url={ url }
+										value={ focalPoint }
+										onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
+									/>
+								) }
 								<PanelColorSettings
 									title={ __( 'Overlay' ) }
 									initialOpen={ true }
@@ -291,7 +312,7 @@ export const settings = {
 
 			if ( ! url ) {
 				const hasTitle = ! RichText.isEmpty( title );
-				const icon = hasTitle ? undefined : 'format-image';
+				const placeholderIcon = hasTitle ? undefined : <BlockIcon icon={ icon } />;
 				const label = hasTitle ? (
 					<RichText
 						tagName="h2"
@@ -305,7 +326,7 @@ export const settings = {
 					<Fragment>
 						{ controls }
 						<MediaPlaceholder
-							icon={ icon }
+							icon={ placeholderIcon }
 							className={ className }
 							labels={ {
 								title: label,
@@ -370,6 +391,7 @@ export const settings = {
 			contentAlign,
 			customOverlayColor,
 			dimRatio,
+			focalPoint,
 			hasParallax,
 			overlayColor,
 			title,
@@ -381,6 +403,9 @@ export const settings = {
 			{};
 		if ( ! overlayColorClass ) {
 			style.backgroundColor = customOverlayColor;
+		}
+		if ( focalPoint && ! hasParallax ) {
+			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
 		}
 
 		const classes = classnames(

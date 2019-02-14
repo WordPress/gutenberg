@@ -44,6 +44,13 @@ $color-palette-circle-spacing: 14px;
 
 	&.is-active {
 		box-shadow: inset 0 0 0 4px;
+		border: $border-width solid $dark-gray-400;
+
+		& + .dashicons-saved {
+			position: absolute;
+			left: 4px;
+			top: 4px;
+		}
 	}
 
 	&::after {
@@ -53,7 +60,7 @@ $color-palette-circle-spacing: 14px;
 		left: 0;
 		bottom: 0;
 		right: 0;
-		border-radius: 50%;
+		border-radius: $radius-round;
 		box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.2);
 	}
 
@@ -61,13 +68,15 @@ $color-palette-circle-spacing: 14px;
 		outline: none;
 		&::after {
 			content: "";
-			border: $border-width solid $dark-gray-400;
+			position: absolute;
+			border: #{ $border-width * 2 } solid $dark-gray-400;
 			width: 32px;
 			height: 32px;
 			position: absolute;
 			top: -2px;
 			left: -2px;
-			border-radius: 50%;
+			border-radius: $radius-round;
+			box-shadow: inset 0 0 0 2px $white;
 		}
 	}
 }

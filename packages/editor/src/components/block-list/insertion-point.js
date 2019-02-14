@@ -47,7 +47,7 @@ class BlockInsertionPoint extends Component {
 		const {
 			showInsertionPoint,
 			rootClientId,
-			insertIndex,
+			clientId,
 		} = this.props;
 
 		return (
@@ -73,7 +73,7 @@ class BlockInsertionPoint extends Component {
 				>
 					<Inserter
 						rootClientId={ rootClientId }
-						index={ insertIndex }
+						clientId={ clientId }
 					/>
 				</div>
 			</div>
@@ -87,13 +87,12 @@ export default withSelect( ( select, { clientId, rootClientId } ) => {
 		isBlockInsertionPointVisible,
 	} = select( 'core/editor' );
 	const blockIndex = getBlockIndex( clientId, rootClientId );
-	const insertIndex = blockIndex;
 	const insertionPoint = getBlockInsertionPoint();
 	const showInsertionPoint = (
 		isBlockInsertionPointVisible() &&
-		insertionPoint.index === insertIndex &&
+		insertionPoint.index === blockIndex &&
 		insertionPoint.rootClientId === rootClientId
 	);
 
-	return { showInsertionPoint, insertIndex };
+	return { showInsertionPoint };
 } )( BlockInsertionPoint );

@@ -4,7 +4,7 @@
 import TestRenderer from 'react-test-renderer';
 
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
 

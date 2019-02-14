@@ -6,7 +6,7 @@ In WordPress lingo, a _format_ is a [HTML tag with text-level semantics](https:/
 
 If you are unfamiliar with how to work with WordPress plugins and JavaScript, you may want to check the [JavaScript Tutorial](/docs/designers-developers/developers/tutorials/javascript/readme.md) first.
 
-## Table of contents
+## Table of Contents
 
 1. [Register a new format](/docs/designers-developers/developers/tutorials/format-api/1-register-format.md)
 2. [Add a button to the toolbar](/docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md)

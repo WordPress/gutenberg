@@ -28,7 +28,7 @@ exports[`undo should undo typing after a pause 2`] = `
 
 exports[`undo should undo typing after non input change 1`] = `
 "<!-- wp:paragraph -->
-<p>before keyboard <strong>after keyboard</strong></p>
+<p>before keyboard <strong>after keyboard</strong></p>
 <!-- /wp:paragraph -->"
 `;
 

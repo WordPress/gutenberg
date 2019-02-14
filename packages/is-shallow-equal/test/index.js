@@ -1,5 +1,5 @@
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import isShallowEqual from '../';
 import isShallowEqualArrays from '../arrays';
@@ -82,6 +82,14 @@ describe( 'isShallowEqual', () => {
 
 		expect( isShallowEqual( a, b ) ).toBe( true );
 		expect( isShallowEqual( b, a ) ).toBe( true );
+	} );
+
+	it( 'returns false on object deep-but-referentially-unequal values', () => {
+		const a = { foo: {} };
+		const b = { foo: {} };
+
+		expect( isShallowEqual( a, b ) ).toBe( false );
+		expect( isShallowEqual( b, a ) ).toBe( false );
 	} );
 
 	it( 'returns false if a array has more keys than b', () => {

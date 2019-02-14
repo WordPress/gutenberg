@@ -69,7 +69,7 @@ function Header( {
 						shortcut={ shortcuts.toggleSidebar }
 					/>
 					<DotTip tipId="core/editor.settings">
-						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click “Settings” to open it.' ) }
+						{ __( 'You’ll find more settings for your page and blocks in the sidebar. Click the cog icon to toggle the sidebar open and closed.' ) }
 					</DotTip>
 				</div>
 				<PinnedPlugins.Slot />
@@ -92,7 +92,7 @@ export default compose(
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' ),
-			closeGeneralSidebar: closeGeneralSidebar,
+			closeGeneralSidebar,
 		};
 	} ),
 )( Header );

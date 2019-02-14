@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { applyMiddleware } from 'redux';
+import { mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +15,10 @@ export default function( registry ) {
 			const store = registry.registerStore( reducerKey, options );
 
 			if ( options.controls ) {
-				const middleware = createMiddleware( options.controls );
+				const normalizedControls = mapValues( options.controls, ( control ) => {
+					return control.isRegistryControl ? control( registry ) : control;
+				} );
+				const middleware = createMiddleware( normalizedControls );
 				const enhancer = applyMiddleware( middleware );
 				const createStore = () => store;
 

@@ -15,6 +15,7 @@ export { default as RegistryProvider, RegistryConsumer } from './components/regi
 export { default as __experimentalAsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { plugins };
+export { createRegistrySelector, createRegistryControl } from './factory';
 
 /**
  * The combineReducers helper function turns an object whose values are different
