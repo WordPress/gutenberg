@@ -18,6 +18,7 @@ type PropsType = {
 	title: string,
 	initialTitle: string,
 	initialHtml: string,
+	focusTitle: boolean,
 	editTitle: string => mixed,
 	resetBlocks: Array<BlockType> => mixed,
 	setupEditor: ( mixed, ?mixed ) => mixed,
@@ -92,6 +93,7 @@ class AppContainer extends React.Component<PropsType> {
 				setTitleAction={ this.setTitleAction }
 				updateHtmlAction={ this.updateHtmlAction }
 				title={ this.props.title }
+				focusTitle={ this.props.focusTitle }
 			/>
 		);
 	}
