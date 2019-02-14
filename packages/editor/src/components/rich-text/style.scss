@@ -7,7 +7,6 @@
 .editor-rich-text__editable {
 	margin: 0;
 	position: relative;
-	line-height: $editor-line-height;
 	// In HTML, leading and trailing spaces are not visible, and multiple spaces
 	// elsewhere are visually reduced to one space. This rule prevents spaces
 	// from collapsing so all space is visible in the editor and can be removed.
