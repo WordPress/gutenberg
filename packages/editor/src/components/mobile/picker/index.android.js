@@ -45,16 +45,17 @@ export default class Picker extends Component {
 				<View>
 					{ this.props.options.map( ( option, index ) =>
 						<BottomSheet.Cell
+							icon={ option.icon }
 							key={ index }
 							label={ option.label }
 							onPress={ () => this.onCellPress( option.value ) }
 						/>
 					) }
-					<BottomSheet.Cell
+					{ ! this.props.hideCancelButton && <BottomSheet.Cell
 						label={ __( 'Cancel' ) }
 						onPress={ this.onClose }
 						drawSeparator={ false }
-					/>
+					/> }
 				</View>
 			</BottomSheet>
 		);
