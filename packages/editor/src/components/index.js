@@ -94,7 +94,7 @@ export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockSelectionClearer } from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
-export { default as _BlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
+export { default as _BlockControlsLastItem } from './block-settings-menu/block-controls-last-item';
 export { default as _BlockSettingsMenuPluginsExtension } from './block-settings-menu/block-settings-menu-plugins-extension';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';

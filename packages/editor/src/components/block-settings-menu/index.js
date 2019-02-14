@@ -22,7 +22,6 @@ import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import BlockUnknownConvertButton from './block-unknown-convert-button';
-import _BlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import _BlockSettingsMenuPluginsExtension from './block-settings-menu-plugins-extension';
 
 export function BlockSettingsMenu( { clientIds, onSelect } ) {
@@ -59,7 +58,6 @@ export function BlockSettingsMenu( { clientIds, onSelect } ) {
 					} }
 					renderContent={ ( { onClose } ) => (
 						<NavigableMenu className="editor-block-settings-menu__content">
-							<_BlockSettingsMenuFirstItem.Slot fillProps={ { onClose } } />
 							{ count === 1 && (
 								<BlockUnknownConvertButton
 									clientId={ firstBlockClientId }

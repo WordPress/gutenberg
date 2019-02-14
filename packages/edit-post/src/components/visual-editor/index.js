@@ -10,7 +10,7 @@ import {
 	VisualEditorGlobalKeyboardShortcuts,
 	BlockSelectionClearer,
 	MultiSelectScrollIntoView,
-	_BlockSettingsMenuFirstItem,
+	_BlockControlsLastItem,
 	_BlockSettingsMenuPluginsExtension,
 } from '@wordpress/editor';
 
@@ -32,9 +32,9 @@ function VisualEditor() {
 					<BlockList />
 				</ObserveTyping>
 			</WritingFlow>
-			<_BlockSettingsMenuFirstItem>
-				{ ( { onClose } ) => <BlockInspectorButton onClick={ onClose } /> }
-			</_BlockSettingsMenuFirstItem>
+			<_BlockControlsLastItem>
+				<BlockInspectorButton />
+			</_BlockControlsLastItem>
 			<_BlockSettingsMenuPluginsExtension>
 				{ ( { clientIds, onClose } ) => <PluginBlockSettingsMenuGroup.Slot fillProps={ { clientIds, onClose } } /> }
 			</_BlockSettingsMenuPluginsExtension>

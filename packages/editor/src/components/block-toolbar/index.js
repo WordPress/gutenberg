@@ -12,6 +12,7 @@ import MultiBlocksSwitcher from '../block-switcher/multi-blocks-switcher';
 import BlockControls from '../block-controls';
 import BlockFormatControls from '../block-format-controls';
 import BlockSettingsMenu from '../block-settings-menu';
+import _BlockControlsLastItem from '../block-settings-menu/block-controls-last-item';
 
 function BlockToolbar( { blockClientIds, isValid, mode } ) {
 	if ( blockClientIds.length === 0 ) {
@@ -34,6 +35,7 @@ function BlockToolbar( { blockClientIds, isValid, mode } ) {
 					<BlockSwitcher clientIds={ blockClientIds } />
 					<BlockControls.Slot />
 					<BlockFormatControls.Slot />
+					<_BlockControlsLastItem.Slot />
 				</Fragment>
 			) }
 			<BlockSettingsMenu clientIds={ blockClientIds } />
