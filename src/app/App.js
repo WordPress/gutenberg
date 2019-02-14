@@ -1,33 +1,74 @@
 /** @flow
  * @format */
+
+import '../globals';
+
 import React from 'react';
+
+// Gutenberg imports
+import { registerCoreBlocks } from '@wordpress/block-library';
+import { registerBlockType, setUnregisteredTypeHandlerName, unregisterBlockType } from '@wordpress/blocks';
+import { setLocaleData } from '@wordpress/i18n';
 
 import AppContainer from './AppContainer';
 import initialHtml from './initial-html';
+
+import * as UnsupportedBlock from '../block-types/unsupported-block/';
+import { getTranslation } from '../../i18n-cache';
+
+registerCoreBlocks();
+registerBlockType( UnsupportedBlock.name, UnsupportedBlock.settings );
+setUnregisteredTypeHandlerName( UnsupportedBlock.name );
+
+// disable Code and More blocks for release
+if ( ! __DEV__ ) {
+	unregisterBlockType( 'core/code' );
+	unregisterBlockType( 'core/more' );
+}
 
 type PropsType = {
 	initialData: string,
 	initialHtmlModeEnabled: boolean,
 	initialTitle: string,
+	locale: string,
 	translations: mixed,
 };
 
-const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled, translations }: PropsType ) => {
-	if ( initialData === undefined ) {
-		initialData = initialHtml;
+export default class AppProvider extends React.Component<PropsType> {
+	constructor( props: PropsType ) {
+		super( props );
+
+		this.setLocale( props.locale );
 	}
 
-	if ( initialTitle === undefined ) {
-		initialTitle = 'Welcome to Gutenberg!';
+	componentDidUpdate( prevProps: PropsType ) {
+		if ( prevProps.locale !== this.props.locale ) {
+			this.setLocale( this.props.locale );
+		}
 	}
-	console.log( 'translations', translations );
 
-	return (
-		<AppContainer
-			initialHtml={ initialData }
-			initialHtmlModeEnabled={ initialHtmlModeEnabled }
-			initialTitle={ initialTitle } />
-	);
-};
+	setLocale( locale: ?string ) {
+		const translationsFromParentApp = this.props.translations || {};
+		const translations = Object.assign( {}, translationsFromParentApp, getTranslation( locale ) );
+		setLocaleData( translations );
+	}
 
-export default AppProvider;
+	render() {
+		const { initialHtmlModeEnabled } = this.props;
+		let initialData = this.props.initialData;
+		let initialTitle = this.props.initialTitle;
+		if ( initialData === undefined ) {
+			initialData = initialHtml;
+		}
+		if ( initialTitle === undefined ) {
+			initialTitle = 'Welcome to Gutenberg!';
+		}
+		return (
+			<AppContainer
+				initialHtml={ initialData }
+				initialHtmlModeEnabled={ initialHtmlModeEnabled }
+				initialTitle={ initialTitle } />
+		);
+	}
+}
+
