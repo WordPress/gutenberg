@@ -27,6 +27,7 @@ import * as categories from './categories';
 import * as code from './code';
 import * as columns from './columns';
 import * as column from './columns/column';
+import * as container from './container';
 import * as cover from './cover';
 import * as embed from './embed';
 import * as file from './file';
@@ -88,6 +89,7 @@ export const registerCoreBlocks = () => {
 		code,
 		columns,
 		column,
+		container,
 		cover,
 		embed,
 		...embed.common,
