@@ -37,6 +37,8 @@ export default class AppProvider extends React.Component<PropsType> {
 	setLocale( locale: ?string ) {
 		const translationsFromParentApp = this.props.translations || {};
 		const translations = Object.assign( {}, translationsFromParentApp, getTranslation( locale ) );
+		// eslint-disable-next-line no-console
+		console.log( 'locale', locale, translations );
 		setLocaleData( translations );
 	}
 
