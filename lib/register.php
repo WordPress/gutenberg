@@ -25,44 +25,15 @@ function gutenberg_collect_meta_box_data() {
  * Return whether the post can be edited in Gutenberg and by the current user.
  *
  * @since 0.5.0
+ * @deprecated 5.0.0 use_block_editor_for_post
  *
  * @param int|WP_Post $post Post ID or WP_Post object.
  * @return bool Whether the post can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post( $post ) {
-	$post     = get_post( $post );
-	$can_edit = true;
+	_deprecated_function( __FUNCTION__, '5.0.0', 'use_block_editor_for_post' );
 
-	if ( ! $post ) {
-		$can_edit = false;
-	}
-
-	if ( $can_edit && 'trash' === $post->post_status ) {
-		$can_edit = false;
-	}
-
-	if ( $can_edit && ! gutenberg_can_edit_post_type( $post->post_type ) ) {
-		$can_edit = false;
-	}
-
-	if ( $can_edit && ! current_user_can( 'edit_post', $post->ID ) ) {
-		$can_edit = false;
-	}
-
-	// Disable the editor if on the blog page and there is no content.
-	if ( $can_edit && absint( get_option( 'page_for_posts' ) ) === $post->ID && empty( $post->post_content ) ) {
-		$can_edit = false;
-	}
-
-	/**
-	 * Filter to allow plugins to enable/disable Gutenberg for particular post.
-	 *
-	 * @since 3.5
-	 *
-	 * @param bool $can_edit Whether the post can be edited or not.
-	 * @param WP_Post $post The post being checked.
-	 */
-	return apply_filters( 'gutenberg_can_edit_post', $can_edit, $post );
+	return use_block_editor_for_post( $post );
 
 }
 
@@ -73,34 +44,15 @@ function gutenberg_can_edit_post( $post ) {
  * REST API, then the post cannot be edited in Gutenberg.
  *
  * @since 1.5.2
+ * @deprecated 5.0.0 use_block_editor_for_post_type
  *
  * @param string $post_type The post type.
  * @return bool Whether the post type can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post_type( $post_type ) {
-	$can_edit = true;
-	if ( ! post_type_exists( $post_type ) ) {
-		$can_edit = false;
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0', 'use_block_editor_for_post_type' );
 
-	if ( ! post_type_supports( $post_type, 'editor' ) ) {
-		$can_edit = false;
-	}
-
-	$post_type_object = get_post_type_object( $post_type );
-	if ( $post_type_object && ! $post_type_object->show_in_rest ) {
-		$can_edit = false;
-	}
-
-	/**
-	 * Filter to allow plugins to enable/disable Gutenberg for particular post types.
-	 *
-	 * @since 1.5.2
-	 *
-	 * @param bool   $can_edit  Whether the post type can be edited or not.
-	 * @param string $post_type The post type being checked.
-	 */
-	return apply_filters( 'gutenberg_can_edit_post_type', $can_edit, $post_type );
+	return use_block_editor_for_post_type( $post_type );
 }
 
 /**
