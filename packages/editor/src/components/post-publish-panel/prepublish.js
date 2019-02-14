@@ -24,6 +24,7 @@ function PostPublishPanelPrepublish( {
 	hasPublishAction,
 	isBeingScheduled,
 	children,
+	visibility,
 } ) {
 	let prePublishTitle, prePublishBodyText;
 
@@ -32,7 +33,7 @@ function PostPublishPanelPrepublish( {
 		prePublishBodyText = __(
 			'When you’re ready, submit your work for review, and an Editor will be able to approve it for you.'
 		);
-	} else if ( isBeingScheduled ) {
+	} else if ( isBeingScheduled && 'private' !== visibility ) {
 		prePublishTitle = __( 'Are you ready to schedule?' );
 		prePublishBodyText = __(
 			'Your work will be published at the specified date and time.'
@@ -90,9 +91,11 @@ function PostPublishPanelPrepublish( {
 }
 
 export default withSelect( ( select ) => {
-	const { getCurrentPost, isEditedPostBeingScheduled } = select(
-		'core/editor'
-	);
+	const {
+		getCurrentPost,
+		isEditedPostBeingScheduled,
+		getEditedPostVisibility,
+	} = select( 'core/editor' );
 	return {
 		hasPublishAction: get(
 			getCurrentPost(),
@@ -100,5 +103,6 @@ export default withSelect( ( select ) => {
 			false
 		),
 		isBeingScheduled: isEditedPostBeingScheduled(),
+		visibility: getEditedPostVisibility(),
 	};
 } )( PostPublishPanelPrepublish );

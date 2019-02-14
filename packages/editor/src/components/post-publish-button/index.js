@@ -166,10 +166,10 @@ export class PostPublishButton extends Component {
 		};
 
 		let toggleChildren;
-		if ( isBeingScheduled ) {
-			toggleChildren = __( 'Schedule…' );
-		} else if ( 'private' === visibility ) {
+		if ( 'private' === visibility ) {
 			toggleChildren = __( 'Publish Privately…' );
+		} else if ( isBeingScheduled ) {
+			toggleChildren = __( 'Schedule…' );
 		} else {
 			toggleChildren = __( 'Publish…' );
 		}

@@ -29,6 +29,7 @@ export function PublishButtonLabel( {
 	}
 
 	if ( ! hasPublishAction ) {
+<<<<<<< HEAD
 		return hasNonPostEntityChanges
 			? __( 'Submit for Review…' )
 			: __( 'Submit for Review' );
@@ -40,6 +41,15 @@ export function PublishButtonLabel( {
 
 	if ( 'private' === visibility ) {
 		return __( 'Publish Privately' );
+=======
+		return __( 'Submit for Review' );
+	} else if ( ! isPublished && 'private' === visibility ) {
+		return __( 'Publish Privately' );
+	} else if ( isBeingScheduled && 'private' !== visibility ) {
+		return __( 'Schedule' );
+	} else if ( isPublished ) {
+		return __( 'Update' );
+>>>>>>> Handle proper labeling for scheduled private posts
 	}
 
 	return __( 'Publish' );
