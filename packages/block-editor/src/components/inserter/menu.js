@@ -197,11 +197,16 @@ export class InserterMenu extends Component {
 		if ( filterValue !== this.state.filterValue ) {
 			if ( ! filterValue ) {
 				openPanels = [ 'suggested' ];
-			} else if ( reusableItems.length ) {
-				openPanels = [ 'reusable' ];
-			} else if ( filteredItems.length ) {
-				const firstCategory = find( getCategories(), ( { slug } ) => itemsPerCategory[ slug ] && itemsPerCategory[ slug ].length );
-				openPanels = [ firstCategory.slug ];
+			} else {
+				openPanels = [];
+				if ( reusableItems.length ) {
+					openPanels.push( 'reusable' );
+				}
+				if ( filteredItems.length ) {
+					openPanels = openPanels.concat(
+						Object.keys( itemsPerCategory )
+					);
+				}
 			}
 		}
 
@@ -238,7 +243,6 @@ export class InserterMenu extends Component {
 		const { instanceId, onSelect, rootClientId } = this.props;
 		const { childItems, filterValue, hoveredItem, suggestedItems, reusableItems, itemsPerCategory, openPanels } = this.state;
 		const isPanelOpen = ( panel ) => openPanels.indexOf( panel ) !== -1;
-		const isSearching = !! filterValue;
 
 		// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 		// is always visible, and one which already incurs this behavior of autoFocus via
@@ -300,7 +304,7 @@ export class InserterMenu extends Component {
 								key={ category.slug }
 								title={ category.title }
 								icon={ category.icon }
-								opened={ isSearching || isPanelOpen( category.slug ) }
+								opened={ isPanelOpen( category.slug ) }
 								onToggle={ this.onTogglePanel( category.slug ) }
 								ref={ this.bindPanel( category.slug ) }
 							>
