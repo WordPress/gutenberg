@@ -42,12 +42,13 @@ export default class Cell extends Component {
 			children,
 			editable = true,
 			separatorType,
+			style = {},
 			...valueProps
 		} = this.props;
 
 		const showValue = value !== undefined;
 		const isValueEditable = editable && onChangeValue !== undefined;
-		const defaultLabelStyle = showValue ? styles.cellLabel : styles.cellLabelCentered;
+		const defaultLabelStyle = showValue || icon !== undefined ? styles.cellLabel : styles.cellLabelCentered;
 		const drawSeparator = ( separatorType && separatorType !== 'none' ) || separatorStyle === undefined;
 
 		const onCellPress = () => {
@@ -110,7 +111,7 @@ export default class Cell extends Component {
 		};
 
 		return (
-			<TouchableOpacity onPress={ onCellPress } style={ styles.clipToBounds } >
+			<TouchableOpacity onPress={ onCellPress } style={ { ...styles.clipToBounds, ...style } } >
 				<View style={ styles.cellContainer }>
 					<View style={ styles.cellRowContainer }>
 						{ icon && (

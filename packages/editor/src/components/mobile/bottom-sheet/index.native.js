@@ -45,7 +45,7 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { title = '', isVisible, leftButton, rightButton, hideHeader } = this.props;
+		const { title = '', isVisible, leftButton, rightButton, hideHeader, style={} } = this.props;
 
 		return (
 			<Modal
@@ -63,7 +63,7 @@ class BottomSheet extends Component {
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }
+					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />

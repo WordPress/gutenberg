@@ -11,6 +11,8 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { BottomSheet } from '@wordpress/editor';
 
+import styles from './styles'
+
 export default class Picker extends Component {
 	constructor() {
 		super( ...arguments );
@@ -40,16 +42,23 @@ export default class Picker extends Component {
 			<BottomSheet
 				isVisible={ this.state.isVisible }
 				onClose={ this.onClose }
+				style={ { paddingBottom: 20 } }
 				hideHeader
 			>
 				<View>
-					{ this.props.options.map( ( option, index ) =>
-						<BottomSheet.Cell
-							icon={ option.icon }
-							key={ index }
-							label={ option.label }
-							onPress={ () => this.onCellPress( option.value ) }
-						/>
+					{ this.props.options.map( ( option, index ) => {
+						const hasIcon = option.icon !== undefined;
+						return (
+							<BottomSheet.Cell
+								icon={ option.icon }
+								key={ index }
+								label={ option.label }
+								labelStyle={ hasIcon && styles.cellLabelWithIcon }
+								separatorType={ 'none' }
+								onPress={ () => this.onCellPress( option.value ) }
+							/>
+						)
+					}
 					) }
 					{ ! this.props.hideCancelButton && <BottomSheet.Cell
 						label={ __( 'Cancel' ) }
