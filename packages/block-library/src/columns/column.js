@@ -1,9 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG } from '@wordpress/components';
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
+import { Path, SVG, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, BlockControls } from '@wordpress/block-editor';
 
 export const name = 'core/column';
 
@@ -18,17 +22,65 @@ export const settings = {
 
 	category: 'common',
 
+	attributes: {
+		verticalAlignment: {
+			type: 'string',
+			default: 'top',
+		},
+	},
+
 	supports: {
 		inserter: false,
 		reusable: false,
 		html: false,
 	},
 
-	edit() {
-		return <InnerBlocks templateLock={ false } />;
+	edit( { attributes, setAttributes, isSelected } ) {
+		const toolbarControls = [
+			{
+				icon: 'arrow-up-alt2',
+				title: 'V-align column Top',
+				isActive: attributes.verticalAlignment === 'top',
+				onClick: () => setAttributes( { verticalAlignment: 'top' } ),
+			},
+			{
+				icon: 'minus',
+				title: 'V-align column Middle',
+				isActive: attributes.verticalAlignment === 'center',
+				onClick: () => setAttributes( { verticalAlignment: 'center' } ),
+			},
+			{
+				icon: 'arrow-down-alt2',
+				title: 'V-align column Bottom',
+				isActive: attributes.verticalAlignment === 'bottom',
+				onClick: () => setAttributes( { verticalAlignment: 'bottom' } ),
+			},
+		];
+
+		const classes = classnames( {
+			'block-core-columns': true,
+			'is-selected': isSelected,
+		} );
+
+		return (
+			<div className={ classes }>
+				<BlockControls>
+					<Toolbar controls={ toolbarControls } />
+				</BlockControls>
+				<InnerBlocks templateLock={ false } />
+			</div>
+		);
 	},
 
-	save() {
-		return <div><InnerBlocks.Content /></div>;
+	save( { attributes } ) {
+		const { verticalAlignment } = attributes;
+		const wrapperClasses = classnames( {
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: true,
+		} );
+		return (
+			<div className={ wrapperClasses }>
+				<InnerBlocks.Content />
+			</div>
+		);
 	},
 };

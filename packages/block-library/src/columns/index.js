@@ -235,7 +235,7 @@ export const settings = {
 		const { columns, verticalAlignment } = attributes;
 		const wrapperClasses = classnames( {
 			[ `has-${ columns }-columns` ]: true,
-			[ `is-vertically-aligned-${ verticalAlignment }` ]: true,
+			[ `are-vertically-aligned-${ verticalAlignment }` ]: true,
 		} );
 
 		return (

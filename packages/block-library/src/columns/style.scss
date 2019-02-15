@@ -46,15 +46,29 @@
 }
 
 .wp-block-columns {
-	&.is-vertically-aligned-top {
+	&.are-vertically-aligned-top {
 		align-items: flex-start;
 	}
 
-	&.is-vertically-aligned-center {
+	&.are-vertically-aligned-center {
 		align-items: center;
 	}
 
-	&.is-vertically-aligned-bottom {
+	&.are-vertically-aligned-bottom {
 		align-items: flex-end;
+	}
+}
+
+.wp-block-column {
+	&.is-vertically-aligned-top {
+		align-self: flex-start;
+	}
+
+	&.is-vertically-aligned-center {
+		align-self: center;
+	}
+
+	&.is-vertically-aligned-bottom {
+		align-self: flex-end;
 	}
 }
