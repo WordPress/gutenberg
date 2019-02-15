@@ -20,7 +20,7 @@
 		&:focus {
 			outline-style: solid;
 			outline-color: $blue-medium-400;
-			animation: editor-animation__region-focus 0.2s ease-out;
+			animation: editor-animation__region-focus 0.1s ease-out;
 			animation-fill-mode: forwards;
 		}
 	}
