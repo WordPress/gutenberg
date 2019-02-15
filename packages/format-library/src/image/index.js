@@ -40,22 +40,22 @@ export const image = {
 		}
 
 		static getDerivedStateFromProps( props, state ) {
-			const { value, activeAttributes: { style } } = props;
+			const { activeAttributes: { style } } = props;
 
-			if ( value.start === state.previousStart ) {
+			if ( style === state.previousStyle ) {
 				return null;
 			}
 
 			if ( ! style ) {
 				return {
 					width: undefined,
-					previousStart: value.start,
+					previousStyle: style,
 				};
 			}
 
 			return {
 				width: style.replace( /\D/g, '' ),
-				previousStart: value.start,
+				previousStyle: style,
 			};
 		}
 
