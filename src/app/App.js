@@ -9,7 +9,6 @@ type PropsType = {
 	initialData: string,
 	initialHtmlModeEnabled: boolean,
 	initialTitle: string,
-	focusTitle: boolean,
 };
 
 const AppProvider = ( { initialTitle, initialData, initialHtmlModeEnabled }: PropsType ) => {
