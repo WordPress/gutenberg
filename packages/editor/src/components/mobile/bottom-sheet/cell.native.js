@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import platformStyles from './cellStyles'
+import platformStyles from './cellStyles';
 
 export default class Cell extends Component {
 	constructor() {
@@ -80,7 +80,7 @@ export default class Cell extends Component {
 
 		const getValueComponent = () => {
 			const styleRTL = I18nManager.isRTL && styles.cellValueRTL;
-			const style = { ...styles.cellValue, ...valueStyle, ...styleRTL };
+			const finalStyle = { ...styles.cellValue, ...valueStyle, ...styleRTL };
 
 			// To be able to show the `middle` ellipsizeMode on editable cells
 			// we show the TextInput just when the user wants to edit the value,
@@ -91,7 +91,7 @@ export default class Cell extends Component {
 				<TextInput
 					ref={ ( c ) => this._valueTextInput = c }
 					numberOfLines={ 1 }
-					style={ style }
+					style={ finalStyle }
 					value={ value }
 					placeholder={ valuePlaceholder }
 					placeholderTextColor={ '#87a6bc' }

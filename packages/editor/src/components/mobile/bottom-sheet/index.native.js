@@ -45,7 +45,7 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { title = '', isVisible, leftButton, rightButton, hideHeader, style={} } = this.props;
+		const { title = '', isVisible, leftButton, rightButton, hideHeader, style = {} } = this.props;
 
 		return (
 			<Modal
@@ -59,7 +59,7 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
-				onMoveShouldSetResponderCapture={ () => true 
+				onMoveShouldSetResponderCapture={ () => true }
 				swipeDirection="down"
 			>
 				<KeyboardAvoidingView
