@@ -24,4 +24,10 @@ public protocol GutenbergBridgeDataSource: class {
     ///
     /// - Returns: The locale slug value or nil.
     func gutenbergLocale() -> String?
+    
+    /// Asks the data source for the list of localized strings to be used by the editor.
+    /// Return `nil` if no localization file is present for the current locale
+    ///
+    /// - Returns: Gutenberg related localization key value pairs for the current locale.
+    func gutenbergTranslations() -> [String : String]?
 }

@@ -33,8 +33,8 @@ public class Gutenberg: NSObject {
         return RCTBridge(delegate: self, launchOptions: [:])
     }()
 
-    private var initialProps: [String: String]? {
-        var initialProps = [String: String]()
+    private var initialProps: [String: Any]? {
+        var initialProps = [String: Any]()
         
         if let initialContent = dataSource.gutenbergInitialContent() {
             initialProps["initialData"] = initialContent
@@ -46,6 +46,10 @@ public class Gutenberg: NSObject {
 
         if let locale = dataSource.gutenbergLocale() {
             initialProps["locale"] = locale
+        }
+        
+        if let translations = dataSource.gutenbergTranslations() {
+            initialProps["translations"] = translations
         }
         
         return initialProps
