@@ -47,16 +47,16 @@ class BottomSheet extends Component {
 	render() {
 		const { title = '', isVisible, leftButton, rightButton, hideHeader, style = {} } = this.props;
 
-		const panResponder = PanResponder.create({
+		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
 				// Activates swipe down over child Touchables if the swipe is long enough.
 				// With this we can adjust sensibility on the swipe vs tap gestures.
-				if (gestureState.dy > 3) {
+				if ( gestureState.dy > 3 ) {
 					gestureState.dy = 0;
 					return true;
 				}
 			},
-		})
+		} );
 
 		return (
 			<Modal
