@@ -81,6 +81,8 @@ export const image = {
 		render() {
 			const { value, onChange, isActive, activeAttributes } = this.props;
 			const { style } = activeAttributes;
+			// Rerender PositionedAtSelection when the selection changes or when
+			// the width changes.
 			const key = value.start + style;
 
 			return (
@@ -127,6 +129,7 @@ export const image = {
 
 									newFormats[ value.start ] = [ {
 										type: name,
+										object: true,
 										attributes: {
 											...activeAttributes,
 											style: `width: ${ this.state.width }px;`,
