@@ -6,7 +6,8 @@
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"jsdoc",
-		"documentation"
+		"documentation",
+		"wordpress"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/docgen/README.md",
 	"repository": {
