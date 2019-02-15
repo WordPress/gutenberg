@@ -169,13 +169,14 @@ export class RichText extends Component {
 		} );
 	}
 
-	applyRecord( record ) {
+	applyRecord( record, { domOnly } = {} ) {
 		apply( {
 			value: record,
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
+			__unstableDomOnly: domOnly,
 		} );
 	}
 
@@ -421,7 +422,7 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end, selectedFormat } );
-			this.applyRecord( { ...value, selectedFormat } );
+			this.applyRecord( { ...value, selectedFormat }, { domOnly: true } );
 
 			delete this.formatPlaceholder;
 		}
