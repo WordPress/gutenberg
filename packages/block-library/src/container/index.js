@@ -27,9 +27,10 @@ export const settings = {
 	description: __( 'A container for other blocks.' ),
 
 	supports: {
-		reusable: false,
-		html: false,
 		align: [ 'wide', 'full' ],
+		anchor: true,
+		html: false,
+		reusable: false,
 	},
 
 	attributes: {
