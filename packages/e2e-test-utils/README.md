@@ -10,8 +10,6 @@ Install the module
 npm install @wordpress/e2e-test-utils --save-dev
 ```
 
-<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
-
 ## API
 
 ### activatePlugin
@@ -536,3 +534,5 @@ without the new dimensions being applied.
 
 -   **width** `number`: Width of the window.
 -   **height** `height`: Height of the window.
+
+<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
