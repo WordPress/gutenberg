@@ -113,6 +113,7 @@ class ModalLinkUI extends Component {
 				onBackdropPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
 				swipeDirection="down"
+				avoidKeyboard={ true }
 			>
 				<View style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }>
 					<View style={ styles.dragIndicator } />
