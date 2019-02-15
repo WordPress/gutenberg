@@ -220,6 +220,7 @@ export class RichText extends Component {
 
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
+		this.lastEventCount = event.nativeEvent.eventCount;
 		if ( ! this.props.onSplit ) {
 			// TODO: insert the \n char instead?
 			return;
@@ -253,7 +254,7 @@ export class RichText extends Component {
 		}
 	}
 
-	onSelectionChange( start, end, text ) {
+	onSelectionChange( start, end, text, event ) {
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
@@ -272,6 +273,7 @@ export class RichText extends Component {
 			end: realEnd,
 			formatPlaceholder,
 		} );
+		this.lastEventCount = event.nativeEvent.eventCount;
 		// we don't want to refresh aztec as no content can have changed from this event
 		// let's update lastContent to prevent that in shouldComponentUpdate
 		this.lastContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
