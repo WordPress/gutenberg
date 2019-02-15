@@ -46,6 +46,7 @@ public class WPAndroidGlueCode {
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
+    private OnEditorMountListener mOnEditorMountListener;
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
@@ -86,6 +87,10 @@ public class WPAndroidGlueCode {
 
     public interface OnReattachQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    public interface OnEditorMountListener {
+        void onEditorDidMount(boolean hasUnsupportedBlocks);
     }
 
     protected List<ReactPackage> getPackages() {
@@ -133,6 +138,11 @@ public class WPAndroidGlueCode {
             public void requestImageUploadCancelDialog(int mediaId) {
                 mOnMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
             }
+
+            @Override
+            public void editorDidMount(boolean hasUnsupportedBlocks) {
+                mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+            }
         });
         return Arrays.asList(
                 new MainReactPackage(),
@@ -179,12 +189,14 @@ public class WPAndroidGlueCode {
     }
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener) {
+                                  OnReattachQueryListener onReattachQueryListener,
+                                  OnEditorMountListener onEditorMountListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachQueryListener = onReattachQueryListener;
+        mOnEditorMountListener = onEditorMountListener;
 
         if (mReactRootView.getParent() != null) {
             ((ViewGroup) mReactRootView.getParent()).removeView(mReactRootView);
