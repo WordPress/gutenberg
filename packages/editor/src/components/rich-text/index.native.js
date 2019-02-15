@@ -212,7 +212,6 @@ export class RichText extends Component {
 
 	onContentSizeChange( contentSize ) {
 		const contentHeight = contentSize.height;
-		this.forceUpdate(); // force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
 		this.props.onContentSizeChange( {
 			aztecHeight: contentHeight,
 		} );
@@ -378,6 +377,10 @@ export class RichText extends Component {
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
+
+						if ( this.props.setRef ) {
+							this.props.setRef( ref );
+						}
 					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }
