@@ -30,6 +30,12 @@ exports[`RichText should not format text after code backtick 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should not lose selection direction 1`] = `
+"<!-- wp:paragraph -->
+<p><strong>1</strong>2-3</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should only mutate text data on input 1`] = `
 "<!-- wp:paragraph -->
 <p>1<strong>2</strong>34</p>
