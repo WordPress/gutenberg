@@ -1,3 +1,6 @@
+/**
+ * External dependencies
+ */
 import { TextInput } from 'react-native';
 
 /**
