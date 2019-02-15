@@ -29,9 +29,41 @@ class RCTAztecView: Aztec.TextView {
 
     private var previousContentSize: CGSize = .zero
 
+    var leftTextInset: CGFloat {
+        return contentInset.left + textContainerInset.left + textContainer.lineFragmentPadding
+    }
+
+    var leftTextInsetInRTLLayout: CGFloat {
+        return bounds.width - leftTextInset
+    }
+
+    var hasRTLLayout: Bool {
+        return reactLayoutDirection == .rightToLeft
+    }
+
     private lazy var placeholderLabel: UILabel = {
         let label = UILabel(frame: .zero)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .natural
+        label.font = font
         return label
+    }()
+
+    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout contraints
+    // on views inserted after the transformation.
+    var placeholderPreferedHorizontalAnchor: NSLayoutXAxisAnchor {
+        return hasRTLLayout ? placeholderLabel.rightAnchor : placeholderLabel.leftAnchor
+    }
+
+    // This constraint is created from the prefered horizontal anchor (analog to "leading")
+    // but appending it always to left of its super view (Aztec).
+    // This partially fixes the position issue originated from fliping the scroll view.
+    // fixLabelPositionForRTLLayout() fixes the rest.
+    private lazy var placeholderHorizontalConstraint: NSLayoutConstraint = {
+        return placeholderPreferedHorizontalAnchor.constraint(
+            equalTo: leftAnchor,
+            constant: leftTextInset
+        )
     }()
     
     // MARK: - Font
@@ -69,21 +101,31 @@ class RCTAztecView: Aztec.TextView {
 
     func commonInit() {
         delegate = self
+        addPlaceholder()
+    }
+
+    func addPlaceholder() {
         addSubview(placeholderLabel)
-        placeholderLabel.textAlignment = .natural
-        placeholderLabel.translatesAutoresizingMaskIntoConstraints = false
-        placeholderLabel.font = font
         NSLayoutConstraint.activate([
-            placeholderLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: contentInset.left + textContainerInset.left + textContainer.lineFragmentPadding),
+            placeholderHorizontalConstraint,
             placeholderLabel.topAnchor.constraint(equalTo: topAnchor, constant: contentInset.top + textContainerInset.top)
-            ])
+        ])
     }
 
     // MARK - View Height: Match to content height
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
+        fixLabelPositionForRTLLayout()
         updateContentSizeInRN()
+    }
+
+    private func fixLabelPositionForRTLLayout() {
+        if hasRTLLayout {
+            // RCTScrollViews are flipped horizontally on RTL layout.
+            // This fixes the position of the label after "fixing" (partially) the constraints.
+            placeholderHorizontalConstraint.constant = leftTextInsetInRTLLayout
+        }
     }
 
     func updateContentSizeInRN() {
