@@ -159,4 +159,25 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should not lose selection direction', async () => {
+		await clickBlockAppender();
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'b' );
+		await page.keyboard.type( '23' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.up( 'Shift' );
+
+		// There should be no selection. The following should insert "-" without
+		// deleting the numbers.
+		await page.keyboard.type( '-' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );
