@@ -59,6 +59,7 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.props.onClose }
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
+				onMoveShouldSetResponderCapture={ () => true 
 				swipeDirection="down"
 			>
 				<KeyboardAvoidingView
