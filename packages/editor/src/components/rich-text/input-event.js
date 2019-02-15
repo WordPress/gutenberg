@@ -16,7 +16,7 @@ export class RichTextInputEvent extends Component {
 		}
 	}
 
-	componentWillMount() {
+	componentDidMount() {
 		document.addEventListener( 'input', this.onInput, true );
 	}
 
