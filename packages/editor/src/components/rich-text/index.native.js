@@ -385,6 +385,10 @@ export class RichText extends Component {
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
+
+						if ( this.props.setRef ) {
+							this.props.setRef( ref );
+						}
 					}
 					}
 					text={ { text: html, eventCount: this.lastEventCount } }

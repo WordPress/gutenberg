@@ -28,6 +28,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	BottomSheet,
+	Picker,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { isURL } from '@wordpress/url';
@@ -42,6 +43,10 @@ const MEDIA_UPLOAD_STATE_UPLOADING = 1;
 const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
 const MEDIA_UPLOAD_STATE_FAILED = 3;
 const MEDIA_UPLOAD_STATE_RESET = 4;
+
+const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE = 'choose_from_device';
+const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO = 'take_photo';
+const MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY = 'wordpress_media_library';
 
 const LINK_DESTINATION_CUSTOM = 'custom';
 const LINK_DESTINATION_NONE = 'none';
@@ -173,6 +178,14 @@ class ImageEdit extends React.Component {
 		} );
 	}
 
+	getMediaOptionsItems() {
+		return [
+			{ icon: 'wordpress-alt', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE, label: __( 'Choose from device' ) },
+			{ icon: 'camera', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO, label: __( 'Take a Photo' ) },
+			{ icon: 'format-image', value: MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY, label: __( 'WordPress Media Library' ) },
+		];
+	}
+
 	render() {
 		const { attributes, isSelected, setAttributes } = this.props;
 		const { url, caption, height, width, alt, href } = attributes;
@@ -185,33 +198,23 @@ class ImageEdit extends React.Component {
 			} );
 		};
 
-		if ( ! url ) {
-			const onMediaUploadButtonPressed = () => {
-				requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
-					if ( mediaUri ) {
-						this.addMediaUploadListener( );
-						setAttributes( { url: mediaUri, id: mediaId } );
-					}
-				} );
-			};
+		const onMediaUploadButtonPressed = () => {
+			requestMediaPickFromDeviceLibrary( ( mediaId, mediaUri ) => {
+				if ( mediaUri ) {
+					this.addMediaUploadListener( );
+					setAttributes( { url: mediaUri, id: mediaId } );
+				}
+			} );
+		};
 
-			const onMediaCaptureButtonPressed = () => {
-				requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
-					if ( mediaUri ) {
-						this.addMediaUploadListener( );
-						setAttributes( { url: mediaUri, id: mediaId } );
-					}
-				} );
-			};
-
-			return (
-				<MediaPlaceholder
-					onUploadMediaPressed={ onMediaUploadButtonPressed }
-					onMediaLibraryPressed={ onMediaLibraryButtonPressed }
-					onCapturePhotoPressed={ onMediaCaptureButtonPressed }
-				/>
-			);
-		}
+		const onMediaCaptureButtonPressed = () => {
+			requestMediaPickFromDeviceCamera( ( mediaId, mediaUri ) => {
+				if ( mediaUri ) {
+					this.addMediaUploadListener( );
+					setAttributes( { url: mediaUri, id: mediaId } );
+				}
+			} );
+		};
 
 		const onImageSettingsButtonPressed = () => {
 			this.setState( { showSettings: true } );
@@ -221,12 +224,18 @@ class ImageEdit extends React.Component {
 			this.setState( { showSettings: false } );
 		};
 
+		let picker;
+
+		const onMediaOptionsButtonPressed = () => {
+			picker.presentPicker();
+		};
+
 		const toolbarEditButton = (
 			<Toolbar>
 				<ToolbarButton
 					label={ __( 'Edit image' ) }
 					icon="edit"
-					onClick={ onMediaLibraryButtonPressed }
+					onClick={ onMediaOptionsButtonPressed }
 				/>
 			</Toolbar>
 		);
@@ -262,6 +271,36 @@ class ImageEdit extends React.Component {
 				/>
 			</BottomSheet>
 		);
+
+		const mediaOptions = this.getMediaOptionsItems();
+
+		const getMediaOptions = () => (
+			<Picker
+				hideCancelButton={ true }
+				ref={ ( instance ) => picker = instance }
+				options={ mediaOptions }
+				onChange={ ( value ) => {
+					if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_CHOOSE_FROM_DEVICE ) {
+						onMediaUploadButtonPressed();
+					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_TAKE_PHOTO ) {
+						onMediaCaptureButtonPressed();
+					} else if ( value === MEDIA_UPLOAD_BOTTOM_SHEET_VALUE_WORD_PRESS_LIBRARY ) {
+						onMediaLibraryButtonPressed();
+					}
+				} }
+			/>
+		);
+
+		if ( ! url ) {
+			return (
+				<View style={ { flex: 1 } } >
+					{ getMediaOptions() }
+					<MediaPlaceholder
+						onMediaOptionsPressed={ onMediaOptionsButtonPressed }
+					/>
+				</View>
+			);
+		}
 
 		const showSpinner = this.state.isUploadInProgress;
 		const opacity = this.state.isUploadInProgress ? 0.3 : 1;
@@ -301,6 +340,7 @@ class ImageEdit extends React.Component {
 							return (
 								<View style={ { flex: 1 } } >
 									{ getInspectorControls() }
+									{ getMediaOptions() }
 									<ImageBackground
 										style={ { width: finalWidth, height: finalHeight, opacity } }
 										resizeMethod="scale"
