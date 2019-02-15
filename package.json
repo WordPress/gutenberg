@@ -10,6 +10,9 @@
 		"WordPress",
 		"editor"
 	],
+	"config": {
+		"GUTENBERG_PHASE": 2
+	},
 	"dependencies": {
 		"@wordpress/a11y": "file:packages/a11y",
 		"@wordpress/annotations": "file:packages/annotations",
@@ -113,6 +116,7 @@
 		"sprintf-js": "1.1.1",
 		"stylelint-config-wordpress": "13.1.0",
 		"uuid": "3.3.2",
+		"webpack": "4.8.3",
 		"webpack-bundle-analyzer": "3.0.2",
 		"webpack-livereload-plugin": "2.1.1",
 		"webpack-rtl-plugin": "github:yoavf/webpack-rtl-plugin#develop"
