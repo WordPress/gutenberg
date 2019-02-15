@@ -52,6 +52,9 @@ if ( ! function_exists( 'render_block_core_rss' ) ) {
 if ( ! function_exists( 'render_block_core_shortcode' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/shortcode/index.php';
 }
+if ( ! function_exists( 'render_block_core_tag_cloud' ) ) {
+	require dirname( __FILE__ ) . '/../packages/block-library/src/tag-cloud/index.php';
+}
 if ( ! function_exists( 'render_block_core_search' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/search/index.php';
 }
