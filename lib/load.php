@@ -36,6 +36,9 @@ if ( ! function_exists( 'render_block_core_categories' ) ) {
 }
 // Currently merged in core as `gutenberg_render_block_core_latest_comments`,
 // expected to change soon.
+if ( ! function_exists( 'render_block_core_calendar' ) ) {
+	require dirname( __FILE__ ) . '/../packages/block-library/src/calendar/index.php';
+}
 if ( ! function_exists( 'render_block_core_latest_comments' )
 	&& ! function_exists( 'gutenberg_render_block_core_latest_comments' ) ) {
 	require dirname( __FILE__ ) . '/../packages/block-library/src/latest-comments/index.php';
