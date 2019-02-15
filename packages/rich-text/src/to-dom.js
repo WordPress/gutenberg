@@ -212,6 +212,7 @@ export function apply( {
 	multilineTag,
 	multilineWrapperTags,
 	prepareEditableTree,
+	__unstableDomOnly,
 } ) {
 	// Construct a new element tree in memory.
 	const { body, selection } = toDom( {
@@ -223,7 +224,7 @@ export function apply( {
 
 	applyValue( body, current );
 
-	if ( value.start !== undefined ) {
+	if ( value.start !== undefined && ! __unstableDomOnly ) {
 		applySelection( selection, current );
 	}
 }
