@@ -2,6 +2,7 @@
  * @format */
 
 import React from 'react';
+import { isEmpty } from 'lodash';
 import { parse, serialize } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
@@ -9,6 +10,7 @@ import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 
 import MainApp from './MainApp';
 import type { BlockType } from '../store/types';
+import { name as unsupportedBlockName } from '../block-types/unsupported-block';
 
 type PropsType = {
 	rootClientId: ?string,
@@ -52,6 +54,12 @@ class AppContainer extends React.Component<PropsType> {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
 			this.toggleHtmlModeAction();
 		}
+	}
+
+	componentDidMount = () => {
+		const blocks = this.props.getBlocks();
+		const hasUnsupportedBlocks = ! isEmpty( blocks.filter( ( { name } ) => name === unsupportedBlockName ) );
+		RNReactNativeGutenbergBridge.editorDidMount( hasUnsupportedBlocks );
 	}
 
 	serializeToNativeAction = () => {
