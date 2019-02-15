@@ -2,6 +2,17 @@
  * @format */
 
 /**
+* This file is used in src/globals.js to patch jsdom-jscore.
+*
+* Node.prototype.contains is implemented as a simple recursive function.
+*
+* Node.prototype.insertBefore is re-implemented (code copied) with the
+* WrongDocumentError exception disabled.
+*
+* Element.prototype.matches is aliased to Element.prototype.matchesSelector.
+*/
+
+/**
  * External dependencies
  */
 import jsdom from 'jsdom-jscore';
@@ -26,6 +37,7 @@ const {
 	DOCUMENT_FRAGMENT_NODE,
 } = Node;
 
+// Simple recursive implementation of Node.contains method
 Node.prototype.contains = function( otherNode ) {
 	return this === otherNode ||
 		Array.prototype.some.call( this._childNodes, ( childNode ) => {

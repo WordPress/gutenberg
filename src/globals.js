@@ -5,7 +5,7 @@ import { createElement } from '@wordpress/element';
 import jsdom from 'jsdom-jscore';
 import jsdomLevel1Core from 'jsdom-jscore/lib/jsdom/level1/core';
 
-// Import for side-effects: Patches for jsdom-jscore.
+// Import for side-effects: Patches for jsdom-jscore, details commented in file.
 import './jsdom-patches';
 
 global.wp = {
