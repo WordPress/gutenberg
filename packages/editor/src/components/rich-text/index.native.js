@@ -361,10 +361,6 @@ export class RichText extends Component {
 				html: innerContent,
 				range: null,
 				multilineTag: false,
-				removeNode: null,
-				unwrapNode: null,
-				removeAttribute: null,
-				filterString: null,
 			} ),
 		};
 
