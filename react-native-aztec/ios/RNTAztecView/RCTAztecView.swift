@@ -33,7 +33,7 @@ class RCTAztecView: Aztec.TextView {
         return contentInset.left + textContainerInset.left + textContainer.lineFragmentPadding
     }
 
-    var isRTLLayout: Bool {
+    var hasRTLLayout: Bool {
         return reactLayoutDirection == .rightToLeft
     }
 
@@ -48,7 +48,7 @@ class RCTAztecView: Aztec.TextView {
     // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout contraints
     // on views inserted after the transformation.
     var placeholderPreferedHorizontalAnchor: NSLayoutXAxisAnchor {
-        return isRTLLayout ? placeholderLabel.rightAnchor : placeholderLabel.leftAnchor
+        return hasRTLLayout ? placeholderLabel.rightAnchor : placeholderLabel.leftAnchor
     }
 
     // This constraint is created from the prefered horizontal anchor (analog to "leading")
@@ -117,7 +117,7 @@ class RCTAztecView: Aztec.TextView {
     }
 
     private func fixLabelPositionForRTLLayout() {
-        if isRTLLayout {
+        if hasRTLLayout {
             // RCTScrollViews are flipped horizontally on RTL layout.
             // This fixes the position of the label after "fixing" (partially) the constraints.
             placeholderHorizontalConstraint.constant = bounds.width - textHorizontalInset
