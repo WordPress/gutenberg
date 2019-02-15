@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import platformStyles from './cellStyles';
+import platformStyles from './cellStyles.scss';
 
 export default class Cell extends Component {
 	constructor() {
