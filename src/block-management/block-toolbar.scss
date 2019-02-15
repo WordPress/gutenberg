@@ -6,6 +6,10 @@
     border-top-width: 1;
 }
 
+.scrollableContent {
+    flex-grow: 1; // Fixes RTL issue on Android.
+}
+
 .keyboardHideContainer {
     padding-right: 0px;
     padding-left: 0px;
