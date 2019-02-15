@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { Path, SVG, TextControl, Popover, IconButton } from '@wordpress/components';
+import { Path, SVG, TextControl, Popover, IconButton, PositionedAtSelection } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { insertObject, PositionedAtSelection } from '@wordpress/rich-text';
+import { insertObject } from '@wordpress/rich-text';
 import { MediaUpload, RichTextInserterItem, MediaUploadCheck } from '@wordpress/editor';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 

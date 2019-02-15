@@ -213,8 +213,6 @@ return array(
 	'wp-rich-text'                          => array(
 		'lodash',
 		'wp-data',
-		'wp-dom',
-		'wp-element',
 		'wp-escape-html',
 	),
 	'wp-shortcode'                          => array(

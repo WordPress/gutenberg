@@ -3,8 +3,6 @@
  */
 import './store';
 
-export { PositionedAtSelection } from './components/positioned-at-selection';
-
 export { applyFormat } from './apply-format';
 export { charAt } from './char-at';
 export { concat } from './concat';
