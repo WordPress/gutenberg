@@ -13,6 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './styles.scss';
+import platformStyles from './cellStyles'
 
 export default class Cell extends Component {
 	constructor() {
@@ -64,15 +65,16 @@ export default class Cell extends Component {
 		};
 
 		const separatorStyle = () => {
+			const leftMarginStyle = { ...styles.cellSeparator, ...platformStyles.separatorMarginLeft };
 			switch ( separatorType ) {
 				case 'leftMargin':
-					return styles.cellSeparator;
+					return leftMarginStyle;
 				case 'fullWidth':
 					return styles.separator;
 				case 'none':
 					return undefined;
 				case undefined:
-					return showValue ? styles.cellSeparator : styles.separator;
+					return showValue ? leftMarginStyle : styles.separator;
 			}
 		};
 
@@ -117,7 +119,7 @@ export default class Cell extends Component {
 						{ icon && (
 							<View style={ styles.cellRowContainer }>
 								<Dashicon icon={ icon } size={ 24 } />
-								<View style={ { width: 12 } } />
+								<View style={ platformStyles.labelIconSeparator } />
 							</View>
 						) }
 						<Text numberOfLines={ 1 } style={ { ...defaultLabelStyle, ...labelStyle } }>
