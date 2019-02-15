@@ -44,3 +44,17 @@
 		}
 	}
 }
+
+.wp-block-columns {
+	&.is-vertically-aligned-top {
+		align-items: flex-start;
+	}
+
+	&.is-vertically-aligned-center {
+		align-items: center;
+	}
+
+	&.is-vertically-aligned-bottom {
+		align-items: flex-end;
+	}
+}

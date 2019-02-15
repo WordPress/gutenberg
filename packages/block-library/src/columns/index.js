@@ -9,12 +9,20 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, RangeControl, G, SVG, Path } from '@wordpress/components';
+import {
+	PanelBody,
+	RangeControl,
+	G,
+	SVG,
+	Path,
+	Toolbar,
+} from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import {
 	InspectorControls,
 	InnerBlocks,
+	BlockControls,
 } from '@wordpress/block-editor';
 
 /**
@@ -78,6 +86,10 @@ export const settings = {
 		columns: {
 			type: 'number',
 			default: 2,
+		},
+		verticalAlignment: {
+			type: 'string',
+			default: 'top',
 		},
 	},
 
@@ -143,10 +155,15 @@ export const settings = {
 				];
 			},
 			save( { attributes } ) {
-				const { columns } = attributes;
+				const { columns, verticalAlignment } = attributes;
+
+				const wrapperClasses = classnames( {
+					[ `has-${ columns }-columns` ]: true,
+					[ `is-aligned-${ verticalAlignment }` ]: true,
+				} );
 
 				return (
-					<div className={ `has-${ columns }-columns` }>
+					<div className={ wrapperClasses }>
 						<InnerBlocks.Content />
 					</div>
 				);
@@ -155,8 +172,29 @@ export const settings = {
 	],
 
 	edit( { attributes, setAttributes, className } ) {
-		const { columns } = attributes;
+		const { columns, verticalAlignment } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
+
+		const toolbarControls = [
+			{
+				icon: 'arrow-up-alt2',
+				title: 'V-align columns Top',
+				isActive: verticalAlignment === 'top',
+				onClick: () => setAttributes( { verticalAlignment: 'top' } ),
+			},
+			{
+				icon: 'minus',
+				title: 'V-align columns Middle',
+				isActive: verticalAlignment === 'center',
+				onClick: () => setAttributes( { verticalAlignment: 'center' } ),
+			},
+			{
+				icon: 'arrow-down-alt2',
+				title: 'V-align columns Bottom',
+				isActive: verticalAlignment === 'bottom',
+				onClick: () => setAttributes( { verticalAlignment: 'bottom' } ),
+			},
+		];
 
 		return (
 			<Fragment>
@@ -176,6 +214,13 @@ export const settings = {
 						/>
 					</PanelBody>
 				</InspectorControls>
+				<BlockControls>
+					<Toolbar
+						controls={ toolbarControls }
+					>
+
+					</Toolbar>
+				</BlockControls>
 				<div className={ classes }>
 					<InnerBlocks
 						template={ getColumnsTemplate( columns ) }
@@ -187,10 +232,14 @@ export const settings = {
 	},
 
 	save( { attributes } ) {
-		const { columns } = attributes;
+		const { columns, verticalAlignment } = attributes;
+		const wrapperClasses = classnames( {
+			[ `has-${ columns }-columns` ]: true,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: true,
+		} );
 
 		return (
-			<div className={ `has-${ columns }-columns` }>
+			<div className={ wrapperClasses }>
 				<InnerBlocks.Content />
 			</div>
 		);
