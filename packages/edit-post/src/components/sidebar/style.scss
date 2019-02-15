@@ -36,6 +36,8 @@
 		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
 		margin-top: -1px;
 		margin-bottom: -1px;
+		position: relative;
+		z-index: z-index(".edit-post-sidebar .components-panel");
 
 		@include break-small() {
 			overflow: inherit;
