@@ -106,7 +106,7 @@ function createReduxStore( reducer, key, registry ) {
  */
 function mapSelectors( selectors, store, registry ) {
 	const createStateSelector = ( registeredSelector ) => {
-		const selector = registeredSelector.isRegistrySelector ? registeredSelector( registry ) : registeredSelector;
+		const selector = registeredSelector.isRegistrySelector ? registeredSelector( registry.select ) : registeredSelector;
 
 		return function runSelector() {
 			// This function is an optimized implementation of:
