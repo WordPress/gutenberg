@@ -29,8 +29,12 @@ class RCTAztecView: Aztec.TextView {
 
     private var previousContentSize: CGSize = .zero
 
-    var textHorizontalInset: CGFloat {
+    var leftTextInset: CGFloat {
         return contentInset.left + textContainerInset.left + textContainer.lineFragmentPadding
+    }
+
+    var leftTextInsetInRTLLayout: CGFloat {
+        return bounds.width - leftTextInset
     }
 
     var hasRTLLayout: Bool {
@@ -58,7 +62,7 @@ class RCTAztecView: Aztec.TextView {
     private lazy var placeholderHorizontalConstraint: NSLayoutConstraint = {
         return placeholderPreferedHorizontalAnchor.constraint(
             equalTo: leftAnchor,
-            constant: textHorizontalInset
+            constant: leftTextInset
         )
     }()
     
@@ -120,7 +124,7 @@ class RCTAztecView: Aztec.TextView {
         if hasRTLLayout {
             // RCTScrollViews are flipped horizontally on RTL layout.
             // This fixes the position of the label after "fixing" (partially) the constraints.
-            placeholderHorizontalConstraint.constant = bounds.width - textHorizontalInset
+            placeholderHorizontalConstraint.constant = leftTextInsetInRTLLayout
         }
     }
 
