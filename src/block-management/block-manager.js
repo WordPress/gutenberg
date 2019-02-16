@@ -238,7 +238,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		const clientId = value.item;
 
 		return (
-			<View>
+			<View testID={clientId}>
 				<BlockHolder
 					key={ clientId }
 					showTitle={ false }
