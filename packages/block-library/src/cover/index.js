@@ -9,35 +9,23 @@ import classnames from 'classnames';
  */
 import { createBlock } from '@wordpress/blocks';
 import {
-	FocalPointPicker,
-	IconButton,
-	PanelBody,
-	RangeControl,
-	ToggleControl,
-	Toolbar,
-	withNotices,
-} from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import {
-	BlockControls,
-	BlockIcon,
 	InnerBlocks,
-	InspectorControls,
-	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
-	PanelColorSettings,
 	RichText,
 	getColorClassName,
-	withColors,
 } from '@wordpress/editor';
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import icon from './icon';
+import {
+	default as CoverEdit,
+	IMAGE_BACKGROUND_TYPE,
+	VIDEO_BACKGROUND_TYPE,
+	backgroundImageStyles,
+	dimRatioToClass,
+} from './edit';
 
 const blockAttributes = {
 	url: {
@@ -70,18 +58,6 @@ const blockAttributes = {
 };
 
 export const name = 'core/cover';
-
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
-const IMAGE_BACKGROUND_TYPE = 'image';
-const VIDEO_BACKGROUND_TYPE = 'video';
-const INNER_BLOCKS_TEMPLATE = [
-	[ 'core/paragraph', {
-		align: 'center',
-		fontSize: 'large',
-		placeholder: __( 'Write title…' ),
-	} ],
-];
-const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
 
 export const settings = {
 	title: __( 'Cover' ),
@@ -160,195 +136,6 @@ export const settings = {
 		],
 	},
 
-	edit: compose( [
-		withColors( { overlayColor: 'background-color' } ),
-		withNotices,
-	] )(
-		( { attributes, setAttributes, className, noticeOperations, noticeUI, overlayColor, setOverlayColor } ) => {
-			const {
-				backgroundType,
-				dimRatio,
-				focalPoint,
-				hasParallax,
-				id,
-				url,
-			} = attributes;
-			const onSelectMedia = ( media ) => {
-				if ( ! media || ! media.url ) {
-					setAttributes( { url: undefined, id: undefined } );
-					return;
-				}
-				let mediaType;
-				// for media selections originated from a file upload.
-				if ( media.media_type ) {
-					if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
-						mediaType = IMAGE_BACKGROUND_TYPE;
-					} else {
-						// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
-						// Videos contain the media type of 'file' in the object returned from the rest api.
-						mediaType = VIDEO_BACKGROUND_TYPE;
-					}
-				} else { // for media selections originated from existing files in the media library.
-					if (
-						media.type !== IMAGE_BACKGROUND_TYPE &&
-						media.type !== VIDEO_BACKGROUND_TYPE
-					) {
-						return;
-					}
-					mediaType = media.type;
-				}
-
-				setAttributes( {
-					url: media.url,
-					id: media.id,
-					backgroundType: mediaType,
-				} );
-			};
-			const toggleParallax = () => setAttributes( { hasParallax: ! hasParallax } );
-			const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-
-			const style = {
-				...(
-					backgroundType === IMAGE_BACKGROUND_TYPE ?
-						backgroundImageStyles( url ) :
-						{}
-				),
-				backgroundColor: overlayColor.color,
-			};
-
-			if ( focalPoint ) {
-				style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
-			}
-
-			const controls = (
-				<Fragment>
-					<BlockControls>
-						{ !! url && (
-							<Fragment>
-								<MediaUploadCheck>
-									<Toolbar>
-										<MediaUpload
-											onSelect={ onSelectMedia }
-											allowedTypes={ ALLOWED_MEDIA_TYPES }
-											value={ id }
-											render={ ( { open } ) => (
-												<IconButton
-													className="components-toolbar__control"
-													label={ __( 'Edit media' ) }
-													icon="edit"
-													onClick={ open }
-												/>
-											) }
-										/>
-									</Toolbar>
-								</MediaUploadCheck>
-							</Fragment>
-						) }
-					</BlockControls>
-					{ !! url && (
-						<InspectorControls>
-							<PanelBody title={ __( 'Cover Settings' ) }>
-								{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-									<ToggleControl
-										label={ __( 'Fixed Background' ) }
-										checked={ hasParallax }
-										onChange={ toggleParallax }
-									/>
-								) }
-								{ IMAGE_BACKGROUND_TYPE === backgroundType && ! hasParallax && (
-									<FocalPointPicker
-										label={ __( 'Focal Point Picker' ) }
-										url={ url }
-										value={ focalPoint }
-										onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
-									/>
-								) }
-								<PanelColorSettings
-									title={ __( 'Overlay' ) }
-									initialOpen={ true }
-									colorSettings={ [ {
-										value: overlayColor.color,
-										onChange: setOverlayColor,
-										label: __( 'Overlay Color' ),
-									} ] }
-								>
-									<RangeControl
-										label={ __( 'Background Opacity' ) }
-										value={ dimRatio }
-										onChange={ setDimRatio }
-										min={ 0 }
-										max={ 100 }
-										step={ 10 }
-									/>
-								</PanelColorSettings>
-							</PanelBody>
-						</InspectorControls>
-					) }
-				</Fragment>
-			);
-
-			if ( ! url ) {
-				const placeholderIcon = <BlockIcon icon={ icon } />;
-				const label = __( 'Cover' );
-
-				return (
-					<Fragment>
-						{ controls }
-						<MediaPlaceholder
-							icon={ placeholderIcon }
-							className={ className }
-							labels={ {
-								title: label,
-								instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
-							} }
-							onSelect={ onSelectMedia }
-							accept="image/*,video/*"
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							notices={ noticeUI }
-							onError={ noticeOperations.createErrorNotice }
-						/>
-					</Fragment>
-				);
-			}
-
-			const classes = classnames(
-				className,
-				dimRatioToClass( dimRatio ),
-				{
-					'has-background-dim': dimRatio !== 0,
-					'has-parallax': hasParallax,
-				}
-			);
-
-			return (
-				<Fragment>
-					{ controls }
-					<div
-						data-url={ url }
-						style={ style }
-						className={ classes }
-					>
-						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-							<video
-								className="wp-block-cover__video-background"
-								autoPlay
-								muted
-								loop
-								src={ url }
-							/>
-						) }
-						<div className="wp-block-cover__inner-container">
-							<InnerBlocks
-								template={ INNER_BLOCKS_TEMPLATE }
-								allowedBlocks={ INNER_BLOCKS_ALLOWED_BLOCKS }
-							/>
-						</div>
-					</div>
-				</Fragment>
-			);
-		}
-	),
-
 	save( { attributes } ) {
 		const {
 			backgroundType,
@@ -395,6 +182,7 @@ export const settings = {
 		);
 	},
 
+	edit: CoverEdit,
 	deprecated: [ {
 		attributes: {
 			...blockAttributes,
@@ -564,15 +352,3 @@ export const settings = {
 		},
 	} ],
 };
-
-function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 ) ?
-		null :
-		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
-}
-
-function backgroundImageStyles( url ) {
-	return url ?
-		{ backgroundImage: `url(${ url })` } :
-		{};
-}
