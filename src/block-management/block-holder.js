@@ -179,7 +179,7 @@ export class BlockHolder extends React.Component<PropsType, StateType> {
 
 	render() {
 		const { isSelected, clientId } = this.props;
-
+		
 		return (
 			<TouchableWithoutFeedback accessible={false} onPress={ this.onFocus } onLayout={ this.onBlockHolderLayout } >
 				<View style={ [ styles.blockHolder, isSelected && this.blockHolderFocusedStyle() ] }>

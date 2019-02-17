@@ -38,6 +38,7 @@ type PropsType = {
 	focusBlock: ( clientId: string ) => void,
 	insertBlock: ( block: BlockType, position: number ) => void,
 	replaceBlock: ( string, BlockType ) => mixed,
+	getBlockName: string => string,
 	selectedBlock: ?BlockType,
 	selectedBlockClientId: string,
 	setTitleAction: string => void,
@@ -90,9 +91,15 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	onBlockTypeSelected( itemValue: string ) {
 		this.setState( { blockTypePickerVisible: false } );
 
+		console.log("Item added ");
+		console.log(itemValue);
+		
 		// create an empty block of the selected type
 		const newBlock = createBlock( itemValue );
 
+		console.log("Block added");
+		console.log(newBlock);
+		debugger;
 		// now determine whether we need to replace the currently selected block (if it's empty)
 		// or just add a new block as usual
 		if ( this.isReplaceable( this.props.selectedBlock ) ) {
@@ -236,9 +243,13 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 
 	renderItem( value: { item: string, index: number } ) {
 		const clientId = value.item;
+		const testID = this.props.getBlockName(clientId) + '-' + clientId;
+		console.log("Test ID:", testID);
+		debugger;
 
+	
 		return (
-			<View testID={clientId}>
+			<View testID={testID}>
 				<BlockHolder
 					key={ clientId }
 					showTitle={ false }
@@ -268,6 +279,7 @@ export default compose( [
 	withSelect( ( select, { rootClientId } ) => {
 		const {
 			getBlockCount,
+			getBlockName,
 			getBlockIndex,
 			getBlockOrder,
 			getSelectedBlock,
@@ -280,6 +292,7 @@ export default compose( [
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
 			blockCount: getBlockCount( rootClientId ),
+			getBlockName,
 			isBlockSelected,
 			selectedBlock: getSelectedBlock(),
 			selectedBlockClientId,
