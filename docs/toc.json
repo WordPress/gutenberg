@@ -20,9 +20,6 @@
 			{"docs/designers-developers/developers/internationalization.md": []},
 			{"docs/designers-developers/developers/accessibility.md": []},
 			{"docs/designers-developers/developers/feature-flags.md": []},
-			{"docs/designers-developers/developers/data/README.md": "{{data}}"},
-			{"docs/designers-developers/developers/packages.md": "{{packages}}"},
-			{"packages/components/README.md": "{{components}}"},
 			{"docs/designers-developers/developers/themes/README.md": [
 				{"docs/designers-developers/developers/themes/theme-support.md": []}
 			]},
@@ -69,7 +66,10 @@
 					{"docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": []},
 					{"docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": []}
 				]}
-			]}
+			]},
+			{"docs/designers-developers/developers/data/README.md": "{{data}}"},
+			{"docs/designers-developers/developers/packages.md": "{{packages}}"},
+			{"packages/components/README.md": "{{components}}"}
 		]},
 		{"docs/designers-developers/designers/README.md": [
 			{"docs/designers-developers/designers/block-design.md": []},

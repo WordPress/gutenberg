@@ -114,24 +114,6 @@
 		"parent": "developers"
 	},
 	{
-		"title": "Data Module Reference",
-		"slug": "data",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
-		"parent": "developers"
-	},
-	{
-		"title": "Packages",
-		"slug": "packages",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/packages.md",
-		"parent": "developers"
-	},
-	{
-		"title": "Components",
-		"slug": "components",
-		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
-		"parent": "developers"
-	},
-	{
 		"title": "Theming for Gutenberg",
 		"slug": "themes",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/themes/README.md",
@@ -364,6 +346,24 @@
 		"slug": "3-apply-format",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/tutorials/format-api/3-apply-format.md",
 		"parent": "format-api"
+	},
+	{
+		"title": "Data Module Reference",
+		"slug": "data",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
+		"parent": "developers"
+	},
+	{
+		"title": "Packages",
+		"slug": "packages",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/packages.md",
+		"parent": "developers"
+	},
+	{
+		"title": "Components",
+		"slug": "components",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/components/README.md",
+		"parent": "developers"
 	},
 	{
 		"title": "Designer Documentation",
