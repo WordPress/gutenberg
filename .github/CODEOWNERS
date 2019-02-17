@@ -10,8 +10,8 @@
 # Editor
 /packages/annotations                           @youknowriad @gziolo @aduth @atimmer
 /packages/autop                                 @youknowriad @aduth
-/packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth
-/packages/block-serialization-default-parser    @youknowriad @gziolo @aduth
+/packages/block-serialization-spec-parser       @youknowriad @gziolo @aduth @dmsnell
+/packages/block-serialization-default-parser    @youknowriad @gziolo @aduth @dmsnell
 /packages/blocks                                @youknowriad @gziolo @aduth @noisysocks
 /packages/edit-post                             @youknowriad @gziolo @talldan @noisysocks
 /packages/editor                                @youknowriad @gziolo @talldan @noisysocks
@@ -34,7 +34,7 @@
 /packages/library-export-default-webpack-plugin @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra
-/packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw
+/packages/scripts                               @youknowriad @gziolo @aduth @ntwb @nerrad @ajitbohra @nosolosw @mkaz
 
 # UI Components
 /packages/components                            @youknowriad @gziolo @aduth @chrisvanpatten @ajitbohra @jaymanpandya @jorgefilipecosta @talldan @noisysocks
@@ -76,6 +76,9 @@
 # Documentation
 /docs                                           @youknowriad @gziolo @chrisvanpatten @mkaz @ajitbohra @nosolosw @notnownikki
 
+# Styles (Unowned)
+*.scss                                          @ghost
+
 # Native (Unowned)
 *.native.js                                     @ghost
 *.android.js                                    @ghost
@@ -83,3 +86,6 @@
 *.native.scss                                   @ghost
 *.android.scss                                  @ghost
 *.ios.scss                                      @ghost
+
+# Project Management
+/.github                                        @youknowriad @mapk @karmatosed

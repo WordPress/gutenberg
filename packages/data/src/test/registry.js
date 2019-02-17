@@ -445,8 +445,8 @@ describe( 'createRegistry', () => {
 
 		it( 'should run the registry selectors properly', () => {
 			const selector1 = () => 'result1';
-			const selector2 = createRegistrySelector( ( reg ) => () =>
-				reg.select( 'reducer1' ).selector1()
+			const selector2 = createRegistrySelector( ( select ) => () =>
+				select( 'reducer1' ).selector1()
 			);
 			registry.registerStore( 'reducer1', {
 				reducer: () => 'state1',

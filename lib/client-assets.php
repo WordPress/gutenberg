@@ -548,7 +548,7 @@ function gutenberg_register_vendor_scripts() {
 	);
 	gutenberg_register_vendor_script(
 		'lodash',
-		'https://unpkg.com/lodash@4.17.10/lodash' . $suffix . '.js'
+		'https://unpkg.com/lodash@4.17.11/lodash' . $suffix . '.js'
 	);
 	wp_add_inline_script( 'lodash', 'window.lodash = _.noConflict();' );
 	gutenberg_register_vendor_script(
@@ -1118,7 +1118,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 		$editor_settings['colors'] = $color_palette;
 	}
 
-	if ( ! empty( $font_sizes ) ) {
+	if ( false !== $font_sizes ) {
 		$editor_settings['fontSizes'] = $font_sizes;
 	}
 

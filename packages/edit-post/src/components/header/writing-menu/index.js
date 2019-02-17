@@ -1,5 +1,5 @@
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';

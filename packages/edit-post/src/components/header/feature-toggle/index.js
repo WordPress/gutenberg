@@ -4,7 +4,7 @@
 import { flow } from 'lodash';
 
 /**
- * WordPress Dependencies
+ * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';

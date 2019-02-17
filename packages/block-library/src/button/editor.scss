@@ -14,17 +14,17 @@
 	margin-bottom: 0;
 	position: relative;
 
-	.editor-rich-text__tinymce.mce-content-body {
+	[contenteditable] {
 		cursor: text;
 	}
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.
-	&:not(.has-text-color):not(.is-style-outline) .editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+	&:not(.has-text-color):not(.is-style-outline) .editor-rich-text__editable[data-is-placeholder-visible="true"] + .editor-rich-text__editable {
 		color: $white;
 	}
 
 	// Increase placeholder opacity to meet contrast ratios.
-	.editor-rich-text__tinymce[data-is-placeholder-visible="true"] + .editor-rich-text__tinymce {
+	.editor-rich-text__editable[data-is-placeholder-visible="true"] + .editor-rich-text__editable {
 		opacity: 0.8;
 	}
 
@@ -33,7 +33,7 @@
 		max-width: 100%;
 
 		// Polish the empty placeholder text for the button in variation previews.
-		.editor-rich-text__tinymce[data-is-placeholder-visible="true"] {
+		.editor-rich-text__editable[data-is-placeholder-visible="true"] {
 			height: auto;
 		}
 

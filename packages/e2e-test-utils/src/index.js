@@ -12,6 +12,7 @@ export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
 export { enablePrePublishChecks } from './enable-pre-publish-checks';
 export { ensureSidebarOpened } from './ensure-sidebar-opened';
+export { findSidebarPanelToggleButtonWithTitle } from './find-sidebar-panel-toggle-button-with-title';
 export { findSidebarPanelWithTitle } from './find-sidebar-panel-with-title';
 export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
@@ -40,7 +41,6 @@ export { toggleScreenOption } from './toggle-screen-option';
 export { transformBlockTo } from './transform-block-to';
 export { uninstallPlugin } from './uninstall-plugin';
 export { visitAdminPage } from './visit-admin-page';
-export { waitForAnimation } from './wait-for-animation';
 export { waitForWindowDimensions } from './wait-for-window-dimensions';
 
 export * from './mocks';

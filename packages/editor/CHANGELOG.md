@@ -15,7 +15,9 @@
 
 ### Internal
 
-- Removed `jQuery` dependency
+- Removed `jQuery` dependency.
+- Removed `TinyMCE` dependency.
+- RichText: improve format boundaries.
 
 ## 9.0.7 (2019-01-03)
 

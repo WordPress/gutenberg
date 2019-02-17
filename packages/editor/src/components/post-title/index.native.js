@@ -65,6 +65,7 @@ class PostTitle extends Component {
 				placeholder={ decodedPlaceholder }
 				value={ title }
 				onSplit={ this.props.onEnterPress }
+				setRef={ this.props.setRef }
 			>
 			</RichText>
 		);
