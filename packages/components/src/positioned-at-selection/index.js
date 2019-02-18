@@ -43,7 +43,7 @@ function getCurrentCaretPositionStyle() {
  *
  * @type {WPComponent}
  */
-export class PositionedAtSelection extends Component {
+export default class PositionedAtSelection extends Component {
 	constructor() {
 		super( ...arguments );
 
