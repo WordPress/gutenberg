@@ -4,18 +4,24 @@
  */
 
 /**
- * WordPress dependencies
- */
-import { SVG } from '@wordpress/components';
-
+* External dependencies
+*/
 import React from 'react';
-import { Component } from '@wordpress/element';
 import { FlatList, Text, TouchableHighlight, View, Dimensions } from 'react-native';
-import Modal from 'react-native-modal';
+
+/**
+* WordPress dependencies
+*/
+import { SVG } from '@wordpress/components';
+import { BottomSheet } from '@wordpress/editor';
+import { Component } from '@wordpress/element';
+import { getBlockTypes } from '@wordpress/blocks';
+
+/**
+* WordPress dependencies
+*/
 import styles from './block-picker.scss';
 import { name as unsupportedBlockName } from '../block-types/unsupported-block';
-// Gutenberg imports
-import { getBlockTypes } from '@wordpress/blocks';
 
 type PropsType = {
 	style?: StyleSheet,
@@ -33,44 +39,37 @@ export default class BlockPicker extends Component<PropsType> {
 		const paddingBottom = this.paddingBottom();
 
 		return (
-			<Modal
-				transparent={ true }
+			<BottomSheet
 				isVisible={ true }
-				onSwipe={ this.props.onDismiss }
-				onBackButtonPress={ this.props.onDismiss }
-				swipeDirection="down"
-				style={ [ styles.bottomModal, this.props.style ] }
-				backdropColor={ 'lightgrey' }
-				backdropOpacity={ 0.4 }
-				onBackdropPress={ this.props.onDismiss }>
-				<View style={ [ styles.modalContent, { paddingBottom } ] }>
-					<View style={ styles.shortLineStyle } />
-					<FlatList
-						scrollEnabled={ false }
-						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-						keyboardShouldPersistTaps="always"
-						numColumns={ numberOfColumns }
-						data={ this.availableBlockTypes }
-						keyExtractor={ ( item ) => item.name }
-						renderItem={ ( { item } ) =>
-							<TouchableHighlight
-								style={ styles.touchableArea }
-								underlayColor={ 'transparent' }
-								activeOpacity={ .5 }
-								onPress={ () => this.props.onValueSelected( item.name ) }>
-								<View style={ styles.modalItem }>
-									<View style={ styles.modalIconWrapper }>
-										<View style={ styles.modalIcon }>
-											{ this.iconWithUpdatedFillColor( styles.modalIcon.fill, item.icon ) }
-										</View>
+				onClose={ this.props.onDismiss }
+				contentStyle={ { paddingLeft: 0, paddingRight: 0 } }
+				hideHeader
+			>
+				<FlatList
+					scrollEnabled={ false }
+					key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+					keyboardShouldPersistTaps="always"
+					numColumns={ numberOfColumns }
+					data={ this.availableBlockTypes }
+					keyExtractor={ ( item ) => item.name }
+					renderItem={ ( { item } ) =>
+						<TouchableHighlight
+							style={ styles.touchableArea }
+							underlayColor={ 'transparent' }
+							activeOpacity={ .5 }
+							onPress={ () => this.props.onValueSelected( item.name ) }>
+							<View style={ styles.modalItem }>
+								<View style={ styles.modalIconWrapper }>
+									<View style={ styles.modalIcon }>
+										{ this.iconWithUpdatedFillColor( styles.modalIcon.fill, item.icon ) }
 									</View>
-									<Text style={ styles.modalItemLabel }>{ item.title }</Text>
 								</View>
-							</TouchableHighlight>
-						}
-					/>
-				</View>
-			</Modal>
+								<Text style={ styles.modalItemLabel }>{ item.title }</Text>
+							</View>
+						</TouchableHighlight>
+					}
+				/>
+			</BottomSheet>
 		);
 	}
 
@@ -90,7 +89,7 @@ export default class BlockPicker extends Component<PropsType> {
 	}
 
 	calculateNumberOfColumns() {
-		const { width: windowWidth } = Dimensions.get( 'window' );
+		const windowWidth = Math.min(Dimensions.get( 'window' ).width, 512 );
 		const { paddingLeft: itemPaddingLeft, paddingRight: itemPaddingRight } = styles.modalItem;
 		const { paddingLeft: containerPaddingLeft, paddingRight: containerPaddingRight } = styles.modalContent;
 		const { width: itemWidth } = styles.modalIconWrapper;
