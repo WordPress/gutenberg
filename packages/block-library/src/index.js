@@ -50,6 +50,7 @@ import * as template from './template';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
+import * as tagCloud from './tag-cloud';
 
 import * as classic from './classic';
 
@@ -96,6 +97,7 @@ export const registerCoreBlocks = () => {
 		spacer,
 		subhead,
 		table,
+		tagCloud,
 		template,
 		textColumns,
 		verse,
