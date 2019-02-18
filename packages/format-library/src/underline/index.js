@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { toggleFormat } from '@wordpress/rich-text';
-import { RichTextShortcut, RichTextInputEvent } from '@wordpress/editor';
+import { RichTextShortcut, UnstableRichTextInputEvent } from '@wordpress/editor';
 
 const name = 'core/underline';
 
@@ -34,7 +34,7 @@ export const underline = {
 					character="u"
 					onUse={ onToggle }
 				/>
-				<RichTextInputEvent
+				<UnstableRichTextInputEvent
 					inputType="formatUnderline"
 					onInput={ onToggle }
 				/>

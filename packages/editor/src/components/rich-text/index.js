@@ -1165,4 +1165,4 @@ export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { RichTextInserterItem } from './inserter-list-item';
-export { RichTextInputEvent } from './input-event';
+export { UnstableRichTextInputEvent } from './input-event';
