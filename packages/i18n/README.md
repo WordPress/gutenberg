@@ -26,7 +26,7 @@ sprintf( _n( '%d hat', '%d hats', 4, 'text-domain' ), 4 );
 
 ## Build and Usage
 
-You can use the [wp-cli utility](https://wp-cli.org/) to generate a `.pot` file containing all your localized strings.
+You can use [WP-CLI](https://wp-cli.org/) to generate a `.pot` file containing all your translatable strings.
 
 ```sh
 wp i18n make-pot ./src myplugin.pot

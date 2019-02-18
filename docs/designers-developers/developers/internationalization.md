@@ -4,7 +4,7 @@
 
 Internationalization is the process to provide multiple language support to software, in this case WordPress. Internationalization is often abbreviated as **i18n**, where 18 stands for the number of letters between the first _i_ and the last _n_.
 
-Providing i18n support to your plugin and theme allows it to reach the largest possible audience, even without requiring you to provide the additional language translations.  When you upload your software to wordpress.org, all JS and PHP files will automatically be parsed. Any detected translation strings are added to translate.wordpress.org to allow the community to translate, ensuring WordPress plugins and themes are available in as many languages as possible.
+Providing i18n support to your plugin and theme allows it to reach the largest possible audience, even without requiring you to provide the additional language translations.  When you upload your software to WordPress.org, all JS and PHP files will automatically be parsed. Any detected translation strings are added to [translate.wordpress.org](https://translate.wordpress.org/) to allow the community to translate, ensuring WordPress plugins and themes are available in as many languages as possible.
 
 For PHP, WordPress has a long established process, see [How to Internationalize Your Plugin](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/). The release of WordPress 5.0 brings a similar process for translation to JavaScript code.
 
@@ -86,7 +86,7 @@ After all strings in your code is wrapped, the final step is to tell WordPress y
 
 This is all you need to make your plugin JavaScript code translatable.
 
-When you set script translations for a handle WordPress will automatically figure out if a translations file exists on translate.wordpress.org, and if so ensure that it's loaded into wp.i18n before your script runs.  With translate.wordpress.org, plugin authors also do not need to worry about setting up their own infrastructure for translations and can rely on a global community with dozens of active locales.  Read more about [WordPress Translations](https://make.wordpress.org/meta/handbook/documentation/translations/).
+When you set script translations for a handle WordPress will automatically figure out if a translations file exists on translate.wordpress.org, and if so ensure that it's loaded into `wp.i18n` before your script runs.  With translate.wordpress.org, plugin authors also do not need to worry about setting up their own infrastructure for translations and can rely on a global community with dozens of active locales. Read more about [WordPress Translations](https://make.wordpress.org/meta/handbook/documentation/translations/).
 
 ## Provide Your Own Translations
 
@@ -97,13 +97,13 @@ You can create and ship your own translations with your plugin, if you have suff
 The translation files must be in the JED 1.x JSON format.
 
 To create a JED translation file, first you need to extract the strings from the text.
-Using the [wp-cli tool](https://wp-cli.org/), you create a `.pot` file using the following command from within your plugin directory:
+Using [WP-CLI](https://wp-cli.org/), you create a `.pot` file using the following command from within your plugin directory:
 
 ```
 wp i18n make-pot ./
 ```
 
-This will create the file `myguten.pot` a pot file is a template file to be used for translating to different languages. The pot file is made up of translation sets, for example:
+This will create the file `myguten.pot` which contains all the translatable strings from your project. A single entry in this POT file might look like this:
 
 ```
 #: block.js:6
@@ -111,9 +111,9 @@ msgid "Simple Block"
 msgstr ""
 ```
 
-The `msgid` is the string to be translated, and `msgstr` is the translated string, which in the pot file the msgstr will be empty.
+Here, `msgid` is the string to be translated, and `msgstr` is the actual translation. In the POT file, `msgstr` will always be empty.
 
-A po file is then created from this template, which is the same format, but the translations filled in. You should copy the file using the language code you are going to translate, this example will use the Esperanto (eo) language:
+This POT file can then be used as the template for new translations. You should copy the file using the language code you are going to translate, this example will use the Esperanto (eo) language:
 
 ```
 cp myguten.pot myguten-eo.po
