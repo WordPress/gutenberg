@@ -8,14 +8,13 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
 	RangeControl,
 	G,
 	SVG,
 	Path,
-	Toolbar,
 } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
@@ -28,7 +27,7 @@ import {
 /**
  * Internal dependencies
  */
-import { valignTop, valignCenter, valignBottom } from './icons';
+import VAlignToolbar from './VAlignToolbar';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -180,27 +179,6 @@ export const settings = {
 		const { columns, verticalAlignment } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
-		const toolbarControls = [
-			{
-				icon: valignTop,
-				title: _x( 'V-align all Columns to Top', 'Block vertical alignment setting' ),
-				isActive: verticalAlignment === 'top',
-				onClick: () => setAttributes( { verticalAlignment: 'top' } ),
-			},
-			{
-				icon: valignCenter,
-				title: _x( 'V-align all Columns to Middle', 'Block vertical alignment setting' ),
-				isActive: verticalAlignment === 'center',
-				onClick: () => setAttributes( { verticalAlignment: 'center' } ),
-			},
-			{
-				icon: valignBottom,
-				title: _x( 'V-align all Columns to Bottom', 'Block vertical alignment setting' ),
-				isActive: verticalAlignment === 'bottom',
-				onClick: () => setAttributes( { verticalAlignment: 'bottom' } ),
-			},
-		];
-
 		return (
 			<Fragment>
 				<InspectorControls>
@@ -220,11 +198,10 @@ export const settings = {
 					</PanelBody>
 				</InspectorControls>
 				<BlockControls>
-					<Toolbar
-						controls={ toolbarControls }
-					>
-
-					</Toolbar>
+					<VAlignToolbar
+						setAttributes={ setAttributes }
+						verticalAlignment={ verticalAlignment }
+					/>
 				</BlockControls>
 				<div className={ classes }>
 					<InnerBlocks

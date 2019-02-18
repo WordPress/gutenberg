@@ -6,14 +6,14 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Path, SVG, Toolbar } from '@wordpress/components';
-import { __, _x } from '@wordpress/i18n';
+import { Path, SVG } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import { InnerBlocks, BlockControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { valignTop, valignCenter, valignBottom } from './icons';
+import VAlignToolbar from './VAlignToolbar';
 
 export const name = 'core/column';
 
@@ -42,27 +42,6 @@ export const settings = {
 	},
 
 	edit( { attributes, setAttributes, isSelected } ) {
-		const toolbarControls = [
-			{
-				icon: valignTop,
-				title: _x( 'V-align Top', 'Block vertical alignment setting' ),
-				isActive: attributes.verticalAlignment === 'top',
-				onClick: () => setAttributes( { verticalAlignment: 'top' } ),
-			},
-			{
-				icon: valignCenter,
-				title: _x( 'V-align Middle', 'Block vertical alignment setting' ),
-				isActive: attributes.verticalAlignment === 'center',
-				onClick: () => setAttributes( { verticalAlignment: 'center' } ),
-			},
-			{
-				icon: valignBottom,
-				title: _x( 'V-align Bottom', 'Block vertical alignment setting' ),
-				isActive: attributes.verticalAlignment === 'bottom',
-				onClick: () => setAttributes( { verticalAlignment: 'bottom' } ),
-			},
-		];
-
 		const classes = classnames( {
 			'block-core-columns': true,
 			'is-selected': isSelected,
@@ -71,13 +50,15 @@ export const settings = {
 		return (
 			<div className={ classes }>
 				<BlockControls>
-					<Toolbar controls={ toolbarControls } />
+					<VAlignToolbar
+						setAttributes={ setAttributes }
+						verticalAlignment={ attributes.verticalAlignment }
+					/>
 				</BlockControls>
 				<InnerBlocks templateLock={ false } />
 			</div>
 		);
 	},
-
 	save( { attributes } ) {
 		const { verticalAlignment } = attributes;
 		const wrapperClasses = classnames( {
