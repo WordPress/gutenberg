@@ -1810,7 +1810,26 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should not replace the selected block if we keep it when replacing blocks', () => {
+		it( 'should not replace the selected block if we keep it at the end when replacing blocks', () => {
+			const original = deepFreeze( { start: 'wings', end: 'wings' } );
+			const state = blockSelection( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'wings' ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/freeform',
+					},
+					{
+						clientId: 'wings',
+						name: 'core/freeform',
+					} ],
+			} );
+
+			expect( state ).toBe( original );
+		} );
+
+		it( 'should replace the selected block if we keep it not at the end when replacing blocks', () => {
 			const original = deepFreeze( { start: 'chicken', end: 'chicken' } );
 			const state = blockSelection( original, {
 				type: 'REPLACE_BLOCKS',
