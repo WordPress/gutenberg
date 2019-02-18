@@ -20,6 +20,10 @@
 	width: 100%;
 }
 
+.emptyHeaderSpace {
+	height: 14;
+}
+
 .content {
 	padding: 6px 16px 0 16px;
 	background-color: $white;
@@ -35,6 +39,7 @@
 	justify-content: space-between;
 	align-items: center;
 	align-content: center;
+	min-height: 48;
 }
 
 .title {
@@ -65,11 +70,14 @@
 	align-items: center;
 }
 
+.clipToBounds {
+	overflow: hidden;
+}
+
 .cellSeparator {
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
-	margin-left: 36px;
 }
 
 .cellRowContainer {
@@ -99,4 +107,8 @@
 	color: #2e4453;
 	text-align: right;
 	flex: 1;
+}
+
+.cellValueRTL {
+	text-align: left;
 }

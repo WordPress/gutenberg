@@ -26,7 +26,7 @@
 	"dependencies": {
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.10",
+		"lodash": "^4.17.11",
 		"node-fetch": "^1.7.3"
 	},
 	"peerDependencies": {

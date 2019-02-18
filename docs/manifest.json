@@ -108,6 +108,12 @@
 		"parent": "developers"
 	},
 	{
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/feature-flags.md",
+		"parent": "developers"
+	},
+	{
 		"title": "Data Module Reference",
 		"slug": "data",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/developers/data/README.md",
@@ -651,6 +657,12 @@
 		"title": "@wordpress/edit-post",
 		"slug": "packages-edit-post",
 		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-post/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/edit-widgets",
+		"slug": "packages-edit-widgets",
+		"markdown_source": "https://raw.githubusercontent.com/WordPress/gutenberg/master/packages/edit-widgets/README.md",
 		"parent": "packages"
 	},
 	{

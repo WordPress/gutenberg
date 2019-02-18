@@ -3,19 +3,16 @@
  */
 import RCTAztecView from 'react-native-aztec';
 import { View, Platform } from 'react-native';
-import {
-	forEach,
-	merge,
-} from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component, RawHTML } from '@wordpress/element';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { Toolbar } from '@wordpress/components';
 import { BlockFormatControls } from '@wordpress/editor';
+import { withSelect } from '@wordpress/data';
 import {
+	getActiveFormat,
 	isEmpty,
 	create,
 	split,
@@ -23,47 +20,28 @@ import {
 } from '@wordpress/rich-text';
 import { BACKSPACE } from '@wordpress/keycodes';
 import { children } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import FormatEdit from './format-edit';
+import FormatToolbar from './format-toolbar';
 
-const FORMATTING_CONTROLS = [
-	{
-		icon: 'editor-bold',
-		title: __( 'Bold' ),
-		format: 'bold',
-	},
-	{
-		icon: 'editor-italic',
-		title: __( 'Italic' ),
-		format: 'italic',
-	},
-	// TODO: get this back after alpha
-	// {
-	// 	icon: 'admin-links',
-	// 	title: __( 'Link' ),
-	// 	format: 'link',
-	// },
-	{
-		icon: 'editor-strikethrough',
-		title: __( 'Strikethrough' ),
-		format: 'strikethrough',
-	},
-];
+import styles from './style.scss';
 
 const isRichTextValueEmpty = ( value ) => {
 	return ! value || ! value.length;
 };
 
-export function getFormatValue( formatName ) {
-	if ( 'link' === formatName ) {
-		//TODO: Implement link command
-	}
-	return { isActive: true };
-}
+const unescapeSpaces = ( text ) => {
+	return text.replace( /&nbsp;|&#160;/gi, ' ' );
+};
+
+const gutenbergFormatNamesToAztec = {
+	'core/bold': 'bold',
+	'core/italic': 'italic',
+	'core/strikethrough': 'strikethrough',
+};
 
 export class RichText extends Component {
 	constructor() {
@@ -73,15 +51,29 @@ export class RichText extends Component {
 		this.onEnter = this.onEnter.bind( this );
 		this.onBackspace = this.onBackspace.bind( this );
 		this.onContentSizeChange = this.onContentSizeChange.bind( this );
-		this.changeFormats = this.changeFormats.bind( this );
-		this.toggleFormat = this.toggleFormat.bind( this );
-		this.onActiveFormatsChange = this.onActiveFormatsChange.bind( this );
-		this.isEmpty = this.isEmpty.bind( this );
+		this.onFormatChange = this.onFormatChange.bind( this );
+		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
+		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.state = {
-			formats: {},
-			selectedNodeId: 0,
+			start: 0,
+			end: 0,
+			formatPlaceholder: null,
 		};
+	}
+
+	/**
+	 * Get the current record (value and selection) from props and state.
+	 *
+	 * @return {Object} The current record (value and selection).
+	 */
+	getRecord() {
+		const { formatPlaceholder, start, end } = this.state;
+		// Since we get the text selection from Aztec we need to be in sync with the HTML `value`
+		// Removing leading white spaces using `trim()` should make sure this is the case.
+		const { formats, text } = this.formatToValue( this.props.value === undefined ? undefined : this.props.value.trimLeft() );
+
+		return { formats, formatPlaceholder, text, start, end };
 	}
 
 	/*
@@ -149,19 +141,37 @@ export class RichText extends Component {
 		return this.removeRootTagsProduceByAztec( value );
 	}
 
-	onActiveFormatsChange( formats ) {
-		// force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
-		// This is needed because our shouldComponentUpdate impl. doesn't take in consideration props yet.
-		this.forceUpdate();
-		const newFormats = formats.reduce( ( accFormats, activeFormat ) => {
-			accFormats[ activeFormat ] = getFormatValue( activeFormat );
-			return accFormats;
-		}, {} );
+	getActiveFormatNames( record ) {
+		const {
+			formatTypes,
+		} = this.props;
 
+		return formatTypes.map( ( { name } ) => name ).filter( ( name ) => {
+			return getActiveFormat( record, name ) !== undefined;
+		} ).map( ( name ) => gutenbergFormatNamesToAztec[ name ] ).filter( Boolean );
+	}
+
+	onFormatChange( record ) {
+		let newContent;
+		// valueToFormat might throw when converting the record to a tree structure
+		// let's ignore the event for now and force a render update so we're still in sync
+		try {
+			newContent = this.valueToFormat( record );
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.log( error );
+		}
 		this.setState( {
-			formats: merge( {}, newFormats ),
-			selectedNodeId: this.state.selectedNodeId + 1,
+			formatPlaceholder: record.formatPlaceholder,
 		} );
+		if ( newContent && newContent !== this.props.value ) {
+			this.props.onChange( newContent );
+		} else {
+			// make sure the component rerenders without refreshing the text on gutenberg
+			// (this can trigger other events that might update the active formats on aztec)
+			this.lastEventCount = 0;
+			this.forceUpdate();
+		}
 	}
 
 	/*
@@ -186,17 +196,14 @@ export class RichText extends Component {
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
 
-	/**
+	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
-
 	onChange( event ) {
 		this.lastEventCount = event.nativeEvent.eventCount;
-		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( event.nativeEvent.text );
+		const contentWithoutRootTag = this.removeRootTagsProduceByAztec( unescapeSpaces( event.nativeEvent.text ) );
 		this.lastContent = contentWithoutRootTag;
-		this.props.onChange( {
-			content: this.lastContent,
-		} );
+		this.props.onChange( this.lastContent );
 	}
 
 	/**
@@ -207,18 +214,18 @@ export class RichText extends Component {
 		const contentHeight = contentSize.height;
 		this.props.onContentSizeChange( {
 			aztecHeight: contentHeight,
-		}
-		);
+		} );
 	}
 
 	// eslint-disable-next-line no-unused-vars
 	onEnter( event ) {
+		this.lastEventCount = event.nativeEvent.eventCount;
 		if ( ! this.props.onSplit ) {
 			// TODO: insert the \n char instead?
 			return;
 		}
 
-		this.splitContent( event.nativeEvent.text, event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
+		this.splitContent( unescapeSpaces( event.nativeEvent.text ), event.nativeEvent.selectionStart, event.nativeEvent.selectionEnd );
 	}
 
 	// eslint-disable-next-line no-unused-vars
@@ -244,6 +251,32 @@ export class RichText extends Component {
 		if ( onRemove && empty && isReverse ) {
 			onRemove( ! isReverse );
 		}
+	}
+
+	onSelectionChange( start, end, text, event ) {
+		// `end` can be less than `start` on iOS
+		// Let's fix that here so `rich-text/slice` can work properly
+		const realStart = Math.min( start, end );
+		const realEnd = Math.max( start, end );
+		const noChange = this.state.start === start && this.state.end === end;
+		const isTyping = this.state.start + 1 === realStart;
+		const shouldKeepFormats = noChange || isTyping;
+		// update format placeholder to continue writing in the current format
+		// or set it to null if user jumped to another part in the text
+		const formatPlaceholder = shouldKeepFormats && this.state.formatPlaceholder ? {
+			...this.state.formatPlaceholder,
+			index: realStart,
+		} : null;
+		this.setState( {
+			start: realStart,
+			end: realEnd,
+			formatPlaceholder,
+		} );
+		this.lastEventCount = event.nativeEvent.eventCount;
+		// we don't want to refresh aztec as no content can have changed from this event
+		// let's update lastContent to prevent that in shouldComponentUpdate
+		this.lastContent = this.removeRootTagsProduceByAztec( unescapeSpaces( text ) );
+		this.props.onChange( this.lastContent );
 	}
 
 	isEmpty() {
@@ -276,7 +309,7 @@ export class RichText extends Component {
 	}
 
 	shouldComponentUpdate( nextProps ) {
-		if ( nextProps.tagName !== this.props.tagName ) {
+		if ( nextProps.tagName !== this.props.tagName || nextProps.isSelected !== this.props.isSelected ) {
 			this.lastEventCount = undefined;
 			this.lastContent = undefined;
 			return true;
@@ -316,61 +349,18 @@ export class RichText extends Component {
 		}
 	}
 
-	isFormatActive( format ) {
-		return this.state.formats[ format ] && this.state.formats[ format ].isActive;
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	removeFormat( format ) {
-		this._editor.applyFormat( format );
-	}
-
-	// eslint-disable-next-line no-unused-vars
-	applyFormat( format, args, node ) {
-		this._editor.applyFormat( format );
-	}
-
-	changeFormats( formats ) {
-		const newStateFormats = {};
-		forEach( formats, ( formatValue, format ) => {
-			newStateFormats[ format ] = getFormatValue( format );
-			const isActive = this.isFormatActive( format );
-			if ( isActive && ! formatValue ) {
-				this.removeFormat( format );
-			} else if ( ! isActive && formatValue ) {
-				this.applyFormat( format );
-			}
-		} );
-
-		this.setState( ( state ) => ( {
-			formats: merge( {}, state.formats, newStateFormats ),
-		} ) );
-	}
-
-	toggleFormat( format ) {
-		return () => this.changeFormats( {
-			[ format ]: ! this.state.formats[ format ],
-		} );
-	}
-
 	render() {
 		const {
 			tagName,
 			style,
 			formattingControls,
-			value,
+			isSelected,
 		} = this.props;
 
-		const toolbarControls = FORMATTING_CONTROLS
-			.filter( ( control ) => formattingControls.indexOf( control.format ) !== -1 )
-			.map( ( control ) => ( {
-				...control,
-				onClick: this.toggleFormat( control.format ),
-				isActive: this.isFormatActive( control.format ),
-			} ) );
-
+		const record = this.getRecord();
 		// Save back to HTML from React tree
-		let html = '<' + tagName + '>' + value + '</' + tagName + '>';
+		const value = this.valueToFormat( record );
+		let html = `<${ tagName }>${ value }</${ tagName }>`;
 		// We need to check if the value is undefined or empty, and then assign it properly otherwise the placeholder is not visible
 		if ( value === undefined || value === '' ) {
 			html = '';
@@ -379,14 +369,19 @@ export class RichText extends Component {
 
 		return (
 			<View>
-				<BlockFormatControls>
-					<Toolbar controls={ toolbarControls } />
-				</BlockFormatControls>
+				{ isSelected && (
+					<BlockFormatControls>
+						<FormatToolbar controls={ formattingControls } />
+					</BlockFormatControls>
+				) }
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
-					}
-					}
+
+						if ( this.props.setRef ) {
+							this.props.setRef( ref );
+						}
+					} }
 					text={ { text: html, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={ this.props.placeholderTextColor || 'lightgrey' }
@@ -395,10 +390,11 @@ export class RichText extends Component {
 					onBlur={ this.props.onBlur }
 					onEnter={ this.onEnter }
 					onBackspace={ this.onBackspace }
+					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
-					onActiveFormatsChange={ this.onActiveFormatsChange }
 					onCaretVerticalPositionChange={ this.props.onCaretVerticalPositionChange }
-					isSelected={ this.props.isSelected }
+					onSelectionChange={ this.onSelectionChange }
+					isSelected={ isSelected }
 					blockType={ { tag: tagName } }
 					color={ 'black' }
 					maxImagesWidth={ 200 }
@@ -408,18 +404,26 @@ export class RichText extends Component {
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
 				/>
+				{ isSelected && <FormatEdit value={ record } onChange={ this.onFormatChange } /> }
 			</View>
 		);
 	}
 }
 
 RichText.defaultProps = {
-	formattingControls: FORMATTING_CONTROLS.map( ( { format } ) => format ),
+	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
 	format: 'string',
 };
 
 const RichTextContainer = compose( [
 	withInstanceId,
+	withSelect( ( select ) => {
+		const { getFormatTypes } = select( 'core/rich-text' );
+
+		return {
+			formatTypes: getFormatTypes(),
+		};
+	} ),
 ] )( RichText );
 
 RichTextContainer.Content = ( { value, format, tagName: Tag, ...props } ) => {
@@ -444,3 +448,6 @@ RichTextContainer.Content.defaultProps = {
 };
 
 export default RichTextContainer;
+export { RichTextShortcut } from './shortcut';
+export { RichTextToolbarButton } from './toolbar-button';
+export { RichTextInputEvent } from './input-event';
