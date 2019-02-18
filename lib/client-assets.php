@@ -841,6 +841,67 @@ function gutenberg_get_available_image_sizes() {
 }
 
 /**
+ * Extends block editor settings to include Gutenberg's `editor-styles.css` as
+ * taking precedent those styles shipped with core.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_styles( $settings ) {
+	$editor_styles_file = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+
+	/*
+	 * If, for whatever reason, the built editor styles do not exist, avoid
+	 * override and fall back to the default.
+	 */
+	if ( ! file_exists( $editor_styles_file ) ) {
+		return $settings;
+	}
+
+	if ( empty( $settings['styles'] ) ) {
+		$settings['styles'] = array();
+	} else {
+		/*
+		 * The styles setting is an array of CSS strings, so there is no direct
+		 * way to find the default styles. To maximize stability, load (again)
+		 * the default styles from disk and find its place in the array.
+		 *
+		 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L175
+		 */
+
+		$default_styles = file_get_contents(
+			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
+		);
+
+		/*
+		 * Iterate backwards from the end of the array since the preferred
+		 * insertion point in case not found is prepended as first entry.
+		 */
+		for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
+			if ( isset( $settings['styles'][ $i ]['css'] ) &&
+					$default_styles === $settings['styles'][ $i ]['css'] ) {
+				break;
+			}
+		}
+	}
+
+	$editor_styles = array(
+		'css' => file_get_contents( $editor_styles_file ),
+	);
+
+	// Substitute default styles if found. Otherwise, prepend to setting array.
+	if ( isset( $i ) && $i >= 0 ) {
+		$settings['styles'][ $i ] = $editor_styles;
+	} else {
+		array_unshift( $settings['styles'], $editor_styles );
+	}
+
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+
+/**
  * Scripts & Styles.
  *
  * Enqueues the needed scripts and styles when visiting the top-level page of
@@ -1002,7 +1063,7 @@ function gutenberg_editor_scripts_and_styles( $hook ) {
 	$styles = array(
 		array(
 			'css' => file_get_contents(
-				gutenberg_dir_path() . 'build/editor/editor-styles.css'
+				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
 			),
 		),
 	);
