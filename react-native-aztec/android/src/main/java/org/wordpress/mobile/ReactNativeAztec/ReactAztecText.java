@@ -26,6 +26,10 @@ import org.wordpress.aztec.plugins.IToolbarButton;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.HashMap;
 
 public class ReactAztecText extends AztecText {
 
@@ -51,6 +55,17 @@ public class ReactAztecText extends AztecText {
     boolean shouldHandleOnBackspace = false;
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
+
+    private static final HashMap<ITextFormat, String> typingFormatsMap = new HashMap<ITextFormat, String>() {
+        {
+            put(AztecTextFormat.FORMAT_BOLD, "bold");
+            put(AztecTextFormat.FORMAT_STRONG, "bold");
+            put(AztecTextFormat.FORMAT_EMPHASIS, "italic");
+            put(AztecTextFormat.FORMAT_ITALIC, "italic");
+            put(AztecTextFormat.FORMAT_CITE, "italic");
+            put(AztecTextFormat.FORMAT_STRIKETHROUGH, "strikethrough");
+        }
+    };
 
     public ReactAztecText(ThemedReactContext reactContext) {
         super(reactContext);
@@ -232,7 +247,7 @@ public class ReactAztecText extends AztecText {
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd)
+                new ReactAztecSelectionChangeEvent(getId(), content, selStart, selEnd, incrementAndGetEventCounter())
         );
     }
 
@@ -296,7 +311,7 @@ public class ReactAztecText extends AztecText {
         ReactContext reactContext = (ReactContext) getContext();
         EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
         eventDispatcher.dispatchEvent(
-                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+                new ReactAztecEnterEvent(getId(), content, cursorPositionStart, cursorPositionEnd, incrementAndGetEventCounter())
         );
         return true;
     }
@@ -321,66 +336,27 @@ public class ReactAztecText extends AztecText {
         return true;
     }
 
-    public void applyFormat(String format) {
-        ArrayList<ITextFormat> newFormats = new ArrayList<>();
-        switch (format) {
-            case ("bold"):
-            case ("strong"):
-                newFormats.add(AztecTextFormat.FORMAT_STRONG);
-                newFormats.add(AztecTextFormat.FORMAT_BOLD);
-            break;
-            case ("italic"):
-                newFormats.add(AztecTextFormat.FORMAT_ITALIC);
-                newFormats.add(AztecTextFormat.FORMAT_CITE);
-            break;
-            case ("strikethrough"):
-                newFormats.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
-            break;
-        }
-
-        if (newFormats.size() == 0) {
-            return;
-        }
-
-        if (!isTextSelected()) {
-            final ArrayList<ITextFormat> newStylesList = getNewStylesList(newFormats);
-            setSelectedStyles(newStylesList);
-            // Update the toolbar state
-            updateToolbarButtons(newStylesList);
-        } else {
-            toggleFormatting(newFormats.get(0));
-            // Update the toolbar state
-            updateToolbarButtons(getSelectionStart(), getSelectionEnd());
-        }
-
-        // emit onChange because the underlying HTML has changed applying the style
-        ReactContext reactContext = (ReactContext) getContext();
-        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class).getEventDispatcher();
-        eventDispatcher.dispatchEvent(
-                new ReactTextChangedEvent(
-                        getId(),
-                        toHtml(false),
-                        incrementAndGetEventCounter())
-        );
-    }
-
-    // Removes all formats in the list but if none found, applies the first one
-    private ArrayList<ITextFormat> getNewStylesList(ArrayList<ITextFormat> newFormats) {
-        ArrayList<ITextFormat> textFormats = new ArrayList<>();
-        textFormats.addAll(getSelectedStyles());
-        boolean wasRemoved = false;
-        for (ITextFormat newFormat : newFormats) {
-            if (textFormats.contains(newFormat)) {
-                wasRemoved = true;
-                textFormats.remove(newFormat);
+    public void setActiveFormats(Iterable<String> newFormats) {
+        Set<ITextFormat> selectedStylesSet = new HashSet<>(getSelectedStyles());
+        Set<ITextFormat> newFormatsSet = new HashSet<>();
+        for (String newFormat : newFormats) {
+            switch (newFormat) {
+                case "bold":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_STRONG);
+                    break;
+                case "italic":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_EMPHASIS);
+                    break;
+                case "strikethrough":
+                    newFormatsSet.add(AztecTextFormat.FORMAT_STRIKETHROUGH);
+                    break;
             }
         }
-
-        if (!wasRemoved) {
-            textFormats.add(newFormats.get(0));
-        }
-
-        return textFormats;
+        selectedStylesSet.removeAll(typingFormatsMap.keySet());
+        selectedStylesSet.addAll(newFormatsSet);
+        ArrayList<ITextFormat> newStylesList = new ArrayList<>(selectedStylesSet);
+        setSelectedStyles(newStylesList);
+        updateToolbarButtons(newStylesList);
     }
 
     /**

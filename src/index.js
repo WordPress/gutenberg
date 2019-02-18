@@ -21,6 +21,7 @@ const gutenbergSetup = () => {
 };
 
 const editorSetup = () => {
+	require( '@wordpress/format-library' );
 	const wpBlockLibrary = require( '@wordpress/block-library' );
 	const wpBlocks = require( '@wordpress/blocks' );
 	const registerCoreBlocks = wpBlockLibrary.registerCoreBlocks;
