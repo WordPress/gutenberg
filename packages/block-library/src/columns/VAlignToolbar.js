@@ -11,10 +11,12 @@ import { _x } from '@wordpress/i18n';
 import { valignTop, valignCenter, valignBottom } from './icons';
 
 class VAlignToolbar extends Component {
-	constructor( props ) {
-		super( props );
+	makeAlignmentUpdater( alignment ) {
+		return () => this.props.setAttributes( { verticalAlignment: alignment } );
+	}
 
-		this.toolbarControls = [
+	render() {
+		const toolbarControls = [
 			{
 				icon: valignTop,
 				title: _x( 'V-align Top', 'Block vertical alignment setting' ),
@@ -34,15 +36,9 @@ class VAlignToolbar extends Component {
 				onClick: this.makeAlignmentUpdater( 'bottom' ),
 			},
 		];
-	}
 
-	makeAlignmentUpdater( alignment ) {
-		return () => this.props.setAttributes( { verticalAlignment: alignment } );
-	}
-
-	render() {
 		return (
-			<Toolbar controls={ this.toolbarControls } />
+			<Toolbar controls={ toolbarControls } />
 		);
 	}
 }
