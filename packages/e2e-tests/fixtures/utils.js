@@ -25,11 +25,11 @@ function writeFixtureFile( fixturesDir, filename, content ) {
 	);
 }
 
-export function blockNameToFixtureBaseName( blockName ) {
+export function blockNameToFixtureBasename( blockName ) {
 	return blockName.replace( /\//g, '__' );
 }
 
-export function getAvailableBlockFixturesBaseNames() {
+export function getAvailableBlockFixturesBasenames() {
 	// We expect 4 different types of files for each fixture:
 	//  - fixture.html            : original content
 	//  - fixture.parsed.json     : parser output
@@ -43,50 +43,50 @@ export function getAvailableBlockFixturesBaseNames() {
 	);
 }
 
-export function getBlockFixtureHTML( baseName ) {
-	const fileName = `${ baseName }.html`;
+export function getBlockFixtureHTML( basename ) {
+	const filename = `${ basename }.html`;
 	return {
-		fileName,
-		file: readFixtureFile( FIXTURES_DIR, fileName ),
+		filename,
+		file: readFixtureFile( FIXTURES_DIR, filename ),
 	};
 }
 
-export function getBlockFixtureJSON( baseName ) {
-	const fileName = `${ baseName }.json`;
+export function getBlockFixtureJSON( basename ) {
+	const filename = `${ basename }.json`;
 	return {
-		fileName,
-		file: readFixtureFile( FIXTURES_DIR, fileName ),
+		filename,
+		file: readFixtureFile( FIXTURES_DIR, filename ),
 	};
 }
 
-export function getBlockFixtureParsedJSON( baseName ) {
-	const fileName = `${ baseName }.parsed.json`;
+export function getBlockFixtureParsedJSON( basename ) {
+	const filename = `${ basename }.parsed.json`;
 	return {
-		fileName,
-		file: readFixtureFile( FIXTURES_DIR, fileName ),
+		filename,
+		file: readFixtureFile( FIXTURES_DIR, filename ),
 	};
 }
 
-export function getBlockFixtureSerializedHTML( baseName ) {
-	const fileName = `${ baseName }.serialized.html`;
+export function getBlockFixtureSerializedHTML( basename ) {
+	const filename = `${ basename }.serialized.html`;
 	return {
-		fileName,
-		file: readFixtureFile( FIXTURES_DIR, fileName ),
+		filename,
+		file: readFixtureFile( FIXTURES_DIR, filename ),
 	};
 }
 
-export function writeBlockFixtureHTML( baseName, fixture ) {
-	writeFixtureFile( FIXTURES_DIR, `${ baseName }.html`, fixture );
+export function writeBlockFixtureHTML( basename, fixture ) {
+	writeFixtureFile( FIXTURES_DIR, `${ basename }.html`, fixture );
 }
 
-export function writeBlockFixtureJSON( baseName, fixture ) {
-	writeFixtureFile( FIXTURES_DIR, `${ baseName }.json`, fixture );
+export function writeBlockFixtureJSON( basename, fixture ) {
+	writeFixtureFile( FIXTURES_DIR, `${ basename }.json`, fixture );
 }
 
-export function writeBlockFixtureParsedJSON( baseName, fixture ) {
-	writeFixtureFile( FIXTURES_DIR, `${ baseName }.parsed.json`, fixture );
+export function writeBlockFixtureParsedJSON( basename, fixture ) {
+	writeFixtureFile( FIXTURES_DIR, `${ basename }.parsed.json`, fixture );
 }
 
-export function writeBlockFixtureSerializedHTML( baseName, fixture ) {
-	writeFixtureFile( FIXTURES_DIR, `${ baseName }.serialized.html`, fixture );
+export function writeBlockFixtureSerializedHTML( basename, fixture ) {
+	writeFixtureFile( FIXTURES_DIR, `${ basename }.serialized.html`, fixture );
 }

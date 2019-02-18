@@ -1,6 +1,6 @@
 export {
-	blockNameToFixtureBaseName,
-	getAvailableBlockFixturesBaseNames,
+	blockNameToFixtureBasename,
+	getAvailableBlockFixturesBasenames,
 	getBlockFixtureHTML,
 	getBlockFixtureJSON,
 	getBlockFixtureParsedJSON,

@@ -16,8 +16,8 @@ import {
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { //eslint-disable-line no-restricted-syntax
-	blockNameToFixtureBaseName,
-	getAvailableBlockFixturesBaseNames,
+	blockNameToFixtureBasename,
+	getAvailableBlockFixturesBasenames,
 	getBlockFixtureHTML,
 	getBlockFixtureJSON,
 	getBlockFixtureParsedJSON,
@@ -27,7 +27,7 @@ import { //eslint-disable-line no-restricted-syntax
 	writeBlockFixtureSerializedHTML,
 } from '@wordpress/e2e-tests/fixtures';
 
-const blockBaseNames = getAvailableBlockFixturesBaseNames();
+const blockBasenames = getAvailableBlockFixturesBasenames();
 
 function normalizeParsedBlocks( blocks ) {
 	return blocks.map( ( block, index ) => {
@@ -54,12 +54,12 @@ describe( 'full post content fixture', () => {
 		registerCoreBlocks();
 	} );
 
-	blockBaseNames.forEach( ( baseName ) => {
-		it( baseName, () => {
+	blockBasenames.forEach( ( basename ) => {
+		it( basename, () => {
 			const {
-				fileName: htmlFixtureFileName,
+				filename: htmlFixtureFileName,
 				file: htmlFixtureContent,
-			} = getBlockFixtureHTML( baseName );
+			} = getBlockFixtureHTML( basename );
 			if ( htmlFixtureContent === null ) {
 				throw new Error(
 					`Missing fixture file: ${ htmlFixtureFileName }`
@@ -67,9 +67,9 @@ describe( 'full post content fixture', () => {
 			}
 
 			const {
-				fileName: parsedJSONFixtureFileName,
+				filename: parsedJSONFixtureFileName,
 				file: parsedJSONFixtureContent,
-			} = getBlockFixtureParsedJSON( baseName );
+			} = getBlockFixtureParsedJSON( basename );
 			const parserOutputActual = grammarParse( htmlFixtureContent );
 			let parserOutputExpectedString;
 			if ( parsedJSONFixtureContent ) {
@@ -80,7 +80,7 @@ describe( 'full post content fixture', () => {
 					null,
 					4
 				) + '\n';
-				writeBlockFixtureParsedJSON( baseName, parserOutputExpectedString );
+				writeBlockFixtureParsedJSON( basename, parserOutputExpectedString );
 			} else {
 				throw new Error(
 					`Missing fixture file: ${ parsedJSONFixtureFileName }`
@@ -104,8 +104,8 @@ describe( 'full post content fixture', () => {
 
 			// Block validation may log errors during deprecation migration,
 			// unless explicitly handled from a valid block via isEligible.
-			// Match on baseName for deprecated blocks fixtures to allow.
-			const isDeprecated = /__deprecated([-_]|$)/.test( baseName );
+			// Match on basename for deprecated blocks fixtures to allow.
+			const isDeprecated = /__deprecated([-_]|$)/.test( basename );
 			if ( isDeprecated ) {
 				/* eslint-disable no-console */
 				console.warn.mockReset();
@@ -115,9 +115,9 @@ describe( 'full post content fixture', () => {
 
 			const blocksActualNormalized = normalizeParsedBlocks( blocksActual );
 			const {
-				fileName: jsonFixtureFileName,
+				filename: jsonFixtureFileName,
 				file: jsonFixtureContent,
-			} = getBlockFixtureJSON( baseName );
+			} = getBlockFixtureJSON( basename );
 
 			let blocksExpectedString;
 
@@ -129,7 +129,7 @@ describe( 'full post content fixture', () => {
 					null,
 					4
 				) + '\n';
-				writeBlockFixtureJSON( baseName, blocksExpectedString );
+				writeBlockFixtureJSON( basename, blocksExpectedString );
 			} else {
 				throw new Error(
 					`Missing fixture file: ${ jsonFixtureFileName }`
@@ -153,16 +153,16 @@ describe( 'full post content fixture', () => {
 			// files should.
 			const serializedActual = serialize( blocksActual ) + '\n';
 			const {
-				fileName: serializedHTMLFileName,
+				filename: serializedHTMLFileName,
 				file: serializedHTMLFixtureContent,
-			} =	getBlockFixtureSerializedHTML( baseName );
+			} =	getBlockFixtureSerializedHTML( basename );
 
 			let serializedExpected;
 			if ( serializedHTMLFixtureContent ) {
 				serializedExpected = serializedHTMLFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
 				serializedExpected = serializedActual;
-				writeBlockFixtureSerializedHTML( baseName, serializedExpected );
+				writeBlockFixtureSerializedHTML( basename, serializedExpected );
 			} else {
 				throw new Error(
 					`Missing fixture file: ${ serializedHTMLFileName }`
@@ -191,19 +191,19 @@ describe( 'full post content fixture', () => {
 			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
 			.filter( ( name ) => name.indexOf( 'core-embed' ) !== 0 && name !== 'core/template' )
 			.forEach( ( name ) => {
-				const nameToFilename = blockNameToFixtureBaseName( name );
-				const foundFixtures = blockBaseNames
-					.filter( ( baseName ) => (
-						baseName === nameToFilename ||
-						startsWith( baseName, nameToFilename + '__' )
+				const nameToFilename = blockNameToFixtureBasename( name );
+				const foundFixtures = blockBasenames
+					.filter( ( basename ) => (
+						basename === nameToFilename ||
+						startsWith( basename, nameToFilename + '__' )
 					) )
-					.map( ( baseName ) => {
+					.map( ( basename ) => {
 						const {
-							fileName: htmlFixtureFileName,
-						} = getBlockFixtureHTML( baseName );
+							filename: htmlFixtureFileName,
+						} = getBlockFixtureHTML( basename );
 						const {
 							file: jsonFixtureContent,
-						} = getBlockFixtureJSON( baseName );
+						} = getBlockFixtureJSON( basename );
 						// The parser output for this test.  For missing files,
 						// JSON.parse( null ) === null.
 						const parserOutput = JSON.parse(
