@@ -37,25 +37,24 @@ export const settings = {
 		backgroundColor: {
 			type: 'string',
 		},
-		padding: {
-			type: 'number',
-			default: 0,
+		paddingClassName: {
+			type: 'string',
+			default: '',
 		},
 	},
 
 	edit,
 
 	save( { attributes } ) {
-		const { backgroundColor, customBackgroundColor, padding } = attributes;
+		const { backgroundColor, customBackgroundColor, paddingClassName } = attributes;
 
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-		const className = classnames( backgroundClass, {
+		const className = classnames( backgroundClass, paddingClassName, {
 			'has-background': backgroundColor || customBackgroundColor,
 		} );
 
 		const styles = {
 			backgroundColor: backgroundClass ? undefined : customBackgroundColor,
-			padding: padding ? `${ padding }%` : undefined,
 		};
 
 		return (
