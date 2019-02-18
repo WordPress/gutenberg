@@ -97,7 +97,12 @@ class EmbedPreview extends Component {
 				{ ( cannotPreview ) ? (
 					<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label }>
 						<p className="components-placeholder__error"><a href={ url }>{ url }</a></p>
-						<p className="components-placeholder__error">{ sprintf( __( "Embedded content from %s can't be previewed in the editor." ), parsedHostBaseUrl ) }</p>
+						<p className="components-placeholder__error">
+							{
+								/* translators: %s: host providing embed content e.g: www.youtube.com */
+								sprintf( __( "Embedded content from %s can't be previewed in the editor." ), parsedHostBaseUrl )
+							}
+						</p>
 					</Placeholder>
 				) : embedWrapper }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
