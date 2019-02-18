@@ -1,13 +1,19 @@
 /**
- * WordPress dependencies
- */
-/**
  * External dependencies
  */
 import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
 import { Path, SVG, Toolbar } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InnerBlocks, BlockControls } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { valignTop, valignCenter, valignBottom } from './icons';
 
 export const name = 'core/column';
 
@@ -38,20 +44,20 @@ export const settings = {
 	edit( { attributes, setAttributes, isSelected } ) {
 		const toolbarControls = [
 			{
-				icon: 'arrow-up-alt2',
-				title: 'V-align column Top',
+				icon: valignTop,
+				title: 'V-align Top',
 				isActive: attributes.verticalAlignment === 'top',
 				onClick: () => setAttributes( { verticalAlignment: 'top' } ),
 			},
 			{
-				icon: 'minus',
-				title: 'V-align column Middle',
+				icon: valignCenter,
+				title: 'V-align Middle',
 				isActive: attributes.verticalAlignment === 'center',
 				onClick: () => setAttributes( { verticalAlignment: 'center' } ),
 			},
 			{
-				icon: 'arrow-down-alt2',
-				title: 'V-align column Bottom',
+				icon: valignBottom,
+				title: 'V-align Bottom',
 				isActive: attributes.verticalAlignment === 'bottom',
 				onClick: () => setAttributes( { verticalAlignment: 'bottom' } ),
 			},
