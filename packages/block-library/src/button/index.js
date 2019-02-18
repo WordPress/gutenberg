@@ -70,6 +70,8 @@ export const settings = {
 
 	category: 'layout',
 
+	keywords: [ __( 'link' ) ],
+
 	attributes: blockAttributes,
 
 	supports: {
