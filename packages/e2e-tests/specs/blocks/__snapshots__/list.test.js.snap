@@ -76,7 +76,7 @@ exports[`List can be created by using an asterisk at the start of a paragraph bl
 
 exports[`List can undo asterisk transform 1`] = `
 "<!-- wp:paragraph -->
-<p>1.</p>
+<p>1. </p>
 <!-- /wp:paragraph -->"
 `;
 
