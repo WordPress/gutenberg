@@ -166,7 +166,6 @@ return array(
 	'wp-escape-html'                        => array(),
 	'wp-format-library'                     => array(
 		'wp-components',
-		'wp-dom',
 		'wp-editor',
 		'wp-element',
 		'wp-i18n',
