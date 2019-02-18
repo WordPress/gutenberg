@@ -3,6 +3,8 @@
 ### Breaking Changes
 
 - The bundled `eslint` dependency has been updated from requiring `^4.19.1` to requiring `^5.12.1` (see [Migration Guide](https://eslint.org/docs/user-guide/migrating-to-5.0.0)).
+- The bundled `jest` dependency has been updated from requiring `^23.6.0` to requiring `^24.1.0` (see [Breaking Changes](https://jestjs.io/blog/2019/01/25/jest-24-refreshing-polished-typescript-friendly#breaking-changes), [#13922](https://github.com/WordPress/gutenberg/pull/13922)).
+- The bundled `jest-puppeteer` dependency has been updated from requiring `3.2.1` to requiring `^4.0.0` ([#13922](https://github.com/WordPress/gutenberg/pull/13922)).
 
 ### New Features
 
@@ -12,6 +14,10 @@
 ### Bug Fix
 
 - Avoid inheriting from ESLint configurations in ancestor directories when using the default configuration ([#13483](https://github.com/WordPress/gutenberg/pull/13483))
+
+### Internal
+
+- The bundled `puppeteer` dependency has been updated from requiring `1.6.1` to requiring `^1.12.2` ([#13922](https://github.com/WordPress/gutenberg/pull/13922)).
 
 ## 2.5.0 (2019-01-09)
 

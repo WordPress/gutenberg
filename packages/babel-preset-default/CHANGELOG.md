@@ -1,3 +1,9 @@
+## 4.0.0 (Unreleased)
+
+## Breaking Change
+
+- Removed `babel-core` dependency acting as Babel 7 bridge ([#13922](https://github.com/WordPress/gutenberg/pull/13922).
+
 ## 3.0.0 (2018-09-30)
 
 ## Breaking Change
