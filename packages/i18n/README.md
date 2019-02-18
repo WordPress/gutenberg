@@ -1,8 +1,8 @@
 # Internationalization (i18n)
 
-Internationalization utilities for client-side localization.
+Internationalization utilities for client-side localization. See [How to Internationalize Your Plugin](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/) for server-side documentation.
 
-<https://codex.wordpress.org/I18n_for_WordPress_Developers>
+For a complete example, see the [Internationalization section of the Gutenberg Handbook](https://wordpress.org/gutenberg/handbook/designers-developers/developers/internationalization.md).
 
 ## Installation
 
@@ -23,17 +23,27 @@ sprintf( _n( '%d hat', '%d hats', 4, 'text-domain' ), 4 );
 // 4 hats
 ```
 
-Note that you will not need to specify [domain](https://codex.wordpress.org/I18n_for_WordPress_Developers#Text_Domains) for the strings.
 
-## Build
+## Build and Usage
 
-You can use the [WordPress i18n babel plugin](/packages/babel-plugin-makepot/README.md) to generate a `.pot` file containing all your localized strings.
-
-The package also includes a `pot-to-php` script used to generate a php files containing the messages listed in a `.pot` file. This is useful to trick WordPress.org translation strings discovery since at the moment, WordPress.org is not capable of parsing strings directly from JavaScript files.
+You can use the [wp-cli utility](https://wp-cli.org/) to generate a `.pot` file containing all your localized strings.
 
 ```sh
-npx pot-to-php languages/myplugin.pot languages/myplugin-translations.php text-domain
+wp i18n make-pot ./src myplugin.pot
 ```
+
+Use the [po2json](https://github.com/mikeedwards/po2json) npm module to convert a po file to the proper Jed json format.
+
+```sh
+po2json myplugin-eo.po myplugin-eo.json -f jed
+```
+
+Use the [wp_set_script_translations](https://developer.wordpress.org/reference/functions/wp_set_script_translations/) function to load the json translation file.
+
+```php
+wp_set_script_translations( 'myplugin-script', 'myplugin', plugin_dir_path( __FILE__ ) . 'languages' );
+```
+
 
 ## API
 
