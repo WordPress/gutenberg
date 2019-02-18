@@ -129,7 +129,15 @@ export const editor = flow( [
 
 	withHistory( {
 		resetTypes: [ 'SETUP_EDITOR_STATE' ],
-		ignoreTypes: [ 'RECEIVE_BLOCKS', 'RESET_POST', 'UPDATE_POST' ],
+		ignoreTypes: [
+			'RECEIVE_BLOCKS',
+			'RESET_POST',
+			'UPDATE_POST',
+
+			// Blocks history is managed by explicit createUndoLevel actions
+			// occurring via the rendered BlockEditor's onChange callback.
+			'RESET_EDITOR_BLOCKS',
+		],
 		shouldOverwriteState,
 	} ),
 ] )( {
