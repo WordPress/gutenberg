@@ -13,6 +13,7 @@ import {
 	IconButton,
 	ToggleControl,
 	withSpokenMessages,
+	PositionedAtSelection,
 } from '@wordpress/components';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { prependHTTP, safeDecodeURI, filterURLForDisplay } from '@wordpress/url';
@@ -29,7 +30,6 @@ import { URLInput, URLPopover } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import PositionedAtSelection from './positioned-at-selection';
 import { isValidHref } from './utils';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
