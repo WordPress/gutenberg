@@ -2,7 +2,6 @@
 
 Internationalization utilities for client-side localization. See [How to Internationalize Your Plugin](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/) for server-side documentation.
 
-For a complete example, see the [Internationalization section of the Gutenberg Handbook](https://wordpress.org/gutenberg/handbook/designers-developers/developers/internationalization.md).
 
 ## Installation
 
@@ -23,27 +22,7 @@ sprintf( _n( '%d hat', '%d hats', 4, 'text-domain' ), 4 );
 // 4 hats
 ```
 
-
-## Build and Usage
-
-You can use [WP-CLI](https://wp-cli.org/) to generate a `.pot` file containing all your translatable strings.
-
-```sh
-wp i18n make-pot ./src myplugin.pot
-```
-
-Use the [po2json](https://github.com/mikeedwards/po2json) npm module to convert a po file to the proper Jed json format.
-
-```sh
-po2json myplugin-eo.po myplugin-eo.json -f jed
-```
-
-Use the [wp_set_script_translations](https://developer.wordpress.org/reference/functions/wp_set_script_translations/) function to load the json translation file.
-
-```php
-wp_set_script_translations( 'myplugin-script', 'myplugin', plugin_dir_path( __FILE__ ) . 'languages' );
-```
-
+For a complete example, see the [Internationalization section of the Gutenberg Handbook](https://wordpress.org/gutenberg/handbook/designers-developers/developers/internationalization/).
 
 ## API
 
