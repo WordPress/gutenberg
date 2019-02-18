@@ -26,7 +26,7 @@ function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAtt
 		backgroundColor: backgroundColor.color,
 	};
 
-	const classes = classnames( className, {
+	const classes = classnames( className, backgroundColor.class, {
 		'has-padding': hasPadding,
 	} );
 
