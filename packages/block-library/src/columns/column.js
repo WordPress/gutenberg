@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Path, SVG, Toolbar } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { InnerBlocks, BlockControls } from '@wordpress/block-editor';
 
 /**
@@ -45,19 +45,19 @@ export const settings = {
 		const toolbarControls = [
 			{
 				icon: valignTop,
-				title: 'V-align Top',
+				title: _x( 'V-align Top', 'Block vertical alignment setting' ),
 				isActive: attributes.verticalAlignment === 'top',
 				onClick: () => setAttributes( { verticalAlignment: 'top' } ),
 			},
 			{
 				icon: valignCenter,
-				title: 'V-align Middle',
+				title: _x( 'V-align Middle', 'Block vertical alignment setting' ),
 				isActive: attributes.verticalAlignment === 'center',
 				onClick: () => setAttributes( { verticalAlignment: 'center' } ),
 			},
 			{
 				icon: valignBottom,
-				title: 'V-align Bottom',
+				title: _x( 'V-align Bottom', 'Block vertical alignment setting' ),
 				isActive: attributes.verticalAlignment === 'bottom',
 				onClick: () => setAttributes( { verticalAlignment: 'bottom' } ),
 			},

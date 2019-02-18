@@ -8,7 +8,7 @@ import memoize from 'memize';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import {
 	PanelBody,
 	RangeControl,
@@ -24,6 +24,11 @@ import {
 	InnerBlocks,
 	BlockControls,
 } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { valignTop, valignCenter, valignBottom } from './icons';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -177,20 +182,20 @@ export const settings = {
 
 		const toolbarControls = [
 			{
-				icon: 'arrow-up-alt2',
-				title: 'V-align columns Top',
+				icon: valignTop,
+				title: _x( 'V-align all Columns to Top', 'Block vertical alignment setting' ),
 				isActive: verticalAlignment === 'top',
 				onClick: () => setAttributes( { verticalAlignment: 'top' } ),
 			},
 			{
-				icon: 'minus',
-				title: 'V-align columns Middle',
+				icon: valignCenter,
+				title: _x( 'V-align all Columns to Middle', 'Block vertical alignment setting' ),
 				isActive: verticalAlignment === 'center',
 				onClick: () => setAttributes( { verticalAlignment: 'center' } ),
 			},
 			{
-				icon: 'arrow-down-alt2',
-				title: 'V-align columns Bottom',
+				icon: valignBottom,
+				title: _x( 'V-align all Columns to Bottom', 'Block vertical alignment setting' ),
 				isActive: verticalAlignment === 'bottom',
 				onClick: () => setAttributes( { verticalAlignment: 'bottom' } ),
 			},
