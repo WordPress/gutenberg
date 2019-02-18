@@ -10,7 +10,7 @@ For PHP, WordPress has a long established process, see [How to Internationalize 
 
 ## How to use i18n in JavaScript
 
-WordPress 5.0 introduced the wp-i18n JavaScript package that provides the functions needed add translatable strings as you would in PHP.
+WordPress 5.0 introduced the wp-i18n JavaScript package that provides the functions needed to add translatable strings as you would in PHP.
 
 First, add **wp-i18n** as a dependency when registering your script:
 
@@ -20,9 +20,9 @@ First, add **wp-i18n** as a dependency when registering your script:
  * Plugin Name: Myguten Plugin
  * Text Domain: myguten
  */
-function myguten_block() {
+function myguten_block_init() {
     wp_register_script(
-        'myguten-block-script',
+        'myguten-script',
         plugins_url( 'block.js', __FILE__ ),
         array( 'wp-blocks', 'wp-element', 'wp-i18n' )
     );
@@ -31,10 +31,10 @@ function myguten_block() {
         'editor_script' => 'myguten-script',
     ) );
 }
-add_action( 'init', 'myguten_block_load' );
+add_action( 'init', 'myguten_block_init' );
 ```
 
-In your code, you can include the i18n functions. The most common function is **__** which provides translation of a simple string. Here is a basic static block example, this is in a file called `block.js`:
+In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic static block example, this is in a file called `block.js`:
 
 ```js
 const { __ } = wp.i18n;
@@ -81,7 +81,7 @@ After all strings in your code is wrapped, the final step is to tell WordPress y
 
 	// Added in init action
 	// Uses script handle defined in register
-	wp_set_script_translations( 'myguten-block-script', 'myguten' );
+	wp_set_script_translations( 'myguten-script', 'myguten' );
 ```
 
 This is all you need to make your plugin JavaScript code translatable.
@@ -113,13 +113,13 @@ msgstr ""
 
 The `msgid` is the string to be translated, and `msgstr` is the translated string, which in the pot file the msgstr will be empty.
 
-You should copy this file using the language code you are going to translate, in this case Esperanto (eo):
+A po file is then created from this template, which is the same format, but the translations filled in. You should copy the file using the language code you are going to translate, this example will use the Esperanto (eo) language:
 
 ```
 cp myguten.pot myguten-eo.po
 ```
 
-You then go through the `.po` file and add the translation to all the `msgstr`
+You then go through the `.po` file and add the translation to all the `msgstr` sets:
 
 ```
 #: block.js:6
