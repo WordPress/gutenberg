@@ -45,6 +45,9 @@
 	}
 }
 
+/**
+ * All Columns Alignment
+ */
 .wp-block-columns {
 	&.are-vertically-aligned-top {
 		align-items: flex-start;
@@ -59,6 +62,9 @@
 	}
 }
 
+/**
+ * Individual Column Alignment
+ */
 .wp-block-column {
 	&.is-vertically-aligned-top {
 		align-self: flex-start;
