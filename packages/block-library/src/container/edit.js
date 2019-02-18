@@ -1,13 +1,12 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	PanelBody,
+	RangeControl,
+} from '@wordpress/components';
 import {
 	InspectorControls,
 	InnerBlocks,
@@ -15,13 +14,15 @@ import {
 	withColors,
 } from '@wordpress/editor';
 
-function ContainerEdit( { setBackgroundColor, backgroundColor } ) {
-	const className = classnames( backgroundColor.class, {
-		'has-background': backgroundColor.color,
-	} );
+const MIN_PADDING = 0;
+const MAX_PADDING = 50;
+
+function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAttributes, attributes } ) {
+	const { padding } = attributes;
 
 	const styles = {
 		backgroundColor: backgroundColor.color,
+		padding: padding ? `${ padding }%` : undefined,
 	};
 
 	return (
@@ -37,6 +38,19 @@ function ContainerEdit( { setBackgroundColor, backgroundColor } ) {
 						},
 					] }
 				/>
+				<PanelBody title={ __( 'Container padding' ) }>
+					<RangeControl
+						label={ __( 'Padding' ) }
+						value={ padding }
+						onChange={ ( newPadding ) => {
+							setAttributes( {
+								padding: newPadding,
+							} );
+						} }
+						min={ MIN_PADDING }
+						max={ MAX_PADDING }
+					/>
+				</PanelBody>
 			</InspectorControls>
 			<div className={ className } style={ styles }>
 				<InnerBlocks />
