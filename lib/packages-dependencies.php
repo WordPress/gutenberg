@@ -130,6 +130,9 @@ return array(
 		'wp-url',
 		'wp-viewport',
 	),
+	'wp-edit-widgets'                       => array(
+		'wp-element',
+	),
 	'wp-editor'                             => array(
 		'lodash',
 		'wp-a11y',
