@@ -10,6 +10,7 @@ import reducer from './reducer';
 import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
+import * as controls from './controls';
 
 /**
  * Module Constants
@@ -20,6 +21,7 @@ const store = registerStore( MODULE_KEY, {
 	reducer,
 	selectors,
 	actions,
+	controls,
 	persist: [ 'preferences' ],
 } );
 applyMiddlewares( store );
