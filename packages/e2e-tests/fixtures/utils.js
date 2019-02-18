@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { uniq } from 'lodash';
 
-const FIXTURES_DIR = path.join( __dirname, 'fixtures' );
+const FIXTURES_DIR = path.join( __dirname, 'blocks' );
 
 function readFixtureFile( fixturesDir, filename ) {
 	try {

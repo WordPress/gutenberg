@@ -15,7 +15,7 @@ import {
 } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
 import { registerCoreBlocks } from '@wordpress/block-library';
-import {
+import { //eslint-disable-line no-restricted-syntax
 	blockNameToFixtureBaseName,
 	getAvailableBlockFixturesBaseNames,
 	getBlockFixtureHTML,
@@ -25,7 +25,7 @@ import {
 	writeBlockFixtureParsedJSON,
 	writeBlockFixtureJSON,
 	writeBlockFixtureSerializedHTML,
-} from '@wordpress/e2e-tests';
+} from '@wordpress/e2e-tests/fixtures';
 
 const blockBaseNames = getAvailableBlockFixturesBaseNames();
 
