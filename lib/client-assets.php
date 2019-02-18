@@ -486,6 +486,14 @@ function gutenberg_register_scripts_and_styles() {
 	);
 	wp_style_add_data( 'wp-list-reusable-block', 'rtl', 'replace' );
 
+	gutenberg_override_style(
+		'wp-edit-widgets',
+		gutenberg_url( 'build/edit-widgets/style.css' ),
+		array(),
+		filemtime( gutenberg_dir_path() . 'build/edit-widgets/style.css' )
+	);
+	wp_style_add_data( 'wp-edit-widgets', 'rtl', 'replace' );
+
 	if ( defined( 'GUTENBERG_LIVE_RELOAD' ) && GUTENBERG_LIVE_RELOAD ) {
 		$live_reload_url = ( GUTENBERG_LIVE_RELOAD === true ) ? 'http://localhost:35729/livereload.js' : GUTENBERG_LIVE_RELOAD;
 
