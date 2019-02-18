@@ -228,6 +228,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						onDismiss={ () => this.showBlockTypePicker( false ) }
 						onValueSelected={ this.onBlockTypeSelected }
 						isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
+						safeAreaBottomInset={ this.state.safeAreaBottomInset }
 					/>
 				) }
 			</SafeAreaView>
