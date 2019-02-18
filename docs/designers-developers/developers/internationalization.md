@@ -77,11 +77,10 @@ After all strings in your code is wrapped, the final step is to tell WordPress y
 
 ```php
 <?php
-	...
-
-	// Added in init action
-	// Uses script handle defined in register
-	wp_set_script_translations( 'myguten-script', 'myguten' );
+	function myguten_set_script_translations() {
+		wp_set_script_translations( 'myguten-script', 'myguten' );
+	}
+	add_action( 'init', 'myguten_set_script_translations' );
 ```
 
 This is all you need to make your plugin JavaScript code translatable.
@@ -96,11 +95,11 @@ You can create and ship your own translations with your plugin, if you have suff
 
 The translation files must be in the JED 1.x JSON format.
 
-To create a JED translation file, first you need to extract the strings from the text.
-Using [WP-CLI](https://wp-cli.org/), you create a `.pot` file using the following command from within your plugin directory:
+To create a JED translation file, first you need to extract the strings from the text. Typically, the language files all live in a directory called `languages` in your plugin.  Using [WP-CLI](https://wp-cli.org/), you create a `.pot` file using the following command from within your plugin directory:
 
 ```
-wp i18n make-pot ./
+mkdir languages
+wp i18n make-pot ./ languages/myguten.pot
 ```
 
 This will create the file `myguten.pot` which contains all the translatable strings from your project. A single entry in this POT file might look like this:
@@ -119,7 +118,7 @@ This POT file can then be used as the template for new translations. You should 
 cp myguten.pot myguten-eo.po
 ```
 
-You then go through the `.po` file and add the translation to all the `msgstr` sets:
+For this simple example, you can simply edit the `.po` file in your editor and add the translation to all the `msgstr` sets. For a larger, more complex set of translation, the [Glotpress](https://glotpress.blog/) and [poedit](https://poedit.net/) tools exist to help.
 
 ```
 #: block.js:6
@@ -140,20 +139,19 @@ The final part is to tell WordPress where it can look to find the translation fi
 
 ```php
 <?php
-	// added in init action
-	wp_set_script_translations( 'myguten-script', 'myguten', plugin_dir_path( __FILE__ ) . 'languages' );
+	function myguten_set_script_translations() {
+		wp_set_script_translations( 'myguten-script', 'myguten', plugin_dir_path( __FILE__ ) . 'languages' );
+	}
+	add_action( 'init', 'myguten_set_script_translations' );
 ```
 
-WordPress will check for a file in that path with the format `${domain}-${locale}-${handle}.json` as the source of translations.
+WordPress will check for a file in that path with the format `${domain}-${locale}-${handle}.json` as the source of translations. Alternatively, instead of the registered handle you can use the md5 hash of the relative path of the file, `${domain}-${locale} in the form of ${domain}-${locale}-${md5}.json.`
 
-So you should create a directory called `languages` and move the `myguten-eo.json` file there, the handle in the file name is the same handle for the script that needs translating, `myguten-script` in this example:
+This example uses the handle, rename the `myguten-eo.json` file to `myguten-eo-myguten-script.json`.
 
-```
-mkdir languages
-mv myguten-eo.json myguten-eo-myguten-script.json
-```
+### Test Translations
 
-You will need to set your WordPress installation to Esperanto language, you can do so in Settings > General and change your site language to Esperanto. This may require you add `define( 'WPLANG', 'eo' );` to your wp-config.php.
+You will need to set your WordPress installation to Esperanto language. Go to Settings > General and change your site language to Esperanto.
 
-With the language set, you can create a new block which will use the translations.
+With the language set, create a new post, add the block, and you will see the translations used.
 
