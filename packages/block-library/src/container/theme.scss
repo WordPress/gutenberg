@@ -1,9 +1,5 @@
 .wp-block-container {
-	&.is-narrow-padding {
-		padding: 0 1rem;
-	}
-
-	&.is-wide-padding {
-		padding: 0 5rem;
+	&.has-padding {
+		padding: 0 2rem;
 	}
 }

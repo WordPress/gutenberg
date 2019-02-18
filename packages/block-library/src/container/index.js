@@ -37,20 +37,21 @@ export const settings = {
 		backgroundColor: {
 			type: 'string',
 		},
-		paddingClassName: {
-			type: 'string',
-			default: '',
+		hasPadding: {
+			type: 'boolean',
+			default: false,
 		},
 	},
 
 	edit,
 
 	save( { attributes } ) {
-		const { backgroundColor, customBackgroundColor, paddingClassName } = attributes;
+		const { backgroundColor, customBackgroundColor, hasPadding } = attributes;
 
 		const backgroundClass = getColorClassName( 'background-color', backgroundColor );
-		const className = classnames( backgroundClass, paddingClassName, {
+		const className = classnames( backgroundClass, {
 			'has-background': backgroundColor || customBackgroundColor,
+			'has-padding': hasPadding,
 		} );
 
 		const styles = {

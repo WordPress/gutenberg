@@ -10,7 +10,7 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
-	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -20,13 +20,15 @@ import {
 } from '@wordpress/editor';
 
 function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAttributes, attributes } ) {
-	const { paddingClassName } = attributes;
+	const { hasPadding } = attributes;
 
 	const styles = {
 		backgroundColor: backgroundColor.color,
 	};
 
-	const classes = classnames( className, paddingClassName );
+	const classes = classnames( className, {
+		'has-padding': hasPadding,
+	} );
 
 	return (
 		<Fragment>
@@ -42,15 +44,10 @@ function ContainerEdit( { className, setBackgroundColor, backgroundColor, setAtt
 					] }
 				/>
 				<PanelBody title={ __( 'Container Padding' ) }>
-					<SelectControl
-						label={ __( 'Padding' ) }
-						value={ paddingClassName }
-						options={ [
-							{ value: '', label: __( 'None' ) },
-							{ value: 'is-narrow-padding', label: __( 'Narrow' ) },
-							{ value: 'is-wide-padding', label: __( 'Wide' ) },
-						] }
-						onChange={ ( newClassName ) => setAttributes( { paddingClassName: newClassName } ) }
+					<ToggleControl
+						label={ hasPadding ? __( 'Padding Applied' ) : __( 'No Padding' ) }
+						onChange={ ( value ) => setAttributes( { hasPadding: value } ) }
+						checked={ hasPadding }
 					/>
 				</PanelBody>
 			</InspectorControls>
