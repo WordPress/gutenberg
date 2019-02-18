@@ -32,6 +32,7 @@
 		"@wordpress/dom": "file:packages/dom",
 		"@wordpress/dom-ready": "file:packages/dom-ready",
 		"@wordpress/edit-post": "file:packages/edit-post",
+		"@wordpress/edit-widgets": "file:packages/edit-widgets",
 		"@wordpress/editor": "file:packages/editor",
 		"@wordpress/element": "file:packages/element",
 		"@wordpress/escape-html": "file:packages/escape-html",

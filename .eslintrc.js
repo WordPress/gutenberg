@@ -88,6 +88,10 @@ module.exports = {
 				message: 'Use @wordpress/edit-post as import path instead.',
 			},
 			{
+				selector: 'ImportDeclaration[source.value=/^edit-widgets(\\u002F|$)/]',
+				message: 'Use @wordpress/edit-widgets as import path instead.',
+			},
+			{
 				selector: 'ImportDeclaration[source.value=/^viewport(\\u002F|$)/]',
 				message: 'Use @wordpress/viewport as import path instead.',
 			},
