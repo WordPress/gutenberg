@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
@@ -142,7 +143,9 @@ public class WPAndroidGlueCode {
             @Override
             public void editorDidMount(boolean hasUnsupportedBlocks) {
                 mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
-                setFocusOnTitle();
+                if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
+                    setFocusOnTitle();
+                }
             }
         });
         return Arrays.asList(

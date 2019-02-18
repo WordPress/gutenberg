@@ -129,8 +129,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		Keyboard.addListener( 'keyboardDidHide', this.keyboardDidHide );
 		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( ( ) => {
-			const focusTitle = this.props.title === '' && this.props.blockCount === 0;
-			if ( this.titleViewRef && focusTitle ) {
+			if ( this.titleViewRef ) {
 				this.titleViewRef.focus();
 			}
 		} );
