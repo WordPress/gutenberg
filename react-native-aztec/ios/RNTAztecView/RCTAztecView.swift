@@ -152,6 +152,7 @@ class RCTAztecView: Aztec.TextView {
         }
 
         super.insertText(text)
+        updatePlaceholderVisibility()
     }
 
     open override func deleteBackward() {
@@ -160,6 +161,7 @@ class RCTAztecView: Aztec.TextView {
         }
         
         super.deleteBackward()
+        updatePlaceholderVisibility()
     }
 
     // MARK: - Dictation
@@ -460,8 +462,9 @@ extension RCTAztecView: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
 
         guard isInsertingDictationResult == false else {
-            // Dictation refreshes the TextView with an empty string when the dictation finishes
-            // This avoid propagating that unwanted empty string to RN.
+            // If a dictation start with an empty UITextView,
+            // the dictation engine refreshes the TextView with an empty string when the dictation finishes.
+            // This avoid propagating that unwanted empty string to RN. (Solving #606)
             return
         }
 
