@@ -142,6 +142,7 @@ public class WPAndroidGlueCode {
             @Override
             public void editorDidMount(boolean hasUnsupportedBlocks) {
                 mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+                setFocusOnTitle();
             }
         });
         return Arrays.asList(
@@ -265,6 +266,10 @@ public class WPAndroidGlueCode {
 
     public void showDevOptionsDialog() {
         mReactInstanceManager.showDevOptionsDialog();
+    }
+
+    public void setFocusOnTitle() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
     public void setTitle(String title) {
