@@ -26,11 +26,11 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"dependencies": {
-		"axe-puppeteer": "^0.1.0"
+		"axe-puppeteer": "^1.0.0"
 	},
 	"peerDependencies": {
-		"jest": ">=23",
-		"puppeteer": ">=1.6"
+		"jest": ">=24",
+		"puppeteer": ">=1.12"
 	},
 	"publishConfig": {
 		"access": "public"
