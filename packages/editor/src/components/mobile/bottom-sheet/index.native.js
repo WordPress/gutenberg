@@ -50,7 +50,15 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { title = '', isVisible, leftButton, rightButton, hideHeader, style = {} } = this.props;
+		const {
+			title = '',
+			isVisible,
+			leftButton,
+			rightButton,
+			hideHeader,
+			style = {},
+			contentStyle = {},
+		} = this.props;
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
@@ -62,6 +70,25 @@ class BottomSheet extends Component {
 				}
 			},
 		} );
+
+		const getHeader = () => (
+			<View>
+				<View style={ styles.head }>
+					<View style={ { flex: 1 } }>
+						{ leftButton }
+					</View>
+					<View style={ styles.titleContainer }>
+						<Text style={ styles.title }>
+							{ title }
+						</Text>
+					</View>
+					<View style={ { flex: 1 } }>
+						{ rightButton }
+					</View>
+				</View>
+				<View style={ styles.separator } />
+			</View>
+		)
 
 		return (
 			<Modal
@@ -81,31 +108,15 @@ class BottomSheet extends Component {
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)', ...style, width: '100%' } }
+					style={ { ...styles.background, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader ? (
-						<View style={ styles.emptyHeaderSpace } />
-					) : (
-						<View>
-							<View style={ styles.head }>
-								<View style={ { flex: 1 } }>
-									{ leftButton }
-								</View>
-								<View style={ styles.titleContainer }>
-									<Text style={ styles.title }>
-										{ title }
-									</Text>
-								</View>
-								<View style={ { flex: 1 } }>
-									{ rightButton }
-								</View>
-							</View>
-							<View style={ styles.separator } />
-						</View>
-					) }
-					{ this.props.children }
+					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } />) }
+					{ ! hideHeader && getHeader() }
+					<View style={ [styles.content, contentStyle] }>
+						{ this.props.children }
+					</View>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>

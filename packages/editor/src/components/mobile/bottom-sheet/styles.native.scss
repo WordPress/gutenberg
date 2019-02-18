@@ -11,6 +11,7 @@
 	height: 4px;
 	width: 36px;
 	margin: auto;
+	margin-top: 6px;
 	border-radius: 2px;
 }
 
@@ -24,13 +25,16 @@
 	height: 14;
 }
 
-.content {
-	padding: 6px 16px 0 16px;
+.background {
 	background-color: $white;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
 	width: 100%;
 	max-width: 512;
+}
+
+.content {
+	padding: 0px 16px 0 16px;
 }
 
 .head {
