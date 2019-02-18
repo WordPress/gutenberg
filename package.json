@@ -75,7 +75,6 @@
 		"@wordpress/npm-package-json-lint-config": "file:packages/npm-package-json-lint-config",
 		"@wordpress/postcss-themes": "file:packages/postcss-themes",
 		"@wordpress/scripts": "file:packages/scripts",
-		"@wordpress/webpack-config": "file:packages/webpack-config",
 		"benchmark": "2.1.4",
 		"browserslist": "4.4.1",
 		"chalk": "2.4.1",

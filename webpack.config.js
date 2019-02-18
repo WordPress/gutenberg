@@ -13,7 +13,8 @@ const { basename } = require( 'path' );
  */
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
-const { camelCaseDash, config } = require( '@wordpress/webpack-config' );
+const config = require( '@wordpress/scripts/config/webpack.config' );
+const { camelCaseDash } = require( '@wordpress/scripts/utils' );
 
 /**
  * Internal dependencies

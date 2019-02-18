@@ -8,7 +8,7 @@ const path = require( 'path' );
 /**
  * Internal dependencies
  */
-const { camelCaseDash } = require( './utils' );
+const { camelCaseDash } = require( '../utils' );
 
 /**
  * Converts @wordpress/* string request into request object.
