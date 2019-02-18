@@ -30,17 +30,17 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		this.eventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.safeAreaEventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	componentWillUnmount() {
-		this.eventSubscription.remove();
-		this.eventSubscription = null;
+		this.safeAreaEventSubscription && this.safeAreaEventSubscription.remove();
+		this.safeAreaEventSubscription = null;
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
-		if ( this.eventSubscription === null ) {
+		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
 		const { safeAreaInsets } = result;
@@ -81,7 +81,7 @@ class BottomSheet extends Component {
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
+					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)', ...style, width: '100%' } }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
