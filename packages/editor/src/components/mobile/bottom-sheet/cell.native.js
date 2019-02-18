@@ -18,7 +18,6 @@ import platformStyles from './cellStyles.scss';
 export default class Cell extends Component {
 	constructor() {
 		super( ...arguments );
-		this._valueTextInput = undefined;
 		this.state = {
 			isEditingValue: false,
 		};
