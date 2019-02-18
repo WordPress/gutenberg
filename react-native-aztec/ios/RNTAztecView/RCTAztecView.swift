@@ -164,17 +164,16 @@ class RCTAztecView: Aztec.TextView {
 
     // MARK: - Dictation
 
+    override func dictationRecordingDidEnd() {
+        isInsertingDictationResult = true
+    }
+
     public override func insertDictationResult(_ dictationResult: [UIDictationPhrase]) {
         let text = dictationResult.reduce("") { $0 + $1.text }
         insertText(text)
         isInsertingDictationResult = false
     }
 
-    override func removeDictationResultPlaceholder(_ placeholder: Any, willInsertResult: Bool) {
-        super.removeDictationResultPlaceholder(placeholder, willInsertResult: willInsertResult)
-        isInsertingDictationResult = true
-    }
-    
     // MARK: - Custom Edit Intercepts
     
     private func interceptEnter(_ text: String) -> Bool {
