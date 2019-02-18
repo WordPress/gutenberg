@@ -67,7 +67,7 @@ import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
  * Browser dependencies
  */
 
-const { getSelection } = window;
+const { getSelection, getComputedStyle } = window;
 
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
@@ -136,7 +136,17 @@ export class RichText extends Component {
 	}
 
 	setRef( node ) {
-		this.editableRef = node;
+		if ( node ) {
+			const computedStyle = getComputedStyle( node );
+
+			if ( computedStyle.display === 'inline' ) {
+				window.console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
+			}
+
+			this.editableRef = node;
+		} else {
+			delete this.editableRef;
+		}
 	}
 
 	setFocusedElement() {
