@@ -8,7 +8,7 @@
 .dragIndicator {
 	background-color: $light-gray-400;
 	height: 4px;
-	width: 10%;
+	width: 36px;
 	margin: auto;
 	border-radius: 2px;
 }
@@ -17,6 +17,10 @@
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
+}
+
+.emptyHeaderSpace {
+	height: 14;
 }
 
 .content {
@@ -33,6 +37,7 @@
 	justify-content: space-between;
 	align-items: center;
 	align-content: center;
+	min-height: 48;
 }
 
 .title {
@@ -63,11 +68,14 @@
 	align-items: center;
 }
 
+.clipToBounds {
+	overflow: hidden;
+}
+
 .cellSeparator {
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
-	margin-left: 36px;
 }
 
 .cellRowContainer {
