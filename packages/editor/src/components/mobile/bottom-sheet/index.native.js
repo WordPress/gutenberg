@@ -21,7 +21,6 @@ import PickerCell from './picker-cell';
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
-		this._isMounted = false;
 		this.onSafeAreaInsetsUpdate = this.onSafeAreaInsetsUpdate.bind( this );
 		this.state = {
 			safeAreaBottomInset: 0,
@@ -31,21 +30,17 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		this._isMounted = true;
 		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	componentWillUnmount() {
-		this._isMounted = false;
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
-		if ( this._isMounted ) {
-			const { safeAreaInsets } = result;
-			if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
-				this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
-			}
+		const { safeAreaInsets } = result;
+		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
+			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
 		}
 	}
 
