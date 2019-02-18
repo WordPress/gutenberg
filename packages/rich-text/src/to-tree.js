@@ -2,24 +2,50 @@
  * Internal dependencies
  */
 
+import { getActiveFormats } from './get-active-formats';
 import { getFormatType } from './get-format-type';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
-	ZERO_WIDTH_NO_BREAK_SPACE,
 } from './special-characters';
 
-function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
+/**
+ * Converts a format object to information that can be used to create an element
+ * from (type, attributes and object).
+ *
+ * @param  {Object}  $1                        Named parameters.
+ * @param  {string}  $1.type                   The format type.
+ * @param  {Object}  $1.attributes             The format attributes.
+ * @param  {Object}  $1.unregisteredAttributes The unregistered format
+ *                                             attributes.
+ * @param  {boolean} $1.object                 Wether or not it is an object
+ *                                             format.
+ * @param  {boolean} $1.boundaryClass          Wether or not to apply a boundary
+ *                                             class.
+ * @return {Object}                            Information to be used for
+ *                                             element creation.
+ */
+function fromFormat( { type, attributes, unregisteredAttributes, object, boundaryClass } ) {
 	const formatType = getFormatType( type );
 
-	if ( ! formatType ) {
-		return { type, attributes, object };
+	let elementAttributes = {};
+
+	if ( boundaryClass ) {
+		elementAttributes[ 'data-rich-text-format-boundary' ] = 'true';
 	}
 
-	const elementAttributes = { ...unregisteredAttributes };
+	if ( ! formatType ) {
+		if ( attributes ) {
+			elementAttributes = { ...attributes, ...elementAttributes };
+		}
+
+		return { type, attributes: elementAttributes, object };
+	}
+
+	elementAttributes = { ...unregisteredAttributes, ...elementAttributes };
 
 	for ( const name in attributes ) {
-		const key = formatType.attributes[ name ];
+		const key = formatType.attributes ? formatType.attributes[ name ] : false;
 
 		if ( key ) {
 			elementAttributes[ key ] = attributes[ name ];
@@ -43,6 +69,17 @@ function fromFormat( { type, attributes, unregisteredAttributes, object } ) {
 	};
 }
 
+function getDeepestActiveFormat( value ) {
+	const activeFormats = getActiveFormats( value );
+	const { selectedFormat } = value;
+
+	if ( selectedFormat === undefined ) {
+		return activeFormats[ activeFormats.length - 1 ];
+	}
+
+	return activeFormats[ selectedFormat - 1 ];
+}
+
 export function toTree( {
 	value,
 	multilineTag,
@@ -59,10 +96,11 @@ export function toTree( {
 	onEndIndex,
 	isEditableTree,
 } ) {
-	const { formats, text, start, end, formatPlaceholder } = value;
+	const { formats, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
+	const deepestActiveFormat = getDeepestActiveFormat( value );
 
 	let lastSeparatorFormats;
 	let lastCharacterFormats;
@@ -74,22 +112,6 @@ export function toTree( {
 		lastCharacterFormats = lastSeparatorFormats = [ multilineFormat ];
 	} else {
 		append( tree, '' );
-	}
-
-	function setFormatPlaceholder( pointer, index ) {
-		if ( isEditableTree && formatPlaceholder && formatPlaceholder.index === index ) {
-			const parent = getParent( pointer );
-
-			if ( formatPlaceholder.format === undefined ) {
-				pointer = getParent( parent );
-			} else {
-				pointer = append( parent, fromFormat( formatPlaceholder.format ) );
-			}
-
-			pointer = append( pointer, ZERO_WIDTH_NO_BREAK_SPACE );
-		}
-
-		return pointer;
 	}
 
 	for ( let i = 0; i < formatsLength; i++ ) {
@@ -146,8 +168,23 @@ export function toTree( {
 					return;
 				}
 
+				const { type, attributes, unregisteredAttributes, object } = format;
+
+				const boundaryClass = (
+					isEditableTree &&
+					! object &&
+					character !== LINE_SEPARATOR &&
+					format === deepestActiveFormat
+				);
+
 				const parent = getParent( pointer );
-				const newNode = append( parent, fromFormat( format ) );
+				const newNode = append( parent, fromFormat( {
+					type,
+					attributes,
+					unregisteredAttributes,
+					object,
+					boundaryClass,
+				} ) );
 
 				if ( isText( pointer ) && getText( pointer ).length === 0 ) {
 					remove( pointer );
@@ -163,8 +200,6 @@ export function toTree( {
 			lastCharacter = character;
 			continue;
 		}
-
-		pointer = setFormatPlaceholder( pointer, 0 );
 
 		// If there is selection at 0, handle it before characters are inserted.
 		if ( i === 0 ) {
@@ -188,8 +223,6 @@ export function toTree( {
 				appendText( pointer, character );
 			}
 		}
-
-		pointer = setFormatPlaceholder( pointer, i + 1 );
 
 		if ( onStartIndex && start === i + 1 ) {
 			onStartIndex( tree, pointer );

@@ -170,8 +170,19 @@ export class RichText extends Component {
 	 */
 
 	removeRootTagsProduceByAztec( html ) {
-		const openingTagRegexp = RegExp( '^<' + this.props.tagName + '>', 'gim' );
-		const closingTagRegexp = RegExp( '</' + this.props.tagName + '>$', 'gim' );
+		let result = this.removeRootTag( this.props.tagName, html );
+		// Temporary workaround for https://github.com/WordPress/gutenberg/pull/13763
+		if ( this.props.rootTagsToEliminate ) {
+			this.props.rootTagsToEliminate.forEach( ( element ) => {
+				result = this.removeRootTag( element, result );
+			} );
+		}
+		return result;
+	}
+
+	removeRootTag( tag, html ) {
+		const openingTagRegexp = RegExp( '^<' + tag + '>', 'gim' );
+		const closingTagRegexp = RegExp( '</' + tag + '>$', 'gim' );
 		return html.replace( openingTagRegexp, '' ).replace( closingTagRegexp, '' );
 	}
 
@@ -194,7 +205,6 @@ export class RichText extends Component {
 
 	onContentSizeChange( contentSize ) {
 		const contentHeight = contentSize.height;
-		this.forceUpdate(); // force re-render the component skipping shouldComponentUpdate() See: https://reactjs.org/docs/react-component.html#forceupdate
 		this.props.onContentSizeChange( {
 			aztecHeight: contentHeight,
 		}
@@ -375,10 +385,15 @@ export class RichText extends Component {
 				<RCTAztecView
 					ref={ ( ref ) => {
 						this._editor = ref;
+
+						if ( this.props.setRef ) {
+							this.props.setRef( ref );
+						}
 					}
 					}
 					text={ { text: html, eventCount: this.lastEventCount } }
 					placeholder={ this.props.placeholder }
+					placeholderTextColor={ this.props.placeholderTextColor || 'lightgrey' }
 					onChange={ this.onChange }
 					onFocus={ this.props.onFocus }
 					onBlur={ this.props.onBlur }

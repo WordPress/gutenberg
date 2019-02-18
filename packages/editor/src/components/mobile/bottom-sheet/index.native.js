@@ -16,6 +16,7 @@ import { Component } from '@wordpress/element';
 import styles from './styles.scss';
 import Button from './button';
 import Cell from './cell';
+import PickerCell from './picker-cell';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -59,7 +60,9 @@ class BottomSheet extends Component {
 				animationOutTiming={ 500 }
 				backdropTransitionInTiming={ 500 }
 				backdropTransitionOutTiming={ 500 }
+				backdropOpacity={ 0.2 }
 				onBackdropPress={ this.props.onClose }
+				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
 				swipeDirection="down"
 			>
@@ -99,5 +102,6 @@ class BottomSheet extends Component {
 
 BottomSheet.Button = Button;
 BottomSheet.Cell = Cell;
+BottomSheet.PickerCell = PickerCell;
 
 export default BottomSheet;

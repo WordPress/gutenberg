@@ -1,5 +1,5 @@
 /**
- * External imports
+ * External dependencies
  */
 import { isPlainObject, isString } from 'lodash';
 

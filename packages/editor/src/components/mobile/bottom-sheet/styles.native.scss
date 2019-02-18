@@ -17,7 +17,6 @@
 	background-color: $light-gray-400;
 	height: 1px;
 	width: 100%;
-	margin-bottom: 14px;
 }
 
 .content {
@@ -98,4 +97,8 @@
 	color: #2e4453;
 	text-align: right;
 	flex: 1;
+}
+
+.cellValueRTL {
+	text-align: left;
 }
