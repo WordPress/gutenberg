@@ -181,24 +181,24 @@ export function selectBlock( clientId, initialPosition = null ) {
  * @return {Object} Action object.
  */
 export function selectPreviousBlock( clientId ) {
-	return selectNextBlock( clientId, { isReverse: true } );
+	return {
+		type: 'SELECT_PREVIOUS_BLOCK',
+		clientId,
+	};
 }
 
 /**
  * Returns an action object used in signalling that the block following the
  * given clientId should be selected.
  *
- * @param {string}  clientId          Block client ID.
- * @param {?Object} options           Optional selection options.
- * @param {boolean} options.isReverse Whether to select preceding.
+ * @param {string} clientId Block client ID.
  *
  * @return {Object} Action object.
  */
-export function selectNextBlock( clientId, options ) {
+export function selectNextBlock( clientId ) {
 	return {
 		type: 'SELECT_NEXT_BLOCK',
 		clientId,
-		...options,
 	};
 }
 

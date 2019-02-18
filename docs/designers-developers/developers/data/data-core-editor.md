@@ -1577,8 +1577,6 @@ given clientId should be selected.
 *Parameters*
 
  * clientId: Block client ID.
- * options: Optional selection options.
- * options.isReverse: Whether to select preceding.
 
 ### toggleSelection
 
@@ -1723,7 +1721,7 @@ be created.
 
 ### removeBlocks
 
-Returns an action object used in signalling that the blocks corresponding to
+Yields action objects used in signalling that the blocks corresponding to
 the set of specified client IDs are to be removed.
 
 *Parameters*
