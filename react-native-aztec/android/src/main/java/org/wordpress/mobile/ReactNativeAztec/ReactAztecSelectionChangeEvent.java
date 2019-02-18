@@ -16,12 +16,14 @@ class ReactAztecSelectionChangeEvent extends Event<ReactAztecSelectionChangeEven
     private String mText;
     private int mSelectionStart;
     private int mSelectionEnd;
+    private int mEventCount;
 
-    public ReactAztecSelectionChangeEvent(int viewId, String text, int selectionStart, int selectionEnd) {
+    public ReactAztecSelectionChangeEvent(int viewId, String text, int selectionStart, int selectionEnd, int eventCount) {
         super(viewId);
         mText = text;
         mSelectionStart = selectionStart;
         mSelectionEnd = selectionEnd;
+        mEventCount = eventCount;
     }
 
     @Override
@@ -45,6 +47,7 @@ class ReactAztecSelectionChangeEvent extends Event<ReactAztecSelectionChangeEven
         eventData.putString("text", mText);
         eventData.putInt("selectionStart", mSelectionStart);
         eventData.putInt("selectionEnd", mSelectionEnd);
+        eventData.putInt("eventCount", mEventCount);
         return eventData;
     }
 }
