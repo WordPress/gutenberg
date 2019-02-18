@@ -3,6 +3,7 @@
  */
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const LiveReloadPlugin = require( 'webpack-livereload-plugin' );
+const path = require( 'path' );
 
 /**
  * Internal dependencies
@@ -59,6 +60,13 @@ const mode = isProduction ? 'production' : 'development';
 
 const config = {
 	mode,
+	entry: {
+		index: path.resolve( process.cwd(), 'src', 'index.js' ),
+	},
+	output: {
+		filename: '[name].js',
+		path: path.resolve( process.cwd(), 'build' ),
+	},
 	externals,
 	resolve: {
 		modules: [
