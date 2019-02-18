@@ -12,7 +12,7 @@ import { valignTop, valignCenter, valignBottom } from './icons';
 
 class VAlignToolbar extends Component {
 	makeAlignmentUpdater( alignment ) {
-		return () => this.props.setAttributes( { verticalAlignment: alignment } );
+		return () => this.props.onSelection( alignment );
 	}
 
 	render() {
@@ -20,19 +20,19 @@ class VAlignToolbar extends Component {
 			{
 				icon: valignTop,
 				title: _x( 'V-align Top', 'Block vertical alignment setting' ),
-				isActive: this.props.verticalAlignment === 'top',
+				isActive: this.props.alignment === 'top',
 				onClick: this.makeAlignmentUpdater( 'top' ),
 			},
 			{
 				icon: valignCenter,
 				title: _x( 'V-align Middle', 'Block vertical alignment setting' ),
-				isActive: this.props.verticalAlignment === 'center',
+				isActive: this.props.alignment === 'center',
 				onClick: this.makeAlignmentUpdater( 'center' ),
 			},
 			{
 				icon: valignBottom,
 				title: _x( 'V-align Bottom', 'Block vertical alignment setting' ),
-				isActive: this.props.verticalAlignment === 'bottom',
+				isActive: this.props.alignment === 'bottom',
 				onClick: this.makeAlignmentUpdater( 'bottom' ),
 			},
 		];
@@ -44,7 +44,7 @@ class VAlignToolbar extends Component {
 }
 
 VAlignToolbar.defaultProps = {
-	verticalAlignment: 'top',
+	alignment: 'top',
 };
 
 export default VAlignToolbar;

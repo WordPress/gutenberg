@@ -47,12 +47,14 @@ export const settings = {
 			'is-selected': isSelected,
 		} );
 
+		const onSelection = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
+
 		return (
 			<div className={ classes }>
 				<BlockControls>
 					<VAlignToolbar
-						setAttributes={ setAttributes }
-						verticalAlignment={ attributes.verticalAlignment }
+						onSelection={ onSelection }
+						alignment={ attributes.verticalAlignment }
 					/>
 				</BlockControls>
 				<InnerBlocks templateLock={ false } />

@@ -179,6 +179,8 @@ export const settings = {
 		const { columns, verticalAlignment } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
+		const onSelection = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
+
 		return (
 			<Fragment>
 				<InspectorControls>
@@ -199,8 +201,8 @@ export const settings = {
 				</InspectorControls>
 				<BlockControls>
 					<VAlignToolbar
-						setAttributes={ setAttributes }
-						verticalAlignment={ verticalAlignment }
+						onSelection={ onSelection }
+						alignment={ verticalAlignment }
 					/>
 				</BlockControls>
 				<div className={ classes }>
