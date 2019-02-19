@@ -6,4 +6,8 @@ module.exports = {
 	setupFilesAfterEnv: [
 		'<rootDir>/config/setup-test-framework.js',
 	],
+	transformIgnorePatterns: [
+		'node_modules',
+		'scripts/config/puppeteer.config.js',
+	],
 };

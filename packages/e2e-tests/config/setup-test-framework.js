@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import 'expect-puppeteer';
 import { get } from 'lodash';
 
 /**
