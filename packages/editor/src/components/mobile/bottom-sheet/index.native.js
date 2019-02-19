@@ -34,7 +34,10 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		this.safeAreaEventSubscription && this.safeAreaEventSubscription.remove();
+		if ( this.safeAreaEventSubscription === null ) {
+			return;
+		}
+		this.safeAreaEventSubscription.remove();
 		this.safeAreaEventSubscription = null;
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
@@ -88,7 +91,7 @@ class BottomSheet extends Component {
 				</View>
 				<View style={ styles.separator } />
 			</View>
-		)
+		);
 
 		return (
 			<Modal
@@ -112,9 +115,9 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } />) }
+					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } /> ) }
 					{ ! hideHeader && getHeader() }
-					<View style={ [styles.content, contentStyle] }>
+					<View style={ [ styles.content, contentStyle ] }>
 						{ this.props.children }
 					</View>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
@@ -126,7 +129,7 @@ class BottomSheet extends Component {
 }
 
 function getWidth() {
-	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth )
+	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth );
 }
 
 BottomSheet.getWidth = getWidth;
