@@ -25,7 +25,7 @@ import createResolversCacheMiddleware from './resolvers-cache-middleware';
  */
 export default function createNamespace( key, options, registry ) {
 	const reducer = options.reducer;
-	const store = createReduxStore( reducer, key, registry );
+	const store = createReduxStore( key, options, registry );
 
 	let selectors, actions, resolvers;
 	if ( options.actions ) {
@@ -76,13 +76,14 @@ export default function createNamespace( key, options, registry ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {Function} reducer    Root reducer for redux store.
- * @param {string} key          Part of the state shape to register the
- *                              selectors for.
- * @param {Object} registry     Registry reference, for resolver enhancer support.
- * @return {Object}             Newly created redux store.
+ * @param {string} key      Part of the state shape to register the
+ *                          selectors for.
+ * @param {Object} options  Registered store options.
+ * @param {Object} registry Registry reference, for resolver enhancer support.
+ *
+ * @return {Object} Newly created redux store.
  */
-function createReduxStore( reducer, key, registry ) {
+function createReduxStore( key, options, registry ) {
 	const enhancers = [
 		applyMiddleware( createResolversCacheMiddleware( registry, key ), promise ),
 	];
@@ -90,7 +91,8 @@ function createReduxStore( reducer, key, registry ) {
 		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: key, instanceId: key } ) );
 	}
 
-	return createStore( reducer, flowRight( enhancers ) );
+	const { reducer, initialState } = options;
+	return createStore( reducer, initialState, flowRight( enhancers ) );
 }
 
 /**
