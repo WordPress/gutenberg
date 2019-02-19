@@ -76,6 +76,59 @@ describe( 'persistence', () => {
 		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1, b: null } );
 	} );
 
+	it( 'should merge persisted value with default if object-like', () => {
+		const DEFAULT_STATE = { preferences: { useFoo: true, useBar: true } };
+
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( {
+					test: {
+						preferences: {
+							useFoo: false,
+						},
+					},
+				} ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: [ 'preferences' ],
+			reducer: ( state = DEFAULT_STATE ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( {
+			preferences: {
+				useFoo: false,
+				useBar: true,
+			},
+		} );
+	} );
+
+	it( 'should be reasonably tolerant to a non-object persisted state', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( {
+					test: 1,
+				} ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = null ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toBe( 1 );
+	} );
+
 	it( 'override values passed to registerStore', () => {
 		const options = { persist: true, reducer() {} };
 

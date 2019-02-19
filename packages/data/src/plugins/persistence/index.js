@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow } from 'lodash';
+import { flow, merge, isPlainObject } from 'lodash';
 
 /**
  * Internal dependencies
@@ -167,16 +167,18 @@ export default function( registry, pluginOptions ) {
 			// Load from persistence to use as initial state.
 			let initialState = persistence.get()[ reducerKey ];
 			if ( initialState !== undefined ) {
-				// When persisting only a subset of keys from the reducer
-				// result, ensure that other keys are left intact when
-				// restoring from persistence.
-				if ( Array.isArray( options.persist ) ) {
-					initialState = {
-						...options.reducer( undefined, {
+				// For object-like persistence, ensure that:
+				// - Other keys are left intact when persisting only a subset
+				//   of keys.
+				// - New keys in what would otherwise be provided as a default
+				//   state are deeply merged as a base for the persisted value.
+				if ( isPlainObject( initialState ) ) {
+					initialState = merge(
+						options.reducer( undefined, {
 							type: '@@WP/PERSISTENCE_RESTORE',
 						} ),
-						...initialState,
-					};
+						initialState,
+					);
 				}
 
 				// Since it's otherwise not possible to assign an initial state
