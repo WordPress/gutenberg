@@ -121,7 +121,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return "en"
     }
     
-    func gutenbergTranslations() -> [String : String]? {
+    func gutenbergTranslations() -> [String : [String]]? {
         return nil
     }
     

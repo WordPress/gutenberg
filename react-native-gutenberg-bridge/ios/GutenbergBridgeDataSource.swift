@@ -29,5 +29,5 @@ public protocol GutenbergBridgeDataSource: class {
     /// Return `nil` if no localization file is present for the current locale
     ///
     /// - Returns: Gutenberg related localization key value pairs for the current locale.
-    func gutenbergTranslations() -> [String : String]?
+    func gutenbergTranslations() -> [String : [String]]?
 }
