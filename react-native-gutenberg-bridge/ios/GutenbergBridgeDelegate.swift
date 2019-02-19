@@ -41,6 +41,10 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate every time the editor has finished layout.
     ///
     func gutenbergDidLayout()
+
+    /// Tells the delegate that the editor view has completed the initial render.
+    ///
+    func gutenbergDidMount(hasUnsupportedBlocks: Bool)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods

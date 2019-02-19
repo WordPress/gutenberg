@@ -1,5 +1,5 @@
 // External dependencies
-import { AppRegistry } from 'react-native';
+import { AppRegistry, I18nManager } from 'react-native';
 
 // Setting up environment
 import './globals';
@@ -7,6 +7,8 @@ import './globals';
 const gutenbergSetup = () => {
 	const apiFetch = require( '@wordpress/api-fetch' ).default;
 	const wpData = require( '@wordpress/data' );
+
+	I18nManager.forceRTL( false ); // Change to `true` to debug RTL layout easily.
 
 	// wp-api-fetch
 	apiFetch.use( apiFetch.createRootURLMiddleware( 'https://public-api.wordpress.com/' ) );
@@ -19,6 +21,7 @@ const gutenbergSetup = () => {
 };
 
 const editorSetup = () => {
+	require( '@wordpress/format-library' );
 	const wpBlockLibrary = require( '@wordpress/block-library' );
 	const wpBlocks = require( '@wordpress/blocks' );
 	const registerCoreBlocks = wpBlockLibrary.registerCoreBlocks;

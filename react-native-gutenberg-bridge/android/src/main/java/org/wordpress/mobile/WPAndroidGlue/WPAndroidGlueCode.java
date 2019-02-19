@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout.LayoutParams;
@@ -46,6 +47,7 @@ public class WPAndroidGlueCode {
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
+    private OnEditorMountListener mOnEditorMountListener;
 
     private String mContentHtml = "";
     private boolean mContentInitialized;
@@ -88,6 +90,10 @@ public class WPAndroidGlueCode {
 
     public interface OnReattachQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    public interface OnEditorMountListener {
+        void onEditorDidMount(boolean hasUnsupportedBlocks);
     }
 
     protected List<ReactPackage> getPackages() {
@@ -134,6 +140,14 @@ public class WPAndroidGlueCode {
             @Override
             public void requestImageUploadCancelDialog(int mediaId) {
                 mOnMediaLibraryButtonListener.onCancelUploadForMediaClicked(mediaId);
+            }
+
+            @Override
+            public void editorDidMount(boolean hasUnsupportedBlocks) {
+                mOnEditorMountListener.onEditorDidMount(hasUnsupportedBlocks);
+                if (TextUtils.isEmpty(mTitle) && TextUtils.isEmpty(mContentHtml)) {
+                    setFocusOnTitle();
+                }
             }
         });
         return Arrays.asList(
@@ -182,12 +196,14 @@ public class WPAndroidGlueCode {
     }
 
     public void attachToContainer(ViewGroup viewGroup, OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener) {
+                                  OnReattachQueryListener onReattachQueryListener,
+                                  OnEditorMountListener onEditorMountListener) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachQueryListener = onReattachQueryListener;
+        mOnEditorMountListener = onEditorMountListener;
 
         if (mReactRootView.getParent() != null) {
             ((ViewGroup) mReactRootView.getParent()).removeView(mReactRootView);
@@ -256,6 +272,10 @@ public class WPAndroidGlueCode {
 
     public void showDevOptionsDialog() {
         mReactInstanceManager.showDevOptionsDialog();
+    }
+
+    public void setFocusOnTitle() {
+        mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().setFocusOnTitleInJS();
     }
 
     public void setTitle(String title) {

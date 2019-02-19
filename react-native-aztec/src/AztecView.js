@@ -9,6 +9,7 @@ class AztecView extends React.Component {
   selectionEndCaretY: number;
 
   static propTypes = {
+    activeFormats: PropTypes.array,
     isSelected: PropTypes.bool,
     disableGutenbergMode: PropTypes.bool,
     text: PropTypes.object,
@@ -24,8 +25,6 @@ class AztecView extends React.Component {
     onEnter: PropTypes.func,
     onBackspace: PropTypes.func,
     onScroll: PropTypes.func,
-    onActiveFormatsChange: PropTypes.func,
-    onActiveFormatAttributesChange: PropTypes.func,
     onSelectionChange: PropTypes.func,
     onHTMLContentWithCursor: PropTypes.func,
     onCaretVerticalPositionChange: PropTypes.func,
@@ -42,38 +41,8 @@ class AztecView extends React.Component {
     );
   }
 
-  applyFormat(format) {
-    this.dispatch(AztecManager.Commands.applyFormat, [format])
-  }
-
-  removeLink() {
-    this.dispatch(AztecManager.Commands.removeLink)
-  }
-
-  setLink(url, title) {
-    this.dispatch(AztecManager.Commands.setLink, [url, title])
-  }
-
   requestHTMLWithCursor() {
     this.dispatch(AztecManager.Commands.returnHTMLWithCursor)
-  }
-
-  _onActiveFormatsChange = (event) => {
-    if (!this.props.onActiveFormatsChange) {
-      return;
-    }
-    const formats = event.nativeEvent.formats;
-    const { onActiveFormatsChange } = this.props;
-    onActiveFormatsChange(formats);
-  }
-
-  _onActiveFormatAttributesChange = (event) => {
-    if (!this.props.onActiveFormatAttributesChange) {
-      return;
-    }
-    const attributes = event.nativeEvent.attributes;
-    const { onActiveFormatAttributesChange } = this.props;
-    onActiveFormatAttributesChange(attributes);
   }
 
   _onContentSizeChange = (event) => {
@@ -140,7 +109,7 @@ class AztecView extends React.Component {
     if ( this.props.onSelectionChange ) {
       const { selectionStart, selectionEnd, text } = event.nativeEvent;
       const { onSelectionChange } = this.props;
-      onSelectionChange( selectionStart, selectionEnd, text );
+      onSelectionChange( selectionStart, selectionEnd, text, event );
     }
 
     if ( this.props.onCaretVerticalPositionChange && 
@@ -174,8 +143,6 @@ class AztecView extends React.Component {
     return (
       <TouchableWithoutFeedback onPress={ this._onPress }>
         <RCTAztecView {...otherProps}
-          onActiveFormatsChange={ this._onActiveFormatsChange }
-          onActiveFormatAttributesChange={ this._onActiveFormatAttributesChange }
           onContentSizeChange = { this._onContentSizeChange }
           onHTMLContentWithCursor = { this._onHTMLContentWithCursor }
           onSelectionChange = { this._onSelectionChange }

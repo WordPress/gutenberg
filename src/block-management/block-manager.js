@@ -29,7 +29,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { createBlock, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { DefaultBlockAppender, PostTitle } from '@wordpress/editor';
-import { sendNativeEditorDidLayout } from 'react-native-gutenberg-bridge';
+import { sendNativeEditorDidLayout, subscribeSetFocusOnTitle } from 'react-native-gutenberg-bridge';
 
 type PropsType = {
 	rootClientId: ?string,
@@ -56,6 +56,8 @@ type StateType = {
 
 export class BlockManager extends React.Component<PropsType, StateType> {
 	scrollViewRef: Object;
+	titleViewRef: Object;
+	subscriptionParentSetFocusOnTitle: ?Object;
 
 	constructor( props: PropsType ) {
 		super( props );
@@ -126,12 +128,20 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 		Keyboard.addListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.addListener( 'keyboardDidHide', this.keyboardDidHide );
 		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle( ( ) => {
+			if ( this.titleViewRef ) {
+				this.titleViewRef.focus();
+			}
+		} );
 	}
 
 	componentWillUnmount() {
 		Keyboard.removeListener( 'keyboardDidShow', this.keyboardDidShow );
 		Keyboard.removeListener( 'keyboardDidHide', this.keyboardDidHide );
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		if ( this.subscriptionParentSetFocusOnTitle ) {
+			this.subscriptionParentSetFocusOnTitle.remove();
+		}
 	}
 
 	keyboardDidShow() {
@@ -161,9 +171,17 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 	}
 
 	renderHeader() {
+		const focusTitle = this.props.title === '' && this.props.blockCount === 0;
+
 		return (
 			<View style={ styles.titleContainer }>
 				<PostTitle
+					setRef={ ( ref ) => {
+						if ( focusTitle && ref ) {
+							ref.focus();
+							this.titleViewRef = ref;
+						}
+					} }
 					title={ this.props.title }
 					onUpdate={ this.props.setTitleAction }
 					placeholder={ 'Add a Title' } />
@@ -221,6 +239,7 @@ export class BlockManager extends React.Component<PropsType, StateType> {
 						onDismiss={ () => this.showBlockTypePicker( false ) }
 						onValueSelected={ this.onBlockTypeSelected }
 						isReplacement={ this.isReplaceable( this.props.selectedBlock ) }
+						addExtraBottomPadding={ this.state.safeAreaBottomInset === 0 }
 					/>
 				) }
 			</SafeAreaView>

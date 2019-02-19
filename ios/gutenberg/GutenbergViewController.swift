@@ -39,6 +39,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         
     }
 
+    func gutenbergDidMount(hasUnsupportedBlocks: Bool) {
+        print("gutenbergDidMount(hasUnsupportedBlocks: \(hasUnsupportedBlocks))")
+    }
+
     func gutenbergDidProvideHTML(title: String, html: String, changed: Bool) {
         print("didProvideHTML:")
         print("↳ Content changed: \(changed)")
