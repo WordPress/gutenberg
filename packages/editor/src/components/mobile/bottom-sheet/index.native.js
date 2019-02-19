@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View, KeyboardAvoidingView, Platform, PanResponder } from 'react-native';
+import { Text, View, KeyboardAvoidingView, Platform, PanResponder, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -30,17 +30,20 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		this.eventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.safeAreaEventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	componentWillUnmount() {
-		this.eventSubscription.remove();
-		this.eventSubscription = null;
+		if ( this.safeAreaEventSubscription === null ) {
+			return;
+		}
+		this.safeAreaEventSubscription.remove();
+		this.safeAreaEventSubscription = null;
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
-		if ( this.eventSubscription === null ) {
+		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
 		const { safeAreaInsets } = result;
@@ -50,7 +53,15 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { title = '', isVisible, leftButton, rightButton, hideHeader, style = {} } = this.props;
+		const {
+			title = '',
+			isVisible,
+			leftButton,
+			rightButton,
+			hideHeader,
+			style = {},
+			contentStyle = {},
+		} = this.props;
 
 		const panResponder = PanResponder.create( {
 			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
@@ -62,6 +73,25 @@ class BottomSheet extends Component {
 				}
 			},
 		} );
+
+		const getHeader = () => (
+			<View>
+				<View style={ styles.head }>
+					<View style={ { flex: 1 } }>
+						{ leftButton }
+					</View>
+					<View style={ styles.titleContainer }>
+						<Text style={ styles.title }>
+							{ title }
+						</Text>
+					</View>
+					<View style={ { flex: 1 } }>
+						{ rightButton }
+					</View>
+				</View>
+				<View style={ styles.separator } />
+			</View>
+		);
 
 		return (
 			<Modal
@@ -81,32 +111,15 @@ class BottomSheet extends Component {
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
+					style={ { ...styles.background, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader ? (
-						<View style={ styles.emptyHeaderSpace } />
-					) : (
-						<View>
-							<View style={ styles.head }>
-								<View style={ { flex: 1 } }>
-									{ leftButton }
-								</View>
-								<View style={ styles.titleContainer }>
-									<Text style={ styles.title }>
-										{ title }
-									</Text>
-								</View>
-								<View style={ { flex: 1 } }>
-									{ rightButton }
-								</View>
-							</View>
-							<View style={ styles.separator } />
-						</View>
-					) }
-					{ this.props.children }
-					<View style={ { flexGrow: 1 } }></View>
+					{ hideHeader && ( <View style={ styles.emptyHeaderSpace } /> ) }
+					{ ! hideHeader && getHeader() }
+					<View style={ [ styles.content, contentStyle ] }>
+						{ this.props.children }
+					</View>
 					<View style={ { height: this.state.safeAreaBottomInset } } />
 				</KeyboardAvoidingView>
 			</Modal>
@@ -115,6 +128,11 @@ class BottomSheet extends Component {
 	}
 }
 
+function getWidth() {
+	return Math.min( Dimensions.get( 'window' ).width, styles.background.maxWidth );
+}
+
+BottomSheet.getWidth = getWidth;
 BottomSheet.Button = Button;
 BottomSheet.Cell = Cell;
 BottomSheet.PickerCell = PickerCell;
