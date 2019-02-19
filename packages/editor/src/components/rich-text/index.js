@@ -74,15 +74,15 @@ const { getSelection } = window;
  *
  * @see  https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
  *
- * @type {Array}
+ * @type {Set}
  */
-const INSERTION_INPUT_TYPES_TO_IGNORE = [
+const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertParagraph',
 	'insertOrderedList',
 	'insertUnorderedList',
 	'insertHorizontalRule',
 	'insertLink',
-];
+] );
 
 export class RichText extends Component {
 	constructor( { value, onReplace, multiline } ) {
@@ -374,7 +374,7 @@ export class RichText extends Component {
 			// needed.
 			if (
 				inputType.indexOf( 'format' ) === 0 ||
-				INSERTION_INPUT_TYPES_TO_IGNORE.indexOf( inputType ) !== -1
+				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
 			) {
 				this.applyRecord( this.getRecord() );
 				return;
