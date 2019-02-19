@@ -1,3 +1,6 @@
+// @format
+
+@import "variables.scss";
 
 .blockHolder {
 	flex: 1 1 auto;
@@ -5,10 +8,11 @@
 
 .blockContainer {
 	background-color: $white;
-	padding: 8px;
+	padding: 16px;
 }
 
 .textView {
 	color: #87a6bc;
 	font-size: 16px;
+	font-family: $default-regular-font;
 }
