@@ -1,4 +1,8 @@
-## 4.2.1 (Unreleased)
+## 4.3.0 (Unreleased)
+
+### Enhancements
+
+- The `registerStore` function now accepts an optional `initialState` option value.
 
 ### Bug Fix
 

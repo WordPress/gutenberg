@@ -151,7 +151,7 @@ describe( 'createRegistry', () => {
 	describe( 'registerStore', () => {
 		it( 'should be shorthand for reducer, actions, selectors registration', () => {
 			const store = registry.registerStore( 'butcher', {
-				reducer( state = { ribs: 6, chicken: 4 }, action ) {
+				reducer( state = {}, action ) {
 					switch ( action.type ) {
 						case 'sale':
 							return {
@@ -162,6 +162,7 @@ describe( 'createRegistry', () => {
 
 					return state;
 				},
+				initialState: { ribs: 6, chicken: 4 },
 				selectors: {
 					getPrice: ( state, meat ) => state[ meat ],
 				},
