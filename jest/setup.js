@@ -5,6 +5,7 @@ jest.mock( '../react-native-gutenberg-bridge', () => {
 		subscribeParentGetHtml: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
+		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
 		editorDidMount: jest.fn(),
 	};
