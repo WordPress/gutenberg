@@ -107,6 +107,9 @@ class RCTAztecView: Aztec.TextView {
 
     func commonInit() {
         delegate = self
+        textContainerInset = .zero
+        contentInset = .zero
+        textContainer.lineFragmentPadding = 0        
         addPlaceholder()
     }
 
