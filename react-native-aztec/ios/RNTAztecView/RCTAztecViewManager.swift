@@ -6,6 +6,9 @@ public class RCTAztecViewManager: RCTViewManager {
 
     public var attachmentDelegate: Aztec.TextViewAttachmentDelegate?
     public var imageProvider: Aztec.TextViewAttachmentImageProvider?
+    public lazy var unsupportedHTMLImageProvider = {
+        Aztec.HTMLAttachmentRenderer(font: defaultFont)
+    }()
 
     public override static func requiresMainQueueSetup() -> Bool {
         return true
@@ -21,9 +24,12 @@ public class RCTAztecViewManager: RCTViewManager {
         view.isScrollEnabled = false
 
         view.textAttachmentDelegate = attachmentDelegate
+        
         if let imageProvider = imageProvider {
             view.registerAttachmentImageProvider(imageProvider)
         }
+        
+        view.registerAttachmentImageProvider(unsupportedHTMLImageProvider)
 
         return view
     }
