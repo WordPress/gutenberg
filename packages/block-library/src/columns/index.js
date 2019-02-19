@@ -83,7 +83,15 @@ export const settings = {
 		const { columns, verticalAlignment } = attributes;
 		const classes = classnames( className, `has-${ columns }-columns` );
 
-		const onSelection = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
+		const onSelection = ( alignment ) => {
+			// If the current alignment is selected again we can assume it is an attempt to toggle
+			// the alignment value "off" for that setting so we reset alignment state to null
+			if ( alignment === attributes.verticalAlignment ) {
+				alignment = null;
+			}
+
+			setAttributes( { verticalAlignment: alignment } );
+		};
 
 		return (
 			<Fragment>
