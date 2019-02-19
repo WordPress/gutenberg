@@ -81,6 +81,11 @@ public class Gutenberg: NSObject {
         }
         bridgeModule.sendEventIfNeeded(name: EventName.mediaUpload, body: data)
     }
+
+    public func setFocusOnTitle() {
+        bridgeModule.sendEventIfNeeded(name: EventName.setFocusOnTitle, body: nil)
+    }
+
 }
 
 extension Gutenberg: RCTBridgeDelegate {
@@ -104,6 +109,7 @@ extension Gutenberg {
         static let toggleHTMLMode = "toggleHTMLMode"
         static let updateHtml = "updateHtml"
         static let mediaUpload = "mediaUpload"
+        static let setFocusOnTitle = "setFocusOnTitle"
     }
     
     public enum MediaUploadState: Int {
