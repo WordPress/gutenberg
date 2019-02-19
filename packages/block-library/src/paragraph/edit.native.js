@@ -6,7 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
@@ -125,7 +125,7 @@ class ParagraphEdit extends Component {
 					onContentSizeChange={ ( event ) => {
 						this.setState( { aztecHeight: event.aztecHeight } );
 					} }
-					placeholder={ placeholder || sprintf( __( 'Start writing or press %s to add content' ), '\u2295' ) }
+					placeholder={ placeholder || __( 'Start writing…' ) }
 				/>
 			</View>
 		);
