@@ -36,7 +36,7 @@ class GutenbergViewController: UIViewController {
 extension GutenbergViewController: GutenbergBridgeDelegate {
 
     func gutenbergDidLoad() {
-        
+        gutenberg.setFocusOnTitle()
     }
 
     func gutenbergDidMount(hasUnsupportedBlocks: Bool) {

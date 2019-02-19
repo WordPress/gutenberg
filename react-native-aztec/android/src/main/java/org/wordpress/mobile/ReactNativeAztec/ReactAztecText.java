@@ -1,5 +1,7 @@
 package org.wordpress.mobile.ReactNativeAztec;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
@@ -31,6 +33,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.HashMap;
 
+import static android.content.ClipData.*;
+
 public class ReactAztecText extends AztecText {
 
     private final InputMethodManager mInputMethodManager;
@@ -53,6 +57,7 @@ public class ReactAztecText extends AztecText {
     String lastSentFormattingOptionsEventString = "";
     boolean shouldHandleOnEnter = false;
     boolean shouldHandleOnBackspace = false;
+    boolean shouldHandleOnPaste = false;
     boolean shouldHandleOnSelectionChange = false;
     boolean shouldHandleActiveFormatsChange = false;
 
@@ -113,6 +118,20 @@ public class ReactAztecText extends AztecText {
         if (plugin instanceof IToolbarButton && getToolbar() != null ) {
             getToolbar().addButton((IToolbarButton)plugin);
         }
+    }
+
+    @Override
+    public boolean onTextContextMenuItem(int id) {
+        if (shouldHandleOnPaste) {
+            switch (id) {
+                case android.R.id.paste:
+                    return onPaste(false);
+                case android.R.id.pasteAsPlainText:
+                    return onPaste(true);
+            }
+        }
+
+        return super.onTextContextMenuItem(id);
     }
 
     // VisibleForTesting from {@link TextInputEventsTestCase}.
@@ -332,6 +351,50 @@ public class ReactAztecText extends AztecText {
         // TODO: isRTL? Should be passed here?
         eventDispatcher.dispatchEvent(
                 new ReactAztecBackspaceEvent(getId(), content, cursorPositionStart, cursorPositionEnd)
+        );
+        return true;
+    }
+
+    /**
+     * Handle paste action by retrieving clipboard contents and dispatching a
+     * {@link ReactAztecPasteEvent} with the data
+     *
+     * @param   isPastedAsPlainText boolean indicating whether the paste action chosen was
+     *                         "PASTE AS PLAIN TEXT"
+     *
+     * @return  boolean to indicate that the action was handled (always true)
+     */
+    private boolean onPaste(boolean isPastedAsPlainText) {
+        ClipboardManager clipboardManager = (ClipboardManager) getContext().getSystemService(
+                Context.CLIPBOARD_SERVICE);
+
+        StringBuilder text = new StringBuilder();
+        StringBuilder html = new StringBuilder();
+
+        if (clipboardManager != null && clipboardManager.hasPrimaryClip()) {
+            ClipData clipData = clipboardManager.getPrimaryClip();
+            int itemCount = clipData.getItemCount();
+
+            for (int i = 0; i < itemCount; i++) {
+                Item item = clipData.getItemAt(i);
+                text.append(item.coerceToText(getContext()));
+                if (!isPastedAsPlainText) {
+                    html.append(item.coerceToHtmlText(getContext()));
+                }
+            }
+        }
+
+        // temporarily disable listener during call to toHtml()
+        disableTextChangedListener();
+        String content = toHtml(false);
+        int cursorPositionStart = getSelectionStart();
+        int cursorPositionEnd = getSelectionEnd();
+        enableTextChangedListener();
+        ReactContext reactContext = (ReactContext) getContext();
+        EventDispatcher eventDispatcher = reactContext.getNativeModule(UIManagerModule.class)
+                .getEventDispatcher();
+        eventDispatcher.dispatchEvent(new ReactAztecPasteEvent(getId(), content,
+                cursorPositionStart, cursorPositionEnd, text.toString(), html.toString())
         );
         return true;
     }
