@@ -44,7 +44,7 @@ class VAlignToolbar extends Component {
 }
 
 VAlignToolbar.defaultProps = {
-	alignment: 'top',
+	alignment: null,
 };
 
 export default VAlignToolbar;

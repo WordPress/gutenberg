@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isNil } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -31,7 +32,6 @@ export const settings = {
 	attributes: {
 		verticalAlignment: {
 			type: 'string',
-			default: 'top',
 		},
 	},
 
@@ -64,8 +64,9 @@ export const settings = {
 	save( { attributes } ) {
 		const { verticalAlignment } = attributes;
 		const wrapperClasses = classnames( {
-			[ `is-vertically-aligned-${ verticalAlignment }` ]: true,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
+
 		return (
 			<div className={ wrapperClasses }>
 				<InnerBlocks.Content />
