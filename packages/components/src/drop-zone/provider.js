@@ -172,7 +172,7 @@ class DropZoneProvider extends Component {
 		}
 
 		// Notifying the dropzones
-		toUpdate.map( ( dropZone ) => {
+		toUpdate.forEach( ( dropZone ) => {
 			const index = this.dropZones.indexOf( dropZone );
 			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
 			dropZone.setState( {
