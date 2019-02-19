@@ -1,3 +1,10 @@
+@mixin flex-full-height() {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+}
+
+
 // These margins make sure that nested blocks stack/overlay with the parent block chrome
 // This is sort of an experiment at making sure the editor looks as much like the end result as possible
 // Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
@@ -41,9 +48,15 @@
 
 		// Adjust the individual column block.
 		> [data-type="core/column"] {
-			display: flex;
-			flex-direction: column;
-			flex: 1;
+			@include flex-full-height();
+			// Enable vertical alignment preview
+			> .editor-block-list__block-edit {
+				@include flex-full-height();
+				> div[data-block],
+				.block-core-columns {
+					@include flex-full-height();
+				}
+			}
 
 			// Remove Block "padding" so individual Column is flush with parent Columns
 			> .block-editor-block-list__block-edit::before {
@@ -97,4 +110,33 @@
 			}
 		}
 	}
+}
+
+/**
+ * Vertical Alignment Preview
+ */
+.are-vertically-aligned-top .block-core-columns {
+	justify-content: flex-start;
+}
+
+.are-vertically-aligned-center .block-core-columns {
+	justify-content: center;
+}
+
+.are-vertically-aligned-bottom .block-core-columns {
+	justify-content: flex-end;
+}
+
+// Specificity is important to ensure individual columns alignment
+// is prioritised over parent column alignment
+div.block-core-columns.is-vertically-aligned-top {
+	justify-content: flex-start;
+}
+
+div.block-core-columns.is-vertically-aligned-center {
+	justify-content: center;
+}
+
+div.block-core-columns.is-vertically-aligned-bottom {
+	justify-content: flex-end;
 }

@@ -41,16 +41,18 @@ export const settings = {
 		html: false,
 	},
 
-	edit( { attributes, setAttributes, isSelected } ) {
+	edit( { attributes, setAttributes } ) {
+		const { verticalAlignment } = attributes;
+
 		const classes = classnames( {
 			'block-core-columns': true,
-			'is-selected': isSelected,
+			[ `is-vertically-aligned-${ verticalAlignment }` ]: ! isNil( verticalAlignment ),
 		} );
 
 		const onSelection = ( alignment ) => {
 			// If the current alignment is selected again we can assume it is an attempt to toggle
 			// the alignment value "off" for that setting so we reset alignment state to null
-			if ( alignment === attributes.verticalAlignment ) {
+			if ( alignment === verticalAlignment ) {
 				alignment = null;
 			}
 
@@ -62,7 +64,7 @@ export const settings = {
 				<BlockControls>
 					<VAlignToolbar
 						onSelection={ onSelection }
-						alignment={ attributes.verticalAlignment }
+						alignment={ verticalAlignment }
 					/>
 				</BlockControls>
 				<InnerBlocks templateLock={ false } />
