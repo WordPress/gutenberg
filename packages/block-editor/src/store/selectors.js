@@ -89,7 +89,7 @@ export const getBlockDependantsCacheBust = createSelector(
  * @return {string} Block name.
  */
 export function getBlockName( state, clientId ) {
-	const block = state.editor.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId[ clientId ];
 	return block ? block.name : null;
 }
 
@@ -102,7 +102,7 @@ export function getBlockName( state, clientId ) {
  * @return {boolean} Is Valid.
  */
 export function isBlockValid( state, clientId ) {
-	const block = state.editor.blocks.byClientId[ clientId ];
+	const block = state.blocks.byClientId[ clientId ];
 	return !! block && block.isValid;
 }
 
@@ -117,12 +117,12 @@ export function isBlockValid( state, clientId ) {
  */
 export const getBlockAttributes = createSelector(
 	( state, clientId ) => {
-		const block = state.editor.blocks.byClientId[ clientId ];
+		const block = state.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
 		}
 
-		let attributes = state.editor.blocks.attributes[ clientId ];
+		let attributes = state.blocks.attributes[ clientId ];
 
 		// Inject custom source attribute values.
 		//
@@ -146,8 +146,8 @@ export const getBlockAttributes = createSelector(
 		return attributes;
 	},
 	( state, clientId ) => [
-		state.editor.blocks.byClientId[ clientId ],
-		state.editor.blocks.attributes[ clientId ],
+		state.blocks.byClientId[ clientId ],
+		state.blocks.attributes[ clientId ],
 		getPostMeta( state ),
 	]
 );
@@ -165,7 +165,7 @@ export const getBlockAttributes = createSelector(
  */
 export const getBlock = createSelector(
 	( state, clientId ) => {
-		const block = state.editor.blocks.byClientId[ clientId ];
+		const block = state.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
 		}
@@ -184,7 +184,7 @@ export const getBlock = createSelector(
 
 export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 	( state, clientId ) => {
-		const block = state.editor.blocks.byClientId[ clientId ];
+		const block = state.blocks.byClientId[ clientId ];
 		if ( ! block ) {
 			return null;
 		}
@@ -195,7 +195,7 @@ export const __unstableGetBlockWithoutInnerBlocks = createSelector(
 		};
 	},
 	( state, clientId ) => [
-		state.editor.blocks.byClientId[ clientId ],
+		state.blocks.byClientId[ clientId ],
 		...getBlockAttributes.getDependants( state, clientId ),
 	]
 );
@@ -219,7 +219,7 @@ export const getBlocks = createSelector(
 			( clientId ) => getBlock( state, clientId )
 		);
 	},
-	( state ) => [ state.editor.blocks ]
+	( state ) => [ state.blocks ]
 );
 
 /**
@@ -250,7 +250,7 @@ export const getClientIdsWithDescendants = createSelector(
 		return [ ...topLevelIds, ...getClientIdsOfDescendants( state, topLevelIds ) ];
 	},
 	( state ) => [
-		state.editor.blocks.order,
+		state.blocks.order,
 	]
 );
 
@@ -270,13 +270,13 @@ export const getGlobalBlockCount = createSelector(
 			return clientIds.length;
 		}
 		return reduce( clientIds, ( count, clientId ) => {
-			const block = state.editor.blocks.byClientId[ clientId ];
+			const block = state.blocks.byClientId[ clientId ];
 			return block.name === blockName ? count + 1 : count;
 		}, 0 );
 	},
 	( state ) => [
-		state.editor.blocks.order,
-		state.editor.blocks.byClientId,
+		state.blocks.order,
+		state.blocks.byClientId,
 	]
 );
 
@@ -296,7 +296,7 @@ export const getBlocksByClientId = createSelector(
 	),
 	( state ) => [
 		getPostMeta( state ),
-		state.editor.blocks,
+		state.blocks,
 	]
 );
 
@@ -380,7 +380,7 @@ export function getSelectedBlockClientId( state ) {
 	// We need to check the block exists because the current blockSelection
 	// reducer doesn't take into account when blocks are reset via undo. To be
 	// removed when that's fixed.
-	return start && start === end && !! state.editor.blocks.byClientId[ start ] ? start : null;
+	return start && start === end && !! state.blocks.byClientId[ start ] ? start : null;
 }
 
 /**
@@ -407,7 +407,7 @@ export function getSelectedBlock( state ) {
  */
 export const getBlockRootClientId = createSelector(
 	( state, clientId ) => {
-		const { order } = state.editor.blocks;
+		const { order } = state.blocks;
 
 		for ( const rootClientId in order ) {
 			if ( includes( order[ rootClientId ], clientId ) ) {
@@ -418,7 +418,7 @@ export const getBlockRootClientId = createSelector(
 		return null;
 	},
 	( state ) => [
-		state.editor.blocks.order,
+		state.blocks.order,
 	]
 );
 
@@ -442,7 +442,7 @@ export const getBlockHierarchyRootClientId = createSelector(
 		return current;
 	},
 	( state ) => [
-		state.editor.blocks.order,
+		state.blocks.order,
 	]
 );
 
@@ -487,7 +487,7 @@ export function getAdjacentBlockClientId( state, startClientId, modifier = 1 ) {
 		return null;
 	}
 
-	const { order } = state.editor.blocks;
+	const { order } = state.blocks;
 	const orderSet = order[ rootClientId ];
 	const index = orderSet.indexOf( startClientId );
 	const nextIndex = ( index + ( 1 * modifier ) );
@@ -587,7 +587,7 @@ export const getMultiSelectedBlockClientIds = createSelector(
 		return blockOrder.slice( startIndex, endIndex + 1 );
 	},
 	( state ) => [
-		state.editor.blocks.order,
+		state.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
 	],
@@ -612,7 +612,7 @@ export const getMultiSelectedBlocks = createSelector(
 	},
 	( state ) => [
 		...getMultiSelectedBlockClientIds.getDependants( state ),
-		state.editor.blocks,
+		state.blocks,
 		getPostMeta( state ),
 	]
 );
@@ -660,7 +660,7 @@ const isAncestorOf = createSelector(
 		return possibleAncestorId === idToCheck;
 	},
 	( state ) => [
-		state.editor.blocks.order,
+		state.blocks.order,
 	],
 );
 
@@ -712,7 +712,7 @@ export const isAncestorMultiSelected = createSelector(
 		return isMultiSelected;
 	},
 	( state ) => [
-		state.editor.blocks.order,
+		state.blocks.order,
 		state.blockSelection.start,
 		state.blockSelection.end,
 	],
@@ -768,7 +768,7 @@ export function getMultiSelectedBlocksEndClientId( state ) {
  * @return {Array} Ordered client IDs of editor blocks.
  */
 export function getBlockOrder( state, rootClientId ) {
-	return state.editor.blocks.order[ rootClientId || '' ] || EMPTY_ARRAY;
+	return state.blocks.order[ rootClientId || '' ] || EMPTY_ARRAY;
 }
 
 /**
@@ -1070,7 +1070,7 @@ export const canInsertBlockType = createSelector(
 	canInsertBlockTypeUnmemoized,
 	( state, blockName, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.blocks.byClientId[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 	],
@@ -1280,8 +1280,8 @@ export const getInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.blocks.byClientId,
-		state.editor.blocks.order,
+		state.blocks.byClientId,
+		state.blocks.order,
 		state.preferences.insertUsage,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
@@ -1315,7 +1315,7 @@ export const hasInserterItems = createSelector(
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
-		state.editor.blocks.byClientId,
+		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getReusableBlocks( state ),

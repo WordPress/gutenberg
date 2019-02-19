@@ -86,7 +86,7 @@ function createChangeObserver( store, callback ) {
 			isPendingCommit = false;
 		} else if ( lastAction && lastState && state !== lastState ) {
 			if (
-				state.editor.blocks !== lastState.editor.blocks &&
+				state.blocks !== lastState.blocks &&
 				isUpdatingSameBlockAttribute( action, lastAction )
 			) {
 				// So long as block updates occur as operating on the same

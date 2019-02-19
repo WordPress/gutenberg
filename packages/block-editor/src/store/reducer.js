@@ -155,7 +155,7 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
 		// For each removed client ID, include its inner blocks to remove,
 		// recursing into those so long as inner blocks exist.
 		for ( let i = 0; i < clientIds.length; i++ ) {
-			clientIds.push( ...state.blocks.order[ clientIds[ i ] ] );
+			clientIds.push( ...state.order[ clientIds[ i ] ] );
 		}
 
 		action = { ...action, clientIds };
@@ -243,275 +243,270 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  *
  * @returns {Object} Updated state.
  */
-export const editor = flow( [
+export const blocks = flow(
 	combineReducers,
-
 	withInnerBlocksRemoveCascade,
-] )( {
-	blocks: flow(
-		combineReducers,
-		withBlockReset,
-		withSaveReusableBlock,
-	)( {
-		byClientId( state = {}, action ) {
-			switch ( action.type ) {
-				case 'RESET_BLOCKS':
-					return getFlattenedBlocksWithoutAttributes( action.blocks );
+	withBlockReset,
+	withSaveReusableBlock,
+)( {
+	byClientId( state = {}, action ) {
+		switch ( action.type ) {
+			case 'RESET_BLOCKS':
+				return getFlattenedBlocksWithoutAttributes( action.blocks );
 
-				case 'RECEIVE_BLOCKS':
-					return {
-						...state,
-						...getFlattenedBlocksWithoutAttributes( action.blocks ),
-					};
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...getFlattenedBlocksWithoutAttributes( action.blocks ),
+				};
 
-				case 'UPDATE_BLOCK':
-					// Ignore updates if block isn't known
-					if ( ! state[ action.clientId ] ) {
-						return state;
+			case 'UPDATE_BLOCK':
+				// Ignore updates if block isn't known
+				if ( ! state[ action.clientId ] ) {
+					return state;
+				}
+
+				// Do nothing if only attributes change.
+				const changes = omit( action.updates, 'attributes' );
+				if ( isEmpty( changes ) ) {
+					return state;
+				}
+
+				return {
+					...state,
+					[ action.clientId ]: {
+						...state[ action.clientId ],
+						...changes,
+					},
+				};
+
+			case 'INSERT_BLOCKS':
+				return {
+					...state,
+					...getFlattenedBlocksWithoutAttributes( action.blocks ),
+				};
+
+			case 'REPLACE_BLOCKS':
+				if ( ! action.blocks ) {
+					return state;
+				}
+
+				return {
+					...omit( state, action.clientIds ),
+					...getFlattenedBlocksWithoutAttributes( action.blocks ),
+				};
+
+			case 'REMOVE_BLOCKS':
+				return omit( state, action.clientIds );
+		}
+
+		return state;
+	},
+
+	attributes( state = {}, action ) {
+		switch ( action.type ) {
+			case 'RESET_BLOCKS':
+				return getFlattenedBlockAttributes( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...getFlattenedBlockAttributes( action.blocks ),
+				};
+
+			case 'UPDATE_BLOCK':
+				// Ignore updates if block isn't known or there are no attribute changes.
+				if ( ! state[ action.clientId ] || ! action.updates.attributes ) {
+					return state;
+				}
+
+				return {
+					...state,
+					[ action.clientId ]: {
+						...state[ action.clientId ],
+						...action.updates.attributes,
+					},
+				};
+
+			case 'UPDATE_BLOCK_ATTRIBUTES':
+				// Ignore updates if block isn't known
+				if ( ! state[ action.clientId ] ) {
+					return state;
+				}
+
+				// Consider as updates only changed values
+				const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
+					if ( value !== result[ key ] ) {
+						result = getMutateSafeObject( state[ action.clientId ], result );
+						result[ key ] = value;
 					}
 
-					// Do nothing if only attributes change.
-					const changes = omit( action.updates, 'attributes' );
-					if ( isEmpty( changes ) ) {
-						return state;
-					}
+					return result;
+				}, state[ action.clientId ] );
 
-					return {
-						...state,
-						[ action.clientId ]: {
-							...state[ action.clientId ],
-							...changes,
-						},
-					};
+				// Skip update if nothing has been changed. The reference will
+				// match the original block if `reduce` had no changed values.
+				if ( nextAttributes === state[ action.clientId ] ) {
+					return state;
+				}
 
-				case 'INSERT_BLOCKS':
-					return {
-						...state,
-						...getFlattenedBlocksWithoutAttributes( action.blocks ),
-					};
+				// Otherwise replace attributes in state
+				return {
+					...state,
+					[ action.clientId ]: nextAttributes,
+				};
 
-				case 'REPLACE_BLOCKS':
-					if ( ! action.blocks ) {
-						return state;
-					}
+			case 'INSERT_BLOCKS':
+				return {
+					...state,
+					...getFlattenedBlockAttributes( action.blocks ),
+				};
 
-					return {
-						...omit( state, action.clientIds ),
-						...getFlattenedBlocksWithoutAttributes( action.blocks ),
-					};
+			case 'REPLACE_BLOCKS':
+				if ( ! action.blocks ) {
+					return state;
+				}
 
-				case 'REMOVE_BLOCKS':
-					return omit( state, action.clientIds );
+				return {
+					...omit( state, action.clientIds ),
+					...getFlattenedBlockAttributes( action.blocks ),
+				};
+
+			case 'REMOVE_BLOCKS':
+				return omit( state, action.clientIds );
+		}
+
+		return state;
+	},
+
+	order( state = {}, action ) {
+		switch ( action.type ) {
+			case 'RESET_BLOCKS':
+				return mapBlockOrder( action.blocks );
+
+			case 'RECEIVE_BLOCKS':
+				return {
+					...state,
+					...omit( mapBlockOrder( action.blocks ), '' ),
+				};
+
+			case 'INSERT_BLOCKS': {
+				const { rootClientId = '' } = action;
+				const subState = state[ rootClientId ] || [];
+				const mappedBlocks = mapBlockOrder( action.blocks, rootClientId );
+				const { index = subState.length } = action;
+
+				return {
+					...state,
+					...mappedBlocks,
+					[ rootClientId ]: insertAt( subState, mappedBlocks[ rootClientId ], index ),
+				};
 			}
 
-			return state;
-		},
+			case 'MOVE_BLOCK_TO_POSITION': {
+				const { fromRootClientId = '', toRootClientId = '', clientId } = action;
+				const { index = state[ toRootClientId ].length } = action;
 
-		attributes( state = {}, action ) {
-			switch ( action.type ) {
-				case 'RESET_BLOCKS':
-					return getFlattenedBlockAttributes( action.blocks );
-
-				case 'RECEIVE_BLOCKS':
+				// Moving inside the same parent block
+				if ( fromRootClientId === toRootClientId ) {
+					const subState = state[ toRootClientId ];
+					const fromIndex = subState.indexOf( clientId );
 					return {
 						...state,
-						...getFlattenedBlockAttributes( action.blocks ),
+						[ toRootClientId ]: moveTo( state[ toRootClientId ], fromIndex, index ),
 					};
+				}
 
-				case 'UPDATE_BLOCK':
-					// Ignore updates if block isn't known or there are no attribute changes.
-					if ( ! state[ action.clientId ] || ! action.updates.attributes ) {
-						return state;
-					}
-
-					return {
-						...state,
-						[ action.clientId ]: {
-							...state[ action.clientId ],
-							...action.updates.attributes,
-						},
-					};
-
-				case 'UPDATE_BLOCK_ATTRIBUTES':
-					// Ignore updates if block isn't known
-					if ( ! state[ action.clientId ] ) {
-						return state;
-					}
-
-					// Consider as updates only changed values
-					const nextAttributes = reduce( action.attributes, ( result, value, key ) => {
-						if ( value !== result[ key ] ) {
-							result = getMutateSafeObject( state[ action.clientId ], result );
-							result[ key ] = value;
-						}
-
-						return result;
-					}, state[ action.clientId ] );
-
-					// Skip update if nothing has been changed. The reference will
-					// match the original block if `reduce` had no changed values.
-					if ( nextAttributes === state[ action.clientId ] ) {
-						return state;
-					}
-
-					// Otherwise replace attributes in state
-					return {
-						...state,
-						[ action.clientId ]: nextAttributes,
-					};
-
-				case 'INSERT_BLOCKS':
-					return {
-						...state,
-						...getFlattenedBlockAttributes( action.blocks ),
-					};
-
-				case 'REPLACE_BLOCKS':
-					if ( ! action.blocks ) {
-						return state;
-					}
-
-					return {
-						...omit( state, action.clientIds ),
-						...getFlattenedBlockAttributes( action.blocks ),
-					};
-
-				case 'REMOVE_BLOCKS':
-					return omit( state, action.clientIds );
+				// Moving from a parent block to another
+				return {
+					...state,
+					[ fromRootClientId ]: without( state[ fromRootClientId ], clientId ),
+					[ toRootClientId ]: insertAt( state[ toRootClientId ], clientId, index ),
+				};
 			}
 
-			return state;
-		},
+			case 'MOVE_BLOCKS_UP': {
+				const { clientIds, rootClientId = '' } = action;
+				const firstClientId = first( clientIds );
+				const subState = state[ rootClientId ];
 
-		order( state = {}, action ) {
-			switch ( action.type ) {
-				case 'RESET_BLOCKS':
-					return mapBlockOrder( action.blocks );
-
-				case 'RECEIVE_BLOCKS':
-					return {
-						...state,
-						...omit( mapBlockOrder( action.blocks ), '' ),
-					};
-
-				case 'INSERT_BLOCKS': {
-					const { rootClientId = '', blocks } = action;
-					const subState = state[ rootClientId ] || [];
-					const mappedBlocks = mapBlockOrder( blocks, rootClientId );
-					const { index = subState.length } = action;
-
-					return {
-						...state,
-						...mappedBlocks,
-						[ rootClientId ]: insertAt( subState, mappedBlocks[ rootClientId ], index ),
-					};
+				if ( ! subState.length || firstClientId === first( subState ) ) {
+					return state;
 				}
 
-				case 'MOVE_BLOCK_TO_POSITION': {
-					const { fromRootClientId = '', toRootClientId = '', clientId } = action;
-					const { index = state[ toRootClientId ].length } = action;
+				const firstIndex = subState.indexOf( firstClientId );
 
-					// Moving inside the same parent block
-					if ( fromRootClientId === toRootClientId ) {
-						const subState = state[ toRootClientId ];
-						const fromIndex = subState.indexOf( clientId );
-						return {
-							...state,
-							[ toRootClientId ]: moveTo( state[ toRootClientId ], fromIndex, index ),
-						};
-					}
-
-					// Moving from a parent block to another
-					return {
-						...state,
-						[ fromRootClientId ]: without( state[ fromRootClientId ], clientId ),
-						[ toRootClientId ]: insertAt( state[ toRootClientId ], clientId, index ),
-					};
-				}
-
-				case 'MOVE_BLOCKS_UP': {
-					const { clientIds, rootClientId = '' } = action;
-					const firstClientId = first( clientIds );
-					const subState = state[ rootClientId ];
-
-					if ( ! subState.length || firstClientId === first( subState ) ) {
-						return state;
-					}
-
-					const firstIndex = subState.indexOf( firstClientId );
-
-					return {
-						...state,
-						[ rootClientId ]: moveTo( subState, firstIndex, firstIndex - 1, clientIds.length ),
-					};
-				}
-
-				case 'MOVE_BLOCKS_DOWN': {
-					const { clientIds, rootClientId = '' } = action;
-					const firstClientId = first( clientIds );
-					const lastClientId = last( clientIds );
-					const subState = state[ rootClientId ];
-
-					if ( ! subState.length || lastClientId === last( subState ) ) {
-						return state;
-					}
-
-					const firstIndex = subState.indexOf( firstClientId );
-
-					return {
-						...state,
-						[ rootClientId ]: moveTo( subState, firstIndex, firstIndex + 1, clientIds.length ),
-					};
-				}
-
-				case 'REPLACE_BLOCKS': {
-					const { blocks, clientIds } = action;
-					if ( ! blocks ) {
-						return state;
-					}
-
-					const mappedBlocks = mapBlockOrder( blocks );
-
-					return flow( [
-						( nextState ) => omit( nextState, clientIds ),
-						( nextState ) => ( {
-							...nextState,
-							...omit( mappedBlocks, '' ),
-						} ),
-						( nextState ) => mapValues( nextState, ( subState ) => (
-							reduce( subState, ( result, clientId ) => {
-								if ( clientId === clientIds[ 0 ] ) {
-									return [
-										...result,
-										...mappedBlocks[ '' ],
-									];
-								}
-
-								if ( clientIds.indexOf( clientId ) === -1 ) {
-									result.push( clientId );
-								}
-
-								return result;
-							}, [] )
-						) ),
-					] )( state );
-				}
-
-				case 'REMOVE_BLOCKS':
-					return flow( [
-						// Remove inner block ordering for removed blocks
-						( nextState ) => omit( nextState, action.clientIds ),
-
-						// Remove deleted blocks from other blocks' orderings
-						( nextState ) => mapValues( nextState, ( subState ) => (
-							without( subState, ...action.clientIds )
-						) ),
-					] )( state );
+				return {
+					...state,
+					[ rootClientId ]: moveTo( subState, firstIndex, firstIndex - 1, clientIds.length ),
+				};
 			}
 
-			return state;
-		},
-	} ),
+			case 'MOVE_BLOCKS_DOWN': {
+				const { clientIds, rootClientId = '' } = action;
+				const firstClientId = first( clientIds );
+				const lastClientId = last( clientIds );
+				const subState = state[ rootClientId ];
+
+				if ( ! subState.length || lastClientId === last( subState ) ) {
+					return state;
+				}
+
+				const firstIndex = subState.indexOf( firstClientId );
+
+				return {
+					...state,
+					[ rootClientId ]: moveTo( subState, firstIndex, firstIndex + 1, clientIds.length ),
+				};
+			}
+
+			case 'REPLACE_BLOCKS': {
+				const { clientIds } = action;
+				if ( ! action.blocks ) {
+					return state;
+				}
+
+				const mappedBlocks = mapBlockOrder( action.blocks );
+
+				return flow( [
+					( nextState ) => omit( nextState, clientIds ),
+					( nextState ) => ( {
+						...nextState,
+						...omit( mappedBlocks, '' ),
+					} ),
+					( nextState ) => mapValues( nextState, ( subState ) => (
+						reduce( subState, ( result, clientId ) => {
+							if ( clientId === clientIds[ 0 ] ) {
+								return [
+									...result,
+									...mappedBlocks[ '' ],
+								];
+							}
+
+							if ( clientIds.indexOf( clientId ) === -1 ) {
+								result.push( clientId );
+							}
+
+							return result;
+						}, [] )
+					) ),
+				] )( state );
+			}
+
+			case 'REMOVE_BLOCKS':
+				return flow( [
+					// Remove inner block ordering for removed blocks
+					( nextState ) => omit( nextState, action.clientIds ),
+
+					// Remove deleted blocks from other blocks' orderings
+					( nextState ) => mapValues( nextState, ( subState ) => (
+						without( subState, ...action.clientIds )
+					) ),
+				] )( state );
+		}
+
+		return state;
+	},
 } );
 
 /**
@@ -826,7 +821,7 @@ export const blockListSettings = ( state = {}, action ) => {
 };
 
 export default combineReducers( {
-	editor,
+	blocks,
 	isTyping,
 	isCaretWithinFormattedText,
 	blockSelection,
