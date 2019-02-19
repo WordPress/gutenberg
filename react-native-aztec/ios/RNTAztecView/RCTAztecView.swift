@@ -1,4 +1,5 @@
 import Aztec
+import CoreServices
 import Foundation
 import UIKit
 
@@ -8,6 +9,7 @@ class RCTAztecView: Aztec.TextView {
     @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onFocus: RCTBubblingEventBlock? = nil
     @objc var onBlur: RCTBubblingEventBlock? = nil
+    @objc var onPaste: RCTBubblingEventBlock? = nil
     @objc var onContentSizeChange: RCTBubblingEventBlock? = nil
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var blockType: NSDictionary? = nil {
@@ -146,6 +148,40 @@ class RCTAztecView: Aztec.TextView {
         
         let body = packForRN(newSize, withName: "contentSize")
         onContentSizeChange(body)
+    }
+    
+    // MARK: - Paste handling
+    
+    private func html(from pasteboard: UIPasteboard) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String) else {
+            return nil
+        }
+        
+        return String(data: data, encoding: .utf8)
+    }
+    
+    private func text(from pasteboard: UIPasteboard) -> String? {
+        guard let data = pasteboard.data(forPasteboardType: kUTTypePlainText as String) else {
+            return nil
+        }
+        
+        return String(data: data, encoding: .utf8)
+    }
+    
+    override func paste(_ sender: Any?) {
+        let start = selectedRange.location
+        let end = selectedRange.location + selectedRange.length
+        
+        let pasteboard = UIPasteboard.general
+        let text = self.text(from: pasteboard) ?? ""
+        let html = self.html(from: pasteboard) ?? ""
+        
+        onPaste?([
+            "currentContent": getHTML(),
+            "selectionStart": start,
+            "selectionEnd": end,
+            "pastedText": text,
+            "pastedHtml": html])
     }
     
     // MARK: - Edits
