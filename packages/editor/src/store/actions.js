@@ -9,6 +9,11 @@ import { castArray } from 'lodash';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import { select } from './controls';
+
+/**
  * Returns an action object used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
@@ -177,14 +182,10 @@ export function selectBlock( clientId, initialPosition = null ) {
  * given clientId should be selected.
  *
  * @param {string} clientId Block client ID.
- *
- * @return {Object} Action object.
  */
-export function selectPreviousBlock( clientId ) {
-	return {
-		type: 'SELECT_PREVIOUS_BLOCK',
-		clientId,
-	};
+export function * selectPreviousBlock( clientId ) {
+	const previousBlockClientId = yield select( 'core/editor', 'getPreviousBlockClientId', clientId );
+	yield selectBlock( previousBlockClientId );
 }
 
 /**
@@ -192,14 +193,10 @@ export function selectPreviousBlock( clientId ) {
  * given clientId should be selected.
  *
  * @param {string} clientId Block client ID.
- *
- * @return {Object} Action object.
  */
-export function selectNextBlock( clientId ) {
-	return {
-		type: 'SELECT_NEXT_BLOCK',
-		clientId,
-	};
+export function * selectNextBlock( clientId ) {
+	const nextBlockClientId = yield select( 'core/editor', 'getNextBlockClientId', clientId );
+	yield selectBlock( nextBlockClientId );
 }
 
 export function startMultiSelect() {

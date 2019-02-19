@@ -3,18 +3,28 @@
  */
 import { createRegistryControl } from '@wordpress/data';
 
-export const SELECT_PREVIOUS_BLOCK = createRegistryControl( ( registry ) => ( action ) => {
-	const { clientId } = action;
-	const { getPreviousBlockClientId } = registry.select( 'core/editor' );
-	const { selectBlock } = registry.dispatch( 'core/editor' );
+/**
+ * Calls a selector using the current state.
+ *
+ * @param {string} storeKey     Store key.
+ * @param {string} selectorName Selector name.
+ * @param  {Array} args         Selector arguments.
+ *
+ * @return {Object} control descriptor.
+ */
+export function select( storeKey, selectorName, ...args ) {
+	return {
+		type: 'SELECT',
+		storeKey,
+		selectorName,
+		args,
+	};
+}
 
-	selectBlock( getPreviousBlockClientId( clientId ), -1 );
-} );
+const controls = {
+	SELECT: createRegistryControl( ( registry ) => ( { storeKey, selectorName, args } ) => {
+		return registry.select( storeKey )[ selectorName ]( ...args );
+	} ),
+};
 
-export const SELECT_NEXT_BLOCK = createRegistryControl( ( registry ) => ( action ) => {
-	const { clientId } = action;
-	const { getNextBlockClientId } = registry.select( 'core/editor' );
-	const { selectBlock } = registry.dispatch( 'core/editor' );
-
-	selectBlock( getNextBlockClientId( clientId ) );
-} );
+export default controls;
