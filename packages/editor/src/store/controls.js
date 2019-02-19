@@ -11,24 +11,24 @@ export function apiFetch( request ) {
 	};
 }
 
-export function select( reducerKey, selectorName, ...args ) {
+export function select( storeKey, selectorName, ...args ) {
 	return {
 		type: 'SELECT',
-		reducerKey,
+		storeKey,
 		selectorName,
 		args,
 	};
 }
 
-/**
- * Dispatches an action.
- *
- * @param {string} storeKey   Store key.
- * @param {string} actionName Action name.
- * @param  {Array} args       Action arguments.
- *
- * @return {Object} control descriptor.
- */
+export function resolveSelect( storeKey, selectorName, ...args ) {
+	return {
+		type: 'RESOLVE_SELECT',
+		storeKey,
+		selectorName,
+		args,
+	};
+}
+
 export function dispatch( storeKey, actionName, ...args ) {
 	return {
 		type: 'DISPATCH',
@@ -50,6 +50,29 @@ export default {
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { storeKey, actionName, args } ) => {
 			return registry.dispatch( storeKey )[ actionName ]( ...args );
+		}
+	),
+	RESOLVE_SELECT: createRegistryControl(
+		( registry ) => ( { storeKey, selectorName, args } ) => {
+			return new Promise( ( resolve ) => {
+				const hasFinished = () => registry.select( 'core/data' )
+					.hasFinishedResolution( storeKey, selectorName, args );
+				const getResult = () => registry.select( storeKey )[ selectorName ]
+					.apply( null, args );
+
+				// trigger the selector (to trigger the resolver)
+				const result = getResult();
+				if ( hasFinished() ) {
+					return resolve( result );
+				}
+
+				const unsubscribe = registry.subscribe( () => {
+					if ( hasFinished() ) {
+						unsubscribe();
+						resolve( getResult() );
+					}
+				} );
+			} );
 		}
 	),
 };

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { select, dispatch, apiFetch } from '../controls';
+import { select, resolveSelect, dispatch, apiFetch } from '../controls';
 import {
 	MODULE_KEY,
 	SAVE_POST_NOTICE_ID,
@@ -82,7 +82,7 @@ export function* savePost( options = {} ) {
 		'getCurrentPostType'
 	);
 
-	const postType = yield select(
+	const postType = yield resolveSelect(
 		'core',
 		'getPostType',
 		currentPostType
@@ -208,7 +208,7 @@ export function* trashPost() {
 		MODULE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield select(
+	const postType = yield resolveSelect(
 		'core',
 		'getPostType',
 		postTypeSlug
@@ -258,7 +258,7 @@ export function* refreshPost() {
 		MODULE_KEY,
 		'getCurrentPostType'
 	);
-	const postType = yield select(
+	const postType = yield resolveSelect(
 		'core',
 		'getPostType',
 		postTypeSlug

@@ -7,7 +7,7 @@ import actions, {
 	trashPost,
 	refreshPost,
 } from '../post-generators';
-import { select, dispatch, apiFetch } from '../../controls';
+import { select, dispatch, apiFetch, resolveSelect } from '../../controls';
 import {
 	MODULE_KEY,
 	SAVE_POST_NOTICE_ID,
@@ -24,6 +24,12 @@ select.mockImplementation( ( ...args ) => {
 dispatch.mockImplementation( ( ...args ) => {
 	const { dispatch: actualDispatch } = jest.requireActual( '../../controls' );
 	return actualDispatch( ...args );
+} );
+
+resolveSelect.mockImplementation( ( ...args ) => {
+	const { resolveSelect: selectResolver } = jest
+		.requireActual( '../../controls' );
+	return selectResolver( ...args );
 } );
 
 const apiFetchThrowError = ( error ) => {
@@ -205,7 +211,7 @@ describe( 'Post generator actions', () => {
 				() => {
 					const { value } = fulfillment.next( postTypeSlug );
 					expect( value ).toEqual(
-						select( 'core', 'getPostType', postTypeSlug )
+						resolveSelect( 'core', 'getPostType', postTypeSlug )
 					);
 				},
 			],
@@ -517,7 +523,7 @@ describe( 'trashPost()', () => {
 	} );
 	it( 'yields expected action for selecting the post type object', () => {
 		const { value } = fulfillment.next( postTypeSlug );
-		expect( value ).toEqual( select(
+		expect( value ).toEqual( resolveSelect(
 			'core',
 			'getPostType',
 			postTypeSlug
@@ -595,7 +601,7 @@ describe( 'refreshPost()', () => {
 	} );
 	it( 'yields expected action for selecting the post type object', () => {
 		const { value } = fulfillment.next( postTypeSlug );
-		expect( value ).toEqual( select(
+		expect( value ).toEqual( resolveSelect(
 			'core',
 			'getPostType',
 			postTypeSlug
