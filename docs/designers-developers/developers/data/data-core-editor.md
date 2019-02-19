@@ -1562,8 +1562,8 @@ reflects a reverse selection.
 
 ### selectPreviousBlock
 
-Returns an action object used in signalling that the block preceding the
-given clientId should be selected.
+Yields action objects used in signalling that the block preceding the given
+clientId should be selected.
 
 *Parameters*
 
@@ -1571,8 +1571,8 @@ given clientId should be selected.
 
 ### selectNextBlock
 
-Returns an action object used in signalling that the block following the
-given clientId should be selected.
+Yields action objects used in signalling that the block following the given
+clientId should be selected.
 
 *Parameters*
 

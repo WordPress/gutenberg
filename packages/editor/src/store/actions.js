@@ -178,24 +178,34 @@ export function selectBlock( clientId, initialPosition = null ) {
 }
 
 /**
- * Returns an action object used in signalling that the block preceding the
- * given clientId should be selected.
+ * Yields action objects used in signalling that the block preceding the given
+ * clientId should be selected.
  *
  * @param {string} clientId Block client ID.
  */
-export function * selectPreviousBlock( clientId ) {
-	const previousBlockClientId = yield select( 'core/editor', 'getPreviousBlockClientId', clientId );
-	yield selectBlock( previousBlockClientId );
+export function* selectPreviousBlock( clientId ) {
+	const previousBlockClientId = yield select(
+		'core/editor',
+		'getPreviousBlockClientId',
+		clientId
+	);
+
+	yield selectBlock( previousBlockClientId, -1 );
 }
 
 /**
- * Returns an action object used in signalling that the block following the
- * given clientId should be selected.
+ * Yields action objects used in signalling that the block following the given
+ * clientId should be selected.
  *
  * @param {string} clientId Block client ID.
  */
-export function * selectNextBlock( clientId ) {
-	const nextBlockClientId = yield select( 'core/editor', 'getNextBlockClientId', clientId );
+export function* selectNextBlock( clientId ) {
+	const nextBlockClientId = yield select(
+		'core/editor',
+		'getNextBlockClientId',
+		clientId
+	);
+
 	yield selectBlock( nextBlockClientId );
 }
 
