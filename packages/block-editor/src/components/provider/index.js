@@ -119,11 +119,10 @@ class BlockEditorProvider extends Component {
 	}
 
 	componentDidMount() {
+		this.isSyncingBlockValue = true;
 		this.props.updateEditorSettings( this.props.settings );
 		this.props.resetBlocks( this.props.value );
 		this.attachChangeObserver( this.props.registry );
-
-		this.isSyncingBlockValue = true;
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -148,11 +147,11 @@ class BlockEditorProvider extends Component {
 		if ( this.isSyncingBlockValue ) {
 			this.isSyncingBlockValue = false;
 		} else if ( blocks !== prevProps.blocks ) {
+			this.isSyncingBlockValue = true;
 			onInput( blocks );
-			this.isSyncingBlockValue = true;
 		} else if ( value !== prevProps.value ) {
-			resetBlocks( value );
 			this.isSyncingBlockValue = true;
+			resetBlocks( value );
 		}
 	}
 
