@@ -62,7 +62,6 @@ export default function ColorPalette( { colors, disableCustomColors = false, val
 						contentClassName="components-color-palette__picker"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<Button
-								type="button"
 								aria-expanded={ isOpen }
 								onClick={ onToggle }
 								aria-label={ customColorPickerLabel }
