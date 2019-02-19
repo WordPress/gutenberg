@@ -4,7 +4,12 @@
 	justify-content: space-between;
 	align-items: center;
 
+	// Apply the same height as the isSmall Reset button.
 	.components-range-control__number {
+		height: 24px;
+		line-height: 22px;
+		margin-left: 0;
+
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
 			cursor: default;
@@ -32,6 +37,14 @@
 		position: absolute;
 		top: calc(50% - 10px);
 		left: 10px;
+	}
+
+	&:hover {
+		@include menu-style__hover;
+	}
+
+	&:focus {
+		@include menu-style__focus;
 	}
 }
 
