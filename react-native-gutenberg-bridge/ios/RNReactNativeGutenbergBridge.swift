@@ -94,7 +94,8 @@ extension RNReactNativeGutenbergBridge {
             Gutenberg.EventName.toggleHTMLMode,
             Gutenberg.EventName.setTitle,
             Gutenberg.EventName.updateHtml,
-            Gutenberg.EventName.mediaUpload
+            Gutenberg.EventName.mediaUpload,
+            Gutenberg.EventName.setFocusOnTitle,
         ]
     }
 
