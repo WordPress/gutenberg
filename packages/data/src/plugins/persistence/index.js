@@ -35,20 +35,6 @@ const DEFAULT_STORAGE = defaultStorage;
 const DEFAULT_STORAGE_KEY = 'WP_DATA';
 
 /**
- * Higher-order reducer to provides an initial value when state is undefined.
- *
- * @param {Function} reducer      Original reducer.
- * @param {*}        initialState Value to use as initial state.
- *
- * @return {Function} Enhanced reducer.
- */
-export function withInitialState( reducer, initialState ) {
-	return ( state = initialState, action ) => {
-		return reducer( state, action );
-	};
-}
-
-/**
  * Higher-order reducer which invokes the original reducer only if state is
  * inequal from that of the action's `nextState` property, otherwise returning
  * the original state reference.
@@ -198,7 +184,7 @@ export default function( registry, pluginOptions ) {
 				// higher-order reducer to use the persisted state as initial.
 				options = {
 					...options,
-					reducer: withInitialState( options.reducer, initialState ),
+					initialState,
 				};
 			}
 

@@ -3,7 +3,6 @@
  */
 import plugin, {
 	createPersistenceInterface,
-	withInitialState,
 	withLazySameState,
 } from '../';
 import objectStorage from '../storage/object';
@@ -243,22 +242,6 @@ describe( 'persistence', () => {
 				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{}}' );
 				expect( objectStorage.setItem ).toHaveBeenCalledWith( storageKey, '{"test1":{},"test2":{}}' );
 			} );
-		} );
-	} );
-
-	describe( 'withInitialState', () => {
-		it( 'should return a reducer function', () => {
-			const reducer = ( state = 1 ) => state;
-			const enhanced = withInitialState( reducer );
-
-			expect( enhanced() ).toBe( 1 );
-		} );
-
-		it( 'should assign a default state by argument', () => {
-			const reducer = ( state = 1 ) => state;
-			const enhanced = withInitialState( reducer, 2 );
-
-			expect( enhanced() ).toBe( 2 );
 		} );
 	} );
 
