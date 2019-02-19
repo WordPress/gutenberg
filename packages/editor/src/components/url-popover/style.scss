@@ -40,6 +40,11 @@
 	&__settings-toggle {
 		flex-shrink: 0;
 
+		// Add a left divider to the toggle button
+		border-radius: 0;
+		border-left: $border-width solid $light-gray-500;
+		margin-left: 1px;
+
 		&[aria-expanded="true"] .dashicon {
 			transform: rotate(180deg);
 		}
