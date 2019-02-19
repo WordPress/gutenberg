@@ -6,17 +6,20 @@ jest.mock( '../react-native-gutenberg-bridge', () => {
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
+		editorDidMount: jest.fn(),
 	};
 } );
 
 jest.mock( 'react-native-safe-area', () => {
+	const addEventListener = jest.fn();
+	addEventListener.mockReturnValue( { remove: () => {} } );
 	return {
 		getSafeAreaInsetsForRootView: () => {
 			return new Promise( ( accept ) => {
 				accept( { safeAreaInsets: { bottom: 34 } } );
 			} );
 		},
-		addEventListener: jest.fn(),
+		addEventListener: addEventListener,
 		removeEventListener: jest.fn(),
 	};
 } );

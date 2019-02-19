@@ -5,6 +5,10 @@ import android.app.Application;
 import com.facebook.react.ReactApplication;
 import com.horcrux.svg.SvgPackage;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
 import com.github.godness84.RNRecyclerViewList.RNRecyclerviewListPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -28,7 +32,32 @@ public class MainApplication extends Application implements ReactApplication {
           new MainReactPackage(),
             new SvgPackage(),
             new ReactAztecPackage(),
-            new RNRecyclerviewListPackage()
+            new RNRecyclerviewListPackage(),
+            new RNReactNativeGutenbergBridgePackage(new GutenbergBridgeJS2Parent() {
+                @Override
+                public void responseHtml(String title, String html, boolean changed) {}
+
+                @Override
+                public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback) {}
+
+                @Override
+                public void requestMediaPickFromDeviceLibrary(MediaUploadCallback mediaUploadCallback) {}
+
+                @Override
+                public void requestMediaPickerFromDeviceCamera(MediaUploadCallback mediaUploadCallback) {}
+
+                @Override
+                public void mediaUploadSync(MediaUploadCallback mediaUploadCallback) {}
+
+                @Override
+                public void requestImageFailedRetryDialog(int mediaId) {}
+
+                @Override
+                public void requestImageUploadCancelDialog(int mediaId) {}
+
+                @Override
+                public void editorDidMount(boolean hasUnsupportedBlocks) {}
+            })
       );
     }
 

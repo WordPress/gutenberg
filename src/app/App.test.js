@@ -2,11 +2,14 @@
 
 import renderer from 'react-test-renderer';
 
+import { setupApp } from '..';
 import App from './App';
 import BlockHolder from '../block-management/block-holder';
 import { dispatch, select } from '@wordpress/data';
 
 describe( 'App', () => {
+	beforeAll( setupApp );
+
 	it( 'renders without crashing', () => {
 		const app = renderer.create( <App /> );
 		const rendered = app.toJSON();
