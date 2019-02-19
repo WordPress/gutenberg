@@ -15,10 +15,6 @@
 
 - Avoid inheriting from ESLint configurations in ancestor directories when using the default configuration ([#13483](https://github.com/WordPress/gutenberg/pull/13483))
 
-### Internal
-
-- The bundled `puppeteer` dependency has been updated from requiring `1.6.1` to requiring `^1.12.2` ([#13922](https://github.com/WordPress/gutenberg/pull/13922)).
-
 ## 2.5.0 (2019-01-09)
 
 ### New Features
