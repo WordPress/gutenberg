@@ -165,20 +165,24 @@ export default function( registry, pluginOptions ) {
 			}
 
 			// Load from persistence to use as initial state.
-			let initialState = persistence.get()[ reducerKey ];
-			if ( initialState !== undefined ) {
-				// For object-like persistence, ensure that:
+			const persistedState = persistence.get()[ reducerKey ];
+			if ( persistedState !== undefined ) {
+				let initialState = options.reducer( undefined, {
+					type: '@@WP/PERSISTENCE_RESTORE',
+				} );
+
+				// If there is a mismatch in object-likeness of either default
+				// initial or persisted state, defer to default implementation.
+				// Otherwise, consume from persistence, with assurance that for
+				// an object-like states:
 				// - Other keys are left intact when persisting only a subset
-				//   of keys.
-				// - New keys in what would otherwise be provided as a default
-				//   state are deeply merged as a base for the persisted value.
-				if ( isPlainObject( initialState ) ) {
-					initialState = merge(
-						options.reducer( undefined, {
-							type: '@@WP/PERSISTENCE_RESTORE',
-						} ),
-						initialState,
-					);
+				//   subset of keys.
+				// - New keys in what would otherwise be used as initial state
+				//   are deeply merged as base for persisted value.
+				if ( isPlainObject( initialState ) === isPlainObject( persistedState ) ) {
+					initialState = isPlainObject( initialState ) ?
+						merge( {}, initialState, persistedState ) :
+						persistedState;
 				}
 
 				options = { ...options, initialState };

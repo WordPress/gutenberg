@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import deepFreeze from 'deep-freeze';
+
+/**
  * Internal dependencies
  */
 import plugin, {
@@ -46,7 +51,7 @@ describe( 'persistence', () => {
 
 		registry.registerStore( 'test', {
 			persist: true,
-			reducer: ( state = null ) => state,
+			reducer: ( state = {} ) => state,
 			selectors: {
 				getState: ( state ) => state,
 			},
@@ -77,7 +82,7 @@ describe( 'persistence', () => {
 	} );
 
 	it( 'should merge persisted value with default if object-like', () => {
-		const DEFAULT_STATE = { preferences: { useFoo: true, useBar: true } };
+		const DEFAULT_STATE = deepFreeze( { preferences: { useFoo: true, useBar: true } } );
 
 		registry = createRegistry().use( plugin, {
 			storage: {
@@ -106,6 +111,44 @@ describe( 'persistence', () => {
 				useBar: true,
 			},
 		} );
+	} );
+
+	it( 'should defer to default initialState if mismatch of object-like (persisted object-like)', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: { persisted: true } } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = 'initial' ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toBe( 'initial' );
+	} );
+
+	it( 'should defer to default initialState if mismatch of object-like (initial object-like)', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: 'persisted' } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = { initial: true } ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( { initial: true } );
 	} );
 
 	it( 'should be reasonably tolerant to a non-object persisted state', () => {
