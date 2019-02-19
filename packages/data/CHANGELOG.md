@@ -1,3 +1,9 @@
+## 4.2.1 (Unreleased)
+
+### Bug Fix
+
+- Resolves issue in the persistence plugin where passing `persist` as an array of reducer keys would wrongly replace state values for the unpersisted reducer keys.
+
 ## 4.2.0 (2019-01-03)
 
 ### Enhancements

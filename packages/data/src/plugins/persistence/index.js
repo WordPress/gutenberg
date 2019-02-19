@@ -178,12 +178,29 @@ export default function( registry, pluginOptions ) {
 				return registry.registerStore( reducerKey, options );
 			}
 
-			const initialState = persistence.get()[ reducerKey ];
+			// Load from persistence to use as initial state.
+			let initialState = persistence.get()[ reducerKey ];
+			if ( initialState !== undefined ) {
+				// When persisting only a subset of keys from the reducer
+				// result, ensure that other keys are left intact when
+				// restoring from persistence.
+				if ( Array.isArray( options.persist ) ) {
+					initialState = {
+						...options.reducer( undefined, {
+							type: '@@WP/PERSISTENCE_RESTORE',
+						} ),
+						...initialState,
+					};
+				}
 
-			options = {
-				...options,
-				reducer: withInitialState( options.reducer, initialState ),
-			};
+				// Since it's otherwise not possible to assign an initial state
+				// to use for the store, emulate the behavior by assigning a
+				// higher-order reducer to use the persisted state as initial.
+				options = {
+					...options,
+					reducer: withInitialState( options.reducer, initialState ),
+				};
+			}
 
 			const store = registry.registerStore( reducerKey, options );
 

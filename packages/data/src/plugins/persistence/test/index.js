@@ -37,6 +37,46 @@ describe( 'persistence', () => {
 		registry.registerStore( 'test', options );
 	} );
 
+	it( 'should load a persisted value as initialState', () => {
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: { a: 1 } } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: true,
+			reducer: ( state = null ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1 } );
+	} );
+
+	it( 'should load a persisted subset value as initialState', () => {
+		const DEFAULT_STATE = { a: null, b: null };
+
+		registry = createRegistry().use( plugin, {
+			storage: {
+				getItem: () => JSON.stringify( { test: { a: 1 } } ),
+				setItem() {},
+			},
+		} );
+
+		registry.registerStore( 'test', {
+			persist: [ 'a' ],
+			reducer: ( state = DEFAULT_STATE ) => state,
+			selectors: {
+				getState: ( state ) => state,
+			},
+		} );
+
+		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1, b: null } );
+	} );
+
 	it( 'override values passed to registerStore', () => {
 		const options = { persist: true, reducer() {} };
 
@@ -46,8 +86,6 @@ describe( 'persistence', () => {
 			persist: true,
 			reducer: expect.any( Function ),
 		} );
-		// Replaced reducer:
-		expect( originalRegisterStore.mock.calls[ 0 ][ 1 ].reducer ).not.toBe( options.reducer );
 	} );
 
 	it( 'should not persist if option not passed', () => {
