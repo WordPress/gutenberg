@@ -33,6 +33,7 @@ import {
 	toHTMLString,
 	getTextContent,
 	insert,
+	insertLineBreak,
 	insertLineSeparator,
 	isEmptyLine,
 	unstableToDom,
@@ -110,6 +111,7 @@ export class RichText extends Component {
 		this.setRef = this.setRef.bind( this );
 		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
 		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
+		this.onPointerDown = this.onPointerDown.bind( this );
 
 		this.formatToValue = memize( this.formatToValue.bind( this ), { size: 1 } );
 
@@ -156,7 +158,8 @@ export class RichText extends Component {
 	}
 
 	createRecord() {
-		const range = getSelection().getRangeAt( 0 );
+		const selection = getSelection();
+		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
 		return create( {
 			element: this.editableRef,
@@ -167,13 +170,14 @@ export class RichText extends Component {
 		} );
 	}
 
-	applyRecord( record ) {
+	applyRecord( record, { domOnly } = {} ) {
 		apply( {
 			value: record,
 			current: this.editableRef,
 			multilineTag: this.multilineTag,
 			multilineWrapperTags: this.multilineWrapperTags,
 			prepareEditableTree: this.props.prepareEditableTree,
+			__unstableDomOnly: domOnly,
 		} );
 	}
 
@@ -347,6 +351,21 @@ export class RichText extends Component {
 			return;
 		}
 
+		if ( event ) {
+			const { inputType } = event.nativeEvent;
+
+			// The browser formatted something or tried to insert a list.
+			// Overwrite it. It will be handled later by the format library if
+			// needed.
+			if (
+				inputType.indexOf( 'format' ) === 0 ||
+				( inputType.indexOf( 'insert' ) === 0 && inputType !== 'insertText' )
+			) {
+				this.applyRecord( this.getRecord() );
+				return;
+			}
+		}
+
 		let { selectedFormat } = this.state;
 		const { formats, text, start, end } = this.patterns.reduce(
 			( accumlator, transform ) => transform( accumlator ),
@@ -419,7 +438,7 @@ export class RichText extends Component {
 			}
 
 			this.setState( { start, end, selectedFormat } );
-			this.applyRecord( { ...value, selectedFormat } );
+			this.applyRecord( { ...value, selectedFormat }, { domOnly: true } );
 
 			delete this.formatPlaceholder;
 		}
@@ -599,27 +618,15 @@ export class RichText extends Component {
 			}
 
 			if ( this.multilineTag ) {
-				if ( this.onSplit && isEmptyLine( record ) ) {
+				if ( event.shiftKey ) {
+					this.onChange( insertLineBreak( record ) );
+				} else if ( this.onSplit && isEmptyLine( record ) ) {
 					this.onSplit( ...split( record ).map( this.valueToFormat ) );
 				} else {
 					this.onChange( insertLineSeparator( record ) );
 				}
 			} else if ( event.shiftKey || ! this.onSplit ) {
-				const text = getTextContent( record );
-				const length = text.length;
-				let toInsert = '\n';
-
-				// If the caret is at the end of the text, and there is no
-				// trailing line break or no text at all, we have to insert two
-				// line breaks in order to create a new line visually and place
-				// the caret there.
-				if ( record.end === length && (
-					text.charAt( length - 1 ) !== '\n' || length === 0
-				) ) {
-					toInsert = '\n\n';
-				}
-
-				this.onChange( insert( record, toInsert ) );
+				this.onChange( insertLineBreak( record ) );
 			} else {
 				this.splitContent();
 			}
@@ -750,6 +757,32 @@ export class RichText extends Component {
 		}
 
 		this.onSplit( before, after, ...blocks );
+	}
+
+	/**
+	 * Select object when they are clicked. The browser will not set any
+	 * selection when clicking e.g. an image.
+	 *
+	 * @param  {SyntheticEvent} event Synthetic mousedown or touchstart event.
+	 */
+	onPointerDown( event ) {
+		const { target } = event;
+
+		// If the child element has no text content, it must be an object.
+		if ( target === this.editableRef || target.textContent ) {
+			return;
+		}
+
+		const { parentNode } = target;
+		const index = Array.from( parentNode.childNodes ).indexOf( target );
+		const range = target.ownerDocument.createRange();
+		const selection = getSelection();
+
+		range.setStart( target.parentNode, index );
+		range.setEnd( target.parentNode, index + 1 );
+
+		selection.removeAllRanges();
+		selection.addRange( range );
 	}
 
 	componentDidUpdate( prevProps ) {
@@ -988,6 +1021,8 @@ export class RichText extends Component {
 								onKeyDown={ this.onKeyDown }
 								onFocus={ this.onFocus }
 								onBlur={ this.onBlur }
+								onMouseDown={ this.onPointerDown }
+								onTouchStart={ this.onPointerDown }
 								multilineTag={ this.multilineTag }
 								multilineWrapperTags={ this.multilineWrapperTags }
 								setRef={ this.setRef }
@@ -1115,3 +1150,4 @@ export default RichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
 export { RichTextInserterItem } from './inserter-list-item';
+export { RichTextInputEvent } from './input-event';

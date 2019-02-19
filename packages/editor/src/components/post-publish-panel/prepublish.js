@@ -12,7 +12,7 @@ import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import PostVisibility from '../post-visibility';
 import PostVisibilityLabel from '../post-visibility/label';

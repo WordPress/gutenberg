@@ -168,6 +168,8 @@ export default class Editable extends Component {
 			onCompositionEnd,
 			onFocus,
 			onBlur,
+			onMouseDown,
+			onTouchStart,
 		} = this.props;
 
 		ariaProps.role = 'textbox';
@@ -188,6 +190,8 @@ export default class Editable extends Component {
 			onBlur,
 			onKeyDown,
 			onCompositionEnd,
+			onMouseDown,
+			onTouchStart,
 		} );
 	}
 }

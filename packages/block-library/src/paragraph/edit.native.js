@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { parse, createBlock } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/editor';
 
 /**
@@ -99,12 +99,9 @@ class ParagraphEdit extends Component {
 						...style,
 						minHeight: Math.max( minHeight, this.state.aztecHeight ),
 					} }
-					onChange={ ( event ) => {
-						// Create a React Tree from the new HTML
-						const newParaBlock = parse( '<!-- wp:paragraph --><p>' + event.content + '</p><!-- /wp:paragraph -->' )[ 0 ];
+					onChange={ ( nextContent ) => {
 						setAttributes( {
-							...this.props.attributes,
-							content: newParaBlock.attributes.content,
+							content: nextContent,
 						} );
 					} }
 					onSplit={ this.splitBlock }
