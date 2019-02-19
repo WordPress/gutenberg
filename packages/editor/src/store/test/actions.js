@@ -19,6 +19,7 @@ import {
 	updateBlockAttributes,
 	updateBlock,
 	selectBlock,
+	selectPreviousBlock,
 	startMultiSelect,
 	stopMultiSelect,
 	multiSelect,
@@ -293,32 +294,47 @@ describe( 'actions', () => {
 
 	describe( 'removeBlocks', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
-			const clientIds = [ 'clientId' ];
-			expect( removeBlocks( clientIds ) ).toEqual( {
-				type: 'REMOVE_BLOCKS',
-				clientIds,
-				selectPrevious: true,
-			} );
+			const clientId = 'clientId';
+			const clientIds = [ clientId ];
+
+			const actions = Array.from( removeBlocks( clientIds ) );
+
+			expect( actions ).toEqual( [
+				selectPreviousBlock( clientId ),
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds,
+				},
+			] );
 		} );
 	} );
 
 	describe( 'removeBlock', () => {
 		it( 'should return REMOVE_BLOCKS action', () => {
 			const clientId = 'myclientid';
-			expect( removeBlock( clientId ) ).toEqual( {
-				type: 'REMOVE_BLOCKS',
-				clientIds: [
-					clientId,
-				],
-				selectPrevious: true,
-			} );
-			expect( removeBlock( clientId, false ) ).toEqual( {
-				type: 'REMOVE_BLOCKS',
-				clientIds: [
-					clientId,
-				],
-				selectPrevious: false,
-			} );
+
+			const actions = Array.from( removeBlock( clientId ) );
+
+			expect( actions ).toEqual( [
+				selectPreviousBlock( clientId ),
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ clientId ],
+				},
+			] );
+		} );
+
+		it( 'should return REMOVE_BLOCKS action, opting out of remove previous', () => {
+			const clientId = 'myclientid';
+
+			const actions = Array.from( removeBlock( clientId, false ) );
+
+			expect( actions ).toEqual( [
+				{
+					type: 'REMOVE_BLOCKS',
+					clientIds: [ clientId ],
+				},
+			] );
 		} );
 	} );
 
