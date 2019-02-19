@@ -14,8 +14,8 @@
 		width: $icon-button-size;
 		height: $icon-button-size;
 
-		.dashicon {
-			transform: rotate(90deg);
+		&[aria-expanded="true"] .dashicon {
+			transform: rotate(180deg);
 		}
 	}
 
