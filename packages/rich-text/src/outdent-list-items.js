@@ -16,16 +16,16 @@ import { getLastChildIndex } from './get-last-child-index';
  * @return {Object} The changed value.
  */
 export function outdentListItems( value ) {
-	const { text, formats, start, end } = value;
+	const { text, lineFormats, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
 
 	// Return early if the starting line index cannot be further outdented.
-	if ( formats[ startingLineIndex ] === undefined ) {
+	if ( lineFormats[ startingLineIndex ] === undefined ) {
 		return value;
 	}
 
-	const newFormats = formats.slice( 0 );
-	const parentFormats = formats[ getParentLineIndex( value, startingLineIndex ) ] || [];
+	const newFormats = lineFormats.slice( 0 );
+	const parentFormats = lineFormats[ getParentLineIndex( value, startingLineIndex ) ] || [];
 	const endingLineIndex = getLineIndex( value, end );
 	const lastChildIndex = getLastChildIndex( value, endingLineIndex );
 
@@ -52,9 +52,7 @@ export function outdentListItems( value ) {
 	}
 
 	return normaliseFormats( {
-		text,
-		formats: newFormats,
-		start,
-		end,
+		...value,
+		lineFormats: newFormats,
 	} );
 }

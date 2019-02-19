@@ -14,8 +14,8 @@ import { getLineIndex } from './get-line-index';
  *
  * @return {boolean} The line index.
  */
-function getTargetLevelLineIndex( { text, formats }, lineIndex ) {
-	const startFormats = formats[ lineIndex ] || [];
+function getTargetLevelLineIndex( { text, lineFormats }, lineIndex ) {
+	const startFormats = lineFormats[ lineIndex ] || [];
 
 	let index = lineIndex;
 
@@ -24,7 +24,7 @@ function getTargetLevelLineIndex( { text, formats }, lineIndex ) {
 			continue;
 		}
 
-		const formatsAtIndex = formats[ index ] || [];
+		const formatsAtIndex = lineFormats[ index ] || [];
 
 		// Return the first line index that is one level higher. If the level is
 		// lower or equal, there is no result.
@@ -52,10 +52,10 @@ export function indentListItems( value, rootFormat ) {
 		return value;
 	}
 
-	const { text, formats, start, end } = value;
+	const { text, lineFormats, end } = value;
 	const previousLineIndex = getLineIndex( value, lineIndex );
-	const formatsAtLineIndex = formats[ lineIndex ] || [];
-	const formatsAtPreviousLineIndex = formats[ previousLineIndex ] || [];
+	const formatsAtLineIndex = lineFormats[ lineIndex ] || [];
+	const formatsAtPreviousLineIndex = lineFormats[ previousLineIndex ] || [];
 
 	// The the indentation of the current line is greater than previous line,
 	// then the line cannot be furter indented.
@@ -63,7 +63,7 @@ export function indentListItems( value, rootFormat ) {
 		return value;
 	}
 
-	const newFormats = formats.slice();
+	const newFormats = lineFormats.slice();
 	const targetLevelLineIndex = getTargetLevelLineIndex( value, lineIndex );
 
 	for ( let index = lineIndex; index < end; index++ ) {
@@ -74,12 +74,12 @@ export function indentListItems( value, rootFormat ) {
 		// Get the previous list, and if there's a child list, take over the
 		// formats. If not, duplicate the last level and create a new level.
 		if ( targetLevelLineIndex ) {
-			const targetFormats = formats[ targetLevelLineIndex ] || [];
+			const targetFormats = lineFormats[ targetLevelLineIndex ] || [];
 			newFormats[ index ] = targetFormats.concat(
 				( newFormats[ index ] || [] ).slice( targetFormats.length - 1 )
 			);
 		} else {
-			const targetFormats = formats[ previousLineIndex ] || [];
+			const targetFormats = lineFormats[ previousLineIndex ] || [];
 			const lastformat = targetFormats[ targetFormats.length - 1 ] || rootFormat;
 
 			newFormats[ index ] = targetFormats.concat(
@@ -90,9 +90,7 @@ export function indentListItems( value, rootFormat ) {
 	}
 
 	return normaliseFormats( {
-		text,
-		formats: newFormats,
-		start,
-		end,
+		...value,
+		lineFormats: newFormats,
 	} );
 }

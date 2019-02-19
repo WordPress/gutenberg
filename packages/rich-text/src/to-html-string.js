@@ -21,16 +21,13 @@ import { toTree } from './to-tree';
  * @param {Object} $1                        Named argements.
  * @param {Object} $1.value                  Rich text value.
  * @param {string} [$1.multilineTag]         Multiline tag.
- * @param {Array}  [$1.multilineWrapperTags] Tags where lines can be found if
- *                                           nesting is possible.
  *
  * @return {string} HTML string.
  */
-export function toHTMLString( { value, multilineTag, multilineWrapperTags } ) {
+export function toHTMLString( { value, multilineTag } ) {
 	const tree = toTree( {
 		value,
 		multilineTag,
-		multilineWrapperTags,
 		createEmpty,
 		append,
 		getLastChild,

@@ -91,7 +91,6 @@ const padding = {
 export function toTree( {
 	value,
 	multilineTag,
-	multilineWrapperTags = [],
 	createEmpty,
 	append,
 	getLastChild,
@@ -104,7 +103,7 @@ export function toTree( {
 	onEndIndex,
 	isEditableTree,
 } ) {
-	const { formats, text, start, end } = value;
+	const { formats, lineFormats, objects, text, start, end } = value;
 	const formatsLength = formats.length + 1;
 	const tree = createEmpty();
 	const multilineFormat = { type: multilineTag };
@@ -138,12 +137,9 @@ export function toTree( {
 		// Set multiline tags in queue for building the tree.
 		if ( multilineTag ) {
 			if ( character === LINE_SEPARATOR ) {
-				characterFormats = lastSeparatorFormats = ( characterFormats || [] ).reduce( ( accumulator, format ) => {
-					if ( character === LINE_SEPARATOR && multilineWrapperTags.indexOf( format.type ) !== -1 ) {
-						accumulator.push( format );
-						accumulator.push( multilineFormat );
-					}
-
+				characterFormats = lastSeparatorFormats = ( lineFormats[ i ] || [] ).reduce( ( accumulator, format ) => {
+					accumulator.push( format );
+					accumulator.push( multilineFormat );
 					return accumulator;
 				}, [ multilineFormat ] );
 			} else {
@@ -196,11 +192,10 @@ export function toTree( {
 					return;
 				}
 
-				const { type, attributes, unregisteredAttributes, object } = format;
+				const { type, attributes, unregisteredAttributes } = format;
 
 				const boundaryClass = (
 					isEditableTree &&
-					! object &&
 					character !== LINE_SEPARATOR &&
 					format === deepestActiveFormat
 				);
@@ -210,7 +205,6 @@ export function toTree( {
 					type,
 					attributes,
 					unregisteredAttributes,
-					object,
 					boundaryClass,
 				} ) );
 
@@ -218,7 +212,7 @@ export function toTree( {
 					remove( pointer );
 				}
 
-				pointer = append( format.object ? parent : newNode, '' );
+				pointer = append( newNode, '' );
 			} );
 		}
 
@@ -240,22 +234,27 @@ export function toTree( {
 			}
 		}
 
-		if ( character !== OBJECT_REPLACEMENT_CHARACTER ) {
-			if ( character === '\n' ) {
-				pointer = append( getParent( pointer ), {
-					type: 'br',
-					attributes: isEditableTree ? {
-						'data-rich-text-line-break': 'true',
-					} : undefined,
-					object: true,
-				} );
-				// Ensure pointer is text node.
-				pointer = append( getParent( pointer ), '' );
-			} else if ( ! isText( pointer ) ) {
-				pointer = append( getParent( pointer ), character );
-			} else {
-				appendText( pointer, character );
-			}
+		if ( character === OBJECT_REPLACEMENT_CHARACTER ) {
+			pointer = append( getParent( pointer ), fromFormat( {
+				...objects[ i ],
+				object: true,
+			} ) );
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( character === '\n' ) {
+			pointer = append( getParent( pointer ), {
+				type: 'br',
+				attributes: isEditableTree ? {
+					'data-rich-text-line-break': 'true',
+				} : undefined,
+				object: true,
+			} );
+			// Ensure pointer is text node.
+			pointer = append( getParent( pointer ), '' );
+		} else if ( ! isText( pointer ) ) {
+			pointer = append( getParent( pointer ), character );
+		} else {
+			appendText( pointer, character );
 		}
 
 		if ( onStartIndex && start === i + 1 ) {

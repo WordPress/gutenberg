@@ -10,6 +10,7 @@ import { select } from '@wordpress/data';
 import { isEmpty } from './is-empty';
 import { isFormatEqual } from './is-format-equal';
 import { createElement } from './create-element';
+import { concatPair } from './concat';
 import {
 	LINE_SEPARATOR,
 	OBJECT_REPLACEMENT_CHARACTER,
@@ -22,7 +23,12 @@ import {
 const { TEXT_NODE, ELEMENT_NODE } = window.Node;
 
 function createEmptyValue() {
-	return { formats: [], text: '' };
+	return {
+		formats: [],
+		lineFormats: [],
+		objects: [],
+		text: '',
+	};
 }
 
 function simpleFindKey( object, value ) {
@@ -120,6 +126,8 @@ export function create( {
 	if ( typeof text === 'string' && text.length > 0 ) {
 		return {
 			formats: Array( text.length ),
+			lineFormats: Array( text.length ),
+			objects: Array( text.length ),
 			text,
 		};
 	}
@@ -291,10 +299,12 @@ function createFromElement( {
 			const text = filterString( node.nodeValue );
 			range = filterRange( node, range, filterString );
 			accumulateSelection( accumulator, node, range, { text } );
-			accumulator.text += text;
 			// Create a sparse array of the same length as `text`, in which
 			// formats can be added.
 			accumulator.formats.length += text.length;
+			accumulator.lineFormats.length += text.length;
+			accumulator.objects.length += text.length;
+			accumulator.text += text;
 			continue;
 		}
 
@@ -312,8 +322,7 @@ function createFromElement( {
 
 		if ( type === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
-			accumulator.text += '\n';
-			accumulator.formats.length += 1;
+			concatPair( accumulator, create( { text: '\n' } ) );
 			continue;
 		}
 
@@ -323,22 +332,10 @@ function createFromElement( {
 			type,
 			attributes: getAttributes( { element: node } ),
 		} );
-
-		let format;
-
-		if ( newFormat ) {
-			// Reuse the last format if it's equal.
-			if ( isFormatEqual( newFormat, lastFormat ) ) {
-				format = lastFormat;
-			} else {
-				format = newFormat;
-			}
-		}
-
-		let value;
+		const format = isFormatEqual( newFormat, lastFormat ) ? lastFormat : newFormat;
 
 		if ( multilineWrapperTags && multilineWrapperTags.indexOf( type ) !== -1 ) {
-			value = createFromMultilineElement( {
+			const value = createFromMultilineElement( {
 				element: node,
 				range,
 				multilineTag,
@@ -346,65 +343,43 @@ function createFromElement( {
 				currentWrapperTags: [ ...currentWrapperTags, format ],
 				isEditableTree,
 			} );
-			format = undefined;
-		} else {
-			value = createFromElement( {
-				element: node,
-				range,
-				multilineTag,
-				multilineWrapperTags,
-				isEditableTree,
-			} );
+
+			accumulateSelection( accumulator, node, range, value );
+			concatPair( accumulator, value );
+			continue;
 		}
 
-		const text = value.text;
-		const start = accumulator.text.length;
+		const value = createFromElement( {
+			element: node,
+			range,
+			multilineTag,
+			multilineWrapperTags,
+			isEditableTree,
+		} );
 
 		accumulateSelection( accumulator, node, range, value );
 
 		// Don't apply the element as formatting if it has no content.
-		if ( isEmpty( value ) && format && ! format.attributes ) {
+		if ( isEmpty( value ) && ! format.attributes ) {
 			continue;
 		}
 
-		const { formats } = accumulator;
-
-		if ( format && format.attributes && text.length === 0 ) {
-			format.object = true;
-			accumulator.text += OBJECT_REPLACEMENT_CHARACTER;
-
-			if ( formats[ start ] ) {
-				formats[ start ].unshift( format );
-			} else {
-				formats[ start ] = [ format ];
-			}
-		} else {
-			accumulator.text += text;
-			accumulator.formats.length += text.length;
-
-			let i = value.formats.length;
-
-			// Optimise for speed.
-			while ( i-- ) {
-				const formatIndex = start + i;
-
-				if ( format ) {
-					if ( formats[ formatIndex ] ) {
-						formats[ formatIndex ].push( format );
-					} else {
-						formats[ formatIndex ] = [ format ];
-					}
-				}
-
-				if ( value.formats[ i ] ) {
-					if ( formats[ formatIndex ] ) {
-						formats[ formatIndex ].push( ...value.formats[ i ] );
-					} else {
-						formats[ formatIndex ] = value.formats[ i ];
-					}
-				}
-			}
+		if ( format.attributes && value.text.length === 0 ) {
+			concatPair( accumulator, {
+				formats: [ , ],
+				lineFormats: [ , ],
+				objects: [ format ],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			} );
+			continue;
 		}
+
+		concatPair( accumulator, {
+			...value,
+			formats: Array.from( value.formats, ( formats ) =>
+				formats ? [ format, ...formats ] : [ format ]
+			),
+		} );
 	}
 
 	return accumulator;
@@ -459,17 +434,18 @@ function createFromMultilineElement( {
 			isEditableTree,
 		} );
 
-		// Multiline value text should be separated by a double line break.
+		// Multiline value text should be separated by a line separator.
 		if ( index !== 0 || currentWrapperTags.length > 0 ) {
 			const formats = currentWrapperTags.length > 0 ? [ currentWrapperTags ] : [ , ];
-			accumulator.formats = accumulator.formats.concat( formats );
+
+			accumulator.formats.length += 1;
+			accumulator.lineFormats = accumulator.lineFormats.concat( formats );
+			accumulator.objects.length += 1;
 			accumulator.text += LINE_SEPARATOR;
 		}
 
 		accumulateSelection( accumulator, node, range, value );
-
-		accumulator.formats = accumulator.formats.concat( value.formats );
-		accumulator.text += value.text;
+		concatPair( accumulator, value );
 	}
 
 	return accumulator;

@@ -984,7 +984,6 @@ export class RichText extends Component {
 			return toHTMLString( {
 				value,
 				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
 			} );
 		}
 

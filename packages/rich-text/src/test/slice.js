@@ -16,10 +16,14 @@ describe( 'slice', () => {
 	it( 'should slice', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			lineFormats: [ , , , , , , , , , , , , , ],
+			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 		};
 		const expected = {
 			formats: [ , [ em ], [ em ] ],
+			lineFormats: [ , , , ],
+			objects: [ , , , ],
 			text: ' tw',
 		};
 		const result = slice( deepFreeze( record ), 3, 6 );
@@ -32,12 +36,16 @@ describe( 'slice', () => {
 	it( 'should slice record', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			lineFormats: [ , , , , , , , , , , , , , ],
+			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 3,
 			end: 6,
 		};
 		const expected = {
 			formats: [ , [ em ], [ em ] ],
+			lineFormats: [ , , , ],
+			objects: [ , , , ],
 			text: ' tw',
 		};
 		const result = slice( deepFreeze( record ) );

@@ -18,17 +18,23 @@ describe( 'split', () => {
 			start: 5,
 			end: 10,
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			lineFormats: [ , , , , , , , , , , , , , ],
+			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 		};
 		const expected = [
 			{
 				formats: [ , , , , [ em ], [ em ] ],
+				lineFormats: [ , , , , , , ],
+				objects: [ , , , , , , ],
 				text: 'one tw',
 			},
 			{
 				start: 0,
 				end: 0,
 				formats: [ [ em ], , , , , , , ],
+				lineFormats: [ , , , , , , , ],
+				objects: [ , , , , , , , ],
 				text: 'o three',
 			},
 		];
@@ -45,6 +51,8 @@ describe( 'split', () => {
 	it( 'should split with selection', () => {
 		const record = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			lineFormats: [ , , , , , , , , , , , , , ],
+			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 			start: 6,
 			end: 6,
@@ -52,10 +60,14 @@ describe( 'split', () => {
 		const expected = [
 			{
 				formats: [ , , , , [ em ], [ em ] ],
+				lineFormats: [ , , , , , , ],
+				objects: [ , , , , , , ],
 				text: 'one tw',
 			},
 			{
 				formats: [ [ em ], , , , , , , ],
+				lineFormats: [ , , , , , , , ],
+				objects: [ , , , , , , , ],
 				text: 'o three',
 				start: 0,
 				end: 0,
@@ -74,6 +86,8 @@ describe( 'split', () => {
 	it( 'should split empty', () => {
 		const record = {
 			formats: [],
+			lineFormats: [],
+			objects: [],
 			text: '',
 			start: 0,
 			end: 0,
@@ -81,10 +95,14 @@ describe( 'split', () => {
 		const expected = [
 			{
 				formats: [],
+				lineFormats: [],
+				objects: [],
 				text: '',
 			},
 			{
 				formats: [],
+				lineFormats: [],
+				objects: [],
 				text: '',
 				start: 0,
 				end: 0,
@@ -103,6 +121,8 @@ describe( 'split', () => {
 	it( 'should split multiline', () => {
 		const record = {
 			formats: [ , , , , , , , , , , ],
+			lineFormats: [ , , , , , , , , , , ],
+			objects: [ , , , , , , , , , , ],
 			text: 'test\u2028\u2028test',
 			start: 5,
 			end: 5,
@@ -110,10 +130,14 @@ describe( 'split', () => {
 		const expected = [
 			{
 				formats: [ , , , , ],
+				lineFormats: [ , , , , ],
+				objects: [ , , , , ],
 				text: 'test',
 			},
 			{
 				formats: [ , , , , ],
+				lineFormats: [ , , , , ],
+				objects: [ , , , , ],
 				text: 'test',
 				start: 0,
 				end: 0,
@@ -134,33 +158,45 @@ describe( 'split', () => {
 			start: 6,
 			end: 16,
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , , , , , , , , , , , ],
+			lineFormats: [ , , , , , , , , , , , , , , , , , , , , , , , ],
+			objects: [ , , , , , , , , , , , , , , , , , , , , , , , ],
 			text: 'one two three four five',
 		};
 		const expected = [
 			{
 				formats: [ , , , ],
+				lineFormats: [ , , , ],
+				objects: [ , , , ],
 				text: 'one',
 			},
 			{
 				start: 2,
 				end: 3,
 				formats: [ [ em ], [ em ], [ em ] ],
+				lineFormats: [ , , , ],
+				objects: [ , , , ],
 				text: 'two',
 			},
 			{
 				start: 0,
 				end: 5,
 				formats: [ , , , , , ],
+				lineFormats: [ , , , , , ],
+				objects: [ , , , , , ],
 				text: 'three',
 			},
 			{
 				start: 0,
 				end: 2,
 				formats: [ , , , , ],
+				lineFormats: [ , , , , ],
+				objects: [ , , , , ],
 				text: 'four',
 			},
 			{
 				formats: [ , , , , ],
+				lineFormats: [ , , , , ],
+				objects: [ , , , , ],
 				text: 'five',
 			},
 		];
@@ -179,21 +215,29 @@ describe( 'split', () => {
 			start: 5,
 			end: 6,
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			lineFormats: [ , , , , , , , , , , , , , ],
+			objects: [ , , , , , , , , , , , , , ],
 			text: 'one two three',
 		};
 		const expected = [
 			{
 				formats: [ , , , ],
+				lineFormats: [ , , , ],
+				objects: [ , , , ],
 				text: 'one',
 			},
 			{
 				start: 1,
 				end: 2,
 				formats: [ [ em ], [ em ], [ em ] ],
+				lineFormats: [ , , , ],
+				objects: [ , , , ],
 				text: 'two',
 			},
 			{
 				formats: [ , , , , , ],
+				lineFormats: [ , , , , , ],
+				objects: [ , , , , , ],
 				text: 'three',
 			},
 		];

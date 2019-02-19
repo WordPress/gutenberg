@@ -12,8 +12,8 @@ import { LINE_SEPARATOR } from './special-characters';
  *
  * @return {Array} The index of the last child.
  */
-export function getLastChildIndex( { text, formats }, lineIndex ) {
-	const lineFormats = formats[ lineIndex ] || [];
+export function getLastChildIndex( { text, lineFormats }, lineIndex ) {
+	const currentLineFormats = lineFormats[ lineIndex ] || [];
 	// Use the given line index in case there are no next children.
 	let childIndex = lineIndex;
 
@@ -24,11 +24,11 @@ export function getLastChildIndex( { text, formats }, lineIndex ) {
 			continue;
 		}
 
-		const formatsAtIndex = formats[ index ] || [];
+		const formatsAtIndex = lineFormats[ index ] || [];
 
 		// If the amout of formats is equal or more, store it, then return the
 		// last one if the amount of formats is less.
-		if ( formatsAtIndex.length >= lineFormats.length ) {
+		if ( formatsAtIndex.length >= currentLineFormats.length ) {
 			childIndex = index;
 		} else {
 			return childIndex;

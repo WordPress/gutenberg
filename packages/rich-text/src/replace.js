@@ -20,11 +20,12 @@ import { normaliseFormats } from './normalise-formats';
  *
  * @return {Object} A new value with replacements applied.
  */
-export function replace( { formats, text, start, end }, pattern, replacement ) {
+export function replace( { formats, lineFormats, objects, text, start, end }, pattern, replacement ) {
 	text = text.replace( pattern, ( match, ...rest ) => {
 		const offset = rest[ rest.length - 2 ];
 		let newText = replacement;
 		let newFormats;
+		let newObjects;
 
 		if ( typeof newText === 'function' ) {
 			newText = replacement( match, ...rest );
@@ -32,9 +33,11 @@ export function replace( { formats, text, start, end }, pattern, replacement ) {
 
 		if ( typeof newText === 'object' ) {
 			newFormats = newText.formats;
+			newObjects = newText.objects;
 			newText = newText.text;
 		} else {
 			newFormats = Array( newText.length );
+			newObjects = Array( newText.length );
 
 			if ( formats[ offset ] ) {
 				newFormats = newFormats.fill( formats[ offset ] );
@@ -42,6 +45,8 @@ export function replace( { formats, text, start, end }, pattern, replacement ) {
 		}
 
 		formats = formats.slice( 0, offset ).concat( newFormats, formats.slice( offset + match.length ) );
+		lineFormats = lineFormats.slice( 0, offset ).concat( Array( newText.length ), lineFormats.slice( offset + match.length ) );
+		objects = objects.slice( 0, offset ).concat( newObjects, objects.slice( offset + match.length ) );
 
 		if ( start ) {
 			start = end = offset + newText.length;
@@ -50,5 +55,5 @@ export function replace( { formats, text, start, end }, pattern, replacement ) {
 		return newText;
 	} );
 
-	return normaliseFormats( { formats, text, start, end } );
+	return normaliseFormats( { formats, lineFormats, objects, text, start, end } );
 }

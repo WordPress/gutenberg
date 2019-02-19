@@ -25,11 +25,10 @@ export function insertObject(
 	endIndex
 ) {
 	const valueToInsert = {
+		formats: [ , ],
+		lineFormats: [ , ],
+		objects: [ formatToInsert ],
 		text: OBJECT_REPLACEMENT_CHARACTER,
-		formats: [ [ {
-			...formatToInsert,
-			object: true,
-		} ] ],
 	};
 
 	return insert( value, valueToInsert, startIndex, endIndex );

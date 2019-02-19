@@ -332,7 +332,6 @@ provided, text separated by a line separator will be wrapped in it.
 -   **$1** `Object`: Named argements.
 -   **$1.value** `Object`: Rich text value.
 -   **$1.multilineTag** `[string]`: Multiline tag.
--   **$1.multilineWrapperTags** `[Array]`: Tags where lines can be found if nesting is possible.
 
 **Returns**
 

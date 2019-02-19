@@ -19,11 +19,13 @@ import { normaliseFormats } from './normalise-formats';
  * @return {Object} A new value with the value inserted.
  */
 export function insert(
-	{ formats, text, start, end },
+	value,
 	valueToInsert,
-	startIndex = start,
-	endIndex = end
+	startIndex = value.start,
+	endIndex = value.end
 ) {
+	const { formats, lineFormats, objects, text } = value;
+
 	if ( typeof valueToInsert === 'string' ) {
 		valueToInsert = create( { text: valueToInsert } );
 	}
@@ -32,6 +34,8 @@ export function insert(
 
 	return normaliseFormats( {
 		formats: formats.slice( 0, startIndex ).concat( valueToInsert.formats, formats.slice( endIndex ) ),
+		lineFormats: lineFormats.slice( 0, startIndex ).concat( valueToInsert.lineFormats, lineFormats.slice( endIndex ) ),
+		objects: objects.slice( 0, startIndex ).concat( valueToInsert.objects, objects.slice( endIndex ) ),
 		text: text.slice( 0, startIndex ) + valueToInsert.text + text.slice( endIndex ),
 		start: index,
 		end: index,

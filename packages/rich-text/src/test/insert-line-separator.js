@@ -17,12 +17,16 @@ describe( 'insertLineSeparator', () => {
 	it( 'should insert line separator at end', () => {
 		const value = {
 			formats: [ , ],
+			lineFormats: [ , ],
+			objects: [ , ],
 			text: '1',
 			start: 1,
 			end: 1,
 		};
 		const expected = {
 			formats: [ , , ],
+			lineFormats: [ , , ],
+			objects: [ , , ],
 			text: `1${ LINE_SEPARATOR }`,
 			start: 2,
 			end: 2,
@@ -31,18 +35,22 @@ describe( 'insertLineSeparator', () => {
 
 		expect( result ).not.toBe( value );
 		expect( result ).toEqual( expected );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+		expect( getSparseArrayLength( result.lineFormats ) ).toBe( 0 );
 	} );
 
 	it( 'should insert line separator at start', () => {
 		const value = {
 			formats: [ , ],
+			lineFormats: [ , ],
+			objects: [ , ],
 			text: '1',
 			start: 0,
 			end: 0,
 		};
 		const expected = {
 			formats: [ , , ],
+			lineFormats: [ , , ],
+			objects: [ , , ],
 			text: `${ LINE_SEPARATOR }1`,
 			start: 1,
 			end: 1,
@@ -51,38 +59,22 @@ describe( 'insertLineSeparator', () => {
 
 		expect( result ).not.toBe( value );
 		expect( result ).toEqual( expected );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+		expect( getSparseArrayLength( result.lineFormats ) ).toBe( 0 );
 	} );
 
 	it( 'should insert line separator with previous line separator formats', () => {
 		const value = {
-			formats: [ , , , [ ol ], , ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a`,
-			start: 5,
-			end: 5,
-		};
-		const expected = {
-			formats: [ , , , [ ol ], , [ ol ] ],
-			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a${ LINE_SEPARATOR }`,
-			start: 6,
-			end: 6,
-		};
-		const result = insertLineSeparator( deepFreeze( value ) );
-
-		expect( result ).not.toBe( value );
-		expect( result ).toEqual( expected );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 2 );
-	} );
-
-	it( 'should insert line separator without formats if previous line separator did not have any', () => {
-		const value = {
 			formats: [ , , , , , ],
+			lineFormats: [ , , , [ ol ], , ],
+			objects: [ , , , , , ],
 			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a`,
 			start: 5,
 			end: 5,
 		};
 		const expected = {
 			formats: [ , , , , , , ],
+			lineFormats: [ , , , [ ol ], , [ ol ] ],
+			objects: [ , , , , , , ],
 			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a${ LINE_SEPARATOR }`,
 			start: 6,
 			end: 6,
@@ -91,6 +83,30 @@ describe( 'insertLineSeparator', () => {
 
 		expect( result ).not.toBe( value );
 		expect( result ).toEqual( expected );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+		expect( getSparseArrayLength( result.lineFormats ) ).toBe( 2 );
+	} );
+
+	it( 'should insert line separator without formats if previous line separator did not have any', () => {
+		const value = {
+			formats: [ , , , , , ],
+			lineFormats: [ , , , , , ],
+			objects: [ , , , , , ],
+			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a`,
+			start: 5,
+			end: 5,
+		};
+		const expected = {
+			formats: [ , , , , , , ],
+			lineFormats: [ , , , , , , ],
+			objects: [ , , , , , , ],
+			text: `1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }a${ LINE_SEPARATOR }`,
+			start: 6,
+			end: 6,
+		};
+		const result = insertLineSeparator( deepFreeze( value ) );
+
+		expect( result ).not.toBe( value );
+		expect( result ).toEqual( expected );
+		expect( getSparseArrayLength( result.lineFormats ) ).toBe( 0 );
 	} );
 } );

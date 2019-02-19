@@ -17,7 +17,8 @@ describe( 'changeListType', () => {
 
 	it( 'should only change list type if list item is indented', () => {
 		const record = {
-			formats: [ , ],
+			formats: [],
+			lineFormats: [ , ],
 			text: '1',
 			start: 1,
 			end: 1,
@@ -26,27 +27,26 @@ describe( 'changeListType', () => {
 
 		expect( result ).toEqual( record );
 		expect( result ).toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 0 );
+		expect( getSparseArrayLength( result.lineFormats ) ).toBe( 0 );
 	} );
 
 	it( 'should change list type', () => {
 		const record = {
-			formats: [ , [ ul ] ],
+			formats: [],
+			lineFormats: [ , [ ul ] ],
 			text: `1${ LINE_SEPARATOR }`,
 			start: 2,
 			end: 2,
 		};
 		const expected = {
-			formats: [ , [ ol ] ],
-			text: `1${ LINE_SEPARATOR }`,
-			start: 2,
-			end: 2,
+			...record,
+			lineFormats: [ , [ ol ] ],
 		};
 		const result = changeListType( deepFreeze( record ), ol );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 1 );
+		expect( getSparseArrayLength( result.lineFormats ) ).toBe( 1 );
 	} );
 
 	it( 'should outdent with multiple lines selected', () => {
@@ -54,21 +54,20 @@ describe( 'changeListType', () => {
 		const text = `a${ LINE_SEPARATOR }1${ LINE_SEPARATOR }2${ LINE_SEPARATOR }i${ LINE_SEPARATOR }3${ LINE_SEPARATOR }4${ LINE_SEPARATOR }b`;
 
 		const record = {
-			formats: [ , [ ul ], , [ ul ], , [ ul, ul ], , [ ul ], , [ ul ], , , , [ ul ], , ],
+			formats: [],
+			lineFormats: [ , [ ul ], , [ ul ], , [ ul, ul ], , [ ul ], , [ ul ], , , , [ ul ], , ],
 			text,
 			start: 4,
 			end: 9,
 		};
 		const expected = {
-			formats: [ , [ ol ], , [ ol ], , [ ol, ul ], , [ ol ], , [ ol ], , , , [ ul ], , ],
-			text,
-			start: 4,
-			end: 9,
+			...record,
+			lineFormats: [ , [ ol ], , [ ol ], , [ ol, ul ], , [ ol ], , [ ol ], , , , [ ul ], , ],
 		};
 		const result = changeListType( deepFreeze( record ), ol );
 
 		expect( result ).toEqual( expected );
 		expect( result ).not.toBe( record );
-		expect( getSparseArrayLength( result.formats ) ).toBe( 6 );
+		expect( getSparseArrayLength( result.lineFormats ) ).toBe( 6 );
 	} );
 } );
