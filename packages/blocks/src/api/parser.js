@@ -304,11 +304,13 @@ export function getBlockAttributes( blockTypeOrName, innerHTML, attributes = {} 
  * deprecated migrations applied, or the original block if it was both valid
  * and no eligible migrations exist.
  *
- * @param {WPBlock} block Original block object.
+ * @param {WPBlock} block            Original block object.
+ * @param {Object}  parsedAttributes Attributes as parsed from the initial
+ *                                   block markup.
  *
  * @return {WPBlock} Migrated block object.
  */
-export function getMigratedBlock( block ) {
+export function getMigratedBlock( block, parsedAttributes ) {
 	const blockType = getBlockType( block.name );
 
 	const { deprecated: deprecatedDefinitions } = blockType;
@@ -316,14 +318,14 @@ export function getMigratedBlock( block ) {
 		return block;
 	}
 
-	const { originalContent, attributes, innerBlocks } = block;
+	const { originalContent, innerBlocks } = block;
 
 	for ( let i = 0; i < deprecatedDefinitions.length; i++ ) {
 		// A block can opt into a migration even if the block is valid by
 		// defining isEligible on its deprecation. If the block is both valid
 		// and does not opt to migrate, skip.
 		const { isEligible = stubFalse } = deprecatedDefinitions[ i ];
-		if ( block.isValid && ! isEligible( attributes, innerBlocks ) ) {
+		if ( block.isValid && ! isEligible( parsedAttributes, innerBlocks ) ) {
 			continue;
 		}
 
@@ -338,7 +340,7 @@ export function getMigratedBlock( block ) {
 		let migratedAttributes = getBlockAttributes(
 			deprecatedBlockType,
 			originalContent,
-			attributes
+			parsedAttributes
 		);
 
 		// Ignore the deprecation if it produces a block which is not valid.
@@ -364,7 +366,7 @@ export function getMigratedBlock( block ) {
 		const { migrate } = deprecatedBlockType;
 		if ( migrate ) {
 			( [
-				migratedAttributes = attributes,
+				migratedAttributes = parsedAttributes,
 				migratedInnerBlocks = innerBlocks,
 			] = castArray( migrate( migratedAttributes, innerBlocks ) ) );
 		}
@@ -468,7 +470,7 @@ export function createBlockWithFallback( blockNode ) {
 	// invalid, or future serialization attempt results in an error.
 	block.originalContent = innerHTML;
 
-	block = getMigratedBlock( block );
+	block = getMigratedBlock( block, attributes );
 
 	return block;
 }
