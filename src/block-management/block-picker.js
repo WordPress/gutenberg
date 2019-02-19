@@ -18,7 +18,7 @@ import { Component } from '@wordpress/element';
 import { getBlockTypes } from '@wordpress/blocks';
 
 /**
-* WordPress dependencies
+* Internal dependencies
 */
 import styles from './block-picker.scss';
 import { name as unsupportedBlockName } from '../block-types/unsupported-block';
