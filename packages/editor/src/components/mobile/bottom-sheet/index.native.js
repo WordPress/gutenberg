@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, View, KeyboardAvoidingView, Platform } from 'react-native';
+import { Text, View, KeyboardAvoidingView, Platform, PanResponder } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
 
@@ -30,14 +30,19 @@ class BottomSheet extends Component {
 	}
 
 	componentDidMount() {
-		SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
+		this.eventSubscription = SafeArea.addEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	componentWillUnmount() {
+		this.eventSubscription.remove();
+		this.eventSubscription = null;
 		SafeArea.removeEventListener( 'safeAreaInsetsForRootViewDidChange', this.onSafeAreaInsetsUpdate );
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
+		if ( this.eventSubscription === null ) {
+			return;
+		}
 		const { safeAreaInsets } = result;
 		if ( this.state.safeAreaBottomInset !== safeAreaInsets.bottom ) {
 			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
@@ -45,7 +50,18 @@ class BottomSheet extends Component {
 	}
 
 	render() {
-		const { title = '', isVisible, leftButton, rightButton, hideHeader } = this.props;
+		const { title = '', isVisible, leftButton, rightButton, hideHeader, style = {} } = this.props;
+
+		const panResponder = PanResponder.create( {
+			onMoveShouldSetPanResponder: ( evt, gestureState ) => {
+				// Activates swipe down over child Touchables if the swipe is long enough.
+				// With this we can adjust sensibility on the swipe vs tap gestures.
+				if ( gestureState.dy > 3 ) {
+					gestureState.dy = 0;
+					return true;
+				}
+			},
+		} );
 
 		return (
 			<Modal
@@ -60,14 +76,18 @@ class BottomSheet extends Component {
 				onBackButtonPress={ this.props.onClose }
 				onSwipe={ this.props.onClose }
 				swipeDirection="down"
+				onMoveShouldSetResponder={ panResponder.panHandlers.onMoveShouldSetResponder }
+				onMoveShouldSetResponderCapture={ panResponder.panHandlers.onMoveShouldSetResponderCapture }
 			>
 				<KeyboardAvoidingView
 					behavior={ Platform.OS === 'ios' && 'padding' }
-					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)' } }
+					style={ { ...styles.content, borderColor: 'rgba(0, 0, 0, 0.1)', ...style } }
 					keyboardVerticalOffset={ -this.state.safeAreaBottomInset }
 				>
 					<View style={ styles.dragIndicator } />
-					{ hideHeader || (
+					{ hideHeader ? (
+						<View style={ styles.emptyHeaderSpace } />
+					) : (
 						<View>
 							<View style={ styles.head }>
 								<View style={ { flex: 1 } }>
