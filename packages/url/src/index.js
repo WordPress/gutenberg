@@ -214,7 +214,7 @@ export function getQueryArg( url, arg ) {
  * @param {string} url URL
  * @param {string} arg Query arg name
  *
- * @return {boolean} Whether or not the URL contains the query aeg.
+ * @return {boolean} Whether or not the URL contains the query arg.
  */
 export function hasQueryArg( url, arg ) {
 	return getQueryArg( url, arg ) !== undefined;
@@ -286,4 +286,20 @@ export function filterURLForDisplay( url ) {
 	}
 
 	return filteredURL;
+}
+
+/**
+ * Safely decodes a URI component with `decodeURIComponent`. Returns the URI component unmodified if
+ * `decodeURIComponent` throws an error.
+ *
+ * @param {string} uriComponent URI component to decode.
+ *
+ * @return {string} Decoded URI component if possible.
+ */
+export function safeDecodeURIComponent( uriComponent ) {
+	try {
+		return decodeURIComponent( uriComponent );
+	} catch ( uriComponentError ) {
+		return uriComponent;
+	}
 }

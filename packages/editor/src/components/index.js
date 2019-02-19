@@ -23,6 +23,7 @@ export {
 	RichTextShortcut,
 	RichTextToolbarButton,
 	RichTextInserterItem,
+	RichTextInputEvent,
 } from './rich-text';
 export { default as ServerSideRender } from './server-side-render';
 export { default as MediaPlaceholder } from './media-placeholder';

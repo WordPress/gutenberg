@@ -25,44 +25,15 @@ function gutenberg_collect_meta_box_data() {
  * Return whether the post can be edited in Gutenberg and by the current user.
  *
  * @since 0.5.0
+ * @deprecated 5.0.0 use_block_editor_for_post
  *
  * @param int|WP_Post $post Post ID or WP_Post object.
  * @return bool Whether the post can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post( $post ) {
-	$post     = get_post( $post );
-	$can_edit = true;
+	_deprecated_function( __FUNCTION__, '5.0.0', 'use_block_editor_for_post' );
 
-	if ( ! $post ) {
-		$can_edit = false;
-	}
-
-	if ( $can_edit && 'trash' === $post->post_status ) {
-		$can_edit = false;
-	}
-
-	if ( $can_edit && ! gutenberg_can_edit_post_type( $post->post_type ) ) {
-		$can_edit = false;
-	}
-
-	if ( $can_edit && ! current_user_can( 'edit_post', $post->ID ) ) {
-		$can_edit = false;
-	}
-
-	// Disable the editor if on the blog page and there is no content.
-	if ( $can_edit && absint( get_option( 'page_for_posts' ) ) === $post->ID && empty( $post->post_content ) ) {
-		$can_edit = false;
-	}
-
-	/**
-	 * Filter to allow plugins to enable/disable Gutenberg for particular post.
-	 *
-	 * @since 3.5
-	 *
-	 * @param bool $can_edit Whether the post can be edited or not.
-	 * @param WP_Post $post The post being checked.
-	 */
-	return apply_filters( 'gutenberg_can_edit_post', $can_edit, $post );
+	return use_block_editor_for_post( $post );
 
 }
 
@@ -73,34 +44,15 @@ function gutenberg_can_edit_post( $post ) {
  * REST API, then the post cannot be edited in Gutenberg.
  *
  * @since 1.5.2
+ * @deprecated 5.0.0 use_block_editor_for_post_type
  *
  * @param string $post_type The post type.
  * @return bool Whether the post type can be edited with Gutenberg.
  */
 function gutenberg_can_edit_post_type( $post_type ) {
-	$can_edit = true;
-	if ( ! post_type_exists( $post_type ) ) {
-		$can_edit = false;
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0', 'use_block_editor_for_post_type' );
 
-	if ( ! post_type_supports( $post_type, 'editor' ) ) {
-		$can_edit = false;
-	}
-
-	$post_type_object = get_post_type_object( $post_type );
-	if ( $post_type_object && ! $post_type_object->show_in_rest ) {
-		$can_edit = false;
-	}
-
-	/**
-	 * Filter to allow plugins to enable/disable Gutenberg for particular post types.
-	 *
-	 * @since 1.5.2
-	 *
-	 * @param bool   $can_edit  Whether the post type can be edited or not.
-	 * @param string $post_type The post type being checked.
-	 */
-	return apply_filters( 'gutenberg_can_edit_post_type', $can_edit, $post_type );
+	return use_block_editor_for_post_type( $post_type );
 }
 
 /**
@@ -203,67 +155,55 @@ function gutenberg_bulk_post_updated_messages( $messages ) {
  * Injects a hidden input in the edit form to propagate the information that classic editor is selected.
  *
  * @since 1.5.2
+ * @deprecated 5.0.0
  */
 function gutenberg_remember_classic_editor_when_saving_posts() {
-	?>
-	<input type="hidden" name="classic-editor" />
-	<?php
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 }
-add_action( 'edit_form_top', 'gutenberg_remember_classic_editor_when_saving_posts' );
 
 /**
  * Appends a query argument to the redirect url to make sure it gets redirected to the classic editor.
  *
  * @since 1.5.2
+ * @deprecated 5.0.0
  *
  * @param string $url Redirect url.
  * @return string Redirect url.
  */
 function gutenberg_redirect_to_classic_editor_when_saving_posts( $url ) {
-	if ( isset( $_REQUEST['classic-editor'] ) ) {
-		$url = add_query_arg( 'classic-editor', '', $url );
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
+
 	return $url;
 }
-add_filter( 'redirect_post_location', 'gutenberg_redirect_to_classic_editor_when_saving_posts', 10, 1 );
 
 /**
  * Appends a query argument to the edit url to make sure it is redirected to
  * the editor from which the user navigated.
  *
  * @since 1.5.2
+ * @deprecated 5.0.0
  *
  * @param string $url Edit url.
  * @return string Edit url.
  */
 function gutenberg_revisions_link_to_editor( $url ) {
-	global $pagenow;
-	if ( 'revision.php' !== $pagenow || isset( $_REQUEST['gutenberg'] ) ) {
-		return $url;
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 
-	return add_query_arg( 'classic-editor', '', $url );
+	return $url;
 }
-add_filter( 'get_edit_post_link', 'gutenberg_revisions_link_to_editor' );
 
 /**
  * Modifies revisions data to preserve Gutenberg argument used in determining
  * where to redirect user returning to editor.
  *
  * @since 1.9.0
+ * @deprecated 5.0.0
  *
  * @param array $revisions_data The bootstrapped data for the revisions screen.
  * @return array Modified bootstrapped data for the revisions screen.
  */
 function gutenberg_revisions_restore( $revisions_data ) {
-	if ( isset( $_REQUEST['gutenberg'] ) ) {
-		$revisions_data['restoreUrl'] = add_query_arg(
-			'gutenberg',
-			$_REQUEST['gutenberg'],
-			$revisions_data['restoreUrl']
-		);
-	}
+	_deprecated_function( __FUNCTION__, '5.0.0' );
 
 	return $revisions_data;
 }
-add_filter( 'wp_prepare_revision_for_js', 'gutenberg_revisions_restore' );

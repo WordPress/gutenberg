@@ -13,7 +13,7 @@ import { withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 
 /**
- * Internal Dependencies
+ * Internal dependencies
  */
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockIcon from '../block-icon';

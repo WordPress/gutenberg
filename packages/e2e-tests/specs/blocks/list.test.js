@@ -95,6 +95,21 @@ describe( 'List', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should not transform lines in block when transforming multiple blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'one' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.type( '...' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'two' );
+		await page.keyboard.down( 'Shift' );
+		await page.click( '[data-type="core/paragraph"]' );
+		await page.keyboard.up( 'Shift' );
+		await transformBlockTo( 'List' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'can be converted to paragraphs', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
@@ -277,6 +292,27 @@ describe( 'List', () => {
 
 		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'primaryShift', 'm' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert a line break on shift+enter', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert a line break on shift+enter in a non trailing list item', async () => {
+		await insertBlock( 'List' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'b' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'shift', 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

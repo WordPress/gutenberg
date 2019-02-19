@@ -1,4 +1,4 @@
-# Initialize the input control
+# Initialize the Input Control
 
 Now that the field is available in the editor store, it can be surfaced to the UI. The first step will be to extract the input control to a separate function so you can expand its functionality while the code stays clear.
 

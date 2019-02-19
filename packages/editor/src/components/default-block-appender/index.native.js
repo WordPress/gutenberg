@@ -6,11 +6,14 @@ import { TextInput, TouchableWithoutFeedback, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
 import styles from './style.scss';
 
 export function DefaultBlockAppender( {
@@ -23,7 +26,7 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Start writing or press \u2295 to add content' );
+	const value = decodeEntities( placeholder ) || sprintf( __( 'Start writing or press %s to add content' ), '\u2295' );
 
 	return (
 		<TouchableWithoutFeedback

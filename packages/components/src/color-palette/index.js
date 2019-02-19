@@ -8,7 +8,6 @@ import { map } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import Dashicon from '../dashicon';
 
 /**
  * Internal dependencies
@@ -17,6 +16,7 @@ import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
 import ColorPicker from '../color-picker';
+import Dashicon from '../dashicon';
 
 export default function ColorPalette( { colors, disableCustomColors = false, value, onChange, className } ) {
 	function applyOrUnset( color ) {

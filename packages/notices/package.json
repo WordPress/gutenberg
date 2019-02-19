@@ -19,10 +19,10 @@
 	"main": "build/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.0.0",
+		"@babel/runtime": "^7.3.1",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.10"
+		"lodash": "^4.17.11"
 	},
 	"publishConfig": {
 		"access": "public"

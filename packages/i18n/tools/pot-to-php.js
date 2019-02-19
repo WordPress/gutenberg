@@ -53,17 +53,17 @@ function convertTranslationToPHP( translation, textdomain, context = '' ) {
 				NEWLINE;
 		}
 
-		if ( ! isEmpty( comments.extracted ) ) {
+		if ( ! isEmpty( comments.translator ) ) {
 			// All extracted comments are split by newlines, add a tab to line them up nicely.
-			const extracted = comments.extracted
+			const translator = comments.translator
 				.split( NEWLINE )
 				.join( NEWLINE + TAB + '   ' );
 
-			php += TAB + `/* ${ extracted } */${ NEWLINE }`;
+			php += TAB + `/* ${ translator } */${ NEWLINE }`;
 		}
 
-		if ( ! isEmpty( comments.translator ) ) {
-			php += TAB + `/* translators: ${ comments.translator } */${ NEWLINE }`;
+		if ( ! isEmpty( comments.extracted ) ) {
+			php += TAB + `/* translators: ${ comments.extracted } */${ NEWLINE }`;
 		}
 	}
 
