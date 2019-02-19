@@ -1,0 +1,12 @@
+[
+    {
+        "blockName": "core/tag-cloud",
+        "attrs": {
+            "taxonomy": "category",
+            "showTagCounts": true
+        },
+        "innerBlocks": [],
+        "innerHTML": "",
+        "innerContent": []
+    }
+]

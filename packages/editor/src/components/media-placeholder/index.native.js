@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { View, Text, Button } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { Dashicon } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -15,19 +16,17 @@ import styles from './styles.scss';
 
 function MediaPlaceholder( props ) {
 	return (
-		<View style={ styles.emptyStateContainer }>
-			<Text style={ styles.emptyStateTitle }>
-				{ __( 'Image' ) }
-			</Text>
-			<Text style={ styles.emptyStateDescription }>
-				{ __( 'Upload a new image or select a file from your library.' ) }
-			</Text>
-			<View style={ styles.emptyStateButtonsContainer }>
-				<Button title={ __( 'Device Library' ) } onPress={ props.onUploadMediaPressed } />
-				<Button title={ __( 'Take photo' ) } onPress={ props.onCapturePhotoPressed } />
+		<TouchableWithoutFeedback onPress={ props.onMediaOptionsPressed }>
+			<View style={ styles.emptyStateContainer }>
+				<Dashicon icon={ 'format-image' } />
+				<Text style={ styles.emptyStateTitle }>
+					{ __( 'Image' ) }
+				</Text>
+				<Text style={ styles.emptyStateDescription }>
+					{ __( 'CHOOSE IMAGE' ) }
+				</Text>
 			</View>
-			<Button title={ __( 'Media Library' ) } onPress={ props.onMediaLibraryPressed } />
-		</View>
+		</TouchableWithoutFeedback>
 	);
 }
 

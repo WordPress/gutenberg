@@ -1,0 +1,29 @@
+{
+	"name": "@wordpress/edit-widgets",
+	"version": "0.0.1-alpha.0",
+	"private": true,
+	"description": "Widgets Page module for WordPress..",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-widgets/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"dependencies": {
+		"@babel/runtime": "^7.0.0",
+		"@wordpress/element": "file:../element"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

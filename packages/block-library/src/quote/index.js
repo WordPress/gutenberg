@@ -51,7 +51,7 @@ export const settings = {
 	attributes: blockAttributes,
 
 	styles: [
-		{ name: 'default', label: _x( 'Regular', 'block style' ), isDefault: true },
+		{ name: 'default', label: _x( 'Default', 'block style' ), isDefault: true },
 		{ name: 'large', label: _x( 'Large', 'block style' ) },
 	],
 

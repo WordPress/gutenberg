@@ -40,21 +40,24 @@ export default class Picker extends Component {
 			<BottomSheet
 				isVisible={ this.state.isVisible }
 				onClose={ this.onClose }
+				style={ { paddingBottom: 20 } }
 				hideHeader
 			>
 				<View>
 					{ this.props.options.map( ( option, index ) =>
 						<BottomSheet.Cell
+							icon={ option.icon }
 							key={ index }
 							label={ option.label }
+							separatorType={ 'none' }
 							onPress={ () => this.onCellPress( option.value ) }
 						/>
 					) }
-					<BottomSheet.Cell
+					{ ! this.props.hideCancelButton && <BottomSheet.Cell
 						label={ __( 'Cancel' ) }
 						onPress={ this.onClose }
-						drawSeparator={ false }
-					/>
+						separatorType={ 'none' }
+					/> }
 				</View>
 			</BottomSheet>
 		);

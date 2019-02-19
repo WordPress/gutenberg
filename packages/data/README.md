@@ -139,6 +139,10 @@ The `controls` option should be passed as an object where each key is the name o
 
 Refer to the [documentation of `@wordpress/redux-routine`](/packages/redux-routine/README.md) for more information.
 
+### `initialState`
+
+An optional preloaded initial state for the store. You may use this to restore some serialized state value or a state generated server-side.
+
 ## Data Access and Manipulation
 
 It is very rare that you should access store methods directly. Instead, the following suite of functions and higher-order components is provided for the most common data access and manipulation needs.
